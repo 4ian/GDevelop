@@ -63,8 +63,9 @@
 				<Option output="bin\dev\PlayWin" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin\dev" />
 				<Option object_output="obj\dev\" />
-				<Option type="0" />
+				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -111,7 +112,21 @@
 			<Add directory="C:\Libs\SFML\lib\mingw" />
 		</Linker>
 		<Unit filename="..\..\..\..\..\Libs\dlib-17.12\dlib\all\source.cpp" />
-		<Unit filename="CompilationChecker.cpp" />
+		<Unit filename="..\GDL\GDL\tinystr.cpp">
+			<Option target="Debug" />
+		</Unit>
+		<Unit filename="..\GDL\GDL\tinyxml.cpp">
+			<Option target="Debug" />
+		</Unit>
+		<Unit filename="..\GDL\GDL\tinyxmlerror.cpp">
+			<Option target="Debug" />
+		</Unit>
+		<Unit filename="..\GDL\GDL\tinyxmlparser.cpp">
+			<Option target="Debug" />
+		</Unit>
+		<Unit filename="CompilationChecker.cpp">
+			<Option weight="60" />
+		</Unit>
 		<Unit filename="CompilationChecker.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>

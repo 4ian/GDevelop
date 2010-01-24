@@ -13,7 +13,7 @@
 #include <wx/animate.h>
 #include <wx/filename.h>
 
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 
 
 //(*IdInit(ImportImage)
@@ -111,7 +111,7 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	wxFlexGridSizer* FlexGridSizer11;
 	wxFlexGridSizer* FlexGridSizer17;
 	wxStaticBoxSizer* StaticBoxSizer5;
-	
+
 	Create(parent, wxID_ANY, _("Importer des images"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
@@ -307,7 +307,7 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	colorDialog = new wxColourDialog(this);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ImportImage::OnFileGIFEditText);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ImportImage::OnBrowseGIFBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ImportImage::OnDecomposeGIFBtClick);

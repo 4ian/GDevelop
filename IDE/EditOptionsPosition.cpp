@@ -14,7 +14,7 @@
 #include "GDL/Chercher.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include <wx/help.h>
 #include <sstream>
 #include <string>

@@ -6,7 +6,7 @@
 //*)
 #include <wx/colordlg.h>
 #include <wx/log.h>
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 
 //(*IdInit(GridSetup)
 const long GridSetup::ID_STATICTEXT3 = wxNewId();

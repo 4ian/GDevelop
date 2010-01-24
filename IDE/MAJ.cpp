@@ -10,7 +10,7 @@
 //*)
 #include "CheckMAJ.h"
 #include "tinyxml.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "GDL/VersionWrapper.h"
 #include <wx/log.h>
 #include <wx/mimetype.h>

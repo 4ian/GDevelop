@@ -24,7 +24,7 @@
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
 #include "GDL/Chercher.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "GDL/needReload.h"
 #include "MemTrace.h"
 #include "Clipboard.h"

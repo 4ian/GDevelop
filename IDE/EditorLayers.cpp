@@ -8,7 +8,7 @@
 //*)
 #include <wx/config.h>
 #include <wx/log.h>
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "ObjectsOnBadLayerBox.h"
 #include "EditLayer.h"
 #ifdef __WXGTK__

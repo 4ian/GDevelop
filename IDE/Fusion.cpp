@@ -21,7 +21,7 @@
 
 #endif
 
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "GDL/Game.h"
 #include "GDL/ChercherScene.h"
 #include "GDL/OpenSaveGame.h"

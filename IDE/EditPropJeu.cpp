@@ -13,7 +13,7 @@
 #include <wx/string.h>
 //*)
 #include "sstream"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include <wx/help.h>
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>

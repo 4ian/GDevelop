@@ -33,7 +33,7 @@
 #include "gdTreeItemStringData.h"
 #include "Extensions.h"
 
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "TranslateAction.h"
 
 

@@ -8,7 +8,7 @@
 //*)
 #include <wx/toolbar.h>
 #include <wx/image.h>
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 
 #ifdef ___WXMSW___
 #include <wx/msw/winundef.h>

@@ -23,7 +23,7 @@
 #include <vector>
 #include <wx/log.h>
 #include "GDL/Position.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include <stdexcept>
 
 using namespace std;

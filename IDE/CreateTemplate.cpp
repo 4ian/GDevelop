@@ -17,7 +17,7 @@
 
 #include "GDL/Game.h"
 #include "GDL/OpenSaveGame.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 
 using namespace std;
 

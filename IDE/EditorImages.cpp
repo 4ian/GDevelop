@@ -33,7 +33,7 @@
 
 #include "Game_Develop_EditorMain.h"
 #include "GDL/Game.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "MemTrace.h"
 #include "GDL/ChoixDossier.h"
 #include "CppUnitLite/TestHarness.h"

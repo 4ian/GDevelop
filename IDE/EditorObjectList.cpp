@@ -25,7 +25,7 @@
 #include "GDL/Object.h"
 #include "GDL/Chercher.h"
 #include "GDL/ExtensionsManager.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "GDL/needReload.h"
 #include "MemTrace.h"
 #include "Clipboard.h"
@@ -33,7 +33,7 @@
 #include <numeric>
 #include "EditorObjetsGroups.h"
 #include "GDL/BitmapGUIManager.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "DndTextObjectsEditor.h"
 #include "ObjectTypeChoice.h"
 #include "InitialVariablesDialog.h"

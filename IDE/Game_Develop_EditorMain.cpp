@@ -57,7 +57,7 @@ extern MemTrace MemTracer;
 #endif
 
 #include "Game_Develop_EditorMain.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "GDL/ChercherScene.h"
 #include "GDL/OpenSaveGame.h"
 #include "ChoixObjet.h"

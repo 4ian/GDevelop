@@ -39,7 +39,7 @@
 #include "GDL/BitmapGUIManager.h"
 #include "TranslateCondition.h"
 #include "MemTrace.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 
 extern MemTrace MemTracer;
 

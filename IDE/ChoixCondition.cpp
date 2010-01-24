@@ -52,7 +52,7 @@
 
 #include <string>
 #include <vector>
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "MemTrace.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"

@@ -50,7 +50,7 @@
 #include "GDL/Game.h"
 #include "GDL/OpenSaveGame.h"
 #include <wx/log.h>
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "RecentList.h"
 #include "GDL/needReload.h"
 class RuntimeGame;

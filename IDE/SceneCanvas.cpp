@@ -13,7 +13,7 @@
 #include <sstream>
 #include "GDL/Chercher.h"
 #include "GDL/algo.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "EditOptionsPosition.h"
 #include <wx/log.h>
 #include <wx/scrolbar.h>

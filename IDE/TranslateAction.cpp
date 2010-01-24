@@ -11,7 +11,7 @@
 #include <sstream>
 #include <wx/log.h>
 #include "MemTrace.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include "GDL/BitmapGUIManager.h"
 #include "GDL/ExtensionBase.h"
 #include "tinyxml.h"

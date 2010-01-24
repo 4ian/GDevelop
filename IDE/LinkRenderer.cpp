@@ -9,7 +9,7 @@
 #include <wx/brush.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 
 #ifdef DEBUG
 

@@ -55,7 +55,7 @@
 #include "CommentaireRenderer.h"
 #include "EventRenderer.h"
 #include "Clipboard.h"
-#include "StdAlgo.h"
+#include "GDL/StdAlgo.h"
 #include <time.h>
 
 

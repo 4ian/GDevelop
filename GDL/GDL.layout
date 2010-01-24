@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
+	<ActiveTarget name="Debug" />
 	<File name="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\Failure.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="23" topLine="0" />
 	</File>
@@ -29,7 +29,7 @@
 		<Cursor position="320" topLine="0" />
 	</File>
 	<File name="GDL\DrawerObject.cpp" open="0" top="0" tabpos="11">
-		<Cursor position="6232" topLine="178" />
+		<Cursor position="5857" topLine="155" />
 	</File>
 	<File name="GDL\DrawerObjectEditor.cpp" open="0" top="0" tabpos="12">
 		<Cursor position="210" topLine="0" />
@@ -82,8 +82,8 @@
 	<File name="GDL\Game.cpp" open="0" top="0" tabpos="38">
 		<Cursor position="995" topLine="7" />
 	</File>
-	<File name="GDL\ImageManager.cpp" open="0" top="0" tabpos="43">
-		<Cursor position="201" topLine="0" />
+	<File name="GDL\ImageManager.cpp" open="1" top="0" tabpos="43">
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="GDL\ListVariable.cpp" open="0" top="0" tabpos="39">
 		<Cursor position="238" topLine="0" />
@@ -96,6 +96,9 @@
 	</File>
 	<File name="GDL\Object.cpp" open="0" top="0" tabpos="16">
 		<Cursor position="1552" topLine="55" />
+	</File>
+	<File name="GDL\ObjectsConcerned.cpp" open="1" top="0" tabpos="10">
+		<Cursor position="5038" topLine="93" />
 	</File>
 	<File name="GDL\OpenSaveGame.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="32112" topLine="700" />
@@ -116,10 +119,10 @@
 		<Cursor position="736" topLine="27" />
 	</File>
 	<File name="GDL\RuntimeScene.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="5800" topLine="84" />
+		<Cursor position="4467" topLine="73" />
 	</File>
-	<File name="GDL\RuntimeScene.h" open="0" top="0" tabpos="8">
-		<Cursor position="3310" topLine="93" />
+	<File name="GDL\RuntimeScene.h" open="1" top="0" tabpos="9">
+		<Cursor position="2400" topLine="54" />
 	</File>
 	<File name="GDL\Scene.cpp" open="0" top="0" tabpos="41">
 		<Cursor position="498" topLine="13" />
@@ -202,7 +205,7 @@
 	<File name="GDL\cScale.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="591" topLine="7" />
 	</File>
-	<File name="GDL\eObjectFunctions.cpp" open="1" top="0" tabpos="2">
+	<File name="GDL\eObjectFunctions.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="295" topLine="0" />
 	</File>
 	<File name="GDL\sf_classes_1.pypp.cpp" open="0" top="0" tabpos="25">

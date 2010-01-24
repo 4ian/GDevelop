@@ -1,0 +1,31 @@
+#include "GDL/NetworkExtension.h"
+#include "GDL/aNet.h"
+
+NetworkExtension::NetworkExtension()
+{
+    DECLARE_THE_EXTENSION("BuiltinNetwork",
+                          _("Fonctionnalités réseau"),
+                          _("Extension pour utiliser internet, integrée en standard"),
+                          "Compil Games",
+                          "Freeware")
+
+    DECLARE_ACTION("EnvoiDataNet",
+                   _("Envoyer des données sur internet"),
+                   _("Envoie les données spécifié à un site web.\nVous avez besoin de mettre en place une page php sur votre site web permettant de récolter ces données.\nEntrez un mot de passe, et appliquez le même à la configuration de votre page php.\nPour plus d'informations sur la mise en place de votre site, consultez l'aide."),
+                   _("Envoyer à _PARAM0_ les données : _PARAM2_, _PARAM3_,_PARAM4_,_PARAM5_,_PARAM6_,_PARAM7_"),
+                   _("Réseau"),
+                   "res/actions/net24.png",
+                   "res/actions/net.png",
+                   &ActEnvoiDataNet);
+
+        DECLARE_PARAMETER("", _("Adresse de la page .php"), false, "")
+        DECLARE_PARAMETER("password", _("Mot de passe de sécurité"), false, "")
+        DECLARE_PARAMETER("texte", _("Donnée 1"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("texte", _("Donnée 2"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("texte", _("Donnée 3"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("texte", _("Donnée 4"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("texte", _("Donnée 5"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("texte", _("Donnée 6"), false, "")
+
+    DECLARE_END_ACTION()
+}

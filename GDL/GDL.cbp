@@ -1,0 +1,680 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Game Develop Library" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Option virtualFolders="LIB fparser\;LIB CppUnitLite\;LIB nwidgets\;md5\;" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\Runtime\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-DGDP" />
+					<Add option="-DDEBUG" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lsfml-audio-d.dll" />
+					<Add option="-lsfml-graphics-d.dll" />
+					<Add option="-lsfml-window-d.dll" />
+					<Add option="-lsfml-system-d.dll" />
+					<Add option="-lgmon" />
+				</Linker>
+			</Target>
+			<Target title="Debug - Edittime">
+				<Option output="..\IDE\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug Edittime\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DGDE" />
+					<Add option="-DDEBUG" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DPYSUPPORT" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-D__WXDEBUG__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="C:\Python26\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lwxmsw29d_xrc" />
+					<Add option="-lwxmsw29d_richtext" />
+					<Add option="-lwxmsw29d_ribbon" />
+					<Add option="-lwxmsw29d_aui" />
+					<Add option="-lwxmsw29d_adv" />
+					<Add option="-lwxmsw29d_html" />
+					<Add option="-lwxmsw29d_core" />
+					<Add option="-lwxbase29d_xml" />
+					<Add option="-lwxbase29d_net" />
+					<Add option="-lwxexpatd" />
+					<Add option="-lwxbase29d" />
+					<Add option="-lwxpngd" />
+					<Add option="-lwxjpegd" />
+					<Add option="-lwxzlibd" />
+					<Add option="-lwxtiffd" />
+					<Add option="-lsfml-audio-d.dll" />
+					<Add option="-lsfml-graphics-d.dll" />
+					<Add option="-lsfml-window-d.dll" />
+					<Add option="-lsfml-system-d.dll" />
+					<Add option="-lkernel32" />
+					<Add option="-luser32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-luuid" />
+					<Add option="-lshell32" />
+					<Add option="-lole32" />
+					<Add option="-lwinspool" />
+					<Add option="-ladvapi32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-loleaut32" />
+					<Add library="C:\Libs\boost_1_38_0\bin.v2\libs\python\build\gcc-mingw-4.3.2\release\threading-multi\boost_python-mgw43-mt-1_38.lib" />
+					<Add library="C:\Python26\libs\libpython26.a" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="..\Runtime\bin\release\gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DGDP" />
+					<Add option="-DRELEASE" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lsfml-audio.dll" />
+					<Add option="-lsfml-graphics.dll" />
+					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-system.dll" />
+				</Linker>
+			</Target>
+			<Target title="Release - Edittime">
+				<Option output="..\IDE\bin\release\gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release Edittime\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DGDE" />
+					<Add option="-DRELEASE" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DPYSUPPORT" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DWXUSINGDLL" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="C:\Python26\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lwxmsw29_xrc" />
+					<Add option="-lwxmsw29_richtext" />
+					<Add option="-lwxmsw29_ribbon" />
+					<Add option="-lwxmsw29_aui" />
+					<Add option="-lwxmsw29_adv" />
+					<Add option="-lwxmsw29_html" />
+					<Add option="-lwxmsw29_core" />
+					<Add option="-lwxbase29_xml" />
+					<Add option="-lwxbase29_net" />
+					<Add option="-lwxexpat" />
+					<Add option="-lwxbase29" />
+					<Add option="-lwxpng" />
+					<Add option="-lwxjpeg" />
+					<Add option="-lwxzlib" />
+					<Add option="-lwxtiff" />
+					<Add option="-lsfml-audio.dll" />
+					<Add option="-lsfml-graphics.dll" />
+					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-system.dll" />
+					<Add option="-lkernel32" />
+					<Add option="-luser32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-luuid" />
+					<Add option="-lshell32" />
+					<Add option="-lole32" />
+					<Add option="-lwinspool" />
+					<Add option="-ladvapi32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-loleaut32" />
+					<Add library="C:\Libs\boost_1_38_0\bin.v2\libs\python\build\gcc-mingw-4.3.2\release\threading-multi\boost_python-mgw43-mt-1_38.lib" />
+					<Add library="C:\Python26\libs\libpython26.a" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
+				</Linker>
+			</Target>
+			<Target title="Development">
+				<Option output="..\Runtime\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Dev\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DGDP" />
+					<Add option="-DRELEASE" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lsfml-audio.dll" />
+					<Add option="-lsfml-graphics.dll" />
+					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-system.dll" />
+				</Linker>
+			</Target>
+			<Target title="Development - Edittime">
+				<Option output="..\IDE\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Dev Edittime\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DGDE" />
+					<Add option="-DRELEASE" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DPYSUPPORT" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DWXUSINGDLL" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="C:\Python26\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lwxmsw29_xrc" />
+					<Add option="-lwxmsw29_richtext" />
+					<Add option="-lwxmsw29_ribbon" />
+					<Add option="-lwxmsw29_aui" />
+					<Add option="-lwxmsw29_adv" />
+					<Add option="-lwxmsw29_html" />
+					<Add option="-lwxmsw29_core" />
+					<Add option="-lwxbase29_xml" />
+					<Add option="-lwxbase29_net" />
+					<Add option="-lwxexpat" />
+					<Add option="-lwxbase29" />
+					<Add option="-lwxpng" />
+					<Add option="-lwxjpeg" />
+					<Add option="-lwxzlib" />
+					<Add option="-lwxtiff" />
+					<Add option="-lsfml-audio.dll" />
+					<Add option="-lsfml-graphics.dll" />
+					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-system.dll" />
+					<Add option="-lkernel32" />
+					<Add option="-luser32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-luuid" />
+					<Add option="-lshell32" />
+					<Add option="-lole32" />
+					<Add option="-lwinspool" />
+					<Add option="-ladvapi32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-loleaut32" />
+					<Add library="C:\Libs\boost_1_38_0\bin.v2\libs\python\build\gcc-mingw-4.3.2\release\threading-multi\boost_python-mgw43-mt-1_38.lib" />
+					<Add library="C:\Python26\libs\libpython26.a" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-DGD_API=__declspec(dllexport)" />
+			<Add directory="C:\Users\Florian\Programmation\GameDevelop\GDL" />
+			<Add directory="C:\Libs\boost_1_38_0" />
+			<Add directory="C:\Python26\include" />
+			<Add directory="C:\Libs\SFML\include" />
+			<Add directory="C:\Libs\fparser" />
+			<Add directory="C:\Users\Florian\Programmation\nwidgets" />
+			<Add directory="C:\Libs\dlib-17.12" />
+			<Add directory="C:\Libs\CppUnitLite" />
+		</Compiler>
+		<Linker>
+			<Add option="-lmingw32" />
+			<Add option="-lopengl32" />
+			<Add option="-limm32" />
+			<Add option="-lcomctl32" />
+			<Add option="-lglu32" />
+			<Add option="-lws2_32" />
+			<Add option="-lgdi32" />
+			<Add option="-lwinmm" />
+			<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
+			<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
+			<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+			<Add directory="C:\Libs\SFML\lib\mingw" />
+		</Linker>
+		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\Failure.cpp">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\Failure.h">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\SimpleString.cpp">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\SimpleString.h">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\Test.cpp">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\Test.h">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\TestHarness.h">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\TestRegistry.cpp">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\TestRegistry.h">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\TestResult.cpp">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\TestResult.h">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="..\..\..\..\..\Libs\dlib-17.12\dlib\all\source.cpp" />
+		<Unit filename="..\..\..\..\..\Libs\fparser\fparser.cc">
+			<Option virtualFolder="LIB fparser\" />
+		</Unit>
+		<Unit filename="GDL\Access.cpp" />
+		<Unit filename="GDL\Access.h" />
+		<Unit filename="GDL\AdvancedExtension.cpp" />
+		<Unit filename="GDL\AdvancedExtension.h" />
+		<Unit filename="GDL\AjoutPlusImage.cpp" />
+		<Unit filename="GDL\AjoutPlusImage.h" />
+		<Unit filename="GDL\Animation.cpp" />
+		<Unit filename="GDL\Animation.h" />
+		<Unit filename="GDL\AppelEvent.cpp" />
+		<Unit filename="GDL\AppelEvent.h" />
+		<Unit filename="GDL\AudioExtension.cpp" />
+		<Unit filename="GDL\AudioExtension.h" />
+		<Unit filename="GDL\BBDConditions.cpp" />
+		<Unit filename="GDL\BBDConditions.h" />
+		<Unit filename="GDL\BaseDebugger.cpp" />
+		<Unit filename="GDL\BaseDebugger.h" />
+		<Unit filename="GDL\BaseObjectExtension.cpp" />
+		<Unit filename="GDL\BaseObjectExtension.h" />
+		<Unit filename="GDL\BaseObjectExtension2.cpp" />
+		<Unit filename="GDL\BitmapGUIManager.cpp" />
+		<Unit filename="GDL\BitmapGUIManager.h" />
+		<Unit filename="GDL\CameraExtension.cpp" />
+		<Unit filename="GDL\CameraExtension.h" />
+		<Unit filename="GDL\Chercher.cpp" />
+		<Unit filename="GDL\Chercher.h" />
+		<Unit filename="GDL\ChercherScene.cpp" />
+		<Unit filename="GDL\ChercherScene.h" />
+		<Unit filename="GDL\ChoixDossier.cpp" />
+		<Unit filename="GDL\ChoixDossier.h" />
+		<Unit filename="GDL\Collisions.cpp" />
+		<Unit filename="GDL\Collisions.h" />
+		<Unit filename="GDL\DatFile.cpp" />
+		<Unit filename="GDL\DatFile.h" />
+		<Unit filename="GDL\Direction.cpp" />
+		<Unit filename="GDL\Direction.h" />
+		<Unit filename="GDL\Dossier.cpp" />
+		<Unit filename="GDL\Dossier.h" />
+		<Unit filename="GDL\DrawerObject.cpp" />
+		<Unit filename="GDL\DrawerObject.h" />
+		<Unit filename="GDL\DrawerObjectEditor.cpp" />
+		<Unit filename="GDL\DrawerObjectEditor.h" />
+		<Unit filename="GDL\EditorImages.cpp" />
+		<Unit filename="GDL\EditorImages.h" />
+		<Unit filename="GDL\EditorObjet.cpp" />
+		<Unit filename="GDL\EditorObjet.h" />
+		<Unit filename="GDL\ErrorReport.cpp" />
+		<Unit filename="GDL\ErrorReport.h" />
+		<Unit filename="GDL\Event.cpp" />
+		<Unit filename="GDL\Event.h" />
+		<Unit filename="GDL\EventsPreprocessor.cpp" />
+		<Unit filename="GDL\EventsPreprocessor.h" />
+		<Unit filename="GDL\ExpressionInstruction.cpp" />
+		<Unit filename="GDL\ExpressionInstruction.h" />
+		<Unit filename="GDL\ExtensionBase.cpp" />
+		<Unit filename="GDL\ExtensionBase.h" />
+		<Unit filename="GDL\ExtensionsLoader.cpp">
+			<Option weight="60" />
+		</Unit>
+		<Unit filename="GDL\ExtensionsLoader.h" />
+		<Unit filename="GDL\ExtensionsManager.cpp" />
+		<Unit filename="GDL\ExtensionsManager.h" />
+		<Unit filename="GDL\FileExtension.cpp" />
+		<Unit filename="GDL\FileExtension.h" />
+		<Unit filename="GDL\FontManager.cpp" />
+		<Unit filename="GDL\FontManager.h" />
+		<Unit filename="GDL\Force.cpp" />
+		<Unit filename="GDL\Force.h" />
+		<Unit filename="GDL\GDExpression.cpp" />
+		<Unit filename="GDL\GDExpression.h" />
+		<Unit filename="GDL\GDL.cbp" />
+		<Unit filename="GDL\GDL.depend" />
+		<Unit filename="GDL\Game.cpp" />
+		<Unit filename="GDL\Game.h" />
+		<Unit filename="GDL\Image.cpp" />
+		<Unit filename="GDL\Image.h" />
+		<Unit filename="GDL\ImageManager.cpp" />
+		<Unit filename="GDL\ImageManager.h" />
+		<Unit filename="GDL\ImageStruct.h" />
+		<Unit filename="GDL\Instruction.cpp" />
+		<Unit filename="GDL\Instruction.h" />
+		<Unit filename="GDL\InterfaceExtension.cpp" />
+		<Unit filename="GDL\InterfaceExtension.h" />
+		<Unit filename="GDL\JoystickExtension.cpp" />
+		<Unit filename="GDL\JoystickExtension.h" />
+		<Unit filename="GDL\KeyboardExtension.cpp" />
+		<Unit filename="GDL\KeyboardExtension.h" />
+		<Unit filename="GDL\Layer.cpp" />
+		<Unit filename="GDL\Layer.h" />
+		<Unit filename="GDL\ListVariable.cpp" />
+		<Unit filename="GDL\ListVariable.h" />
+		<Unit filename="GDL\LoadingScreen.cpp" />
+		<Unit filename="GDL\LoadingScreen.h" />
+		<Unit filename="GDL\Log.cpp">
+			<Option weight="62" />
+		</Unit>
+		<Unit filename="GDL\Log.h" />
+		<Unit filename="GDL\MainEditorCommand.cpp" />
+		<Unit filename="GDL\MainEditorCommand.h" />
+		<Unit filename="GDL\ManualTimer.cpp" />
+		<Unit filename="GDL\ManualTimer.h" />
+		<Unit filename="GDL\McbDES2.hpp" />
+		<Unit filename="GDL\MemTrace.cpp" />
+		<Unit filename="GDL\MemTrace.h" />
+		<Unit filename="GDL\Modules.cpp" />
+		<Unit filename="GDL\Modules.h" />
+		<Unit filename="GDL\MouseExtension.cpp" />
+		<Unit filename="GDL\MouseExtension.h" />
+		<Unit filename="GDL\Music.cpp" />
+		<Unit filename="GDL\Music.h" />
+		<Unit filename="GDL\NetworkExtension.cpp" />
+		<Unit filename="GDL\NetworkExtension.h" />
+		<Unit filename="GDL\Object.cpp" />
+		<Unit filename="GDL\Object.h" />
+		<Unit filename="GDL\ObjectGroup.cpp" />
+		<Unit filename="GDL\ObjectGroup.h" />
+		<Unit filename="GDL\ObjectStruct.h" />
+		<Unit filename="GDL\ObjectType.cpp" />
+		<Unit filename="GDL\ObjectType.h" />
+		<Unit filename="GDL\ObjectWithOpacity.cpp" />
+		<Unit filename="GDL\ObjectWithOpacity.h" />
+		<Unit filename="GDL\ObjectsConcerned.cpp" />
+		<Unit filename="GDL\ObjectsConcerned.h" />
+		<Unit filename="GDL\OpenSaveGame.cpp" />
+		<Unit filename="GDL\OpenSaveGame.h" />
+		<Unit filename="GDL\OpenSaveLoadingScreen.cpp" />
+		<Unit filename="GDL\OpenSaveLoadingScreen.h" />
+		<Unit filename="GDL\Point.cpp" />
+		<Unit filename="GDL\Point.h" />
+		<Unit filename="GDL\Position.cpp" />
+		<Unit filename="GDL\Position.h" />
+		<Unit filename="GDL\PrimitiveDrawingExtension.cpp" />
+		<Unit filename="GDL\PrimitiveDrawingExtension.h" />
+		<Unit filename="GDL\PropImage.cpp" />
+		<Unit filename="GDL\PropImage.h" />
+		<Unit filename="GDL\RessourcesLoader.cpp" />
+		<Unit filename="GDL\RessourcesLoader.h" />
+		<Unit filename="GDL\RuntimeGame.cpp" />
+		<Unit filename="GDL\RuntimeGame.h" />
+		<Unit filename="GDL\RuntimeScene.cpp" />
+		<Unit filename="GDL\RuntimeScene.h" />
+		<Unit filename="GDL\Scene.cpp" />
+		<Unit filename="GDL\Scene.h" />
+		<Unit filename="GDL\SceneExtension.cpp" />
+		<Unit filename="GDL\SceneExtension.h" />
+		<Unit filename="GDL\Son.cpp" />
+		<Unit filename="GDL\Son.h" />
+		<Unit filename="GDL\SortByPlan.h" />
+		<Unit filename="GDL\SortBySurface.h" />
+		<Unit filename="GDL\SoundManager.cpp" />
+		<Unit filename="GDL\SoundManager.h" />
+		<Unit filename="GDL\Sprite.cpp" />
+		<Unit filename="GDL\Sprite.h" />
+		<Unit filename="GDL\SpriteExtension.cpp" />
+		<Unit filename="GDL\SpriteExtension.h" />
+		<Unit filename="GDL\SpriteInitialPositionPanel.cpp" />
+		<Unit filename="GDL\SpriteInitialPositionPanel.h" />
+		<Unit filename="GDL\SpriteObject.cpp" />
+		<Unit filename="GDL\SpriteObject.h" />
+		<Unit filename="GDL\StdAlgo.cpp" />
+		<Unit filename="GDL\StdAlgo.h" />
+		<Unit filename="GDL\Text.cpp" />
+		<Unit filename="GDL\Text.h" />
+		<Unit filename="GDL\TextExtension.cpp" />
+		<Unit filename="GDL\TextExtension.h" />
+		<Unit filename="GDL\TextObject.cpp" />
+		<Unit filename="GDL\TextObject.h" />
+		<Unit filename="GDL\TextObjectEditor.cpp" />
+		<Unit filename="GDL\TextObjectEditor.h" />
+		<Unit filename="GDL\TimeExtension.cpp" />
+		<Unit filename="GDL\TimeExtension.h" />
+		<Unit filename="GDL\Variable.cpp" />
+		<Unit filename="GDL\Variable.h" />
+		<Unit filename="GDL\VariablesExtension.cpp" />
+		<Unit filename="GDL\VariablesExtension.h" />
+		<Unit filename="GDL\Version.cpp">
+			<Option weight="64" />
+		</Unit>
+		<Unit filename="GDL\Version.h" />
+		<Unit filename="GDL\VersionWrapper.cpp">
+			<Option weight="64" />
+		</Unit>
+		<Unit filename="GDL\VersionWrapper.h" />
+		<Unit filename="GDL\WindowExtension.cpp" />
+		<Unit filename="GDL\WindowExtension.h" />
+		<Unit filename="GDL\aADS.cpp" />
+		<Unit filename="GDL\aADS.h" />
+		<Unit filename="GDL\aAdvanced.cpp" />
+		<Unit filename="GDL\aAdvanced.h" />
+		<Unit filename="GDL\aCamera.cpp" />
+		<Unit filename="GDL\aCamera.h" />
+		<Unit filename="GDL\aEffects.cpp" />
+		<Unit filename="GDL\aEffects.h" />
+		<Unit filename="GDL\aFichier.cpp" />
+		<Unit filename="GDL\aFichier.h" />
+		<Unit filename="GDL\aGUI.cpp" />
+		<Unit filename="GDL\aGUI.h" />
+		<Unit filename="GDL\aJoystick.cpp" />
+		<Unit filename="GDL\aJoystick.h" />
+		<Unit filename="GDL\aLayer.cpp" />
+		<Unit filename="GDL\aLayer.h" />
+		<Unit filename="GDL\aMove.cpp" />
+		<Unit filename="GDL\aMove.h" />
+		<Unit filename="GDL\aMusic.cpp" />
+		<Unit filename="GDL\aMusic.h" />
+		<Unit filename="GDL\aNet.cpp" />
+		<Unit filename="GDL\aNet.h" />
+		<Unit filename="GDL\aObjet.cpp" />
+		<Unit filename="GDL\aObjet.h" />
+		<Unit filename="GDL\aPlans.cpp" />
+		<Unit filename="GDL\aPlans.h" />
+		<Unit filename="GDL\aPosition.cpp" />
+		<Unit filename="GDL\aPosition.h" />
+		<Unit filename="GDL\aScale.cpp" />
+		<Unit filename="GDL\aScale.h" />
+		<Unit filename="GDL\aScene.cpp" />
+		<Unit filename="GDL\aScene.h" />
+		<Unit filename="GDL\aSouris.cpp" />
+		<Unit filename="GDL\aSouris.h" />
+		<Unit filename="GDL\aTexte.cpp" />
+		<Unit filename="GDL\aTexte.h" />
+		<Unit filename="GDL\aTime.cpp" />
+		<Unit filename="GDL\aTime.h" />
+		<Unit filename="GDL\aVariables.cpp" />
+		<Unit filename="GDL\aVariables.h" />
+		<Unit filename="GDL\aVisibilite.cpp" />
+		<Unit filename="GDL\aVisibilite.h" />
+		<Unit filename="GDL\aWindow.cpp" />
+		<Unit filename="GDL\aWindow.h" />
+		<Unit filename="GDL\actions.cpp" />
+		<Unit filename="GDL\actions.h" />
+		<Unit filename="GDL\algo.cpp" />
+		<Unit filename="GDL\algo.h" />
+		<Unit filename="GDL\btAlignedAllocator.h" />
+		<Unit filename="GDL\btScalar.h" />
+		<Unit filename="GDL\cADS.cpp" />
+		<Unit filename="GDL\cADS.h" />
+		<Unit filename="GDL\cCamera.cpp" />
+		<Unit filename="GDL\cCamera.h" />
+		<Unit filename="GDL\cClavier.cpp" />
+		<Unit filename="GDL\cClavier.h" />
+		<Unit filename="GDL\cCollisions.cpp" />
+		<Unit filename="GDL\cCollisions.h" />
+		<Unit filename="GDL\cFichier.cpp" />
+		<Unit filename="GDL\cFichier.h" />
+		<Unit filename="GDL\cJoystick.cpp" />
+		<Unit filename="GDL\cJoystick.h" />
+		<Unit filename="GDL\cLayer.cpp" />
+		<Unit filename="GDL\cLayer.h" />
+		<Unit filename="GDL\cMove.cpp" />
+		<Unit filename="GDL\cMove.h" />
+		<Unit filename="GDL\cMusic.cpp" />
+		<Unit filename="GDL\cMusic.h" />
+		<Unit filename="GDL\cObjet.cpp" />
+		<Unit filename="GDL\cObjet.h" />
+		<Unit filename="GDL\cPlans.cpp" />
+		<Unit filename="GDL\cPlans.h" />
+		<Unit filename="GDL\cPos.cpp" />
+		<Unit filename="GDL\cPos.h" />
+		<Unit filename="GDL\cScale.cpp" />
+		<Unit filename="GDL\cScale.h" />
+		<Unit filename="GDL\cScene.cpp" />
+		<Unit filename="GDL\cScene.h" />
+		<Unit filename="GDL\cSouris.cpp" />
+		<Unit filename="GDL\cSouris.h" />
+		<Unit filename="GDL\cTime.cpp" />
+		<Unit filename="GDL\cTime.h" />
+		<Unit filename="GDL\cVariables.cpp" />
+		<Unit filename="GDL\cVariables.h" />
+		<Unit filename="GDL\cVisibilite.cpp" />
+		<Unit filename="GDL\cVisibilite.h" />
+		<Unit filename="GDL\conditions.cpp" />
+		<Unit filename="GDL\conditions.h" />
+		<Unit filename="GDL\constantes.h" />
+		<Unit filename="GDL\crypter.cpp" />
+		<Unit filename="GDL\crypter.h" />
+		<Unit filename="GDL\eFreeFunctions.cpp" />
+		<Unit filename="GDL\eFreeFunctions.h" />
+		<Unit filename="GDL\eObjectFunctions.cpp" />
+		<Unit filename="GDL\eObjectFunctions.h" />
+		<Unit filename="GDL\gpl.cpp" />
+		<Unit filename="GDL\gpl.h" />
+		<Unit filename="GDL\mathexpr.cpp" />
+		<Unit filename="GDL\mathexpr.h" />
+		<Unit filename="GDL\md5.cpp">
+			<Option virtualFolder="md5\" />
+		</Unit>
+		<Unit filename="GDL\md5.h">
+			<Option virtualFolder="md5\" />
+		</Unit>
+		<Unit filename="GDL\needReload.cpp" />
+		<Unit filename="GDL\needReload.h" />
+		<Unit filename="GDL\profile.cpp" />
+		<Unit filename="GDL\profile.h" />
+		<Unit filename="GDL\sf_classes_1.pypp.cpp" />
+		<Unit filename="GDL\sf_classes_1.pypp.hpp" />
+		<Unit filename="GDL\sf_classes_2.pypp.cpp" />
+		<Unit filename="GDL\sf_classes_2.pypp.hpp" />
+		<Unit filename="GDL\sf_classes_3.pypp.cpp" />
+		<Unit filename="GDL\sf_classes_3.pypp.hpp" />
+		<Unit filename="GDL\sf_classes_4.pypp.cpp" />
+		<Unit filename="GDL\sf_classes_4.pypp.hpp" />
+		<Unit filename="GDL\sf_classes_5.pypp.cpp" />
+		<Unit filename="GDL\sf_classes_5.pypp.hpp" />
+		<Unit filename="GDL\sf_classes_6.pypp.cpp" />
+		<Unit filename="GDL\sf_classes_6.pypp.hpp" />
+		<Unit filename="GDL\sf_classes_7.pypp.cpp" />
+		<Unit filename="GDL\sf_classes_7.pypp.hpp" />
+		<Unit filename="GDL\sf_enumerations.pypp.cpp" />
+		<Unit filename="GDL\sf_enumerations.pypp.hpp" />
+		<Unit filename="GDL\sf_free_functions.pypp.cpp" />
+		<Unit filename="GDL\sf_free_functions.pypp.hpp" />
+		<Unit filename="GDL\sf_global_variables.pypp.cpp" />
+		<Unit filename="GDL\sf_global_variables.pypp.hpp" />
+		<Unit filename="GDL\singleton.cpp" />
+		<Unit filename="GDL\singleton.h" />
+		<Unit filename="GDL\tinystr.cpp" />
+		<Unit filename="GDL\tinystr.h" />
+		<Unit filename="GDL\tinyxml.cpp" />
+		<Unit filename="GDL\tinyxml.h" />
+		<Unit filename="GDL\tinyxmlerror.cpp" />
+		<Unit filename="GDL\tinyxmlparser.cpp" />
+		<Unit filename="..\..\nwidgets\nwidgets\source.cpp">
+			<Option virtualFolder="LIB nwidgets\" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<AutoVersioning>
+				<Scheme minor_max="1" build_max="0" rev_max="0" rev_rand_max="9" build_times_to_increment_minor="1" />
+				<Settings autoincrement="0" date_declarations="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="GDL/Version.h" />
+				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+			</AutoVersioning>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

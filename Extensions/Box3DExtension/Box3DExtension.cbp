@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Box3DExtension" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\..\Runtime\bin\debug\Box3DExtension.xgd" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Debug\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-DGDP" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DDEBUG" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lgdl.dll" />
+					<Add option="-lsfml-audio-d.dll" />
+					<Add option="-lsfml-graphics-d.dll" />
+					<Add option="-lsfml-network-d.dll" />
+					<Add option="-lsfml-window-d.dll" />
+					<Add option="-lsfml-system-d.dll" />
+					<Add directory="C:\Users\Florian\Programmation\GameDevelop\Runtime\bin\debug" />
+				</Linker>
+			</Target>
+			<Target title="Debug - Edittime">
+				<Option output="..\..\IDE\bin\debug\Extensions\Box3DExtension.xgd" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Debug Edittime\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-DGDE" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DDEBUG" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DPYSUPPORT" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-D__WXDEBUG__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="C:\Libs\wxwidgets\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lgdl.dll" />
+					<Add option="-lwxmsw29d_xrc" />
+					<Add option="-lwxmsw29d_richtext" />
+					<Add option="-lwxmsw29d_ribbon" />
+					<Add option="-lwxmsw29d_aui" />
+					<Add option="-lwxmsw29d_adv" />
+					<Add option="-lwxmsw29d_html" />
+					<Add option="-lwxmsw29d_core" />
+					<Add option="-lwxbase29d_xml" />
+					<Add option="-lwxbase29d_net" />
+					<Add option="-lwxexpatd" />
+					<Add option="-lwxbase29d" />
+					<Add option="-lwxpngd" />
+					<Add option="-lwxjpegd" />
+					<Add option="-lwxzlibd" />
+					<Add option="-lwxtiffd" />
+					<Add option="-lsfml-audio-d.dll" />
+					<Add option="-lsfml-graphics-d.dll" />
+					<Add option="-lsfml-network-d.dll" />
+					<Add option="-lsfml-window-d.dll" />
+					<Add option="-lsfml-system-d.dll" />
+					<Add option="-lkernel32" />
+					<Add option="-luser32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-luuid" />
+					<Add option="-lshell32" />
+					<Add option="-lole32" />
+					<Add option="-lwinspool" />
+					<Add option="-ladvapi32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-loleaut32" />
+					<Add directory="C:\Users\Florian\Programmation\GameDevelop\IDE\bin\debug" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="..\..\Runtime\bin\release\Box3DExtension.xgd" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DGDP" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DRELEASE" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl.dll" />
+					<Add option="-lsfml-audio.dll" />
+					<Add option="-lsfml-graphics.dll" />
+					<Add option="-lsfml-network.dll" />
+					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-system.dll" />
+					<Add directory="C:\Users\Florian\Programmation\GameDevelop\Runtime\bin\release" />
+				</Linker>
+			</Target>
+			<Target title="Release - Edittime">
+				<Option output="..\..\IDE\bin\release\Extensions\Box3DExtension.xgd" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Release Edittime\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DGDE" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DRELEASE" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DPYSUPPORT" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DWXUSINGDLL" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="C:\Libs\wxwidgets\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl.dll" />
+					<Add option="-lwxmsw29_xrc" />
+					<Add option="-lwxmsw29_richtext" />
+					<Add option="-lwxmsw29_ribbon" />
+					<Add option="-lwxmsw29_aui" />
+					<Add option="-lwxmsw29_adv" />
+					<Add option="-lwxmsw29_html" />
+					<Add option="-lwxmsw29_core" />
+					<Add option="-lwxbase29_xml" />
+					<Add option="-lwxbase29_net" />
+					<Add option="-lwxexpat" />
+					<Add option="-lwxbase29" />
+					<Add option="-lwxpng" />
+					<Add option="-lwxjpeg" />
+					<Add option="-lwxzlib" />
+					<Add option="-lwxtiff" />
+					<Add option="-lsfml-audio.dll" />
+					<Add option="-lsfml-graphics.dll" />
+					<Add option="-lsfml-network.dll" />
+					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-system.dll" />
+					<Add option="-lkernel32" />
+					<Add option="-luser32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-luuid" />
+					<Add option="-lshell32" />
+					<Add option="-lole32" />
+					<Add option="-lwinspool" />
+					<Add option="-ladvapi32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-loleaut32" />
+					<Add directory="C:\Users\Florian\Programmation\GameDevelop\IDE\bin\release" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+				</Linker>
+			</Target>
+			<Target title="Development">
+				<Option output="..\..\Runtime\bin\dev\Box3DExtension.xgd" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Dev\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DGDP" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DDEV" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl.dll" />
+					<Add option="-lsfml-audio.dll" />
+					<Add option="-lsfml-graphics.dll" />
+					<Add option="-lsfml-network.dll" />
+					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-system.dll" />
+					<Add directory="C:\Users\Florian\Programmation\GameDevelop\Runtime\bin\dev" />
+				</Linker>
+			</Target>
+			<Target title="Development - Edittime">
+				<Option output="..\..\IDE\bin\dev\Extensions\Box3DExtension.xgd" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Dev Edittime\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DGDE" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DDEV" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DPYSUPPORT" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DWXUSINGDLL" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="C:\Libs\wxwidgets\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl.dll" />
+					<Add option="-lwxmsw29_xrc" />
+					<Add option="-lwxmsw29_richtext" />
+					<Add option="-lwxmsw29_ribbon" />
+					<Add option="-lwxmsw29_aui" />
+					<Add option="-lwxmsw29_adv" />
+					<Add option="-lwxmsw29_html" />
+					<Add option="-lwxmsw29_core" />
+					<Add option="-lwxbase29_xml" />
+					<Add option="-lwxbase29_net" />
+					<Add option="-lwxexpat" />
+					<Add option="-lwxbase29" />
+					<Add option="-lwxpng" />
+					<Add option="-lwxjpeg" />
+					<Add option="-lwxzlib" />
+					<Add option="-lwxtiff" />
+					<Add option="-lsfml-audio.dll" />
+					<Add option="-lsfml-graphics.dll" />
+					<Add option="-lsfml-network.dll" />
+					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-system.dll" />
+					<Add option="-lkernel32" />
+					<Add option="-luser32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-luuid" />
+					<Add option="-lshell32" />
+					<Add option="-lole32" />
+					<Add option="-lwinspool" />
+					<Add option="-ladvapi32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-loleaut32" />
+					<Add directory="C:\Users\Florian\Programmation\GameDevelop\IDE\bin\dev" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add directory="C:\Users\Florian\Programmation\GameDevelop\GDL" />
+			<Add directory="C:\Libs\SFML\include" />
+			<Add directory="C:\Libs\boost_1_38_0" />
+			<Add directory="C:\Libs\fparser" />
+		</Compiler>
+		<Linker>
+			<Add library="opengl32" />
+			<Add library="glu32" />
+			<Add directory="C:\Libs\SFML\lib\mingw" />
+		</Linker>
+		<Unit filename="Box3DActions.cpp" />
+		<Unit filename="Box3DConditions.cpp" />
+		<Unit filename="Box3DExpressions.cpp" />
+		<Unit filename="Box3DInitialPositionPanel.cpp" />
+		<Unit filename="Box3DInitialPositionPanel.h" />
+		<Unit filename="Box3DObject.cpp" />
+		<Unit filename="Box3DObject.h" />
+		<Unit filename="Box3DObjectEditor.cpp" />
+		<Unit filename="Box3DObjectEditor.h" />
+		<Unit filename="Extension.cpp" />
+		<Unit filename="..\..\GDL\GDL\tinystr.cpp" />
+		<Unit filename="..\..\GDL\GDL\tinystr.h" />
+		<Unit filename="..\..\GDL\GDL\tinyxml.cpp" />
+		<Unit filename="..\..\GDL\GDL\tinyxml.h" />
+		<Unit filename="..\..\GDL\GDL\tinyxmlerror.cpp" />
+		<Unit filename="..\..\GDL\GDL\tinyxmlparser.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<wxsmith version="1">
+				<resources>
+					<wxDialog wxs="wxsmith/Box3DObjectEditor.wxs" src="Box3DObjectEditor.cpp" hdr="Box3DObjectEditor.h" name="Box3DObjectEditor" language="CPP" />
+					<wxPanel wxs="wxsmith/Box3DInitialPositionPanel.wxs" src="Box3DInitialPositionPanel.cpp" hdr="Box3DInitialPositionPanel.h" name="Box3DInitialPositionPanel" language="CPP" />
+				</resources>
+			</wxsmith>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Game Develop Player" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Option virtualFolders="Versioning\;" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin\debug\PlayWin.exe" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin\debug" />
+				<Option object_output="obj\Debug\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DDEBUG" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lgdl.dll" />
+					<Add option="-lsfml-audio-d.dll" />
+					<Add option="-lsfml-graphics-d.dll" />
+					<Add option="-lsfml-network-d.dll" />
+					<Add option="-lsfml-window-d.dll" />
+					<Add option="-lsfml-system-d.dll" />
+					<Add directory="bin\debug" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin\release\PlayWin" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin\release" />
+				<Option object_output="obj\release\" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DRELEASE" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl.dll" />
+					<Add option="-lsfml-audio.dll" />
+					<Add option="-lsfml-graphics.dll" />
+					<Add option="-lsfml-network.dll" />
+					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-system.dll" />
+					<Add directory="bin\release" />
+				</Linker>
+			</Target>
+			<Target title="Development">
+				<Option output="bin\dev\PlayWin" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin\dev" />
+				<Option object_output="obj\dev\" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DDEV" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl.dll" />
+					<Add option="-lsfml-audio.dll" />
+					<Add option="-lsfml-graphics.dll" />
+					<Add option="-lsfml-network.dll" />
+					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-system.dll" />
+					<Add directory="bin\dev" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-fexceptions" />
+			<Add option="-DGDP" />
+			<Add directory="C:\Users\Florian\Programmation\GameDevelop\GDL" />
+			<Add directory="C:\Libs\dlib-17.12" />
+			<Add directory="C:\Users\Florian\Programmation\nwidgets" />
+			<Add directory="C:\Libs\muParser\ParserLib" />
+			<Add directory="C:\Libs\fparser" />
+			<Add directory="C:\Libs\boost_1_38_0" />
+			<Add directory="C:\Libs\SFML\include" />
+		</Compiler>
+		<Linker>
+			<Add library="mingw32" />
+			<Add library="opengl32" />
+			<Add library="Imm32" />
+			<Add library="Comctl32" />
+			<Add library="glu32" />
+			<Add library="Ws2_32" />
+			<Add library="gdi32" />
+			<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
+			<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
+			<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+			<Add library="winmm" />
+			<Add directory="C:\Libs\SFML\lib\mingw" />
+		</Linker>
+		<Unit filename="..\..\..\..\..\Libs\dlib-17.12\dlib\all\source.cpp" />
+		<Unit filename="CompilationChecker.cpp" />
+		<Unit filename="CompilationChecker.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<AutoVersioning>
+				<Scheme minor_max="1" build_max="0" rev_max="0" rev_rand_max="9" build_times_to_increment_minor="100" />
+				<Settings autoincrement="0" date_declarations="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
+				<Changes_Log show_changes_editor="0" app_title="sortie de la version %M.%m.%b de %p" changeslog_path="ChangesLog.txt" />
+			</AutoVersioning>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Development - Edittime" />
+	<File name="BugReport.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="12778" topLine="179" />
+	</File>
+	<File name="CheckMAJ.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="3588" topLine="92" />
+	</File>
+	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="492" topLine="0" />
+	</File>
+	<File name="CompilationChecker.h" open="0" top="0" tabpos="6">
+		<Cursor position="158" topLine="0" />
+	</File>
+	<File name="Credits.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="226" topLine="0" />
+	</File>
+	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="11766" topLine="243" />
+	</File>
+	<File name="DndTextSceneEditor.cpp" open="0" top="0" tabpos="6">
+		<Cursor position="267" topLine="0" />
+	</File>
+	<File name="EditObjectGroup.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="8728" topLine="179" />
+	</File>
+	<File name="EditOptionsPosition.h" open="0" top="0" tabpos="0">
+		<Cursor position="601" topLine="6" />
+	</File>
+	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="30264" topLine="702" />
+	</File>
+	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="1269" topLine="33" />
+	</File>
+	<File name="Extensions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="12287" topLine="314" />
+	</File>
+	<File name="Extensions.h" open="0" top="0" tabpos="2">
+		<Cursor position="1971" topLine="58" />
+	</File>
+	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="2790" topLine="90" />
+	</File>
+	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="1338" topLine="39" />
+	</File>
+	<File name="MAJ.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="6735" topLine="93" />
+	</File>
+	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="5129" topLine="120" />
+	</File>
+	<File name="SplashScreen.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="1411" topLine="61" />
+	</File>
+	<File name="SplashScreen.h" open="0" top="0" tabpos="6">
+		<Cursor position="288" topLine="6" />
+	</File>
+</CodeBlocks_layout_file>

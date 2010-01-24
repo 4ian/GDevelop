@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="Game Develop Editor" />
+		<Option title="IDE" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Editeurs\Editeur Image\;Editeurs\Choix\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Affichage\;Editeur principal\Options\;Fichiers\;LIB TinyXml\;wxSFML Canvas\;LIB MyStatusBar\;LIB nwidgets\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Renderers\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\EditorEvents\Events\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;LIB fparser\;" />

@@ -31,6 +31,9 @@
 	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="30264" topLine="702" />
 	</File>
+	<File name="EditorScene.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="31429" topLine="622" />
+	</File>
 	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="1269" topLine="33" />
 	</File>
@@ -49,8 +52,8 @@
 	<File name="MAJ.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="6735" topLine="93" />
 	</File>
-	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="5129" topLine="120" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="4595" topLine="99" />
 	</File>
 	<File name="SplashScreen.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="1411" topLine="61" />

@@ -33,7 +33,7 @@ eval( *scene->game, *scene )
 int EventsExecutor::ExecuteEventsScene()
 {
     BT_PROFILE("ExecuteEventsScene");
-    ObjectsConcerned objectsConcerned(&scene->objets, &scene->objectGroups);
+    ObjectsConcerned objectsConcerned(&scene->objectsInstances, &scene->objectGroups);
 
     ExecuteEvents(scene->events, objectsConcerned);
 
@@ -156,7 +156,7 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
                 objectsConcerned = objectsConcernedStart;
                 eval.SetObjectsConcerned(&objectsConcerned);
 
-                objectsConcerned.objectsPicked.push_back(*obj);
+                objectsConcerned.objectsPicked.AddObject(*obj);
 
                 if ( ExecuteConditions( event, objectsConcerned, k+1 ) == CondTrue )
                 {
@@ -334,7 +334,7 @@ int EventsExecutor::ExecuteActions( Event & event, ObjectsConcerned & objectsCon
                 objectsConcerned = objectsConcernedStart;
                 eval.SetObjectsConcerned(&objectsConcerned);
 
-                objectsConcerned.objectsPicked.push_back(*obj);
+                objectsConcerned.objectsPicked.AddObject(*obj);
 
                 //On execute les actions
                 retour = ExecuteActions( event, objectsConcerned, k+1 );

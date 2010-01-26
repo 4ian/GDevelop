@@ -452,6 +452,8 @@
 		<Unit filename="GDL\Music.h" />
 		<Unit filename="GDL\NetworkExtension.cpp" />
 		<Unit filename="GDL\NetworkExtension.h" />
+		<Unit filename="GDL\ObjInstancesHolder.cpp" />
+		<Unit filename="GDL\ObjInstancesHolder.h" />
 		<Unit filename="GDL\Object.cpp" />
 		<Unit filename="GDL\Object.h" />
 		<Unit filename="GDL\ObjectGroup.cpp" />

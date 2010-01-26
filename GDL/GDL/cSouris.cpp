@@ -164,7 +164,7 @@ bool CondSourisSurObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcern
                         if ( !condition.IsInverted() )
                         {
                             isTrue = true;
-                            objectsConcerned.objectsPicked.push_back( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                            objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
                         }
                     }
                     else
@@ -172,7 +172,7 @@ bool CondSourisSurObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcern
                         if ( condition.IsInverted() )
                         {
                             isTrue = true;
-                            objectsConcerned.objectsPicked.push_back( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                            objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
                         }
                     }
                 }
@@ -181,7 +181,7 @@ bool CondSourisSurObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcern
                     if ( condition.IsInverted() )
                     {
                         isTrue = true;
-                        objectsConcerned.objectsPicked.push_back( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                        objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
                     }
                 }
             }

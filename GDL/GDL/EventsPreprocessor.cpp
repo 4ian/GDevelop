@@ -48,7 +48,7 @@ bool ConditionForEachObject( RuntimeScene * scene, ObjectsConcerned & objectsCon
         if ( ((*obj).get()->*condition.objectFunction)(scene, objectsConcerned, condition, eval) ^ condition.IsInverted())
         {
             isTrue = true;
-            objectsConcerned.objectsPicked.push_back( *obj );
+            objectsConcerned.objectsPicked.AddObject( *obj );
         }
     }
 

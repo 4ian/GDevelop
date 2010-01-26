@@ -116,8 +116,8 @@ bool CondDistance( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
                     if ( !condition.IsInverted() )
                     {
                         isTrue = true;
-                        objectsConcerned.objectsPicked.push_back( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
-                        objectsConcerned.objectsPicked.push_back( *obj2 ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                        objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                        objectsConcerned.objectsPicked.AddObject( *obj2 ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
                     }
                 }
                 else
@@ -125,8 +125,8 @@ bool CondDistance( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
                     if ( condition.IsInverted() )
                     {
                         isTrue = true;
-                        objectsConcerned.objectsPicked.push_back( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
-                        objectsConcerned.objectsPicked.push_back( *obj2 ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                        objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                        objectsConcerned.objectsPicked.AddObject( *obj2 ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
                     }
                 }
             }

@@ -11,12 +11,14 @@ using namespace std;
 
 bool ActMoveObjects( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    for (unsigned int i = 0;i<scene->objets.size();++i)
-    {
-        scene->objets.at( i )->SetX( scene->objets.at( i )->GetX() + scene->objets.at( i )->TotalForceX() * scene->GetElapsedTime() );
-        scene->objets.at( i )->SetY( scene->objets.at( i )->GetY() + scene->objets.at( i )->TotalForceY() * scene->GetElapsedTime() );
+    ObjList allObjects = scene->objectsInstances.GetAllObjects();
 
-        scene->objets.at( i )->UpdateForce( scene->GetElapsedTime() );
+    for (unsigned int id = 0;id < allObjects.size();++id)
+    {
+        allObjects[id]->SetX( allObjects[id]->GetX() + allObjects[id]->TotalForceX() * scene->GetElapsedTime() );
+        allObjects[id]->SetY( allObjects[id]->GetY() + allObjects[id]->TotalForceY() * scene->GetElapsedTime() );
+
+        allObjects[id]->UpdateForce( scene->GetElapsedTime() );
     }
 
     return true;

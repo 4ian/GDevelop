@@ -18,6 +18,7 @@
 #include "GDL/Object.h"
 #include "GDL/ObjectGroup.h"
 #include "GDL/ObjectType.h"
+#include "GDL/ObjInstancesHolder.h"
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
@@ -31,7 +32,7 @@ class GD_API ObjectsConcerned
 {
     public:
 
-        ObjectsConcerned(ObjList * allObjects_, vector < ObjectGroup > * allGroups_ );
+        ObjectsConcerned(ObjInstancesHolder * allObjects_, vector < ObjectGroup > * allGroups_ );
         virtual ~ObjectsConcerned();
 
         /**
@@ -67,13 +68,13 @@ class GD_API ObjectsConcerned
         };
 
         /** Objects already picked */
-        ObjList objectsPicked;
+        ObjInstancesHolder objectsPicked;
 
     protected:
     private:
 
         /** Reference to all objects list */
-        ObjList * allObjects;
+        ObjInstancesHolder * allObjects;
 
         /** Reference to groups */
         vector < ObjectGroup > * allGroups;

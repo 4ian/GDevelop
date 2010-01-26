@@ -57,7 +57,7 @@ bool CondNbObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
 	ObjList::const_iterator obj_end = list.end();
     for ( ; obj != obj_end; ++obj )
     {
-        objectsConcerned.objectsPicked.push_back(*obj);
+        objectsConcerned.objectsPicked.AddObject(*obj);
     }
 
     return isTrue;
@@ -77,7 +77,7 @@ bool CondAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 	ObjList::const_iterator obj_end = list.end();
     for ( ; obj != obj_end; ++obj )
     {
-        objectsConcerned.objectsPicked.push_back(*obj);
+        objectsConcerned.objectsPicked.AddObject(*obj);
     }
 
     return true;
@@ -97,7 +97,7 @@ bool CondAjoutHasard( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     if ( !list.empty() )
     {
         int id = sf::Randomizer::Random(0, list.size()-1);
-        objectsConcerned.objectsPicked.push_back(list[id]);
+        objectsConcerned.objectsPicked.AddObject(list[id]);
     }
 
 

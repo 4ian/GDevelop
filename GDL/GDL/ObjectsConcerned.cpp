@@ -5,12 +5,11 @@
 #include "GDL/ObjectType.h"
 #include "GDL/profile.h"
 
-ObjectsConcerned::ObjectsConcerned(ObjList * allObjects_, vector < ObjectGroup > * allGroups_ ) :
+ObjectsConcerned::ObjectsConcerned(ObjInstancesHolder * allObjects_, vector < ObjectGroup > * allGroups_ ) :
 allObjects(allObjects_),
 allGroups(allGroups_)
 {
     //ctor
-    objectsPicked.reserve(50); //Reserve some space
 }
 
 
@@ -19,7 +18,7 @@ allGroups(allGroups_)
 ////////////////////////////////////////////////////////////
 ObjList ObjectsConcerned::Pick(string name, bool forceGlobal)
 {
-    BT_PROFILE("Pick");
+    //BT_PROFILE("Pick");
     ObjList objectsToTest;
 
     vector < ObjectGroup >::iterator groupsIter = allGroups->begin();
@@ -51,7 +50,7 @@ ObjList ObjectsConcerned::Pick(string name, bool forceGlobal)
 ////////////////////////////////////////////////////////////
 ObjList ObjectsConcerned::PickAndRemove(string name, bool forceGlobal)
 {
-    BT_PROFILE("PickAndRemove");
+    //BT_PROFILE("PickAndRemove");
     ObjList objectsToTest;
 
     vector < ObjectGroup >::iterator groupsIter = allGroups->begin();
@@ -90,37 +89,15 @@ ObjList ObjectsConcerned::PickOnlyObjects(string name, bool onlyAlreadyConcerned
                                         name) != alreadyConcernedObjects.end() )
         && !forceGlobal )
     {
-        //Rechercher dans les objets déjà concernés
-        ObjList::iterator objIter = objectsPicked.begin();
-        ObjList::const_iterator objEnd = objectsPicked.end();
-        for (;objIter != objEnd;++objIter)
-        {
-        	if ( (*objIter)->GetName() == name )
-        	    objectsToTest.push_back(*objIter); //Ajout aux objets à tester
-        }
+        objectsToTest = objectsPicked.GetObjects(name);
 
-        if  ( removeFromAlreadyConcernedObjects ) //Ajout aux objets pour les futures instructions
-        {
-            objectsPicked.erase(std::remove_if(objectsPicked.begin(), objectsPicked.end(),
-                                                std::bind2nd(ObjectHasName(), name))
-                                , objectsPicked.end());
-        }
+        if  ( removeFromAlreadyConcernedObjects ) objectsPicked.RemoveObjects(name);
     }
     else
     {
-        //Rechercher dans tous les objets
-        ObjList::iterator objIter = allObjects->begin();
-        ObjList::const_iterator objEnd = allObjects->end();
-        for (;objIter!=objEnd;++objIter)
-        {
-        	if ( (*objIter)->GetName() == name )
-        	{
-        	    objectsToTest.push_back(*objIter); //Ajout aux objets à tester
+        objectsToTest = allObjects->GetObjects(name);
 
-                if  ( !removeFromAlreadyConcernedObjects )
-                    objectsPicked.push_back(*objIter); //Ajout aux objets pour les futures instructions
-        	}
-        }
+        if  ( !removeFromAlreadyConcernedObjects ) objectsPicked.AddListOfObjectsWithSameName(objectsToTest);
     }
 
     alreadyConcernedObjects.insert(name);

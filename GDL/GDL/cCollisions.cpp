@@ -79,12 +79,12 @@ bool CondCollision( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
         //L'objet est il en collision avec un autre ?
         if ( find(ObjetsEnCollisions.begin(), ObjetsEnCollisions.end(), *obj) != ObjetsEnCollisions.end() )
         {
-            if ( !condition.IsInverted() ) objectsConcerned.objectsPicked.push_back( *obj );
+            if ( !condition.IsInverted() ) objectsConcerned.objectsPicked.AddObject( *obj );
             AuMoinsUnObjet = true;
         }
         else
         {
-            if ( condition.IsInverted() ) objectsConcerned.objectsPicked.push_back( *obj );
+            if ( condition.IsInverted() ) objectsConcerned.objectsPicked.AddObject( *obj );
             TousLesObjets = false;
         }
     }
@@ -93,12 +93,12 @@ bool CondCollision( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
         //L'objet est il en collision avec un autre ?
         if ( find(ObjetsEnCollisions.begin(), ObjetsEnCollisions.end(), *obj2) != ObjetsEnCollisions.end() )
         {
-            if ( !condition.IsInverted() ) objectsConcerned.objectsPicked.push_back( *obj2 );
+            if ( !condition.IsInverted() ) objectsConcerned.objectsPicked.AddObject( *obj2 );
             AuMoinsUnObjet = true;
         }
         else
         {
-            if ( condition.IsInverted() ) objectsConcerned.objectsPicked.push_back( *obj2 );
+            if ( condition.IsInverted() ) objectsConcerned.objectsPicked.AddObject( *obj2 );
             TousLesObjets = false;
         }
     }
@@ -150,8 +150,8 @@ bool CondCollisionNP( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
                     if ( !condition.IsInverted() )
                     {
                         isTrue = true;
-                        objectsConcerned.objectsPicked.push_back( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
-                        objectsConcerned.objectsPicked.push_back( *obj2 ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                        objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                        objectsConcerned.objectsPicked.AddObject( *obj2 ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
                     }
                     AuMoinsUnObjet = true;
                 }
@@ -163,7 +163,7 @@ bool CondCollisionNP( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
             if ( condition.IsInverted() )
             {
                 isTrue = true;
-                objectsConcerned.objectsPicked.push_back( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
             }
         }
     }

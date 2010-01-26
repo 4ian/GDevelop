@@ -82,11 +82,7 @@ RuntimeScene::RuntimeScene(const RuntimeScene & scene) : Scene(scene)
     #endif
     running = scene.running;
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
-
-    objets.clear();
-    for (unsigned int i =0;i<scene.objets.size();++i)
-    	objets.push_back( extensionManager->CreateObject(scene.objets[i]) );
+    objectsInstances = scene.objectsInstances.CopyAndCloneAllObjects();
 
     variables = scene.variables;
     textes = scene.textes;
@@ -119,11 +115,7 @@ RuntimeScene& RuntimeScene::operator=(const RuntimeScene & scene)
         #endif
         this->running = scene.running;
 
-        gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
-
-        this->objets.clear();
-        for (unsigned int i =0;i<scene.objets.size();++i)
-            this->objets.push_back( extensionManager->CreateObject(scene.objets[i]) );
+        this->objectsInstances = scene.objectsInstances.CopyAndCloneAllObjects();
 
         this->variables = scene.variables;
         this->textes = scene.textes;
@@ -283,41 +275,39 @@ void RuntimeScene::Render()
 {
     renderWindow->Clear( sf::Color( backgroundColorR, backgroundColorG, backgroundColorB ) );
 
-    vector < PlanObjet > ordre;
-    OrdreAffichageObjets( ordre ); //On trie les objets par leurs plans
+    //Sort object by order to rendering them
+    ObjList allObjects = objectsInstances.GetAllObjects();
+    OrderObjectsByZOrder( allObjects );
 
     //To allow using OpenGL to draw :
     glClear(GL_DEPTH_BUFFER_BIT); // Clear the depth buffer
     renderWindow->SaveGLStates();
     renderWindow->SetActive();
 
-    //Affichage par calque
+    //Draw layer by layer
     for (unsigned int layerIndex =0;layerIndex<layers.size();++layerIndex)
     {
         renderWindow->SetView(layers.at(layerIndex).ModView());
         if ( layers.at(layerIndex).GetVisibility() )
         {
-            //Objets
-            for (unsigned int BoucleAffich = 0;BoucleAffich < ordre.size();++BoucleAffich)
+            for (unsigned int id = 0;id < allObjects.size();++id)
             {
                 //Affichage de l'objet si il appartient au calque
-                if ( objets.at( ordre.at( BoucleAffich ).idObjet )->GetLayer() == layers.at(layerIndex).GetName() )
+                if ( allObjects[id]->GetLayer() == layers[layerIndex].GetName() )
                 {
                     //Calcul des coordonnées en fonction des forces.
-                    objets[ordre[BoucleAffich].idObjet]->SetX( objets[ordre[BoucleAffich].idObjet]->GetX() +
-                                                                                    ( objets[ordre[BoucleAffich].idObjet]->TotalForceX() * GetElapsedTime() ));
-                    objets[ordre[BoucleAffich].idObjet]->SetY( objets[ordre[BoucleAffich].idObjet]->GetY() +
-                                                                                    ( objets[ordre[BoucleAffich].idObjet]->TotalForceY() * GetElapsedTime() ));
+                    allObjects[id]->SetX( allObjects[id]->GetX() + ( allObjects[id]->TotalForceX() * GetElapsedTime() ));
+                    allObjects[id]->SetY( allObjects[id]->GetY() + ( allObjects[id]->TotalForceY() * GetElapsedTime() ));
 
-                    objets[ordre[BoucleAffich].idObjet]->UpdateTime( GetElapsedTime() );
-                    objets[ordre[BoucleAffich].idObjet]->Draw( *renderWindow );
+                    allObjects[id]->UpdateTime( GetElapsedTime() );
+                    allObjects[id]->Draw( *renderWindow );
 
                     //Fin des forces
-                    objets[ordre[BoucleAffich].idObjet]->UpdateForce( GetElapsedTime() );
+                    allObjects[id]->UpdateForce( GetElapsedTime() );
                 }
             }
 
-            //Textes
+            //Texts
             AfficheTexte(layers.at(layerIndex).GetName());
         }
     }
@@ -397,21 +387,12 @@ bool RuntimeScene::UpdateTime()
 ////////////////////////////////////////////////////////////
 /// Met à jour un tableau contenant l'ordre d'affichage des objets
 ////////////////////////////////////////////////////////////
-bool RuntimeScene::OrdreAffichageObjets( vector < PlanObjet > & ordre )
+bool RuntimeScene::OrderObjectsByZOrder( ObjList & objList )
 {
-    ordre.clear();
-    for (unsigned int BouclePlan = 0;BouclePlan < objets.size();++BouclePlan)
-    {
-        PlanObjet po;
-        po.idObjet = BouclePlan;
-        po.plan = objets[BouclePlan]->GetZOrder();
-        ordre.push_back( po );
-    }
-
     if ( standardSortMethod )
-        std::sort( ordre.begin(), ordre.end(), SortByPlan() );
+        std::sort( objList.begin(), objList.end(), SortByZOrder() );
     else
-        std::stable_sort( ordre.begin(), ordre.end(), SortByPlan() );
+        std::stable_sort( objList.begin(), objList.end(), SortByZOrder() );
 
     return true;
 }
@@ -498,7 +479,15 @@ void RuntimeScene::GestionMusique()
 ////////////////////////////////////////////////////////////
 void RuntimeScene::GestionObjets()
 {
-    objets.erase( std::remove_if( objets.begin(), objets.end(), MustBeDeleted ), objets.end() );
+    //Sort object by order to rendering them
+    ObjList allObjects = objectsInstances.GetAllObjects();
+    for (unsigned int id = 0;id<allObjects.size();++id)
+    {
+    	if ( allObjects[id]->GetName() == "" )
+    	{
+            objectsInstances.RemoveObject(allObjects[id]); //Remove from objects Instances, not from the temporary list !
+    	}
+    }
 }
 
 
@@ -507,9 +496,9 @@ void RuntimeScene::GestionObjets()
 ////////////////////////////////////////////////////////////
 bool RuntimeScene::LoadFromScene( const Scene & scene )
 {
-    //Remise à zéro des données de jeux
+    //Clear RuntimeScene datas
     variables.variables.clear();
-    objets.clear();
+    objectsInstances.Clear();
     textes.clear();
     timers.clear();
     layers.clear();
@@ -519,7 +508,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     pauseTime = 0;
     timeFromStart = 0;
 
-    //Copie des autres données de la scène
+    //Copy inherited datas
     objetsInitiaux = scene.objetsInitiaux;
     objectGroups = scene.objectGroups;
     layers = scene.layers;
@@ -531,14 +520,14 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     title = scene.title;
     standardSortMethod = scene.standardSortMethod;
 
-    //Initialisation des calques
+    //Initialize layers
     for (unsigned int i = 0;i<layers.size();++i)
     {
         sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->windowWidth, game->windowHeight ) );
         layers[i].SetView(defaultView);
     }
 
-    //Chargement des images dans les objets de la scène
+    //Load resources of initial objects
     try
     {
         for (unsigned int i = 0; i < scene.objetsInitiaux.size();++i)
@@ -552,8 +541,8 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
         std::cout << "Out of range: " << e.what() << "\n";
     }
 
-    //Chargement des images dans les objets globaux
-    //TODO : Faire ça qu'une fois et pas à chaque scène
+    //Load resources of global objects
+    //TODO : Make this only one time during game
     try
     {
         for (unsigned int i = 0; i < game->globalObjects.size();++i)
@@ -569,39 +558,41 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
 
-    // Les objets positionnés sur la scéne
-    for(unsigned int i = 0;i < scene.positionsInitiales.size();++i) // On parcourt les objets
+    //Create object instances which are originally positionned on scene
+    for(unsigned int i = 0;i < scene.positionsInitiales.size();++i)
     {
         MessageLoading( "Positionnement de l'objet : " + scene.positionsInitiales[i].objectName, i + 1 / scene.positionsInitiales.size()*100 / 3 + 33 );
-        bool successfulyCreated = true;
 
         int IDsceneObject = Picker::PickOneObject( &objetsInitiaux, scene.positionsInitiales[i].objectName );
         int IDglobalObject = Picker::PickOneObject( &game->globalObjects, scene.positionsInitiales[i].objectName );
 
+        ObjSPtr newObject = boost::shared_ptr<Object> ();
+
         if ( IDsceneObject != -1 ) //We check first scene's objects' list.
-            objets.push_back( extensionManager->CreateObject(objetsInitiaux[IDsceneObject]));
+            newObject = extensionManager->CreateObject(objetsInitiaux[IDsceneObject]);
         else if ( IDglobalObject != -1 ) //Then the global object list
-            objets.push_back( extensionManager->CreateObject(game->globalObjects.at( IDglobalObject )));
+            newObject = extensionManager->CreateObject(game->globalObjects.at( IDglobalObject ));
         else
         {
             string nom = scene.positionsInitiales[i].objectName;
             errors.Add( "N'a pas pu trouver et positionner l'objet nommé " + nom + " ( N'existe pas dans la liste des objets de la scène ou globale )", "", nom, -1, 2 );
-            successfulyCreated = false;
         }
 
-        if ( successfulyCreated )
+        if ( newObject != boost::shared_ptr<Object> () )
         {
-            objets.back()->errors = &errors;
-            objets.back()->SetX( scene.positionsInitiales[i].x );
-            objets.back()->SetY( scene.positionsInitiales[i].y );
-            objets.back()->SetZOrder( scene.positionsInitiales[i].zOrder );
-            objets.back()->SetLayer( scene.positionsInitiales[i].layer );
+            newObject->errors = &errors;
+            newObject->SetX( scene.positionsInitiales[i].x );
+            newObject->SetY( scene.positionsInitiales[i].y );
+            newObject->SetZOrder( scene.positionsInitiales[i].zOrder );
+            newObject->SetLayer( scene.positionsInitiales[i].layer );
 
-            objets.back()->InitializeFromInitialPosition(scene.positionsInitiales[i]);
+            newObject->InitializeFromInitialPosition(scene.positionsInitiales[i]);
+
+            objectsInstances.AddObject(newObject);
         }
     }
 
-    //Les événements
+    //Preprocess events
     PreprocessScene( *game );
 
     MessageLoading( "Chargement de la scène terminé", 100 );

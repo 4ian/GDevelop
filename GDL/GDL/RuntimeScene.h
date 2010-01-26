@@ -36,6 +36,7 @@
 #include "GDL/SoundManager.h"
 #include "GDL/Layer.h"
 #include "GDL/ManualTimer.h"
+#include "GDL/ObjInstancesHolder.h"
 
 #ifdef GDE
 #include "GDL/BaseDebugger.h"
@@ -66,7 +67,7 @@ class GD_API RuntimeScene : public Scene
         bool running;
 
         //Données supplémentaires pour une RuntimeScene
-        vector < boost::shared_ptr<Object> >    objets;
+        ObjInstancesHolder                      objectsInstances;
         ListVariable                            variables;
         vector < Text >                         textes;
         vector < ManualTimer >                  timers;
@@ -107,7 +108,7 @@ class GD_API RuntimeScene : public Scene
         //-> Gestion de la boucle de jeu
         void Render();
         bool AfficheTexte(string layer = "");
-        bool OrdreAffichageObjets( vector < PlanObjet > & ordre );
+        bool OrderObjectsByZOrder( ObjList & objList );
         void GestionObjets();
         void ManageRenderTargetEvents();
         bool UpdateMousePos();

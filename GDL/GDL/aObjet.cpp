@@ -37,8 +37,10 @@ bool Object::ActDuplicate( RuntimeScene * scene, ObjectsConcerned & objectsConce
 {
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
 
-    scene->objets.push_back( extensionManager->CreateObject(shared_from_this()) );
-    objectsConcerned.objectsPicked.push_back( scene->objets.back() ); //Ajout aux objets concernés
+    ObjSPtr newObject = extensionManager->CreateObject(shared_from_this());
+
+    scene->objectsInstances.AddObject(newObject);
+    objectsConcerned.objectsPicked.AddObject(newObject); //Object is concerned for future actions
 
     return true;
 }
@@ -55,11 +57,12 @@ bool ActCreate( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const
     int IDglobalObject = Picker::PickOneObject( &scene->game->globalObjects, objectWanted );
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    ObjSPtr newObject = boost::shared_ptr<Object> ();
 
     if ( IDsceneObject != -1)
-        scene->objets.push_back( extensionManager->CreateObject(scene->objetsInitiaux[IDsceneObject]) );
+        newObject = extensionManager->CreateObject(scene->objetsInitiaux[IDsceneObject]);
     else if ( IDglobalObject != -1)
-        scene->objets.push_back( extensionManager->CreateObject(scene->game->globalObjects[IDglobalObject]) );
+        newObject = extensionManager->CreateObject(scene->game->globalObjects[IDglobalObject]);
     else
     {
         scene->errors.Add("L'objet à créer ("+objectWanted+") n'existe pas dans la liste des objets", "", "", -1, 1);
@@ -67,16 +70,17 @@ bool ActCreate( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const
     }
 
     //Ajout à la liste d'objet et configuration de sa position
-    scene->objets.back()->errors = &scene->errors;
-    scene->objets.back()->SetX( eval.EvalExp( action.GetParameter( 1 ) ) );
-    scene->objets.back()->SetY( eval.EvalExp( action.GetParameter( 2 ) ) );
+    newObject->errors = &scene->errors;
+    newObject->SetX( eval.EvalExp( action.GetParameter( 1 ) ) );
+    newObject->SetY( eval.EvalExp( action.GetParameter( 2 ) ) );
 
     //Compatibilité avec les versions de Game Develop précédentes
     if ( action.GetParameters().size() > 3 )
-        scene->objets.back()->SetLayer( eval.EvalTxt( action.GetParameter( 3 ) ) );
+        newObject->SetLayer( eval.EvalTxt( action.GetParameter( 3 ) ) );
 
-    //Ajout aux objets concernés
-    objectsConcerned.objectsPicked.push_back( scene->objets.back() );
+    //Add object to scene and let it be concerned by futures actions
+    scene->objectsInstances.AddObject(newObject);
+    objectsConcerned.objectsPicked.AddObject( newObject );
     objectsConcerned.AddAnObjectConcerned(objectWanted);
 
     return true;
@@ -108,7 +112,7 @@ bool ActAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 	ObjList::const_iterator obj_end = list.end();
     for ( ; obj != obj_end; ++obj )
     {
-        objectsConcerned.objectsPicked.push_back(*obj);
+        objectsConcerned.objectsPicked.AddObject(*obj);
         //TODO : Encore utile ?
     }
 
@@ -129,7 +133,7 @@ bool ActAjoutHasard( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, 
     if ( !list.empty() )
     {
         int id = sf::Randomizer::Random(0, list.size()-1);
-        objectsConcerned.objectsPicked.push_back(list[id]);
+        objectsConcerned.objectsPicked.AddObject(list[id]);
     }
 
     return true;

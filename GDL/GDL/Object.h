@@ -251,4 +251,15 @@ struct ObjectHasName : public std::binary_function<boost::shared_ptr<Object>, st
     bool operator()(const boost::shared_ptr<Object> & object, string name) const { return object->GetName() == name; }
 };
 
+/**
+ * Functor for sorting an ObjList by ZOrder
+ */
+struct SortByZOrder
+{
+   bool operator ()(ObjSPtr o1, ObjSPtr o2) const
+   {
+      return o1->GetZOrder() < o2->GetZOrder();
+   }
+};
+
 #endif // OBJECT_H

@@ -163,8 +163,8 @@ bool CondEstTourne( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
                     if ( !condition.IsInverted() )
                     {
                         isTrue = true;
-                        objectsConcerned.objectsPicked.push_back( *obj );
-                        objectsConcerned.objectsPicked.push_back( *obj2 );
+                        objectsConcerned.objectsPicked.AddObject( *obj );
+                        objectsConcerned.objectsPicked.AddObject( *obj2 );
                     }
                 }
                 else
@@ -172,8 +172,8 @@ bool CondEstTourne( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
                     if ( condition.IsInverted() )
                     {
                         isTrue = true;
-                        objectsConcerned.objectsPicked.push_back( *obj );
-                        objectsConcerned.objectsPicked.push_back( *obj2 );
+                        objectsConcerned.objectsPicked.AddObject( *obj );
+                        objectsConcerned.objectsPicked.AddObject( *obj2 );
                     }
                 }
             }

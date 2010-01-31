@@ -81,7 +81,7 @@ private :
     void OnLayerDownSelected(wxCommandEvent & event);
 
     //Fonctions outils
-    int GetPositionInitialeIdFromObjectId(int objectId);
+    int GetInitialPositionFromObject(ObjSPtr object);
     int GetObjectsSelectedHighestLayer();
     int GetObjectsSelectedLowestLayer();
 

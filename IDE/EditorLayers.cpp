@@ -9,6 +9,7 @@
 #include <wx/config.h>
 #include <wx/log.h>
 #include "GDL/StdAlgo.h"
+#include "GDL/Position.h"
 #include "ObjectsOnBadLayerBox.h"
 #include "EditLayer.h"
 #ifdef __WXGTK__

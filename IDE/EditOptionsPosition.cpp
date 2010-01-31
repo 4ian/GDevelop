@@ -1,11 +1,9 @@
 #include "EditOptionsPosition.h"
 
 //(*InternalHeaders(EditOptionsPosition)
-#include <wx/bitmap.h>
 #include <wx/settings.h>
 #include <wx/font.h>
 #include <wx/intl.h>
-#include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include "GDL/Position.h"
@@ -28,10 +26,13 @@ const long EditOptionsPosition::ID_PANEL1 = wxNewId();
 const long EditOptionsPosition::ID_STATICLINE1 = wxNewId();
 const long EditOptionsPosition::ID_STATICTEXT3 = wxNewId();
 const long EditOptionsPosition::ID_TEXTCTRL1 = wxNewId();
-const long EditOptionsPosition::ID_STATICBITMAP1 = wxNewId();
 const long EditOptionsPosition::ID_STATICTEXT4 = wxNewId();
 const long EditOptionsPosition::ID_TEXTCTRL2 = wxNewId();
-const long EditOptionsPosition::ID_STATICBITMAP2 = wxNewId();
+const long EditOptionsPosition::ID_CHECKBOX1 = wxNewId();
+const long EditOptionsPosition::ID_STATICTEXT5 = wxNewId();
+const long EditOptionsPosition::ID_TEXTCTRL3 = wxNewId();
+const long EditOptionsPosition::ID_STATICTEXT6 = wxNewId();
+const long EditOptionsPosition::ID_TEXTCTRL5 = wxNewId();
 const long EditOptionsPosition::ID_STATICTEXT11 = wxNewId();
 const long EditOptionsPosition::ID_CHOICE1 = wxNewId();
 const long EditOptionsPosition::ID_STATICTEXT12 = wxNewId();
@@ -56,8 +57,11 @@ game(game_),
 scene(scene_)
 {
 	//(*Initialize(EditOptionsPosition)
+	wxStaticBoxSizer* StaticBoxSizer2;
 	wxFlexGridSizer* FlexGridSizer4;
+	wxFlexGridSizer* FlexGridSizer10;
 	wxFlexGridSizer* FlexGridSizer3;
+	wxFlexGridSizer* FlexGridSizer5;
 	wxFlexGridSizer* FlexGridSizer9;
 	wxFlexGridSizer* FlexGridSizer2;
 	wxBoxSizer* BoxSizer2;
@@ -101,26 +105,44 @@ scene(scene_)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer6->AddGrowableCol(0);
 	FlexGridSizer6->AddGrowableRow(1);
-	FlexGridSizer13 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer13 = new wxFlexGridSizer(0, 2, 0, 0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Position"));
-	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer3->AddGrowableCol(1);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT3, _("X :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	XEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(74,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	XEdit->SetToolTip(_("Coordonnée X de l\'objet sur la scène"));
 	FlexGridSizer3->Add(XEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	CheckXImg = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/ok.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP1"));
-	FlexGridSizer3->Add(CheckXImg, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT4, _("Y :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer3->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	YEdit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	YEdit->SetToolTip(_("Coordonnée Y de l\'objet sur la scène."));
 	FlexGridSizer3->Add(YEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	CheckYImg = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/ok.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP2"));
-	FlexGridSizer3->Add(CheckYImg, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer13->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Taille"));
+	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer5->AddGrowableCol(0);
+	FlexGridSizer5->AddGrowableRow(1);
+	sizeCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Taille personnalisée"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	sizeCheck->SetValue(false);
+	FlexGridSizer5->Add(sizeCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer10 = new wxFlexGridSizer(0, 2, 0, 0);
+	FlexGridSizer10->AddGrowableCol(1);
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT5, _("Largeur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	FlexGridSizer10->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	widthEdit = new wxTextCtrl(this, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
+	widthEdit->Disable();
+	FlexGridSizer10->Add(widthEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT6, _("Hauteur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	FlexGridSizer10->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	heightEdit = new wxTextCtrl(this, ID_TEXTCTRL5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
+	heightEdit->Disable();
+	FlexGridSizer10->Add(heightEdit, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer5->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticBoxSizer2->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer13->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer5 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Calque"));
 	FlexGridSizer12 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer12->AddGrowableCol(0);
@@ -180,6 +202,7 @@ scene(scene_)
 	FlexGridSizer1->SetSizeHints(this);
 	Center();
 
+	Connect(ID_CHECKBOX1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnsizeCheckClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnOkBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnAnnulerBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnAideBtClick);
@@ -188,15 +211,15 @@ scene(scene_)
     //Initializing controls with values
     objectNameTxt->SetLabel( position.objectName );
 
+    XEdit->SetValue( toString(position.x) );
+    YEdit->SetValue( toString(position.y) );
+    widthEdit->SetValue( toString(position.width) );
+    heightEdit->SetValue( toString(position.height) );
+    if ( position.personalizedSize )
     {
-        ostringstream os;
-        os << position.x;
-        XEdit->SetValue( os.str() );
-    }
-    {
-        ostringstream os;
-        os << position.y;
-        YEdit->SetValue( os.str() );
+        sizeCheck->SetValue(true);
+        widthEdit->Enable(true);
+        heightEdit->Enable(true);
     }
 
     for (unsigned int i = 0;i<scene.layers.size();++i)
@@ -229,7 +252,10 @@ scene(scene_)
         FlexGridSizer15->Add(customPanel, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     }
 
-    SetSize(GetSize().GetWidth(), GetSize().GetHeight()+customPanel->GetSize().GetHeight()+10);
+    int maxWidth =  customPanel->GetSize().GetWidth() > GetSize().GetWidth() ?
+                    customPanel->GetSize().GetWidth() :
+                    GetSize().GetWidth();
+    SetSize(maxWidth, GetSize().GetHeight()+customPanel->GetSize().GetHeight()+10);
 }
 
 EditOptionsPosition::~EditOptionsPosition()
@@ -241,43 +267,48 @@ EditOptionsPosition::~EditOptionsPosition()
 
 void EditOptionsPosition::OnOkBtClick(wxCommandEvent& event)
 {
-    string x = (string) XEdit->GetValue();
-    std::istringstream iss( x );
-    int i;
-    // tenter la conversion et
-    // vérifier qu'il ne reste plus rien dans la chaîne
-    if ( ( iss >> i ) && ( iss.eof() ) )
     {
-        position.x = i;
-    }
-    else
-    {
-        CheckXImg->SetBitmap( wxBitmap( "res/error.png", wxBITMAP_TYPE_ANY ) );
-        return;
+        string x = (string) XEdit->GetValue();
+        std::istringstream iss( x );
+        float i;
+
+        if ( ( iss >> i ) && ( iss.eof() ) )
+            position.x = i;
     }
 
-    string y = (string) YEdit->GetValue();
-    std::istringstream iss2( y );
-    // tenter la conversion et
-    // vérifier qu'il ne reste plus rien dans la chaîne
-    if ( ( iss2 >> i ) && ( iss2.eof() ) )
     {
-        position.y = i;
-    }
-    else
-    {
-        CheckYImg->SetBitmap( wxBitmap( "res/error.png", wxBITMAP_TYPE_ANY ) );
-        return;
+        string y = (string) YEdit->GetValue();
+        std::istringstream iss( y );
+        float i;
+
+        if ( ( iss >> i ) && ( iss.eof() ) )
+            position.y = i;
     }
 
-    string plan = (string) zOrderEdit->GetValue();
-    std::istringstream iss4( plan );
-    // tenter la conversion et
-    // vérifier qu'il ne reste plus rien dans la chaîne
-    if ( ( iss4 >> i ) && ( iss4.eof() ) )
     {
-        position.zOrder = i;
+        string width = (string) widthEdit->GetValue();
+        std::istringstream iss( width );
+        float i;
+
+        if ( ( iss >> i ) && ( iss.eof() ) )
+            position.width = i;
     }
+
+    {
+        string height = (string) heightEdit->GetValue();
+        std::istringstream iss( height );
+        float i;
+
+        if ( ( iss >> i ) && ( iss.eof() ) )
+            position.height = i;
+    }
+
+    if ( sizeCheck->GetValue() )
+        position.personalizedSize = true;
+    else
+        position.personalizedSize = false;
+
+    position.zOrder = toInt(string(zOrderEdit->GetValue().mb_str()));
 
     position.layer = static_cast<string>(layerChoice->GetStringSelection());
     if ( layerChoice->GetStringSelection() == _("Calque de base"))
@@ -299,4 +330,18 @@ void EditOptionsPosition::OnAideBtClick(wxCommandEvent& event)
     wxHelpController * help = new wxHelpController;
     help->Initialize( "aide.chm" );
     help->DisplaySection(25);
+}
+
+void EditOptionsPosition::OnsizeCheckClick(wxCommandEvent& event)
+{
+    if ( sizeCheck )
+    {
+        widthEdit->Enable(true);
+        heightEdit->Enable(true);
+    }
+    else
+    {
+        widthEdit->Enable(false);
+        heightEdit->Enable(false);
+    }
 }

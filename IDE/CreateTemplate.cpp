@@ -255,7 +255,7 @@ void CreateTemplate::OnCreateBtClick( wxCommandEvent& event )
 
     OpenSaveGame::SaveEvents(events, elemEvents);
 
-    wxFileDialog dialog( this, _( "Choisissez où enregistrer le modèle" ), "", "", "Modèle (*.mgd)|*.mgd" );
+    wxFileDialog dialog( this, _( "Choisissez où enregistrer le modèle" ), "", "", "Modèle (*.mgd)|*.mgd", wxFD_SAVE );
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )

@@ -53,7 +53,10 @@ class EdittimeScene : public RuntimeScene
 
         //Déplacement d'objets
         bool isMovingObject;
-        vector < int > idObjectsSelected;
+        bool isResizingX;
+        bool isResizingY;
+        bool isRotatingObject;
+        vector < ObjSPtr > objectsSelected;
         vector < float > xObjectsSelected;
         vector < float > yObjectsSelected;
         int xDecalement;
@@ -73,7 +76,7 @@ class EdittimeScene : public RuntimeScene
         int deplacementOX;
         int deplacementOY;
 
-        int FindSmallestObject();
+        ObjSPtr FindSmallestObject();
 
     protected:
     private:

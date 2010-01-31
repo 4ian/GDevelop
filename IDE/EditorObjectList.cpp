@@ -403,6 +403,17 @@ void EditorObjectList::OneditMenuISelected(wxCommandEvent& event)
     {
         objects->at(i)->EditObject(this, game, mainEditorCommand);
         mainEditorCommand.NeedRefreshScene();
+
+        //Reload thumbnail
+        int thumbnailID = -1;
+        wxBitmap thumbnail;
+        if ( objects->at(i)->GenerateThumbnail(game, thumbnail) )
+        {
+            objectsImagesList->Add(thumbnail);
+            thumbnailID = objectsImagesList->GetImageCount()-1;
+        }
+
+        objectsList->SetItemImage( item, thumbnailID );
     }
     else
     {
@@ -472,8 +483,19 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
 
     //And to the TreeCtrl
     wxTreeItemId rootId = objectsList->GetRootItem();
-    objectsList->AppendItem( rootId, name );
+    wxTreeItemId itemAdded = objectsList->AppendItem( rootId, name );
     objectsList->ExpandAll();
+
+    //Reload thumbnail
+    int thumbnailID = -1;
+    wxBitmap thumbnail;
+    if ( objects->at(i)->GenerateThumbnail(game, thumbnail) )
+    {
+        objectsImagesList->Add(thumbnail);
+        thumbnailID = objectsImagesList->GetImageCount()-1;
+    }
+
+    objectsList->SetItemImage( itemAdded, thumbnailID );
 
     mainEditorCommand.NeedRefreshScene();
     wxLogStatus( _( "L'objet a été correctement ajouté" ) );
@@ -714,7 +736,7 @@ void EditorObjectList::OnMoveDownSelected(wxCommandEvent& event)
         return;
     }
 
-    if ( i+1 < objects->size() )
+    if ( static_cast<unsigned>(i+1) < objects->size() )
     {
         //On déplace l'image
         boost::shared_ptr<Object> object = objects->at(i);

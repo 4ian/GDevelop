@@ -7,35 +7,71 @@
 	<File name="CheckMAJ.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="3588" topLine="92" />
 	</File>
+	<File name="ChoixAction.cpp" open="0" top="0" tabpos="9">
+		<Cursor position="590" topLine="21" />
+	</File>
+	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="10">
+		<Cursor position="1078" topLine="40" />
+	</File>
 	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="492" topLine="0" />
 	</File>
 	<File name="CompilationChecker.h" open="0" top="0" tabpos="6">
 		<Cursor position="158" topLine="0" />
 	</File>
+	<File name="CreateTemplate.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="17738" topLine="237" />
+	</File>
 	<File name="Credits.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="226" topLine="0" />
 	</File>
-	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="11766" topLine="243" />
+	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="26638" topLine="607" />
 	</File>
 	<File name="DndTextSceneEditor.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="267" topLine="0" />
 	</File>
+	<File name="EditLink.cpp" open="0" top="0" tabpos="13">
+		<Cursor position="237" topLine="0" />
+	</File>
 	<File name="EditObjectGroup.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="8728" topLine="179" />
+	</File>
+	<File name="EditOptionsPosition.cpp" open="1" top="0" tabpos="11">
+		<Cursor position="16452" topLine="284" />
 	</File>
 	<File name="EditOptionsPosition.h" open="0" top="0" tabpos="0">
 		<Cursor position="601" topLine="6" />
 	</File>
-	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="30264" topLine="702" />
+	<File name="EditPropJeu.cpp" open="0" top="0" tabpos="15">
+		<Cursor position="298" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="1" top="0" tabpos="8">
+	<File name="EditorEvents.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="37299" topLine="708" />
+	</File>
+	<File name="EditorImages.cpp" open="0" top="0" tabpos="17">
+		<Cursor position="806" topLine="7" />
+	</File>
+	<File name="EditorLayers.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="250" topLine="0" />
+	</File>
+	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="31061" topLine="701" />
+	</File>
+	<File name="EditorObjets.cpp" open="0" top="0" tabpos="20">
+		<Cursor position="533" topLine="0" />
+	</File>
+	<File name="EditorObjetsGroups.cpp" open="0" top="0" tabpos="21">
+		<Cursor position="481" topLine="0" />
+	</File>
+	<File name="EditorScene.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="31429" topLine="622" />
 	</File>
-	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="1269" topLine="33" />
+	<File name="EdittimeScene.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="4484" topLine="81" />
+	</File>
+	<File name="EdittimeScene.h" open="1" top="0" tabpos="2">
+		<Cursor position="1260" topLine="32" />
 	</File>
 	<File name="Extensions.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="12287" topLine="314" />
@@ -43,22 +79,52 @@
 	<File name="Extensions.h" open="0" top="0" tabpos="2">
 		<Cursor position="1971" topLine="58" />
 	</File>
+	<File name="Fusion.cpp" open="0" top="0" tabpos="22">
+		<Cursor position="379" topLine="1" />
+	</File>
 	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2790" topLine="90" />
 	</File>
 	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="1338" topLine="39" />
 	</File>
-	<File name="MAJ.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="6735" topLine="93" />
+	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="23">
+		<Cursor position="1384" topLine="31" />
 	</File>
-	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="4595" topLine="99" />
+	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="24">
+		<Cursor position="1349" topLine="24" />
+	</File>
+	<File name="ImportImage.cpp" open="0" top="0" tabpos="25">
+		<Cursor position="325" topLine="0" />
+	</File>
+	<File name="LinkRenderer.cpp" open="0" top="0" tabpos="26">
+		<Cursor position="239" topLine="0" />
+	</File>
+	<File name="MAJ.cpp" open="0" top="0" tabpos="27">
+		<Cursor position="253" topLine="12" />
+	</File>
+	<File name="MiniChoixObjet.cpp" open="0" top="0" tabpos="28">
+		<Cursor position="458" topLine="0" />
+	</File>
+	<File name="SceneCanvas.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="15138" topLine="379" />
+	</File>
+	<File name="SceneCanvas.h" open="0" top="0" tabpos="0">
+		<Cursor position="2511" topLine="66" />
 	</File>
 	<File name="SplashScreen.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="1411" topLine="61" />
 	</File>
 	<File name="SplashScreen.h" open="0" top="0" tabpos="6">
 		<Cursor position="288" topLine="6" />
+	</File>
+	<File name="TranslateAction.cpp" open="0" top="0" tabpos="29">
+		<Cursor position="285" topLine="0" />
+	</File>
+	<File name="TranslateCondition.cpp" open="0" top="0" tabpos="30">
+		<Cursor position="711" topLine="13" />
+	</File>
+	<File name="gridSetup.cpp" open="0" top="0" tabpos="31">
+		<Cursor position="542" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

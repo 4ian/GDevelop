@@ -247,7 +247,7 @@ void DebuggerGUI::UpdateGUI()
     //Général
     generalList->SetItem(0, 1, toString(1/scene.GetElapsedTime())+_(" i/s"));
     generalList->SetItem(1, 1, toString(scene.GetElapsedTime())+"s");
-    generalList->SetItem(2, 1, toString(scene.objets.size()));
+    generalList->SetItem(2, 1, toString(scene.objectsInstances.GetAllObjects().size()));
     generalList->SetItem(3, 1, toString(scene.game->images.size()));
     generalList->SetItem(4, 1, toString(scene.game->windowWidth)+"*"+toString(scene.game->windowHeight));
     generalList->SetItem(5, 1, toString(scene.input->GetMouseX())+";"+toString(scene.input->GetMouseY()));
@@ -314,22 +314,23 @@ void DebuggerGUI::UpdateGUI()
     }
 
     //Ajout des objets
-    for(unsigned int i = 0;i<scene.objets.size();++i)
+    ObjList allObjects = scene.objectsInstances.GetAllObjects();
+    for(unsigned int i = 0;i<allObjects.size();++i)
     {
         //L'objet n'est pas dans l'arbre : on l'ajoute
         if ( objectsInTree.find(i) == objectsInTree.end() )
         {
-            wxTreeItemId objectItem = objectsTree->AppendItem(initialObjects[scene.objets[i]->GetName()], toString(i));
-            objectsInTree[i] = pair<string, wxTreeItemId>(scene.objets[i]->GetName(), objectItem);
+            wxTreeItemId objectItem = objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], toString(i));
+            objectsInTree[i] = pair<string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
         }
         else
         {
             //Si l'objet qui est dans l'arbre n'est pas le même, on le supprime et le reajoute au bon endroit
-            if ( objectsInTree[i].first != scene.objets[i]->GetName() )
+            if ( objectsInTree[i].first != allObjects[i]->GetName() )
             {
                 objectsTree->Delete(objectsInTree[i].second);
-                wxTreeItemId objectItem = objectsTree->AppendItem(initialObjects[scene.objets[i]->GetName()], toString(i));
-                objectsInTree[i] = pair<string, wxTreeItemId>(scene.objets[i]->GetName(), objectItem);
+                wxTreeItemId objectItem = objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], toString(i));
+                objectsInTree[i] = pair<string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
             }
         }
     }
@@ -340,7 +341,7 @@ void DebuggerGUI::UpdateGUI()
 
     for(;objectsInTreeIter != objectsInTreeEnd;++objectsInTreeIter)
     {
-        if ( (*objectsInTreeIter).first < 0 || static_cast<unsigned>((*objectsInTreeIter).first) > scene.objets.size() )
+        if ( (*objectsInTreeIter).first < 0 || static_cast<unsigned>((*objectsInTreeIter).first) > allObjects.size() )
         {
             objectsTree->Delete((*objectsInTreeIter).second.second); //Suppression de l'arbre
             map < int, pair<string, wxTreeItemId> >::iterator temp = objectsInTreeIter;
@@ -355,22 +356,22 @@ void DebuggerGUI::UpdateGUI()
         return;
 
     int idObject = toInt(static_cast<string>(objectsTree->GetItemText( objectsTree->GetSelection() )));
-    if ( idObject < 0 || static_cast<unsigned>(idObject) >= scene.objets.size() )
+    if ( idObject < 0 || static_cast<unsigned>(idObject) >= allObjects.size() )
         return;
 
-    objectName->SetLabel(scene.objets[idObject]->GetName());
+    objectName->SetLabel(allObjects[idObject]->GetName());
 
     //Object selected has changed, recreate the enitre table.
     if ( objectChanged )
-        RecreateListForObject(scene.objets[idObject]);
+        RecreateListForObject(allObjects[idObject]);
 
     string value, uselessName;
     unsigned int currentLine = 1; //We start a the second line, after "General"
 
     //Properties of base object
-    for (unsigned int i = 0;i<scene.objets[idObject]->Object::GetNumberOfProperties();++i)
+    for (unsigned int i = 0;i<allObjects[idObject]->Object::GetNumberOfProperties();++i)
     {
-        scene.objets[idObject]->Object::GetPropertyForDebugger(i, uselessName, value);
+        allObjects[idObject]->Object::GetPropertyForDebugger(i, uselessName, value);
         objectList->SetItem(currentLine, 1, value);
 
         currentLine++;
@@ -379,9 +380,9 @@ void DebuggerGUI::UpdateGUI()
     currentLine += 2; //We have two lines to jump for "Specific"
 
     //Specific properties of object
-    for (unsigned int i = 0;i<scene.objets[idObject]->GetNumberOfProperties();++i)
+    for (unsigned int i = 0;i<allObjects[idObject]->GetNumberOfProperties();++i)
     {
-        scene.objets[idObject]->GetPropertyForDebugger(i, uselessName, value);
+        allObjects[idObject]->GetPropertyForDebugger(i, uselessName, value);
         objectList->SetItem(currentLine, 1, value);
 
         currentLine++;
@@ -390,20 +391,20 @@ void DebuggerGUI::UpdateGUI()
     currentLine += 2; //We have two lines to jump for "Variables"
 
     //Suppression des lignes en trop pour les variables
-    while(objectList->GetItemCount() > baseItemCount+scene.objets[idObject]->variablesObjet.variables.size())
-        objectList->DeleteItem(baseItemCount+scene.objets[idObject]->variablesObjet.variables.size());
+    while(objectList->GetItemCount() > baseItemCount+allObjects[idObject]->variablesObjet.variables.size())
+        objectList->DeleteItem(baseItemCount+allObjects[idObject]->variablesObjet.variables.size());
 
     //Rajout si au contraire il n'y en a pas assez
-    while(objectList->GetItemCount() < baseItemCount+scene.objets[idObject]->variablesObjet.variables.size())
+    while(objectList->GetItemCount() < baseItemCount+allObjects[idObject]->variablesObjet.variables.size())
     {
         objectList->InsertItem(baseItemCount, "");
     }
 
     //Mise à jour des variables
-    for (unsigned int i =0;i<scene.objets[idObject]->variablesObjet.variables.size();++i)
+    for (unsigned int i =0;i<allObjects[idObject]->variablesObjet.variables.size();++i)
     {
-        objectList->SetItem(baseItemCount+i, 0, scene.objets[idObject]->variablesObjet.variables[i].GetName());
-        objectList->SetItem(baseItemCount+i, 1, scene.objets[idObject]->variablesObjet.variables[i].Gettexte());
+        objectList->SetItem(baseItemCount+i, 0, allObjects[idObject]->variablesObjet.variables[i].GetName());
+        objectList->SetItem(baseItemCount+i, 1, allObjects[idObject]->variablesObjet.variables[i].Gettexte());
     }
 }
 
@@ -467,50 +468,52 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     if ( !objectsTree->GetSelection().IsOk() )
         return;
 
+    ObjList allObjects = scene.objectsInstances.GetAllObjects();
+
     int idObject = toInt(static_cast<string>(objectsTree->GetItemText( objectsTree->GetSelection() )));
-    if ( idObject < 0 || static_cast<unsigned>(idObject) >= scene.objets.size() )
+    if ( idObject < 0 || static_cast<unsigned>(idObject) >= allObjects.size() )
         return;
 
     //Check if we are trying to modify a "general" property
-    if ( event.GetIndex() < 1+scene.objets[idObject]->Object::GetNumberOfProperties()) //1+ for include the "General"
+    if ( event.GetIndex() < 1+allObjects[idObject]->Object::GetNumberOfProperties()) //1+ for include the "General"
     {
         int propNb = event.GetIndex()-1;
 
         string uselessName, oldValue;
-        scene.objets[idObject]->Object::GetPropertyForDebugger(propNb, uselessName, oldValue);
+        allObjects[idObject]->Object::GetPropertyForDebugger(propNb, uselessName, oldValue);
         string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), oldValue).mb_str());
 
-        if ( !scene.objets[idObject]->Object::ChangeProperty(propNb, newValue) )
+        if ( !allObjects[idObject]->Object::ChangeProperty(propNb, newValue) )
         {
             wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entrée peut être incorrecte, ou la propriété en lecture seule."));
         }
     }
     //A specific property
-    else if ( event.GetIndex() < 1+scene.objets[idObject]->Object::GetNumberOfProperties()
-                                +2+scene.objets[idObject]->GetNumberOfProperties()) //+2 for include the "Specific"
+    else if ( event.GetIndex() < 1+allObjects[idObject]->Object::GetNumberOfProperties()
+                                +2+allObjects[idObject]->GetNumberOfProperties()) //+2 for include the "Specific"
     {
-        int propNb = event.GetIndex()-1-2-scene.objets[idObject]->Object::GetNumberOfProperties();
+        int propNb = event.GetIndex()-1-2-allObjects[idObject]->Object::GetNumberOfProperties();
 
         string uselessName, oldValue;
-        scene.objets[idObject]->GetPropertyForDebugger(propNb, uselessName, oldValue);
+        allObjects[idObject]->GetPropertyForDebugger(propNb, uselessName, oldValue);
         string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), oldValue).mb_str());
 
-        if ( !scene.objets[idObject]->ChangeProperty(propNb, newValue) )
+        if ( !allObjects[idObject]->ChangeProperty(propNb, newValue) )
         {
             wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entrée peut être incorrecte, ou la propriété en lecture seule."));
         }
     }
     else //Or a variable
     {
-        int idVariable = event.GetIndex() - ( 1+scene.objets[idObject]->Object::GetNumberOfProperties()
-                                              +2+scene.objets[idObject]->GetNumberOfProperties()
+        int idVariable = event.GetIndex() - ( 1+allObjects[idObject]->Object::GetNumberOfProperties()
+                                              +2+allObjects[idObject]->GetNumberOfProperties()
                                               +2);
 
-        if ( idVariable >= 0 && idVariable < scene.objets[idObject]->variablesObjet.variables.size() )
+        if ( idVariable >= 0 && idVariable < allObjects[idObject]->variablesObjet.variables.size() )
         {
-            string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une variable"), scene.objets[idObject]->variablesObjet.variables[idVariable].Gettexte()).mb_str());
+            string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une variable"), allObjects[idObject]->variablesObjet.variables[idVariable].Gettexte()).mb_str());
 
-            scene.objets[idObject]->variablesObjet.variables[idVariable] = newValue;
+            allObjects[idObject]->variablesObjet.variables[idVariable] = newValue;
         }
     }
 
@@ -549,11 +552,13 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
     if ( !objectsTree->GetSelection().IsOk() )
         return;
 
+    ObjList allObjects = scene.objectsInstances.GetAllObjects();
+
     int idObject = toInt(static_cast<string>(objectsTree->GetItemText( objectsTree->GetSelection() )));
-    if ( idObject < 0 || static_cast<unsigned>(idObject) >= scene.objets.size() )
+    if ( idObject < 0 || static_cast<unsigned>(idObject) >= allObjects.size() )
         return;
 
-    scene.objets[idObject]->SetName("");
+    allObjects[idObject]->SetName("");
 }
 
 /**
@@ -610,12 +615,13 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     int IDglobalObject = Picker::PickOneObject( &scene.game->globalObjects, objectWanted );
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    ObjSPtr newObject = boost::shared_ptr<Object> ();
 
     //Creation of the object
     if ( IDsceneObject != -1)
-        scene.objets.push_back( extensionManager->CreateObject(scene.objetsInitiaux[IDsceneObject]) );
+        newObject = extensionManager->CreateObject(scene.objetsInitiaux[IDsceneObject]);
     else if ( IDglobalObject != -1)
-        scene.objets.push_back( extensionManager->CreateObject(scene.game->globalObjects[IDglobalObject]) );
+        newObject = extensionManager->CreateObject(scene.game->globalObjects[IDglobalObject]);
     else
     {
         wxLogWarning(_("Impossible de créer l'objet."));
@@ -623,16 +629,20 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     }
 
     //Initialisation
-    scene.objets.back()->errors = &scene.errors;
+    newObject->errors = &scene.errors;
 
     int x = toInt(string(wxGetTextFromUser(_("Entrez la position X de l'objet"), _("Ajout d'un objet")).mb_str()));
     int y = toInt(string(wxGetTextFromUser(_("Entrez la position Y de l'objet"), _("Ajout d'un objet")).mb_str()));
-    scene.objets.back()->SetX( x );
-    scene.objets.back()->SetY( y );
+    newObject->SetX( x );
+    newObject->SetY( y );
 
     ChoixLayer layerDialog(this, scene.layers);
     layerDialog.ShowModal();
-    scene.objets.back()->SetLayer( layerDialog.layerChosen );
+    newObject->SetLayer( layerDialog.layerChosen );
+
+    scene.objectsInstances.AddObject(newObject);
 
     return;
 }
+
+//TODO : Use an "AllObjects" list with an number in this list to identify object is not verify good. Better to use shared_ptr ?

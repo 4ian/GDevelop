@@ -24,6 +24,7 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/AppelEvent.h"
 #include "GDL/Chercher.h"
+#include "GDL/ExtensionsManager.h"
 #include "GDL/ImageManager.h"
 #include "GDL/RuntimeGame.h"
 #include "DndTextSceneEditor.h"
@@ -137,9 +138,13 @@ void SceneCanvas::OnUpdate()
         int retourEvent = scene.RenderAndStep(1);
 
         if ( retourEvent == -2 )
+        {
             wxLogStatus( _( "Dans le jeu final, le jeu se terminera." ) );
+        }
         else if ( retourEvent != -1 )
+        {
             wxLogStatus( _( "Dans le jeu final, un changement de scène s'effectuera." ) );
+        }
 
     }
     else if ( !scene.running && !scene.editing )
@@ -225,33 +230,75 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
         return;
     }
 
-    int idObject = scene.FindSmallestObject();
+    ObjSPtr object = scene.FindSmallestObject();
 
     //Suppression de la selection
-    if ( idObject == -1 || /*Si clic n'importe où */
+    if ( object == boost::shared_ptr<Object> () || /*Si clic n'importe où */
         (( !scene.input->IsKeyDown(sf::Key::LShift) && !scene.input->IsKeyDown(sf::Key::RShift) ) && /*Ou si clic sur un objet sans Shift*/
-         find(scene.idObjectsSelected.begin(), scene.idObjectsSelected.end(), idObject) == scene.idObjectsSelected.end() ))
+         find(scene.objectsSelected.begin(), scene.objectsSelected.end(), object) == scene.objectsSelected.end() ))
     {
-        scene.idObjectsSelected.clear();
+        scene.objectsSelected.clear();
         scene.xObjectsSelected.clear();
         scene.yObjectsSelected.clear();
     }
 
     //On ajoute l'objet surligné dans les objets à bouger
-    if ( idObject == -1 ) return;
+    if ( object == boost::shared_ptr<Object> () ) return;
 
-    if ( find(scene.idObjectsSelected.begin(), scene.idObjectsSelected.end(), idObject) == scene.idObjectsSelected.end() )
+    int mouseX = ConvertCoords(scene.input->GetMouseX(), 0).x;
+    int mouseY = ConvertCoords(0, scene.input->GetMouseY()).y;
+
+    //Verify if user want to resize the object
+    if (    scene.objectsSelected.size() == 1 &&
+            mouseX > object->GetDrawableX()+object->GetWidth()-6 &&
+            mouseX < object->GetDrawableX()+object->GetWidth() &&
+            mouseY > object->GetDrawableY()+object->GetHeight()/2-3 &&
+            mouseY < object->GetDrawableY()+object->GetHeight()/2+3)
     {
-        scene.idObjectsSelected.push_back(idObject);
+        scene.isMovingObject = false;
+        scene.isRotatingObject = false;
+        scene.isResizingX = true;
+    }
+    else if (   scene.objectsSelected.size() == 1 &&
+                mouseY > object->GetDrawableY()+object->GetHeight()-6 &&
+                mouseY < object->GetDrawableY()+object->GetHeight() &&
+                mouseX > object->GetDrawableX()+object->GetWidth()/2-3 &&
+                mouseX < object->GetDrawableX()+object->GetWidth()/2+3 )
+    {
+        scene.isMovingObject = false;
+        scene.isRotatingObject = false;
+        scene.isResizingY = true;
+    }
+    else if ( scene.objectsSelected.size() == 1 &&
+                mouseX > object->GetDrawableX()+object->GetWidth()/2+20*cos(object->GetAngle()/180.f*3.14)-3 &&
+                mouseX < object->GetDrawableX()+object->GetWidth()/2+20*cos(object->GetAngle()/180.f*3.14)+3 &&
+                mouseY > object->GetDrawableY()+object->GetHeight()/2+20*sin(object->GetAngle()/180.f*3.14)-3 &&
+                mouseY < object->GetDrawableY()+object->GetHeight()/2+20*sin(object->GetAngle()/180.f*3.14)+3 )
+    {
+        scene.isRotatingObject = true;
+        scene.isMovingObject = false;
+        scene.isResizingX = false;
+        scene.isResizingY = false;
+    }
+    else
+    {
+        if ( find(scene.objectsSelected.begin(), scene.objectsSelected.end(), object) == scene.objectsSelected.end() )
+        {
+            scene.objectsSelected.push_back(object);
 
-        //Et on renseigne sa position de départ :
-        scene.xObjectsSelected.push_back(scene.objets[idObject]->GetX());
-        scene.yObjectsSelected.push_back(scene.objets[idObject]->GetY());
+            //Et on renseigne sa position de départ :
+            scene.xObjectsSelected.push_back(object->GetX());
+            scene.yObjectsSelected.push_back(object->GetY());
+        }
+
+        scene.isMovingObject = true;
+        scene.isRotatingObject = false;
+        scene.isResizingX = false;
+        scene.isResizingY = false;
     }
 
-    scene.isMovingObject = true;
-    scene.oldMouseX = ConvertCoords(scene.input->GetMouseX(), 0).x; //Position de départ de la souris
-    scene.oldMouseY = ConvertCoords(0, scene.input->GetMouseY()).y;
+    scene.oldMouseX = mouseX; //Position de départ de la souris
+    scene.oldMouseY = mouseY;
 }
 
 ////////////////////////////////////////////////////////////
@@ -264,256 +311,22 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
     //position de départ est celle où ils sont.
     if ( scene.isMovingObject )
     {
-        for (unsigned int i = 0;i<scene.idObjectsSelected.size();++i)
+        for (unsigned int i = 0;i<scene.objectsSelected.size();++i)
         {
-            int ID = scene.idObjectsSelected.at(i);
-
-            if ( ID > -1 && static_cast<unsigned>(ID) < scene.objets.size() )
+            ObjSPtr object = scene.objectsSelected.at(i);
+            int IDInitialPosition = GetInitialPositionFromObject(object);
+            if ( IDInitialPosition != -1)
             {
-                bool trouve = false;
-                unsigned int j = 0;
-                while ( j < sceneEdited->positionsInitiales.size() && !trouve )
-                {
-                    if ( sceneEdited->positionsInitiales.at( j ).objectName == scene.objets[ID]->GetName() &&
-                            sceneEdited->positionsInitiales.at( j ).x == scene.objets[ID]->GetX() &&
-                            sceneEdited->positionsInitiales.at( j ).y == scene.objets[ID]->GetY() )
-                    {
-
-                        scene.xObjectsSelected[i] = sceneEdited->positionsInitiales.at( j ).x;
-                        scene.yObjectsSelected[i] = sceneEdited->positionsInitiales.at( j ).y;
-
-                        trouve = true;
-                    }
-
-                    j++;
-                }
+                scene.xObjectsSelected[i] = sceneEdited->positionsInitiales.at( IDInitialPosition ).x;
+                scene.yObjectsSelected[i] = sceneEdited->positionsInitiales.at( IDInitialPosition ).y;
             }
         }
     }
 
+    scene.isResizingX = false;
+    scene.isResizingY = false;
     scene.isMovingObject = false;
-}
-
-////////////////////////////////////////////////////////////
-/// Double clic : insertion objet
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnLeftDClick( wxMouseEvent &event )
-{
-    wxCommandEvent unused;
-    OnAddObjetSelected(unused);
-}
-
-////////////////////////////////////////////////////////////
-/// Insertion d'un objet
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnAddObjetSelected( wxCommandEvent & event )
-{
-    //Seulement en mode éditeur
-    if ( !scene.editing )
-        return;
-
-    scene.isMovingObject = false;
-
-    if ( scene.objectToAdd == "" ) { wxLogMessage( _( "Vous n'avez selectionné aucun objet à ajouter.\nSélectionnez en un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils." ) ); return;}
-    if ( Picker::PickOneObject( &sceneEdited->objetsInitiaux, scene.objectToAdd ) == -1
-        && Picker::PickOneObject( &game.globalObjects, scene.objectToAdd ) == -1 )
-    {
-        if ( wxMessageBox( _( "Vous tentez d'ajouter un objet qui n'existe pas ou plus dans la liste des objets.\nÊtes vous sur de vouloir l'ajouter à la scène ?" ), "L'objet n'existe pas dans la liste !",
-                           wxYES_NO ) == wxID_NO )
-        {
-            return; //On arrête si l'utilisateur ne veut pas rajouter son objet.
-        }
-    }
-
-    InitialPosition pos;
-    pos.objectName = scene.objectToAdd; //A choisir avec un dialog approprié ou par drag'n'drop
-    if ( scene.grid && scene.snap )
-    {
-        pos.x = static_cast<int>(ConvertCoords(scene.input->GetMouseX(), 0).x/scene.gridWidth)*scene.gridWidth;
-        pos.y = static_cast<int>(ConvertCoords(0, scene.input->GetMouseY()).y/scene.gridHeight)*scene.gridHeight;
-    }
-    else
-    {
-        pos.x = ConvertCoords(scene.input->GetMouseX(), 0).x;
-        pos.y = ConvertCoords(0, scene.input->GetMouseY()).y;
-    }
-    pos.direction = 0;
-    pos.zOrder = 0;
-    pos.layer = scene.addOnLayer;
-    sceneEdited->positionsInitiales.push_back( pos );
-
-
-
-    Reload();
-}
-
-////////////////////////////////////////////////////////////
-/// Clic droit : edition propriétés objet
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnRightUp( wxMouseEvent &event )
-{
-    if ( !scene.editing )
-        return;
-
-    int idObject = scene.FindSmallestObject();
-
-    //Suppression de la selection
-    if ( idObject == -1 || /*Si clic n'importe où */
-        (( !scene.input->IsKeyDown(sf::Key::LShift) && !scene.input->IsKeyDown(sf::Key::RShift) ) && /*Ou si clic sur un objet sans Shift*/
-         find(scene.idObjectsSelected.begin(), scene.idObjectsSelected.end(), idObject) == scene.idObjectsSelected.end() ))
-    {
-        scene.idObjectsSelected.clear();
-        scene.xObjectsSelected.clear();
-        scene.yObjectsSelected.clear();
-    }
-
-    //On ajoute l'objet surligné dans les objets à bouger
-    if ( idObject == -1 ) return;
-
-    if ( find(scene.idObjectsSelected.begin(), scene.idObjectsSelected.end(), idObject) == scene.idObjectsSelected.end() )
-    {
-        scene.idObjectsSelected.push_back(idObject);
-
-        //Et on renseigne sa position de départ :
-        scene.xObjectsSelected.push_back(scene.objets[idObject]->GetX());
-        scene.yObjectsSelected.push_back(scene.objets[idObject]->GetY());
-    }
-
-    OnUpdate(); //Pour afficher le rectangle de selection
-    UpdateContextMenu();
-    PopupMenu(&contextMenu);
-
-    hasJustRightClicked = true;
-}
-
-////////////////////////////////////////////////////////////
-/// Déplacement de(s) objet(s) selectionné(s) sur le calque supérieur
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnLayerUpSelected(wxCommandEvent & event)
-{
-    int lowestLayer = GetObjectsSelectedLowestLayer();
-    if ( lowestLayer+1 < 0 || static_cast<unsigned>(lowestLayer+1) >= scene.layers.size() )
-        return;
-
-    string layerName = scene.layers.at(lowestLayer+1).GetName();
-
-    for (unsigned int i =0;i<scene.idObjectsSelected.size();++i)
-    {
-        //Récupérons la position initiale
-        int posId = GetPositionInitialeIdFromObjectId(scene.idObjectsSelected[i]);
-        if ( posId != -1 )
-            sceneEdited->positionsInitiales.at(posId).layer = layerName;
-            scene.objets[scene.idObjectsSelected[i]]->SetLayer(layerName);
-    }
-}
-
-////////////////////////////////////////////////////////////
-/// Déplacement de(s) objet(s) selectionné(s) sur le calque inférieur
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnLayerDownSelected(wxCommandEvent & event)
-{
-    int highestLayer = GetObjectsSelectedLowestLayer();
-    if ( highestLayer-1 < 0 || static_cast<unsigned>(highestLayer-1) >= scene.layers.size() )
-        return;
-
-    string layerName = scene.layers.at(highestLayer-1).GetName();
-
-    for (unsigned int i =0;i<scene.idObjectsSelected.size();++i)
-    {
-        //Récupérons la position initiale
-        int posId = GetPositionInitialeIdFromObjectId(scene.idObjectsSelected[i]);
-        if ( posId != -1 )
-        {
-            sceneEdited->positionsInitiales.at(posId).layer = layerName;
-            scene.objets[scene.idObjectsSelected[i]]->SetLayer(layerName);
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////
-/// Editer les valeurs initiales d'un objet sur la scène
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
-{
-    if ( !scene.editing )
-        return;
-
-    //Cherche l'objet sous la souris
-    int IDpluspetit = scene.FindSmallestObject();
-    if ( IDpluspetit == -1 ) return;
-
-    unsigned int i = 0;
-    bool trouve = false;
-
-    //On cherche la position initiale correspondante
-    while ( i < sceneEdited->positionsInitiales.size() && !trouve )
-    {
-        if ( sceneEdited->positionsInitiales.at( i ).objectName == scene.objets[IDpluspetit]->GetName() &&
-                sceneEdited->positionsInitiales.at( i ).x == scene.objets[IDpluspetit]->GetX() &&
-                sceneEdited->positionsInitiales.at( i ).y == scene.objets[IDpluspetit]->GetY() )
-        {
-            //Affichage des propriétés de l'objet sous la souris
-            EditOptionsPosition DialogPosition( this, game, scene, sceneEdited->positionsInitiales.at( i ) );
-            if ( DialogPosition.ShowModal() == 1 )
-            {
-                sceneEdited->positionsInitiales.at( i ) = DialogPosition.position;
-            }
-
-
-            Reload();
-            return;
-        }
-
-        i++;
-    }
-}
-
-////////////////////////////////////////////////////////////
-/// Double clic droit : propriétés direct de l'objet
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnRightDClick( wxMouseEvent &event )
-{
-    wxCommandEvent unusedEvent;
-    OnPropObjSelected(unusedEvent);
-}
-
-////////////////////////////////////////////////////////////
-/// Suppression de(s) objet(s) selectionné(s)
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnDelObjetSelected(wxCommandEvent & event)
-{
-    if ( !scene.editing )
-        return;
-
-    for (unsigned int i = 0;i<scene.idObjectsSelected.size();++i)
-    {
-        int ID = scene.idObjectsSelected.at(i);
-
-        if ( ID > -1 && static_cast<unsigned>(ID) < scene.objets.size() )
-        {
-            bool trouve = false;
-            unsigned int j = 0;
-            while ( j < sceneEdited->positionsInitiales.size() && !trouve )
-            {
-                if ( sceneEdited->positionsInitiales.at( j ).objectName == scene.objets[ID]->GetName() &&
-                        sceneEdited->positionsInitiales.at( j ).x == scene.objets[ID]->GetX() &&
-                        sceneEdited->positionsInitiales.at( j ).y == scene.objets[ID]->GetY() )
-                {
-                    sceneEdited->positionsInitiales.erase(sceneEdited->positionsInitiales.begin() + j);
-                    scene.objets[ID]->SetName( "" ); //On ne supprime pas l'objet pour le moment
-                    trouve = true;
-                }
-
-                j++;
-            }
-        }
-    }
-    //Suppression effective des objets
-    scene.objets.erase( std::remove_if( scene.objets.begin(), scene.objets.end(), MustBeDeleted ), scene.objets.end() );
-
-    scene.idObjectsSelected.clear();
-    scene.xObjectsSelected.clear();
-    scene.yObjectsSelected.clear();
+    scene.isRotatingObject = false;
 }
 
 ////////////////////////////////////////////////////////////
@@ -544,57 +357,325 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
     if ( scene.isMoving )
         scene.view.Move( scene.deplacementOX - mouseXInScene, scene.deplacementOY - mouseYInScene );
 
+    if ( scene.isResizingX )
+    {
+        for (unsigned int i = 0;i<scene.objectsSelected.size();++i)
+        {
+            ObjSPtr object = scene.objectsSelected.at(i);
+            object->SetWidth(mouseXInScene-scene.xObjectsSelected.at(i));
+
+            int idPos = GetInitialPositionFromObject(object);
+            if ( idPos != -1 )
+            {
+                sceneEdited->positionsInitiales.at( idPos ).personalizedSize = true;
+                sceneEdited->positionsInitiales.at( idPos ).width = object->GetWidth();
+                sceneEdited->positionsInitiales.at( idPos ).height = object->GetHeight();
+            }
+        }
+    }
+    if ( scene.isResizingY )
+    {
+        for (unsigned int i = 0;i<scene.objectsSelected.size();++i)
+        {
+            ObjSPtr object = scene.objectsSelected.at(i);
+            object->SetHeight(mouseYInScene-scene.yObjectsSelected.at(i));
+
+            int idPos = GetInitialPositionFromObject(object);
+            if ( idPos != -1 )
+            {
+                sceneEdited->positionsInitiales.at( idPos ).personalizedSize = true;
+                sceneEdited->positionsInitiales.at( idPos ).height = object->GetHeight();
+                sceneEdited->positionsInitiales.at( idPos ).width = object->GetWidth();
+            }
+        }
+    }
+    if ( scene.isRotatingObject )
+    {
+        for (unsigned int i = 0;i<scene.objectsSelected.size();++i)
+        {
+            ObjSPtr object = scene.objectsSelected.at(i);
+            float x = mouseXInScene-(object->GetDrawableX()+object->GetWidth()/2);
+            float y = mouseYInScene-(object->GetDrawableY()+object->GetHeight()/2);
+            float newAngle = atan2(y,x)*180/3.14;
+
+            object->SetAngle(newAngle);
+
+            int idPos = GetInitialPositionFromObject(object);
+            if ( idPos != -1 )
+            {
+                sceneEdited->positionsInitiales.at( idPos ).angle = newAngle;
+            }
+        }
+    }
     //Déplacement de la position initiale d'un objet
     if ( scene.isMovingObject )
     {
-        for (unsigned int i = 0;i<scene.idObjectsSelected.size();++i)
+        for (unsigned int i = 0;i<scene.objectsSelected.size();++i)
         {
-            int ID = scene.idObjectsSelected.at(i);
+            ObjSPtr object = scene.objectsSelected.at(i);
 
-            if ( ID > -1 && static_cast<unsigned>(ID) < scene.objets.size() )
+            int idPos = GetInitialPositionFromObject(object);
+            if ( idPos != -1 )
             {
-                bool trouve = false;
-                unsigned int j = 0;
-                while ( j < sceneEdited->positionsInitiales.size() && !trouve )
+                //Déplacement effectué par la souris
+                int deltaX = mouseXInScene - scene.oldMouseX;
+                int deltaY = mouseYInScene - scene.oldMouseY;
+
+                //Anciennes et nouvelles coordonnées
+                int oldX = scene.xObjectsSelected[i];
+                int oldY = scene.yObjectsSelected[i];
+                int newX = oldX + deltaX;
+                int newY = oldY + deltaY;
+
+                if ( scene.grid && scene.snap )
                 {
-                    if ( sceneEdited->positionsInitiales.at( j ).objectName == scene.objets[ID]->GetName() &&
-                            sceneEdited->positionsInitiales.at( j ).x == scene.objets[ID]->GetX() &&
-                            sceneEdited->positionsInitiales.at( j ).y == scene.objets[ID]->GetY() )
-                    {
-
-                        //Déplacement effectué par la souris
-                        int deltaX = mouseXInScene - scene.oldMouseX;
-                        int deltaY = mouseYInScene - scene.oldMouseY;
-
-                        //Anciennes et nouvelles coordonnées
-                        int oldX = scene.xObjectsSelected[i];
-                        int oldY = scene.yObjectsSelected[i];
-                        int newX = oldX + deltaX;
-                        int newY = oldY + deltaY;
-
-                        if ( scene.grid && scene.snap )
-                        {
-                            newX = static_cast<int>(newX/scene.gridWidth)*scene.gridWidth;
-                            newY = static_cast<int>(newY/scene.gridHeight)*scene.gridHeight;
-                        }
-
-                        //Modification de l'emplacement initial
-                        sceneEdited->positionsInitiales.at( j ).x = newX;
-                        sceneEdited->positionsInitiales.at( j ).y = newY;
-
-                        //On bouge aussi l'objet actuellement affiché
-                        scene.objets[ID]->SetX( newX );
-                        scene.objets[ID]->SetY( newY );
-
-                        trouve = true;
-                    }
-
-                    j++;
+                    newX = static_cast<int>(newX/scene.gridWidth)*scene.gridWidth;
+                    newY = static_cast<int>(newY/scene.gridHeight)*scene.gridHeight;
                 }
+
+                //Modification de l'emplacement initial
+                sceneEdited->positionsInitiales.at( idPos ).x = newX;
+                sceneEdited->positionsInitiales.at( idPos ).y = newY;
+
+                //On bouge aussi l'objet actuellement affiché
+                object->SetX( newX );
+                object->SetY( newY );
             }
         }
     }
 
+}
+
+////////////////////////////////////////////////////////////
+/// Double clic : insertion objet
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnLeftDClick( wxMouseEvent &event )
+{
+    wxCommandEvent unused;
+    OnAddObjetSelected(unused);
+}
+
+////////////////////////////////////////////////////////////
+/// Insertion d'un objet
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnAddObjetSelected( wxCommandEvent & event )
+{
+    //Seulement en mode éditeur
+    if ( !scene.editing )
+        return;
+
+    scene.isMovingObject = false;
+
+    if ( scene.objectToAdd == "" ) { wxLogMessage( _( "Vous n'avez selectionné aucun objet à ajouter.\nSélectionnez en un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils." ) ); return;}
+
+    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    int IDsceneObject = Picker::PickOneObject( &sceneEdited->objetsInitiaux, scene.objectToAdd );
+    int IDglobalObject = Picker::PickOneObject( &game.globalObjects, scene.objectToAdd );
+
+    ObjSPtr newObject = boost::shared_ptr<Object> ();
+
+    if ( IDsceneObject != -1 ) //We check first scene's objects' list.
+        newObject = extensionManager->CreateObject(sceneEdited->objetsInitiaux[IDsceneObject]);
+    else if ( IDglobalObject != -1 ) //Then the global object list
+        newObject = extensionManager->CreateObject(game.globalObjects[IDglobalObject]);
+
+    if ( newObject == boost::shared_ptr<Object> () )
+    {
+        wxLogMessage(_("L'objet à ajouter n'existe pas ou plus dans la liste des objets."));
+        return;
+    }
+
+    //Initial position creation
+    InitialPosition pos;
+    pos.objectName = scene.objectToAdd; //A choisir avec un dialog approprié ou par drag'n'drop
+    if ( scene.grid && scene.snap )
+    {
+        pos.x = static_cast<int>(ConvertCoords(scene.input->GetMouseX(), 0).x/scene.gridWidth)*scene.gridWidth;
+        pos.y = static_cast<int>(ConvertCoords(0, scene.input->GetMouseY()).y/scene.gridHeight)*scene.gridHeight;
+    }
+    else
+    {
+        pos.x = ConvertCoords(scene.input->GetMouseX(), 0).x;
+        pos.y = ConvertCoords(0, scene.input->GetMouseY()).y;
+    }
+
+    pos.zOrder = 0;
+    pos.layer = scene.addOnLayer;
+    sceneEdited->positionsInitiales.push_back( pos );
+
+    //Edittime scene object creation
+    newObject->errors = &scene.errors;
+    newObject->SetX( pos.x );
+    newObject->SetY( pos.y );
+    newObject->SetZOrder( pos.zOrder );
+    newObject->SetLayer( pos.layer );
+
+    newObject->InitializeFromInitialPosition(pos);
+
+    scene.objectsInstances.AddObject(newObject);
+}
+
+////////////////////////////////////////////////////////////
+/// Clic droit : edition propriétés objet
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnRightUp( wxMouseEvent &event )
+{
+    if ( !scene.editing )
+        return;
+
+    ObjSPtr object = scene.FindSmallestObject();
+
+    //Suppression de la selection
+    if ( object == boost::shared_ptr<Object> () || /*Si clic n'importe où */
+        (( !scene.input->IsKeyDown(sf::Key::LShift) && !scene.input->IsKeyDown(sf::Key::RShift) ) && /*Ou si clic sur un objet sans Shift*/
+         find(scene.objectsSelected.begin(), scene.objectsSelected.end(), object) == scene.objectsSelected.end() ))
+    {
+        scene.objectsSelected.clear();
+        scene.xObjectsSelected.clear();
+        scene.yObjectsSelected.clear();
+    }
+
+    //On ajoute l'objet surligné dans les objets à bouger
+    if ( object == boost::shared_ptr<Object> () ) return;
+
+    if ( find(scene.objectsSelected.begin(), scene.objectsSelected.end(), object) == scene.objectsSelected.end() )
+    {
+        scene.objectsSelected.push_back(object);
+
+        //Et on renseigne sa position de départ :
+        scene.xObjectsSelected.push_back(object->GetX());
+        scene.yObjectsSelected.push_back(object->GetY());
+    }
+
+    OnUpdate(); //Pour afficher le rectangle de selection
+    UpdateContextMenu();
+    PopupMenu(&contextMenu);
+
+    hasJustRightClicked = true;
+}
+
+////////////////////////////////////////////////////////////
+/// Déplacement de(s) objet(s) selectionné(s) sur le calque supérieur
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnLayerUpSelected(wxCommandEvent & event)
+{
+    int lowestLayer = GetObjectsSelectedLowestLayer();
+    if ( lowestLayer+1 < 0 || static_cast<unsigned>(lowestLayer+1) >= scene.layers.size() )
+        return;
+
+    string layerName = scene.layers.at(lowestLayer+1).GetName();
+
+    for (unsigned int i =0;i<scene.objectsSelected.size();++i)
+    {
+        //Récupérons la position initiale
+        int posId = GetInitialPositionFromObject(scene.objectsSelected[i]);
+        if ( posId != -1 )
+        {
+            sceneEdited->positionsInitiales.at(posId).layer = layerName;
+            scene.objectsSelected[i]->SetLayer(layerName);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////
+/// Déplacement de(s) objet(s) selectionné(s) sur le calque inférieur
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnLayerDownSelected(wxCommandEvent & event)
+{
+    int highestLayer = GetObjectsSelectedLowestLayer();
+    if ( highestLayer-1 < 0 || static_cast<unsigned>(highestLayer-1) >= scene.layers.size() )
+        return;
+
+    string layerName = scene.layers.at(highestLayer-1).GetName();
+
+    for (unsigned int i =0;i<scene.objectsSelected.size();++i)
+    {
+        //Récupérons la position initiale
+        int posId = GetInitialPositionFromObject(scene.objectsSelected[i]);
+        if ( posId != -1 )
+        {
+            sceneEdited->positionsInitiales.at(posId).layer = layerName;
+            scene.objectsSelected[i]->SetLayer(layerName);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////
+/// Editer les valeurs initiales d'un objet sur la scène
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
+{
+    if ( !scene.editing )
+        return;
+
+    //Cherche l'objet sous la souris
+    ObjSPtr smallestObject = scene.FindSmallestObject();
+    if ( smallestObject == boost::shared_ptr<Object> ()) return;
+
+    int idPos = GetInitialPositionFromObject(smallestObject);
+    if ( idPos == -1 ) return;
+
+    bool hadAPersonalizedSize = sceneEdited->positionsInitiales.at( idPos ).personalizedSize;
+
+    //Affichage des propriétés de l'objet sous la souris
+    EditOptionsPosition DialogPosition( this, game, scene, sceneEdited->positionsInitiales.at( idPos ) );
+    if ( DialogPosition.ShowModal() == 1 )
+    {
+        sceneEdited->positionsInitiales.at( idPos ) = DialogPosition.position;
+
+        smallestObject->SetX( sceneEdited->positionsInitiales.at( idPos ).x );
+        smallestObject->SetY( sceneEdited->positionsInitiales.at( idPos ).y );
+        smallestObject->SetZOrder( sceneEdited->positionsInitiales.at( idPos ).zOrder );
+        smallestObject->SetLayer( sceneEdited->positionsInitiales.at( idPos ).layer );
+
+        smallestObject->InitializeFromInitialPosition(sceneEdited->positionsInitiales.at( idPos ));
+
+        if ( sceneEdited->positionsInitiales.at( idPos ).personalizedSize )
+        {
+            smallestObject->SetWidth( sceneEdited->positionsInitiales.at( idPos ).width );
+            smallestObject->SetHeight( sceneEdited->positionsInitiales.at( idPos ).height );
+        }
+        else if ( hadAPersonalizedSize ) //For now, we reload the scene so as the object get back its initial size
+        {
+            Reload();
+        }
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////
+/// Double clic droit : propriétés direct de l'objet
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnRightDClick( wxMouseEvent &event )
+{
+    wxCommandEvent unusedEvent;
+    OnPropObjSelected(unusedEvent);
+}
+
+////////////////////////////////////////////////////////////
+/// Suppression de(s) objet(s) selectionné(s)
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnDelObjetSelected(wxCommandEvent & event)
+{
+    if ( !scene.editing )
+        return;
+
+    for (unsigned int i = 0;i<scene.objectsSelected.size();++i)
+    {
+        ObjSPtr object = scene.objectsSelected.at(i);
+
+        int idPos = GetInitialPositionFromObject(object);
+        if ( idPos != -1 )
+        {
+            sceneEdited->positionsInitiales.erase(sceneEdited->positionsInitiales.begin() + idPos);
+            scene.objectsInstances.RemoveObject(object);
+        }
+    }
+
+    scene.objectsSelected.clear();
+    scene.xObjectsSelected.clear();
+    scene.yObjectsSelected.clear();
 }
 
 ////////////////////////////////////////////////////////////
@@ -657,10 +738,10 @@ void SceneCanvas::OnMouseWheel( wxMouseEvent &event )
 int SceneCanvas::GetObjectsSelectedHighestLayer()
 {
     int highestLayer = 0;
-    for (unsigned int i =0;i<scene.idObjectsSelected.size();++i)
+    for (unsigned int i =0;i<scene.objectsSelected.size();++i)
     {
         //Récupérons la position initiale
-        int posId = GetPositionInitialeIdFromObjectId(scene.idObjectsSelected[i]);
+        int posId = GetInitialPositionFromObject(scene.objectsSelected[i]);
         if ( posId != -1 )
         {
             int layerObjId = 0;
@@ -682,10 +763,10 @@ int SceneCanvas::GetObjectsSelectedHighestLayer()
 int SceneCanvas::GetObjectsSelectedLowestLayer()
 {
     int lowestLayer = scene.layers.size()-1;
-    for (unsigned int i =0;i<scene.idObjectsSelected.size();++i)
+    for (unsigned int i =0;i<scene.objectsSelected.size();++i)
     {
         //Récupérons la position initiale
-        int posId = GetPositionInitialeIdFromObjectId(scene.idObjectsSelected[i]);
+        int posId = GetInitialPositionFromObject(scene.objectsSelected[i]);
         if ( posId != -1 )
         {
             int layerObjId = 0;
@@ -707,18 +788,17 @@ int SceneCanvas::GetObjectsSelectedLowestLayer()
 ////////////////////////////////////////////////////////////
 /// Renvoi l'ID d'une position initiale à partir d'un objet sur la scène
 ////////////////////////////////////////////////////////////
-int SceneCanvas::GetPositionInitialeIdFromObjectId(int ID)
+int SceneCanvas::GetInitialPositionFromObject(ObjSPtr object)
 {
-    if ( ID > -1 && static_cast<unsigned>(ID) < scene.objets.size() )
+    if ( object == boost::shared_ptr<Object> ()) return -1;
+
+    for (unsigned int j = 0;j < sceneEdited->positionsInitiales.size();++j)
     {
-        for (unsigned int j = 0;j < sceneEdited->positionsInitiales.size();++j)
+        if ( sceneEdited->positionsInitiales.at( j ).objectName == object->GetName() &&
+                sceneEdited->positionsInitiales.at( j ).x == object->GetX() &&
+                sceneEdited->positionsInitiales.at( j ).y == object->GetY() )
         {
-            if ( sceneEdited->positionsInitiales.at( j ).objectName == scene.objets[ID]->GetName() &&
-                    sceneEdited->positionsInitiales.at( j ).x == scene.objets[ID]->GetX() &&
-                    sceneEdited->positionsInitiales.at( j ).y == scene.objets[ID]->GetY() )
-            {
-                return j;
-            }
+            return j;
         }
     }
 

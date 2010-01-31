@@ -5,10 +5,10 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
+#include <wx/checkbox.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
 #include <wx/choice.h>
-#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -29,10 +29,13 @@ class EditOptionsPosition: public wxDialog
 		//(*Declarations(EditOptionsPosition)
 		wxButton* OkBt;
 		wxStaticText* StaticText9;
+		wxTextCtrl* widthEdit;
 		wxTextCtrl* YEdit;
 		wxStaticText* StaticText2;
+		wxCheckBox* sizeCheck;
 		wxChoice* layerChoice;
 		wxStaticText* StaticText6;
+		wxTextCtrl* heightEdit;
 		wxStaticText* StaticText8;
 		wxPanel* Panel1;
 		wxPanel* customPanel;
@@ -40,12 +43,12 @@ class EditOptionsPosition: public wxDialog
 		wxStaticText* StaticText3;
 		wxTextCtrl* XEdit;
 		wxStaticLine* StaticLine2;
+		wxStaticText* StaticText5;
 		wxStaticText* StaticText7;
-		wxStaticBitmap* CheckYImg;
 		wxStaticLine* StaticLine1;
 		wxButton* AnnulerBt;
 		wxTextCtrl* zOrderEdit;
-		wxStaticBitmap* CheckXImg;
+		wxStaticText* StaticText4;
 		wxStaticText* objectNameTxt;
 		wxButton* AideBt;
 		//*)
@@ -59,10 +62,13 @@ class EditOptionsPosition: public wxDialog
 		static const long ID_STATICLINE1;
 		static const long ID_STATICTEXT3;
 		static const long ID_TEXTCTRL1;
-		static const long ID_STATICBITMAP1;
 		static const long ID_STATICTEXT4;
 		static const long ID_TEXTCTRL2;
-		static const long ID_STATICBITMAP2;
+		static const long ID_CHECKBOX1;
+		static const long ID_STATICTEXT5;
+		static const long ID_TEXTCTRL3;
+		static const long ID_STATICTEXT6;
+		static const long ID_TEXTCTRL5;
 		static const long ID_STATICTEXT11;
 		static const long ID_CHOICE1;
 		static const long ID_STATICTEXT12;
@@ -83,6 +89,7 @@ class EditOptionsPosition: public wxDialog
 		void OnAnnulerBtClick(wxCommandEvent& event);
 		void OnAideBtClick(wxCommandEvent& event);
 		void OnAnimationComboText(wxCommandEvent& event);
+		void OnsizeCheckClick(wxCommandEvent& event);
 		//*)
 		void RefreshDirecType(int anim);
 

@@ -18,6 +18,8 @@ gridR( 158 ),
 gridG( 180 ),
 gridB( 255 ),
 isMovingObject( false ),
+isResizingX( false ),
+isResizingY( false ),
 colorGUI( 0 ),
 colorPlus( true ),
 selection( sf::Shape::Rectangle( 0, 0, 10, 10, sf::Color( 100, 255, 255 ), 1 ) ),
@@ -52,31 +54,65 @@ void EdittimeScene::RenderEdittimeScene()
     UpdateGUI();
 
     //On trie les objets par leurs plans
-    vector < PlanObjet > ordre;
-    OrdreAffichageObjets(ordre);
+    ObjList allObjects = objectsInstances.GetAllObjects();
+    OrderObjectsByZOrder( allObjects );
 
     //Affichage des objets
     for (unsigned int layerIndex =0;layerIndex<layers.size();++layerIndex)
     {
         if ( layers.at(layerIndex).GetVisibility() )
         {
-            for (unsigned int BoucleAffich = 0;BoucleAffich < ordre.size();++BoucleAffich)
+            for (unsigned int id = 0;id < allObjects.size();++id)
             {
-                if ( objets[ordre.at( BoucleAffich ).idObjet]->GetLayer() == layers.at(layerIndex).GetName())
+                if ( allObjects[id]->GetLayer() == layers.at(layerIndex).GetName())
                 {
-                    objets[ordre.at( BoucleAffich ).idObjet]->DrawEdittime(*renderWindow);
+                    allObjects[id]->DrawEdittime(*renderWindow);
 
                     //Selection rectangle
-                    if ( find(idObjectsSelected.begin(), idObjectsSelected.end(), ordre.at( BoucleAffich ).idObjet) != idObjectsSelected.end() )
+                    if ( find(objectsSelected.begin(), objectsSelected.end(), allObjects[id]) != objectsSelected.end() )
                     {
                         sf::Shape selection = sf::Shape::Rectangle( 0, 0,
-                                                                   objets[ordre.at( BoucleAffich ).idObjet]->GetWidth(),
-                                                                   objets[ordre.at( BoucleAffich ).idObjet]->GetHeight(),
+                                                                   allObjects[id]->GetWidth(),
+                                                                   allObjects[id]->GetHeight(),
                                                                    sf::Color( 0, 0, 200, 40 ), 1, sf::Color( 0, 0, 255, 128 ) );
 
-                        selection.SetPosition( objets[ordre.at( BoucleAffich ).idObjet]->GetDrawableX(),
-                                              objets[ordre.at( BoucleAffich ).idObjet]->GetDrawableY() );
+                        selection.SetPosition( allObjects[id]->GetDrawableX(),
+                                              allObjects[id]->GetDrawableY() );
                         renderWindow->Draw( selection );
+
+                        if ( objectsSelected.size() == 1)
+                        {
+                            sf::Shape resizeXBt = sf::Shape::Rectangle( 0, 0, 4, 4, sf::Color( 255, 255, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
+                            sf::Shape resizeYBt = sf::Shape::Rectangle( 0, 0, 4, 4, sf::Color( 255, 255, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
+                            sf::Shape angleBt = sf::Shape::Rectangle( 0, 0, 4, 4, sf::Color( 255, 255, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
+                            sf::Shape center = sf::Shape::Circle( 0, 0, 2, sf::Color( 0, 0, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
+                            sf::Shape centerToAngle = sf::Shape::Line(0,0, 20, 0, 1, sf::Color( 0, 0, 255, 255 ), 0, sf::Color( 0, 0, 255, 255 ) );
+
+                            resizeXBt.SetPosition( allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()-4,
+                                                  allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2-2 );
+
+                            resizeYBt.SetPosition( allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2-2,
+                                                  allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()-4 );
+
+                            center.SetPosition(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
+                                               allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2);
+
+                            angleBt.SetPosition(    allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2-2
+                                                    +20*cos(allObjects[id]->GetAngle()/180.f*3.14),
+                                                    allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2-2
+                                                    +20*sin(allObjects[id]->GetAngle()/180.f*3.14) );
+
+                            centerToAngle.Rotate(-allObjects[id]->GetAngle());
+                            centerToAngle.SetPosition(  allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
+                                                        allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2);
+
+                            renderWindow->Draw( centerToAngle );
+                            renderWindow->Draw( center );
+                            renderWindow->Draw( angleBt );
+                            renderWindow->Draw( resizeXBt );
+                            renderWindow->Draw( resizeYBt );
+
+                        }
                     }
                 }
             }
@@ -183,48 +219,50 @@ void EdittimeScene::UpdateGUI()
 ////////////////////////////////////////////////////////////
 /// Cherche et renvoie l'ID du plus petit objet sous le curseur
 ////////////////////////////////////////////////////////////
-int EdittimeScene::FindSmallestObject()
+ObjSPtr EdittimeScene::FindSmallestObject()
 {
-    vector < int > IDobjet;
+    ObjList potentialObjects;
     int x = renderWindow->ConvertCoords(input->GetMouseX(), 0).x;
     int y = renderWindow->ConvertCoords(0, input->GetMouseY()).y;
 
     unsigned int boucleTest = 0;
-    //Test de chaque objet
-    while ( boucleTest < objets.size() )
+
+    ObjList allObjects = objectsInstances.GetAllObjects();
+
+    for (unsigned int id = 0;id < allObjects.size();++id)
     {
-        if ( objets[boucleTest]->GetDrawableX() < x &&
-                objets[boucleTest]->GetDrawableY() < y &&
-                objets[boucleTest]->GetDrawableX() + objets[boucleTest]->GetWidth() > x &&
-                objets[boucleTest]->GetDrawableY() + objets[boucleTest]->GetHeight() > y &&
-                GetLayer(objets[boucleTest]->GetLayer()).GetVisibility())
+        if ( allObjects[id]->GetDrawableX() < x &&
+                allObjects[id]->GetDrawableY() < y &&
+                allObjects[id]->GetDrawableX() + allObjects[id]->GetWidth() > x &&
+                allObjects[id]->GetDrawableY() + allObjects[id]->GetHeight() > y &&
+                GetLayer(allObjects[id]->GetLayer()).GetVisibility())
         {
-            IDobjet.push_back( boucleTest );
+            potentialObjects.push_back( allObjects[id] );
         }
 
         boucleTest++;
     }
-    if ( IDobjet.size() == 0 ) return -1; //Aucun objet trouvé
+    if ( potentialObjects.empty() ) return boost::shared_ptr<Object> (); //Aucun objet trouvé
 
-    int IDpluspetit = IDobjet.at( 0 ); //1er objet par défaut
-    if ( IDobjet.size() > 1 )
+    ObjSPtr smallest = potentialObjects[0]; //1er objet par défaut
+    if ( potentialObjects.size() > 1 )
     {
         int compare = 1;
-        for ( unsigned int j = 0;j < IDobjet.size();j++ )
+        for ( unsigned int j = 0;j < potentialObjects.size();j++ )
         {
-            if (( objets[IDobjet[j]]->GetWidth() * objets[IDobjet[j]]->GetHeight() ) <
-                    ( objets[IDobjet[compare]]->GetWidth() * objets[IDobjet[compare]]->GetHeight() ) )
+            if (( potentialObjects[j]->GetWidth() * potentialObjects[j]->GetHeight() ) <
+                    ( potentialObjects[compare]->GetWidth() * potentialObjects[compare]->GetHeight() ) )
             {
-                IDpluspetit = IDobjet.at( j );
+                smallest = potentialObjects.at( j );
 
                 compare = j;
             }
             else
             {
-                IDpluspetit = IDobjet.at( compare );
+                smallest = potentialObjects.at( compare );
             }
         }
     }
 
-    return IDpluspetit;
+    return smallest;
 }

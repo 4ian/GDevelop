@@ -67,11 +67,11 @@ class Box3DObject : public Object
         inline void SetZPosition(float newZ) {zPosition = newZ;};
         inline float GetZPosition() const {return zPosition;};
 
-        inline void SetYaw(float newYaw) {yaw = newYaw;};
-        inline float GetYaw() const {return yaw;};
+        virtual inline void SetAngle(float newAngle) { yaw = newAngle;};
+        virtual inline float GetAngle() const {return yaw;};
 
-        inline void SetWidth(float newWidth) {width = newWidth;};
-        inline void SetHeight(float newHeight) {height = newHeight;};
+        virtual inline void SetWidth(float newWidth) {width = newWidth;};
+        virtual inline void SetHeight(float newHeight) {height = newHeight;};
         inline void SetDepth(float newDepth) {depth = newDepth;};
 
         std::string frontTextureName;

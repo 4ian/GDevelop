@@ -5,6 +5,7 @@
 #include "GDL/Access.h"
 #include "GDL/ImageManager.h"
 #include "GDL/FontManager.h"
+#include "GDL/Position.h"
 #include "GDL/tinyxml.h"
 
 #ifdef GDE
@@ -198,9 +199,6 @@ bool Box3DObject::InitializeFromInitialPosition(const InitialPosition & position
     if ( position.floatInfos.find("z") != position.floatInfos.end() )
         zPosition = position.floatInfos.find("z")->second;
 
-    if ( position.floatInfos.find("yaw") != position.floatInfos.end() )
-        yaw = position.floatInfos.find("yaw")->second;
-
     if ( position.floatInfos.find("pitch") != position.floatInfos.end() )
         pitch = position.floatInfos.find("pitch")->second;
 
@@ -221,7 +219,7 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
     window.RestoreGLStates();
 
     float windowRatio = static_cast<float>(window.GetWidth())/static_cast<float>(window.GetHeight());
-    float sizeRatio =   0.3125 //To make base have the same size as a rectangle drawn by SFML
+    float sizeRatio =   0.3330 //To make base have the same size as a rectangle drawn by SFML
                         *(window.GetView().GetSize().x/static_cast<float>(window.GetWidth()))
                         *1/window.GetView().GetSize().y*600.f; //To make size window's size independant
 
@@ -309,7 +307,7 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
     window.RestoreGLStates();
 
     float windowRatio = static_cast<float>(window.GetWidth())/static_cast<float>(window.GetHeight());
-    float sizeRatio =   0.3125 //To make base have the same size as a rectangle drawn by SFML
+    float sizeRatio =   0.3330 //To make base have the same size as a rectangle drawn by SFML
                         *(window.GetView().GetSize().x/static_cast<float>(window.GetWidth()))
                         *1/window.GetView().GetSize().y*600.f; //To make size window's size independant
 
@@ -390,7 +388,7 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
 
 bool Box3DObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
 {
-    thumbnail = wxBitmap("Extensions/texticon.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("Extensions/Box3Dicon.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
@@ -408,8 +406,7 @@ wxPanel * Box3DObject::CreateInitialPositionPanel( wxWindow* parent, const Game 
     if ( position.floatInfos.find("z") != position.floatInfos.end())
         panel->zEdit->SetValue(toString( position.floatInfos.find("z")->second));
 
-    if ( position.floatInfos.find("yaw") != position.floatInfos.end())
-        panel->yawEdit->SetValue(toString(position.floatInfos.find("yaw")->second));
+    panel->yawEdit->SetValue(toString(position.angle));
 
     if ( position.floatInfos.find("pitch") != position.floatInfos.end())
         panel->pitchEdit->SetValue(toString(position.floatInfos.find("pitch")->second));
@@ -426,7 +423,7 @@ void Box3DObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
     if (box3DPanel == NULL) return;
 
     position.floatInfos["z"] = toInt(string(box3DPanel->zEdit->GetValue().mb_str()));
-    position.floatInfos["yaw"] = toInt(string(box3DPanel->yawEdit->GetValue().mb_str()));
+    position.angle = toInt(string(box3DPanel->yawEdit->GetValue().mb_str()));
     position.floatInfos["pitch"] = toInt(string(box3DPanel->pitchEdit->GetValue().mb_str()));
     position.floatInfos["roll"] = toInt(string(box3DPanel->rollEdit->GetValue().mb_str()));
 }

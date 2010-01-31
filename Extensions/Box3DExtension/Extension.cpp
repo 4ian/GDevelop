@@ -17,7 +17,7 @@ class Box3DExtension : public ExtensionBase
             DECLARE_OBJECT("Box3D",
                            _("Boite en 3D"),
                            _("Objet affichant une boite en 3D"),
-                           "Extensions/texticon.png",
+                           "Extensions/Box3Dicon.png",
                            &CreateBox3DObject,
                            &CreateBox3DObjectByCopy,
                            &DestroyBox3DObject);
@@ -27,8 +27,8 @@ class Box3DExtension : public ExtensionBase
                                _("Modifie la largeur d'une boite 3D."),
                                _("Faire _PARAM2__PARAM1_ à la largeur de _PARAM0_"),
                                _("Taille"),
-                               "",
-                               "",
+                               "res/actions/scaleWidth24.png",
+                               "res/actions/scaleWidth.png",
                                &Box3DObject::ActWidth);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -43,8 +43,8 @@ class Box3DExtension : public ExtensionBase
                                _("Teste la largeur d'une boite 3D."),
                                _("La largeur de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Taille"),
-                               "",
-                               "",
+                               "res/conditions/scaleWidth24.png",
+                               "res/conditions/scaleWidth.png",
                                &Box3DObject::CondWidth);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -59,8 +59,8 @@ class Box3DExtension : public ExtensionBase
                                _("Modifie la hauteur d'une boite 3D."),
                                _("Faire _PARAM2__PARAM1_ à la hauteur de _PARAM0_"),
                                _("Taille"),
-                               "",
-                               "",
+                               "res/actions/scaleHeight24.png",
+                               "res/actions/scaleHeight.png",
                                &Box3DObject::ActHeight);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -75,8 +75,8 @@ class Box3DExtension : public ExtensionBase
                                _("Teste la hauteur d'une boite 3D."),
                                _("La hauteur de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Taille"),
-                               "",
-                               "",
+                               "res/conditions/scaleHeight24.png",
+                               "res/conditions/scaleHeight.png",
                                &Box3DObject::CondHeight);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -91,8 +91,8 @@ class Box3DExtension : public ExtensionBase
                                _("Modifie la profondeur d'une boite 3D."),
                                _("Faire _PARAM2__PARAM1_ à la profondeur de _PARAM0_"),
                                _("Taille"),
-                               "",
-                               "",
+                               "res/actions/depth24.png",
+                               "res/actions/depth.png",
                                &Box3DObject::ActDepth);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -107,8 +107,8 @@ class Box3DExtension : public ExtensionBase
                                _("Teste la profondeur d'une boite 3D."),
                                _("La profondeur de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Taille"),
-                               "",
-                               "",
+                               "res/conditions/depth24.png",
+                               "res/conditions/depth.png",
                                &Box3DObject::CondDepth);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -123,8 +123,8 @@ class Box3DExtension : public ExtensionBase
                                _("Modifie la position Z d'une boite 3D."),
                                _("Faire _PARAM2__PARAM1_ à la position Z de _PARAM0_"),
                                _("Position"),
-                               "",
-                               "",
+                               "res/actions/position24.png",
+                               "res/actions/position.png",
                                &Box3DObject::ActZPosition);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -139,8 +139,8 @@ class Box3DExtension : public ExtensionBase
                                _("Teste la position Z d'une boite 3D."),
                                _("La position Z de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Position"),
-                               "",
-                               "",
+                               "res/conditions/position24.png",
+                               "res/conditions/position.png",
                                &Box3DObject::CondZPosition);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -155,8 +155,8 @@ class Box3DExtension : public ExtensionBase
                                _("Modifie la rotation yaw d'une boite 3D."),
                                _("Faire _PARAM2__PARAM1_ au yaw de _PARAM0_"),
                                _("Angle"),
-                               "",
-                               "",
+                               "res/actions/rotate24.png",
+                               "res/actions/rotate.png",
                                &Box3DObject::ActYaw);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -171,8 +171,8 @@ class Box3DExtension : public ExtensionBase
                                _("Teste la rotation yaw d'une boite 3D."),
                                _("Le yaw de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Angle"),
-                               "",
-                               "",
+                               "res/conditions/rotate24.png",
+                               "res/conditions/rotate.png",
                                &Box3DObject::CondYaw);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -187,8 +187,8 @@ class Box3DExtension : public ExtensionBase
                                _("Modifie la rotation pitch d'une boite 3D."),
                                _("Faire _PARAM2__PARAM1_ au pitch de _PARAM0_"),
                                _("Angle"),
-                               "",
-                               "",
+                               "res/actions/rotate24.png",
+                               "res/actions/rotate.png",
                                &Box3DObject::ActPitch);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -203,8 +203,8 @@ class Box3DExtension : public ExtensionBase
                                _("Teste la rotation pitch d'une boite 3D."),
                                _("Le pitch de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Angle"),
-                               "",
-                               "",
+                               "res/conditions/rotate24.png",
+                               "res/conditions/rotate.png",
                                &Box3DObject::CondPitch);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -219,8 +219,8 @@ class Box3DExtension : public ExtensionBase
                                _("Modifie la rotation roll d'une boite 3D."),
                                _("Faire _PARAM2__PARAM1_ au roll de _PARAM0_"),
                                _("Angle"),
-                               "",
-                               "",
+                               "res/actions/rotate24.png",
+                               "res/actions/rotate.png",
                                &Box3DObject::ActRoll);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
@@ -235,8 +235,8 @@ class Box3DExtension : public ExtensionBase
                                _("Teste la rotation roll d'une boite 3D."),
                                _("Le roll de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Angle"),
-                               "",
-                               "",
+                               "res/conditions/rotate24.png",
+                               "res/conditions/rotate.png",
                                &Box3DObject::CondRoll);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")

@@ -1,17 +1,17 @@
 # depslib dependency file v1.0
-1264283982 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dactions.cpp
+1264360805 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dactions.cpp
 	"Box3DObject.h"
 	"GDL/Access.h"
 	"GDL/Instruction.h"
 	"GDL/ObjectsConcerned.h"
 	"GDL/RuntimeScene.h"
 
-1264284498 c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dobject.h
+1264803213 c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dobject.h
 	"GDL/Object.h"
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\object.h
+1264803200 c:\users\florian\programmation\gamedevelop\gdl\gdl\object.h
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 	<iostream>
@@ -1489,7 +1489,7 @@
 	<boost/detail/shared_count.hpp>
 	<boost/shared_ptr.hpp>
 
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\force.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\force.h
 	<iostream>
 	<vector>
 	<string>
@@ -1497,11 +1497,11 @@
 	"GDL/Log.h"
 	"GDL/Event.h"
 
-1260108164 c:\users\florian\programmation\gamedevelop\gdl\gdl\log.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\log.h
 	<string>
 	<vector>
 
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\event.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\event.h
 	<iostream>
 	<vector>
 	<string>
@@ -1509,13 +1509,13 @@
 	"GDL/Log.h"
 	"GDL/Instruction.h"
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\instruction.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\instruction.h
 	<string>
 	<vector>
 	<iostream>
 	"GDL/GDExpression.h"
 
-1263663225 c:\users\florian\programmation\gamedevelop\gdl\gdl\gdexpression.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\gdexpression.h
 	<string>
 	<vector>
 	<iostream>
@@ -1528,48 +1528,48 @@
 	<vector>
 	<iostream>
 
-1260819187 c:\users\florian\programmation\gamedevelop\gdl\gdl\expressioninstruction.h
+1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\expressioninstruction.h
 	<vector>
 	<string>
 	<boost/shared_ptr.hpp>
 
-1250855806 c:\users\florian\programmation\gamedevelop\gdl\gdl\constantes.h
+1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\constantes.h
 
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\sprite.h
+1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\sprite.h
 	<SFML/Graphics.hpp>
 	"GDL/Point.h"
 	<string>
 
-1260120291 c:\users\florian\programmation\gamedevelop\gdl\gdl\point.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\point.h
 	<string>
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\listvariable.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\listvariable.h
 	<vector>
 	<string>
 	"GDL/Variable.h"
 
-1260108113 c:\users\florian\programmation\gamedevelop\gdl\gdl\variable.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\variable.h
 	<string>
 	<iostream>
 
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\animation.h
+1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\animation.h
 	<iostream>
 	<SFML/Graphics.hpp>
 	<string>
 	<vector>
 	"GDL/Direction.h"
 
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\direction.h
+1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\direction.h
 	<string>
 	<vector>
 	<SFML/Graphics.hpp>
 	"GDL/Sprite.h"
 
-1260108164 c:\users\florian\programmation\gamedevelop\gdl\gdl\errorreport.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\errorreport.h
 	<string>
 	<vector>
 
-1256229748 c:\users\florian\programmation\gamedevelop\gdl\gdl\objecttype.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\objecttype.h
 
 1253304927 c:\libs\wxwidgets\include\wx\wx.h
 	"wx/defs.h"
@@ -4511,11 +4511,11 @@
 	<OpenGL/gl.h>
 	<OpenGL/glu.h>
 
-1263662853 c:\users\florian\programmation\gamedevelop\gdl\gdl\access.h
+1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\access.h
 	"GDL/RuntimeScene.h"
 	"GDL/Game.h"
 
-1264339957 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
+1264448672 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
 	"GDL/MemTrace.h"
 	<iostream>
 	<sstream>
@@ -4536,43 +4536,43 @@
 	"GDL/SoundManager.h"
 	"GDL/Layer.h"
 	"GDL/ManualTimer.h"
+	"GDL/ObjInstancesHolder.h"
 	"GDL/BaseDebugger.h"
 	"GDL/profile.h"
 
-1260108164 c:\users\florian\programmation\gamedevelop\gdl\gdl\memtrace.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\memtrace.h
 	<string>
 	<vector>
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\scene.h
+1264854082 c:\users\florian\programmation\gamedevelop\gdl\gdl\scene.h
 	<vector>
 	<string>
 	<boost/shared_ptr.hpp>
 	"GDL/Event.h"
 	"GDL/Object.h"
 	"GDL/ObjectGroup.h"
-	"GDL/Position.h"
 	"GDL/Layer.h"
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectgroup.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectgroup.h
 	<vector>
 	<string>
 	<set>
 	"GDL/ObjectType.h"
 
-1261155061 c:\users\florian\programmation\gamedevelop\gdl\gdl\position.h
+1264943911 c:\users\florian\programmation\gamedevelop\gdl\gdl\position.h
 	<string>
 	<map>
 
-1260108094 c:\users\florian\programmation\gamedevelop\gdl\gdl\layer.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\layer.h
 	<string>
 	<vector>
 	<SFML/Graphics.hpp>
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimegame.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimegame.h
 	"GDL/Game.h"
 	"GDL/ImageManager.h"
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\game.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\game.h
 	"GDL/Object.h"
 	"GDL/Scene.h"
 	"GDL/ListVariable.h"
@@ -4582,19 +4582,19 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1260108093 c:\users\florian\programmation\gamedevelop\gdl\gdl\dossier.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\dossier.h
 	<string>
 	<vector>
 
-1260108093 c:\users\florian\programmation\gamedevelop\gdl\gdl\image.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\image.h
 	<string>
 	<vector>
 
-1260108121 c:\users\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.h
+1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.h
 	<string>
 	<vector>
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\imagemanager.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\imagemanager.h
 	<SFML/System.hpp>
 	"GDL/ListVariable.h"
 	"GDL/Game.h"
@@ -4603,7 +4603,7 @@
 	<vector>
 	<string>
 
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\algo.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\algo.h
 	<sstream>
 	<string>
 	<iostream>
@@ -4611,7 +4611,7 @@
 	<vector>
 	<stdio.h>
 
-1260108094 c:\users\florian\programmation\gamedevelop\gdl\gdl\son.h
+1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\son.h
 	<SFML/Audio.hpp>
 	<string>
 	<vector>
@@ -4665,17 +4665,17 @@
 	<SFML/System/Thread.hpp>
 	<vector>
 
-1260108094 c:\users\florian\programmation\gamedevelop\gdl\gdl\music.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\music.h
 	<SFML/Audio.hpp>
 	<string>
 
-1250855806 c:\users\florian\programmation\gamedevelop\gdl\gdl\sortbyplan.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\sortbyplan.h
 
-1263842314 c:\users\florian\programmation\gamedevelop\gdl\gdl\text.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\text.h
 	<SFML/Graphics.hpp>
 	<string>
 
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\soundmanager.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\soundmanager.h
 	<SFML/Audio.hpp>
 	"GDL/constantes.h"
 	"GDL/Son.h"
@@ -4683,13 +4683,13 @@
 	<string>
 	<vector>
 
-1260108094 c:\users\florian\programmation\gamedevelop\gdl\gdl\manualtimer.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\manualtimer.h
 	<string>
 
-1263498517 c:\users\florian\programmation\gamedevelop\gdl\gdl\basedebugger.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\basedebugger.h
 	<SFML/System.hpp>
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\profile.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\profile.h
 	"GDL/btScalar.h"
 	"GDL/btAlignedAllocator.h"
 	<new>
@@ -4703,7 +4703,7 @@
 	<time.h>
 	<sys/time.h>
 
-1250881033 c:\users\florian\programmation\gamedevelop\gdl\gdl\btscalar.h
+1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\btscalar.h
 	<math.h>
 	<stdlib.h>
 	<cstdlib>
@@ -4716,43 +4716,44 @@
 	<assert.h>
 	<assert.h>
 
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
 	"GDL/btScalar.h"
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
+1264449772 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
 	"GDL/Object.h"
 	"GDL/ObjectGroup.h"
 	"GDL/ObjectType.h"
+	"GDL/ObjInstancesHolder.h"
 	<boost/shared_ptr.hpp>
 	<string>
 	<vector>
 
-1264284027 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dconditions.cpp
+1264360805 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dconditions.cpp
 	"Box3DObject.h"
 	"GDL/Access.h"
 	"GDL/Instruction.h"
 	"GDL/ObjectsConcerned.h"
 	"GDL/RuntimeScene.h"
 
-1264284087 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dexpressions.cpp
+1264360805 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dexpressions.cpp
 	"GDL/Object.h"
 	"GDL/ExpressionInstruction.h"
 	"GDL/RuntimeScene.h"
 	"GDL/ObjectsConcerned.h"
 	"Box3DObject.h"
 
-1264284451 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dinitialpositionpanel.cpp
+1264360805 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dinitialpositionpanel.cpp
 	"Box3DInitialPositionPanel.h"
 	<wx/intl.h>
 	<wx/string.h>
 
-1264284445 c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dinitialpositionpanel.h
+1264360805 c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dinitialpositionpanel.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
 	<wx/panel.h>
 
-1264250333 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dobjecteditor.cpp
+1264360805 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dobjecteditor.cpp
 	"Box3DObjectEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -4764,7 +4765,7 @@
 	"GDL/MainEditorCommand.h"
 	"Box3DObject.h"
 
-1264250073 c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dobjecteditor.h
+1264360805 c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dobjecteditor.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
@@ -4803,30 +4804,30 @@
 
 1253304906 c:\libs\wxwidgets\include\wx\generic\statline.h
 
-1263731462 c:\users\florian\programmation\gamedevelop\gdl\gdl\stdalgo.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\stdalgo.h
 	<string>
 	<sstream>
 	<iostream>
 	<vector>
 	"GDL/Image.h"
 
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\textobject.h
+1264803213 c:\users\florian\programmation\gamedevelop\gdl\gdl\textobject.h
 	"GDL/Object.h"
 	"GDL/ObjectWithOpacity.h"
 	<SFML/Graphics.hpp>
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectwithopacity.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectwithopacity.h
 	<string>
 	<boost/shared_ptr.hpp>
 	"GDL/Object.h"
 
-1263739339 c:\users\florian\programmation\gamedevelop\gdl\gdl\maineditorcommand.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\maineditorcommand.h
 	"GDL/needReload.h"
 	<wx/ribbon/bar.h>
 	<wx/ribbon/buttonbar.h>
 	<iostream>
 
-1263733455 c:\users\florian\programmation\gamedevelop\gdl\gdl\needreload.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\needreload.h
 	<string>
 	<vector>
 
@@ -4865,13 +4866,13 @@
 	<wx/pen.h>
 	<wx/bitmap.h>
 
-1264284356 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\extension.cpp
+1264620692 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"Box3DObject.h"
 	<boost/version.hpp>
 
-1263928868 c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
+1264447384 c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
 	<string>
 	<vector>
 	<map>
@@ -4879,24 +4880,24 @@
 	<wx/bitmap.h>
 	<wx/wx.h>
 
-1264353672 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
+1264945543 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
 
 1225727431 c:\libs\boost_1_38_0\boost\version.hpp
 
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\tinystr.cpp
+1264360630 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\tinystr.cpp
 	"GDL/tinystr.h"
 
-1250855800 c:\users\florian\programmation\gamedevelop\gdl\gdl\tinystr.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\tinystr.h
 	<assert.h>
 	<string.h>
 
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxml.cpp
+1264360630 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxml.cpp
 	<ctype.h>
 	<sstream>
 	<iostream>
 	"GDL/tinyxml.h"
 
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxml.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxml.h
 	<ctype.h>
 	<stdio.h>
 	<stdlib.h>
@@ -4907,12 +4908,38 @@
 	<sstream>
 	"GDL/tinystr.h"
 
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxmlerror.cpp
+1264360630 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxmlerror.cpp
 	"GDL/tinyxml.h"
 
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxmlparser.cpp
+1264360629 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxmlparser.cpp
 	<ctype.h>
 	<stddef.h>
 	"GDL/tinyxml.h"
 	<windows.h>
+
+1264601319 c:\users\florian\programmation\gamedevelop\gdl\gdl\objinstancesholder.h
+	"GDL/Object.h"
+	<string>
+	<map>
+
+1264856777 source:c:\users\florian\programmation\gamedevelop\extensions\box3dextension\box3dobject.cpp
+	"Box3DObject.h"
+	<SFML/Graphics.hpp>
+	<SFML/OpenGL.hpp>
+	"GDL/Object.h"
+	"GDL/Access.h"
+	"GDL/ImageManager.h"
+	"GDL/FontManager.h"
+	"GDL/Position.h"
+	"GDL/tinyxml.h"
+	<wx/wx.h>
+	"GDL/StdAlgo.h"
+	"GDL/MainEditorCommand.h"
+	"Box3DObjectEditor.h"
+	"Box3DInitialPositionPanel.h"
+
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\fontmanager.h
+	<SFML/Graphics.hpp>
+	<string>
+	<vector>
 

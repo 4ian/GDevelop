@@ -15,10 +15,12 @@ class GD_API InitialPosition
         string objectName;
         float x;
         float y;
+        float angle;
         int zOrder;
         string layer;
-        int animation;
-        int direction;
+        bool personalizedSize;
+        float width;
+        float height;
         map < string, float > floatInfos;
         map < string, string > stringInfos;
 

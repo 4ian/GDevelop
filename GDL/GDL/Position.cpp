@@ -23,10 +23,12 @@ InitialPosition::InitialPosition() :
 objectName(""),
 x(0),
 y(0),
+angle(0),
 zOrder(0),
 layer(""),
-animation(0),
-direction(0)
+personalizedSize(false),
+width(0),
+height(0)
 {
     //ctor
 }

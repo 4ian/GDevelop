@@ -56,12 +56,17 @@ class TextObject : public Object
 
         virtual float GetWidth() const;
         virtual float GetHeight() const;
+        virtual void SetWidth(float ) {};
+        virtual void SetHeight(float ) {};
 
         virtual float GetDrawableX() const;
         virtual float GetDrawableY() const;
 
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
+
+        virtual void SetAngle(float newAngle) { angle = newAngle;};
+        virtual float GetAngle() const {return angle;};
 
         inline void SetString(std::string str) { text.SetString(str); };
         inline std::string GetString() const {return text.GetString();};
@@ -110,6 +115,8 @@ class TextObject : public Object
         unsigned int colorR;
         unsigned int colorG;
         unsigned int colorB;
+
+        float angle;
 };
 
 void GD_API DestroyTextObject(Object * object);

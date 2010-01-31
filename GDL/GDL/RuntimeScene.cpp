@@ -30,6 +30,7 @@
 #include "GDL/EventsPreprocessor.h"
 #include "GDL/profile.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/Position.h"
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du player ou de l'éditeur
@@ -585,6 +586,13 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
             newObject->SetY( scene.positionsInitiales[i].y );
             newObject->SetZOrder( scene.positionsInitiales[i].zOrder );
             newObject->SetLayer( scene.positionsInitiales[i].layer );
+            newObject->SetAngle( scene.positionsInitiales[i].angle );
+
+            if ( scene.positionsInitiales[i].personalizedSize )
+            {
+                newObject->SetWidth(scene.positionsInitiales[i].width);
+                newObject->SetHeight(scene.positionsInitiales[i].height);
+            }
 
             newObject->InitializeFromInitialPosition(scene.positionsInitiales[i]);
 

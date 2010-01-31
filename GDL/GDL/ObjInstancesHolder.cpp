@@ -14,12 +14,3 @@ ObjInstancesHolder ObjInstancesHolder::CopyAndCloneAllObjects() const
 
     return newObjInstancesHolder;
 }
-
-void ObjInstancesHolder::RemoveObject(const ObjSPtr & object)
-{
-    for (map<string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
-    {
-        ObjList & associatedList = it->second;
-        associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());
-    }
-}

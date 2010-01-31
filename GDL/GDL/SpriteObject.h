@@ -54,6 +54,9 @@ class SpriteObject : public Object
 
         virtual float GetWidth() const;
         virtual float GetHeight() const;
+        virtual void SetWidth(float newWidth);
+        virtual void SetHeight(float newHeight);
+        virtual void SetOriginalSize();
 
         virtual float GetDrawableX() const;
         virtual float GetDrawableY() const;
@@ -99,6 +102,9 @@ class SpriteObject : public Object
         bool RemoveAnimation(unsigned int nb);
         inline void RemoveAllAnimation() { animations.clear(); cacheAnimationSizeNeedUpdate = true;}
         inline bool HasNoAnimations() { return animations.empty(); }
+
+        virtual void SetAngle(float newAngle);
+        virtual float GetAngle() const;
 
         bool SetDirec(int nb);
         inline int GetDirectionNb() const { return m_direcCourant; }

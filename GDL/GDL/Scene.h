@@ -9,7 +9,7 @@ class Game;
 #include "GDL/Event.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectGroup.h"
-#include "GDL/Position.h"
+class InitialPosition;
 #include "GDL/Layer.h"
 
 class GD_API Scene

@@ -66,7 +66,7 @@ CameraExtension::CameraExtension()
                    "res/actions/camera.png",
                    &ActRotateCamera);
 
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
+        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
         DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
         DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( Calque de base si vide )"), false, "")
 
@@ -87,7 +87,7 @@ CameraExtension::CameraExtension()
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("FixCamera",
-                   _("Centrer la caméra sur un objet"),
+                   _("Centrer la caméra sur un objet ( Limites )"),
                    _("Centre la caméra sur l'objet, dans les limites définies.\nIl est préférable d'appeler cette action vers la fin des évènements, quand toutes les actions\nde positionnement et de déplacement de l'objet ont été effectuées."),
                    _("Centrer la caméra sur _PARAM0_ ( limites : de _PARAM1_;_PARAM2_ à _PARAM3_;_PARAM4_ )"),
                    _("Calques et caméras"),

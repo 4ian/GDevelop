@@ -3,6 +3,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Chercher.h"
 #include "GDL/Game.h"
+#include "GDL/Position.h"
 
 Scene::Scene() :
 backgroundColorR(125),

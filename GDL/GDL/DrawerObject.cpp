@@ -5,6 +5,7 @@
 #include "GDL/ImageManager.h"
 #include "GDL/tinyxml.h"
 #include "GDL/FontManager.h"
+#include "GDL/Position.h"
 
 #ifdef GDE
 #include <wx/wx.h>

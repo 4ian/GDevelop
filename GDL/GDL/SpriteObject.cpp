@@ -3,6 +3,7 @@
 #include "GDL/Access.h"
 #include "GDL/ImageManager.h"
 #include "GDL/tinyxml.h"
+#include "GDL/Position.h"
 #include <SFML/Graphics.hpp>
 
 #ifdef GDE
@@ -315,8 +316,21 @@ bool SpriteObject::InitializeFromInitialPosition(const InitialPosition & positio
     if ( position.floatInfos.find("animation") != position.floatInfos.end() )
         SetAnim(position.floatInfos.find("animation")->second);
 
+    //Compatibility with Game Develop 1.2.8522 and inferior
     if ( position.floatInfos.find("direction") != position.floatInfos.end() )
-        SetDirec(position.floatInfos.find("direction")->second);
+    {
+        InitialPosition & updatePosition = const_cast<InitialPosition&>(position);
+        updatePosition.angle = position.floatInfos.find("direction")->second;
+        if (    position.floatInfos.find("animation") != position.floatInfos.end()
+            &&  GetAnimation(position.floatInfos.find("animation")->second).typeNormal )
+        {
+            updatePosition.angle *= 45;
+        }
+
+        updatePosition.floatInfos.erase(updatePosition.floatInfos.find("direction"));
+    }
+
+    SetAngle(position.angle);
 
     return true;
 }
@@ -350,25 +364,7 @@ bool SpriteObject::Draw( sf::RenderWindow& window )
  */
 bool SpriteObject::DrawEdittime(sf::RenderWindow& renderWindow)
 {
-    sf::Sprite & spriteToDraw = GetAnimation( m_animCourant ).GetDirectionToModify( m_direcCourant ).ModSprite(m_spriteCourant).ModSprite();
-    Sprite & spriteDatas = GetAnimation( m_animCourant ).GetDirectionToModify( m_direcCourant ).ModSprite(m_spriteCourant);
-
-    if ( GetAnimation( m_animCourant ).typeNormal )
-    {
-        spriteToDraw.SetX( GetX() - spriteDatas.GetOrigine().GetX() );
-        spriteToDraw.SetY( GetY() - spriteDatas.GetOrigine().GetY() );
-
-        renderWindow.Draw( spriteToDraw );
-    }
-    else
-    {
-        spriteToDraw.SetX( GetX() + spriteToDraw.GetSize().x/2 - spriteDatas.GetOrigine().GetX());
-        spriteToDraw.SetY( GetY() + spriteToDraw.GetSize().y/2 - spriteDatas.GetOrigine().GetY());
-
-        spriteToDraw.SetOrigin(spriteToDraw.GetSize().x/2, spriteToDraw.GetSize().y/2);
-        spriteToDraw.SetRotation(-m_direcCourant);
-        renderWindow.Draw( spriteToDraw );
-    }
+    renderWindow.Draw( GetCurrentSprite() );
 
     return true;
 }
@@ -403,8 +399,7 @@ wxPanel * SpriteObject::CreateInitialPositionPanel( wxWindow* parent, const Game
 {
     SpriteInitialPositionPanel * panel = new SpriteInitialPositionPanel(parent);
 
-    if ( position.floatInfos.find("direction") != position.floatInfos.end())
-        panel->DirectionEdit->SetValue(ToString( position.floatInfos.find("direction")->second));
+    panel->DirectionEdit->SetValue(ToString( position.angle ));
 
     for (unsigned int i = 0;i<GetAnimationsNumber();i++ )
         panel->AnimationCombo->Append(ToString(i));
@@ -420,7 +415,7 @@ void SpriteObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositi
     SpriteInitialPositionPanel * spritePanel = dynamic_cast<SpriteInitialPositionPanel*>(panel);
     if (spritePanel == NULL) return;
 
-    position.floatInfos["direction"] = toInt(string(spritePanel->DirectionEdit->GetValue().mb_str()));
+    position.angle = toInt(string(spritePanel->DirectionEdit->GetValue().mb_str()));
     position.floatInfos["animation"] = toInt(string(spritePanel->AnimationCombo->GetValue().mb_str()));
 }
 
@@ -473,7 +468,7 @@ float SpriteObject::GetDrawableY() const
 }
 
 /**
- * Width is the width of the current sprite.
+ * Get the width of the current sprite.
  */
 float SpriteObject::GetWidth() const
 {
@@ -481,11 +476,36 @@ float SpriteObject::GetWidth() const
 }
 
 /**
- * Height is the height of the current sprite.
+ * Get the height of the current sprite.
  */
 float SpriteObject::GetHeight() const
 {
     return GetCurrentSprite().GetSize().y;
+}
+
+void SpriteObject::SetWidth(float newWidth)
+{
+    if ( newWidth > 0 )
+    {
+        scaleX = newWidth/(GetCurrentSprite().GetSubRect().GetSize().x);
+        needUpdateCurrentSprite = true;
+    }
+}
+
+void SpriteObject::SetHeight(float newHeight)
+{
+    if ( newHeight > 0 )
+    {
+        scaleY = newHeight/(GetCurrentSprite().GetSubRect().GetSize().y);
+        needUpdateCurrentSprite = true;
+    }
+}
+
+void SpriteObject::SetOriginalSize()
+{
+    scaleX = 1;
+    scaleY = 1;
+    needUpdateCurrentSprite = true;
 }
 
 /**
@@ -781,6 +801,7 @@ bool SpriteObject::SetDirec( int nb )
     if ( IsValid( m_animCourant, -1, -1 ) && !GetAnimation( m_animCourant ).typeNormal )
     {
         m_direcCourant = nb;
+        needUpdateCurrentSprite = true;
         //Pas de remise à zéro du sprite car c'est la rotation automatique
         return true;
     }
@@ -794,6 +815,28 @@ bool SpriteObject::SetDirec( int nb )
     }
 
     return true;
+}
+
+/**
+ * Set the angle of a sprite object, which corresponds to its direction.
+ */
+void SpriteObject::SetAngle(float newAngle)
+{
+    if ( !GetAnimation( m_animCourant ).typeNormal )
+        SetDirec(newAngle);
+    else
+        SetDirec(static_cast<int>(round((static_cast<int>(newAngle)%360)/45.f))%8);
+}
+
+/**
+ * Get the angle of a sprite object, which corresponds to its direction.
+ */
+float SpriteObject::GetAngle() const
+{
+    if ( !GetAnimation( m_animCourant ).typeNormal )
+        return m_direcCourant;
+    else
+        return m_direcCourant*45;
 }
 
 /**

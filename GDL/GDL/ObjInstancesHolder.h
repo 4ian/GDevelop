@@ -8,7 +8,7 @@
 /**
  * Hold lists of objects classified by the name of the objects
  */
-class ObjInstancesHolder
+class GD_API ObjInstancesHolder
 {
 public:
     ObjInstancesHolder() {};
@@ -57,7 +57,14 @@ public:
     /**
      * Remove an object
      */
-    void RemoveObject(const ObjSPtr & object);
+    inline void RemoveObject(const ObjSPtr & object)
+    {
+        for (map<string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        {
+            ObjList & associatedList = it->second;
+            associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());
+        }
+    }
 
     /**
      * Remove an entire list of object of the given name

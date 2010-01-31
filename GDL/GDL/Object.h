@@ -90,24 +90,89 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
         virtual void UpdateTime(float timeElapsed) {};
 
-        //Taille
+        /**
+         * Get the width of the object
+         */
         virtual float GetWidth() const {return 0;};
+
+        /**
+         * Get the height of the object
+         */
         virtual float GetHeight() const {return 0;};
 
-        //Position de l'objet
+        /**
+         * Set the new width of the object.
+         * The width can be not changed if the object doesn't want/is not designed to.
+         */
+        virtual void SetWidth(float ) {};
+
+        /**
+         * Set the new height of the object.
+         * The height can be not changed if the object doesn't want/is not designed to.
+         */
+        virtual void SetHeight(float ) {};
+
+        /**
+         * Set the new angle of the object.
+         * The angle can be not changed if the object doesn't want/is not designed to.
+         */
+        virtual void SetAngle(float ) {};
+
+        /**
+         * Get the angle of the object
+         */
+        virtual float GetAngle() const {return 0;};
+
+        /**
+         * Get X Position of the object.
+         */
         inline float GetX() const { return X; }
+
+        /**
+         * Get Y Position of the object.
+         */
         inline float GetY() const { return Y; }
+
+        /**
+         * Change X position. Call OnPositionChanged() to allow
+         * objects do special things if they want.
+         */
         void SetX(float x_) { X = x_; OnPositionChanged(); }
+
+        /**
+         * Change Y position. Call OnPositionChanged() to allow
+         * objects do special things if they want.
+         */
         void SetY(float y_) { Y = y_; OnPositionChanged(); }
 
+        /**
+         * Object can use this function to do special work
+         * when position is changed.
+         */
         virtual void OnPositionChanged() {};
 
-        //Real position of the drawable
+        /**
+         * Get the real X position where is renderer the object.
+         * Used by the IDE to draw selection box for instance.
+         */
         virtual float GetDrawableX() const {return 0;};
+
+        /**
+         * Get the real Y position where is renderer the object.
+         * Used by the IDE to draw selection box for instance.
+         */
         virtual float GetDrawableY() const {return 0;};
 
-        //Position du centre
+        /**
+         * Get the X position of the center.
+         * Used by actions that move object for instance.
+         */
         virtual float GetCenterX() const {return 0;};
+
+        /**
+         * Get the Y position of the center.
+         * Used by actions that move object for instance.
+         */
         virtual float GetCenterY() const {return 0;};
 
         //Forces

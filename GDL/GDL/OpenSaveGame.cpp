@@ -421,16 +421,37 @@ void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement
         //Compatibility with Game Develop 1.2 and inferior
         if ( elemScene->Attribute( "direction" ) != NULL )
         {
-            elemScene->QueryIntAttribute( "direction", &newPosition.direction );
-            newPosition.floatInfos["direction"] = newPosition.direction;
+            int direction;
+            elemScene->QueryIntAttribute( "direction", &direction );
+            newPosition.floatInfos["direction"] = direction;
         }
 
         //Compatibility with Game Develop 1.2 and inferior
         if ( elemScene->Attribute( "animation" ) != NULL )
         {
-            elemScene->QueryIntAttribute( "animation", &newPosition.animation );
-            newPosition.floatInfos["animation"] = newPosition.animation;
+            int animation;
+            elemScene->QueryIntAttribute( "animation", &animation );
+            newPosition.floatInfos["animation"] = animation;
         }
+
+        if ( elemScene->Attribute( "angle" ) != NULL ) { elemScene->QueryFloatAttribute( "angle", &newPosition.angle );}
+
+        //Compatibility with Game Develop 1.2.8522 and inferior
+        newPosition.personalizedSize = false;
+        if ( elemScene->Attribute( "personalizedSize" ) != NULL )
+        {
+            string personalizedSize = elemScene->Attribute( "personalizedSize" );
+            if ( personalizedSize == "true")
+                newPosition.personalizedSize = true;
+        }
+
+        //Compatibility with Game Develop 1.2.8522 and inferior
+        if ( elemScene->Attribute( "width" ) != NULL )
+            elemScene->QueryFloatAttribute( "width", &newPosition.width );
+
+        //Compatibility with Game Develop 1.2.8522 and inferior
+        if ( elemScene->Attribute( "height" ) != NULL )
+            elemScene->QueryFloatAttribute( "height", &newPosition.height );
 
         if ( elemScene->Attribute( "plan" ) != NULL ) { elemScene->QueryIntAttribute( "plan", &newPosition.zOrder );}
         else { MSG( "Les informations concernant le plan d'un objet manquent." ); }
@@ -948,6 +969,14 @@ void OpenSaveGame::SavePositions(const vector < InitialPosition > & list, TiXmlE
         objet->SetAttribute( "y", list.at( j ).y );
         objet->SetAttribute( "plan", list.at( j ).zOrder );
         objet->SetAttribute( "layer", list.at( j ).layer.c_str() );
+        objet->SetAttribute( "angle", list.at( j ).angle );
+
+        objet->SetAttribute( "personalizedSize", "false" );
+        if ( list.at( j ).personalizedSize )
+            objet->SetAttribute( "personalizedSize", "true" );
+
+        objet->SetAttribute( "width", list.at( j ).width );
+        objet->SetAttribute( "height", list.at( j ).height );
 
         TiXmlElement * floatInfos = new TiXmlElement( "floatInfos" );
         objet->LinkEndChild( floatInfos );

@@ -5,6 +5,7 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/Game.h"
 #include "GDL/Chercher.h"
+#include <vector>
 
 EdittimeScene::EdittimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
 RuntimeScene(renderWindow_, game_),
@@ -57,6 +58,8 @@ void EdittimeScene::RenderEdittimeScene()
     ObjList allObjects = objectsInstances.GetAllObjects();
     OrderObjectsByZOrder( allObjects );
 
+    std::vector < sf::Shape > GUIelements;
+
     //Affichage des objets
     for (unsigned int layerIndex =0;layerIndex<layers.size();++layerIndex)
     {
@@ -78,7 +81,7 @@ void EdittimeScene::RenderEdittimeScene()
 
                         selection.SetPosition( allObjects[id]->GetDrawableX(),
                                               allObjects[id]->GetDrawableY() );
-                        renderWindow->Draw( selection );
+                        GUIelements.push_back( selection );
 
                         if ( objectsSelected.size() == 1)
                         {
@@ -106,11 +109,11 @@ void EdittimeScene::RenderEdittimeScene()
                             centerToAngle.SetPosition(  allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
                                                         allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2);
 
-                            renderWindow->Draw( centerToAngle );
-                            renderWindow->Draw( center );
-                            renderWindow->Draw( angleBt );
-                            renderWindow->Draw( resizeXBt );
-                            renderWindow->Draw( resizeYBt );
+                            GUIelements.push_back( centerToAngle );
+                            GUIelements.push_back( center );
+                            GUIelements.push_back( angleBt );
+                            GUIelements.push_back( resizeXBt );
+                            GUIelements.push_back( resizeYBt );
 
                         }
                     }
@@ -118,6 +121,10 @@ void EdittimeScene::RenderEdittimeScene()
             }
         }
     }
+
+    for (unsigned int i = 0;i<GUIelements.size();++i)
+    	renderWindow->Draw(GUIelements[i]);
+
     //Affichage de l'objet à insérer en semi transparent
     if ( objectToAdd != "" )
     {

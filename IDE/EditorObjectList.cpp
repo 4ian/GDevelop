@@ -489,7 +489,7 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     //Reload thumbnail
     int thumbnailID = -1;
     wxBitmap thumbnail;
-    if ( objects->at(i)->GenerateThumbnail(game, thumbnail) )
+    if ( objects->back()->GenerateThumbnail(game, thumbnail) )
     {
         objectsImagesList->Add(thumbnail);
         thumbnailID = objectsImagesList->GetImageCount()-1;

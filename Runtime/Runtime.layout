@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug" />
+	<ActiveTarget name="Development" />
 	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="492" topLine="0" />
 	</File>
-	<File name="main.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="1414" topLine="44" />
+	<File name="main.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="4512" topLine="156" />
 	</File>
 </CodeBlocks_layout_file>

@@ -41,8 +41,10 @@ using namespace boost::python;
 #include "GDL/ExtensionsManager.h"
 #include "GDL/SpriteExtension.h"
 #include "GDL/ExtensionsLoader.h"
+#include "GDL/McbDES2.hpp"
 #include "GDL/Modules.h"
 #include "CompilationChecker.h"
+#include "GDL/AES.h"
 
 #include "profile.h"
 
@@ -99,7 +101,7 @@ int main( int argc, char *p_argv[] )
 
     RessourcesLoader * exeGD = RessourcesLoader::getInstance();
     exeGD->SetExeGD( "gam.egd" );
-    string contenu = exeGD->LoadPlainText( "src" );
+    string srcString = exeGD->LoadPlainText( "src" );
 
     //Le jeu
     RuntimeGame game;
@@ -133,50 +135,39 @@ int main( int argc, char *p_argv[] )
     //loadingApp.Display();
 
     //Ouverture du jeu
-#ifdef RELEASE
+#ifndef RELEASE
 
-    if ( contenu == "" )
+    if ( srcString == "" )
     {
         cout << endl << "N'a pas pu charger src. Fermeture." << endl;
         return EXIT_FAILURE;
     }
 
-    // this is the object we will use to do the base64 encoding
-    base64::kernel_1a base64_coder;
-    // this is the object we will use to do the data compression
-    compress_stream::kernel_1ea compressor;
-
-    ostringstream sout;
-    istringstream sin;
-
-    // compress the contents of the file and store the results in the string stream sou
-    sin.str( contenu );
-    sout.clear();
-    sout.str( "" );
-    try
-    {
-        // now base64 encode the compressed data
-        base64_coder.decode( sin, sout );
-    }
-    catch ( std::ios_base::failure & e )
-    {
-        cout << "std::ios_base::failure";
-    }
-    catch ( ... )
-    {
-        cout << "\nUne exception a été lancée.\n";
-    }
-
-
-    sin.clear();
-    sin.str( sout.str() );
-    sout.str( "" );
-
-    compressor.decompress( sin, sout );
-
-    string crypte = sout.str();
     OpenSaveGame openGame( game );
-    openGame.OpenFromString(crypte);
+    {
+        int fsize = exeGD->GetBinaryFileSize( "src" );
+
+        // round up (ignore pad for here)
+        int size = (fsize+15)&(~15);
+
+        char * ibuffer = exeGD->LoadBinaryFile( "src" );
+        char * obuffer = new char[size];
+
+        AES crypt;
+        crypt.SetParameters(192);
+
+        unsigned char key[] = "-P:j$4t&OHIUVM/Z+u4DeDP.";
+
+        crypt.StartDecryption(key);
+        crypt.Decrypt(reinterpret_cast<const unsigned char*>(ibuffer),reinterpret_cast<unsigned char*>(obuffer),size/16);
+
+        string uncryptedSrc = obuffer;
+
+        delete [] obuffer;
+
+        openGame.OpenFromString(uncryptedSrc);
+	}
+
 #else
     OpenSaveGame openGame( game );
     //openGame.OpenFromFile("C:/Program Files/Compil Games/Game Develop/Exemples/CourseAdvanced.jgd" );
@@ -189,7 +180,7 @@ int main( int argc, char *p_argv[] )
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/Game Develop Player/test2.txt" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/testCPPExtension2.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/testFont.jgd" );
-    openGame.OpenFromFile("C:/Users/Florian/Programmation/3DEngine.jgd" );
+    //openGame.OpenFromFile("C:/Users/Florian/Programmation/3DEngine.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/Course3D/Course3D.jgd" );
 #endif
 
@@ -197,8 +188,6 @@ int main( int argc, char *p_argv[] )
         return EXIT_FAILURE;
 
     game.imageManager.LoadImagesFromFile( game );
-    //loadingApp.SetActive(false);
-    //loadingApp.Close();
 
     //Fenêtre de jeu
     sf::RenderWindow window;

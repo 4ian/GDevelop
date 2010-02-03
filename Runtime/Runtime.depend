@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1264360388 source:c:\users\florian\programmation\gamedevelop\runtime\main.cpp
+1265222279 source:c:\users\florian\programmation\gamedevelop\runtime\main.cpp
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
@@ -25,8 +25,10 @@
 	"GDL/ExtensionsManager.h"
 	"GDL/SpriteExtension.h"
 	"GDL/ExtensionsLoader.h"
+	"GDL/McbDES2.hpp"
 	"GDL/Modules.h"
 	"CompilationChecker.h"
+	"GDL/AES.h"
 	"profile.h"
 	<time.h>
 	<stdlib.h>
@@ -219,24 +221,12 @@
 	<string>
 	<vector>
 
-1261918998 c:\libs\sfml\include\sfml\graphics\renderimage.hpp
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/RenderTarget.hpp>
-
-1263999377 c:\libs\sfml\include\sfml\graphics\rendertarget.hpp
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<SFML/Graphics/Renderer.hpp>
-	<SFML/Graphics/View.hpp>
-
-1261918998 c:\libs\sfml\include\sfml\graphics\renderqueue.hpp
+1263999377 c:\libs\sfml\include\sfml\graphics\renderer.hpp
 	<SFML/Config.hpp>
 	<SFML/System/NonCopyable.hpp>
+	<SFML/Graphics/Color.hpp>
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Graphics/Matrix3.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<vector>
 
 1263999377 c:\libs\sfml\include\sfml\graphics\drawable.hpp
 	<SFML/System/Vector2.hpp>
@@ -251,6 +241,17 @@
 	<SFML/Graphics/Matrix3.inl>
 
 1248631193 c:\libs\sfml\include\sfml\graphics\matrix3.inl
+
+1261918998 c:\libs\sfml\include\sfml\graphics\renderimage.hpp
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/RenderTarget.hpp>
+
+1263999377 c:\libs\sfml\include\sfml\graphics\rendertarget.hpp
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<SFML/Graphics/Renderer.hpp>
+	<SFML/Graphics/View.hpp>
 
 1263999377 c:\libs\sfml\include\sfml\graphics\view.hpp
 	<SFML/Config.hpp>
@@ -289,6 +290,16 @@
 	<SFML/Graphics/Font.hpp>
 	<SFML/Graphics/Rect.hpp>
 	<string>
+
+1244724446 c:\libs\sfml\include\sfml\opengl.hpp
+	<SFML/Config.hpp>
+	<windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
 
 1137094133 c:\libs\boost_1_38_0\boost\python.hpp
 	<boost/python/args.hpp>
@@ -5415,7 +5426,7 @@
 	<boost/python/detail/value_arg.hpp>
 	<boost/mpl/assert.hpp>
 
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\algo.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\algo.h
 	<sstream>
 	<string>
 	<iostream>
@@ -5423,7 +5434,7 @@
 	<vector>
 	<stdio.h>
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\object.h
+1264803200 c:\users\florian\programmation\gamedevelop\gdl\gdl\object.h
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 	<iostream>
@@ -5451,7 +5462,7 @@
 	<boost/detail/shared_count.hpp>
 	<boost/shared_ptr.hpp>
 
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\force.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\force.h
 	<iostream>
 	<vector>
 	<string>
@@ -5459,11 +5470,11 @@
 	"GDL/Log.h"
 	"GDL/Event.h"
 
-1260108164 c:\users\florian\programmation\gamedevelop\gdl\gdl\log.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\log.h
 	<string>
 	<vector>
 
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\event.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\event.h
 	<iostream>
 	<vector>
 	<string>
@@ -5471,13 +5482,13 @@
 	"GDL/Log.h"
 	"GDL/Instruction.h"
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\instruction.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\instruction.h
 	<string>
 	<vector>
 	<iostream>
 	"GDL/GDExpression.h"
 
-1263663225 c:\users\florian\programmation\gamedevelop\gdl\gdl\gdexpression.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\gdexpression.h
 	<string>
 	<vector>
 	<iostream>
@@ -5490,56 +5501,56 @@
 	<vector>
 	<iostream>
 
-1260819187 c:\users\florian\programmation\gamedevelop\gdl\gdl\expressioninstruction.h
+1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\expressioninstruction.h
 	<vector>
 	<string>
 	<boost/shared_ptr.hpp>
 
-1250855806 c:\users\florian\programmation\gamedevelop\gdl\gdl\constantes.h
+1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\constantes.h
 
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\sprite.h
+1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\sprite.h
 	<SFML/Graphics.hpp>
 	"GDL/Point.h"
 	<string>
 
-1260120291 c:\users\florian\programmation\gamedevelop\gdl\gdl\point.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\point.h
 	<string>
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\listvariable.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\listvariable.h
 	<vector>
 	<string>
 	"GDL/Variable.h"
 
-1260108113 c:\users\florian\programmation\gamedevelop\gdl\gdl\variable.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\variable.h
 	<string>
 	<iostream>
 
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\animation.h
+1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\animation.h
 	<iostream>
 	<SFML/Graphics.hpp>
 	<string>
 	<vector>
 	"GDL/Direction.h"
 
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\direction.h
+1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\direction.h
 	<string>
 	<vector>
 	<SFML/Graphics.hpp>
 	"GDL/Sprite.h"
 
-1260108164 c:\users\florian\programmation\gamedevelop\gdl\gdl\errorreport.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\errorreport.h
 	<string>
 	<vector>
 
-1256229748 c:\users\florian\programmation\gamedevelop\gdl\gdl\objecttype.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\objecttype.h
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\opensavegame.h
+1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\opensavegame.h
 	"GDL/Game.h"
 	<string>
 	"GDL/tinyxml.h"
 	"GDL/algo.h"
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\game.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\game.h
 	"GDL/Object.h"
 	"GDL/Scene.h"
 	"GDL/ListVariable.h"
@@ -5549,44 +5560,39 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\scene.h
+1264854082 c:\users\florian\programmation\gamedevelop\gdl\gdl\scene.h
 	<vector>
 	<string>
 	<boost/shared_ptr.hpp>
 	"GDL/Event.h"
 	"GDL/Object.h"
 	"GDL/ObjectGroup.h"
-	"GDL/Position.h"
 	"GDL/Layer.h"
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectgroup.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectgroup.h
 	<vector>
 	<string>
 	<set>
 	"GDL/ObjectType.h"
 
-1261155061 c:\users\florian\programmation\gamedevelop\gdl\gdl\position.h
-	<string>
-	<map>
-
-1260108094 c:\users\florian\programmation\gamedevelop\gdl\gdl\layer.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\layer.h
 	<string>
 	<vector>
 	<SFML/Graphics.hpp>
 
-1260108093 c:\users\florian\programmation\gamedevelop\gdl\gdl\dossier.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\dossier.h
 	<string>
 	<vector>
 
-1260108093 c:\users\florian\programmation\gamedevelop\gdl\gdl\image.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\image.h
 	<string>
 	<vector>
 
-1260108121 c:\users\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.h
+1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.h
 	<string>
 	<vector>
 
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxml.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxml.h
 	<ctype.h>
 	<stdio.h>
 	<stdlib.h>
@@ -5597,15 +5603,15 @@
 	<sstream>
 	"GDL/tinystr.h"
 
-1250855800 c:\users\florian\programmation\gamedevelop\gdl\gdl\tinystr.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\tinystr.h
 	<assert.h>
 	<string.h>
 
-1260108164 c:\users\florian\programmation\gamedevelop\gdl\gdl\memtrace.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\memtrace.h
 	<string>
 	<vector>
 
-1264339957 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
+1264448672 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
 	"GDL/MemTrace.h"
 	<iostream>
 	<sstream>
@@ -5626,14 +5632,15 @@
 	"GDL/SoundManager.h"
 	"GDL/Layer.h"
 	"GDL/ManualTimer.h"
+	"GDL/ObjInstancesHolder.h"
 	"GDL/BaseDebugger.h"
 	"GDL/profile.h"
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimegame.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimegame.h
 	"GDL/Game.h"
 	"GDL/ImageManager.h"
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\imagemanager.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\imagemanager.h
 	<SFML/System.hpp>
 	"GDL/ListVariable.h"
 	"GDL/Game.h"
@@ -5642,7 +5649,7 @@
 	<vector>
 	<string>
 
-1260108094 c:\users\florian\programmation\gamedevelop\gdl\gdl\son.h
+1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\son.h
 	<SFML/Audio.hpp>
 	<string>
 	<vector>
@@ -5696,17 +5703,17 @@
 	<SFML/System/Thread.hpp>
 	<vector>
 
-1260108094 c:\users\florian\programmation\gamedevelop\gdl\gdl\music.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\music.h
 	<SFML/Audio.hpp>
 	<string>
 
-1250855806 c:\users\florian\programmation\gamedevelop\gdl\gdl\sortbyplan.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\sortbyplan.h
 
-1263842314 c:\users\florian\programmation\gamedevelop\gdl\gdl\text.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\text.h
 	<SFML/Graphics.hpp>
 	<string>
 
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\soundmanager.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\soundmanager.h
 	<SFML/Audio.hpp>
 	"GDL/constantes.h"
 	"GDL/Son.h"
@@ -5714,13 +5721,18 @@
 	<string>
 	<vector>
 
-1260108094 c:\users\florian\programmation\gamedevelop\gdl\gdl\manualtimer.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\manualtimer.h
 	<string>
 
-1263498517 c:\users\florian\programmation\gamedevelop\gdl\gdl\basedebugger.h
+1264601319 c:\users\florian\programmation\gamedevelop\gdl\gdl\objinstancesholder.h
+	"GDL/Object.h"
+	<string>
+	<map>
+
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\basedebugger.h
 	<SFML/System.hpp>
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\profile.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\profile.h
 	"GDL/btScalar.h"
 	"GDL/btAlignedAllocator.h"
 	<new>
@@ -5734,7 +5746,7 @@
 	<time.h>
 	<sys/time.h>
 
-1250881033 c:\users\florian\programmation\gamedevelop\gdl\gdl\btscalar.h
+1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\btscalar.h
 	<math.h>
 	<stdlib.h>
 	<cstdlib>
@@ -5747,36 +5759,36 @@
 	<assert.h>
 	<assert.h>
 
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
 	"GDL/btScalar.h"
 
-1250855800 c:\users\florian\programmation\gamedevelop\gdl\gdl\crypter.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\crypter.h
 	<iostream>
 	<string.h>
 	<string>
 	<vector>
 
-1263842011 c:\users\florian\programmation\gamedevelop\gdl\gdl\ressourcesloader.h
+1265219050 c:\users\florian\programmation\gamedevelop\gdl\gdl\ressourcesloader.h
 	"GDL/DatFile.h"
 	<SFML/Graphics.hpp>
 	<SFML/Audio.hpp>
 	<string>
 
-1260108093 c:\users\florian\programmation\gamedevelop\gdl\gdl\datfile.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\datfile.h
 	<string>
 	<vector>
 
-1263842458 c:\users\florian\programmation\gamedevelop\gdl\gdl\fontmanager.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\fontmanager.h
 	<SFML/Graphics.hpp>
 	<string>
 	<vector>
 
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\opensaveloadingscreen.h
+1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\opensaveloadingscreen.h
 	<string>
 	"GDL/LoadingScreen.h"
 	"GDL/tinyxml.h"
 
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionsmanager.h
+1264447388 c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionsmanager.h
 	<string>
 	<iostream>
 	<vector>
@@ -7340,7 +7352,7 @@
 	<boost/bimap/support/map_type_by.hpp>
 	<boost/bimap/relation/detail/access_builder.hpp>
 
-1263928868 c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
+1264447384 c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
 	<string>
 	<vector>
 	<map>
@@ -7348,13 +7360,23 @@
 	<wx/bitmap.h>
 	<wx/wx.h>
 
-1261512088 c:\users\florian\programmation\gamedevelop\gdl\gdl\spriteextension.h
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\spriteextension.h
 
-1263757859 c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionsloader.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionsloader.h
 	<string>
 	<vector>
 
-1260122769 c:\users\florian\programmation\gamedevelop\gdl\gdl\modules.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\mcbdes2.hpp
+	<string.h>
+	<stdlib.h>
+	<time.h>
+	<assert.h>
+
+1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\modules.h
+
+1264360389 c:\users\florian\programmation\gamedevelop\runtime\compilationchecker.h
+
+1265222572 c:\users\florian\programmation\gamedevelop\gdl\gdl\aes.h
 
 1226339888 c:\libs\dlib-17.12\dlib\compress_stream.h
 	"compress_stream/compress_stream_kernel_1.h"
@@ -9413,2553 +9435,22 @@
 	"widgets.h"
 	<algorithm>
 
-1264360389 c:\users\florian\programmation\gamedevelop\runtime\compilationchecker.h
-
 1264360388 source:c:\users\florian\programmation\gamedevelop\runtime\compilationchecker.cpp
 	"CompilationChecker.h"
 	"GDL/Version.h"
 	"GDL/VersionWrapper.h"
 	"GDL/StdAlgo.h"
 
-1264353672 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
+1265222793 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
 
-1263929620 c:\users\florian\programmation\gamedevelop\gdl\gdl\versionwrapper.h
+1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\versionwrapper.h
 	<string>
 	<vector>
 
-1263731462 c:\users\florian\programmation\gamedevelop\gdl\gdl\stdalgo.h
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\stdalgo.h
 	<string>
 	<sstream>
 	<iostream>
 	<vector>
 	"GDL/Image.h"
-
-1263999377 c:\libs\sfml\include\sfml\graphics\renderer.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/Graphics/Matrix3.hpp>
-
-1244724446 c:\libs\sfml\include\sfml\opengl.hpp
-	<SFML/Config.hpp>
-	<windows.h>
-	<GL/gl.h>
-	<GL/glu.h>
-	<GL/gl.h>
-	<GL/glu.h>
-	<OpenGL/gl.h>
-	<OpenGL/glu.h>
-
-1263662853 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\access.cpp
-	"GDL/Access.h"
-	"GDL/algo.h"
-	"GDL/Log.h"
-	"GDL/Object.h"
-	<iostream>
-	<sstream>
-	<string>
-	<vector>
-	<cmath>
-	"GDL/Chercher.h"
-	<stdio.h>
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Access.h"
-	"GDL/GDExpression.h"
-	"GDL/ExpressionInstruction.h"
-	"GDL/gpl.h"
-	"GDL/profile.h"
-	<ctime>
-	"GDL/eFreeFunctions.h"
-	"GDL/eObjectFunctions.h"
-	"GDL/ExtensionsManager.h"
-
-1263662853 c:\users\florian\programmation\gamedevelop\gdl\gdl\access.h
-	"GDL/RuntimeScene.h"
-	"GDL/Game.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\chercher.h
-	"GDL/tinyxml.h"
-	<SFML/System.hpp>
-	<SFML/Graphics.hpp>
-	<iostream>
-	<string>
-	<sstream>
-	<string>
-	<vector>
-	<iostream>
-	<boost/shared_ptr.hpp>
-	"GDL/Image.h"
-	"GDL/ObjectGroup.h"
-
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
-	"GDL/Object.h"
-	"GDL/ObjectGroup.h"
-	"GDL/ObjectType.h"
-	<boost/shared_ptr.hpp>
-	<string>
-	<vector>
-
-1250855798 c:\users\florian\programmation\gamedevelop\gdl\gdl\gpl.h
-
-1260819188 c:\users\florian\programmation\gamedevelop\gdl\gdl\efreefunctions.h
-	<vector>
-	<string>
-
-1261081267 c:\users\florian\programmation\gamedevelop\gdl\gdl\eobjectfunctions.h
-	<vector>
-	<string>
-
-1263731300 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\advancedextension.cpp
-	"GDL/AdvancedExtension.h"
-	"GDL/ExtensionBase.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\advancedextension.h
-	"GDL/ExtensionBase.h"
-
-1263739183 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\ajoutplusimage.cpp
-	"GDL/AjoutPlusImage.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-
-1263739183 c:\users\florian\programmation\gamedevelop\gdl\gdl\ajoutplusimage.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	<string>
-	<vector>
-
-1263666817 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\animation.cpp
-	"GDL/Animation.h"
-	<SFML/System.hpp>
-	<iostream>
-	<SFML/Graphics.hpp>
-	<string>
-	<vector>
-	"GDL/MemTrace.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\appelevent.cpp
-	<iostream>
-	<sstream>
-	<SFML/System.hpp>
-	<SFML/Graphics.hpp>
-	<vector>
-	<string>
-	"GDL/Object.h"
-	"GDL/Event.h"
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/MemTrace.h"
-	"GDL/Game.h"
-	"GDL/AppelEvent.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ExtensionsManager.h"
-	"GDL/GDExpression.h"
-	"GDL/profile.h"
-	"GDL/ObjectsConcerned.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\appelevent.h
-	<SFML/System.hpp>
-	<iostream>
-	<SFML/Graphics.hpp>
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	"GDL/MemTrace.h"
-	"GDL/SortByPlan.h"
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\audioextension.cpp
-	"GDL/AudioExtension.h"
-	"GDL/cMusic.h"
-	"GDL/aMusic.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\audioextension.h
-	"GDL/ExtensionBase.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\cmusic.h
-	<vector>
-	<string>
-	<iostream>
-	<sstream>
-	"GDL/cMusic.h"
-	"GDL/Object.h"
-	"GDL/Event.h"
-	"GDL/Chercher.h"
-	"GDL/RuntimeScene.h"
-	"GDL/algo.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/SoundManager.h"
-	<SFML/Audio.hpp>
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\amusic.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/aMusic.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Audio.hpp>
-	"GDL/RuntimeScene.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\bbdconditions.cpp
-	"GDL/BBDConditions.h"
-
-1250855799 c:\users\florian\programmation\gamedevelop\gdl\gdl\bbdconditions.h
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\basedebugger.cpp
-	"GDL/BaseDebugger.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\baseobjectextension.cpp
-	"GDL/BaseObjectExtension.h"
-	"GDL/ExtensionBase.h"
-	"GDL/Object.h"
-
-1263751115 c:\users\florian\programmation\gamedevelop\gdl\gdl\baseobjectextension.h
-	"GDL/ExtensionBase.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\baseobjectextension2.cpp
-	"GDL/BaseObjectExtension.h"
-	"GDL/Object.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\bitmapguimanager.cpp
-	<wx/bitmap.h>
-	<wx/wx.h>
-	<wx/gdicmn.h>
-	<wx/dc.h>
-	<wx/dcmemory.h>
-	<iostream>
-	<string>
-	"GDL/BitmapGUIManager.h"
-
-1263733455 c:\users\florian\programmation\gamedevelop\gdl\gdl\bitmapguimanager.h
-	<wx/bitmap.h>
-	<string>
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cameraextension.cpp
-	"GDL/CameraExtension.h"
-	"GDL/ExtensionBase.h"
-	"GDL/cCamera.h"
-	"GDL/aCamera.h"
-	"GDL/eFreeFunctions.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\cameraextension.h
-	"GDL/ExtensionBase.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\ccamera.h
-	<vector>
-	<string>
-	<iostream>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	"GDL/RuntimeScene.h"
-
-1263662853 c:\users\florian\programmation\gamedevelop\gdl\gdl\acamera.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\chercher.cpp
-	<SFML/System.hpp>
-	<iostream>
-	<SFML/Graphics.hpp>
-	<string>
-	<list>
-	<sstream>
-	<string>
-	<vector>
-	<cmath>
-	<iostream>
-	"GDL/Log.h"
-	"GDL/Object.h"
-	"GDL/Image.h"
-	"GDL/ObjectGroup.h"
-	<algorithm>
-	"GDL/Chercher.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\chercherscene.cpp
-	<string>
-	"GDL/Scene.h"
-	<vector>
-
-1263663293 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\choixdossier.cpp
-	"GDL/ChoixDossier.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	"GDL/Dossier.h"
-	<wx/log.h>
-	<wx/textdlg.h>
-	<string>
-	<vector>
-
-1263733454 c:\users\florian\programmation\gamedevelop\gdl\gdl\choixdossier.h
-	<wx/treectrl.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/menu.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	"GDL/Dossier.h"
-	<string>
-	<vector>
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\collisions.cpp
-	<iostream>
-	<vector>
-	<string>
-	<cmath>
-	<time.h>
-	<SFML/Graphics.hpp>
-	"GDL/SpriteObject.h"
-	"GDL/Collisions.h"
-	"GDL/Log.h"
-
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\spriteobject.h
-	"GDL/Object.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\collisions.h
-	<iostream>
-	<vector>
-	<string>
-	"GDL/SpriteObject.h"
-	<cmath>
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\datfile.cpp
-	"GDL/DatFile.h"
-	<iostream>
-	<stdio.h>
-	<string.h>
-	<fstream>
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\direction.cpp
-	"GDL/Direction.h"
-	<SFML/Graphics.hpp>
-	<string>
-	<vector>
-	<iostream>
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\dossier.cpp
-	"GDL/Dossier.h"
-	<string>
-	<vector>
-	<iostream>
-
-1263663293 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\drawerobject.cpp
-	"GDL/DrawerObject.h"
-	<SFML/Graphics.hpp>
-	"GDL/Object.h"
-	"GDL/Access.h"
-	"GDL/ImageManager.h"
-	"GDL/tinyxml.h"
-	"GDL/FontManager.h"
-	<wx/wx.h>
-	"GDL/StdAlgo.h"
-	"GDL/MainEditorCommand.h"
-	"GDL/DrawerObjectEditor.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\drawerobject.h
-	"GDL/Object.h"
-	<SFML/Graphics.hpp>
-
-1263739339 c:\users\florian\programmation\gamedevelop\gdl\gdl\maineditorcommand.h
-	"GDL/needReload.h"
-	<wx/ribbon/bar.h>
-	<wx/ribbon/buttonbar.h>
-	<iostream>
-
-1263733455 c:\users\florian\programmation\gamedevelop\gdl\gdl\needreload.h
-	<string>
-	<vector>
-
-1263408930 c:\users\florian\programmation\gamedevelop\gdl\gdl\drawerobjecteditor.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/radiobox.h>
-	<wx/spinctrl.h>
-	<wx/statline.h>
-	<wx/button.h>
-	<wx/dialog.h>
-
-1263663293 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\drawerobjecteditor.cpp
-	"GDL/DrawerObjectEditor.h"
-	<wx/intl.h>
-	<wx/string.h>
-	<wx/colordlg.h>
-	"GDL/Game.h"
-	"GDL/DrawerObject.h"
-	"GDL/MainEditorCommand.h"
-
-1263666816 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\editorimages.cpp
-	"GDL/EditorImages.h"
-	<wx/msw/winundef.h>
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/toolbar.h>
-	<wx/config.h>
-	<wx/aui/aui.h>
-	<wx/log.h>
-	<wx/filedlg.h>
-	<wx/image.h>
-	<wx/imaglist.h>
-	<wx/textdlg.h>
-	<wx/help.h>
-	<wx/dcbuffer.h>
-	<wx/dnd.h>
-	<wx/ribbon/bar.h>
-	<wx/ribbon/buttonbar.h>
-	<wx/ribbon/gallery.h>
-	<wx/ribbon/toolbar.h>
-	"CppUnitLite/TestHarness.h"
-	"GDL/Game.h"
-	"GDL/StdAlgo.h"
-	"GDL/MemTrace.h"
-	"GDL/ChoixDossier.h"
-	"GDL/PropImage.h"
-	"GDL/BitmapGUIManager.h"
-	<gtk/gtk.h>
-
-1263733455 c:\users\florian\programmation\gamedevelop\gdl\gdl\editorimages.h
-	<wx/treectrl.h>
-	<wx/sizer.h>
-	<wx/menu.h>
-	<wx/panel.h>
-	<wx/aui/aui.h>
-	"GDL/Game.h"
-	"GDL/ImageManager.h"
-	"GDL/MainEditorCommand.h"
-
-1263733454 c:\users\florian\programmation\gamedevelop\gdl\gdl\propimage.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/checkbox.h>
-	<wx/panel.h>
-	<wx/button.h>
-	<wx/scrolbar.h>
-	<wx/dialog.h>
-	"GDL/Image.h"
-
-1263663293 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\editorobjet.cpp
-	"GDL/EditorObjet.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/font.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/log.h>
-	<wx/msgdlg.h>
-	<string>
-	<vector>
-	<wx/help.h>
-	<wx/numdlg.h>
-	<wx/config.h>
-	<sstream>
-	<wx/dcbuffer.h>
-	<wx/settings.h>
-	<wx/textdlg.h>
-	<wx/choicdlg.h>
-	<wx/textdlg.h>
-	<wx/msgdlg.h>
-	"CppUnitLite/TestHarness.h"
-	"GDL/StdAlgo.h"
-	"GDL/Game.h"
-	"GDL/Animation.h"
-	"GDL/algo.h"
-	"GDL/MainEditorCommand.h"
-	"GDL/AjoutPlusImage.h"
-	"GDL/BitmapGUIManager.h"
-	<gtk/gtk.h>
-
-1263663293 c:\users\florian\programmation\gamedevelop\gdl\gdl\editorobjet.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/menu.h>
-	<wx/textctrl.h>
-	<wx/checkbox.h>
-	<wx/tglbtn.h>
-	<wx/statline.h>
-	<wx/radiobut.h>
-	<wx/panel.h>
-	<wx/choice.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/scrolbar.h>
-	<wx/dialog.h>
-	<wx/toolbar.h>
-	<wx/statbmp.h>
-	<wx/aui/aui.h>
-	"GDL/Game.h"
-	"GDL/SpriteObject.h"
-	"GDL/MainEditorCommand.h"
-	"GDL/EditorImages.h"
-	<string>
-	<vector>
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\errorreport.cpp
-	"GDL/ErrorReport.h"
-	<sstream>
-	"GDL/Log.h"
-
-1264015793 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\event.cpp
-	<iostream>
-	<vector>
-	<string>
-	<cmath>
-	"GDL/Log.h"
-	"GDL/Event.h"
-	"GDL/MemTrace.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\eventspreprocessor.cpp
-	"GDL/EventsPreprocessor.h"
-	"GDL/conditions.h"
-	"GDL/actions.h"
-	"GDL/ExtensionsManager.h"
-	"GDL/RuntimeScene.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\eventspreprocessor.h
-	"GDL/Event.h"
-	<string>
-	<vector>
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\conditions.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	<iostream>
-	"GDL/cADS.h"
-	"GDL/cClavier.h"
-	"GDL/cCollisions.h"
-	"GDL/cTime.h"
-	"GDL/cVariables.h"
-	"GDL/cPlans.h"
-	"GDL/cCamera.h"
-	"GDL/cSouris.h"
-	"GDL/RuntimeScene.h"
-	"GDL/cVisibilite.h"
-	"GDL/cObjet.h"
-	"GDL/cScene.h"
-	"GDL/cPos.h"
-	"GDL/cMove.h"
-	"GDL/cFichier.h"
-	"GDL/cMusic.h"
-	"GDL/cJoystick.h"
-	"GDL/cLayer.h"
-	"GDL/cScale.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\cads.h
-	<vector>
-	<string>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	<iostream>
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\cclavier.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\ccollisions.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Collisions.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\ctime.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\cvariables.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/ListVariable.h"
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\cplans.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\csouris.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/RuntimeScene.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\cvisibilite.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cVariables.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\cobjet.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cADS.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/Instruction.h"
-
-1250855798 c:\users\florian\programmation\gamedevelop\gdl\gdl\cscene.h
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\cpos.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\cmove.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\cfichier.h
-	"GDL/tinyxml.h"
-	"GDL/RuntimeScene.h"
-	"GDL/Instruction.h"
-	"GDL/Access.h"
-	<vector>
-	<string>
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\cjoystick.h
-	<vector>
-	<string>
-	<iostream>
-	<sstream>
-	<iostream>
-	"GDL/Object.h"
-	"GDL/algo.h"
-	"GDL/RuntimeScene.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\clayer.h
-	<vector>
-	"GDL/Object.h"
-	"GDL/Event.h"
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/Instruction.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\cscale.h
-	<vector>
-	<string>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	<iostream>
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\actions.h
-	"GDL/ObjectsConcerned.h"
-	"GDL/aADS.h"
-	"GDL/aMove.h"
-	"GDL/aObjet.h"
-	"GDL/aPosition.h"
-	"GDL/aVariables.h"
-	"GDL/aPlans.h"
-	"GDL/aCamera.h"
-	"GDL/aSouris.h"
-	"GDL/aTime.h"
-	"GDL/aVisibilite.h"
-	"GDL/aMusic.h"
-	"GDL/aScene.h"
-	"GDL/aTexte.h"
-	"GDL/aEffects.h"
-	"GDL/aFichier.h"
-	"GDL/aGUI.h"
-	"GDL/aNet.h"
-	"GDL/aAdvanced.h"
-	"GDL/aJoystick.h"
-	"GDL/aLayer.h"
-	"GDL/aScale.h"
-
-1263662853 c:\users\florian\programmation\gamedevelop\gdl\gdl\aads.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\amove.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\aobjet.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\aposition.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Collisions.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\avariables.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Collisions.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/ListVariable.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\aplans.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\asouris.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Collisions.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Graphics.hpp>
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\atime.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\avisibilite.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Collisions.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\ascene.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/aScene.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	<string>
-	<vector>
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\atexte.h
-	<vector>
-	<string>
-	<SFML/System.hpp>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\aeffects.h
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/aMusic.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\afichier.h
-	"GDL/tinyxml.h"
-	"GDL/RuntimeScene.h"
-	<vector>
-	<string>
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\agui.h
-	"GDL/aGUI.h"
-	<vector>
-	<string>
-	"GDL/Object.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\anet.h
-	<vector>
-	"GDL/RuntimeScene.h"
-
-1263662853 c:\users\florian\programmation\gamedevelop\gdl\gdl\aadvanced.h
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-	"GDL/Instruction.h"
-	<string>
-	<vector>
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\ajoystick.h
-	<vector>
-	<string>
-	<iostream>
-	<sstream>
-	<iostream>
-	"GDL/algo.h"
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\alayer.h
-	<vector>
-	<string>
-	<iostream>
-	<cmath>
-	<sstream>
-	"GDL/Object.h"
-	"GDL/Event.h"
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\ascale.h
-	<vector>
-	<string>
-	<iostream>
-	<sstream>
-	"GDL/Object.h"
-	"GDL/Event.h"
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\expressioninstruction.cpp
-	"GDL/ExpressionInstruction.h"
-	"GDL/GDExpression.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionbase.cpp
-	"GDL/ExtensionBase.h"
-	<vector>
-	<string>
-	<iostream>
-
-1263929014 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionsloader.cpp
-	"GDL/ExtensionsLoader.h"
-	"GDL/ExtensionsManager.h"
-	<stdio.h>
-	<sys/types.h>
-	<dirent.h>
-	<boost/version.hpp>
-	"GDL/BaseObjectExtension.h"
-	"GDL/AudioExtension.h"
-	"GDL/MouseExtension.h"
-	"GDL/KeyboardExtension.h"
-	"GDL/JoystickExtension.h"
-	"GDL/TimeExtension.h"
-	"GDL/FileExtension.h"
-	"GDL/VariablesExtension.h"
-	"GDL/InterfaceExtension.h"
-	"GDL/CameraExtension.h"
-	"GDL/WindowExtension.h"
-	"GDL/NetworkExtension.h"
-	"GDL/SpriteExtension.h"
-	"GDL/SceneExtension.h"
-	"GDL/AdvancedExtension.h"
-	"GDL/TextExtension.h"
-	"GDL/PrimitiveDrawingExtension.h"
-	"GDL/Object.h"
-	"GDL/Game.h"
-	"GDL/Version.h"
-	"GDL/ExtensionBase.h"
-	<windows.h>
-	<dlfcn.h>
-
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\mouseextension.h
-	"GDL/ExtensionBase.h"
-
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\keyboardextension.h
-	"GDL/ExtensionBase.h"
-
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\joystickextension.h
-	"GDL/ExtensionBase.h"
-
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\timeextension.h
-	"GDL/ExtensionBase.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\fileextension.h
-	"GDL/ExtensionBase.h"
-
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\variablesextension.h
-	"GDL/ExtensionBase.h"
-
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\interfaceextension.h
-	"GDL/ExtensionBase.h"
-
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\windowextension.h
-	"GDL/ExtensionBase.h"
-
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\networkextension.h
-	"GDL/ExtensionBase.h"
-
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\sceneextension.h
-	"GDL/ExtensionBase.h"
-
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\textextension.h
-	"GDL/ExtensionBase.h"
-
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\primitivedrawingextension.h
-	"GDL/ExtensionBase.h"
-
-1263746430 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionsmanager.cpp
-	<vector>
-	<map>
-	<string>
-	"GDL/ExtensionsManager.h"
-	"GDL/BaseObjectExtension.h"
-	"GDL/AudioExtension.h"
-	"GDL/MouseExtension.h"
-	"GDL/KeyboardExtension.h"
-	"GDL/JoystickExtension.h"
-	"GDL/TimeExtension.h"
-	"GDL/FileExtension.h"
-	"GDL/VariablesExtension.h"
-	"GDL/InterfaceExtension.h"
-	"GDL/CameraExtension.h"
-	"GDL/WindowExtension.h"
-	"GDL/NetworkExtension.h"
-	"GDL/SpriteExtension.h"
-	"GDL/SceneExtension.h"
-	"GDL/AdvancedExtension.h"
-	"GDL/TextExtension.h"
-	"GDL/PrimitiveDrawingExtension.h"
-	"GDL/Object.h"
-	"GDL/Game.h"
-	"GDL/MainEditorCommand.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\fileextension.cpp
-	"GDL/FileExtension.h"
-	"GDL/cFichier.h"
-	"GDL/aFichier.h"
-
-1263927053 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\fontmanager.cpp
-	"GDL/FontManager.h"
-	"GDL/RessourcesLoader.h"
-	<SFML/Graphics.hpp>
-	<iostream>
-	<string>
-	<vector>
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\force.cpp
-	<iostream>
-	<vector>
-	<string>
-	<cmath>
-	"GDL/Log.h"
-	"GDL/Event.h"
-	"GDL/gpl.h"
-	"GDL/Force.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\gdexpression.cpp
-	"GDL/GDExpression.h"
-	"GDL/ExpressionInstruction.h"
-
-1263666817 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\game.cpp
-	"GDL/Game.h"
-	"GDL/MemTrace.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\image.cpp
-	"GDL/Image.h"
-
-1263666868 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\imagemanager.cpp
-	"GDL/ImageManager.h"
-	"GDL/RessourcesLoader.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\instruction.cpp
-	"GDL/Instruction.h"
-	<string>
-	<iostream>
-	<vector>
-	<assert.h>
-	"GDL/GDExpression.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\interfaceextension.cpp
-	"GDL/InterfaceExtension.h"
-	"GDL/aGUI.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\joystickextension.cpp
-	"GDL/JoystickExtension.h"
-	"GDL/cJoystick.h"
-	"GDL/aJoystick.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\keyboardextension.cpp
-	"GDL/KeyboardExtension.h"
-	"GDL/ExtensionBase.h"
-	"GDL/cClavier.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\layer.cpp
-	"GDL/Layer.h"
-
-1263666817 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\listvariable.cpp
-	"GDL/ListVariable.h"
-	"GDL/MemTrace.h"
-	"GDL/Variable.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.cpp
-	"GDL/LoadingScreen.h"
-	<string>
-	<vector>
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\log.cpp
-	<string>
-	<vector>
-	"GDL/Version.h"
-
-1263739339 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\maineditorcommand.cpp
-	"GDL/MainEditorCommand.h"
-	"GDL/needReload.h"
-	<wx/ribbon/page.h>
-	<iostream>
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\manualtimer.cpp
-	"GDL/ManualTimer.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\memtrace.cpp
-	"GDL/MemTrace.h"
-	<stdlib.h>
-
-1264010718 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\modules.cpp
-	<string>
-	<vector>
-	<boost/python.hpp>
-	<SFML/System.hpp>
-	<SFML/Window.hpp>
-	<SFML/Graphics.hpp>
-	<SFML/Audio.hpp>
-	"GDL/sf_classes_1.pypp.hpp"
-	"GDL/sf_classes_2.pypp.hpp"
-	"GDL/sf_classes_3.pypp.hpp"
-	"GDL/sf_classes_4.pypp.hpp"
-	"GDL/sf_classes_5.pypp.hpp"
-	"GDL/sf_classes_6.pypp.hpp"
-	"GDL/sf_classes_7.pypp.hpp"
-	"GDL/sf_enumerations.pypp.hpp"
-	"GDL/sf_free_functions.pypp.hpp"
-	"GDL/sf_global_variables.pypp.hpp"
-	"GDL/Game.h"
-	"GDL/Scene.h"
-	"GDL/RuntimeScene.h"
-	"GDL/Variable.h"
-	"GDL/Modules.h"
-
-1250855801 c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_1.pypp.hpp
-
-1250855803 c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_2.pypp.hpp
-
-1250855806 c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_3.pypp.hpp
-
-1250855800 c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_4.pypp.hpp
-
-1250855802 c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_5.pypp.hpp
-
-1250855804 c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_6.pypp.hpp
-
-1250855798 c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_7.pypp.hpp
-
-1250855806 c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_enumerations.pypp.hpp
-
-1250855799 c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_free_functions.pypp.hpp
-
-1250855805 c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_global_variables.pypp.hpp
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\mouseextension.cpp
-	"GDL/MouseExtension.h"
-	"GDL/ExtensionBase.h"
-	"GDL/cSouris.h"
-	"GDL/aSouris.h"
-	"GDL/eFreeFunctions.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\music.cpp
-	"GDL/Music.h"
-	<string>
-	<iostream>
-	<stdio.h>
-	<string.h>
-	"GDL/SoundManager.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\networkextension.cpp
-	"GDL/NetworkExtension.h"
-	"GDL/aNet.h"
-
-1263666817 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\object.cpp
-	"GDL/Object.h"
-	<SFML/System.hpp>
-	<SFML/Graphics.hpp>
-	<iostream>
-	<string>
-	<vector>
-	<boost/shared_ptr.hpp>
-	"GDL/Log.h"
-	"GDL/Force.h"
-	"GDL/constantes.h"
-	<string>
-	<list>
-	<sstream>
-	"GDL/MemTrace.h"
-	"GDL/ErrorReport.h"
-	"GDL/algo.h"
-	"GDL/StdAlgo.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\objectgroup.cpp
-	"GDL/ObjectGroup.h"
-	"GDL/ObjectType.h"
-	<vector>
-	<string>
-	<algorithm>
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\objecttype.cpp
-	"GDL/ObjectType.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\objectwithopacity.cpp
-	"GDL/ObjectWithOpacity.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-	"GDL/Access.h"
-
-1263662856 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectwithopacity.h
-	<string>
-	<boost/shared_ptr.hpp>
-	"GDL/Object.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.cpp
-	"GDL/ObjectsConcerned.h"
-	"GDL/Object.h"
-	<boost/shared_ptr.hpp>
-	"GDL/ObjectGroup.h"
-	"GDL/ObjectType.h"
-	"GDL/profile.h"
-
-1263927872 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\opensavegame.cpp
-	<wx/wx.h>
-	"GDL/StdAlgo.h"
-	"CppUnitLite/TestHarness.h"
-	<string>
-	"GDL/OpenSaveGame.h"
-	"GDL/tinyxml.h"
-	"GDL/algo.h"
-	"GDL/Game.h"
-	"GDL/Scene.h"
-	"GDL/Object.h"
-	"GDL/constantes.h"
-	"GDL/Animation.h"
-	"GDL/Position.h"
-	"GDL/Event.h"
-	"GDL/Instruction.h"
-	"GDL/VersionWrapper.h"
-	"GDL/ExtensionsLoader.h"
-	"GDL/Layer.h"
-	"GDL/OpenSaveLoadingScreen.h"
-	"GDL/ExtensionsManager.h"
-	<boost/shared_ptr.hpp>
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\opensaveloadingscreen.cpp
-	"GDL/OpenSaveLoadingScreen.h"
-	"GDL/tinyxml.h"
-	<string>
-	<iostream>
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\point.cpp
-	"GDL/Point.h"
-	<string>
-
-1263666817 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\position.cpp
-	"GDL/Position.h"
-	"GDL/MemTrace.h"
-	<string>
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\primitivedrawingextension.cpp
-	"GDL/PrimitiveDrawingExtension.h"
-	"GDL/DrawerObject.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\propimage.cpp
-	"GDL/PropImage.h"
-	<wx/intl.h>
-	<wx/string.h>
-	<wx/dcbuffer.h>
-	<wx/filedlg.h>
-	"GDL/BitmapGUIManager.h"
-	"GDL/StdAlgo.h"
-
-1263842011 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\ressourcesloader.cpp
-	"GDL/RessourcesLoader.h"
-	<SFML/Graphics.hpp>
-	<SFML/Audio.hpp>
-	<string>
-	<fstream>
-	<iostream>
-	"GDL/Music.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimegame.cpp
-	"GDL/RuntimeGame.h"
-
-1264353672 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimescene.cpp
-	<SFML/System.hpp>
-	<SFML/Graphics.hpp>
-	<SFML/OpenGL.hpp>
-	<exception>
-	<stdexcept>
-	<sstream>
-	"GDL/RuntimeScene.h"
-	"GDL/Scene.h"
-	"GDL/Game.h"
-	"GDL/ImageManager.h"
-	"GDL/SortByPlan.h"
-	"GDL/Chercher.h"
-	"GDL/ChercherScene.h"
-	"GDL/AppelEvent.h"
-	"GDL/ExtensionsManager.h"
-	"GDL/Layer.h"
-	"GDL/EventsPreprocessor.h"
-	"GDL/profile.h"
-	"GDL/ExtensionsManager.h"
-
-1263662855 c:\users\florian\programmation\gamedevelop\gdl\gdl\chercherscene.h
-	<string>
-	"GDL/Scene.h"
-
-1263666817 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\scene.cpp
-	"GDL/Scene.h"
-	"GDL/MemTrace.h"
-	"GDL/ExtensionsManager.h"
-	"GDL/Chercher.h"
-	"GDL/Game.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\sceneextension.cpp
-	"GDL/SceneExtension.h"
-	"GDL/aWindow.h"
-	"GDL/actions.h"
-	"GDL/conditions.h"
-	"GDL/ExtensionBase.h"
-
-1263662854 c:\users\florian\programmation\gamedevelop\gdl\gdl\awindow.h
-	"GDL/RuntimeScene.h"
-	"GDL/Instruction.h"
-	"GDL/Access.h"
-	<string>
-	<vector>
-
-1263666817 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\son.cpp
-	"GDL/Son.h"
-	<SFML/Audio.hpp>
-	"GDL/MemTrace.h"
-	"GDL/RessourcesLoader.h"
-	<string>
-	<vector>
-	<iostream>
-	"GDL/SoundManager.h"
-
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\soundmanager.cpp
-	"GDL/SoundManager.h"
-	"GDL/Music.h"
-	"GDL/Son.h"
-	<iostream>
-	<string>
-	<vector>
-
-1264015794 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\sprite.cpp
-	"GDL/Sprite.h"
-	<SFML/Graphics.hpp>
-	<iostream>
-
-1263663294 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\spriteextension.cpp
-	"GDL/ExtensionBase.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-	"GDL/SpriteExtension.h"
-	"GDL/ExtensionsManager.h"
-	"GDL/Access.h"
-	"GDL/Chercher.h"
-	"GDL/Object.h"
-	<iostream>
-	<string>
-	"GDL/ExtensionBase.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-	"GDL/Access.h"
-	"GDL/Object.h"
-	"GDL/SpriteObject.h"
-	<iostream>
-	<wx/textdlg.h>
-	<wx/bitmap.h>
-	<wx/wx.h>
-	"GDL/Game.h"
-	"GDL/MainEditorCommand.h"
-
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\spriteinitialpositionpanel.cpp
-	"GDL/SpriteInitialPositionPanel.h"
-	<wx/intl.h>
-	<wx/string.h>
-
-1263410130 c:\users\florian\programmation\gamedevelop\gdl\gdl\spriteinitialpositionpanel.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/panel.h>
-	<wx/combobox.h>
-
-1263663294 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\spriteobject.cpp
-	"GDL/SpriteObject.h"
-	"GDL/Object.h"
-	"GDL/Access.h"
-	"GDL/ImageManager.h"
-	"GDL/tinyxml.h"
-	<SFML/Graphics.hpp>
-	<wx/wx.h>
-	"GDL/StdAlgo.h"
-	"GDL/MainEditorCommand.h"
-	"GDL/EditorObjet.h"
-	"GDL/SpriteInitialPositionPanel.h"
-
-1263731462 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\stdalgo.cpp
-	<string>
-	<sstream>
-	<iostream>
-	<vector>
-	"GDL/StdAlgo.h"
-	"GDL/Image.h"
-
-1263927106 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\text.cpp
-	"GDL/Text.h"
-	"GDL/FontManager.h"
-	<iostream>
-	<SFML/Graphics.hpp>
-	<string>
-
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\textextension.cpp
-	"GDL/TextExtension.h"
-	"GDL/TextObject.h"
-
-1263662857 c:\users\florian\programmation\gamedevelop\gdl\gdl\textobject.h
-	"GDL/Object.h"
-	"GDL/ObjectWithOpacity.h"
-	<SFML/Graphics.hpp>
-
-1263842350 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\textobject.cpp
-	"GDL/TextObject.h"
-	<SFML/Graphics.hpp>
-	"GDL/Object.h"
-	"GDL/Access.h"
-	"GDL/ImageManager.h"
-	"GDL/tinyxml.h"
-	"GDL/FontManager.h"
-	<wx/wx.h>
-	"GDL/StdAlgo.h"
-	"GDL/MainEditorCommand.h"
-	"GDL/TextObjectEditor.h"
-
-1263408955 c:\users\florian\programmation\gamedevelop\gdl\gdl\textobjecteditor.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/spinctrl.h>
-	<wx/statline.h>
-	<wx/button.h>
-	<wx/dialog.h>
-
-1263663294 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\textobjecteditor.cpp
-	"GDL/TextObjectEditor.h"
-	<wx/intl.h>
-	<wx/string.h>
-	<wx/colordlg.h>
-	<wx/filedlg.h>
-	"GDL/Game.h"
-	"GDL/TextObject.h"
-	"GDL/MainEditorCommand.h"
-
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\timeextension.cpp
-	"GDL/TimeExtension.h"
-	"GDL/cTime.h"
-	"GDL/aTime.h"
-	"GDL/eFreeFunctions.h"
-
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\variable.cpp
-	"GDL/Variable.h"
-	<string>
-	<sstream>
-
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\variablesextension.cpp
-	"GDL/VariablesExtension.h"
-	"GDL/cVariables.h"
-	"GDL/aVariables.h"
-	"GDL/eFreeFunctions.h"
-
-1250855805 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\version.cpp
-	<string>
-
-1263929666 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\versionwrapper.cpp
-	"GDL/VersionWrapper.h"
-	"GDL/Version.h"
-
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\windowextension.cpp
-	"GDL/WindowExtension.h"
-	"GDL/aTexte.h"
-	"GDL/aWindow.h"
-	"GDL/actions.h"
-
-1263662853 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\aads.cpp
-	<vector>
-	<string>
-	<iostream>
-	<cmath>
-	<sstream>
-	"GDL/Object.h"
-	"GDL/SpriteObject.h"
-	"GDL/Event.h"
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-
-1263662853 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\aadvanced.cpp
-	"GDL/aAdvanced.h"
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-	"GDL/Instruction.h"
-	"GDL/ObjectsConcerned.h"
-	<string>
-	<vector>
-
-1263662853 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\acamera.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<SFML/System.hpp>
-	<iostream>
-	<SFML/Graphics.hpp>
-	<cmath>
-	"GDL/aCamera.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-
-1264015794 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\aeffects.cpp
-	"GDL/aEffects.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/SpriteObject.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\afichier.cpp
-	"GDL/tinyxml.h"
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-	"GDL/ObjectsConcerned.h"
-	<vector>
-	<string>
-	"GDL/algo.h"
-	<stdio.h>
-
-1263668108 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\agui.cpp
-	"GDL/aGUI.h"
-	<vector>
-	<string>
-	"GDL/Object.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	<nwidgets/MessageBox.h>
-	<nwidgets/YesNoMsgBox.h>
-	<nwidgets/OpenFile.h>
-	<nwidgets/TextInput.h>
-	<string>
-	<vector>
-
-1240668463 c:\users\florian\programmation\nwidgets\nwidgets\messagebox.h
-	"dlib/gui_widgets.h"
-	"ColorBox.h"
-	<sstream>
-	<string>
-
-1240668595 c:\users\florian\programmation\nwidgets\nwidgets\colorbox.h
-	"dlib/gui_widgets.h"
-	<sstream>
-	<string>
-
-1240671949 c:\users\florian\programmation\nwidgets\nwidgets\yesnomsgbox.h
-	"dlib/gui_widgets.h"
-	"ColorBox.h"
-	<sstream>
-	<string>
-
-1240670153 c:\users\florian\programmation\nwidgets\nwidgets\openfile.h
-	"dlib/gui_widgets.h"
-	"dlib/gui_core.h"
-	<string>
-	<sstream>
-	"dlib/timer.h"
-	"dlib/member_function_pointer.h"
-	"dlib/array.h"
-	"dlib/sequence.h"
-	"dlib/dir_nav.h"
-	"dlib/queue.h"
-	"dlib/smart_pointers.h"
-	"dlib/string.h"
-	"dlib/misc_api.h"
-	<sstream>
-	<string>
-
-1240674699 c:\users\florian\programmation\nwidgets\nwidgets\textinput.h
-	"dlib/gui_widgets.h"
-	"ColorBox.h"
-	<sstream>
-	<string>
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\ajoystick.cpp
-	<vector>
-	<string>
-	<iostream>
-	<sstream>
-	<iostream>
-	"GDL/Object.h"
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\alayer.cpp
-	<vector>
-	<string>
-	<iostream>
-	<cmath>
-	<sstream>
-	"GDL/Object.h"
-	"GDL/Event.h"
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\amove.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/aMove.h"
-	"GDL/cCollisions.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/gpl.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\amusic.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/aMusic.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Audio.hpp>
-	<SFML/System.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/constantes.h"
-	"GDL/RessourcesLoader.h"
-
-1263742434 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\anet.cpp
-	<vector>
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/md5.h"
-
-1263742401 c:\users\florian\programmation\gamedevelop\gdl\gdl\md5.h
-	<string>
-	<iostream>
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\aobjet.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/aObjet.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/ExtensionsManager.h"
-	<stdexcept>
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\aplans.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/aPlans.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/ListVariable.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\aposition.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/aPosition.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/ListVariable.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\ascale.cpp
-	<vector>
-	<string>
-	<iostream>
-	<sstream>
-	"GDL/Object.h"
-	"GDL/Event.h"
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Access.h"
-	"GDL/SpriteObject.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\ascene.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/aScene.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	<string>
-	<vector>
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\asouris.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/aSouris.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Graphics.hpp>
-	"GDL/RuntimeScene.h"
-
-1263847233 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\atexte.cpp
-	<vector>
-	<string>
-	<SFML/System.hpp>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/aTexte.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\atime.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/aTime.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ManualTimer.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\avariables.cpp
-	<vector>
-	<string>
-	"GDL/aVariables.h"
-	<cmath>
-	"GDL/Collisions.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/ListVariable.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\avisibilite.cpp
-	<vector>
-	<string>
-	"GDL/aVisibilite.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\awindow.cpp
-	"GDL/aWindow.h"
-	"GDL/RuntimeScene.h"
-	"GDL/Instruction.h"
-	"GDL/Access.h"
-	"GDL/ObjectsConcerned.h"
-	<string>
-	<vector>
-
-1263662853 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\actions.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Collisions.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\algo.cpp
-	"GDL/algo.h"
-	"GDL/Log.h"
-	"GDL/Object.h"
-	<iostream>
-	<sstream>
-	<string>
-	<vector>
-	<cmath>
-	"GDL/Chercher.h"
-	<stdio.h>
-	<SFML/System.hpp>
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cads.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cADS.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/Instruction.h"
-	"GDL/SpriteObject.h"
-	"GDL/ObjectsConcerned.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\ccamera.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cADS.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/Instruction.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cclavier.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cClavier.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/Instruction.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\ccollisions.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cCollisions.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/profile.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-
-1263662854 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cfichier.cpp
-	"GDL/cFichier.h"
-	"GDL/tinyxml.h"
-	"GDL/RuntimeScene.h"
-	"GDL/Instruction.h"
-	"GDL/Access.h"
-	"GDL/algo.h"
-	<vector>
-	<string>
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cjoystick.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cADS.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\clayer.cpp
-	<vector>
-	<string>
-	<iostream>
-	<sstream>
-	"GDL/Object.h"
-	"GDL/Event.h"
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/Instruction.h"
-	"GDL/ObjectsConcerned.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cmove.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cMove.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cmusic.cpp
-	<vector>
-	<string>
-	<iostream>
-	<sstream>
-	"GDL/cMusic.h"
-	"GDL/Object.h"
-	"GDL/Event.h"
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/SoundManager.h"
-	"GDL/ObjectsConcerned.h"
-	<SFML/Audio.hpp>
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cobjet.cpp
-	"GDL/cObjet.h"
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cADS.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cplans.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cPlans.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cpos.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cPos.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/gpl.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cscale.cpp
-	<vector>
-	<string>
-	<iostream>
-	<sstream>
-	"GDL/Object.h"
-	"GDL/Event.h"
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-	"GDL/SpriteObject.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cscene.cpp
-	"GDL/cScene.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\csouris.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	"GDL/SpriteObject.h"
-	<cmath>
-	"GDL/cADS.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\ctime.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cTime.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cvariables.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cVariables.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/ListVariable.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cvisibilite.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/cVariables.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/SpriteObject.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\conditions.cpp
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Collisions.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-	"GDL/Instruction.h"
-
-1250855802 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\crypter.cpp
-	<iostream>
-	<string.h>
-	<string>
-	<vector>
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\efreefunctions.cpp
-	"GDL/Object.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/ExpressionInstruction.h"
-	<SFML/System.hpp>
-	<vector>
-	<string>
-	<ctime>
-	<iostream>
-
-1263662855 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\eobjectfunctions.cpp
-	"GDL/Object.h"
-	"GDL/SpriteObject.h"
-	"GDL/RuntimeScene.h"
-	"GDL/gpl.h"
-	"GDL/ObjectsConcerned.h"
-	<SFML/System.hpp>
-	<vector>
-	<string>
-
-1250855806 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\gpl.cpp
-
-1250855806 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\mathexpr.cpp
-	"mathexpr.h"
-
-1250855802 c:\users\florian\programmation\gamedevelop\gdl\gdl\mathexpr.h
-	<string.h>
-	<stdio.h>
-	<stdlib.h>
-	<math.h>
-	<float.h>
-
-1263744688 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\md5.cpp
-	"md5.h"
-	<stdio.h>
-	<cstring>
-
-1263663028 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\needreload.cpp
-	<string>
-	<vector>
-	<algorithm>
-	"GDL/needReload.h"
-
-1263662856 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\profile.cpp
-	"GDL/profile.h"
-	<stdio.h>
-
-1263664550 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_1.pypp.cpp
-	"boost/python.hpp"
-	"c:/libs/sfml/include/sfml/system.hpp"
-	"c:/libs/sfml/include/sfml/window.hpp"
-	"c:/libs/sfml/include/sfml/window/contextsettings.hpp"
-	"c:/libs/sfml/include/sfml/graphics.hpp"
-	"c:/libs/sfml/include/sfml/audio.hpp"
-	"sf_classes_1.pypp.hpp"
-
-1263664794 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_2.pypp.cpp
-	"boost/python.hpp"
-	"c:/libs/sfml/include/sfml/system.hpp"
-	"c:/libs/sfml/include/sfml/window.hpp"
-	"c:/libs/sfml/include/sfml/window/contextsettings.hpp"
-	"c:/libs/sfml/include/sfml/graphics.hpp"
-	"c:/libs/sfml/include/sfml/audio.hpp"
-	"sf_classes_2.pypp.hpp"
-
-1263664795 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_3.pypp.cpp
-	"boost/python.hpp"
-	"c:/libs/sfml/include/sfml/system.hpp"
-	"c:/libs/sfml/include/sfml/window.hpp"
-	"c:/libs/sfml/include/sfml/window/contextsettings.hpp"
-	"c:/libs/sfml/include/sfml/graphics.hpp"
-	"c:/libs/sfml/include/sfml/audio.hpp"
-	"sf_classes_3.pypp.hpp"
-
-1263664795 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_4.pypp.cpp
-	"boost/python.hpp"
-	"c:/libs/sfml/include/sfml/system.hpp"
-	"c:/libs/sfml/include/sfml/window.hpp"
-	"c:/libs/sfml/include/sfml/window/contextsettings.hpp"
-	"c:/libs/sfml/include/sfml/graphics.hpp"
-	"c:/libs/sfml/include/sfml/audio.hpp"
-	"sf_classes_4.pypp.hpp"
-
-1263664795 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_5.pypp.cpp
-	"boost/python.hpp"
-	"c:/libs/sfml/include/sfml/system.hpp"
-	"c:/libs/sfml/include/sfml/window.hpp"
-	"c:/libs/sfml/include/sfml/window/contextsettings.hpp"
-	"c:/libs/sfml/include/sfml/graphics.hpp"
-	"c:/libs/sfml/include/sfml/audio.hpp"
-	"sf_classes_5.pypp.hpp"
-
-1263664795 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_6.pypp.cpp
-	"boost/python.hpp"
-	"c:/libs/sfml/include/sfml/system.hpp"
-	"c:/libs/sfml/include/sfml/window.hpp"
-	"c:/libs/sfml/include/sfml/window/contextsettings.hpp"
-	"c:/libs/sfml/include/sfml/graphics.hpp"
-	"c:/libs/sfml/include/sfml/audio.hpp"
-	"sf_classes_6.pypp.hpp"
-
-1263664795 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_classes_7.pypp.cpp
-	"boost/python.hpp"
-	"c:/libs/sfml/include/sfml/system.hpp"
-	"c:/libs/sfml/include/sfml/window.hpp"
-	"c:/libs/sfml/include/sfml/window/contextsettings.hpp"
-	"c:/libs/sfml/include/sfml/graphics.hpp"
-	"c:/libs/sfml/include/sfml/audio.hpp"
-	"sf_classes_7.pypp.hpp"
-
-1264010594 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_enumerations.pypp.cpp
-	"boost/python.hpp"
-	"c:/libs/sfml/include/sfml/system.hpp"
-	"c:/libs/sfml/include/sfml/window.hpp"
-	"c:/libs/sfml/include/sfml/window/contextsettings.hpp"
-	"c:/libs/sfml/include/sfml/graphics.hpp"
-	"c:/libs/sfml/include/sfml/audio.hpp"
-	"sf_enumerations.pypp.hpp"
-
-1263664795 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_free_functions.pypp.cpp
-	"boost/python.hpp"
-	"c:/libs/sfml/include/sfml/system.hpp"
-	"c:/libs/sfml/include/sfml/window.hpp"
-	"c:/libs/sfml/include/sfml/window/contextsettings.hpp"
-	"c:/libs/sfml/include/sfml/graphics.hpp"
-	"c:/libs/sfml/include/sfml/audio.hpp"
-	"sf_free_functions.pypp.hpp"
-
-1263664795 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\sf_global_variables.pypp.cpp
-	"boost/python.hpp"
-	"c:/libs/sfml/include/sfml/system.hpp"
-	"c:/libs/sfml/include/sfml/window.hpp"
-	"c:/libs/sfml/include/sfml/window/contextsettings.hpp"
-	"c:/libs/sfml/include/sfml/graphics.hpp"
-	"c:/libs/sfml/include/sfml/audio.hpp"
-	"sf_global_variables.pypp.hpp"
-
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\singleton.cpp
-	"GDL/singleton.h"
-
-1260218599 c:\users\florian\programmation\gamedevelop\gdl\gdl\singleton.h
-	<iostream>
-
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\tinystr.cpp
-	"GDL/tinystr.h"
-
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxml.cpp
-	<ctype.h>
-	<sstream>
-	<iostream>
-	"GDL/tinyxml.h"
-
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxmlerror.cpp
-	"GDL/tinyxml.h"
-
-1263662857 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxmlparser.cpp
-	<ctype.h>
-	<stddef.h>
-	"GDL/tinyxml.h"
-	<windows.h>
 

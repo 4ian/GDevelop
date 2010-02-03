@@ -5,7 +5,7 @@
 		<Option title="GDL" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="LIB fparser\;LIB CppUnitLite\;LIB nwidgets\;md5\;" />
+		<Option virtualFolders="LIB fparser\;LIB CppUnitLite\;LIB nwidgets\;md5\;DES\;" />
 		<Build>
 			<Target title="Debug">
 				<Option output="..\Runtime\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
@@ -441,7 +441,9 @@
 		<Unit filename="GDL\MainEditorCommand.h" />
 		<Unit filename="GDL\ManualTimer.cpp" />
 		<Unit filename="GDL\ManualTimer.h" />
-		<Unit filename="GDL\McbDES2.hpp" />
+		<Unit filename="GDL\McbDES2.hpp">
+			<Option virtualFolder="DES\" />
+		</Unit>
 		<Unit filename="GDL\MemTrace.cpp" />
 		<Unit filename="GDL\MemTrace.h" />
 		<Unit filename="GDL\Modules.cpp" />

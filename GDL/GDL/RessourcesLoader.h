@@ -59,7 +59,8 @@ public:
     /**
      * Load a binary text file
      */
-    std::string LoadBinaryFile( const string & filename );
+    char* LoadBinaryFile( const string & filename );
+    int GetBinaryFileSize( const string & filename);
 
     /**
      * Set the name of the Game Develop Executable to be open

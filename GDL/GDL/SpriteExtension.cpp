@@ -323,6 +323,22 @@ ExtensionSprite::ExtensionSprite()
             DECLARE_PARAMETER("texte", _("Nom de l'image source"), false, "")
             DECLARE_PARAMETER("expression", _("Position X"), false, "")
             DECLARE_PARAMETER("expression", _("Position Y"), false, "")
+            DECLARE_PARAMETER("yesorno", _("Utiliser la transparence de la source ( non si vide )"), false, "")
+            MAIN_OBJECTS_IN_PARAMETER(0)
+
+        DECLARE_END_OBJECT_ACTION()
+
+        DECLARE_OBJECT_ACTION("CreateMaskFromColorOnActualImage",
+                       _("Rendre une couleur de l'image d'un objet transparente"),
+                       _("Rend une couleur de l'image d'un objet transparente."),
+                       _("Rendre la couleur _PARAM1_ de l'image actuelle de _PARAM0_ transparente"),
+                       _("Effets"),
+                       "res/actions/opacity24.png",
+                       "res/actions/opacity.png",
+                       &SpriteObject::ActCreateMaskFromColorOnActualImage);
+
+            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("color", _("Couleur à rendre transparente"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_ACTION()

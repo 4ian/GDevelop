@@ -104,38 +104,36 @@ std::string RessourcesLoader::LoadPlainText( const string & filename )
 
     return text;
 }
-/*
-std::string RessourcesLoader::LoadPlainText( const string & filename )
-{
-    std::string text;
 
+
+/**
+ * Load a binary text file
+ */
+char* RessourcesLoader::LoadBinaryFile( const string & filename )
+{
     if ( ExeGD.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
     {
         char* buffer = ExeGD.GetFile(filename);
         if (buffer==NULL)
             cout << "Erreur lors de la récupération interne du fichier " << filename << endl;
 
-        text = buffer;
+        return buffer;
     }
     else
-    {
-        ifstream file(filename.c_str(), ios::in);
+            cout << "Binary file can't be loaded from external file for " << filename << endl;
 
-        if(!file.fail())
-        {
-            string ligne;
-            while(getline(file, ligne))
-                text += ligne;
-
-            file.close();
-        }
-        else
-            cout << "Erreur lors de la lecture externe du fichier " << filename << endl;
-    }
-
-    return text;
+    return NULL;
 }
-*/
+
+int RessourcesLoader::GetBinaryFileSize( const string & filename)
+{
+    if ( ExeGD.ContainsFile(filename))
+        return ExeGD.GetFileSize(filename);
+
+    cout << "Internal file " << filename << " not found for GetFileSize.";
+    return 0;
+}
+
 Music * RessourcesLoader::LoadMusic( const string & filename )
 {
     Music * music = new Music;

@@ -38,7 +38,32 @@ bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene * scene, ObjectsCon
     int destY = eval.EvalExp(action.GetParameter(3), shared_from_this());
     if ( destY < 0 || static_cast<unsigned>(destY) >= dest.GetWidth()) return false;
 
-    dest.Copy(src->second, destX, destY);
+    bool applyAlpha = false;
+    if ( action.GetParameters().size() > 4 )
+    {
+        if ( action.GetParameter(4).GetPlainString() == "yes" || action.GetParameter(4).GetPlainString() == "oui" )
+            applyAlpha = true;
+    }
+
+    dest.Copy(src->second, destX, destY, sf::IntRect(0, 0, 0, 0), applyAlpha);
+
+    return true;
+}
+
+bool SpriteObject::ActCreateMaskFromColorOnActualImage( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+{
+    if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
+
+    currentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
+    sf::Image & dest = currentSprite->GetSpriteOwnImage();
+
+    vector < GDExpression > colors = SpliterStringToVector <GDExpression> (eval.EvalTxt(action.GetParameter(1), shared_from_this()), ';');
+
+    if ( colors.size() < 3 ) return false; //La couleur est incorrecte
+
+    dest.CreateMaskFromColor(  sf::Color(  eval.EvalExp( colors[0] ),
+                                           eval.EvalExp( colors[1] ),
+                                           eval.EvalExp( colors[2] )));
 
     return true;
 }

@@ -135,7 +135,7 @@ int main( int argc, char *p_argv[] )
     //loadingApp.Display();
 
     //Ouverture du jeu
-#ifndef RELEASE
+#ifdef RELEASE
 
     if ( srcString == "" )
     {

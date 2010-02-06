@@ -125,9 +125,11 @@ bool TextObject::Draw( sf::RenderWindow& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    text.SetX( GetX() );
-    text.SetY( GetY() );
+    text.SetX( GetX()-text.GetRect().GetSize().x/2 );
+    text.SetY( GetY()-text.GetRect().GetSize().y/2 );
     text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
+    text.SetOrigin(text.GetRect().GetSize().x/2, text.GetRect().GetSize().y/2);
+    text.SetRotation(-angle);
 
     window.Draw( text );
 
@@ -140,9 +142,11 @@ bool TextObject::Draw( sf::RenderWindow& window )
  */
 bool TextObject::DrawEdittime(sf::RenderWindow& renderWindow)
 {
-    text.SetX( GetX() );
-    text.SetY( GetY() );
+    text.SetX( GetX()+text.GetRect().GetSize().x/2 );
+    text.SetY( GetY()+text.GetRect().GetSize().y/2 );
     text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
+    text.SetOrigin(text.GetRect().GetSize().x/2, text.GetRect().GetSize().y/2);
+    text.SetRotation(-angle);
 
     renderWindow.Draw( text );
 
@@ -228,7 +232,7 @@ unsigned int TextObject::GetNumberOfProperties() const
  */
 float TextObject::GetDrawableX() const
 {
-    return text.GetPosition().x;
+    return text.GetPosition().x-text.GetOrigin().x;
 }
 
 /**
@@ -236,7 +240,7 @@ float TextObject::GetDrawableX() const
  */
 float TextObject::GetDrawableY() const
 {
-    return text.GetPosition().y;
+    return text.GetPosition().y-text.GetOrigin().y;
 }
 
 /**
@@ -432,6 +436,50 @@ bool TextObject::ActChangeColor( RuntimeScene * scene, ObjectsConcerned & object
     colorB = eval.EvalExp( colors[2], shared_from_this() );
 
     return true;
+}
+
+/**
+ * Test the angle
+ */
+bool TextObject::CondAngle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+{
+    //optimisation : le test de signe en premier
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetAngle() == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetAngle() < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetAngle() > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetAngle() <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetAngle() >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetAngle() != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+       )
+    {
+       return true;
+    }
+
+    return false;
+}
+
+/**
+ * Modify angle
+ */
+bool TextObject::ActAngle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+{
+    if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
+        SetAngle( static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
+        SetAngle( GetAngle() + static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
+        SetAngle( GetAngle() - static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
+        SetAngle( GetAngle() * static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
+        SetAngle( GetAngle() / static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+
+    return true;
+}
+
+double TextObject::ExpAngle( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    return angle;
 }
 
 

@@ -19,17 +19,29 @@
 					<Add option="-pg" />
 					<Add option="-g" />
 					<Add option="-DGDP" />
+					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
+					<Add option="-lmingw32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
 					<Add option="-lsfml-audio-d.dll" />
 					<Add option="-lsfml-graphics-d.dll" />
 					<Add option="-lsfml-window-d.dll" />
 					<Add option="-lsfml-system-d.dll" />
 					<Add option="-lgmon" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
@@ -46,6 +58,7 @@
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGDE" />
+					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DPYSUPPORT" />
@@ -59,6 +72,14 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
+					<Add option="-lmingw32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
 					<Add option="-lwxmsw29d_xrc" />
 					<Add option="-lwxmsw29d_richtext" />
 					<Add option="-lwxmsw29d_ribbon" />
@@ -80,13 +101,6 @@
 					<Add option="-lsfml-system-d.dll" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
-					<Add option="-lopengl32" />
-					<Add option="-limm32" />
-					<Add option="-lcomctl32" />
-					<Add option="-lglu32" />
-					<Add option="-lws2_32" />
-					<Add option="-lgdi32" />
-					<Add option="-lwinmm" />
 					<Add option="-luuid" />
 					<Add option="-lshell32" />
 					<Add option="-lole32" />
@@ -96,6 +110,9 @@
 					<Add option="-loleaut32" />
 					<Add library="C:\Libs\boost_1_38_0\bin.v2\libs\python\build\gcc-mingw-4.3.2\release\threading-multi\boost_python-mgw43-mt-1_38.lib" />
 					<Add library="C:\Python26\libs\libpython26.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
 				</Linker>
@@ -111,16 +128,28 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-DGDP" />
+					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lmingw32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
 					<Add option="-lsfml-audio.dll" />
 					<Add option="-lsfml-graphics.dll" />
 					<Add option="-lsfml-window.dll" />
 					<Add option="-lsfml-system.dll" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
@@ -136,6 +165,7 @@
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGDE" />
+					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DPYSUPPORT" />
@@ -148,6 +178,14 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lmingw32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
@@ -169,13 +207,6 @@
 					<Add option="-lsfml-system.dll" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
-					<Add option="-lopengl32" />
-					<Add option="-limm32" />
-					<Add option="-lcomctl32" />
-					<Add option="-lglu32" />
-					<Add option="-lws2_32" />
-					<Add option="-lgdi32" />
-					<Add option="-lwinmm" />
 					<Add option="-luuid" />
 					<Add option="-lshell32" />
 					<Add option="-lole32" />
@@ -185,6 +216,9 @@
 					<Add option="-loleaut32" />
 					<Add library="C:\Libs\boost_1_38_0\bin.v2\libs\python\build\gcc-mingw-4.3.2\release\threading-multi\boost_python-mgw43-mt-1_38.lib" />
 					<Add library="C:\Python26\libs\libpython26.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
 				</Linker>
@@ -200,16 +234,28 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-DGDP" />
+					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lmingw32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
 					<Add option="-lsfml-audio.dll" />
 					<Add option="-lsfml-graphics.dll" />
 					<Add option="-lsfml-window.dll" />
 					<Add option="-lsfml-system.dll" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
@@ -225,6 +271,7 @@
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGDE" />
+					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DPYSUPPORT" />
@@ -237,6 +284,14 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lmingw32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
@@ -258,13 +313,6 @@
 					<Add option="-lsfml-system.dll" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
-					<Add option="-lopengl32" />
-					<Add option="-limm32" />
-					<Add option="-lcomctl32" />
-					<Add option="-lglu32" />
-					<Add option="-lws2_32" />
-					<Add option="-lgdi32" />
-					<Add option="-lwinmm" />
 					<Add option="-luuid" />
 					<Add option="-lshell32" />
 					<Add option="-lole32" />
@@ -274,14 +322,56 @@
 					<Add option="-loleaut32" />
 					<Add library="C:\Libs\boost_1_38_0\bin.v2\libs\python\build\gcc-mingw-4.3.2\release\threading-multi\boost_python-mgw43-mt-1_38.lib" />
 					<Add library="C:\Python26\libs\libpython26.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
+			<Target title="Linux - Release">
+				<Option output="..\Runtime\bin\release\gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-DGDP" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="\home\florian\Programmation\libs\dlib-17.12\" />
+					<Add directory="\home\florian\Programmation\libs\nwidgets\" />
+					<Add directory="\home\florian\Programmation\libs\fparser\" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-DGD_API=__declspec(dllexport)" />
-			<Add directory="C:\Users\Florian\Programmation\GameDevelop\GDL" />
+			<Add directory="..\GDL\" />
 			<Add directory="C:\Libs\boost_1_38_0" />
 			<Add directory="C:\Python26\include" />
 			<Add directory="C:\Libs\SFML\include" />
@@ -291,17 +381,6 @@
 			<Add directory="C:\Libs\CppUnitLite" />
 		</Compiler>
 		<Linker>
-			<Add option="-lmingw32" />
-			<Add option="-lopengl32" />
-			<Add option="-limm32" />
-			<Add option="-lcomctl32" />
-			<Add option="-lglu32" />
-			<Add option="-lws2_32" />
-			<Add option="-lgdi32" />
-			<Add option="-lwinmm" />
-			<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
-			<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
-			<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
 			<Add directory="C:\Libs\SFML\lib\mingw" />
 		</Linker>
 		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\Failure.cpp">
@@ -341,6 +420,8 @@
 		<Unit filename="..\..\..\..\..\Libs\fparser\fparser.cc">
 			<Option virtualFolder="LIB fparser\" />
 		</Unit>
+		<Unit filename="GDL\AES.cpp" />
+		<Unit filename="GDL\AES.h" />
 		<Unit filename="GDL\Access.cpp" />
 		<Unit filename="GDL\Access.h" />
 		<Unit filename="GDL\AdvancedExtension.cpp" />

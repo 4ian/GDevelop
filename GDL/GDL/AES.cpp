@@ -104,6 +104,49 @@ bool tablesInitialized = false;
 
 #define RotByteL(a) _rotl(a,8)
 
+//Define remplacement functions for _rotr and _rotl which are windows specific
+#if defined(LINUX)
+unsigned int _rotr(unsigned int num, unsigned int numbits)
+{
+    unsigned int lowbitmask=1;          // mask for 1st bit
+    unsigned int highbitmask=2147483648;    //mask for 32nd bit 2^31
+
+	for(int i=0;i<numbits; i++)
+	    {
+		if(num & lowbitmask)
+		    {
+			num=num>>1;
+			num=(num|highbitmask);
+		    }
+		else
+		    {
+			num=num>>1;
+		    }
+	    }
+return num;
+}
+
+unsigned int _rotl(unsigned int num, unsigned int numbits)
+{
+    unsigned int lowbitmask=1;          // mask for 1st bit
+    unsigned int highbitmask=2147483648;     //mask for 32nd bit 2^31
+
+	for(int i=0;i<numbits; i++)
+	    {
+		if(num &highbitmask )
+		    {
+			num=num<<1;
+			num=(num|lowbitmask);
+		    }
+		else
+		    {
+			num=num<<1;
+		    }
+	    }
+return num;
+}
+#endif
+
 // mult 2 elements using gf2_8_poly as a reduction
 inline unsigned char GF2_8_mult(unsigned char a, unsigned char b)
 	{ // todo - make 4x4 table for nibbles, use lookup

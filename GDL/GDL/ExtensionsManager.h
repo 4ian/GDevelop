@@ -96,9 +96,15 @@ class GD_API ExtensionsManager
 
         /**
          * Get information about an expression from its type
-         * Works for object and static expressions.
+         * Works for static expressions.
          */
-        const ExpressionInfos & GetExpressionInfos(string exprType, bool onlyStaticExpressions = false) const;
+        const ExpressionInfos & GetExpressionInfos(string exprType) const;
+
+        /**
+         * Get information about an expression from its type
+         * Works for object expressions.
+         */
+        const ExpressionInfos & GetObjectExpressionInfos(string objectType, string exprType) const;
 
         /**
          * Get a pointer to a ( static ) action

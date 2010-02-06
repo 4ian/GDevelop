@@ -144,5 +144,46 @@ TextExtension::TextExtension()
 
         DECLARE_END_OBJECT_CONDITION()
 
+
+        DECLARE_OBJECT_ACTION("Angle",
+                       _("Régler l'angle d'un objet texte"),
+                       _("Modifie l'angle d'un objet texte."),
+                       _("Faire _PARAM2__PARAM1_ à l'angle de _PARAM0_"),
+                       _("Rotation"),
+                       "res/actions/rotate24.png",
+                       "res/actions/rotate.png",
+                       &TextObject::ActAngle);
+
+            DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
+            DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+            DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+            MAIN_OBJECTS_IN_PARAMETER(0)
+
+        DECLARE_END_OBJECT_ACTION()
+
+        DECLARE_OBJECT_CONDITION("Angle",
+                       _("Angle d'un objet texte"),
+                       _("Teste la valeur de l'angle d'un objet texte."),
+                       _("L'angle de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                       _("Rotation"),
+                       "res/conditions/rotate24.png",
+                       "res/conditions/rotate.png",
+                       &TextObject::CondAngle);
+
+            DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
+            DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
+            DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+            MAIN_OBJECTS_IN_PARAMETER(0)
+
+        DECLARE_END_OBJECT_CONDITION()
+
+        DECLARE_OBJECT_EXPRESSION("opacity", _("Opacité"), _("Opacité"), _("Opacité"), "res/actions/opacity.png", &TextObject::GetOpacity)
+            DECLARE_PARAMETER("object", _("Objet"), true, "Text")
+        DECLARE_END_OBJECT_EXPRESSION()
+
+        DECLARE_OBJECT_EXPRESSION("angle", _("Angle"), _("Angle"), _("Rotation"), "res/actions/rotate.png", &TextObject::GetAngle)
+            DECLARE_PARAMETER("object", _("Objet"), true, "Text")
+        DECLARE_END_OBJECT_EXPRESSION()
+
     DECLARE_END_OBJECT()
 }

@@ -94,12 +94,6 @@ double ExpObjectFunction( const RuntimeScene * scene, ObjectsConcerned * objects
  */
 void Evaluateur::AddConstantFunctionCall(GDExpression & expr, string & plainExpression, size_t endPos)
 {
-    /*ExpressionInstruction instruction;
-
-    instruction.parameters.push_back(GDExpression(plainExpression.substr(0, endPos)));
-    instruction.function = &ExpConstantText;
-
-    expr.exprSteps.push_back(instruction);*/
 
     //Finally, get ride of the object expression
     if ( endPos < plainExpression.length() )

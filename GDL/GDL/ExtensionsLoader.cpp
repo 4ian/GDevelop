@@ -88,11 +88,25 @@ void ExtensionsLoader::LoadAllExtensionsAvailable()
     rep = opendir( directory.c_str() );
     int l = 0;
 
+    string suffix = "";
+
+    #if defined(WINDOWS)
+        suffix += "w";
+    #elif defined(LINUX)
+        suffix += "l";
+    #else
+        #error No target system defined.
+    #endif
+
+    #if defined(GDE)
+        suffix += "e";
+    #endif
+
     //External extensions
     while (( lecture = readdir( rep ) ) )
     {
         string lec = lecture->d_name;
-        if ( lec != "." && lec != ".." && lec.find(".xgd", lec.length()-4) != string::npos)
+        if ( lec != "." && lec != ".." && lec.find(".xgd"+suffix, lec.length()-4-suffix.length()) != string::npos)
         {
             //Charger l'extension
             LoadExtensionInManager(directory+"/"+lec);
@@ -169,8 +183,9 @@ void ExtensionsLoader::LoadExtensionInManager(std::string fullpath)
             {
                 if ( extensionPtr->compilationInfo.gdlVersion != RC_FILEVERSION_STRING)
                 {
+                    char beep = 7;
                     cout << endl;
-                    cout << "-- WARNING ! --" << endl;
+                    cout << "-- WARNING ! --" << beep << endl;
                     cout << "Compiled with a different version of GDL." << endl;
                     cout << "---------------" << endl;
                 }

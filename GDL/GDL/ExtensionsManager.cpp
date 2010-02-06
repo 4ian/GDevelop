@@ -160,24 +160,29 @@ const InstructionInfos & ExtensionsManager::GetConditionInfos(string conditionTy
     return badInstructionInfos;
 }
 
-const ExpressionInfos & ExtensionsManager::GetExpressionInfos(string exprType, bool onlyStaticExpressions) const
+const ExpressionInfos & ExtensionsManager::GetObjectExpressionInfos(string objectType, string exprType) const
+{
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        const vector < string > & objects = extensionsLoaded[i]->GetExtensionObjectsTypes();
+        if ( find(objects.begin(), objects.end(), objectType) != objects.end())
+        {
+            const std::map<string, ExpressionInfos> & allObjectExpressions = extensionsLoaded[i]->GetAllExpressionsForObject(objectType);
+            if ( allObjectExpressions.find(exprType) != allObjectExpressions.end() )
+                return allObjectExpressions.find(exprType)->second;
+        }
+    }
+
+    return badExpressionInfos;
+}
+
+const ExpressionInfos & ExtensionsManager::GetExpressionInfos(string exprType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
         const std::map<string, ExpressionInfos> & allExpr = extensionsLoaded[i]->GetAllExpressions();
         if ( allExpr.find(exprType) != allExpr.end() )
             return allExpr.find(exprType)->second;
-
-        if ( !onlyStaticExpressions )
-        {
-            const vector < string > & objects = extensionsLoaded[i]->GetExtensionObjectsTypes();
-            for (unsigned int j = 0;j<objects.size();++j)
-            {
-                const std::map<string, ExpressionInfos> & allObjectExpressions = extensionsLoaded[i]->GetAllExpressionsForObject(objects[j]);
-                if ( allObjectExpressions.find(exprType) != allObjectExpressions.end() )
-                    return allObjectExpressions.find(exprType)->second;
-            }
-        }
     }
 
     return badExpressionInfos;

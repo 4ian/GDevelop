@@ -343,7 +343,7 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
 /**
  * Need to be added after DECLARE_OBJECT_EXPRESSION and all actions/conditions/expressions.
  */
-#define DECLARE_END_OBJECT_EXPRESSION() objInfos.expressionsInfos[GetNameSpace()+currentExprDeclarationName]=instrInfo;\
+#define DECLARE_END_OBJECT_EXPRESSION() objInfos.expressionsInfos[currentExprDeclarationName]=instrInfo;\
             }
 
 
@@ -549,13 +549,14 @@ class GD_API ExtensionBase
      */
     DestroyFunPtr       GetDestroyObjectFunction(std::string objectType) const;
 
+    inline std::string GetNameSpace() { return nameSpace; };
+
     protected :
 
     /**
      * Set the namespace ( the string each actions/conditions/expressions start with )
      */
     void SetNameSpace(std::string nameSpace_);
-    inline std::string GetNameSpace() { return nameSpace; };
 
     std::string name;
 

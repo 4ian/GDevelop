@@ -109,6 +109,7 @@ TextObjectEditor::~TextObjectEditor()
 void TextObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
     object.SetString(string(textEdit->GetValue().mb_str()));
+    object.SetFont(fontEdit->GetValue().mb_str());
 
     EndModal(1);
 }
@@ -132,7 +133,6 @@ void TextObjectEditor::OnfontBtClick(wxCommandEvent& event)
     if ( dialog.GetPath() != "" )
     {
         fontEdit->SetValue(dialog.GetPath());
-        object.SetFont(dialog.GetPath().mb_str());
     }
 }
 

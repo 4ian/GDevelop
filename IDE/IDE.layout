@@ -13,8 +13,8 @@
 	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="1078" topLine="40" />
 	</File>
-	<File name="Compilation.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="18777" topLine="332" />
+	<File name="Compilation.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="21472" topLine="407" />
 	</File>
 	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="492" topLine="0" />
@@ -80,7 +80,7 @@
 		<Cursor position="1260" topLine="32" />
 	</File>
 	<File name="Extensions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="12287" topLine="314" />
+		<Cursor position="12288" topLine="348" />
 	</File>
 	<File name="Extensions.h" open="0" top="0" tabpos="2">
 		<Cursor position="1971" topLine="58" />
@@ -91,8 +91,8 @@
 	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2790" topLine="90" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="1338" topLine="39" />
+	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="5146" topLine="259" />
 	</File>
 	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="23">
 		<Cursor position="1384" topLine="31" />

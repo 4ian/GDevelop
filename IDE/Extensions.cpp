@@ -9,6 +9,7 @@
 #include <wx/string.h>
 //*)
 #include <stdio.h>
+#include <fstream>
 #include <sys/types.h>
 #include <dirent.h>
 #include <wx/clntdata.h>
@@ -220,6 +221,23 @@ void Extensions::OnExtensionsListSelect(wxCommandEvent& event)
             infoEdit->SetValue(extensionsInstalled[i]->GetInfo());
             authorTxt->SetLabel(extensionsInstalled[i]->GetAuthor());
             licenseTxt->SetLabel(extensionsInstalled[i]->GetLicense());
+
+            {
+                std::ifstream testFile( string("Extensions/"+extensionsInstalled[i]->GetName()+".xgdw").c_str() );
+                if ( testFile || ( extensionsInstalled[i]->GetNameSpace() == "" ) ) //Use namespace to check if it is a builtin extension
+                    wincompatibleBmp->SetBitmap(wxBitmap(_T("res/win-compatible.png"), wxBITMAP_TYPE_ANY));
+                else
+                    wincompatibleBmp->SetBitmap(wxBitmap(_T("res/win-notcompatible.png"), wxBITMAP_TYPE_ANY));
+            }
+
+            {
+                std::ifstream testFile( string("Extensions/"+extensionsInstalled[i]->GetName()+".xgdl").c_str() );
+                if ( testFile || ( extensionsInstalled[i]->GetNameSpace() == "" ) ) //Use namespace to check if it is a builtin extension
+                    linuxcompatibleBmp->SetBitmap(wxBitmap(_T("res/linux-compatible.png"), wxBITMAP_TYPE_ANY));
+                else
+                    linuxcompatibleBmp->SetBitmap(wxBitmap(_T("res/linux-notcompatible.png"), wxBITMAP_TYPE_ANY));
+            }
+
             return;
         }
     }

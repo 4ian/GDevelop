@@ -40,6 +40,7 @@
 #include "GDL/DatFile.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/OpenSaveGame.h"
+#include "GDL/ExtensionsManager.h"
 #include "Compilation.h"
 #include "ErrorCompilation.h"
 
@@ -332,43 +333,6 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     StaticText2->SetLabel( "Etape 2 sur 3" );
 
     //Création du fichier source
-    /*{
-
-        ifstream fichier( repTemp+"/compil.jgd", ios::in | ios::binary ); // on ouvre le fichier en lecture
-
-
-        ostringstream sout;
-        istringstream sin;
-
-        // this is the object we will use to do the base64 encoding
-        base64::kernel_1a base64_coder;
-        // this is the object we will use to do the data compression
-        compress_stream::kernel_1ea compressor;
-
-        // compress the contents of the file and store the results in the string stream sout
-        compressor.compress( fichier, sout );
-        sin.str( sout.str() );
-        sout.clear();
-        sout.str( "" );
-
-        // now base64 encode the compressed data
-        base64_coder.encode( sin, sout );
-
-
-        sin.clear();
-        sin.str( sout.str() );
-        sout.str( "" );
-
-        string crypte = sin.str();
-
-        ofstream fichier2( repTemp+"/src", ios::out | ios::binary );  // on ouvre le fichier en lecture
-        fichier2.write( crypte.c_str(), crypte.length() );
-        if ( fichier2.bad() )
-            report += _( "Impossible de créer src dans le répertoire de compilation.\n" );
-
-        fichier2.close();
-
-    }*/
     {
         ifstream ifile(repTemp+"/compil.jgd",ios_base::binary);
         ofstream ofile(repTemp+"/src",ios_base::binary);
@@ -449,6 +413,25 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     StaticText3->SetLabel( "Exportation du jeu..." );
     StaticText2->SetLabel( "" );
     wxSafeYield();
+
+    //Copy extensions
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    for (unsigned int i = 0;i<Jeu.extensionsUsed.size();++i)
+    {
+        //Builtin extensions does not have a namespace.
+        boost::shared_ptr<ExtensionBase> extension = extensionsManager->GetExtension(Jeu.extensionsUsed[i]);
+
+        if ( extension->GetNameSpace() != "" )
+        {
+            if ( WinCheck->GetValue() &&
+                wxCopyFile( "Extensions/"+Jeu.extensionsUsed[i]+".xgdw", repTemp + Jeu.extensionsUsed[i]+".xgdw", true ) == false )
+                report += _( "Impossible de copier l'extension \""+Jeu.extensionsUsed[i]+"\" pour Windows dans le répertoire de compilation.\n" );
+
+            if ( LinuxCheck->GetValue() &&
+                wxCopyFile( "Extensions/"+Jeu.extensionsUsed[i]+".xgdl", repTemp + Jeu.extensionsUsed[i]+".xgdl", true ) == false )
+                report += _( "Impossible de copier l'extension \""+Jeu.extensionsUsed[i]+"\" pour Linux dans le répertoire de compilation.\n" );
+        }
+    }
 
     //Copie des derniers fichiers
     if ( TypeBox->GetSelection() == 0 )

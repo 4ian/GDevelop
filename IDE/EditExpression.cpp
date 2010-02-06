@@ -337,7 +337,7 @@ void EditExpression::RefreshLists()
                         IDimage = imageListObj->GetImageCount()-1;
                     }
 
-                    gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+                    gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first, objectsTypes[j]);
                     ObjList->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
                 }
             }
@@ -577,7 +577,7 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
     {
         gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
 
-        ExpressionInfos infos = extensionsManager->GetExpressionInfos(associatedData->GetString());
+        ExpressionInfos infos = extensionsManager->GetObjectExpressionInfos(associatedData->GetSecondString(), associatedData->GetString());
 
         if ( infos.parameters.empty() ) return; //Not even a parameter for the object ?
 
@@ -602,7 +602,7 @@ void EditExpression::OnAddValBtClick(wxCommandEvent& event)
     {
         gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
 
-        ExpressionInfos infos = extensionsManager->GetExpressionInfos(associatedData->GetString(), true);
+        ExpressionInfos infos = extensionsManager->GetExpressionInfos(associatedData->GetString());
 
         string parametersStr;
         for (unsigned int i = 0;i<infos.parameters.size();++i)

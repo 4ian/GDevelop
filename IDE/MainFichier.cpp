@@ -1,17 +1,12 @@
-#ifdef DEBUG
-#define _MEMORY_TRACKER
-#include "debugMem.h" //suivi mémoire
-#endif
-
-#include "MemTrace.h"
-extern MemTrace MemTracer;
+#include <boost/shared_ptr.hpp>
+#include "GDL/OpenSaveGame.h"
+#include "GDL/ExtensionsManager.h"
+#include "GDL/Game.h"
 
 #include "Game_Develop_EditorMain.h"
 #include "Compilation.h"
 #include "Portable.h"
 #include "Fusion.h"
-#include "GDL/OpenSaveGame.h"
-#include "GDL/Game.h"
 #include "MessagePlus.h"
 
 ////////////////////////////////////////////////////////////
@@ -117,6 +112,24 @@ void Game_Develop_EditorFrame::Open( string file )
     //Mise à jour des éditeurs
     ReloadEditors();
     RefreshListScene();
+
+    string unknownExtensions = "";
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    for (unsigned int i = 0;i<game.extensionsUsed.size();++i)
+    {
+    	if ( extensionsManager->GetExtension(game.extensionsUsed[i]) == boost::shared_ptr<ExtensionBase> () )
+    	{
+    	    unknownExtensions += game.extensionsUsed[i]+"\n";
+    	}
+    }
+
+    if (unknownExtensions != "")
+    {
+        wxString errorMsg = _("Une ou plusieurs extensions sont utilisées par le jeu mais ne sont pas installées :\n")
+                            + unknownExtensions
+                            + _("\nCertains objets, actions, conditions ou expressions peuvent manquer ou être inconnues.");
+        wxLogWarning(errorMsg);
+    }
 }
 
 ////////////////////////////////////////////////////////////

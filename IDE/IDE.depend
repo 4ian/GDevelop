@@ -11000,94 +11000,6 @@
 	"wx/dcclient.h"
 	"wx/window.h"
 
-1265496546 source:c:\users\florian\programmation\gamedevelop\ide\compilation.cpp
-	"nommgr.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/textctrl.h>
-	<wx/icon.h>
-	<wx/image.h>
-	<wx/bitmap.h>
-	<wx/filefn.h>
-	<wx/log.h>
-	<wx/msgdlg.h>
-	<wx/dir.h>
-	<wx/help.h>
-	<wx/config.h>
-	<wx/dirdlg.h>
-	<wx/filedlg.h>
-	<wx/msgdlg.h>
-	<wx/filename.h>
-	<string>
-	<vector>
-	<iostream>
-	<fstream>
-	"dlib/compress_stream.h"
-	"dlib/base64.h"
-	"GDL/AES.h"
-	"GDL/Game.h"
-	"GDL/DatFile.h"
-	"GDL/OpenSaveLoadingScreen.h"
-	"GDL/OpenSaveGame.h"
-	"GDL/ExtensionsManager.h"
-	"Compilation.h"
-	"ErrorCompilation.h"
-	<wx/msw/winundef.h>
-
-1253304923 c:\libs\wxwidgets\include\wx\dir.h
-	"wx/longlong.h"
-	"wx/string.h"
-
-1265222572 c:\users\florian\programmation\gamedevelop\gdl\gdl\aes.h
-
-1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\datfile.h
-	<string>
-	<vector>
-
-1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\opensaveloadingscreen.h
-	<string>
-	"GDL/LoadingScreen.h"
-	"GDL/tinyxml.h"
-
-1264360533 c:\users\florian\programmation\gamedevelop\ide\compilation.h
-	<wx/msw/winundef.h>
-	<wx/notebook.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/radiobox.h>
-	<wx/checkbox.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	<wx/gauge.h>
-	"GDL/Game.h"
-	<string>
-	<vector>
-	<wx/process.h>
-	<wx/msw/winundef.h>
-
-1253304918 c:\libs\wxwidgets\include\wx\process.h
-	"wx/event.h"
-	"wx/stream.h"
-	"wx/utils.h"
-
-1264360532 c:\users\florian\programmation\gamedevelop\ide\errorcompilation.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	<string>
-	<vector>
-
 1264360533 source:c:\users\florian\programmation\gamedevelop\ide\tinyxml.cpp
 	<ctype.h>
 	<sstream>
@@ -12515,7 +12427,7 @@
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
-1265498518 source:c:\users\florian\programmation\gamedevelop\ide\editorscene.cpp
+1265546469 source:c:\users\florian\programmation\gamedevelop\ide\editorscene.cpp
 	"EditorScene.h"
 	<wx/settings.h>
 	<wx/intl.h>
@@ -12577,6 +12489,18 @@
 1264360534 source:c:\users\florian\programmation\gamedevelop\ide\errorcompilation.cpp
 	"ErrorCompilation.h"
 	"nommgr.h"
+
+1264360532 c:\users\florian\programmation\gamedevelop\ide\errorcompilation.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<string>
+	<vector>
 
 1264360530 source:c:\users\florian\programmation\gamedevelop\ide\eventrenderer.cpp
 	"nommgr.h"
@@ -15398,6 +15322,30 @@
 	"Fusion.h"
 	"MessagePlus.h"
 
+1264360533 c:\users\florian\programmation\gamedevelop\ide\compilation.h
+	<wx/msw/winundef.h>
+	<wx/notebook.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/radiobox.h>
+	<wx/checkbox.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<wx/gauge.h>
+	"GDL/Game.h"
+	<string>
+	<vector>
+	<wx/process.h>
+	<wx/msw/winundef.h>
+
+1253304918 c:\libs\wxwidgets\include\wx\process.h
+	"wx/event.h"
+	"wx/stream.h"
+	"wx/utils.h"
+
 1264360533 c:\users\florian\programmation\gamedevelop\ide\portable.h
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -15604,7 +15552,7 @@
 1264360532 source:c:\users\florian\programmation\gamedevelop\ide\renderer.cpp
 	"Renderer.h"
 
-1265544912 source:c:\users\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1265545202 source:c:\users\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<SFML/System.hpp>
@@ -15915,5 +15863,57 @@
 	"GDL/VersionWrapper.h"
 	"GDL/StdAlgo.h"
 
-1265497853 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
+1265546645 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
+
+1265555012 source:c:\users\florian\programmation\gamedevelop\ide\compilation.cpp
+	"nommgr.h"
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/textctrl.h>
+	<wx/icon.h>
+	<wx/image.h>
+	<wx/bitmap.h>
+	<wx/filefn.h>
+	<wx/log.h>
+	<wx/msgdlg.h>
+	<wx/dir.h>
+	<wx/help.h>
+	<wx/config.h>
+	<wx/dirdlg.h>
+	<wx/filedlg.h>
+	<wx/msgdlg.h>
+	<wx/filename.h>
+	<string>
+	<vector>
+	<iostream>
+	<fstream>
+	"dlib/compress_stream.h"
+	"dlib/base64.h"
+	"GDL/AES.h"
+	"GDL/Game.h"
+	"GDL/DatFile.h"
+	"GDL/OpenSaveLoadingScreen.h"
+	"GDL/OpenSaveGame.h"
+	"GDL/ExtensionsManager.h"
+	"Compilation.h"
+	"ErrorCompilation.h"
+	<wx/msw/winundef.h>
+
+1253304923 c:\libs\wxwidgets\include\wx\dir.h
+	"wx/longlong.h"
+	"wx/string.h"
+
+1265222572 c:\users\florian\programmation\gamedevelop\gdl\gdl\aes.h
+
+1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\datfile.h
+	<string>
+	<vector>
+
+1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\opensaveloadingscreen.h
+	<string>
+	"GDL/LoadingScreen.h"
+	"GDL/tinyxml.h"
 

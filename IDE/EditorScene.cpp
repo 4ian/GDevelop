@@ -655,6 +655,7 @@ void EditorScene::OnPlayWindowBtClick( wxCommandEvent & event )
     externalWindow.SetFramerateLimit(60);
 
     sceneCanvas->scene.ChangeRenderWindow(&externalWindow);
+    externalWindow.SetActive(true);
 
     debugger->Play();
 }

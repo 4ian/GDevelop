@@ -529,8 +529,26 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     {
         if ( WinCheck->GetValue() )
         {
-            if ( wxCopyFile( "StartW", repTemp + "/setup.exe", true ) == false )
+            if ( wxCopyFile( "Runtime/exeWin", repTemp + "/setup.exe", true ) == false )
                 report += _( "Impossible de créer l'executable Windows dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/gdl.dll", repTemp + "/gdl.dll", true ) == false )
+                report += _( "Impossible de créer l'executable gdl.dll dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "sfml-audio.dll", repTemp + "/sfml-audio.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-audio.dll dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "sfml-graphics.dll", repTemp + "/sfml-graphics.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-graphics.dll dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "sfml-network.dll", repTemp + "/sfml-network.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-network.dll dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "sfml-system.dll", repTemp + "/sfml-system.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-system.dll dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "sfml-window.dll", repTemp + "/sfml-window.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-window.dll dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "libsndfile-1.dll", repTemp + "/libsndfile-1.dll", true ) == false )
                 report += _( "Impossible de copier libsndfile-1.dll dans le répertoire de compilation.\n" );

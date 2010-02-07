@@ -451,14 +451,18 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnLeftDClick( wxMouseEvent &event )
 {
-    wxCommandEvent unused;
-    OnAddObjetSelected(unused);
+    AddObjetSelected(ConvertCoords(scene.input->GetMouseX(), 0).x, ConvertCoords(0, scene.input->GetMouseY()).y);
 }
 
 ////////////////////////////////////////////////////////////
 /// Insertion d'un objet
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnAddObjetSelected( wxCommandEvent & event )
+{
+    AddObjetSelected(ConvertCoords(scene.input->GetMouseX(), 0).x, ConvertCoords(0, scene.input->GetMouseY()).y);
+}
+
+void SceneCanvas::AddObjetSelected(float x, float y)
 {
     //Seulement en mode éditeur
     if ( !scene.editing )
@@ -490,13 +494,13 @@ void SceneCanvas::OnAddObjetSelected( wxCommandEvent & event )
     pos.objectName = scene.objectToAdd; //A choisir avec un dialog approprié ou par drag'n'drop
     if ( scene.grid && scene.snap )
     {
-        pos.x = static_cast<int>(ConvertCoords(scene.input->GetMouseX(), 0).x/scene.gridWidth)*scene.gridWidth;
-        pos.y = static_cast<int>(ConvertCoords(0, scene.input->GetMouseY()).y/scene.gridHeight)*scene.gridHeight;
+        pos.x = static_cast<int>(x/scene.gridWidth)*scene.gridWidth;
+        pos.y = static_cast<int>(y/scene.gridHeight)*scene.gridHeight;
     }
     else
     {
-        pos.x = ConvertCoords(scene.input->GetMouseX(), 0).x;
-        pos.y = ConvertCoords(0, scene.input->GetMouseY()).y;
+        pos.x = x;
+        pos.y = y;
     }
 
     pos.zOrder = 0;

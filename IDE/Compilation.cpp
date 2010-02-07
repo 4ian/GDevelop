@@ -421,14 +421,15 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         //Builtin extensions does not have a namespace.
         boost::shared_ptr<ExtensionBase> extension = extensionsManager->GetExtension(Jeu.extensionsUsed[i]);
 
-        if ( extension->GetNameSpace() != "" )
+        if ( extension != boost::shared_ptr<ExtensionBase>() &&
+            extension->GetNameSpace() != "" )
         {
             if ( WinCheck->GetValue() &&
-                wxCopyFile( "Extensions/"+Jeu.extensionsUsed[i]+".xgdw", repTemp + Jeu.extensionsUsed[i]+".xgdw", true ) == false )
+                wxCopyFile( "Extensions/"+Jeu.extensionsUsed[i]+".xgdw", repTemp + "/" + Jeu.extensionsUsed[i]+".xgdw", true ) == false )
                 report += _( "Impossible de copier l'extension \""+Jeu.extensionsUsed[i]+"\" pour Windows dans le répertoire de compilation.\n" );
 
             if ( LinuxCheck->GetValue() &&
-                wxCopyFile( "Extensions/"+Jeu.extensionsUsed[i]+".xgdl", repTemp + Jeu.extensionsUsed[i]+".xgdl", true ) == false )
+                wxCopyFile( "Extensions/"+Jeu.extensionsUsed[i]+".xgdl", repTemp + "/"+Jeu.extensionsUsed[i]+".xgdl", true ) == false )
                 report += _( "Impossible de copier l'extension \""+Jeu.extensionsUsed[i]+"\" pour Linux dans le répertoire de compilation.\n" );
         }
     }
@@ -439,8 +440,26 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         //Fichier pour windows
         if ( WinCheck->GetValue() )
         {
-            if ( wxCopyFile( "StartW", repTemp + "/PlayWin.exe", true ) == false )
+            if ( wxCopyFile( "Runtime/exeWin", repTemp + "/PlayWin.exe", true ) == false )
                 report += _( "Impossible de créer l'executable Windows dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/gdl.dll", repTemp + "/gdl.dll", true ) == false )
+                report += _( "Impossible de créer l'executable gdl.dll dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "sfml-audio.dll", repTemp + "/sfml-audio.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-audio.dll dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "sfml-graphics.dll", repTemp + "/sfml-graphics.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-graphics.dll dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "sfml-network.dll", repTemp + "/sfml-network.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-network.dll dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "sfml-system.dll", repTemp + "/sfml-system.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-system.dll dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "sfml-window.dll", repTemp + "/sfml-window.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-window.dll dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "libsndfile-1.dll", repTemp + "/libsndfile-1.dll", true ) == false )
                 report += _( "Impossible de copier libsndfile-1.dll dans le répertoire de compilation.\n" );
@@ -455,8 +474,44 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         //Fichiers pour linux
         if ( LinuxCheck->GetValue() )
         {
-            if ( wxCopyFile( "StartL", repTemp + "/PlayLinux", true ) == false )
+            if ( wxCopyFile( "Runtime/exeLinux", repTemp + "/ExeLinux", true ) == false )
                 report += _( "Impossible de créer l'executable Linux dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/PlayLinux", repTemp + "/PlayLinux", true ) == false )
+                report += _( "Impossible de créer le script executable Linux dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/libFLAC.so.7.0.0", repTemp + "/libFLAC.so.7.0.0", true ) == false )
+                report += _( "Impossible de créer libFLAC.so.7.0.0 dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/libfreetype.so.6.3.10", repTemp + "/libfreetype.so.6.3.10", true ) == false )
+                report += _( "Impossible de créer libfreetype.so.6.3.10 dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/libgdl.so", repTemp + "/libgdl.so", true ) == false )
+                report += _( "Impossible de créer libgdl.so dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/libopenal.so.0.0.0", repTemp + "/libopenal.so.0.0.0", true ) == false )
+                report += _( "Impossible de créer libopenal.so.0.0.0 dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/libsfml-audio.so.2.0", repTemp + "/libsfml-audio.so.2.0", true ) == false )
+                report += _( "Impossible de créer libsfml-audio.so.2.0 dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/libsfml-graphics.so.2.0", repTemp + "/libsfml-graphics.so.2.0", true ) == false )
+                report += _( "Impossible de créer libsfml-graphics.so.2.0 dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/libsfml-network.so.2.0", repTemp + "/libsfml-network.so.2.0", true ) == false )
+                report += _( "Impossible de créer libsfml-network.so.2.0 dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/libsfml-system.so.2.0", repTemp + "/libsfml-system.so.2.0", true ) == false )
+                report += _( "Impossible de créer libsfml-system.so.2.0 dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/libsfml-system.so.2.0", repTemp + "/libsfml-system.so.2.0", true ) == false )
+                report += _( "Impossible de créer libsfml-system.so.2.0 dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/libsfml-window.so.2.0", repTemp + "/libsfml-window.so.2.0", true ) == false )
+                report += _( "Impossible de créer libsfml-window.so.2.0 dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/libsndfile.so.1.0.16", repTemp + "/libsndfile.so.1.0.16", true ) == false )
+                report += _( "Impossible de créer libsndfile.so.1.0.16 dans le répertoire de compilation.\n" );
         }
 
         //Copie du tout dans le répertoire final

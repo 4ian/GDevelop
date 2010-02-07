@@ -49,14 +49,15 @@ public :
 
     MainEditorCommand & mainEditorCommand;
 
-
     void Reload();
+    inline void ManualRefresh() { OnUpdate(); };
     void UpdateScrollbars();
     void ChangeScenePtr(Scene * newScenePtr, bool refresh);
 
     void SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_);
 
     void OnAddObjetSelected(wxCommandEvent & event);
+    void AddObjetSelected(float x, float y);
 
 private :
 

@@ -8,11 +8,8 @@ bool DndTextSceneEditor::OnDropText(wxCoord x, wxCoord y, const wxString& text)
 {
     sceneCanvas.scene.objectToAdd = text;
 
-    sf::Event unusedEvent;
-    sceneCanvas.GetEvent(unusedEvent); //So as to refresh mouse position
-
-    wxCommandEvent unused;
-    sceneCanvas.OnAddObjetSelected(unused);
+    sceneCanvas.AddObjetSelected(   sceneCanvas.ConvertCoords(x, 0).x,
+                                    sceneCanvas.ConvertCoords(0, y).y);
 
     sceneCanvas.scene.objectToAdd = "";
 

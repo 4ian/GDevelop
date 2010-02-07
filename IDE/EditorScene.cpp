@@ -652,6 +652,7 @@ void EditorScene::OnPlayWindowBtClick( wxCommandEvent & event )
     sceneCanvas->scene.editing = false;
 
     externalWindow.Create(sf::VideoMode(sceneCanvas->GetWidth(), sceneCanvas->GetHeight(), 32), string(_("Aperçu").mb_str()));
+    externalWindow.SetFramerateLimit(60);
 
     sceneCanvas->scene.ChangeRenderWindow(&externalWindow);
 

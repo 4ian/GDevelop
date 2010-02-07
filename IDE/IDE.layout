@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
+	<ActiveTarget name="Release - Edittime" />
 	<File name="BugReport.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="12778" topLine="179" />
 	</File>
@@ -14,7 +14,7 @@
 		<Cursor position="1078" topLine="40" />
 	</File>
 	<File name="Compilation.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="21472" topLine="407" />
+		<Cursor position="21690" topLine="412" />
 	</File>
 	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="492" topLine="0" />
@@ -31,11 +31,17 @@
 	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="26638" topLine="607" />
 	</File>
+	<File name="DnDFileEditor.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="335" topLine="0" />
+	</File>
 	<File name="DndTextObjectsEditor.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="125" topLine="0" />
 	</File>
 	<File name="DndTextSceneEditor.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="267" topLine="0" />
+	</File>
+	<File name="EditExpression.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="31787" topLine="566" />
 	</File>
 	<File name="EditLink.cpp" open="0" top="0" tabpos="13">
 		<Cursor position="237" topLine="0" />
@@ -70,17 +76,17 @@
 	<File name="EditorObjetsGroups.cpp" open="0" top="0" tabpos="21">
 		<Cursor position="481" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="31429" topLine="622" />
+	<File name="EditorScene.cpp" open="1" top="1" tabpos="5">
+		<Cursor position="16750" topLine="200" />
 	</File>
 	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="5197" topLine="87" />
+		<Cursor position="4974" topLine="87" />
 	</File>
 	<File name="EdittimeScene.h" open="0" top="0" tabpos="2">
 		<Cursor position="1260" topLine="32" />
 	</File>
 	<File name="Extensions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="12288" topLine="348" />
+		<Cursor position="12288" topLine="322" />
 	</File>
 	<File name="Extensions.h" open="0" top="0" tabpos="2">
 		<Cursor position="1971" topLine="58" />
@@ -91,11 +97,11 @@
 	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2790" topLine="90" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="2">
+	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="5146" topLine="259" />
 	</File>
 	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="23">
-		<Cursor position="1384" topLine="31" />
+		<Cursor position="2810" topLine="78" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="24">
 		<Cursor position="1349" topLine="24" />
@@ -109,11 +115,14 @@
 	<File name="MAJ.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="253" topLine="12" />
 	</File>
+	<File name="MainFichier.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="3411" topLine="110" />
+	</File>
 	<File name="MiniChoixObjet.cpp" open="0" top="0" tabpos="28">
 		<Cursor position="458" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="15384" topLine="305" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="4835" topLine="128" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="0">
 		<Cursor position="2511" topLine="66" />
@@ -129,6 +138,12 @@
 	</File>
 	<File name="TranslateCondition.cpp" open="0" top="0" tabpos="30">
 		<Cursor position="711" topLine="13" />
+	</File>
+	<File name="debugMem.h" open="0" top="0" tabpos="0">
+		<Cursor position="0" topLine="29" />
+	</File>
+	<File name="gdTreeItemStringData.h" open="0" top="0" tabpos="0">
+		<Cursor position="362" topLine="0" />
 	</File>
 	<File name="gridSetup.cpp" open="0" top="0" tabpos="31">
 		<Cursor position="542" topLine="0" />

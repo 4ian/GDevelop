@@ -174,7 +174,6 @@
 		<Linker>
 			<Add directory="C:\Libs\SFML\lib\mingw" />
 		</Linker>
-		<Unit filename="..\..\..\..\..\Libs\dlib-17.12\dlib\all\source.cpp" />
 		<Unit filename="..\GDL\GDL\tinystr.cpp">
 			<Option target="Debug" />
 		</Unit>

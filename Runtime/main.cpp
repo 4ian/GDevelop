@@ -46,8 +46,6 @@ using namespace boost::python;
 #include "CompilationChecker.h"
 #include "GDL/AES.h"
 
-#include "profile.h"
-
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -70,7 +68,6 @@ void MessageLoading( string message, float avancement )
 
 int main( int argc, char *p_argv[] )
 {
-    BT_PROFILE("Main");
 
     InitLog();
 #ifdef PYSUPPORT
@@ -113,9 +110,9 @@ int main( int argc, char *p_argv[] )
     // Fenêtre de chargement
     unsigned long style = 0;
     if ( game.loadingScreen.border ) style |= sf::Style::Titlebar;
-    //sf::RenderWindow loadingApp( sf::VideoMode( game.loadingScreen.width, game.loadingScreen.height, 32 ), "Chargement en cours...", style );
-    //if ( !game.loadingScreen.afficher ) loadingApp.Show(false);
-    //loadingApp.Clear( sf::Color( 100, 100, 100 ) );
+    sf::RenderWindow loadingApp( sf::VideoMode( game.loadingScreen.width, game.loadingScreen.height, 32 ), "Chargement en cours...", style );
+    if ( !game.loadingScreen.afficher ) loadingApp.Show(false);
+    loadingApp.Clear( sf::Color( 100, 100, 100 ) );
 
     sf::Image image;
     image = exeGD->LoadImage( game.loadingScreen.imageFichier );
@@ -124,18 +121,18 @@ int main( int argc, char *p_argv[] )
     sf::Sprite sprite( image );
     if ( game.loadingScreen.image )
     {
-        //loadingApp.Draw( sprite );
+        loadingApp.Draw( sprite );
     }
     if ( game.loadingScreen.texte )
     {
         sf::Text Chargement( game.loadingScreen.texteChargement );
         Chargement.SetPosition( game.loadingScreen.texteXPos, game.loadingScreen.texteYPos );
-        //loadingApp.Draw( Chargement );
+        loadingApp.Draw( Chargement );
     }
-    //loadingApp.Display();
+    loadingApp.Display();
 
     //Ouverture du jeu
-#ifdef RELEASE
+#ifndef RELEASE
 
     if ( srcString == "" )
     {
@@ -175,7 +172,7 @@ int main( int argc, char *p_argv[] )
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/Game Develop Player/BZmod.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/BenchC2.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Desktop/shoot.jgd" );
-    //openGame.OpenFromFile("C:/Users/Florian/Programmation/SO4/SO4.jgd" );
+    openGame.OpenFromFile("C:/Users/Florian/Programmation/SO4/SO4.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/Course/CourseTest.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/Game Develop Player/test2.txt" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/testCPPExtension2.jgd" );
@@ -198,6 +195,7 @@ int main( int argc, char *p_argv[] )
     if ( !scenePlayed.LoadFromScene( game.m_scenes.at( 0 ) ) )
         EcrireLog( "Chargement", "Erreur lors du chargement de la scène initiale" );
 
+    loadingApp.Close();
     window.Create( sf::VideoMode( game.windowWidth, game.windowHeight, 32 ), scenePlayed.title, sf::Style::Close );
     window.SetActive(true);
 

@@ -43,6 +43,8 @@ const long EditorObjetsGroups::ID_Refresh = wxNewId();
 const long EditorObjetsGroups::ID_Help = wxNewId();
 const long EditorObjetsGroups::idRibbonAdd = wxNewId();
 const long EditorObjetsGroups::idRibbonDel = wxNewId();
+const long EditorObjetsGroups::idRibbonUp = wxNewId();
+const long EditorObjetsGroups::idRibbonDown = wxNewId();
 const long EditorObjetsGroups::idRibbonEdit = wxNewId();
 const long EditorObjetsGroups::idRibbonModName = wxNewId();
 const long EditorObjetsGroups::idRibbonHelp = wxNewId();
@@ -115,6 +117,8 @@ mainEditorCommand(mainEditorCommand_)
     toolbar->AddTool( idAddGroup, wxT( "Ajouter un groupe" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un groupe") );
     toolbar->AddTool( idDelGroup, wxT( "Supprimer le groupe selectionné" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer le groupe selectionné") );
     toolbar->AddTool( IdGroupEdit, wxT( "Modifier le groupe" ), wxBitmap( wxImage( "res/editpropicon.png" ) ), _("Modifier le groupe") );
+    toolbar->AddTool( idRibbonUp, wxT( "Déplacer le groupe vers le haut" ), wxBitmap( wxImage( "res/up24.png" ) ), _("Déplacer le groupe vers le haut") );
+    toolbar->AddTool( idRibbonDown, wxT( "Déplacer le groupe vers le bas" ), wxBitmap( wxImage( "res/down24.png" ) ), _("Déplacer le groupe vers le bas") );
     toolbar->AddSeparator();
     toolbar->AddTool( ID_Help, wxT( "Aide de l'éditeur de groupes d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur de groupes d'objets") );
     toolbar->Realize();
@@ -151,6 +155,8 @@ void EditorObjetsGroups::CreateRibbonPage(wxRibbonPage * page)
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Ajouter un groupe") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Supprimer") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("Déplacer vers le haut") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("Déplacer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objet sélectionné"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -170,6 +176,8 @@ void EditorObjetsGroups::ConnectEvents()
 {
     mainEditorCommand.GetMainEditor()->Connect(idRibbonAdd, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnAddGroupSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonDel, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnDelGroupSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonUp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnMoveUpSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonDown, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnMoveDownSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonEdit, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnEditGroupSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonModName, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnModNameSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnHelp, NULL, this);
@@ -187,6 +195,72 @@ void EditorObjetsGroups::Refresh()
         ObjetsGroupsList->AppendItem( ObjetsGroupsList->GetRootItem(), objectsGroups->at( i ).GetName() );
 
     ObjetsGroupsList->ExpandAll();
+}
+
+void EditorObjetsGroups::OnMoveUpSelected(wxCommandEvent& event)
+{
+    string groupName = string(ObjetsGroupsList->GetItemText( itemSelected ).mb_str());
+
+    for (unsigned int i = 0;i<objectsGroups->size();++i)
+    {
+        if ( objectsGroups->at(i).GetName() == groupName )
+        {
+            if ( i-1 >= 0)
+            {
+                ObjectGroup group = objectsGroups->at(i);
+                objectsGroups->erase(objectsGroups->begin()+i);
+                objectsGroups->insert(objectsGroups->begin()+i-1, group);
+
+                Refresh();
+
+                //Reselect group
+                wxTreeItemId item = ObjetsGroupsList->GetLastChild(ObjetsGroupsList->GetRootItem());
+                while ( item.IsOk() )
+                {
+                    if ( ObjetsGroupsList->GetItemText( item ) == groupName )
+                    {
+                        ObjetsGroupsList->SelectItem(item);
+                        return;
+                    }
+                    item = ObjetsGroupsList->GetPrevSibling(item);
+                }
+            }
+
+        }
+    }
+}
+
+void EditorObjetsGroups::OnMoveDownSelected(wxCommandEvent& event)
+{
+    string groupName = string(ObjetsGroupsList->GetItemText( itemSelected ).mb_str());
+
+    for (unsigned int i = 0;i<objectsGroups->size();++i)
+    {
+        if ( objectsGroups->at(i).GetName() == groupName )
+        {
+            if ( static_cast<unsigned>(i+1) < objectsGroups->size())
+            {
+                ObjectGroup group = objectsGroups->at(i);
+                objectsGroups->erase(objectsGroups->begin()+i);
+                objectsGroups->insert(objectsGroups->begin()+i+1, group);
+
+                Refresh();
+
+                //Reselect group
+                wxTreeItemId item = ObjetsGroupsList->GetLastChild(ObjetsGroupsList->GetRootItem());
+                while ( item.IsOk() )
+                {
+                    if ( ObjetsGroupsList->GetItemText( item ) == groupName )
+                    {
+                        ObjetsGroupsList->SelectItem(item);
+                        return;
+                    }
+                    item = ObjetsGroupsList->GetPrevSibling(item);
+                }
+            }
+
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////
@@ -285,10 +359,9 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
             != objectsGroups->end() )
     {
         ++i;
-        name =  _( "Nouveau groupe " );
-        name += st (i);
+        name =  _( "Nouveau groupe" )+" "+st (i);
     }
-    NewGroup.SetName( static_cast<string>(name) );
+    NewGroup.SetName( string(name.mb_str()) );
 
     //On l'ajoute
     objectsGroups->push_back( NewGroup );
@@ -406,12 +479,9 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
             i->SetName( static_cast<string>(event.GetLabel()) );
 
             mainEditorCommand.NeedRefreshScene();
-            Refresh();
             return;
         }
-        Refresh();
     }
-    Refresh();
 }
 
 ////////////////////////////////////////////////////////////

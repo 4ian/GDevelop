@@ -13,8 +13,11 @@
 	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="1078" topLine="40" />
 	</File>
-	<File name="Compilation.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="21690" topLine="412" />
+	<File name="ChoixVariableDialog.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="410" topLine="0" />
+	</File>
+	<File name="Compilation.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="28730" topLine="514" />
 	</File>
 	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="492" topLine="0" />
@@ -37,8 +40,8 @@
 	<File name="DndTextObjectsEditor.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="125" topLine="0" />
 	</File>
-	<File name="DndTextSceneEditor.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="267" topLine="0" />
+	<File name="DndTextSceneEditor.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="239" topLine="0" />
 	</File>
 	<File name="EditExpression.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="31787" topLine="566" />
@@ -76,8 +79,8 @@
 	<File name="EditorObjetsGroups.cpp" open="0" top="0" tabpos="21">
 		<Cursor position="481" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="1" top="1" tabpos="5">
-		<Cursor position="16750" topLine="200" />
+	<File name="EditorScene.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="31646" topLine="618" />
 	</File>
 	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="4974" topLine="87" />
@@ -121,11 +124,11 @@
 	<File name="MiniChoixObjet.cpp" open="0" top="0" tabpos="28">
 		<Cursor position="458" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="4835" topLine="128" />
+	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="25712" topLine="660" />
 	</File>
-	<File name="SceneCanvas.h" open="0" top="0" tabpos="0">
-		<Cursor position="2511" topLine="66" />
+	<File name="SceneCanvas.h" open="0" top="0" tabpos="5">
+		<Cursor position="1684" topLine="39" />
 	</File>
 	<File name="SplashScreen.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="1411" topLine="61" />
@@ -147,5 +150,8 @@
 	</File>
 	<File name="gridSetup.cpp" open="0" top="0" tabpos="31">
 		<Cursor position="542" topLine="0" />
+	</File>
+	<File name="wxSFMLCanvas.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="314" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

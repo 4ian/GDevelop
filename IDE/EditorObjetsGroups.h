@@ -75,6 +75,8 @@ class EditorObjetsGroups: public wxPanel
 		static const long ID_Help;
 		static const long idRibbonAdd;
 		static const long idRibbonDel;
+		static const long idRibbonUp;
+		static const long idRibbonDown;
 		static const long idRibbonEdit;
 		static const long idRibbonModName;
 		static const long idRibbonHelp;
@@ -95,6 +97,8 @@ class EditorObjetsGroups: public wxPanel
 		void OnSetFocus(wxFocusEvent& event);
 		//*)
 		void OnHelp(wxCommandEvent& event);
+		void OnMoveUpSelected(wxCommandEvent& event);
+		void OnMoveDownSelected(wxCommandEvent& event);
 		void DisableAll();
 		void EnableAll();
 

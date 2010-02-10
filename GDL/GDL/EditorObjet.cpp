@@ -24,7 +24,6 @@
 #include <wx/choicdlg.h>
 #include <wx/textdlg.h>
 #include <wx/msgdlg.h>
-#include "CppUnitLite/TestHarness.h"
 
 #include "GDL/StdAlgo.h"
 #include "GDL/Game.h"
@@ -1708,7 +1707,7 @@ void EditorObjet::OnDelPointSelected(wxCommandEvent& event)
     }
 }
 
-
+/*
 TEST( Dialogues, EditorObjet )
 {
     //wxLogNull log;
@@ -1753,5 +1752,5 @@ TEST( Dialogues, EditorObjet )
     CHECK_EQUAL( false, Dialog.BoucleOuiCheck->GetValue() ); //Boucle : non
     CHECK_EQUAL( true, Dialog.BoucleNonCheck->GetValue() );
     CHECK_EQUAL( "1", static_cast<string>(Dialog.TempsEdit->GetValue()) ); //Temps entre : 1
-}
+}*/
 #endif

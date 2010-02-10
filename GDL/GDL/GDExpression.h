@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "fparser.hh"
+#include "GDL/fparser/fparser.hh"
 #include <boost/shared_ptr.hpp>
 #include "GDL/ExpressionInstruction.h"
 class Object;

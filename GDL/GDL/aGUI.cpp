@@ -9,10 +9,10 @@
 #include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
-#include <nwidgets/MessageBox.h>
-#include <nwidgets/YesNoMsgBox.h>
-#include <nwidgets/OpenFile.h>
-#include <nwidgets/TextInput.h>
+#include "GDL/nwidgets/MessageBox.h"
+#include "GDL/nwidgets/YesNoMsgBox.h"
+#include "GDL/nwidgets/OpenFile.h"
+#include "GDL/nwidgets/TextInput.h"
 #include <string>
 #include <vector>
 

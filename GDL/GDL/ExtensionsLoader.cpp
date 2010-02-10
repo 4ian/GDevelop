@@ -20,8 +20,6 @@
 #include "GDL/SpriteExtension.h"
 #include "GDL/SceneExtension.h"
 #include "GDL/AdvancedExtension.h"
-#include "GDL/TextExtension.h"
-#include "GDL/PrimitiveDrawingExtension.h"
 #include "GDL/Object.h"
 #include "GDL/Game.h"
 #include "GDL/Version.h"
@@ -80,8 +78,6 @@ void ExtensionsLoader::LoadAllExtensionsAvailable()
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new NetworkExtension()));
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new SceneExtension()));
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new TextExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new PrimitiveDrawingExtension()));
 
     struct dirent *lecture;
     DIR *rep;

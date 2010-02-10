@@ -165,9 +165,9 @@ bool ActZoomCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 
     float newZoom = eval.EvalExp( action.GetParameter( 0 ) );
     if ( newZoom == 0 ) return false;
-#ifndef SFMLTEST
+
     view->SetSize((scene->game->windowWidth/newZoom), (scene->game->windowHeight/newZoom));
-#endif
+
     return true;
 }
 

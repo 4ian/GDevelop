@@ -18,8 +18,6 @@
 #include "GDL/SpriteExtension.h"
 #include "GDL/SceneExtension.h"
 #include "GDL/AdvancedExtension.h"
-#include "GDL/TextExtension.h"
-#include "GDL/PrimitiveDrawingExtension.h"
 #include "GDL/Object.h"
 
 #ifdef GDE
@@ -57,8 +55,6 @@ ExtensionsManager::ExtensionsManager()
     AddExtension(boost::shared_ptr<ExtensionBase>(new NetworkExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new SceneExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new TextExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new PrimitiveDrawingExtension()));
 }
 
 ////////////////////////////////////////////////////////////

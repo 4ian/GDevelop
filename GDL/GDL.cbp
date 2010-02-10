@@ -5,7 +5,7 @@
 		<Option title="GDL" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="LIB fparser\;LIB CppUnitLite\;LIB nwidgets\;md5\;DES\;" />
+		<Option virtualFolders="LIB fparser\;LIB nwidgets\;md5\;AES\;LIB dlib\;" />
 		<Build>
 			<Target title="Debug">
 				<Option output="..\Runtime\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
@@ -330,7 +330,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
-				<Option output="..\Runtime\bin\release\gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="..\Runtime\bin\release\libgdl.so" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -372,56 +372,22 @@
 		</Build>
 		<Compiler>
 			<Add directory="..\GDL\" />
+			<Add directory="..\GDL\GDL\fparser" />
+			<Add directory="..\GDL\GDL\nwidgets" />
+			<Add directory="..\GDL\GDL\dlib-17.12" />
 			<Add directory="C:\Libs\boost_1_38_0" />
 			<Add directory="C:\Python26\include" />
 			<Add directory="C:\Libs\SFML\include" />
-			<Add directory="C:\Libs\fparser" />
-			<Add directory="C:\Users\Florian\Programmation\nwidgets" />
-			<Add directory="C:\Libs\dlib-17.12" />
-			<Add directory="C:\Libs\CppUnitLite" />
 		</Compiler>
 		<Linker>
 			<Add directory="C:\Libs\SFML\lib\mingw" />
 		</Linker>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\Failure.cpp">
-			<Option virtualFolder="LIB CppUnitLite\" />
+		<Unit filename="GDL\AES.cpp">
+			<Option virtualFolder="AES\" />
 		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\Failure.h">
-			<Option virtualFolder="LIB CppUnitLite\" />
+		<Unit filename="GDL\AES.h">
+			<Option virtualFolder="AES\" />
 		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\SimpleString.cpp">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\SimpleString.h">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\Test.cpp">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\Test.h">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\TestHarness.h">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\TestRegistry.cpp">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\TestRegistry.h">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\TestResult.cpp">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\TestResult.h">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\dlib-17.12\dlib\all\source.cpp" />
-		<Unit filename="..\..\..\..\..\Libs\fparser\fparser.cc">
-			<Option virtualFolder="LIB fparser\" />
-		</Unit>
-		<Unit filename="GDL\AES.cpp" />
-		<Unit filename="GDL\AES.h" />
 		<Unit filename="GDL\Access.cpp" />
 		<Unit filename="GDL\Access.h" />
 		<Unit filename="GDL\AdvancedExtension.cpp" />
@@ -459,10 +425,6 @@
 		<Unit filename="GDL\Direction.h" />
 		<Unit filename="GDL\Dossier.cpp" />
 		<Unit filename="GDL\Dossier.h" />
-		<Unit filename="GDL\DrawerObject.cpp" />
-		<Unit filename="GDL\DrawerObject.h" />
-		<Unit filename="GDL\DrawerObjectEditor.cpp" />
-		<Unit filename="GDL\DrawerObjectEditor.h" />
 		<Unit filename="GDL\EditorImages.cpp" />
 		<Unit filename="GDL\EditorImages.h" />
 		<Unit filename="GDL\EditorObjet.cpp" />
@@ -522,9 +484,6 @@
 		<Unit filename="GDL\MainEditorCommand.h" />
 		<Unit filename="GDL\ManualTimer.cpp" />
 		<Unit filename="GDL\ManualTimer.h" />
-		<Unit filename="GDL\McbDES2.hpp">
-			<Option virtualFolder="DES\" />
-		</Unit>
 		<Unit filename="GDL\MemTrace.cpp" />
 		<Unit filename="GDL\MemTrace.h" />
 		<Unit filename="GDL\Modules.cpp" />
@@ -556,8 +515,6 @@
 		<Unit filename="GDL\Point.h" />
 		<Unit filename="GDL\Position.cpp" />
 		<Unit filename="GDL\Position.h" />
-		<Unit filename="GDL\PrimitiveDrawingExtension.cpp" />
-		<Unit filename="GDL\PrimitiveDrawingExtension.h" />
 		<Unit filename="GDL\PropImage.cpp" />
 		<Unit filename="GDL\PropImage.h" />
 		<Unit filename="GDL\RessourcesLoader.cpp" />
@@ -588,12 +545,6 @@
 		<Unit filename="GDL\StdAlgo.h" />
 		<Unit filename="GDL\Text.cpp" />
 		<Unit filename="GDL\Text.h" />
-		<Unit filename="GDL\TextExtension.cpp" />
-		<Unit filename="GDL\TextExtension.h" />
-		<Unit filename="GDL\TextObject.cpp" />
-		<Unit filename="GDL\TextObject.h" />
-		<Unit filename="GDL\TextObjectEditor.cpp" />
-		<Unit filename="GDL\TextObjectEditor.h" />
 		<Unit filename="GDL\TimeExtension.cpp" />
 		<Unit filename="GDL\TimeExtension.h" />
 		<Unit filename="GDL\Variable.cpp" />
@@ -701,14 +652,18 @@
 		<Unit filename="GDL\constantes.h" />
 		<Unit filename="GDL\crypter.cpp" />
 		<Unit filename="GDL\crypter.h" />
+		<Unit filename="GDL\dlib-17.12\dlib\all\source.cpp">
+			<Option virtualFolder="LIB dlib\" />
+		</Unit>
 		<Unit filename="GDL\eFreeFunctions.cpp" />
 		<Unit filename="GDL\eFreeFunctions.h" />
 		<Unit filename="GDL\eObjectFunctions.cpp" />
 		<Unit filename="GDL\eObjectFunctions.h" />
+		<Unit filename="GDL\fparser\fparser.cc">
+			<Option virtualFolder="LIB fparser\" />
+		</Unit>
 		<Unit filename="GDL\gpl.cpp" />
 		<Unit filename="GDL\gpl.h" />
-		<Unit filename="GDL\mathexpr.cpp" />
-		<Unit filename="GDL\mathexpr.h" />
 		<Unit filename="GDL\md5.cpp">
 			<Option virtualFolder="md5\" />
 		</Unit>
@@ -717,6 +672,9 @@
 		</Unit>
 		<Unit filename="GDL\needReload.cpp" />
 		<Unit filename="GDL\needReload.h" />
+		<Unit filename="GDL\nwidgets\source.cpp">
+			<Option virtualFolder="LIB nwidgets\" />
+		</Unit>
 		<Unit filename="GDL\profile.cpp" />
 		<Unit filename="GDL\profile.h" />
 		<Unit filename="GDL\sf_classes_1.pypp.cpp" />
@@ -747,9 +705,6 @@
 		<Unit filename="GDL\tinyxml.h" />
 		<Unit filename="GDL\tinyxmlerror.cpp" />
 		<Unit filename="GDL\tinyxmlparser.cpp" />
-		<Unit filename="..\..\nwidgets\nwidgets\source.cpp">
-			<Option virtualFolder="LIB nwidgets\" />
-		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -27,7 +27,6 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
-#include "CppUnitLite/TestHarness.h"
 
 #include "GDL/Game.h"
 #include "GDL/StdAlgo.h"
@@ -734,10 +733,6 @@ void EditorImages::OnMenuItem6Selected(wxCommandEvent& event)
     {
         wxLogStatus( _( "Aucune image sélectionnée" ) );
     }
-}
-
-TEST(Dialogues, EditorImages)
-{
 }
 
 ////////////////////////////////////////////////////////////

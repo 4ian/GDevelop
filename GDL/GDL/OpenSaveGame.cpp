@@ -22,7 +22,6 @@
 #ifdef GDE
     #include <wx/wx.h>
     #include "GDL/StdAlgo.h"
-    #include "CppUnitLite/TestHarness.h"
     #define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
     #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
     #define ToString(x) st(x) // Méthode de conversion int vers string

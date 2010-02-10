@@ -2,12 +2,12 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="Box3DExtension" />
+		<Option title="Box3DObject" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="..\..\Runtime\bin\debug\Box3DExtension.xgd" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\Box3DObject.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -29,15 +29,16 @@
 					<Add option="-lsfml-network-d.dll" />
 					<Add option="-lsfml-window-d.dll" />
 					<Add option="-lsfml-system-d.dll" />
-					<Add directory="C:\Users\Florian\Programmation\GameDevelop\Runtime\bin\debug" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add directory="..\..\Runtime\bin\debug" />
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\Box3DExtension.xgd" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\Extensions\Box3DObject.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
-				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-pg" />
@@ -93,18 +94,18 @@
 					<Add option="-ladvapi32" />
 					<Add option="-lcomdlg32" />
 					<Add option="-loleaut32" />
-					<Add directory="C:\Users\Florian\Programmation\GameDevelop\IDE\bin\debug" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add directory="..\..\IDE\bin\debug" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="..\..\Runtime\bin\release\Box3DExtension.xgd" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\Box3DObject.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -122,16 +123,16 @@
 					<Add option="-lsfml-network.dll" />
 					<Add option="-lsfml-window.dll" />
 					<Add option="-lsfml-system.dll" />
-					<Add directory="C:\Users\Florian\Programmation\GameDevelop\Runtime\bin\release" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add directory="..\..\Runtime\bin\release" />
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\Box3DExtension.xgd" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\Extensions\Box3DObject.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -185,18 +186,18 @@
 					<Add option="-ladvapi32" />
 					<Add option="-lcomdlg32" />
 					<Add option="-loleaut32" />
-					<Add directory="C:\Users\Florian\Programmation\GameDevelop\IDE\bin\release" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add directory="..\..\IDE\bin\release" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
 			<Target title="Development">
-				<Option output="..\..\Runtime\bin\dev\Box3DExtension.xgd" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\dev\Box3DObject.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -214,16 +215,16 @@
 					<Add option="-lsfml-network.dll" />
 					<Add option="-lsfml-window.dll" />
 					<Add option="-lsfml-system.dll" />
-					<Add directory="C:\Users\Florian\Programmation\GameDevelop\Runtime\bin\dev" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add directory="..\..\Runtime\bin\dev" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
-				<Option output="..\..\IDE\bin\dev\Extensions\Box3DExtension.xgd" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\dev\Extensions\Box3DObject.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -277,21 +278,61 @@
 					<Add option="-ladvapi32" />
 					<Add option="-lcomdlg32" />
 					<Add option="-loleaut32" />
-					<Add directory="C:\Users\Florian\Programmation\GameDevelop\IDE\bin\dev" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add directory="..\..\IDE\bin\dev" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
+			<Target title="Linux - Release">
+				<Option output="..\..\Runtime\bin\release\Box3DObject.xgdl" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-DGDP" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="\home\florian\Programmation\libs\dlib-17.12\" />
+					<Add directory="\home\florian\Programmation\libs\nwidgets\" />
+					<Add directory="\home\florian\Programmation\libs\fparser\" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="..\..\Runtime\bin\release" />
+					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
-			<Add directory="C:\Users\Florian\Programmation\GameDevelop\GDL" />
+			<Add directory="..\..\GDL" />
 			<Add directory="C:\Libs\SFML\include" />
 			<Add directory="C:\Libs\boost_1_38_0" />
 			<Add directory="C:\Libs\fparser" />
 		</Compiler>
 		<Linker>
-			<Add library="opengl32" />
-			<Add library="glu32" />
 			<Add directory="C:\Libs\SFML\lib\mingw" />
 		</Linker>
 		<Unit filename="Box3DActions.cpp" />

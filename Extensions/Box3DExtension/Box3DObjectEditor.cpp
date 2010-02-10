@@ -9,7 +9,6 @@
 //*)
 #include "GDL/Game.h"
 #include "GDL/StdAlgo.h"
-#include "GDL/TextObject.h"
 #include "GDL/MainEditorCommand.h"
 
 #include "Box3DObject.h"

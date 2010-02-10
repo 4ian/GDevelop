@@ -335,16 +335,14 @@
 		<Linker>
 			<Add directory="C:\Libs\SFML\lib\mingw" />
 		</Linker>
+		<Unit filename="Extension.cpp" />
 		<Unit filename="TextActions.cpp" />
 		<Unit filename="TextConditions.cpp" />
 		<Unit filename="TextExpressions.cpp" />
-		<Unit filename="TextInitialPositionPanel.cpp" />
-		<Unit filename="TextInitialPositionPanel.h" />
 		<Unit filename="TextObject.cpp" />
 		<Unit filename="TextObject.h" />
 		<Unit filename="TextObjectEditor.cpp" />
 		<Unit filename="TextObjectEditor.h" />
-		<Unit filename="Extension.cpp" />
 		<Unit filename="..\..\GDL\GDL\tinystr.cpp" />
 		<Unit filename="..\..\GDL\GDL\tinystr.h" />
 		<Unit filename="..\..\GDL\GDL\tinyxml.cpp" />
@@ -359,7 +357,6 @@
 			<wxsmith version="1">
 				<resources>
 					<wxDialog wxs="wxsmith/TextObjectEditor.wxs" src="TextObjectEditor.cpp" hdr="TextObjectEditor.h" name="TextObjectEditor" language="CPP" />
-					<wxPanel wxs="wxsmith/TextInitialPositionPanel.wxs" src="TextInitialPositionPanel.cpp" hdr="TextInitialPositionPanel.h" name="TextInitialPositionPanel" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

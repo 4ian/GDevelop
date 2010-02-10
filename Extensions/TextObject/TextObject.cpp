@@ -126,8 +126,8 @@ bool TextObject::Draw( sf::RenderWindow& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    text.SetX( GetX()-text.GetRect().GetSize().x/2 );
-    text.SetY( GetY()-text.GetRect().GetSize().y/2 );
+    text.SetX( GetX()+text.GetRect().GetSize().x/2 );
+    text.SetY( GetY()+text.GetRect().GetSize().y/2 );
     text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
     text.SetOrigin(text.GetRect().GetSize().x/2, text.GetRect().GetSize().y/2);
     text.SetRotation(-angle);

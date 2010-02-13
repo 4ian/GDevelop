@@ -1,6 +1,6 @@
 #if defined(GDE)
 
-#include "GDL/DrawerObjectEditor.h"
+#include "DrawerObjectEditor.h"
 
 //(*InternalHeaders(DrawerObjectEditor)
 #include <wx/intl.h>
@@ -48,7 +48,7 @@ object(object_)
 	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
-	
+
 	Create(parent, wxID_ANY, _("Edition de l\'objet Dessinateur manuel"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
@@ -89,7 +89,7 @@ object(object_)
 	FlexGridSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer6->AddGrowableCol(0);
-	wxString __wxRadioBoxChoices_1[2] = 
+	wxString __wxRadioBoxChoices_1[2] =
 	{
 		_("Absolues"),
 		_("Relatives à la position de l\'objet Dessinateur")
@@ -108,7 +108,7 @@ object(object_)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&DrawerObjectEditor::OnfillColorBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&DrawerObjectEditor::OnoutlineColorBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&DrawerObjectEditor::OnokBtClick);

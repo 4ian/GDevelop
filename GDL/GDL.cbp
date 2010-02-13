@@ -364,6 +364,7 @@
 					<Add option="-lXrandr" />
 					<Add option="-lXrender" />
 					<Add option="-lFLAC" />
+					<Add option="-lGLU" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="\home\florian\Programmation\libs\sfml\lib" />

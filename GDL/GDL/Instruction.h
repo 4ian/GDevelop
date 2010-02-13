@@ -86,9 +86,6 @@ class GD_API Instruction
             {
                 #ifndef RELEASE
                     std::cout << "Paramètre invalide demandé";
-                    #ifdef DEBUG
-                        //throw("");
-                    #endif
                 #endif
                 return badExpression;
             }
@@ -107,12 +104,18 @@ class GD_API Instruction
          */
         void SetParameter(unsigned int nb, const GDExpression & val);
 
+        inline const vector < Instruction > & GetSubInstructions() const { return subInstructions; };
+        inline vector < Instruction > & GetSubInstructions() { return subInstructions; };
+        inline void SetSubInstructions(const vector < Instruction > & subInstructions_) { subInstructions = subInstructions_; };
+
     private:
         string type;
         string objectFunctionType;
         bool isLocal;
         bool inverted;
         mutable vector < GDExpression > parameters;
+
+        vector < Instruction > subInstructions;
 
         static GDExpression badExpression;
 };

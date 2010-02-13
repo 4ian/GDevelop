@@ -156,6 +156,7 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
 
     double windowRatio = static_cast<double>(renderWindow->GetWidth())/static_cast<double>(renderWindow->GetHeight());
     gluPerspective(90.f, windowRatio, 1.f, 500.f);
+    glViewport(0, 0, renderWindow->GetWidth(), renderWindow->GetHeight());
 }
 
 ////////////////////////////////////////////////////////////
@@ -218,7 +219,7 @@ void RuntimeScene::ManageRenderTargetEvents()
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
 
-            double windowRatio = static_cast<double>(renderWindow->GetWidth())/static_cast<double>(renderWindow->GetHeight());
+            double windowRatio = static_cast<double>(event.Size.Width)/static_cast<double>(event.Size.Height);
             gluPerspective(90.f, windowRatio, 1.f, 500.f);
             glViewport(0, 0, event.Size.Width, event.Size.Height);
         }

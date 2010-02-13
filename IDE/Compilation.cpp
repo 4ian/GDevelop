@@ -440,7 +440,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         //Fichier pour windows
         if ( WinCheck->GetValue() )
         {
-            if ( wxCopyFile( "Runtime/exeWin", repTemp + "/PlayWin.exe", true ) == false )
+            if ( wxCopyFile( "Runtime/PlayWin.exe", repTemp + "/PlayWin.exe", true ) == false )
                 report += _( "Impossible de créer l'executable Windows dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/gdl.dll", repTemp + "/gdl.dll", true ) == false )
@@ -474,23 +474,23 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         //Fichiers pour linux
         if ( LinuxCheck->GetValue() )
         {
-            if ( wxCopyFile( "Runtime/exeLinux", repTemp + "/ExeLinux", true ) == false )
+            if ( wxCopyFile( "Runtime/ExeLinux", repTemp + "/ExeLinux", true ) == false )
                 report += _( "Impossible de créer l'executable Linux dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/PlayLinux", repTemp + "/PlayLinux", true ) == false )
                 report += _( "Impossible de créer le script executable Linux dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "Runtime/libFLAC.so.7.0.0", repTemp + "/libFLAC.so.7.0.0", true ) == false )
-                report += _( "Impossible de créer libFLAC.so.7.0.0 dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "Runtime/libFLAC.so.7", repTemp + "/libFLAC.so.7", true ) == false )
+                report += _( "Impossible de créer libFLAC.so.7 dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "Runtime/libfreetype.so.6.3.10", repTemp + "/libfreetype.so.6.3.10", true ) == false )
-                report += _( "Impossible de créer libfreetype.so.6.3.10 dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "Runtime/libfreetype.so.6", repTemp + "/libfreetype.so.6", true ) == false )
+                report += _( "Impossible de créer libfreetype.so.6 dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libgdl.so", repTemp + "/libgdl.so", true ) == false )
                 report += _( "Impossible de créer libgdl.so dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "Runtime/libopenal.so.0.0.0", repTemp + "/libopenal.so.0.0.0", true ) == false )
-                report += _( "Impossible de créer libopenal.so.0.0.0 dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "Runtime/libopenal.so.0", repTemp + "/libopenal.so.0", true ) == false )
+                report += _( "Impossible de créer libopenal.so.0 dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libsfml-audio.so.2.0", repTemp + "/libsfml-audio.so.2.0", true ) == false )
                 report += _( "Impossible de créer libsfml-audio.so.2.0 dans le répertoire de compilation.\n" );
@@ -510,8 +510,8 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
             if ( wxCopyFile( "Runtime/libsfml-window.so.2.0", repTemp + "/libsfml-window.so.2.0", true ) == false )
                 report += _( "Impossible de créer libsfml-window.so.2.0 dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "Runtime/libsndfile.so.1.0.16", repTemp + "/libsndfile.so.1.0.16", true ) == false )
-                report += _( "Impossible de créer libsndfile.so.1.0.16 dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "Runtime/libsndfile.so.1", repTemp + "/libsndfile.so.1", true ) == false )
+                report += _( "Impossible de créer libsndfile.so.1 dans le répertoire de compilation.\n" );
         }
 
         //Copie du tout dans le répertoire final
@@ -529,7 +529,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     {
         if ( WinCheck->GetValue() )
         {
-            if ( wxCopyFile( "Runtime/exeWin", repTemp + "/setup.exe", true ) == false )
+            if ( wxCopyFile( "Runtime/PlayWin.exe", repTemp + "/setup.exe", true ) == false )
                 report += _( "Impossible de créer l'executable Windows dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/gdl.dll", repTemp + "/gdl.dll", true ) == false )

@@ -667,6 +667,8 @@
 		<Unit filename="RecentList.h">
 			<Option virtualFolder="Editeur principal\Fichier\" />
 		</Unit>
+		<Unit filename="RenderDialog.cpp" />
+		<Unit filename="RenderDialog.h" />
 		<Unit filename="Renderer.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Renderers\" />
 		</Unit>
@@ -847,6 +849,7 @@
 					<wxDialog wxs="wxsmith/ChoixVariableDialog.wxs" src="ChoixVariableDialog.cpp" hdr="ChoixVariableDialog.h" name="ChoixVariableDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/TextObjectEditor.wxs" src="TextObjectEditor.cpp" hdr="TextObjectEditor.h" name="TextObjectEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/DrawerObjectEditor.wxs" src="DrawerObjectEditor.cpp" hdr="DrawerObjectEditor.h" name="DrawerObjectEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="RenderDialog.cpp" hdr="RenderDialog.h" name="RenderDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

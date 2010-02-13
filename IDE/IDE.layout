@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release - Edittime" />
+	<ActiveTarget name="Debug - Edittime" />
 	<File name="BugReport.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="12778" topLine="179" />
 	</File>
@@ -13,11 +13,11 @@
 	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="1078" topLine="40" />
 	</File>
-	<File name="ChoixVariableDialog.cpp" open="1" top="0" tabpos="7">
+	<File name="ChoixVariableDialog.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="410" topLine="0" />
 	</File>
 	<File name="Compilation.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="28730" topLine="514" />
+		<Cursor position="28867" topLine="517" />
 	</File>
 	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="492" topLine="0" />
@@ -61,8 +61,8 @@
 	<File name="EditPropJeu.cpp" open="0" top="0" tabpos="15">
 		<Cursor position="298" topLine="0" />
 	</File>
-	<File name="EditorEvents.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="37299" topLine="708" />
+	<File name="EditorEvents.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="40135" topLine="792" />
 	</File>
 	<File name="EditorImages.cpp" open="0" top="0" tabpos="17">
 		<Cursor position="806" topLine="7" />
@@ -71,16 +71,22 @@
 		<Cursor position="250" topLine="0" />
 	</File>
 	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="10">
-		<Cursor position="23073" topLine="474" />
+		<Cursor position="31004" topLine="724" />
 	</File>
 	<File name="EditorObjets.cpp" open="0" top="0" tabpos="20">
 		<Cursor position="533" topLine="0" />
 	</File>
 	<File name="EditorObjetsGroups.cpp" open="0" top="0" tabpos="21">
-		<Cursor position="481" topLine="0" />
+		<Cursor position="11531" topLine="150" />
 	</File>
-	<File name="EditorScene.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="31646" topLine="618" />
+	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="0">
+		<Cursor position="2757" topLine="76" />
+	</File>
+	<File name="EditorScene.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="31328" topLine="630" />
+	</File>
+	<File name="EditorScene.h" open="1" top="0" tabpos="3">
+		<Cursor position="5517" topLine="150" />
 	</File>
 	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="4974" topLine="87" />
@@ -124,6 +130,12 @@
 	<File name="MiniChoixObjet.cpp" open="0" top="0" tabpos="28">
 		<Cursor position="458" topLine="0" />
 	</File>
+	<File name="RenderDialog.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="949" topLine="21" />
+	</File>
+	<File name="RenderDialog.h" open="1" top="0" tabpos="4">
+		<Cursor position="22" topLine="0" />
+	</File>
 	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="25712" topLine="660" />
 	</File>
@@ -152,6 +164,9 @@
 		<Cursor position="542" topLine="0" />
 	</File>
 	<File name="wxSFMLCanvas.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="314" topLine="0" />
+		<Cursor position="1373" topLine="131" />
+	</File>
+	<File name="wxSFMLCanvas.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="428" topLine="75" />
 	</File>
 </CodeBlocks_layout_file>

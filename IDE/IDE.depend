@@ -118,7 +118,7 @@
 
 1253304887 c:\libs\wxwidgets\include\wx\osx\config_xcode.h
 
-1253304862 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
+1253304862 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
 1253304918 c:\libs\wxwidgets\include\wx\setup_gccxml.h
 
@@ -3195,7 +3195,7 @@
 	"GDL/Log.h"
 	"GDL/Instruction.h"
 
-1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\instruction.h
+1265912137 c:\users\florian\programmation\gamedevelop\gdl\gdl\instruction.h
 	<string>
 	<vector>
 	<iostream>
@@ -8924,7 +8924,7 @@
 	"wx/dcclient.h"
 	"wx/window.h"
 
-1265555012 source:c:\users\florian\programmation\gamedevelop\ide\compilation.cpp
+1265833719 source:c:\users\florian\programmation\gamedevelop\ide\compilation.cpp
 	"nommgr.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -9634,7 +9634,7 @@
 	"GDL/BaseDebugger.h"
 	<wx/msw/winundef.h>
 
-1264448672 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
+1266065958 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
 	"GDL/MemTrace.h"
 	<iostream>
 	<sstream>
@@ -10150,7 +10150,7 @@
 	<vector>
 	"GDL/Event.h"
 
-1264360531 c:\users\florian\programmation\gamedevelop\ide\editorscene.h
+1266003941 c:\users\florian\programmation\gamedevelop\ide\editorscene.h
 	<wx/sizer.h>
 	<wx/aui/aui.h>
 	<wx/panel.h>
@@ -10168,6 +10168,7 @@
 	"EditorEvents.h"
 	"EditorObjets.h"
 	"EditorLayers.h"
+	"RenderDialog.h"
 	"DebuggerGUI.h"
 	"GDL/needReload.h"
 	<string>
@@ -10228,6 +10229,11 @@
 	"GDL/Scene.h"
 	"GDL/Game.h"
 	"GDL/MainEditorCommand.h"
+
+1266005149 c:\users\florian\programmation\gamedevelop\ide\renderdialog.h
+	<wx/sizer.h>
+	"wxSFMLCanvas.hpp"
+	<wx/dialog.h>
 
 1264360529 c:\users\florian\programmation\gamedevelop\ide\recentlist.h
 	"wx/wxprec.h"
@@ -10670,7 +10676,7 @@
 	"GDL/Game.h"
 	"GDL/Scene.h"
 
-1264363197 source:c:\users\florian\programmation\gamedevelop\ide\editorevents.cpp
+1265833135 source:c:\users\florian\programmation\gamedevelop\ide\editorevents.cpp
 	"debugMem.h"
 	"nommgr.h"
 	"CppUnitLite/TestHarness.h"
@@ -10915,7 +10921,7 @@
 	"GDL/BitmapGUIManager.h"
 	<gtk/gtk.h>
 
-1264363197 source:c:\users\florian\programmation\gamedevelop\ide\editorobjetsgroups.cpp
+1265822784 source:c:\users\florian\programmation\gamedevelop\ide\editorobjetsgroups.cpp
 	"EditorObjetsGroups.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -10938,7 +10944,7 @@
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
-1265566578 source:c:\users\florian\programmation\gamedevelop\ide\editorscene.cpp
+1266065472 source:c:\users\florian\programmation\gamedevelop\ide\editorscene.cpp
 	"EditorScene.h"
 	<wx/settings.h>
 	<wx/intl.h>
@@ -14024,6 +14030,12 @@
 1264360532 source:c:\users\florian\programmation\gamedevelop\ide\recentlist.cpp
 	"RecentList.h"
 
+1266009240 source:c:\users\florian\programmation\gamedevelop\ide\renderdialog.cpp
+	"RenderDialog.h"
+	<wx/intl.h>
+	<wx/string.h>
+	<iostream>
+
 1264360532 source:c:\users\florian\programmation\gamedevelop\ide\renderer.cpp
 	"Renderer.h"
 
@@ -14338,5 +14350,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/StdAlgo.h"
 
-1265746099 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
+1266062222 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
 

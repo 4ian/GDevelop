@@ -700,7 +700,9 @@ void EditorEvents::OnMenuItem7Selected( wxCommandEvent& event )
     EditCommentaire Dialog( this, &eventToAdd );
     if ( Dialog.ShowModal() == 1 )
     {
-        if ( eventNbInListSelected >= 0 && static_cast<unsigned>(eventNbInListSelected) < listEventSelected->size() )
+        if ( eventNbInListSelected >= 0 &&
+            static_cast<unsigned>(eventNbInListSelected) < listEventSelected->size() &&
+            eventSelected != NULL )
         {
             listEventSelected->insert( listEventSelected->begin() + eventNbInListSelected, eventToAdd );
         }
@@ -763,7 +765,9 @@ void EditorEvents::OnAddLienSelected( wxCommandEvent& event )
     EditLink dialog( this, eventToAdd );
     if ( dialog.ShowModal() == 1 )
     {
-        if ( eventNbInListSelected >= 0 && static_cast<unsigned>(eventNbInListSelected) < listEventSelected->size() )
+        if ( eventNbInListSelected >= 0 &&
+            static_cast<unsigned>(eventNbInListSelected) < listEventSelected->size()  &&
+            eventSelected != NULL )
         {
             listEventSelected->insert( listEventSelected->begin() + eventNbInListSelected, eventToAdd );
         }

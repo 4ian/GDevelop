@@ -25,6 +25,7 @@ class RuntimeGame;
 #include "EditorEvents.h"
 #include "EditorObjets.h"
 #include "EditorLayers.h"
+#include "RenderDialog.h"
 #include "DebuggerGUI.h"
 #include "GDL/needReload.h"
 #include <string>
@@ -168,7 +169,7 @@ class EditorScene: public wxPanel
 		RuntimeGame & runtimeGame;
 		MainEditorCommand mainEditorCommand;
 		wxToolBar * toolbar;
-		sf::RenderWindow externalWindow;
+		RenderDialog externalWindow;
 
         wxAuiManager m_mgr;
 

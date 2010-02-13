@@ -95,7 +95,7 @@ scene(scene_),
 game(game_),
 runtimeGame(runtimeGame_),
 mainEditorCommand(mainEditorCommand_),
-externalWindow()
+externalWindow(this)
 {
 	//(*Initialize(EditorScene)
 	wxFlexGridSizer* FlexGridSizer3;
@@ -356,6 +356,8 @@ void EditorScene::UpdateSceneCanvasSize(int parentPanelWidht, int parentPanelHei
         sceneCanvas->Window::SetSize(game.windowWidth, game.windowHeight);
         sceneCanvas->wxWindowBase::SetSize(game.windowWidth, game.windowHeight);
 
+        externalWindow.SetSize(game.windowWidth, game.windowHeight);
+
         //Scene is centered in preview mode
         sceneCanvas->wxWindowBase::SetSize((parentPanelWidht-sceneCanvas->wxWindowBase::GetSize().GetX())/2,
                                             (parentPanelHeight-sceneCanvas->wxWindowBase::GetSize().GetY())/2,
@@ -388,13 +390,16 @@ void EditorScene::OnEditionBtClick( wxCommandEvent & event )
     sceneCanvas->scene.editing = true;
     sceneCanvas->scene.running = false;
 
-    externalWindow.Close();
+    externalWindow.Show(false);
 
-    sceneCanvas->scene.renderWindow = sceneCanvas;
-    sceneCanvas->scene.input = &sceneCanvas->GetInput();
+    sceneCanvas->scene.ChangeRenderWindow(sceneCanvas);
 
     UpdateScenePanelSize(Core->GetSize().GetX(), Core->GetSize().GetY());
+
     sceneCanvas->Reload();
+    sceneCanvas->scene.RenderEdittimeScene(); //FIXME : Hack to make sure OpenGL Rendering is correct
+
+    sceneCanvas->scene.ChangeRenderWindow(sceneCanvas);
 
     debugger->Pause();
 
@@ -637,8 +642,9 @@ void EditorScene::OnPlayBtClick( wxCommandEvent & event )
     sceneCanvas->scene.running = true;
     sceneCanvas->scene.editing = false;
 
-    externalWindow.Close();
+    externalWindow.Show(false);
     sceneCanvas->scene.ChangeRenderWindow(sceneCanvas);
+
 
     debugger->Play();
 }
@@ -651,10 +657,14 @@ void EditorScene::OnPlayWindowBtClick( wxCommandEvent & event )
     sceneCanvas->scene.running = true;
     sceneCanvas->scene.editing = false;
 
-    externalWindow.Create(sf::VideoMode(sceneCanvas->GetWidth(), sceneCanvas->GetHeight(), 32), string(_("Aperçu").mb_str()));
-    externalWindow.SetFramerateLimit(60);
+    externalWindow.Show(true);
+    externalWindow.SetSize(sceneCanvas->GetWidth(), sceneCanvas->GetHeight());
+    sceneCanvas->scene.ChangeRenderWindow(externalWindow.renderCanvas);
 
-    sceneCanvas->scene.ChangeRenderWindow(&externalWindow);
+    sceneCanvas->scene.RenderAndStep(1);  //FIXME : Hack to make sure OpenGL Rendering is correct
+
+    externalWindow.SetSize(sceneCanvas->GetWidth(), sceneCanvas->GetHeight());
+    sceneCanvas->scene.ChangeRenderWindow(externalWindow.renderCanvas);
 
     debugger->Play();
 }

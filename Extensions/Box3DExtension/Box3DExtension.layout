@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release - Edittime" />
+	<ActiveTarget name="Development - Edittime" />
 	<File name="Box3DActions.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="13" topLine="0" />
 	</File>
@@ -16,13 +16,13 @@
 	<File name="Box3DInitialPositionPanel.h" open="0" top="0" tabpos="0">
 		<Cursor position="1002" topLine="17" />
 	</File>
-	<File name="Box3DObject.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="14383" topLine="364" />
+	<File name="Box3DObject.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="11176" topLine="299" />
 	</File>
 	<File name="Box3DObject.h" open="0" top="0" tabpos="1">
 		<Cursor position="235" topLine="0" />
 	</File>
-	<File name="Box3DObjectEditor.cpp" open="1" top="1" tabpos="9">
+	<File name="Box3DObjectEditor.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="144" topLine="0" />
 	</File>
 	<File name="Box3DObjectEditor.h" open="0" top="0" tabpos="3">

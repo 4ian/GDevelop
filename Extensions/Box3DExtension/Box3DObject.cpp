@@ -218,20 +218,19 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
 
     window.RestoreGLStates();
 
-    float windowRatio = static_cast<float>(window.GetWidth())/static_cast<float>(window.GetHeight());
+    float windowRatio = static_cast<float>(window.GetView().GetSize().x)/static_cast<float>(window.GetView().GetSize().y);
     float sizeRatio =   0.3330 //To make base have the same size as a rectangle drawn by SFML
-                        *(window.GetView().GetSize().x/static_cast<float>(window.GetWidth()))
                         *1/window.GetView().GetSize().y*600.f; //To make size window's size independant
 
     //Get the position of the box
-    float x = ( (GetX()-window.GetView().GetCenter().x+window.GetWidth()/2) * 200.f / window.GetWidth()  - 100.f)*windowRatio;
-    float y = -(GetY()-window.GetView().GetCenter().y+window.GetHeight()/2) * 200.f / window.GetHeight() + 100.f;
+    float x = ( (GetX()-window.GetView().GetCenter().x+window.GetView().GetSize().x/2) * 200.f / window.GetView().GetSize().x  - 100.f)*windowRatio;
+    float y = -(GetY()-window.GetView().GetCenter().y+window.GetView().GetSize().y/2) * 200.f / window.GetView().GetSize().y + 100.f;
 
     //Prepare for rendering
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glRotatef(window.GetView().GetRotation(), 0, 0, 1);
-    glTranslatef(x, y, -100*(window.GetView().GetSize().x/static_cast<double>(window.GetWidth()))+zPosition*0.3125);
+    glTranslatef(x, y, -100+zPosition*0.3125);
 
     //Prepare size of the renderered box
     float sizeWidth =   width * sizeRatio;
@@ -306,20 +305,19 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
 {
     window.RestoreGLStates();
 
-    float windowRatio = static_cast<float>(window.GetWidth())/static_cast<float>(window.GetHeight());
+    float windowRatio = static_cast<float>(window.GetView().GetSize().x)/static_cast<float>(window.GetView().GetSize().y);
     float sizeRatio =   0.3330 //To make base have the same size as a rectangle drawn by SFML
-                        *(window.GetView().GetSize().x/static_cast<float>(window.GetWidth()))
                         *1/window.GetView().GetSize().y*600.f; //To make size window's size independant
 
     //Get the position of the box
-    float x = ( (GetX()-window.GetView().GetCenter().x+window.GetWidth()/2) * 200.f / window.GetWidth()  - 100.f)*windowRatio;
-    float y = -(GetY()-window.GetView().GetCenter().y+window.GetHeight()/2) * 200.f / window.GetHeight() + 100.f;
+    float x = ( (GetX()-window.GetView().GetCenter().x+window.GetView().GetSize().x/2) * 200.f / window.GetView().GetSize().x  - 100.f)*windowRatio;
+    float y = -(GetY()-window.GetView().GetCenter().y+window.GetView().GetSize().y/2) * 200.f / window.GetView().GetSize().y + 100.f;
 
     //Prepare for rendering
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glRotatef(window.GetView().GetRotation(), 0, 0, 1);
-    glTranslatef(x, y, -100*(window.GetView().GetSize().x/static_cast<double>(window.GetWidth()))+zPosition*0.3125);
+    glTranslatef(x, y, -100+zPosition*0.3125);
 
     //Prepare size of the renderered box
     float sizeWidth =   width * sizeRatio;

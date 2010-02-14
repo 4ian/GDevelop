@@ -157,8 +157,9 @@ void EditObjectGroup::Refresh()
     ObjetsList->DeleteAllItems();
     ObjetsList->AddRoot( _( "Tous les objets du groupe" ) );
 
-    for ( unsigned int i = 0;i < group.Getobjets().size();i++ )
-        ObjetsList->AppendItem( ObjetsList->GetRootItem(), group.Getobjets().at(i) );
+    vector < string > allObjects = group.GetAllObjectsNames();
+    for ( unsigned int i = 0;i < allObjects.size();i++ )
+        ObjetsList->AppendItem( ObjetsList->GetRootItem(), allObjects.at(i) );
 
     ObjetsList->ExpandAll();
 }

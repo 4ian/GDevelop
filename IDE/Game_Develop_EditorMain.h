@@ -29,7 +29,7 @@
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
 
-#include "EditorImages.h"
+#include "GDL/EditorImages.h"
 #include "EditorObjets.h"
 #include "EditorEvents.h"
 #include "EditorScene.h"

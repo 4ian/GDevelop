@@ -481,12 +481,6 @@
 		<Unit filename="EditorEvents.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
 		</Unit>
-		<Unit filename="EditorImages.cpp">
-			<Option virtualFolder="Editeurs\Editeur Image\" />
-		</Unit>
-		<Unit filename="EditorImages.h">
-			<Option virtualFolder="Editeurs\Editeur Image\" />
-		</Unit>
 		<Unit filename="EditorJeu.cpp">
 			<Option virtualFolder="Racine\" />
 		</Unit>
@@ -748,6 +742,9 @@
 		</Unit>
 		<Unit filename="mp3ogg.h">
 			<Option virtualFolder="Editeur principal\Outils\" />
+		</Unit>
+		<Unit filename="resource.rc">
+			<Option compilerVar="WINDRES" />
 		</Unit>
 		<Unit filename="tinystr.cpp">
 			<Option virtualFolder="LIB TinyXml\" />

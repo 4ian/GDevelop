@@ -419,9 +419,10 @@ void EditorObjetsGroups::OnObjetsGroupsListItemActivated(wxTreeEvent& event)
         wxString tooltip = _("Contenu du groupe \"");
         tooltip += nomItemSelected;
         tooltip += "\" :\n";
-        for (unsigned int j = 0;j< i->Getobjets().size() && j < 10;++j)
+        vector < string > allObjects = i->GetAllObjectsNames();
+        for (unsigned int j = 0;j< allObjects.size() && j < 10;++j)
         {
-        	tooltip += i->Getobjets().at(j)+"\n";
+        	tooltip += allObjects.at(j)+"\n";
 
         	if ( j == 9 ) tooltip += "...";
         }

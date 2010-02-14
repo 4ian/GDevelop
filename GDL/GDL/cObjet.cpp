@@ -31,7 +31,7 @@ bool CondNbObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     ObjectsConcerned originalObjectsConcerned = objectsConcerned;
     eval.SetObjectsConcerned(&originalObjectsConcerned);
 
-    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetPlainString(), condition.IsGlobal());
+    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     bool isTrue = false;
 
     //optimisation : le test de signe en premier
@@ -71,7 +71,7 @@ bool CondNbObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
 ////////////////////////////////////////////////////////////
 bool CondAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetPlainString(), condition.IsGlobal());
+    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
 
 	ObjList::iterator obj = list.begin();
 	ObjList::const_iterator obj_end = list.end();
@@ -91,7 +91,7 @@ bool CondAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 ////////////////////////////////////////////////////////////
 bool CondAjoutHasard( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetPlainString(), condition.IsGlobal());
+    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
 
     //On en reprend un dans la liste
     if ( !list.empty() )

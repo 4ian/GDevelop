@@ -81,7 +81,7 @@ bool ActCreate( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const
     //Add object to scene and let it be concerned by futures actions
     scene->objectsInstances.AddObject(newObject);
     objectsConcerned.objectsPicked.AddObject( newObject );
-    objectsConcerned.AddAnObjectConcerned(objectWanted);
+    objectsConcerned.AddAnObjectConcerned(newObject->GetObjectIdentifier());
 
     return true;
 }
@@ -106,7 +106,7 @@ bool Object::ActDelete( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 ////////////////////////////////////////////////////////////
 bool ActAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetPlainString(), action.IsGlobal());
+    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
 
 	ObjList::iterator obj = list.begin();
 	ObjList::const_iterator obj_end = list.end();
@@ -127,7 +127,7 @@ bool ActAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 ////////////////////////////////////////////////////////////
 bool ActAjoutHasard( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.PickAndRemove(action.GetParameter( 0 ).GetPlainString(), action.IsGlobal());
+    ObjList list = objectsConcerned.PickAndRemove(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
 
     //On en reprend un dans la liste
     if ( !list.empty() )

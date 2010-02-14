@@ -96,7 +96,7 @@ unsigned int GD_API GetTypeIdOfObject(const Game & game, const Scene & scene, st
                 //A group has the name searched
                 //Verifying now that all objects have the same typeId.
 
-                vector < string > groupsObjects = scene.objectGroups[i].Getobjets();
+                vector < string > groupsObjects = scene.objectGroups[i].GetAllObjectsNames();
                 unsigned int previousTypeId = groupsObjects.empty() ? 0 : GetTypeIdOfObject(game, scene, groupsObjects[0], false);
 
                 for (unsigned int j = 0;j<groupsObjects.size();++j)

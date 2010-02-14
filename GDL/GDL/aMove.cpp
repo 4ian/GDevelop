@@ -38,8 +38,8 @@
 ////////////////////////////////////////////////////////////
 bool ActEcarter( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetPlainString(), action.IsGlobal());
-    ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetPlainString(), action.IsGlobal());
+    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
+    ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetAsObjectIdentifier(), action.IsGlobal());
 
 	ObjList::iterator obj = list.begin();
 	ObjList::const_iterator obj_end = list.end();
@@ -93,8 +93,8 @@ bool ActEcarter( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, cons
 ////////////////////////////////////////////////////////////
 bool ActRebondir( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetPlainString(), action.IsGlobal());
-    ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetPlainString(), action.IsGlobal());
+    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
+    ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetAsObjectIdentifier(), action.IsGlobal());
 
 	ObjList::iterator obj = list.begin();
 	ObjList::const_iterator obj_end = list.end();
@@ -182,8 +182,8 @@ bool Object::ActAddForceAL( RuntimeScene * scene, ObjectsConcerned & objectsConc
 ////////////////////////////////////////////////////////////
 bool ActAddForceVers( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetPlainString(), action.IsGlobal());
-    ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetPlainString(), action.IsGlobal());
+    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
+    ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetAsObjectIdentifier(), action.IsGlobal());
 
     if ( list2.empty() ) return true; //Pas d'objet vers lequel se diriger
     boost::shared_ptr<Object> obj2 = list2[0];
@@ -274,8 +274,8 @@ bool Object::ActAddForceTournePos( RuntimeScene * scene, ObjectsConcerned & obje
 ////////////////////////////////////////////////////////////
 bool ActAddForceTourne( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetPlainString(), action.IsGlobal());
-    ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetPlainString(), action.IsGlobal());
+    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
+    ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetAsObjectIdentifier(), action.IsGlobal());
 
     if ( list2.empty() ) return true; //Pas d'objet vers lequel se diriger
     boost::shared_ptr<Object> obj2 = list2[0];

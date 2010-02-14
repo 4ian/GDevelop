@@ -13,10 +13,11 @@ class Object;
 class ExtensionBase;
 class ExpressionInstruction;
 
-#ifdef GDE
+#if defined(GDE)
 class Game;
 class MainEditorCommand;
 #include <wx/bitmap.h>
+#include <wx/file.h>
 #include <wx/wx.h>
 #endif
 
@@ -57,8 +58,14 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
             instrInfo.group = std::string(group_.mb_str()); \
-            instrInfo.icon = wxBitmap(icon_, wxBITMAP_TYPE_ANY); \
-            instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            if ( wxFile::Exists(icon_) )\
+            {\
+                instrInfo.icon = wxBitmap(icon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.icon = wxBitmap(24,24);}\
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.smallicon = wxBitmap(16,16);}
 
 /**
  * Start declaring an action, and some information about it.
@@ -72,8 +79,14 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
             instrInfo.group = std::string(group_.mb_str()); \
-            instrInfo.icon = wxBitmap(icon_, wxBITMAP_TYPE_ANY); \
-            instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            if ( wxFile::Exists(icon_) )\
+            {\
+                instrInfo.icon = wxBitmap(icon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.icon = wxBitmap(24,24);}\
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.smallicon = wxBitmap(16,16);}
 
 /**
  * Start declaring a condition for an object, and some information about it.
@@ -87,9 +100,14 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
             instrInfo.group = std::string(group_.mb_str()); \
-            instrInfo.icon = wxBitmap(icon_, wxBITMAP_TYPE_ANY); \
-            instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
-
+            if ( wxFile::Exists(icon_) )\
+            {\
+                instrInfo.icon = wxBitmap(icon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.icon = wxBitmap(24,24);}\
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.smallicon = wxBitmap(16,16);}
 /**
  * Start declaring an action for an object, and some information about it.
  * DECLARE_END_OBJECT_ACTION need to be used after having declared parameter ( DECLARE_PARAMETER ).
@@ -102,8 +120,14 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
             instrInfo.group = std::string(group_.mb_str()); \
-            instrInfo.icon = wxBitmap(icon_, wxBITMAP_TYPE_ANY); \
-            instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            if ( wxFile::Exists(icon_) )\
+            {\
+                instrInfo.icon = wxBitmap(icon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.icon = wxBitmap(24,24);}\
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.smallicon = wxBitmap(16,16);}
 
 /**
  * Start declaring a parameter of a action or condition.
@@ -166,7 +190,10 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
-            instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY);
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.smallicon = wxBitmap(16,16);}
 
 /**
  * Declare an object expression
@@ -182,7 +209,10 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
-            instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY);
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.smallicon = wxBitmap(16,16);}
 
 /**
  * Declare an hidden expression ( not displayed in editor )
@@ -198,7 +228,10 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
-            instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.smallicon = wxBitmap(16,16);}\
             instrInfo.shown = false;
 
 /**
@@ -215,7 +248,10 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
-            instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.smallicon = wxBitmap(16,16);}\
             instrInfo.shown = false;
 
 

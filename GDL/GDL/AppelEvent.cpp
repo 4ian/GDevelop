@@ -143,7 +143,7 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
         }
         else if (event.conditions[k].GetType() == "ForEach" )
         {
-            ObjList list = objectsConcerned.PickAndRemove(event.conditions[k].GetParameter( 0 ).GetPlainString(), event.conditions[k].IsGlobal());
+            ObjList list = objectsConcerned.PickAndRemove(event.conditions[k].GetParameter( 0 ).GetAsObjectIdentifier(), event.conditions[k].IsGlobal());
 
             ObjectsConcerned objectsConcernedStart = objectsConcerned;
             int retour = ActAllProcessed;
@@ -320,7 +320,7 @@ int EventsExecutor::ExecuteActions( Event & event, ObjectsConcerned & objectsCon
         }
         else if (event.actions[k].GetType() == "ForEach" )
         {
-            ObjList list = objectsConcerned.PickAndRemove(event.actions[k].GetParameter( 0 ).GetPlainString(), event.actions[k].IsGlobal());
+            ObjList list = objectsConcerned.PickAndRemove(event.actions[k].GetParameter( 0 ).GetAsObjectIdentifier(), event.actions[k].IsGlobal());
 
             ObjectsConcerned objectsConcernedStart = objectsConcerned;
             eval.SetObjectsConcerned(&objectsConcernedStart);

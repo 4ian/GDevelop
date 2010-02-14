@@ -7,6 +7,7 @@
 #include "GDL/fparser/fparser.hh"
 #include <boost/shared_ptr.hpp>
 #include "GDL/ExpressionInstruction.h"
+#include "GDL/ObjectIdentifiersManager.h"
 class Object;
 class RuntimeScene;
 class ObjectsConcerned;
@@ -39,6 +40,17 @@ class GD_API GDExpression
          * Get a number representing a modification operator.
          */
         inline short int GetAsModOperator() const { return modOperator; };
+
+        inline unsigned int GetAsObjectIdentifier() const
+        {
+            if ( !oIDcomputed )
+            {
+                ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+                oID = objectIdentifiersManager->GetOIDfromName(plainString);
+            }
+
+            return oID;
+        }
 
         /**
          * Parse the formula with the parameters in mathExpression.
@@ -91,35 +103,15 @@ class GD_API GDExpression
     protected:
     private:
 
-        /**
-         * The plain expression
-         */
-        std::string     plainString;
+        std::string     plainString; ///<The plain expression
+        char            compOperator; ///<Char representing a comparison operator. Computed at creation.
+        char            modOperator; ///<Char representing a modification operator. Computed at creation.
+        mutable unsigned int    oID; ///< Object identifier, if expression contains an object name.
+        mutable bool    oIDcomputed;
 
-        /**
-         * Char representing a comparison operator. Computed at creation.
-         */
-        char            compOperator;
-        /**
-         * Char representing a modificiation operator. Computed at creation.
-         */
-        char            modOperator;
-
-        /**
-         * Object representing the mathemathic expression to parse and evaluate.
-         */
-        FunctionParser  mathExpression;
-
-        /**
-         * The functions to call to generate the values of the parameters to pass to
-         * the mathematic expression when evaluating.
-         */
-        std::vector < ExpressionInstruction > mathExpressionFunctions;
-
-        /**
-         * Indicate if the functions to call and the mathematic expression have been preprocessed.
-         */
-        bool            isPreprocessed;
+        FunctionParser  mathExpression; ///<Object representing the mathemathic expression to parse and evaluate.
+        std::vector < ExpressionInstruction > mathExpressionFunctions; ///< The functions to call to generate the values of the parameters to pass to the mathematic expression when evaluating.
+        bool            isPreprocessed; ///<Indicate if the functions to call and the mathematic expression have been preprocessed.
 
 };
 

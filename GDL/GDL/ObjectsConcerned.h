@@ -43,7 +43,7 @@ class GD_API ObjectsConcerned
         * @param Force searching in all objects
         * @return A list of objects matching the name
         */
-        ObjList Pick(string name, bool forceGlobal = false);
+        ObjList Pick(unsigned int oID, bool forceGlobal = false);
 
         /**
         * Search objects matching the name and remove them to
@@ -54,7 +54,7 @@ class GD_API ObjectsConcerned
         * @param Force searching in all objects
         * @return A list of objects matching the name
         */
-        ObjList PickAndRemove(string name, bool forceGlobal = false);
+        ObjList PickAndRemove(unsigned int oID, bool forceGlobal = false);
 
         /**
         * Add an object to the list of already concerned
@@ -62,9 +62,9 @@ class GD_API ObjectsConcerned
         *
         * @param Name of the object concerned
         */
-        inline void AddAnObjectConcerned(string name)
+        inline void AddAnObjectConcerned(unsigned int oID)
         {
-            alreadyConcernedObjects.insert((name));
+            alreadyConcernedObjects.insert(oID);
         };
 
         /** Objects already picked */
@@ -79,11 +79,11 @@ class GD_API ObjectsConcerned
         /** Reference to groups */
         vector < ObjectGroup > * allGroups;
 
-        /** A set containing name of objects already picked.
+        /** A set containing identifers of objects already picked.
         If an object is not in this list, pickers functions will
         use all objects List. If an object is in the list, they will
         use already picked list*/
-        set < string > alreadyConcernedObjects;
+        set < unsigned int > alreadyConcernedObjects;
 
         /**
         * Pick only object. Called by generals picking functions.
@@ -94,7 +94,7 @@ class GD_API ObjectsConcerned
         * @param Remove picked objects from picked list. See PickAndRemove
         * @return A list of objects matching the name
         */
-        ObjList PickOnlyObjects(string name, bool onlyAlreadyConcernedObjects, bool forceGlobal, bool removeFromAlreadyConcernedObjects);
+        ObjList PickOnlyObjects(unsigned int oID, bool onlyAlreadyConcernedObjects, bool forceGlobal, bool removeFromAlreadyConcernedObjects);
 };
 
 #endif // OBJECTSCONCERNED_H

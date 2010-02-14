@@ -21,6 +21,7 @@
 #include <wx/imaglist.h>
 #include <wx/textdlg.h>
 #include <wx/help.h>
+#include <wx/file.h>
 #include <wx/dcbuffer.h>
 #include <wx/dnd.h>
 #include <wx/ribbon/bar.h>
@@ -807,7 +808,7 @@ void EditorImages::OnapercuPanelPaint(wxPaintEvent& event)
     dc.SetBrush(bitmapGUIManager->transparentBg);
     dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
-    if ( fileImageSelected == "" )
+    if ( !wxFile::Exists(fileImageSelected) )
         return;
 
     wxBitmap bmp( fileImageSelected, wxBITMAP_TYPE_ANY);

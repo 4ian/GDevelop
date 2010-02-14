@@ -16,7 +16,7 @@ allGroups(allGroups_)
 ////////////////////////////////////////////////////////////
 /// Prendre les objets ayant le nom voulu ou appartenant au groupe ayant ce nom
 ////////////////////////////////////////////////////////////
-ObjList ObjectsConcerned::Pick(string name, bool forceGlobal)
+ObjList ObjectsConcerned::Pick(unsigned int oID, bool forceGlobal)
 {
     //BT_PROFILE("Pick");
     ObjList objectsToTest;
@@ -26,19 +26,19 @@ ObjList ObjectsConcerned::Pick(string name, bool forceGlobal)
     for (;groupsIter!=groupsEnd;++groupsIter)
     {
         //Si le groupe a le nom voulu, on va prendre en compte ses objets
-        if ( (*groupsIter).GetName() == name )
+        if ( (*groupsIter).GetIdentifier() == oID )
         {
             bool containObjectAlreadyC = (*groupsIter).HasAnIdenticalValue(alreadyConcernedObjects);
 
-            for (unsigned int j = 0;j < (*groupsIter).Getobjets().size();++j)
+            for (unsigned int j = 0;j < (*groupsIter).GetAllObjectsWithOID().size();++j)
             {
-                ObjList listObjects = PickOnlyObjects((*groupsIter).Getobjets()[j], containObjectAlreadyC, forceGlobal, false);
+                ObjList listObjects = PickOnlyObjects((*groupsIter).GetAllObjectsWithOID()[j].second, containObjectAlreadyC, forceGlobal, false);
                 copy(listObjects.begin(), listObjects.end(), back_inserter(objectsToTest));
             }
         }
     }
 
-    ObjList listObjects = PickOnlyObjects(name, false, forceGlobal, false);
+    ObjList listObjects = PickOnlyObjects(oID, false, forceGlobal, false);
     copy(listObjects.begin(), listObjects.end(), back_inserter(objectsToTest));
 
     return objectsToTest;
@@ -48,7 +48,7 @@ ObjList ObjectsConcerned::Pick(string name, bool forceGlobal)
 /// Prendre les objets ayant le nom voulu ou appartenant au groupe ayant ce nom
 /// mais en les supprimant des objectsPicked
 ////////////////////////////////////////////////////////////
-ObjList ObjectsConcerned::PickAndRemove(string name, bool forceGlobal)
+ObjList ObjectsConcerned::PickAndRemove(unsigned int oID, bool forceGlobal)
 {
     //BT_PROFILE("PickAndRemove");
     ObjList objectsToTest;
@@ -58,19 +58,19 @@ ObjList ObjectsConcerned::PickAndRemove(string name, bool forceGlobal)
     for (;groupsIter!=groupsEnd;++groupsIter)
     {
         //Si le groupe a le nom voulu, on va prendre en compte ses objets
-        if ( (*groupsIter).GetName() == name )
+        if ( (*groupsIter).GetIdentifier() == oID )
         {
             bool containObjectAlreadyC = (*groupsIter).HasAnIdenticalValue(alreadyConcernedObjects);
 
-            for (unsigned int j = 0;j < (*groupsIter).Getobjets().size();++j)
+            for (unsigned int j = 0;j < (*groupsIter).GetAllObjectsWithOID().size();++j)
             {
-                ObjList listObjects = PickOnlyObjects((*groupsIter).Getobjets()[j], containObjectAlreadyC, forceGlobal, true);
+                ObjList listObjects = PickOnlyObjects((*groupsIter).GetAllObjectsWithOID()[j].second, containObjectAlreadyC, forceGlobal, true);
                 copy(listObjects.begin(), listObjects.end(), back_inserter(objectsToTest));
             }
         }
     }
 
-    ObjList listObjects = PickOnlyObjects(name, false, forceGlobal, true);
+    ObjList listObjects = PickOnlyObjects(oID, false, forceGlobal, true);
     copy(listObjects.begin(), listObjects.end(), back_inserter(objectsToTest));
 
     return objectsToTest;
@@ -79,28 +79,28 @@ ObjList ObjectsConcerned::PickAndRemove(string name, bool forceGlobal)
 ////////////////////////////////////////////////////////////
 /// Prendre les objets ayant le nom voulu, sans tenir compte des groupes
 ////////////////////////////////////////////////////////////
-ObjList ObjectsConcerned::PickOnlyObjects(string name, bool onlyAlreadyConcerned, bool forceGlobal, bool removeFromAlreadyConcernedObjects)
+ObjList ObjectsConcerned::PickOnlyObjects(unsigned int oId, bool onlyAlreadyConcerned, bool forceGlobal, bool removeFromAlreadyConcernedObjects)
 {
     ObjList objectsToTest;
 
     //L'objet a il déjà été selectionné auparavant ?
     if (( onlyAlreadyConcerned || find(alreadyConcernedObjects.begin(),
                                         alreadyConcernedObjects.end(),
-                                        name) != alreadyConcernedObjects.end() )
+                                        oId) != alreadyConcernedObjects.end() )
         && !forceGlobal )
     {
-        objectsToTest = objectsPicked.GetObjects(name);
+        objectsToTest = objectsPicked.GetObjects(oId);
 
-        if  ( removeFromAlreadyConcernedObjects ) objectsPicked.RemoveObjects(name);
+        if  ( removeFromAlreadyConcernedObjects ) objectsPicked.RemoveObjects(oId);
     }
     else
     {
-        objectsToTest = allObjects->GetObjects(name);
+        objectsToTest = allObjects->GetObjects(oId);
 
         if  ( !removeFromAlreadyConcernedObjects ) objectsPicked.AddListOfObjectsWithSameName(objectsToTest);
     }
 
-    alreadyConcernedObjects.insert(name);
+    alreadyConcernedObjects.insert(oId);
 
     return objectsToTest;
 }

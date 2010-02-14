@@ -63,7 +63,7 @@ double ExpObjectFunction( const RuntimeScene * scene, ObjectsConcerned * objects
 {
     //We need an object to pass to the function
     ObjSPtr object = boost::shared_ptr<Object>();
-    ObjList list = objectsConcerned->Pick( exprInstruction.parameters[0].GetPlainString() );
+    ObjList list = objectsConcerned->Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() );
 
     if ( !list.empty() )
     {
@@ -242,11 +242,6 @@ void Evaluateur::AddFunctionCall(GDExpression & expr, string & plainExpression, 
     if ( extensionsManager->HasExpression(functionName) )
     {
         instruction.function = (extensionsManager->GetExpressionFunctionPtr(functionName));
-        instruction.parameters = (parameters);
-    }
-    else if ( GetExpBuiltinTable().find(functionName) != GetExpBuiltinTable().end() )
-    {
-        instruction.function = (GetExpBuiltinTable().find(functionName)->second);
         instruction.parameters = (parameters);
     }
     else //Not corresponding to a function name, assume it is a variable
@@ -541,7 +536,9 @@ string Evaluateur::EvalExpTxt( GDExpression & gdExpression, ObjSPtr obj1, ObjSPt
 
         //On cherche l'objet concerné
         ObjSPtr object = boost::shared_ptr<Object>( );
-        ObjList list = objectsConcerned->Pick( nomObjet );
+
+        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+        ObjList list = objectsConcerned->Pick( objectIdentifiersManager->GetOIDfromName(nomObjet) );
 
         if ( !list.empty() )
         {

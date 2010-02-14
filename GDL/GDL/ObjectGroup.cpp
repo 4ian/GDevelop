@@ -13,13 +13,15 @@
 
 #include "GDL/ObjectGroup.h"
 #include "GDL/ObjectType.h"
+#include "GDL/ObjectIdentifiersManager.h"
 #include <vector>
 #include <string>
 #include <algorithm>
 
 using namespace std;
 
-ObjectGroup::ObjectGroup()
+ObjectGroup::ObjectGroup() :
+id(0)
 {
     //ctor
 }
@@ -31,8 +33,11 @@ ObjectGroup::~ObjectGroup()
 
 bool ObjectGroup::Find(string name) const
 {
-    if ( find(m_objets.begin(), m_objets.end(), name) != m_objets.end() )
-        return true;
+    for (unsigned int i = 0;i<memberObjects.size();++i)
+    {
+    	if ( memberObjects[i].first == name )
+            return true;
+    }
 
     return false;
 }
@@ -40,31 +45,31 @@ bool ObjectGroup::Find(string name) const
 void ObjectGroup::AddObject(string name)
 {
     if ( !Find(name) )
-        m_objets.push_back(name);
+    {
+        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+        unsigned int oID = objectIdentifiersManager->GetOIDfromName(name);
+
+        memberObjects.push_back(std::pair<string, unsigned int>(name, oID));
+    }
 }
 
 void ObjectGroup::RemoveObject(string name)
 {
-    m_objets.erase(remove(m_objets.begin(), m_objets.end(), name), m_objets.end());
-}
-/*
-bool ObjectGroup::HasAnIdenticalValue( const set < ObjectType > & list)
-{
-    ObjectTypeManager * objectTypeManager = ObjectTypeManager::getInstance();
-
-    for (unsigned int j = 0;j < m_objets.size();++j)
+    for (unsigned int i = 0;i<memberObjects.size();++i)
     {
-        if ( find(list.begin(), list.end(), objectTypeManager->GetObjectTypeFromName(m_objets[j])) != list.end())
-            return true;
+    	if ( memberObjects[i].first == name )
+    	{
+            memberObjects.erase(memberObjects.begin()+i);
+            return;
+    	}
     }
-    return false;
-}*/
+}
 
-bool ObjectGroup::HasAnIdenticalValue( const set < string > & list)
+bool ObjectGroup::HasAnIdenticalValue( const set < unsigned int > & list)
 {
-    for (unsigned int j = 0;j < m_objets.size();++j)
+    for (unsigned int j = 0;j < memberObjects.size();++j)
     {
-        if ( find(list.begin(), list.end(), m_objets[j]) != list.end())
+        if ( find(list.begin(), list.end(), memberObjects[j].second) != list.end())
             return true;
     }
     return false;

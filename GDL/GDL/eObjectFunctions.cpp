@@ -126,7 +126,7 @@ double Object::ExpGetObjectVariableValue( const RuntimeScene * scene, ObjectsCon
 double Object::ExpGetDistanceBetweenObjects( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     ObjSPtr object2 = boost::shared_ptr<Object>( );
-    ObjList list2 = objectsConcerned->Pick( exprInstruction.parameters[1].GetPlainString() );
+    ObjList list2 = objectsConcerned->Pick( exprInstruction.parameters[1].GetAsObjectIdentifier() );
 
     if ( !list2.empty() )
     {
@@ -158,7 +158,7 @@ double Object::ExpGetDistanceBetweenObjects( const RuntimeScene * scene, Objects
 double Object::ExpGetSqDistanceBetweenObjects( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     ObjSPtr object2 = boost::shared_ptr<Object>( );
-    ObjList list2 = objectsConcerned->Pick( exprInstruction.parameters[1].GetPlainString() );
+    ObjList list2 = objectsConcerned->Pick( exprInstruction.parameters[1].GetAsObjectIdentifier() );
 
     if ( !list2.empty() )
     {

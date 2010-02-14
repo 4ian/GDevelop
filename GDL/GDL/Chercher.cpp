@@ -153,9 +153,10 @@ vector < int > Picker::PickGroups(const vector < boost::shared_ptr<Object> > *ob
     {
         if ( groups->at(i).GetName() == nom )
         {
-            for (unsigned int j = 0;j < groups->at(i).Getobjets().size();++j)
+            vector < string > allGroupObjects = groups->at(i).GetAllObjectsNames();
+            for (unsigned int j = 0;j < allGroupObjects.size();++j)
             {
-                vector <int> List2 = Picker::PickObjects(objets, groups->at(i).Getobjets().at(j));
+                vector <int> List2 = Picker::PickObjects(objets, allGroupObjects.at(j));
 
                 copy(List2.begin(), List2.end(), back_inserter(List1));
             }
@@ -172,9 +173,10 @@ vector < int > Picker::PickGroups(const vector < boost::shared_ptr<Object> > *ob
     {
         if ( groups->at(i).GetName() == nom )
         {
-            for (unsigned int j = 0;j < groups->at(i).Getobjets().size();++j)
+            vector < string > allGroupObjects = groups->at(i).GetAllObjectsNames();
+            for (unsigned int j = 0;j < allGroupObjects.size();++j)
             {
-                vector <int> List2 = Picker::PickObjects(objets, groups->at(i).Getobjets().at(j), ObjConcern);
+                vector <int> List2 = Picker::PickObjects(objets, allGroupObjects.at(j), ObjConcern);
 
                 copy(List2.begin(), List2.end(), back_inserter(List1));
             }

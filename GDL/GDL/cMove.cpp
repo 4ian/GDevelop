@@ -73,8 +73,8 @@ bool CondSeDirige( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
     ObjectsConcerned originalObjectsConcerned = objectsConcerned;
     eval.SetObjectsConcerned(&originalObjectsConcerned);
 
-    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetPlainString(), condition.IsGlobal());
-    ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetPlainString(), condition.IsGlobal());
+    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
+    ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());
     if ( condition.GetParameter( 1 ).GetPlainString() == condition.GetParameter( 0 ).GetPlainString())
         list2 = list;
     bool isTrue = false;

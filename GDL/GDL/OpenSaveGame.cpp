@@ -946,13 +946,14 @@ void OpenSaveGame::SaveGroupesObjets(const vector < ObjectGroup > & list, TiXmlE
         grpsobjets->LinkEndChild( grp );
         grp->SetAttribute( "nom", list.at( j ).GetName().c_str() );
 
-        for ( unsigned int k = 0;k < list.at(j).Getobjets().size();k++ )
+        vector < string > allObjects = list.at(j).GetAllObjectsNames();
+        for ( unsigned int k = 0;k < allObjects.size();k++ )
         {
             TiXmlElement * objet;
 
             objet = new TiXmlElement( "Objet" );
             grp->LinkEndChild( objet );
-            objet->SetAttribute( "nom", list.at( j ).Getobjets().at(k).c_str() );
+            objet->SetAttribute( "nom", allObjects.at(k).c_str() );
         }
     }
 }

@@ -129,7 +129,7 @@ bool CondSourisSurObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcern
     ObjectsConcerned originalObjectsConcerned = objectsConcerned;
     eval.SetObjectsConcerned(&originalObjectsConcerned);
 
-    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetPlainString(), condition.IsGlobal());
+    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     bool isTrue = false;
 
 

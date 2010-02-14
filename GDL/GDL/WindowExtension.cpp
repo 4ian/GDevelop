@@ -1,6 +1,7 @@
 #include "GDL/WindowExtension.h"
 #include "GDL/aTexte.h"
 #include "GDL/aWindow.h"
+#include "GDL/eFreeFunctions.h"
 #include "GDL/actions.h"
 
 WindowExtension::WindowExtension()
@@ -56,4 +57,11 @@ WindowExtension::WindowExtension()
         DECLARE_PARAMETER("expression", _("Hauteur"), false, "")
 
     DECLARE_END_ACTION()
+
+    DECLARE_EXPRESSION("screenWidth", "Largeur de la résolution actuelle", "Largeur de la résolution actuelle", "Ecran", "", &ExpGetScreenWidth)
+    DECLARE_END_EXPRESSION()
+    DECLARE_EXPRESSION("screenHeight", "Hauteur de la résolution actuelle", "Hauteur de la résolution actuelle", "Ecran", "", &ExpGetScreenHeight)
+    DECLARE_END_EXPRESSION()
+    DECLARE_EXPRESSION("colorDepth", "Profondeur de couleur de la résolution actuelle", "Profondeur de couleur de la résolution actuelle", "Ecran", "", &ExpGetScreenColorDepth)
+    DECLARE_END_EXPRESSION()
 }

@@ -1,7 +1,7 @@
 #include "GDL/GDExpression.h"
 #include "GDL/ExpressionInstruction.h"
 
-GDExpression::GDExpression(std::string plainString_) : plainString(plainString_), isPreprocessed(false)
+GDExpression::GDExpression(std::string plainString_) : plainString(plainString_), oIDcomputed(false), isPreprocessed(false)
 {
     if (plainString == "=" ) compOperator = Equal;
     else if (plainString == "<" ) compOperator = Inferior;

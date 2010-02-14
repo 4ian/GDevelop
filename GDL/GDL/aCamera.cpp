@@ -45,7 +45,7 @@
 ////////////////////////////////////////////////////////////
 bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetPlainString(), action.IsGlobal());
+    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
 
     if ( list.empty() ) return false;
 
@@ -113,7 +113,7 @@ bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 ////////////////////////////////////////////////////////////
 bool ActCentreCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetPlainString(), action.IsGlobal());
+    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
 
     if ( list.empty() ) return false;
 

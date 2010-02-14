@@ -22,6 +22,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+#include "GDL/ObjectIdentifiersManager.h"
 #include "GDL/Log.h"
 #include "GDL/Force.h"
 #include "GDL/constantes.h"
@@ -44,12 +45,16 @@ using namespace std;
 Object::Object(string name_) :
         errors( NULL ),
         name( name_ ),
+        objectId(0),
         typeId(0), //0 is the default typeId for an object
         X( 0 ),
         Y( 0 ),
         zOrder( 0 ),
         hidden( false )
 {
+    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+    objectId = objectIdentifiersManager->GetOIDfromName(name_);
+
     this->ClearForce();
 }
 
@@ -61,12 +66,15 @@ Object::~Object()
     //dtor
 }
 
-////////////////////////////////////////////////////////////
-/// Modifier le nom
-////////////////////////////////////////////////////////////
+/**
+ * Change object's name
+ */
 void Object::SetName(string name_)
 {
     name = name_;
+
+    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+    objectId = objectIdentifiersManager->GetOIDfromName(name_);
 }
 
 ////////////////////////////////////////////////////////////

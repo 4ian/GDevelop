@@ -289,6 +289,20 @@ void RuntimeScene::Render()
     //Draw layer by layer
     for (unsigned int layerIndex =0;layerIndex<layers.size();++layerIndex)
     {
+        /*layers.at(layerIndex).ModView().SetViewport(sf::FloatRect(0.25,0.25,0.75,0.75)); //To test
+        layers.at(layerIndex).ModView().SetSize(800,600); //To test*/
+
+        renderWindow->RestoreGLStates();
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        gluPerspective(90.f, layers.at(layerIndex).ModView().GetSize().x/layers.at(layerIndex).ModView().GetSize().y, 1.f, 500.f);
+
+        //0.25 and 0.75 To test :
+        //glViewport(0.25*renderWindow->GetWidth(), 0.25*renderWindow->GetHeight(), 0.5*renderWindow->GetWidth(), 0.5*renderWindow->GetHeight());
+
+        renderWindow->SaveGLStates();
+
         renderWindow->SetView(layers.at(layerIndex).ModView());
         if ( layers.at(layerIndex).GetVisibility() )
         {

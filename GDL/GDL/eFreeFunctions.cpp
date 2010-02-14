@@ -113,29 +113,27 @@ double ExpGetGlobalVariableValue( const RuntimeScene * scene, ObjectsConcerned *
 
 double ExpGetObjectCount( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    return objectsConcerned->Pick( exprInstruction.parameters[0].GetPlainString() ).size();
+    return objectsConcerned->Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() ).size();
 }
 
-/**
- * Return the table containing the mapping between expressions name and functions
- */
-const std::map<string, double (*)( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )> &
-GetExpBuiltinTable()
+double ExpGetScreenWidth( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    static std::map<string, double (*)( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )> expBuiltinTable;
-    if ( expBuiltinTable.empty() )
-    {
-        //expBuiltinTable["random"]       = &ExpRandom;
-        //expBuiltinTable["SourisX"]      = expBuiltinTable["mouseX"]         = &ExpMouseX;
-        //expBuiltinTable["SourisY"]      = expBuiltinTable["mouseY"]         = &ExpMouseY;
-        //expBuiltinTable["TempsFrame"]   = expBuiltinTable["timeDelta"]      = expBuiltinTable["ElapsedTime"] =  &ExpTimeDelta;
-        //expBuiltinTable["TempsDebut"]   = expBuiltinTable["timeFromStart"]  = &ExpTimeFromStart;
-        //expBuiltinTable["TimeScale"]    = expBuiltinTable["timeScale"]      = &ExpTimeScale;
-        //expBuiltinTable["VueX"]         = expBuiltinTable["cameraX"]        = &ExpCameraX;
-        //expBuiltinTable["VueY"]         = expBuiltinTable["cameraY"]        = &ExpCameraY;
-        //expBuiltinTable["VueRotation"]  = expBuiltinTable["cameraRotation"] = &ExpCameraRotation;
-        //expBuiltinTable["time"]         = &ExpTime;
-    }
+    sf::VideoMode videoMode = sf::VideoMode::GetDesktopMode();
 
-    return expBuiltinTable;
+    return videoMode.Width;
+}
+
+double ExpGetScreenHeight( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    sf::VideoMode videoMode = sf::VideoMode::GetDesktopMode();
+
+    return videoMode.Height;
+}
+
+
+double ExpGetScreenColorDepth( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    sf::VideoMode videoMode = sf::VideoMode::GetDesktopMode();
+
+    return videoMode.BitsPerPixel;
 }

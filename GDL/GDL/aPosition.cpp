@@ -113,8 +113,8 @@ bool Object::ActMettreXY( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 ////////////////////////////////////////////////////////////
 bool ActMettreAutour( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetPlainString(), action.IsGlobal());
-    ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetPlainString(), action.IsGlobal());
+    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
+    ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetAsObjectIdentifier(), action.IsGlobal());
 
     if ( list2.empty() ) return true; //Pas d'objet vers lequel se diriger
     boost::shared_ptr<Object> obj2 = list2[0];

@@ -16,7 +16,9 @@
 #include <vector>
 #include <string>
 #include <set>
+#include <utility>
 #include "GDL/ObjectType.h"
+#include "GDL/ObjectIdentifiersManager.h"
 
 using namespace std;
 
@@ -26,27 +28,45 @@ class GD_API ObjectGroup
 
         ObjectGroup();
         virtual ~ObjectGroup();
-        /** Access m_objets
-         * \return The current value of m_objets
+
+        /** Get a vector with only objects names.
          */
-        inline const vector < string > & Getobjets() const { return m_objets; }
-        /** Set m_objets
-         * \param val New value to set
-         */
-        void Setobjets(vector < string > val) { m_objets = val; }
+        inline vector < string > GetAllObjectsNames() const
+        {
+            vector < string > objectsNames;
+            for (unsigned int i = 0 ;i<memberObjects.size();++i)
+            {
+            	objectsNames.push_back(memberObjects[i].first);
+            }
+
+            return objectsNames;
+        }
+
+        inline const vector < std::pair<string, unsigned int> > & GetAllObjectsWithOID() const
+        {
+            return memberObjects;
+        }
+
         bool Find(string name) const;
         void AddObject(string name);
         void RemoveObject(string name);
 
         inline string GetName() const { return name; };
-        inline void SetName(string name_) { name = name_; };
+        inline unsigned int GetIdentifier() const { return id; }
+        inline void SetName(string name_)
+        {
+            name = name_;
 
-        bool HasAnIdenticalValue( const set < ObjectType > & list );
-        bool HasAnIdenticalValue( const set < string > & list );
+            ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+            id = objectIdentifiersManager->GetOIDfromName(name_);
+        };
+
+        bool HasAnIdenticalValue( const set < unsigned int > & list );
 
     private:
-        vector < string > m_objets;
+        vector < std::pair<string, unsigned int> > memberObjects;
         string name;
+        unsigned int id; ///<As objects, groups must be able to be identifed during runtime with a unique identifier.
 };
 
 struct HasTheSameName : public std::binary_function<ObjectGroup, string, bool>

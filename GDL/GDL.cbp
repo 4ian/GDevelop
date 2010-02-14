@@ -501,6 +501,8 @@
 		<Unit filename="GDL\Object.h" />
 		<Unit filename="GDL\ObjectGroup.cpp" />
 		<Unit filename="GDL\ObjectGroup.h" />
+		<Unit filename="GDL\ObjectIdentifiersManager.cpp" />
+		<Unit filename="GDL\ObjectIdentifiersManager.h" />
 		<Unit filename="GDL\ObjectStruct.h" />
 		<Unit filename="GDL\ObjectType.cpp" />
 		<Unit filename="GDL\ObjectType.h" />

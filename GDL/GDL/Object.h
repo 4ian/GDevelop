@@ -187,6 +187,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
         void SetName(string name_);
         inline string GetName() { return name; }
+        inline unsigned int GetObjectIdentifier() {return objectId;};
 
         /** Return the type indentifier of the object.
          */
@@ -262,8 +263,8 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
     protected:
 
         string name;
-
-        unsigned int typeId; //The TypeId indicate of which type is the object. ( To test if we can do something reserved to some objects with it )
+        unsigned int objectId; ///< The ObjectId, associated with the name, is used ( instead of the name ) by the runtime to identify objects.
+        unsigned int typeId; ///< The TypeId indicate of which type is the object. ( To test if we can do something reserved to some objects with it )*/
 
         //Position of the object
         float X;

@@ -19,7 +19,7 @@ EventsPreprocessor::~EventsPreprocessor()
  */
 bool ActionForEachObject( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetPlainString(), action.IsGlobal());
+    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
 
 	ObjList::iterator obj = list.begin();
 	ObjList::const_iterator obj_end = list.end();
@@ -38,7 +38,7 @@ bool ConditionForEachObject( RuntimeScene * scene, ObjectsConcerned & objectsCon
     ObjectsConcerned originalObjectsConcerned = objectsConcerned;
     eval.SetObjectsConcerned(&originalObjectsConcerned);
 
-    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetPlainString(), condition.IsGlobal());
+    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     bool isTrue = false;
 
 	ObjList::iterator obj = list.begin();

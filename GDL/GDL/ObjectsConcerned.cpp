@@ -7,7 +7,8 @@
 
 ObjectsConcerned::ObjectsConcerned(ObjInstancesHolder * allObjects_, vector < ObjectGroup > * allGroups_ ) :
 allObjects(allObjects_),
-allGroups(allGroups_)
+allGroups(allGroups_),
+parent(NULL)
 {
     //ctor
 }

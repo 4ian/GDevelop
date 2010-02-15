@@ -33,7 +33,21 @@ class GD_API ObjectsConcerned
     public:
 
         ObjectsConcerned(ObjInstancesHolder * allObjects_, vector < ObjectGroup > * allGroups_ );
+
+        /**
+         * Using this constructor implies to call InheritsFrom after.
+         */
+        ObjectsConcerned() : allObjects(NULL), allGroups(NULL), parent(NULL) {};
         virtual ~ObjectsConcerned();
+
+        /**
+         * Make the ObjectsConcerned inherits from another.
+         */
+        inline void InheritsFrom(ObjectsConcerned * parent_)
+        {
+            *this = *parent_;
+            parent = parent_;
+        }
 
         /**
         * Search objects matching the name and add them to
@@ -67,6 +81,16 @@ class GD_API ObjectsConcerned
             alreadyConcernedObjects.insert(oID);
         };
 
+        /**
+         * Remove an object which was deleted
+         * from objects picked, and from parent's objects picked also.
+         */
+        inline void AnObjectWasDeleted(ObjSPtr object)
+        {
+            objectsPicked.RemoveObject(object);
+            if ( parent != NULL ) parent->AnObjectWasDeleted(object);
+        }
+
         /** Objects already picked */
         ObjInstancesHolder objectsPicked;
 
@@ -95,6 +119,8 @@ class GD_API ObjectsConcerned
         * @return A list of objects matching the name
         */
         ObjList PickOnlyObjects(unsigned int oID, bool onlyAlreadyConcernedObjects, bool forceGlobal, bool removeFromAlreadyConcernedObjects);
+
+        ObjectsConcerned * parent;
 };
 
 #endif // OBJECTSCONCERNED_H

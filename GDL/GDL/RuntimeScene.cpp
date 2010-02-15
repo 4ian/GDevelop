@@ -62,7 +62,8 @@ timeFromStart(0)
     //Calque par défaut
     sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->windowWidth, game->windowHeight ) );
     layers.push_back(Layer());
-    layers[0].SetView(defaultView);
+    layers[0].SetViewsNumber(1);
+    layers[0].SetView(0, defaultView);
 
     ChangeRenderWindow(renderWindow);
 }
@@ -277,7 +278,7 @@ void RuntimeScene::Render()
 {
     renderWindow->Clear( sf::Color( backgroundColorR, backgroundColorG, backgroundColorB ) );
 
-    //Sort object by order to rendering them
+    //Sort object by order to render them
     ObjList allObjects = objectsInstances.GetAllObjects();
     OrderObjectsByZOrder( allObjects );
 
@@ -289,42 +290,39 @@ void RuntimeScene::Render()
     //Draw layer by layer
     for (unsigned int layerIndex =0;layerIndex<layers.size();++layerIndex)
     {
-        /*layers.at(layerIndex).ModView().SetViewport(sf::FloatRect(0.25,0.25,0.75,0.75)); //To test
-        layers.at(layerIndex).ModView().SetSize(800,600); //To test*/
-
-        renderWindow->RestoreGLStates();
-
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        gluPerspective(90.f, layers.at(layerIndex).ModView().GetSize().x/layers.at(layerIndex).ModView().GetSize().y, 1.f, 500.f);
-
-        //0.25 and 0.75 To test :
-        //glViewport(0.25*renderWindow->GetWidth(), 0.25*renderWindow->GetHeight(), 0.5*renderWindow->GetWidth(), 0.5*renderWindow->GetHeight());
-
-        renderWindow->SaveGLStates();
-
-        renderWindow->SetView(layers.at(layerIndex).ModView());
         if ( layers.at(layerIndex).GetVisibility() )
         {
-            for (unsigned int id = 0;id < allObjects.size();++id)
+            for (unsigned int viewIndex = 0;viewIndex < layers[layerIndex].GetViewsNumber();++viewIndex)
             {
-                //Affichage de l'objet si il appartient au calque
-                if ( allObjects[id]->GetLayer() == layers[layerIndex].GetName() )
+                //Prepare OpenGL rendering
+                renderWindow->RestoreGLStates();
+
+                glMatrixMode(GL_PROJECTION);
+                glLoadIdentity();
+                gluPerspective(90.f, layers.at(layerIndex).ModView(viewIndex).GetSize().x/layers.at(layerIndex).ModView(viewIndex).GetSize().y, 1.f, 500.f);
+
+                sf::FloatRect viewport = layers.at(layerIndex).ModView(viewIndex).GetViewport();
+                glViewport(viewport.Left*renderWindow->GetWidth(),
+                           renderWindow->GetHeight()-(viewport.Top+viewport.GetSize().y)*renderWindow->GetHeight(), //Y start from bottom
+                           viewport.GetSize().x*renderWindow->GetWidth(),
+                           viewport.GetSize().y*renderWindow->GetHeight());
+
+                renderWindow->SaveGLStates();
+
+                //Prepare SFML rendering
+                renderWindow->SetView(layers.at(layerIndex).ModView(viewIndex));
+
+                //Rendering all objects
+                for (unsigned int id = 0;id < allObjects.size();++id)
                 {
-                    //Calcul des coordonnées en fonction des forces.
-                    allObjects[id]->SetX( allObjects[id]->GetX() + ( allObjects[id]->TotalForceX() * GetElapsedTime() ));
-                    allObjects[id]->SetY( allObjects[id]->GetY() + ( allObjects[id]->TotalForceY() * GetElapsedTime() ));
-
-                    allObjects[id]->UpdateTime( GetElapsedTime() );
-                    allObjects[id]->Draw( *renderWindow );
-
-                    //Fin des forces
-                    allObjects[id]->UpdateForce( GetElapsedTime() );
+                    //Affichage de l'objet si il appartient au calque
+                    if ( allObjects[id]->GetLayer() == layers[layerIndex].GetName() )
+                        allObjects[id]->Draw( *renderWindow );
                 }
-            }
 
-            //Texts
-            AfficheTexte(layers.at(layerIndex).GetName());
+                //Texts
+                AfficheTexte(layers.at(layerIndex).GetName());
+            }
         }
     }
 
@@ -490,12 +488,11 @@ void RuntimeScene::GestionMusique()
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Efface les objets à effacer ( nom vide )
-////////////////////////////////////////////////////////////
+/**
+ * Delete objects, updates forces and time
+ */
 void RuntimeScene::GestionObjets()
 {
-    //Sort object by order to rendering them
     ObjList allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
     {
@@ -503,6 +500,15 @@ void RuntimeScene::GestionObjets()
     	{
             objectsInstances.RemoveObject(allObjects[id]); //Remove from objects Instances, not from the temporary list !
     	}
+    }
+
+    allObjects = objectsInstances.GetAllObjects();
+    for (unsigned int id = 0;id<allObjects.size();++id)
+    {
+        allObjects[id]->SetX( allObjects[id]->GetX() + ( allObjects[id]->TotalForceX() * GetElapsedTime() ));
+        allObjects[id]->SetY( allObjects[id]->GetY() + ( allObjects[id]->TotalForceY() * GetElapsedTime() ));
+        allObjects[id]->UpdateTime( GetElapsedTime() );
+        allObjects[id]->UpdateForce( GetElapsedTime() );
     }
 }
 
@@ -540,7 +546,13 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     for (unsigned int i = 0;i<layers.size();++i)
     {
         sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->windowWidth, game->windowHeight ) );
-        layers[i].SetView(defaultView);
+        layers[i].SetViewsNumber(1);
+        layers[i].SetView(0, defaultView);
+        //layers[i].SetView(1, defaultView);
+        //layers[i].SetView(2, defaultView);
+
+        //layers[i].ModView(1).SetViewport(sf::FloatRect(0.4,0.4, 0.8, 0.8));
+        //layers[i].ModView(2).SetViewport(sf::FloatRect(0,0.75, 0.25, 1));
     }
 
     //Load resources of initial objects

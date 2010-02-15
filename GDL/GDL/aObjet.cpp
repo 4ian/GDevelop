@@ -94,6 +94,10 @@ bool Object::ActDelete( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 {
     SetName("");
 
+    //Classes that have a reference to the object must know it has not the same name anymore :
+    scene->objectsInstances.ObjectIdentifierHasChanged(shared_from_this()); //Keep the object in objectsInstances from scene, but notify its identifier has changed.
+    objectsConcerned.AnObjectWasDeleted(shared_from_this()); //Remove object from objectsConcerned.
+
     return true;
 }
 

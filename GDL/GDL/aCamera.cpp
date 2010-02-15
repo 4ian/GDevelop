@@ -49,13 +49,17 @@ bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 
     if ( list.empty() ) return false;
 
-    sf::View * view = NULL;
-
     //Compatibilité Game Develop < 1.1.5429 :
+    std::string layer = "";
     if ( action.GetParameters().size() >= 6 )
-        view = &scene->ModLayer(action.GetParameter(5).GetPlainString()).ModView();
-    else
-        view = &scene->ModLayer("").ModView();
+        layer = action.GetParameter(5).GetPlainString();
+
+    //Compatibilité Game Develop < 1.2.8699 :
+    unsigned int camera = 0;
+    if ( action.GetParameters().size() >= 7 )
+        camera = eval.EvalExp(action.GetParameter(6));
+
+    sf::View & view = scene->ModLayer(layer).ModView(camera);
 
     float decalementX = 0;
     float decalementY = 0;
@@ -79,7 +83,7 @@ bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
         && list[0]->GetY() < eval.EvalExp(action.GetParameter( 4 ))
         )
     {
-        view->SetCenter(list[0]->GetX() + decalementX, list[0]->GetY() + decalementY);
+        view.SetCenter(list[0]->GetX() + decalementX, list[0]->GetY() + decalementY);
     }
 
     //Si on n'est pas dedans.
@@ -89,14 +93,14 @@ bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
         && list[0]->GetY() < eval.EvalExp(action.GetParameter( 4 )) )
 
     {
-        view->SetCenter(view->GetCenter().x, list[0]->GetY() + decalementY);
+        view.SetCenter(view.GetCenter().x, list[0]->GetY() + decalementY);
     }
     if ( ( list[0]->GetY() < eval.EvalExp(action.GetParameter( 2 ))
         || list[0]->GetY() > eval.EvalExp(action.GetParameter( 4 )) )
         && list[0]->GetX() > eval.EvalExp(action.GetParameter( 1 ))
         && list[0]->GetX() < eval.EvalExp(action.GetParameter( 3 )))
     {
-        view->SetCenter(list[0]->GetX() + decalementX, view->GetCenter().y);
+        view.SetCenter(list[0]->GetX() + decalementX, view.GetCenter().y);
     }
 
     return true;
@@ -120,13 +124,17 @@ bool ActCentreCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     float decalementX = 0;
     float decalementY = 0;
 
-    sf::View * view = NULL;
-
     //Compatibilité Game Develop < 1.1.5429 :
+    std::string layer = "";
     if ( action.GetParameters().size() >= 3 )
-        view = &scene->ModLayer(action.GetParameter(2).GetPlainString()).ModView();
-    else
-        view = &scene->ModLayer("").ModView();
+        layer = action.GetParameter(2).GetPlainString();
+
+    //Compatibilité Game Develop < 1.2.8699 :
+    unsigned int camera = 0;
+    if ( action.GetParameters().size() >= 4 )
+        camera = eval.EvalExp(action.GetParameter(3));
+
+    sf::View & view = scene->ModLayer(layer).ModView(camera);
 
     //Prise en compte des déplacements de l'objet
     if ( action.GetParameters().size() < 2 )
@@ -140,7 +148,7 @@ bool ActCentreCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
         decalementY = ( list[0]->TotalForceY() * scene->GetElapsedTime() );
     }
 
-    view->SetCenter(list[0]->GetX() + decalementX,
+    view.SetCenter(list[0]->GetX() + decalementX,
                     list[0]->GetY() + decalementY);
 
     return true;
@@ -155,18 +163,22 @@ bool ActCentreCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 ////////////////////////////////////////////////////////////
 bool ActZoomCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    sf::View * view = NULL;
-
     //Compatibilité Game Develop < 1.1.5429 :
+    std::string layer = "";
     if ( action.GetParameters().size() >= 2 )
-        view = &scene->ModLayer(action.GetParameter(1).GetPlainString()).ModView();
-    else
-        view = &scene->ModLayer("").ModView();
+        layer = action.GetParameter(1).GetPlainString();
+
+    //Compatibilité Game Develop < 1.2.8699 :
+    unsigned int camera = 0;
+    if ( action.GetParameters().size() >= 3 )
+        camera = eval.EvalExp(action.GetParameter(2));
+
+    sf::View & view = scene->ModLayer(layer).ModView(camera);
 
     float newZoom = eval.EvalExp( action.GetParameter( 0 ) );
     if ( newZoom == 0 ) return false;
 
-    view->SetSize((scene->game->windowWidth/newZoom), (scene->game->windowHeight/newZoom));
+    view.SetSize((scene->game->windowWidth/newZoom), (scene->game->windowHeight/newZoom));
 
     return true;
 }
@@ -181,20 +193,24 @@ bool ActZoomCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 ////////////////////////////////////////////////////////////
 bool ActRotateCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    sf::View * view = NULL;
-
     //Compatibilité Game Develop < 1.1.5429 :
+    std::string layer = "";
     if ( action.GetParameters().size() >= 3 )
-        view = &scene->ModLayer(action.GetParameter(2).GetPlainString()).ModView();
-    else
-        view = &scene->ModLayer("").ModView();
+        layer = action.GetParameter(2).GetPlainString();
+
+    //Compatibilité Game Develop < 1.2.8699 :
+    unsigned int camera = 0;
+    if ( action.GetParameters().size() >= 4 )
+        camera = eval.EvalExp(action.GetParameter(3));
+
+    sf::View & view = scene->ModLayer(layer).ModView(camera);
 
     float value = eval.EvalExp( action.GetParameter( 0 ) );
-    if ( action.GetParameter( 1 ).GetPlainString().empty() || action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Set ) view->SetRotation(value);
-    else if ( action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Add ) view->SetRotation(view->GetRotation()+value);
-    else if ( action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Substract ) view->SetRotation(view->GetRotation()-value);
-    else if ( action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Multiply ) view->SetRotation(view->GetRotation()*value);
-    else if ( action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Divide ) view->SetRotation(view->GetRotation()/value);
+    if ( action.GetParameter( 1 ).GetPlainString().empty() || action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Set ) view.SetRotation(value);
+    else if ( action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Add ) view.SetRotation(view.GetRotation()+value);
+    else if ( action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Substract ) view.SetRotation(view.GetRotation()-value);
+    else if ( action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Multiply ) view.SetRotation(view.GetRotation()*value);
+    else if ( action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Divide ) view.SetRotation(view.GetRotation()/value);
 
     return true;
 }

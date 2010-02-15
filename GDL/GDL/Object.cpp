@@ -67,7 +67,9 @@ Object::~Object()
 }
 
 /**
- * Change object's name
+ * Change object's name, and so identifier.
+ * Remember to notify classes that can hold the object ( e.g. ObjectInstancesHolder )
+ * that the object's name has changed.
  */
 void Object::SetName(string name_)
 {

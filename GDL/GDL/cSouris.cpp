@@ -28,11 +28,17 @@
 ////////////////////////////////////////////////////////////
 bool CondSourisX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    sf::View & view = scene->ModLayer("").ModView();
-
     //Compatibilité Game Develop < 1.1.5429 :
+    std::string layer = "";
     if ( condition.GetParameters().size() >= 3 )
-        view = scene->ModLayer(condition.GetParameter(2).GetPlainString()).ModView();
+        layer = condition.GetParameter(2).GetPlainString();
+
+    //Compatibilité Game Develop < 1.2.8699 :
+    unsigned int camera = 0;
+    if ( condition.GetParameters().size() >= 4 )
+        camera = eval.EvalExp(condition.GetParameter(3));
+
+    sf::View & view = scene->ModLayer(layer).ModView(camera);
 
     //On calcule la position de la souris dans le calque donné
     int mouseX = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), view).x;
@@ -66,11 +72,17 @@ bool CondSourisX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
 ////////////////////////////////////////////////////////////
 bool CondSourisY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    sf::View & view = scene->ModLayer("").ModView();
-
     //Compatibilité Game Develop < 1.1.5429 :
+    std::string layer = "";
     if ( condition.GetParameters().size() >= 3 )
-        view = scene->ModLayer(condition.GetParameter(2).GetPlainString()).ModView();
+        layer = condition.GetParameter(2).GetPlainString();
+
+    //Compatibilité Game Develop < 1.2.8699 :
+    unsigned int camera = 0;
+    if ( condition.GetParameters().size() >= 4 )
+        camera = eval.EvalExp(condition.GetParameter(3));
+
+    sf::View & view = scene->ModLayer(layer).ModView(camera);
 
     //On calcule la position de la souris dans le calque donné
     int mouseY = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), view).y;
@@ -140,31 +152,42 @@ bool CondSourisSurObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcern
         accurate = false;
 
     //Pour chaque objet concerné
-    for (unsigned int layerIndex = 0;layerIndex<scene->layers.size();++layerIndex)
+    for (unsigned int layerIndex = 0;layerIndex < scene->layers.size();++layerIndex)
     {
-        int mouseXInTheLayer = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), scene->layers[layerIndex].GetView()).x;
-        int mouseYInTheLayer = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), scene->layers[layerIndex].GetView()).y;
-
-        ObjList::iterator obj = list.begin();
-        ObjList::const_iterator obj_end = list.end();
-        for ( ; obj != obj_end; ++obj )
+        for (unsigned int viewIndex = 0;viewIndex < scene->layers[layerIndex].GetViewsNumber();++viewIndex)
         {
-            if ( (*obj)->GetLayer() == scene->layers[layerIndex].GetName())
-            {
-                if  ( (*obj)->GetDrawableX() < mouseXInTheLayer &&
-                    ( (*obj)->GetDrawableX() + (*obj)->GetWidth() ) > mouseXInTheLayer &&
-                    (*obj)->GetDrawableY() < mouseYInTheLayer &&
-                    ( (*obj)->GetDrawableY() + (*obj)->GetHeight() ) > mouseYInTheLayer )
-                {
-                    int ClicX = static_cast<int>( mouseXInTheLayer - (*obj)->GetDrawableX() );
-                    int ClicY = static_cast<int>( mouseYInTheLayer - (*obj)->GetDrawableY() );
+            int mouseXInTheLayer = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), scene->layers[layerIndex].GetView(viewIndex)).x;
+            int mouseYInTheLayer = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), scene->layers[layerIndex].GetView(viewIndex)).y;
 
-                    if ( !accurate || (  boost::static_pointer_cast<SpriteObject>(*obj)->GetCurrentSprite().GetPixel( ClicX , ClicY ).a != 0 ) )
+            ObjList::iterator obj = list.begin();
+            ObjList::const_iterator obj_end = list.end();
+            for ( ; obj != obj_end; ++obj )
+            {
+                if ( (*obj)->GetLayer() == scene->layers[layerIndex].GetName())
+                {
+                    if  ( (*obj)->GetDrawableX() < mouseXInTheLayer &&
+                        ( (*obj)->GetDrawableX() + (*obj)->GetWidth() ) > mouseXInTheLayer &&
+                        (*obj)->GetDrawableY() < mouseYInTheLayer &&
+                        ( (*obj)->GetDrawableY() + (*obj)->GetHeight() ) > mouseYInTheLayer )
                     {
-                        if ( !condition.IsInverted() )
+                        int ClicX = static_cast<int>( mouseXInTheLayer - (*obj)->GetDrawableX() );
+                        int ClicY = static_cast<int>( mouseYInTheLayer - (*obj)->GetDrawableY() );
+
+                        if ( !accurate || (  boost::static_pointer_cast<SpriteObject>(*obj)->GetCurrentSprite().GetPixel( ClicX , ClicY ).a != 0 ) )
                         {
-                            isTrue = true;
-                            objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                            if ( !condition.IsInverted() )
+                            {
+                                isTrue = true;
+                                objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                            }
+                        }
+                        else
+                        {
+                            if ( condition.IsInverted() )
+                            {
+                                isTrue = true;
+                                objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+                            }
                         }
                     }
                     else
@@ -174,14 +197,6 @@ bool CondSourisSurObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcern
                             isTrue = true;
                             objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
                         }
-                    }
-                }
-                else
-                {
-                    if ( condition.IsInverted() )
-                    {
-                        isTrue = true;
-                        objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
                     }
                 }
             }

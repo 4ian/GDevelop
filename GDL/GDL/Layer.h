@@ -20,16 +20,27 @@ class GD_API Layer
         inline void SetVisibility(bool isVisible_) { isVisible = isVisible_; }
         inline bool GetVisibility() const { return isVisible; }
 
-        inline void SetView(sf::View & view_) { view = view_; }
-        inline const sf::View & GetView() const { return view; }
-        inline sf::View & ModView() { return view; }
+        inline void SetViewsNumber(unsigned int n)
+        {
+            while ( views.size() < n)
+                views.push_back(sf::View());
+
+            while ( views.size() > n)
+                views.erase(views.begin()+views.size()-1);
+        }
+
+        inline unsigned int GetViewsNumber() const { return views.size(); };
+
+        inline void SetView(unsigned int n, sf::View & view_) { views[n] = view_; }
+        inline const sf::View & GetView(unsigned int n) const { return views[n]; }
+        inline sf::View & ModView(unsigned int n) { return views[n]; }
 
     protected:
     private:
 
         string name;
         bool isVisible;
-        sf::View view;
+        vector <sf::View> views;
 
         string followLayer;
 };

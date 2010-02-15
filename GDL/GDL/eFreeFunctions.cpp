@@ -2,6 +2,7 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/ExpressionInstruction.h"
+#include "GDL/StdAlgo.h"
 #include <SFML/System.hpp>
 #include <vector>
 #include <string>
@@ -32,39 +33,60 @@ double ExpTimeScale( const RuntimeScene * scene, ObjectsConcerned * objectsConce
 
 double ExpMouseX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
+    unsigned int camera = 0;
+    if ( exprInstruction.parameters.size() > 1 ) //Compatibility with Game Develop < 1.2.8699
+        camera = toInt(exprInstruction.parameters[1].GetPlainString());
+
     const sf::View & view = scene->GetLayer(
                                             exprInstruction.parameters[0].GetPlainString()
-                                            ).GetView();
+                                            ).GetView(camera);
+
     return scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), view).x;
 }
 
 double ExpMouseY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
+    unsigned int camera = 0;
+    if ( exprInstruction.parameters.size() > 1 ) //Compatibility with Game Develop < 1.2.8699
+        camera = toInt(exprInstruction.parameters[1].GetPlainString());
+
     const sf::View & view = scene->GetLayer(
                                             exprInstruction.parameters[0].GetPlainString()
-                                            ).GetView();
+                                            ).GetView(camera);
     return scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), view).y;
 }
 
 double ExpCameraX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
+    unsigned int camera = 0;
+    if ( exprInstruction.parameters.size() > 1 ) //Compatibility with Game Develop < 1.2.8699
+        camera = toInt(exprInstruction.parameters[1].GetPlainString());
+
     const sf::View & view = scene->GetLayer(
                                             exprInstruction.parameters[0].GetPlainString()
-                                            ).GetView();
+                                            ).GetView(camera);
     return view.GetCenter().x-view.GetSize().x/2;
 }
 
 double ExpCameraY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
+    unsigned int camera = 0;
+    if ( exprInstruction.parameters.size() > 1 ) //Compatibility with Game Develop < 1.2.8699
+        camera = toInt(exprInstruction.parameters[1].GetPlainString());
+
     const sf::View & view = scene->GetLayer(
                                             exprInstruction.parameters[0].GetPlainString()
-                                            ).GetView();
+                                            ).GetView(camera);
     return view.GetCenter().y-view.GetSize().y/2;
 }
 
 double ExpCameraRotation( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    return scene->GetLayer(exprInstruction.parameters[0].GetPlainString()).GetView().GetRotation();
+    unsigned int camera = 0;
+    if ( exprInstruction.parameters.size() > 1 ) //Compatibility with Game Develop < 1.2.8699
+        camera = toInt(exprInstruction.parameters[1].GetPlainString());
+
+    return scene->GetLayer(exprInstruction.parameters[0].GetPlainString()).GetView(camera).GetRotation();
 }
 
 double ExpTime( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )

@@ -46,17 +46,18 @@ int EventsExecutor::ExecuteEventsScene()
 /// Parcourt tous les évènements et les execute.
 /// Fonction récursive en cas de besoin avec les dossiers.
 ////////////////////////////////////////////////////////////
-int EventsExecutor::ExecuteEvents(vector < Event > & events, const ObjectsConcerned & objectsConcernedParent)
+int EventsExecutor::ExecuteEvents(vector < Event > & events, ObjectsConcerned & objectsConcernedParent)
 {
     BT_PROFILE("ExecuteEvents");
 	vector<Event>::iterator e = events.begin();
 	vector<Event>::const_iterator events_end = events.end();
 
-    ObjectsConcerned objectsConcerned = objectsConcernedParent;
     for ( ; e != events_end; ++e )
     {
         //On réutilise les objets concernés de l'évènement parent
-        objectsConcerned = objectsConcernedParent;
+        ObjectsConcerned objectsConcerned;
+        objectsConcerned.InheritsFrom(&objectsConcernedParent);
+
         int retour = ActAllProcessed;
 
         if ( ExecuteConditions( *e, objectsConcerned ) == CondTrue )
@@ -106,8 +107,7 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
         else if (event.conditions[k].GetType() == "DepartScene" ) {     Ok = scene->IsFirstLoop();}
         else if (event.conditions[k].GetType() == "Repeat" )
         {
-            ObjectsConcerned objectsConcernedStart = objectsConcerned;
-            eval.SetObjectsConcerned(&objectsConcernedStart);
+            ObjectsConcerned objectsConcernedInRepeat;
 
             int nbRepeat = eval.EvalExp(event.conditions[k].GetParameter(0));
             if ( nbRepeat <= 0 ) return CondFalse;
@@ -117,19 +117,19 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
             for (unsigned int i = 0;i<static_cast<unsigned>(nbRepeat);++i)
             {
                 //On repart à chaque fois des mêmes objets concernés
-                objectsConcerned = objectsConcernedStart;
-                eval.SetObjectsConcerned(&objectsConcerned);
+                objectsConcernedInRepeat.InheritsFrom(&objectsConcerned);
+                eval.SetObjectsConcerned(&objectsConcernedInRepeat);
 
-                if ( ExecuteConditions( event, objectsConcerned, k+1 ) == CondTrue )
+                if ( ExecuteConditions( event, objectsConcernedInRepeat, k+1 ) == CondTrue )
                 {
                     //On execute les actions
-                    retour = ExecuteActions( event, objectsConcerned, 0 );
+                    retour = ExecuteActions( event, objectsConcernedInRepeat, 0 );
                     if ( retour == ActStopProcess) return CondFalse;
 
                     //Sous évènements
                     if ( !event.events.empty() )
                     {
-                        retour = ExecuteEvents( event.events, objectsConcerned);
+                        retour = ExecuteEvents( event.events, objectsConcernedInRepeat);
                         if ( retour == ActStopProcess) return CondFalse;
                     }
                 }
@@ -145,7 +145,7 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
         {
             ObjList list = objectsConcerned.PickAndRemove(event.conditions[k].GetParameter( 0 ).GetAsObjectIdentifier(), event.conditions[k].IsGlobal());
 
-            ObjectsConcerned objectsConcernedStart = objectsConcerned;
+            ObjectsConcerned objectsConcernedInForEach;
             int retour = ActAllProcessed;
 
             ObjList::iterator obj = list.begin();
@@ -153,21 +153,21 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
             for ( ; obj != obj_end; ++obj )
             {
                 //On repart à chaque fois des mêmes objets concernés
-                objectsConcerned = objectsConcernedStart;
-                eval.SetObjectsConcerned(&objectsConcerned);
+                objectsConcernedInForEach.InheritsFrom(&objectsConcerned);
+                eval.SetObjectsConcerned(&objectsConcernedInForEach);
 
-                objectsConcerned.objectsPicked.AddObject(*obj);
+                objectsConcernedInForEach.objectsPicked.AddObject(*obj);
 
-                if ( ExecuteConditions( event, objectsConcerned, k+1 ) == CondTrue )
+                if ( ExecuteConditions( event, objectsConcernedInForEach, k+1 ) == CondTrue )
                 {
                     //On execute les actions
-                    retour = ExecuteActions( event, objectsConcerned, 0 );
+                    retour = ExecuteActions( event, objectsConcernedInForEach, 0 );
                     if ( retour == ActStopProcess) return CondFalse;
 
                     //Sous évènements
                     if ( !event.events.empty() )
                     {
-                        retour = ExecuteEvents( event.events, objectsConcerned);
+                        retour = ExecuteEvents( event.events, objectsConcernedInForEach);
                         if ( retour == ActStopProcess) return CondFalse;
                     }
                 }
@@ -181,8 +181,7 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
         }
         else if (event.conditions[k].GetType() == "While" )
         {
-            ObjectsConcerned objectsConcernedStart = objectsConcerned;
-            eval.SetObjectsConcerned(&objectsConcerned);
+            ObjectsConcerned objectsConcernedInWhile;
 
             int retour = ActAllProcessed;
 
@@ -196,24 +195,25 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
             while (testIsTrue)
             {
                 //On repart à chaque fois des mêmes objets concernés
-                objectsConcerned = objectsConcernedStart;
-                eval.SetObjectsConcerned(&objectsConcerned);
+                objectsConcernedInWhile.InheritsFrom(&objectsConcerned);
+                eval.SetObjectsConcerned(&objectsConcernedInWhile);
 
-                if ( ExecuteConditions( event, objectsConcerned, k+2 ) == CondTrue )
+                if ( ExecuteConditions( event, objectsConcernedInWhile, k+2 ) == CondTrue )
                 {
                     //On execute les actions
-                    retour = ExecuteActions( event, objectsConcerned, 0 );
+                    retour = ExecuteActions( event, objectsConcernedInWhile, 0 );
                     if ( retour == ActStopProcess) return CondFalse;
 
                     //Sous évènements
                     if ( !event.events.empty() )
                     {
-                        retour = ExecuteEvents( event.events, objectsConcerned);
+                        retour = ExecuteEvents( event.events, objectsConcernedInWhile);
                         if ( retour == ActStopProcess) return CondFalse;
                     }
                 }
 
-                testIsTrue = ExecuteConditions( event, objectsConcerned, k+1 ) == resultExcepted;
+                //TODO : Use objectsConcernedInWhile or ObjectsConcerned ?...
+                testIsTrue = ExecuteConditions( event, objectsConcernedInWhile, k+1 ) == resultExcepted;
             }
 
             //On s'est occupé nous même de l'évènement, on s'arrête là.
@@ -287,8 +287,7 @@ int EventsExecutor::ExecuteActions( Event & event, ObjectsConcerned & objectsCon
         }
         else if (event.actions[k].GetType() == "Repeat" )
         {
-            ObjectsConcerned objectsConcernedStart = objectsConcerned;
-            eval.SetObjectsConcerned(&objectsConcernedStart);
+            ObjectsConcerned objectsConcernedInRepeat;
 
             int nbRepeat = eval.EvalExp(event.actions[k].GetParameter(0));
             if ( nbRepeat <= 0 ) return ActAllProcessed;
@@ -298,17 +297,17 @@ int EventsExecutor::ExecuteActions( Event & event, ObjectsConcerned & objectsCon
             for (unsigned int i = 0;i<static_cast<unsigned>(nbRepeat);++i)
             {
                 //On repart toujours des mêmes objets concernés
-                objectsConcerned = objectsConcernedStart;
-                eval.SetObjectsConcerned(&objectsConcerned);
+                objectsConcernedInRepeat.InheritsFrom(&objectsConcerned);
+                eval.SetObjectsConcerned(&objectsConcernedInRepeat);
 
                 //On execute les actions
-                retour = ExecuteActions( event, objectsConcerned, k+1 );
+                retour = ExecuteActions( event, objectsConcernedInRepeat, k+1 );
                 if ( retour == ActStopProcess) return ActStopProcess;
 
                 //Sous évènements
                 if ( !event.events.empty() )
                 {
-                    retour = ExecuteEvents( event.events, objectsConcerned);
+                    retour = ExecuteEvents( event.events, objectsConcernedInRepeat);
                     if ( retour == ActStopProcess) return ActStopProcess;
                 }
             }
@@ -322,8 +321,7 @@ int EventsExecutor::ExecuteActions( Event & event, ObjectsConcerned & objectsCon
         {
             ObjList list = objectsConcerned.PickAndRemove(event.actions[k].GetParameter( 0 ).GetAsObjectIdentifier(), event.actions[k].IsGlobal());
 
-            ObjectsConcerned objectsConcernedStart = objectsConcerned;
-            eval.SetObjectsConcerned(&objectsConcernedStart);
+            ObjectsConcerned objectsConcernedInForEach;
             int retour = ActAllProcessed;
 
             ObjList::iterator obj = list.begin();
@@ -331,19 +329,19 @@ int EventsExecutor::ExecuteActions( Event & event, ObjectsConcerned & objectsCon
             for ( ; obj != obj_end; ++obj )
             {
                 //On repart à chaque fois des mêmes objets concernés
-                objectsConcerned = objectsConcernedStart;
-                eval.SetObjectsConcerned(&objectsConcerned);
+                objectsConcernedInForEach.InheritsFrom(&objectsConcerned);
+                eval.SetObjectsConcerned(&objectsConcernedInForEach);
 
-                objectsConcerned.objectsPicked.AddObject(*obj);
+                objectsConcernedInForEach.objectsPicked.AddObject(*obj);
 
                 //On execute les actions
-                retour = ExecuteActions( event, objectsConcerned, k+1 );
+                retour = ExecuteActions( event, objectsConcernedInForEach, k+1 );
                 if ( retour == ActStopProcess) return ActStopProcess;
 
                 //Sous évènements
                 if ( !event.events.empty() )
                 {
-                    retour = ExecuteEvents( event.events, objectsConcerned);
+                    retour = ExecuteEvents( event.events, objectsConcernedInForEach);
                     if ( retour == ActStopProcess) return ActStopProcess;
                 }
             }

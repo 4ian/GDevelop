@@ -108,7 +108,7 @@ bool CondEstTourne( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());
-    if ( condition.GetParameter( 1 ).GetPlainString() == condition.GetParameter( 0 ).GetPlainString())
+    if ( condition.GetParameter( 1 ).GetPlainString() == condition.GetParameter( 0 ).GetPlainString() )
         list2 = list;
 
     bool isTrue = false;
@@ -132,33 +132,25 @@ bool CondEstTourne( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 
                 int angleObjet = 0;
 
-
                 //On récupère l'angle de l'objet
                 if (  boost::static_pointer_cast<SpriteObject>(*obj)->GetAnimation(  boost::static_pointer_cast<SpriteObject>(*obj)->GetAnimationNb() ).typeNormal )
                 {
-                    //TODO : Refactor
-                    if (  boost::static_pointer_cast<SpriteObject>(*obj)->GetDirectionNb() == 0 ) angleObjet = 0;
-                    else if (  boost::static_pointer_cast<SpriteObject>(*obj)->GetDirectionNb() == 1 ) angleObjet = 45;
-                    else if (  boost::static_pointer_cast<SpriteObject>(*obj)->GetDirectionNb() == 2 ) angleObjet = 90;
-                    else if (  boost::static_pointer_cast<SpriteObject>(*obj)->GetDirectionNb() == 3 ) angleObjet = 135;
-                    else if (  boost::static_pointer_cast<SpriteObject>(*obj)->GetDirectionNb() == 4 ) angleObjet = 180;
-                    else if (  boost::static_pointer_cast<SpriteObject>(*obj)->GetDirectionNb() == 5 ) angleObjet = 225;
-                    else if (  boost::static_pointer_cast<SpriteObject>(*obj)->GetDirectionNb() == 6 ) angleObjet = 270;
-                    else if (  boost::static_pointer_cast<SpriteObject>(*obj)->GetDirectionNb() == 7 ) angleObjet = 315;
+                    angleObjet = boost::static_pointer_cast<SpriteObject>(*obj)->GetDirectionNb() * 45;
                 }
                 else { angleObjet =  boost::static_pointer_cast<SpriteObject>(*obj)->GetDirectionNb(); }
 
-                while ( angle < 0 )
+                angle = fmodf(angle, 360);
+                if ( angle < 0 )
                     angle += 360;
-                while ( angle > 360 )
-                    angle -= 360;
 
-                while ( angleObjet < 0 )
+                angleObjet = fmodf(angleObjet, 360);
+                if ( angleObjet < 0 )
                     angleObjet += 360;
-                while ( angleObjet > 360 )
-                    angleObjet -= 360;
 
-                if ( fabs( angle - angleObjet ) < eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) / 2 )
+                float gap = fabs( angle - angleObjet );
+                gap = gap > 180 ? 360 - gap : gap;
+
+                if ( gap < eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) / 2 )
                 {
                     if ( !condition.IsInverted() )
                     {

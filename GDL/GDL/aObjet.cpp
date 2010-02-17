@@ -53,14 +53,14 @@ bool ActCreate( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const
 {
     //On récupère l'ID de l'objet à créer
     string objectWanted = eval.EvalTxt(action.GetParameter( 0 ));
-    int IDsceneObject = Picker::PickOneObject( &scene->objetsInitiaux, objectWanted );
+    int IDsceneObject = Picker::PickOneObject( &scene->initialObjects, objectWanted );
     int IDglobalObject = Picker::PickOneObject( &scene->game->globalObjects, objectWanted );
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
     ObjSPtr newObject = boost::shared_ptr<Object> ();
 
     if ( IDsceneObject != -1)
-        newObject = extensionManager->CreateObject(scene->objetsInitiaux[IDsceneObject]);
+        newObject = extensionManager->CreateObject(scene->initialObjects[IDsceneObject]);
     else if ( IDglobalObject != -1)
         newObject = extensionManager->CreateObject(scene->game->globalObjects[IDglobalObject]);
     else

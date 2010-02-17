@@ -49,7 +49,7 @@ bool CondCameraX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     if ( condition.GetParameters().size() >= 4 )
         camera = eval.EvalExp(condition.GetParameter(3));
 
-    sf::View & view = scene->ModLayer(layer).ModView(camera);
+    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier
@@ -92,7 +92,7 @@ bool CondCameraY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     if ( condition.GetParameters().size() >= 4 )
         camera = eval.EvalExp(condition.GetParameter(3));
 
-    sf::View & view = scene->ModLayer(layer).ModView(camera);
+    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier
@@ -134,7 +134,7 @@ bool CondCameraAngle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     if ( condition.GetParameters().size() >= 4 )
         camera = eval.EvalExp(condition.GetParameter(3));
 
-    sf::View & view = scene->ModLayer(layer).ModView(camera);
+    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier

@@ -35,7 +35,7 @@ SceneExtension::SceneExtension()
 
         DECLARE_PARAMETER("expression", _("Expression 1"), false, "")
         DECLARE_PARAMETER("expression", _("Expression 2"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
 
     DECLARE_END_CONDITION()
 

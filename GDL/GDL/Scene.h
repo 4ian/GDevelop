@@ -30,10 +30,10 @@ class GD_API Scene
         string title; //Titre affiché par la fenêtre
 
         vector < Event >                        events;
-        vector < boost::shared_ptr<Object> >    objetsInitiaux;
+        vector < boost::shared_ptr<Object> >    initialObjects;
         vector < ObjectGroup >                  objectGroups;
-        vector < InitialPosition >              positionsInitiales;
-        vector < Layer >                        layers;
+        vector < InitialPosition >              initialObjectsPositions;
+        vector < Layer >                        initialLayers;
         ListVariable                            variables;
 
     protected:

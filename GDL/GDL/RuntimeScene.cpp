@@ -35,7 +35,7 @@
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du player ou de l'éditeur
 
-Layer RuntimeScene::badLayer;
+RuntimeLayer RuntimeScene::badLayer;
 
 RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
 renderWindow(renderWindow_),
@@ -61,9 +61,10 @@ timeFromStart(0)
 
     //Calque par défaut
     sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->windowWidth, game->windowHeight ) );
-    layers.push_back(Layer());
-    layers[0].SetViewsNumber(1);
-    layers[0].SetView(0, defaultView);
+    Layer layer;
+    layer.SetCamerasNumber(1);
+
+    layers.push_back(RuntimeLayer(layer, defaultView));
 
     ChangeRenderWindow(renderWindow);
 }
@@ -292,16 +293,19 @@ void RuntimeScene::Render()
     {
         if ( layers.at(layerIndex).GetVisibility() )
         {
-            for (unsigned int viewIndex = 0;viewIndex < layers[layerIndex].GetViewsNumber();++viewIndex)
+            for (unsigned int cameraIndex = 0;cameraIndex < layers[layerIndex].GetCamerasNumber();++cameraIndex)
             {
+                RuntimeCamera & camera = layers.at(layerIndex).GetCamera(cameraIndex);
+
                 //Prepare OpenGL rendering
                 renderWindow->RestoreGLStates();
 
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
-                gluPerspective(90.f, layers.at(layerIndex).ModView(viewIndex).GetSize().x/layers.at(layerIndex).ModView(viewIndex).GetSize().y, 1.f, 500.f);
+                gluPerspective(90.f, camera.GetSFMLView().GetSize().x
+                                    /camera.GetSFMLView().GetSize().y, 1.f, 500.f);
 
-                sf::FloatRect viewport = layers.at(layerIndex).ModView(viewIndex).GetViewport();
+                const sf::FloatRect & viewport = camera.GetSFMLView().GetViewport();
                 glViewport(viewport.Left*renderWindow->GetWidth(),
                            renderWindow->GetHeight()-(viewport.Top+viewport.GetSize().y)*renderWindow->GetHeight(), //Y start from bottom
                            viewport.GetSize().x*renderWindow->GetWidth(),
@@ -310,7 +314,7 @@ void RuntimeScene::Render()
                 renderWindow->SaveGLStates();
 
                 //Prepare SFML rendering
-                renderWindow->SetView(layers.at(layerIndex).ModView(viewIndex));
+                renderWindow->SetView(camera.GetSFMLView());
 
                 //Rendering all objects
                 for (unsigned int id = 0;id < allObjects.size();++id)
@@ -347,7 +351,7 @@ void RuntimeScene::Render()
 ////////////////////////////////////////////////////////////
 /// Renvoie le calque avec le nom indiqué
 ////////////////////////////////////////////////////////////
-Layer & RuntimeScene::ModLayer(string name)
+RuntimeLayer & RuntimeScene::GetLayer(string name)
 {
     for (unsigned int i = 0;i<layers.size();++i)
     {
@@ -362,7 +366,7 @@ Layer & RuntimeScene::ModLayer(string name)
 ////////////////////////////////////////////////////////////
 /// Renvoie le calque avec le nom indiqué
 ////////////////////////////////////////////////////////////
-const Layer & RuntimeScene::GetLayer(string name) const
+const RuntimeLayer & RuntimeScene::GetLayer(string name) const
 {
     for (unsigned int i = 0;i<layers.size();++i)
     {
@@ -531,9 +535,9 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     timeFromStart = 0;
 
     //Copy inherited datas
-    objetsInitiaux = scene.objetsInitiaux;
+    initialObjects = scene.initialObjects;
     objectGroups = scene.objectGroups;
-    layers = scene.layers;
+    initialLayers = scene.initialLayers;
     variables = scene.variables;
     events = scene.events;
     backgroundColorR = scene.backgroundColorR;
@@ -542,26 +546,20 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     title = scene.title;
     standardSortMethod = scene.standardSortMethod;
 
-    //Initialize layers
-    for (unsigned int i = 0;i<layers.size();++i)
+    //Initialize runtime layers
+    sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->windowWidth, game->windowHeight ) );
+    for (unsigned int i = 0;i<initialLayers.size();++i)
     {
-        sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->windowWidth, game->windowHeight ) );
-        layers[i].SetViewsNumber(1);
-        layers[i].SetView(0, defaultView);
-        //layers[i].SetView(1, defaultView);
-        //layers[i].SetView(2, defaultView);
-
-        //layers[i].ModView(1).SetViewport(sf::FloatRect(0.4,0.4, 0.8, 0.8));
-        //layers[i].ModView(2).SetViewport(sf::FloatRect(0,0.75, 0.25, 1));
+        layers.push_back(RuntimeLayer(initialLayers[i], defaultView));
     }
 
     //Load resources of initial objects
     try
     {
-        for (unsigned int i = 0; i < scene.objetsInitiaux.size();++i)
+        for (unsigned int i = 0; i < scene.initialObjects.size();++i)
         {
-            MessageLoading( "Chargement des images de l'objet : " + scene.objetsInitiaux.at( i )->GetName(), i + 1 / scene.objetsInitiaux.size()*100 / 3 + 33 );
-            scene.objetsInitiaux[i]->LoadResources(game->imageManager);
+            MessageLoading( "Chargement des images de l'objet : " + scene.initialObjects.at( i )->GetName(), i + 1 / scene.initialObjects.size()*100 / 3 + 33 );
+            scene.initialObjects[i]->LoadResources(game->imageManager);
         }
     }
     catch ( std::out_of_range& e )
@@ -587,41 +585,41 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
 
     //Create object instances which are originally positionned on scene
-    for(unsigned int i = 0;i < scene.positionsInitiales.size();++i)
+    for(unsigned int i = 0;i < scene.initialObjectsPositions.size();++i)
     {
-        MessageLoading( "Positionnement de l'objet : " + scene.positionsInitiales[i].objectName, i + 1 / scene.positionsInitiales.size()*100 / 3 + 33 );
+        MessageLoading( "Positionnement de l'objet : " + scene.initialObjectsPositions[i].objectName, i + 1 / scene.initialObjectsPositions.size()*100 / 3 + 33 );
 
-        int IDsceneObject = Picker::PickOneObject( &objetsInitiaux, scene.positionsInitiales[i].objectName );
-        int IDglobalObject = Picker::PickOneObject( &game->globalObjects, scene.positionsInitiales[i].objectName );
+        int IDsceneObject = Picker::PickOneObject( &initialObjects, scene.initialObjectsPositions[i].objectName );
+        int IDglobalObject = Picker::PickOneObject( &game->globalObjects, scene.initialObjectsPositions[i].objectName );
 
         ObjSPtr newObject = boost::shared_ptr<Object> ();
 
         if ( IDsceneObject != -1 ) //We check first scene's objects' list.
-            newObject = extensionManager->CreateObject(objetsInitiaux[IDsceneObject]);
+            newObject = extensionManager->CreateObject(initialObjects[IDsceneObject]);
         else if ( IDglobalObject != -1 ) //Then the global object list
             newObject = extensionManager->CreateObject(game->globalObjects.at( IDglobalObject ));
         else
         {
-            string nom = scene.positionsInitiales[i].objectName;
+            string nom = scene.initialObjectsPositions[i].objectName;
             errors.Add( "N'a pas pu trouver et positionner l'objet nommé " + nom + " ( N'existe pas dans la liste des objets de la scène ou globale )", "", nom, -1, 2 );
         }
 
         if ( newObject != boost::shared_ptr<Object> () )
         {
             newObject->errors = &errors;
-            newObject->SetX( scene.positionsInitiales[i].x );
-            newObject->SetY( scene.positionsInitiales[i].y );
-            newObject->SetZOrder( scene.positionsInitiales[i].zOrder );
-            newObject->SetLayer( scene.positionsInitiales[i].layer );
-            newObject->SetAngle( scene.positionsInitiales[i].angle );
+            newObject->SetX( scene.initialObjectsPositions[i].x );
+            newObject->SetY( scene.initialObjectsPositions[i].y );
+            newObject->SetZOrder( scene.initialObjectsPositions[i].zOrder );
+            newObject->SetLayer( scene.initialObjectsPositions[i].layer );
+            newObject->SetAngle( scene.initialObjectsPositions[i].angle );
 
-            if ( scene.positionsInitiales[i].personalizedSize )
+            if ( scene.initialObjectsPositions[i].personalizedSize )
             {
-                newObject->SetWidth(scene.positionsInitiales[i].width);
-                newObject->SetHeight(scene.positionsInitiales[i].height);
+                newObject->SetWidth(scene.initialObjectsPositions[i].width);
+                newObject->SetHeight(scene.initialObjectsPositions[i].height);
             }
 
-            newObject->InitializeFromInitialPosition(scene.positionsInitiales[i]);
+            newObject->InitializeFromInitialPosition(scene.initialObjectsPositions[i]);
 
             objectsInstances.AddObject(newObject);
         }

@@ -32,6 +32,7 @@
 #include "GDL/Music.h"
 #include "GDL/constantes.h"
 #include "GDL/SortByPlan.h"
+#include "GDL/RuntimeLayer.h"
 #include "GDL/Text.h"
 #include "GDL/SoundManager.h"
 #include "GDL/Layer.h"
@@ -69,6 +70,7 @@ class GD_API RuntimeScene : public Scene
         //Données supplémentaires pour une RuntimeScene
         ObjInstancesHolder                      objectsInstances;
         ListVariable                            variables;
+        vector < RuntimeLayer >                 layers;
         vector < Text >                         textes;
         vector < ManualTimer >                  timers;
         float                                   pauseTime;
@@ -90,8 +92,8 @@ class GD_API RuntimeScene : public Scene
         void RenderWithoutStep();
 
         //Calques
-        const Layer & GetLayer(string name) const;
-        Layer & ModLayer(string name);
+        const RuntimeLayer & GetLayer(string name) const;
+        RuntimeLayer & GetLayer(string name);
 
         //Accès au temps
         inline void SetTimeScale(float timeScale_) { timeScale = timeScale_; };
@@ -126,7 +128,7 @@ class GD_API RuntimeScene : public Scene
         float timeScale;
         float timeFromStart;
 
-        static Layer badLayer;
+        static RuntimeLayer badLayer;
 };
 
 #endif // SCENEIG_H

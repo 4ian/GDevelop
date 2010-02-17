@@ -38,7 +38,7 @@ bool CondSourisX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     if ( condition.GetParameters().size() >= 4 )
         camera = eval.EvalExp(condition.GetParameter(3));
 
-    sf::View & view = scene->ModLayer(layer).ModView(camera);
+    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //On calcule la position de la souris dans le calque donné
     int mouseX = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), view).x;
@@ -82,7 +82,7 @@ bool CondSourisY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     if ( condition.GetParameters().size() >= 4 )
         camera = eval.EvalExp(condition.GetParameter(3));
 
-    sf::View & view = scene->ModLayer(layer).ModView(camera);
+    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //On calcule la position de la souris dans le calque donné
     int mouseY = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), view).y;
@@ -154,10 +154,10 @@ bool CondSourisSurObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcern
     //Pour chaque objet concerné
     for (unsigned int layerIndex = 0;layerIndex < scene->layers.size();++layerIndex)
     {
-        for (unsigned int viewIndex = 0;viewIndex < scene->layers[layerIndex].GetViewsNumber();++viewIndex)
+        for (unsigned int cameraIndex = 0;cameraIndex < scene->layers[layerIndex].GetCamerasNumber();++cameraIndex)
         {
-            int mouseXInTheLayer = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), scene->layers[layerIndex].GetView(viewIndex)).x;
-            int mouseYInTheLayer = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), scene->layers[layerIndex].GetView(viewIndex)).y;
+            int mouseXInTheLayer = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), scene->layers[layerIndex].GetCamera(cameraIndex).GetSFMLView()).x;
+            int mouseYInTheLayer = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), scene->layers[layerIndex].GetCamera(cameraIndex).GetSFMLView()).y;
 
             ObjList::iterator obj = list.begin();
             ObjList::const_iterator obj_end = list.end();

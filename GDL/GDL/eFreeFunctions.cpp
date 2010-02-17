@@ -39,7 +39,7 @@ double ExpMouseX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerne
 
     const sf::View & view = scene->GetLayer(
                                             exprInstruction.parameters[0].GetPlainString()
-                                            ).GetView(camera);
+                                            ).GetCamera(camera).GetSFMLView();
 
     return scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), view).x;
 }
@@ -52,7 +52,7 @@ double ExpMouseY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerne
 
     const sf::View & view = scene->GetLayer(
                                             exprInstruction.parameters[0].GetPlainString()
-                                            ).GetView(camera);
+                                            ).GetCamera(camera).GetSFMLView();
     return scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), view).y;
 }
 
@@ -64,7 +64,7 @@ double ExpCameraX( const RuntimeScene * scene, ObjectsConcerned * objectsConcern
 
     const sf::View & view = scene->GetLayer(
                                             exprInstruction.parameters[0].GetPlainString()
-                                            ).GetView(camera);
+                                            ).GetCamera(camera).GetSFMLView();
     return view.GetCenter().x-view.GetSize().x/2;
 }
 
@@ -76,7 +76,7 @@ double ExpCameraY( const RuntimeScene * scene, ObjectsConcerned * objectsConcern
 
     const sf::View & view = scene->GetLayer(
                                             exprInstruction.parameters[0].GetPlainString()
-                                            ).GetView(camera);
+                                            ).GetCamera(camera).GetSFMLView();
     return view.GetCenter().y-view.GetSize().y/2;
 }
 
@@ -86,7 +86,7 @@ double ExpCameraRotation( const RuntimeScene * scene, ObjectsConcerned * objects
     if ( exprInstruction.parameters.size() > 1 ) //Compatibility with Game Develop < 1.2.8699
         camera = toInt(exprInstruction.parameters[1].GetPlainString());
 
-    return scene->GetLayer(exprInstruction.parameters[0].GetPlainString()).GetView(camera).GetRotation();
+    return scene->GetLayer(exprInstruction.parameters[0].GetPlainString()).GetCamera(camera).GetSFMLView().GetRotation();
 }
 
 double ExpTime( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )

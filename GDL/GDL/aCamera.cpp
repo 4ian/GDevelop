@@ -59,7 +59,7 @@ bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
     if ( action.GetParameters().size() >= 7 )
         camera = eval.EvalExp(action.GetParameter(6));
 
-    sf::View & view = scene->ModLayer(layer).ModView(camera);
+    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     float decalementX = 0;
     float decalementY = 0;
@@ -134,7 +134,7 @@ bool ActCentreCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     if ( action.GetParameters().size() >= 4 )
         camera = eval.EvalExp(action.GetParameter(3));
 
-    sf::View & view = scene->ModLayer(layer).ModView(camera);
+    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //Prise en compte des déplacements de l'objet
     if ( action.GetParameters().size() < 2 )
@@ -173,7 +173,7 @@ bool ActZoomCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
     if ( action.GetParameters().size() >= 3 )
         camera = eval.EvalExp(action.GetParameter(2));
 
-    sf::View & view = scene->ModLayer(layer).ModView(camera);
+    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     float newZoom = eval.EvalExp( action.GetParameter( 0 ) );
     if ( newZoom == 0 ) return false;
@@ -203,7 +203,7 @@ bool ActRotateCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     if ( action.GetParameters().size() >= 4 )
         camera = eval.EvalExp(action.GetParameter(3));
 
-    sf::View & view = scene->ModLayer(layer).ModView(camera);
+    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     float value = eval.EvalExp( action.GetParameter( 0 ) );
     if ( action.GetParameter( 1 ).GetPlainString().empty() || action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Set ) view.SetRotation(value);

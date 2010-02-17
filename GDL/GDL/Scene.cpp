@@ -12,7 +12,9 @@ backgroundColorB(125),
 standardSortMethod(true)
 {
     //ctor
-    layers.push_back(Layer());
+    Layer layer;
+    layer.SetCamerasNumber(1);
+    initialLayers.push_back(layer);
 }
 
 Scene::~Scene()
@@ -34,13 +36,13 @@ Scene::Scene(const Scene & scene)
 
     events = scene.events;
 
-    objetsInitiaux.clear();
-    for (unsigned int i =0;i<scene.objetsInitiaux.size();++i)
-    	objetsInitiaux.push_back( extensionManager->CreateObject(scene.objetsInitiaux[i]) );
+    initialObjects.clear();
+    for (unsigned int i =0;i<scene.initialObjects.size();++i)
+    	initialObjects.push_back( extensionManager->CreateObject(scene.initialObjects[i]) );
 
     objectGroups = scene.objectGroups;
-    positionsInitiales = scene.positionsInitiales;
-    layers = scene.layers;
+    initialObjectsPositions = scene.initialObjectsPositions;
+    initialLayers = scene.initialLayers;
     variables = scene.variables;
 }
 
@@ -60,13 +62,13 @@ Scene& Scene::operator=(const Scene & scene)
 
         this->events = scene.events;
 
-        this->objetsInitiaux.clear();
-        for (unsigned int i =0;i<scene.objetsInitiaux.size();++i)
-            this->objetsInitiaux.push_back( extensionManager->CreateObject(scene.objetsInitiaux[i]) );
+        this->initialObjects.clear();
+        for (unsigned int i =0;i<scene.initialObjects.size();++i)
+            this->initialObjects.push_back( extensionManager->CreateObject(scene.initialObjects[i]) );
 
         this->objectGroups = scene.objectGroups;
-        this->positionsInitiales = scene.positionsInitiales;
-        this->layers = scene.layers;
+        this->initialObjectsPositions = scene.initialObjectsPositions;
+        this->initialLayers = scene.initialLayers;
         this->variables = scene.variables;
     }
 
@@ -78,11 +80,11 @@ unsigned int GD_API GetTypeIdOfObject(const Game & game, const Scene & scene, st
     unsigned int objectTypeId = 0;
 
     //Search in objects
-    int IDsceneObject = Picker::PickOneObject( &scene.objetsInitiaux, name );
+    int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, name );
     int IDglobalObject = Picker::PickOneObject( &game.globalObjects, name );
 
     if ( IDsceneObject != -1 )
-        objectTypeId = scene.objetsInitiaux[IDsceneObject]->GetTypeId();
+        objectTypeId = scene.initialObjects[IDsceneObject]->GetTypeId();
     else if ( IDglobalObject != -1 )
         objectTypeId = game.globalObjects[IDglobalObject]->GetTypeId();
 

@@ -2,6 +2,8 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/cCamera.h"
 #include "GDL/aCamera.h"
+#include "GDL/cLayer.h"
+#include "GDL/aLayer.h"
 #include "GDL/eFreeFunctions.h"
 
 CameraExtension::CameraExtension()
@@ -121,6 +123,47 @@ CameraExtension::CameraExtension()
         MAIN_OBJECTS_IN_PARAMETER(0)
 
     DECLARE_END_ACTION()
+
+    DECLARE_ACTION("ShowLayer",
+                   _("Afficher un calque"),
+                   _("Rend visible un calque."),
+                   _("Afficher le calque _PARAM0_"),
+                   _("Calques et caméras"),
+                   "res/actions/layer24.png",
+                   "res/actions/layer.png",
+                   &ActShowLayer);
+
+        DECLARE_PARAMETER("layer", _("Calque ( Calque de base si vide )"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_ACTION()
+
+    DECLARE_ACTION("HideLayer",
+                   _("Cacher un calque"),
+                   _("Rend invisible un calque."),
+                   _("Cacher le calque _PARAM0_"),
+                   _("Calques et caméras"),
+                   "res/actions/layer24.png",
+                   "res/actions/layer.png",
+                   &ActHideLayer);
+
+        DECLARE_PARAMETER("layer", _("Calque ( Calque de base si vide )"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_ACTION()
+
+    DECLARE_CONDITION("LayerVisible",
+                   _("Visibilité d'un calque"),
+                   _("Teste si un calque est affiché."),
+                   _("Le calque _PARAM0_ est visible"),
+                   _("Calques et caméras"),
+                   "res/conditions/layer24.png",
+                   "res/conditions/layer.png",
+                   &CondLayerVisible);
+
+        DECLARE_PARAMETER("layer", _("Calque ( Calque de base si vide )"), false, "")
+
+    DECLARE_END_CONDITION()
 
     DECLARE_EXPRESSION("cameraX", _("Position X de la caméra d'un calque"), _("Position X de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png", &ExpCameraX)
         DECLARE_PARAMETER("text", _("Calque"), false, "")

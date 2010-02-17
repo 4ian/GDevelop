@@ -34,3 +34,20 @@ bool Object::CondLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 
     return false;
 }
+
+/**
+ * Test if a layer is visible
+ */
+bool CondLayerVisible( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+{
+    string layer = condition.GetParameter(0).GetPlainString();
+    bool isTrue = false;
+
+    if ( scene->GetLayer(layer).GetVisibility() )
+        isTrue = true;
+
+    if ( condition.IsInverted() )
+        return !isTrue;
+
+    return isTrue;
+}

@@ -200,13 +200,13 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
             OpenGroupesObjets(newScene.objectGroups, elem->FirstChildElement( "GroupesObjets" ));
 
         if ( elem->FirstChildElement( "Objets" ) != NULL )
-            OpenObjects(newScene.objetsInitiaux, elem->FirstChildElement( "Objets" ));
+            OpenObjects(newScene.initialObjects, elem->FirstChildElement( "Objets" ));
 
         if ( elem->FirstChildElement( "Positions" ) != NULL )
-            OpenPositions(newScene.positionsInitiales, elem->FirstChildElement( "Positions" ));
+            OpenPositions(newScene.initialObjectsPositions, elem->FirstChildElement( "Positions" ));
 
         if ( elem->FirstChildElement( "Layers" ) != NULL )
-            OpenLayers(newScene.layers, elem->FirstChildElement( "Layers" ));
+            OpenLayers(newScene.initialLayers, elem->FirstChildElement( "Layers" ));
 
         if ( elem->FirstChildElement( "Events" ) != NULL )
             OpenEvents(newScene.events, elem->FirstChildElement( "Events" ));
@@ -688,6 +688,34 @@ void OpenSaveGame::OpenLayers(vector < Layer > & list, TiXmlElement * elem)
         }
         else { MSG( "Les informations concernant la visibilité manquent." ); }
 
+        TiXmlElement * elemCamera = elemScene->FirstChildElement("Camera");
+
+        //Compatibility with Game Develop 1.2.8699 and inferior
+        if ( !elemCamera ) layer.SetCamerasNumber(1);
+
+        while (elemCamera)
+        {
+            layer.SetCamerasNumber(layer.GetCamerasNumber()+1);
+
+            string defaultSize = elemCamera->Attribute("DefaultSize");
+            layer.GetCamera(layer.GetCamerasNumber()-1).defaultSize = true;
+            if ( defaultSize == "false") layer.GetCamera(layer.GetCamerasNumber()-1).defaultSize = false;
+
+            elemCamera->QueryFloatAttribute("Width", &layer.GetCamera(layer.GetCamerasNumber()-1).size.x);
+            elemCamera->QueryFloatAttribute("Height", &layer.GetCamera(layer.GetCamerasNumber()-1).size.y);
+
+            string defaultViewport = elemCamera->Attribute("DefaultViewport");
+            layer.GetCamera(layer.GetCamerasNumber()-1).defaultViewport = true;
+            if ( defaultViewport == "false") layer.GetCamera(layer.GetCamerasNumber()-1).defaultViewport = false;
+
+            elemCamera->QueryFloatAttribute("ViewportLeft", &layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Left);
+            elemCamera->QueryFloatAttribute("ViewportTop", &layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Top);
+            elemCamera->QueryFloatAttribute("ViewportRight", &layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Right);
+            elemCamera->QueryFloatAttribute("ViewportBottom", &layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Bottom);
+
+            elemCamera = elemCamera->NextSiblingElement();
+        }
+
         list.push_back( layer );
         elemScene = elemScene->NextSiblingElement();
     }
@@ -874,22 +902,22 @@ bool OpenSaveGame::SaveToFile(string file)
 
             TiXmlElement * objets = new TiXmlElement( "Objets" );
             scene->LinkEndChild( objets );
-            SaveObjects(game.m_scenes.at( i ).objetsInitiaux, objets);
+            SaveObjects(game.m_scenes.at( i ).initialObjects, objets);
 
             TiXmlElement * layers = new TiXmlElement( "Layers" );
             scene->LinkEndChild( layers );
-            SaveLayers(game.m_scenes.at( i ).layers, layers);
+            SaveLayers(game.m_scenes.at( i ).initialLayers, layers);
 
             TiXmlElement * variables = new TiXmlElement( "Variables" );
             scene->LinkEndChild( variables );
             SaveVariablesList(game.m_scenes.at( i ).variables, variables);
 
-            if ( !game.m_scenes.at( i ).positionsInitiales.empty() )
+            if ( !game.m_scenes.at( i ).initialObjectsPositions.empty() )
             {
                 TiXmlElement * positions = new TiXmlElement( "Positions" );
                 scene->LinkEndChild( positions );
 
-                SavePositions(game.m_scenes.at( i ).positionsInitiales, positions);
+                SavePositions(game.m_scenes.at( i ).initialObjectsPositions, positions);
             }
 
             //Evènements
@@ -1205,6 +1233,27 @@ void OpenSaveGame::SaveLayers(const vector < Layer > & list, TiXmlElement * laye
         else
             layer->SetAttribute("Visibility", "false");
 
+        for (unsigned int c = 0;c<list.at(j).GetCamerasNumber();++c)
+        {
+            TiXmlElement * camera = new TiXmlElement( "Camera" );
+            layer->LinkEndChild( camera );
+
+            camera->SetAttribute("DefaultSize", "true");
+            if ( !list.at(j).GetCamera(c).defaultSize )
+                camera->SetAttribute("DefaultSize", "false");
+
+            camera->SetDoubleAttribute("Width", list.at(j).GetCamera(c).size.x);
+            camera->SetDoubleAttribute("Height", list.at(j).GetCamera(c).size.y);
+
+            camera->SetAttribute("DefaultViewport", "true");
+            if ( !list.at(j).GetCamera(c).defaultViewport )
+                camera->SetAttribute("DefaultViewport", "false");
+
+            camera->SetDoubleAttribute("ViewportLeft", list.at(j).GetCamera(c).viewport.Left);
+            camera->SetDoubleAttribute("ViewportTop", list.at(j).GetCamera(c).viewport.Top);
+            camera->SetDoubleAttribute("ViewportRight", list.at(j).GetCamera(c).viewport.Right);
+            camera->SetDoubleAttribute("ViewportBottom", list.at(j).GetCamera(c).viewport.Bottom);
+        }
     }
 }
 

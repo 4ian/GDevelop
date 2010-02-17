@@ -431,7 +431,7 @@ ExtensionSprite::ExtensionSprite()
 
     DECLARE_CONDITION("EstTourne",
                       _("Un objet est tourné vers un autre"),
-                      _("Description de EstTourne"),
+                      _("Teste si un objet est tourné vers un autre"),
                       _("L'objet _PARAM0_ est tourné vers _PARAM1_"),
                       _("Direction"),
                       "res/conditions/estTourne24.png",

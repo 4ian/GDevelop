@@ -410,6 +410,8 @@
 		<Unit filename="GDL\BaseObjectExtension2.cpp" />
 		<Unit filename="GDL\BitmapGUIManager.cpp" />
 		<Unit filename="GDL\BitmapGUIManager.h" />
+		<Unit filename="GDL\Camera.cpp" />
+		<Unit filename="GDL\Camera.h" />
 		<Unit filename="GDL\CameraExtension.cpp" />
 		<Unit filename="GDL\CameraExtension.h" />
 		<Unit filename="GDL\Chercher.cpp" />
@@ -522,8 +524,12 @@
 		<Unit filename="GDL\PropImage.h" />
 		<Unit filename="GDL\RessourcesLoader.cpp" />
 		<Unit filename="GDL\RessourcesLoader.h" />
+		<Unit filename="GDL\RuntimeCamera.cpp" />
+		<Unit filename="GDL\RuntimeCamera.h" />
 		<Unit filename="GDL\RuntimeGame.cpp" />
 		<Unit filename="GDL\RuntimeGame.h" />
+		<Unit filename="GDL\RuntimeLayer.cpp" />
+		<Unit filename="GDL\RuntimeLayer.h" />
 		<Unit filename="GDL\RuntimeScene.cpp" />
 		<Unit filename="GDL\RuntimeScene.h" />
 		<Unit filename="GDL\Scene.cpp" />

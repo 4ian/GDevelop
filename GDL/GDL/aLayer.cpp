@@ -20,3 +20,27 @@ bool Object::ActChangeLayer( RuntimeScene * scene, ObjectsConcerned & objectsCon
 
     return true;
 }
+
+/**
+ * Show a layer
+ */
+bool ActShowLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+{
+    string layer = action.GetParameter(0).GetPlainString();
+
+    scene->GetLayer(layer).SetVisibility(true);
+
+    return true;
+}
+
+/**
+ * Hide a layer
+ */
+bool ActHideLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+{
+    string layer = action.GetParameter(0).GetPlainString();
+
+    scene->GetLayer(layer).SetVisibility(false);
+
+    return true;
+}

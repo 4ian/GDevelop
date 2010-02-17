@@ -13,4 +13,7 @@
 #include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 
+bool ActShowLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+bool ActHideLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+
 #endif // ALAYER_H

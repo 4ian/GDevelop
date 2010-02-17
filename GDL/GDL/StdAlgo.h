@@ -39,6 +39,15 @@ int toInt( const T & value )
 }
 
 template<typename T>
+int toFloat( const T & value )
+{
+    float f;
+    std::istringstream oss(value);
+    oss >> f;
+    return f;
+}
+
+template<typename T>
 std::string toString( const T & Value )
 {
     // utiliser un flux de sortie pour créer la chaîne

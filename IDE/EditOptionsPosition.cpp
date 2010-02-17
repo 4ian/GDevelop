@@ -222,12 +222,12 @@ scene(scene_)
         heightEdit->Enable(true);
     }
 
-    for (unsigned int i = 0;i<scene.layers.size();++i)
+    for (unsigned int i = 0;i<scene.initialLayers.size();++i)
     {
-        if ( scene.layers[i].GetName() == "" )
+        if ( scene.initialLayers[i].GetName() == "" )
             layerChoice->Insert(_("Calque de base"), 0);
         else
-            layerChoice->Insert(scene.layers[i].GetName(), 0);
+            layerChoice->Insert(scene.initialLayers[i].GetName(), 0);
     }
 
     layerChoice->SetStringSelection(position.layer);
@@ -239,10 +239,10 @@ scene(scene_)
     //Create the object-specific panel, if it has one.
     wxPanel * returnedPanel = NULL;
 
-    int objetId = Picker::PickOneObject(&scene.objetsInitiaux, position.objectName);
+    int objetId = Picker::PickOneObject(&scene.initialObjects, position.objectName);
     int objetGlobalId = Picker::PickOneObject(&game.globalObjects, position.objectName);
     if ( objetId != -1 )
-        returnedPanel = scene.objetsInitiaux[objetId]->CreateInitialPositionPanel(this, game, scene, position);
+        returnedPanel = scene.initialObjects[objetId]->CreateInitialPositionPanel(this, game, scene, position);
     else if  (objetGlobalId != -1)
         returnedPanel = game.globalObjects[objetGlobalId]->CreateInitialPositionPanel(this, game, scene, position);
 
@@ -314,8 +314,8 @@ void EditOptionsPosition::OnOkBtClick(wxCommandEvent& event)
     if ( layerChoice->GetStringSelection() == _("Calque de base"))
         position.layer = "";
 
-    int objetId = Picker::PickOneObject(&scene.objetsInitiaux, position.objectName);
-    if ( objetId != -1 ) scene.objetsInitiaux[objetId]->UpdateInitialPositionFromPanel(customPanel, position);
+    int objetId = Picker::PickOneObject(&scene.initialObjects, position.objectName);
+    if ( objetId != -1 ) scene.initialObjects[objetId]->UpdateInitialPositionFromPanel(customPanel, position);
 
     EndModal(1);
 }

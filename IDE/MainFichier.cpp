@@ -148,6 +148,8 @@ void Game_Develop_EditorFrame::OnMenuSaveSelected( wxCommandEvent& event )
         {
             wxLogError( "L'enregistrement a échoué" );
         }
+
+        wxLogStatus(_("Enregistrement du fichier terminé."));
         return;
     }
 }

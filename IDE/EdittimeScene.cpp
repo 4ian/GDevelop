@@ -45,6 +45,7 @@ EdittimeScene::~EdittimeScene()
 void EdittimeScene::RenderEdittimeScene()
 {
     ManageRenderTargetEvents();
+    view.SetViewport(sf::FloatRect(0.4,0.4,0.8,0.8));
 
     renderWindow->Clear( sf::Color( backgroundColorR, backgroundColorG, backgroundColorB ) );
     renderWindow->SetView(view);
@@ -132,8 +133,8 @@ void EdittimeScene::RenderEdittimeScene()
         {
             ObjSPtr object = boost::shared_ptr<Object>();
 
-            if ( Picker::PickOneObject( &objetsInitiaux, objectToAdd ) != -1)
-                object = objetsInitiaux[Picker::PickOneObject( &objetsInitiaux, objectToAdd ) ];
+            if ( Picker::PickOneObject( &initialObjects, objectToAdd ) != -1)
+                object = initialObjects[Picker::PickOneObject( &initialObjects, objectToAdd ) ];
             else if ( Picker::PickOneObject( &game->globalObjects, objectToAdd ) != -1)
                 object = game->globalObjects[Picker::PickOneObject( &game->globalObjects, objectToAdd ) ];
 

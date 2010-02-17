@@ -608,7 +608,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         }
         else if ( instructionInfos.parameters[i].type == "layer" )
         {
-            ChoixLayer dialog(this, scene.layers);
+            ChoixLayer dialog(this, scene.initialLayers);
             if( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->SetValue(dialog.layerChosen);
 
@@ -635,13 +635,13 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             if ( ParaEdit.empty() ) return;
 
             string objectWanted = string(ParaEdit[0]->GetValue().mb_str());
-            int IDsceneObject = Picker::PickOneObject( &scene.objetsInitiaux, objectWanted );
+            int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, objectWanted );
             int IDglobalObject = Picker::PickOneObject( &game.globalObjects, objectWanted );
 
             ObjSPtr object = boost::shared_ptr<Object> ();
 
             if ( IDsceneObject != -1)
-                object = scene.objetsInitiaux[IDsceneObject];
+                object = scene.initialObjects[IDsceneObject];
             else if ( IDglobalObject != -1)
                 object = game.globalObjects[IDglobalObject];
             else

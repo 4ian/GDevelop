@@ -245,9 +245,9 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
 
             //Verifying if there are objects on this layer
             bool objectsOnThisLayer = false;
-            for (unsigned int j =0;j<scene->positionsInitiales.size();++j)
+            for (unsigned int j =0;j<scene->initialObjectsPositions.size();++j)
             {
-                if ( scene->positionsInitiales[j].layer == name )
+                if ( scene->initialObjectsPositions[j].layer == name )
                     objectsOnThisLayer = true;
             }
 
@@ -260,18 +260,18 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
                 if ( retour == 0 ) return; //Annulation
                 else if ( retour == 1 )
                 {
-                    for (int i = scene->positionsInitiales.size()-1;i>=0;--i)
+                    for (int i = scene->initialObjectsPositions.size()-1;i>=0;--i)
                     {
-                        if ( scene->positionsInitiales[i].layer == name )
-                            scene->positionsInitiales.erase(scene->positionsInitiales.begin()+i);
+                        if ( scene->initialObjectsPositions[i].layer == name )
+                            scene->initialObjectsPositions.erase(scene->initialObjectsPositions.begin()+i);
                     }
                 }
                 else if ( retour == 2 )
                 {
-                    for (unsigned int i =0;i<scene->positionsInitiales.size();++i)
+                    for (unsigned int i =0;i<scene->initialObjectsPositions.size();++i)
                     {
-                        if ( scene->positionsInitiales[i].layer == name )
-                            scene->positionsInitiales[i].layer = dialog.moveOnLayerNamed;
+                        if ( scene->initialObjectsPositions[i].layer == name )
+                            scene->initialObjectsPositions[i].layer = dialog.moveOnLayerNamed;
                     }
                 }
     	    }
@@ -415,10 +415,10 @@ void EditorLayers::EditLayerParam()
     //On renomme les objets qui sont sur le calque
     if ( layer->GetName() != oldName )
     {
-        for (int i = scene->positionsInitiales.size()-1;i>=0;--i)
+        for (int i = scene->initialObjectsPositions.size()-1;i>=0;--i)
         {
-            if ( scene->positionsInitiales[i].layer == oldName )
-                scene->positionsInitiales[i].layer = layer->GetName();
+            if ( scene->initialObjectsPositions[i].layer == oldName )
+                scene->initialObjectsPositions[i].layer = layer->GetName();
         }
     }
 

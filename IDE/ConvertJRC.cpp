@@ -328,16 +328,16 @@ void ConvertJRC::OnConvertirBtClick(wxCommandEvent& event)
                 i++;
             }
 
-            sceneMM.positionsInitiales.push_back(FondPos);
-            sceneMM.positionsInitiales.push_back(JouerPos);
-            sceneMM.positionsInitiales.push_back(QuitterPos);
-            sceneMM.positionsInitiales.push_back(ChargerPos);
-            sceneMM.positionsInitiales.push_back(ProposPos);
-            sceneMM.objetsInitiaux.push_back(fond);
-            sceneMM.objetsInitiaux.push_back(JouerBt);
-            sceneMM.objetsInitiaux.push_back(QuitterBt);
-            sceneMM.objetsInitiaux.push_back(ChargerBt);
-            sceneMM.objetsInitiaux.push_back(ProposBt);
+            sceneMM.initialObjectsPositions.push_back(FondPos);
+            sceneMM.initialObjectsPositions.push_back(JouerPos);
+            sceneMM.initialObjectsPositions.push_back(QuitterPos);
+            sceneMM.initialObjectsPositions.push_back(ChargerPos);
+            sceneMM.initialObjectsPositions.push_back(ProposPos);
+            sceneMM.initialObjects.push_back(fond);
+            sceneMM.initialObjects.push_back(JouerBt);
+            sceneMM.initialObjects.push_back(QuitterBt);
+            sceneMM.initialObjects.push_back(ChargerBt);
+            sceneMM.initialObjects.push_back(ProposBt);
 
             {
                 Event event;

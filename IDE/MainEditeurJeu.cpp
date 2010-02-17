@@ -85,14 +85,14 @@ void Game_Develop_EditorFrame::OnEditSceneBtClick( wxCommandEvent& event )
 
     //On vérifie si un éditeur de scène édite actuellement cette scène
     bool sceneEditorAlreadyOpened = false;
-    for (unsigned int j =0;j<Notebook1->GetPageCount() ;j++ )
+    for (unsigned int j =0;j<editorsNotebook->GetPageCount() ;j++ )
     {
-        EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(Notebook1->GetPage(j));
+        EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(j));
 
         if ( sceneEditorPtr != NULL && sceneEditorPtr->scene->name == game.m_scenes.at(sceneId).name )
         {
             //Si oui, on l'ouvre
-            Notebook1->SetSelection(j);
+            editorsNotebook->SetSelection(j);
             sceneEditorAlreadyOpened = true;
         }
     }
@@ -106,12 +106,12 @@ void Game_Develop_EditorFrame::OnEditSceneBtClick( wxCommandEvent& event )
         mainEditorCommand.SetRibbonSceneEditorButtonBar(ribbonSceneEditorButtonBar); //Need link to the scene editor wxRibbonButtonBar
         mainEditorCommand.SetMainEditor(this);
 
-        EditorScene * editorScene = new EditorScene( Notebook1, wxSize(game.windowWidth, game.windowHeight), game, &game.m_scenes.at(sceneId), runtimeGame, mainEditorCommand);
+        EditorScene * editorScene = new EditorScene( editorsNotebook, wxSize(game.windowWidth, game.windowHeight), game, &game.m_scenes.at(sceneId), runtimeGame, mainEditorCommand);
 
         BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::getInstance();
 
-        Notebook1->AddPage(editorScene, game.m_scenes.at(sceneId).name, true, bitmapGUIManager->scene);
-        Notebook1->SetSelection(Notebook1->GetPageCount()-1);
+        editorsNotebook->AddPage(editorScene, game.m_scenes.at(sceneId).name, true, bitmapGUIManager->scene);
+        editorsNotebook->SetSelection(editorsNotebook->GetPageCount()-1);
     }
 
 }
@@ -136,9 +136,9 @@ void Game_Develop_EditorFrame::OnModParaBtClick( wxCommandEvent& event )
     if ( Confirm.Check() != wxID_NO && ( Confirm.Check() == wxID_YES || Confirm.ShowModal() == wxID_YES ) )
     {
         //Redimensionnement des éditeurs de scène
-        for (unsigned int j =0;j<Notebook1->GetPageCount() ;j++ )
+        for (unsigned int j =0;j<editorsNotebook->GetPageCount() ;j++ )
         {
-            EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(Notebook1->GetPage(j));
+            EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(j));
 
             if ( sceneEditorPtr != NULL )
                 sceneEditorPtr->Resize(game.windowWidth, game.windowHeight);
@@ -409,14 +409,14 @@ void Game_Develop_EditorFrame::OnSceneTreeEndLabelEdit( wxTreeEvent& event )
         if ( IDscene != -1 )
         {
             //On vérifie si un éditeur de cette scène n'est pas ouvert
-            for (unsigned int k =0;k<static_cast<unsigned>(Notebook1->GetPageCount()) ;k++ )
+            for (unsigned int k =0;k<static_cast<unsigned>(editorsNotebook->GetPageCount()) ;k++ )
             {
-                EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(Notebook1->GetPage(k));
+                EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(k));
 
                 //Si il s'agit d'un éditeur de scène avec ce nom, on le renomme
                 if ( sceneEditorPtr != NULL &&
-                     Notebook1->GetPageText(k) == game.m_scenes.at(IDscene).name)
-                    Notebook1->SetPageText(k, event.GetLabel());
+                     editorsNotebook->GetPageText(k) == game.m_scenes.at(IDscene).name)
+                    editorsNotebook->SetPageText(k, event.GetLabel());
             }
             game.m_scenes.at( IDscene ).name = event.GetLabel(); //Mise à jour
             SceneTree->SetItemText( event.GetItem(), event.GetLabel() );
@@ -453,10 +453,10 @@ void Game_Develop_EditorFrame::OnMenuEditPropSceneSelected( wxCommandEvent& even
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::CloseScene( int IDscene )
 {
-    for (unsigned int k =1;k<static_cast<unsigned>(Notebook1->GetPageCount()) ;k++ )
+    for (unsigned int k =1;k<static_cast<unsigned>(editorsNotebook->GetPageCount()) ;k++ )
     {
-        if ( Notebook1->GetPageText(k) == game.m_scenes.at(IDscene).name)
-            Notebook1->DeletePage(k);
+        if ( editorsNotebook->GetPageText(k) == game.m_scenes.at(IDscene).name)
+            editorsNotebook->DeletePage(k);
     }
 }
 
@@ -467,17 +467,17 @@ void Game_Develop_EditorFrame::CloseScene( int IDscene )
 void Game_Develop_EditorFrame::UpdateEditorsSceneID()
 {
     //On repasse tous les éditeurs de scènes ouverts
-    for (unsigned int j =0;j<Notebook1->GetPageCount() ;j++ )
+    for (unsigned int j =0;j<editorsNotebook->GetPageCount() ;j++ )
     {
         wxLogStatus(_("Mise à jour des scènes actuellement ouvertes..."));
         cout << "j" << j;
-        EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(Notebook1->GetPage(j));
+        EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(j));
         if ( sceneEditorPtr != NULL )
         {
             for (unsigned int k =0;k<game.m_scenes.size() ;k++ )
             {
                 //On vérifie avec quelle scène ils vont
-                if ( Notebook1->GetPageText(j) == game.m_scenes.at(k).name)
+                if ( editorsNotebook->GetPageText(j) == game.m_scenes.at(k).name)
                 {
                     cout << "majStart";
                     sceneEditorPtr->ChangeScenePtr(&game.m_scenes.at(k), false);
@@ -498,17 +498,18 @@ void Game_Develop_EditorFrame::UpdateEditorsSceneID()
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
 {
-    if ( dynamic_cast<EditorScene*>(Notebook1->GetPage(Notebook1->GetSelection())) == NULL )
+    if ( dynamic_cast<EditorScene*>(editorsNotebook->GetPage(editorsNotebook->GetSelection())) == NULL &&
+         dynamic_cast<EditorImages*>(editorsNotebook->GetPage(editorsNotebook->GetSelection())) == NULL )
     {
-        long style = Notebook1->GetWindowStyleFlag();
+        long style = editorsNotebook->GetWindowStyleFlag();
         style &= ~wxAUI_NB_CLOSE_ON_ACTIVE_TAB;
-        Notebook1->SetWindowStyleFlag(style);
+        editorsNotebook->SetWindowStyleFlag(style);
     }
     else
     {
-        long style = Notebook1->GetWindowStyleFlag();
+        long style = editorsNotebook->GetWindowStyleFlag();
         style |= wxAUI_NB_CLOSE_ON_ACTIVE_TAB;
-        Notebook1->SetWindowStyleFlag(style);
+        editorsNotebook->SetWindowStyleFlag(style);
     }
 }
 

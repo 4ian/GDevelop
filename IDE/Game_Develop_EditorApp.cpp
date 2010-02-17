@@ -157,8 +157,8 @@ bool Game_Develop_EditorApp::OnInit()
     wxLocale::AddCatalogLookupPathPrefix(wxT(".."));
     wxLocale::AddCatalogLookupPathPrefix(_T("locale"));
     // Mise en place de la langue par défaut du système
-    //m_locale.Init(wxLANGUAGE_ENGLISH);
-    m_locale.Init(wxLANGUAGE_DEFAULT);
+    m_locale.Init(wxLANGUAGE_ENGLISH);
+    //m_locale.Init(wxLANGUAGE_DEFAULT);
     {
         wxLogNull noLog;  // Supprime les erreurs si les catalogues n'existent pas
         // Catalogue de l'application

@@ -298,10 +298,10 @@ void DebuggerGUI::UpdateGUI()
         mustRecreateTree = false;
 
         //Scene's objects
-        for(unsigned int i = 0;i<scene.objetsInitiaux.size();++i)
+        for(unsigned int i = 0;i<scene.initialObjects.size();++i)
         {
-            wxTreeItemId objectItem = objectsTree->AppendItem(objectsTree->GetRootItem(), scene.objetsInitiaux[i]->GetName());
-            initialObjects[scene.objetsInitiaux[i]->GetName()] = objectItem;
+            wxTreeItemId objectItem = objectsTree->AppendItem(objectsTree->GetRootItem(), scene.initialObjects[i]->GetName());
+            initialObjects[scene.initialObjects[i]->GetName()] = objectItem;
         }
         //Globals objects
         for(unsigned int i = 0;i<scene.game->globalObjects.size();++i)
@@ -611,7 +611,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     if ( dialog.ShowModal() != 1 ) return;
 
     string objectWanted = dialog.NomObjet;
-    int IDsceneObject = Picker::PickOneObject( &scene.objetsInitiaux, objectWanted );
+    int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, objectWanted );
     int IDglobalObject = Picker::PickOneObject( &scene.game->globalObjects, objectWanted );
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
@@ -619,7 +619,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
 
     //Creation of the object
     if ( IDsceneObject != -1)
-        newObject = extensionManager->CreateObject(scene.objetsInitiaux[IDsceneObject]);
+        newObject = extensionManager->CreateObject(scene.initialObjects[IDsceneObject]);
     else if ( IDglobalObject != -1)
         newObject = extensionManager->CreateObject(scene.game->globalObjects[IDglobalObject]);
     else
@@ -636,7 +636,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     newObject->SetX( x );
     newObject->SetY( y );
 
-    ChoixLayer layerDialog(this, scene.layers);
+    ChoixLayer layerDialog(this, scene.initialLayers);
     layerDialog.ShowModal();
     newObject->SetLayer( layerDialog.layerChosen );
 

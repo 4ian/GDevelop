@@ -69,6 +69,7 @@ extern MemTrace MemTracer;
 #include "EditorObjectList.h"
 #include "DnDFileEditor.h"
 #include "ConsoleManager.h"
+#include "ProjectManager.h"
 
 //(*IdInit(Game_Develop_EditorFrame)
 const long Game_Develop_EditorFrame::ID_PANEL3 = wxNewId();
@@ -238,8 +239,8 @@ m_fichierJeu("")
     FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer2->AddGrowableCol(0);
     FlexGridSizer2->AddGrowableRow(0);
-    Notebook1 = new wxAuiNotebook(Panel1, ID_AUINOTEBOOK1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_TOP|wxNO_BORDER);
-    Panel2 = new wxPanel(Notebook1, ID_PANEL2, wxDefaultPosition, wxSize(700,462), wxTAB_TRAVERSAL, _T("ID_PANEL2"));
+    editorsNotebook = new wxAuiNotebook(Panel1, ID_AUINOTEBOOK1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_TOP|wxNO_BORDER);
+    Panel2 = new wxPanel(editorsNotebook, ID_PANEL2, wxDefaultPosition, wxSize(700,462), wxTAB_TRAVERSAL, _T("ID_PANEL2"));
     Panel2->SetBackgroundColour(wxColour(255,255,255));
     Panel2->SetToolTip(_("L\'éditeur du jeu permet de régler les principaux paramètres et de créer les scènes."));
     FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -310,8 +311,8 @@ m_fichierJeu("")
     FlexGridSizer3->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel2->SetSizer(FlexGridSizer3);
     FlexGridSizer3->SetSizeHints(Panel2);
-    Notebook1->AddPage(Panel2, _("Editeur du jeu"));
-    FlexGridSizer2->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    editorsNotebook->AddPage(Panel2, _("Editeur du jeu"));
+    FlexGridSizer2->Add(editorsNotebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     Panel1->SetSizer(FlexGridSizer2);
     FlexGridSizer2->SetSizeHints(Panel1);
     FlexGridSizer1->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -673,8 +674,8 @@ m_fichierJeu("")
     imageListScene->Add(( wxBitmap( "res/sceneeditor.png", wxBITMAP_TYPE_ANY ) ) );
     SceneTree->AssignImageList( imageListScene );
 
-    Notebook1->SetArtProvider(new GDAuiTabArt());
-    Notebook1->SetPageBitmap(0, wxBitmap( "res/jeueditor.png", wxBITMAP_TYPE_ANY ));
+    editorsNotebook->SetArtProvider(new GDAuiTabArt());
+    editorsNotebook->SetPageBitmap(0, wxBitmap( "res/jeueditor.png", wxBITMAP_TYPE_ANY ));
 
     //Pour chaque toolbar : Initialiser la toolbar
     /*ToolBarDefaut = new wxToolBar( this, -1, wxDefaultPosition, wxDefaultSize,
@@ -690,20 +691,16 @@ m_fichierJeu("")
     if ( !UpdateToolBar() )
         wxMessageBox( _("Erreur lors de la création des barres d'outils"), _("Erreur"), wxICON_EXCLAMATION );*/
 
-    //Puis ajout des toolbars
-    /*m_mgr.AddPane( ToolBarDefaut, wxAuiPaneInfo().Name( wxT( "TC" ) ).Top().Caption( _( "Barre d'outils commune" ) ).ToolbarPane().LeftDockable( false ).RightDockable( false ) );
-    m_mgr.AddPane( ToolBarEditors, wxAuiPaneInfo().Name( wxT( "TE" ) ).Top().Caption( _( "Barre d'outils d'accès aux éditeurs" ) ).ToolbarPane().LeftDockable( false ).RightDockable( false ) );
-    m_mgr.AddPane( ToolBarCG, wxAuiPaneInfo().Name( wxT( "TCG" ) ).Top().Caption( _( "Barre Compil Games" ) ).ToolbarPane().LeftDockable( false ).RightDockable( false ) );
-    m_mgr.AddPane( ToolBarAide, wxAuiPaneInfo().Name( wxT( "TA" ) ).Top().Caption( _( "Barre d'outils d'aide" ) ).ToolbarPane().LeftDockable( false ).RightDockable( false ) );*/
-
-    //Editeur d'images
+    //
     MainEditorCommand imagesMainEditorCommand(nr, -1);
     imagesMainEditorCommand.SetRibbon(m_ribbon);
     imagesMainEditorCommand.SetMainEditor(this);
-    EditorImagesPnl = new EditorImages( this, game, imagesMainEditorCommand, true );
+
+    projectManager = new ProjectManager(this, *this);
+
 
     //Puis ajout des éditeurs
-    m_mgr.AddPane( EditorImagesPnl, wxAuiPaneInfo().Name( wxT( "EBI" ) ).Caption( _( "Editeur de la banque d'image" ) ).Left().MaximizeButton( true ).MinimizeButton( false ).MinSize(200,100) );
+    m_mgr.AddPane( projectManager, wxAuiPaneInfo().Name( wxT( "PM" ) ).Caption( _( "Projets" ) ).Left().MaximizeButton( true ).MinimizeButton( false ).MinSize(200,100) );
     m_mgr.AddPane( Panel1, wxAuiPaneInfo().Name( wxT( "EP" ) ).Caption( _( "Editeur principal" ) ).Center().CaptionVisible(false).CloseButton( false ).MaximizeButton( true ).MinimizeButton( false ) );
     m_mgr.AddPane( ribbonPanel, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ruban" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).MinSize(1, 107).Resizable(false) );
 
@@ -758,7 +755,7 @@ void Game_Develop_EditorFrame::UpdateNotebook()
     wxString result;
     if ( pConfig->Exists( "/Onglets" ) )
     {
-        Notebook1->SetWindowStyleFlag(wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS | wxNO_BORDER );
+        editorsNotebook->SetWindowStyleFlag(wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS | wxNO_BORDER );
     }
 
 }
@@ -822,10 +819,6 @@ void Game_Develop_EditorFrame::OnClose( wxCloseEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::ReloadEditors()
 {
-    //Images ( à rafraichir normalement seulement pour un changement de jeu )
-    EditorImagesPnl->game = game;
-    EditorImagesPnl->Refresh();
-
     runtimeGame.imageManager.LoadImagesFromFile( game );
     nr.SetImagesAreUpToDate();
     nr.SetAllScenesMustBeReloaded();

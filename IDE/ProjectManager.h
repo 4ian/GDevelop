@@ -4,19 +4,22 @@
 //(*Headers(ProjectManager)
 #include <wx/treectrl.h>
 #include <wx/sizer.h>
-#include <wx/dialog.h>
+#include <wx/panel.h>
 //*)
+class Game_Develop_EditorFrame;
 
-class ProjectManager: public wxDialog
+class ProjectManager: public wxPanel
 {
 	public:
 
-		ProjectManager(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
+		ProjectManager(wxWindow* parent, Game_Develop_EditorFrame & mainEditor_);
 		virtual ~ProjectManager();
 
 		//(*Declarations(ProjectManager)
-		wxTreeCtrl* TreeCtrl1;
+		wxTreeCtrl* projectsTree;
 		//*)
+
+		Game_Develop_EditorFrame & mainEditor;
 
 	protected:
 
@@ -27,7 +30,10 @@ class ProjectManager: public wxDialog
 	private:
 
 		//(*Handlers(ProjectManager)
+		void OnprojectsTreeItemActivated(wxTreeEvent& event);
 		//*)
+        void Refresh();
+
 
 		DECLARE_EVENT_TABLE()
 };

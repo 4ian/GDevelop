@@ -147,8 +147,8 @@ void ChoixObjetExpression::Refresh()
     ObjetsList->DeleteAllItems();
     ObjetsList->AddRoot( _( "Tous les objets de la scène" ) );
 
-    for ( unsigned int i = 0;i < scene.objetsInitiaux.size();i++ )
-        ObjetsList->AppendItem( ObjetsList->GetRootItem(), scene.objetsInitiaux[i]->GetName());
+    for ( unsigned int i = 0;i < scene.initialObjects.size();i++ )
+        ObjetsList->AppendItem( ObjetsList->GetRootItem(), scene.initialObjects[i]->GetName());
 
     ObjetsList->ExpandAll();
 

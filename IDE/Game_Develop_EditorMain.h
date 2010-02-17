@@ -54,6 +54,7 @@
 #include "RecentList.h"
 #include "GDL/needReload.h"
 class RuntimeGame;
+class ProjectManager;
 
 
 using namespace std;
@@ -67,11 +68,17 @@ class Game_Develop_EditorFrame: public wxFrame
         virtual ~Game_Develop_EditorFrame();
 
         Game game;
+        vector < Game > games;
 
         void Open(string FichierJeu);
 
         static void LoadSkin(wxRibbonBar * bar);
         static void LoadSkin(wxAuiManager * auiManager);
+
+        inline wxAuiNotebook * GetEditorsNotebook() { return editorsNotebook; };
+        inline const wxAuiNotebook * GetEditorsNotebook() const { return editorsNotebook; };
+        inline wxRibbonBar * GetRibbon() { return m_ribbon; };
+        inline const wxRibbonBar * GetRibbon() const { return m_ribbon; };
 
     private:
 
@@ -291,6 +298,7 @@ class Game_Develop_EditorFrame: public wxFrame
         wxMenuItem* MenuItem22;
         wxPanel* Panel1;
         wxStaticText* StaticText1;
+        wxAuiNotebook* editorsNotebook;
         wxMenuItem* modVarSceneMenuI;
         wxMenu ContextMenu;
         wxMenu openContextMenu;
@@ -302,7 +310,6 @@ class Game_Develop_EditorFrame: public wxFrame
         wxMenuItem* MenuItem38;
         wxMenuItem* MenuItem20;
         wxMenuItem* MenuItem28;
-        wxAuiNotebook* Notebook1;
         wxMenuItem* MenuItem6;
         wxMenuItem* MenuItem35;
         wxStaticLine* StaticLine1;
@@ -324,17 +331,11 @@ class Game_Develop_EditorFrame: public wxFrame
         wxRibbonBar * m_ribbon;
         wxRibbonButtonBar * ribbonSceneEditorButtonBar;
 
-        //Editeurs
-        EditorImages* EditorImagesPnl;
-
+        ProjectManager * projectManager;
         vector < EditorScene* > EditorsScene;
+
         void CloseScene(int nb);
         void UpdateEditorsSceneID();
-
-        //Passé à chaque éditeur, needReload
-        //permet aux éditeurs d'indiquer qu'ils
-        //ont modifiés des choses qui nécessite un rechargement
-        needReload nr;
 
         //Images pour la liste des scènes
         wxImageList * imageListScene;

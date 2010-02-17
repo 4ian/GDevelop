@@ -176,12 +176,12 @@ void ChoixObjet::Refresh()
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
     unsigned int typeIdAllowed = extensionsManager->GetTypeIdFromString(onlyObjectOfType);
 
-    for ( unsigned int i = 0;i < scene.objetsInitiaux.size();i++ )
+    for ( unsigned int i = 0;i < scene.initialObjects.size();i++ )
     {
         //Only add the object if it has the correct typeId
-        if ( typeIdAllowed == 0 || scene.objetsInitiaux[i]->GetTypeId() == typeIdAllowed )
+        if ( typeIdAllowed == 0 || scene.initialObjects[i]->GetTypeId() == typeIdAllowed )
         {
-            ObjetsList->AppendItem( ObjetsList->GetRootItem(), scene.objetsInitiaux[i]->GetName() );
+            ObjetsList->AppendItem( ObjetsList->GetRootItem(), scene.initialObjects[i]->GetName() );
         }
     }
 

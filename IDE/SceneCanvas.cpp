@@ -192,9 +192,9 @@ void SceneCanvas::UpdateContextMenu()
     int lowestLayer = GetObjectsSelectedLowestLayer();
 
     contextMenu.FindItem(ID_LAYERUPMENU)->Enable(false);
-    if ( lowestLayer+1 < scene.layers.size() )
+    if ( lowestLayer+1 < scene.initialLayers.size() )
     {
-        string name = scene.layers[lowestLayer+1].GetName();
+        string name = scene.initialLayers[lowestLayer+1].GetName();
         if ( name == "" ) name = _("Calque de base");
         contextMenu.FindItem(ID_LAYERUPMENU)->Enable(true);
         contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(string(_("Passer le(s) objet(s) sur le calque \"")) + name +"\"");
@@ -206,7 +206,7 @@ void SceneCanvas::UpdateContextMenu()
     contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(false);
     if ( highestLayer-1 >= 0 )
     {
-        string name = scene.layers[highestLayer-1].GetName();
+        string name = scene.initialLayers[highestLayer-1].GetName();
         if ( name == "" ) name = _("Calque de base");
 
         contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(true);
@@ -317,8 +317,8 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
             int IDInitialPosition = GetInitialPositionFromObject(object);
             if ( IDInitialPosition != -1)
             {
-                scene.xObjectsSelected[i] = sceneEdited->positionsInitiales.at( IDInitialPosition ).x;
-                scene.yObjectsSelected[i] = sceneEdited->positionsInitiales.at( IDInitialPosition ).y;
+                scene.xObjectsSelected[i] = sceneEdited->initialObjectsPositions.at( IDInitialPosition ).x;
+                scene.yObjectsSelected[i] = sceneEdited->initialObjectsPositions.at( IDInitialPosition ).y;
             }
         }
     }
@@ -367,9 +367,9 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
             int idPos = GetInitialPositionFromObject(object);
             if ( idPos != -1 )
             {
-                sceneEdited->positionsInitiales.at( idPos ).personalizedSize = true;
-                sceneEdited->positionsInitiales.at( idPos ).width = object->GetWidth();
-                sceneEdited->positionsInitiales.at( idPos ).height = object->GetHeight();
+                sceneEdited->initialObjectsPositions.at( idPos ).personalizedSize = true;
+                sceneEdited->initialObjectsPositions.at( idPos ).width = object->GetWidth();
+                sceneEdited->initialObjectsPositions.at( idPos ).height = object->GetHeight();
             }
         }
     }
@@ -383,9 +383,9 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
             int idPos = GetInitialPositionFromObject(object);
             if ( idPos != -1 )
             {
-                sceneEdited->positionsInitiales.at( idPos ).personalizedSize = true;
-                sceneEdited->positionsInitiales.at( idPos ).height = object->GetHeight();
-                sceneEdited->positionsInitiales.at( idPos ).width = object->GetWidth();
+                sceneEdited->initialObjectsPositions.at( idPos ).personalizedSize = true;
+                sceneEdited->initialObjectsPositions.at( idPos ).height = object->GetHeight();
+                sceneEdited->initialObjectsPositions.at( idPos ).width = object->GetWidth();
             }
         }
     }
@@ -403,7 +403,7 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
             int idPos = GetInitialPositionFromObject(object);
             if ( idPos != -1 )
             {
-                sceneEdited->positionsInitiales.at( idPos ).angle = newAngle;
+                sceneEdited->initialObjectsPositions.at( idPos ).angle = newAngle;
             }
         }
     }
@@ -434,8 +434,8 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
                 }
 
                 //Modification de l'emplacement initial
-                sceneEdited->positionsInitiales.at( idPos ).x = newX;
-                sceneEdited->positionsInitiales.at( idPos ).y = newY;
+                sceneEdited->initialObjectsPositions.at( idPos ).x = newX;
+                sceneEdited->initialObjectsPositions.at( idPos ).y = newY;
 
                 //On bouge aussi l'objet actuellement affiché
                 object->SetX( newX );
@@ -473,13 +473,13 @@ void SceneCanvas::AddObjetSelected(float x, float y)
     if ( scene.objectToAdd == "" ) { wxLogMessage( _( "Vous n'avez selectionné aucun objet à ajouter.\nSélectionnez en un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils." ) ); return;}
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
-    int IDsceneObject = Picker::PickOneObject( &sceneEdited->objetsInitiaux, scene.objectToAdd );
+    int IDsceneObject = Picker::PickOneObject( &sceneEdited->initialObjects, scene.objectToAdd );
     int IDglobalObject = Picker::PickOneObject( &game.globalObjects, scene.objectToAdd );
 
     ObjSPtr newObject = boost::shared_ptr<Object> ();
 
     if ( IDsceneObject != -1 ) //We check first scene's objects' list.
-        newObject = extensionManager->CreateObject(sceneEdited->objetsInitiaux[IDsceneObject]);
+        newObject = extensionManager->CreateObject(sceneEdited->initialObjects[IDsceneObject]);
     else if ( IDglobalObject != -1 ) //Then the global object list
         newObject = extensionManager->CreateObject(game.globalObjects[IDglobalObject]);
 
@@ -505,7 +505,7 @@ void SceneCanvas::AddObjetSelected(float x, float y)
 
     pos.zOrder = 0;
     pos.layer = scene.addOnLayer;
-    sceneEdited->positionsInitiales.push_back( pos );
+    sceneEdited->initialObjectsPositions.push_back( pos );
 
     //Edittime scene object creation
     newObject->errors = &scene.errors;
@@ -564,10 +564,10 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
 void SceneCanvas::OnLayerUpSelected(wxCommandEvent & event)
 {
     int lowestLayer = GetObjectsSelectedLowestLayer();
-    if ( lowestLayer+1 < 0 || static_cast<unsigned>(lowestLayer+1) >= scene.layers.size() )
+    if ( lowestLayer+1 < 0 || static_cast<unsigned>(lowestLayer+1) >= scene.initialLayers.size() )
         return;
 
-    string layerName = scene.layers.at(lowestLayer+1).GetName();
+    string layerName = scene.initialLayers.at(lowestLayer+1).GetName();
 
     for (unsigned int i =0;i<scene.objectsSelected.size();++i)
     {
@@ -575,7 +575,7 @@ void SceneCanvas::OnLayerUpSelected(wxCommandEvent & event)
         int posId = GetInitialPositionFromObject(scene.objectsSelected[i]);
         if ( posId != -1 )
         {
-            sceneEdited->positionsInitiales.at(posId).layer = layerName;
+            sceneEdited->initialObjectsPositions.at(posId).layer = layerName;
             scene.objectsSelected[i]->SetLayer(layerName);
         }
     }
@@ -587,10 +587,10 @@ void SceneCanvas::OnLayerUpSelected(wxCommandEvent & event)
 void SceneCanvas::OnLayerDownSelected(wxCommandEvent & event)
 {
     int highestLayer = GetObjectsSelectedLowestLayer();
-    if ( highestLayer-1 < 0 || static_cast<unsigned>(highestLayer-1) >= scene.layers.size() )
+    if ( highestLayer-1 < 0 || static_cast<unsigned>(highestLayer-1) >= scene.initialLayers.size() )
         return;
 
-    string layerName = scene.layers.at(highestLayer-1).GetName();
+    string layerName = scene.initialLayers.at(highestLayer-1).GetName();
 
     for (unsigned int i =0;i<scene.objectsSelected.size();++i)
     {
@@ -598,7 +598,7 @@ void SceneCanvas::OnLayerDownSelected(wxCommandEvent & event)
         int posId = GetInitialPositionFromObject(scene.objectsSelected[i]);
         if ( posId != -1 )
         {
-            sceneEdited->positionsInitiales.at(posId).layer = layerName;
+            sceneEdited->initialObjectsPositions.at(posId).layer = layerName;
             scene.objectsSelected[i]->SetLayer(layerName);
         }
     }
@@ -619,25 +619,25 @@ void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
     int idPos = GetInitialPositionFromObject(smallestObject);
     if ( idPos == -1 ) return;
 
-    bool hadAPersonalizedSize = sceneEdited->positionsInitiales.at( idPos ).personalizedSize;
+    bool hadAPersonalizedSize = sceneEdited->initialObjectsPositions.at( idPos ).personalizedSize;
 
     //Affichage des propriétés de l'objet sous la souris
-    EditOptionsPosition DialogPosition( this, game, scene, sceneEdited->positionsInitiales.at( idPos ) );
+    EditOptionsPosition DialogPosition( this, game, scene, sceneEdited->initialObjectsPositions.at( idPos ) );
     if ( DialogPosition.ShowModal() == 1 )
     {
-        sceneEdited->positionsInitiales.at( idPos ) = DialogPosition.position;
+        sceneEdited->initialObjectsPositions.at( idPos ) = DialogPosition.position;
 
-        smallestObject->SetX( sceneEdited->positionsInitiales.at( idPos ).x );
-        smallestObject->SetY( sceneEdited->positionsInitiales.at( idPos ).y );
-        smallestObject->SetZOrder( sceneEdited->positionsInitiales.at( idPos ).zOrder );
-        smallestObject->SetLayer( sceneEdited->positionsInitiales.at( idPos ).layer );
+        smallestObject->SetX( sceneEdited->initialObjectsPositions.at( idPos ).x );
+        smallestObject->SetY( sceneEdited->initialObjectsPositions.at( idPos ).y );
+        smallestObject->SetZOrder( sceneEdited->initialObjectsPositions.at( idPos ).zOrder );
+        smallestObject->SetLayer( sceneEdited->initialObjectsPositions.at( idPos ).layer );
 
-        smallestObject->InitializeFromInitialPosition(sceneEdited->positionsInitiales.at( idPos ));
+        smallestObject->InitializeFromInitialPosition(sceneEdited->initialObjectsPositions.at( idPos ));
 
-        if ( sceneEdited->positionsInitiales.at( idPos ).personalizedSize )
+        if ( sceneEdited->initialObjectsPositions.at( idPos ).personalizedSize )
         {
-            smallestObject->SetWidth( sceneEdited->positionsInitiales.at( idPos ).width );
-            smallestObject->SetHeight( sceneEdited->positionsInitiales.at( idPos ).height );
+            smallestObject->SetWidth( sceneEdited->initialObjectsPositions.at( idPos ).width );
+            smallestObject->SetHeight( sceneEdited->initialObjectsPositions.at( idPos ).height );
         }
         else if ( hadAPersonalizedSize ) //For now, we reload the scene so as the object get back its initial size
         {
@@ -672,7 +672,7 @@ void SceneCanvas::OnDelObjetSelected(wxCommandEvent & event)
         int idPos = GetInitialPositionFromObject(object);
         if ( idPos != -1 )
         {
-            sceneEdited->positionsInitiales.erase(sceneEdited->positionsInitiales.begin() + idPos);
+            sceneEdited->initialObjectsPositions.erase(sceneEdited->initialObjectsPositions.begin() + idPos);
             scene.objectsInstances.RemoveObject(object);
         }
     }
@@ -750,9 +750,9 @@ int SceneCanvas::GetObjectsSelectedHighestLayer()
         {
             int layerObjId = 0;
             //On cherche le numéro du calque de l'objet
-            for (unsigned int layerId = 0;layerId<scene.layers.size();++layerId)
+            for (unsigned int layerId = 0;layerId<scene.initialLayers.size();++layerId)
             {
-                if ( scene.layers[layerId].GetName() == sceneEdited->positionsInitiales.at(posId).layer )
+                if ( scene.initialLayers[layerId].GetName() == sceneEdited->initialObjectsPositions.at(posId).layer )
                    layerObjId = layerId;
             }
 
@@ -766,7 +766,7 @@ int SceneCanvas::GetObjectsSelectedHighestLayer()
 
 int SceneCanvas::GetObjectsSelectedLowestLayer()
 {
-    int lowestLayer = scene.layers.size()-1;
+    int lowestLayer = scene.initialLayers.size()-1;
     for (unsigned int i =0;i<scene.objectsSelected.size();++i)
     {
         //Récupérons la position initiale
@@ -775,9 +775,9 @@ int SceneCanvas::GetObjectsSelectedLowestLayer()
         {
             int layerObjId = 0;
             //On cherche le numéro du calque de l'objet
-            for (unsigned int layerId = 0;layerId<scene.layers.size();++layerId)
+            for (unsigned int layerId = 0;layerId<scene.initialLayers.size();++layerId)
             {
-                if ( scene.layers[layerId].GetName() == sceneEdited->positionsInitiales.at(posId).layer )
+                if ( scene.initialLayers[layerId].GetName() == sceneEdited->initialObjectsPositions.at(posId).layer )
                    layerObjId = layerId;
             }
 
@@ -796,11 +796,11 @@ int SceneCanvas::GetInitialPositionFromObject(ObjSPtr object)
 {
     if ( object == boost::shared_ptr<Object> ()) return -1;
 
-    for (unsigned int j = 0;j < sceneEdited->positionsInitiales.size();++j)
+    for (unsigned int j = 0;j < sceneEdited->initialObjectsPositions.size();++j)
     {
-        if ( sceneEdited->positionsInitiales.at( j ).objectName == object->GetName() &&
-                sceneEdited->positionsInitiales.at( j ).x == object->GetX() &&
-                sceneEdited->positionsInitiales.at( j ).y == object->GetY() )
+        if ( sceneEdited->initialObjectsPositions.at( j ).objectName == object->GetName() &&
+                sceneEdited->initialObjectsPositions.at( j ).x == object->GetX() &&
+                sceneEdited->initialObjectsPositions.at( j ).y == object->GetY() )
         {
             return j;
         }

@@ -66,7 +66,7 @@ mainEditorCommand(mainEditorCommand_)
     //(*Initialize(EditorObjets)
     Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
     Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(128,168), wxNB_MULTILINE, _T("ID_NOTEBOOK1"));
-    sceneObjectsEditor = new EditorObjectList(Notebook1, game, &scene->objetsInitiaux, mainEditorCommand);
+    sceneObjectsEditor = new EditorObjectList(Notebook1, game, &scene->initialObjects, mainEditorCommand);
     ObjetsGroups = new EditorObjetsGroups(Notebook1, game, scene, &scene->objectGroups, mainEditorCommand);
     globalObjectsEditor = new EditorObjectList(Notebook1, game, &game.globalObjects, mainEditorCommand);
     Notebook1->AddPage(sceneObjectsEditor, _("Objets"), false);
@@ -115,7 +115,7 @@ void EditorObjets::ChangeScenePtr(Scene * newScenePtr, bool refresh)
     scene = newScenePtr;
 
     //Sub editors
-    sceneObjectsEditor->ChangeObjectsPtr(&scene->objetsInitiaux);
+    sceneObjectsEditor->ChangeObjectsPtr(&scene->initialObjects);
     if (refresh) sceneObjectsEditor->Refresh();
 
     ObjetsGroups->ChangeScenePtr(scene);

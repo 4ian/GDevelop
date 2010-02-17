@@ -167,8 +167,8 @@ externalWindow(this)
     Connect(ID_DEBUGBUTTON,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorScene::OnDebugBtClick);
 
 	//Initialisation des éditeurs
-    objectsEditor = new EditorObjets(this, game, scene, &scene->objetsInitiaux, mainEditorCommand);
-    layersEditor = new EditorLayers(this, game, scene, &scene->layers, mainEditorCommand);
+    objectsEditor = new EditorObjets(this, game, scene, &scene->initialObjects, mainEditorCommand);
+    layersEditor = new EditorLayers(this, game, scene, &scene->initialLayers, mainEditorCommand);
     sceneCanvas->SetScrollbars(ScrollBar1, ScrollBar2);
     debugger = new DebuggerGUI(this, sceneCanvas->scene);
     sceneCanvas->scene.debugger = debugger;
@@ -517,7 +517,7 @@ void EditorScene::ChangeScenePtr(Scene * newScenePtr, bool refresh)
     if ( refresh ) eventsEditor->Refresh();
 
     layersEditor->ChangeScenePtr(scene);
-    layersEditor->ChangeLayersPtr(&scene->layers);
+    layersEditor->ChangeLayersPtr(&scene->initialLayers);
     if ( refresh ) layersEditor->Refresh();
 
     if ( refresh ) Refresh();
@@ -602,7 +602,7 @@ void EditorScene::OnChoisirObjetBtClick( wxCommandEvent & event )
 ////////////////////////////////////////////////////////////
 void EditorScene::OnChoisirLayerBtClick( wxCommandEvent & event )
 {
-    ChoixLayer Dialog( this, scene->layers );
+    ChoixLayer Dialog( this, scene->initialLayers );
     if ( Dialog.ShowModal() == 1 )
     {
         sceneCanvas->scene.addOnLayer = Dialog.layerChosen;

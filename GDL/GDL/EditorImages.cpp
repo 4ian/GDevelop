@@ -44,6 +44,7 @@
 const long EditorImages::ID_PANEL2 = wxNewId();
 const long EditorImages::ID_TREECTRL1 = wxNewId();
 const long EditorImages::ID_PANEL3 = wxNewId();
+const long EditorImages::ID_SPLITTERWINDOW1 = wxNewId();
 const long EditorImages::ID_PANEL1 = wxNewId();
 const long EditorImages::idMenuModProp = wxNewId();
 const long EditorImages::idMenuMod = wxNewId();
@@ -103,7 +104,7 @@ toolbar(NULL)
     wxMenuItem* editMenuItem;
     wxFlexGridSizer* FlexGridSizer1;
 
-    Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
     FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer2->AddGrowableCol(0);
     FlexGridSizer2->AddGrowableRow(0);
@@ -119,11 +120,14 @@ toolbar(NULL)
     if ( useRibbon ) toolbarPanel->SetSize(-1, 0);
     FlexGridSizer1->Add(toolbarPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer4->Add(FlexGridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    BanqueImageList = new wxTreeCtrl(Core, ID_TREECTRL1, wxDefaultPosition, wxSize(200,170), wxTR_EDIT_LABELS|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
+    SplitterWindow1 = new wxSplitterWindow(Core, ID_SPLITTERWINDOW1, wxDefaultPosition, wxSize(239,271), wxSP_3D, _T("ID_SPLITTERWINDOW1"));
+    SplitterWindow1->SetMinSize(wxSize(10,10));
+    SplitterWindow1->SetMinimumPaneSize(10);
+    BanqueImageList = new wxTreeCtrl(SplitterWindow1, ID_TREECTRL1, wxDefaultPosition, wxSize(200,170), wxTR_EDIT_LABELS|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
     BanqueImageList->SetToolTip(_("Clic droit sur une image pour accéder aux options"));
-    FlexGridSizer4->Add(BanqueImageList, 1, wxALL|wxEXPAND|wxFIXED_MINSIZE|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    apercuPanel = new wxPanel(Core, ID_PANEL3, wxDefaultPosition, wxSize(200,120), wxSUNKEN_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
-    FlexGridSizer4->Add(apercuPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    apercuPanel = new wxPanel(SplitterWindow1, ID_PANEL3, wxDefaultPosition, wxSize(200,120), wxSUNKEN_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
+    SplitterWindow1->SplitHorizontally(BanqueImageList, apercuPanel);
+    FlexGridSizer4->Add(SplitterWindow1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     Core->SetSizer(FlexGridSizer4);
     FlexGridSizer4->Fit(Core);
     FlexGridSizer4->SetSizeHints(Core);
@@ -169,16 +173,11 @@ toolbar(NULL)
     FlexGridSizer2->SetSizeHints(this);
 
     toolbarPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorImages::OntoolbarPanelResize,0,this);
-    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_DRAG,(wxObjectEventFunction)&EditorImages::OnBanqueImageListBeginDrag);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT,(wxObjectEventFunction)&EditorImages::OnBanqueImageListBeginLabelEdit);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_END_LABEL_EDIT,(wxObjectEventFunction)&EditorImages::OnBanqueImageListEndLabelEdit);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&EditorImages::OnBanqueImageListItemActivated1);
-    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&EditorImages::OnBanqueImageListSelectionChanged);
-    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&EditorImages::OnBanqueImageListSelectionChanged);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_MENU,(wxObjectEventFunction)&EditorImages::OnBanqueImageListItemMenu);
     apercuPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EditorImages::OnapercuPanelPaint,0,this);
-    apercuPanel->Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorImages::OnSetFocus,0,this);
-    Core->Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorImages::OnSetFocus,0,this);
     Connect(idMenuModProp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnModPropSelected);
     Connect(idMenuMod,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnModNameImageBtClick);
     Connect(idMenuModFile,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnModFileImage);
@@ -188,7 +187,6 @@ toolbar(NULL)
     Connect(idMenuRemoveDossier,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnMenuItem6Selected);
     Connect(idMoveUp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnMoveUpSelected);
     Connect(idMoveDown,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnMoveDownSelected);
-    Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorImages::OnSetFocus);
     //*)
 
     m_NomItem = "";
@@ -226,6 +224,8 @@ toolbar(NULL)
     Connect(ID_BITMAPBUTTON4,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorImages::DossierBt);
     Connect(ID_BITMAPBUTTON2,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorImages::OnChercherBtClick);
     Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorImages::OnAideBtClick);
+
+    Refresh();
 }
 
 EditorImages::~EditorImages()

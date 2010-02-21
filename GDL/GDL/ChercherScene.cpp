@@ -9,7 +9,7 @@ int GD_API ChercherScene( vector < Scene > vecteur, string chaine )
         //On vérifie le nom de chaque scène
         for ( unsigned int j = 0;j < vecteur.size();j++ )
         {
-            if ( vecteur.at( j ).name == chaine )
+            if ( vecteur.at( j ).GetName() == chaine )
             {
                 return j;
             }
@@ -26,7 +26,7 @@ bool GD_API SceneExist( vector < Scene > vecteur, string chaine, int exclude )
         //On vérifie le nom de chaque scène
         for ( unsigned int i = 0;i < vecteur.size();i++ )
         {
-            if ( vecteur.at( i ).name == chaine && i != exclude )
+            if ( vecteur.at( i ).GetName() == chaine && i != exclude )
             {
                 return true;
             }

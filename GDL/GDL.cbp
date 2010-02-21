@@ -724,6 +724,11 @@
 				<Settings autoincrement="0" date_declarations="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="GDL/Version.h" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
 			</AutoVersioning>
+			<wxsmith version="1">
+				<resources>
+					<wxPanel wxs="wxsmith/EditorImages.wxs" src="GDL/EditorImages.cpp" hdr="GDL/EditorImages.h" name="EditorImages" language="CPP" />
+				</resources>
+			</wxsmith>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

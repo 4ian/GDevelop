@@ -28,17 +28,22 @@
 
 using namespace std;
 
+/**
+ * Game contains all data of a game, from scenes
+ * to properties like game's name.
+ */
 class GD_API Game
 {
     public:
         Game();
-        virtual ~Game();
+        Game(const Game&);
+        virtual ~Game() {};
 
-        //Quelques informations
+        Game& operator=(const Game & rhs);
+
+        //Some properties
         string name;
         string author;
-
-        //Paramètres généraux
         int windowWidth;
         int windowHeight;
         int maxFPS;
@@ -47,26 +52,33 @@ class GD_API Game
         bool portable;
         bool fullscreen;
 
-        //Noms des extensions utilisées
+        //Extensions used
         vector < string > extensionsUsed;
 
-        //Contenu du jeu
         LoadingScreen loadingScreen;
 
+        //Resources
         vector < Image >    images;
         vector < Dossier >  dossierImages;
 
-        vector < Scene >    m_scenes;
+        vector < boost::shared_ptr<Scene> >     scenes;
         vector < boost::shared_ptr<Object> >    globalObjects;
 
-        //Variables globales
+        //Initial
         ListVariable variables;
 
         #if defined(GDE)
-        needReload nr;
+        needReload      nr;
+        string          gameFile; ///< File of the game
         #endif
     protected:
     private:
+
+        /**
+         * Initialize from another game. Used by copy-ctor and assign-op.
+         * Don't forget to update me if members were changed !
+         */
+        void Init(const Game & game);
 };
 
 #endif // GAME_H

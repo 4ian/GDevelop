@@ -17,8 +17,6 @@ class GD_API RuntimeGame : public Game
         RuntimeGame();
         virtual ~RuntimeGame();
 
-        bool LoadFromGame(const Game & game);
-
         ImageManager imageManager;
 
     protected:

@@ -3,6 +3,7 @@
 
 #include <string>
 #include "GDL/Scene.h"
+#include <boost/shared_ptr.hpp>
 
 int GD_API ChercherScene( vector < Scene > vecteur, string chaine );
 bool GD_API SceneExist( vector < Scene > vecteur, string chaine, int exclude );

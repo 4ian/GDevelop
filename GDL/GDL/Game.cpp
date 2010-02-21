@@ -1,8 +1,9 @@
 #include "GDL/Game.h"
 #include "GDL/MemTrace.h"
-
+#include "GDL/ExtensionsManager.h"
 
 Game::Game() :
+name("Application"),
 windowWidth(800),
 windowHeight(600),
 maxFPS(60),
@@ -29,7 +30,57 @@ fullscreen(false)
     extensionsUsed.push_back("Sprite");
 }
 
-Game::~Game()
+
+void Game::Init(const Game & game)
 {
-    //dtor
+    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+
+    //Some properties
+    name = game.name;
+    author = game.author;
+    windowWidth = game.windowWidth;
+    windowHeight = game.windowHeight;
+    maxFPS = game.maxFPS;
+    minFPS = game.minFPS;
+    verticalSync = game.verticalSync;
+    portable = game.portable;
+    fullscreen = game.fullscreen;
+
+    //Extensions used
+    extensionsUsed = game.extensionsUsed;
+
+    loadingScreen = game.loadingScreen;
+
+    //Resources
+    images = game.images;
+    dossierImages = game.dossierImages;
+
+    globalObjects.clear();
+    for (unsigned int i =0;i<game.globalObjects.size();++i)
+    	globalObjects.push_back( extensionManager->CreateObject(game.globalObjects[i]) );
+
+    scenes.clear();
+    for (unsigned int i =0;i<game.scenes.size();++i)
+    	scenes.push_back( boost::shared_ptr<Scene>(new Scene(*game.scenes[i])) );
+
+    //Initial
+    variables = game.variables;
+
+    #if defined(GDE)
+    nr = game.nr;
+    gameFile = game.gameFile;
+    #endif
+}
+
+Game::Game(const Game & game)
+{
+    Init(game);
+}
+
+Game& Game::operator=(const Game & game)
+{
+    if ( this != &game )
+        Init(game);
+
+    return *this;
 }

@@ -658,8 +658,10 @@ void RuntimeScene::PreprocessEventList( const Game & Jeu, vector < Event > & lis
         if ( listEvent.at( i ).type == "Link" )
         {
             //On récupère la scène à insérer
-            int sceneID = ChercherScene( Jeu.m_scenes, listEvent.at( i ).sceneLinked );
-            if ( sceneID == -1 ) return;
+            vector< boost::shared_ptr<Scene> >::const_iterator scene =
+                find_if(Jeu.scenes.begin(), Jeu.scenes.end(), bind2nd(SceneHasName(), listEvent.at( i ).sceneLinked));
+
+            if ( scene == Jeu.scenes.end() ) return;
 
             int start = listEvent.at( i ).start;
             int end = listEvent.at( i ).end;
@@ -667,7 +669,7 @@ void RuntimeScene::PreprocessEventList( const Game & Jeu, vector < Event > & lis
             if ( start == -1 && end == -1 ) //Doit on inclure tous les évènements ?
             {
                 start = 0;
-                end = Jeu.m_scenes.at( sceneID ).events.size() - 1;
+                end = (*scene)->events.size() - 1;
             }
             else //Ou inclure juste certains évènements
             {
@@ -676,12 +678,12 @@ void RuntimeScene::PreprocessEventList( const Game & Jeu, vector < Event > & lis
             }
 
             //On teste la validité de l'insertion
-            if ( start < 0 || static_cast<unsigned>(start) >= Jeu.m_scenes.at( sceneID ).events.size() )
+            if ( start < 0 || static_cast<unsigned>(start) >= (*scene)->events.size() )
             {
                 errors.Add( "Impossible d'insérer les évènements du lien", "", "", i, 2 );
                 return;
             }
-            if ( end < 0 || static_cast<unsigned>(end) >= Jeu.m_scenes.at( sceneID ).events.size() )
+            if ( end < 0 || static_cast<unsigned>(end) >= (*scene)->events.size() )
             {
                 errors.Add( "Impossible d'insérer les évènements du lien", "", "", i, 2 );
                 return;
@@ -696,9 +698,9 @@ void RuntimeScene::PreprocessEventList( const Game & Jeu, vector < Event > & lis
             for ( int insertion = start ; insertion <= end ;insertion++ ) //Insertion des évènements du lien
             {
                 if ( i+insertion < listEvent.size() )
-                    listEvent.insert( listEvent.begin() + i+insertion, Jeu.m_scenes.at( sceneID ).events.at( insertion ) );
+                    listEvent.insert( listEvent.begin() + i+insertion, (*scene)->events.at( insertion ) );
                 else
-                    listEvent.push_back( Jeu.m_scenes.at( sceneID ).events.at( insertion ) );
+                    listEvent.push_back( (*scene)->events.at( insertion ) );
             }
         }
         else if ( !listEvent.at( i ).events.empty() )

@@ -10,6 +10,9 @@ backgroundColorR(125),
 backgroundColorG(125),
 backgroundColorB(125),
 standardSortMethod(true)
+#if defined(GDE)
+,wasModified(false)
+#endif
 {
     //ctor
     Layer layer;
@@ -17,12 +20,7 @@ standardSortMethod(true)
     initialLayers.push_back(layer);
 }
 
-Scene::~Scene()
-{
-    //dtor
-}
-
-Scene::Scene(const Scene & scene)
+void Scene::Init(const Scene & scene)
 {
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
 
@@ -46,31 +44,15 @@ Scene::Scene(const Scene & scene)
     variables = scene.variables;
 }
 
+Scene::Scene(const Scene & scene)
+{
+    Init(scene);
+}
+
 Scene& Scene::operator=(const Scene & scene)
 {
     if ( this != &scene )
-    {
-        gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
-
-        this->name = scene.name;
-
-        this->backgroundColorR = scene.backgroundColorR;
-        this->backgroundColorG = scene.backgroundColorG;
-        this->backgroundColorB = scene.backgroundColorB;
-        this->standardSortMethod = scene.standardSortMethod;
-        this->title = scene.title;
-
-        this->events = scene.events;
-
-        this->initialObjects.clear();
-        for (unsigned int i =0;i<scene.initialObjects.size();++i)
-            this->initialObjects.push_back( extensionManager->CreateObject(scene.initialObjects[i]) );
-
-        this->objectGroups = scene.objectGroups;
-        this->initialObjectsPositions = scene.initialObjectsPositions;
-        this->initialLayers = scene.initialLayers;
-        this->variables = scene.variables;
-    }
+        Init(scene);
 
     return *this;
 }

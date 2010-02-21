@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxPanel" name="EditorImages">
+		<id_arg>0</id_arg>
+		<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+			<cols>1</cols>
+			<growablecols>0</growablecols>
+			<growablerows>0</growablerows>
+			<object class="sizeritem">
+				<object class="wxPanel" name="ID_PANEL1" variable="Core" member="yes">
+					<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
+						<cols>1</cols>
+						<growablecols>0</growablecols>
+						<growablerows>1</growablerows>
+						<object class="sizeritem">
+							<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+								<cols>3</cols>
+								<growablecols>0</growablecols>
+								<growablerows>0</growablerows>
+								<object class="sizeritem">
+									<object class="wxPanel" name="ID_PANEL2" variable="toolbarPanel" member="yes">
+										<size>-1,25</size>
+										<bg>wxSYS_COLOUR_WINDOW</bg>
+										<extra_code>if ( useRibbon ) toolbarPanel-&gt;SetSize(-1, 0);</extra_code>
+										<handler function="OntoolbarPanelResize" entry="EVT_SIZE" />
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="SplitterWindow1" member="yes">
+								<minsize>10</minsize>
+								<size>239,271</size>
+								<minsize>10,10</minsize>
+								<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="BanqueImageList" member="yes">
+									<size>200,170</size>
+									<tooltip>Clic droit sur une image pour accéder aux options</tooltip>
+									<style>wxTR_EDIT_LABELS|wxTR_DEFAULT_STYLE</style>
+									<handler function="OnBanqueImageListBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
+									<handler function="OnBanqueImageListEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
+									<handler function="OnBanqueImageListItemActivated1" entry="EVT_TREE_ITEM_ACTIVATED" />
+									<handler function="OnBanqueImageListItemMenu" entry="EVT_TREE_ITEM_MENU" />
+								</object>
+								<object class="wxPanel" name="ID_PANEL3" variable="apercuPanel" member="yes">
+									<size>200,120</size>
+									<style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
+									<handler function="OnapercuPanelPaint" entry="EVT_PAINT" />
+								</object>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<option>1</option>
+						</object>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+		</object>
+		<object class="wxMenu" variable="ContextMenu" member="yes">
+			<object class="wxMenuItem" name="idMenuModProp" variable="editMenuItem" member="no">
+				<label>Modifier les propriétés de l&apos;image</label>
+				<bitmap>res/editpropicon.png</bitmap>
+				<extra_code>#ifdef ____WXMSW____&#x0A;ContextMenu.Remove(editMenuItem);&#x0A; wxFont boldFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE__NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING__DEFAULT);&#x0A; editMenuItem-&gt;SetFont(boldFont);&#x0A; ContextMenu.Append(editMenuItem);&#x0A;#endif</extra_code>
+				<handler function="OnModPropSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idMenuMod" variable="MenuItem3" member="no">
+				<label>Modifier le nom de l&apos;image</label>
+				<bitmap>res/editnom.png</bitmap>
+				<handler function="OnModNameImageBtClick" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idMenuModFile" variable="MenuItem4" member="yes">
+				<label>Modifier le fichier de l&apos;image</label>
+				<bitmap>res/openicon.png</bitmap>
+				<handler function="OnModFileImage" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="idMenuAjouter" variable="MenuItem1" member="no">
+				<label>Ajouter une image</label>
+				<bitmap>res/addicon.png</bitmap>
+				<handler function="OnAddImageBtClick" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idMenuDel" variable="MenuItem2" member="no">
+				<label>Supprimer l&apos;image</label>
+				<bitmap>res/deleteicon.png</bitmap>
+				<handler function="OnDelImageBtClick" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="idMenuAddDossier" variable="MenuItem5" member="yes">
+				<label>Ajouter une image déjà existante au dossier</label>
+				<bitmap>res/addicon.png</bitmap>
+				<handler function="OnMenuItem5Selected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idMenuRemoveDossier" variable="MenuItem6" member="yes">
+				<label>Supprimer l&apos;image du dossier</label>
+				<bitmap>res/remove.png</bitmap>
+				<handler function="OnMenuItem6Selected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="idMoveUp" variable="MenuItem7" member="yes">
+				<label>Déplacer vers le haut</label>
+				<accel>Ctrl-P</accel>
+				<help>Déplacer l&apos;image vers le haut dans la liste</help>
+				<bitmap>res/up.png</bitmap>
+				<handler function="OnMoveUpSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idMoveDown" variable="MenuItem8" member="yes">
+				<label>Déplacer vers le bas</label>
+				<help>Déplacer l&apos;image vers le bas dans la liste</help>
+				<bitmap>res/down.png</bitmap>
+				<handler function="OnMoveDownSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+	</object>
+</wxsmith>

@@ -72,7 +72,6 @@ BOOST_PYTHON_MODULE(gd)
                         .def_readwrite("verticalSync", &Game::verticalSync);
 
     class_<Scene>("Scene")
-                        .def_readwrite("name", &Scene::name)
                         .def_readwrite("backgroundColorR", &Scene::backgroundColorR)
                         .def_readwrite("backgroundColorG", &Scene::backgroundColorG)
                         .def_readwrite("backgroundColorB", &Scene::backgroundColorB)

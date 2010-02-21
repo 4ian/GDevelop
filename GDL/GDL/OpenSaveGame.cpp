@@ -176,46 +176,45 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     //Scenes du jeu
     elem = hdl.FirstChildElement().FirstChildElement( "Scenes" ).Element();
     if ( elem == NULL ) { MSG( "Les informations concernant les scenes manquent" ); }
-    game.m_scenes.clear();
+    game.scenes.clear();
 
     elem = hdl.FirstChildElement().FirstChildElement( "Scenes" ).FirstChildElement().Element();
     while ( elem )
     {
         //Scene vide
-        Scene newScene;
+        boost::shared_ptr<Scene> newScene = boost::shared_ptr<Scene>(new Scene());
 
         //Nom
-        if ( elem->Attribute( "nom" ) != NULL ) { newScene.name = elem->Attribute( "nom" );}
+        if ( elem->Attribute( "nom" ) != NULL ) { newScene->SetName( elem->Attribute( "nom" ) );}
         else { MSG( "Les informations concernant le nom de la scene manquent." ); }
-        if ( elem->Attribute( "r" ) != NULL ) { int value;elem->QueryIntAttribute( "r", &value ); newScene.backgroundColorR = value;}
+        if ( elem->Attribute( "r" ) != NULL ) { int value;elem->QueryIntAttribute( "r", &value ); newScene->backgroundColorR = value;}
         else { MSG( "Les informations concernant la couleur de fond de la scene manquent." ); }
-        if ( elem->Attribute( "v" ) != NULL ) { int value;elem->QueryIntAttribute( "v", &value ); newScene.backgroundColorG = value;}
+        if ( elem->Attribute( "v" ) != NULL ) { int value;elem->QueryIntAttribute( "v", &value ); newScene->backgroundColorG = value;}
         else { MSG( "Les informations concernant la couleur de fond de la scene manquent." ); }
-        if ( elem->Attribute( "b" ) != NULL ) { int value;elem->QueryIntAttribute( "b", &value ); newScene.backgroundColorB = value;}
+        if ( elem->Attribute( "b" ) != NULL ) { int value;elem->QueryIntAttribute( "b", &value ); newScene->backgroundColorB = value;}
         else { MSG( "Les informations concernant la couleur de fond de la scene manquent." ); }
-        if ( elem->Attribute( "titre" ) != NULL ) { newScene.title = elem->Attribute( "titre" );}
+        if ( elem->Attribute( "titre" ) != NULL ) { newScene->title = elem->Attribute( "titre" );}
         else { MSG( "Les informations concernant le titre de la fenêtre de la scene manquent." ); }
 
         if ( elem->FirstChildElement( "GroupesObjets" ) != NULL )
-            OpenGroupesObjets(newScene.objectGroups, elem->FirstChildElement( "GroupesObjets" ));
+            OpenGroupesObjets(newScene->objectGroups, elem->FirstChildElement( "GroupesObjets" ));
 
         if ( elem->FirstChildElement( "Objets" ) != NULL )
-            OpenObjects(newScene.initialObjects, elem->FirstChildElement( "Objets" ));
+            OpenObjects(newScene->initialObjects, elem->FirstChildElement( "Objets" ));
 
         if ( elem->FirstChildElement( "Positions" ) != NULL )
-            OpenPositions(newScene.initialObjectsPositions, elem->FirstChildElement( "Positions" ));
+            OpenPositions(newScene->initialObjectsPositions, elem->FirstChildElement( "Positions" ));
 
         if ( elem->FirstChildElement( "Layers" ) != NULL )
-            OpenLayers(newScene.initialLayers, elem->FirstChildElement( "Layers" ));
+            OpenLayers(newScene->initialLayers, elem->FirstChildElement( "Layers" ));
 
         if ( elem->FirstChildElement( "Events" ) != NULL )
-            OpenEvents(newScene.events, elem->FirstChildElement( "Events" ));
+            OpenEvents(newScene->events, elem->FirstChildElement( "Events" ));
 
         if ( elem->FirstChildElement( "Variables" ) != NULL )
-            OpenVariablesList(newScene.variables, elem->FirstChildElement( "Variables" ));
+            OpenVariablesList(newScene->variables, elem->FirstChildElement( "Variables" ));
 
-        //Ajout de la scène et suppression de la mémoire de celle ci
-        game.m_scenes.push_back( newScene );
+        game.scenes.push_back( newScene );
 
         elem = elem->NextSiblingElement();
     }
@@ -880,53 +879,53 @@ bool OpenSaveGame::SaveToFile(string file)
     root->LinkEndChild( scenes );
     TiXmlElement * scene;
 
-    if ( !game.m_scenes.empty() )
+    if ( !game.scenes.empty() )
     {
-        for ( unsigned int i = 0;i < game.m_scenes.size();i++ )
+        for ( unsigned int i = 0;i < game.scenes.size();i++ )
         {
             scene = new TiXmlElement( "Scene" );
             scenes->LinkEndChild( scene );
-            scene->SetAttribute( "nom", game.m_scenes.at( i ).name.c_str() );
-            scene->SetDoubleAttribute( "r", game.m_scenes.at( i ).backgroundColorR );
-            scene->SetDoubleAttribute( "v", game.m_scenes.at( i ).backgroundColorG );
-            scene->SetDoubleAttribute( "b", game.m_scenes.at( i ).backgroundColorB );
-            scene->SetAttribute( "titre", game.m_scenes.at( i ).title.c_str() );
+            scene->SetAttribute( "nom", game.scenes[i]->GetName().c_str() );
+            scene->SetDoubleAttribute( "r", game.scenes[i]->backgroundColorR );
+            scene->SetDoubleAttribute( "v", game.scenes[i]->backgroundColorG );
+            scene->SetDoubleAttribute( "b", game.scenes[i]->backgroundColorB );
+            scene->SetAttribute( "titre", game.scenes[i]->title.c_str() );
 
-            if ( !game.m_scenes.at( i ).objectGroups.empty() )
+            if ( !game.scenes[i]->objectGroups.empty() )
             {
                 TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
                 scene->LinkEndChild( grpsobjets );
 
-                SaveGroupesObjets(game.m_scenes.at( i ).objectGroups, grpsobjets);
+                SaveGroupesObjets(game.scenes[i]->objectGroups, grpsobjets);
             }
 
             TiXmlElement * objets = new TiXmlElement( "Objets" );
             scene->LinkEndChild( objets );
-            SaveObjects(game.m_scenes.at( i ).initialObjects, objets);
+            SaveObjects(game.scenes[i]->initialObjects, objets);
 
             TiXmlElement * layers = new TiXmlElement( "Layers" );
             scene->LinkEndChild( layers );
-            SaveLayers(game.m_scenes.at( i ).initialLayers, layers);
+            SaveLayers(game.scenes[i]->initialLayers, layers);
 
             TiXmlElement * variables = new TiXmlElement( "Variables" );
             scene->LinkEndChild( variables );
-            SaveVariablesList(game.m_scenes.at( i ).variables, variables);
+            SaveVariablesList(game.scenes[i]->variables, variables);
 
-            if ( !game.m_scenes.at( i ).initialObjectsPositions.empty() )
+            if ( !game.scenes[i]->initialObjectsPositions.empty() )
             {
                 TiXmlElement * positions = new TiXmlElement( "Positions" );
                 scene->LinkEndChild( positions );
 
-                SavePositions(game.m_scenes.at( i ).initialObjectsPositions, positions);
+                SavePositions(game.scenes[i]->initialObjectsPositions, positions);
             }
 
             //Evènements
-            if ( !game.m_scenes.at( i ).events.empty() )
+            if ( !game.scenes[i]->events.empty() )
             {
                 TiXmlElement * events = new TiXmlElement( "Events" );
                 scene->LinkEndChild( events );
 
-                SaveEvents(game.m_scenes.at( i ).events, events);
+                SaveEvents(game.scenes[i]->events, events);
             }
 
         }
@@ -1295,28 +1294,28 @@ void OpenSaveGame::RecreatePaths(string file)
         wxSafeYield();
     }
 
-    for ( unsigned int i = 0;i < game.m_scenes.size();i++ )
+    for ( unsigned int i = 0;i < game.scenes.size();i++ )
     {
-        for ( unsigned int j = 0;j < game.m_scenes[i].events.size() ;j++ )
+        for ( unsigned int j = 0;j < game.scenes[i]->events.size() ;j++ )
         {
-            for ( unsigned int k = 0;k < game.m_scenes[i].events[j].actions.size() ;k++ )
+            for ( unsigned int k = 0;k < game.scenes[i]->events[j].actions.size() ;k++ )
             {
-                if ( game.m_scenes[i].events[j].actions[k].GetType() == "PlaySound" || game.m_scenes[i].events[j].actions[k].GetType() == "PlaySoundCanal" )
+                if ( game.scenes[i]->events[j].actions[k].GetType() == "PlaySound" || game.scenes[i]->events[j].actions[k].GetType() == "PlaySoundCanal" )
                 {
                     //Rajout répertoire
-                    game.m_scenes[i].events[j].actions[k].SetParameter(0, GDExpression(rep + game.m_scenes[i].events[j].actions[k].GetParameter(0).GetPlainString()));
+                    game.scenes[i]->events[j].actions[k].SetParameter(0, GDExpression(rep + game.scenes[i]->events[j].actions[k].GetParameter(0).GetPlainString()));
                 }
-                if ( game.m_scenes[i].events[j].actions[k].GetType() == "PlayMusic" || game.m_scenes[i].events[j].actions[k].GetType() == "PlayMusicCanal" )
+                if ( game.scenes[i]->events[j].actions[k].GetType() == "PlayMusic" || game.scenes[i]->events[j].actions[k].GetType() == "PlayMusicCanal" )
                 {
                     //Rajout répertoire
-                    game.m_scenes[i].events[j].actions[k].SetParameter(0, GDExpression(rep + game.m_scenes[i].events[j].actions[k].GetParameter(0).GetPlainString()));
+                    game.scenes[i]->events[j].actions[k].SetParameter(0, GDExpression(rep + game.scenes[i]->events[j].actions[k].GetParameter(0).GetPlainString()));
                 }
-                if ( game.m_scenes[i].events[j].actions[k].GetType() == "EcrireTexte" )
+                if ( game.scenes[i]->events[j].actions[k].GetType() == "EcrireTexte" )
                 {
-                    if ( game.m_scenes[i].events[j].actions[k].GetParameter(5).GetPlainString() != "" )
+                    if ( game.scenes[i]->events[j].actions[k].GetParameter(5).GetPlainString() != "" )
                     {
                         //Rajout répertoire
-                        game.m_scenes[i].events[j].actions[k].SetParameter(5, GDExpression(rep + game.m_scenes[i].events[j].actions[k].GetParameter(5).GetPlainString()));
+                        game.scenes[i]->events[j].actions[k].SetParameter(5, GDExpression(rep + game.scenes[i]->events[j].actions[k].GetParameter(5).GetPlainString()));
                     }
                 }
             }

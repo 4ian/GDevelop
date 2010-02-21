@@ -276,9 +276,9 @@ int EventsExecutor::ExecuteActions( Event & event, ObjectsConcerned & objectsCon
             string returnNom = eval.EvalTxt(event.actions[k].GetParameter(0));
             unsigned int i = 0;
             //On cherche la scène vers laquelle aller
-            for ( i = 0;i < scene->game->m_scenes.size() ; ++i )
+            for ( i = 0;i < scene->game->scenes.size() ; ++i )
             {
-                if ( scene->game->m_scenes[i].name == returnNom )
+                if ( scene->game->scenes[i]->GetName() == returnNom )
                 {
                     nouvelleScene = i;
                     return ActStopProcess; //On arrête l'execution des évènements

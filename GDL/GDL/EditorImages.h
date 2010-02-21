@@ -7,6 +7,7 @@
 #include <wx/treectrl.h>
 #include <wx/sizer.h>
 #include <wx/menu.h>
+#include <wx/splitter.h>
 #include <wx/panel.h>
 //*)
 #include <wx/aui/aui.h>
@@ -40,6 +41,7 @@ class GD_API EditorImages: public wxPanel
 		wxMenu ContextMenu;
 		wxMenuItem* MenuItem6;
 		wxTreeCtrl* BanqueImageList;
+		wxSplitterWindow* SplitterWindow1;
 		//*)
 
 		static void CreateRibbonPage(wxRibbonPage * page);
@@ -50,6 +52,7 @@ class GD_API EditorImages: public wxPanel
 		static const long ID_PANEL2;
 		static const long ID_TREECTRL1;
 		static const long ID_PANEL3;
+		static const long ID_SPLITTERWINDOW1;
 		static const long ID_PANEL1;
 		static const long idMenuModProp;
 		static const long idMenuMod;

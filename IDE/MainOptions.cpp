@@ -38,28 +38,17 @@ void Game_Develop_EditorFrame::OnMenuSaveWSSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnWSDefautSelected(wxCommandEvent& event)
 {
-    m_mgr.GetPane( EditorImagesPnl ).Dock().Left().Show();
 
-    m_mgr.Update();
 }
 
 void Game_Develop_EditorFrame::OnWSDetacheSelected(wxCommandEvent& event)
 {
-    m_mgr.GetPane( EditorImagesPnl ).Float().Left().Show();
-
-    m_mgr.Update();
 }
 
 void Game_Develop_EditorFrame::OnWSSimpleSelected1(wxCommandEvent& event)
 {
-    m_mgr.GetPane( EditorImagesPnl ).Show(false);
-
-    m_mgr.Update();
 }
 
 void Game_Develop_EditorFrame::OnWSChronoSelected(wxCommandEvent& event)
 {
-    m_mgr.GetPane( EditorImagesPnl ).Dock().Left().Show();
-
-    m_mgr.Update();
 }

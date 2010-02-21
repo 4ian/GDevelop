@@ -56,7 +56,7 @@ BEGIN_EVENT_TABLE( EditorObjets, wxPanel )
     //*)
 END_EVENT_TABLE()
 
-EditorObjets::EditorObjets(wxWindow* parent, Game & game_, Scene * scene_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand_) :
+EditorObjets::EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand_) :
 game(game_),
 scene(scene_),
 objects(objects_),
@@ -66,9 +66,9 @@ mainEditorCommand(mainEditorCommand_)
     //(*Initialize(EditorObjets)
     Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
     Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(128,168), wxNB_MULTILINE, _T("ID_NOTEBOOK1"));
-    sceneObjectsEditor = new EditorObjectList(Notebook1, game, &scene->initialObjects, mainEditorCommand);
-    ObjetsGroups = new EditorObjetsGroups(Notebook1, game, scene, &scene->objectGroups, mainEditorCommand);
-    globalObjectsEditor = new EditorObjectList(Notebook1, game, &game.globalObjects, mainEditorCommand);
+    sceneObjectsEditor = new EditorObjectList(Notebook1, game, &scene.initialObjects, mainEditorCommand, &scene.wasModified);
+    ObjetsGroups = new EditorObjetsGroups(Notebook1, game, scene, &scene.objectGroups, mainEditorCommand);
+    globalObjectsEditor = new EditorObjectList(Notebook1, game, &game.globalObjects, mainEditorCommand, &scene.wasModified);
     Notebook1->AddPage(sceneObjectsEditor, _("Objets"), false);
     Notebook1->AddPage(ObjetsGroups, _("Groupes d\'objets"), false);
     Notebook1->AddPage(globalObjectsEditor, _("Objets globaux à toutes les scènes"), false);
@@ -104,28 +104,6 @@ EditorObjets::~EditorObjets()
     //(*Destroy(EditorObjets)
     //*)
 }
-
-////////////////////////////////////////////////////////////
-/// Change pointer to scene edited
-////////////////////////////////////////////////////////////
-void EditorObjets::ChangeScenePtr(Scene * newScenePtr, bool refresh)
-{
-    assert(newScenePtr != NULL);
-
-    scene = newScenePtr;
-
-    //Sub editors
-    sceneObjectsEditor->ChangeObjectsPtr(&scene->initialObjects);
-    if (refresh) sceneObjectsEditor->Refresh();
-
-    ObjetsGroups->ChangeScenePtr(scene);
-    ObjetsGroups->ChangeGroupsPtr(&scene->objectGroups);
-    if (refresh) ObjetsGroups->Refresh();
-
-    //No need to refresh global objects editor.
-};
-
-
 ////////////////////////////////////////////////////////////
 /// Redimensionement de l'éditeur
 ///

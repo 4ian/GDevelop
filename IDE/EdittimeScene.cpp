@@ -45,7 +45,6 @@ EdittimeScene::~EdittimeScene()
 void EdittimeScene::RenderEdittimeScene()
 {
     ManageRenderTargetEvents();
-    view.SetViewport(sf::FloatRect(0.4,0.4,0.8,0.8));
 
     renderWindow->Clear( sf::Color( backgroundColorR, backgroundColorG, backgroundColorB ) );
     renderWindow->SetView(view);

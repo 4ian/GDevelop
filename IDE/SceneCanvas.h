@@ -36,15 +36,16 @@ class SceneCanvas : public wxSFMLCanvas
 {
 public :
 
-    SceneCanvas( wxWindow* Parent, Game & game_, Scene * scene_, RuntimeGame & runtimeGame_, MainEditorCommand & nr_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style );
+    SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & nr_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style );
 
     ~SceneCanvas() { MemTracer.DelObj((long)this); }
 
     //Le jeu
-    Game & gameEdited;
-    RuntimeGame & game;
+    RuntimeGame & gameEdited;
+    Scene & sceneEdited;
 
-    Scene * sceneEdited;
+    //Used during testing
+    RuntimeGame game;
     EdittimeScene scene;
 
     MainEditorCommand & mainEditorCommand;
@@ -52,7 +53,6 @@ public :
     void Reload();
     inline void ManualRefresh() { OnUpdate(); };
     void UpdateScrollbars();
-    void ChangeScenePtr(Scene * newScenePtr, bool refresh);
 
     void SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_);
 

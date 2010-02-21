@@ -316,10 +316,10 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     }
 
     StaticText3->SetLabel( "Copie des sons/musiques..." );
-    for ( unsigned int i = 0;i < Jeu.m_scenes.size();i++ )
+    for ( unsigned int i = 0;i < Jeu.scenes.size();i++ )
     {
-        CopyEventsRes(Jeu, Jeu.m_scenes.at( i ).events, report);
-        AvancementGauge->SetValue( i / static_cast<float>(Jeu.m_scenes.size())*100.f / 3.f + 33 );
+        CopyEventsRes(Jeu, Jeu.scenes[i]->events, report);
+        AvancementGauge->SetValue( i / static_cast<float>(Jeu.scenes.size())*100.f / 3.f + 33 );
     }
 
     wxSafeYield();

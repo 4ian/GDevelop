@@ -28,7 +28,7 @@ class EditorObjetsGroups: public wxPanel
 {
 	public:
 
-		EditorObjetsGroups(wxWindow* parent, Game & game_, Scene * scene_, vector < ObjectGroup > * objectsGroups_, MainEditorCommand & mainEditorCommand);
+		EditorObjetsGroups(wxWindow* parent, Game & game_, Scene & scene_, vector < ObjectGroup > * objectsGroups_, MainEditorCommand & mainEditorCommand);
 		virtual ~EditorObjetsGroups();
 
 		//(*Declarations(EditorObjetsGroups)
@@ -43,18 +43,6 @@ class EditorObjetsGroups: public wxPanel
 
         static void CreateRibbonPage(wxRibbonPage * page);
         void ConnectEvents();
-
-        void ChangeScenePtr(Scene * newScenePtr)
-        {
-            assert(newScenePtr != NULL);
-            scene = newScenePtr;
-        };
-
-        void ChangeGroupsPtr(vector < ObjectGroup > * newGroupsPtr)
-        {
-            assert(newGroupsPtr != NULL);
-            objectsGroups = newGroupsPtr;
-        };
 
 		void Refresh();
 
@@ -112,11 +100,9 @@ class EditorObjetsGroups: public wxPanel
 		Game & game;
 
         /**
-         * Pointer to scene containing the datas to edit
-         * Use a pointer instead of a reference because scene pointer/reference can change
-         * @see EditorScene
+         * Reference to the scene to edit
          */
-		Scene * scene;
+		Scene & scene;
 
 		vector < ObjectGroup > * objectsGroups;
 

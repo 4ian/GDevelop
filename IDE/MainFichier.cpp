@@ -27,14 +27,11 @@ void Game_Develop_EditorFrame::OnMenuNewSelected( wxCommandEvent& event )
 
     CloseAllSceneEditors();
 
-    Game blankGame;
-
-    game = blankGame;
+    games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
     wxString GD = _( "Game Develop - Nouveau jeu" );
     SetTitle( GD );
 
-    m_fichierJeu = "";
-
+    gameCurrentlyEdited = games.size()-1;
 
     //Mise à jour des éditeurs
     ReloadEditors();
@@ -87,22 +84,18 @@ void Game_Develop_EditorFrame::OnRibbonOpenDropDownClicked(wxRibbonButtonBarEven
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::Open( string file )
 {
-    CloseAllSceneEditors();
+    //CloseAllSceneEditors();
 
-    Game blankGame;
-    game = blankGame;
+    games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
 
-    m_fichierJeu = file;
-
-    OpenSaveGame openGame( game );
-    openGame.OpenFromFile(m_fichierJeu);
+    OpenSaveGame openGame( *games.back() );
+    openGame.OpenFromFile(file);
 
     wxString GD = "Game Develop";
-    wxString Fichier = m_fichierJeu;
-    SetTitle( GD + " - " + Fichier );
+    SetTitle( GD + " - " + file );
 
     //Sauvegarde fichiers récents
-    m_recentlist.SetLastUsed( m_fichierJeu );
+    m_recentlist.SetLastUsed( file );
     for ( int i = 0;i < 9;i++ )
     {
         wxConfigBase *pConfig = wxConfigBase::Get();
@@ -115,11 +108,11 @@ void Game_Develop_EditorFrame::Open( string file )
 
     string unknownExtensions = "";
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-    for (unsigned int i = 0;i<game.extensionsUsed.size();++i)
+    for (unsigned int i = 0;i<games.back()->extensionsUsed.size();++i)
     {
-    	if ( extensionsManager->GetExtension(game.extensionsUsed[i]) == boost::shared_ptr<ExtensionBase> () )
+    	if ( extensionsManager->GetExtension(games.back()->extensionsUsed[i]) == boost::shared_ptr<ExtensionBase> () )
     	{
-    	    unknownExtensions += game.extensionsUsed[i]+"\n";
+    	    unknownExtensions += games.back()->extensionsUsed[i]+"\n";
     	}
     }
 
@@ -137,14 +130,16 @@ void Game_Develop_EditorFrame::Open( string file )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuSaveSelected( wxCommandEvent& event )
 {
-    if ( m_fichierJeu == "" )
+    if ( !CurrentGameIsValid() ) return;
+
+    if ( games[gameCurrentlyEdited]->gameFile == "" )
     {
         SaveAs();
     }
     else
     {
-        OpenSaveGame saveGame( game );
-        if ( !saveGame.SaveToFile(m_fichierJeu) )
+        OpenSaveGame saveGame( *games[gameCurrentlyEdited] );
+        if ( !saveGame.SaveToFile(games[gameCurrentlyEdited]->gameFile) )
         {
             wxLogError( "L'enregistrement a échoué" );
         }
@@ -179,6 +174,8 @@ void Game_Develop_EditorFrame::OnMenuSaveAsSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::SaveAs()
 {
+    if ( !CurrentGameIsValid() ) return;
+
     //Affichage de la boite de dialogue
     wxFileDialog FileDialog( this, _( "Choisissez le nom et le répertoire du jeu à enregistrer" ), "", "", "*.jgd", wxFD_SAVE );
     FileDialog.ShowModal();
@@ -187,16 +184,16 @@ void Game_Develop_EditorFrame::SaveAs()
     if ( FileDialog.GetPath() != "" )
     {
         //oui, donc on l'enregistre
-        m_fichierJeu = FileDialog.GetPath();
-        OpenSaveGame saveGame( game );
+        GetCurrentGame()->gameFile = FileDialog.GetPath();
+        OpenSaveGame saveGame( *GetCurrentGame() );
 
-        if ( !saveGame.SaveToFile(m_fichierJeu) )
+        if ( !saveGame.SaveToFile(GetCurrentGame()->gameFile) )
         {
             wxLogError( "L'enregistrement a échoué" );
         }
 
         wxString GD = "Game Develop";
-        wxString Fichier = m_fichierJeu;
+        wxString Fichier = GetCurrentGame()->gameFile;
         SetTitle( GD + " - " + Fichier );
 
         return;
@@ -209,7 +206,7 @@ void Game_Develop_EditorFrame::SaveAs()
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event )
 {
-    Compilation Dialog( this, &game );
+    Compilation Dialog( this, GetCurrentGame().get() );
     Dialog.ShowModal();
 }
 
@@ -218,7 +215,7 @@ void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event 
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuPortableSelected( wxCommandEvent& event )
 {
-    Portable dialog( this, &game );
+    Portable dialog( this, GetCurrentGame().get() );
     dialog.ShowModal();
 }
 
@@ -273,7 +270,7 @@ void Game_Develop_EditorFrame::OnRecentClicked( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuFusionSelected(wxCommandEvent& event)
 {
-    Fusion dialog(this, &game);
+    Fusion dialog(this, *GetCurrentGame());
     dialog.ShowModal();
 
     ReloadEditors();

@@ -34,7 +34,7 @@ BEGIN_EVENT_TABLE(EditorLayers,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorLayers::EditorLayers(wxWindow* parent, Game & game_, Scene * scene_, vector < Layer > * layers_, MainEditorCommand & mainEditorCommand_) :
+EditorLayers::EditorLayers(wxWindow* parent, Game & game_, Scene & scene_, vector < Layer > * layers_, MainEditorCommand & mainEditorCommand_) :
 game(game_),
 scene(scene_),
 layers(layers_),
@@ -221,7 +221,7 @@ void EditorLayers::OnAddSelected(wxCommandEvent& event)
     layers->push_back(layer);
 
     Refresh();
-    mainEditorCommand.NeedRefreshScene();
+    scene.wasModified = true;
 }
 
 /**
@@ -245,9 +245,9 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
 
             //Verifying if there are objects on this layer
             bool objectsOnThisLayer = false;
-            for (unsigned int j =0;j<scene->initialObjectsPositions.size();++j)
+            for (unsigned int j =0;j<scene.initialObjectsPositions.size();++j)
             {
-                if ( scene->initialObjectsPositions[j].layer == name )
+                if ( scene.initialObjectsPositions[j].layer == name )
                     objectsOnThisLayer = true;
             }
 
@@ -260,18 +260,18 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
                 if ( retour == 0 ) return; //Annulation
                 else if ( retour == 1 )
                 {
-                    for (int i = scene->initialObjectsPositions.size()-1;i>=0;--i)
+                    for (int i = scene.initialObjectsPositions.size()-1;i>=0;--i)
                     {
-                        if ( scene->initialObjectsPositions[i].layer == name )
-                            scene->initialObjectsPositions.erase(scene->initialObjectsPositions.begin()+i);
+                        if ( scene.initialObjectsPositions[i].layer == name )
+                            scene.initialObjectsPositions.erase(scene.initialObjectsPositions.begin()+i);
                     }
                 }
                 else if ( retour == 2 )
                 {
-                    for (unsigned int i =0;i<scene->initialObjectsPositions.size();++i)
+                    for (unsigned int i =0;i<scene.initialObjectsPositions.size();++i)
                     {
-                        if ( scene->initialObjectsPositions[i].layer == name )
-                            scene->initialObjectsPositions[i].layer = dialog.moveOnLayerNamed;
+                        if ( scene.initialObjectsPositions[i].layer == name )
+                            scene.initialObjectsPositions[i].layer = dialog.moveOnLayerNamed;
                     }
                 }
     	    }
@@ -279,7 +279,7 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
             //Delete the layer
     	    layers->erase(layers->begin() + i );
             Refresh();
-            mainEditorCommand.NeedRefreshScene();
+            scene.wasModified = true;
     	    return;
     	}
     }
@@ -309,7 +309,7 @@ void EditorLayers::OnUpSelected(wxCommandEvent& event)
                 layers->insert(layers->begin()+i+1, layer);
 
                 Refresh();
-                mainEditorCommand.NeedRefreshScene();
+                scene.wasModified = true;
 
                 //On reslectionne le calque
                 layersList->SetItemState(itemSelected-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
@@ -343,7 +343,7 @@ void EditorLayers::OnDownSelected(wxCommandEvent& event)
                 layers->insert(layers->begin()+i-1, layer);
 
                 Refresh();
-                mainEditorCommand.NeedRefreshScene();
+                scene.wasModified = true;
 
                 //On reslectionne le calque
                 layersList->SetItemState(itemSelected+1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
@@ -415,15 +415,15 @@ void EditorLayers::EditLayerParam()
     //On renomme les objets qui sont sur le calque
     if ( layer->GetName() != oldName )
     {
-        for (int i = scene->initialObjectsPositions.size()-1;i>=0;--i)
+        for (int i = scene.initialObjectsPositions.size()-1;i>=0;--i)
         {
-            if ( scene->initialObjectsPositions[i].layer == oldName )
-                scene->initialObjectsPositions[i].layer = layer->GetName();
+            if ( scene.initialObjectsPositions[i].layer == oldName )
+                scene.initialObjectsPositions[i].layer = layer->GetName();
         }
     }
 
     Refresh();
-    mainEditorCommand.NeedRefreshScene();
+    scene.wasModified = true;
 }
 
 ////////////////////////////////////////////////////////////

@@ -20,10 +20,8 @@ class EditorObjets: public wxPanel
 {
 	public:
 
-		EditorObjets(wxWindow* parent, Game & game_, Scene * scene_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand_);
+		EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand_);
 		virtual ~EditorObjets();
-
-        void ChangeScenePtr(Scene * newScenePtr, bool refresh);
 
 		//(*Declarations(EditorObjets)
 		wxNotebook* Notebook1;
@@ -62,11 +60,9 @@ class EditorObjets: public wxPanel
 		Game & game;
 
         /**
-         * Pointer to scene containing the datas to edit
-         * Use a pointer instead of a reference because scene pointer/reference can change
-         * @see EditorScene
+         * Reference to scene edited
          */
-		Scene * scene;
+		Scene & scene;
 		vector < boost::shared_ptr<Object> > * objects;
 
 		MainEditorCommand & mainEditorCommand;

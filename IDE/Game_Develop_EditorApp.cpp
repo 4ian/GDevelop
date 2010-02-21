@@ -207,7 +207,7 @@ bool Game_Develop_EditorApp::OnInit()
     //Création de la fenêtre
     if ( wxsOK )
     {
-        Frame = new Game_Develop_EditorFrame( 0, Jeu, fileToOpen );
+        Frame = new Game_Develop_EditorFrame( 0, fileToOpen );
         SetTopWindow( Frame );
     }
 
@@ -268,8 +268,12 @@ void Game_Develop_EditorApp::OnUnhandledException()
 
     try
     {
-        OpenSaveGame save(Frame->game);
-        save.SaveToFile("recup.jgd");
+        for (unsigned int i = 0;i<Frame->games.size();++i)
+        {
+            OpenSaveGame save(*Frame->games[i]);
+            save.SaveToFile("recup"+toString(i)+".jgd");
+        }
+
     }
     catch(...)
     {
@@ -290,8 +294,11 @@ bool Game_Develop_EditorApp::OnExceptionInMainLoop()
 
     try
     {
-        OpenSaveGame save(Frame->game);
-        save.SaveToFile("recup.jgd");
+        for (unsigned int i = 0;i<Frame->games.size();++i)
+        {
+            OpenSaveGame save(*Frame->games[i]);
+            save.SaveToFile("recup"+toString(i)+".jgd");
+        }
     }
     catch(...)
     {

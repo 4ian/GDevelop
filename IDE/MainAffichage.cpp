@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuImagesEditorSelected( wxCommandEvent& event )
 {
-    m_mgr.GetPane( EditorImagesPnl ).Show();
-    m_mgr.Update();
 }
 /**
  * Adapter for the ribbon

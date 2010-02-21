@@ -130,7 +130,7 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
 
 	scene = pScene;
 	CaptionEdit->SetValue(scene->title);
-	NomSceneTxt->SetLabel(scene->name);
+	NomSceneTxt->SetLabel(scene->GetName());
 
 	Panel1->SetBackgroundColour(wxColour(scene->backgroundColorR, scene->backgroundColorG, scene->backgroundColorB));
 

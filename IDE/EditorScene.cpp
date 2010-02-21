@@ -90,10 +90,9 @@ BEGIN_EVENT_TABLE(EditorScene,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorScene::EditorScene(wxWindow* parent, const wxSize & sizeCanvas, Game & game_, Scene * scene_, RuntimeGame & runtimeGame_, const MainEditorCommand & mainEditorCommand_) :
+EditorScene::EditorScene(wxWindow* parent, RuntimeGame & game_, Scene & scene_, const MainEditorCommand & mainEditorCommand_) :
 scene(scene_),
 game(game_),
-runtimeGame(runtimeGame_),
 mainEditorCommand(mainEditorCommand_),
 externalWindow(this)
 {
@@ -117,14 +116,14 @@ externalWindow(this)
 	ScrollBar1 = new wxScrollBar(Core, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
 	ScrollBar1->SetScrollbar(2500, 10, 5000, 10);
 	Panel4 = new wxPanel(Core, ID_PANEL4, wxDefaultPosition, wxSize(1,1), 0, _T("ID_PANEL4"));
-	sceneCanvas = new SceneCanvas(Panel4, game, scene, runtimeGame, mainEditorCommand, ID_CUSTOM1,wxPoint(0,0),sizeCanvas, wxWANTS_CHARS | wxBORDER_SIMPLE);
+	sceneCanvas = new SceneCanvas(Panel4, game, scene, mainEditorCommand, ID_CUSTOM1,wxPoint(0,0),wxDefaultSize, wxWANTS_CHARS | wxBORDER_SIMPLE);
 	Panel5 = new wxPanel(notebook, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL6"));
 	Panel5->SetBackgroundColour(wxColour(255,255,255));
 	Panel5->SetToolTip(_("Editer les évènements de la scène."));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
 	FlexGridSizer3->AddGrowableRow(0);
-	eventsEditor = new EditorEvents(Panel5, game, scene, &scene->events, mainEditorCommand);
+	eventsEditor = new EditorEvents(Panel5, game, scene, &scene.events, mainEditorCommand);
 	FlexGridSizer3->Add(eventsEditor, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel5->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(Panel5);
@@ -167,8 +166,8 @@ externalWindow(this)
     Connect(ID_DEBUGBUTTON,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorScene::OnDebugBtClick);
 
 	//Initialisation des éditeurs
-    objectsEditor = new EditorObjets(this, game, scene, &scene->initialObjects, mainEditorCommand);
-    layersEditor = new EditorLayers(this, game, scene, &scene->initialLayers, mainEditorCommand);
+    objectsEditor = new EditorObjets(this, game, scene, &scene.initialObjects, mainEditorCommand);
+    layersEditor = new EditorLayers(this, game, scene, &scene.initialLayers, mainEditorCommand);
     sceneCanvas->SetScrollbars(ScrollBar1, ScrollBar2);
     debugger = new DebuggerGUI(this, sceneCanvas->scene);
     sceneCanvas->scene.debugger = debugger;
@@ -493,42 +492,12 @@ void EditorScene::SetToolbarApercu()
 }
 
 
-////////////////////////////////////////////////////////////
-/// Change the pointer to the scene edited
-///
-/// Needed because of the fact that scene are stored in
-/// a vector, which can erase the scene ( if adding, cuting,
-/// pasting another scene... ). If we were using a reference,
-/// this reference could become invalid.
-/// Modals editors can use a reference, but not modl
-////////////////////////////////////////////////////////////
-void EditorScene::ChangeScenePtr(Scene * newScenePtr, bool refresh)
-{
-    assert(newScenePtr != NULL);
-
-    scene = newScenePtr;
-
-    //Editeurs à mise à jour automatique
-    objectsEditor->ChangeScenePtr(scene, refresh);
-    sceneCanvas->ChangeScenePtr(scene, refresh);
-
-    eventsEditor->ChangeScenePtr(scene);
-    eventsEditor->ChangeEventsPtr(&scene->events);
-    if ( refresh ) eventsEditor->Refresh();
-
-    layersEditor->ChangeScenePtr(scene);
-    layersEditor->ChangeLayersPtr(&scene->initialLayers);
-    if ( refresh ) layersEditor->Refresh();
-
-    if ( refresh ) Refresh();
-};
-
 void EditorScene::Resize( int width, int height )
 {
     if ( sceneCanvas != NULL )
         delete sceneCanvas;
 
-	sceneCanvas = new SceneCanvas(Panel4, game, scene, runtimeGame, mainEditorCommand, ID_CUSTOM1,wxPoint(0,0),wxSize(width, height), wxWANTS_CHARS | wxBORDER_SIMPLE);
+	sceneCanvas = new SceneCanvas(Panel4, game, scene, mainEditorCommand, ID_CUSTOM1,wxPoint(0,0),wxSize(width, height), wxWANTS_CHARS | wxBORDER_SIMPLE);
     sceneCanvas->SetScrollbars(ScrollBar1, ScrollBar2);
     sceneCanvas->Reload();
 
@@ -590,7 +559,7 @@ void EditorScene::OnOrigineBtClick(wxCommandEvent & event )
 ////////////////////////////////////////////////////////////
 void EditorScene::OnChoisirObjetBtClick( wxCommandEvent & event )
 {
-    ChoixObjet Dialog( this, game, *scene, false );
+    ChoixObjet Dialog( this, game, scene, false );
     if ( Dialog.ShowModal() == 1 )
     {
         sceneCanvas->scene.objectToAdd = Dialog.NomObjet;
@@ -602,7 +571,7 @@ void EditorScene::OnChoisirObjetBtClick( wxCommandEvent & event )
 ////////////////////////////////////////////////////////////
 void EditorScene::OnChoisirLayerBtClick( wxCommandEvent & event )
 {
-    ChoixLayer Dialog( this, scene->initialLayers );
+    ChoixLayer Dialog( this, scene.initialLayers );
     if ( Dialog.ShowModal() == 1 )
     {
         sceneCanvas->scene.addOnLayer = Dialog.layerChosen;

@@ -166,11 +166,10 @@ END_EVENT_TABLE()
 ////////////////////////////////////////////////////////////
 /// Constructeur
 ////////////////////////////////////////////////////////////
-Game_Develop_EditorFrame::Game_Develop_EditorFrame( wxWindow* parent, const Game & game_, string FileToOpen) :
-game(game_),
+Game_Develop_EditorFrame::Game_Develop_EditorFrame( wxWindow* parent, string FileToOpen) :
+gameCurrentlyEdited(0),
 m_ribbon(NULL),
-ribbonSceneEditorButtonBar(NULL),
-m_fichierJeu("")
+ribbonSceneEditorButtonBar(NULL)
 {
 
     //(*Initialize(Game_Develop_EditorFrame)
@@ -212,7 +211,7 @@ m_fichierJeu("")
     wxMenuItem* MenuItem30;
     wxFlexGridSizer* ribbonSizer;
     wxMenu* Menu5;
-
+    
     Create(parent, wxID_ANY, _("Game Develop - Nouveau jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(850,700));
     {
@@ -483,7 +482,7 @@ m_fichierJeu("")
     decomposerContextMenu.Append(MenuItem43);
     FlexGridSizer1->SetSizeHints(this);
     Center();
-
+    
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnextensionsEditBtClick);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnglobalVarBtClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnModParaBtClick);
@@ -647,6 +646,8 @@ m_fichierJeu("")
     }
     ribbonSizer->Add(m_ribbon, 0, wxEXPAND);
 
+    games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
+
     //notify wxAUI which frame to use
     m_mgr.SetManagedWindow( this );
 
@@ -691,13 +692,7 @@ m_fichierJeu("")
     if ( !UpdateToolBar() )
         wxMessageBox( _("Erreur lors de la création des barres d'outils"), _("Erreur"), wxICON_EXCLAMATION );*/
 
-    //
-    MainEditorCommand imagesMainEditorCommand(nr, -1);
-    imagesMainEditorCommand.SetRibbon(m_ribbon);
-    imagesMainEditorCommand.SetMainEditor(this);
-
     projectManager = new ProjectManager(this, *this);
-
 
     //Puis ajout des éditeurs
     m_mgr.AddPane( projectManager, wxAuiPaneInfo().Name( wxT( "PM" ) ).Caption( _( "Projets" ) ).Left().MaximizeButton( true ).MinimizeButton( false ).MinSize(200,100) );
@@ -819,10 +814,14 @@ void Game_Develop_EditorFrame::OnClose( wxCloseEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::ReloadEditors()
 {
-    runtimeGame.imageManager.LoadImagesFromFile( game );
-    nr.SetImagesAreUpToDate();
-    nr.SetAllScenesMustBeReloaded();
+    for (unsigned int i = 0;i<games.size();++i)
+    {
+    	games[i]->imageManager.LoadImagesFromFile(*games[i]);
+        games[i]->nr.SetImagesAreUpToDate();
+        games[i]->nr.SetAllScenesMustBeReloaded();
+    }
 
+    projectManager->Refresh();
     RefreshParaJeu();
 
     return;
@@ -830,8 +829,11 @@ void Game_Develop_EditorFrame::ReloadEditors()
 
 void Game_Develop_EditorFrame::CloseAllSceneEditors()
 {
-    for (unsigned int i =0;i<game.m_scenes.size();i++)
-        CloseScene(i);
+    for (unsigned int i = 0;i<games.size();++i)
+    {
+        for (unsigned int j =0;j<games[i]->scenes.size();j++)
+            CloseScene(i); //TODO: TO FIX
+    }
 }
 
 void Game_Develop_EditorFrame::LoadSkin(wxRibbonBar * bar)

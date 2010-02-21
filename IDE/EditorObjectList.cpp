@@ -83,10 +83,11 @@ BEGIN_EVENT_TABLE(EditorObjectList,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorObjectList::EditorObjectList(wxWindow* parent, Game & game_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand_) :
+EditorObjectList::EditorObjectList(wxWindow* parent, Game & game_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand_, bool * wasModifiedCallback_) :
 objects(objects_),
 game(game_),
-mainEditorCommand(mainEditorCommand_)
+mainEditorCommand(mainEditorCommand_),
+wasModifiedCallback(wasModifiedCallback_)
 {
 	//(*Initialize(EditorObjectList)
 	wxMenuItem* delObjMenuI;
@@ -402,7 +403,7 @@ void EditorObjectList::OneditMenuISelected(wxCommandEvent& event)
     if ( i != -1 )
     {
         objects->at(i)->EditObject(this, game, mainEditorCommand);
-        mainEditorCommand.NeedRefreshScene();
+        if ( wasModifiedCallback ) *wasModifiedCallback = true;
 
         //Reload thumbnail
         int thumbnailID = -1;
@@ -497,7 +498,7 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
 
     objectsList->SetItemImage( itemAdded, thumbnailID );
 
-    mainEditorCommand.NeedRefreshScene();
+    if ( wasModifiedCallback ) *wasModifiedCallback = true;
     wxLogStatus( _( "L'objet a été correctement ajouté" ) );
 }
 
@@ -513,7 +514,7 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
         if ( i != -1 )
             objects->erase( objects->begin() + i );
 
-        mainEditorCommand.NeedRefreshScene();
+        if ( wasModifiedCallback ) *wasModifiedCallback = true;
         objectsList->Delete( item );
         return;
 
@@ -557,7 +558,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
             {
                 objects->at( i )->SetName( (string)event.GetLabel() );
 
-                mainEditorCommand.NeedRefreshScene();
+                if ( wasModifiedCallback ) *wasModifiedCallback = true;
                 objectsList->SetItemText( event.GetItem(), event.GetLabel() );
                 return;
             }
@@ -637,7 +638,7 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
     }
 
     objectsList->Delete( item );
-    mainEditorCommand.NeedRefreshScene();
+    if ( wasModifiedCallback ) *wasModifiedCallback = true;
 
     clipboard->SetObject(objects->at(i));
     objects->erase(objects->begin() + i);
@@ -681,7 +682,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     objects->push_back( object );
     objectsList->AppendItem( objectsList->GetRootItem(), name );
 
-    mainEditorCommand.NeedRefreshScene();
+    if ( wasModifiedCallback ) *wasModifiedCallback = true;
     wxLogStatus( _( "L'objet a été correctement ajouté" ) );
 }
 
@@ -706,7 +707,7 @@ void EditorObjectList::OnMoveUpSelected(wxCommandEvent& event)
         objects->insert(objects->begin()+i-1, object);
 
         Refresh();
-        mainEditorCommand.NeedRefreshScene();
+        if ( wasModifiedCallback ) *wasModifiedCallback = true;
 
         //On la reselectionne
         wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
@@ -744,7 +745,7 @@ void EditorObjectList::OnMoveDownSelected(wxCommandEvent& event)
         objects->insert(objects->begin()+i+1, object);
 
         Refresh();
-        mainEditorCommand.NeedRefreshScene();
+        if ( wasModifiedCallback ) *wasModifiedCallback = true;
 
         //On la reselectionne
         wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
@@ -799,6 +800,6 @@ void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
     {
         objects->at(i)->variablesObjet = dialog.variables;
         cout << objects->at(i)->variablesObjet.variables.size()<< endl;
-        mainEditorCommand.NeedRefreshScene();
+        if ( wasModifiedCallback ) *wasModifiedCallback = true;
     }
 }

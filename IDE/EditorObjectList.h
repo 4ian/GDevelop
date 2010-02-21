@@ -24,7 +24,7 @@ class EditorObjectList: public wxPanel
 {
 	public:
 
-		EditorObjectList(wxWindow* parent, Game & game_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand);
+		EditorObjectList(wxWindow* parent, Game & game_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand, bool * wasModifiedCallback_);
 		virtual ~EditorObjectList();
 
 		//(*Declarations(EditorObjectList)
@@ -42,11 +42,6 @@ class EditorObjectList: public wxPanel
         void ConnectEvents();
 
 		void Refresh();
-		void ChangeObjectsPtr(std::vector < boost::shared_ptr<Object> > * objects_)
-		{
-		    assert ( objects_ != NULL );
-		    objects = objects_;
-		}
 
 		std::vector < boost::shared_ptr<Object> > * objects;
 
@@ -120,7 +115,9 @@ class EditorObjectList: public wxPanel
         wxToolBar * toolbar;
 
 		Game & game;
+
 		MainEditorCommand & mainEditorCommand;
+		bool * wasModifiedCallback; ///< Set this to true when objects are modified. Can be NULL
 
         //Item sélectionné
         wxTreeItemId item;

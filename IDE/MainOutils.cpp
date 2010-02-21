@@ -25,7 +25,7 @@ void Game_Develop_EditorFrame::OnMenuItem23Selected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuConvertirJRCSelected( wxCommandEvent& event )
 {
-    ConvertJRC dialog( this, &game );
+    ConvertJRC dialog( this, games[gameCurrentlyEdited].get() );
     dialog.ShowModal();
 
     RefreshParaJeu();

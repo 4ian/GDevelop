@@ -64,11 +64,32 @@ class Game_Develop_EditorFrame: public wxFrame
     friend class EditorImages;
     public:
 
-        Game_Develop_EditorFrame(wxWindow* parent, const Game & game_, string FileToOpen);
+        Game_Develop_EditorFrame(wxWindow* parent, string FileToOpen);
         virtual ~Game_Develop_EditorFrame();
 
-        Game game;
-        vector < Game > games;
+        vector < boost::shared_ptr<RuntimeGame> > games;
+        inline boost::shared_ptr<RuntimeGame> GetCurrentGame()
+        {
+            if ( gameCurrentlyEdited >= games.size()) return boost::shared_ptr<RuntimeGame> ();
+
+            return games[gameCurrentlyEdited];
+        }
+
+        inline bool CurrentGameIsValid()
+        {
+            if ( gameCurrentlyEdited >= games.size()) return false;
+
+            return true;
+        }
+
+        inline bool SetCurrentGame()
+        {
+            if ( gameCurrentlyEdited >= games.size()) return false;
+
+            return true;
+        }
+
+        unsigned int gameCurrentlyEdited;
 
         void Open(string FichierJeu);
 
@@ -79,6 +100,8 @@ class Game_Develop_EditorFrame: public wxFrame
         inline const wxAuiNotebook * GetEditorsNotebook() const { return editorsNotebook; };
         inline wxRibbonBar * GetRibbon() { return m_ribbon; };
         inline const wxRibbonBar * GetRibbon() const { return m_ribbon; };
+        inline wxRibbonButtonBar * GetRibbonSceneEditorButtonBar() const { return ribbonSceneEditorButtonBar; };
+        inline wxRibbonButtonBar * GetRibbonSceneEditorButtonBar() { return ribbonSceneEditorButtonBar; };
 
     private:
 
@@ -355,8 +378,6 @@ class Game_Develop_EditorFrame: public wxFrame
         string ancienNom;
 
         //Relatif au jeu geré
-        string m_fichierJeu;
-        RuntimeGame runtimeGame;
 
         wxFileConfig* m_config;
 

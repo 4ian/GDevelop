@@ -31,12 +31,14 @@ void Game_Develop_EditorFrame::RefreshListScene()
     SceneTree->DeleteAllItems();
     SceneTree->AddRoot( _( "Toutes les scènes du jeu" ), 0 );
 
-    if ( !game.m_scenes.empty() )
+    /*if ( gameCurrentlyEdited >= games.size() ) return;
+
+    if ( !games[gameCurrentlyEdited]->m_scenes.empty() )
     {
         StaticText2->SetLabel( "" );
-        for ( unsigned int i = 0;i < game.m_scenes.size();i++ )
+        for ( unsigned int i = 0;i < games[gameCurrentlyEdited]->m_scenes.size();i++ )
         {
-            SceneTree->AppendItem( SceneTree->GetRootItem(), game.m_scenes.at( i ).name, 1 );
+            SceneTree->AppendItem( SceneTree->GetRootItem(), games[gameCurrentlyEdited]->m_scenes.at( i ).name, 1 );
         }
     }
     else
@@ -44,7 +46,7 @@ void Game_Develop_EditorFrame::RefreshListScene()
         StaticText2->SetLabel( _( "Le jeu ne contient aucune scène,\nil vous faut en ajouter une. Faites un\nclic droit sur \"Toutes les scènes\" et\nchoisissez \"Ajouter une scène\"." ) );
     }
 
-    SceneTree->Expand( SceneTree->GetRootItem() );
+    SceneTree->Expand( SceneTree->GetRootItem() );*/
 }
 
 ////////////////////////////////////////////////////////////
@@ -52,10 +54,10 @@ void Game_Develop_EditorFrame::RefreshListScene()
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::RefreshParaJeu()
 {
-    NomJeuTxt->SetLabel( game.name );
-    AuteurTxt->SetLabel( game.author );
+    /*NomJeuTxt->SetLabel( games[gameCurrentlyEdited]->name );
+    AuteurTxt->SetLabel( games[gameCurrentlyEdited]->author );
 
-    TailleJeuTxt->SetLabel( wxString::Format(_("Taille fenêtre du jeu : %i x %i"), game.windowWidth, game.windowHeight));
+    TailleJeuTxt->SetLabel( wxString::Format(_("Taille fenêtre du jeu : %i x %i"), games[gameCurrentlyEdited]->windowWidth, games[gameCurrentlyEdited]->windowHeight));*/
 }
 
 ////////////////////////////////////////////////////////////
@@ -71,12 +73,12 @@ void Game_Develop_EditorFrame::OnSceneTreeItemMenu( wxTreeEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnEditSceneBtClick( wxCommandEvent& event )
 {
-
-    if ( game.m_scenes.empty() )
+/*
+    if ( games[gameCurrentlyEdited]->m_scenes.empty() )
         return;
 
     //On cherche l'ID de la scène voulue
-    int sceneId = ChercherScene( game.m_scenes, static_cast<string>( SceneTree->GetItemText( item ) ) );
+    int sceneId = ChercherScene( games[gameCurrentlyEdited]->m_scenes, static_cast<string>( SceneTree->GetItemText( item ) ) );
 
     if ( sceneId == -1 )
     {
@@ -89,7 +91,7 @@ void Game_Develop_EditorFrame::OnEditSceneBtClick( wxCommandEvent& event )
     {
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(j));
 
-        if ( sceneEditorPtr != NULL && sceneEditorPtr->scene->name == game.m_scenes.at(sceneId).name )
+        if ( sceneEditorPtr != NULL && sceneEditorPtr->scene->name == games[gameCurrentlyEdited]->m_scenes.at(sceneId).name )
         {
             //Si oui, on l'ouvre
             editorsNotebook->SetSelection(j);
@@ -101,18 +103,21 @@ void Game_Develop_EditorFrame::OnEditSceneBtClick( wxCommandEvent& event )
     if ( !sceneEditorAlreadyOpened )
     {
         //Class to transmit informations between editors and main editor
-        MainEditorCommand mainEditorCommand(nr, sceneId);
+        MainEditorCommand mainEditorCommand(games[gameCurrentlyEdited]->nr, sceneId);
         mainEditorCommand.SetRibbon(m_ribbon); //Need link to the ribbon
         mainEditorCommand.SetRibbonSceneEditorButtonBar(ribbonSceneEditorButtonBar); //Need link to the scene editor wxRibbonButtonBar
         mainEditorCommand.SetMainEditor(this);
 
-        EditorScene * editorScene = new EditorScene( editorsNotebook, wxSize(game.windowWidth, game.windowHeight), game, &game.m_scenes.at(sceneId), runtimeGame, mainEditorCommand);
+        EditorScene * editorScene = new EditorScene( editorsNotebook,
+                                                    *games[gameCurrentlyEdited],
+                                                    &games[gameCurrentlyEdited]->m_scenes.at(sceneId),
+                                                    mainEditorCommand);
 
         BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::getInstance();
 
-        editorsNotebook->AddPage(editorScene, game.m_scenes.at(sceneId).name, true, bitmapGUIManager->scene);
+        editorsNotebook->AddPage(editorScene, games[gameCurrentlyEdited]->m_scenes.at(sceneId).name, true, bitmapGUIManager->scene);
         editorsNotebook->SetSelection(editorsNotebook->GetPageCount()-1);
-    }
+    }*/
 
 }
 
@@ -129,7 +134,7 @@ void Game_Develop_EditorFrame::OnSceneTreeItemActivated(wxTreeEvent& event)
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnModParaBtClick( wxCommandEvent& event )
 {
-    EditPropJeu Dialog( this, &game );
+    /*EditPropJeu Dialog( this, games[gameCurrentlyEdited].get() );
     Dialog.ShowModal();
 
     MessagePlus Confirm( this, _( "Voulez vous mettre à jour les éditeurs de scènes\navec la taille de la fenêtre de jeu ?" ), 0, "/Auto/TailleEditeurScene" );
@@ -141,11 +146,11 @@ void Game_Develop_EditorFrame::OnModParaBtClick( wxCommandEvent& event )
             EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(j));
 
             if ( sceneEditorPtr != NULL )
-                sceneEditorPtr->Resize(game.windowWidth, game.windowHeight);
+                sceneEditorPtr->Resize(games[gameCurrentlyEdited]->windowWidth, games[gameCurrentlyEdited]->windowHeight);
         }
     }
 
-    RefreshParaJeu();
+    RefreshParaJeu();*/
 }
 
 /**
@@ -153,12 +158,12 @@ void Game_Develop_EditorFrame::OnModParaBtClick( wxCommandEvent& event )
  */
 void Game_Develop_EditorFrame::OnglobalVarBtClick(wxCommandEvent& event)
 {
-    InitialVariablesDialog dialog(this, game.variables);
+    /*InitialVariablesDialog dialog(this, games[gameCurrentlyEdited]->variables);
     if ( dialog.ShowModal() == 1 )
     {
-        game.variables = dialog.variables;
-        nr.SetAllScenesMustBeReloaded();
-    }
+        games[gameCurrentlyEdited]->variables = dialog.variables;
+        games[gameCurrentlyEdited]->nr.SetAllScenesMustBeReloaded();
+    }*/
 }
 
 
@@ -169,39 +174,39 @@ void Game_Develop_EditorFrame::OnglobalVarBtClick(wxCommandEvent& event)
 void Game_Develop_EditorFrame::OnMenuCopySceneSelected( wxCommandEvent& event )
 {
     //1) On cherche la scène
-    int IDscene = ChercherScene( game.m_scenes, static_cast<string>( SceneTree->GetItemText( item ) ) );
+    /*int IDscene = ChercherScene( games[gameCurrentlyEdited]->m_scenes, static_cast<string>( SceneTree->GetItemText( item ) ) );
 
     if ( IDscene != -1 )
     {
         Clipboard * clipboard = Clipboard::getInstance();
-        clipboard->SetScene(game.m_scenes.at( IDscene ));
+        clipboard->SetScene(games[gameCurrentlyEdited]->m_scenes.at( IDscene ));
         return;
     }
-    else { wxLogStatus( _( "La scène à copier n'a pas pu être trouvée !" ) ); }
+    else { wxLogStatus( _( "La scène à copier n'a pas pu être trouvée !" ) ); }*/
 }
 
 void Game_Develop_EditorFrame::OnMenuCutSceneSelected( wxCommandEvent& event )
 {
     //1) On cherche la scène
-    int IDscene = ChercherScene( game.m_scenes, static_cast<string>( SceneTree->GetItemText( item ) ) );
+   /* int IDscene = ChercherScene( games[gameCurrentlyEdited]->m_scenes, static_cast<string>( SceneTree->GetItemText( item ) ) );
 
     if ( IDscene != -1 )
     {
         Clipboard * clipboard = Clipboard::getInstance();
-        clipboard->SetScene(game.m_scenes.at( IDscene ));
+        clipboard->SetScene(games[gameCurrentlyEdited]->m_scenes.at( IDscene ));
 
         CloseScene(IDscene);
-        game.m_scenes.erase( game.m_scenes.begin() + IDscene );
+        games[gameCurrentlyEdited]->m_scenes.erase( games[gameCurrentlyEdited]->m_scenes.begin() + IDscene );
     }
     else { wxLogStatus( _( "La scène à couper n'a pas pu être trouvée !" ) ); }
 
     UpdateEditorsSceneID();
-    RefreshListScene();
+    RefreshListScene();*/
 }
 
 void Game_Develop_EditorFrame::OnMenuPasteSceneSelected( wxCommandEvent& event )
 {
-    cout << "OnMenuPasteSceneSelected";
+    /*cout << "OnMenuPasteSceneSelected";
     Clipboard * clipboard = Clipboard::getInstance();
     if ( !clipboard->HasScene() )
     {
@@ -209,7 +214,7 @@ void Game_Develop_EditorFrame::OnMenuPasteSceneSelected( wxCommandEvent& event )
         return;
     }
 
-    int IDscene = ChercherScene( game.m_scenes, static_cast<string>( SceneTree->GetItemText( item ) ) );
+    int IDscene = ChercherScene( games[gameCurrentlyEdited]->m_scenes, static_cast<string>( SceneTree->GetItemText( item ) ) );
     if ( IDscene == -1 )
     {
         wxLogMessage(_("Scène introuvable."));
@@ -225,9 +230,9 @@ void Game_Develop_EditorFrame::OnMenuPasteSceneSelected( wxCommandEvent& event )
     {
         ok = true;
         //On vérifie le nom de chaque scène
-        for ( unsigned int j = 0;j < game.m_scenes.size();j++ )
+        for ( unsigned int j = 0;j < games[gameCurrentlyEdited]->m_scenes.size();j++ )
         {
-            if ( game.m_scenes.at( j ).name == name )
+            if ( games[gameCurrentlyEdited]->m_scenes.at( j ).name == name )
             {
                 i++;
                 name =  wxString::Format(_("Copie de %s (%i)"), clipboard->GetScene().name, i);
@@ -240,12 +245,12 @@ void Game_Develop_EditorFrame::OnMenuPasteSceneSelected( wxCommandEvent& event )
     Scene scenePasted = clipboard->GetScene();
     scenePasted.name = static_cast<string>(name);
 
-    game.m_scenes.insert( game.m_scenes.begin() + IDscene, scenePasted );
+    games[gameCurrentlyEdited]->m_scenes.insert( games[gameCurrentlyEdited]->m_scenes.begin() + IDscene, scenePasted );
     cout << "UpdateEditorsSceneID";
     UpdateEditorsSceneID();
     cout << "UpdateEditorsSceneIDEND";
     RefreshListScene();
-    cout << "OnMenuPasteSceneSelected END";
+    cout << "OnMenuPasteSceneSelected END";*/
 }
 
 ////////////////////////////////////////////////////////////
@@ -262,7 +267,7 @@ void Game_Develop_EditorFrame::OnSceneTreeSelectionChanged( wxTreeEvent& event )
 void Game_Develop_EditorFrame::OnAddScene( wxCommandEvent& event )
 {
     //La scène à ajouter
-    Scene NewScene;
+    /*Scene NewScene;
 
     //Le treeCtrl
     wxTreeItemId rootId = SceneTree->GetRootItem();
@@ -283,9 +288,9 @@ void Game_Develop_EditorFrame::OnAddScene( wxCommandEvent& event )
 
         ok = true;
         //On vérifie le nom de chaque scène
-        for ( unsigned int j = 0;j < game.m_scenes.size();j++ )
+        for ( unsigned int j = 0;j < games[gameCurrentlyEdited]->m_scenes.size();j++ )
         {
-            if ( game.m_scenes.at( j ).name == Name )
+            if ( games[gameCurrentlyEdited]->m_scenes.at( j ).name == Name )
             {
                 ok = false;
             }
@@ -297,11 +302,11 @@ void Game_Develop_EditorFrame::OnAddScene( wxCommandEvent& event )
     NewScene.name = ( string ) Name;
 
     //On l'ajoute
-    game.m_scenes.push_back( NewScene );
+    games[gameCurrentlyEdited]->m_scenes.push_back( NewScene );
     SceneTree->AppendItem( rootId, Name, 1 );
 
     StaticText2->SetLabel( "" );
-    UpdateEditorsSceneID();
+    UpdateEditorsSceneID();*/
 }
 
 ////////////////////////////////////////////////////////////
@@ -309,20 +314,20 @@ void Game_Develop_EditorFrame::OnAddScene( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnDelScene( wxCommandEvent& event )
 {
-    wxTreeItemId ItemNul = NULL;
+    /*wxTreeItemId ItemNul = NULL;
     if ( item != ItemNul && item != SceneTree->GetRootItem() )
     {
-        int i = ChercherScene( game.m_scenes, ( string ) SceneTree->GetItemText( item ) );
+        int i = ChercherScene( games[gameCurrentlyEdited]->m_scenes, ( string ) SceneTree->GetItemText( item ) );
         if ( i != -1 )
         {
             CloseScene(i);
-            game.m_scenes.erase( game.m_scenes.begin() + i );
+            games[gameCurrentlyEdited]->m_scenes.erase( games[gameCurrentlyEdited]->m_scenes.begin() + i );
         }
 
         SceneTree->Delete( item );
 
         //Reaffichage si besoin du message "d'aucune scène présente".
-        if ( game.m_scenes.empty() )
+        if ( games[gameCurrentlyEdited]->m_scenes.empty() )
         {
             StaticText2->SetLabel( _( "Le jeu ne contient aucune scène,\nil vous faut en ajouter une. Faites un\nclic droit sur \"Toutes les scènes\" et\nchoisissez \"Ajouter une scène\"." ) );
         }
@@ -333,7 +338,7 @@ void Game_Develop_EditorFrame::OnDelScene( wxCommandEvent& event )
     else
     {
         wxLogStatus( _( "Aucun objet sélectionnée" ) );
-    }
+    }*/
 }
 
 ////////////////////////////////////////////////////////////
@@ -341,7 +346,7 @@ void Game_Develop_EditorFrame::OnDelScene( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnModNameScene( wxCommandEvent& event )
 {
-    wxTreeItemId ItemNul = NULL;
+    /*wxTreeItemId ItemNul = NULL;
     if ( item != ItemNul && SceneTree->GetItemText( item ) != _( "Toutes les scènes du jeu" ) )
     {
         SceneTree->EditLabel( item );
@@ -349,7 +354,7 @@ void Game_Develop_EditorFrame::OnModNameScene( wxCommandEvent& event )
     else
     {
         wxLogStatus( _( "Aucune scène sélectionnée" ) );
-    }
+    }*/
 }
 
 /**
@@ -357,19 +362,19 @@ void Game_Develop_EditorFrame::OnModNameScene( wxCommandEvent& event )
  */
 void Game_Develop_EditorFrame::OnmodVarSceneMenuISelected(wxCommandEvent& event)
 {
-    int IDscene = ChercherScene( game.m_scenes, static_cast<string>( SceneTree->GetItemText( item ) ) );
+    /*int IDscene = ChercherScene( games[gameCurrentlyEdited]->m_scenes, static_cast<string>( SceneTree->GetItemText( item ) ) );
     if ( IDscene == -1 )
     {
         wxLogMessage(_("Scène introuvable."));
         return;
     }
 
-    InitialVariablesDialog dialog(this, game.m_scenes[IDscene].variables);
+    InitialVariablesDialog dialog(this, games[gameCurrentlyEdited]->m_scenes[IDscene].variables);
     if ( dialog.ShowModal() == 1 )
     {
-        game.m_scenes[IDscene].variables = dialog.variables;
-        nr.SetASceneMustBeReloaded(IDscene);
-    }
+        games[gameCurrentlyEdited]->m_scenes[IDscene].variables = dialog.variables;
+        games[gameCurrentlyEdited]->nr.SetASceneMustBeReloaded(IDscene);
+    }*/
 }
 
 ////////////////////////////////////////////////////////////
@@ -377,14 +382,14 @@ void Game_Develop_EditorFrame::OnmodVarSceneMenuISelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnSceneTreeBeginLabelEdit( wxTreeEvent& event )
 {
-    if ( SceneTree->GetItemText( event.GetItem() ) != _( "Toutes les scènes du jeu" ) )
+    /*if ( SceneTree->GetItemText( event.GetItem() ) != _( "Toutes les scènes du jeu" ) )
     {
         ancienNom = SceneTree->GetItemText( event.GetItem() );
     }
     else
     {
         SceneTree->EndEditLabel( event.GetItem(), true );
-    }
+    }*/
 }
 
 ////////////////////////////////////////////////////////////
@@ -392,13 +397,13 @@ void Game_Develop_EditorFrame::OnSceneTreeBeginLabelEdit( wxTreeEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnSceneTreeEndLabelEdit( wxTreeEvent& event )
 {
-    if ( !event.IsEditCancelled() )
+    /*if ( !event.IsEditCancelled() )
     {
         //1) On cherche l'ancienne scène
-        int IDscene = ChercherScene( game.m_scenes, ancienNom );
+        int IDscene = ChercherScene( games[gameCurrentlyEdited]->m_scenes, ancienNom );
 
         //2) On vérifie si aucune autre scène a le même nom
-        bool nomExist = SceneExist( game.m_scenes, ( string ) event.GetLabel(), IDscene );;
+        bool nomExist = SceneExist( games[gameCurrentlyEdited]->m_scenes, ( string ) event.GetLabel(), IDscene );;
 
         if ( nomExist )
         {
@@ -415,15 +420,15 @@ void Game_Develop_EditorFrame::OnSceneTreeEndLabelEdit( wxTreeEvent& event )
 
                 //Si il s'agit d'un éditeur de scène avec ce nom, on le renomme
                 if ( sceneEditorPtr != NULL &&
-                     editorsNotebook->GetPageText(k) == game.m_scenes.at(IDscene).name)
+                     editorsNotebook->GetPageText(k) == games[gameCurrentlyEdited]->m_scenes.at(IDscene).name)
                     editorsNotebook->SetPageText(k, event.GetLabel());
             }
-            game.m_scenes.at( IDscene ).name = event.GetLabel(); //Mise à jour
+            games[gameCurrentlyEdited]->m_scenes.at( IDscene ).name = event.GetLabel(); //Mise à jour
             SceneTree->SetItemText( event.GetItem(), event.GetLabel() );
             return;
         }
         else { wxLogError( _( "La scène à renommer n'a pas pu être trouvée !" ) ); }
-    }
+    }*/
 }
 
 ////////////////////////////////////////////////////////////
@@ -431,21 +436,21 @@ void Game_Develop_EditorFrame::OnSceneTreeEndLabelEdit( wxTreeEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuEditPropSceneSelected( wxCommandEvent& event )
 {
-    if ( !item.IsOk() || item == SceneTree->GetRootItem() )
+    /*if ( !item.IsOk() || item == SceneTree->GetRootItem() )
         return;
 
-    int IDscene = ChercherScene( game.m_scenes, static_cast<string>( SceneTree->GetItemText( item ) ) );
+    int IDscene = ChercherScene( games[gameCurrentlyEdited]->m_scenes, static_cast<string>( SceneTree->GetItemText( item ) ) );
 
     if ( IDscene != -1 )
     {
-        EditPropScene Dialog( this, &game.m_scenes.at( IDscene ) );
+        EditPropScene Dialog( this, &games[gameCurrentlyEdited]->m_scenes.at( IDscene ) );
 
         Dialog.ShowModal();
 
-        nr.SetASceneMustBeReloaded(IDscene);
+        games[gameCurrentlyEdited]->nr.SetASceneMustBeReloaded(IDscene);
         return;
     }
-    else { wxLogStatus( _( "La scène n'a pas pu être trouvée !" ) ); }
+    else { wxLogStatus( _( "La scène n'a pas pu être trouvée !" ) ); }*/
 }
 
 ////////////////////////////////////////////////////////////
@@ -453,11 +458,11 @@ void Game_Develop_EditorFrame::OnMenuEditPropSceneSelected( wxCommandEvent& even
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::CloseScene( int IDscene )
 {
-    for (unsigned int k =1;k<static_cast<unsigned>(editorsNotebook->GetPageCount()) ;k++ )
+    /*for (unsigned int k =1;k<static_cast<unsigned>(editorsNotebook->GetPageCount()) ;k++ )
     {
-        if ( editorsNotebook->GetPageText(k) == game.m_scenes.at(IDscene).name)
+        if ( editorsNotebook->GetPageText(k) == games[gameCurrentlyEdited]->m_scenes.at(IDscene).name)
             editorsNotebook->DeletePage(k);
-    }
+    }*/
 }
 
 ////////////////////////////////////////////////////////////
@@ -467,20 +472,20 @@ void Game_Develop_EditorFrame::CloseScene( int IDscene )
 void Game_Develop_EditorFrame::UpdateEditorsSceneID()
 {
     //On repasse tous les éditeurs de scènes ouverts
-    for (unsigned int j =0;j<editorsNotebook->GetPageCount() ;j++ )
+    /*for (unsigned int j =0;j<editorsNotebook->GetPageCount() ;j++ )
     {
         wxLogStatus(_("Mise à jour des scènes actuellement ouvertes..."));
         cout << "j" << j;
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(j));
         if ( sceneEditorPtr != NULL )
         {
-            for (unsigned int k =0;k<game.m_scenes.size() ;k++ )
+            for (unsigned int k =0;k<games[gameCurrentlyEdited]->m_scenes.size() ;k++ )
             {
                 //On vérifie avec quelle scène ils vont
-                if ( editorsNotebook->GetPageText(j) == game.m_scenes.at(k).name)
+                if ( editorsNotebook->GetPageText(j) == games[gameCurrentlyEdited]->m_scenes.at(k).name)
                 {
                     cout << "majStart";
-                    sceneEditorPtr->ChangeScenePtr(&game.m_scenes.at(k), false);
+                    sceneEditorPtr->ChangeScenePtr(&games[gameCurrentlyEdited]->m_scenes.at(k), false);
 
                     //On met alors à jour le numéro de la scène
                     cout << "majEnd";
@@ -488,7 +493,7 @@ void Game_Develop_EditorFrame::UpdateEditorsSceneID()
             }
         }
     }
-    wxLogStatus(_("Mise à jour terminée."));
+    wxLogStatus(_("Mise à jour terminée."));*/
 }
 
 ////////////////////////////////////////////////////////////
@@ -518,7 +523,7 @@ void Game_Develop_EditorFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnextensionsEditBtClick(wxCommandEvent& event)
 {
-    Extensions dialog(this, game);
-    dialog.ShowModal();
+    /*Extensions dialog(this, *games[gameCurrentlyEdited]);
+    dialog.ShowModal();*/
 }
 

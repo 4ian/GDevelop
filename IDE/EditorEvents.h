@@ -25,20 +25,8 @@ class EditorEvents: public wxPanel
 	public:
 
 
-        EditorEvents(wxWindow* parent, Game & game_, Scene * scene_, vector < Event > * events_, MainEditorCommand & mainEditorCommand_ );
+        EditorEvents(wxWindow* parent, Game & game_, Scene & scene_, vector < Event > * events_, MainEditorCommand & mainEditorCommand_ );
 		virtual ~EditorEvents();
-
-        void ChangeScenePtr(Scene * newScenePtr)
-        {
-            assert(newScenePtr != NULL);
-            scene = newScenePtr;
-        };
-
-        void ChangeEventsPtr(vector < Event > * newEventsPtr)
-        {
-            assert(newEventsPtr != NULL);
-            events = newEventsPtr;
-        };
 
 		static void CreateRibbonPage(wxRibbonPage * page);
 		void ConnectEvents();
@@ -165,11 +153,9 @@ class EditorEvents: public wxPanel
 		Game & game;
 
         /**
-         * Pointer to scene containing the datas to edit
-         * Use a pointer instead of a reference because scene pointer/reference can change
-         * @see EditorScene
+         * Reference to the scene edited
          */
-		Scene * scene;
+		Scene & scene;
         vector < Event > * events; //Pointeur vers les évènements à modifier
 
 		MainEditorCommand & mainEditorCommand;

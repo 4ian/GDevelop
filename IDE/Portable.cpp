@@ -130,38 +130,38 @@ void Portable::OnButton1Click(wxCommandEvent& event)
         wxSafeYield();
     }
 
-    for ( unsigned int i = 0;i < Jeu.m_scenes.size();i++ )
+    for ( unsigned int i = 0;i < Jeu.scenes.size();i++ )
     {
-        for ( unsigned int j = 0;j < Jeu.m_scenes.at( i ).events.size() ;j++ )
+        for ( unsigned int j = 0;j < Jeu.scenes[i]->events.size() ;j++ )
         {
-            for ( unsigned int k = 0;k < Jeu.m_scenes.at( i ).events.at( j ).actions.size() ;k++ )
+            for ( unsigned int k = 0;k < Jeu.scenes[i]->events.at( j ).actions.size() ;k++ )
             {
-                if ( Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).GetType() == "PlaySound" || Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).GetType() == "PlaySoundCanal" )
+                if ( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetType() == "PlaySound" || Jeu.scenes[i]->events.at( j ).actions.at( k ).GetType() == "PlaySoundCanal" )
                 {
-                    StaticText2->SetLabel( Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString() );
+                    StaticText2->SetLabel( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString() );
                     //Copie et réduction du nom des sons
-                    Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).SetParameter( 0, CopyAndReduceFileName( Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString(), rep ));
+                    Jeu.scenes[i]->events.at( j ).actions.at( k ).SetParameter( 0, CopyAndReduceFileName( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString(), rep ));
                 }
-                if ( Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).GetType() == "PlayMusic" || Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).GetType() == "PlayMusicCanal" )
+                if ( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetType() == "PlayMusic" || Jeu.scenes[i]->events.at( j ).actions.at( k ).GetType() == "PlayMusicCanal" )
                 {
-                    StaticText2->SetLabel( Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString() );
+                    StaticText2->SetLabel( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString() );
                     //Copie et réduction du nom des musiques
-                    Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).SetParameter( 0, CopyAndReduceFileName( Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString(), rep ));
+                    Jeu.scenes[i]->events.at( j ).actions.at( k ).SetParameter( 0, CopyAndReduceFileName( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString(), rep ));
                 }
-                if ( Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).GetType() == "EcrireTexte" )
+                if ( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetType() == "EcrireTexte" )
                 {
-                    if ( Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).GetParameter( 5 ).GetPlainString() != "" )
+                    if ( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 5 ).GetPlainString() != "" )
                     {
 
-                        StaticText2->SetLabel( Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).GetParameter( 5 ).GetPlainString() );
+                        StaticText2->SetLabel( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 5 ).GetPlainString() );
                         //Copie et réduction du nom des musiques
-                        Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).SetParameter( 5, CopyAndReduceFileName( Jeu.m_scenes.at( i ).events.at( j ).actions.at( k ).GetParameter( 5 ).GetPlainString(), rep ));
+                        Jeu.scenes[i]->events.at( j ).actions.at( k ).SetParameter( 5, CopyAndReduceFileName( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 5 ).GetPlainString(), rep ));
                     }
                 }
             }
         }
         wxSafeYield();
-        AvancementGauge->SetValue(i/Jeu.m_scenes.size()*100/3+33);
+        AvancementGauge->SetValue(i/Jeu.scenes.size()*100/3+33);
     }
 
     wxSafeYield();

@@ -114,7 +114,7 @@ BEGIN_EVENT_TABLE( EditorEvents, wxPanel )
     //*)
 END_EVENT_TABLE()
 
-EditorEvents::EditorEvents( wxWindow* parent, Game & game_, Scene * scene_, vector < Event > * events_, MainEditorCommand & mainEditorCommand_ ) :
+EditorEvents::EditorEvents( wxWindow* parent, Game & game_, Scene & scene_, vector < Event > * events_, MainEditorCommand & mainEditorCommand_ ) :
 game(game_),
 scene(scene_),
 events(events_),
@@ -448,7 +448,7 @@ void EditorEvents::ChangesMadeOnEvents()
     history.push_back(*events);
     redoHistory.clear();
 
-    mainEditorCommand.NeedRefreshScene();
+    scene.wasModified = true;
 
     //Rafraichissement
     EventsPanel->Refresh();
@@ -945,7 +945,7 @@ void EditorEvents::OnEventsPanelLeftDClick( wxMouseEvent& event )
     {
         if ( ConditionsSelected )
         {
-            EditConditions EditDialog( this, game, *scene, *eventSelected );
+            EditConditions EditDialog( this, game, scene, *eventSelected );
             if ( EditDialog.ShowModal() == 1 )
             {
                 *eventSelected = EditDialog.eventEdited;
@@ -955,7 +955,7 @@ void EditorEvents::OnEventsPanelLeftDClick( wxMouseEvent& event )
         }
         else
         {
-            EditActions EditDialog( this, game, *scene, *eventSelected );
+            EditActions EditDialog( this, game, scene, *eventSelected );
             if ( EditDialog.ShowModal() == 1 )
             {
                 *eventSelected = EditDialog.eventEdited;
@@ -1050,7 +1050,7 @@ void EditorEvents::OnUndoSelected(wxCommandEvent& event)
     EventsPanel->Refresh();
     EventsPanel->Update();
 
-    mainEditorCommand.NeedRefreshScene();
+    scene.wasModified = true;
 }
 
 ////////////////////////////////////////////////////////////
@@ -1068,7 +1068,7 @@ void EditorEvents::OnRedoSelected(wxCommandEvent& event)
     EventsPanel->Refresh();
     EventsPanel->Update();
 
-    mainEditorCommand.NeedRefreshScene();
+    scene.wasModified = true;
 }
 
 ////////////////////////////////////////////////////////////
@@ -1103,7 +1103,7 @@ TEST( Dialogues, EditorEvents )
     wxLogNull noLog;
 
     //On vérifie que rien ne plante
-    EditorEvents editor(NULL, game, &scene, &scene.events, nrC);
+    EditorEvents editor(NULL, game, scene, &scene.events, nrC);
 
     wxCommandEvent unusedEvent;
     editor.OnDelEventSelected(unusedEvent);

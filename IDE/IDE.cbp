@@ -729,6 +729,8 @@
 		<Unit filename="debugMem.h">
 			<Option virtualFolder="Log et Memoire\" />
 		</Unit>
+		<Unit filename="gdTreeItemGameData.cpp" />
+		<Unit filename="gdTreeItemGameData.h" />
 		<Unit filename="gdTreeItemStringData.cpp" />
 		<Unit filename="gdTreeItemStringData.h" />
 		<Unit filename="gridSetup.cpp">
@@ -839,7 +841,6 @@
 					<wxDialog wxs="wxsmith/ChoiceFile.wxs" src="ChoiceFile.cpp" hdr="ChoiceFile.h" name="ChoiceFile" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorObjectList.wxs" src="EditorObjectList.cpp" hdr="EditorObjectList.h" name="EditorObjectList" language="CPP" />
 					<wxFrame wxs="wxsmith/ConsoleFrame.wxs" src="ConsoleFrame.cpp" hdr="ConsoleFrame.h" name="ConsoleFrame" language="CPP" />
-					<wxDialog wxs="wxsmith/ProjectManager.wxs" src="ProjectManager.cpp" hdr="ProjectManager.h" name="ProjectManager" language="CPP" />
 					<wxDialog wxs="wxsmith/ObjectTypeChoice.wxs" src="ObjectTypeChoice.cpp" hdr="ObjectTypeChoice.h" name="ObjectTypeChoice" language="CPP" />
 					<wxPanel wxs="wxsmith/SpriteInitialPositionPanel.wxs" src="SpriteInitialPositionPanel.cpp" hdr="SpriteInitialPositionPanel.h" name="SpriteInitialPositionPanel" language="CPP" />
 					<wxDialog wxs="wxsmith/InitialVariablesDialog.wxs" src="InitialVariablesDialog.cpp" hdr="InitialVariablesDialog.h" name="InitialVariablesDialog" language="CPP" />
@@ -847,6 +848,7 @@
 					<wxDialog wxs="wxsmith/TextObjectEditor.wxs" src="TextObjectEditor.cpp" hdr="TextObjectEditor.h" name="TextObjectEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/DrawerObjectEditor.wxs" src="DrawerObjectEditor.cpp" hdr="DrawerObjectEditor.h" name="DrawerObjectEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="RenderDialog.cpp" hdr="RenderDialog.h" name="RenderDialog" language="CPP" />
+					<wxPanel wxs="wxsmith/ProjectManager.wxs" src="ProjectManager.cpp" hdr="ProjectManager.h" name="ProjectManager" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

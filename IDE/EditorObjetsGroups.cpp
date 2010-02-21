@@ -54,7 +54,7 @@ BEGIN_EVENT_TABLE(EditorObjetsGroups,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorObjetsGroups::EditorObjetsGroups( wxWindow* parent,  Game & game_, Scene * scene_, vector < ObjectGroup > * objectsGroups_, MainEditorCommand & mainEditorCommand_) :
+EditorObjetsGroups::EditorObjetsGroups( wxWindow* parent,  Game & game_, Scene & scene_, vector < ObjectGroup > * objectsGroups_, MainEditorCommand & mainEditorCommand_) :
 game(game_),
 scene(scene_),
 objectsGroups(objectsGroups_),
@@ -333,11 +333,11 @@ void EditorObjetsGroups::OnEditGroupSelected(wxCommandEvent& event)
                                                     std::bind2nd(HasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
     if ( i != objectsGroups->end() )
     {
-        EditObjectGroup dialog(this, game, *scene, *i);
+        EditObjectGroup dialog(this, game, scene, *i);
         if ( dialog.ShowModal() == 1 )
             *i = dialog.group;
 
-        mainEditorCommand.NeedRefreshScene();
+        scene.wasModified = true;
         return;
     }
 }
@@ -367,7 +367,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
     objectsGroups->push_back( NewGroup );
     ObjetsGroupsList->AppendItem( rootId, name );
 
-    mainEditorCommand.NeedRefreshScene();
+    scene.wasModified = true;
     wxLogStatus( _( "Le groupe a été correctement ajouté" ) );
 }
 
@@ -384,7 +384,7 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
         if ( i != objectsGroups->end() )
             objectsGroups->erase( i );
 
-        mainEditorCommand.NeedRefreshScene();
+        scene.wasModified = true;
         ObjetsGroupsList->Delete( itemSelected );
         return;
 
@@ -479,7 +479,7 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
         {
             i->SetName( static_cast<string>(event.GetLabel()) );
 
-            mainEditorCommand.NeedRefreshScene();
+            scene.wasModified = true;
             return;
         }
     }

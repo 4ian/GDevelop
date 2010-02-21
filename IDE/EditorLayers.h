@@ -16,7 +16,7 @@ class EditorLayers: public wxPanel
 {
 	public:
 
-		EditorLayers(wxWindow* parent, Game & game_, Scene * scene_, vector < Layer > * layers_, MainEditorCommand & mainEditorCommand_);
+		EditorLayers(wxWindow* parent, Game & game_, Scene & scene_, vector < Layer > * layers_, MainEditorCommand & mainEditorCommand_);
 		virtual ~EditorLayers();
 
 		//(*Declarations(EditorLayers)
@@ -26,18 +26,6 @@ class EditorLayers: public wxPanel
 		wxMenu contextMenu;
 		wxPanel* toolBarPanel;
 		//*)
-
-        void ChangeScenePtr(Scene * newScenePtr)
-        {
-            assert(newScenePtr != NULL);
-            scene = newScenePtr;
-        };
-
-        void ChangeLayersPtr(vector < Layer > * newLayersPtr)
-        {
-            assert(newLayersPtr != NULL);
-            layers = newLayersPtr;
-        };
 
 		void Refresh();
 
@@ -85,7 +73,7 @@ class EditorLayers: public wxPanel
          * Use a pointer instead of a reference because scene pointer/reference can change
          * @see EditorScene
          */
-		Scene * scene;
+		Scene & scene;
 		vector < Layer > * layers;
 
 		MainEditorCommand & mainEditorCommand;

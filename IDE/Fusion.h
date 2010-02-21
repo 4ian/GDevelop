@@ -22,7 +22,7 @@ class Fusion: public wxDialog
 {
 	public:
 
-		Fusion(wxWindow* parent, Game * pJeu);
+		Fusion(wxWindow* parent, Game & game_);
 		virtual ~Fusion();
 
 		//(*Declarations(Fusion)
@@ -62,7 +62,7 @@ class Fusion: public wxDialog
 
 		DECLARE_EVENT_TABLE()
 
-		Game * jeu;
+		Game & game;
 };
 
 #endif

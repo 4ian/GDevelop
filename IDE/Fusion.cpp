@@ -47,7 +47,8 @@ BEGIN_EVENT_TABLE(Fusion,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-Fusion::Fusion(wxWindow* parent, Game * pJeu)
+Fusion::Fusion(wxWindow* parent, Game & game_) :
+game(game_)
 {
 	//(*Initialize(Fusion)
 	wxFlexGridSizer* FlexGridSizer3;
@@ -104,8 +105,6 @@ Fusion::Fusion(wxWindow* parent, Game * pJeu)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Fusion::OnFusionBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Fusion::OnFermerBtClick);
 	//*)
-
-	jeu = pJeu;
 }
 
 Fusion::~Fusion()
@@ -136,39 +135,41 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
     {
         for(unsigned int i = 0;i<secondGame.images.size();i++)
         {
-            if ( ChercherNomImage( jeu->images, secondGame.images.at(i).nom ) != -1)
+            if ( ChercherNomImage( game.images, secondGame.images.at(i).nom ) != -1)
             {
                 wxString depart = _("Une image nommé \"");
                 wxString fin = _("\" est déjà présente dans le jeu. Voulez vous la remplacer ?");
                 if (wxMessageBox(depart+secondGame.images.at(i).nom+fin, "Une image de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
-                    jeu->images.erase(jeu->images.begin() + ChercherNomImage( jeu->images, secondGame.images.at(i).nom ));
-                    jeu->images.push_back(secondGame.images.at(i));
+                    game.images.erase(game.images.begin() + ChercherNomImage( game.images, secondGame.images.at(i).nom ));
+                    game.images.push_back(secondGame.images.at(i));
                 }
 
             }
             else
-                jeu->images.push_back(secondGame.images.at(i));
+                game.images.push_back(secondGame.images.at(i));
         }
     }
     if ( ScenesCheck->GetValue() )
     {
-        for(unsigned int i = 0;i<secondGame.m_scenes.size();i++)
+        for(unsigned int i = 0;i<secondGame.scenes.size();i++)
         {
-            if ( ChercherScene( jeu->m_scenes, secondGame.m_scenes.at(i).name) != -1)
+            vector< boost::shared_ptr<Scene> >::iterator scene =
+                find_if(game.scenes.begin(), game.scenes.end(), bind2nd(SceneHasName(), secondGame.scenes[i]->GetName()));
+
+            if ( scene != game.scenes.end())
             {
                 wxString depart = _("Une scène nommé \"");
                 wxString fin = _("\" est déjà présente dans le jeu. Voulez vous la remplacer ?");
-                if (wxMessageBox(depart+secondGame.m_scenes.at(i).name+fin, "Une scène de ce nom existe déjà",wxYES_NO ) == wxYES)
+                if (wxMessageBox(depart+secondGame.scenes[i]->GetName()+fin, "Une scène de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
-                    jeu->m_scenes.erase(jeu->m_scenes.begin() + ChercherScene( jeu->m_scenes, secondGame.m_scenes.at(i).name));
-                    jeu->m_scenes.push_back(secondGame.m_scenes.at(i));
+                    *scene = boost::shared_ptr<Scene>(new Scene(*secondGame.scenes[i]));
                 }
             }
             else
-                jeu->m_scenes.push_back(secondGame.m_scenes.at(i));
+                game.scenes.push_back(boost::shared_ptr<Scene>(new Scene(*secondGame.scenes[i])));
         }
     }
 

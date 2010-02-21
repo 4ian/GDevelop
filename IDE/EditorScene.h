@@ -37,10 +37,9 @@ class EditorScene: public wxPanel
 {
 	public:
 
-		EditorScene(wxWindow* parent, const wxSize & sizeCanvas, Game & game_, Scene * scene_, RuntimeGame & runtimeGame_, const MainEditorCommand & mainEditorCommand_);
+		EditorScene(wxWindow* parent, RuntimeGame & game_, Scene & scene_, const MainEditorCommand & mainEditorCommand_);
 		virtual ~EditorScene();
 
-        void ChangeScenePtr(Scene * newScenePtr, bool reload);
         void Resize( int width, int height );
 
 		//(*Declarations(EditorScene)
@@ -59,7 +58,7 @@ class EditorScene: public wxPanel
 		EditorLayers *  layersEditor;
         DebuggerGUI *   debugger;
 
-		Scene * scene;
+		Scene & scene;
 
         static wxRibbonButtonBar * CreateRibbonPage(wxRibbonPage * page);
         static void CreateToolsBar(wxRibbonButtonBar * bar, bool editing);
@@ -165,8 +164,7 @@ class EditorScene: public wxPanel
 
         void ConnectEvents();
 
-		Game & game;
-		RuntimeGame & runtimeGame;
+		RuntimeGame & game;
 		MainEditorCommand mainEditorCommand;
 		wxToolBar * toolbar;
 		RenderDialog externalWindow;

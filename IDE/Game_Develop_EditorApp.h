@@ -23,7 +23,6 @@ class Game_Develop_EditorApp : public wxApp
         virtual void    OnUnhandledException();
         virtual bool    OnExceptionInMainLoop();
 
-        Game Jeu;
         Game_Develop_EditorFrame * Frame;
         wxLogGui *log;
         wxLogStderr *log_stderr_;

@@ -67,7 +67,7 @@ int EventsExecutor::ExecuteEvents(vector < Event > & events, ObjectsConcerned & 
             if ( retour == ActStopProcess) return ActStopProcess;
 
             //Sous évènements
-            if ( !e->events.empty() )
+            if ( !e->events.empty() && retour != ActAllProcessedAndDoNotSubEvents)
             {
                 retour = ExecuteEvents( e->events, objectsConcerned);
                 if ( retour == ActStopProcess) return ActStopProcess;
@@ -127,7 +127,7 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
                     if ( retour == ActStopProcess) return CondFalse;
 
                     //Sous évènements
-                    if ( !event.events.empty() )
+                    if ( !event.events.empty() && retour != ActAllProcessedAndDoNotSubEvents )
                     {
                         retour = ExecuteEvents( event.events, objectsConcernedInRepeat);
                         if ( retour == ActStopProcess) return CondFalse;
@@ -165,7 +165,7 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
                     if ( retour == ActStopProcess) return CondFalse;
 
                     //Sous évènements
-                    if ( !event.events.empty() )
+                    if ( !event.events.empty() && retour != ActAllProcessedAndDoNotSubEvents  )
                     {
                         retour = ExecuteEvents( event.events, objectsConcernedInForEach);
                         if ( retour == ActStopProcess) return CondFalse;
@@ -205,7 +205,7 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
                     if ( retour == ActStopProcess) return CondFalse;
 
                     //Sous évènements
-                    if ( !event.events.empty() )
+                    if ( !event.events.empty() && retour != ActAllProcessedAndDoNotSubEvents  )
                     {
                         retour = ExecuteEvents( event.events, objectsConcernedInWhile);
                         if ( retour == ActStopProcess) return CondFalse;
@@ -258,9 +258,6 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
 ////////////////////////////////////////////////////////////
 int EventsExecutor::ExecuteActions( Event & event, ObjectsConcerned & objectsConcerned, int startFrom)
 {
-    //Inutile : Devait représenter le numéro de l'évènement
-    int j = 0;
-
     if ( startFrom < 0 ) startFrom = 0;
 
     for ( unsigned int k = startFrom; k < event.actions.size();k++ )
@@ -305,15 +302,15 @@ int EventsExecutor::ExecuteActions( Event & event, ObjectsConcerned & objectsCon
                 if ( retour == ActStopProcess) return ActStopProcess;
 
                 //Sous évènements
-                if ( !event.events.empty() )
+                if ( !event.events.empty() && retour != ActAllProcessedAndDoNotSubEvents)
                 {
                     retour = ExecuteEvents( event.events, objectsConcernedInRepeat);
                     if ( retour == ActStopProcess) return ActStopProcess;
                 }
             }
 
-            if ( retour == ActAllProcessed )
-                return ActAllProcessed;
+            if ( retour == ActAllProcessed || retour == ActAllProcessedAndDoNotSubEvents )
+                return ActAllProcessedAndDoNotSubEvents;
             else
                 k = retour;
         }
@@ -339,7 +336,7 @@ int EventsExecutor::ExecuteActions( Event & event, ObjectsConcerned & objectsCon
                 if ( retour == ActStopProcess) return ActStopProcess;
 
                 //Sous évènements
-                if ( !event.events.empty() )
+                if ( !event.events.empty() && retour != ActAllProcessedAndDoNotSubEvents )
                 {
                     retour = ExecuteEvents( event.events, objectsConcernedInForEach);
                     if ( retour == ActStopProcess) return ActStopProcess;
@@ -347,8 +344,8 @@ int EventsExecutor::ExecuteActions( Event & event, ObjectsConcerned & objectsCon
             }
 
             //On s'est occupé nous même de l'évènement, on s'arrête là.
-            if ( retour == ActAllProcessed )
-                return ActAllProcessed;
+            if ( retour == ActAllProcessed || retour == ActAllProcessedAndDoNotSubEvents )
+                return ActAllProcessedAndDoNotSubEvents;
             else
                 k = retour;
         }

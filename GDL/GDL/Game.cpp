@@ -11,6 +11,9 @@ minFPS(10),
 verticalSync(false),
 portable(false),
 fullscreen(false)
+#if defined(GDE)
+,imagesWereModified(true)
+#endif
 {
     //Game use builtin extensions by default
     extensionsUsed.push_back("BuiltinObject");
@@ -67,7 +70,6 @@ void Game::Init(const Game & game)
     variables = game.variables;
 
     #if defined(GDE)
-    nr = game.nr;
     gameFile = game.gameFile;
     #endif
 }

@@ -11,7 +11,7 @@
 #include <wx/panel.h>
 //*)
 #include <wx/aui/aui.h>
-#include "GDL/Game.h"
+#include "GDL/RuntimeGame.h"
 #include "GDL/ImageManager.h"
 #include "GDL/MainEditorCommand.h"
 
@@ -116,6 +116,7 @@ class GD_API EditorImages: public wxPanel
 		void OnMoveUpSelected(wxCommandEvent& event);
 		void OnMoveDownSelected(wxCommandEvent& event);
 		void OnSetFocus(wxFocusEvent& event);
+		void OnResize(wxSizeEvent& event);
 		//*)
         void OnMoreOptions( wxCommandEvent& event );
 

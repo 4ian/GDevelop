@@ -23,7 +23,7 @@ class ObjectsConcerned;
 //Utilisé pour le retour des actions/conditions
 //Un nombre égal ou supérieur à zéro signifie qu'il faut continuer
 //le traitement à partir de ce numéro
-enum { CondFalse = -4, CondTrue = -3, ActStopProcess = -2, ActAllProcessed = -1};
+enum {  ActAllProcessedAndDoNotSubEvents = -5, CondFalse = -4, CondTrue = -3, ActStopProcess = -2, ActAllProcessed = -1};
 
 
 class GD_API EventsExecutor

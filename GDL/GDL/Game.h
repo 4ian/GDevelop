@@ -22,9 +22,6 @@
 #include <vector>
 #include "GDL/Image.h"
 #include "GDL/LoadingScreen.h"
-#if defined(GDE)
-#include "GDL/needReload.h"
-#endif
 
 using namespace std;
 
@@ -68,9 +65,10 @@ class GD_API Game
         ListVariable variables;
 
         #if defined(GDE)
-        needReload      nr;
-        string          gameFile; ///< File of the game
+        std::string gameFile; ///< File of the game
+        bool imagesWereModified;
         #endif
+
     protected:
     private:
 

@@ -9,52 +9,14 @@
 #include <iostream>
 
 /**
- *  MainEditorCommand is used by editors to transmit and receive commands,
- *  such as the need of reloading a scene.
+ *  MainEditorCommand is used to give access to some members of the mainEditor
+ *  to editors
  */
 class GD_API MainEditorCommand
 {
     public:
-        MainEditorCommand(needReload & nr_, int sceneID_);
+        MainEditorCommand();
         virtual ~MainEditorCommand();
-
-        /**
-         * Indicate that the scene edited need refreshing
-         */
-        void NeedRefreshScene() { nr.SetASceneMustBeReloaded(sceneID); };
-
-        /**
-         * Indicate that all scenes need refreshing
-         */
-        void NeedRefreshAllScenes() { nr.SetAllScenesMustBeReloaded(); };
-
-        /**
-         * Indicate that images have to be reloaded
-         */
-        void NeedRefreshAllImages() { nr.SetImagesMustBeReloaded(); };
-
-        /**
-         * Indicate that the scene edited doesn't need refresh anymore.
-         */
-        void SceneDontNeedRefresh() { nr.SetASceneIsUpToDate(sceneID); };
-        /**
-         * Indicate that the images don't need refresh anymore.
-         */
-        void ImagesDontNeedRefresh() { nr.SetImagesAreUpToDate(); };
-
-        /**
-         * Return true if Scene must be refreshed.
-         */
-        bool QuerySceneNeedRefresh() const { return nr.MustTheSceneBeReloaded(sceneID); };
-        /**
-         * Return true if images must be reloaded
-         */
-        bool QueryImagesNeedRefresh() const { return nr.GetImagesMustBeReloaded(); };
-
-        /**
-         * Change the number of the scene which will be transmit to needReload
-         */
-        void SetScene(int nb) { sceneID = nb; };
 
         /**
          * Return the pointer to the ribbon of the main editor.
@@ -89,7 +51,6 @@ class GD_API MainEditorCommand
     protected:
     private:
 
-        needReload & nr;
         int sceneID;
         wxRibbonBar * ribbon;
         wxRibbonButtonBar * ribbonSceneEditorButtonBar;

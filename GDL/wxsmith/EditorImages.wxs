@@ -34,6 +34,7 @@
 						<object class="sizeritem">
 							<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="SplitterWindow1" member="yes">
 								<minsize>10</minsize>
+								<orientation>vertical</orientation>
 								<size>239,271</size>
 								<minsize>10,10</minsize>
 								<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="BanqueImageList" member="yes">
@@ -43,6 +44,7 @@
 									<handler function="OnBanqueImageListBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
 									<handler function="OnBanqueImageListEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
 									<handler function="OnBanqueImageListItemActivated1" entry="EVT_TREE_ITEM_ACTIVATED" />
+									<handler function="OnBanqueImageListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
 									<handler function="OnBanqueImageListItemMenu" entry="EVT_TREE_ITEM_MENU" />
 								</object>
 								<object class="wxPanel" name="ID_PANEL3" variable="apercuPanel" member="yes">

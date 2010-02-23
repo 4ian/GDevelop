@@ -126,7 +126,7 @@ toolbar(NULL)
     BanqueImageList = new wxTreeCtrl(SplitterWindow1, ID_TREECTRL1, wxDefaultPosition, wxSize(200,170), wxTR_EDIT_LABELS|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
     BanqueImageList->SetToolTip(_("Clic droit sur une image pour accéder aux options"));
     apercuPanel = new wxPanel(SplitterWindow1, ID_PANEL3, wxDefaultPosition, wxSize(200,120), wxSUNKEN_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
-    SplitterWindow1->SplitHorizontally(BanqueImageList, apercuPanel);
+    SplitterWindow1->SplitVertically(BanqueImageList, apercuPanel);
     FlexGridSizer4->Add(SplitterWindow1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     Core->SetSizer(FlexGridSizer4);
     FlexGridSizer4->Fit(Core);
@@ -176,6 +176,7 @@ toolbar(NULL)
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT,(wxObjectEventFunction)&EditorImages::OnBanqueImageListBeginLabelEdit);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_END_LABEL_EDIT,(wxObjectEventFunction)&EditorImages::OnBanqueImageListEndLabelEdit);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&EditorImages::OnBanqueImageListItemActivated1);
+    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&EditorImages::OnBanqueImageListSelectionChanged);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_MENU,(wxObjectEventFunction)&EditorImages::OnBanqueImageListItemMenu);
     apercuPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EditorImages::OnapercuPanelPaint,0,this);
     Connect(idMenuModProp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnModPropSelected);
@@ -226,6 +227,23 @@ toolbar(NULL)
     Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorImages::OnAideBtClick);
 
     Refresh();
+
+    SplitterWindow1->Unsplit(BanqueImageList);
+    SplitterWindow1->Unsplit(apercuPanel);
+    if ( GetSize().GetWidth() > 350 )
+        SplitterWindow1->SplitVertically(BanqueImageList, apercuPanel);
+    else
+        SplitterWindow1->SplitHorizontally(BanqueImageList, apercuPanel);
+}
+
+void EditorImages::OnResize(wxSizeEvent& event)
+{
+    SplitterWindow1->Unsplit(BanqueImageList);
+    SplitterWindow1->Unsplit(apercuPanel);
+    if ( GetSize().GetWidth() > 350 )
+        SplitterWindow1->SplitVertically(BanqueImageList, apercuPanel);
+    else
+        SplitterWindow1->SplitHorizontally(BanqueImageList, apercuPanel);
 }
 
 EditorImages::~EditorImages()
@@ -391,8 +409,7 @@ void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
         }
 
         //Fin du processus, nécessitée de mettre à jour les scènes.
-        mainEditorCommand.NeedRefreshAllImages();
-        mainEditorCommand.NeedRefreshAllScenes();
+        game.imagesWereModified = true;
         wxLogStatus( _( "L'image a été correctement ajoutée à la banque d'image" ) );
     }
 
@@ -415,7 +432,7 @@ void EditorImages::OnDelImageBtClick( wxCommandEvent& event )
             Dossier::RemoveImage(&game.dossierImages, ( string ) BanqueImageList->GetItemText( Item ));
         }
 
-        mainEditorCommand.NeedRefreshAllImages();
+        game.imagesWereModified = true;
         BanqueImageList->Delete( Item );
 
         return;
@@ -521,7 +538,7 @@ void EditorImages::OnBanqueImageListEndLabelEdit( wxTreeEvent& event )
                 game.images.at( i ).nom = event.GetLabel();
                 Dossier::ReplaceNomImage(&game.dossierImages, m_NomItem, static_cast<string> (event.GetLabel()));
 
-                mainEditorCommand.NeedRefreshAllImages();
+                game.imagesWereModified = true;
                 BanqueImageList->SetItemText( event.GetItem(), event.GetLabel() );
 
                 return;
@@ -612,7 +629,7 @@ void EditorImages::OnModFileImage( wxCommandEvent& event )
         game.images.at( i ).fichier = Fichier;
         //Ne concerne pas les dossiers
 
-        mainEditorCommand.NeedRefreshAllImages();
+        game.imagesWereModified = true;
         wxLogStatus( _( "Changement du fichier de l'image effectué" ) );
     }
 
@@ -750,7 +767,7 @@ void EditorImages::OnModPropSelected(wxCommandEvent& event)
 
     PropImage dialog(this, game.images.at(i));
     if ( dialog.ShowModal() == 1 )
-        mainEditorCommand.NeedRefreshAllImages();
+        game.imagesWereModified = true;
 }
 void EditorImages::OnBanqueImageListItemActivated1(wxTreeEvent& event)
 {
@@ -852,7 +869,6 @@ void EditorImages::OnMoveUpSelected(wxCommandEvent& event)
             game.images.insert(game.images.begin()+i-1, image);
 
             Refresh();
-            mainEditorCommand.NeedRefreshAllImages();
 
             //On la reselectionne
             wxTreeItemId item = BanqueImageList->GetLastChild(BanqueImageList->GetRootItem());
@@ -890,7 +906,6 @@ void EditorImages::OnMoveUpSelected(wxCommandEvent& event)
             game.dossierImages[dossierId].contenu.insert( game.dossierImages[dossierId].contenu.begin()+imageId-1, image);
 
             Refresh();
-            mainEditorCommand.NeedRefreshAllImages();
 
             //On la reselectionne
             wxTreeItemId item = BanqueImageList->GetLastChild(BanqueImageList->GetRootItem());
@@ -929,7 +944,6 @@ void EditorImages::OnMoveDownSelected(wxCommandEvent& event)
             game.images.insert(game.images.begin()+i+1, image);
 
             Refresh();
-            mainEditorCommand.NeedRefreshAllImages();
 
             //On la reselectionne
             wxTreeItemId item = BanqueImageList->GetLastChild(BanqueImageList->GetRootItem());
@@ -967,7 +981,6 @@ void EditorImages::OnMoveDownSelected(wxCommandEvent& event)
             game.dossierImages[dossierId].contenu.insert( game.dossierImages[dossierId].contenu.begin()+imageId+1, image);
 
             Refresh();
-            mainEditorCommand.NeedRefreshAllImages();
 
             //On la reselectionne
             wxTreeItemId item = BanqueImageList->GetLastChild(BanqueImageList->GetRootItem());
@@ -1005,6 +1018,6 @@ void EditorImages::OnBanqueImageListBeginDrag(wxTreeEvent& event)
 void EditorImages::OnSetFocus(wxFocusEvent& event)
 {
     if ( useRibbon )
-        mainEditorCommand.GetRibbon()->SetActivePage(1);
+        mainEditorCommand.GetRibbon()->SetActivePage(2);
 }
 #endif

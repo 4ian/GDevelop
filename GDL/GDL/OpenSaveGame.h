@@ -27,7 +27,7 @@ public:
     OpenSaveGame( Game & game_ );
     virtual ~OpenSaveGame();
 
-    void OpenFromFile(string file);
+    bool OpenFromFile(string file);
     void OpenFromString(string text);
     bool SaveToFile(string file);
     void RecreatePaths(string file);

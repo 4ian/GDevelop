@@ -4,9 +4,7 @@
 #include <wx/ribbon/page.h>
 #include <iostream>
 
-MainEditorCommand::MainEditorCommand(needReload & nr_, int sceneID_) :
-nr(nr_),
-sceneID(sceneID_),
+MainEditorCommand::MainEditorCommand() :
 ribbon(NULL),
 ribbonSceneEditorButtonBar(NULL),
 mainEditor(NULL)

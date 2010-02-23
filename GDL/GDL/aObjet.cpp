@@ -81,6 +81,7 @@ bool ActCreate( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const
     //Add object to scene and let it be concerned by futures actions
     scene->objectsInstances.AddObject(newObject);
     objectsConcerned.objectsPicked.AddObject( newObject );
+
     objectsConcerned.AddAnObjectConcerned(newObject->GetObjectIdentifier());
 
     return true;

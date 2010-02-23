@@ -26,6 +26,7 @@ CameraExtension::CameraExtension()
         DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
         DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
         DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( Calque de base si vide )"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
 
     DECLARE_END_CONDITION()
 
@@ -41,6 +42,7 @@ CameraExtension::CameraExtension()
         DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
         DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
         DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( Calque de base si vide )"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
 
     DECLARE_END_CONDITION()
 
@@ -56,6 +58,7 @@ CameraExtension::CameraExtension()
         DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
         DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
         DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( Calque de base si vide )"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
 
     DECLARE_END_CONDITION()
 
@@ -71,6 +74,7 @@ CameraExtension::CameraExtension()
         DECLARE_PARAMETER("expression", _("Valeur"), false, "")
         DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
         DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( Calque de base si vide )"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
 
     DECLARE_END_ACTION()
 
@@ -104,6 +108,7 @@ CameraExtension::CameraExtension()
         DECLARE_PARAMETER("expression", _("Coté bas droit de la limite : Position Y"), false, "")
         DECLARE_PARAMETER_OPTIONAL("yesorno", _("Anticiper le déplacement de l'objet ( oui par défaut )"), false, "")
         DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( Calque de base si vide )"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
         MAIN_OBJECTS_IN_PARAMETER(0)
 
     DECLARE_END_ACTION()
@@ -120,6 +125,7 @@ CameraExtension::CameraExtension()
         DECLARE_PARAMETER("objet", _("Objet"), true, "")
         DECLARE_PARAMETER_OPTIONAL("yesorno", _("Anticiper le déplacement de l'objet ( oui par défaut )"), false, "")
         DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( Calque de base si vide )"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
         MAIN_OBJECTS_IN_PARAMETER(0)
 
     DECLARE_END_ACTION()
@@ -167,25 +173,31 @@ CameraExtension::CameraExtension()
 
     DECLARE_EXPRESSION("cameraX", _("Position X de la caméra d'un calque"), _("Position X de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png", &ExpCameraX)
         DECLARE_PARAMETER("text", _("Calque"), false, "")
+        DECLARE_PARAMETER("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
     DECLARE_END_EXPRESSION()
 
     DECLARE_HIDDEN_EXPRESSION("VueX", _("Position X de la caméra d'un calque"), _("Position X de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png", &ExpCameraX)
         DECLARE_PARAMETER("text", _("Calque"), false, "")
+        DECLARE_PARAMETER("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("cameraY", _("Position Y de la caméra d'un calque"), _("Position Y de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png", &ExpCameraY)
         DECLARE_PARAMETER("text", _("Calque"), false, "")
+        DECLARE_PARAMETER("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
     DECLARE_END_EXPRESSION()
 
     DECLARE_HIDDEN_EXPRESSION("VueY", _("Position Y de la caméra d'un calque"), _("Position Y de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png", &ExpCameraY)
         DECLARE_PARAMETER("text", _("Calque"), false, "")
+        DECLARE_PARAMETER("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("cameraRotation", _("Angle de la caméra d'un calque"), _("Angle de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png", &ExpCameraRotation)
         DECLARE_PARAMETER("text", _("Calque"), false, "")
+        DECLARE_PARAMETER("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
     DECLARE_END_EXPRESSION()
 
     DECLARE_HIDDEN_EXPRESSION("VueRotation", _("Angle de la caméra d'un calque"), _("Angle de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png", &ExpCameraRotation)
         DECLARE_PARAMETER("text", _("Calque"), false, "")
+        DECLARE_PARAMETER("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
     DECLARE_END_EXPRESSION()
 }

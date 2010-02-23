@@ -62,7 +62,7 @@ OpenSaveGame::~OpenSaveGame()
 ////////////////////////////////////////////////////////////
 /// Chargement depuis un fichier
 ////////////////////////////////////////////////////////////
-void OpenSaveGame::OpenFromFile(string file)
+bool OpenSaveGame::OpenFromFile(string file)
 {
     TiXmlDocument doc;
     if ( !doc.LoadFile(file.c_str()) )
@@ -76,7 +76,7 @@ void OpenSaveGame::OpenFromFile(string file)
         wxString Error = _( "Erreur lors du chargement : " ) + ErrorDescription + _("\nVérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder.");
 #endif
         MSGERR( Error );
-        return;
+        return false;
     }
 
     OpenDocument(doc);
@@ -85,6 +85,8 @@ void OpenSaveGame::OpenFromFile(string file)
     if ( game.portable )
         RecreatePaths(file);
     game.portable = false;
+
+    return true;
 }
 
 ////////////////////////////////////////////////////////////

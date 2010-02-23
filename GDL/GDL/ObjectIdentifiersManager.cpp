@@ -4,7 +4,7 @@ ObjectIdentifiersManager *ObjectIdentifiersManager::_singleton = NULL;
 
 ObjectIdentifiersManager::ObjectIdentifiersManager()
 {
-    //ctor
+    nameToObjectIdentifer.insert( StringToObjectIdBiMap::value_type("", 0) );
 }
 
 ObjectIdentifiersManager::~ObjectIdentifiersManager()

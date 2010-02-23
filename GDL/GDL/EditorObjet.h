@@ -22,7 +22,7 @@
 #include <wx/toolbar.h>
 #include <wx/statbmp.h>
 #include <wx/aui/aui.h>
-#include "GDL/Game.h"
+#include "GDL/RuntimeGame.h"
 #include "GDL/SpriteObject.h"
 #include "GDL/MainEditorCommand.h"
 #include "GDL/EditorImages.h"

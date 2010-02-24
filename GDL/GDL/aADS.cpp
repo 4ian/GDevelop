@@ -20,6 +20,7 @@
 #include "GDL/Event.h"
 #include "GDL/Chercher.h"
 #include "GDL/algo.h"
+#include "GDL/StdAlgo.h"
 #include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
@@ -73,15 +74,15 @@ bool SpriteObject::ActChangeAnimation( RuntimeScene * scene, ObjectsConcerned & 
 bool SpriteObject::ActChangeDirection( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetDirec(round((eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
+        SetDirec(gdRound((eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetDirec(round((GetDirectionNb() + eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
+        SetDirec(gdRound((GetDirectionNb() + eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetDirec(round((GetDirectionNb() - eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
+        SetDirec(gdRound((GetDirectionNb() - eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetDirec(round((GetDirectionNb() * eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
+        SetDirec(gdRound((GetDirectionNb() * eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetDirec(round((GetDirectionNb() / eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
+        SetDirec(gdRound((GetDirectionNb() / eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
 
     return true;
 }
@@ -146,10 +147,10 @@ bool ActTourneVers( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
  */
 bool SpriteObject::ActTourneVersPos( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    int angle = atan2(
-    eval.EvalExp(action.GetParameter( 2 ), shared_from_this()) - (GetDrawableY()+GetCenterY()),
-    eval.EvalExp(action.GetParameter( 1 ), shared_from_this()) - (GetDrawableX()+GetCenterX())
-    ) * 180 / 3.14;
+	//Work around for a Visual C++ internal compiler error (!)
+	double y = eval.EvalExp(action.GetParameter( 2 ), shared_from_this()) - (GetDrawableY()+GetCenterY());
+	double x = eval.EvalExp(action.GetParameter( 1 ), shared_from_this()) - (GetDrawableX()+GetCenterX());
+    int angle = atan2(y,x) * 180 / 3.14;
 
     if ( GetAnimation( GetAnimationNb() ).typeNormal )
     {

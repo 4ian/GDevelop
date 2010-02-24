@@ -147,7 +147,7 @@ bool CondEstTourne( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
                 if ( angleObjet < 0 )
                     angleObjet += 360;
 
-                float gap = fabs( angle - angleObjet );
+                float gap = fabs( static_cast<float>(angle - angleObjet) );
                 gap = gap > 180 ? 360 - gap : gap;
 
                 if ( gap < eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) / 2 )

@@ -445,6 +445,8 @@ double Evaluateur::EvalExp(GDExpression & expression, ObjSPtr obj1, ObjSPtr obj2
     for (unsigned int i = 0;i<expression.GetMathExprFunctions().size();++i)
         vals.push_back((expression.GetMathExprFunctions()[i].function)(&scene, objectsConcerned, obj1, obj2, expression.GetMathExprFunctions()[i]));
 
+	if ( vals.empty() ) vals.push_back(0);
+
     return expression.EvalMathExpression(&vals[0]);
 }
 

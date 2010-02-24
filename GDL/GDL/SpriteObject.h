@@ -200,8 +200,8 @@ bool CondCollisionNP( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 //Actions
 bool ActTourneVers( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
 
-void GD_API DestroySpriteObject(Object * object);
-Object * GD_API CreateSpriteObject(std::string name);
-Object * GD_API CreateSpriteObjectByCopy(Object * object);
+GD_API void DestroySpriteObject(Object * object);
+GD_API Object * CreateSpriteObject(std::string name);
+GD_API Object * CreateSpriteObjectByCopy(Object * object);
 
 #endif // SPRITEOBJECT_H

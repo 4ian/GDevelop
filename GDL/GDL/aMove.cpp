@@ -213,10 +213,11 @@ bool Object::ActAddForceVersPos( RuntimeScene * scene, ObjectsConcerned & object
     Force forceToAdd;
     forceToAdd.SetLength( eval.EvalExp( action.GetParameter( 3 ), shared_from_this()) );
     forceToAdd.SetClearing( eval.EvalExp( action.GetParameter( 4 ), shared_from_this() ) );
-    forceToAdd.SetAngle( atan2(
-                            eval.EvalExp(action.GetParameter( 2 ), shared_from_this() ) - (GetDrawableY()+GetCenterY()),
-                            eval.EvalExp(action.GetParameter( 1 ), shared_from_this() ) - (GetDrawableX()+GetCenterX())
-                            ) * 180 / 3.14 );
+
+	//Workaround Visual C++ internal error (!) by using temporary doubles.
+	double y = eval.EvalExp(action.GetParameter( 2 ), shared_from_this() ) - (GetDrawableY()+GetCenterY());
+	double x = eval.EvalExp(action.GetParameter( 1 ), shared_from_this() ) - (GetDrawableX()+GetCenterX());
+    forceToAdd.SetAngle( atan2(y,x) * 180 / 3.14 );
 
     Forces.push_back( forceToAdd );
 
@@ -239,9 +240,11 @@ bool Object::ActArreter( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 bool Object::ActAddForceTournePos( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     //Angle en degré entre les deux objets
-    float angle = atan2(( GetDrawableY() + GetCenterY()) - eval.EvalExp( action.GetParameter( 2 ), shared_from_this() ),
-                        ( GetDrawableX() + GetCenterX() ) - eval.EvalExp( action.GetParameter( 1 ), shared_from_this() ))
-                        * 180 / 3.14;
+
+	//Workaround Visual C++ internal error (!) by using temporary doubles.
+	double y = ( GetDrawableY() + GetCenterY()) - eval.EvalExp( action.GetParameter( 2 ), shared_from_this() );
+	double x = ( GetDrawableX() + GetCenterX() ) - eval.EvalExp( action.GetParameter( 1 ), shared_from_this() );
+    float angle = atan2(y,x) * 180 / 3.14;
     float newangle = angle + eval.EvalExp( action.GetParameter( 3 ), shared_from_this());
 
     //position actuelle de l'objet 1 par rapport à l'objet centre

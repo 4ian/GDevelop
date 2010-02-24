@@ -10,7 +10,7 @@
 
 1265222572 c:\users\florian\programmation\gamedevelop\gdl\gdl\aes.h
 
-1266087474 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\access.cpp
+1267034030 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\access.cpp
 	"GDL/Access.h"
 	"GDL/algo.h"
 	"GDL/Log.h"
@@ -1291,7 +1291,7 @@
 	<iostream>
 	"GDL/GDExpression.h"
 
-1266086811 c:\users\florian\programmation\gamedevelop\gdl\\gdl\gdexpression.h
+1267052426 c:\users\florian\programmation\gamedevelop\gdl\\gdl\gdexpression.h
 	<string>
 	<vector>
 	<iostream>
@@ -4972,7 +4972,7 @@
 	<boost/detail/shared_count.hpp>
 	<boost/shared_ptr.hpp>
 
-1264360630 c:\users\florian\programmation\gamedevelop\gdl\\gdl\force.h
+1267019857 c:\users\florian\programmation\gamedevelop\gdl\\gdl\force.h
 	<iostream>
 	<vector>
 	<string>
@@ -8382,7 +8382,7 @@
 1266332652 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\camera.cpp
 	"GDL/Camera.h"
 
-1266859302 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cameraextension.cpp
+1267008522 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\cameraextension.cpp
 	"GDL/CameraExtension.h"
 	"GDL/ExtensionBase.h"
 	"GDL/cCamera.h"
@@ -8535,7 +8535,7 @@
 	"GDL/Collisions.h"
 	"GDL/Log.h"
 
-1265144195 c:\users\florian\programmation\gamedevelop\gdl\\gdl\spriteobject.h
+1267019857 c:\users\florian\programmation\gamedevelop\gdl\\gdl\spriteobject.h
 	"GDL/Object.h"
 
 1264360627 c:\users\florian\programmation\gamedevelop\gdl\\gdl\collisions.h
@@ -9122,12 +9122,13 @@
 	"wx/ribbon/control.h"
 	"wx/ribbon/art.h"
 
-1266344341 c:\users\florian\programmation\gamedevelop\gdl\\gdl\stdalgo.h
+1267020462 c:\users\florian\programmation\gamedevelop\gdl\\gdl\stdalgo.h
 	<string>
 	<sstream>
 	<iostream>
 	<vector>
 	"GDL/Image.h"
+	<cmath>
 
 1264360628 c:\users\florian\programmation\gamedevelop\gdl\\gdl\propimage.h
 	<wx/sizer.h>
@@ -9854,7 +9855,7 @@
 	<SFML/Audio.hpp>
 	<string>
 
-1264360628 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\force.cpp
+1267018905 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\force.cpp
 	<iostream>
 	<vector>
 	<string>
@@ -12385,7 +12386,7 @@
 	<boost/shared_ptr.hpp>
 	"GDL/Object.h"
 
-1266956369 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.cpp
+1267053310 source:c:\users\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.cpp
 	"GDL/ObjectsConcerned.h"
 	"GDL/Object.h"
 	<boost/shared_ptr.hpp>

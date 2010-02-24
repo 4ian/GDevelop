@@ -111,7 +111,7 @@ bool CondSeDirige( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
                     while ( angleObjet > 360 )
                         angleObjet -= 360;
 
-                    if ( fabs( angle - angleObjet ) < eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) / 2 )
+                    if ( fabs( static_cast<float>(angle - angleObjet) ) < eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) / 2 )
                     {
                         if ( !condition.IsInverted() )
                         {

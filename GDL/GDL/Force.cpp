@@ -22,6 +22,8 @@
 #include "GDL/gpl.h"
 #include "GDL/Force.h"
 
+const float Force::PI = 3.14159265;
+
 Force::Force() :
 X(0),
 Y(0),

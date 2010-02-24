@@ -4,6 +4,7 @@
 #include "GDL/ImageManager.h"
 #include "GDL/tinyxml.h"
 #include "GDL/Position.h"
+#include "GDL/StdAlgo.h"
 #include <SFML/Graphics.hpp>
 
 #ifdef GDE
@@ -825,7 +826,7 @@ void SpriteObject::SetAngle(float newAngle)
     if ( !GetAnimation( m_animCourant ).typeNormal )
         SetDirec(newAngle);
     else
-        SetDirec(static_cast<int>(round((static_cast<int>(newAngle)%360)/45.f))%8);
+        SetDirec(static_cast<int>(gdRound((static_cast<int>(newAngle)%360)/45.f))%8);
 }
 
 /**

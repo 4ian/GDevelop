@@ -2,7 +2,14 @@
 #include "GDL/ExtensionsManager.h"
 #include <stdio.h>
 #include <sys/types.h>
+
+//Compiler specific include, for listing files of directory ( see below )
+#if defined(__GNUC__)
 #include <dirent.h>
+#elif defined(_MSC_VER)
+#include <windows.h>
+#endif
+
 #include <boost/version.hpp>
 
 #include "GDL/BaseObjectExtension.h"
@@ -79,11 +86,6 @@ void ExtensionsLoader::LoadAllExtensionsAvailable()
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new SceneExtension()));
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
 
-    struct dirent *lecture;
-    DIR *rep;
-    rep = opendir( directory.c_str() );
-    int l = 0;
-
     string suffix = "";
 
     #if defined(WINDOWS)
@@ -99,6 +101,12 @@ void ExtensionsLoader::LoadAllExtensionsAvailable()
     #endif
 
     //External extensions
+	#if defined(__GNUC__) //For compilers with posix support
+    struct dirent *lecture;
+    DIR *rep;
+    rep = opendir( directory.c_str() );
+    int l = 0;
+
     while (( lecture = readdir( rep ) ) )
     {
         string lec = lecture->d_name;
@@ -110,7 +118,23 @@ void ExtensionsLoader::LoadAllExtensionsAvailable()
             l++;
         }
     }
+
     closedir( rep );
+	#elif defined(_MSC_VER)
+	WIN32_FIND_DATA f;
+	string dirPart = "/*.xgd";
+	string dirComplete = directory + dirPart + suffix;
+	HANDLE h = FindFirstFile(dirComplete.c_str(), &f);
+	if(h != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			LoadExtensionInManager(f.cFileName);
+		} while(FindNextFile(h, &f));
+	}
+	#else
+		#error Compiler not supported ( but might support one style of directory listing, update defines if necessary )
+	#endif
 }
 
 ////////////////////////////////////////////////////////////

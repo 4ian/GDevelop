@@ -47,6 +47,7 @@ class GD_API GDExpression
             {
                 ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
                 oID = objectIdentifiersManager->GetOIDfromName(plainString);
+                oIDcomputed = true;
             }
 
             return oID;

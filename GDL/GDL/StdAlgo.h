@@ -20,7 +20,7 @@
 #include <iostream>
 #include <vector>
 #include "GDL/Image.h"
-
+#include <cmath>
 
 using namespace std;
 
@@ -28,6 +28,17 @@ std::string GD_API st(int i);
 std::string GD_API stFromFloat(float i);
 int GD_API ChercherNomImage( vector < Image > vecteur, string chaine );
 
+#ifdef __GNUC__
+inline int gdRound(float x)
+{
+    return round(x);
+}
+#else
+inline double gdRound( double d )
+{
+return floor( d + 0.5 );
+}
+#endif
 
 template<typename T>
 int toInt( const T & value )

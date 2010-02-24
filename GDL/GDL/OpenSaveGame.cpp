@@ -67,11 +67,11 @@ bool OpenSaveGame::OpenFromFile(string file)
     TiXmlDocument doc;
     if ( !doc.LoadFile(file.c_str()) )
     {
-#ifdef GDP
+#if defined(GDP)
         string ErrorDescription = doc.ErrorDesc();
         string Error =  "Erreur lors du chargement : " + ErrorDescription + _("\nVérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder.");
 #endif
-#ifdef GDE
+#if defined(GDE)
         wxString ErrorDescription = doc.ErrorDesc();
         wxString Error = _( "Erreur lors du chargement : " ) + ErrorDescription + _("\nVérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder.");
 #endif
@@ -80,6 +80,9 @@ bool OpenSaveGame::OpenFromFile(string file)
     }
 
     OpenDocument(doc);
+    #if defined(GDE)
+    game.gameFile = file;
+    #endif
 
     //Vérification de la portabilité du jeu
     if ( game.portable )

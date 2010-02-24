@@ -8,6 +8,7 @@
 			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxPanel" name="ID_PANEL1" variable="Core" member="yes">
+					<handler function="OnResize" entry="EVT_SIZE" />
 					<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
 						<cols>1</cols>
 						<growablecols>0</growablecols>
@@ -22,7 +23,6 @@
 										<size>-1,25</size>
 										<bg>wxSYS_COLOUR_WINDOW</bg>
 										<extra_code>if ( useRibbon ) toolbarPanel-&gt;SetSize(-1, 0);</extra_code>
-										<handler function="OntoolbarPanelResize" entry="EVT_SIZE" />
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<option>1</option>

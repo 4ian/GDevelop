@@ -172,13 +172,13 @@ toolbar(NULL)
     FlexGridSizer2->Fit(this);
     FlexGridSizer2->SetSizeHints(this);
 
-    toolbarPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorImages::OntoolbarPanelResize,0,this);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT,(wxObjectEventFunction)&EditorImages::OnBanqueImageListBeginLabelEdit);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_END_LABEL_EDIT,(wxObjectEventFunction)&EditorImages::OnBanqueImageListEndLabelEdit);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&EditorImages::OnBanqueImageListItemActivated1);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&EditorImages::OnBanqueImageListSelectionChanged);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_MENU,(wxObjectEventFunction)&EditorImages::OnBanqueImageListItemMenu);
     apercuPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EditorImages::OnapercuPanelPaint,0,this);
+    Core->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorImages::OnResize,0,this);
     Connect(idMenuModProp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnModPropSelected);
     Connect(idMenuMod,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnModNameImageBtClick);
     Connect(idMenuModFile,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnModFileImage);
@@ -236,14 +236,25 @@ toolbar(NULL)
         SplitterWindow1->SplitHorizontally(BanqueImageList, apercuPanel);
 }
 
+/**
+ * Adapt splitterwindow and toolbar when resizing
+ */
 void EditorImages::OnResize(wxSizeEvent& event)
 {
+    if ( !useRibbon )
+    {
+        toolbarPanel->SetSize(event.GetSize().GetWidth(), toolbar->GetSize().GetHeight());
+        toolbar->SetSize(toolbarPanel->GetSize().x, -1);
+    }
+
     SplitterWindow1->Unsplit(BanqueImageList);
     SplitterWindow1->Unsplit(apercuPanel);
     if ( GetSize().GetWidth() > 350 )
         SplitterWindow1->SplitVertically(BanqueImageList, apercuPanel);
     else
         SplitterWindow1->SplitHorizontally(BanqueImageList, apercuPanel);
+
+    SplitterWindow1->SetSize(event.GetSize());
 }
 
 EditorImages::~EditorImages()
@@ -341,17 +352,6 @@ void EditorImages::CreateToolbar()
 #endif
 }
 
-////////////////////////////////////////////////////////////
-/// Redimensionement de la toolbar
-////////////////////////////////////////////////////////////
-void EditorImages::OntoolbarPanelResize(wxSizeEvent& event)
-{
-    if ( !useRibbon )
-    {
-        toolbar->SetSize(toolbarPanel->GetSize().x, -1);
-        toolbarPanel->SetSize(toolbarPanel->GetSize().GetWidth(), toolbar->GetSize().GetHeight());
-    }
-}
 
 ////////////////////////////////////////////////////////////
 /// Ajouter une nouvelle image vierge

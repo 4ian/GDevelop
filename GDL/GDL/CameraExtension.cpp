@@ -17,7 +17,7 @@ CameraExtension::CameraExtension()
     DECLARE_CONDITION("CameraX",
                    _("Position X de la caméra"),
                    _("Teste si la valeur de la position x de la caméra\ncorrespond au test effectué."),
-                   _("La position X de la caméra est _PARAM1_ à _PARAM0_"),
+                   _("La position X de la caméra _PARAM3_ est _PARAM1_ à _PARAM0_ ( Calque : _PARAM2_ )"),
                    _("Calques et caméras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png",
@@ -33,7 +33,7 @@ CameraExtension::CameraExtension()
     DECLARE_CONDITION("CameraY",
                    _("Position Y de la caméra"),
                    _("Teste si la valeur de la position Y de la caméra\ncorrespond au test effectué."),
-                   _("La position Y de la caméra est _PARAM1_ à _PARAM0_"),
+                   _("La position Y de la caméra _PARAM3_ est _PARAM1_ à _PARAM0_ ( Calque : _PARAM2_ )"),
                    _("Calques et caméras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png",
@@ -49,7 +49,7 @@ CameraExtension::CameraExtension()
     DECLARE_CONDITION("CameraAngle",
                    _("Angle de la caméra d'un calque"),
                    _("Teste l'angle d'une caméra."),
-                   _("L'angle de la caméra est _PARAM1_ à _PARAM0_° ( Calque : _PARAM2_ )"),
+                   _("L'angle de la caméra est _PARAM1_ à _PARAM0_° ( Calque : _PARAM2_, caméra : _PARAM3_  )"),
                    _("Calques et caméras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png",
@@ -65,7 +65,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("RotateCamera",
                    _("Modifier l'angle de la caméra"),
                    _("Cette action modifie l'angle de la caméra du calque indiqué."),
-                   _("Faire _PARAM1__PARAM0_ à l'angle de la caméra"),
+                   _("Faire _PARAM1__PARAM0_ à l'angle de la caméra ( calque : _PARAM2_, caméra : _PARAM3_ )"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png",
@@ -81,7 +81,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("ZoomCamera",
                    _("Changer le niveau de zoom de la caméra"),
                    _("Modifie le niveau de zoom de la caméra."),
-                   _("Mettre le niveau de zoom de la caméra à _PARAM0_"),
+                   _("Mettre le niveau de zoom de la caméra à _PARAM0_ ( calque : _PARAM1_, caméra : _PARAM2_ )"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png",
@@ -89,13 +89,14 @@ CameraExtension::CameraExtension()
 
         DECLARE_PARAMETER("expression", _("Valeur ( 1: Zoom initial, 2: Zoom avant x2, 0.5:Zoom arrière x2... )"), false, "")
         DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( Calque de base si vide )"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("FixCamera",
                    _("Centrer la caméra sur un objet ( Limites )"),
                    _("Centre la caméra sur l'objet, dans les limites définies.\nIl est préférable d'appeler cette action vers la fin des évènements, quand toutes les actions\nde positionnement et de déplacement de l'objet ont été effectuées."),
-                   _("Centrer la caméra sur _PARAM0_ ( limites : de _PARAM1_;_PARAM2_ à _PARAM3_;_PARAM4_ )"),
+                   _("Centrer la caméra sur _PARAM0_ ( limites : de _PARAM1_;_PARAM2_ à _PARAM3_;_PARAM4_ ) ( calque : _PARAM6_, caméra : _PARAM7_ )"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png",
@@ -116,7 +117,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("CentreCamera",
                    _("Centrer la caméra sur un objet"),
                    _("Centre la caméra sur l'objet indiqué.\nIl est préférable d'appeler cette action vers la fin des évènements, quand toutes les actions\nde positionnement et de déplacement de l'objet ont été effectuées."),
-                   _("Centrer la caméra sur _PARAM0_"),
+                   _("Centrer la caméra sur _PARAM0_ ( calque : _PARAM1_, caméra : _PARAM2_ )"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png",

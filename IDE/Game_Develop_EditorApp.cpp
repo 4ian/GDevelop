@@ -88,11 +88,18 @@ void MessageLoading( string message, float avancement )
 ////////////////////////////////////////////////////////////
 bool Game_Develop_EditorApp::OnInit()
 {
-    // On définit le chemin d'execution du programme par rapport a la localisation de son executable
-    // Utile surtout sous linux
+    //Get file to open from first argument.
+    string fileToOpen;
+    if ( wxApp::argc > 1 )
+    {
+        fileToOpen = wxApp::argv[1]; //Make sure the filename is absolute.
+        wxFileName filename(fileToOpen);
+        filename.MakeAbsolute();
+        fileToOpen = filename.GetFullPath();
+    }
+
 #ifdef LINUX
-    cout << "Build pour linux";
-    string tmp;
+    string tmp; //Make sure current working directory is executable directory.
     if ( *argv[0] != '/' )
     {
         char buffer[1024];
@@ -103,15 +110,18 @@ bool Game_Develop_EditorApp::OnInit()
     tmp = tmp.substr( 0, tmp.find_last_of( "/" ) );
     chdir( tmp.c_str() );
 #endif
+#ifdef WINDOWS
+    string exeDirectory = argv[0]; //Make sure current working directory is executable directory.
+    exeDirectory = exeDirectory.substr( 0, exeDirectory.find_last_of( "\\" ) );
+    chdir( exeDirectory.c_str() );
+#endif
+
+    cout << fileToOpen;
 
     //(*AppInitialize
     bool wxsOK = true;
     wxInitAllImageHandlers();
     //*)
-    string fileToOpen;
-
-    if ( wxApp::argc > 1 )
-        fileToOpen = wxApp::argv[1];
 
     CompilationChecker::EnsureCorrectGDLVersion();
 

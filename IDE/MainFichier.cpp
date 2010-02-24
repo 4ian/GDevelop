@@ -8,6 +8,8 @@
 #include "Portable.h"
 #include "Fusion.h"
 #include "MessagePlus.h"
+#include "ProjectManager.h"
+#include "StartHerePage.h"
 
 ////////////////////////////////////////////////////////////
 /// Fermeture avec le menu quitter
@@ -22,11 +24,6 @@ void Game_Develop_EditorFrame::OnQuit( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuNewSelected( wxCommandEvent& event )
 {
-    if ( wxMessageBox( _( "Attention !\nToute modification non enregistrée sera perdue.\n\nCréer un nouveau jeu ?" ), _( "Création d'un nouveau jeu" ), wxYES_NO, this ) == wxNO )
-        return;
-
-    CloseAllSceneEditors();
-
     games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
     wxString GD = _( "Game Develop - Nouveau jeu" );
     SetTitle( GD );
@@ -34,9 +31,8 @@ void Game_Develop_EditorFrame::OnMenuNewSelected( wxCommandEvent& event )
     gameCurrentlyEdited = games.size()-1;
 
     //Mise à jour des éditeurs
-    ReloadEditors();
-    RefreshListScene();
-
+    projectManager->Refresh();
+    if ( startPage ) startPage->Refresh();
 }
 
 /**
@@ -84,44 +80,43 @@ void Game_Develop_EditorFrame::OnRibbonOpenDropDownClicked(wxRibbonButtonBarEven
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::Open( string file )
 {
-    //CloseAllSceneEditors();
+    boost::shared_ptr<RuntimeGame> newGame(new RuntimeGame);
 
-    games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
-
-    OpenSaveGame openGame( *games.back() );
-    openGame.OpenFromFile(file);
-
-    wxString GD = "Game Develop";
-    SetTitle( GD + " - " + file );
-
-    //Sauvegarde fichiers récents
-    m_recentlist.SetLastUsed( file );
-    for ( int i = 0;i < 9;i++ )
+    OpenSaveGame openGame( *newGame );
+    if ( openGame.OpenFromFile(file) )
     {
-        wxConfigBase *pConfig = wxConfigBase::Get();
-        pConfig->Write( wxString::Format( _T( "/Recent/%d" ), i ), m_recentlist.GetEntry( i ) );
-    }
+        games.push_back(newGame);
 
-    //Mise à jour des éditeurs
-    ReloadEditors();
-    RefreshListScene();
+        //Sauvegarde fichiers récents
+        m_recentlist.SetLastUsed( file );
+        for ( int i = 0;i < 9;i++ )
+        {
+            wxConfigBase *pConfig = wxConfigBase::Get();
+            pConfig->Write( wxString::Format( _T( "/Recent/%d" ), i ), m_recentlist.GetEntry( i ) );
+        }
 
-    string unknownExtensions = "";
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-    for (unsigned int i = 0;i<games.back()->extensionsUsed.size();++i)
-    {
-    	if ( extensionsManager->GetExtension(games.back()->extensionsUsed[i]) == boost::shared_ptr<ExtensionBase> () )
-    	{
-    	    unknownExtensions += games.back()->extensionsUsed[i]+"\n";
-    	}
-    }
+        //Mise à jour des éditeurs
+        SetCurrentGame(games.size()-1);
+        projectManager->Refresh();
+        if ( startPage ) startPage->Refresh();
 
-    if (unknownExtensions != "")
-    {
-        wxString errorMsg = _("Une ou plusieurs extensions sont utilisées par le jeu mais ne sont pas installées :\n")
-                            + unknownExtensions
-                            + _("\nCertains objets, actions, conditions ou expressions peuvent manquer ou être inconnues.");
-        wxLogWarning(errorMsg);
+        string unknownExtensions = "";
+        gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+        for (unsigned int i = 0;i<newGame->extensionsUsed.size();++i)
+        {
+            if ( extensionsManager->GetExtension(newGame->extensionsUsed[i]) == boost::shared_ptr<ExtensionBase> () )
+            {
+                unknownExtensions += newGame->extensionsUsed[i]+"\n";
+            }
+        }
+
+        if (unknownExtensions != "")
+        {
+            wxString errorMsg = _("Une ou plusieurs extensions sont utilisées par le jeu mais ne sont pas installées :\n")
+                                + unknownExtensions
+                                + _("\nCertains objets, actions, conditions ou expressions peuvent manquer ou être inconnues.");
+            wxLogWarning(errorMsg);
+        }
     }
 }
 
@@ -132,16 +127,16 @@ void Game_Develop_EditorFrame::OnMenuSaveSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
 
-    if ( games[gameCurrentlyEdited]->gameFile == "" )
+    if ( GetCurrentGame()->gameFile == "" )
     {
         SaveAs();
     }
     else
     {
-        OpenSaveGame saveGame( *games[gameCurrentlyEdited] );
-        if ( !saveGame.SaveToFile(games[gameCurrentlyEdited]->gameFile) )
+        OpenSaveGame saveGame( *GetCurrentGame() );
+        if ( !saveGame.SaveToFile(GetCurrentGame()->gameFile) )
         {
-            wxLogError( "L'enregistrement a échoué" );
+            wxLogError( "L'enregistrement a échoué." );
         }
 
         wxLogStatus(_("Enregistrement du fichier terminé."));
@@ -273,6 +268,6 @@ void Game_Develop_EditorFrame::OnMenuFusionSelected(wxCommandEvent& event)
     Fusion dialog(this, *GetCurrentGame());
     dialog.ShowModal();
 
-    ReloadEditors();
-    RefreshListScene();
+    projectManager->Refresh();
+    if ( startPage ) startPage->Refresh();
 }

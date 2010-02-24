@@ -5,7 +5,7 @@
 		<Option title="IDE" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Editeurs\Editeur Image\;Editeurs\Choix\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Affichage\;Editeur principal\Options\;Fichiers\;LIB TinyXml\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Renderers\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\EditorEvents\Events\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
+		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Editeurs\Editeur Image\;Editeurs\Choix\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Options\;Fichiers\;LIB TinyXml\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Renderers\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\EditorEvents\Events\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
 		<Build>
 			<Target title="Debug - Edittime">
 				<Option output="bin\debug\GDEditor" prefix_auto="1" extension_auto="1" />
@@ -179,6 +179,10 @@
 					<Add directory="c:\Libs\SFML\lib\mingw" />
 					<Add directory="C:\Libs\SFML\extlibs\libs-mingw" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="c:\Program Files\VideoLAN\VLC\vlc.exe C:\Windows\Media\chimes.wav --play-and-exit" />
+					<Mode after="always" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
@@ -587,14 +591,8 @@
 		<Unit filename="MAJ.h">
 			<Option virtualFolder="Editeur principal\Aide\" />
 		</Unit>
-		<Unit filename="MainAffichage.cpp">
-			<Option virtualFolder="Editeur principal\Affichage\" />
-		</Unit>
 		<Unit filename="MainAide.cpp">
 			<Option virtualFolder="Editeur principal\Aide\" />
-		</Unit>
-		<Unit filename="MainEditeurJeu.cpp">
-			<Option virtualFolder="Editeur principal\" />
 		</Unit>
 		<Unit filename="MainFichier.cpp">
 			<Option virtualFolder="Editeur principal\Fichier\" />
@@ -699,6 +697,8 @@
 		<Unit filename="SplashScreen.h">
 			<Option virtualFolder="Racine\Demarrage\" />
 		</Unit>
+		<Unit filename="StartHerePage.cpp" />
+		<Unit filename="StartHerePage.h" />
 		<Unit filename="TemplateEvents.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Templates\" />
 		</Unit>
@@ -780,7 +780,6 @@
 				<gui name="wxWidgets" src="Game_Develop_EditorApp.cpp" main="-- None --" init_handlers="necessary" language="CPP" />
 				<resources>
 					<wxFrame wxs="wxsmith/Game_Develop_Editorframe.wxs" src="Game_Develop_EditorMain.cpp" hdr="Game_Develop_EditorMain.h" name="Game_Develop_EditorFrame" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorImages.wxs" src="EditorImages.cpp" hdr="EditorImages.h" name="EditorImages" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorObjets.wxs" src="EditorObjets.cpp" hdr="EditorObjets.h" name="EditorObjets" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorEvents.wxs" src="EditorEvents.cpp" hdr="EditorEvents.h" name="EditorEvents" language="CPP" />
 					<wxDialog wxs="wxsmith/EditConditions.wxs" src="EditConditions.cpp" hdr="EditConditions.h" name="EditConditions" language="CPP" />
@@ -849,6 +848,7 @@
 					<wxDialog wxs="wxsmith/DrawerObjectEditor.wxs" src="DrawerObjectEditor.cpp" hdr="DrawerObjectEditor.h" name="DrawerObjectEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="RenderDialog.cpp" hdr="RenderDialog.h" name="RenderDialog" language="CPP" />
 					<wxPanel wxs="wxsmith/ProjectManager.wxs" src="ProjectManager.cpp" hdr="ProjectManager.h" name="ProjectManager" language="CPP" />
+					<wxPanel wxs="wxsmith/StartHerePage.wxs" src="StartHerePage.cpp" hdr="StartHerePage.h" name="StartHerePage" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

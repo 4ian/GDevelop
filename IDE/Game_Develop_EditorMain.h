@@ -11,14 +11,10 @@
 #define GAME_DEVELOP_EDITORMAIN_H
 
 //(*Headers(Game_Develop_EditorFrame)
-#include <wx/treectrl.h>
 #include <wx/sizer.h>
-#include <wx/stattext.h>
 #include <wx/menu.h>
 #include <wx/aui/aui.h>
-#include <wx/statline.h>
 #include <wx/panel.h>
-#include <wx/button.h>
 #include <wx/frame.h>
 //*)
 #include "wx/aui/aui.h"
@@ -55,6 +51,7 @@
 #include "GDL/needReload.h"
 class RuntimeGame;
 class ProjectManager;
+class StartHerePage;
 
 
 using namespace std;
@@ -82,12 +79,7 @@ class Game_Develop_EditorFrame: public wxFrame
             return true;
         }
 
-        inline bool SetCurrentGame()
-        {
-            if ( gameCurrentlyEdited >= games.size()) return false;
-
-            return true;
-        }
+        void SetCurrentGame(unsigned int i);
 
         unsigned int gameCurrentlyEdited;
 
@@ -103,7 +95,6 @@ class Game_Develop_EditorFrame: public wxFrame
         inline wxRibbonButtonBar * GetRibbonSceneEditorButtonBar() const { return ribbonSceneEditorButtonBar; };
         inline wxRibbonButtonBar * GetRibbonSceneEditorButtonBar() { return ribbonSceneEditorButtonBar; };
 
-    private:
 
         //(*Handlers(Game_Develop_EditorFrame)
         void OnQuit(wxCommandEvent& event);
@@ -122,13 +113,6 @@ class Game_Develop_EditorFrame: public wxFrame
         void OnMenuEventsEditorSelected(wxCommandEvent& event);
         void OnMenuAideSelected(wxCommandEvent& event);
         void OnSceneTreeItemMenu(wxTreeEvent& event);
-        void OnEditSceneBtClick(wxCommandEvent& event);
-        void OnSceneTreeSelectionChanged(wxTreeEvent& event);
-        void OnAddScene(wxCommandEvent& event);
-        void OnDelScene(wxCommandEvent& event);
-        void OnModNameScene(wxCommandEvent& event);
-        void OnSceneTreeBeginLabelEdit(wxTreeEvent& event);
-        void OnSceneTreeEndLabelEdit(wxTreeEvent& event);
         void OnShowTBSelected(wxCommandEvent& event);
         void OnShowTBEditorsSelected(wxCommandEvent& event);
         void OnShowTBSceneSelected(wxCommandEvent& event);
@@ -156,11 +140,6 @@ class Game_Develop_EditorFrame: public wxFrame
         void OnDeplacerGCheckClick(wxCommandEvent& event);
         void OnDelObjetCheckClick(wxCommandEvent& event);
         void OnDeplacerDCheckClick(wxCommandEvent& event);
-        void OnMenuEditPropSceneSelected(wxCommandEvent& event);
-        void OnMenuCopySceneSelected(wxCommandEvent& event);
-        void OnMenuCutSceneSelected(wxCommandEvent& event);
-        void OnMenuPasteSceneSelected(wxCommandEvent& event);
-        void OnModParaBtClick(wxCommandEvent& event);
         void OnMenuPrefSelected(wxCommandEvent& event);
         void OnMenuSaveWSSelected(wxCommandEvent& event);
         void OnRefreshAnalyseBtClick(wxCommandEvent& event);
@@ -195,82 +174,27 @@ class Game_Develop_EditorFrame: public wxFrame
         void OnNotebook1PageChanged(wxAuiNotebookEvent& event);
         void OnmodVarSceneMenuISelected(wxCommandEvent& event);
         void OnglobalVarBtClick(wxCommandEvent& event);
+        void OneditorsNotebookPageClose(wxAuiNotebookEvent& event);
         //*)
         void OnRibbonNewClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonOpenClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonOpenDropDownClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonSaveClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonSaveDropDownClicked(wxRibbonButtonBarEvent& evt);
-        void OnRibbonImagesEditorClicked(wxRibbonButtonBarEvent& evt);
+        void OnProjectsManagerClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonDecomposerDropDownClicked(wxRibbonButtonBarEvent& evt);
+        void OnRibbonStartPageClicked(wxRibbonButtonBarEvent& evt);
         void SaveAs();
-        void RefreshListScene();
-        void ReloadEditors();
-        void CloseAllSceneEditors();
-        void RefreshParaJeu();
         void OnRecentClicked(wxCommandEvent& event );
         void UpdateNotebook();
         void MakeImagesEditorRibbon();
 
+    private:
+
         //(*Identifiers(Game_Develop_EditorFrame)
         static const long ID_PANEL3;
-        static const long ID_STATICTEXT1;
-        static const long ID_STATICTEXT16;
-        static const long ID_STATICTEXT2;
-        static const long ID_STATICTEXT17;
-        static const long ID_STATICTEXT6;
-        static const long ID_BUTTON3;
-        static const long ID_BUTTON4;
-        static const long ID_BUTTON1;
-        static const long ID_TREECTRL1;
-        static const long ID_STATICTEXT3;
-        static const long ID_STATICTEXT4;
-        static const long ID_STATICLINE1;
-        static const long ID_BUTTON2;
-        static const long ID_BUTTON10;
-        static const long ID_PANEL2;
         static const long ID_AUINOTEBOOK1;
         static const long ID_PANEL1;
-        static const long idMenuNew;
-        static const long idMenuOpen;
-        static const long idMenuFusion;
-        static const long idMenuSave;
-        static const long idMenuSaveAs;
-        static const long idMenuPortable;
-        static const long idMenuCompil;
-        static const long idMenuQuit;
-        static const long idMenuImgEditor;
-        static const long idMenuShowToolBar;
-        static const long idMenuShowToolbarEditors;
-        static const long idMenuShowToolbarCG;
-        static const long IdMenuShowToolbarAide;
-        static const long idMenuEncoder;
-        static const long idMenuGIF;
-        static const long idMenuRPG;
-        static const long idMenuSpriteSheet;
-        static const long idMenuSimple;
-        static const long idMenuPref;
-        static const long idMenuWSDef;
-        static const long idMenuWSDet;
-        static const long idMenuWSSimple;
-        static const long idMenuWSChrono;
-        static const long ID_MENUITEM1;
-        static const long idMenuTuto;
-        static const long idMenuHelp;
-        static const long idMenuForum;
-        static const long idMenuWiki;
-        static const long idMenuSite;
-        static const long idMenuMAJ;
-        static const long idMenuAbout;
-        static const long idMenuEditScene;
-        static const long idMenuEditPropScene;
-        static const long idMenuModVar;
-        static const long idMenuModNameScene;
-        static const long idMenuAddScene;
-        static const long idMenuDelScene;
-        static const long idMenuCopyScene;
-        static const long idMenuCutScene;
-        static const long idMenuPasteScene;
         static const long ID_MENUITEM8;
         static const long ID_MENUITEM2;
         static const long ID_MENUITEM3;
@@ -285,7 +209,7 @@ class Game_Develop_EditorFrame: public wxFrame
         static const long idRibbonSaveAs;
         static const long idRibbonPortable;
         static const long idRibbonCompil;
-        static const long idRibbonImagesEditor;
+        static const long idRibbonProjectsManager;
         static const long idRibbonSimpleMode;
         static const long idRibbonImporter;
         static const long idRibbonEncoder;
@@ -297,63 +221,22 @@ class Game_Develop_EditorFrame: public wxFrame
         static const long idRibbonUpdate;
         static const long idRibbonWebSite;
         static const long idRibbonCredits;
+        static const long idRibbonStartPage;
 
         //(*Declarations(Game_Develop_EditorFrame)
-        wxButton* extensionsEditBt;
-        wxStaticText* StaticText9;
-        wxMenuItem* MenuItem31;
-        wxMenuItem* MenuItem26;
-        wxMenuItem* MenuItem7;
-        wxButton* globalVarBt;
-        wxMenuItem* MenuItem25;
-        wxMenuItem* MenuItem40;
-        wxMenuItem* MenuItem5;
-        wxStaticText* TailleJeuTxt;
-        wxStaticText* StaticText2;
-        wxMenuItem* MenuItem2;
-        wxStaticText* AuteurTxt;
-        wxStaticText* NomJeuTxt;
-        wxMenu* Menu3;
-        wxMenuItem* MenuItem4;
-        wxMenuItem* MenuItem36;
-        wxMenuItem* MenuItem29;
-        wxButton* ModParaBt;
-        wxMenuItem* MenuItem22;
         wxPanel* Panel1;
-        wxStaticText* StaticText1;
         wxAuiNotebook* editorsNotebook;
-        wxMenuItem* modVarSceneMenuI;
-        wxMenu ContextMenu;
         wxMenu openContextMenu;
         wxMenuItem* MenuItem10;
         wxMenu decomposerContextMenu;
         wxPanel* ribbonPanel;
-        wxMenuItem* MenuItem27;
-        wxMenuItem* MenuItem39;
-        wxMenuItem* MenuItem38;
-        wxMenuItem* MenuItem20;
-        wxMenuItem* MenuItem28;
-        wxMenuItem* MenuItem6;
-        wxMenuItem* MenuItem35;
-        wxStaticLine* StaticLine1;
-        wxTreeCtrl* SceneTree;
-        wxButton* EditPropSceneBt;
-        wxMenu* MenuItem24;
-        wxPanel* Panel2;
-        wxMenuItem* MenuItem21;
-        wxMenuItem* MenuItem34;
-        wxButton* EditSceneBt;
         wxMenuItem* MenuItem43;
-        wxMenuItem* MenuItem9;
-        wxMenuItem* MenuItem18;
-        wxStaticText* StaticText;
         wxMenu saveContextMenu;
-        wxMenuItem* MenuItem19;
-        wxMenu* Menu4;
         //*)
         wxRibbonBar * m_ribbon;
         wxRibbonButtonBar * ribbonSceneEditorButtonBar;
 
+        StartHerePage * startPage;
         ProjectManager * projectManager;
         vector < EditorScene* > EditorsScene;
 
@@ -362,13 +245,6 @@ class Game_Develop_EditorFrame: public wxFrame
 
         //Images pour la liste des scènes
         wxImageList * imageListScene;
-
-        //Toolbars
-        wxToolBar* ToolBarDefaut;
-        wxToolBar* ToolBarEditors;
-        wxToolBar* ToolBarCG;
-        wxToolBar* ToolBarAide;
-        bool UpdateToolBar();
 
         //RecentList
         RecentList m_recentlist;

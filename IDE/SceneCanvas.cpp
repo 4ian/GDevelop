@@ -110,10 +110,10 @@ void SceneCanvas::OnUpdate()
     //On vérifie qu'on ne doit pas mettre à jour la scène
     if ( !scene.running || scene.editing )
     {
-        if ( mainEditorCommand.QueryImagesNeedRefresh() )
+        if ( gameEdited.imagesWereModified )
         {
             gameEdited.imageManager.LoadImagesFromFile( gameEdited );
-            mainEditorCommand.ImagesDontNeedRefresh(); //Les images sont rechargés
+            gameEdited.imagesWereModified = false;
 
             Reload();
         }

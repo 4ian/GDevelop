@@ -190,7 +190,7 @@ externalWindow(this)
     SetToolbarEdition();
 
     CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->scene.editing);
-    mainEditorCommand.GetRibbon()->SetActivePage(2);
+    mainEditorCommand.GetRibbon()->SetActivePage(3);
     ConnectEvents();
 
     m_mgr.Update();
@@ -673,12 +673,12 @@ void EditorScene::OnnotebookPageChanged(wxAuiNotebookEvent& event)
     if ( notebook->GetPageText(notebook->GetSelection()) == _("Scène") )
     {
         CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->scene.editing);
-        mainEditorCommand.GetRibbon()->SetActivePage(2);
+        mainEditorCommand.GetRibbon()->SetActivePage(3);
         ConnectEvents();
     }
     else if ( notebook->GetPageText(notebook->GetSelection()) == _("Evènements") )
     {
-        mainEditorCommand.GetRibbon()->SetActivePage(3);
+        mainEditorCommand.GetRibbon()->SetActivePage(4);
         eventsEditor->ConnectEvents();
     }
 }
@@ -686,6 +686,6 @@ void EditorScene::OnnotebookPageChanged(wxAuiNotebookEvent& event)
 void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {
     CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->scene.editing);
-    mainEditorCommand.GetRibbon()->SetActivePage(2);
+    mainEditorCommand.GetRibbon()->SetActivePage(3);
     ConnectEvents();
 }

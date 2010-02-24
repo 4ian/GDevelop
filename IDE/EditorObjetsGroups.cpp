@@ -512,6 +512,6 @@ void EditorObjetsGroups::OnObjetsGroupsListItemDoubleClicked(wxTreeEvent& event)
  */
 void EditorObjetsGroups::OnSetFocus(wxFocusEvent& event)
 {
-    mainEditorCommand.GetRibbon()->SetActivePage(5);
+    mainEditorCommand.GetRibbon()->SetActivePage(6);
     ConnectEvents();
 }

@@ -1097,7 +1097,7 @@ TEST( Dialogues, EditorEvents )
 {
     Game game;
     needReload nr;
-    MainEditorCommand nrC(nr, 0);
+    MainEditorCommand nrC;
     Scene scene;
 
     wxLogNull noLog;
@@ -1199,6 +1199,6 @@ void EditorEvents::OnEventsPanelKeyUp(wxKeyEvent& event)
  */
 void EditorEvents::OnEventsPanelSetFocus(wxFocusEvent& event)
 {
-    mainEditorCommand.GetRibbon()->SetActivePage(3);
+    mainEditorCommand.GetRibbon()->SetActivePage(4);
     ConnectEvents();
 }

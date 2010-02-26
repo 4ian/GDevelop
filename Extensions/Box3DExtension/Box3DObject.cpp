@@ -428,13 +428,13 @@ void Box3DObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
 
 void Box3DObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Largeur");       value = width;}
-    else if ( propertyNb == 1 ) {name = _("Hauteur");       value = height;}
-    else if ( propertyNb == 2 ) {name = _("Profondeur");    value = depth;}
-    else if ( propertyNb == 3 ) {name = _("Coordonnée Z");  value = zPosition;}
-    else if ( propertyNb == 4 ) {name = _("Yaw");           value = yaw;}
-    else if ( propertyNb == 5 ) {name = _("Pitch");         value = pitch;}
-    else if ( propertyNb == 6 ) {name = _("Roll");          value = roll;}
+    if      ( propertyNb == 0 ) {name = _("Largeur");       value = toString(width);}
+    else if ( propertyNb == 1 ) {name = _("Hauteur");       value = toString(height);}
+    else if ( propertyNb == 2 ) {name = _("Profondeur");    value = toString(depth);}
+    else if ( propertyNb == 3 ) {name = _("Coordonnée Z");  value = toString(zPosition);}
+    else if ( propertyNb == 4 ) {name = _("Yaw");           value = toString(yaw);}
+    else if ( propertyNb == 5 ) {name = _("Pitch");         value = toString(pitch);}
+    else if ( propertyNb == 6 ) {name = _("Roll");          value = toString(roll);}
 }
 
 bool Box3DObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -452,7 +452,7 @@ bool Box3DObject::ChangeProperty(unsigned int propertyNb, string newValue)
 
 unsigned int Box3DObject::GetNumberOfProperties() const
 {
-    return 5;
+    return 7;
 }
 #endif
 

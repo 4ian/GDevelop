@@ -25,6 +25,7 @@
 #include <wx/textdlg.h>
 #include <wx/msgdlg.h>
 
+#include "GDL/HelpFileAccess.h"
 #include "GDL/StdAlgo.h"
 #include "GDL/Game.h"
 #include "GDL/Animation.h"
@@ -893,9 +894,8 @@ void EditorObjet::OnNormalCheckSelect( wxCommandEvent& event )
 
 void EditorObjet::OnAideBtClick( wxCommandEvent& event )
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection( 17 );
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(47);
 }
 
 void EditorObjet::OnOkBtClick(wxCommandEvent& event)

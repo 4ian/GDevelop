@@ -100,8 +100,6 @@ ObjList ObjectsConcerned::PickOnlyObjects(unsigned int oId, bool onlyAlreadyConc
 
         if  ( !removeFromAlreadyConcernedObjects )
 			objectsPicked.AddListOfObjectsWithSameName(objectsToTest);
-		else
-			objectsPicked.RemoveObjects(oId); //We can be in a global action/condition even if there are already some objects oID concerned ( by forcing global ). We must so be sure to remove objects if needed.
     }
 
     alreadyConcernedObjects.insert(oId);

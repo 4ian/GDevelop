@@ -111,7 +111,7 @@ bool Object::ActDelete( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 ////////////////////////////////////////////////////////////
 bool ActAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
+    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), true);
 
 	ObjList::iterator obj = list.begin();
 	ObjList::const_iterator obj_end = list.end();

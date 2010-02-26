@@ -47,7 +47,7 @@ BOOST_PYTHON_MODULE(sf){
     bp::implicitly_convertible< sf::Unicode::Text, std::string >();
     bp::implicitly_convertible< sf::Unicode::Text, std::wstring >();*/
 
-    register_classes_1();
+    /*register_classes_1();
     register_classes_2();
     register_classes_3();
     register_classes_4();
@@ -55,7 +55,7 @@ BOOST_PYTHON_MODULE(sf){
     register_classes_6();
     register_classes_7();
     register_global_variables();
-    register_free_functions();
+    register_free_functions();*/
 }
 
 ////////////////////////////////////////////////////////////

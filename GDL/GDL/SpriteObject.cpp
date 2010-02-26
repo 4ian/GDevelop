@@ -298,11 +298,11 @@ bool SpriteObject::LoadResources(const ImageManager & imageMgr )
                     sprite.SetSprite(imageMgr.imageVide);
                 }
             }
-            if ( GetAnimation( j ).GetDirectionToModify(k).HasNoSprites() )
+            /*if ( GetAnimation( j ).GetDirectionToModify(k).HasNoSprites() )
             {
                 GetAnimation( j ).GetDirectionToModify(k).AddSprite(Sprite());
                 GetAnimation( j ).GetDirectionToModify(k).ModSprite(GetAnimation( j ).GetDirectionToModify(k).GetSpritesNumber()-1).SetSprite(imageMgr.imageVide);
-            }
+            }*/
         }
     }
 

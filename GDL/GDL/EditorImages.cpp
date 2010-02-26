@@ -28,6 +28,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
+#include "GDL/HelpFileAccess.h"
 
 #include "GDL/Game.h"
 #include "GDL/StdAlgo.h"
@@ -660,9 +661,8 @@ void EditorImages::OnChercherBtClick( wxCommandEvent& event )
 
 void EditorImages::OnAideBtClick( wxCommandEvent& event )
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection(9);
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(9);
 }
 
 void EditorImages::DossierBt( wxCommandEvent& event )

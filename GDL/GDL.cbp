@@ -681,7 +681,7 @@
 		</Unit>
 		<Unit filename="GDL\needReload.cpp" />
 		<Unit filename="GDL\needReload.h" />
-		<Unit filename="GDL\nwidgets\source.cpp">
+		<Unit filename="GDL\nwidgets\nsource.cpp">
 			<Option virtualFolder="LIB nwidgets\" />
 		</Unit>
 		<Unit filename="GDL\profile.cpp" />

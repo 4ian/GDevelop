@@ -71,7 +71,7 @@ bool CondNbObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
 ////////////////////////////////////////////////////////////
 bool CondAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
+    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), true);
 
 	ObjList::iterator obj = list.begin();
 	ObjList::const_iterator obj_end = list.end();

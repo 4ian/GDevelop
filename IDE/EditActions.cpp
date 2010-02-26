@@ -39,6 +39,7 @@
 #include "TranslateAction.h"
 #include "MemTrace.h"
 #include "ChoixAction.h"
+#include "GDL/HelpFileAccess.h"
 
 extern MemTrace MemTracer;
 
@@ -331,9 +332,8 @@ void EditActions::OnMenuItem6Selected(wxCommandEvent& event)
 
 void EditActions::OnAideBtClick(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection(20);
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(20);
 }
 
 void EditActions::OnAnnulerBtClick(wxCommandEvent& event)

@@ -37,6 +37,7 @@
 #include "DndTextObjectsEditor.h"
 #include "ObjectTypeChoice.h"
 #include "InitialVariablesDialog.h"
+#include "GDL/HelpFileAccess.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -596,9 +597,8 @@ void EditorObjectList::OnChercherBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorObjectList::OnAideBtClick( wxCommandEvent& event )
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection(10);
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(10);
 }
 
 

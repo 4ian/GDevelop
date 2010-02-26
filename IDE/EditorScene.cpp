@@ -20,6 +20,7 @@
 #include "GDL/needReload.h"
 #include "SceneCanvas.h"
 #include "ChoixObjet.h"
+#include "GDL/HelpFileAccess.h"
 #include "GridSetup.h"
 #include "ChoixLayer.h"
 #include "GDAuiTabArt.h"
@@ -660,9 +661,8 @@ void EditorScene::OnDebugBtClick( wxCommandEvent & event )
 
 void EditorScene::OnHelpBtClick( wxCommandEvent & event )
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection( 12 );
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(12);
 }
 
 /**

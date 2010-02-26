@@ -56,6 +56,7 @@
 #include "EventRenderer.h"
 #include "Clipboard.h"
 #include "GDL/StdAlgo.h"
+#include "GDL/HelpFileAccess.h"
 #include <time.h>
 
 
@@ -896,9 +897,8 @@ void EditorEvents::OnDelSubEventsSelected(wxCommandEvent& event)
 
 void EditorEvents::OnAideBtClick( wxCommandEvent& event )
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection( 11 );
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(11);
 }
 
 ////////////////////////////////////////////////////////////

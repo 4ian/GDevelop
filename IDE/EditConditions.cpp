@@ -46,6 +46,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "Clipboard.h"
 
+#include "GDL/HelpFileAccess.h"
 #include "TranslateCondition.h"
 #include "ChoixCondition.h"
 
@@ -394,9 +395,8 @@ void EditConditions::OnMenuPasteSelected(wxCommandEvent& event)
 
 void EditConditions::OnAideBtClick(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection(19);
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(19);
 }
 
 void EditConditions::OnAnnulerBtClick(wxCommandEvent& event)

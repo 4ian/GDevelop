@@ -15,10 +15,7 @@
 #include <wx/cmndata.h>
 #include <wx/help.h>
 #include <wx/config.h>
-
-#ifdef DEBUG
-
-#endif
+#include "GDL/HelpFileAccess.h"
 
 #include "GDL/Scene.h"
 
@@ -196,7 +193,6 @@ void EditPropScene::OnColorBtClick(wxCommandEvent& event)
 
 void EditPropScene::OnAideBtClick(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection(8);
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(8);
 }

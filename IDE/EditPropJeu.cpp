@@ -14,15 +14,11 @@
 //*)
 #include "sstream"
 #include "GDL/StdAlgo.h"
-#include <wx/help.h>
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <wx/filedlg.h>
 #include <wx/config.h>
-
-#ifdef DEBUG
-
-#endif
+#include "GDL/HelpFileAccess.h"
 
 #include "GDL/Game.h"
 
@@ -566,9 +562,8 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
 
 void EditPropJeu::OnAideBtClick( wxCommandEvent& event )
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection( 8 );
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(8);
 }
 
 

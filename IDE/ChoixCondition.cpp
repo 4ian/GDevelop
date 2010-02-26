@@ -35,7 +35,7 @@
 #include <wx/log.h>
 #include <wx/msgdlg.h>
 #include "gdTreeItemStringData.h"
-
+#include "GDL/HelpFileAccess.h"
 #include "TranslateCondition.h"
 #include "EditExpression.h"
 #include "EditTexte.h"
@@ -768,52 +768,10 @@ void ChoixCondition::OnCancelBtClick( wxCommandEvent& event )
     EndModal( 1 );
 }
 
-TEST( Dialogues, ChoixCondition )
-{
-    wxLogNull log;
-    Scene scene;
-    Game jeu;
-    vector < string > unused;
-    //ChoixCondition Dialog(NULL, jeu, scene, unused);
-
-    //Initialisation avec des valeurs
-/*    Dialog.Type = "Collision";
-    vector < string > Param;
-    Param.push_back("objet 1");
-    Param.push_back("objet 2");
-    Dialog.Param = Param;
-
-    Dialog.RefreshFromCondition();
-
-    CHECK_EQUAL(Dialog.Loc, true);
-    CHECK_EQUAL(Dialog.ParaEdit.at(0)->IsShown(), true);
-    CHECK_EQUAL(Dialog.ParaEdit.at(1)->IsShown(), true);
-    CHECK_EQUAL(Dialog.ParaEdit.at(2)->IsShown(), false);
-    CHECK_EQUAL(Dialog.ParaEdit.at(3)->IsShown(), false);
-    CHECK_EQUAL(Dialog.ParaEdit.at(4)->IsShown(), false);
-
-    CHECK_EQUAL(static_cast<string>(Dialog.ParaEdit.at(0)->GetValue()), "objet 1");
-    CHECK_EQUAL(static_cast<string>(Dialog.ParaEdit.at(1)->GetValue()), "objet 2");
-
-    Dialog.Type = "KeyPressed";
-    Dialog.RefreshFromCondition();
-    CHECK_EQUAL(Dialog.ParaEdit.at(0)->IsShown(), true);
-    CHECK_EQUAL(Dialog.ParaEdit.at(1)->IsShown(), false);
-
-
-    Dialog.Type = "trucquinemarcherapas";
-    Dialog.RefreshFromCondition();
-
-    CHECK_EQUAL(Dialog.Loc, true);
-    CHECK_EQUAL(Dialog.ParaEdit.at(0)->IsShown(), false);*/
-
-}
-
 void ChoixCondition::OnAideBtClick(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection(23);
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(23);
 }
 
 void ChoixCondition::OnextSortCheckClick(wxCommandEvent& event)

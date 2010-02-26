@@ -8,8 +8,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/config.h>
-#include <wx/help.h>
-#include <wx/fs_zip.h>
+#include "GDL/HelpFileAccess.h"
 #include <wx/mimetype.h> // mimetype support
 #include "Game_Develop_EditorMain.h"
 
@@ -51,7 +50,7 @@ mainEditor(mainEditor_)
 	wxGridSizer* GridSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxGridSizer* GridSizer2;
-	
+
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
 	SetBackgroundColour(wxColour(255,255,255));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -117,7 +116,7 @@ mainEditor(mainEditor_)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&StartHerePage::OnguideBtClick);
 	Connect(ID_BUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&StartHerePage::OntutoBtClick);
 	Connect(ID_BUTTON12,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&StartHerePage::OnwikiBtClick);
@@ -239,9 +238,8 @@ void StartHerePage::Onrecent9BtClick(wxCommandEvent& event)
 
 void StartHerePage::OnguideBtClick(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize("aide.chm");
-    help->DisplaySection(16);
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(16);
 }
 
 void StartHerePage::OntutoBtClick(wxCommandEvent& event)

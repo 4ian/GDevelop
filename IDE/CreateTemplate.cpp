@@ -10,7 +10,7 @@
 //*)
 #include <wx/log.h>
 #include <wx/filedlg.h>
-#include <wx/help.h>
+#include "GDL/HelpFileAccess.h"
 #include "tinyxml.h"
 #include <string>
 #include <vector>
@@ -332,9 +332,8 @@ string CreateTemplate::ConvertParam( string Parametre, string ToReplace, string 
 
 void CreateTemplate::OnAideBtClick( wxCommandEvent& event )
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection( 151 );
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(151);
 }
 
 void CreateTemplate::OnButton1Click(wxCommandEvent& event)

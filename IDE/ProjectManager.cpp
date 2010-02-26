@@ -521,7 +521,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
     //Renaming a scene
     else if ( data->GetString() == "Scene")
     {
-        vector< boost::shared_ptr<Scene> >::const_iterator scene =
+        vector< boost::shared_ptr<Scene> >::iterator scene =
             find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), itemTextBeforeEditing));
 
         if ( scene == game->scenes.end() )
@@ -536,6 +536,8 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
             Refresh();
             return;
         }
+
+        projectsTree->SetItemData(selectedItem, new gdTreeItemGameData("Scene", newName, game));
 
         (*scene)->SetName(newName);
 

@@ -18,6 +18,7 @@
 #include "GDL/Game.h"
 #include "GDL/OpenSaveGame.h"
 #include "TemplateEvents.h"
+#include "GDL/HelpFileAccess.h"
 
 #define MSG(x) wxLogWarning(_(x));
 
@@ -426,7 +427,6 @@ string ChoixTemplateEvent::ConvertParam( string Parametre, string ToReplace, str
 
 void ChoixTemplateEvent::OnAideBtClick(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection(151);
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(151);
 }

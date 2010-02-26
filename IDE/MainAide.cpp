@@ -9,7 +9,7 @@ extern MemTrace MemTracer;
 #include "Game_Develop_EditorMain.h"
 #include <wx/string.h>
 #include <wx/mimetype.h> // mimetype support
-#include <wx/help.h>
+#include "GDL/HelpFileAccess.h"
 #include "Credits.h"
 #include "MAJ.h"
 
@@ -18,9 +18,8 @@ extern MemTrace MemTracer;
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuAideSelected( wxCommandEvent& event )
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplayContents();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplayContents();
 }
 
 ////////////////////////////////////////////////////////////

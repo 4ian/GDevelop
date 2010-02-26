@@ -31,12 +31,14 @@ class Preferences: public wxDialog
 		wxStaticText* StaticText9;
 		wxChoice* TailleEditeurScene;
 		wxPanel* backColorPnl;
+		wxPanel* Panel5;
 		wxCheckBox* hideLabelsCheck;
 		wxButton* auiStyleBt;
 		wxCheckBox* MAJCheck;
 		wxRadioBox* ribbonStyleBox;
 		wxButton* gdStyleBt;
 		wxButton* BrowseDossierTempBt;
+		wxStaticText* StaticText13;
 		wxPanel* ActifColor2Pnl;
 		wxStaticText* StaticText2;
 		wxPanel* Panel4;
@@ -63,6 +65,7 @@ class Preferences: public wxDialog
 		wxStaticText* StaticText12;
 		wxButton* AnnulerBt;
 		wxPanel* Panel2;
+		wxChoice* langChoice;
 		wxTextCtrl* DossierTempCompEdit;
 		wxPanel* ribbonColor1Pnl;
 		wxPanel* ribbonColor2Pnl;
@@ -84,6 +87,9 @@ class Preferences: public wxDialog
 		static const long ID_STATICTEXT5;
 		static const long ID_CHOICE1;
 		static const long ID_PANEL6;
+		static const long ID_STATICTEXT13;
+		static const long ID_CHOICE2;
+		static const long ID_PANEL15;
 		static const long ID_STATICTEXT6;
 		static const long ID_TEXTCTRL3;
 		static const long ID_BUTTON5;
@@ -142,6 +148,7 @@ class Preferences: public wxDialog
 		void OnofficeStyleBtClick(wxCommandEvent& event);
 		void OnauiStyleBtClick(wxCommandEvent& event);
 		void OnhideLabelsCheckClick(wxCommandEvent& event);
+		void OnlangChoiceSelect(wxCommandEvent& event);
 		//*)
 		void SetSkinDefault();
 		void SetSkinOffice();

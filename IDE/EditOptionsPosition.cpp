@@ -13,7 +13,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/StdAlgo.h"
-#include <wx/help.h>
+#include "GDL/HelpFileAccess.h"
 #include <sstream>
 #include <string>
 
@@ -327,9 +327,8 @@ void EditOptionsPosition::OnAnnulerBtClick(wxCommandEvent& event)
 
 void EditOptionsPosition::OnAideBtClick(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection(25);
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(25);
 }
 
 void EditOptionsPosition::OnsizeCheckClick(wxCommandEvent& event)

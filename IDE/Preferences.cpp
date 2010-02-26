@@ -16,6 +16,7 @@
 #include <wx/help.h>
 #include <wx/dirdlg.h>
 #include <wx/log.h>
+#include "GDL/HelpFileAccess.h"
 
 #include <string>
 #include <vector>
@@ -33,6 +34,9 @@ const long Preferences::ID_CHECKBOX4 = wxNewId();
 const long Preferences::ID_STATICTEXT5 = wxNewId();
 const long Preferences::ID_CHOICE1 = wxNewId();
 const long Preferences::ID_PANEL6 = wxNewId();
+const long Preferences::ID_STATICTEXT13 = wxNewId();
+const long Preferences::ID_CHOICE2 = wxNewId();
+const long Preferences::ID_PANEL15 = wxNewId();
 const long Preferences::ID_STATICTEXT6 = wxNewId();
 const long Preferences::ID_TEXTCTRL3 = wxNewId();
 const long Preferences::ID_BUTTON5 = wxNewId();
@@ -87,6 +91,7 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer10;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
+    wxFlexGridSizer* FlexGridSizer9;
     wxFlexGridSizer* FlexGridSizer2;
     wxStaticBoxSizer* StaticBoxSizer9;
     wxFlexGridSizer* FlexGridSizer7;
@@ -155,6 +160,17 @@ changesNeedRestart(false)
     Panel2->SetSizer(FlexGridSizer14);
     FlexGridSizer14->Fit(Panel2);
     FlexGridSizer14->SetSizeHints(Panel2);
+    Panel5 = new wxPanel(Listbook1, ID_PANEL15, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL15"));
+    FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
+    StaticText13 = new wxStaticText(Panel5, ID_STATICTEXT13, _("Langue :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT13"));
+    FlexGridSizer9->Add(StaticText13, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    langChoice = new wxChoice(Panel5, ID_CHOICE2, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE2"));
+    langChoice->Append(_("English"));
+    langChoice->Append(_("Français"));
+    FlexGridSizer9->Add(langChoice, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Panel5->SetSizer(FlexGridSizer9);
+    FlexGridSizer9->Fit(Panel5);
+    FlexGridSizer9->SetSizeHints(Panel5);
     Panel3 = new wxPanel(Listbook1, ID_PANEL7, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL7"));
     FlexGridSizer15 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer15->AddGrowableCol(0);
@@ -271,6 +287,7 @@ changesNeedRestart(false)
     FlexGridSizer16->Fit(Panel4);
     FlexGridSizer16->SetSizeHints(Panel4);
     Listbook1->AddPage(Panel2, _("Général"), false);
+    Listbook1->AddPage(Panel5, _("Langue"), false);
     Listbook1->AddPage(Panel3, _("Répertoires"), false);
     Listbook1->AddPage(Panel4, _("Apparence"), false);
     FlexGridSizer1->Add(Listbook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -289,6 +306,7 @@ changesNeedRestart(false)
     FlexGridSizer1->SetSizeHints(this);
     Center();
 
+    Connect(ID_CHOICE2,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&Preferences::OnlangChoiceSelect);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnBrowseEditionImageClick);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnBrowseDossierTempBtClick);
     Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OngdStyleBtClick);
@@ -310,46 +328,45 @@ changesNeedRestart(false)
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnAideBtClick);
     //*)
 
-    //Buttons' images
-    /*AideBt->SetBitmap(wxBitmap("res/helpicon.png", wxBITMAP_TYPE_ANY));
-    AnnulerBt->SetBitmap(wxBitmap("res/button_cancel.png", wxBITMAP_TYPE_ANY));
-    OkBt->SetBitmap(wxBitmap("res/button_ok.png", wxBITMAP_TYPE_ANY));*/
-    //AideBt->SetBitmapMargins(0,0);
-
     wxConfigBase *pConfig = wxConfigBase::Get();
-    wxString * result = new wxString();
-
-    pConfig->Read( _T( "/Démarrage/Guide" ), result );
-    if ( *result == "false" )
-    {
-        GuideCheck->SetValue( false );
-    }
-    else { GuideCheck->SetValue( true ); }
-
-    *result = "";
-    pConfig->Read( _T( "/Démarrage/MAJ" ), result );
-    if ( *result == "false" )
-    {
-        MAJCheck->SetValue( false );
-    }
-    else { MAJCheck->SetValue( true ); }
-
-
-
-    pConfig->Read( _T( "/Auto/TailleEditeurScene" ), result );
-    if ( *result == "" )
-        TailleEditeurScene->SetSelection( 0 );
-    else if ( *result == "Y" )
-        TailleEditeurScene->SetSelection( 1 );
-    else if ( *result == "N" )
-        TailleEditeurScene->SetSelection( 2 );
-
-
-    wxColour couleur;
-    int r, v, b;
 
     {
         wxString result;
+
+        pConfig->Read( _T( "/Démarrage/Guide" ), &result );
+        if ( result == "false" )
+        {
+            GuideCheck->SetValue( false );
+        }
+        else { GuideCheck->SetValue( true ); }
+    }
+
+    {
+        wxString result;
+
+        pConfig->Read( _T( "/Démarrage/MAJ" ), &result );
+        if ( result == "false" )
+        {
+            MAJCheck->SetValue( false );
+        }
+        else { MAJCheck->SetValue( true ); }
+    }
+
+    {
+        wxString result;
+        pConfig->Read( _T( "/Auto/TailleEditeurScene" ), result );
+        if ( result == "" )
+            TailleEditeurScene->SetSelection( 0 );
+        else if ( result == "Y" )
+            TailleEditeurScene->SetSelection( 1 );
+        else if ( result == "N" )
+            TailleEditeurScene->SetSelection( 2 );
+    }
+
+    {
+        wxString result;
+        wxColour couleur;
+        int r, v, b;
         pConfig->Read( _T( "/Skin/RDefined" ), &result );
 
         if ( result == "true" )
@@ -440,17 +457,26 @@ changesNeedRestart(false)
 
     }
 
-    if ( pConfig->Read( _T( "/EditeursExternes/Image" ), result ) )
-        EditeurImageEdit->SetValue( *result );
-    if ( pConfig->Read( _T( "/Dossier/Compilation" ), result ) )
-        DossierTempCompEdit->SetValue( *result );
+    {
+        wxString result;
 
+        if ( pConfig->Read( _T( "/EditeursExternes/Image" ), &result ) )
+            EditeurImageEdit->SetValue( result );
+        if ( pConfig->Read( _T( "/Dossier/Compilation" ), &result ) )
+            DossierTempCompEdit->SetValue( result );
+    }
 
-    /*bool whiteBugFix = false;
-    pConfig->Read("/whiteBugFix", &whiteBugFix);
+    {
+        wxString result;
 
-    if ( whiteBugFix )
-        whiteBugCheck->SetValue(true);*/
+        if ( pConfig->Read( _T( "/Lang" ), &result ) )
+        {
+            if ( result == "English")
+                langChoice->SetSelection(0);
+            else if ( result == "French")
+                langChoice->SetSelection(1);
+        }
+    }
 }
 
 Preferences::~Preferences()
@@ -558,10 +584,13 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     pConfig->Write( _T( "/Skin/HideLabels"), hideLabelsCheck->GetValue() );
 
-    /*pConfig->Write("/whiteBugFix", whiteBugCheck->GetValue());*/
-
     pConfig->Write( _T( "/EditeursExternes/Image" ), EditeurImageEdit->GetValue() );
     pConfig->Write( _T( "/Dossier/Compilation" ), DossierTempCompEdit->GetValue() );
+
+    if ( langChoice->GetSelection() == 0 )
+        pConfig->Write( _T( "/Lang" ), "English" );
+    else if ( langChoice->GetSelection() == 1 )
+        pConfig->Write( _T( "/Lang" ), "French" );
 
     if ( changesNeedRestart ) wxLogMessage(_("Certains changements nécessitent de redémarrer Game Develop pour prendre effet."));
 
@@ -755,9 +784,8 @@ void Preferences::OnInactifColor2PnlRightUp( wxMouseEvent& event )
 
 void Preferences::OnAideBtClick( wxCommandEvent& event )
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplayContents();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplayContents();
 }
 
 void Preferences::OnBrowseDossierTempBtClick( wxCommandEvent& event )
@@ -835,6 +863,11 @@ void Preferences::OnborderColorPnlLeftUp(wxMouseEvent& event)
 }
 
 void Preferences::OnhideLabelsCheckClick(wxCommandEvent& event)
+{
+    changesNeedRestart = true;
+}
+
+void Preferences::OnlangChoiceSelect(wxCommandEvent& event)
 {
     changesNeedRestart = true;
 }

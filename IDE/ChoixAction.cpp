@@ -32,6 +32,7 @@
 #include <wx/config.h>
 #include "gdTreeItemStringData.h"
 #include "Extensions.h"
+#include "GDL/HelpFileAccess.h"
 
 #include "GDL/StdAlgo.h"
 #include "TranslateAction.h"
@@ -758,9 +759,8 @@ void ChoixAction::OnCancelBtClick(wxCommandEvent& event)
 
 void ChoixAction::OnAideBtClick(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection(29);
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(29);
 }
 
 void ChoixAction::OnextSortCheckClick(wxCommandEvent& event)

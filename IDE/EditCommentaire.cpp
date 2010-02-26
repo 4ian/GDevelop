@@ -6,7 +6,7 @@
 //*)
 #include <wx/colordlg.h>
 #include "GDL/Event.h"
-#include <wx/help.h>
+#include "GDL/HelpFileAccess.h"
 
 //(*IdInit(EditCommentaire)
 const long EditCommentaire::ID_BUTTON1 = wxNewId();
@@ -112,7 +112,6 @@ void EditCommentaire::OnAnnulerBtClick(wxCommandEvent& event)
 
 void EditCommentaire::OnAideBtClick(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection(21);
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(21);
 }

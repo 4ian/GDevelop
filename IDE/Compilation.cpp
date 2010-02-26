@@ -31,9 +31,6 @@
 #include "dlib/compress_stream.h"
 #include "dlib/base64.h"
 
-#ifdef DEBUG
-
-#endif
 
 #include "GDL/AES.h"
 #include "GDL/Game.h"
@@ -43,6 +40,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "Compilation.h"
 #include "ErrorCompilation.h"
+#include "GDL/HelpFileAccess.h"
 
 #ifdef ___WXMSW___
 #include <wx/msw/winundef.h>
@@ -629,9 +627,8 @@ void Compilation::OnOuvrirBtClick( wxCommandEvent& event )
 
 void Compilation::OnAideBtClick( wxCommandEvent& event )
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection( 125 );
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(125);
 }
 
 void Compilation::OnTypeBoxSelect( wxCommandEvent& event )
@@ -704,16 +701,14 @@ void Compilation::CopyEventsRes(const Game & Jeu, vector < Event > & events, str
 
 void Compilation::OnCGShareBtClick(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection( 192 );
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(192);
 }
 
 void Compilation::OnDistribuerBtClick(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection( 158 );
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(158);
 }
 
 

@@ -20,6 +20,7 @@
 #include "Game_Develop_EditorMain.h"
 #include "GDL/StdAlgo.h"
 #include "EditObjectGroup.h"
+#include "GDL/HelpFileAccess.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -298,9 +299,8 @@ void EditorObjetsGroups::DisableAll()
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnHelp(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection( 180 );
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(180);
 }
 
 ////////////////////////////////////////////////////////////

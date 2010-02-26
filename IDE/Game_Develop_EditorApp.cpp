@@ -59,6 +59,7 @@
 #include "GDL/OpenSaveGame.h"
 #include "GDL/SoundManager.h"
 #include "GDL/FontManager.h"
+#include "GDL/HelpFileAccess.h"
 
 #include "GDL/ExtensionsManager.h"
 #include "GDL/SpriteExtension.h"
@@ -116,14 +117,55 @@ bool Game_Develop_EditorApp::OnInit()
     chdir( exeDirectory.c_str() );
 #endif
 
-    cout << fileToOpen;
-
     //(*AppInitialize
     bool wxsOK = true;
     wxInitAllImageHandlers();
     //*)
 
     CompilationChecker::EnsureCorrectGDLVersion();
+
+    //Load configuration
+    wxString ConfigPath = wxFileName::GetHomeDir() + "/.Game Develop/";
+    if ( !wxDirExists( ConfigPath ) )
+        wxMkdir( ConfigPath );
+
+    wxFileConfig *Config = new wxFileConfig( _T( "Game Develop" ), _T( "Compil Games" ), ConfigPath + "options.cfg" );
+    wxConfigBase::Set( Config );
+
+    //Set language
+    {
+        wxString result;
+
+        Config->Read("/Lang", &result);
+
+
+        if ( result == "English" )
+            m_locale.Init(wxLANGUAGE_ENGLISH);
+        else if ( result == "French" )
+            m_locale.Init(wxLANGUAGE_FRENCH);
+        else
+            m_locale.Init(wxLANGUAGE_DEFAULT);
+
+        {
+            wxLogNull noLog;
+            wxLocale::AddCatalogLookupPathPrefix(wxT("."));
+            wxLocale::AddCatalogLookupPathPrefix(wxT(".."));
+            wxLocale::AddCatalogLookupPathPrefix(_T("locale"));
+            m_locale.AddCatalog(_T("GD"));      //Application translations
+            m_locale.AddCatalog(_T("wxstd"));   //wxWidgets specific translations
+        }
+        // This sets the decimal point to be '.', whatever the language defined !
+        wxSetlocale(LC_NUMERIC, "C");        // didn't understand why "C"...
+    }
+
+    //Set help file
+    {
+        HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+        if ( m_locale.GetLanguage() == wxLANGUAGE_ENGLISH )
+            helpFileAccess->InitWithHelpFile("help.chm");
+        else if ( m_locale.GetLanguage() == wxLANGUAGE_FRENCH )
+            helpFileAccess->InitWithHelpFile("aide.chm");
+    }
 
     //Test si le programme n'aurait pas planté la dernière fois
     //En vérifiant si un fichier existe toujours
@@ -161,24 +203,7 @@ bool Game_Develop_EditorApp::OnInit()
     logChain = new wxLogChain( log_stderr_ );
     logChain2 = new wxLogChain( log );
 
-    // Gestion de la langue
-    // Ajout des préfixes possibles de chemins d'accès aux catalogues
-    wxLocale::AddCatalogLookupPathPrefix(wxT("."));
-    wxLocale::AddCatalogLookupPathPrefix(wxT(".."));
-    wxLocale::AddCatalogLookupPathPrefix(_T("locale"));
-    // Mise en place de la langue par défaut du système
-    m_locale.Init(wxLANGUAGE_ENGLISH);
-    //m_locale.Init(wxLANGUAGE_DEFAULT);
-    {
-        wxLogNull noLog;  // Supprime les erreurs si les catalogues n'existent pas
-        // Catalogue de l'application
-        m_locale.AddCatalog(_T("GD"));
-        // Catalogue de wxWidgets
-        m_locale.AddCatalog(_T("wxstd"));
-    }
-    // This sets the decimal point to be '.', whatever the language defined !
-    wxSetlocale(LC_NUMERIC, "C");        // didn't understand why "C"...
-
+    //Load extensions
     ExtensionsLoader * extensionsLoader = ExtensionsLoader::getInstance();
     extensionsLoader->SetExtensionsDir("./Extensions/");
     extensionsLoader->LoadAllExtensionsAvailable();
@@ -187,30 +212,24 @@ bool Game_Develop_EditorApp::OnInit()
     wxSetAssertHandler(NULL); //Don't want to have annoying assert dialogs in release
     #endif
 
-    //Les préférences de Game Develop
-    wxString ConfigPath = wxFileName::GetHomeDir() + "/.Game Develop/";
-    if ( !wxDirExists( ConfigPath ) )
-        wxMkdir( ConfigPath );
-
-    wxFileConfig *Config = new wxFileConfig( _T( "Game Develop" ), _T( "Compil Games" ), ConfigPath + "options.cfg" );
-    wxConfigBase::Set( Config );
-
     wxFileSystem::AddHandler( new wxZipFSHandler );
 
-    //Fenêtre de bienvenue
-    wxString result;
-    Config->Read( "Démarrage/Guide", &result );
-    if ( result != "false" )
+    //Welcome window
     {
-        Demarrage bienvenue( NULL );
-        if ( bienvenue.ShowModal() == 1 )
+        wxString result;
+        Config->Read( "Démarrage/Guide", &result );
+        if ( result != "false" )
         {
-            wxFileDialog open( NULL, _( "Ouvrir un exemple" ), "Exemples/", "", "Jeu Game Develop (*.jgd)|*.jgd" );
-            open.ShowModal();
+            Demarrage bienvenue( NULL );
+            if ( bienvenue.ShowModal() == 1 )
+            {
+                wxFileDialog open( NULL, _( "Ouvrir un exemple" ), "Exemples/", "", "Jeu Game Develop (*.jgd)|*.jgd" );
+                open.ShowModal();
 
-            fileToOpen = static_cast<string>( open.GetPath() );
+                fileToOpen = static_cast<string>( open.GetPath() );
+            }
+            Config->Write( "Démarrage/Guide", "false" );
         }
-        Config->Write( "Démarrage/Guide", "false" );
     }
 
 
@@ -221,27 +240,29 @@ bool Game_Develop_EditorApp::OnInit()
         SetTopWindow( Frame );
     }
 
-    result = "";
-    Config->Read( "Démarrage/MAJ", &result );
-    if ( result != "false" )
+    //Checking for updates
     {
-        CheckMAJ verif;
-        verif.Check();
+        wxString result;
+        Config->Read( "Démarrage/MAJ", &result );
+        if ( result != "false" )
+        {
+            CheckMAJ verif;
+            verif.Check();
+        }
     }
 
     //Fin du splash screen, affichage de la fenêtre
-    //while(!splash->timeUp) wxSafeYield(); //TODO : Seems to block with wx 2.9
     splash->Destroy();
     Frame->Show();
 
 
     //wxLogWarning("Cette version de Game Develop n'est utilisable qu'à des fins de tests. Merci d'utiliser la version disponible sur notre site pour toute autre utilisation.");
-#ifndef SFMLTEST
+
 #ifndef RELEASE
-    /*TestResult tr;
-    TestRegistry::runAllTests( tr );*/
+    TestResult tr;
+    TestRegistry::runAllTests( tr );
 #endif
-#endif
+
     return wxsOK;
 
 }
@@ -257,6 +278,8 @@ int Game_Develop_EditorApp::OnExit()
     clipboard->kill();
     FontManager * fontManager = FontManager::getInstance();
     fontManager->kill();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->kill();
 
 #ifndef RELEASE
     MemTracer.Rapport();

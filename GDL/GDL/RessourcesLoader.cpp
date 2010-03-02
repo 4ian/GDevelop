@@ -87,7 +87,6 @@ std::string RessourcesLoader::LoadPlainText( const string & filename )
     }
     else
     {
-        cout << "fichier externe";
         ifstream file(filename.c_str(), ios::in);
 
         if(!file.fail())

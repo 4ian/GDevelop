@@ -378,6 +378,8 @@ bool SpriteObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
         int idImage = ChercherNomImage(game.images, GetAnimation(0).GetDirection(0).GetSprite(0).GetImage());
         if ( idImage != -1 )
         {
+            if ( !wxFileExists(game.images.at( idImage ).fichier) ) return false;
+
             thumbnail = wxBitmap( game.images.at( idImage ).fichier, wxBITMAP_TYPE_ANY);
 
             wxImage image = thumbnail.ConvertToImage();

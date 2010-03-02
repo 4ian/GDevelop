@@ -157,7 +157,6 @@
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
-				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -460,6 +459,8 @@
 		<Unit filename="GDL\GDL.depend" />
 		<Unit filename="GDL\Game.cpp" />
 		<Unit filename="GDL\Game.h" />
+		<Unit filename="GDL\HelpFileAccess.cpp" />
+		<Unit filename="GDL\HelpFileAccess.h" />
 		<Unit filename="GDL\Image.cpp" />
 		<Unit filename="GDL\Image.h" />
 		<Unit filename="GDL\ImageManager.cpp" />

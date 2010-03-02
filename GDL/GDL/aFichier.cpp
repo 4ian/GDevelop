@@ -28,13 +28,13 @@ bool ActLaunchFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 {
 #ifdef WINDOWS
     //Création de l'adresse internet à lancer
-    string appel = "start "+eval.EvalTxt(action.GetParameter(0));
+    string appel = "start \"\" \""+eval.EvalTxt(action.GetParameter(0))+"\""; //quotes are important
 
     system(appel.c_str());
 #endif
 #ifdef LINUX
     //Nécessite le paquet xdg-utils
-    string appel = "xdg-open \""+eval.EvalTxt(action.GetParameter(0));
+    string appel = "xdg-open \""+eval.EvalTxt(action.GetParameter(0))+"\"";
 
     system(appel.c_str());
 #endif

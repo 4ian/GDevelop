@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release - Edittime" />
-	<File name="Extension.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="78" topLine="0" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="10965" topLine="213" />
 	</File>
 	<File name="TextActions.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="457" topLine="0" />
+		<Cursor position="974" topLine="0" />
 	</File>
 	<File name="TextConditions.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="4841" topLine="0" />
+		<Cursor position="974" topLine="0" />
 	</File>
 	<File name="TextExpressions.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="151" topLine="0" />
+		<Cursor position="974" topLine="0" />
 	</File>
 	<File name="TextObject.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="8613" topLine="312" />
+		<Cursor position="974" topLine="153" />
 	</File>
 	<File name="TextObject.h" open="0" top="0" tabpos="0">
-		<Cursor position="5048" topLine="103" />
+		<Cursor position="974" topLine="0" />
 	</File>
 	<File name="TextObjectEditor.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="186" topLine="0" />
+		<Cursor position="974" topLine="0" />
 	</File>
 	<File name="TextObjectEditor.h" open="0" top="0" tabpos="0">
-		<Cursor position="102" topLine="0" />
+		<Cursor position="749" topLine="27" />
 	</File>
 </CodeBlocks_layout_file>

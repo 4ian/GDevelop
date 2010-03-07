@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #if defined(GDE)
 #include "GDL/PropImage.h"
 
@@ -48,7 +53,7 @@ image(pImage)
 	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
-	
+
 	Create(parent, wxID_ANY, _("Modifier les propriétés de l\'image"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer1->AddGrowableCol(1);
@@ -113,7 +118,7 @@ image(pImage)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&PropImage::OnFichierEditText);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PropImage::OnBrowseBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PropImage::OnOkBtClick);
@@ -125,7 +130,7 @@ image(pImage)
 	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&PropImage::OnscrollWidthScroll);
 	//*)
 
-    LissageCheck->SetValue(image.lissage);
+    LissageCheck->SetValue(image.smooth);
     NomEdit->SetValue(image.nom);
     FichierEdit->SetValue(image.fichier);
 
@@ -140,7 +145,7 @@ PropImage::~PropImage()
 
 void PropImage::OnOkBtClick(wxCommandEvent& event)
 {
-    image.lissage = LissageCheck->GetValue();
+    image.smooth = LissageCheck->GetValue();
     image.nom = NomEdit->GetValue();
     image.fichier = FichierEdit->GetValue();
 

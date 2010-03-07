@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/ImageManager.h"
 #include "GDL/RessourcesLoader.h"
 
@@ -41,7 +46,7 @@ bool ImageManager::LoadImagesFromFile(Game & Jeu)
 
         //Lissage ou pas
         images[Jeu.images.at(i).nom].SetSmooth(true);
-        if ( !Jeu.images.at(i).lissage )
+        if ( !Jeu.images.at(i).smooth )
             images[Jeu.images.at(i).nom].SetSmooth(false);
     }
 
@@ -63,7 +68,7 @@ bool ImageManager::LoadImage(Game & Jeu, string imageName)
 
             //Lissage ou pas
             images.at( i ).SetSmooth(true);
-            if ( !Jeu.images.at( i ).lissage )
+            if ( !Jeu.images.at( i ).smooth )
                 images.at( i ).SetSmooth(false);
 
             return true;

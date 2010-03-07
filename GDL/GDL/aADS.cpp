@@ -1,13 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *  Contient une ou plusieurs actions
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <vector>

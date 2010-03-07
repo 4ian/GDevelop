@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Collisions.cpp
- *
- *  Vérifications des collisions
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <iostream>
@@ -164,10 +156,9 @@ bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf:
     return false;
 }
 
-////////////////////////////////////////////////////////////
-/// Vérifie une collision entre deux objets rapidement et sans pixel perfect
-/// ( Bounding Box )
-////////////////////////////////////////////////////////////
+/**
+ * Check for a collision between two sprite objects, using only bounding boxes.
+ */
 bool GD_API CheckCollisionNP( const boost::shared_ptr<const SpriteObject> objet1, const boost::shared_ptr<const SpriteObject> objet2 )
 {
     //Get AABBs of the two sprites
@@ -182,9 +173,9 @@ bool GD_API CheckCollisionNP( const boost::shared_ptr<const SpriteObject> objet1
     return false;
 }
 
-////////////////////////////////////////////////////////////
-/// Vérifie une collision entre deux objets ( pixel perfect )
-////////////////////////////////////////////////////////////
+/**
+ * Check for collision between two sprite objects
+ */
 bool GD_API CheckCollision( const boost::shared_ptr<const SpriteObject> objet1, const boost::shared_ptr<const SpriteObject> objet2)
 {
     return PixelPerfectTest( objet1->GetCurrentSprite(), objet2->GetCurrentSprite(), 1 );

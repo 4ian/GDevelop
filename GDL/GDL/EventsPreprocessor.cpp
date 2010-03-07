@@ -1,8 +1,8 @@
 #include "GDL/EventsPreprocessor.h"
 #include "GDL/conditions.h"
-#include "GDL/actions.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/RuntimeScene.h"
+#include "GDL/ObjectsConcerned.h"
 
 EventsPreprocessor::EventsPreprocessor()
 {

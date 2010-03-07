@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Log.h
- *
- *  Header de log.cpp
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef LOG_H_INCLUDED

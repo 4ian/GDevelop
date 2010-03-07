@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Chercher.h
- *
- *  Header de chercher.cpp
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef CHERCHER_H_INCLUDED
@@ -33,6 +25,10 @@ using namespace std;
 int ChercherImage(const vector < string > *nomImages, const string nom);
 int ChercherImage(const vector < Image > & images, const string nom);
 
+/**
+ * Deprecated. Do not use it anymore.
+ * Old class to pick objects
+ */
 class GD_API Picker
 {
     public :

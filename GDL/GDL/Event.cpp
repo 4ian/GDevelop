@@ -1,15 +1,8 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
-/**
- *  Event.cpp
- *
- *  Classe contenant un évènement : condition(s) + para et action(s) + paramètres.
- */
+
 
 #include <iostream>
 #include <vector>
@@ -31,7 +24,8 @@ end(0)
 ,conditionsHeightNeedUpdate(true),
 conditionsHeight(0),
 actionsHeightNeedUpdate(true),
-actionsHeight(0)
+actionsHeight(0),
+selected(false)
 #endif
 {
 }

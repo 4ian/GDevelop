@@ -103,7 +103,7 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
         bool Ok = false;
         eval.SetObjectsConcerned(&objectsConcerned);
         if ( event.conditions[k].function != NULL ) { Ok = event.conditions[k].function( scene, objectsConcerned, event.conditions[k], eval ); }
-        else if (event.conditions[k].GetType() == "Toujours" ) {        Ok = true; }
+        else if (event.conditions[k].GetType() == "Toujours" ) {        Ok = !event.conditions[k].IsInverted(); }
         else if (event.conditions[k].GetType() == "DepartScene" ) {     Ok = scene->IsFirstLoop();}
         else if (event.conditions[k].GetType() == "Repeat" )
         {

@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/Animation.h"
 #include <SFML/System.hpp>
 #include <iostream>

@@ -5,7 +5,7 @@
 		<Option title="GDL" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="LIB fparser\;LIB nwidgets\;md5\;AES\;LIB dlib\;" />
+		<Option virtualFolders="LIB fparser\;md5\;AES\;" />
 		<Build>
 			<Target title="Debug">
 				<Option output="..\Runtime\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
@@ -344,9 +344,6 @@
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="\home\florian\Programmation\libs\dlib-17.12\" />
-					<Add directory="\home\florian\Programmation\libs\nwidgets\" />
-					<Add directory="\home\florian\Programmation\libs\fparser\" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
@@ -373,8 +370,6 @@
 		<Compiler>
 			<Add directory="..\GDL\" />
 			<Add directory="..\GDL\GDL\fparser" />
-			<Add directory="..\GDL\GDL\nwidgets" />
-			<Add directory="..\GDL\GDL\dlib-17.12" />
 			<Add directory="C:\Libs\boost_1_38_0" />
 			<Add directory="C:\Python26\include" />
 			<Add directory="C:\Libs\SFML\include" />
@@ -455,8 +450,6 @@
 		<Unit filename="GDL\Force.h" />
 		<Unit filename="GDL\GDExpression.cpp" />
 		<Unit filename="GDL\GDExpression.h" />
-		<Unit filename="GDL\GDL.cbp" />
-		<Unit filename="GDL\GDL.depend" />
 		<Unit filename="GDL\Game.cpp" />
 		<Unit filename="GDL\Game.h" />
 		<Unit filename="GDL\HelpFileAccess.cpp" />
@@ -468,8 +461,6 @@
 		<Unit filename="GDL\ImageStruct.h" />
 		<Unit filename="GDL\Instruction.cpp" />
 		<Unit filename="GDL\Instruction.h" />
-		<Unit filename="GDL\InterfaceExtension.cpp" />
-		<Unit filename="GDL\InterfaceExtension.h" />
 		<Unit filename="GDL\JoystickExtension.cpp" />
 		<Unit filename="GDL\JoystickExtension.h" />
 		<Unit filename="GDL\KeyboardExtension.cpp" />
@@ -506,7 +497,6 @@
 		<Unit filename="GDL\ObjectGroup.h" />
 		<Unit filename="GDL\ObjectIdentifiersManager.cpp" />
 		<Unit filename="GDL\ObjectIdentifiersManager.h" />
-		<Unit filename="GDL\ObjectStruct.h" />
 		<Unit filename="GDL\ObjectType.cpp" />
 		<Unit filename="GDL\ObjectType.h" />
 		<Unit filename="GDL\ObjectWithOpacity.cpp" />
@@ -539,7 +529,6 @@
 		<Unit filename="GDL\SceneExtension.h" />
 		<Unit filename="GDL\Son.cpp" />
 		<Unit filename="GDL\Son.h" />
-		<Unit filename="GDL\SortByPlan.h" />
 		<Unit filename="GDL\SortBySurface.h" />
 		<Unit filename="GDL\SoundManager.cpp" />
 		<Unit filename="GDL\SoundManager.h" />
@@ -561,9 +550,6 @@
 		<Unit filename="GDL\Variable.h" />
 		<Unit filename="GDL\VariablesExtension.cpp" />
 		<Unit filename="GDL\VariablesExtension.h" />
-		<Unit filename="GDL\Version.cpp">
-			<Option weight="64" />
-		</Unit>
 		<Unit filename="GDL\Version.h" />
 		<Unit filename="GDL\VersionWrapper.cpp">
 			<Option weight="64" />
@@ -581,8 +567,6 @@
 		<Unit filename="GDL\aEffects.h" />
 		<Unit filename="GDL\aFichier.cpp" />
 		<Unit filename="GDL\aFichier.h" />
-		<Unit filename="GDL\aGUI.cpp" />
-		<Unit filename="GDL\aGUI.h" />
 		<Unit filename="GDL\aJoystick.cpp" />
 		<Unit filename="GDL\aJoystick.h" />
 		<Unit filename="GDL\aLayer.cpp" />
@@ -660,11 +644,6 @@
 		<Unit filename="GDL\conditions.cpp" />
 		<Unit filename="GDL\conditions.h" />
 		<Unit filename="GDL\constantes.h" />
-		<Unit filename="GDL\crypter.cpp" />
-		<Unit filename="GDL\crypter.h" />
-		<Unit filename="GDL\dlib-17.12\dlib\all\source.cpp">
-			<Option virtualFolder="LIB dlib\" />
-		</Unit>
 		<Unit filename="GDL\eFreeFunctions.cpp" />
 		<Unit filename="GDL\eFreeFunctions.h" />
 		<Unit filename="GDL\eObjectFunctions.cpp" />
@@ -679,11 +658,6 @@
 		</Unit>
 		<Unit filename="GDL\md5.h">
 			<Option virtualFolder="md5\" />
-		</Unit>
-		<Unit filename="GDL\needReload.cpp" />
-		<Unit filename="GDL\needReload.h" />
-		<Unit filename="GDL\nwidgets\nsource.cpp">
-			<Option virtualFolder="LIB nwidgets\" />
 		</Unit>
 		<Unit filename="GDL\profile.cpp" />
 		<Unit filename="GDL\profile.h" />

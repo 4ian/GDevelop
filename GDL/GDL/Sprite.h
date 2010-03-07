@@ -1,14 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- * Un Sprite contient un sf::Sprite, et les données
- * qui lui sont associées, comme les points ou zones.
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef SPRITE_H

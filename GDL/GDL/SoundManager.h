@@ -1,16 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  SoundManager : Classe unique qui gère les sons et musiques
- *  Les sons et musiques sur canaux peuvent être accédées avec
- *  les fonctions membres faites pour.
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef SOUNDMANAGER_H
@@ -25,6 +15,9 @@
 
 using namespace std;
 
+/**
+ * Manage the sound played by the game
+ */
 class GD_API SoundManager
 {
 public:

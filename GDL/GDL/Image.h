@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef IMAGE_H
 #define IMAGE_H
 
@@ -6,20 +11,18 @@
 
 using namespace std;
 
+/**
+ * Class that represent an image of an image manager.
+ */
 class GD_API Image
 {
     public:
-        /** Default constructor */
-        Image();
-        /** Default destructor */
-        ~Image();
+        Image() : smooth(true) {};
+        ~Image() {};
 
-        string fichier; //!< Member variable "fichier"
-        string nom; //!< Member variable "nom"
-        bool lissage; //!< Member variable "lissage"
-
-    protected:
-    private:
+        string fichier; ///<File to load
+        string nom; ///<Name of the image
+        bool smooth; ///< True if smoothing filter is applied
 };
 
 #endif // IMAGE_H

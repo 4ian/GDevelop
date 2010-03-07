@@ -1,6 +1,5 @@
 #if defined(GDE)
 #include "GDL/MainEditorCommand.h"
-#include "GDL/needReload.h"
 #include <wx/ribbon/page.h>
 #include <iostream>
 

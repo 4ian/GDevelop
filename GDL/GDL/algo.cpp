@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Algo.cpp
- *
- *  Contient divers algorithmes
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDL/algo.h"

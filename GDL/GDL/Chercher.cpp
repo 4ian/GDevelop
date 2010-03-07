@@ -1,16 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Chercher.cpp
- *
- *  Les algorithmes de recherche d'objets.
- *  Consistent souvent à passer en revue les objets
- *  et renvoyer ceux qui ont un nom précis.
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <SFML/System.hpp>
@@ -71,9 +61,10 @@ int ChercherImage(const vector < Image > & images, const string nom)
 
     return -1;
 }
-////////////////////////////////////////////////////////////
-/// Cherche et renvoie le premier objet ayant le nom spécifié
-////////////////////////////////////////////////////////////
+
+/**
+ * Deprecated Search for one object
+ */
 int Picker::PickOneObject(const vector < boost::shared_ptr<Object> > *objets, const string nom, const vector < int > *ObjConcern)
 {
     //Syntaxe avec l'opérateur [] peu agréable mais
@@ -90,9 +81,9 @@ int Picker::PickOneObject(const vector < boost::shared_ptr<Object> > *objets, co
     return -1;
 }
 
-////////////////////////////////////////////////////////////
-/// Cherche et renvoie le premier objet ayant le nom spécifié
-////////////////////////////////////////////////////////////
+/**
+ * Deprecated Search for one object
+ */
 int Picker::PickOneObject(const vector < boost::shared_ptr<Object> > *objets, const string nom)
 {
     //Syntaxe avec l'opérateur [] peu agréable mais
@@ -109,9 +100,9 @@ int Picker::PickOneObject(const vector < boost::shared_ptr<Object> > *objets, co
     return -1;
 }
 
-////////////////////////////////////////////////////////////
-/// Cherche et renvoie une liste d'objet ayant le nom spécifié
-////////////////////////////////////////////////////////////
+/**
+ * Deprecated Search for a list of objects
+ */
 vector < int > Picker::PickObjects(const vector < boost::shared_ptr<Object> > *objets, const string nom)
 {
     vector <int> List1;
@@ -126,6 +117,10 @@ vector < int > Picker::PickObjects(const vector < boost::shared_ptr<Object> > *o
 
     return List1;
 }
+
+/**
+ * Deprecated Search for a list of objects
+ */
 vector < int > Picker::PickObjects(const vector < boost::shared_ptr<Object> > *objets, const string nom, const vector < int > *ObjConcern)
 {
     vector <int> List1;
@@ -142,9 +137,9 @@ vector < int > Picker::PickObjects(const vector < boost::shared_ptr<Object> > *o
     return List1;
 }
 
-////////////////////////////////////////////////////////////
-/// Cherche et renvoie une liste d'objet appartenant au grouep spécifié
-////////////////////////////////////////////////////////////
+/**
+ * Deprecated Search for a group of objects
+ */
 vector < int > Picker::PickGroups(const vector < boost::shared_ptr<Object> > *objets, const vector < ObjectGroup > *groups, const string nom)
 {
     vector <int> List1;
@@ -165,6 +160,10 @@ vector < int > Picker::PickGroups(const vector < boost::shared_ptr<Object> > *ob
 
     return List1;
 }
+
+/**
+ * Deprecated Search for a group of objects
+ */
 vector < int > Picker::PickGroups(const vector < boost::shared_ptr<Object> > *objets, const vector < ObjectGroup > *groups, const string nom, const vector < int > *ObjConcern)
 {
     vector <int> List1;
@@ -187,9 +186,9 @@ vector < int > Picker::PickGroups(const vector < boost::shared_ptr<Object> > *ob
 }
 
 
-////////////////////////////////////////////////////////////
-/// Cherche et renvoie une liste d'objets ayant le nom spécifié en utilisant les groupes d'objets
-////////////////////////////////////////////////////////////
+/**
+ * Deprecated Search for a list of objects including groups
+ */
 vector < int > Picker::Pick(const vector < boost::shared_ptr<Object> > *objets, const vector < ObjectGroup > *groups, const string nom)
 {
     vector <int> ObjConcern = Picker::PickObjects(objets, nom);
@@ -200,10 +199,9 @@ vector < int > Picker::Pick(const vector < boost::shared_ptr<Object> > *objets, 
     return ObjConcern;
 }
 
-////////////////////////////////////////////////////////////
-/// Cherche et renvoie une liste d'objets ayant le nom spécifié ( dans
-/// la liste des objets concernés )
-////////////////////////////////////////////////////////////
+/**
+ * Deprecated Search for a list of objects including groups
+ */
 vector < int > Picker::Pick(const vector < boost::shared_ptr<Object> > *objets, const vector < ObjectGroup > *groups, const string nom, const vector < int > *ObjConcern)
 {
     vector <int> List1 = Picker::PickObjects(objets, nom, ObjConcern);

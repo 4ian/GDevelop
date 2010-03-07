@@ -1,18 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Event.h
- *
- *  Un évènement peut être :
- *  normal : actions/conditions et sous évènements
- *  commentaire : affichage juste de texte
- *  lien : lien vers les évènements d'une scène
- *  dossier : Contient d'autre évènements
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef EVENT_H
@@ -25,6 +13,10 @@
 #include "GDL/Log.h"
 #include "GDL/Instruction.h"
 
+/**
+ * @brief An event contains conditions to check and actions to do if conditions are true.
+ * Events can also be comments, links and can have sub events
+ */
 class GD_API Event
 {
     public:
@@ -64,6 +56,7 @@ class GD_API Event
         mutable unsigned int conditionsHeight;
         mutable bool actionsHeightNeedUpdate;
         mutable unsigned int actionsHeight;
+        bool selected;
 #endif
 };
 

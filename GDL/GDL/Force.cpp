@@ -1,16 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Force.cpp
- *
- *  Classe pour décrire une force sur un objet ( ou autre )
- *  Permet de calculer aussi un angle/longueur depuis ses coordonées
- *  ou l'inverse.
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <iostream>

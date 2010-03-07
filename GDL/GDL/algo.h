@@ -1,16 +1,7 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
-
-/** Fichier Algo.h
-
-Contient divers algorithmes.
-
-**/
 
 #ifndef ALGO_H_INCLUDED
 #define ALGO_H_INCLUDED

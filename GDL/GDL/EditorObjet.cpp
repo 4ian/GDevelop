@@ -1715,7 +1715,6 @@ TEST( Dialogues, EditorObjet )
     Game game;
     SpriteObject object("unnamed");
     Animation AnimToAdd;
-    needReload nr;
     MainEditorCommand nrC(nr, 3);
 
     EditorObjet Dialog( NULL, game, object, nrC );

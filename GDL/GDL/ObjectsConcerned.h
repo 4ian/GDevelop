@@ -1,15 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Système de sélection d'objets suivant un nom donné.
- *  Prend en compte les groupes qui regroupent des objets.
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef OBJECTSCONCERNED_H
@@ -28,6 +19,10 @@ typedef boost::shared_ptr<Object> ObjSPtr;
 
 using namespace std;
 
+/**
+ * Class used to pick objects from all objects of the scene, or from
+ * already picked objects.
+ */
 class GD_API ObjectsConcerned
 {
     public:

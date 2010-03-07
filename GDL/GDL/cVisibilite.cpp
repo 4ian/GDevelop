@@ -1,16 +1,7 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
-/**
- *
- *
- *  Contient une ou plusieurs conditions
- */
-
 #include <vector>
 #include <string>
 #include "GDL/Object.h"

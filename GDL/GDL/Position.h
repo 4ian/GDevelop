@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef POSITION_H
 #define POSITION_H
 
@@ -6,6 +11,10 @@
 
 using namespace std;
 
+/**
+ * Class used so as to represent objects at their initial state on the scene.
+ * During loading of a scene, "real" objects are created from the initial positions.
+ */
 class GD_API InitialPosition
 {
     public:

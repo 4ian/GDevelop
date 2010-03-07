@@ -1,15 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Position permet de contenir les positions initales des objets et d'autres paramètres.
- *  Dans le jeu, les objets retiennent eux mêmes leurs positions et paramètres.
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDL/Position.h"

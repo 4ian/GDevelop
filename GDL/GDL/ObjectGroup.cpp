@@ -1,14 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Un groupe d'objets contient le nom de plusieurs objets
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDL/ObjectGroup.h"

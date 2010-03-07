@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
 #include <string>
@@ -11,6 +16,10 @@ class Object;
 
 using namespace std;
 
+/**
+ * An instruction is a member of an event. It can be a condition or an action.
+ * Instructions have a type, which is used to link the Instruction to a function
+ */
 class GD_API Instruction
 {
     public:
@@ -19,20 +28,19 @@ class GD_API Instruction
         Instruction(string type_, const vector <GDExpression> & parameters_, bool isLocal);
         Instruction(string type_, const vector <GDExpression> & parameters_, bool isLocal, bool pContraire);
         Instruction();
-
-        //Main function to be called
-        typedef bool (*ptrFunction)( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction, const Evaluateur & eval );
-        ptrFunction function;
-
-        //Function to call on each object, if the instruction need one.
-        typedef bool (Object::*ptrObjectFunction)( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction, const Evaluateur & eval );
-        ptrObjectFunction objectFunction;
-
         virtual ~Instruction();
+
+        typedef bool (*ptrFunction)( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction, const Evaluateur & eval );
+        ptrFunction function; ///<Main function to be called.
+
+        typedef bool (Object::*ptrObjectFunction)( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction, const Evaluateur & eval );
+        ptrObjectFunction objectFunction; ///<Function to call on each object, if the instruction need one.
+
         /** Access type
          * \return The type of the instruction
          */
         string GetType() const { return type; }
+
         /** Set type
          * \param val New value to set
          */
@@ -42,6 +50,7 @@ class GD_API Instruction
          * \return The objectFunctionType of the instruction
          */
         inline string GetObjectFunctionType() const { return objectFunctionType; }
+
         /** Set objectFunctionType
          * \param val New value to set
          */
@@ -80,12 +89,12 @@ class GD_API Instruction
         /** Access a parameter
          * \return The current value of the parameter
          */
-        inline GDExpression & GetParameter(int nb) const
+        inline GDExpression & GetParameter(unsigned int nb) const
         {
-            if ( nb < 0 || static_cast<unsigned>(nb) >= parameters.size() )
+            if ( nb >= parameters.size() )
             {
                 #ifndef RELEASE
-                    std::cout << "Paramètre invalide demandé";
+                    std::cout << "Parameter that doesn't exist was requested.";
                 #endif
                 return badExpression;
             }
@@ -107,6 +116,12 @@ class GD_API Instruction
         inline const vector < Instruction > & GetSubInstructions() const { return subInstructions; };
         inline vector < Instruction > & GetSubInstructions() { return subInstructions; };
         inline void SetSubInstructions(const vector < Instruction > & subInstructions_) { subInstructions = subInstructions_; };
+
+        #if defined(GDE)
+        mutable bool renderedHeightNeedUpdate;
+        mutable unsigned int renderedHeight; ///<Height of the instruction rendered in an event editor
+        mutable bool selected; ///<True if selected in an event editor
+        #endif
 
     private:
         string type;

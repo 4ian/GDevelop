@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  actions.h
- *
- *  Header de actions.cpp
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef ACTIONS_H_INCLUDED

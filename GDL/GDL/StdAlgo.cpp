@@ -1,15 +1,8 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
-/**
- *
- * Contient des fonctions usuelles
- *
- */
+
 
 #include <string>
 #include <sstream>

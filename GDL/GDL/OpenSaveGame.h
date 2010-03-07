@@ -1,14 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Gère l'ouverture et la sauvegarde des jeux Game Develop
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef OPENSAVEGAME_H
@@ -21,6 +13,9 @@
 
 using namespace std;
 
+/**
+ * Class used so as to save and open games files.
+ */
 class GD_API OpenSaveGame
 {
 public:

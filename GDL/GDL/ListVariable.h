@@ -1,15 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Une liste de variable.
- *  Utile pour les objets, les scènes, le jeu...
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef LISTVARIABLE_H
@@ -20,6 +11,9 @@
 #include "GDL/Variable.h"
 using namespace std;
 
+/**
+ * A list of Game Develop variables. Used by objects, games and scenes.
+ */
 class GD_API ListVariable
 {
     public:

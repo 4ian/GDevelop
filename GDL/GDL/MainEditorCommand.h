@@ -1,9 +1,13 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #if defined(GDE)
 
 #ifndef NEEDREFRESHCOMMAND_H
 #define NEEDREFRESHCOMMAND_H
 
-#include "GDL/needReload.h"
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <iostream>

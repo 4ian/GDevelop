@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Log.cpp
- *
- *  Gestion des erreurs et du suivi du déroulement du programme
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <string>

@@ -18,7 +18,7 @@ class MainEditorCommand;
 #endif
 
 /**
- * Object from an extension
+ * Sprite object is an object composed of animations, containing directions with images.
  */
 class SpriteObject : public Object
 {

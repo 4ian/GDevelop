@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  conditions.h
- *
- *  Header de conditions.cpp
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef CONDITIONS_H_INCLUDED

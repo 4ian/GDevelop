@@ -861,7 +861,7 @@ void EditorImages::OnMoveUpSelected(wxCommandEvent& event)
             wxLogStatus( _( "L'image à déplacer n'a pas été trouvée." ) );
             return;
         }
-        else if ( static_cast<unsigned>(i-1) >= 0 )
+        else if ( i-1 >= 0 )
         {
             //On déplace l'image
             Image image = game.images[i];

@@ -20,7 +20,6 @@
 #include "GDL/TimeExtension.h"
 #include "GDL/FileExtension.h"
 #include "GDL/VariablesExtension.h"
-#include "GDL/InterfaceExtension.h"
 #include "GDL/CameraExtension.h"
 #include "GDL/WindowExtension.h"
 #include "GDL/NetworkExtension.h"
@@ -78,7 +77,6 @@ void ExtensionsLoader::LoadAllExtensionsAvailable()
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new JoystickExtension()));
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new TimeExtension()));
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new FileExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new InterfaceExtension()));
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new VariablesExtension()));
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new CameraExtension()));
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new WindowExtension()));

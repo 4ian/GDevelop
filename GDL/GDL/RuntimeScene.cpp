@@ -1,14 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Contient des fonctions propres aux scènes In game ( mises à jour de données... )
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <SFML/System.hpp>
@@ -21,7 +13,6 @@
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/ImageManager.h"
-#include "GDL/SortByPlan.h"
 #include "GDL/Chercher.h"
 #include "GDL/ChercherScene.h"
 #include "GDL/AppelEvent.h"
@@ -33,7 +24,7 @@
 #include "GDL/Position.h"
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
-//La fonction est implémenté différemment en fonction du player ou de l'éditeur
+//La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
 
 RuntimeLayer RuntimeScene::badLayer;
 

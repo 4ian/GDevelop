@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Object.h
- *
- *  Le header de la classe Object.
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef OBJECT_H
@@ -48,14 +40,16 @@ class MainEditorCommand;
 #endif
 
 /**
- * An object is an animated sprite displayed on the scene
+ * An object is something displayed on the scene.
+ * Games use not directly this class, but derived classes
+ * provided by extensions.
  */
 class GD_API Object : public boost::enable_shared_from_this<Object>
 {
     public:
 
-        //Constructeur
         Object(string name);
+        virtual ~Object();
 
         /**
          * Called by RuntimeScene at loading
@@ -67,12 +61,15 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
          */
         virtual bool InitializeFromInitialPosition(const InitialPosition & position) {return true;}
 
-        //Destructeur
-        virtual ~Object();
-
+        /**
+         * Draw the object
+         */
         virtual bool Draw(sf::RenderWindow& main_window) {return true;};
 
         #ifdef GDE
+        /**
+         * Draw the object at edittime ( on a scene editor )
+         */
         virtual bool DrawEdittime(sf::RenderWindow& main_window) {return true;};
 
         virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail) {return false;};
@@ -245,7 +242,6 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         bool CondInvisibleObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
         bool CondVisibleObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
 
-
         //Expressions
         double ExpGetObjectX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
         double ExpGetObjectY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
@@ -266,11 +262,9 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         unsigned int objectId; ///< The ObjectId, associated with the name, is used ( instead of the name ) by the runtime to identify objects.
         unsigned int typeId; ///< The TypeId indicate of which type is the object. ( To test if we can do something reserved to some objects with it )*/
 
-        //Position of the object
         float X;
         float Y;
 
-        //Autres propriétés
         int zOrder;
         bool hidden;
         string layer;

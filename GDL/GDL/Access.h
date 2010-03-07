@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Access.h
- *
- *  Header de Access.cpp
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef ACCESS_H_INCLUDED
@@ -21,6 +13,9 @@ class ObjectsConcerned;
 typedef vector < boost::shared_ptr<Object> > ObjList;
 typedef boost::shared_ptr<Object> ObjSPtr;
 
+/**
+ * This class evaluate expressions.
+ */
 class GD_API Evaluateur
 {
     public :

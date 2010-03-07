@@ -1,14 +1,10 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 /**
- *  constantes.h
- *
- *  Contient les constantes
+ * @file constantes.h
+ * Some constantes. Rather deprecated, do not add anymore constantes here.
  */
 
 #ifndef CONSTANTES_H_INCLUDED

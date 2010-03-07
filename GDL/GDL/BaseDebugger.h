@@ -1,23 +1,20 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #if defined(GDE)
-/**
- * Game Develop
- *    Editor
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *  Classe de base pour créer un debugger.
- *  Il suffit de dériver de cette classe et
- *  d'implémenter la fonction UpdateGUI() qui
- *  sera appelée à intervalle régulier.
- */
 
 #ifndef BASEDEBUGGER_H
 #define BASEDEBUGGER_H
 #include <SFML/System.hpp>
 
+/**
+ * Base class to implement a debugger.
+ * Derive from this class and implement
+ * UpdateGUI function which be called
+ * automatically by the scene
+ */
 class GD_API BaseDebugger
 {
     public:

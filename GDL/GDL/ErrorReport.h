@@ -1,14 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Report d'erreur
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef ERRORREPORT_H
@@ -19,6 +11,10 @@
 
 using namespace std;
 
+/**
+ * Nearly deprecated class to report errors.
+ * Need to use a better error handling system for Runtime
+ */
 class GD_API ErrorReport
 {
     public:

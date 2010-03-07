@@ -1,14 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- * Une scène Runtime est une scène directement utilisée par le
- * moteur de jeu ( contient images, sons ).
- * Elle est chargée depuis une scène normale ( voir LoadScene )
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef SCENEIG_H
@@ -31,7 +23,6 @@
 #include "GDL/Son.h"
 #include "GDL/Music.h"
 #include "GDL/constantes.h"
-#include "GDL/SortByPlan.h"
 #include "GDL/RuntimeLayer.h"
 #include "GDL/Text.h"
 #include "GDL/SoundManager.h"
@@ -47,6 +38,11 @@
 #include "GDL/profile.h"
 #endif
 
+/**
+ * A Runtime Scene is used when a game is played.
+ * It contains everything a scene provide, but also specific
+ * functions and members for runtime ( Render functions, objects instances, variables... )
+ */
 class GD_API RuntimeScene : public Scene
 {
     public:

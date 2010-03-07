@@ -1,14 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Fenêtre de chargement
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef ECRANCHARGEMENTPARA_H
@@ -19,6 +11,9 @@
 
 using namespace std;
 
+/**
+ * Class containg information so as to display a loading screen
+ */
 class GD_API LoadingScreen
 {
     public:

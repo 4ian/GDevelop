@@ -1,16 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Access.cpp
- *
- *  Evaluation des expressions
- *  avec accès aux données des
- *  objets et valeurs spéciales.
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDL/Access.h"

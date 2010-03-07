@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
@@ -9,6 +14,9 @@
 
 using namespace std;
 
+/**
+ * Animation used by Sprite objects. Contains directions.
+ */
 class GD_API Animation
 {
     public:

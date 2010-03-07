@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/ExtensionBase.h"
 #include <vector>
 #include <string>
@@ -56,7 +61,8 @@ void ExtensionBase::SetNameSpace(std::string nameSpace_)
         name == "BuiltinWindow"||
         name == "BuiltinNetwork"||
         name == "BuiltinScene"||
-        name == "BuiltinAdvanced")
+        name == "BuiltinAdvanced" ||
+        name == "CommonDialogs") //New name for BuiltinInterface
     {
         nameSpace = "";
         return;

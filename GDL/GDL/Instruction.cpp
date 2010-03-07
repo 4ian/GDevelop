@@ -13,6 +13,11 @@ Instruction::Instruction(string type_) :
 function(NULL),
 objectFunction(NULL),
 type(type_)
+#if defined(GDE)
+,renderedHeightNeedUpdate(true),
+renderedHeight(0),
+selected(false)
+#endif
 {
     //ctor
     parameters.reserve(8);
@@ -25,6 +30,11 @@ type(type_),
 isLocal(isLocal_),
 inverted(false),
 parameters(parameters_)
+#if defined(GDE)
+,renderedHeightNeedUpdate(true),
+renderedHeight(0),
+selected(false)
+#endif
 {
     parameters.reserve(8);
 }
@@ -36,6 +46,11 @@ type(type_),
 isLocal(isLocal_),
 inverted(inverted_),
 parameters(parameters_)
+#if defined(GDE)
+,renderedHeightNeedUpdate(true),
+renderedHeight(0),
+selected(false)
+#endif
 {
     parameters.reserve(8);
 }
@@ -43,6 +58,11 @@ parameters(parameters_)
 Instruction::Instruction() :
 function(NULL),
 objectFunction(NULL)
+#if defined(GDE)
+,renderedHeightNeedUpdate(true),
+renderedHeight(0),
+selected(false)
+#endif
 {
     //ctor
     parameters.reserve(8);

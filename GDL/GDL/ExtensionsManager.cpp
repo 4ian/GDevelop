@@ -11,7 +11,6 @@
 #include "GDL/TimeExtension.h"
 #include "GDL/FileExtension.h"
 #include "GDL/VariablesExtension.h"
-#include "GDL/InterfaceExtension.h"
 #include "GDL/CameraExtension.h"
 #include "GDL/WindowExtension.h"
 #include "GDL/NetworkExtension.h"
@@ -40,7 +39,6 @@ ExtensionsManager::ExtensionsManager()
 {
     //Load all extensions
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
-    cout << extensionsLoaded[0]->GetName();
     AddExtension(boost::shared_ptr<ExtensionBase>(new ExtensionSprite()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new VariablesExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new TimeExtension()));
@@ -51,7 +49,6 @@ ExtensionsManager::ExtensionsManager()
     AddExtension(boost::shared_ptr<ExtensionBase>(new CameraExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new WindowExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new FileExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new InterfaceExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new NetworkExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new SceneExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));

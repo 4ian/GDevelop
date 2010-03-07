@@ -1,17 +1,9 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #if defined(GDE)
-/**
- * Game Develop
- *    Editor
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  BitmapGUIManager est une classe unique qui contient des bitmaps
- *  et images fréquemment utilisées.
- */
 
 #ifndef BITMAPGUIMANAGER_H
 #define BITMAPGUIMANAGER_H
@@ -20,28 +12,12 @@
 
 using namespace std;
 
+/**
+ * Class containing frequently used bitmaps
+ */
 class GD_API BitmapGUIManager
 {
 public:
-    // Fonctions de création et destruction du singleton
-    static BitmapGUIManager *getInstance()
-    {
-        if ( NULL == _singleton )
-            _singleton =  new BitmapGUIManager;
-
-        return _singleton;
-    }
-
-    static void kill()
-    {
-        if ( NULL != _singleton )
-        {
-            delete _singleton;
-            _singleton = NULL;
-        }
-    }
-
-    static BitmapGUIManager *_singleton;
 
     wxBitmap expressionBt;
     wxBitmap objetBt;
@@ -69,12 +45,29 @@ public:
     wxBitmap backthumbsBg;
     wxBitmap varBt;
 
+    static BitmapGUIManager *getInstance()
+    {
+        if ( NULL == _singleton )
+            _singleton =  new BitmapGUIManager;
+
+        return _singleton;
+    }
+
+    static void kill()
+    {
+        if ( NULL != _singleton )
+        {
+            delete _singleton;
+            _singleton = NULL;
+        }
+    }
+
 protected:
 private:
     BitmapGUIManager();
     virtual ~BitmapGUIManager() {};
 
-    static wxBitmap CreateImageButton(string imageFile, string label);
+    static BitmapGUIManager *_singleton;
 };
 
 #endif // BITMAPGUIMANAGER_H

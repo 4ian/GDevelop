@@ -1,15 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Charge les ressources depuis un nom de fichier
- *  et renvoie une image, un son...
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef RESSOURCESLOADER_H

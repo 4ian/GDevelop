@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Force.h
- *
- *  Header de Force.cpp
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef FORCE_H_INCLUDED
@@ -21,6 +13,9 @@
 #include "GDL/Log.h"
 #include "GDL/Event.h"
 
+/**
+ * A force is a simple vector with also a "Clearing" member.
+ */
 class GD_API Force
 {
     public:

@@ -1,14 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Un groupe d'objets contient le nom de plusieurs objets
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef OBJECTGROUP_H
@@ -64,7 +56,7 @@ class GD_API ObjectGroup
         bool HasAnIdenticalValue( const set < unsigned int > & list );
 
     private:
-        vector < std::pair<string, unsigned int> > memberObjects;
+        vector < std::pair<string, unsigned int> > memberObjects; ///<For performance, objects are associated with their objects Id
         string name;
         unsigned int id; ///<As objects, groups must be able to be identifed during runtime with a unique identifier.
 };

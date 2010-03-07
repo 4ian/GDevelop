@@ -1,18 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  SoundManager : Classe unique qui gère les sons et musiques
- *  Pour les sons : utilise un tableau pour les channels
- *  Pour les sons sans channels : utilise un vector de pointeur, pour éviter des coupures.
- *  Idem pour les musiques, sauf que le vector utilise aussi des pointeurs car
- *  les musiques sont non-copyable.
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDL/SoundManager.h"
@@ -26,14 +14,10 @@ using namespace std;
 
 SoundManager *SoundManager::_singleton = NULL;
 
-////////////////////////////////////////////////////////////
-/// Constructeur
-///
-/// Initialise en particulier les sons et musiques sur canaux
-////////////////////////////////////////////////////////////
 SoundManager::SoundManager() :
 globalVolume(100)
 {
+    //Initialize sounds and musics
     for (unsigned int i = 0;i<MAX_CANAUX_SON;++i)
     {
         Son * son = new Son;
@@ -46,14 +30,9 @@ globalVolume(100)
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Destructeur
-///
-/// Supprime les sons et musiques détenus par le soundManager
-/// ( c'est à dire les sons et musiques sur les canaux )
-////////////////////////////////////////////////////////////
 SoundManager::~SoundManager()
 {
+    //Delete sounds and musics owned by the manager
     for (unsigned int channel = 0;channel<MAX_CANAUX_SON;++channel)
     {
         if ( soundsChannel.at(channel) != NULL )

@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  ObjectStruct.h
- *
- *  Structure des objets
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef IMAGESTRUCT_H_INCLUDED

@@ -1,16 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Classe gérant le son ( pas les musiques ).
- *  Sert essentiellement à relier un sf::SoundBuffer et son sf::Sound associé
- *  ( L'un ne marchant pas sans l'autre )
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDL/Son.h"

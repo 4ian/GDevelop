@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  OpenSaveGame.cpp
- *
- *  Ouvre un jeu et le stocke dans un Game.
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifdef GDP
@@ -146,7 +138,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         game.extensionsUsed.push_back("BuiltinCamera");
         game.extensionsUsed.push_back("BuiltinAdvanced");
         game.extensionsUsed.push_back("BuiltinFile");
-        game.extensionsUsed.push_back("BuiltinInterface");
+        game.extensionsUsed.push_back("CommonDialogs");
         game.extensionsUsed.push_back("BuiltinJoystick");
         game.extensionsUsed.push_back("BuiltinKeyboard");
         game.extensionsUsed.push_back("BuiltinMouse");
@@ -255,6 +247,12 @@ void OpenSaveGame::OpenGameInformations(TiXmlElement * elem)
         }
     }
 
+    //Compatibility with Game Develop 1.3 and older
+    {
+        std::vector<string>::iterator oldName = find(game.extensionsUsed.begin(), game.extensionsUsed.end(), "BuiltinInterface");
+        if ( oldName != game.extensionsUsed.end() ) *oldName = "CommonDialogs";
+    }
+
     if ( elem->FirstChildElement( "FPSmax" ) != NULL ) { elem->FirstChildElement( "FPSmax" )->QueryIntAttribute( "value", &game.maxFPS ); }
     if ( elem->FirstChildElement( "FPSmin" ) != NULL ) { elem->FirstChildElement( "FPSmin" )->QueryIntAttribute( "value", &game.minFPS ); }
 
@@ -291,11 +289,11 @@ void OpenSaveGame::OpenImages(const TiXmlElement * imagesElem, TiXmlElement * do
         if ( imagesElem->Attribute( "fichier" ) != NULL ) {imageToAdd.fichier = imagesElem->Attribute( "fichier" ); }
         else { MSG( "Les informations concernant le fichier de l'image manquent." ); }
 
-        imageToAdd.lissage = true;
+        imageToAdd.smooth = true;
         if ( imagesElem->Attribute( "lissage" ) != NULL )
         {
             if ( strcmp(imagesElem->Attribute( "lissage" ), "false") == 0 )
-                imageToAdd.lissage = false;
+                imageToAdd.smooth = false;
         }
 
         game.images.push_back(imageToAdd);
@@ -834,7 +832,7 @@ bool OpenSaveGame::SaveToFile(string file)
             image->SetAttribute( "nom", game.images.at( i ).nom.c_str() );
             image->SetAttribute( "fichier", game.images.at( i ).fichier.c_str() );
 
-            if ( !game.images.at( i ).lissage )
+            if ( !game.images.at( i ).smooth )
             {
                 image->SetAttribute( "lissage", "false" );
             }

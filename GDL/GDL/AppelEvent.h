@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef APPELEVENT_H_INCLUDED
 #define APPELEVENT_H_INCLUDED
 
@@ -15,7 +20,6 @@
 #include "GDL/algo.h"
 #include "GDL/Force.h"
 #include "GDL/MemTrace.h"
-#include "GDL/SortByPlan.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/Access.h"
 class ObjectsConcerned;
@@ -25,7 +29,9 @@ class ObjectsConcerned;
 //le traitement à partir de ce numéro
 enum {  ActAllProcessedAndDoNotSubEvents = -5, CondFalse = -4, CondTrue = -3, ActStopProcess = -2, ActAllProcessed = -1};
 
-
+/**
+ * Class that execute a list of event.
+ */
 class GD_API EventsExecutor
 {
     public :

@@ -1,15 +1,8 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
-/**
- *  Object.cpp
- *
- *  La classe Object : les objets composant le jeu.
- */
+
 
 ////////////////////////////////////////////////////////////
 // Headers
@@ -39,9 +32,6 @@
 
 using namespace std;
 
-////////////////////////////////////////////////////////////
-/// Default constructor
-////////////////////////////////////////////////////////////
 Object::Object(string name_) :
         errors( NULL ),
         name( name_ ),
@@ -58,9 +48,6 @@ Object::Object(string name_) :
     this->ClearForce();
 }
 
-////////////////////////////////////////////////////////////
-/// Destructeur
-////////////////////////////////////////////////////////////
 Object::~Object()
 {
     //dtor

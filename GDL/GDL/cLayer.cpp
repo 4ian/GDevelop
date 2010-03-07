@@ -1,14 +1,6 @@
 /**
  *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Conditions sur les calques
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <vector>

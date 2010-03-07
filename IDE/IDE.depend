@@ -118,7 +118,7 @@
 
 1253304887 c:\libs\wxwidgets\include\wx\osx\config_xcode.h
 
-1253304862 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
+1253304862 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
 1253304918 c:\libs\wxwidgets\include\wx\setup_gccxml.h
 
@@ -1687,7 +1687,7 @@
 1253304873 c:\libs\wxwidgets\include\wx\os2\dialog.h
 	"wx/panel.h"
 
-1266851085 c:\users\florian\programmation\gamedevelop\gdl\gdl\game.h
+1267732849 c:\users\florian\programmation\gamedevelop\gdl\gdl\game.h
 	"GDL/Object.h"
 	"GDL/Scene.h"
 	"GDL/ListVariable.h"
@@ -1697,7 +1697,7 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1266082600 c:\users\florian\programmation\gamedevelop\gdl\gdl\object.h
+1267733063 c:\users\florian\programmation\gamedevelop\gdl\gdl\object.h
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 	<iostream>
@@ -3174,7 +3174,7 @@
 	<boost/detail/shared_count.hpp>
 	<boost/shared_ptr.hpp>
 
-1267019857 c:\users\florian\programmation\gamedevelop\gdl\gdl\force.h
+1267732848 c:\users\florian\programmation\gamedevelop\gdl\gdl\force.h
 	<iostream>
 	<vector>
 	<string>
@@ -3182,11 +3182,11 @@
 	"GDL/Log.h"
 	"GDL/Event.h"
 
-1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\log.h
+1267733063 c:\users\florian\programmation\gamedevelop\gdl\gdl\log.h
 	<string>
 	<vector>
 
-1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\event.h
+1267907766 c:\users\florian\programmation\gamedevelop\gdl\gdl\event.h
 	<iostream>
 	<vector>
 	<string>
@@ -3194,7 +3194,7 @@
 	"GDL/Log.h"
 	"GDL/Instruction.h"
 
-1265912137 c:\users\florian\programmation\gamedevelop\gdl\gdl\instruction.h
+1267907989 c:\users\florian\programmation\gamedevelop\gdl\gdl\instruction.h
 	<string>
 	<vector>
 	<iostream>
@@ -6598,9 +6598,9 @@
 	<boost/bimap/support/map_type_by.hpp>
 	<boost/bimap/relation/detail/access_builder.hpp>
 
-1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\constantes.h
+1267816834 c:\users\florian\programmation\gamedevelop\gdl\gdl\constantes.h
 
-1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\sprite.h
+1267816605 c:\users\florian\programmation\gamedevelop\gdl\gdl\sprite.h
 	<SFML/Graphics.hpp>
 	"GDL/Point.h"
 	<string>
@@ -6608,7 +6608,7 @@
 1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\point.h
 	<string>
 
-1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\listvariable.h
+1267732849 c:\users\florian\programmation\gamedevelop\gdl\gdl\listvariable.h
 	<vector>
 	<string>
 	"GDL/Variable.h"
@@ -6617,7 +6617,7 @@
 	<string>
 	<iostream>
 
-1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\animation.h
+1267817522 c:\users\florian\programmation\gamedevelop\gdl\gdl\animation.h
 	<iostream>
 	<SFML/Graphics.hpp>
 	<string>
@@ -6630,7 +6630,7 @@
 	<SFML/Graphics.hpp>
 	"GDL/Sprite.h"
 
-1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\errorreport.h
+1267732703 c:\users\florian\programmation\gamedevelop\gdl\gdl\errorreport.h
 	<string>
 	<vector>
 
@@ -8001,7 +8001,7 @@
 	"GDL/Position.h"
 	"GDL/Layer.h"
 
-1266087240 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectgroup.h
+1267733112 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectgroup.h
 	<vector>
 	<string>
 	<set>
@@ -8009,7 +8009,7 @@
 	"GDL/ObjectType.h"
 	"GDL/ObjectIdentifiersManager.h"
 
-1264943911 c:\users\florian\programmation\gamedevelop\gdl\gdl\position.h
+1267733380 c:\users\florian\programmation\gamedevelop\gdl\gdl\position.h
 	<string>
 	<map>
 
@@ -8023,15 +8023,15 @@
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 
-1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\dossier.h
+1267817522 c:\users\florian\programmation\gamedevelop\gdl\gdl\dossier.h
 	<string>
 	<vector>
 
-1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\image.h
+1267817318 c:\users\florian\programmation\gamedevelop\gdl\gdl\image.h
 	<string>
 	<vector>
 
-1264360631 c:\users\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.h
+1267732849 c:\users\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.h
 	<string>
 	<vector>
 
@@ -8527,7 +8527,7 @@
 	"wx/filesys.h"
 	"wx/hashmap.h"
 
-1267020462 c:\users\florian\programmation\gamedevelop\gdl\gdl\stdalgo.h
+1267816605 c:\users\florian\programmation\gamedevelop\gdl\gdl\stdalgo.h
 	<string>
 	<sstream>
 	<iostream>
@@ -8550,7 +8550,7 @@
 	<boost/bimap/bimap.hpp>
 	"GDL/ExtensionBase.h"
 
-1266095066 c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
+1267817522 c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
 	<string>
 	<vector>
 	<map>
@@ -8559,7 +8559,7 @@
 	<wx/file.h>
 	<wx/wx.h>
 
-1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\chercher.h
+1267732591 c:\users\florian\programmation\gamedevelop\gdl\gdl\chercher.h
 	"GDL/tinyxml.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -8628,7 +8628,7 @@
 	<string>
 	<vector>
 
-1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\bitmapguimanager.h
+1267732591 c:\users\florian\programmation\gamedevelop\gdl\gdl\bitmapguimanager.h
 	<wx/bitmap.h>
 	<string>
 
@@ -8701,7 +8701,7 @@
 	<vector>
 	<wx/msgdlg.h>
 
-1267213857 source:c:\users\florian\programmation\gamedevelop\ide\choixcondition.cpp
+1267820472 source:c:\users\florian\programmation\gamedevelop\ide\choixcondition.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"ChoixCondition.h"
@@ -8889,13 +8889,13 @@
 	<string>
 	<vector>
 
-1266876892 c:\users\florian\programmation\gamedevelop\gdl\gdl\opensavegame.h
+1267733380 c:\users\florian\programmation\gamedevelop\gdl\gdl\opensavegame.h
 	"GDL/Game.h"
 	<string>
 	"GDL/tinyxml.h"
 	"GDL/algo.h"
 
-1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\algo.h
+1267816775 c:\users\florian\programmation\gamedevelop\gdl\gdl\algo.h
 	<sstream>
 	<string>
 	<iostream>
@@ -8931,8 +8931,7 @@
 	"GDL/Scene.h"
 	"GDL/Instruction.h"
 
-1264360530 source:c:\users\florian\programmation\gamedevelop\ide\commentairerenderer.cpp
-	"nommgr.h"
+1267892882 source:c:\users\florian\programmation\gamedevelop\ide\commentairerenderer.cpp
 	"CommentaireRenderer.h"
 	"GDL/Event.h"
 	<wx/dc.h>
@@ -8941,25 +8940,26 @@
 	<wx/colour.h>
 	<wx/settings.h>
 
-1264360530 c:\users\florian\programmation\gamedevelop\ide\nommgr.h
-
-1264360531 c:\users\florian\programmation\gamedevelop\ide\commentairerenderer.h
+1267892882 c:\users\florian\programmation\gamedevelop\ide\commentairerenderer.h
 	"GDL/Event.h"
 	"Renderer.h"
 	<wx/dc.h>
 	<wx/dcbuffer.h>
+	"EventsRendererDatas.h"
 
-1264360533 c:\users\florian\programmation\gamedevelop\ide\renderer.h
-	"GDL/Event.h"
-	<wx/dc.h>
-	<wx/dcbuffer.h>
+1267892882 c:\users\florian\programmation\gamedevelop\ide\renderer.h
 
 1253304925 c:\libs\wxwidgets\include\wx\dcbuffer.h
 	"wx/dcmemory.h"
 	"wx/dcclient.h"
 	"wx/window.h"
 
-1267213858 source:c:\users\florian\programmation\gamedevelop\ide\compilation.cpp
+1267893032 c:\users\florian\programmation\gamedevelop\ide\eventsrendererdatas.h
+	<wx/dc.h>
+	<wx/dcbuffer.h>
+	<wx/html/htmprint.h>
+
+1267560032 source:c:\users\florian\programmation\gamedevelop\ide\compilation.cpp
 	"nommgr.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -8984,8 +8984,6 @@
 	<vector>
 	<iostream>
 	<fstream>
-	"dlib/compress_stream.h"
-	"dlib/base64.h"
 	"GDL/AES.h"
 	"GDL/Game.h"
 	"GDL/DatFile.h"
@@ -8997,508 +8995,11 @@
 	"GDL/HelpFileAccess.h"
 	<wx/msw/winundef.h>
 
+1264360530 c:\users\florian\programmation\gamedevelop\ide\nommgr.h
+
 1253304923 c:\libs\wxwidgets\include\wx\dir.h
 	"wx/longlong.h"
 	"wx/string.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\compress_stream.h
-	"compress_stream/compress_stream_kernel_1.h"
-	"compress_stream/compress_stream_kernel_2.h"
-	"compress_stream/compress_stream_kernel_3.h"
-	"conditioning_class.h"
-	"entropy_encoder.h"
-	"entropy_decoder.h"
-	"entropy_encoder_model.h"
-	"entropy_decoder_model.h"
-	"lz77_buffer.h"
-	"sliding_buffer.h"
-	"lzp_buffer.h"
-	"crc32.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\compress_stream\compress_stream_kernel_1.h
-	"../algs.h"
-	<iostream>
-	<streambuf>
-	"compress_stream_kernel_abstract.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\algs.h
-	<string>
-	<algorithm>
-	<new>
-	<cstdlib>
-	"platform.h"
-	"assert.h"
-	"error.h"
-	"noncopyable.h"
-	"enable_if.h"
-	"uintn.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\platform.h
-
-1226339888 c:\libs\dlib-17.12\dlib\assert.h
-	<sstream>
-	<iosfwd>
-	"error.h"
-	"stack_trace.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\error.h
-	<string>
-	<new>
-
-1226339886 c:\libs\dlib-17.12\dlib\stack_trace.h
-	<iostream>
-	<dlib/stack_trace.h>
-	<string>
-	"assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\noncopyable.h
-
-1226339888 c:\libs\dlib-17.12\dlib\enable_if.h
-
-1226339888 c:\libs\dlib-17.12\dlib\uintn.h
-	"assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\compress_stream\compress_stream_kernel_abstract.h
-	"../algs.h"
-	<iosfwd>
-
-1226339888 c:\libs\dlib-17.12\dlib\compress_stream\compress_stream_kernel_2.h
-	"../algs.h"
-	<iostream>
-	<streambuf>
-	"compress_stream_kernel_abstract.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\compress_stream\compress_stream_kernel_3.h
-	"../algs.h"
-	"compress_stream_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\conditioning_class.h
-	"conditioning_class/conditioning_class_kernel_1.h"
-	"conditioning_class/conditioning_class_kernel_2.h"
-	"conditioning_class/conditioning_class_kernel_3.h"
-	"conditioning_class/conditioning_class_kernel_4.h"
-	"conditioning_class/conditioning_class_kernel_c.h"
-	"memory_manager.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\conditioning_class\conditioning_class_kernel_1.h
-	"conditioning_class_kernel_abstract.h"
-	"../assert.h"
-	"../algs.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\conditioning_class\conditioning_class_kernel_abstract.h
-	"../algs.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\conditioning_class\conditioning_class_kernel_2.h
-	"conditioning_class_kernel_abstract.h"
-	"../assert.h"
-	"../algs.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\conditioning_class\conditioning_class_kernel_3.h
-	"conditioning_class_kernel_abstract.h"
-	"../assert.h"
-	"../algs.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\conditioning_class\conditioning_class_kernel_4.h
-	"conditioning_class_kernel_abstract.h"
-	"../assert.h"
-	"../algs.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\conditioning_class\conditioning_class_kernel_c.h
-	"conditioning_class_kernel_abstract.h"
-	"../algs.h"
-	"../assert.h"
-	<iostream>
-
-1226339888 c:\libs\dlib-17.12\dlib\memory_manager.h
-	"memory_manager/memory_manager_kernel_1.h"
-	"memory_manager/memory_manager_kernel_2.h"
-	"memory_manager/memory_manager_kernel_3.h"
-
-1226339884 c:\libs\dlib-17.12\dlib\memory_manager\memory_manager_kernel_1.h
-	"../algs.h"
-	"memory_manager_kernel_abstract.h"
-	"../assert.h"
-	<new>
-
-1226339884 c:\libs\dlib-17.12\dlib\memory_manager\memory_manager_kernel_abstract.h
-	"../algs.h"
-
-1226339884 c:\libs\dlib-17.12\dlib\memory_manager\memory_manager_kernel_2.h
-	"../algs.h"
-	"memory_manager_kernel_abstract.h"
-	"../assert.h"
-	<new>
-
-1226339884 c:\libs\dlib-17.12\dlib\memory_manager\memory_manager_kernel_3.h
-	"../algs.h"
-	"memory_manager_kernel_abstract.h"
-	"../assert.h"
-	<new>
-	"memory_manager_kernel_2.h"
-	"../binary_search_tree/binary_search_tree_kernel_2.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\binary_search_tree\binary_search_tree_kernel_2.h
-	"binary_search_tree_kernel_abstract.h"
-	"../algs.h"
-	"../interfaces/map_pair.h"
-	"../interfaces/enumerable.h"
-	"../interfaces/remover.h"
-	"../serialize.h"
-	<functional>
-
-1226339888 c:\libs\dlib-17.12\dlib\binary_search_tree\binary_search_tree_kernel_abstract.h
-	"../interfaces/map_pair.h"
-	"../interfaces/enumerable.h"
-	"../interfaces/remover.h"
-	"../serialize.h"
-	"../memory_manager/memory_manager_kernel_abstract.h"
-	<functional>
-
-1226339884 c:\libs\dlib-17.12\dlib\interfaces\map_pair.h
-
-1226339884 c:\libs\dlib-17.12\dlib\interfaces\enumerable.h
-
-1226339884 c:\libs\dlib-17.12\dlib\interfaces\remover.h
-	<functional>
-
-1226339888 c:\libs\dlib-17.12\dlib\serialize.h
-	"algs.h"
-	"assert.h"
-	<iomanip>
-	<cstddef>
-	<iostream>
-	<string>
-	<vector>
-	<complex>
-	<map>
-	<limits>
-	"uintn.h"
-	"interfaces/enumerable.h"
-	"interfaces/map_pair.h"
-	"enable_if.h"
-	"unicode.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\unicode.h
-	"unicode/unicode.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\unicode\unicode.h
-	"../uintn.h"
-	"../algs.h"
-	"unicode_abstract.h"
-	<string>
-	<cstring>
-	<fstream>
-	"unicode.cpp"
-
-1226339888 c:\libs\dlib-17.12\dlib\unicode\unicode_abstract.h
-	"../uintn.h"
-	"../error.h"
-	<string>
-	<fstream>
-
-1226339888 c:\libs\dlib-17.12\dlib\unicode\unicode.cpp
-	"unicode.h"
-	<cwchar>
-	"../string.h"
-	<vector>
-
-1226339888 c:\libs\dlib-17.12\dlib\string.h
-	"string/string.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\string\string.h
-	"../algs.h"
-	<string>
-	<iostream>
-	"../error.h"
-	"../assert.h"
-	"string_abstract.h"
-	"../uintn.h"
-	<cctype>
-	<algorithm>
-	"../enable_if.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\string\string_abstract.h
-	<string>
-	<iostream>
-	"../error.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder.h
-	"entropy_encoder/entropy_encoder_kernel_1.h"
-	"entropy_encoder/entropy_encoder_kernel_2.h"
-	"entropy_encoder/entropy_encoder_kernel_c.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder\entropy_encoder_kernel_1.h
-	"../algs.h"
-	"entropy_encoder_kernel_abstract.h"
-	<iosfwd>
-	"../uintn.h"
-	"entropy_encoder_kernel_1.cpp"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder\entropy_encoder_kernel_abstract.h
-	"../algs.h"
-	<iosfwd>
-	"../uintn.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder\entropy_encoder_kernel_1.cpp
-	"entropy_encoder_kernel_1.h"
-	<iostream>
-	<streambuf>
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder\entropy_encoder_kernel_2.h
-	"../algs.h"
-	"entropy_encoder_kernel_abstract.h"
-	<iosfwd>
-	"../uintn.h"
-	"entropy_encoder_kernel_2.cpp"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder\entropy_encoder_kernel_2.cpp
-	"entropy_encoder_kernel_2.h"
-	<iostream>
-	<streambuf>
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder\entropy_encoder_kernel_c.h
-	"entropy_encoder_kernel_abstract.h"
-	"../algs.h"
-	"../assert.h"
-	<iostream>
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder.h
-	"entropy_decoder/entropy_decoder_kernel_1.h"
-	"entropy_decoder/entropy_decoder_kernel_2.h"
-	"entropy_decoder/entropy_decoder_kernel_c.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder\entropy_decoder_kernel_1.h
-	"../algs.h"
-	"entropy_decoder_kernel_abstract.h"
-	<iosfwd>
-	"../uintn.h"
-	"entropy_decoder_kernel_1.cpp"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder\entropy_decoder_kernel_abstract.h
-	"../algs.h"
-	<iosfwd>
-	"../uintn.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder\entropy_decoder_kernel_1.cpp
-	"entropy_decoder_kernel_1.h"
-	<iostream>
-	<streambuf>
-	<sstream>
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder\entropy_decoder_kernel_2.h
-	"../algs.h"
-	"entropy_decoder_kernel_abstract.h"
-	<iosfwd>
-	"../uintn.h"
-	"entropy_decoder_kernel_2.cpp"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder\entropy_decoder_kernel_2.cpp
-	"entropy_decoder_kernel_2.h"
-	<iostream>
-	<streambuf>
-	<sstream>
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder\entropy_decoder_kernel_c.h
-	"entropy_decoder_kernel_abstract.h"
-	"../algs.h"
-	"../assert.h"
-	<iostream>
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder_model.h
-	"entropy_encoder_model/entropy_encoder_model_kernel_1.h"
-	"entropy_encoder_model/entropy_encoder_model_kernel_2.h"
-	"entropy_encoder_model/entropy_encoder_model_kernel_3.h"
-	"entropy_encoder_model/entropy_encoder_model_kernel_4.h"
-	"entropy_encoder_model/entropy_encoder_model_kernel_5.h"
-	"entropy_encoder_model/entropy_encoder_model_kernel_6.h"
-	"entropy_encoder_model/entropy_encoder_model_kernel_c.h"
-	"conditioning_class.h"
-	"memory_manager.h"
-	"sliding_buffer.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder_model\entropy_encoder_model_kernel_1.h
-	"../algs.h"
-	"entropy_encoder_model_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder_model\entropy_encoder_model_kernel_abstract.h
-	"../algs.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder_model\entropy_encoder_model_kernel_2.h
-	"../algs.h"
-	"entropy_encoder_model_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder_model\entropy_encoder_model_kernel_3.h
-	"../algs.h"
-	"entropy_encoder_model_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder_model\entropy_encoder_model_kernel_4.h
-	"../algs.h"
-	"entropy_encoder_model_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder_model\entropy_encoder_model_kernel_5.h
-	"../algs.h"
-	"entropy_encoder_model_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder_model\entropy_encoder_model_kernel_6.h
-	"../algs.h"
-	"entropy_encoder_model_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_encoder_model\entropy_encoder_model_kernel_c.h
-	"entropy_encoder_model_kernel_abstract.h"
-	"../algs.h"
-	"../assert.h"
-	<iostream>
-
-1226339888 c:\libs\dlib-17.12\dlib\sliding_buffer.h
-	"sliding_buffer/sliding_buffer_kernel_1.h"
-	"sliding_buffer/sliding_buffer_kernel_c.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\sliding_buffer\sliding_buffer_kernel_1.h
-	"sliding_buffer_kernel_abstract.h"
-	"../algs.h"
-	"../interfaces/enumerable.h"
-	"../serialize.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\sliding_buffer\sliding_buffer_kernel_abstract.h
-	"../algs.h"
-	"../interfaces/enumerable.h"
-	"../serialize.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\sliding_buffer\sliding_buffer_kernel_c.h
-	"sliding_buffer_kernel_abstract.h"
-	"../algs.h"
-	"../assert.h"
-	<iostream>
-
-1226339884 c:\libs\dlib-17.12\dlib\entropy_decoder_model.h
-	"entropy_decoder_model/entropy_decoder_model_kernel_1.h"
-	"entropy_decoder_model/entropy_decoder_model_kernel_2.h"
-	"entropy_decoder_model/entropy_decoder_model_kernel_3.h"
-	"entropy_decoder_model/entropy_decoder_model_kernel_4.h"
-	"entropy_decoder_model/entropy_decoder_model_kernel_5.h"
-	"entropy_decoder_model/entropy_decoder_model_kernel_6.h"
-	"conditioning_class.h"
-	"memory_manager.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder_model\entropy_decoder_model_kernel_1.h
-	"../algs.h"
-	"entropy_decoder_model_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder_model\entropy_decoder_model_kernel_abstract.h
-	"../algs.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder_model\entropy_decoder_model_kernel_2.h
-	"../algs.h"
-	"entropy_decoder_model_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder_model\entropy_decoder_model_kernel_3.h
-	"../algs.h"
-	"entropy_decoder_model_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder_model\entropy_decoder_model_kernel_4.h
-	"../algs.h"
-	"entropy_decoder_model_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder_model\entropy_decoder_model_kernel_5.h
-	"../algs.h"
-	"entropy_decoder_model_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\entropy_decoder_model\entropy_decoder_model_kernel_6.h
-	"../algs.h"
-	"entropy_decoder_model_kernel_abstract.h"
-	"../assert.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\lz77_buffer.h
-	"lz77_buffer/lz77_buffer_kernel_1.h"
-	"lz77_buffer/lz77_buffer_kernel_2.h"
-	"lz77_buffer/lz77_buffer_kernel_c.h"
-	"sliding_buffer.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\lz77_buffer\lz77_buffer_kernel_1.h
-	"lz77_buffer_kernel_abstract.h"
-	"../algs.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\lz77_buffer\lz77_buffer_kernel_abstract.h
-	"../algs.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\lz77_buffer\lz77_buffer_kernel_2.h
-	"lz77_buffer_kernel_abstract.h"
-	"../algs.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\lz77_buffer\lz77_buffer_kernel_c.h
-	"lz77_buffer_kernel_abstract.h"
-	"../algs.h"
-	"../assert.h"
-	<iostream>
-
-1226339888 c:\libs\dlib-17.12\dlib\lzp_buffer.h
-	"lzp_buffer/lzp_buffer_kernel_1.h"
-	"lzp_buffer/lzp_buffer_kernel_2.h"
-	"lzp_buffer/lzp_buffer_kernel_c.h"
-	"sliding_buffer.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\lzp_buffer\lzp_buffer_kernel_1.h
-	"../algs.h"
-	"lzp_buffer_kernel_abstract.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\lzp_buffer\lzp_buffer_kernel_abstract.h
-	"../algs.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\lzp_buffer\lzp_buffer_kernel_2.h
-	"../algs.h"
-	"lzp_buffer_kernel_abstract.h"
-	<new>
-
-1226339888 c:\libs\dlib-17.12\dlib\lzp_buffer\lzp_buffer_kernel_c.h
-	"lzp_buffer_kernel_abstract.h"
-	"../algs.h"
-	"../assert.h"
-	<iostream>
-
-1226339884 c:\libs\dlib-17.12\dlib\crc32.h
-	"crc32/crc32_kernel_1.h"
-
-1226339886 c:\libs\dlib-17.12\dlib\crc32\crc32_kernel_1.h
-	"../algs.h"
-	<string>
-	"crc32_kernel_abstract.h"
-
-1226339886 c:\libs\dlib-17.12\dlib\crc32\crc32_kernel_abstract.h
-	"../algs.h"
-	<string>
-
-1226339888 c:\libs\dlib-17.12\dlib\base64.h
-	"base64/base64_kernel_1.h"
-
-1226339888 c:\libs\dlib-17.12\dlib\base64\base64_kernel_1.h
-	"../algs.h"
-	"base64_kernel_abstract.h"
-	<iosfwd>
-	"base64_kernel_1.cpp"
-
-1226339888 c:\libs\dlib-17.12\dlib\base64\base64_kernel_abstract.h
-	"../algs.h"
-	<iosfwd>
-
-1226339888 c:\libs\dlib-17.12\dlib\base64\base64_kernel_1.cpp
-	"base64_kernel_1.h"
-	<iostream>
-	<sstream>
-	<climits>
 
 1265222572 c:\users\florian\programmation\gamedevelop\gdl\gdl\aes.h
 
@@ -9670,7 +9171,7 @@
 	"GDL/BaseDebugger.h"
 	<wx/msw/winundef.h>
 
-1266329081 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
+1267734706 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
 	"GDL/MemTrace.h"
 	<iostream>
 	<sstream>
@@ -9686,7 +9187,6 @@
 	"GDL/Son.h"
 	"GDL/Music.h"
 	"GDL/constantes.h"
-	"GDL/SortByPlan.h"
 	"GDL/RuntimeLayer.h"
 	"GDL/Text.h"
 	"GDL/SoundManager.h"
@@ -9772,8 +9272,6 @@
 	<SFML/Audio.hpp>
 	<string>
 
-1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\sortbyplan.h
-
 1266328384 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimelayer.h
 	<SFML/Graphics.hpp>
 	"GDL/Layer.h"
@@ -9786,7 +9284,7 @@
 	<SFML/Graphics.hpp>
 	<string>
 
-1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\soundmanager.h
+1267816125 c:\users\florian\programmation\gamedevelop\gdl\gdl\soundmanager.h
 	<SFML/Audio.hpp>
 	"GDL/constantes.h"
 	"GDL/Son.h"
@@ -9802,7 +9300,7 @@
 	<string>
 	<map>
 
-1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\basedebugger.h
+1267732591 c:\users\florian\programmation\gamedevelop\gdl\gdl\basedebugger.h
 	<SFML/System.hpp>
 
 1264360628 c:\users\florian\programmation\gamedevelop\gdl\gdl\profile.h
@@ -9925,7 +9423,7 @@
 	<os2.h>
 	<pmstddlg.h>
 
-1266966410 c:\users\florian\programmation\gamedevelop\ide\game_develop_editormain.h
+1267972375 c:\users\florian\programmation\gamedevelop\ide\game_develop_editormain.h
 	<wx/sizer.h>
 	<wx/menu.h>
 	<wx/aui/aui.h>
@@ -9939,8 +9437,6 @@
 	<wx/ribbon/gallery.h>
 	<wx/ribbon/toolbar.h>
 	"GDL/EditorImages.h"
-	"EditorObjets.h"
-	"EditorEvents.h"
 	"EditorScene.h"
 	<wx/msw/winundef.h>
 	"wxSFMLCanvas.hpp"
@@ -9956,7 +9452,6 @@
 	<wx/log.h>
 	"GDL/StdAlgo.h"
 	"RecentList.h"
-	"GDL/needReload.h"
 
 1253304836 c:\libs\wxwidgets\include\wx\aui\aui.h
 	"wx/aui/framemanager.h"
@@ -10102,90 +9597,12 @@
 	"GDL/ImageManager.h"
 	"GDL/MainEditorCommand.h"
 
-1266849643 c:\users\florian\programmation\gamedevelop\gdl\gdl\maineditorcommand.h
-	"GDL/needReload.h"
+1267816605 c:\users\florian\programmation\gamedevelop\gdl\gdl\maineditorcommand.h
 	<wx/ribbon/bar.h>
 	<wx/ribbon/buttonbar.h>
 	<iostream>
 
-1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\needreload.h
-	<string>
-	<vector>
-
-1266686134 c:\users\florian\programmation\gamedevelop\ide\editorobjets.h
-	<wx/notebook.h>
-	<wx/panel.h>
-	"EditorObjectList.h"
-	<wx/aui/aui.h>
-	<wx/imaglist.h>
-	"GDL/Game.h"
-	"GDL/Scene.h"
-	"GDL/MainEditorCommand.h"
-	<wx/msw/winundef.h>
-	"EditorObjetsGroups.h"
-
-1266688807 c:\users\florian\programmation\gamedevelop\ide\editorobjectlist.h
-	<wx/treectrl.h>
-	<wx/sizer.h>
-	<wx/menu.h>
-	<wx/panel.h>
-	<wx/toolbar.h>
-	<wx/image.h>
-	<string>
-	<vector>
-	<wx/ribbon/bar.h>
-	<wx/ribbon/buttonbar.h>
-	<wx/ribbon/gallery.h>
-	<wx/ribbon/toolbar.h>
-	"GDL/Object.h"
-	"GDL/Game.h"
-	"GDL/MainEditorCommand.h"
-
-1266685662 c:\users\florian\programmation\gamedevelop\ide\editorobjetsgroups.h
-	<wx/treectrl.h>
-	<wx/sizer.h>
-	<wx/menu.h>
-	<wx/panel.h>
-	<wx/toolbar.h>
-	<string>
-	<vector>
-	"GDL/needReload.h"
-	<wx/msw/winundef.h>
-	"GDL/ObjectGroup.h"
-	"GDL/Object.h"
-	"GDL/Game.h"
-	"GDL/MainEditorCommand.h"
-	<wx/msw/winundef.h>
-
-1266686134 c:\users\florian\programmation\gamedevelop\ide\editorevents.h
-	<wx/sizer.h>
-	<wx/menu.h>
-	<wx/panel.h>
-	<wx/scrolbar.h>
-	<wx/dc.h>
-	<wx/dcbuffer.h>
-	<wx/toolbar.h>
-	<stack>
-	"GDL/needReload.h"
-	"SearchEvents.h"
-	"GDL/MainEditorCommand.h"
-	"GDL/Game.h"
-
-1264360529 c:\users\florian\programmation\gamedevelop\ide\searchevents.h
-	<wx/listctrl.h>
-	<wx/notebook.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/checkbox.h>
-	<wx/panel.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	<string>
-	<vector>
-	"GDL/Event.h"
-
-1266686134 c:\users\florian\programmation\gamedevelop\ide\editorscene.h
+1267820400 c:\users\florian\programmation\gamedevelop\ide\editorscene.h
 	<wx/sizer.h>
 	<wx/aui/aui.h>
 	<wx/panel.h>
@@ -10205,7 +9622,6 @@
 	"EditorLayers.h"
 	"RenderDialog.h"
 	"DebuggerGUI.h"
-	"GDL/needReload.h"
 	<string>
 	<vector>
 
@@ -10245,7 +9661,7 @@
 	"GDL/SpriteObject.h"
 	<cmath>
 
-1267019857 c:\users\florian\programmation\gamedevelop\gdl\gdl\spriteobject.h
+1267818191 c:\users\florian\programmation\gamedevelop\gdl\gdl\spriteobject.h
 	"GDL/Object.h"
 
 1264875080 c:\users\florian\programmation\gamedevelop\ide\edittimescene.h
@@ -10254,6 +9670,78 @@
 	"GDL/Game.h"
 	<string>
 	<vector>
+
+1267984675 c:\users\florian\programmation\gamedevelop\ide\editorevents.h
+	<wx/sizer.h>
+	<wx/menu.h>
+	<wx/panel.h>
+	<wx/scrolbar.h>
+	<wx/dc.h>
+	<wx/dcbuffer.h>
+	<wx/toolbar.h>
+	<stack>
+	"SearchEvents.h"
+	"GDL/MainEditorCommand.h"
+	"EventsRendererDatas.h"
+	"GDL/Game.h"
+
+1264360529 c:\users\florian\programmation\gamedevelop\ide\searchevents.h
+	<wx/listctrl.h>
+	<wx/notebook.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/checkbox.h>
+	<wx/panel.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<string>
+	<vector>
+	"GDL/Event.h"
+
+1266686134 c:\users\florian\programmation\gamedevelop\ide\editorobjets.h
+	<wx/notebook.h>
+	<wx/panel.h>
+	"EditorObjectList.h"
+	<wx/aui/aui.h>
+	<wx/imaglist.h>
+	"GDL/Game.h"
+	"GDL/Scene.h"
+	"GDL/MainEditorCommand.h"
+	<wx/msw/winundef.h>
+	"EditorObjetsGroups.h"
+
+1266688807 c:\users\florian\programmation\gamedevelop\ide\editorobjectlist.h
+	<wx/treectrl.h>
+	<wx/sizer.h>
+	<wx/menu.h>
+	<wx/panel.h>
+	<wx/toolbar.h>
+	<wx/image.h>
+	<string>
+	<vector>
+	<wx/ribbon/bar.h>
+	<wx/ribbon/buttonbar.h>
+	<wx/ribbon/gallery.h>
+	<wx/ribbon/toolbar.h>
+	"GDL/Object.h"
+	"GDL/Game.h"
+	"GDL/MainEditorCommand.h"
+
+1267820399 c:\users\florian\programmation\gamedevelop\ide\editorobjetsgroups.h
+	<wx/treectrl.h>
+	<wx/sizer.h>
+	<wx/menu.h>
+	<wx/panel.h>
+	<wx/toolbar.h>
+	<string>
+	<vector>
+	<wx/msw/winundef.h>
+	"GDL/ObjectGroup.h"
+	"GDL/Object.h"
+	"GDL/Game.h"
+	"GDL/MainEditorCommand.h"
+	<wx/msw/winundef.h>
 
 1266686272 c:\users\florian\programmation\gamedevelop\ide\editorlayers.h
 	<wx/listctrl.h>
@@ -10335,7 +9823,7 @@
 
 1264360533 source:c:\users\florian\programmation\gamedevelop\ide\dossierrenderer.cpp
 
-1267213858 source:c:\users\florian\programmation\gamedevelop\ide\editactions.cpp
+1267970659 source:c:\users\florian\programmation\gamedevelop\ide\editactions.cpp
 	"debugMem.h"
 	"nommgr.h"
 	"CppUnitLite/TestHarness.h"
@@ -10391,7 +9879,7 @@
 	<wx/dialog.h>
 	"GDL/Event.h"
 
-1267213858 source:c:\users\florian\programmation\gamedevelop\ide\editconditions.cpp
+1267820474 source:c:\users\florian\programmation\gamedevelop\ide\editconditions.cpp
 	"debugMem.h"
 	"nommgr.h"
 	"CppUnitLite/TestHarness.h"
@@ -10714,9 +10202,8 @@
 	"GDL/Game.h"
 	"GDL/Scene.h"
 
-1267213859 source:c:\users\florian\programmation\gamedevelop\ide\editorevents.cpp
+1267992818 source:c:\users\florian\programmation\gamedevelop\ide\editorevents.cpp
 	"debugMem.h"
-	"nommgr.h"
 	"CppUnitLite/TestHarness.h"
 	"EditorEvents.h"
 	<wx/bitmap.h>
@@ -10747,7 +10234,6 @@
 	"EditDossier.h"
 	"DossierRenderer.h"
 	"LinkRenderer.h"
-	"GDL/needReload.h"
 	"EditLink.h"
 	"CreateTemplate.h"
 	"CommentaireRenderer.h"
@@ -10760,18 +10246,29 @@
 
 1264360532 c:\users\florian\programmation\gamedevelop\ide\dossierrenderer.h
 
-1264360530 c:\users\florian\programmation\gamedevelop\ide\linkrenderer.h
+1267892882 c:\users\florian\programmation\gamedevelop\ide\linkrenderer.h
 	"GDL/Event.h"
 	"Renderer.h"
 	<wx/dc.h>
 	<wx/dcbuffer.h>
+	"EventsRendererDatas.h"
 
-1264360534 c:\users\florian\programmation\gamedevelop\ide\eventrenderer.h
+1267892882 c:\users\florian\programmation\gamedevelop\ide\eventrenderer.h
 	"GDL/Event.h"
 	<wx/dc.h>
 	<wx/dcbuffer.h>
 	<wx/html/htmprint.h>
 	"Renderer.h"
+	"EventsRendererDatas.h"
+
+1267984576 source:c:\users\florian\programmation\gamedevelop\ide\editoreventsactions.cpp
+	"EditorEvents.h"
+	"ChoixAction.h"
+
+1267992278 source:c:\users\florian\programmation\gamedevelop\ide\editoreventsconditions.cpp
+	"EditorEvents.h"
+	"ChoixCondition.h"
+	"Clipboard.h"
 
 1264360533 source:c:\users\florian\programmation\gamedevelop\ide\editorjeu.cpp
 	"EditorJeu.h"
@@ -10812,7 +10309,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1267213859 source:c:\users\florian\programmation\gamedevelop\ide\editorobjectlist.cpp
+1267820400 source:c:\users\florian\programmation\gamedevelop\ide\editorobjectlist.cpp
 	"EditorObjectList.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -10836,7 +10333,6 @@
 	"GDL/Chercher.h"
 	"GDL/ExtensionsManager.h"
 	"GDL/StdAlgo.h"
-	"GDL/needReload.h"
 	"MemTrace.h"
 	"Clipboard.h"
 	<algorithm>
@@ -10877,7 +10373,7 @@
 	"GDL/ListVariable.h"
 	<wx/msw/winundef.h>
 
-1266689116 source:c:\users\florian\programmation\gamedevelop\ide\editorobjets.cpp
+1267820400 source:c:\users\florian\programmation\gamedevelop\ide\editorobjets.cpp
 	<wx/msw/winundef.h>
 	"debugMem.h"
 	"EditorObjets.h"
@@ -10894,7 +10390,6 @@
 	"GDL/Object.h"
 	"GDL/Chercher.h"
 	"GDL/StdAlgo.h"
-	"GDL/needReload.h"
 	"MemTrace.h"
 	"Clipboard.h"
 	<algorithm>
@@ -10927,7 +10422,7 @@
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
-1267213860 source:c:\users\florian\programmation\gamedevelop\ide\editorscene.cpp
+1267970874 source:c:\users\florian\programmation\gamedevelop\ide\editorscene.cpp
 	"EditorScene.h"
 	<wx/settings.h>
 	<wx/intl.h>
@@ -10943,7 +10438,6 @@
 	"GDL/ImageManager.h"
 	"Game_Develop_EditorMain.h"
 	"GDL/MainEditorCommand.h"
-	"GDL/needReload.h"
 	"SceneCanvas.h"
 	"ChoixObjet.h"
 	"GDL/HelpFileAccess.h"
@@ -10991,8 +10485,7 @@
 	"ErrorCompilation.h"
 	"nommgr.h"
 
-1264360530 source:c:\users\florian\programmation\gamedevelop\ide\eventrenderer.cpp
-	"nommgr.h"
+1267992246 source:c:\users\florian\programmation\gamedevelop\ide\eventrenderer.cpp
 	"EventRenderer.h"
 	"GDL/Event.h"
 	"GDL/ExtensionsManager.h"
@@ -11010,6 +10503,9 @@
 	"wx/filesys.h"
 	"wx/hashmap.h"
 	"wx/bitmap.h"
+
+1267983149 source:c:\users\florian\programmation\gamedevelop\ide\eventsrendererdatas.cpp
+	"EventsRendererDatas.h"
 
 1265478447 source:c:\users\florian\programmation\gamedevelop\ide\extensions.cpp
 	"Extensions.h"
@@ -11029,7 +10525,7 @@
 	<string>
 	<vector>
 
-1266592379 source:c:\users\florian\programmation\gamedevelop\ide\fusion.cpp
+1267280257 source:c:\users\florian\programmation\gamedevelop\ide\fusion.cpp
 	"Fusion.h"
 	"nommgr.h"
 	<wx/filedlg.h>
@@ -11075,7 +10571,7 @@
 	<iostream>
 	<wx/dcbuffer.h>
 
-1267215302 source:c:\users\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
+1267989433 source:c:\users\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
 	"debugMem.h"
 	<wx/msw/winundef.h>
 	<wx/image.h>
@@ -13729,8 +13225,7 @@
 	<wx/log.h>
 	"GDL/ListVariable.h"
 
-1264363197 source:c:\users\florian\programmation\gamedevelop\ide\linkrenderer.cpp
-	"nommgr.h"
+1267892882 source:c:\users\florian\programmation\gamedevelop\ide\linkrenderer.cpp
 	"LinkRenderer.h"
 	"GDL/Event.h"
 	<wx/dc.h>
@@ -13790,7 +13285,7 @@
 	<wx/button.h>
 	<wx/dialog.h>
 
-1266966410 source:c:\users\florian\programmation\gamedevelop\ide\mainfichier.cpp
+1267290476 source:c:\users\florian\programmation\gamedevelop\ide\mainfichier.cpp
 	<boost/shared_ptr.hpp>
 	"GDL/OpenSaveGame.h"
 	"GDL/ExtensionsManager.h"
@@ -13970,7 +13465,67 @@
 	<wx/string.h>
 	"GDL/Layer.h"
 
-1266586463 source:c:\users\florian\programmation\gamedevelop\ide\portable.cpp
+1267224692 source:c:\users\florian\programmation\gamedevelop\ide\playerunittests.cpp
+	"CppUnitLite/TestHarness.h"
+	"GDL/Object.h"
+	"GDL/aMove.h"
+	"GDL/cMove.h"
+	"GDL/Access.h"
+	"GDL/ObjectsConcerned.h"
+	<boost/shared_ptr.hpp>
+	<string>
+	<vector>
+	"GDL/SpriteObject.h"
+	"GDL/Object.h"
+	"GDL/RuntimeGame.h"
+	"windows.h"
+	<wx/msw/winundef.h>
+
+1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\amove.h
+	<vector>
+	<string>
+	"GDL/Object.h"
+	<cmath>
+	"GDL/Event.h"
+	<iostream>
+	<sstream>
+	"GDL/Chercher.h"
+	"GDL/algo.h"
+	"GDL/Force.h"
+	<iostream>
+	"GDL/Access.h"
+	"GDL/RuntimeScene.h"
+
+1267732591 c:\users\florian\programmation\gamedevelop\gdl\gdl\access.h
+	"GDL/RuntimeScene.h"
+	"GDL/Game.h"
+
+1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\cmove.h
+	<vector>
+	<string>
+	"GDL/Object.h"
+	<cmath>
+	"GDL/Event.h"
+	<iostream>
+	<sstream>
+	"GDL/Chercher.h"
+	"GDL/algo.h"
+	"GDL/Force.h"
+	<iostream>
+	"GDL/Access.h"
+	<SFML/Window.hpp>
+	"GDL/RuntimeScene.h"
+
+1267733380 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
+	"GDL/Object.h"
+	"GDL/ObjectGroup.h"
+	"GDL/ObjectType.h"
+	"GDL/ObjInstancesHolder.h"
+	<boost/shared_ptr.hpp>
+	<string>
+	<vector>
+
+1267280257 source:c:\users\florian\programmation\gamedevelop\ide\portable.cpp
 	"nommgr.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -14006,7 +13561,7 @@
 	<vector>
 	<iostream>
 
-1267216493 source:c:\users\florian\programmation\gamedevelop\ide\projectmanager.cpp
+1267292895 source:c:\users\florian\programmation\gamedevelop\ide\projectmanager.cpp
 	"ProjectManager.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -14041,7 +13596,7 @@
 1264360532 source:c:\users\florian\programmation\gamedevelop\ide\renderer.cpp
 	"Renderer.h"
 
-1266854444 source:c:\users\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1267821128 source:c:\users\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<SFML/System.hpp>
@@ -14062,7 +13617,6 @@
 	<wx/log.h>
 	<wx/scrolbar.h>
 	<wx/msw/winundef.h>
-	"GDL/SortByPlan.h"
 	"GDL/RuntimeScene.h"
 	"GDL/AppelEvent.h"
 	"GDL/Chercher.h"
@@ -14072,7 +13626,7 @@
 	"DndTextSceneEditor.h"
 	<wx/cursor.h>
 
-1266955810 c:\users\florian\programmation\gamedevelop\gdl\gdl\appelevent.h
+1267816125 c:\users\florian\programmation\gamedevelop\gdl\gdl\appelevent.h
 	<SFML/System.hpp>
 	<iostream>
 	<SFML/Graphics.hpp>
@@ -14087,13 +13641,8 @@
 	"GDL/algo.h"
 	"GDL/Force.h"
 	"GDL/MemTrace.h"
-	"GDL/SortByPlan.h"
 	"GDL/RuntimeScene.h"
 	"GDL/Access.h"
-
-1264360627 c:\users\florian\programmation\gamedevelop\gdl\gdl\access.h
-	"GDL/RuntimeScene.h"
-	"GDL/Game.h"
 
 1264360534 source:c:\users\florian\programmation\gamedevelop\ide\searchevents.cpp
 	"SearchEvents.h"
@@ -14216,9 +13765,9 @@
 	"wx/msw/rcdefs.h"
 	"version.h"
 
-1263934043 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
+1253433586 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\msw\rcdefs.h
 
-1267216496 c:\users\florian\programmation\gamedevelop\ide\version.h
+1267993045 c:\users\florian\programmation\gamedevelop\ide\version.h
 
 1265563381 source:c:\users\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -14354,7 +13903,7 @@
 	"wx/stream.h"
 	"wx/convauto.h"
 
-1264360532 source:c:\users\florian\programmation\gamedevelop\ide\credits.cpp
+1267296687 source:c:\users\florian\programmation\gamedevelop\ide\credits.cpp
 	"Credits.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -14373,5 +13922,9 @@
 	"GDL/VersionWrapper.h"
 	"GDL/StdAlgo.h"
 
-1267219794 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
+1267959470 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
+
+1253304862 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
+
+1263934043 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 

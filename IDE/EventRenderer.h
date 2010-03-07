@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef EVENTRENDERER_H
 #define EVENTRENDERER_H
 
@@ -6,12 +11,16 @@
 #include <wx/dcbuffer.h>
 #include <wx/html/htmprint.h>
 #include "Renderer.h"
+#include "EventsRendererDatas.h"
 
+/**
+ * Class for rendering an event
+ */
 class EventRenderer : public Renderer
 {
     public:
-        EventRenderer(wxBufferedPaintDC & dc_, const Event & event, int origineX, int origineY, int editorWidth, int conditionsColumnWidth);
-        virtual ~EventRenderer();
+        EventRenderer(wxBufferedPaintDC & dc_, const Event & event, EventsRendererDatas & eventsRenderersDatas_);
+        virtual ~EventRenderer() {};
 
         void Render() const;
         int GetHeight() const;
@@ -21,15 +30,10 @@ class EventRenderer : public Renderer
         int GetConditionsHeight() const;
         int GetActionsHeight() const;
 
-        //Données pour le rendu
+        //Datas for rendering
         wxBufferedPaintDC & dc;
         const Event & event;
-        int origineX;
-        int origineY;
-        int editorWidth;
-        int conditionsColumnWidth;
-
-        mutable wxHtmlDCRenderer htmlRenderer;
+        EventsRendererDatas & renderingDatas;
 };
 
 #endif // EVENTRENDERER_H

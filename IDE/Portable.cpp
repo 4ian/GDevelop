@@ -167,12 +167,12 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     wxSafeYield();
     Jeu.portable = true;
     OpenSaveGame saveGame(Jeu);
-    saveGame.SaveToFile(rep+"/Jeu.jgd");
+    saveGame.SaveToFile(rep+"/Game.gdg");
 
     Jeu.portable = false;
 
     AvancementGauge->SetValue(100);
-    wxLogMessage(_("Le jeu est disponible dans le répertoire choisi sous le nom de Jeu.jgd ."));
+    wxLogMessage(_("Le jeu est disponible dans le répertoire choisi sous le nom de Game.gdg ."));
 }
 
 string Portable::CopyAndReduceFileName( string file, string rep )

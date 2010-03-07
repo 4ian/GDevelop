@@ -1,6 +1,10 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef EDITOREVENTS_H
 #define EDITOREVENTS_H
-
 
 //(*Headers(EditorEvents)
 #include <wx/sizer.h>
@@ -13,9 +17,9 @@
 #include <wx/toolbar.h>
 #include <stack>
 
-#include "GDL/needReload.h"
 #include "SearchEvents.h"
 #include "GDL/MainEditorCommand.h"
+#include "EventsRendererDatas.h"
 
 #include "GDL/Game.h"
 
@@ -35,25 +39,31 @@ class EditorEvents: public wxPanel
 		wxScrollBar* horizontalScrollbar;
 		wxMenuItem* MenuItem8;
 		wxMenuItem* MenuItem7;
+		wxMenuItem* MenuItem25;
 		wxMenu* MenuItem9;
 		wxMenuItem* MenuItem2;
 		wxMenuItem* MenuItem1;
 		wxMenuItem* MenuItem4;
 		wxScrollBar* ScrollBar1;
 		wxMenuItem* MenuItem15;
+		wxMenuItem* MenuItem22;
 		wxPanel* Panel1;
 		wxMenuItem* MenuItem17;
 		wxMenuItem* MenuItem13;
 		wxMenu ContextMenu;
 		wxMenuItem* MenuItem10;
+		wxMenu actionsMenu;
 		wxMenuItem* MenuItem12;
+		wxMenuItem* MenuItem24;
 		wxMenuItem* MenuItem3;
 		wxPanel* EventsPanel;
 		wxMenuItem* MenuItem6;
 		wxMenu* MenuItem14;
+		wxMenuItem* MenuItem21;
 		wxMenuItem* MenuItem16;
 		wxMenuItem* MenuItem18;
 		wxMenuItem* SubEventMenuItem;
+		wxMenu conditionsMenu;
 		//*)
 
 	protected:
@@ -82,6 +92,18 @@ class EditorEvents: public wxPanel
 		static const long idMenuPasteApres;
 		static const long idMenuPasteSubEvent;
 		static const long idMenuPaste;
+		static const long idMenuEdit;
+		static const long idMenuAdd;
+		static const long idMenuDel;
+		static const long ID_MENUITEM3;
+		static const long idMenuCouper;
+		static const long ID_MENUITEM4;
+		static const long ID_MENUITEM5;
+		static const long ID_MENUITEM6;
+		static const long ID_MENUITEM7;
+		static const long ID_MENUITEM8;
+		static const long ID_MENUITEM9;
+		static const long ID_MENUITEM10;
 		//*)
 		static const long ID_TEMPLATEBUTTON;
 		static const long ID_CREATETEMPLATEBUTTON;
@@ -139,11 +161,26 @@ class EditorEvents: public wxPanel
 		void OnEventsPanelLeftDown(wxMouseEvent& event);
 		void OnEventsPanelKeyUp(wxKeyEvent& event);
 		void OnEventsPanelSetFocus(wxFocusEvent& event);
+		void OneEditConditionMenuSelected(wxCommandEvent& event);
+		void OnAddConditionMenuSelected(wxCommandEvent& event);
+		void OnDelConditionMenuSelected(wxCommandEvent& event);
+		void OnEditActionMenuSelected(wxCommandEvent& event);
+		void OnAddActionMenuSelected(wxCommandEvent& event);
+		void OnDelActionMenuSelected(wxCommandEvent& event);
+		void OnCopyActionMenuSelected(wxCommandEvent& event);
+		void OnCutActionMenuSelected(wxCommandEvent& event);
+		void OnPasteActionMenuSelected(wxCommandEvent& event);
+		void OnCopyConditionMenuSelected(wxCommandEvent& event);
+		void OnCutConditionMenuSelected(wxCommandEvent& event);
+		void OnPasteConditionMenuSelected(wxCommandEvent& event);
 		//*)
-        void DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & maximalWidth);
+        void DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & maximalWidth, bool draw);
         void OnSearchBtClick(wxCommandEvent& event);
         void ChangesMadeOnEvents();
         void ResetEventsSizeCache(vector < Event > & eventsToReset);
+        void DeselectAllEvents(vector < Event > & eventsToUnselected);
+        void DeselectAllActions(vector < Event > & eventsToUnselected);
+        void DeselectAllConditions(vector < Event > & eventsToUnselected);
 
         SearchEvents * searchDialog;
 
@@ -164,18 +201,18 @@ class EditorEvents: public wxPanel
         vector < vector < Event > > history; //Historique des changements
         vector < vector < Event > > redoHistory; //Historique des changements pour "refaire"
 
-        //Largeur de la colonne des conditions
-        int conditionsColumnWidth;
+        unsigned int conditionsColumnWidth;
+        EventsRendererDatas eventsRenderersDatas;
 
         //Position du clic
         int MouseX;
         int MouseY;
+        bool ctrlPressed;
         bool isResizingColumns;
 
         //Evènement selectionné
-        Event * eventSelected;
-        vector < Event > * listEventSelected;
-        int eventNbInListSelected;
+        vector < std::pair<vector < Event > *, unsigned int> > eventsSelected; ///<First: Pointer to the list of event, Second: index of the event in this list
+        vector < std::pair<vector < Instruction > *, unsigned int> > instructionsSelected; ///<First: Pointer to the list of instruction, Second: index of the instruction in this list
         bool ConditionsSelected;
 
         Event unusedEvent;

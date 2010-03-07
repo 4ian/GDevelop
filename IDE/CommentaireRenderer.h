@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef COMMENTAIRERENDERER_H
 #define COMMENTAIRERENDERER_H
 
@@ -5,12 +10,13 @@
 #include "Renderer.h"
 #include <wx/dc.h>
 #include <wx/dcbuffer.h>
+#include "EventsRendererDatas.h"
 
 class CommentaireRenderer : public Renderer
 {
     public:
-        CommentaireRenderer(wxBufferedPaintDC & dc_, const Event & event_, int origineX_, int origineY_, int editorWidth_);
-        virtual ~CommentaireRenderer();
+        CommentaireRenderer(wxBufferedPaintDC & dc_, const Event & event_, EventsRendererDatas & eventsRenderersDatas_);
+        virtual ~CommentaireRenderer() {};
 
         void Render() const;
         int GetHeight() const;
@@ -19,9 +25,7 @@ class CommentaireRenderer : public Renderer
     private:
         wxBufferedPaintDC & dc;
         const Event & event;
-        int origineX;
-        int origineY;
-        int editorWidth;
+        EventsRendererDatas & renderingDatas;
 };
 
 #endif // COMMENTAIRERENDERER_H

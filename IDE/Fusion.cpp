@@ -121,7 +121,7 @@ void Fusion::OnFermerBtClick(wxCommandEvent& event)
 
 void Fusion::OnFusionBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog( this, _( "Choisissez le jeu à ouvrir" ), "", "", "*.jgd" );
+    wxFileDialog dialog( this, _( "Choisissez le jeu à ouvrir" ), "", "", "*.gdg;*.jgd" );
     dialog.ShowModal();
 
     if ( dialog.GetPath() == "" )

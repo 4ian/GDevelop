@@ -10,7 +10,6 @@
 #include <wx/toolbar.h>
 #include <string>
 #include <vector>
-#include "GDL/needReload.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif

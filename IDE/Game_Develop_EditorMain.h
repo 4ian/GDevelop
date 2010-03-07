@@ -26,8 +26,6 @@
 #include <wx/ribbon/toolbar.h>
 
 #include "GDL/EditorImages.h"
-#include "EditorObjets.h"
-#include "EditorEvents.h"
 #include "EditorScene.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -48,7 +46,6 @@
 #include <wx/log.h>
 #include "GDL/StdAlgo.h"
 #include "RecentList.h"
-#include "GDL/needReload.h"
 class RuntimeGame;
 class ProjectManager;
 class StartHerePage;

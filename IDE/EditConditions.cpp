@@ -96,7 +96,7 @@ scene(scene_)
     wxMenuItem* editMenuItem;
     wxStaticBoxSizer* StaticBoxSizer1;
     wxFlexGridSizer* FlexGridSizer1;
-
+    
     Create(parent, wxID_ANY, _("Edition des conditions de l\'évènement"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(428,327));
     wxIcon FrameIcon;
@@ -174,7 +174,7 @@ scene(scene_)
     ContextMenu.Append(MenuItem6);
     FlexGridSizer1->SetSizeHints(this);
     Center();
-
+    
     Connect(ID_RADIOBUTTON2,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&EditConditions::OnEtRadioSelect);
     Connect(ID_RADIOBUTTON1,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&EditConditions::OnOuRadioSelect);
     Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&EditConditions::OnConditionsListItemActivated);

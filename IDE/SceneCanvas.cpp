@@ -20,7 +20,6 @@
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-#include "GDL/SortByPlan.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/AppelEvent.h"
 #include "GDL/Chercher.h"

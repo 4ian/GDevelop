@@ -27,7 +27,6 @@ class RuntimeGame;
 #include "EditorLayers.h"
 #include "RenderDialog.h"
 #include "DebuggerGUI.h"
-#include "GDL/needReload.h"
 #include <string>
 #include <vector>
 

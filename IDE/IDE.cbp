@@ -5,7 +5,7 @@
 		<Option title="IDE" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Editeurs\Editeur Image\;Editeurs\Choix\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Options\;Fichiers\;LIB TinyXml\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Renderers\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\EditorEvents\Events\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
+		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Editeurs\Choix\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Options\;Fichiers\;LIB TinyXml\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Renderers\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\EditorEvents\Events\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
 		<Build>
 			<Target title="Debug - Edittime">
 				<Option output="bin\debug\GDEditor" prefix_auto="1" extension_auto="1" />
@@ -537,6 +537,8 @@
 		<Unit filename="EventRenderer.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Renderers\" />
 		</Unit>
+		<Unit filename="EventsRendererDatas.cpp" />
+		<Unit filename="EventsRendererDatas.h" />
 		<Unit filename="Extensions.cpp" />
 		<Unit filename="Extensions.h" />
 		<Unit filename="Fusion.cpp">
@@ -639,6 +641,7 @@
 		<Unit filename="ObjectsOnBadLayerBox.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\Editeur calques\" />
 		</Unit>
+		<Unit filename="PlayerUnitTests.cpp" />
 		<Unit filename="Portable.cpp">
 			<Option virtualFolder="Fichiers\" />
 		</Unit>

@@ -50,7 +50,7 @@ void Game_Develop_EditorFrame::OnRibbonNewClicked(wxRibbonButtonBarEvent& evt)
 void Game_Develop_EditorFrame::OnMenuOpenSelected( wxCommandEvent& event )
 {
     //Affichage de la boite de dialogue
-    wxFileDialog FileDialog( this, _( "Choisissez le jeu à ouvrir" ), "", "", "*.jgd" );
+    wxFileDialog FileDialog( this, _( "Choisissez le jeu à ouvrir" ), "", "", "*\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
     FileDialog.ShowModal();
 
     //A t on  un fichier à ouvrir ?
@@ -172,7 +172,7 @@ void Game_Develop_EditorFrame::SaveAs()
     if ( !CurrentGameIsValid() ) return;
 
     //Affichage de la boite de dialogue
-    wxFileDialog FileDialog( this, _( "Choisissez le nom et le répertoire du jeu à enregistrer" ), "", "", "*.jgd", wxFD_SAVE );
+    wxFileDialog FileDialog( this, _( "Choisissez le nom et le répertoire du jeu à enregistrer" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg", wxFD_SAVE );
     FileDialog.ShowModal();
 
     //A t on  un fichier à enregistrer ?

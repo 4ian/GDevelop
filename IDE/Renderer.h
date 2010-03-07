@@ -1,10 +1,14 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "GDL/Event.h"
-#include <wx/dc.h>
-#include <wx/dcbuffer.h>
-
+/**
+ * Base class for events renderers
+ */
 class Renderer
 {
     public:
@@ -16,8 +20,6 @@ class Renderer
 
     protected:
         bool selected;
-    private:
-
 };
 
 #endif // RENDERER_H

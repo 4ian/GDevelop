@@ -1,19 +1,7 @@
 /**
- * Game Develop
- *    Editeur
- *
- *  Par Florian "4ian" Rival
- *
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
-/**
- *
- *
- *  Affiche un évènement sur une zone de dessin
- */
-
-#ifdef DEBUG
-#include "nommgr.h"
-#endif
 
 #include "EventRenderer.h"
 #include "GDL/Event.h"
@@ -27,24 +15,13 @@
 
 #include "TranslateCondition.h"
 #include "TranslateAction.h"
-#ifdef DEBUG
 
-#endif
-
-EventRenderer::EventRenderer(wxBufferedPaintDC & dc_, const Event & event_, int origineX_, int origineY_, int editorWidth_, int conditionsColumnWidth_) :
+EventRenderer::EventRenderer(wxBufferedPaintDC & dc_, const Event & event_, EventsRendererDatas & eventsRenderersDatas_) :
 dc(dc_),
 event(event_),
-origineX(origineX_),
-origineY(origineY_),
-editorWidth(editorWidth_),
-conditionsColumnWidth(conditionsColumnWidth_)
+renderingDatas(eventsRenderersDatas_)
 {
     //ctor
-}
-
-EventRenderer::~EventRenderer()
-{
-    //dtor
 }
 
 ////////////////////////////////////////////////////////////
@@ -55,81 +32,218 @@ void EventRenderer::Render() const
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
 
     //La classe de rendu de HTML
-    htmlRenderer.SetDC(&dc);
-    htmlRenderer.SetStandardFonts( 8 );
+    renderingDatas.GetHTMLRenderer().SetDC(&dc);
+    renderingDatas.GetHTMLRenderer().SetStandardFonts( 8 );
     const int iconWidth = 18;
     const int separation = 1;
     const int sideSeparation = 1;
 
-    //Préparation
-    dc.SetFont( wxFont( 8, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    dc.SetPen(wxPen(wxColour(242/2,242/2,242/2), 1));
-    dc.SetBrush(wxBrush(wxColour(242,242,242)));
-    if ( selected ) dc.SetPen(wxPen(wxColour(0, 0, 0), 1));
-    if ( selected ) dc.SetBrush(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)));
-
-    dc.DrawRectangle(origineX, origineY, editorWidth-origineX, GetHeight());
-
-    dc.SetPen(wxPen(wxColour(0,0,0), 1));
-    dc.SetBrush(wxBrush(wxColour(230,235,239)));
-    if ( selected ) dc.SetBrush(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)));
-
-    int yCondition = origineY;
-    if ( event.conditions.empty() )
+    //Setup colors
+    dc.SetFont(renderingDatas.GetFont());
+    if ( !selected )
     {
-        //Pas de conditions, on affiche juste un petit message
-        dc.SetFont( wxFont( 8, wxDEFAULT, wxFONTSTYLE_ITALIC, wxNORMAL ) );
-        dc.DrawRectangle(origineX, origineY, (conditionsColumnWidth - origineX), 17+1);
-        dc.DrawText( _("Pas de conditions"), origineX + 2, origineY + 1 );
+        dc.SetPen(renderingDatas.GetRectangleOutlinePen());
+        dc.SetBrush(renderingDatas.GetRectangleFillBrush());
     }
     else
     {
-        dc.DrawRectangle(origineX, origineY, (conditionsColumnWidth - origineX), GetConditionsHeight());
+        dc.SetPen(renderingDatas.GetSelectedRectangleOutlinePen());
+        dc.SetBrush(renderingDatas.GetSelectedRectangleFillBrush());
+    }
 
+    //Draw event rectangle
+    dc.SetPen(*wxTRANSPARENT_PEN);
+    dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
+    {
+        wxRect rect(renderingDatas.GetOrigineX(),
+                         renderingDatas.GetOrigineY(),
+                         renderingDatas.GetRenderZoneWidth()-renderingDatas.GetOrigineX(),
+                         GetHeight());
+        {
+            wxRect edge(rect);
+
+            edge.width = 2;
+            dc.DrawRectangle(edge.x, edge.y, edge.width, edge.height);
+
+            edge.x += rect.width - 2;
+            dc.DrawRectangle(edge.x, edge.y, edge.width, edge.height);
+
+            edge = rect;
+            edge.height = 2;
+            edge.y += (rect.height - edge.height);
+            dc.DrawRectangle(edge.x, edge.y, edge.width, edge.height);
+        }
+        {
+            wxRect background(rect);
+            background.x += 2;
+            background.width -= 4;
+            background.height -= 2;
+
+            background.height = 2;
+            dc.GradientFillLinear(background, wxColour(209, 217, 255),
+                wxColour(196, 207, 255), wxSOUTH);
+
+            background.y += background.height;
+            background.height = rect.height - 2 - background.height;
+            dc.GradientFillLinear(background, wxColour(233, 233, 255),
+                wxColour(205, 205, 255), wxSOUTH);
+        }
+        {
+            wxPoint border_points[8];
+            border_points[0] = wxPoint(2, 0);
+            border_points[1] = wxPoint(1, 1);
+            border_points[2] = wxPoint(1, rect.height - 4);
+            border_points[3] = wxPoint(3, rect.height - 2);
+            border_points[4] = wxPoint(rect.width - 4, rect.height - 2);
+            border_points[5] = wxPoint(rect.width - 2, rect.height - 4);
+            border_points[6] = wxPoint(rect.width - 2, 1);
+            border_points[7] = wxPoint(rect.width - 4, -1);
+
+            dc.SetPen(wxPen(wxColour(185, 185, 247)));
+            dc.DrawLines(sizeof(border_points)/sizeof(wxPoint), border_points, rect.x, rect.y);
+        }
+    }
+
+    dc.SetPen(renderingDatas.GetSelectedRectangleOutlinePen());
+    if (!selected) dc.SetBrush(renderingDatas.GetConditionsRectangleFillBrush());
+
+    //Draw conditions
+    int yCondition = renderingDatas.GetOrigineY();
+    if ( event.conditions.empty() )
+    {
+        //Pas de conditions, on affiche juste un petit message
+        {
+            wxRect rect(renderingDatas.GetOrigineX(),
+                             renderingDatas.GetOrigineY(),
+                             renderingDatas.GetConditionsColumnWidth()-renderingDatas.GetOrigineX(),
+                             17+1);
+            {
+                wxRect background(rect);
+                background.x += 2;
+                background.width -= 4;
+                background.height -= 2;
+
+                background.height = 3;
+                dc.GradientFillLinear(background, wxColour(234, 242, 255),
+                    wxColour(221, 232, 255), wxSOUTH);
+
+                background.y += background.height;
+                background.height = rect.height - 2 - background.height;
+                dc.GradientFillLinear(background, wxColour(237, 237, 255),
+                    wxColour(210, 210, 255), wxSOUTH);
+            }
+            {
+                wxPoint border_points[8];
+                border_points[0] = wxPoint(2, 0);
+                border_points[1] = wxPoint(1, 1);
+                border_points[2] = wxPoint(1, rect.height - 4);
+                border_points[3] = wxPoint(3, rect.height - 2);
+                border_points[4] = wxPoint(rect.width - 4, rect.height - 2);
+                border_points[5] = wxPoint(rect.width - 2, rect.height - 4);
+                border_points[6] = wxPoint(rect.width - 2, 1);
+                border_points[7] = wxPoint(rect.width - 4, -1);
+
+                dc.SetPen(wxPen(wxColour(185, 185, 247)));
+                dc.DrawLines(sizeof(border_points)/sizeof(wxPoint), border_points, rect.x, rect.y);
+            }
+        }
+
+        dc.SetFont( renderingDatas.GetItalicFont() );
+        dc.DrawText( _("Pas de conditions"), renderingDatas.GetOrigineX() + 2, renderingDatas.GetOrigineY() + 1 );
+    }
+    else
+    {
+        //Draw Conditions rectangle
+
+        wxRect rect(renderingDatas.GetOrigineX(),
+                         renderingDatas.GetOrigineY(),
+                         renderingDatas.GetConditionsColumnWidth()-renderingDatas.GetOrigineX(),
+                         GetConditionsHeight());
+        {
+            wxRect background(rect);
+            background.x += 2;
+            background.width -= 4;
+            background.height -= 2;
+
+            background.height = 3;
+            dc.GradientFillLinear(background, wxColour(216, 229, 231),
+                wxColour(176, 189, 201), wxSOUTH);
+
+            background.y += background.height;
+            background.height = rect.height - 2 - background.height;
+            dc.GradientFillLinear(background, wxColour(242, 242, 255),
+                wxColour(210, 210, 255), wxSOUTH);
+        }
+        {
+            wxPoint border_points[8];
+            border_points[0] = wxPoint(2, 0);
+            border_points[1] = wxPoint(1, 1);
+            border_points[2] = wxPoint(1, rect.height - 4);
+            border_points[3] = wxPoint(3, rect.height - 2);
+            border_points[4] = wxPoint(rect.width - 4, rect.height - 2);
+            border_points[5] = wxPoint(rect.width - 2, rect.height - 4);
+            border_points[6] = wxPoint(rect.width - 2, 1);
+            border_points[7] = wxPoint(rect.width - 4, -1);
+
+            dc.SetPen(wxPen(wxColour(185, 185, 247)));
+            dc.DrawLines(sizeof(border_points)/sizeof(wxPoint), border_points, rect.x, rect.y);
+        }
+
+        //Draw each conditions
         int indentWidth = 0;
         yCondition += 1;
         for ( unsigned int j = 0;j < event.conditions.size();j++ )
         {
             const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(event.conditions[j].GetType());
 
-            //Petit texte "ou" si besoin
+            //"OR" text if needed
             if ( event.type == "OR" && j != 0 )
             {
-                dc.SetFont( wxFont( 5, wxDEFAULT, wxFONTSTYLE_ITALIC, wxNORMAL ) );
-                dc.DrawText(_("ou"), origineX + indentWidth + sideSeparation, yCondition );
+                dc.SetFont( renderingDatas.GetItalicSmallFont() );
+                dc.DrawText(_("ou"), renderingDatas.GetOrigineX() + indentWidth + sideSeparation, yCondition );
                 yCondition += 9;
             }
 
-            //Icones
+            //Draw needed icons
             int leftIconsWidth = 0;
             if ( event.conditions[j].IsInverted() )
             {
-                dc.DrawBitmap( wxBitmap( "res/contraire.png", wxBITMAP_TYPE_ANY ), origineX + indentWidth + sideSeparation + leftIconsWidth, yCondition, true );
+                dc.DrawBitmap( wxBitmap( "res/contraire.png", wxBITMAP_TYPE_ANY ), renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth, yCondition, true );
                 leftIconsWidth += 18;
             }
             if ( !event.conditions[j].IsLocal() )
             {
-                dc.DrawBitmap( wxBitmap( "res/global.png", wxBITMAP_TYPE_ANY ), origineX + indentWidth + sideSeparation + leftIconsWidth, yCondition, true );
+                dc.DrawBitmap( wxBitmap( "res/global.png", wxBITMAP_TYPE_ANY ), renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth, yCondition, true );
                 leftIconsWidth += 18;
             }
 
-            //Largeur libre pour le texte
-            int freeWidth = (conditionsColumnWidth - origineX) - leftIconsWidth - indentWidth - iconWidth - sideSeparation*2;
+            //Get the width available
+            int freeWidth = (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) - leftIconsWidth - indentWidth - iconWidth - sideSeparation*2;
             freeWidth = freeWidth <= 0 ? 1 : freeWidth;
-            htmlRenderer.SetSize(freeWidth, 9999);
+            renderingDatas.GetHTMLRenderer().SetSize(freeWidth, 9999);
 
             yCondition += separation;
 
-            //Image
-            dc.DrawBitmap( instructionInfos.smallicon, origineX + indentWidth + sideSeparation + leftIconsWidth, yCondition, true );
+            if ( event.conditions[j].selected )
+            {
+                dc.SetBrush(renderingDatas.GetSelectedRectangleFillBrush());
+                dc.SetPen(renderingDatas.GetSelectedRectangleOutlinePen());
+                dc.DrawRectangle(renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth + iconWidth,
+                                 yCondition,
+                                 renderingDatas.GetConditionsColumnWidth()-(renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth + iconWidth),
+                                 event.conditions[j].renderedHeight);
+            }
 
-            //Calcul de la hauteur prise par le texte
+            //Draw the condition icon
+            dc.DrawBitmap( instructionInfos.smallicon, renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth, yCondition, true );
+
+            //Draw the condition text
             string TexteFinal = TranslateCondition::Translate(event.conditions[j], instructionInfos,  false, true);
-            htmlRenderer.SetHtmlText(TexteFinal);
+            renderingDatas.GetHTMLRenderer().SetHtmlText(TexteFinal);
             wxArrayInt neededArray;
-            htmlRenderer.Render(origineX + indentWidth + sideSeparation + leftIconsWidth + iconWidth, yCondition, neededArray);
+            renderingDatas.GetHTMLRenderer().Render(renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth + iconWidth, yCondition, neededArray);
 
-            yCondition += htmlRenderer.GetTotalHeight()+separation+1;
+            yCondition += renderingDatas.GetHTMLRenderer().GetTotalHeight()+separation+1;
 
             //Indentation
             if ( event.conditions[j].GetType() == "Repeat" ||
@@ -142,43 +256,56 @@ void EventRenderer::Render() const
         yCondition += 3;
     }
 
-    int yAction = origineY;
+    //Draw actions
+    int yAction = renderingDatas.GetOrigineY();
     if ( event.actions.empty() )
     {
-        dc.SetFont( wxFont( 8, wxDEFAULT, wxFONTSTYLE_ITALIC, wxNORMAL ) );
-        dc.DrawText( _("Pas d'actions"), origineX + (conditionsColumnWidth - origineX) + 2, origineY +1 );
+        dc.SetFont( renderingDatas.GetItalicFont() );
+        dc.DrawText( _("Pas d'actions"), renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + 2, renderingDatas.GetOrigineY() +1 );
     }
     else
     {
+        //Draw each actions
         int indentWidth = 0;
         yAction += 1;
         for ( unsigned int j = 0;j < event.actions.size();j++ )
         {
             const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(event.actions[j].GetType());
 
-            //Largeur prise par les icones
+            //Draw global icon, if needed.
             int leftIconsWidth = 0;
             if ( !event.actions[j].IsLocal() )
             {
-                dc.DrawBitmap( wxBitmap( "res/global.png", wxBITMAP_TYPE_ANY ), origineX + (conditionsColumnWidth - origineX) + indentWidth + sideSeparation + leftIconsWidth, yAction, true );
+                dc.DrawBitmap( wxBitmap( "res/global.png", wxBITMAP_TYPE_ANY ), renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + sideSeparation + leftIconsWidth, yAction, true );
                 leftIconsWidth += 18;
             }
 
-            //Largeur libre pour le texte
-            int freeWidth = editorWidth - (conditionsColumnWidth - origineX) - leftIconsWidth - indentWidth - iconWidth - origineX - sideSeparation*2;
+            //Get the width available
+            int freeWidth = renderingDatas.GetRenderZoneWidth() - (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) - leftIconsWidth - indentWidth - iconWidth - renderingDatas.GetOrigineX() - sideSeparation*2;
             freeWidth = freeWidth <= 0 ? 1 : freeWidth;
-            htmlRenderer.SetSize(freeWidth, 9999);
+            renderingDatas.GetHTMLRenderer().SetSize(freeWidth, 9999);
 
+            //Draw the bitmap of the action
             yAction += separation;
 
-            dc.DrawBitmap( instructionInfos.smallicon, origineX + (conditionsColumnWidth - origineX) + indentWidth + sideSeparation + leftIconsWidth, yAction, true );
+            if ( event.actions[j].selected )
+            {
+                dc.SetBrush(renderingDatas.GetSelectedRectangleFillBrush());
+                dc.SetPen(renderingDatas.GetSelectedRectangleOutlinePen());
+                dc.DrawRectangle(renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + leftIconsWidth + iconWidth + sideSeparation,
+                                 yAction,
+                                 renderingDatas.GetRenderZoneWidth() - (renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + leftIconsWidth + iconWidth + sideSeparation),
+                                 event.actions[j].renderedHeight);
+            }
 
-            //Calcul de la hauteur prise par le texte
-            htmlRenderer.SetHtmlText(TranslateAction::Translate( event.actions[j], instructionInfos, false, true ));
+            dc.DrawBitmap( instructionInfos.smallicon, renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + sideSeparation + leftIconsWidth, yAction, true );
+
+            //Draw the action text
+            renderingDatas.GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( event.actions[j], instructionInfos, false, true ));
             wxArrayInt neededArray;
-            htmlRenderer.Render(origineX + (conditionsColumnWidth - origineX) + indentWidth + leftIconsWidth + iconWidth + sideSeparation, yAction, neededArray);
+            renderingDatas.GetHTMLRenderer().Render(renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + leftIconsWidth + iconWidth + sideSeparation, yAction, neededArray);
 
-            yAction += htmlRenderer.GetTotalHeight()+separation+1;
+            yAction += renderingDatas.GetHTMLRenderer().GetTotalHeight()+separation+1;
 
             //Indentation
             if ( event.actions[j].GetType() == "Repeat" ||
@@ -219,8 +346,8 @@ int EventRenderer::GetConditionsHeight() const
         else
         {
             //La classe de rendu de HTML
-            htmlRenderer.SetDC(&dc); //On a besoin du même DC que pour le rendu
-            htmlRenderer.SetStandardFonts( 8 );
+            renderingDatas.GetHTMLRenderer().SetDC(&dc); //On a besoin du même DC que pour le rendu
+            renderingDatas.GetHTMLRenderer().SetStandardFonts( 8 );
             const int iconWidth = 18;
 
             int yCondition = 0;
@@ -243,15 +370,18 @@ int EventRenderer::GetConditionsHeight() const
                     leftIconsWidth += 18;
 
                 //Largeur libre pour le texte
-                int freeWidth = (conditionsColumnWidth - origineX) - leftIconsWidth - indentWidth - iconWidth - sideSeparation*2;
+                int freeWidth = (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) - leftIconsWidth - indentWidth - iconWidth - sideSeparation*2;
                 freeWidth = freeWidth <= 0 ? 1 : freeWidth;
-                htmlRenderer.SetSize(freeWidth, 9999);
+                renderingDatas.GetHTMLRenderer().SetSize(freeWidth, 9999);
 
                 yCondition += separation;
 
                 //Calcul de la hauteur prise par le texte
-                htmlRenderer.SetHtmlText(TranslateCondition::Translate(event.conditions[j], instructionInfos, false, true));
-                yCondition += htmlRenderer.GetTotalHeight()+separation+1;
+                renderingDatas.GetHTMLRenderer().SetHtmlText(TranslateCondition::Translate(event.conditions[j], instructionInfos, false, true));
+                yCondition += renderingDatas.GetHTMLRenderer().GetTotalHeight()+separation+1;
+
+                event.conditions[j].renderedHeight = renderingDatas.GetHTMLRenderer().GetTotalHeight();
+                event.conditions[j].renderedHeightNeedUpdate = false;
 
                 //Indentation
                 if ( event.conditions[j].GetType() == "Repeat" ||
@@ -287,8 +417,8 @@ int EventRenderer::GetActionsHeight() const
         else
         {
             //La classe de rendu de HTML
-            htmlRenderer.SetDC(&dc); //On a besoin du même DC que pour le rendu
-            htmlRenderer.SetStandardFonts( 8 );
+            renderingDatas.GetHTMLRenderer().SetDC(&dc); //On a besoin du même DC que pour le rendu
+            renderingDatas.GetHTMLRenderer().SetStandardFonts( 8 );
             const int iconWidth = 18;
 
             int yAction = 0;
@@ -304,15 +434,18 @@ int EventRenderer::GetActionsHeight() const
                     leftIconsWidth += 18;
 
                 //Largeur libre pour le texte
-                int freeWidth = editorWidth - (conditionsColumnWidth - origineX) - leftIconsWidth - indentWidth - iconWidth - origineX - sideSeparation*2;
+                int freeWidth = renderingDatas.GetRenderZoneWidth() - (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) - leftIconsWidth - indentWidth - iconWidth - renderingDatas.GetOrigineX() - sideSeparation*2;
                 freeWidth = freeWidth <= 0 ? 1 : freeWidth;
-                htmlRenderer.SetSize(freeWidth, 9999);
+                renderingDatas.GetHTMLRenderer().SetSize(freeWidth, 9999);
 
                 yAction += separation;
 
                 //Calcul de la hauteur prise par le texte
-                htmlRenderer.SetHtmlText(TranslateAction::Translate( event.actions[j], instructionInfos, false, true ));
-                yAction += htmlRenderer.GetTotalHeight()+separation+1;
+                renderingDatas.GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( event.actions[j], instructionInfos, false, true ));
+                yAction += renderingDatas.GetHTMLRenderer().GetTotalHeight()+separation+1;
+
+                event.actions[j].renderedHeight = renderingDatas.GetHTMLRenderer().GetTotalHeight();
+                event.actions[j].renderedHeightNeedUpdate = false;
 
                 //Indentation
                 if ( event.actions[j].GetType() == "Repeat" ||

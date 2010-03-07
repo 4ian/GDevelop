@@ -60,7 +60,7 @@ Credits::Credits(wxWindow* parent)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
-
+	
 	Create(parent, wxID_ANY, _("A propos de Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxSize(271,351));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -110,7 +110,7 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer11->AddGrowableCol(0);
 	FlexGridSizer11->AddGrowableRow(0);
-	TextCtrl1 = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("· Game Develop\n\nGame Develop est un freeware, il est donc gratuit.\nSi vous l\'avez payé, autrement que par un don à l\'auteur, nous vous recommandons d\'obtenir un remboursement.\n\nVous pouvez :\n\n-L\'utiliser dans n\'importe quel cadre ( personnel, professionel ).\n-Distribuer l\'éditeur à toutes les personnes que vous connaissez ou autre : \n\t-avec son programme d\'installation et gratuitement.\n\t-en ne vous appropriant pas le fait d\'être l\'auteur du programme.\n\nVous ne devez pas :\n\n-Le faire payer\n-Le décompiler\n-Le distribuer sans son programme d\'installation ou sans tout les fichiers.\n-Vous approprier le fait d\'être l\'auteur du programme.\n\nVous pouvez en obtenant une autorisation de l\'auteur :\n\n-Distribuer le programme sur un CD-Rom, sur un magazine / presse écrite.\n-Ecrire un article sur Game Develop dans un magazine / presse écrite.\n\nL\'auteur acceptera généralement ces demandes, mais nécessite quand même une demande d\'autorisation.\n\n· Jeux créés avec Game Develop\n\n-L\'auteur de Game Develop n\'est aucunement lié et n\'est pas responsable des jeux créés avec le logiciel.\n-Vous ne devez aucune royalties à l\'auteur de Game Develop. Une mention serait appréciée mais n\'est pas obligatoire.\n-Vous êtes libres de distribuer votre jeu sous n\'importe qu\'elle forme ( Shareware, freeware... )\n\n· Pour plus d\'informations\n\nPour toutes question ou autre :\nContactez-nous : CompilGames@gmail.com\nAllez sur notre site web : www.compilgames.net\n"), wxDefaultPosition, wxSize(272,51), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	TextCtrl1 = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("·Game Develop\n\nGame Develop est un freeware, il est donc totalement gratuit.\n\n-Vous pouvez utiliser le logiciel pour n\'importe quelle utilisation, personnelle ou commerciale.\n-Le logiciel est livré \"tel quel\", sans aucune garantie.\n-Vous pouvez distribuer le logiciel tant que vous ne demandez pas d\'argent pour, que vous ne dites pas que vous en êtes l\'auteur, et tant que vous distribuez le logiciel entier avec son programme d\'installation.\n-Vous ne devez pas tenter de décompiler le programme.\n\n·Jeux créés avec Game Develop\n\n-L\'auteur de Game Develop n\'est aucunement lié aux jeux créés avec Game Develop.\n-Vous n\'êtes pas obligé de mentionner l\'utilisation de Game Develop dans votre jeu. Une mention sera appréciée, mais n\'est pas obligatoire.\n\n·Si vous avez des questions\n\nContactez l\'auteur : CompilGames@gmail.com\nAller sur le site officiel : http://www.compilgames.net"), wxDefaultPosition, wxSize(272,51), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer11->Add(TextCtrl1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel2->SetSizer(FlexGridSizer11);
 	FlexGridSizer11->Fit(Panel2);
@@ -158,7 +158,7 @@ Credits::Credits(wxWindow* parent)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->SetSizeHints(this);
 	Center();
-
+	
 	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCompilGamesBtClick);
 	Connect(ID_BITMAPBUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnDonBtClick);
 	Connect(ID_BITMAPBUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCppBtClick);

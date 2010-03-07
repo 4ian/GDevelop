@@ -25,7 +25,6 @@
 #include "GDL/Object.h"
 #include "GDL/Chercher.h"
 #include "GDL/StdAlgo.h"
-#include "GDL/needReload.h"
 #include "MemTrace.h"
 #include "Clipboard.h"
 #include <algorithm>

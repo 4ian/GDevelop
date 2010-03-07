@@ -28,8 +28,6 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include "dlib/compress_stream.h"
-#include "dlib/base64.h"
 
 
 #include "GDL/AES.h"
@@ -49,7 +47,6 @@
 
 
 using namespace std;
-using namespace dlib;
 
 //(*IdInit(Compilation)
 const long Compilation::ID_STATICBITMAP3 = wxNewId();
@@ -324,7 +321,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     StaticText3->SetLabel( "Compilation du jeu..." );
     StaticText2->SetLabel( "Etape 1 sur 3" );
     OpenSaveGame saveGame( Jeu );
-    saveGame.SaveToFile(static_cast<string>( repTemp + "/compil.jgd" ));
+    saveGame.SaveToFile(static_cast<string>( repTemp + "/compil.gdg" ));
     AvancementGauge->SetValue(70);
 
     wxSafeYield();
@@ -332,7 +329,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 
     //Création du fichier source
     {
-        ifstream ifile(repTemp+"/compil.jgd",ios_base::binary);
+        ifstream ifile(repTemp+"/compil.gdg",ios_base::binary);
         ofstream ofile(repTemp+"/src",ios_base::binary);
 
         // get file size
@@ -363,7 +360,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         ofile.close();
         ifile.close();
 	}
-    wxRemoveFile( repTemp + "/compil.jgd" );
+    wxRemoveFile( repTemp + "/compil.gdg" );
     AvancementGauge->SetValue(80);
 
     OpenSaveLoadingScreen saveLS(Jeu.loadingScreen);

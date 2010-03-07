@@ -113,9 +113,16 @@ bool Game_Develop_EditorApp::OnInit()
 #endif
 #ifdef WINDOWS
     string exeDirectory = argv[0]; //Make sure current working directory is executable directory.
-    exeDirectory = exeDirectory.substr( 0, exeDirectory.find_last_of( "\\" ) );
+    unsigned int backslashpos = exeDirectory.find_last_of( "\\" );
+    if ( backslashpos > exeDirectory.length() ) backslashpos = 0;
+    unsigned int slashpos = exeDirectory.find_last_of( "/" );
+    if ( slashpos > exeDirectory.length() ) slashpos = 0;
+
+    exeDirectory = exeDirectory.substr( 0, slashpos > backslashpos ? slashpos : backslashpos );
     chdir( exeDirectory.c_str() );
 #endif
+
+    cout << exeDirectory;
 
     //(*AppInitialize
     bool wxsOK = true;
@@ -172,8 +179,8 @@ bool Game_Develop_EditorApp::OnInit()
     if ( wxFileExists("errordetect.dat") )
     {
         BugReport dialog(NULL);
-        if ( dialog.ShowModal() == 1 && wxFileExists("recup.jgd"))
-            fileToOpen = "recup.jgd";
+        if ( dialog.ShowModal() == 1 && wxFileExists("recup1.gdg"))
+            fileToOpen = "recup1.gdg";
     }
 
     //Creating the console Manager
@@ -223,7 +230,7 @@ bool Game_Develop_EditorApp::OnInit()
             Demarrage bienvenue( NULL );
             if ( bienvenue.ShowModal() == 1 )
             {
-                wxFileDialog open( NULL, _( "Ouvrir un exemple" ), "Exemples/", "", "Jeu Game Develop (*.jgd)|*.jgd" );
+                wxFileDialog open( NULL, _( "Ouvrir un exemple" ), "Exemples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
                 open.ShowModal();
 
                 fileToOpen = static_cast<string>( open.GetPath() );
@@ -304,7 +311,7 @@ void Game_Develop_EditorApp::OnUnhandledException()
         for (unsigned int i = 0;i<Frame->games.size();++i)
         {
             OpenSaveGame save(*Frame->games[i]);
-            save.SaveToFile("recup"+toString(i)+".jgd");
+            save.SaveToFile("recup"+toString(i)+".gdg");
         }
 
     }
@@ -330,7 +337,7 @@ bool Game_Develop_EditorApp::OnExceptionInMainLoop()
         for (unsigned int i = 0;i<Frame->games.size();++i)
         {
             OpenSaveGame save(*Frame->games[i]);
-            save.SaveToFile("recup"+toString(i)+".jgd");
+            save.SaveToFile("recup"+toString(i)+".gdg");
         }
     }
     catch(...)

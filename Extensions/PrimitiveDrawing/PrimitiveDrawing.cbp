@@ -299,9 +299,6 @@
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="\home\florian\Programmation\libs\dlib-17.12\" />
-					<Add directory="\home\florian\Programmation\libs\nwidgets\" />
-					<Add directory="\home\florian\Programmation\libs\fparser\" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
@@ -330,7 +327,6 @@
 			<Add directory="..\..\GDL" />
 			<Add directory="C:\Libs\SFML\include" />
 			<Add directory="C:\Libs\boost_1_38_0" />
-			<Add directory="C:\Libs\fparser" />
 		</Compiler>
 		<Linker>
 			<Add directory="C:\Libs\SFML\lib\mingw" />

@@ -1,0 +1,61 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - array_sort_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_ARRAY_SORt_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_ARRAY_SORt_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='array_kernel_abstract.h.html'>array_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> array_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='array_sort'></a>array_sort</b> : <font color='#0000FF'>public</font> array_base
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON ARRAY_BASE
+                must be an implementation of array/array_kernel_abstract.h 
+
+            POINTERS AND REFERENCES
+                sort() may invalidate pointers and references to internal data.
+
+            WHAT THIS EXTENSION DOES FOR ARRAY
+                This gives an array the ability to sort its contents by calling sort().
+        !*/</font>
+
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='sort'></a>sort</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - for all elements in #*this the ith element is &lt;= the i+1 element
+                    - #at_start() == true
+                throws
+                    - std::bad_alloc or any exception thrown by T's constructor
+                        data may be lost if sort() throws
+            !*/</font>
+
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> array_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        array_sort<font color='#5555FF'>&lt;</font>array_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        array_sort<font color='#5555FF'>&lt;</font>array_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ARRAY_SORt_ABSTRACT_
+</font>
+
+</pre></body></html>

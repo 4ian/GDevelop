@@ -1,0 +1,146 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - tester.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_TESTEr_
+<font color='#0000FF'>#define</font> DLIB_TESTEr_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>map.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>logger.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>assert.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>dlib<font color='#5555FF'>/</font>algs.h<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>typeinfo<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#ifdef</font>  __INTEL_COMPILER
+<font color='#009900'>// ignore the bogus warning about not overloading perform_test() all the way
+</font><font color='#0000FF'>#pragma</font> warning <font face='Lucida Console'>(</font>disable: <font color='#979000'>654</font><font face='Lucida Console'>)</font>
+<font color='#0000FF'>#endif</font>
+
+
+
+<font color='#0000FF'>namespace</font> test
+<b>{</b>
+    <font color='#0000FF'>class</font> tester;
+    <font color='#0000FF'>typedef</font> dlib::map<font color='#5555FF'>&lt;</font>std::string,tester<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::kernel_1a_c map_of_testers;
+
+    map_of_testers<font color='#5555FF'>&amp;</font> <b><a name='testers'></a>testers</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>;
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='print_spinner'></a>print_spinner</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - reprints the spinner
+    !*/</font>
+
+<font color='#009900'>// -----------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='tester'></a>tester</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a generic regression test.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <b><a name='tester'></a>tester</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> switch_name,
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> description_,
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_of_args_ <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - testers().is_in_domain(switch_name) == false
+            ensures
+                - #cmd_line_switch() == switch_name
+                - #description() == description_
+                - #num_of_args() == num_of_args_
+                - adds this tester to the testers() map.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> ~<b><a name='tester'></a>tester</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font><b>{</b><b>}</b>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='cmd_line_switch'></a>cmd_line_switch</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the name of the command line switch for this tester.
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> <b><a name='description'></a>description</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the description of what this tester tests.
+        !*/</font>
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='num_of_args'></a>num_of_args</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of arguments this test expects
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is invoked when number_of_args() == 0
+            ensures
+                - performs the test and throws an exception 
+                  derived from std::exception if the test fails.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> arg 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is invoked when number_of_args() == 1
+            ensures
+                - performs the test and throws an exception 
+                  derived from std::exception if the test fails.
+        !*/</font>
+
+        <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='perform_test'></a>perform_test</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> arg1, 
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> arg2 
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - is invoked when number_of_args() == 2
+            ensures
+                - performs the test and throws an exception 
+                  derived from std::exception if the test fails.
+        !*/</font>
+
+    <font color='#0000FF'>private</font>:
+
+    <font color='#009900'>// ---------------------------------------------------------------------------
+</font>    <font color='#009900'>//             Implementation Details
+</font>    <font color='#009900'>// ---------------------------------------------------------------------------
+</font>
+        <font color='#009900'>/*!
+            CONVENTION
+                - switch_name == cmd_line_switch()
+                - description_ == description()
+                - num_of_args_ == num_of_args()
+                - test::tester[switch_name] == this
+        !*/</font>
+
+        <font color='#0000FF'>const</font> std::string switch_name;
+        <font color='#0000FF'>const</font> std::string description_;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> num_of_args_;
+    <b>}</b>;
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_TESTEr_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,133 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - server_http_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+
+    This example illustrates the use of the HTTP extension to the server object 
+    from the dlib C++ Library.
+    It creates a server that always responds with a simple HTML form.
+
+    To view the page this program displays you should go to http://localhost:5000
+
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/server.h.html'>dlib/server.h</a>"
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#0000FF'>class</font> <b><a name='web_server'></a>web_server</b> : <font color='#0000FF'>public</font> server::http_1a_c
+<b>{</b>
+    <font color='#0000FF'><u>void</u></font> <b><a name='on_request'></a>on_request</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> path,
+        std::string<font color='#5555FF'>&amp;</font> result,
+        <font color='#0000FF'>const</font> map_type<font color='#5555FF'>&amp;</font> queries,
+        <font color='#0000FF'>const</font> map_type<font color='#5555FF'>&amp;</font> cookies,
+        queue_type<font color='#5555FF'>&amp;</font> new_cookies,
+        <font color='#0000FF'>const</font> map_type<font color='#5555FF'>&amp;</font> incoming_headers,
+        map_type<font color='#5555FF'>&amp;</font> response_headers,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> foreign_ip,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> local_ip,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> foreign_port,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>short</u></font> local_port
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            ostringstream sout;
+            <font color='#009900'>// We are going to send back a page that contains an HTML form with two text input fields.
+</font>            <font color='#009900'>// One field called name.  The HTML form uses the post method but could also use the get
+</font>            <font color='#009900'>// method (just change method='post' to method='get').
+</font>            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> &lt;html&gt; &lt;body&gt; </font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;form action='/form_handler' method='post'&gt; </font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>User Name: &lt;input name='user' type='text'&gt;&lt;br&gt;  </font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>User password: &lt;input name='pass' type='text'&gt; &lt;input type='submit'&gt; </font>"
+                <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> &lt;/form&gt;</font>"; 
+
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;br&gt;  path = </font>"         <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> path <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;br&gt;  foreign_ip = </font>"   <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> foreign_ip <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;br&gt;  foreign_port = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> foreign_port <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;br&gt;  local_ip = </font>"     <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> local_ip <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;br&gt;  local_port = </font>"   <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> local_port <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+            <font color='#009900'>// If this request is the result of the user submitting the form then echo back
+</font>            <font color='#009900'>// the submission.
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>path <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'>/form_handler</font>"<font face='Lucida Console'>)</font>
+            <b>{</b>
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;h2&gt; Stuff from the query string &lt;/h2&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;br&gt;  user = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> queries["<font color='#CC0000'>user</font>"] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;br&gt;  pass = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> queries["<font color='#CC0000'>pass</font>"] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+                <font color='#009900'>// save these form submissions as cookies.  
+</font>                string cookie;
+                cookie <font color='#5555FF'>=</font> "<font color='#CC0000'>user=</font>" <font color='#5555FF'>+</font> queries["<font color='#CC0000'>user</font>"]; 
+                new_cookies.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>cookie<font face='Lucida Console'>)</font>;
+                cookie <font color='#5555FF'>=</font> "<font color='#CC0000'>pass=</font>" <font color='#5555FF'>+</font> queries["<font color='#CC0000'>pass</font>"]; 
+                new_cookies.<font color='#BB00BB'>enqueue</font><font face='Lucida Console'>(</font>cookie<font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+
+            <font color='#009900'>// Echo any cookies back to the client browser 
+</font>            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;h2&gt;Cookies we got back from the server&lt;/h2&gt;</font>";
+            cookies.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>cookies.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;br/&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cookies.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> cookies.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <b>}</b>
+
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;br/&gt;&lt;br/&gt;</font>";
+
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;h2&gt;HTTP Headers we sent to the server&lt;/h2&gt;</font>";
+            <font color='#009900'>// Echo out all the HTTP headers we received from the client web browser
+</font>            incoming_headers.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>incoming_headers.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;br/&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> incoming_headers.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> incoming_headers.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+            <b>}</b>
+
+
+            sout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&lt;/body&gt; &lt;/html&gt;</font>";
+
+            result <font color='#5555FF'>=</font> sout.<font color='#BB00BB'>str</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+    <b>}</b>
+
+<b>}</b>;
+
+<font color='#009900'>// create an instance of our web server
+</font>web_server our_web_server;
+
+<font color='#0000FF'><u>void</u></font> <b><a name='thread'></a>thread</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Press enter to end this program</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    cin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// this will cause the server to shut down which will in turn cause 
+</font>    <font color='#009900'>// our_web_server.start() to unblock and thus the main() function will terminate.
+</font>    our_web_server.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+<b>}</b>
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#0000FF'>try</font>
+    <b>{</b>
+        <font color='#009900'>// create a thread that will listen for the user to end this program
+</font>        thread_function <font color='#BB00BB'>t</font><font face='Lucida Console'>(</font>thread<font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// make it listen on port 5000
+</font>        our_web_server.<font color='#BB00BB'>set_listening_port</font><font face='Lucida Console'>(</font><font color='#979000'>5000</font><font face='Lucida Console'>)</font>;
+        our_web_server.<font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+    <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>exception<font color='#5555FF'>&amp;</font> e<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> e.<font color='#BB00BB'>what</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>
+
+
+</pre></body></html>

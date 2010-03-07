@@ -1,0 +1,99 @@
+<html><head><title>
+dlib/test/CMakeLists.txt
+</title></head><body bgcolor='white'><pre>
+<font color='#009900'>#</font>
+<font color='#009900'># This is a CMake makefile.  You can find the cmake utility and</font>
+<font color='#009900'># information about it at http://www.cmake.org</font>
+<font color='#009900'>#</font>
+
+<font color='#009900'># setting this makes CMake allow normal looking IF ELSE statements</font>
+<font color='blue'>SET</font>(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+<font color='blue'>cmake_minimum_required</font>(VERSION 2.4)
+<font color='blue'>if</font>(COMMAND cmake_policy)
+<font color='blue'>   cmake_policy</font>(SET CMP0003 NEW)
+<font color='blue'>endif</font>(COMMAND cmake_policy)
+
+<font color='#009900'># This variable contains a list of all the tests we are building</font>
+<font color='#009900'># into the regression test suite.</font>
+<font color='blue'>set </font>(tests
+   example.cpp
+   example_args.cpp
+   array2d.cpp
+   array.cpp
+   base64.cpp
+   bayes_nets.cpp
+   bigint.cpp
+   binary_search_tree_kernel_1a.cpp
+   binary_search_tree_kernel_2a.cpp
+   binary_search_tree_mm1.cpp
+   binary_search_tree_mm2.cpp
+   cmd_line_parser.cpp
+   cmd_line_parser_wchar_t.cpp
+   compress_stream.cpp
+   conditioning_class.cpp
+   conditioning_class_c.cpp
+   config_reader.cpp
+   directed_graph.cpp
+   graph.cpp
+   geometry.cpp
+   entropy_coder.cpp
+   entropy_encoder_model.cpp
+   hash_map.cpp
+   hash_set.cpp
+   hash_table.cpp
+   image.cpp
+   lz77_buffer.cpp
+   map.cpp
+   matrix.cpp
+   md5.cpp
+   member_function_pointer.cpp
+   metaprogramming.cpp
+   multithreaded_object.cpp
+   optimization.cpp
+   pipe.cpp
+   pixel.cpp
+   queue.cpp
+   rand.cpp
+   reference_counter.cpp
+   sequence.cpp
+   serialize.cpp
+   set.cpp
+   sliding_buffer.cpp
+   smart_pointers.cpp
+   sockets.cpp
+   sockstreambuf.cpp
+   stack.cpp
+   static_map.cpp
+   static_set.cpp
+   string.cpp
+   svm.cpp
+   threads.cpp
+   timer.cpp
+   tokenizer.cpp
+   tuple.cpp
+   )
+
+<font color='#009900'># create a variable called target_name and set it to the string "<font color='#CC0000'>test</font>"</font>
+<font color='blue'>set </font>(target_name test)
+
+<font color='blue'>PROJECT</font>(${<font color='#BB00BB'>target_name</font>})
+
+<font color='#009900'># add all the cpp files we want to compile to this list.  This tells</font>
+<font color='#009900'># cmake that they are part of our target (which is the executable named test)</font>
+<font color='blue'>ADD_EXECUTABLE</font>(${<font color='#BB00BB'>target_name</font>} main.cpp tester.cpp ${<font color='#BB00BB'>tests</font>})
+
+<font color='#009900'># add the folder containing the dlib folder to the include path</font>
+<font color='blue'>INCLUDE_DIRECTORIES</font>(../..)
+
+<font color='#009900'># There is a CMakeLists.txt file in the dlib source folder that tells cmake</font>
+<font color='#009900'># how to build the dlib library.  Tell cmake about that file.</font>
+<font color='blue'>add_subdirectory</font>(.. <a href='../CMakeLists.txt.html'>dlib_build</a>)
+
+<font color='blue'>if </font>(NOT DLIB_NO_GUI_SUPPORT)
+<font color='blue'>   add_subdirectory</font>(gui)<a href='gui)/CMakeLists.txt.html'></a>
+<font color='blue'>endif</font>()
+
+<font color='#009900'># Tell cmake to link our target executable to the non-gui version of the dlib</font>
+<font color='#009900'># library.  </font>
+<font color='blue'>TARGET_LINK_LIBRARIES</font>(${<font color='#BB00BB'>target_name</font>} dlib )
+

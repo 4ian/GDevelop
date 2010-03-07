@@ -1,0 +1,161 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - crc32_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_CRC32_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_CRC32_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='crc32_kernel_abstract.h.html'>crc32_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>class</font> <b><a name='crc32_kernel_1'></a>crc32_kernel_1</b> 
+    <b>{</b>
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                checksum == 0xFFFFFFFF
+                table == crc table
+
+            CONVENTION
+                get_checksum() == checksum ^ 0xFFFFFFFF
+                table == crc table
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+
+        <font color='#0000FF'>inline</font> <b><a name='crc32_kernel_1'></a>crc32_kernel_1</b> <font face='Lucida Console'>(</font>        
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'>virtual</font> ~<b><a name='crc32_kernel_1'></a>crc32_kernel_1</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='get_checksum'></a>get_checksum</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+        <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            crc32_kernel_1<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> checksum;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> table[<font color='#979000'>256</font>];
+
+        <font color='#009900'>// restricted functions
+</font>        <b><a name='crc32_kernel_1'></a>crc32_kernel_1</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> crc32_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>        crc32_kernel_1<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> crc32_kernel_1<font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator
+</font>
+    <b>}</b>;    
+
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        crc32_kernel_1<font color='#5555FF'>&amp;</font> a, 
+        crc32_kernel_1<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>   
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    crc32_kernel_1::
+    <b><a name='crc32_kernel_1'></a>crc32_kernel_1</b> <font face='Lucida Console'>(</font>        
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        checksum <font color='#5555FF'>=</font> <font color='#979000'>0xFFFFFFFF</font>;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> temp;
+
+        <font color='#009900'>// fill out the crc table
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>256</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            temp <font color='#5555FF'>=</font> i;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> j <font color='#5555FF'>=</font> <font color='#979000'>0</font>; j <font color='#5555FF'>&lt;</font> <font color='#979000'>8</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>j<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>&amp;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>
+                    temp <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>temp<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>^<font color='#979000'>0xedb88320</font>;
+                <font color='#0000FF'>else</font>
+                    temp <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+            <b>}</b>
+            table[i] <font color='#5555FF'>=</font> temp;
+        <b>}</b>
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    crc32_kernel_1::
+    ~<b><a name='crc32_kernel_1'></a>crc32_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> crc32_kernel_1::
+    <b><a name='clear'></a>clear</b><font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        checksum <font color='#5555FF'>=</font> <font color='#979000'>0xFFFFFFFF</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> crc32_kernel_1::
+    <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>char</u></font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        checksum <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>checksum<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> ^ table[<font face='Lucida Console'>(</font>checksum^item<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFF</font>];
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> crc32_kernel_1::
+    <b><a name='add'></a>add</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font>std::string::size_type i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            checksum <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>checksum<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font><font color='#979000'>8</font><font face='Lucida Console'>)</font> ^ table[<font face='Lucida Console'>(</font>checksum^item[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font> <font color='#979000'>0xFF</font>];
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> crc32_kernel_1::
+    <b><a name='get_checksum'></a>get_checksum</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> checksum ^ <font color='#979000'>0xFFFFFFFF</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> crc32_kernel_1::
+    <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        crc32_kernel_1<font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>checksum,item.checksum<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CRC32_KERNEl_1_
+</font>
+
+</pre></body></html>

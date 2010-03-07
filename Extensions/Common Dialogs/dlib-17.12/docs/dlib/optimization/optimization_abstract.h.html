@@ -1,0 +1,298 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - optimization_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_OPTIMIZATIOn_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_OPTIMIZATIOn_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                    Functions that transform other functions  
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> central_differences;
+    <font color='#009900'>/*!
+        This is a function object that represents the derivative of some other
+        function. 
+
+        Note that if funct is a function of a double then the derivative of 
+        funct is just a double but if funct is a function of a dlib::matrix (i.e. a
+        function of many variables) then its derivative is a gradient vector.
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> central_differences<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font> <b><a name='derivative'></a>derivative</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'><u>double</u></font> eps
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - f == a function that returns a scalar
+            - f must take either double or a dlib::matrix that is a column vector
+            - eps &gt; 0
+        ensures
+            - returns a function that represents the derivative of the function f.  It
+              is approximated numerically by:
+                  (f(x+eps)-f(x-eps))/(2*eps)
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> central_differences<font color='#5555FF'>&lt;</font>funct<font color='#5555FF'>&gt;</font> <b><a name='derivative'></a>derivative</b><font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns derivative(f, 1e-7)
+    !*/</font>
+
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> line_search_funct; 
+    <font color='#009900'>/*!
+        This object is a function object that represents a line search function.
+
+        It represents a function with the signature:
+            double l(double x)
+    !*/</font>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> line_search_funct<font color='#5555FF'>&lt;</font>funct,T<font color='#5555FF'>&gt;</font> <b><a name='make_line_search_function'></a>make_line_search_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> start, 
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> direction
+    <font face='Lucida Console'>)</font>; 
+    <font color='#009900'>/*!
+        requires
+            - is_matrix&lt;T&gt;::value == true (i.e. T must be a dlib::matrix)
+            - f must take a dlib::matrix that is a column vector
+            - start.nc() == 1  
+            - direction.nc() == 1
+              (i.e. start and direction should be column vectors)
+            - f must return either a double or a column vector the same length and
+              type as start
+            - f(start + 1.5*direction) should be a valid expression
+        ensures
+            - if (f returns a double) then
+                - returns a line search function that computes l(x) == f(start + x*direction)
+            - else
+                - returns a line search function that computes l(x) == trans(f(start + x*direction))*direction
+                - We assume that f is the derivative of some other function and that what
+                  f returns is a gradient vector. 
+                  So the following two expressions both create the derivative of l(x): 
+                    - derivative(make_line_search_function(funct,start,direction))
+                    - make_line_search_function(derivative(funct),start,direction)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                    Functions that perform unconstrained optimization 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>double</u></font> <b><a name='poly_min_extrap'></a>poly_min_extrap</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>double</u></font> f0,
+        <font color='#0000FF'><u>double</u></font> d0,
+        <font color='#0000FF'><u>double</u></font> f1,
+        <font color='#0000FF'><u>double</u></font> d1
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - let c(x) be a 3rd degree polynomial such that:
+                - c(0) == f0
+                - c(1) == f1
+                - derivative of c(x) at x==0 is d0
+                - derivative of c(x) at x==1 is d1
+            - returns the point in the range [0,1] that minimizes the polynomial c(x) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>double</u></font> <b><a name='line_search'></a>line_search</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        <font color='#0000FF'><u>double</u></font> rho, 
+        <font color='#0000FF'><u>double</u></font> sigma, 
+        <font color='#0000FF'><u>double</u></font> minf,
+        <font color='#0000FF'><u>double</u></font><font color='#5555FF'>&amp;</font> f0_out
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 1 &gt; sigma &gt; rho &gt; 0
+            - f and der are scalar functions of scalars
+              (e.g. line_search_funct objects)
+            - der is the derivative of f
+        ensures
+            - returns a value alpha such that f(alpha) is
+              significantly closer to the minimum of f than f(0).
+            - bigger values of sigma result in a less accurate but faster line search
+            - f0_out == f(0)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_min_quasi_newton'></a>find_min_quasi_newton</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> min_f, 
+        <font color='#0000FF'><u>double</u></font> min_delta <font color='#5555FF'>=</font> <font color='#979000'>1</font>e<font color='#5555FF'>-</font><font color='#979000'>7</font> 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - min_delta &gt;= 0 
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of
+              f() at x.
+            - is_matrix&lt;T&gt;::value == true (i.e. T must be a dlib::matrix type)
+            - x.nc() == 1 (i.e. x must be a column vector)
+        ensures
+            - Performs an unconstrained minimization of the function f() using the BFGS 
+              quasi newton method.  The optimization stops when any of the following
+              conditions are satisfied: 
+                - the change in f() from one iteration to the next is less than min_delta
+                - f(#x) &lt;= min_f
+            - #x == the value of x that was found to minimize f()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_min_quasi_newton2'></a>find_min_quasi_newton2</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        T<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> min_f, 
+        <font color='#0000FF'><u>double</u></font> min_delta <font color='#5555FF'>=</font> <font color='#979000'>1</font>e<font color='#5555FF'>-</font><font color='#979000'>7</font>, 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> derivative_eps <font color='#5555FF'>=</font> <font color='#979000'>1</font>e<font color='#5555FF'>-</font><font color='#979000'>7</font> 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - min_delta &gt;= 0 
+            - derivative_eps &gt; 0 
+            - f(x) must be a valid expression that evaluates to a double
+            - is_matrix&lt;T&gt;::value == true (i.e. T must be a dlib::matrix type)
+            - x.nc() == 1 (i.e. x must be a column vector)
+        ensures
+            - Performs an unconstrained minimization of the function f() using a 
+              quasi newton method.  The optimization stops when any of the following
+              conditions are satisfied: 
+                - the change in f() from one iteration to the next is less than min_delta
+                - f(#x) &lt;= min_f
+            - Uses the dlib::derivative(f,derivative_eps) function to compute gradient
+              information
+            - #x == the value of x that was found to minimize f()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> funct_der, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_min_conjugate_gradient'></a>find_min_conjugate_gradient</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        <font color='#0000FF'>const</font> funct_der<font color='#5555FF'>&amp;</font> der, 
+        T<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> min_f, 
+        <font color='#0000FF'><u>double</u></font> min_delta <font color='#5555FF'>=</font> <font color='#979000'>1</font>e<font color='#5555FF'>-</font><font color='#979000'>7</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - min_delta &gt;= 0 
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of
+              f() at x.
+            - is_matrix&lt;T&gt;::value == true (i.e. T must be a dlib::matrix type)
+            - x.nc() == 1 (i.e. x must be a column vector)
+        ensures
+            - Performs an unconstrained minimization of the function f() using a 
+              conjugate gradient method.  The optimization stops when any of the following
+              conditions are satisfied: 
+                - the change in f() from one iteration to the next is less than min_delta
+                - f(#x) &lt;= min_f
+            - #x == the value of x that was found to minimize f()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> funct, 
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='find_min_conjugate_gradient2'></a>find_min_conjugate_gradient2</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> funct<font color='#5555FF'>&amp;</font> f, 
+        T<font color='#5555FF'>&amp;</font> x, 
+        <font color='#0000FF'><u>double</u></font> min_f, 
+        <font color='#0000FF'><u>double</u></font> min_delta <font color='#5555FF'>=</font> <font color='#979000'>1</font>e<font color='#5555FF'>-</font><font color='#979000'>7</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> derivative_eps <font color='#5555FF'>=</font> <font color='#979000'>1</font>e<font color='#5555FF'>-</font><font color='#979000'>7</font> 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - min_delta &gt;= 0 
+            - derivative_eps &gt; 0
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of
+              f() at x.
+            - is_matrix&lt;T&gt;::value == true (i.e. T must be a dlib::matrix type)
+            - x.nc() == 1 (i.e. x must be a column vector)
+        ensures
+            - Performs an unconstrained minimization of the function f() using a 
+              conjugate gradient method.  The optimization stops when any of the following
+              conditions are satisfied: 
+                - the change in f() from one iteration to the next is less than min_delta
+                - f(#x) &lt;= min_f
+            - Uses the dlib::derivative(f,derivative_eps) function to compute gradient
+              information
+            - #x == the value of x that was found to minimize f()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_OPTIMIZATIOn_ABSTRACT_
+</font>
+
+
+
+</pre></body></html>

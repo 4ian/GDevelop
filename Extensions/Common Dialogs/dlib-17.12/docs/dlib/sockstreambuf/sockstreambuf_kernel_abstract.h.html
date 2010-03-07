@@ -1,0 +1,101 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - sockstreambuf_kernel_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SOCKSTREAMBUF_KERNEl_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SOCKSTREAMBUF_KERNEl_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>streambuf<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../sockets/sockets_kernel_abstract.h.html'>../sockets/sockets_kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+    <font color='#0000FF'>class</font> <b><a name='sockstreambuf'></a>sockstreambuf</b> : <font color='#0000FF'>public</font> std::streambuf
+    <b>{</b>
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a stream buffer capable of writing to and
+                reading from TCP connections.
+
+            NOTE:
+                For a sockstreambuf EOF is when the connection has closed or otherwise
+                returned some kind of error.
+
+                Also note that any data written to the streambuf may be buffered 
+                internally.  So if you need to ensure that data is actually sent then you 
+                should flush the stream.  
+
+                A read operation is guaranteed to block until the number of bytes
+                requested has arrived on the connection.  It will never keep blocking
+                once enough data has arrived.
+
+            THREADING
+                generally speaking, this object has the same kind of threading
+                restrictions as a connection object.  those being:
+                - do not try to write to a sockstreambuf from more than one thread
+                - do not try to read from a sockstreambuf from more than one thread
+                - you may call shutdown() on the connection object and this will
+                  cause any reading or writing calls to end.  To the sockstreambuf it
+                  will appear the same as hitting EOF.  (note that EOF for a sockstreambuf
+                  means that the connection has closed)
+                - it is safe to read from and write to the sockstreambuf at the same time
+                - it is not safe to try to putback a char and read from the stream from
+                  different threads
+        !*/</font>
+    <font color='#0000FF'>public</font>:
+        <b><a name='sockstreambuf'></a>sockstreambuf</b> <font face='Lucida Console'>(</font>
+            connection<font color='#5555FF'>*</font> con
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - con == a valid connection object
+            ensures
+                - *this will read from and write to con
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        <b><a name='sockstreambuf'></a>sockstreambuf</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> scoped_ptr<font color='#5555FF'>&lt;</font>connection<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> con
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - con == a valid connection object
+            ensures
+                - *this will read from and write to con
+            throws
+                - std::bad_alloc
+        !*/</font>
+
+        ~<b><a name='sockstreambuf'></a>sockstreambuf</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - get_connection() object has not been deleted
+            ensures
+                - sockstream buffer is destructed but the connection object will 
+                  NOT be closed.  
+                - Any buffered data is flushed to the connection. 
+        !*/</font>
+
+        connection<font color='#5555FF'>*</font> <b><a name='get_connection'></a>get_connection</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a pointer to the connection object which this buffer
+                  reads from and writes to
+        !*/</font>
+
+    <b>}</b>;
+
+<font color='#009900'>// ---------------------------------------------------------------------------------------- 
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SOCKSTREAMBUF_KERNEl_ABSTRACT_
+</font>
+
+</pre></body></html>

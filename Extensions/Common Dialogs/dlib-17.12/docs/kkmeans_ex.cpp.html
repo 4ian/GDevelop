@@ -1,0 +1,152 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - kkmeans_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+    This is an example illustrating the use of the kkmeans object 
+    from the dlib C++ Library.
+
+    The kkmeans object is an implementation of a kernelized k-means clustering 
+    algorithm.  It is implemented by using the kcentroid object to represent 
+    each center found by the usual k-means clustering algorithm.  
+
+    So this object allows you to perform non-linear clustering in the same way 
+    a svm classifier finds non-linear decision surfaces.  
+    
+    This example will make points from 3 classes and perform kernelized k-means 
+    clustering on those points.
+
+    The classes are as follows:
+        - points very close to the origin
+        - points on the circle of radius 10 around the origin
+        - points that are on a circle of radius 4 but not around the origin at all
+*/</font>
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/svm.h.html'>dlib/svm.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/rand.h.html'>dlib/rand.h</a>"
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Here we declare that our samples will be 2 dimensional column vectors.  
+</font>    <font color='#009900'>// (Note that if you don't know the dimensionality of your vectors at compile time
+</font>    <font color='#009900'>// you can change the 2 to a 0 and then set the size at runtime)
+</font>    <font color='#0000FF'>typedef</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>2</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> sample_type;
+
+    <font color='#009900'>// Now we are making a typedef for the kind of kernel we want to use.  I picked the
+</font>    <font color='#009900'>// radial basis kernel because it only has one parameter and generally gives good
+</font>    <font color='#009900'>// results without much fiddling.
+</font>    <font color='#0000FF'>typedef</font> radial_basis_kernel<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> kernel_type;
+
+
+    <font color='#009900'>// Here we declare an instance of the kcentroid object.  The first argument to the constructor
+</font>    <font color='#009900'>// is the kernel we wish to use.  The second is a parameter that determines the numerical 
+</font>    <font color='#009900'>// accuracy with which the object will perform part of the learning algorithm.  Generally
+</font>    <font color='#009900'>// smaller values give better results but cause the algorithm to run slower.  You just have
+</font>    <font color='#009900'>// to play with it to decide what balance of speed and accuracy is right for your problem.
+</font>    <font color='#009900'>// Here we have set it to 0.01.
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>// Also, since we are using the radial basis kernel we have to pick the RBF width parameter.
+</font>    <font color='#009900'>// Here we have it set to 0.1.  But in general, a reasonable way of picking this value is
+</font>    <font color='#009900'>// to start with some initial guess and to just run all the data through the resulting 
+</font>    <font color='#009900'>// kcentroid.  Then print out kc.dictionary_size() to see how many support vectors the 
+</font>    <font color='#009900'>// kcentroid object is using.  A good rule of thumb is that you should have somewhere 
+</font>    <font color='#009900'>// in the range of 10-100 support vectors (but this rule isn't carved in stone).  
+</font>    <font color='#009900'>// So if you aren't in that range then you can change the RBF parameter.  Making it 
+</font>    <font color='#009900'>// smaller will decrease the dictionary size and making it bigger will increase the 
+</font>    <font color='#009900'>// dictionary size.   
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>// So what I often do is I set the kcentroid's second parameter to 0.01 or 0.001.  Then
+</font>    <font color='#009900'>// I find an RBF kernel parameter that gives me the number of support vectors that I 
+</font>    <font color='#009900'>// feel is appropriate for the problem I'm trying to solve.  Again, this just comes down
+</font>    <font color='#009900'>// to playing with it and getting a feel for how things work.
+</font>    kcentroid<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>kc</font><font face='Lucida Console'>(</font><font color='#BB00BB'>kernel_type</font><font face='Lucida Console'>(</font><font color='#979000'>0.1</font><font face='Lucida Console'>)</font>,<font color='#979000'>0.01</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// Now we make an instance of the kkmeans object and tell it to use kcentroid objects
+</font>    <font color='#009900'>// that are configured with the parameters from the kc object we defined above.
+</font>    kkmeans<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>kc<font face='Lucida Console'>)</font>;
+
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> samples;
+    std::vector<font color='#5555FF'>&lt;</font>sample_type<font color='#5555FF'>&gt;</font> initial_centers;
+
+    sample_type m;
+
+    dlib::rand::float_1a rnd;
+
+    <font color='#009900'>// we will make 50 points from each class
+</font>    <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> num <font color='#5555FF'>=</font> <font color='#979000'>50</font>;
+
+    <font color='#009900'>// make some samples near the origin
+</font>    <font color='#0000FF'><u>double</u></font> radius <font color='#5555FF'>=</font> <font color='#979000'>0.5</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> sign <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>
+            sign <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>radius<font color='#5555FF'>*</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>radius;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sign<font color='#5555FF'>*</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>radius<font color='#5555FF'>*</font>radius <font color='#5555FF'>-</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// add this sample to our set of samples we will run k-means 
+</font>        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// make some samples in a circle around the origin but far away
+</font>    radius <font color='#5555FF'>=</font> <font color='#979000'>10.0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> sign <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>
+            sign <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>radius<font color='#5555FF'>*</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>radius;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sign<font color='#5555FF'>*</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>radius<font color='#5555FF'>*</font>radius <font color='#5555FF'>-</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// add this sample to our set of samples we will run k-means 
+</font>        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// make some samples in a circle around the point (25,25) 
+</font>    radius <font color='#5555FF'>=</font> <font color='#979000'>4.0</font>;
+    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> num; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'><u>double</u></font> sign <font color='#5555FF'>=</font> <font color='#979000'>1</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font> <font color='#979000'>0.5</font><font face='Lucida Console'>)</font>
+            sign <font color='#5555FF'>=</font> <font color='#5555FF'>-</font><font color='#979000'>1</font>;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#979000'>2</font><font color='#5555FF'>*</font>radius<font color='#5555FF'>*</font>rnd.<font color='#BB00BB'>get_random_double</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>-</font>radius;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> sign<font color='#5555FF'>*</font><font color='#BB00BB'>sqrt</font><font face='Lucida Console'>(</font>radius<font color='#5555FF'>*</font>radius <font color='#5555FF'>-</font> <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// translate this point away from the origin
+</font>        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>25</font>;
+        <font color='#BB00BB'>m</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#979000'>25</font>;
+
+        <font color='#009900'>// add this sample to our set of samples we will run k-means 
+</font>        samples.<font color='#BB00BB'>push_back</font><font face='Lucida Console'>(</font>m<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+    <font color='#009900'>// tell the kkmeans object we made that we want to run k-means with k set to 3. 
+</font>    <font color='#009900'>// (i.e. we want 3 clusters)
+</font>    test.<font color='#BB00BB'>set_number_of_centers</font><font face='Lucida Console'>(</font><font color='#979000'>3</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// You need to pick some initial centers for the k-means algorithm.  So here
+</font>    <font color='#009900'>// we will use the dlib::pick_initial_centers() function which tries to find
+</font>    <font color='#009900'>// n points that are far apart (basically).  
+</font>    <font color='#BB00BB'>pick_initial_centers</font><font face='Lucida Console'>(</font><font color='#979000'>3</font>, initial_centers, samples, test.<font color='#BB00BB'>get_kernel</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// now run the k-means algorithm on our set of samples.  
+</font>    test.<font color='#BB00BB'>train</font><font face='Lucida Console'>(</font>samples,initial_centers<font face='Lucida Console'>)</font>;
+
+    <font color='#009900'>// now loop over all our samples and print out their predicted class.  In this example
+</font>    <font color='#009900'>// all points are correctly identified.
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> samples.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font color='#979000'>3</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>samples[i]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>";
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>samples[i<font color='#5555FF'>+</font>num]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> </font>";
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>test</font><font face='Lucida Console'>(</font>samples[i<font color='#5555FF'>+</font><font color='#979000'>2</font><font color='#5555FF'>*</font>num]<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n</font>";
+    <b>}</b>
+
+<b>}</b>
+
+
+
+</pre></body></html>

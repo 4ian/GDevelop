@@ -1,0 +1,196 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - server_kernel_c.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_SERVER_KERNEl_C_
+<font color='#0000FF'>#define</font> DLIB_SERVER_KERNEl_C_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='server_kernel_abstract.h.html'>server_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../assert.h.html'>../assert.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> server_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='server_kernel_c'></a>server_kernel_c</b> : <font color='#0000FF'>public</font> server_base
+    <b>{</b>
+        
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='start'></a>start</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_listening_port'></a>set_listening_port</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>int</u></font> port
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_listening_ip'></a>set_listening_ip</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_max_connections'></a>set_max_connections</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>int</u></font> max
+            <font face='Lucida Console'>)</font>;
+
+    <font color='#0000FF'>private</font>:
+        <font color='#0000FF'><u>bool</u></font> <b><a name='is_dotted_quad'></a>is_dotted_quad</b> <font face='Lucida Console'>(</font>
+            std::string ip
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                returns true if ip is a valid dotted quad ip address else
+                returns false
+        !*/</font>
+        
+
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> server_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> server_kernel_c<font color='#5555FF'>&lt;</font>server_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='start'></a>start</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> 
+              <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_running</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font>,
+            "<font color='#CC0000'>\tvoid server::start</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tis_running() == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_running</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        server_base::<font color='#BB00BB'>start</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> server_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> server_kernel_c<font color='#5555FF'>&lt;</font>server_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_max_connections'></a>set_max_connections</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font> max
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> 
+            max <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> ,
+            "<font color='#CC0000'>\tvoid server::set_max_connections</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tmax == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> max
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        server_base::<font color='#BB00BB'>set_max_connections</font><font face='Lucida Console'>(</font>max<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> server_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> server_kernel_c<font color='#5555FF'>&lt;</font>server_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_listening_port'></a>set_listening_port</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>int</u></font> port
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> 
+            <font face='Lucida Console'>(</font> port <font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+              <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_running</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tvoid server::set_listening_port</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tport         == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> port
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tis_running() == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_running</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        server_base::<font color='#BB00BB'>set_listening_port</font><font face='Lucida Console'>(</font>port<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> server_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> server_kernel_c<font color='#5555FF'>&lt;</font>server_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_listening_ip'></a>set_listening_ip</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> ip
+    <font face='Lucida Console'>)</font> 
+    <b>{</b>
+        <font color='#009900'>// make sure requires clause is not broken
+</font>        <font color='#BB00BB'>DLIB_CASSERT</font><font face='Lucida Console'>(</font> 
+            <font face='Lucida Console'>(</font> <font face='Lucida Console'>(</font> <font color='#BB00BB'>is_dotted_quad</font><font face='Lucida Console'>(</font>ip<font face='Lucida Console'>)</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ip <font color='#5555FF'>=</font><font color='#5555FF'>=</font> "<font color='#CC0000'></font>" <font face='Lucida Console'>)</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+              <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_running</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>false</font> <font face='Lucida Console'>)</font>,
+            "<font color='#CC0000'>\tvoid server::set_listening_ip</font>"
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tip           == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> ip
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tis_running() == </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font><font color='#5555FF'>-</font><font color='#5555FF'>&gt;</font><font color='#BB00BB'>is_running</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\n\tthis: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#0000FF'>this</font>
+            <font face='Lucida Console'>)</font>;
+
+        <font color='#009900'>// call the real function
+</font>        server_base::<font color='#BB00BB'>set_listening_ip</font><font face='Lucida Console'>(</font>ip<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// private member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> server_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> server_kernel_c<font color='#5555FF'>&lt;</font>server_base<font color='#5555FF'>&gt;</font>::
+    <b><a name='is_dotted_quad'></a>is_dotted_quad</b> <font face='Lucida Console'>(</font>
+        std::string ip
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+
+        <font color='#0000FF'><u>int</u></font> num;
+        <font color='#0000FF'><u>char</u></font> dot;
+        std::istringstream <font color='#BB00BB'>sin</font><font face='Lucida Console'>(</font>ip<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> <font color='#979000'>3</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+        <b>{</b>
+            sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> num; <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>sin<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> num <font color='#5555FF'>&gt;</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+            sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> dot; <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>sin<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>dot <font color='#5555FF'>!</font><font color='#5555FF'>=</font> '<font color='#FF0000'>.</font>'<font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <b>}</b>
+
+        sin <font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font> num; <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>sin<font face='Lucida Console'>)</font> <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>num <font color='#5555FF'>&lt;</font> <font color='#979000'>0</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> num <font color='#5555FF'>&gt;</font> <font color='#979000'>255</font><font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>sin.<font color='#BB00BB'>get</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>!</font><font color='#5555FF'>=</font> EOF<font face='Lucida Console'>)</font>
+            <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+
+        <font color='#0000FF'>return</font> <font color='#979000'>true</font>;        
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SERVER_KERNEl_C_
+</font>
+
+</pre></body></html>

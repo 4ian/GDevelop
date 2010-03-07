@@ -1,0 +1,416 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I=">
+<title>dlib C++ Library</title>
+<script language="JavaScript">
+
+            // ---------------------------------------------
+            // --- Name:    Easy DHTML Treeview           --
+            // --- Author:  D.D. de Kerf                  --
+            // --- Version: 0.2          Date: 13-6-2001  --
+            // ---------------------------------------------
+            function Toggle(node)
+            {
+               // Unfold the branch if it isn't visible
+               var next_node = node.nextSibling;
+               if (next_node.style.display == 'none')
+               {
+                  // Change the image (if there is an image)
+                  if (node.childNodes.length > 0)
+                  {
+                     if (node.childNodes.length > 0)
+                     { 
+                        if (node.childNodes.item(0).nodeName == "IMG")
+                        {
+                           node.childNodes.item(0).src = "minus.gif";
+                        }
+                     }
+                  }
+
+                  next_node.style.display = 'block';
+               }
+               // Collapse the branch if it IS visible
+               else
+               {
+                  // Change the image (if there is an image)
+                  if (node.childNodes.length > 0)
+                  {
+                     if (node.childNodes.length > 0)
+                     { 
+                        if (node.childNodes.item(0).nodeName == "IMG")
+                        {
+                           node.childNodes.item(0).src = "plus.gif";
+                        }
+                     }
+                  }
+
+                  next_node.style.display = 'none';
+               }
+
+            }
+            </script><style type="text/css">
+               body {margin:0px;}
+               pre {margin:0px;}
+
+               ul.tree  li { list-style: none;  margin-left:10px;} 
+               ul.tree  { margin:0px; padding:0px; margin-left:5px;  }
+               ul.tree  li ul { margin-left:10px; padding:0px; }
+
+               div#component {
+                  background-color:white; 
+                  border: 2px solid rgb(102,102,102); 
+                  text-align:left;
+                  margin-top: 1.5em;
+                  padding: 0.7em;
+               }
+
+               div#logb {
+                  text-align:left;
+                  padding: 0.0em;
+                  float: left;
+                  background-color:#c0c0c0; 
+                  border: double ; 
+                  margin: 0.5em;
+               }
+
+               .bdotted {border-bottom: 1px dotted}
+               .bdashed {border-bottom: 1px dashed}
+               .bsolid {border-bottom: 1px solid}
+               .bdouble {border-bottom: 1px double}
+               .bgroove {border-bottom: 1px groove}
+               .bridge {border-bottom: 1px ridge}
+               .binset {border-bottom: 1px inset}
+               .boutset {border-bottom: 1px outset}
+
+               div#row1 {
+                  background-color:#dfdfdf; 
+               }
+               div#row2 {
+                  background-color:#f2f2f2; 
+               }
+
+               div#typedefs {
+                  margin-left: 1.5em;
+                  margin-top: 0.2em;
+                  border: 1px dotted;
+                  width: 52em;
+               }
+
+               div#tdn {
+                  width: 10em;
+               }
+
+               .fullhr {
+                  clear: both;
+               }
+
+               body {
+                  text-align: center;
+               }
+
+               div#entire_page {
+                  width:62em;  
+                  text-align: left;
+                  margin-top: 0.4em;
+                  margin-left: auto;
+                  margin-right: auto;
+               }
+            </style>
+</head>
+<body bgcolor="#EDF3EE">
+<a name="top"></a><div id="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10"><tr height="100%">
+<td BGCOLOR="#E3E3E3" VALIGN="TOP" height="100%">
+<br><table WIDTH="145" height="100%">
+<tr>
+<td VALIGN="TOP">
+      <b>The Library</b><ul class="tree">
+<li><a href="algorithms.html">Algorithms</a></li>
+<li><a href="api.html">API Wrappers</a></li>
+<li><a href="compression.html">Compression</a></li>
+<li><a href="containers.html">Containers</a></li>
+<li><a href="imaging.html">Imaging</a></li>
+<li><a href="metaprogramming.html">Metaprogramming</a></li>
+<li><a href="other.html">Miscellaneous</a></li>
+<li><a href="network.html">Network</a></li>
+<li><a href="parsing.html">Parsing</a></li>
+</ul>
+<br>
+ 
+
+      <b>Help/Info</b><ul class="tree">
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples</u></font></a><ul style="display:none;">
+<li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li>
+<li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li>
+<li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li>
+<li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li>
+<li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li>
+<li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li>
+<li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li>
+<li><a href="gui_api_ex.cpp.html">GUI</a></li>
+<li><a href="server_http_ex.cpp.html">HTTP_Server</a></li>
+<li><a href="image_ex.cpp.html">Image</a></li>
+<li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li>
+<li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li>
+<li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li>
+<li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li>
+<li><a href="logger_ex.cpp.html">Logger</a></li>
+<li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li>
+<li><a href="matrix_ex.cpp.html">Matrix</a></li>
+<li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li>
+<li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li>
+<li><a href="mlp_ex.cpp.html">Neural_Network</a></li>
+<li><a href="pipe_ex.cpp.html">Pipe</a></li>
+<li><a href="queue_ex.cpp.html">Queue</a></li>
+<li><a href="rank_features_ex.cpp.html">Rank_Features</a></li>
+<li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li>
+<li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li>
+<li><a href="sockets_ex.cpp.html">Sockets</a></li>
+<li><a href="sockets_ex_2.cpp.html">Sockets_2</a></li>
+<li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li>
+<li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li>
+<li><a href="svm_ex.cpp.html">Support_Vector_Machine</a></li>
+<li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li>
+<li><a href="threads_ex.cpp.html">Threads</a></li>
+<li><a href="thread_function_ex.cpp.html">Thread_Function</a></li>
+<li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li>
+<li><a href="timer_ex.cpp.html">Timer</a></li>
+<li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li>
+</ul>
+</li>
+<li><a href="index.html">Home</a></li>
+<li><a href="compile.html">How to compile</a></li>
+<li><a href="term_index.html">Index</a></li>
+<li><a href="intro.html">Introduction</a></li>
+<li><a href="license.html">License</a></li>
+</ul>
+<br>
+ 
+      <b>Current Release</b><ul class="tree">
+<li><a href="change_log.html">Change Log</a></li>
+<li><a href="release_notes.html">Release Notes</a></li>
+<li>Version: 17.12</li>
+</ul>
+<br>
+
+
+      
+    </td>
+<td width="1"></td>
+</tr>
+<tr><td valign="bottom">
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      
+      Last Modified:<br>
+      Nov 10, 2008
+      <br>
+      <br>
+   </td></tr>
+</table>
+</td>
+<td VALIGN="TOP" width="100%">
+      <center>
+<a name="dlib%20C++%20library"></a><h1>dlib C++ library</h1>
+</center>
+      <br><br>
+
+
+      <p>
+         
+         Welcome to the dlib C++ library documentation.
+
+      It is a modern C++ library with a focus on portability
+      and program correctness.  It strives to be easy to use right and hard to use wrong. 
+      Thus, it comes with extensive documentation and thorough debugging modes. 
+      </p>
+
+      <p>
+      The library is open source software and is licensed
+      under the <a href="license.html">Boost Software License</a>.
+
+      The <a href="intro.html">introduction</a> contains everything you need to know to get
+      started using the library.  However, if you have any questions, comments, or complaints feel free to 
+      <a href="mailto:davisking@users.sourceforge.net">email me</a>.
+      
+      
+      </p>
+
+      
+         <p>
+            For updates to this project check its sourceforge page at <a href="http://dclib.sourceforge.net">http://dclib.sourceforge.net</a>.
+         </p>
+      
+
+      <br>
+
+      <p>
+         <a name="Major%20Features"></a><h2>Major Features</h2>
+         <ul>
+            <li>
+<b>Documentation</b>
+            <ul>
+               <li>Unlike a lot of open source projects, this one provides complete and precise 
+                  documentation for every class and function.   There are also debugging modes that check the 
+                  documented preconditions for functions.  When this is enabled it will catch the vast majority of
+                  bugs caused by calling functions incorrectly or using objects in an incorrect manner.  
+               </li>
+               <li>Lots of example programs are provided</li>
+               <li>
+<i>I consider the documentation to be the most important part of the library</i>.  So if you find anything 
+                  that isn't documented, isn't clear, or has out of date documentation, tell me and I will fix it.
+               </li>
+            </ul>
+            </li>
+
+            <li>
+<b>Portable Code</b>
+               <ul>
+                  <li>All non ISO C++ code is isolated inside the OS abstraction layers which are kept as small as possible.   
+                     The rest of the library is either layered on top of the OS 
+                     abstraction layers or is pure ISO C++.  </li>
+                  <li>Big/little endian agnostic</li>
+                  <li>No other packages are required to use the library.  Only APIs that are
+                     provided by an out of the box OS are used. </li> 
+                  <li>The library is tested regularly on win32, Linux, and Mac OS X systems.  However, it should 
+                     work on any POSIX system and has been tested on Solaris, HPUX, and the BSDs.</li>
+               </ul>
+            </li>
+            <li>
+<b>Threading</b>
+               <ul>
+                  <li>The library provides a portable and simple <a href="api.html#threads">threading API</a>
+</li>
+                  <li>A <a href="other.html#pipe">pipe</a> for inter-thread communication</li>
+                  <li>A <a href="other.html#timer">timer</a> object capable of generating events that are regularly spaced in time</li>
+                  <li><a href="api.html#thread_specific_data">Thread specific data</a></li>
+                  <li><a href="api.html#threaded_object">Threaded objects</a></li>
+                  <li><a href="api.html#thread_function">Threaded functions</a></li>
+                  <li>A simple but powerful <a href="api.html#thread_pool">thread_pool</a>
+</li>
+               </ul>
+            </li>
+
+            <li>
+<b>Networking</b>
+               <ul>
+                  <li>The library provides a portable and simple <a href="api.html#sockets">TCP sockets API</a>
+</li>
+                  <li>An object to help you make TCP based <a href="network.html#server">servers</a>
+</li>
+                  <li>A <a href="network.html#sockstreambuf">streambuf</a> object that enables TCP sockets 
+                  to interoperate with the C++ iostreams library </li>
+                  <li>A simple <a href="network.html#http">HTTP server</a> object you can use to embed a 
+                  web server into your applications</li> 
+               </ul>
+            </li>
+
+            <li>
+<b>Graphical User Interfaces</b>
+               <ul>
+                  <li>The library provides a portable and simple core <a href="api.html#gui_core">GUI API</a>
+</li>
+                  <li>Implemented on top of the core GUI API are numerous <a href="api.html#gui_widgets">widgets</a>
+</li>
+                  <li>Unlike many other GUI toolkits, the entire dlib GUI toolkit is threadsafe</li>
+               </ul>
+            </li>
+
+
+            <li>
+<b>Numerical Algorithms</b>
+               <ul>
+                  <li>A fast <a href="containers.html#matrix">matrix</a> object implemented using the expression templates technique</li>
+                  <li>Numerous linear algebra and mathematical operations are defined for the matrix object such as the 
+                     <a href="dlib/matrix/matrix_utilities_abstract.h.html#svd">singular value decomposition</a>, 
+                     <a href="dlib/matrix/matrix_utilities_abstract.h.html#trans">transpose</a>, 
+                     <a href="dlib/matrix/matrix_math_functions_abstract.h.html#sin">trig functions</a>, etc...</li>
+                  <li>Unconstrained non-linear optimization algorithms such as 
+                     <a href="algorithms.html#find_min_conjugate_gradient">conjugate gradient</a> and <a href="algorithms.html#find_min_quasi_newton">quasi newton</a> techniques</li>
+                  <li>A <a href="algorithms.html#bigint">big integer</a> object</li>
+                  <li>A <a href="algorithms.html#rand">random number</a> object</li>
+               </ul>
+            </li>
+
+            <li>
+<b>Machine Learning Algorithms</b>
+               <ul>
+                  <li>
+<a href="algorithms.html#mlp">Multi layer perceptrons</a> </li>  
+                  <li>
+<a href="algorithms.html#svm_nu_trainer">Support vector machines</a> for classification</li>
+                  <li>Relevance vector machines for <a href="algorithms.html#rvm_trainer">classification</a> 
+                      and <a href="algorithms.html#rvm_regression_trainer">regression</a> </li>
+                  <li>An online <a href="algorithms.html#krls">kernel RLS regression</a> algorithm</li>
+                  <li>An online kernelized <a href="algorithms.html#kcentroid">centroid estimator</a>/novelty detector</li>
+                  <li>A kernelized <a href="algorithms.html#kkmeans">k-means</a> clustering algorithm</li>
+                  <li><a href="algorithms.html#rbf_network_trainer">Radial Basis Function Networks</a></li>
+                  <li>Bayesian network inference algorithms such as the 
+                     <a href="algorithms.html#bayesian_network_join_tree">join tree</a> algorithm and 
+                     <a href="algorithms.html#bayesian_network_gibbs_sampler">gibbs sampler</a> markov chain monte carlo algorithm</li>
+               </ul>
+            </li>
+
+            <li>
+<b>Image Processing</b>
+               <ul>
+                  <li>Windows BMP <a href="imaging.html#load_bmp">read</a> and <a href="imaging.html#save_bmp">write</a> support</li>
+                  <li>Automatic color space conversion between various pixel types</li>  
+                  <li>Common image operations such as edge finding and morphological operations</li>
+               </ul>
+            </li>
+
+            <li>
+<b>Data Compression and Integrity Algorithms</b>
+               <ul>
+                  <li>A <a href="algorithms.html#crc32">CRC 32</a> object</li>  
+                  <li>
+<a href="algorithms.html#md5">MD5</a> functions</li>
+                  <li>Various abstracted objects representing parts of <a href="compression.html">data compression</a> 
+                  algorithms.  Many forms of the PPM algorithm are included.  </li>
+               </ul>
+            </li>
+
+            <li>
+<b>Testing</b>
+               <ul>
+                  <li>A thread safe <a href="other.html#logger">logger</a> object styled after the popular Java logger log4j</li>
+                  <li>A modular <a href="other.html#dlib_testing_suite">unit testing framework</a>
+</li>
+                  <li>Various <a href="metaprogramming.html">assert</a> macros useful for testing preconditions</li>
+               </ul>
+            </li>
+
+            <li>
+<b>General Utilities</b>
+               <ul>
+                  <li>A type-safe <a href="other.html#byte_orderer">object</a> to convert between big and little endian byte orderings</li>
+                  <li>A <a href="parsing.html#cmd_line_parser">command line parser</a> with the ability to 
+                  parse and validate command lines with various types of arguments and options</li>
+                  <li>An <a href="parsing.html#xml_parser">XML parser</a>
+</li>
+                  <li>An object that can perform <a href="parsing.html#base64">base64</a> conversions</li>
+                  <li>Many <a href="containers.html">container classes</a>
+</li>
+                  <li><a href="other.html#serialize">Serialization support</a></li>
+                  <li>Many <a href="other.html#memory_manager">memory manager</a> objects that implement 
+                  differnt memory pooling strategies</li>
+               </ul>
+            </li>
+         </ul>
+
+      </p>
+
+   
+   </td>
+</tr></table></div>
+</body>
+</html>

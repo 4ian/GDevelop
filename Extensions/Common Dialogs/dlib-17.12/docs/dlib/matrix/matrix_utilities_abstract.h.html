@@ -1,0 +1,1065 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - matrix_utilities_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_MATRIx_UTILITIES_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_MATRIx_UTILITIES_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_abstract.h.html'>matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>complex<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='pixel.h.html'>pixel.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+#inclue <font color='#5555FF'>&lt;</font>vector<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                             Elementary matrix operations
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='diag'></a>diag</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m is a square matrix
+        ensures
+            - returns a column vector R that contains the elements from the diagonal 
+              of m in the order R(0)==m(0,0), R(1)==m(1,1), R(2)==m(2,2) and so on.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='diagm'></a>diagm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m is a row or column matrix
+        ensures
+            - returns a square matrix M such that:
+                - diag(M) == m
+                - non diagonal elements of M are 0
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='trans'></a>trans</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns the transpose of the matrix m
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T, 
+        <font color='#0000FF'><u>long</u></font> NR, 
+        <font color='#0000FF'><u>long</u></font> NC, 
+        T val
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='uniform_matrix'></a>uniform_matrix</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - NR &gt; 0 &amp;&amp; NC &gt; 0
+        ensures
+            - returns an NR by NC matrix with elements of type T and all set to val.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> NR, 
+        <font color='#0000FF'><u>long</u></font> NC,
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='uniform_matrix'></a>uniform_matrix</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> val
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - NR &gt; 0 &amp;&amp; NC &gt; 0
+        ensures
+            - returns an NR by NC matrix with elements of type T and all set to val.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='uniform_matrix'></a>uniform_matrix</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> nr,
+        <font color='#0000FF'><u>long</u></font> nc,
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> val
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - nr &gt; 0 &amp;&amp; nc &gt; 0
+        ensures
+            - returns an nr by nc matrix with elements of type T and all set to val.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='identity_matrix'></a>identity_matrix</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>long</u></font> N
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - N &gt; 0
+        ensures
+            - returns an N by N identity matrix with elements of type T.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T, 
+        <font color='#0000FF'><u>long</u></font> N
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='identity_matrix'></a>identity_matrix</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - N &gt; 0
+        ensures
+            - returns an N by N identity matrix with elements of type T.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> R,
+        <font color='#0000FF'><u>long</u></font> C
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='rotate'></a>rotate</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - R &lt; m.nr()
+            - C &lt; m.nc()
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R( (r+R)%m.nr() , (c+C)%m.nc() ) == m(r,c)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='vector_to_matrix'></a>vector_to_matrix</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> vector_type<font color='#5555FF'>&amp;</font> vector
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - vector_type is an implementation of array/array_kernel_abstract.h or
+              std::vector or dlib::std_vector_c or dlib::matrix
+        ensures
+            - if (vector_type is a dlib::matrix) then
+                - returns a reference to vector
+            - else
+                - returns a matrix R such that:
+                    - R.nr() == vector.size() 
+                    - R.nc() == 1 
+                    - for all valid r:
+                      R(r) == vector[r]
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> array_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='array_to_matrix'></a>array_to_matrix</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array_type<font color='#5555FF'>&amp;</font> array
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - array_type is an implementation of array2d/array2d_kernel_abstract.h
+              or dlib::matrix
+        ensures
+            - if (array_type is a dlib::matrix) then
+                - returns a reference to array 
+            - else
+                - returns a matrix R such that:
+                    - R.nr() == array.nr() 
+                    - R.nc() == array.nc()
+                    - for all valid r and c:
+                      R(r, c) == array[r][c]
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> rectangle <b><a name='get_rect'></a>get_rect</b> <font face='Lucida Console'>(</font>  
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns rectangle(0, 0, m.nc()-1, m.nr()-1)
+              (i.e. returns a rectangle that has the same dimensions as
+              the matrix m)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='subm'></a>subm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> row,
+        <font color='#0000FF'><u>long</u></font> col,
+        <font color='#0000FF'><u>long</u></font> nr,
+        <font color='#0000FF'><u>long</u></font> nc
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - row &gt;= 0
+            - row + nr &lt;= m.nr()
+            - col &gt;= 0
+            - col + nc &lt;= m.nc()
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == nr 
+                - R.nc() == nc
+                - for all valid r and c:
+                  R(r, c) == m(r+row,c+col)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='subm'></a>subm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - get_rect(m).contains(rect) == true
+              (i.e. rect is a region inside the matrix m)
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == rect.height()  
+                - R.nc() == rect.width()
+                - for all valid r and c:
+                  R(r, c) == m(r+rect.top(), c+rect.left())
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='rowm'></a>rowm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> row
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= row &lt; m.nr()
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == 1
+                - R.nc() == m.nc()
+                - for all valid i:
+                  R(i) == m(row,i)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='colm'></a>colm</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> col 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= col &lt; m.nr()
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == m.nr() 
+                - R.nc() == 1
+                - for all valid i:
+                  R(i) == m(i,col)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    assignable_matrix_expression <b><a name='set_subm'></a>set_subm</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> row,
+        <font color='#0000FF'><u>long</u></font> col,
+        <font color='#0000FF'><u>long</u></font> nr,
+        <font color='#0000FF'><u>long</u></font> nc
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - row &gt;= 0
+            - row + nr &lt;= m.nr()
+            - col &gt;= 0
+            - col + nc &lt;= m.nc()
+        ensures
+            - statements of the following form:
+                - set_subm(m,row,col,nr,nc) = some_matrix;
+              result in it being the case that:
+                - subm(m,row,col,nr,nc) == some_matrix.
+
+            - statements of the following form:
+                - set_subm(m,row,col,nr,nc) = scalar_value;
+              result in it being the case that:
+                - subm(m,row,col,nr,nc) == uniform_matrix&lt;matrix::type&gt;(nr,nc,scalar_value).
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    assignable_matrix_expression <b><a name='set_subm'></a>set_subm</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> rectangle<font color='#5555FF'>&amp;</font> rect
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - get_rect(m).contains(rect) == true
+              (i.e. rect is a region inside the matrix m)
+        ensures
+            - statements of the following form:
+                - set_subm(m,rect) = some_matrix;
+              result in it being the case that:
+                - subm(m,rect) == some_matrix.
+
+            - statements of the following form:
+                - set_subm(m,rect) = scalar_value;
+              result in it being the case that:
+                - subm(m,rect) == uniform_matrix&lt;matrix::type&gt;(nr,nc,scalar_value).
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    assignable_matrix_expression <b><a name='set_rowm'></a>set_rowm</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> row
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= row &lt; m.nr()
+        ensures
+            - statements of the following form:
+                - set_rowm(m,row) = some_matrix;
+              result in it being the case that:
+                - rowm(m,row) == some_matrix.
+
+            - statements of the following form:
+                - set_rowm(m,row) = scalar_value;
+              result in it being the case that:
+                - rowm(m,row) == uniform_matrix&lt;matrix::type&gt;(1,nc,scalar_value).
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    assignable_matrix_expression <b><a name='set_colm'></a>set_colm</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> col 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - 0 &lt;= col &lt; m.nr()
+        ensures
+            - statements of the following form:
+                - set_colm(m,col) = some_matrix;
+              result in it being the case that:
+                - colm(m,col) == some_matrix.
+
+            - statements of the following form:
+                - set_colm(m,col) = scalar_value;
+              result in it being the case that:
+                - colm(m,col) == uniform_matrix&lt;matrix::type&gt;(nr,1,scalar_value).
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> R,
+        <font color='#0000FF'><u>long</u></font> C
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='removerc'></a>removerc</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.nr() &gt; R
+            - m.nc() &gt; C
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == m.nr() - 1
+                - M.nc() == m.nc() - 1
+                - M == m with its R row and C column removed
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='removerc'></a>removerc</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> R,
+        <font color='#0000FF'><u>long</u></font> C
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.nr() &gt; R
+            - m.nc() &gt; C
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == m.nr() - 1
+                - M.nc() == m.nc() - 1
+                - M == m with its R row and C column removed
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> R
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='remove_row'></a>remove_row</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.nr() &gt; R
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == m.nr() - 1
+                - M.nc() == m.nc() 
+                - M == m with its R row removed
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='remove_row'></a>remove_row</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> R
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.nr() &gt; R
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == m.nr() - 1
+                - M.nc() == m.nc() 
+                - M == m with its R row removed
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> C
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='remove_col'></a>remove_col</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.nc() &gt; C
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == m.nr() 
+                - M.nc() == m.nc() - 1 
+                - M == m with its C column removed
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='remove_col'></a>remove_col</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'><u>long</u></font> C
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.nc() &gt; C
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == m.nr() 
+                - M.nc() == m.nc() - 1 
+                - M == m with its C column removed
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+       <font color='#0000FF'>typename</font> target_type
+       <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='matrix_cast'></a>matrix_cast</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R where for all valid r and c:
+              R(r,c) == static_cast&lt;target_type&gt;(m(r,c))
+              also, R has the same dimensions as m.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'><u>long</u></font> NR,
+        <font color='#0000FF'><u>long</u></font> NC,
+        <font color='#0000FF'>typename</font> MM,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='set_all_elements'></a>set_all_elements</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T,NR,NC,MM<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m,
+        U value
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - for all valid r and c:
+              m(r,c) == value
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::matrix_type <b><a name='tmp'></a>tmp</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a temporary matrix object that is a copy of m. 
+              (This is useful because it allows you to easily force a matrix_exp to 
+              fully evaluate before giving it to some other function that queries
+              the elements of the matrix more than once each, such as the matrix
+              multiplication operator.)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='equal'></a>equal</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> b,
+        <font color='#0000FF'>const</font> matrix_exp::type epsilon <font color='#5555FF'>=</font> <font color='#979000'>100</font><font color='#5555FF'>*</font>std::numeric_limits<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font>::<font color='#BB00BB'>epsilon</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - if (a and b don't have the same dimensions) then
+                - returns false
+            - else if (there exists an r and c such that abs(a(r,c)-b(r,c)) &gt; epsilon) then
+                - returns false
+            - else
+                - returns true
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='pointwise_multiply'></a>pointwise_multiply</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - a.nr() == b.nr()
+            - a.nc() == b.nc()
+            - a and b both contain the same type of element
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in a and b.
+                - R has the same dimensions as a and b. 
+                - for all valid r and c:
+                  R(r,c) == a(r,c) * b(r,c)
+    !*/</font>
+
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='pointwise_multiply'></a>pointwise_multiply</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> b,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> c 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        performs pointwise_multiply(a,pointwise_multiply(b,c));
+    !*/</font>
+
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='pointwise_multiply'></a>pointwise_multiply</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> b,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> c,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> d 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        performs pointwise_multiply(pointwise_multiply(a,b),pointwise_multiply(c,d));
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='tensor_product'></a>tensor_product</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> a,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - a and b both contain the same type of element
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in a and b.
+                - R.nr() == a.nr()*b.nr()  
+                - R.nc() == a.nc()*b.nc()  
+                - for all valid r and c:
+                  R(r,c) == a(r/b.nr(), c/b.nc()) * b(r%b.nr(), c%b.nc())
+                - I.e. R is the tensor product of matrix a with matrix b
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='scale_columns'></a>scale_columns</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - v.nc() == 1 (i.e. v is a column vector)
+            - v.nr() == m.nc()
+            - m and v both contain the same type of element
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m and v.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                  R(r,c) == m(r,c) * v(c)
+                - i.e. R is the result of multiplying each of m's columns by
+                  the corresponding scalar in v.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='sort_columns'></a>sort_columns</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - v.nc() == 1 (i.e. v is a column vector)
+            - v.nr() == m.nc()
+            - m and v both contain the same type of element
+        ensures
+            - the dimensions for m and v are not changed
+            - sorts the columns of m according to the values in v.
+              i.e. 
+                - #v == the contents of v but in sorted order according to
+                  operator&lt;.  So smaller elements come first.
+                - Let #v(new(i)) == v(i) (i.e. new(i) is the index element i moved to)
+                - colm(#m,new(i)) == colm(m,i) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> T<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='rsort_columns'></a>rsort_columns</b> <font face='Lucida Console'>(</font>
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> m,
+        matrix<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - v.nc() == 1 (i.e. v is a column vector)
+            - v.nr() == m.nc()
+            - m and v both contain the same type of element
+        ensures
+            - the dimensions for m and v are not changed
+            - sorts the columns of m according to the values in v.
+              i.e. 
+                - #v == the contents of v but in sorted order according to
+                  operator&gt;.  So larger elements come first.
+                - Let #v(new(i)) == v(i) (i.e. new(i) is the index element i moved to)
+                - colm(#m,new(i)) == colm(m,i) 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::type <b><a name='length_squared'></a>length_squared</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.nr() == 1 || m.nc() == 1
+              (i.e. m must be a vector)
+        ensures
+            - returns sum(squared(m))
+              (i.e. returns the square of the length of the vector m)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::type <b><a name='length'></a>length</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.nr() == 1 || m.nc() == 1
+              (i.e. m must be a vector)
+        ensures
+            - returns sqrt(sum(squared(m)))
+              (i.e. returns the length of the vector m)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                             Linear algebra functions 
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::matrix_type <b><a name='inv'></a>inv</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m is a square matrix
+        ensures
+            - returns the inverse of m 
+              (Note that if m is singular or so close to being singular that there
+              is a lot of numerical error then the returned matrix will be bogus.  
+              You can check by seeing if m*inv(m) is an identity matrix)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix <b><a name='pinv'></a>pinv</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns the Moore-Penrose pseudoinverse of m.
+            - The returned matrix has m.nc() rows and m.nr() columns.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='svd'></a>svd</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> u,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - computes the singular value decomposition of m
+            - m == #u*#w*trans(#v)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - diag(#w) == the singular values of the matrix m in no 
+              particular order.  All non-diagonal elements of #w are
+              set to 0.
+            - #u.nr() == m.nr()
+            - #u.nc() == m.nc()
+            - #w.nr() == m.nc()
+            - #w.nc() == m.nc()
+            - #v.nr() == m.nc()
+            - #v.nc() == m.nc()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>long</u></font> <b><a name='svd2'></a>svd2</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>bool</u></font> withu, 
+        <font color='#0000FF'><u>bool</u></font> withv, 
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> u,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.nr() &gt;= m.nc()
+        ensures
+            - computes the singular value decomposition of matrix m
+            - m == subm(#u,get_rect(m))*diagm(#w)*trans(#v)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - #w == the singular values of the matrix m in no 
+              particular order.  
+            - #u.nr() == m.nr()
+            - #u.nc() == m.nr()
+            - #w.nr() == m.nc()
+            - #w.nc() == 1 
+            - #v.nr() == m.nc()
+            - #v.nc() == m.nc()
+            - if (widthu == false) then
+                - ignore the above regarding #u, it isn't computed and its
+                  output state is undefined.
+            - if (widthv == false) then
+                - ignore the above regarding #v, it isn't computed and its
+                  output state is undefined.
+            - returns an error code of 0, if no errors and 'k' if we fail to
+              converge at the 'kth' singular value.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='svd3'></a>svd3</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> u,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> w,
+        matrix<font color='#5555FF'>&lt;</font>matrix_exp::type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> v
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - computes the singular value decomposition of m
+            - m == #u*diagm(#w)*trans(#v)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - #w == the singular values of the matrix m in no 
+              particular order.  
+            - #u.nr() == m.nr()
+            - #u.nc() == m.nc()
+            - #w.nr() == m.nc()
+            - #w.nc() == 1 
+            - #v.nr() == m.nc()
+            - #v.nc() == m.nc()
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::type <b><a name='det'></a>det</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m is a square matrix
+        ensures
+            - returns the determinant of m
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::matrix_type <b><a name='cholesky_decomposition'></a>cholesky_decomposition</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> A
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - A is a square matrix
+        ensures
+            - if (A has a Cholesky Decomposition) then
+                - returns the decomposition of A.  That is, returns a matrix L
+                  such that L*trans(L) == A.  L will also be lower triangular.
+            - else
+                - returns a matrix with the same dimensions as A but it 
+                  will have a bogus value.  I.e. it won't be a decomposition.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::matrix_type <b><a name='inv_lower_triangular'></a>inv_lower_triangular</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> A
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - A is a square matrix
+        ensures
+            - if (A is lower triangular) then
+                - returns the inverse of A. 
+            - else
+                - returns a matrix with the same dimensions as A but it 
+                  will have a bogus value.  I.e. it won't be an inverse.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::matrix_type <b><a name='inv_upper_triangular'></a>inv_upper_triangular</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> A
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - A is a square matrix
+        ensures
+            - if (A is upper triangular) then
+                - returns the inverse of A. 
+            - else
+                - returns a matrix with the same dimensions as A but it 
+                  will have a bogus value.  I.e. it won't be an inverse.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                              Statistics
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::type <b><a name='min'></a>min</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.size() &gt; 0
+        ensures
+            - returns the value of the smallest element of m
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::type <b><a name='max'></a>max</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - m.size() &gt; 0
+        ensures
+            - returns the value of the biggest element of m
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::type <b><a name='sum'></a>sum</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns the sum of all elements in m
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::type <b><a name='prod'></a>prod</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns the results of multiplying all elements of m together. 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::type <b><a name='mean'></a>mean</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns the mean of all elements in m. 
+              (i.e. returns sum(m)/(m.nr()*m.nc()))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix_exp::type <b><a name='variance'></a>variance</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns the unbiased sample variance of all elements in m 
+              (i.e. 1.0/(m.nr()*m.nc() - 1)*(sum of all pow(m(i,j) - mean(m),2)))
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>const</font> matrix <b><a name='covariance'></a>covariance</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - matrix_exp::type == a dlib::matrix object
+            - m.nr() &gt; 1
+            - m.nc() == 1 (i.e. m is a column vector)
+            - for all valid i, j:
+                - m(i).nr() &gt; 0
+                - m(i).nc() == 1
+                - m(i).nr() == m(j).nr() 
+                - i.e. m contains only column vectors and all the column vectors
+                  have the same non-zero length
+        ensures
+            - returns the unbiased sample covariance matrix for the set of samples
+              in m.  
+              (i.e. 1.0/(m.nr()-1)*(sum of all (m(i) - mean(m))*trans(m(i) - mean(m))))
+            - the returned matrix will contain elements of type matrix_exp::type::type.
+            - the returned matrix will have m(0).nr() rows and columns.
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                                 Pixel and Image Utilities
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> P
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='pixel_to_vector'></a>pixel_to_vector</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> P<font color='#5555FF'>&amp;</font> pixel
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;P&gt;::has_alpha == false
+        ensures
+            - returns a matrix M such that:
+                - M::type == T
+                - M::NC == 1 
+                - M::NR == pixel_traits&lt;P&gt;::num
+                - if (pixel_traits&lt;P&gt;::grayscale) then
+                    - M(0) == pixel 
+                - if (pixel_traits&lt;P&gt;::rgb) then
+                    - M(0) == pixel.red 
+                    - M(1) == pixel.green 
+                    - M(2) == pixel.blue 
+                - if (pixel_traits&lt;P&gt;::hsi) then
+                    - M(0) == pixel.h 
+                    - M(1) == pixel.s 
+                    - M(2) == pixel.i 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> P
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='vector_to_pixel'></a>vector_to_pixel</b> <font face='Lucida Console'>(</font>
+        P<font color='#5555FF'>&amp;</font> pixel,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> vector 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - pixel_traits&lt;P&gt;::has_alpha == false
+            - vector::NR == pixel_traits&lt;P&gt;::num
+            - vector::NC == 1 
+              (i.e. you have to use a statically dimensioned vector)
+        ensures
+            - if (pixel_traits&lt;P&gt;::grayscale) then
+                - pixel == M(0) 
+            - if (pixel_traits&lt;P&gt;::rgb) then
+                - pixel.red   == M(0)  
+                - pixel.green == M(1) 
+                - pixel.blue  == M(2)  
+            - if (pixel_traits&lt;P&gt;::hsi) then
+                - pixel.h == M(0)
+                - pixel.s == M(1)
+                - pixel.i == M(2)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'><u>long</u></font> lower,
+        <font color='#0000FF'><u>long</u></font> upper 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix_exp <b><a name='clamp'></a>clamp</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&amp;</font> m
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                    - if (m(r,c) &gt; upper) then
+                        - R(r,c) == upper
+                    - else if (m(r,c) &lt; lower) then
+                        - R(r,c) == lower
+                    - else
+                        - R(r,c) == m(r,c)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIx_UTILITIES_ABSTRACT_
+</font>
+
+</pre></body></html>

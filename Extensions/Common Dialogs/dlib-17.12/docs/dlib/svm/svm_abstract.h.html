@@ -1,0 +1,453 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - svm_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2007  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SVm_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SVm_ABSTRACT_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>cmath<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>limits<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>sstream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../matrix/matrix_abstract.h.html'>../matrix/matrix_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='function_abstract.h.html'>function_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='kernel_abstract.h.html'>kernel_abstract.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>class</font> <b><a name='invalid_svm_nu_error'></a>invalid_svm_nu_error</b> : <font color='#0000FF'>public</font> dlib::error 
+    <b>{</b> 
+        <font color='#009900'>/*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is an exception class used to indicate that a
+                value of nu used for svm training is incompatible with a
+                particular data set.
+
+                this-&gt;nu will be set to the invalid value of nu used.
+        !*/</font>
+
+    <font color='#0000FF'>public</font>: 
+        <b><a name='invalid_svm_nu_error'></a>invalid_svm_nu_error</b><font face='Lucida Console'>(</font><font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> msg, <font color='#0000FF'><u>double</u></font> nu_<font face='Lucida Console'>)</font> : dlib::error<font face='Lucida Console'>(</font>msg<font face='Lucida Console'>)</font>, nu<font face='Lucida Console'>(</font>nu_<font face='Lucida Console'>)</font> <b>{</b><b>}</b>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> nu;
+    <b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>typename</font> T::type <b><a name='maximum_nu'></a>maximum_nu</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> y
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == a matrix object or an object convertible to a matrix via 
+              vector_to_matrix()
+            - y.nc() == 1
+            - y.nr() &gt; 1
+            - for all valid i:
+                - y(i) == -1 or +1
+        ensures
+            - returns the maximum valid nu that can be used with the svm_nu_trainer and
+              the training set labels from the given y vector.
+              (i.e. 2.0*min(number of +1 examples in y, number of -1 examples in y)/y.nr())
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'><u>bool</u></font> <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> <b><a name='is_binary_classification_problem'></a>is_binary_classification_problem</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> U<font color='#5555FF'>&amp;</font> x_labels
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == a matrix or something convertible to a matrix via vector_to_matrix()
+            - U == a matrix or something convertible to a matrix via vector_to_matrix()
+        ensures
+            - returns true if all of the following are true and false otherwise:
+                - x.nc()        == 1 (i.e. x is a column vector)
+                - x_labels.nc() == 1 (i.e. x_labels is a column vector)
+                - x.nr() == x_labels.nr() 
+                - x.nr() &gt; 1
+                - for all valid i:
+                    - x_labels(i) == -1 or +1
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> K 
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='svm_nu_trainer'></a>svm_nu_trainer</b>
+    <b>{</b>
+        <font color='#009900'>/*!
+            REQUIREMENTS ON K 
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object implements a trainer for a nu support vector machine for 
+                solving binary classification problems.
+
+                The implementation of the nu-svm training algorithm used by this object is based
+                on the following excellent papers:
+                    - Chang and Lin, Training {nu}-Support Vector Classifiers: Theory and Algorithms
+                    - Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                      machines, 2001. Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
+
+        !*/</font>
+
+    <font color='#0000FF'>public</font>:
+        <font color='#0000FF'>typedef</font> K kernel_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::scalar_type scalar_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::sample_type sample_type;
+        <font color='#0000FF'>typedef</font> <font color='#0000FF'>typename</font> kernel_type::mem_manager_type mem_manager_type;
+        <font color='#0000FF'>typedef</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> trained_function_type;
+
+        <b><a name='svm_nu_trainer'></a>svm_nu_trainer</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - This object is properly initialized and ready to be used
+                  to train a support vector machine.
+                - #get_nu() == 0.1 
+                - #get_cache_size() == 200
+                - #get_epsilon() == 0.001
+        !*/</font>
+
+        <b><a name='svm_nu_trainer'></a>svm_nu_trainer</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> kernel, 
+            <font color='#0000FF'>const</font> scalar_type<font color='#5555FF'>&amp;</font> nu
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt; nu &lt;= 1
+            ensures
+                - This object is properly initialized and ready to be used
+                  to train a support vector machine.
+                - #get_kernel() == kernel
+                - #get_nu() == nu
+                - #get_cache_size() == 200
+                - #get_epsilon() == 0.001
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_cache_size'></a>set_cache_size</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'><u>long</u></font> cache_size
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - cache_size &gt; 0
+            ensures
+                - #get_cache_size() == cache_size 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> <b><a name='get_cache_size'></a>get_cache_size</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the number of megabytes of cache this object will use
+                  when it performs training via the this-&gt;train() function.
+                  (bigger values of this may make training go faster but won't affect 
+                  the result.  However, too big a value will cause you to run out of 
+                  memory, obviously.)
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_epsilon'></a>set_epsilon</b> <font face='Lucida Console'>(</font>
+            scalar_type eps
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - eps &gt; 0
+            ensures
+                - #get_epsilon() == eps 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_epsilon'></a>get_epsilon</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Generally a good value for this is 0.001.  Smaller values may result
+                  in a more accurate solution but take longer to execute.
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_kernel'></a>set_kernel</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> k
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - #get_kernel() == k 
+        !*/</font>
+
+        <font color='#0000FF'>const</font> kernel_type<font color='#5555FF'>&amp;</font> <b><a name='get_kernel'></a>get_kernel</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns a copy of the kernel function in use by this object
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='set_nu'></a>set_nu</b> <font face='Lucida Console'>(</font>
+            scalar_type nu
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            requires
+                - 0 &lt; nu &lt;= 1
+            ensures
+                - #get_nu() == nu
+        !*/</font>
+
+        <font color='#0000FF'>const</font> scalar_type <b><a name='get_nu'></a>get_nu</b> <font face='Lucida Console'>(</font>
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            ensures
+                - returns the nu svm parameter.  This is a value between 0 and
+                  1.  It is the parameter that determines the trade off between
+                  trying to fit the training data exactly or allowing more errors 
+                  but hopefully improving the generalization ability of the 
+                  resulting classifier.  For more information you should consult
+                  the papers referenced above.
+        !*/</font>
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> in_sample_vector_type,
+            <font color='#0000FF'>typename</font> in_scalar_vector_type
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> decision_function<font color='#5555FF'>&lt;</font>kernel_type<font color='#5555FF'>&gt;</font> <b><a name='train'></a>train</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+            <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y
+        <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+        <font color='#009900'>/*!
+            requires
+                - is_binary_classification_problem(x,y) == true
+                - x == a matrix or something convertible to a matrix via vector_to_matrix().
+                  Also, x should contain sample_type objects.
+                - y == a matrix or something convertible to a matrix via vector_to_matrix().
+                  Also, y should contain scalar_type objects.
+            ensures
+                - trains a nu support vector classifier given the training samples in x and 
+                  labels in y.  Training is done when the error is less than get_epsilon().
+                - returns a decision function F with the following properties:
+                    - if (new_x is a sample predicted have +1 label) then
+                        - F(new_x) &gt;= 0
+                    - else
+                        - F(new_x) &lt; 0
+            throws
+                - invalid_svm_nu_error
+                  This exception is thrown if get_nu() &gt; maximum_nu(y)
+                - std::bad_alloc
+        !*/</font>
+
+        <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+            svm_nu_trainer<font color='#5555FF'>&amp;</font> item
+        <font face='Lucida Console'>)</font>;
+        <font color='#009900'>/*!
+            ensures
+                - swaps *this and item
+        !*/</font>
+    <b>}</b>; 
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> K<font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        svm_nu_trainer<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a,
+        svm_nu_trainer<font color='#5555FF'>&lt;</font>K<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+    <font color='#009900'>/*!
+        provides a global swap
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type,
+        <font color='#0000FF'>typename</font> in_sample_vector_type,
+        <font color='#0000FF'>typename</font> in_scalar_vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> probabilistic_decision_function<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> trainer_type::kernel_type<font color='#5555FF'>&gt;</font> 
+    <b><a name='train_probabilistic_decision_function'></a>train_probabilistic_decision_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> folds
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        requires
+            - 1 &lt; folds &lt;= x.nr()
+            - is_binary_classification_problem(x,y) == true
+            - trainer_type == some kind of trainer object (e.g. svm_nu_trainer)
+        ensures
+            - trains a nu support vector classifier given the training samples in x and 
+              labels in y.  
+            - returns a probabilistic_decision_function that represents the trained svm.
+            - The parameters of the probability model are estimated by performing k-fold 
+              cross validation. 
+            - The number of folds used is given by the folds argument.
+        throws
+            - any exceptions thrown by trainer.train()
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//                                  Miscellaneous functions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> trainer_type,
+        <font color='#0000FF'>typename</font> in_sample_vector_type,
+        <font color='#0000FF'>typename</font> in_scalar_vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> trainer_type::scalar_type, <font color='#979000'>1</font>, <font color='#979000'>2</font>, <font color='#0000FF'>typename</font> trainer_type::mem_manager_type<font color='#5555FF'>&gt;</font> 
+    <b><a name='cross_validate_trainer'></a>cross_validate_trainer</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> trainer_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x,
+        <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> folds
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_binary_classification_problem(x,y) == true
+            - 1 &lt; folds &lt;= x.nr()
+            - trainer_type == some kind of trainer object (e.g. svm_nu_trainer)
+        ensures
+            - performs k-fold cross validation by using the given trainer to solve the
+              given binary classification problem for the given number of folds.
+              Each fold is tested using the output of the trainer and the average 
+              classification accuracy from all folds is returned.  
+            - The accuracy is returned in a column vector, let us call it R.  Both 
+              quantities in R are numbers between 0 and 1 which represent the fraction 
+              of examples correctly classified.  R(0) is the fraction of +1 examples 
+              correctly classified and R(1) is the fraction of -1 examples correctly 
+              classified.
+            - The number of folds used is given by the folds argument.
+        throws
+            - any exceptions thrown by trainer.train()
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> dec_funct_type,
+        <font color='#0000FF'>typename</font> in_sample_vector_type,
+        <font color='#0000FF'>typename</font> in_scalar_vector_type
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> dec_funct_type::scalar_type, <font color='#979000'>1</font>, <font color='#979000'>2</font>, <font color='#0000FF'>typename</font> dec_funct_type::mem_manager_type<font color='#5555FF'>&gt;</font> 
+    <b><a name='test_binary_decision_function'></a>test_binary_decision_function</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> dec_funct_type<font color='#5555FF'>&amp;</font> trainer,
+        <font color='#0000FF'>const</font> in_sample_vector_type<font color='#5555FF'>&amp;</font> x_test,
+        <font color='#0000FF'>const</font> in_scalar_vector_type<font color='#5555FF'>&amp;</font> y_test
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - is_binary_classification_problem(x_test,y_test) == true
+            - dec_funct_type == some kind of decision function object (e.g. decision_function)
+        ensures
+            - tests the given decision function by calling on the x_test and y_test samples.
+            - The test accuracy is returned in a column vector, let us call it R.  Both 
+              quantities in R are numbers between 0 and 1 which represent the fraction 
+              of examples correctly classified.  R(0) is the fraction of +1 examples 
+              correctly classified and R(1) is the fraction of -1 examples correctly 
+              classified.
+        throws
+            - std::bad_alloc
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='randomize_samples'></a>randomize_samples</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> samples,
+        U<font color='#5555FF'>&amp;</font> labels 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == a matrix object that contains a swappable type
+            - U == a matrix object that contains a swappable type
+            - samples.nc() == 1
+            - labels.nc() == 1
+            - samples.nr() == labels.nr()
+        ensures
+            - randomizes the order of the samples and labels but preserves
+              the pairing between each sample and its label
+            - for all valid i:
+                - let r == the random index samples(i) was moved to.  then:
+                    - #labels(r) == labels(i)
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='randomize_samples'></a>randomize_samples</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == a matrix object that contains a swappable type
+            - samples.nc() == 1
+        ensures
+            - randomizes the order of the elements inside samples 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> U
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='randomize_samples'></a>randomize_samples</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> samples,
+        U<font color='#5555FF'>&amp;</font> labels 
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == an object compatible with std::vector that contains a swappable type 
+            - U == an object compatible with std::vector that contains a swappable type 
+            - samples.size() == labels.size()
+        ensures
+            - randomizes the order of the samples and labels but preserves
+              the pairing between each sample and its label
+            - for all valid i:
+                - let r == the random index samples[i] was moved to.  then:
+                    - #labels[r] == labels[i]
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='randomize_samples'></a>randomize_samples</b> <font face='Lucida Console'>(</font>
+        T<font color='#5555FF'>&amp;</font> samples
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - T == an object compatible with std::vector that contains a swappable type 
+        ensures
+            - randomizes the order of the elements inside samples 
+    !*/</font>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SVm_ABSTRACT_
+</font>
+
+
+</pre></body></html>

@@ -1,0 +1,536 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I=">
+<title>dlib C++ Library
+               - Metaprogramming</title>
+<script language="JavaScript">
+
+            // ---------------------------------------------
+            // --- Name:    Easy DHTML Treeview           --
+            // --- Author:  D.D. de Kerf                  --
+            // --- Version: 0.2          Date: 13-6-2001  --
+            // ---------------------------------------------
+            function Toggle(node)
+            {
+               // Unfold the branch if it isn't visible
+               var next_node = node.nextSibling;
+               if (next_node.style.display == 'none')
+               {
+                  // Change the image (if there is an image)
+                  if (node.childNodes.length > 0)
+                  {
+                     if (node.childNodes.length > 0)
+                     { 
+                        if (node.childNodes.item(0).nodeName == "IMG")
+                        {
+                           node.childNodes.item(0).src = "minus.gif";
+                        }
+                     }
+                  }
+
+                  next_node.style.display = 'block';
+               }
+               // Collapse the branch if it IS visible
+               else
+               {
+                  // Change the image (if there is an image)
+                  if (node.childNodes.length > 0)
+                  {
+                     if (node.childNodes.length > 0)
+                     { 
+                        if (node.childNodes.item(0).nodeName == "IMG")
+                        {
+                           node.childNodes.item(0).src = "plus.gif";
+                        }
+                     }
+                  }
+
+                  next_node.style.display = 'none';
+               }
+
+            }
+            </script><style type="text/css">
+               body {margin:0px;}
+               pre {margin:0px;}
+
+               ul.tree  li { list-style: none;  margin-left:10px;} 
+               ul.tree  { margin:0px; padding:0px; margin-left:5px;  }
+               ul.tree  li ul { margin-left:10px; padding:0px; }
+
+               div#component {
+                  background-color:white; 
+                  border: 2px solid rgb(102,102,102); 
+                  text-align:left;
+                  margin-top: 1.5em;
+                  padding: 0.7em;
+               }
+
+               div#logb {
+                  text-align:left;
+                  padding: 0.0em;
+                  float: left;
+                  background-color:#c0c0c0; 
+                  border: double ; 
+                  margin: 0.5em;
+               }
+
+               .bdotted {border-bottom: 1px dotted}
+               .bdashed {border-bottom: 1px dashed}
+               .bsolid {border-bottom: 1px solid}
+               .bdouble {border-bottom: 1px double}
+               .bgroove {border-bottom: 1px groove}
+               .bridge {border-bottom: 1px ridge}
+               .binset {border-bottom: 1px inset}
+               .boutset {border-bottom: 1px outset}
+
+               div#row1 {
+                  background-color:#dfdfdf; 
+               }
+               div#row2 {
+                  background-color:#f2f2f2; 
+               }
+
+               div#typedefs {
+                  margin-left: 1.5em;
+                  margin-top: 0.2em;
+                  border: 1px dotted;
+                  width: 52em;
+               }
+
+               div#tdn {
+                  width: 10em;
+               }
+
+               .fullhr {
+                  clear: both;
+               }
+
+               body {
+                  text-align: center;
+               }
+
+               div#entire_page {
+                  width:62em;  
+                  text-align: left;
+                  margin-top: 0.4em;
+                  margin-left: auto;
+                  margin-right: auto;
+               }
+            </style>
+</head>
+<body bgcolor="#EDF3EE">
+<a name="top"></a><div id="entire_page">
+<table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10"><tr height="100%">
+<td BGCOLOR="#E3E3E3" VALIGN="TOP" height="100%">
+<br><table WIDTH="145" height="100%">
+<tr>
+<td VALIGN="TOP">
+      <b>The Library</b><ul class="tree">
+<li><a href="algorithms.html">Algorithms</a></li>
+<li><a href="api.html">API Wrappers</a></li>
+<li><a href="compression.html">Compression</a></li>
+<li><a href="containers.html">Containers</a></li>
+<li><a href="imaging.html">Imaging</a></li>
+<li><a href="metaprogramming.html">Metaprogramming</a></li>
+<li><a href="other.html">Miscellaneous</a></li>
+<li><a href="network.html">Network</a></li>
+<li><a href="parsing.html">Parsing</a></li>
+</ul>
+<br>
+ 
+
+      <b>Help/Info</b><ul class="tree">
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples</u></font></a><ul style="display:none;">
+<li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li>
+<li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li>
+<li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li>
+<li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li>
+<li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li>
+<li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li>
+<li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li>
+<li><a href="gui_api_ex.cpp.html">GUI</a></li>
+<li><a href="server_http_ex.cpp.html">HTTP_Server</a></li>
+<li><a href="image_ex.cpp.html">Image</a></li>
+<li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li>
+<li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li>
+<li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li>
+<li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li>
+<li><a href="logger_ex.cpp.html">Logger</a></li>
+<li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li>
+<li><a href="matrix_ex.cpp.html">Matrix</a></li>
+<li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li>
+<li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li>
+<li><a href="mlp_ex.cpp.html">Neural_Network</a></li>
+<li><a href="pipe_ex.cpp.html">Pipe</a></li>
+<li><a href="queue_ex.cpp.html">Queue</a></li>
+<li><a href="rank_features_ex.cpp.html">Rank_Features</a></li>
+<li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li>
+<li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li>
+<li><a href="sockets_ex.cpp.html">Sockets</a></li>
+<li><a href="sockets_ex_2.cpp.html">Sockets_2</a></li>
+<li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li>
+<li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li>
+<li><a href="svm_ex.cpp.html">Support_Vector_Machine</a></li>
+<li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li>
+<li><a href="threads_ex.cpp.html">Threads</a></li>
+<li><a href="thread_function_ex.cpp.html">Thread_Function</a></li>
+<li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li>
+<li><a href="timer_ex.cpp.html">Timer</a></li>
+<li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li>
+</ul>
+</li>
+<li><a href="index.html">Home</a></li>
+<li><a href="compile.html">How to compile</a></li>
+<li><a href="term_index.html">Index</a></li>
+<li><a href="intro.html">Introduction</a></li>
+<li><a href="license.html">License</a></li>
+</ul>
+<br>
+ 
+      <b>Current Release</b><ul class="tree">
+<li><a href="change_log.html">Change Log</a></li>
+<li><a href="release_notes.html">Release Notes</a></li>
+<li>Version: 17.12</li>
+</ul>
+<br>
+
+
+      
+    </td>
+<td width="1"></td>
+</tr>
+<tr><td valign="bottom">
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      
+      Last Modified:<br>
+      Nov 10, 2008
+      <br>
+      <br>
+   </td></tr>
+</table>
+</td>
+<td VALIGN="TOP" width="100%">
+<center><h1>Metaprogramming</h1></center>
+      <br><br>
+
+         <p>
+         This page documents library components that provide metaprogramming sorts of functionality.  For
+         the most part they are useful for putting design by contract checks into code or doing various kinds of
+         clever things with templates. 
+         </p>
+         <p>
+            For example, you might have a templated function that is templated on a type T and you want to
+            make sure that T is either a char or wchar_t type.  You could place the following into your code
+            and it would cause the compile to error out when T was set to something other than char or wchar_t.
+            <br>
+            <tt>COMPILE_TIME_ASSERT((is_same_type&lt;T,char&gt;::value || is_same_type&lt;T,wchar_t&gt;::value));</tt>
+         </p>
+
+   </td>
+<td BGCOLOR="#E3E3E3" VALIGN="TOP" height="100%">
+<br><table WIDTH="200" height="100%">
+<tr>
+<td VALIGN="TOP">
+      <b>Objects</b><ul class="tree">
+<li><a href="#enable_if">enable_if</a></li>
+<li><a href="#is_built_in_scalar_type">is_built_in_scalar_type</a></li>
+<li><a href="#is_const_type">is_const_type</a></li>
+<li><a href="#is_directed_graph">is_directed_graph</a></li>
+<li><a href="#is_function">is_function</a></li>
+<li><a href="#is_graph">is_graph</a></li>
+<li><a href="#is_matrix">is_matrix</a></li>
+<li><a href="#is_pointer_type">is_pointer_type</a></li>
+<li><a href="#is_same_type">is_same_type</a></li>
+<li><a href="#is_signed_type">is_signed_type</a></li>
+<li><a href="#is_std_vector">is_std_vector</a></li>
+<li><a href="#is_unsigned_type">is_unsigned_type</a></li>
+<li><a href="#noncopyable">noncopyable</a></li>
+<li><a href="#static_switch">static_switch</a></li>
+<li><a href="#unsigned_type">unsigned_type</a></li>
+</ul>
+<br>
+ 
+      <b>Global Functions</b><ul class="tree">
+<li><a href="#ASSERT_ARE_NOT_SAME_TYPE">ASSERT_ARE_NOT_SAME_TYPE</a></li>
+<li><a href="#ASSERT_ARE_SAME_TYPE">ASSERT_ARE_SAME_TYPE</a></li>
+<li><a href="#assign_zero_if_built_in_scalar_type">assign_zero_if_built_in_scalar_type</a></li>
+<li><a href="#COMPILE_TIME_ASSERT">COMPILE_TIME_ASSERT</a></li>
+<li><a href="#DLIB_ASSERT">DLIB_ASSERT</a></li>
+<li><a href="#DLIB_CASSERT">DLIB_CASSERT</a></li>
+<li><a href="#DLIB_STACK_TRACE">DLIB_STACK_TRACE</a></li>
+<li><a href="#DLIB_STACK_TRACE_NAMED">DLIB_STACK_TRACE_NAMED</a></li>
+<li><a href="#get_stack_trace">get_stack_trace</a></li>
+<li><a href="#TIME_THIS">TIME_THIS</a></li>
+<li><a href="#wrap_function">wrap_function</a></li>
+<li><a href="#_dT">_dT</a></li>
+</ul>
+<br>
+
+      <b>Other</b><ul class="tree"><li><a href="#portability_macros">portability_macros</a></li></ul>
+<br>
+
+    </td>
+<td width="1"></td>
+</tr>
+<tr><td valign="bottom"></td></tr>
+</table>
+</td>
+</tr></table>
+<a name="ASSERT_ARE_NOT_SAME_TYPE"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">ASSERT_ARE_NOT_SAME_TYPE</h1>
+<BR><BR>
+      <p>
+            This is a macro function for debuging.  Its form is <tt>ASSERT_ARE_NOT_SAME_TYPE(type1, type2)</tt>.  
+            If type1 and type2 are the same type then the compile will fail.  This is sometimes useful 
+            in validating template arguments.
+      </p>
+         <BR><BR><b>Specification: </b><a href="dlib/assert.h.html">dlib/assert.h</a><BR><B>File to include: </B><a href="dlib/assert.h.html">dlib/assert.h</a><br><br><center></center>
+</div></a><a name="ASSERT_ARE_SAME_TYPE"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">ASSERT_ARE_SAME_TYPE</h1>
+<BR><BR>
+      <p>
+            This is a macro function for debuging.  Its form is <tt>ASSERT_ARE_SAME_TYPE(type1, type2)</tt>.  
+            If type1 and type2 are not the same type then the compile will fail.  This is sometimes useful 
+            in validating template arguments.
+      </p>
+         <BR><BR><b>Specification: </b><a href="dlib/assert.h.html">dlib/assert.h</a><BR><B>File to include: </B><a href="dlib/assert.h.html">dlib/assert.h</a><br><br><center></center>
+</div></a><a name="assign_zero_if_built_in_scalar_type"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">assign_zero_if_built_in_scalar_type</h1>
+<BR><BR>        
+            <p>
+               This function assigns its argument the value of 0 if it is a built in scalar
+               type according to the <a href="#is_built_in_scalar_type">is_built_in_scalar_type</a>
+               template.  If it isn't a built in scalar type then it does nothing.
+            </p>
+            <p>
+               This function is useful for suppressing compiler warnings about uninitialized 
+               types inside of templates that are designed to accept the built in types
+               as well as user defined classes.
+            </p>
+            
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#assign_zero_if_built_in_scalar_type">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="COMPILE_TIME_ASSERT"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">COMPILE_TIME_ASSERT</h1>
+<BR><BR>
+      <p>
+            This is a macro function for debuging.  Its form is <tt>COMPILE_TIME_ASSERT(condition that should 
+            be true)</tt>.  The condition must be a compile time constant and if it is false then the compile
+            will fail.
+      </p>
+         <BR><BR><b>Specification: </b><a href="dlib/assert.h.html">dlib/assert.h</a><BR><B>File to include: </B><a href="dlib/assert.h.html">dlib/assert.h</a><br><br><center></center>
+</div></a><a name="DLIB_ASSERT"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">DLIB_ASSERT</h1>
+<BR><BR>
+      <p>
+            This is a macro function for debuging.  Its form is <tt>DLIB_ASSERT(condition that should be 
+            true,error message)</tt>.  If the condition is false DLIB_ASSERT throws an exception of type 
+            dlib::fatal_error with fatal_error::type == EBROKEN_ASSERT.  An error message detailing
+            the nature of the problem is stored in the member variable info which is of type std::string.  
+            Look in the following file for more details.  The exception classes are defined 
+            <a href="dlib/error.h.html#error">here</a>.
+      </p>
+      <p>
+         This macro is only enabled if _DEBUG, DEBUG or ENABLE_ASSERTS is defined.  Also, if this macro <i>is</i>
+         enabled then ENABLE_ASSERTS will be defined even if you didn't define it.
+      </p>
+      <p>
+         Note that when this macro fails and throws an exception it also calls the global
+         C function dlib_assert_breakpoint().  This behavior makes it easy to set a debugging
+         tool to break when DLIB_CASSERT fails by setting a breakpoing on dlib_assert_breakpoint().
+      </p>
+         <BR><BR><b>Specification: </b><a href="dlib/assert.h.html">dlib/assert.h</a><BR><B>File to include: </B><a href="dlib/assert.h.html">dlib/assert.h</a><br><br><center></center>
+</div></a><a name="DLIB_CASSERT"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">DLIB_CASSERT</h1>
+<BR><BR>
+      <p>
+         This is a macro function that is identicial to the <a href="#DLIB_ASSERT">DLIB_ASSERT</a> macro
+         except that it is always enabled.  Even if _DEBUG, DEBUG and ENABLE_ASSERTS are not defined.
+      </p>
+      <p>
+         Note that when this macro fails and throws an exception it also calls the global
+         C function dlib_assert_breakpoint().  This behavior makes it easy to set a debugging
+         tool to break when DLIB_CASSERT fails by setting a breakpoing on dlib_assert_breakpoint().
+      </p>
+         <BR><BR><b>Specification: </b><a href="dlib/assert.h.html">dlib/assert.h</a><BR><B>File to include: </B><a href="dlib/assert.h.html">dlib/assert.h</a><br><br><center></center>
+</div></a><a name="DLIB_STACK_TRACE"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">DLIB_STACK_TRACE</h1>
+<BR><BR>
+         <p>
+            This is a preprocessor macro that allows you to tag a function so 
+            that dlib will keep track of it in a function call stack.  That is,
+            you will be able to see a stack trace by calling <a href="#get_stack_trace">get_stack_trace</a>
+            if you put this macro at the top of your functions.
+         </p>
+         <p>
+            This macro is only enabled if DLIB_ENABLE_STACK_TRACE is defined.  If it isn't defined then
+            this macro doesn't do anything.  Also note that when this macro is defined it will
+            cause <a href="#DLIB_ASSERT">DLIB_ASSERT</a> and <a href="#DLIB_CASSERT">DLIB_CASSERT</a>
+            to include a stack trace in their error messages.
+         </p>
+         <BR><BR><b>Specification: </b><a href="dlib/stack_trace.h.html">dlib/stack_trace.h</a><BR><B>File to include: </B><a href="dlib/assert.h.html">dlib/assert.h</a><br><br><center></center>
+</div></a><a name="DLIB_STACK_TRACE_NAMED"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">DLIB_STACK_TRACE_NAMED</h1>
+<BR><BR>
+            This is a preprocessor macro just like <a href="#DLIB_STACK_TRACE">DLIB_STACK_TRACE</a>
+            except that it allows you to supply your own string to use as the function name
+            in the stack trace instead of the one deduced by DLIB_STACK_TRACE.
+            <p>
+               This macro is only enabled if DLIB_ENABLE_STACK_TRACE is defined.  
+            </p>
+         <BR><BR><b>Specification: </b><a href="dlib/stack_trace.h.html">dlib/stack_trace.h</a><BR><B>File to include: </B><a href="dlib/assert.h.html">dlib/assert.h</a><br><br><center></center>
+</div></a><a name="enable_if"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">enable_if</h1>
+<BR><BR>
+            This is a family of templates from the Boost C++ libraries that makes it somewhat easier to control
+            template specilization.  For the details see <a href="enable_if.html">
+               this page</a>.  Note that the header <tt>dlib/enable_if.h</tt> brings
+               these templates into the dlib namespace.<br>
+         <BR><B>File to include: </B><a href="dlib/enable_if.h.html">dlib/enable_if.h</a><br><br><center></center>
+</div></a><a name="get_stack_trace"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">get_stack_trace</h1>
+<BR><BR>
+            This function allows you to query the current stack trace.
+            <p>
+               This macro is only enabled if DLIB_ENABLE_STACK_TRACE is defined.  
+            </p>
+         <BR><BR><b>Specification: </b><a href="dlib/stack_trace.h.html">dlib/stack_trace.h</a><BR><B>File to include: </B><a href="dlib/assert.h.html">dlib/assert.h</a><br><br><center></center>
+</div></a><a name="is_built_in_scalar_type"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_built_in_scalar_type</h1>
+<BR><BR>
+            This is a template where is_built_in_scalar_type&lt;T&gt;::value == true when T
+            is a built in scalar type such as int, char, float, etc...
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#is_built_in_scalar_type">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="is_const_type"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_const_type</h1>
+<BR><BR>
+            This is a template where is_const_type&lt;T&gt;::value == true when T is a const 
+            type ane false otherwise.
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#is_const_type">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="is_directed_graph"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_directed_graph</h1>
+<BR><BR>
+            This is a template where is_directed_graph&lt;T&gt;::value == true when T
+            is a <a href="containers.html#directed_graph">directed_graph</a> object.
+         <BR><BR><b>Specification: </b><a href="dlib/is_kind.h.html#is_directed_graph">dlib/is_kind.h</a><BR><B>File to include: </B><a href="dlib/is_kind.h.html">dlib/is_kind.h</a><br><br><center></center>
+</div></a><a name="is_function"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_function</h1>
+<BR><BR>
+            This is a template where is_function&lt;T&gt;::value == true when T is 
+            a function type.  
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#is_function">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="is_graph"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_graph</h1>
+<BR><BR>
+            This is a template where is_graph&lt;T&gt;::value == true when T
+            is a <a href="containers.html#graph">graph</a> object.
+         <BR><BR><b>Specification: </b><a href="dlib/is_kind.h.html#is_graph">dlib/is_kind.h</a><BR><B>File to include: </B><a href="dlib/is_kind.h.html">dlib/is_kind.h</a><br><br><center></center>
+</div></a><a name="is_matrix"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_matrix</h1>
+<BR><BR>
+            This is a template where is_matrix&lt;T&gt;::value == true when T
+            is a <a href="containers.html#matrix">matrix</a> object or some kind
+            of matrix expression.
+         <BR><BR><b>Specification: </b><a href="dlib/is_kind.h.html#is_matrix">dlib/is_kind.h</a><BR><B>File to include: </B><a href="dlib/is_kind.h.html">dlib/is_kind.h</a><br><br><center></center>
+</div></a><a name="is_pointer_type"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_pointer_type</h1>
+<BR><BR>
+            This is a template where is_pointer_type&lt;T&gt;::value == true when T is a pointer 
+            type ane false otherwise.
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#is_pointer_type">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="is_same_type"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_same_type</h1>
+<BR><BR>
+            This is a template where is_same_type&lt;T,U&gt;::value == true when T and U are 
+            the same type and false otherwise. 
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#is_same_type">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="is_signed_type"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_signed_type</h1>
+<BR><BR>
+            This is a template where is_signed_type&lt;T&gt;::value == true when T is
+            a signed integral type and false when it is an unsigned integral
+            type.
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#is_signed_type">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="is_std_vector"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_std_vector</h1>
+<BR><BR>
+            This is a template where is_std_vector&lt;T&gt;::value == true when T
+            is a <a href="containers.html#std_vector_c">std_vector_c</a> or std::vector object.
+         <BR><BR><b>Specification: </b><a href="dlib/is_kind.h.html#is_std_vector">dlib/is_kind.h</a><BR><B>File to include: </B><a href="dlib/is_kind.h.html">dlib/is_kind.h</a><br><br><center></center>
+</div></a><a name="is_unsigned_type"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_unsigned_type</h1>
+<BR><BR>
+            This is a template where is_unsigned_type&lt;T&gt;::value == true when T is
+            an unsigned integral type and false when it is a signed integral
+            type.
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#is_unsigned_type">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="noncopyable"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">noncopyable</h1>
+<BR><BR>
+            This is a simple class that makes it easy to declare a non-copyable object.
+            To use it to make your own class non-copyable just inherit from it.
+         <BR><BR><b>Specification: </b><a href="dlib/noncopyable.h.html#noncopyable">dlib/noncopyable.h</a><BR><B>File to include: </B><a href="dlib/noncopyable.h.html">dlib/noncopyable.h</a><br><br><center></center>
+</div></a><a name="portability_macros"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">portability_macros</h1>
+<BR><BR>        
+            This file #defines various macros depending on the platform being compiled under. 
+            See the file itself for the specifics.
+         <BR><BR><b>Specification: </b><a href="dlib/platform.h.html">dlib/platform.h</a><BR><B>File to include: </B><a href="dlib/platform.h.html">dlib/platform.h</a><br><br><center></center>
+</div></a><a name="static_switch"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">static_switch</h1>
+<BR><BR>
+        To use this template you give it some number of boolean expressions and it
+        tells you which one of them is true.   If more than one of them is true then
+        it causes a compile time error.  It is useful for cases where you want to
+        specialize a template and you want to specialize it not by
+        the type of object it gets per say but instead according to the values of some
+        type traits associated with the various template arguments.  A simple example of
+        this can be seen in the <a href="imaging.html#assign_pixel">assign_pixel</a>'s
+        implementation which can be found at the bottom of the <a href="dlib/pixel.h.html">
+        dlib/pixel.h</a> file.
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#static_switch">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="TIME_THIS"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">TIME_THIS</h1>
+<BR><BR>        
+            <p>
+            This is a macro function for timing blocks of code.  Its form is <tt>TIME_THIS(whatever you want to time)</tt>
+            It's pretty straight forward. It just prints the time it took to std::cout.
+            </p>
+            <p>
+            There is another version of this function called TIME_THIS_TO which takes as a parameter an ostream
+            object to write its output to.  Its form is <tt>TIME_THIS_TO(what you want to time, the output stream)</tt>;
+            </p>
+            
+         <BR><BR><b>Specification: </b><a href="dlib/time_this.h.html">dlib/time_this.h</a><BR><B>File to include: </B><a href="dlib/time_this.h.html">dlib/time_this.h</a><br><br><center></center>
+</div></a><a name="unsigned_type"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">unsigned_type</h1>
+<BR><BR>
+            This is a template that allows you to obtain the unsigned version 
+            of any integral type.  For example, unsigned_type&lt;signed short&gt;::type ==
+            unsigned short.
+         <BR><BR><b>Specification: </b><a href="dlib/uintn.h.html#unsigned_type">dlib/uintn.h</a><BR><B>File to include: </B><a href="dlib/uintn.h.html">dlib/uintn.h</a><br><br><center></center>
+</div></a><a name="wrap_function"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">wrap_function</h1>
+<BR><BR>        
+            This is a template that allows you to turn a global function into a 
+            function object.  See the specs for more details. 
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#wrap_function">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="_dT"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">_dT</h1>
+<BR><BR>
+            This is a macro function for converting a string/character literal to either a char or wchar_t literal. 
+   Its form is <tt>_dT(target character type,string or character literal)</tt>
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#_dT">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a>
+</div>
+</body>
+</html>

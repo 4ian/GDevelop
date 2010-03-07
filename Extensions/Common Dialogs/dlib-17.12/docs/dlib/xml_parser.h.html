@@ -1,0 +1,54 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - xml_parser.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_XML_PARSEr_
+<font color='#0000FF'>#define</font> DLIB_XML_PARSEr_
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>string<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='xml_parser/xml_parser_kernel_interfaces.h.html'>xml_parser/xml_parser_kernel_interfaces.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='xml_parser/xml_parser_kernel_1.h.html'>xml_parser/xml_parser_kernel_1.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='xml_parser/xml_parser_kernel_c.h.html'>xml_parser/xml_parser_kernel_c.h</a>"
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='map.h.html'>map.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='stack.h.html'>stack.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='sequence.h.html'>sequence.h</a>"
+
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+
+    <font color='#0000FF'>class</font> <b><a name='xml_parser'></a>xml_parser</b>
+    <b>{</b>
+
+
+
+        
+        <font color='#0000FF'>typedef</font> map<font color='#5555FF'>&lt;</font>std::string,std::string,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1b map1a;
+        <font color='#0000FF'>typedef</font> stack<font color='#5555FF'>&lt;</font>std::string,memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_2a<font color='#5555FF'>&gt;</font>::kernel_1a stack1a;
+        <font color='#0000FF'>typedef</font> sequence<font color='#5555FF'>&lt;</font>document_handler<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::kernel_2a seq_dh2a;
+        <font color='#0000FF'>typedef</font> sequence<font color='#5555FF'>&lt;</font>error_handler<font color='#5555FF'>*</font><font color='#5555FF'>&gt;</font>::kernel_2a seq_eh2a;
+
+    
+
+
+        <b><a name='xml_parser'></a>xml_parser</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <b>{</b><b>}</b>
+    <font color='#0000FF'>public</font>:
+        
+        <font color='#009900'>//----------- kernels ---------------
+</font>
+        <font color='#009900'>// kernel_1a        
+</font>        <font color='#0000FF'>typedef</font>     xml_parser_kernel_1<font color='#5555FF'>&lt;</font>map1a,stack1a,seq_dh2a,seq_eh2a<font color='#5555FF'>&gt;</font>    
+                    kernel_1a;
+        <font color='#0000FF'>typedef</font>     xml_parser_kernel_c<font color='#5555FF'>&lt;</font>kernel_1a<font color='#5555FF'>&gt;</font>
+                    kernel_1a_c;
+   
+
+    <b>}</b>;
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_XML_PARSEr_
+</font>
+
+</pre></body></html>

@@ -1,0 +1,149 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - xml_parser_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+
+    This is an example illustrating the use of the xml_parser component in 
+    the dlib C++ Library.
+
+    This example simply reads in an xml file and prints the parsing events
+    to the screen. 
+*/</font>
+
+
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/xml_parser.h.html'>dlib/xml_parser.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>fstream<font color='#5555FF'>&gt;</font>
+
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='doc_handler'></a>doc_handler</b> : <font color='#0000FF'>public</font> document_handler
+<b>{</b>
+    <font color='#009900'>/*
+        As the parser runs it generates events when it encounters tags and
+        data in an XML file.  To be able to receive these events all you have to 
+        do is make a class that inherits from dlib::document_handler and
+        implements its virtual methods.   Then you simply associate an
+        instance of your class with the xml_parser.
+
+        So this class is a simple example document handler that just prints
+        all the events to the screen.
+    */</font>
+<font color='#0000FF'>public</font>:
+
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='start_document'></a>start_document</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>parsing begins</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='end_document'></a>end_document</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Parsing done</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='start_element'></a>start_element</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> line_number,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name,
+        <font color='#0000FF'>const</font> dlib::attribute_list<font color='#5555FF'>&amp;</font> atts
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>on line </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> line_number <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> we hit the &lt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&gt; tag</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+        <font color='#009900'>// print all the tag's attributes
+</font>        atts.<font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>while</font> <font face='Lucida Console'>(</font>atts.<font color='#BB00BB'>move_next</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>\tattribute: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> atts.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>key</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> = </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> atts.<font color='#BB00BB'>element</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.<font color='#BB00BB'>value</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='end_element'></a>end_element</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> line_number,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> name
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>on line </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> line_number <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> we hit the closing tag &lt;/</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> name <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>&gt;</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='characters'></a>characters</b> <font face='Lucida Console'>(</font> 
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> data
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Got some data between tags and it is:\n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='processing_instruction'></a>processing_instruction</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> line_number,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> target,
+        <font color='#0000FF'>const</font> std::string<font color='#5555FF'>&amp;</font> data
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>on line </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> line_number <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> we hit a processing instruction with a target of '</font>" 
+            <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> target <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>' and data '</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> data <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>'</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'>class</font> <b><a name='xml_error_handler'></a>xml_error_handler</b> : <font color='#0000FF'>public</font> error_handler
+<b>{</b>
+    <font color='#009900'>/*
+        This class handles error events that occur during parsing.  
+
+        Just like the document_handler class above it just prints the events to the screen.
+    */</font>
+
+<font color='#0000FF'>public</font>:
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='error'></a>error</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> line_number
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>There is a non-fatal error on line </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> line_number <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> in the file we are parsing.</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+
+    <font color='#0000FF'>virtual</font> <font color='#0000FF'><u>void</u></font> <b><a name='fatal_error'></a>fatal_error</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> line_number
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>There is a fatal error on line </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> line_number <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'> so parsing will now halt</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <b>}</b>
+<b>}</b>;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>int</u></font> argc, <font color='#0000FF'><u>char</u></font><font color='#5555FF'>*</font><font color='#5555FF'>*</font> argv<font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Check if the user entered an argument to this application.  
+</font>    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>argc <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>2</font><font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>Please enter an xml file to parse on the command line</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+    <b>}</b>
+
+    <font color='#009900'>// Try to open the file given on the command line
+</font>    ifstream <font color='#BB00BB'>fin</font><font face='Lucida Console'>(</font>argv[<font color='#979000'>1</font>]<font face='Lucida Console'>)</font>;
+    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>fin<font face='Lucida Console'>)</font>
+    <b>{</b>
+        cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>unable to open file: </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> argv[<font color='#979000'>1</font>] <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+        <font color='#0000FF'>return</font> <font color='#979000'>1</font>;
+    <b>}</b>
+
+    <font color='#009900'>// now make the xml parser and our document and error handlers
+</font>    xml_parser::kernel_1a_c parser;
+    doc_handler dh;
+    xml_error_handler eh;
+
+    <font color='#009900'>// now associate the handlers with the parser and tell it to parse
+</font>    parser.<font color='#BB00BB'>add_document_handler</font><font face='Lucida Console'>(</font>dh<font face='Lucida Console'>)</font>;
+    parser.<font color='#BB00BB'>add_error_handler</font><font face='Lucida Console'>(</font>eh<font face='Lucida Console'>)</font>;
+    parser.<font color='#BB00BB'>parse</font><font face='Lucida Console'>(</font>fin<font face='Lucida Console'>)</font>;
+<b>}</b>
+
+
+</pre></body></html>

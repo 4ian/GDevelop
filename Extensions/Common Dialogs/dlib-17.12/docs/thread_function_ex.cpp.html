@@ -1,0 +1,55 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - thread_function_ex.cpp</title></head><body bgcolor='white'><pre>
+<font color='#009900'>/*
+    This is a very simple example that illustrates the use of the
+    thread_function object from the dlib C++ Library.
+
+    The output of the programs should look like this:
+
+        45.6
+        9.999
+        I have no args!
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/threads.h.html'>dlib/threads.h</a>"
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#0000FF'><u>void</u></font> <b><a name='thread_1'></a>thread_1</b><font face='Lucida Console'>(</font><font color='#0000FF'><u>double</u></font> a<font face='Lucida Console'>)</font>
+<b>{</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> a <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+<font color='#0000FF'><u>void</u></font> <b><a name='thread_2'></a>thread_2</b> <font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>I have no args!</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+<b>}</b>
+
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// create a thread that will call thread_1(45.6)
+</font>    thread_function <font color='#BB00BB'>t1</font><font face='Lucida Console'>(</font>thread_1,<font color='#979000'>45.6</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// wait for the t1 thread to end
+</font>    t1.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// create a thread that will call thread_1(9.999)
+</font>    thread_function <font color='#BB00BB'>t2</font><font face='Lucida Console'>(</font>thread_1,<font color='#979000'>9.999</font><font face='Lucida Console'>)</font>;
+    <font color='#009900'>// wait for the t2 thread to end
+</font>    t2.<font color='#BB00BB'>wait</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+
+
+    <font color='#009900'>// create a thread that will call thread_2()
+</font>    thread_function <font color='#BB00BB'>t3</font><font face='Lucida Console'>(</font>thread_2<font face='Lucida Console'>)</font>;
+
+
+
+    <font color='#009900'>// we will wait for t3 to end here because the destructor for
+</font>    <font color='#009900'>// thread_function objects always waits for their thread to end
+</font><b>}</b>
+
+
+
+</pre></body></html>

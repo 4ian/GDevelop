@@ -1,0 +1,106 @@
+/*
+
+    This is an example illustrating the use of the sockets,
+    server and sockstreambuf components from the dlib C++ Library.
+
+    This is a simple echo server.  It listens on port 1234 for incoming
+    connections and just echos back any text it receives but in upper case.  
+    So basically it is the same as the other sockets example except it 
+    uses stream buffers.
+
+    To test it out you can just open a command prompt and type:
+    telnet localhost 1234
+
+    Then you can type away.
+
+
+    Also note that a good reference on the standard C++ iostream library can be 
+    found at http://www.cplusplus.com/ref/iostream/
+*/
+
+
+
+
+#include "dlib/sockets.h"
+#include "dlib/server.h"
+#include "dlib/sockstreambuf.h"
+#include <iostream>
+
+using namespace dlib;
+using namespace std;
+
+
+
+class serv : public server::kernel_1a_c
+{
+
+    void on_connect  (
+        connection& con
+    )
+    {
+        // create a sockstreambuf that reads/writes on our connection.  I'm using the
+        // kernel_2a version here because it is generally the faster of the two versions in the
+        // library.
+        sockstreambuf::kernel_2a buf(&con);
+
+        // Now we make an iostream object that reads/writes to our streambuffer.  A lot of people
+        // don't seem to know that the C++ iostreams are as powerful as they are.  So what I'm doing
+        // here isn't anything special and is totally portable.  You will be able to use this stream
+        // object just as you would any iostream from the standard library.
+        iostream stream(&buf);
+
+        // This command causes our stream to flush its output buffers whenever you ask it for more 
+        // data.  
+        stream.tie(&stream);
+
+        char ch;
+        while (stream.good())
+        {
+            // get the next character from the client
+            ch = stream.get();
+
+            // now echo it back to them
+            stream << (char)toupper(ch);
+        }
+    }
+
+};
+
+serv our_server;
+
+void thread()
+{
+    cout << "Press enter to end this program" << endl;
+    cin.get();
+    // this will cause the server to shut down which will in turn cause 
+    // our_server.start() to unblock and thus the main() function will terminate.
+    our_server.clear();
+}
+
+int main()
+{
+    try
+    {
+        // create a thread that will listen for the user to end this program
+        thread_function t(thread);
+
+
+        // set up the server object we have made
+        our_server.set_listening_port(1234);
+        our_server.set_max_connections(1000);
+
+        // start the server
+        our_server.start();
+
+    }
+    catch (exception& e)
+    {
+        cout << e.what() << endl;
+    }
+    catch (...)
+    {
+        cout << "Some error occurred" << endl;
+    }
+}
+
+

@@ -1,0 +1,655 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - array_kernel_1.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2003  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_ARRAY_KERNEl_1_
+<font color='#0000FF'>#define</font> DLIB_ARRAY_KERNEl_1_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='array_kernel_abstract.h.html'>array_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../interfaces/enumerable.h.html'>../interfaces/enumerable.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../algs.h.html'>../algs.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../serialize.h.html'>../serialize.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../memory_manager.h.html'>../memory_manager.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager <font color='#5555FF'>=</font> memory_manager<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>char</u></font><font color='#5555FF'>&gt;</font>::kernel_1a
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='array_kernel_1'></a>array_kernel_1</b> : <font color='#0000FF'>public</font> enumerable<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font>
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            INITIAL VALUE
+                - array_size == 0
+                - array_nodes == 0 
+                - max_array_size == 0 
+                - number_of_nodes == 0
+                - mask == 0 
+                - mask_size == 0
+                - _at_start == true
+                - pos == 0
+
+
+            CONVENTION
+                - current_element_valid() == (pos != array_size)
+                - at_start() == _at_start
+                - if (pos != array_size)
+                    - element() == (*this)[pos]
+
+                array_size == number of elements in the array.
+                array_nodes == pointer to array of number_of_nodes pointers.
+                max_array_size == the maximum allowed number of elements in the array.
+                mask_size == the number of bits set to 1 in mask
+                
+        
+                if (array_size &gt; 0)
+                {
+                    Only array_nodes[0] though array_nodes[(array_size-1)/number_of_nodes] 
+                    point to valid addresses.  All other elements in array_nodes
+                    are set to 0.
+                }
+                else
+                {
+                    for all x: array_nodes[x] == 0
+                }
+                
+                operator[](pos) == array_nodes[pos&gt;&gt;mask_size][pos&amp;mask]
+
+                if (max_array_size == 0)
+                {
+                    number_of_nodes == 0
+                    array_nodes == 0
+                    array_size == 0
+                }                
+        !*/</font>
+        
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'>typedef</font> T type;
+            <font color='#0000FF'>typedef</font> mem_manager mem_manager_type;
+
+            <b><a name='array_kernel_1'></a>array_kernel_1</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> :
+                array_nodes<font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#BB00BB'>update_max_array_size</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+            <b>}</b>
+
+            <font color='#0000FF'>virtual</font> ~<b><a name='array_kernel_1'></a>array_kernel_1</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>; 
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            
+            <font color='#0000FF'>inline</font> T<font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='max_size'></a>max_size</b><font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='set_max_size'></a>set_max_size</b><font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max
+            <font face='Lucida Console'>)</font>;
+            
+            <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+                array_kernel_1<font color='#5555FF'>&amp;</font> item
+            <font face='Lucida Console'>)</font>;
+
+
+            <font color='#009900'>// functions from the enumerable interface
+</font>            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>bool</u></font> <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+            <font color='#0000FF'>inline</font> T<font color='#5555FF'>&amp;</font> <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'><u>bool</u></font> <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+
+
+        <font color='#0000FF'>private</font>:
+
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='update_max_array_size'></a>update_max_array_size</b> <font face='Lucida Console'>(</font>
+                <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_max_array_size
+            <font face='Lucida Console'>)</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - everything in the CONVENTION is satisfied
+                    - #max_array_size == new_max_array_size
+                    - #array_size == 0
+                    - mask_size, mask, and number_of_nodes have been set proper
+                      values for the new max array size
+                    - if (new_max_array_size != 0) then
+                        - #array_nodes == pointer to an array of size #number_of_nodes 
+                    - else
+                        - #array_nodes == 0
+                    - #at_start() == true
+            !*/</font>
+
+            <font color='#009900'>// data members
+</font>            T<font color='#5555FF'>*</font><font color='#5555FF'>*</font> array_nodes;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_array_size;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> array_size;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> number_of_nodes;            
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> mask;
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> mask_size;
+            <font color='#0000FF'>mutable</font> <font color='#0000FF'><u>bool</u></font> _at_start;
+
+            
+
+            <font color='#009900'>// restricted functions
+</font>            <b><a name='array_kernel_1'></a>array_kernel_1</b><font face='Lucida Console'>(</font>array_kernel_1<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;        <font color='#009900'>// copy constructor
+</font>            array_kernel_1<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> <b><a name='operator'></a>operator</b><font color='#5555FF'>=</font><font face='Lucida Console'>(</font>array_kernel_1<font color='#5555FF'>&lt;</font>T<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font><font face='Lucida Console'>)</font>;    <font color='#009900'>// assignment operator        
+</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='serialize'></a>serialize</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,  
+        std::ostream<font color='#5555FF'>&amp;</font> out
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>max_size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,out<font face='Lucida Console'>)</font>;
+
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> item.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>serialize</font><font face='Lucida Console'>(</font>item[i],out<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while serializing object of type array_kernel_1</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='deserialize'></a>deserialize</b> <font face='Lucida Console'>(</font>
+        array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item,  
+        std::istream<font color='#5555FF'>&amp;</font> in
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>try</font>
+        <b>{</b>
+            <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max_size, size;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>max_size,in<font face='Lucida Console'>)</font>;
+            <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>size,in<font face='Lucida Console'>)</font>;
+            item.<font color='#BB00BB'>set_max_size</font><font face='Lucida Console'>(</font>max_size<font face='Lucida Console'>)</font>;
+            item.<font color='#BB00BB'>set_size</font><font face='Lucida Console'>(</font>size<font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> size; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <font color='#BB00BB'>deserialize</font><font face='Lucida Console'>(</font>item[i],in<font face='Lucida Console'>)</font>;
+        <b>}</b>
+        <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>serialization_error e<font face='Lucida Console'>)</font>
+        <b>{</b> 
+            item.<font color='#BB00BB'>clear</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>throw</font> <font color='#BB00BB'>serialization_error</font><font face='Lucida Console'>(</font>e.info <font color='#5555FF'>+</font> "<font color='#CC0000'>\n   while deserializing object of type array_kernel_1</font>"<font face='Lucida Console'>)</font>; 
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    ~<b><a name='array_kernel_1'></a>array_kernel_1</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>update_max_array_size</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='clear'></a>clear</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>update_max_array_size</font><font face='Lucida Console'>(</font><font color='#979000'>0</font><font face='Lucida Console'>)</font>;                
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> array_nodes[pos<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>mask_size][pos<font color='#5555FF'>&amp;</font>mask];
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    T<font color='#5555FF'>&amp;</font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='operator'></a>operator</b>[] <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> pos
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> array_nodes[pos<font color='#5555FF'>&gt;</font><font color='#5555FF'>&gt;</font>mask_size][pos<font color='#5555FF'>&amp;</font>mask];
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='max_size'></a>max_size</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> max_array_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_max_size'></a>set_max_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> max
+    <font face='Lucida Console'>)</font>
+    <b>{</b>       
+        <font color='#BB00BB'>update_max_array_size</font><font face='Lucida Console'>(</font>max<font face='Lucida Console'>)</font>;       
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='set_size'></a>set_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> size
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>array_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> size <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_biggest_node <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>mask<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                <font color='#009900'>// we need to initialize some array nodes
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> new_biggest_node; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    array_nodes[i] <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> T[mask<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// undo any changes
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> new_biggest_node; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>array_nodes[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>delete</font> [] array_nodes[i];
+                    array_nodes[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+                <font color='#0000FF'>throw</font>;                
+            <b>}</b>            
+        <b>}</b>
+        <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// free all nodes
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> number_of_nodes; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>array_nodes[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>delete</font> [] array_nodes[i];
+                array_nodes[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> biggest_node <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>array_size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>mask<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>const</font> <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_biggest_node <font color='#5555FF'>=</font> <font face='Lucida Console'>(</font>size<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font><font color='#5555FF'>/</font><font face='Lucida Console'>(</font>mask<font color='#5555FF'>+</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+            <font color='#0000FF'>try</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>biggest_node <font color='#5555FF'>&lt;</font> new_biggest_node<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// we need to initialize more array nodes
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> biggest_node<font color='#5555FF'>+</font><font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> new_biggest_node; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                        array_nodes[i] <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> T[mask<font color='#5555FF'>+</font><font color='#979000'>1</font>];
+                <b>}</b>
+                <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>biggest_node <font color='#5555FF'>&gt;</font> new_biggest_node<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// we need to free some array nodes
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> new_biggest_node<font color='#5555FF'>+</font><font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> biggest_node; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#0000FF'>delete</font> [] array_nodes[i];
+                        array_nodes[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#009900'>// undo any changes
+</font>                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> biggest_node<font color='#5555FF'>+</font><font color='#979000'>1</font>; i <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> new_biggest_node; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>array_nodes[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                        <font color='#0000FF'>delete</font> [] array_nodes[i];
+                    array_nodes[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <b>}</b>
+                <font color='#0000FF'>throw</font>;
+            <b>}</b>
+        <b>}</b>
+        array_size <font color='#5555FF'>=</font> size;        
+        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> item
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>_at_start,item._at_start<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>pos,item.pos<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>mask_size,item.mask_size<font face='Lucida Console'>)</font>;
+        <font color='#BB00BB'>exchange</font><font face='Lucida Console'>(</font>mask,item.mask<font face='Lucida Console'>)</font>;
+
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>    max_array_size_temp    <font color='#5555FF'>=</font> item.max_array_size;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>    array_size_temp        <font color='#5555FF'>=</font> item.array_size;
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font>    number_of_nodes_temp   <font color='#5555FF'>=</font> item.number_of_nodes;
+        T<font color='#5555FF'>*</font><font color='#5555FF'>*</font>                array_nodes_temp     <font color='#5555FF'>=</font> item.array_nodes;
+
+        item.max_array_size     <font color='#5555FF'>=</font> max_array_size;
+        item.array_size         <font color='#5555FF'>=</font> array_size;
+        item.number_of_nodes    <font color='#5555FF'>=</font> number_of_nodes;
+        item.array_nodes        <font color='#5555FF'>=</font> array_nodes;
+
+        max_array_size          <font color='#5555FF'>=</font> max_array_size_temp;
+        array_size              <font color='#5555FF'>=</font> array_size_temp;
+        number_of_nodes         <font color='#5555FF'>=</font> number_of_nodes_temp;
+        array_nodes             <font color='#5555FF'>=</font> array_nodes_temp;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>    <font color='#009900'>// private member function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='update_max_array_size'></a>update_max_array_size</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> new_max_array_size
+    <font face='Lucida Console'>)</font>
+    <b>{</b>   
+        max_array_size <font color='#5555FF'>=</font> new_max_array_size;
+
+        <font color='#009900'>// first free all memory 
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>array_nodes <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> number_of_nodes; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>array_nodes[i] <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                    <font color='#0000FF'>delete</font> [] array_nodes[i];
+                <font color='#0000FF'>else</font>
+                    <font color='#0000FF'>break</font>;
+            <b>}</b>
+            <font color='#0000FF'>delete</font> [] array_nodes;
+        <b>}</b>
+
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_array_size <font color='#5555FF'>&gt;</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#009900'>// select new values for number_of_nodes, mask_size, and mask
+</font>            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_array_size <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0x1000</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                number_of_nodes <font color='#5555FF'>=</font> <font color='#979000'>0x10</font>;
+                mask <font color='#5555FF'>=</font> <font color='#979000'>0xFF</font>;
+                mask_size <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_array_size <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0x10000</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                number_of_nodes <font color='#5555FF'>=</font> <font color='#979000'>0x100</font>;
+                mask <font color='#5555FF'>=</font> <font color='#979000'>0xFF</font>;
+                mask_size <font color='#5555FF'>=</font> <font color='#979000'>8</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_array_size <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0x100000</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                number_of_nodes <font color='#5555FF'>=</font> <font color='#979000'>1024</font>;
+                mask <font color='#5555FF'>=</font> <font color='#979000'>0x3FF</font>;
+                mask_size <font color='#5555FF'>=</font> <font color='#979000'>10</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_array_size <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0x1000000</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                number_of_nodes <font color='#5555FF'>=</font> <font color='#979000'>4096</font>;
+                mask <font color='#5555FF'>=</font> <font color='#979000'>0xFFF</font>;
+                mask_size <font color='#5555FF'>=</font> <font color='#979000'>12</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_array_size <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0x10000000</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                number_of_nodes <font color='#5555FF'>=</font> <font color='#979000'>16384</font>;
+                mask <font color='#5555FF'>=</font> <font color='#979000'>0x3FFF</font>;
+                mask_size <font color='#5555FF'>=</font> <font color='#979000'>14</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>max_array_size <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>0x40000000</font><font face='Lucida Console'>)</font>
+            <b>{</b>
+                number_of_nodes <font color='#5555FF'>=</font> <font color='#979000'>32768</font>;
+                mask <font color='#5555FF'>=</font> <font color='#979000'>0x7FFF</font>;
+                mask_size <font color='#5555FF'>=</font> <font color='#979000'>15</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font> 
+            <b>{</b>
+                number_of_nodes <font color='#5555FF'>=</font> <font color='#979000'>65536</font>;
+                mask <font color='#5555FF'>=</font> <font color='#979000'>0xFFFF</font>;
+                mask_size <font color='#5555FF'>=</font> <font color='#979000'>16</font>;                
+            <b>}</b>
+
+            <font color='#0000FF'>try</font> 
+            <b>{</b>
+                array_nodes <font color='#5555FF'>=</font> <font color='#0000FF'>new</font> T<font color='#5555FF'>*</font>[number_of_nodes];
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> number_of_nodes; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>i<font face='Lucida Console'>)</font>
+                    array_nodes[i] <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <b>}</b>
+            <font color='#0000FF'>catch</font> <font face='Lucida Console'>(</font>...<font face='Lucida Console'>)</font>
+            <b>{</b>
+                max_array_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                array_nodes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                number_of_nodes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                array_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+                <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+                <font color='#0000FF'>throw</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            array_nodes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            number_of_nodes <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <b>}</b>
+     
+        array_size <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+        <font color='#BB00BB'>reset</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>//           enumerable function definitions
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font><font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='at_start'></a>at_start</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> _at_start;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='reset'></a>reset</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        _at_start <font color='#5555FF'>=</font> <font color='#979000'>true</font>;
+        pos <font color='#5555FF'>=</font> array_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='current_element_valid'></a>current_element_valid</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font face='Lucida Console'>(</font>pos <font color='#5555FF'>!</font><font color='#5555FF'>=</font> array_size<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>const</font> T<font color='#5555FF'>&amp;</font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#0000FF'>operator</font>[]<font face='Lucida Console'>(</font>pos<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    T<font color='#5555FF'>&amp;</font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='element'></a>element</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> <font color='#0000FF'>operator</font>[]<font face='Lucida Console'>(</font>pos<font face='Lucida Console'>)</font>;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>bool</u></font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='move_next'></a>move_next</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font><font color='#5555FF'>!</font>_at_start<font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>pos<font color='#5555FF'>+</font><font color='#979000'>1</font> <font color='#5555FF'>&lt;</font> array_size<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#5555FF'>+</font><font color='#5555FF'>+</font>pos;
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+            <b>}</b>
+            <font color='#0000FF'>else</font>
+            <b>{</b>
+                pos <font color='#5555FF'>=</font> array_size;
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            _at_start <font color='#5555FF'>=</font> <font color='#979000'>false</font>;
+            pos <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+            <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>array_size <font color='#5555FF'>=</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>false</font>;
+            <font color='#0000FF'>else</font>
+                <font color='#0000FF'>return</font> <font color='#979000'>true</font>;
+        <b>}</b>
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> T,
+        <font color='#0000FF'>typename</font> mem_manager
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> array_kernel_1<font color='#5555FF'>&lt;</font>T,mem_manager<font color='#5555FF'>&gt;</font>::
+    <b><a name='size'></a>size</b> <font face='Lucida Console'>(</font>
+    <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>
+    <b>{</b>
+        <font color='#0000FF'>return</font> array_size;
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_ARRAY_KERNEl_1_
+</font>
+
+</pre></body></html>

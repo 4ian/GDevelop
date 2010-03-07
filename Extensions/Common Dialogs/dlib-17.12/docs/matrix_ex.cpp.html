@@ -1,0 +1,226 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - matrix_ex.cpp</title></head><body bgcolor='white'><pre>
+
+<font color='#009900'>/*
+    This is an example illustrating the use of the matrix object 
+    from the dlib C++ Library.
+
+*/</font>
+
+
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iostream<font color='#5555FF'>&gt;</font>
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='dlib/matrix.h.html'>dlib/matrix.h</a>"
+
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> dlib;
+<font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> std;
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+<font color='#0000FF'><u>int</u></font> <b><a name='main'></a>main</b><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>
+<b>{</b>
+    <font color='#009900'>// Lets begin this example by using the library to solve a simple 
+</font>    <font color='#009900'>// linear system.
+</font>    <font color='#009900'>// 
+</font>    <font color='#009900'>// We will find the value of x such that y = M*x where
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>//      3.5
+</font>    <font color='#009900'>// y =  1.2
+</font>    <font color='#009900'>//      7.8
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>// and M is
+</font>    <font color='#009900'>//
+</font>    <font color='#009900'>//      54.2   7.4   12.1
+</font>    <font color='#009900'>// M =  1      2     3
+</font>    <font color='#009900'>//      5.9    0.05  1
+</font>
+
+    <font color='#009900'>// First lets declare these 3 matrices.
+</font>    <font color='#009900'>// This declares a matrix that contains doubles and has 3 rows and 1 column.
+</font>    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>1</font><font color='#5555FF'>&gt;</font> y;
+    <font color='#009900'>// Make a 3 by 3 matrix of doubles for the M matrix.
+</font>    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> M;
+    <font color='#009900'>// Make a matrix of doubles that has unknown dimensions (the dimensions are
+</font>    <font color='#009900'>// decided at runtime unlike the above two matrices which are bound at compile
+</font>    <font color='#009900'>// time).  We could declare x the same way as y but I'm doing it differently
+</font>    <font color='#009900'>// for the purposes of illustration.
+</font>    matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font><font color='#5555FF'>&gt;</font> x;
+    
+    <font color='#009900'>// You may be wondering why someone would want to specify the size of a matrix
+</font>    <font color='#009900'>// at compile time when you don't have to.  The reason is two fold.  First,
+</font>    <font color='#009900'>// there is often a substantial performance improvement, especially for small
+</font>    <font color='#009900'>// matrices, because the compiler is able to perform loop unrolling if it knows
+</font>    <font color='#009900'>// the sizes of matrices.  Second, the dlib::matrix object checks these compile
+</font>    <font color='#009900'>// time sizes to ensure that the matrices are being used correctly.  For example,
+</font>    <font color='#009900'>// if you attempt to compile the expression y = M; or x = y*y; you will get
+</font>    <font color='#009900'>// a compiler error on those lines since those are not legal matrix operations.
+</font>    <font color='#009900'>// So if you know the size of a matrix at compile time then it is always a good
+</font>    <font color='#009900'>// idea to let the compiler know about it.
+</font>
+
+
+
+    <font color='#009900'>// now we need to initialize the y and M matrices and we can do so like this:
+</font>    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> M_data[] <font color='#5555FF'>=</font> <b>{</b> 
+      <font color='#979000'>54.2</font>,  <font color='#979000'>7.4</font>,  <font color='#979000'>12.1</font>,
+      <font color='#979000'>1</font>,     <font color='#979000'>2</font>,    <font color='#979000'>3</font>,
+      <font color='#979000'>5.9</font>,   <font color='#979000'>0.05</font>, <font color='#979000'>1</font><b>}</b>;
+
+    <font color='#0000FF'>const</font> <font color='#0000FF'><u>double</u></font> y_data[] <font color='#5555FF'>=</font> <b>{</b> 
+      <font color='#979000'>3.5</font>,  
+      <font color='#979000'>1.2</font>,    
+      <font color='#979000'>7.8</font><b>}</b>;
+
+    <font color='#009900'>// load these matrices up with their data.   Note that you can only load a matrix
+</font>    <font color='#009900'>// with a C style array if the matrix is statically dimensioned as the M and y 
+</font>    <font color='#009900'>// matrices are.  You couldn't do it for x since x = M_data would be ambiguous. 
+</font>    <font color='#009900'>// (e.g. should the data be interpreted as a 3x3 matrix or a 9x1 matrix?)
+</font>    M <font color='#5555FF'>=</font> M_data;
+    y <font color='#5555FF'>=</font> y_data;
+
+    <font color='#009900'>// the solution can be obtained now by multiplying the inverse of M with y
+</font>    x <font color='#5555FF'>=</font> <font color='#BB00BB'>inv</font><font face='Lucida Console'>(</font>M<font face='Lucida Console'>)</font><font color='#5555FF'>*</font>y;
+
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>x: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> x <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// We can check that it really worked by plugging x back into the original equation 
+</font>    <font color='#009900'>// and subtracting y to see if we get a column vector with values all very close
+</font>    <font color='#009900'>// to zero (Which is what happens.  Also, the values may not be exactly zero because 
+</font>    <font color='#009900'>// there may be some numerical error and round off).
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>M*x - y: \n</font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> M<font color='#5555FF'>*</font>x <font color='#5555FF'>-</font> y <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+    <font color='#009900'>// The elements of a matrix are accessed using the () operator like so
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font><font color='#979000'>0</font>,<font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#009900'>// The above expression prints out the value 7.4.  That is, the value of
+</font>    <font color='#009900'>// the element at row 0 and column 1.
+</font>
+
+    <font color='#009900'>// Let's compute the sum of elements in the M matrix.
+</font>    <font color='#0000FF'><u>double</u></font> M_sum <font color='#5555FF'>=</font> <font color='#979000'>0</font>;
+    <font color='#009900'>// loop over all the rows
+</font>    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> M.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+    <b>{</b>
+        <font color='#009900'>// loop over all the columns
+</font>        <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> M.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+        <b>{</b>
+            M_sum <font color='#5555FF'>+</font><font color='#5555FF'>=</font> <font color='#BB00BB'>M</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+        <b>}</b>
+    <b>}</b>
+    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>sum of all elements in M is </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> M_sum <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+    <font color='#009900'>// The above code is just to show you how to loop over the elements of a matrix.  An 
+</font>    <font color='#009900'>// easier way to find this sum is to do the following:
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> "<font color='#CC0000'>sum of all elements in M is </font>" <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>sum</font><font face='Lucida Console'>(</font>M<font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+
+
+    <font color='#009900'>// If we have a matrix that is a row or column vector.  That is, it contains either 
+</font>    <font color='#009900'>// a single row or a single column then we know that any access is always either 
+</font>    <font color='#009900'>// to row 0 or column 0 so we can omit that 0 and use the following syntax.
+</font>    cout <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> <font color='#BB00BB'>y</font><font face='Lucida Console'>(</font><font color='#979000'>1</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>&lt;</font> endl;
+    <font color='#009900'>// The above expression prints out the value 1.2
+</font>
+
+
+    <font color='#009900'>// -------------------------  Template Expressions -----------------------------
+</font>    <font color='#009900'>// Now I will discuss the "template expressions" technique and how it is 
+</font>    <font color='#009900'>// used in the matrix object.  First consider the following expression:
+</font>    x <font color='#5555FF'>=</font> y <font color='#5555FF'>+</font> y;
+
+    <font color='#009900'>/*
+        Normally this expression results in machine code that looks, at a high 
+        level, like the following:
+            temp = y + y;
+            x = temp
+
+        Temp is a temporary matrix returned by the overloaded + operator.  
+        temp then contains the result of adding y to itself.  The assignment 
+        operator copies the value of temp into x and temp is then destroyed while 
+        the blissful C++ user never sees any of this.
+
+        This is, however, totally inefficient.  In the process described above 
+        you have to pay for the cost of constructing a temporary matrix object
+        and allocating its memory.  Then you pay the additional cost of copying
+        it over to x.  It also gets worse when you have more complex expressions
+        such as x = y + y + y + M*y which would involve the creation and copying 
+        of 4 temporary matrices.
+        
+        All these inefficiencies are removed by using the template expressions 
+        technique.  The exact details of how the technique is performed are well
+        outside the scope of this example but the basic idea is as follows.  Instead
+        of having operators and functions return temporary matrix objects you 
+        return a special object that represents the expression you wish to perform.
+
+        So consider the expression x = y + y again.  With dlib::matrix what happens
+        is the expression y+y returns a matrix_exp object instead of a temporary matrix.
+        The construction of a matrix_exp does not allocate any memory or perform any 
+        computations.  The matrix_exp however has an interface that looks just like a 
+        dlib::matrix object and when you ask it for the value of one of its elements 
+        it computes that value on the spot.  Only in the assignment operator does
+        someone ask the matrix_exp for these values so this avoids the use of any
+        temporary matrices.  Thus the statement x = y + y is equivalent to the following 
+        code:
+            // loop over all elements in y matrix
+            for (long r = 0; r &lt; y.nr(); ++r)
+                for (long c = 0; c &lt; y.nc(); ++c)
+                    x(r,c) = y(r,c) + y(r,c);  
+                
+       
+        This technique works for expressions of arbitrary complexity.  So if you 
+        typed x = y + y + y + M*y it would involve no temporary matrices being 
+        created at all.  Each operator takes and returns only matrix_exp objects.
+        Thus, no computations are performed until the assignment operator requests
+        the values from the matrix_exp it receives as input. 
+            
+
+
+
+
+        There is only one caveat in all of this.  It is for statements that involve 
+        the multiplication of a complex matrix_exp such as the following:
+    */</font>
+        x <font color='#5555FF'>=</font> M<font color='#5555FF'>*</font><font face='Lucida Console'>(</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*
+        This statement computes the value of M*(M+M+M+M+M+M+M) totally without 
+        any temporary matrix objects.  This sounds good but we should take 
+        a closer look.  Consider that the + operator is invoked 6 times.  This
+        means we have something like this:
+
+        x = M * (matrix_exp representing M+M+M+M+M+M+M);
+
+        M is being multiplied with a quite complex matrix_exp.  Now recall that when 
+        you ask a matrix_exp what the value of any of its elements are it computes 
+        their values *right then*.  
+        
+        If you think on what is involved in performing a matrix multiply you will 
+        realize that each element of a matrix is accessed M.nr() times.  In the 
+        case of our above expression the cost of accessing an element of the 
+        matrix_exp on the right hand side is the cost of doing 6 addition operations. 
+
+        Thus, it would be faster to assign M+M+M+M+M+M+M to a real matrix and then
+        multiply that by M.  
+
+        So do something like this:
+    */</font>
+        matrix<font color='#5555FF'>&lt;</font><font color='#0000FF'><u>double</u></font>,<font color='#979000'>3</font>,<font color='#979000'>3</font><font color='#5555FF'>&gt;</font> Mtemp;
+        Mtemp <font color='#5555FF'>=</font> M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M;
+        x <font color='#5555FF'>=</font> M<font color='#5555FF'>*</font>Mtemp;
+
+        <font color='#009900'>// Or alternatively you can use the tmp() function like so.
+</font>        x <font color='#5555FF'>=</font> M<font color='#5555FF'>*</font><font color='#BB00BB'>tmp</font><font face='Lucida Console'>(</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font color='#5555FF'>+</font>M<font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*
+        tmp() just evaluates a matrix_exp and returns a real matrix object.  So it
+        does the same thing as the above code that uses Mtemp.
+
+        Anyway, the point of the above discussion is that you shouldn't multiply
+        complex matrix expressions.  You should instead assign the expression to
+        a matrix object and then use that object in the multiply.  This will ensure
+        that your multiplies are always fast.
+    */</font>
+
+    
+<b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+
+</pre></body></html>

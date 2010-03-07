@@ -1,0 +1,256 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I=">
+<title>dlib C++ Library
+               - License</title>
+<script language="JavaScript">
+
+            // ---------------------------------------------
+            // --- Name:    Easy DHTML Treeview           --
+            // --- Author:  D.D. de Kerf                  --
+            // --- Version: 0.2          Date: 13-6-2001  --
+            // ---------------------------------------------
+            function Toggle(node)
+            {
+               // Unfold the branch if it isn't visible
+               var next_node = node.nextSibling;
+               if (next_node.style.display == 'none')
+               {
+                  // Change the image (if there is an image)
+                  if (node.childNodes.length > 0)
+                  {
+                     if (node.childNodes.length > 0)
+                     { 
+                        if (node.childNodes.item(0).nodeName == "IMG")
+                        {
+                           node.childNodes.item(0).src = "minus.gif";
+                        }
+                     }
+                  }
+
+                  next_node.style.display = 'block';
+               }
+               // Collapse the branch if it IS visible
+               else
+               {
+                  // Change the image (if there is an image)
+                  if (node.childNodes.length > 0)
+                  {
+                     if (node.childNodes.length > 0)
+                     { 
+                        if (node.childNodes.item(0).nodeName == "IMG")
+                        {
+                           node.childNodes.item(0).src = "plus.gif";
+                        }
+                     }
+                  }
+
+                  next_node.style.display = 'none';
+               }
+
+            }
+            </script><style type="text/css">
+               body {margin:0px;}
+               pre {margin:0px;}
+
+               ul.tree  li { list-style: none;  margin-left:10px;} 
+               ul.tree  { margin:0px; padding:0px; margin-left:5px;  }
+               ul.tree  li ul { margin-left:10px; padding:0px; }
+
+               div#component {
+                  background-color:white; 
+                  border: 2px solid rgb(102,102,102); 
+                  text-align:left;
+                  margin-top: 1.5em;
+                  padding: 0.7em;
+               }
+
+               div#logb {
+                  text-align:left;
+                  padding: 0.0em;
+                  float: left;
+                  background-color:#c0c0c0; 
+                  border: double ; 
+                  margin: 0.5em;
+               }
+
+               .bdotted {border-bottom: 1px dotted}
+               .bdashed {border-bottom: 1px dashed}
+               .bsolid {border-bottom: 1px solid}
+               .bdouble {border-bottom: 1px double}
+               .bgroove {border-bottom: 1px groove}
+               .bridge {border-bottom: 1px ridge}
+               .binset {border-bottom: 1px inset}
+               .boutset {border-bottom: 1px outset}
+
+               div#row1 {
+                  background-color:#dfdfdf; 
+               }
+               div#row2 {
+                  background-color:#f2f2f2; 
+               }
+
+               div#typedefs {
+                  margin-left: 1.5em;
+                  margin-top: 0.2em;
+                  border: 1px dotted;
+                  width: 52em;
+               }
+
+               div#tdn {
+                  width: 10em;
+               }
+
+               .fullhr {
+                  clear: both;
+               }
+
+               body {
+                  text-align: center;
+               }
+
+               div#entire_page {
+                  width:62em;  
+                  text-align: left;
+                  margin-top: 0.4em;
+                  margin-left: auto;
+                  margin-right: auto;
+               }
+            </style>
+</head>
+<body bgcolor="#EDF3EE">
+<a name="top"></a><div id="entire_page"><table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10"><tr height="100%">
+<td BGCOLOR="#E3E3E3" VALIGN="TOP" height="100%">
+<br><table WIDTH="145" height="100%">
+<tr>
+<td VALIGN="TOP">
+      <b>The Library</b><ul class="tree">
+<li><a href="algorithms.html">Algorithms</a></li>
+<li><a href="api.html">API Wrappers</a></li>
+<li><a href="compression.html">Compression</a></li>
+<li><a href="containers.html">Containers</a></li>
+<li><a href="imaging.html">Imaging</a></li>
+<li><a href="metaprogramming.html">Metaprogramming</a></li>
+<li><a href="other.html">Miscellaneous</a></li>
+<li><a href="network.html">Network</a></li>
+<li><a href="parsing.html">Parsing</a></li>
+</ul>
+<br>
+ 
+
+      <b>Help/Info</b><ul class="tree">
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples</u></font></a><ul style="display:none;">
+<li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li>
+<li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li>
+<li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li>
+<li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li>
+<li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li>
+<li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li>
+<li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li>
+<li><a href="gui_api_ex.cpp.html">GUI</a></li>
+<li><a href="server_http_ex.cpp.html">HTTP_Server</a></li>
+<li><a href="image_ex.cpp.html">Image</a></li>
+<li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li>
+<li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li>
+<li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li>
+<li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li>
+<li><a href="logger_ex.cpp.html">Logger</a></li>
+<li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li>
+<li><a href="matrix_ex.cpp.html">Matrix</a></li>
+<li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li>
+<li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li>
+<li><a href="mlp_ex.cpp.html">Neural_Network</a></li>
+<li><a href="pipe_ex.cpp.html">Pipe</a></li>
+<li><a href="queue_ex.cpp.html">Queue</a></li>
+<li><a href="rank_features_ex.cpp.html">Rank_Features</a></li>
+<li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li>
+<li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li>
+<li><a href="sockets_ex.cpp.html">Sockets</a></li>
+<li><a href="sockets_ex_2.cpp.html">Sockets_2</a></li>
+<li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li>
+<li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li>
+<li><a href="svm_ex.cpp.html">Support_Vector_Machine</a></li>
+<li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li>
+<li><a href="threads_ex.cpp.html">Threads</a></li>
+<li><a href="thread_function_ex.cpp.html">Thread_Function</a></li>
+<li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li>
+<li><a href="timer_ex.cpp.html">Timer</a></li>
+<li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li>
+</ul>
+</li>
+<li><a href="index.html">Home</a></li>
+<li><a href="compile.html">How to compile</a></li>
+<li><a href="term_index.html">Index</a></li>
+<li><a href="intro.html">Introduction</a></li>
+<li><a href="license.html">License</a></li>
+</ul>
+<br>
+ 
+      <b>Current Release</b><ul class="tree">
+<li><a href="change_log.html">Change Log</a></li>
+<li><a href="release_notes.html">Release Notes</a></li>
+<li>Version: 17.12</li>
+</ul>
+<br>
+
+
+      
+    </td>
+<td width="1"></td>
+</tr>
+<tr><td valign="bottom">
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      
+      Last Modified:<br>
+      Nov 10, 2008
+      <br>
+      <br>
+   </td></tr>
+</table>
+</td>
+<td VALIGN="TOP" width="100%">
+<center><h1>License</h1></center>
+<pre>
+
+
+Boost Software License - Version 1.0 - August 17th, 2003
+
+Permission is hereby granted, free of charge, to any person or organization
+obtaining a copy of the software and accompanying documentation covered by
+this license (the "Software") to use, reproduce, display, distribute,
+execute, and transmit the Software, and to prepare derivative works of the
+Software, and to permit third-parties to whom the Software is furnished to
+do so, all subject to the following:
+
+The copyright notices in the Software and this entire statement, including
+the above license grant, this restriction and the following disclaimer,
+must be included in all copies of the Software, in whole or in part, and
+all derivative works of the Software, unless such copies or derivative
+works are solely in the form of machine-executable object code generated by
+a source language processor.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT
+SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
+FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+
+   </pre>
+</td>
+</tr></table></div>
+</body>
+</html>

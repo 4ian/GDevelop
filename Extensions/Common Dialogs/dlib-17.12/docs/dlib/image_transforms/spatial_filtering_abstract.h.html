@@ -1,0 +1,61 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - spatial_filtering_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2006  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_SPATIAL_FILTERINg_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_SPATIAL_FILTERINg_ABSTRACT_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../pixel.h.html'>../pixel.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> in_image_type,
+        <font color='#0000FF'>typename</font> out_image_type,
+        <font color='#0000FF'>typename</font> filter_type,
+        <font color='#0000FF'><u>long</u></font> M,
+        <font color='#0000FF'><u>long</u></font> N
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'><u>void</u></font> <b><a name='spatially_filter_image'></a>spatially_filter_image</b> <font face='Lucida Console'>(</font>
+        <font color='#0000FF'>const</font> in_image_type<font color='#5555FF'>&amp;</font> in_img,
+        out_image_type<font color='#5555FF'>&amp;</font> out_img,
+        <font color='#0000FF'>const</font> <font color='#BB00BB'>filter_type</font> <font face='Lucida Console'>(</font><font color='#5555FF'>&amp;</font>filter<font face='Lucida Console'>)</font>[M][N],
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> scale <font color='#5555FF'>=</font> <font color='#979000'>1</font>,
+        <font color='#0000FF'><u>bool</u></font> use_abs <font color='#5555FF'>=</font> <font color='#979000'>false</font>
+    <font face='Lucida Console'>)</font>;
+    <font color='#009900'>/*!
+        requires
+            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits&lt;typename in_image_type::type&gt;::has_alpha == false
+            - pixel_traits&lt;typename out_image_type::type&gt;::has_alpha == false 
+            - &amp;in_img != &amp;out_img
+            - scale &gt; 0
+            - M % 2 == 1  (i.e. M must be odd)
+            - N % 2 == 1  (i.e. N must be odd)
+        ensures
+            - Applies the given spatial filter to in_img and stores the result in out_img.  Also 
+              divides each resulting pixel by scale.  
+            - pixel values after filtering that are &gt; pixel_traits&lt;out_image_type&gt;::max() are
+              set to pixel_traits&lt;out_image_type&gt;::max()
+            - if (pixel_traits&lt;typename in_image_type::type&gt;::grayscale == false) then
+                - the pixel values are converted to the HSI color space and the filtering
+                  is done on the intensity channel only.
+            - if (use_abs == true) then
+                - pixel values after filtering that are &lt; 0 are converted to their absolute values
+            - else
+                - pixel values after filtering that are &lt; 0 are assigned the value of 0
+            - Pixels close enough to the edge of in_img to not have the filter still fit 
+              inside the image are not modified.  i.e. Whatever value the border of out_img
+              had to begin with is what it will have after this function returns.
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+    !*/</font>
+
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_SPATIAL_FILTERINg_ABSTRACT_
+</font>
+
+</pre></body></html>

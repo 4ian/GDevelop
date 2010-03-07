@@ -1,0 +1,70 @@
+<html><head><title>
+examples/CMakeLists.txt
+</title></head><body bgcolor='white'><pre>
+<font color='#009900'>#</font>
+<font color='#009900'># This is a CMake makefile.  You can find the cmake utility and</font>
+<font color='#009900'># information about it at http://www.cmake.org</font>
+<font color='#009900'>#</font>
+
+
+<font color='#009900'># setting this makes CMake allow normal looking IF ELSE statements</font>
+<font color='blue'>SET</font>(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+<font color='blue'>cmake_minimum_required</font>(VERSION 2.4)
+<font color='blue'>if</font>(COMMAND cmake_policy) 
+<font color='blue'>   cmake_policy</font>(SET CMP0003 NEW) 
+<font color='blue'>endif</font>()
+
+<font color='blue'>PROJECT</font>(examples)
+
+<font color='#009900'># add the folder containing the dlib folder to the include path</font>
+<font color='blue'>INCLUDE_DIRECTORIES</font>(..)
+
+
+<font color='#009900'># There is a CMakeLists.txt file in the dlib source folder that tells cmake</font>
+<font color='#009900'># how to build the dlib library.  Tell cmake about that file.</font>
+<font color='blue'>add_subdirectory</font>(../dlib <a href='../dlib/CMakeLists.txt.html'>dlib_build</a>)
+
+
+<font color='blue'>MACRO</font>(add_example name)
+<font color='blue'>   ADD_EXECUTABLE</font>(${<font color='#BB00BB'>name</font>} ${<font color='#BB00BB'>name</font>}.cpp)
+<font color='blue'>   TARGET_LINK_LIBRARIES</font>(${<font color='#BB00BB'>name</font>} dlib )
+<font color='blue'>ENDMACRO</font>()
+
+
+<font color='#009900'>#here we apply our macros </font>
+<font color='blue'>add_example</font>(bayes_net_ex)
+<font color='blue'>add_example</font>(bayes_net_from_disk_ex)
+<font color='blue'>add_example</font>(bayes_net_gui_ex)
+<font color='blue'>add_example</font>(compress_stream_ex)
+<font color='blue'>add_example</font>(dir_nav_ex)
+<font color='blue'>add_example</font>(file_to_code_ex)
+<font color='blue'>add_example</font>(gui_api_ex)
+<font color='blue'>add_example</font>(image_ex)
+<font color='blue'>add_example</font>(kcentroid_ex)
+<font color='blue'>add_example</font>(kkmeans_ex)
+<font color='blue'>add_example</font>(krls_ex)
+<font color='blue'>add_example</font>(krls_filter_ex)
+<font color='blue'>add_example</font>(logger_ex)
+<font color='blue'>add_example</font>(logger_ex_2)
+<font color='blue'>add_example</font>(matrix_ex)
+<font color='blue'>add_example</font>(member_function_pointer_ex)
+<font color='blue'>add_example</font>(mlp_ex)
+<font color='blue'>add_example</font>(multithreaded_object_ex)
+<font color='blue'>add_example</font>(pipe_ex)
+<font color='blue'>add_example</font>(queue_ex)
+<font color='blue'>add_example</font>(rank_features_ex)
+<font color='blue'>add_example</font>(rvm_ex)
+<font color='blue'>add_example</font>(rvm_regression_ex)
+<font color='blue'>add_example</font>(server_http_ex)
+<font color='blue'>add_example</font>(sockets_ex)
+<font color='blue'>add_example</font>(sockets_ex_2)
+<font color='blue'>add_example</font>(sockstreambuf_ex)
+<font color='blue'>add_example</font>(std_allocator_ex)
+<font color='blue'>add_example</font>(svm_ex)
+<font color='blue'>add_example</font>(threaded_object_ex)
+<font color='blue'>add_example</font>(thread_function_ex)
+<font color='blue'>add_example</font>(thread_pool_ex)
+<font color='blue'>add_example</font>(threads_ex)
+<font color='blue'>add_example</font>(timer_ex)
+<font color='blue'>add_example</font>(xml_parser_ex)
+

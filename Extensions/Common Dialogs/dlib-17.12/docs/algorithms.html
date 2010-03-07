@@ -1,0 +1,1197 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I=">
+<title>dlib C++ Library
+               - Algorithms</title>
+<script language="JavaScript">
+
+            // ---------------------------------------------
+            // --- Name:    Easy DHTML Treeview           --
+            // --- Author:  D.D. de Kerf                  --
+            // --- Version: 0.2          Date: 13-6-2001  --
+            // ---------------------------------------------
+            function Toggle(node)
+            {
+               // Unfold the branch if it isn't visible
+               var next_node = node.nextSibling;
+               if (next_node.style.display == 'none')
+               {
+                  // Change the image (if there is an image)
+                  if (node.childNodes.length > 0)
+                  {
+                     if (node.childNodes.length > 0)
+                     { 
+                        if (node.childNodes.item(0).nodeName == "IMG")
+                        {
+                           node.childNodes.item(0).src = "minus.gif";
+                        }
+                     }
+                  }
+
+                  next_node.style.display = 'block';
+               }
+               // Collapse the branch if it IS visible
+               else
+               {
+                  // Change the image (if there is an image)
+                  if (node.childNodes.length > 0)
+                  {
+                     if (node.childNodes.length > 0)
+                     { 
+                        if (node.childNodes.item(0).nodeName == "IMG")
+                        {
+                           node.childNodes.item(0).src = "plus.gif";
+                        }
+                     }
+                  }
+
+                  next_node.style.display = 'none';
+               }
+
+            }
+            </script><style type="text/css">
+               body {margin:0px;}
+               pre {margin:0px;}
+
+               ul.tree  li { list-style: none;  margin-left:10px;} 
+               ul.tree  { margin:0px; padding:0px; margin-left:5px;  }
+               ul.tree  li ul { margin-left:10px; padding:0px; }
+
+               div#component {
+                  background-color:white; 
+                  border: 2px solid rgb(102,102,102); 
+                  text-align:left;
+                  margin-top: 1.5em;
+                  padding: 0.7em;
+               }
+
+               div#logb {
+                  text-align:left;
+                  padding: 0.0em;
+                  float: left;
+                  background-color:#c0c0c0; 
+                  border: double ; 
+                  margin: 0.5em;
+               }
+
+               .bdotted {border-bottom: 1px dotted}
+               .bdashed {border-bottom: 1px dashed}
+               .bsolid {border-bottom: 1px solid}
+               .bdouble {border-bottom: 1px double}
+               .bgroove {border-bottom: 1px groove}
+               .bridge {border-bottom: 1px ridge}
+               .binset {border-bottom: 1px inset}
+               .boutset {border-bottom: 1px outset}
+
+               div#row1 {
+                  background-color:#dfdfdf; 
+               }
+               div#row2 {
+                  background-color:#f2f2f2; 
+               }
+
+               div#typedefs {
+                  margin-left: 1.5em;
+                  margin-top: 0.2em;
+                  border: 1px dotted;
+                  width: 52em;
+               }
+
+               div#tdn {
+                  width: 10em;
+               }
+
+               .fullhr {
+                  clear: both;
+               }
+
+               body {
+                  text-align: center;
+               }
+
+               div#entire_page {
+                  width:62em;  
+                  text-align: left;
+                  margin-top: 0.4em;
+                  margin-left: auto;
+                  margin-right: auto;
+               }
+            </style>
+</head>
+<body bgcolor="#EDF3EE">
+<a name="top"></a><div id="entire_page">
+<table bgcolor="white" height="100%" bordercolor="#EDF3EE" CELLSPACING="0" CELLPADDING="10"><tr height="100%">
+<td BGCOLOR="#E3E3E3" VALIGN="TOP" height="100%">
+<br><table WIDTH="145" height="100%">
+<tr>
+<td VALIGN="TOP">
+      <b>The Library</b><ul class="tree">
+<li><a href="algorithms.html">Algorithms</a></li>
+<li><a href="api.html">API Wrappers</a></li>
+<li><a href="compression.html">Compression</a></li>
+<li><a href="containers.html">Containers</a></li>
+<li><a href="imaging.html">Imaging</a></li>
+<li><a href="metaprogramming.html">Metaprogramming</a></li>
+<li><a href="other.html">Miscellaneous</a></li>
+<li><a href="network.html">Network</a></li>
+<li><a href="parsing.html">Parsing</a></li>
+</ul>
+<br>
+ 
+
+      <b>Help/Info</b><ul class="tree">
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Examples</u></font></a><ul style="display:none;">
+<li><a href="file_to_code_ex.cpp.html">Base64_Encoder</a></li>
+<li><a href="bayes_net_ex.cpp.html">Bayesian_Network</a></li>
+<li><a href="bayes_net_from_disk_ex.cpp.html">Bayesian_Network_From_Disk</a></li>
+<li><a href="bayes_net_gui_ex.cpp.html">Bayesian_Network_GUI</a></li>
+<li><a href="compress_stream_ex.cpp.html#_top">Cmd_Line_Parser</a></li>
+<li><a href="compress_stream_ex.cpp.html">Compress_Stream</a></li>
+<li><a href="dir_nav_ex.cpp.html">Directory_Navigation</a></li>
+<li><a href="gui_api_ex.cpp.html">GUI</a></li>
+<li><a href="server_http_ex.cpp.html">HTTP_Server</a></li>
+<li><a href="image_ex.cpp.html">Image</a></li>
+<li><a href="kcentroid_ex.cpp.html">Kernel_Centroid</a></li>
+<li><a href="kkmeans_ex.cpp.html">Kernel_K-Means_Clustering</a></li>
+<li><a href="krls_filter_ex.cpp.html">Kernel_RLS_Filtering</a></li>
+<li><a href="krls_ex.cpp.html">Kernel_RLS_Regression</a></li>
+<li><a href="logger_ex.cpp.html">Logger</a></li>
+<li><a href="logger_ex_2.cpp.html">Logger_Advanced</a></li>
+<li><a href="matrix_ex.cpp.html">Matrix</a></li>
+<li><a href="member_function_pointer_ex.cpp.html">Member_Function_Pointer</a></li>
+<li><a href="multithreaded_object_ex.cpp.html">Multithreaded_Object</a></li>
+<li><a href="mlp_ex.cpp.html">Neural_Network</a></li>
+<li><a href="pipe_ex.cpp.html">Pipe</a></li>
+<li><a href="queue_ex.cpp.html">Queue</a></li>
+<li><a href="rank_features_ex.cpp.html">Rank_Features</a></li>
+<li><a href="rvm_ex.cpp.html">Relevance_Vector_Classification</a></li>
+<li><a href="rvm_regression_ex.cpp.html">Relevance_Vector_Regression</a></li>
+<li><a href="sockets_ex.cpp.html">Sockets</a></li>
+<li><a href="sockets_ex_2.cpp.html">Sockets_2</a></li>
+<li><a href="sockstreambuf_ex.cpp.html">Sockstreambuf</a></li>
+<li><a href="std_allocator_ex.cpp.html">Std_C++_Allocator</a></li>
+<li><a href="svm_ex.cpp.html">Support_Vector_Machine</a></li>
+<li><a href="threaded_object_ex.cpp.html">Threaded_Object</a></li>
+<li><a href="threads_ex.cpp.html">Threads</a></li>
+<li><a href="thread_function_ex.cpp.html">Thread_Function</a></li>
+<li><a href="thread_pool_ex.cpp.html">Thread_Pool</a></li>
+<li><a href="timer_ex.cpp.html">Timer</a></li>
+<li><a href="xml_parser_ex.cpp.html">XML_Parser</a></li>
+</ul>
+</li>
+<li><a href="index.html">Home</a></li>
+<li><a href="compile.html">How to compile</a></li>
+<li><a href="term_index.html">Index</a></li>
+<li><a href="intro.html">Introduction</a></li>
+<li><a href="license.html">License</a></li>
+</ul>
+<br>
+ 
+      <b>Current Release</b><ul class="tree">
+<li><a href="change_log.html">Change Log</a></li>
+<li><a href="release_notes.html">Release Notes</a></li>
+<li>Version: 17.12</li>
+</ul>
+<br>
+
+
+      
+    </td>
+<td width="1"></td>
+</tr>
+<tr><td valign="bottom">
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      
+      Last Modified:<br>
+      Nov 10, 2008
+      <br>
+      <br>
+   </td></tr>
+</table>
+</td>
+<td VALIGN="TOP" width="100%">
+<center><h1>Algorithms</h1></center>
+      <br><br>
+
+         <p>
+            This page documents library components that are all basically just implementations of 
+            mathematical functions or algorithms without any really significant data structures 
+            associated with them. So this includes things like checksums, cryptographic hashes, 
+            machine learning algorithms, sorting, etc...
+         </p>
+
+   </td>
+<td BGCOLOR="#E3E3E3" VALIGN="TOP" height="100%">
+<br><table WIDTH="150" height="100%">
+<tr>
+<td VALIGN="TOP">
+      <b>Tools</b><ul class="tree">
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Bayes Utilities</u></font></a><ul style="display:none;">
+<li><a href="#assignment">assignment</a></li>
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Bayes Node Utilities</u></font></a><ul style="display:none;">
+<li><a href="#node_cpt_filled_out">node_cpt_filled_out</a></li>
+<li><a href="#node_first_parent_assignment">node_first_parent_assignment</a></li>
+<li><a href="#node_is_evidence">node_is_evidence</a></li>
+<li><a href="#node_next_parent_assignment">node_next_parent_assignment</a></li>
+<li><a href="#node_num_values">node_num_values</a></li>
+<li><a href="#node_probability">node_probability</a></li>
+<li><a href="#node_value">node_value</a></li>
+<li><a href="#set_node_as_evidence">set_node_as_evidence</a></li>
+<li><a href="#set_node_as_nonevidence">set_node_as_nonevidence</a></li>
+<li><a href="#set_node_num_values">set_node_num_values</a></li>
+<li><a href="#set_node_probability">set_node_probability</a></li>
+<li><a href="#set_node_value">set_node_value</a></li>
+</ul>
+</li>
+<li><a href="#bayesian_network_gibbs_sampler">bayesian_network_gibbs_sampler</a></li>
+<li><a href="#bayesian_network_join_tree">bayesian_network_join_tree</a></li>
+<li><a href="#bayes_node">bayes_node</a></li>
+<li><a href="#conditional_probability_table">conditional_probability_table</a></li>
+<li><a href="#joint_probability_table">joint_probability_table</a></li>
+</ul>
+</li>
+<li><a href="#bigint">bigint</a></li>
+<li><a href="#crc32">crc32</a></li>
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Geometry</u></font></a><ul style="display:none;">
+<li><a href="#centered_rect">centered_rect</a></li>
+<li><a href="#move_rect">move_rect</a></li>
+<li><a href="#nearest_point">nearest_point</a></li>
+<li><a href="#point">point</a></li>
+<li><a href="#rectangle">rectangle</a></li>
+<li><a href="#resize_rect">resize_rect</a></li>
+<li><a href="#resize_rect_height">resize_rect_height</a></li>
+<li><a href="#resize_rect_width">resize_rect_width</a></li>
+<li><a href="#translate_rect">translate_rect</a></li>
+<li><a href="#vector">vector</a></li>
+</ul>
+</li>
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Graph Utilities</u></font></a><ul style="display:none;">
+<li><a href="#copy_graph_structure">copy_graph_structure</a></li>
+<li><a href="#create_join_tree">create_join_tree</a></li>
+<li><a href="#create_moral_graph">create_moral_graph</a></li>
+<li><a href="#edge">edge</a></li>
+<li><a href="#find_connected_nodes">find_connected_nodes</a></li>
+<li><a href="#graph_contains_directed_cycle">graph_contains_directed_cycle</a></li>
+<li><a href="#graph_contains_length_one_cycle">graph_contains_length_one_cycle</a></li>
+<li><a href="#graph_contains_undirected_cycle">graph_contains_undirected_cycle</a></li>
+<li><a href="#graph_is_connected">graph_is_connected</a></li>
+<li><a href="#is_clique">is_clique</a></li>
+<li><a href="#is_join_tree">is_join_tree</a></li>
+<li><a href="#is_maximal_clique">is_maximal_clique</a></li>
+<li><a href="#triangulate_graph_and_find_cliques">triangulate_graph_and_find_cliques</a></li>
+</ul>
+</li>
+<li><a href="#hsort_array">hsort_array</a></li>
+<li><a href="#isort_array">isort_array</a></li>
+<li><a href="#is_binary_classification_problem">is_binary_classification_problem</a></li>
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Kernel_Methods</u></font></a><ul style="display:none;">
+<li><a href="#cross_validate_trainer">cross_validate_trainer</a></li>
+<li><a href="#cross_validate_trainer_threaded">cross_validate_trainer_threaded</a></li>
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Function_Objects</u></font></a><ul style="display:none;">
+<li><a href="#decision_function">decision_function</a></li>
+<li><a href="#distance_function">distance_function</a></li>
+<li><a href="#normalized_function">normalized_function</a></li>
+<li><a href="#probabilistic_decision_function">probabilistic_decision_function</a></li>
+</ul>
+</li>
+<li><a href="#kcentroid">kcentroid</a></li>
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Kernels</u></font></a><ul style="display:none;">
+<li><a href="#linear_kernel">linear_kernel</a></li>
+<li><a href="#polynomial_kernel">polynomial_kernel</a></li>
+<li><a href="#radial_basis_kernel">radial_basis_kernel</a></li>
+<li><a href="#sigmoid_kernel">sigmoid_kernel</a></li>
+</ul>
+</li>
+<li><a href="#kkmeans">kkmeans</a></li>
+<li><a href="#krls">krls</a></li>
+<li><a href="#linearly_independent_subset_finder">linearly_independent_subset_finder</a></li>
+<li><a href="#pick_initial_centers">pick_initial_centers</a></li>
+<li><a href="#rank_features">rank_features</a></li>
+<li><a href="#rbf_network_trainer">rbf_network_trainer</a></li>
+<li><a href="#reduced">reduced</a></li>
+<li><a href="#reduced2">reduced2</a></li>
+<li><a href="#reduced_decision_function_trainer">reduced_decision_function_trainer</a></li>
+<li><a href="#reduced_decision_function_trainer2">reduced_decision_function_trainer2</a></li>
+<li><a href="#rvm_regression_trainer">rvm_regression_trainer</a></li>
+<li><a href="#rvm_trainer">rvm_trainer</a></li>
+<li><a href="#svm_nu_trainer">svm_nu_trainer</a></li>
+<li><a href="#test_binary_decision_function">test_binary_decision_function</a></li>
+<li><a href="#train_probabilistic_decision_function">train_probabilistic_decision_function</a></li>
+</ul>
+</li>
+<li><a href="#md5">md5</a></li>
+<li><a href="#median">median</a></li>
+<li><a href="#mlp">mlp</a></li>
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Optimization</u></font></a><ul style="display:none;">
+<li><a href="#derivative">derivative</a></li>
+<li><a href="#find_min_conjugate_gradient">find_min_conjugate_gradient</a></li>
+<li><a href="#find_min_conjugate_gradient2">find_min_conjugate_gradient2</a></li>
+<li><a href="#find_min_quasi_newton">find_min_quasi_newton</a></li>
+<li><a href="#find_min_quasi_newton2">find_min_quasi_newton2</a></li>
+<li><a href="#line_search">line_search</a></li>
+<li><a href="#make_line_search_function">make_line_search_function</a></li>
+<li><a href="#poly_min_extrap">poly_min_extrap</a></li>
+</ul>
+</li>
+<li><a href="#put_in_range">put_in_range</a></li>
+<li><a href="#qsort_array">qsort_array</a></li>
+<li><a href="#rand">rand</a></li>
+<li><a href="#randomize_samples">randomize_samples</a></li>
+<li><a href="#running_stats">running_stats</a></li>
+<li>
+<a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"><font color="green"><u>Set Utilities</u></font></a><ul style="display:none;">
+<li><a href="#set_difference">set_difference</a></li>
+<li><a href="#set_intersection">set_intersection</a></li>
+<li><a href="#set_intersection_size">set_intersection_size</a></li>
+<li><a href="#set_union">set_union</a></li>
+</ul>
+</li>
+<li><a href="#square_root">square_root</a></li>
+<li><a href="#vector_normalizer">vector_normalizer</a></li>
+</ul>
+<br>
+
+    </td>
+<td width="1"></td>
+</tr>
+<tr><td valign="bottom"></td></tr>
+</table>
+</td>
+</tr></table>
+<a name="assignment"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">assignment</h1>
+<BR><BR>
+            This object models an assignment of random variables to particular values.
+            It is used with the <a href="#joint_probability_table">joint_probability_table</a> and 
+            <a href="#conditional_probability_table">conditional_probability_table</a>
+            objects to represent assignments of various random variables to actual values.
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#assignment">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><BR><b>Code Examples: </b><a href="bayes_net_ex.cpp.html">1</a>, 
+            <a href="bayes_net_gui_ex.cpp.html">2</a><br><br><center></center>
+</div></a><a name="bayesian_network_gibbs_sampler"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">bayesian_network_gibbs_sampler</h1>
+<BR><BR>
+            This object performs Markov Chain Monte Carlo sampling of a bayesian
+            network using the Gibbs sampling technique. 
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#bayesian_network_gibbs_sampler">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><BR><b>Code Examples: </b><a href="bayes_net_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="bayesian_network_join_tree"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">bayesian_network_join_tree</h1>
+<BR><BR>
+            This object represents an implementation of the join tree algorithm 
+            (a.k.a. the junction tree algorithm)
+            for inference in bayesian networks.  
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#bayesian_network_join_tree">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><BR><b>Code Examples: </b><a href="bayes_net_ex.cpp.html">1</a>, 
+            <a href="bayes_net_gui_ex.cpp.html">2</a>, 
+            <a href="bayes_net_from_disk_ex.cpp.html">3</a><br><br><center></center>
+</div></a><a name="bayes_node"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">bayes_node</h1>
+<BR><BR>
+            This object represents a node in a bayesian network.  It is
+            intended to be used inside the <a href="containers.html#directed_graph">directed_graph</a> object to
+            represent bayesian networks.
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#bayes_node">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><BR><b>Code Examples: </b><a href="bayes_net_ex.cpp.html">1</a>, 
+            <a href="bayes_net_gui_ex.cpp.html">2</a><br><br><center></center>
+</div></a><a name="bigint"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">bigint</h1>
+<BR><BR>
+            This object represents an arbitrary precision unsigned integer.  It's pretty simple.  
+            It's interface is just like a normal int, you don't have to tell it how much memory
+            to use or anything unusual.  It just goes :)       
+         <BR><BR><b>Specification: </b><a href="dlib/bigint/bigint_kernel_abstract.h.html">dlib/bigint/bigint_kernel_abstract.h</a><BR><B>File to include: </B><a href="dlib/bigint.h.html">dlib/bigint.h</a><BR><BR><B>Implementations:</B><blockquote>
+<a href="dlib/bigint/bigint_kernel_1.h.html">bigint_kernel_1</a>:
+                  <br> 
+                  This implementation is done using an array of unsigned shorts.  It is also reference counted.  
+                  For further details see the above link.  Also note that kernel_2 should be 
+      faster in almost every case so you should really just use that version of the bigint object.
+               <div id="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white">
+<tr>
+<td bgcolor="#E3E3E3" valign="top"><div id="tdn">kernel_1a</div></td>
+<td width="100%" bgcolor="#E3E3E3">is a typedef for bigint_kernel_1</td>
+</tr>
+<tr>
+<td valign="top"><div id="tdn">kernel_1a_c</div></td>
+<td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td>
+</tr>
+</table></div>
+</blockquote>
+<blockquote>
+<a href="dlib/bigint/bigint_kernel_2.h.html">bigint_kernel_2</a>:
+                  <br> 
+                  This implementation is basically the same as kernel_1 except it uses the 
+                  Fast Fourier Transform to perform multiplcations much faster.  
+               <div id="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white">
+<tr>
+<td bgcolor="#E3E3E3" valign="top"><div id="tdn">kernel_2a</div></td>
+<td width="100%" bgcolor="#E3E3E3">is a typedef for bigint_kernel_2</td>
+</tr>
+<tr>
+<td valign="top"><div id="tdn">kernel_2a_c</div></td>
+<td width="100%"> 
+                  is a typedef for kernel_2a that checks its preconditions.             
+                  </td>
+</tr>
+</table></div>
+</blockquote>
+<center></center>
+</div></a><a name="centered_rect"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">centered_rect</h1>
+<BR><BR>        
+            There are various overloads of this function but the basic idea is
+            that it returns a <a href="#rectangle">rectangle</a> with a given 
+            width and height and centered about a given point.
+         <BR><BR><b>Specification: </b><a href="dlib/geometry/rectangle_abstract.h.html#centered_rect">dlib/geometry/rectangle_abstract.h</a><BR><B>File to include: </B><a href="dlib/geometry.h.html">dlib/geometry.h</a><br><br><center></center>
+</div></a><a name="conditional_probability_table"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">conditional_probability_table</h1>
+<BR><BR>
+            This object represents a conditional probability table.
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#conditional_probability_table">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><br><br><center></center>
+</div></a><a name="copy_graph_structure"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">copy_graph_structure</h1>
+<BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> or 
+            <a href="containers.html#directed_graph">directed_graph</a> and copies  
+            its structure to another graph or directed_graph object.  The only 
+            restriction is that you can't copy the structure of a graph into a
+            directed_graph.  The three other possible combinations are allowed
+            however.
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#copy_graph_structure">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="crc32"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">crc32</h1>
+<BR><BR>
+            This object represents the CRC-32 algorithm for calculating
+                        checksums.   
+         <BR><BR><b>Specification: </b><a href="dlib/crc32/crc32_kernel_abstract.h.html">dlib/crc32/crc32_kernel_abstract.h</a><BR><B>File to include: </B><a href="dlib/crc32.h.html">dlib/crc32.h</a><BR><BR><B>Implementations:</B><blockquote>
+<a href="dlib/crc32/crc32_kernel_1.h.html">crc32_kernel_1</a>:
+                  <br> 
+                  This implementation uses the polynomial 0xedb88320. 
+               <div id="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr>
+<td bgcolor="#E3E3E3" valign="top"><div id="tdn">kernel_1a</div></td>
+<td width="100%" bgcolor="#E3E3E3">is a typedef for crc32_kernel_1</td>
+</tr></table></div>
+</blockquote>
+<center></center>
+</div></a><a name="create_join_tree"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">create_join_tree</h1>
+<BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> object and
+            creates a join tree for that graph.  Or in other words, this function finds a 
+            tree decomposition of the given graph.
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#create_join_tree">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="create_moral_graph"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">create_moral_graph</h1>
+<BR><BR>        
+            This function takes a <a href="containers.html#directed_graph">directed_graph</a>
+            and returns the moralized version of the graph in the form of a 
+            <a href="containers.html#graph">graph</a> object.
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#create_moral_graph">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="cross_validate_trainer"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_trainer</h1>
+<BR><BR>
+               Performs k-fold cross validation on a user supplied trainer object such
+               as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or <a href="#rbf_network_trainer">rbf_network_trainer</a>.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/svm_abstract.h.html#cross_validate_trainer">dlib/svm/svm_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="svm_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="cross_validate_trainer_threaded"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">cross_validate_trainer_threaded</h1>
+<BR><BR>
+               Performs k-fold cross validation on a user supplied trainer object such
+               as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or <a href="#rbf_network_trainer">rbf_network_trainer</a>.  This function does the same thing as <a href="#cross_validate_trainer">cross_validate_trainer</a>
+               except this function also allows you to specify how many threads of execution to use.
+               So you can use this function to take advantage of a multi-core system to perform
+               cross validation faster.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/svm_threaded_abstract.h.html#cross_validate_trainer_threaded">dlib/svm/svm_threaded_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm_threaded.h.html">dlib/svm_threaded.h</a><br><br><center></center>
+</div></a><a name="decision_function"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">decision_function</h1>
+<BR><BR>
+                This object represents a decision or regression function that was 
+                learned by a kernel based learning algorithm.  
+         <BR><BR><b>Specification: </b><a href="dlib/svm/function_abstract.h.html#decision_function">dlib/svm/function_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="svm_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="derivative"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">derivative</h1>
+<BR><BR>
+            This is a function that takes another function as input and returns
+            a function object that numerically computes the derivative of the input function.
+         <BR><BR><b>Specification: </b><a href="dlib/optimization/optimization_abstract.h.html#derivative">dlib/optimization/optimization_abstract.h</a><BR><B>File to include: </B><a href="dlib/optimization.h.html">dlib/optimization.h</a><br><br><center></center>
+</div></a><a name="distance_function"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">distance_function</h1>
+<BR><BR>
+                This object represents a point in kernel induced feature space. 
+                You may use this object to find the distance from the point it 
+                represents to points in input space.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/function_abstract.h.html#distance_function">dlib/svm/function_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><br><br><center></center>
+</div></a><a name="edge"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">edge</h1>
+<BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> object and a 
+            pair of indices.  It returns a reference to the edge object between the two nodes
+            with the given indices. 
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#edge">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="find_connected_nodes"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_connected_nodes</h1>
+<BR><BR>        
+            This function takes a node from a <a href="containers.html#graph">graph</a>
+            or <a href="containers.html#directed_graph">directed_graph</a> object and a 
+            <a href="containers.html#set">set</a> of unsigned longs.  It finds all the
+            nodes in the given graph that are connected to the given node by an 
+            undirected path and returns them in the set (also note that the
+            original query node is also returned in this set).
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#find_connected_nodes">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="find_min_conjugate_gradient"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_min_conjugate_gradient</h1>
+<BR><BR>
+             Performs an unconstrained minimization of the potentially nonlinear function f() using a 
+              conjugate gradient method. 
+         <BR><BR><b>Specification: </b><a href="dlib/optimization/optimization_abstract.h.html#find_min_conjugate_gradient">dlib/optimization/optimization_abstract.h</a><BR><B>File to include: </B><a href="dlib/optimization.h.html">dlib/optimization.h</a><br><br><center></center>
+</div></a><a name="find_min_conjugate_gradient2"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_min_conjugate_gradient2</h1>
+<BR><BR>
+             Performs an unconstrained minimization of the potentially nonlinear function f() using a 
+              conjugate gradient method. This version doesn't take a gradient function of f()
+              but instead numerically approximates the gradient.
+         <BR><BR><b>Specification: </b><a href="dlib/optimization/optimization_abstract.h.html#find_min_conjugate_gradient2">dlib/optimization/optimization_abstract.h</a><BR><B>File to include: </B><a href="dlib/optimization.h.html">dlib/optimization.h</a><br><br><center></center>
+</div></a><a name="find_min_quasi_newton"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_min_quasi_newton</h1>
+<BR><BR>
+             Performs an unconstrained minimization of the potentially nonlinear function f() using the 
+             BFGS quasi newton method.  
+         <BR><BR><b>Specification: </b><a href="dlib/optimization/optimization_abstract.h.html#find_min_quasi_newton">dlib/optimization/optimization_abstract.h</a><BR><B>File to include: </B><a href="dlib/optimization.h.html">dlib/optimization.h</a><br><br><center></center>
+</div></a><a name="find_min_quasi_newton2"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">find_min_quasi_newton2</h1>
+<BR><BR>
+             Performs an unconstrained minimization of the potentially nonlinear function f() using the
+             BFGS quasi newton method.  This version doesn't take a gradient function of f()
+              but instead numerically approximates the gradient.
+         <BR><BR><b>Specification: </b><a href="dlib/optimization/optimization_abstract.h.html#find_min_quasi_newton2">dlib/optimization/optimization_abstract.h</a><BR><B>File to include: </B><a href="dlib/optimization.h.html">dlib/optimization.h</a><br><br><center></center>
+</div></a><a name="graph_contains_directed_cycle"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">graph_contains_directed_cycle</h1>
+<BR><BR>        
+            This function checks a <a href="containers.html#directed_graph">directed_graph</a> for directed cycles.
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#graph_contains_directed_cycle">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="graph_contains_length_one_cycle"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">graph_contains_length_one_cycle</h1>
+<BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a>
+            or <a href="containers.html#directed_graph">directed_graph</a> object and
+            returns true if and only if the graph contains a node that has an edge that
+            links back to itself.
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#graph_contains_length_one_cycle">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="graph_contains_undirected_cycle"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">graph_contains_undirected_cycle</h1>
+<BR><BR>        
+            This function checks a <a href="containers.html#directed_graph">directed_graph</a> for undirected cycles.
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#graph_contains_undirected_cycle">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="graph_is_connected"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">graph_is_connected</h1>
+<BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> or
+            <a href="containers.html#directed_graph">directed_graph</a> object and
+            determines if the graph is connected.  That is, it returns true if and only if
+            there is an undirected path between any two nodes in the given graph.
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#graph_is_connected">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="hsort_array"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">hsort_array</h1>
+<BR><BR>
+            hsort_array is an implementation of the heapsort algorithm.  It will sort anything that has an 
+            array like operator[] interface.  
+         <BR><BR><b>Specification: </b><a href="dlib/sort.h.html#hsort_array">dlib/sort.h</a><BR><B>File to include: </B><a href="dlib/sort.h.html">dlib/sort.h</a><br><br><center></center>
+</div></a><a name="isort_array"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">isort_array</h1>
+<BR><BR>
+            isort_array is an implementation of the insertion sort algorithm.  It will sort anything that has an 
+            array like operator[] interface.   
+         <BR><BR><b>Specification: </b><a href="dlib/sort.h.html#isort_array">dlib/sort.h</a><BR><B>File to include: </B><a href="dlib/sort.h.html">dlib/sort.h</a><br><br><center></center>
+</div></a><a name="is_binary_classification_problem"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_binary_classification_problem</h1>
+<BR><BR>
+             This function simply takes two vectors, the first containing feature vectors and
+             the second containing labels, and reports back if the two could possibly 
+             contain data for a well formed classification problem.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/svm_abstract.h.html#is_binary_classification_problem">dlib/svm/svm_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><br><br><center></center>
+</div></a><a name="is_clique"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_clique</h1>
+<BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> and a 
+            <a href="containers.html#set">set</a> of node index values and checks 
+            if the specified set of nodes is a clique in the graph.
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#is_clique">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="is_join_tree"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_join_tree</h1>
+<BR><BR>        
+            This function takes two <a href="containers.html#graph">graph</a> objects and
+            checks if the second of the two graphs is a valid join tree (aka tree decomposition)
+            of the first graph.
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#is_join_tree">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="is_maximal_clique"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">is_maximal_clique</h1>
+<BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> and a 
+            <a href="containers.html#set">set</a> of node index values and checks 
+            if the specified set of nodes is a maximal clique in the graph.
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#is_maximal_clique">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="joint_probability_table"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">joint_probability_table</h1>
+<BR><BR>
+            This object represents a joint probability table.  
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#joint_probability_table">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><br><br><center></center>
+</div></a><a name="kcentroid"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">kcentroid</h1>
+<BR><BR>
+                This is an implementation of an online algorithm for recursively estimating the
+                centroid of a sequence of training points.  It uses the sparsification technique
+                described in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
+
+            <p>
+                This object then allows you to compute the distance between the center of mass
+                and any test points.  So you can use this object to predict how similar a test
+                point is to the data this object has been trained on (larger distances from the
+                centroid indicate dissimilarity/anomalous points).
+            </p>
+         <BR><BR><b>Specification: </b><a href="dlib/svm/kcentroid_abstract.h.html#kcentroid">dlib/svm/kcentroid_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="kcentroid_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="kkmeans"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">kkmeans</h1>
+<BR><BR>
+                This is an implementation of a kernelized k-means clustering algorithm.  
+                It performs k-means clustering by using the <a href="#kcentroid">kcentroid</a> object.  
+         <BR><BR><b>Specification: </b><a href="dlib/svm/kkmeans_abstract.h.html#kkmeans">dlib/svm/kkmeans_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="kkmeans_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="krls"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">krls</h1>
+<BR><BR>
+                This is an implementation of the kernel recursive least squares algorithm 
+                described in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
+            <p>
+                The long and short of this algorithm is that it is an online kernel based 
+                regression algorithm.  You give it samples (x,y) and it learns the function
+                f(x) == y.  For a detailed description of the algorithm read the above paper.
+            </p>
+         <BR><BR><b>Specification: </b><a href="dlib/svm/krls_abstract.h.html#krls">dlib/svm/krls_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="krls_ex.cpp.html">1</a>, 
+            <a href="krls_filter_ex.cpp.html">2</a><br><br><center></center>
+</div></a><a name="linearly_independent_subset_finder"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">linearly_independent_subset_finder</h1>
+<BR><BR>
+            <p>
+                This is an implementation of an online algorithm for recursively finding a
+                set of linearly independent vectors in a kernel induced feature space.  To 
+                use it you decide how large you would like the set to be and then you feed it 
+                sample points.  
+            </p>
+            <p>
+                
+                Each time you present it with a new sample point it either 
+                keeps the current set of independent points unchanged, or if the new point 
+                is "more linearly independent" than one of the points it already has,  
+                it replaces the weakly linearly independent point with the new one.
+            </p>
+
+            <p>
+                
+                This object uses the Approximately Linearly Dependent metric described in the paper 
+                The Kernel Recursive Least Squares Algorithm by Yaakov Engel to decide which
+                points are more linearly independent than others.
+            </p>
+         <BR><BR><b>Specification: </b><a href="dlib/svm/linearly_independent_subset_finder_abstract.h.html#linearly_independent_subset_finder">dlib/svm/linearly_independent_subset_finder_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><br><br><center></center>
+</div></a><a name="linear_kernel"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">linear_kernel</h1>
+<BR><BR>
+                This object represents a linear function kernel for use with
+                kernel learning machines.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/kernel_abstract.h.html#linear_kernel">dlib/svm/kernel_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><br><br><center></center>
+</div></a><a name="line_search"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">line_search</h1>
+<BR><BR>
+            Performs a line search on a given function and returns the input
+            that makes the function significantly smaller.
+         <BR><BR><b>Specification: </b><a href="dlib/optimization/optimization_abstract.h.html#line_search">dlib/optimization/optimization_abstract.h</a><BR><B>File to include: </B><a href="dlib/optimization.h.html">dlib/optimization.h</a><br><br><center></center>
+</div></a><a name="make_line_search_function"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">make_line_search_function</h1>
+<BR><BR>
+            This is a function that takes another function f(x) as input and returns
+            a function object l(z) = f(start + z*direction). 
+         <BR><BR><b>Specification: </b><a href="dlib/optimization/optimization_abstract.h.html#make_line_search_function">dlib/optimization/optimization_abstract.h</a><BR><B>File to include: </B><a href="dlib/optimization.h.html">dlib/optimization.h</a><br><br><center></center>
+</div></a><a name="md5"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">md5</h1>
+<BR><BR>
+            This is an implementation of The MD5 Message-Digest Algorithm as described in rfc1321.   
+         <BR><BR><b>Specification: </b><a href="dlib/md5/md5_kernel_abstract.h.html">dlib/md5/md5_kernel_abstract.h</a><BR><B>File to include: </B><a href="dlib/md5.h.html">dlib/md5.h</a><br><br><center></center>
+</div></a><a name="median"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">median</h1>
+<BR><BR>
+            This function takes three paramaters and finds the median of the three.  The median is swapped into
+            the first parameter and the first parameter ends up in one of the other two, unless the first parameter was
+            the median to begin with of course. 
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#median">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="mlp"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">mlp</h1>
+<BR><BR>
+                This object represents a multilayer layer perceptron network that is
+                trained using the back propagation algorithm.  The training algorithm also
+                incorporates the momentum method.  That is, each round of back propagation
+                training also adds a fraction of the previous update.  This fraction
+                is controlled by the momentum term set in the constructor.  
+         <BR><BR><b>Specification: </b><a href="dlib/mlp/mlp_kernel_abstract.h.html">dlib/mlp/mlp_kernel_abstract.h</a><BR><B>File to include: </B><a href="dlib/mlp.h.html">dlib/mlp.h</a><BR><b>Code Examples: </b><a href="mlp_ex.cpp.html">1</a><BR><BR><B>Implementations:</B><blockquote>
+<a href="dlib/mlp/mlp_kernel_1.h.html">mlp_kernel_1</a>:
+                  <br> 
+                  This is implemented in the obvious way.
+               <div id="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white">
+<tr>
+<td bgcolor="#E3E3E3" valign="top"><div id="tdn">kernel_1a</div></td>
+<td width="100%" bgcolor="#E3E3E3">is a typedef for mlp_kernel_1</td>
+</tr>
+<tr>
+<td valign="top"><div id="tdn">kernel_1a_c</div></td>
+<td width="100%"> 
+                  is a typedef for kernel_1a that checks its preconditions.             
+                  </td>
+</tr>
+</table></div>
+</blockquote>
+<center></center>
+</div></a><a name="move_rect"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">move_rect</h1>
+<BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and moves
+            it so that it's upper left corner occupies the given location.
+         <BR><BR><b>Specification: </b><a href="dlib/geometry/rectangle_abstract.h.html#move_rect">dlib/geometry/rectangle_abstract.h</a><BR><B>File to include: </B><a href="dlib/geometry.h.html">dlib/geometry.h</a><br><br><center></center>
+</div></a><a name="nearest_point"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">nearest_point</h1>
+<BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and a 
+            <a href="#point">point</a> and returns the point in the given 
+            rectangle that is nearst to the given point.
+         <BR><BR><b>Specification: </b><a href="dlib/geometry/rectangle_abstract.h.html#nearest_point">dlib/geometry/rectangle_abstract.h</a><BR><B>File to include: </B><a href="dlib/geometry.h.html">dlib/geometry.h</a><br><br><center></center>
+</div></a><a name="node_cpt_filled_out"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">node_cpt_filled_out</h1>
+<BR><BR>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily verify that a node
+            in a bayesian network has its <a href="#conditional_probability_table">conditional_probability_table</a> 
+            completely filled out.
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#node_cpt_filled_out">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><BR><b>Code Examples: </b><a href="bayes_net_gui_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="node_first_parent_assignment"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">node_first_parent_assignment</h1>
+<BR><BR>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily obtain an <a href="#assignment">assignment</a>
+            that contains all the parents of a node in a bayesian network.
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#node_first_parent_assignment">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><BR><b>Code Examples: </b><a href="bayes_net_gui_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="node_is_evidence"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">node_is_evidence</h1>
+<BR><BR>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily determine if a  
+            <a href="#bayes_node">bayes_node</a> is evidence when it is inside 
+            a <a href="containers.html#directed_graph"> directed_graph</a> object. 
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#node_is_evidence">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><br><br><center></center>
+</div></a><a name="node_next_parent_assignment"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">node_next_parent_assignment</h1>
+<BR><BR>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily loop through all the parent <a href="#assignment">assignments</a>
+            of a node in a bayesian network.
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#node_next_parent_assignment">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><BR><b>Code Examples: </b><a href="bayes_net_gui_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="node_num_values"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">node_num_values</h1>
+<BR><BR>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily obtain the number of values of a  
+            <a href="#bayes_node">bayes_node</a> when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#node_num_values">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><br><br><center></center>
+</div></a><a name="node_probability"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">node_probability</h1>
+<BR><BR>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily obtain the probability of a  
+            <a href="#bayes_node">bayes_node</a> given its parents when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#node_probability">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><br><br><center></center>
+</div></a><a name="node_value"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">node_value</h1>
+<BR><BR>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily obtain the value of a 
+            <a href="#bayes_node">bayes_node</a> when it is inside a <a href="containers.html#directed_graph">
+            directed_graph</a> object. 
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#node_value">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><br><br><center></center>
+</div></a><a name="normalized_function"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">normalized_function</h1>
+<BR><BR>
+                This object represents a container for another function
+                object and an instance of the <a href="#vector_normalizer">vector_normalizer</a> object.  
+
+                It automatically noramlizes all inputs before passing them
+                off to the contained function object.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/function_abstract.h.html#normalized_function">dlib/svm/function_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="svm_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="pick_initial_centers"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">pick_initial_centers</h1>
+<BR><BR>
+            This is a function that you can use to seed data clustering algorithms
+            like the <a href="#kkmeans">kkmeans</a> clustering method.  What it 
+            does is pick reasonable starting points for clustering by basically
+            trying to find a set of points that are all far away from each other.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/kkmeans_abstract.h.html#pick_initial_centers">dlib/svm/kkmeans_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="kkmeans_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="point"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">point</h1>
+<BR><BR>
+               This object represents a point inside a Cartesian coordinate system.
+         <BR><BR><b>Specification: </b><a href="dlib/geometry/vector_abstract.h.html#point">dlib/geometry/vector_abstract.h</a><BR><B>File to include: </B><a href="dlib/geometry.h.html">dlib/geometry.h</a><br><br><center></center>
+</div></a><a name="polynomial_kernel"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">polynomial_kernel</h1>
+<BR><BR>
+                This object represents a polynomial kernel for use with
+                kernel learning machines.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/kernel_abstract.h.html#polynomial_kernel">dlib/svm/kernel_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><br><br><center></center>
+</div></a><a name="poly_min_extrap"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">poly_min_extrap</h1>
+<BR><BR>
+            This function finds the 3rd degree polynomial that interpolates a 
+            set of points and returns you the minimum of that polynomial.
+         <BR><BR><b>Specification: </b><a href="dlib/optimization/optimization_abstract.h.html#poly_min_extrap">dlib/optimization/optimization_abstract.h</a><BR><B>File to include: </B><a href="dlib/optimization.h.html">dlib/optimization.h</a><br><br><center></center>
+</div></a><a name="probabilistic_decision_function"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">probabilistic_decision_function</h1>
+<BR><BR>
+                This object represents a binary decision function for use with
+                support vector machines.  It returns an 
+                estimate of the probability that a given sample is in the +1 class. 
+         <BR><BR><b>Specification: </b><a href="dlib/svm/function_abstract.h.html#probabilistic_decision_function">dlib/svm/function_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="svm_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="put_in_range"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">put_in_range</h1>
+<BR><BR>
+            This is a simple function that takes a range and a value and returns the given
+            value if it is within the range.  If it isn't in the range then it returns the  
+            end of range value that is closest.
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#put_in_range">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="qsort_array"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">qsort_array</h1>
+<BR><BR>
+            qsort_array is an implementation of the QuickSort algorithm.  It will sort anything that has an array like 
+            operator[] interface.  If the quick sort becomes unstable then it switches to a heap sort.  This 
+            way sorting is guaranteed to take at most N*log(N) time.
+         <BR><BR><b>Specification: </b><a href="dlib/sort.h.html#qsort_array">dlib/sort.h</a><BR><B>File to include: </B><a href="dlib/sort.h.html">dlib/sort.h</a><br><br><center></center>
+</div></a><a name="radial_basis_kernel"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">radial_basis_kernel</h1>
+<BR><BR>
+                This object represents a radial basis function kernel for use with
+                kernel learning machines.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/kernel_abstract.h.html#radial_basis_kernel">dlib/svm/kernel_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="svm_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="rand"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rand</h1>
+<BR><BR>
+            This object represents a pseudorandom number generator.
+         <BR><BR><b>Specification: </b><a href="dlib/rand/rand_kernel_abstract.h.html">dlib/rand/rand_kernel_abstract.h</a><BR><B>File to include: </B><a href="dlib/rand.h.html">dlib/rand.h</a><BR><BR><B>Implementations:</B><blockquote>
+<a href="dlib/rand/rand_kernel_1.h.html">rand_kernel_1</a>:
+                  <br> 
+                  This implementation is done using the Mersenne Twister algorithm.
+               <div id="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr>
+<td bgcolor="#E3E3E3" valign="top"><div id="tdn">kernel_1a</div></td>
+<td width="100%" bgcolor="#E3E3E3">is a typedef for rand_kernel_1</td>
+</tr></table></div>
+</blockquote>
+<center>
+<HR align="center">
+<h2>Extensions to rand</h2>
+</center>
+<BR><a name="rand_float"><B><font size="4">rand_float:</font></B></a><Br> 
+                  This extension gives rand the ability to generate random floating point numbers.
+               <BR><BR><b>Specification: </b><a href="dlib/rand/rand_float_abstract.h.html">dlib/rand/rand_float_abstract.h</a><BR><BR><B>Implementations:</B><blockquote>
+<a href="dlib/rand/rand_float_1.h.html">rand_float_1</a>:
+                  <br> 
+                        The implementation is obvious.  Click on the link if you want to see.                        
+                     <div id="typedefs"><table CELLSPACING="0" CELLPADDING="0" bgcolor="white"><tr>
+<td bgcolor="#E3E3E3" valign="top"><div id="tdn">float_1a</div></td>
+<td width="100%" bgcolor="#E3E3E3">is a typedef for rand_kernel_1a extended by rand_float_1</td>
+</tr></table></div>
+</blockquote>
+<center></center>
+</div></a><a name="randomize_samples"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">randomize_samples</h1>
+<BR><BR>
+               Randomizes the order of samples in a column vector containing sample data.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/svm_abstract.h.html#randomize_samples">dlib/svm/svm_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="svm_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="rank_features"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rank_features</h1>
+<BR><BR>
+             Finds a ranking of the top N (a user supplied parameter) features in a set of data 
+             from a two class classification problem.  It  
+              does this by computing the distance between the centroids of both classes in kernel defined 
+              feature space.  Good features are then ones that result in the biggest separation between
+              the two centroids. 
+         <BR><BR><b>Specification: </b><a href="dlib/svm/feature_ranking_abstract.h.html#rank_features">dlib/svm/feature_ranking_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="rank_features_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="rbf_network_trainer"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rbf_network_trainer</h1>
+<BR><BR>
+               Trains a radial basis function network and outputs a <a href="#decision_function">decision_function</a>. 
+         <BR><BR><b>Specification: </b><a href="dlib/svm/rbf_network_abstract.h.html#rbf_network_trainer">dlib/svm/rbf_network_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><br><br><center></center>
+</div></a><a name="rectangle"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rectangle</h1>
+<BR><BR>
+            This object represents a rectangular region inside a cartesian 
+            coordinate system.  It allows you to easily represent and manipulate
+            rectangles.
+         <BR><BR><b>Specification: </b><a href="dlib/geometry/rectangle_abstract.h.html">dlib/geometry/rectangle_abstract.h</a><BR><B>File to include: </B><a href="dlib/geometry.h.html">dlib/geometry.h</a><br><br><center></center>
+</div></a><a name="reduced"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">reduced</h1>
+<BR><BR>
+            This is a convenience function for creating 
+            <a href="#reduced_decision_function_trainer">reduced_decision_function_trainer</a>
+            objects.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/reduced_abstract.h.html#reduced">dlib/svm/reduced_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><br><br><center></center>
+</div></a><a name="reduced2"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">reduced2</h1>
+<BR><BR>
+            This is a convenience function for creating 
+            <a href="#reduced_decision_function_trainer2">reduced_decision_function_trainer2</a>
+            objects.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/reduced_abstract.h.html#reduced2">dlib/svm/reduced_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="svm_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="reduced_decision_function_trainer"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">reduced_decision_function_trainer</h1>
+<BR><BR>
+               This is a trainer object that is meant to wrap other trainer objects 
+               that create <a href="#decision_function">decision_function</a> objects.
+               It performs post processing on the output decision_function objects 
+               with the intent of representing the decision_function with fewer 
+               support vectors.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/reduced_abstract.h.html#reduced_decision_function_trainer">dlib/svm/reduced_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><br><br><center></center>
+</div></a><a name="reduced_decision_function_trainer2"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">reduced_decision_function_trainer2</h1>
+<BR><BR>
+               <p>
+               This is a trainer object that is meant to wrap other trainer objects 
+               that create <a href="#decision_function">decision_function</a> objects.
+               It performs post processing on the output decision_function objects 
+               with the intent of representing the decision_function with fewer 
+               support vectors.  
+               </p>
+               <p>
+               It begins by performing the same post processing as
+               the <a href="#reduced_decision_function_trainer">reduced_decision_function_trainer</a>
+               object but it also performs a global gradient based optimization 
+               to further improve the results.
+               </p>
+         <BR><BR><b>Specification: </b><a href="dlib/svm/reduced_abstract.h.html#reduced_decision_function_trainer2">dlib/svm/reduced_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="svm_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="resize_rect"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">resize_rect</h1>
+<BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and 
+            returns a new rectangle with the given size but with the same upper
+            left corner as the original rectangle.
+         <BR><BR><b>Specification: </b><a href="dlib/geometry/rectangle_abstract.h.html#resize_rect">dlib/geometry/rectangle_abstract.h</a><BR><B>File to include: </B><a href="dlib/geometry.h.html">dlib/geometry.h</a><br><br><center></center>
+</div></a><a name="resize_rect_height"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">resize_rect_height</h1>
+<BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and 
+            returns a new rectangle with the given height but otherwise with the 
+            same edge points as the original rectangle. 
+         <BR><BR><b>Specification: </b><a href="dlib/geometry/rectangle_abstract.h.html#resize_rect_height">dlib/geometry/rectangle_abstract.h</a><BR><B>File to include: </B><a href="dlib/geometry.h.html">dlib/geometry.h</a><br><br><center></center>
+</div></a><a name="resize_rect_width"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">resize_rect_width</h1>
+<BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and 
+            returns a new rectangle with the given width but otherwise with the 
+            same edge points as the original rectangle. 
+         <BR><BR><b>Specification: </b><a href="dlib/geometry/rectangle_abstract.h.html#resize_rect_width">dlib/geometry/rectangle_abstract.h</a><BR><B>File to include: </B><a href="dlib/geometry.h.html">dlib/geometry.h</a><br><br><center></center>
+</div></a><a name="running_stats"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">running_stats</h1>
+<BR><BR>
+                This object represents something that can compute the running mean and
+                variance of a stream of real numbers.  
+         <BR><BR><b>Specification: </b><a href="dlib/statistics/statistics_abstract.h.html#running_stats">dlib/statistics/statistics_abstract.h</a><BR><B>File to include: </B><a href="dlib/statistics.h.html">dlib/statistics.h</a><BR><b>Code Examples: </b><a href="kcentroid_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="rvm_regression_trainer"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rvm_regression_trainer</h1>
+<BR><BR>
+            <p>
+               Trains a relevance vector machine for solving regression problems.  
+               Outputs a <a href="#decision_function">decision_function</a> that represents the learned 
+               regression function. 
+            </p>
+               The implementation of the RVM training algorithm used by this library is based
+               on the following paper:
+               <blockquote>
+                Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation 
+                for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings 
+                of the Ninth International Workshop on Artificial Intelligence and Statistics, 
+                Key West, FL, Jan 3-6.
+               </blockquote>
+         <BR><BR><b>Specification: </b><a href="dlib/svm/rvm_abstract.h.html#rvm_regression_trainer">dlib/svm/rvm_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="rvm_regression_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="rvm_trainer"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">rvm_trainer</h1>
+<BR><BR>
+            <p>
+               Trains a relevance vector machine for solving binary classification problems.  
+               Outputs a <a href="#decision_function">decision_function</a> that represents the learned classifier. 
+            </p>
+               The implementation of the RVM training algorithm used by this library is based
+               on the following paper:
+               <blockquote>
+                Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation 
+                for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings 
+                of the Ninth International Workshop on Artificial Intelligence and Statistics, 
+                Key West, FL, Jan 3-6.
+               </blockquote>
+         <BR><BR><b>Specification: </b><a href="dlib/svm/rvm_abstract.h.html#rvm_trainer">dlib/svm/rvm_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="rvm_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="set_difference"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_difference</h1>
+<BR><BR>        
+            This function takes two <a href="containers.html#set">set</a> objects and 
+            gives you their difference.
+         <BR><BR><b>Specification: </b><a href="dlib/set_utils/set_utils_abstract.h.html#set_difference">dlib/set_utils/set_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/set_utils.h.html">dlib/set_utils.h</a><br><br><center></center>
+</div></a><a name="set_intersection"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_intersection</h1>
+<BR><BR>        
+            This function takes two <a href="containers.html#set">set</a> objects and 
+            gives you their intersection.
+         <BR><BR><b>Specification: </b><a href="dlib/set_utils/set_utils_abstract.h.html#set_intersection">dlib/set_utils/set_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/set_utils.h.html">dlib/set_utils.h</a><br><br><center></center>
+</div></a><a name="set_intersection_size"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_intersection_size</h1>
+<BR><BR>        
+            This function takes two <a href="containers.html#set">set</a> objects and tells you
+            how many items they have in common.
+         <BR><BR><b>Specification: </b><a href="dlib/set_utils/set_utils_abstract.h.html#set_intersection_size">dlib/set_utils/set_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/set_utils.h.html">dlib/set_utils.h</a><br><br><center></center>
+</div></a><a name="set_node_as_evidence"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_node_as_evidence</h1>
+<BR><BR>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily set the evidence flag of a  
+            <a href="#bayes_node">bayes_node</a> when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#set_node_as_evidence">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><BR><b>Code Examples: </b><a href="bayes_net_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="set_node_as_nonevidence"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_node_as_nonevidence</h1>
+<BR><BR>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily remove the evidence flag of a  
+            <a href="#bayes_node">bayes_node</a> when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#set_node_as_nonevidence">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><BR><b>Code Examples: </b><a href="bayes_net_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="set_node_num_values"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_node_num_values</h1>
+<BR><BR>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily set the number of values of a  
+            <a href="#bayes_node">bayes_node</a> when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#set_node_num_values">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><BR><b>Code Examples: </b><a href="bayes_net_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="set_node_probability"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_node_probability</h1>
+<BR><BR>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily set the probability of a  
+            <a href="#bayes_node">bayes_node</a> given its parents when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#set_node_probability">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><BR><b>Code Examples: </b><a href="bayes_net_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="set_node_value"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_node_value</h1>
+<BR><BR>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily modify the value of a 
+            <a href="#bayes_node">bayes_node</a> when it is inside a <a href="containers.html#directed_graph">
+            directed_graph</a> object. 
+         <BR><BR><b>Specification: </b><a href="dlib/bayes_utils/bayes_utils_abstract.h.html#set_node_value">dlib/bayes_utils/bayes_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/bayes_utils.h.html">dlib/bayes_utils.h</a><BR><b>Code Examples: </b><a href="bayes_net_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="set_union"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">set_union</h1>
+<BR><BR>        
+            This function takes two <a href="containers.html#set">set</a> objects and 
+            gives you their union.
+         <BR><BR><b>Specification: </b><a href="dlib/set_utils/set_utils_abstract.h.html#set_union">dlib/set_utils/set_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/set_utils.h.html">dlib/set_utils.h</a><br><br><center></center>
+</div></a><a name="sigmoid_kernel"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">sigmoid_kernel</h1>
+<BR><BR>
+                This object represents a sigmoid kernel for use with
+                kernel learning machines.
+         <BR><BR><b>Specification: </b><a href="dlib/svm/kernel_abstract.h.html#sigmoid_kernel">dlib/svm/kernel_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><br><br><center></center>
+</div></a><a name="square_root"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">square_root</h1>
+<BR><BR>        
+            square_root is a function which takes an unsigned long and returns the square root of it or
+            if the root is not an integer then it is rounded up to the next integer.
+         <BR><BR><b>Specification: </b><a href="dlib/algs.h.html#square_root">dlib/algs.h</a><BR><B>File to include: </B><a href="dlib/algs.h.html">dlib/algs.h</a><br><br><center></center>
+</div></a><a name="svm_nu_trainer"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">svm_nu_trainer</h1>
+<BR><BR>
+            <p>
+               Trains a nu support vector classifier and outputs a <a href="#decision_function">decision_function</a>. 
+            </p>
+               The implementation of the nu-svm training algorithm used by this library is based
+               on the following excellent papers:
+               <ul>
+                  <li>Chang and Lin, Training {nu}-Support Vector Classifiers: Theory and Algorithms</li>
+                  <li>Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                     machines, 2001. Software available at 
+                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a>
+</li>
+               </ul>
+         <BR><BR><b>Specification: </b><a href="dlib/svm/svm_abstract.h.html#svm_nu_trainer">dlib/svm/svm_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="svm_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="test_binary_decision_function"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">test_binary_decision_function</h1>
+<BR><BR>
+            Tests a <a href="#decision_function">decision_function</a> that represents a binary decision function and
+            returns the test accuracy.  
+
+         <BR><BR><b>Specification: </b><a href="dlib/svm/svm_abstract.h.html#test_binary_decision_function">dlib/svm/svm_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><br><br><center></center>
+</div></a><a name="train_probabilistic_decision_function"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">train_probabilistic_decision_function</h1>
+<BR><BR>
+            <p>
+               Trains a <a href="#probabilistic_decision_function">probabilistic_decision_function</a> using 
+               some sort of trainer object such as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or
+               <a href="#rbf_network_trainer">rbf_network_trainer</a>.
+            </p>
+            The probability model is created by using the technique described in the paper:
+            <blockquote>
+                Probabilistic Outputs for Support Vector Machines and
+                Comparisons to Regularized Likelihood Methods by 
+                John C. Platt.  Match 26, 1999
+            </blockquote>
+         <BR><BR><b>Specification: </b><a href="dlib/svm/svm_abstract.h.html#train_probabilistic_decision_function">dlib/svm/svm_abstract.h</a><BR><B>File to include: </B><a href="dlib/svm.h.html">dlib/svm.h</a><BR><b>Code Examples: </b><a href="svm_ex.cpp.html">1</a><br><br><center></center>
+</div></a><a name="translate_rect"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">translate_rect</h1>
+<BR><BR>        
+            This function takes a <a href="#rectangle">rectangle</a> and moves
+            it by a given number of units along the x and y axis relative to
+            where it was before the move.
+         <BR><BR><b>Specification: </b><a href="dlib/geometry/rectangle_abstract.h.html#translate_rect">dlib/geometry/rectangle_abstract.h</a><BR><B>File to include: </B><a href="dlib/geometry.h.html">dlib/geometry.h</a><br><br><center></center>
+</div></a><a name="triangulate_graph_and_find_cliques"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">triangulate_graph_and_find_cliques</h1>
+<BR><BR>        
+            This function takes a <a href="containers.html#graph">graph</a> and
+            turns it into a chordal graph.  It also returns a 
+            <a href="containers.html#set">set</a> that contains
+            all the cliques present in the choral graph.
+         <BR><BR><b>Specification: </b><a href="dlib/graph_utils/graph_utils_abstract.h.html#triangulate_graph_and_find_cliques">dlib/graph_utils/graph_utils_abstract.h</a><BR><B>File to include: </B><a href="dlib/graph_utils.h.html">dlib/graph_utils.h</a><br><br><center></center>
+</div></a><a name="vector"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">vector</h1>
+<BR><BR>
+            This object represents a three dimensional vector.
+         <BR><BR><b>Specification: </b><a href="dlib/geometry/vector_abstract.h.html#vector">dlib/geometry/vector_abstract.h</a><BR><B>File to include: </B><a href="dlib/geometry.h.html">dlib/geometry.h</a><br><br><center></center>
+</div></a><a name="vector_normalizer"><div id="component">
+<a href="#top"><font size="2"><center>[top]</center></font></a><h1 style="margin:0px;">vector_normalizer</h1>
+<BR><BR>
+                This object represents something that can learn to normalize a set 
+                of vectors.  In particular, normalized vectors should have zero
+                mean and a variance of one.  
+
+                Also, if desired, this object can also use principal component 
+                analysis for the purposes of reducing the number of elements in a 
+                vector.  
+         <BR><BR><b>Specification: </b><a href="dlib/statistics/statistics_abstract.h.html#vector_normalizer">dlib/statistics/statistics_abstract.h</a><BR><B>File to include: </B><a href="dlib/statistics.h.html">dlib/statistics.h</a><BR><b>Code Examples: </b><a href="svm_ex.cpp.html">1</a><br><br><center></center>
+</div></a>
+</div>
+</body>
+</html>

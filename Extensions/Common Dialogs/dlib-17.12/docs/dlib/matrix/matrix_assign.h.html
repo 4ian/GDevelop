@@ -1,0 +1,130 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - matrix_assign.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2008  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#ifndef</font> DLIB_MATRIx_ASSIGn_
+<font color='#0000FF'>#define</font> DLIB_MATRIx_ASSIGn_
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../geometry.h.html'>../geometry.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix.h.html'>matrix.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='matrix_utilities.h.html'>matrix_utilities.h</a>"
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='../enable_if.h.html'>../enable_if.h</a>"
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>namespace</font> ma
+    <b>{</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+            <font color='#0000FF'>typename</font> EXP
+            <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font> <b><a name='make_exp'></a>make_exp</b> <font face='Lucida Console'>(</font>
+            <font color='#0000FF'>const</font> EXP<font color='#5555FF'>&amp;</font> exp
+        <font face='Lucida Console'>)</font>
+        <font color='#009900'>/*!
+            The only point of this function is to make it easy to cause the overloads
+            of matrix_assign to not trigger for a matrix expression.
+        !*/</font>
+        <b>{</b>
+            <font color='#0000FF'>return</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP<font color='#5555FF'>&gt;</font><font face='Lucida Console'>(</font>exp<font face='Lucida Console'>)</font>;
+        <b>}</b>
+
+    <font color='#009900'>// ------------------------------------------------------------------------------------
+</font>
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> EXP, <font color='#0000FF'>typename</font> enable <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='matrix_is_vector'></a>matrix_is_vector</b> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> EXP <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='matrix_is_vector'></a>matrix_is_vector</b><font color='#5555FF'>&lt;</font>EXP, <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>EXP::NR<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> EXP::NC<font color='#5555FF'>=</font><font color='#5555FF'>=</font><font color='#979000'>1</font><font color='#5555FF'>&gt;</font>::type <font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> EXP, <font color='#0000FF'>typename</font> enable <font color='#5555FF'>=</font> <font color='#0000FF'><u>void</u></font> <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='is_small_matrix'></a>is_small_matrix</b> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>false</font>; <b>}</b>;
+        <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font> <font color='#0000FF'>typename</font> EXP <font color='#5555FF'>&gt;</font>
+        <font color='#0000FF'>struct</font> <b><a name='is_small_matrix'></a>is_small_matrix</b><font color='#5555FF'>&lt;</font>EXP, <font color='#0000FF'>typename</font> enable_if_c<font color='#5555FF'>&lt;</font>EXP::NR<font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font><font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> EXP::NC<font color='#5555FF'>&gt;</font><font color='#5555FF'>=</font><font color='#979000'>1</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font>
+        EXP::NR<font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font><font color='#979000'>100</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> EXP::NC<font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font><font color='#979000'>100</font><font color='#5555FF'>&gt;</font>::type <font color='#5555FF'>&gt;</font> <b>{</b> <font color='#0000FF'>static</font> <font color='#0000FF'>const</font> <font color='#0000FF'><u>bool</u></font> value <font color='#5555FF'>=</font> <font color='#979000'>true</font>; <b>}</b>;
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> matrix_dest_type,
+        <font color='#0000FF'>typename</font> EXP1,
+        <font color='#0000FF'>typename</font> EXP2,
+        <font color='#0000FF'><u>unsigned</u></font> <font color='#0000FF'><u>long</u></font> count
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'>typename</font> disable_if_c<font color='#5555FF'>&lt;</font>ma::matrix_is_vector<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ma::matrix_is_vector<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font>
+                                 ma::is_small_matrix<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>|</font><font color='#5555FF'>|</font> ma::is_small_matrix<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font>::value <font color='#5555FF'>&gt;</font>::type <b><a name='matrix_assign'></a>matrix_assign</b> <font face='Lucida Console'>(</font>
+        matrix_dest_type<font color='#5555FF'>&amp;</font> dest,
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>matrix_multiply_exp<font color='#5555FF'>&lt;</font>EXP1,EXP2,count<font color='#5555FF'>&gt;</font> <font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> src,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> row_offset <font color='#5555FF'>=</font> <font color='#979000'>0</font>,
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> col_offset <font color='#5555FF'>=</font> <font color='#979000'>0</font>
+    <font face='Lucida Console'>)</font>
+    <font color='#009900'>/*!
+        This overload catches assignments like:
+            dest = lhs*rhs
+            where lhs and rhs are both not vectors
+    !*/</font>
+    <b>{</b>
+        <font color='#0000FF'>using</font> <font color='#0000FF'>namespace</font> ma;
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP1<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>lhs</font><font face='Lucida Console'>(</font>src.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.lhs<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> matrix_exp<font color='#5555FF'>&lt;</font>EXP2<font color='#5555FF'>&gt;</font> <font color='#BB00BB'>rhs</font><font face='Lucida Console'>(</font>src.<font color='#BB00BB'>ref</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>.rhs<font face='Lucida Console'>)</font>;
+        <font color='#0000FF'>const</font> <font color='#0000FF'><u>long</u></font> bs <font color='#5555FF'>=</font> <font color='#979000'>100</font>;
+
+        <font color='#009900'>// if the matrices are small enough then just use the simple multiply algorithm
+</font>        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> rhs.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> lhs.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> rhs.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> <font color='#979000'>2</font> <font color='#5555FF'>|</font><font color='#5555FF'>|</font> <font face='Lucida Console'>(</font>lhs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> bs<font color='#5555FF'>*</font><font color='#979000'>10</font> <font color='#5555FF'>&amp;</font><font color='#5555FF'>&amp;</font> rhs.<font color='#BB00BB'>size</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font> <font color='#5555FF'>&lt;</font><font color='#5555FF'>=</font> bs<font color='#5555FF'>*</font><font color='#979000'>10</font><font face='Lucida Console'>)</font> <font face='Lucida Console'>)</font>
+        <b>{</b>
+            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>r<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> src.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; <font color='#5555FF'>+</font><font color='#5555FF'>+</font>c<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#BB00BB'>dest</font><font face='Lucida Console'>(</font>r<font color='#5555FF'>+</font>row_offset,c<font color='#5555FF'>+</font>col_offset<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>make_exp</font><font face='Lucida Console'>(</font>lhs<font color='#5555FF'>*</font>rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>(</font>r,c<font face='Lucida Console'>)</font>;
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+        <font color='#0000FF'>else</font>
+        <b>{</b>
+            <font color='#009900'>// if the lhs and rhs matrices are big enough we should use a cache friendly
+</font>            <font color='#009900'>// algorithm that computes the matrix multiply in blocks.  
+</font>
+            <font color='#009900'>// Loop over all the blocks in the lhs matrix
+</font>            <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> r <font color='#5555FF'>=</font> <font color='#979000'>0</font>; r <font color='#5555FF'>&lt;</font> lhs.<font color='#BB00BB'>nr</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; r<font color='#5555FF'>+</font><font color='#5555FF'>=</font>bs<font face='Lucida Console'>)</font>
+            <b>{</b>
+                <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> c <font color='#5555FF'>=</font> <font color='#979000'>0</font>; c <font color='#5555FF'>&lt;</font> lhs.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; c<font color='#5555FF'>+</font><font color='#5555FF'>=</font>bs<font face='Lucida Console'>)</font>
+                <b>{</b>
+                    <font color='#009900'>// make a rect for the block from lhs 
+</font>                    rectangle <font color='#BB00BB'>lhs_block</font><font face='Lucida Console'>(</font>c, r, c<font color='#5555FF'>+</font>bs<font color='#5555FF'>-</font><font color='#979000'>1</font>, r<font color='#5555FF'>+</font>bs<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                    lhs_block <font color='#5555FF'>=</font> lhs_block.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>lhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                    <font color='#009900'>// now loop over all the rhs blocks we have to multiply with the current lhs block
+</font>                    <font color='#0000FF'>for</font> <font face='Lucida Console'>(</font><font color='#0000FF'><u>long</u></font> i <font color='#5555FF'>=</font> <font color='#979000'>0</font>; i <font color='#5555FF'>&lt;</font> rhs.<font color='#BB00BB'>nc</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>; i <font color='#5555FF'>+</font><font color='#5555FF'>=</font> bs<font face='Lucida Console'>)</font>
+                    <b>{</b>
+                        <font color='#009900'>// make a rect for the block from rhs 
+</font>                        rectangle <font color='#BB00BB'>rhs_block</font><font face='Lucida Console'>(</font>i, c, i<font color='#5555FF'>+</font>bs<font color='#5555FF'>-</font><font color='#979000'>1</font>, c<font color='#5555FF'>+</font>bs<font color='#5555FF'>-</font><font color='#979000'>1</font><font face='Lucida Console'>)</font>;
+                        rhs_block <font color='#5555FF'>=</font> rhs_block.<font color='#BB00BB'>intersect</font><font face='Lucida Console'>(</font><font color='#BB00BB'>get_rect</font><font face='Lucida Console'>(</font>rhs<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+
+                        <font color='#009900'>// make a target rect in res
+</font>                        rectangle <font color='#BB00BB'>res_block</font><font face='Lucida Console'>(</font>rhs_block.<font color='#BB00BB'>left</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>,lhs_block.<font color='#BB00BB'>top</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, rhs_block.<font color='#BB00BB'>right</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font>, lhs_block.<font color='#BB00BB'>bottom</font><font face='Lucida Console'>(</font><font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                        res_block <font color='#5555FF'>=</font> <font color='#BB00BB'>translate_rect</font><font face='Lucida Console'>(</font>res_block,col_offset, row_offset<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>if</font> <font face='Lucida Console'>(</font>c <font color='#5555FF'>!</font><font color='#5555FF'>=</font> <font color='#979000'>0</font><font face='Lucida Console'>)</font>
+                            <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>dest, res_block<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>dest,res_block<font face='Lucida Console'>)</font> <font color='#5555FF'>+</font> <font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>lhs,lhs_block<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>rhs, rhs_block<font face='Lucida Console'>)</font>;
+                        <font color='#0000FF'>else</font>
+                            <font color='#BB00BB'>set_subm</font><font face='Lucida Console'>(</font>dest, res_block<font face='Lucida Console'>)</font> <font color='#5555FF'>=</font> <font color='#BB00BB'>make_exp</font><font face='Lucida Console'>(</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>lhs,lhs_block<font face='Lucida Console'>)</font><font color='#5555FF'>*</font><font color='#BB00BB'>subm</font><font face='Lucida Console'>(</font>rhs, rhs_block<font face='Lucida Console'>)</font><font face='Lucida Console'>)</font>;
+                    <b>}</b>
+                <b>}</b>
+            <b>}</b>
+        <b>}</b>
+
+
+    <b>}</b>
+
+<font color='#009900'>// ----------------------------------------------------------------------------------------
+</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_MATRIx_ASSIGn_
+</font>
+
+</pre></body></html>

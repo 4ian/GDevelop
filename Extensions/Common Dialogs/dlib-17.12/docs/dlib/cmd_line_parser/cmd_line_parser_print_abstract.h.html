@@ -1,0 +1,68 @@
+<html><!-- Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates. --><head><title>dlib C++ Library - cmd_line_parser_print_abstract.h</title></head><body bgcolor='white'><pre>
+<font color='#009900'>// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+</font><font color='#009900'>// License: Boost Software License   See LICENSE.txt for the full license.
+</font><font color='#0000FF'>#undef</font> DLIB_CMD_LINE_PARSER_PRINt_ABSTRACT_
+<font color='#0000FF'>#ifdef</font> DLIB_CMD_LINE_PARSER_PRINt_ABSTRACT_
+
+
+<font color='#0000FF'>#include</font> "<a style='text-decoration:none' href='cmd_line_parser_kernel_abstract.h.html'>cmd_line_parser_kernel_abstract.h</a>"
+<font color='#0000FF'>#include</font> <font color='#5555FF'>&lt;</font>iosfwd<font color='#5555FF'>&gt;</font>
+
+<font color='#0000FF'>namespace</font> dlib
+<b>{</b>
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> clp_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>class</font> <b><a name='cmd_line_parser_print'></a>cmd_line_parser_print</b> : <font color='#0000FF'>public</font> clp_base
+    <b>{</b>
+
+        <font color='#009900'>/*!
+            REQUIREMENTS ON CLP_BASE
+                clp_base is an implementation of cmd_line_parser/cmd_line_parser_kernel_abstract.h
+
+
+            POINTERS AND REFERENCES TO INTERNAL DATA
+                The print_options() function may invalidate pointers or references to 
+                internal data.
+
+
+            WHAT THIS EXTENSION DOES FOR CMD_LINE_PARSER
+                This gives a cmd_line_parser object the ability to print its options
+                in a nice format that fits into a console screen.
+        !*/</font>
+
+
+        <font color='#0000FF'>public</font>:
+
+            <font color='#0000FF'><u>void</u></font> <b><a name='print_options'></a>print_options</b> <font face='Lucida Console'>(</font>
+                std::basic_ostream<font color='#5555FF'>&lt;</font><font color='#0000FF'>typename</font> clp_base::char_type<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> out
+            <font face='Lucida Console'>)</font> <font color='#0000FF'>const</font>;
+            <font color='#009900'>/*!
+                ensures
+                    - prints all the command line options to out.
+                    - #at_start() == true
+                throws                
+                    - any exception.
+                        if an exception is thrown then #at_start() == true but otherwise  
+                        it will have no effect on the state of #*this.
+            !*/</font>
+    <b>}</b>;
+
+    <font color='#0000FF'>template</font> <font color='#5555FF'>&lt;</font>
+        <font color='#0000FF'>typename</font> clp_base
+        <font color='#5555FF'>&gt;</font>
+    <font color='#0000FF'>inline</font> <font color='#0000FF'><u>void</u></font> <b><a name='swap'></a>swap</b> <font face='Lucida Console'>(</font>
+        cmd_line_parser_print<font color='#5555FF'>&lt;</font>clp_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> a, 
+        cmd_line_parser_print<font color='#5555FF'>&lt;</font>clp_base<font color='#5555FF'>&gt;</font><font color='#5555FF'>&amp;</font> b 
+    <font face='Lucida Console'>)</font> <b>{</b> a.<font color='#BB00BB'>swap</font><font face='Lucida Console'>(</font>b<font face='Lucida Console'>)</font>; <b>}</b>  
+    <font color='#009900'>/*!
+        provides a global swap function
+    !*/</font>
+
+<b>}</b>
+
+<font color='#0000FF'>#endif</font> <font color='#009900'>// DLIB_CMD_LINE_PARSER_PRINt_ABSTRACT_
+</font>
+
+</pre></body></html>

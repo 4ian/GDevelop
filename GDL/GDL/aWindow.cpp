@@ -21,11 +21,13 @@ bool ActSetFullScreen( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
     {
         scene->game->fullscreen = true;
         scene->renderWindow->Create( sf::VideoMode( scene->game->windowWidth, scene->game->windowHeight, 32 ), scene->title, sf::Style::Close | sf::Style::Fullscreen );
+        scene->ChangeRenderWindow(scene->renderWindow);
     }
     else if ( ( action.GetParameter(0).GetPlainString() == "no" || action.GetParameter(0).GetPlainString() == "non" ) && scene->game->fullscreen )
     {
         scene->game->fullscreen = false;
         scene->renderWindow->Create( sf::VideoMode( scene->game->windowWidth, scene->game->windowHeight, 32 ), scene->title, sf::Style::Close );
+        scene->ChangeRenderWindow(scene->renderWindow);
     }
     #endif
 
@@ -44,10 +46,12 @@ bool ActSetWindowSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
     if ( scene->game->fullscreen )
     {
         scene->renderWindow->Create( sf::VideoMode( scene->game->windowWidth, scene->game->windowHeight, 32 ), scene->title, sf::Style::Close | sf::Style::Fullscreen );
+        scene->ChangeRenderWindow(scene->renderWindow);
     }
     else
     {
         scene->renderWindow->Create( sf::VideoMode( scene->game->windowWidth, scene->game->windowHeight, 32 ), scene->title, sf::Style::Close );
+        scene->ChangeRenderWindow(scene->renderWindow);
     }
     #endif
 

@@ -43,13 +43,13 @@ bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
-    if ( action.GetParameters().size() >= 6 )
-        layer = action.GetParameter(5).GetPlainString();
+    if ( action.GetParameters().size() >= 7 )
+        layer = action.GetParameter(6).GetPlainString();
 
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;
-    if ( action.GetParameters().size() >= 7 )
-        camera = eval.EvalExp(action.GetParameter(6));
+    if ( action.GetParameters().size() >= 8 )
+        camera = eval.EvalExp(action.GetParameter(7));
 
     sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 

@@ -149,7 +149,6 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
 
     double windowRatio = static_cast<double>(renderWindow->GetWidth())/static_cast<double>(renderWindow->GetHeight());
     gluPerspective(90.f, windowRatio, 1.f, 500.f);
-    glViewport(0, 0, renderWindow->GetWidth(), renderWindow->GetHeight());
 }
 
 ////////////////////////////////////////////////////////////
@@ -209,12 +208,16 @@ void RuntimeScene::ManageRenderTargetEvents()
         else if (event.Type == sf::Event::Resized)
         {
             //Resetup OpenGL
+            glEnable(GL_DEPTH_TEST);
+            glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glDepthMask(GL_TRUE);
+            glClearDepth(1.f);
+
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
 
             double windowRatio = static_cast<double>(event.Size.Width)/static_cast<double>(event.Size.Height);
             gluPerspective(90.f, windowRatio, 1.f, 500.f);
-            glViewport(0, 0, event.Size.Width, event.Size.Height);
         }
     }
 }

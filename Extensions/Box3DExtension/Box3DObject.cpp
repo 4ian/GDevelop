@@ -269,6 +269,9 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
     glRotatef(roll, 1, 0, 0);
     glTranslatef(-sizeWidth/2, -sizeHeight/2, -sizeDepth/2);
 
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     //Render the box
     backTexture.Bind();
     glBegin(GL_QUADS);

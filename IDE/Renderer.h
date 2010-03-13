@@ -14,12 +14,8 @@ class Renderer
     public:
         Renderer();
         virtual ~Renderer();
-        void SetSelected(bool pSelected = true);
         virtual void Render() const = 0;
         virtual int GetHeight() const = 0;
-
-    protected:
-        bool selected;
 };
 
 #endif // RENDERER_H

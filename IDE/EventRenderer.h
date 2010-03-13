@@ -29,6 +29,7 @@ class EventRenderer : public Renderer
 
         int GetConditionsHeight() const;
         int GetActionsHeight() const;
+        void DrawNiceRectangle(const wxRect & coords, const wxColor & color1, const wxColor & color2,const wxColor & color3,const wxColor & color4,const wxColor & color5) const;
 
         //Datas for rendering
         wxBufferedPaintDC & dc;

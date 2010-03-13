@@ -22,7 +22,7 @@ class RuntimeGame;
 #include <wx/msw/winundef.h>
 #endif
 #include "SceneCanvas.h"
-#include "EditorEvents.h"
+class EditorEvents;
 #include "EditorObjets.h"
 #include "EditorLayers.h"
 #include "RenderDialog.h"

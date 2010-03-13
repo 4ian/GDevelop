@@ -70,10 +70,6 @@ const long EditorEvents::idMenuSubEvent = wxNewId();
 const long EditorEvents::idMenuLien = wxNewId();
 const long EditorEvents::ID_MENUITEM1 = wxNewId();
 const long EditorEvents::idMenuEventDel = wxNewId();
-const long EditorEvents::idMenuDelConditions = wxNewId();
-const long EditorEvents::idMenuDelActions = wxNewId();
-const long EditorEvents::idMenuDelSubEvents = wxNewId();
-const long EditorEvents::ID_MENUITEM2 = wxNewId();
 const long EditorEvents::idMenuUndo = wxNewId();
 const long EditorEvents::idMenuRedo = wxNewId();
 const long EditorEvents::idMenuClearHistory = wxNewId();
@@ -86,15 +82,27 @@ const long EditorEvents::idMenuPaste = wxNewId();
 const long EditorEvents::idMenuEdit = wxNewId();
 const long EditorEvents::idMenuAdd = wxNewId();
 const long EditorEvents::idMenuDel = wxNewId();
+const long EditorEvents::ID_MENUITEM2 = wxNewId();
+const long EditorEvents::ID_MENUITEM17 = wxNewId();
+const long EditorEvents::ID_MENUITEM21 = wxNewId();
 const long EditorEvents::ID_MENUITEM3 = wxNewId();
 const long EditorEvents::idMenuCouper = wxNewId();
 const long EditorEvents::ID_MENUITEM4 = wxNewId();
 const long EditorEvents::ID_MENUITEM5 = wxNewId();
 const long EditorEvents::ID_MENUITEM6 = wxNewId();
 const long EditorEvents::ID_MENUITEM7 = wxNewId();
+const long EditorEvents::ID_MENUITEM18 = wxNewId();
+const long EditorEvents::ID_MENUITEM19 = wxNewId();
+const long EditorEvents::ID_MENUITEM20 = wxNewId();
 const long EditorEvents::ID_MENUITEM8 = wxNewId();
 const long EditorEvents::ID_MENUITEM9 = wxNewId();
 const long EditorEvents::ID_MENUITEM10 = wxNewId();
+const long EditorEvents::ID_MENUITEM11 = wxNewId();
+const long EditorEvents::ID_MENUITEM13 = wxNewId();
+const long EditorEvents::ID_MENUITEM12 = wxNewId();
+const long EditorEvents::ID_MENUITEM14 = wxNewId();
+const long EditorEvents::ID_MENUITEM15 = wxNewId();
+const long EditorEvents::ID_MENUITEM16 = wxNewId();
 //*)
 const long EditorEvents::ID_TEMPLATEBUTTON = wxNewId();
 const long EditorEvents::ID_CREATETEMPLATEBUTTON = wxNewId();
@@ -120,6 +128,9 @@ BEGIN_EVENT_TABLE( EditorEvents, wxPanel )
     //*)
 END_EVENT_TABLE()
 
+Event EditorEvents::badEvent;
+Instruction EditorEvents::badInstruction;
+
 EditorEvents::EditorEvents( wxWindow* parent, Game & game_, Scene & scene_, vector < Event > * events_, MainEditorCommand & mainEditorCommand_ ) :
 game(game_),
 scene(scene_),
@@ -132,17 +143,22 @@ isResizingColumns(false)
     MemTracer.AddObj( "Editeur d'evenements", ( long )this );
     //(*Initialize(EditorEvents)
     wxMenuItem* MenuItem26;
+    wxMenu* MenuItem36;
     wxFlexGridSizer* FlexGridSizer3;
+    wxMenuItem* MenuItem14;
     wxMenuItem* MenuItem11;
     wxMenuItem* MenuItem29;
+    wxMenuItem* MenuItem15;
     wxFlexGridSizer* FlexGridSizer2;
     wxMenuItem* MenuItem27;
     wxMenuItem* MenuItem20;
     wxMenuItem* MenuItem28;
+    wxMenuItem* MenuItem35;
     wxMenuItem* MenuItem23;
     wxMenuItem* editMenuItem;
     wxMenu* MenuItem5;
     wxFlexGridSizer* FlexGridSizer1;
+    wxMenuItem* MenuItem34;
     wxMenuItem* MenuItem19;
 
     Create(parent, wxID_ANY, wxDefaultPosition, wxSize(536,252), 0, _T("wxID_ANY"));
@@ -188,16 +204,6 @@ isResizingColumns(false)
     MenuItem1 = new wxMenuItem((&ContextMenu), idMenuEventDel, _("Supprimer cet évènement\tDEL"), _("Supprimer l\'évènement complet ( Action et Condition ) de la scène"), wxITEM_NORMAL);
     MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
     ContextMenu.Append(MenuItem1);
-    MenuItem14 = new wxMenu();
-    MenuItem2 = new wxMenuItem(MenuItem14, idMenuDelConditions, _("uniquement les conditions de l\'évènement"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/deletecondition.png"))));
-    MenuItem14->Append(MenuItem2);
-    MenuItem3 = new wxMenuItem(MenuItem14, idMenuDelActions, _("uniquement les actions de l\'évènement"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/deleteaction.png"))));
-    MenuItem14->Append(MenuItem3);
-    MenuItem15 = new wxMenuItem(MenuItem14, idMenuDelSubEvents, _("les sous évènements"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem14->Append(MenuItem15);
-    ContextMenu.Append(ID_MENUITEM2, _("Supprimer..."), MenuItem14, wxEmptyString);
     ContextMenu.AppendSeparator();
     MenuItem16 = new wxMenuItem((&ContextMenu), idMenuUndo, _("Annuler\tCtrl-Z"), _("Annuler les modifications précédentes"), wxITEM_NORMAL);
     MenuItem16->SetBitmap(wxBitmap(wxImage(_T("res/undo.png"))));
@@ -229,9 +235,17 @@ isResizingColumns(false)
     MenuItem19 = new wxMenuItem((&conditionsMenu), idMenuAdd, _("Ajouter une condition"), wxEmptyString, wxITEM_NORMAL);
     MenuItem19->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
     conditionsMenu.Append(MenuItem19);
+    conditionsMenu.AppendSeparator();
     MenuItem20 = new wxMenuItem((&conditionsMenu), idMenuDel, _("Supprimer la condition"), wxEmptyString, wxITEM_NORMAL);
     MenuItem20->SetBitmap(wxBitmap(wxImage(_T("res/remove.png"))));
     conditionsMenu.Append(MenuItem20);
+    MenuItem37 = new wxMenu();
+    MenuItem2 = new wxMenuItem(MenuItem37, ID_MENUITEM2, _("...toutes les conditions"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/deletecondition.png"))));
+    MenuItem37->Append(MenuItem2);
+    MenuItem3 = new wxMenuItem(MenuItem37, ID_MENUITEM17, _("...les sous évènements"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem37->Append(MenuItem3);
+    conditionsMenu.Append(ID_MENUITEM21, _("Supprimer..."), MenuItem37, wxEmptyString);
     conditionsMenu.AppendSeparator();
     MenuItem21 = new wxMenuItem((&conditionsMenu), ID_MENUITEM3, _("Copier"), wxEmptyString, wxITEM_NORMAL);
     MenuItem21->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
@@ -242,6 +256,7 @@ isResizingColumns(false)
     MenuItem23 = new wxMenuItem((&conditionsMenu), ID_MENUITEM4, _("Coller"), wxEmptyString, wxITEM_NORMAL);
     MenuItem23->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
     conditionsMenu.Append(MenuItem23);
+    conditionsMenu.AppendSeparator();
     MenuItem24 = new wxMenuItem((&actionsMenu), ID_MENUITEM5, _("Editer cette action"), wxEmptyString, wxITEM_NORMAL);
     MenuItem24->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
     actionsMenu.Append(MenuItem24);
@@ -249,9 +264,17 @@ isResizingColumns(false)
     MenuItem25 = new wxMenuItem((&actionsMenu), ID_MENUITEM6, _("Ajouter une action"), wxEmptyString, wxITEM_NORMAL);
     MenuItem25->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
     actionsMenu.Append(MenuItem25);
+    actionsMenu.AppendSeparator();
     MenuItem26 = new wxMenuItem((&actionsMenu), ID_MENUITEM7, _("Supprimer cette action"), wxEmptyString, wxITEM_NORMAL);
     MenuItem26->SetBitmap(wxBitmap(wxImage(_T("res/remove.png"))));
     actionsMenu.Append(MenuItem26);
+    MenuItem36 = new wxMenu();
+    MenuItem14 = new wxMenuItem(MenuItem36, ID_MENUITEM18, _("...toutes les actions"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem14->SetBitmap(wxBitmap(wxImage(_T("res/deleteaction.png"))));
+    MenuItem36->Append(MenuItem14);
+    MenuItem15 = new wxMenuItem(MenuItem36, ID_MENUITEM19, _("...les sous évènements"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem36->Append(MenuItem15);
+    actionsMenu.Append(ID_MENUITEM20, _("Supprimer..."), MenuItem36, wxEmptyString);
     actionsMenu.AppendSeparator();
     MenuItem27 = new wxMenuItem((&actionsMenu), ID_MENUITEM8, _("Copier"), wxEmptyString, wxITEM_NORMAL);
     MenuItem27->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
@@ -262,6 +285,31 @@ isResizingColumns(false)
     MenuItem29 = new wxMenuItem((&actionsMenu), ID_MENUITEM10, _("Coller"), wxEmptyString, wxITEM_NORMAL);
     MenuItem29->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
     actionsMenu.Append(MenuItem29);
+    actionsMenu.AppendSeparator();
+    MenuItem30 = new wxMenuItem((&noConditionsMenu), ID_MENUITEM11, _("Ajouter une condition"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem30->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+    noConditionsMenu.Append(MenuItem30);
+    noConditionsMenu.AppendSeparator();
+    MenuItem32 = new wxMenuItem((&noConditionsMenu), ID_MENUITEM13, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem32->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+    noConditionsMenu.Append(MenuItem32);
+    noConditionsMenu.AppendSeparator();
+    MenuItem31 = new wxMenuItem((&noActionsMenu), ID_MENUITEM12, _("Ajouter une action"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem31->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+    noActionsMenu.Append(MenuItem31);
+    noActionsMenu.AppendSeparator();
+    MenuItem33 = new wxMenuItem((&noActionsMenu), ID_MENUITEM14, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem33->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+    noActionsMenu.Append(MenuItem33);
+    noActionsMenu.AppendSeparator();
+    MenuItem34 = new wxMenuItem((&linkMenu), ID_MENUITEM15, _("Editer le lien"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem34->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
+    linkMenu.Append(MenuItem34);
+    linkMenu.AppendSeparator();
+    MenuItem35 = new wxMenuItem((&commentMenu), ID_MENUITEM16, _("Editer le commentaire"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem35->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
+    commentMenu.Append(MenuItem35);
+    commentMenu.AppendSeparator();
     FlexGridSizer1->SetSizeHints(this);
 
     Panel1->Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&EditorEvents::OnEventsPanelKeyUp,0,this);
@@ -288,9 +336,6 @@ isResizingColumns(false)
     Connect(idMenuSubEvent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnSubEventMenuItemSelected);
     Connect(idMenuLien,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnAddLienSelected);
     Connect(idMenuEventDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelEventSelected);
-    Connect(idMenuDelConditions,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelConditionsSelected);
-    Connect(idMenuDelActions,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelActionsSelected);
-    Connect(idMenuDelSubEvents,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelSubEventsSelected);
     Connect(idMenuUndo,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnUndoSelected);
     Connect(idMenuRedo,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnRedoSelected);
     Connect(idMenuClearHistory,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnClearHistorySelected);
@@ -302,15 +347,25 @@ isResizingColumns(false)
     Connect(idMenuEdit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OneEditConditionMenuSelected);
     Connect(idMenuAdd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnAddConditionMenuSelected);
     Connect(idMenuDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelConditionMenuSelected);
+    Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelConditionsSelected);
+    Connect(ID_MENUITEM17,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelSubEventsSelected);
     Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnCopyConditionMenuSelected);
     Connect(idMenuCouper,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnCutConditionMenuSelected);
     Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnPasteConditionMenuSelected);
     Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnEditActionMenuSelected);
     Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnAddActionMenuSelected);
     Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelActionMenuSelected);
+    Connect(ID_MENUITEM18,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelActionsSelected);
+    Connect(ID_MENUITEM19,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelSubEventsSelected);
     Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnCopyActionMenuSelected);
     Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnCutActionMenuSelected);
     Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnPasteActionMenuSelected);
+    Connect(ID_MENUITEM11,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnAddConditionMenuSelected);
+    Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnPasteConditionMenuSelected);
+    Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnAddActionMenuSelected);
+    Connect(ID_MENUITEM14,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnPasteActionMenuSelected);
+    Connect(ID_MENUITEM15,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnEditLinkMenuSelected);
+    Connect(ID_MENUITEM16,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnEditCommentMenuSelected);
     Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&EditorEvents::OnEventsPanelKeyUp);
     Connect(wxEVT_MOUSEWHEEL,(wxObjectEventFunction)&EditorEvents::OnEventsPanelMouseWheel);
     //*)
@@ -370,6 +425,13 @@ isResizingColumns(false)
         MenuItem15->Enable(false);
         MenuItem13->Enable(false);
     }
+
+    actionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
+    conditionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
+    noActionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
+    noConditionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
+    commentMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
+    linkMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
 
     //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
 #ifdef __WXGTK__
@@ -448,6 +510,14 @@ void EditorEvents::ConnectEvents()
 EditorEvents::~EditorEvents()
 {
     MemTracer.DelObj(( long )this );
+
+    //Be careful to remove ( not delete ) the common sub menu, so as to prevent its multiple deletion.
+    actionsMenu.Remove(actionsMenu.FindItemByPosition(actionsMenu.GetMenuItemCount()-1));
+    conditionsMenu.Remove(conditionsMenu.FindItemByPosition(conditionsMenu.GetMenuItemCount()-1));
+    noActionsMenu.Remove(noActionsMenu.FindItemByPosition(noActionsMenu.GetMenuItemCount()-1));
+    noConditionsMenu.Remove(noConditionsMenu.FindItemByPosition(noConditionsMenu.GetMenuItemCount()-1));
+    linkMenu.Remove(linkMenu.FindItemByPosition(linkMenu.GetMenuItemCount()-1));
+    commentMenu.Remove(commentMenu.FindItemByPosition(commentMenu.GetMenuItemCount()-1));
     //(*Destroy(EditorEvents)
     //*)
 }
@@ -520,6 +590,58 @@ void EditorEvents::ChangesMadeOnEvents()
     EventsPanel->Update();
 }
 
+Instruction & EditorEvents::GetLastSelectedInstruction()
+{
+    return GetSelectedInstruction(eventsSelected.size()-1);
+}
+
+Instruction & EditorEvents::GetSelectedInstruction(unsigned int nb)
+{
+    if ( nb >= eventsSelected.size() || boost::tuples::get<3>(eventsSelected[nb]) >= boost::tuples::get<2>(eventsSelected[nb])->size())
+        return badInstruction;
+
+    return boost::tuples::get<2>(eventsSelected[nb])->at(boost::tuples::get<3>(eventsSelected[nb]));
+}
+
+vector < Instruction > * EditorEvents::GetLastSelectedListOfInstructions()
+{
+    return GetSelectedListOfInstructions(eventsSelected.size()-1);
+}
+
+vector < Instruction > * EditorEvents::GetSelectedListOfInstructions(unsigned int nb)
+{
+    if ( nb >= eventsSelected.size() )
+        return NULL;
+
+    return boost::tuples::get<2>(eventsSelected[nb]);
+}
+
+Event & EditorEvents::GetLastSelectedEvent()
+{
+    return GetSelectedEvent(eventsSelected.size()-1);
+}
+
+Event & EditorEvents::GetSelectedEvent(unsigned int nb)
+{
+    if ( nb >= eventsSelected.size() || boost::tuples::get<1>(eventsSelected[nb]) >= boost::tuples::get<0>(eventsSelected[nb])->size() )
+        return badEvent;
+
+    return boost::tuples::get<0>(eventsSelected[nb])->at(boost::tuples::get<1>(eventsSelected[nb]));
+}
+
+vector < Event > * EditorEvents::GetLastSelectedListOfEvents()
+{
+    return GetSelectedListOfEvents(eventsSelected.size()-1);
+}
+
+vector < Event > * EditorEvents::GetSelectedListOfEvents(unsigned int nb)
+{
+    if ( nb >= eventsSelected.size() )
+        return NULL;
+
+    return boost::tuples::get<0>(eventsSelected[nb]);
+}
+
 ////////////////////////////////////////////////////////////
 /// Affichage des évènements de la scène
 ////////////////////////////////////////////////////////////
@@ -551,6 +673,8 @@ void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
     //Setup renderings datas which are constants.
     eventsRenderersDatas.SetRenderZoneWidth(EventsPanel->GetSize().x);
     eventsRenderersDatas.SetConditionsColumnWidth(conditionsColumnWidth);
+
+    instructionsSelected = false;
 
     //Phase de dessin des évènements
     DrawEvents(*events, dc, Yposition, initialXposition, maximalWidth, true);
@@ -606,55 +730,93 @@ void EditorEvents::DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, i
         if ( MouseY >= Yposition+positionScrollbar &&
              MouseY <= Yposition+positionScrollbar+renderer->GetHeight() )
         {
-            eventsSelected.push_back(std::make_pair(&list, i));
-            list[i].selected = true;
 
-            if ( MouseX <= conditionsColumnWidth)
+            if ( list[i].type != "Commentaire" && list[i].type != "Link")
             {
-                if ( !ConditionsSelected )
+                if ( MouseX <= conditionsColumnWidth)
                 {
-                    ConditionsSelected = true;
-                    instructionsSelected.clear();
+                    if ( !conditionsSelected )
+                    {
+                        conditionsSelected = true;
+                        DeselectAllEvents(*events);
+                    }
+
+                    //Test for click on a condition
+                    unsigned int conditionsY = 1;
+                    for (unsigned int c = 0;c<list[i].conditions.size();++c)
+                    {
+                        conditionsY += 1;
+                        if ( MouseY >= Yposition+positionScrollbar+conditionsY &&
+                             MouseY <= Yposition+positionScrollbar+conditionsY+list[i].conditions[c].renderedHeight)
+                        {
+                            //If we have some events selected, deselect them.
+                            if ( !instructionsSelected ) DeselectAllEvents(*events);
+                            instructionsSelected = true;
+
+                            list[i].conditions[c].selected = true;
+                            eventsSelected.push_back(boost::make_tuple(&list, i, &list[i].conditions, c));
+                        }
+                        conditionsY += list[i].conditions[c].renderedHeight+2;
+                    }
+                    //Test for a click on "No conditions"
+                    if ( list[i].conditions.empty() && MouseY <= Yposition+positionScrollbar+18)
+                    {
+                        //If we have some events selected, deselect them.
+                        if ( !instructionsSelected ) DeselectAllEvents(*events);
+                        instructionsSelected = true;
+
+                        eventsSelected.push_back(boost::make_tuple(&list, i, &list[i].conditions, 0));
+                    }
+                }
+                else
+                {
+                    if ( conditionsSelected )
+                    {
+                        conditionsSelected = false;
+                        DeselectAllEvents(*events);
+                    }
+
+                    unsigned int actionsY = 1;
+                    for (unsigned int a = 0;a<list[i].actions.size();++a)
+                    {
+                        actionsY += 1;
+                        if ( MouseY >= Yposition+positionScrollbar+actionsY &&
+                             MouseY <= Yposition+positionScrollbar+actionsY+list[i].actions[a].renderedHeight)
+                         {
+                            //If we have some events selected, deselect them.
+                            if ( !instructionsSelected ) DeselectAllEvents(*events);
+                            instructionsSelected = true;
+
+                            list[i].actions[a].selected = true;
+                            eventsSelected.push_back(boost::make_tuple(&list, i, &list[i].actions, a));
+                         }
+                        actionsY += list[i].actions[a].renderedHeight+2;
+                    }
+                    //Test for a click on "No actions"
+                    if ( list[i].actions.empty() )
+                    {
+                        //If we have some events selected, deselect them.
+                        if ( !instructionsSelected ) DeselectAllEvents(*events);
+                        instructionsSelected = true;
+
+                        eventsSelected.push_back(boost::make_tuple(&list, i, &list[i].actions, 0));
+                    }
                 }
 
-                unsigned int conditionsY = 1;
-                for (unsigned int c = 0;c<list[i].conditions.size();++c)
+                //No instruction selected ? The event is so selected
+                if ( !instructionsSelected )
                 {
-                    conditionsY += 1;
-                    if ( MouseY >= Yposition+positionScrollbar+conditionsY &&
-                         MouseY <= Yposition+positionScrollbar+conditionsY+list[i].conditions[c].renderedHeight)
-                     {
-                         list[i].conditions[c].selected = true;
-                         instructionsSelected.push_back(std::make_pair(&list[i].conditions, c));
-                     }
-                    conditionsY += list[i].conditions[c].renderedHeight+2;
+                    eventsSelected.push_back(boost::make_tuple(&list, i,              //Useful part
+                                                               (vector<Instruction>*)NULL, 0)); //Useless
+                    list[i].selected = true;
                 }
             }
-            else
+            else //Simple event selection
             {
-                cout << "here";
-                if ( ConditionsSelected )
-                {
-                    ConditionsSelected = false;
-                    instructionsSelected.clear();
-                }
-
-                unsigned int actionsY = 1;
-                for (unsigned int a = 0;a<list[i].actions.size();++a)
-                {
-                    actionsY += 1;
-                    if ( MouseY >= Yposition+positionScrollbar+actionsY &&
-                         MouseY <= Yposition+positionScrollbar+actionsY+list[i].actions[a].renderedHeight)
-                     {
-                cout << "selected";
-                         list[i].actions[a].selected = true;
-                         instructionsSelected.push_back(std::make_pair(&list[i].actions, a));
-                     }
-                    actionsY += list[i].actions[a].renderedHeight+2;
-                }
+                eventsSelected.push_back(boost::make_tuple(&list, i,              //Useful part
+                                                           (vector<Instruction>*)NULL, 0)); //Useless
+                list[i].selected = true;
             }
-
-            list[i].selected = true;
         }
 
         //Render
@@ -690,7 +852,7 @@ void EditorEvents::DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, i
 void EditorEvents::OnDelEventSelected( wxCommandEvent& event )
 {
     for (unsigned int i = 0;i<eventsSelected.size();++i)
-    	eventsSelected[i].first->erase(eventsSelected[i].first->begin() + eventsSelected[i].second);
+    	GetSelectedListOfEvents(i)->erase(GetSelectedListOfEvents(i)->begin() + eventsSelected[i].get<1>());
 
     eventsSelected.clear();
 
@@ -703,7 +865,7 @@ void EditorEvents::OnDelEventSelected( wxCommandEvent& event )
 void EditorEvents::OnDelConditionsSelected( wxCommandEvent& event )
 {
     for (unsigned int i = 0;i<eventsSelected.size();++i)
-    	eventsSelected[i].first->at(eventsSelected[i].second).conditions.clear();
+    	GetSelectedEvent(i).conditions.clear();
 
     ChangesMadeOnEvents();
 }
@@ -714,7 +876,7 @@ void EditorEvents::OnDelConditionsSelected( wxCommandEvent& event )
 void EditorEvents::OnDelActionsSelected( wxCommandEvent& event )
 {
     for (unsigned int i = 0;i<eventsSelected.size();++i)
-    	eventsSelected[i].first->at(eventsSelected[i].second).actions.clear();
+    	GetSelectedEvent(i).actions.clear();
 
     ChangesMadeOnEvents();
 }
@@ -735,7 +897,7 @@ void EditorEvents::OnTemplateBtClick( wxCommandEvent& event )
     {
         //Insertion des évènements ( déjà personnalisés )
         for ( unsigned int i = 0;i < Dialog.TemplateFinal.events.size();i++ )
-            eventsSelected[0].first->push_back( Dialog.TemplateFinal.events.at( i ) );
+            GetLastSelectedListOfEvents()->push_back( Dialog.TemplateFinal.events.at( i ) );
 
     }
 
@@ -749,21 +911,18 @@ void EditorEvents::OnTemplateBtClick( wxCommandEvent& event )
 void EditorEvents::OnMenuItem7Selected( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() )
-    {
-        wxLogStatus(_("Aucun endroit où insérer le modèle d'évènement."));
-        return;
-    }
+        eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
     Event eventToAdd;
     eventToAdd.type = "Commentaire";
     EditCommentaire Dialog( this, &eventToAdd );
     if ( Dialog.ShowModal() == 1 )
     {
-        if ( eventsSelected[0].second < eventsSelected[0].first->size() )
+        if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
         {
-            eventsSelected[0].first->insert( eventsSelected[0].first->begin() + eventsSelected[0].second, eventToAdd );
+            GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
         }
-        else { eventsSelected[0].first->push_back( eventToAdd ); }
+        else { GetLastSelectedListOfEvents()->push_back( eventToAdd ); }
 
         ChangesMadeOnEvents();
     }
@@ -776,17 +935,14 @@ void EditorEvents::OnMenuItem7Selected( wxCommandEvent& event )
 void EditorEvents::OnInsertEventSelected( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() )
-    {
-        wxLogStatus(_("Aucun endroit où insérer le modèle d'évènement."));
-        return;
-    }
+        eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
     Event eventToAdd;
 
-    if ( eventsSelected[0].second < eventsSelected[0].first->size() )
-        eventsSelected[0].first->insert( eventsSelected[0].first->begin() + eventsSelected[0].second, eventToAdd );
+    if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
+        GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
     else
-        eventsSelected[0].first->push_back( eventToAdd );
+        GetLastSelectedListOfEvents()->push_back( eventToAdd );
 
     ChangesMadeOnEvents();
 }
@@ -804,7 +960,7 @@ void EditorEvents::OnSubEventMenuItemSelected(wxCommandEvent& event)
     }
 
     Event eventToAdd;
-    eventsSelected[0].first->at(eventsSelected[0].second).events.push_back(eventToAdd);
+    GetLastSelectedEvent().events.push_back(eventToAdd);
 
     ChangesMadeOnEvents();
 }
@@ -816,20 +972,17 @@ void EditorEvents::OnSubEventMenuItemSelected(wxCommandEvent& event)
 void EditorEvents::OnAddLienSelected( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() )
-    {
-        wxLogStatus(_("Aucun endroit où insérer le lien."));
-        return;
-    }
+        eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
     Event eventToAdd;
     eventToAdd.type = "Link";
     EditLink dialog( this, eventToAdd );
     if ( dialog.ShowModal() == 1 )
     {
-        if ( eventsSelected[0].second < eventsSelected[0].first->size() )
-            eventsSelected[0].first->insert( eventsSelected[0].first->begin() + eventsSelected[0].second, eventToAdd );
+        if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
+            GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
         else
-            eventsSelected[0].first->push_back( eventToAdd );
+            GetLastSelectedListOfEvents()->push_back( eventToAdd );
 
         ChangesMadeOnEvents();
     }
@@ -844,7 +997,7 @@ void EditorEvents::OnMenuCopySelected( wxCommandEvent& event )
     if ( eventsSelected.empty() ) return;
 
     Clipboard * clipboard = Clipboard::getInstance();
-    clipboard->SetEvent( eventsSelected[0].first->at(eventsSelected[0].second) );
+    clipboard->SetEvent( GetLastSelectedEvent() );
 }
 
 ////////////////////////////////////////////////////////////
@@ -855,9 +1008,9 @@ void EditorEvents::OnCutSelected( wxCommandEvent& event )
     if ( eventsSelected.empty() ) return;
 
     Clipboard * clipboard = Clipboard::getInstance();
-    clipboard->SetEvent( eventsSelected[0].first->at(eventsSelected[0].second) );
+    clipboard->SetEvent( GetLastSelectedEvent() );
 
-    eventsSelected[0].first->erase( eventsSelected[0].first->begin() + eventsSelected[0].second );
+    GetLastSelectedListOfEvents()->erase( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]) );
     eventsSelected.clear();
 
     ChangesMadeOnEvents();
@@ -868,14 +1021,15 @@ void EditorEvents::OnCutSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnMenuPasteSelected( wxCommandEvent& event )
 {
-    if ( eventsSelected.empty() ) return;
+    if ( eventsSelected.empty() )
+        eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
     Clipboard * clipboard = Clipboard::getInstance();
 
-    if ( eventsSelected[0].second < eventsSelected[0].first->size() )
-        eventsSelected[0].first->insert( eventsSelected[0].first->begin() + eventsSelected[0].second, clipboard->GetEvent() );
+    if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
+        GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), clipboard->GetEvent() );
     else
-        eventsSelected[0].first->push_back( clipboard->GetEvent() );
+        GetLastSelectedListOfEvents()->push_back( clipboard->GetEvent() );
 
     ChangesMadeOnEvents();
 }
@@ -885,14 +1039,15 @@ void EditorEvents::OnMenuPasteSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnMenuPasteAfterSelected( wxCommandEvent& event )
 {
-    if ( eventsSelected.empty() ) return;
+    if ( eventsSelected.empty() )
+        eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
     Clipboard * clipboard = Clipboard::getInstance();
 
-    if ( eventsSelected[0].second+1 < eventsSelected[0].first->size() )
-        eventsSelected[0].first->insert( eventsSelected[0].first->begin() + eventsSelected[0].second+1, clipboard->GetEvent() );
+    if ( boost::tuples::get<1>(eventsSelected[0])+1 < GetLastSelectedListOfEvents()->size() )
+        GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0])+1, clipboard->GetEvent() );
     else
-        eventsSelected[0].first->push_back( clipboard->GetEvent() );
+        GetLastSelectedListOfEvents()->push_back( clipboard->GetEvent() );
 
     ChangesMadeOnEvents();
 }
@@ -905,7 +1060,7 @@ void EditorEvents::OnPasteAsASubEventSelected(wxCommandEvent& event)
     if ( eventsSelected.empty() ) return;
 
     Clipboard * clipboard = Clipboard::getInstance();
-    eventsSelected[0].first->at(eventsSelected[0].second).events.push_back( clipboard->GetEvent() );
+    GetLastSelectedEvent().events.push_back( clipboard->GetEvent() );
 
     ChangesMadeOnEvents();
 }
@@ -917,7 +1072,7 @@ void EditorEvents::OnDelSubEventsSelected(wxCommandEvent& event)
 {
     if ( eventsSelected.empty() ) return;
 
-    eventsSelected[0].first->at(eventsSelected[0].second).events.clear();
+    GetLastSelectedEvent().events.clear();
 
     ChangesMadeOnEvents();
 }
@@ -937,8 +1092,32 @@ void EditorEvents::OnCreateTemplateBtClick( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() );
 
-    CreateTemplate dialog( this, *eventsSelected[0].first );
+    CreateTemplate dialog( this, *GetLastSelectedListOfEvents() );
     dialog.ShowModal();
+}
+
+/**
+ * Edit a link
+ */
+void EditorEvents::OnEditLinkMenuSelected(wxCommandEvent& event)
+{
+    Event & eventSelected = GetLastSelectedEvent();
+
+    EditLink dialog( this, eventSelected );
+    if ( dialog.ShowModal() == 1 )
+        ChangesMadeOnEvents();
+}
+
+/**
+ * Edit a comment
+ */
+void EditorEvents::OnEditCommentMenuSelected(wxCommandEvent& event)
+{
+    Event & eventSelected = GetLastSelectedEvent();
+
+    EditCommentaire dialog( this, &eventSelected );
+    if ( dialog.ShowModal() == 1 )
+        ChangesMadeOnEvents();
 }
 
 ////////////////////////////////////////////////////////////
@@ -948,48 +1127,43 @@ void EditorEvents::OnEventsPanelLeftDClick( wxMouseEvent& event )
 {
     if ( eventsSelected.empty() ) return;
 
+    //Update mouse position
     MouseX = event.GetX();
     MouseY = event.GetY()+ScrollBar1->GetThumbPosition();
 
-    //Rafraichissement nécessaire pour s'assurer que l'évènement selectionné soit le bon
+    //Refresh, so as to display selection and refresh events selected
     EventsPanel->Refresh();
     EventsPanel->Update();
 
-    Event & eventSelected = eventsSelected[0].first->at(eventsSelected[0].second);
-
+    //Event specific edition
+    Event & eventSelected = GetLastSelectedEvent();
     if ( eventSelected.type == "Commentaire" )
     {
-        EditCommentaire dialog( this, &eventSelected );
-        if ( dialog.ShowModal() == 1 )
-            ChangesMadeOnEvents();
+        wxCommandEvent unusedEvent;
+        OnEditCommentMenuSelected(unusedEvent);
     }
     else if ( eventSelected.type == "Link" )
     {
-        EditLink dialog( this, eventSelected );
-        if ( dialog.ShowModal() == 1 )
-            ChangesMadeOnEvents();
+        wxCommandEvent unusedEvent;
+        OnEditLinkMenuSelected(unusedEvent);
     }
     else
     {
-        if ( ConditionsSelected )
+        if ( conditionsSelected )
         {
-            EditConditions EditDialog( this, game, scene, eventSelected );
-            if ( EditDialog.ShowModal() == 1 )
-            {
-                eventSelected = EditDialog.eventEdited;
-                eventSelected.conditionsHeightNeedUpdate = true;
-                ChangesMadeOnEvents();
-            }
+            wxCommandEvent unusedEvent;
+            if ( !eventSelected.conditions.empty() )
+                OneEditConditionMenuSelected(unusedEvent);
+            else
+                OnAddConditionMenuSelected(unusedEvent);
         }
         else
         {
-            EditActions EditDialog( this, game, scene, eventSelected );
-            if ( EditDialog.ShowModal() == 1 )
-            {
-                eventSelected = EditDialog.eventEdited;
-                eventSelected.actionsHeightNeedUpdate = true;
-                ChangesMadeOnEvents();
-            }
+            wxCommandEvent unusedEvent;
+            if ( !eventSelected.actions.empty() )
+                OnEditActionMenuSelected(unusedEvent);
+            else
+                OnAddActionMenuSelected(unusedEvent);
         }
     }
 
@@ -1003,16 +1177,19 @@ void EditorEvents::OnEventsPanelLeftUp(wxMouseEvent& event)
     wxFocusEvent unusedEvent;
     OnEventsPanelSetFocus(unusedEvent);
 
-    instructionsSelected.clear();
-    eventsSelected.clear();
-    DeselectAllEvents(*events);
-    DeselectAllActions(*events);
-    DeselectAllConditions(*events);
+    if ( !ctrlPressed )
+    {
+        instructionsSelected = false;
+        DeselectAllEvents(*events);
+        DeselectAllActions(*events);
+        DeselectAllConditions(*events);
+    }
 
+    //Update mouse position
     MouseX = event.GetX();
     MouseY = event.GetY()+ScrollBar1->GetThumbPosition();
 
-    //Si on relache la souris après avoir redimensionné une colonne
+    //Resize the column size if necessary
     if ( isResizingColumns )
     {
         conditionsColumnWidth = event.GetX();
@@ -1020,6 +1197,7 @@ void EditorEvents::OnEventsPanelLeftUp(wxMouseEvent& event)
         isResizingColumns = false;
     }
 
+    //Refresh the events
     EventsPanel->Refresh();
     EventsPanel->Update();
 }
@@ -1032,23 +1210,47 @@ void EditorEvents::OnEventsPanelRightUp( wxMouseEvent& event )
     wxFocusEvent unusedEvent;
     OnEventsPanelSetFocus(unusedEvent);
 
-    instructionsSelected.clear();
-    eventsSelected.clear();
-    DeselectAllEvents(*events);
-    DeselectAllActions(*events);
-    DeselectAllConditions(*events);
+    if ( !ctrlPressed )
+    {
+        instructionsSelected = false;
+        DeselectAllEvents(*events);
+        DeselectAllActions(*events);
+        DeselectAllConditions(*events);
+    }
 
+    //Update mouse position
     MouseX = event.GetX();
     MouseY = event.GetY()+ScrollBar1->GetThumbPosition();
 
+    //Refresh, so as to display selection and refresh events selected
     EventsPanel->Refresh();
     EventsPanel->Update();
 
-    if ( !instructionsSelected.empty() && ConditionsSelected )
-        PopupMenu( &conditionsMenu );
-    else if ( !instructionsSelected.empty() && !ConditionsSelected )
-        PopupMenu( &actionsMenu );
-    else if ( !eventsSelected.empty())
+    //Event specific menu
+    Event & eventSelected = GetLastSelectedEvent();
+    if ( eventSelected.type == "Commentaire" )
+    {
+        PopupMenu( &commentMenu );
+    }
+    else if ( eventSelected.type == "Link" )
+    {
+        PopupMenu( &linkMenu );
+    }
+    else if ( instructionsSelected && conditionsSelected )
+    {
+        if ( !GetLastSelectedEvent().conditions.empty() )
+            PopupMenu( &conditionsMenu );
+        else
+            PopupMenu( &noConditionsMenu );
+    }
+    else if ( instructionsSelected && !conditionsSelected )
+    {
+        if ( !GetLastSelectedEvent().actions.empty() )
+            PopupMenu( &actionsMenu );
+        else
+            PopupMenu( &noActionsMenu );
+    }
+    else
         PopupMenu( &ContextMenu );
 }
 
@@ -1136,6 +1338,8 @@ void EditorEvents::OnEventsPanelLeftDown(wxMouseEvent& event)
 
 void EditorEvents::DeselectAllEvents(vector < Event > & eventsToUnselected)
 {
+    eventsSelected.clear();
+
     for (unsigned int i = 0;i<eventsToUnselected.size();++i)
     {
     	eventsToUnselected[i].selected = false;
@@ -1146,6 +1350,8 @@ void EditorEvents::DeselectAllEvents(vector < Event > & eventsToUnselected)
 
 void EditorEvents::DeselectAllActions(vector < Event > & eventsToUnselected)
 {
+    eventsSelected.clear();
+
     for (unsigned int i = 0;i<eventsToUnselected.size();++i)
     {
         for (unsigned int a = 0;a<eventsToUnselected[i].actions.size();++a)
@@ -1158,6 +1364,8 @@ void EditorEvents::DeselectAllActions(vector < Event > & eventsToUnselected)
 
 void EditorEvents::DeselectAllConditions(vector < Event > & eventsToUnselected)
 {
+    eventsSelected.clear();
+
     for (unsigned int i = 0;i<eventsToUnselected.size();++i)
     {
         for (unsigned int c = 0;c<eventsToUnselected[i].conditions.size();++c)
@@ -1207,6 +1415,8 @@ TEST( Dialogues, EditorEvents )
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnEventsPanelKeyUp(wxKeyEvent& event)
 {
+    ctrlPressed = event.GetModifiers() == wxMOD_CMD ? true : false;
+
     if ( event.GetKeyCode() == WXK_DELETE )
     {
         wxCommandEvent unusedEvent;
@@ -1219,6 +1429,7 @@ void EditorEvents::OnEventsPanelKeyUp(wxKeyEvent& event)
     }
     else if ( event.GetModifiers() == wxMOD_CMD ) //Ctrl-xxx
     {
+
         switch ( event.GetKeyCode() )
         {
             case 67: //Ctrl C

@@ -36,7 +36,7 @@ void CommentaireRenderer::Render() const
     else
         rectangle.SetHeight(rectangle2.GetHeight()+sideSeparation*2);
 
-    if ( !selected )
+    if ( !event.selected )
     {
         dc.SetBrush(wxBrush(wxColour(event.r, event.v, event.b)));
         dc.SetPen(wxPen(wxColour(event.r/2, event.v/2, event.b/2), 1));

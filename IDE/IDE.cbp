@@ -485,6 +485,8 @@
 		<Unit filename="EditorEvents.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
 		</Unit>
+		<Unit filename="EditorEventsActions.cpp" />
+		<Unit filename="EditorEventsConditions.cpp" />
 		<Unit filename="EditorJeu.cpp">
 			<Option virtualFolder="Racine\" />
 		</Unit>

@@ -15,6 +15,7 @@
 #include <wx/dc.h>
 #include <wx/dcbuffer.h>
 #include <wx/toolbar.h>
+#include <boost/tuple/tuple.hpp>
 #include <stack>
 
 #include "SearchEvents.h"
@@ -36,8 +37,10 @@ class EditorEvents: public wxPanel
 		void ConnectEvents();
 
 		//(*Declarations(EditorEvents)
+		wxMenuItem* MenuItem31;
 		wxScrollBar* horizontalScrollbar;
 		wxMenuItem* MenuItem8;
+		wxMenuItem* MenuItem33;
 		wxMenuItem* MenuItem7;
 		wxMenuItem* MenuItem25;
 		wxMenu* MenuItem9;
@@ -45,23 +48,28 @@ class EditorEvents: public wxPanel
 		wxMenuItem* MenuItem1;
 		wxMenuItem* MenuItem4;
 		wxScrollBar* ScrollBar1;
-		wxMenuItem* MenuItem15;
+		wxMenu commentMenu;
+		wxMenu linkMenu;
 		wxMenuItem* MenuItem22;
 		wxPanel* Panel1;
+		wxMenuItem* MenuItem32;
 		wxMenuItem* MenuItem17;
 		wxMenuItem* MenuItem13;
 		wxMenu ContextMenu;
+		wxMenu noActionsMenu;
 		wxMenuItem* MenuItem10;
+		wxMenu noConditionsMenu;
 		wxMenu actionsMenu;
 		wxMenuItem* MenuItem12;
 		wxMenuItem* MenuItem24;
 		wxMenuItem* MenuItem3;
 		wxPanel* EventsPanel;
 		wxMenuItem* MenuItem6;
-		wxMenu* MenuItem14;
+		wxMenu* MenuItem37;
 		wxMenuItem* MenuItem21;
 		wxMenuItem* MenuItem16;
 		wxMenuItem* MenuItem18;
+		wxMenuItem* MenuItem30;
 		wxMenuItem* SubEventMenuItem;
 		wxMenu conditionsMenu;
 		//*)
@@ -79,10 +87,6 @@ class EditorEvents: public wxPanel
 		static const long idMenuLien;
 		static const long ID_MENUITEM1;
 		static const long idMenuEventDel;
-		static const long idMenuDelConditions;
-		static const long idMenuDelActions;
-		static const long idMenuDelSubEvents;
-		static const long ID_MENUITEM2;
 		static const long idMenuUndo;
 		static const long idMenuRedo;
 		static const long idMenuClearHistory;
@@ -95,15 +99,27 @@ class EditorEvents: public wxPanel
 		static const long idMenuEdit;
 		static const long idMenuAdd;
 		static const long idMenuDel;
+		static const long ID_MENUITEM2;
+		static const long ID_MENUITEM17;
+		static const long ID_MENUITEM21;
 		static const long ID_MENUITEM3;
 		static const long idMenuCouper;
 		static const long ID_MENUITEM4;
 		static const long ID_MENUITEM5;
 		static const long ID_MENUITEM6;
 		static const long ID_MENUITEM7;
+		static const long ID_MENUITEM18;
+		static const long ID_MENUITEM19;
+		static const long ID_MENUITEM20;
 		static const long ID_MENUITEM8;
 		static const long ID_MENUITEM9;
 		static const long ID_MENUITEM10;
+		static const long ID_MENUITEM11;
+		static const long ID_MENUITEM13;
+		static const long ID_MENUITEM12;
+		static const long ID_MENUITEM14;
+		static const long ID_MENUITEM15;
+		static const long ID_MENUITEM16;
 		//*)
 		static const long ID_TEMPLATEBUTTON;
 		static const long ID_CREATETEMPLATEBUTTON;
@@ -173,14 +189,29 @@ class EditorEvents: public wxPanel
 		void OnCopyConditionMenuSelected(wxCommandEvent& event);
 		void OnCutConditionMenuSelected(wxCommandEvent& event);
 		void OnPasteConditionMenuSelected(wxCommandEvent& event);
+		void OnEditLinkMenuSelected(wxCommandEvent& event);
+		void OnEditCommentMenuSelected(wxCommandEvent& event);
 		//*)
         void DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & maximalWidth, bool draw);
         void OnSearchBtClick(wxCommandEvent& event);
         void ChangesMadeOnEvents();
         void ResetEventsSizeCache(vector < Event > & eventsToReset);
+
         void DeselectAllEvents(vector < Event > & eventsToUnselected);
         void DeselectAllActions(vector < Event > & eventsToUnselected);
         void DeselectAllConditions(vector < Event > & eventsToUnselected);
+
+        Instruction & GetLastSelectedInstruction();
+        Instruction & GetSelectedInstruction(unsigned int nb);
+
+        vector < Instruction > * GetSelectedListOfInstructions(unsigned int nb);
+        vector < Instruction > * GetLastSelectedListOfInstructions();
+
+        Event & GetLastSelectedEvent();
+        Event & GetSelectedEvent(unsigned int nb);
+
+        vector < Event > * GetSelectedListOfEvents(unsigned int nb);
+        vector < Event > * GetLastSelectedListOfEvents();
 
         SearchEvents * searchDialog;
 
@@ -210,15 +241,18 @@ class EditorEvents: public wxPanel
         bool ctrlPressed;
         bool isResizingColumns;
 
-        //Evènement selectionné
-        vector < std::pair<vector < Event > *, unsigned int> > eventsSelected; ///<First: Pointer to the list of event, Second: index of the event in this list
-        vector < std::pair<vector < Instruction > *, unsigned int> > instructionsSelected; ///<First: Pointer to the list of instruction, Second: index of the instruction in this list
-        bool ConditionsSelected;
+        //Selection
+        vector < boost::tuple< vector < Event > *, unsigned int, vector < Instruction > *, unsigned int >
+                > eventsSelected; ///<First: Pointer to the event list, 2nd: Number of the event in this list, 3rd: Pointer to the list of instruction, Second: index of the instruction in this list
+        bool conditionsSelected;
+        bool instructionsSelected;
 
-        Event unusedEvent;
         vector < Event > unusedEventList;
 
 		wxToolBar * toolbar;
+
+		static Event badEvent;
+		static Instruction badInstruction;
 
 		DECLARE_EVENT_TABLE()
 };

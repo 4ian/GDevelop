@@ -67,6 +67,7 @@ ConsoleFrame::ConsoleFrame(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 
 ConsoleFrame::~ConsoleFrame()
 {
+    delete redirector;
 	//(*Destroy(ConsoleFrame)
 	//*)
 }

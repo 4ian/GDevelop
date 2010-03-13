@@ -1,11 +1,6 @@
 #include "Renderer.h"
 
-#ifdef DEBUG
-
-#endif
-
-Renderer::Renderer() :
-selected(false)
+Renderer::Renderer()
 {
     //ctor
 }
@@ -13,9 +8,4 @@ selected(false)
 Renderer::~Renderer()
 {
     //dtor
-}
-
-void Renderer::SetSelected(bool pSelected)
-{
-    selected = pSelected;
 }

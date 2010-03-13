@@ -22,10 +22,16 @@ renderingDatas(eventsRenderersDatas_)
 
 void LinkRenderer::Render() const
 {
-    dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
-    dc.SetPen( wxPen( wxColour( 255, 255, 255 ), 5, wxSOLID ) );
-    if ( selected ) dc.SetPen(wxPen(wxColour(0, 0, 0), 1));
-    if ( selected ) dc.SetBrush(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)));
+    if ( !event.selected )
+    {
+        dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
+        dc.SetPen( wxPen( wxColour( 255, 255, 255 ), 5, wxSOLID ) );
+    }
+    else
+    {
+        dc.SetPen(wxPen(wxColour(0, 0, 0), 1));
+        dc.SetBrush(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)));
+    }
 
     dc.DrawRectangle(renderingDatas.GetOrigineX(), renderingDatas.GetOrigineY(), renderingDatas.GetRenderZoneWidth(), GetHeight());
 

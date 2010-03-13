@@ -122,8 +122,6 @@ bool Game_Develop_EditorApp::OnInit()
     chdir( exeDirectory.c_str() );
 #endif
 
-    cout << exeDirectory;
-
     //(*AppInitialize
     bool wxsOK = true;
     wxInitAllImageHandlers();
@@ -296,7 +294,7 @@ int Game_Develop_EditorApp::OnExit()
 
     return 0;
 }
-
+#ifndef DEBUG //So as to let the debugger catch exceptions in debug build
 void Game_Develop_EditorApp::OnUnhandledException()
 {
     wxSafeShowMessage( "Erreur fatale", "Game Develop a rencontré une erreur fatale : (01) Fatal error.\nLe programme va devoir se fermer." );
@@ -347,3 +345,4 @@ bool Game_Develop_EditorApp::OnExceptionInMainLoop()
 
     terminate();
 }
+#endif

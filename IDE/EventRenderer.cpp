@@ -40,7 +40,7 @@ void EventRenderer::Render() const
 
     //Setup colors
     dc.SetFont(renderingDatas.GetFont());
-    if ( !selected )
+    if ( !event.selected )
     {
         dc.SetPen(renderingDatas.GetRectangleOutlinePen());
         dc.SetBrush(renderingDatas.GetRectangleFillBrush());
@@ -59,94 +59,30 @@ void EventRenderer::Render() const
                          renderingDatas.GetOrigineY(),
                          renderingDatas.GetRenderZoneWidth()-renderingDatas.GetOrigineX(),
                          GetHeight());
-        {
-            wxRect edge(rect);
 
-            edge.width = 2;
-            dc.DrawRectangle(edge.x, edge.y, edge.width, edge.height);
-
-            edge.x += rect.width - 2;
-            dc.DrawRectangle(edge.x, edge.y, edge.width, edge.height);
-
-            edge = rect;
-            edge.height = 2;
-            edge.y += (rect.height - edge.height);
-            dc.DrawRectangle(edge.x, edge.y, edge.width, edge.height);
-        }
-        {
-            wxRect background(rect);
-            background.x += 2;
-            background.width -= 4;
-            background.height -= 2;
-
-            background.height = 2;
-            dc.GradientFillLinear(background, wxColour(209, 217, 255),
-                wxColour(196, 207, 255), wxSOUTH);
-
-            background.y += background.height;
-            background.height = rect.height - 2 - background.height;
-            dc.GradientFillLinear(background, wxColour(233, 233, 255),
-                wxColour(205, 205, 255), wxSOUTH);
-        }
-        {
-            wxPoint border_points[8];
-            border_points[0] = wxPoint(2, 0);
-            border_points[1] = wxPoint(1, 1);
-            border_points[2] = wxPoint(1, rect.height - 4);
-            border_points[3] = wxPoint(3, rect.height - 2);
-            border_points[4] = wxPoint(rect.width - 4, rect.height - 2);
-            border_points[5] = wxPoint(rect.width - 2, rect.height - 4);
-            border_points[6] = wxPoint(rect.width - 2, 1);
-            border_points[7] = wxPoint(rect.width - 4, -1);
-
-            dc.SetPen(wxPen(wxColour(185, 185, 247)));
-            dc.DrawLines(sizeof(border_points)/sizeof(wxPoint), border_points, rect.x, rect.y);
-        }
+        DrawNiceRectangle(rect, renderingDatas.eventGradient1,
+                                renderingDatas.eventGradient2,
+                                renderingDatas.eventGradient3,
+                                renderingDatas.eventGradient4,
+                                renderingDatas.eventBorderColor);
     }
 
     dc.SetPen(renderingDatas.GetSelectedRectangleOutlinePen());
-    if (!selected) dc.SetBrush(renderingDatas.GetConditionsRectangleFillBrush());
 
     //Draw conditions
     int yCondition = renderingDatas.GetOrigineY();
     if ( event.conditions.empty() )
     {
         //Pas de conditions, on affiche juste un petit message
-        {
-            wxRect rect(renderingDatas.GetOrigineX(),
-                             renderingDatas.GetOrigineY(),
-                             renderingDatas.GetConditionsColumnWidth()-renderingDatas.GetOrigineX(),
-                             17+1);
-            {
-                wxRect background(rect);
-                background.x += 2;
-                background.width -= 4;
-                background.height -= 2;
-
-                background.height = 3;
-                dc.GradientFillLinear(background, wxColour(234, 242, 255),
-                    wxColour(221, 232, 255), wxSOUTH);
-
-                background.y += background.height;
-                background.height = rect.height - 2 - background.height;
-                dc.GradientFillLinear(background, wxColour(237, 237, 255),
-                    wxColour(210, 210, 255), wxSOUTH);
-            }
-            {
-                wxPoint border_points[8];
-                border_points[0] = wxPoint(2, 0);
-                border_points[1] = wxPoint(1, 1);
-                border_points[2] = wxPoint(1, rect.height - 4);
-                border_points[3] = wxPoint(3, rect.height - 2);
-                border_points[4] = wxPoint(rect.width - 4, rect.height - 2);
-                border_points[5] = wxPoint(rect.width - 2, rect.height - 4);
-                border_points[6] = wxPoint(rect.width - 2, 1);
-                border_points[7] = wxPoint(rect.width - 4, -1);
-
-                dc.SetPen(wxPen(wxColour(185, 185, 247)));
-                dc.DrawLines(sizeof(border_points)/sizeof(wxPoint), border_points, rect.x, rect.y);
-            }
-        }
+        wxRect rect(renderingDatas.GetOrigineX(),
+                         renderingDatas.GetOrigineY(),
+                         renderingDatas.GetConditionsColumnWidth()-renderingDatas.GetOrigineX(),
+                         17+1);
+        DrawNiceRectangle(rect, renderingDatas.eventConditionsGradient1,
+                                renderingDatas.eventConditionsGradient2,
+                                renderingDatas.eventConditionsGradient3,
+                                renderingDatas.eventConditionsGradient4,
+                                renderingDatas.eventConditionsBorderColor);
 
         dc.SetFont( renderingDatas.GetItalicFont() );
         dc.DrawText( _("Pas de conditions"), renderingDatas.GetOrigineX() + 2, renderingDatas.GetOrigineY() + 1 );
@@ -154,40 +90,15 @@ void EventRenderer::Render() const
     else
     {
         //Draw Conditions rectangle
-
         wxRect rect(renderingDatas.GetOrigineX(),
                          renderingDatas.GetOrigineY(),
                          renderingDatas.GetConditionsColumnWidth()-renderingDatas.GetOrigineX(),
                          GetConditionsHeight());
-        {
-            wxRect background(rect);
-            background.x += 2;
-            background.width -= 4;
-            background.height -= 2;
-
-            background.height = 3;
-            dc.GradientFillLinear(background, wxColour(216, 229, 231),
-                wxColour(176, 189, 201), wxSOUTH);
-
-            background.y += background.height;
-            background.height = rect.height - 2 - background.height;
-            dc.GradientFillLinear(background, wxColour(242, 242, 255),
-                wxColour(210, 210, 255), wxSOUTH);
-        }
-        {
-            wxPoint border_points[8];
-            border_points[0] = wxPoint(2, 0);
-            border_points[1] = wxPoint(1, 1);
-            border_points[2] = wxPoint(1, rect.height - 4);
-            border_points[3] = wxPoint(3, rect.height - 2);
-            border_points[4] = wxPoint(rect.width - 4, rect.height - 2);
-            border_points[5] = wxPoint(rect.width - 2, rect.height - 4);
-            border_points[6] = wxPoint(rect.width - 2, 1);
-            border_points[7] = wxPoint(rect.width - 4, -1);
-
-            dc.SetPen(wxPen(wxColour(185, 185, 247)));
-            dc.DrawLines(sizeof(border_points)/sizeof(wxPoint), border_points, rect.x, rect.y);
-        }
+        DrawNiceRectangle(rect, renderingDatas.eventConditionsGradient1,
+                                renderingDatas.eventConditionsGradient2,
+                                renderingDatas.eventConditionsGradient3,
+                                renderingDatas.eventConditionsGradient4,
+                                renderingDatas.eventConditionsBorderColor);
 
         //Draw each conditions
         int indentWidth = 0;
@@ -230,7 +141,7 @@ void EventRenderer::Render() const
                 dc.SetPen(renderingDatas.GetSelectedRectangleOutlinePen());
                 dc.DrawRectangle(renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth + iconWidth,
                                  yCondition,
-                                 renderingDatas.GetConditionsColumnWidth()-(renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth + iconWidth),
+                                 renderingDatas.GetConditionsColumnWidth()-(renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth + iconWidth)-2,
                                  event.conditions[j].renderedHeight);
             }
 
@@ -294,7 +205,7 @@ void EventRenderer::Render() const
                 dc.SetPen(renderingDatas.GetSelectedRectangleOutlinePen());
                 dc.DrawRectangle(renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + leftIconsWidth + iconWidth + sideSeparation,
                                  yAction,
-                                 renderingDatas.GetRenderZoneWidth() - (renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + leftIconsWidth + iconWidth + sideSeparation),
+                                 renderingDatas.GetRenderZoneWidth() - (renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + leftIconsWidth + iconWidth + sideSeparation)-2,
                                  event.actions[j].renderedHeight);
             }
 
@@ -338,6 +249,12 @@ int EventRenderer::GetConditionsHeight() const
 
     const int separation = 1;
     const int sideSeparation = 1;
+
+    for ( unsigned int j = 0;j < event.conditions.size();j++ )
+    {
+        if (event.conditions[j].renderedHeightNeedUpdate == true)
+            event.conditionsHeightNeedUpdate = true;
+    }
 
     if ( event.conditionsHeightNeedUpdate )
     {
@@ -410,6 +327,12 @@ int EventRenderer::GetActionsHeight() const
     const int separation = 1;
     const int sideSeparation = 1;
 
+    for ( unsigned int j = 0;j < event.actions.size();j++ )
+    {
+        if (event.actions[j].renderedHeightNeedUpdate == true)
+            event.actionsHeightNeedUpdate = true;
+    }
+
     if ( event.actionsHeightNeedUpdate )
     {
         if ( event.actions.empty() )
@@ -461,4 +384,35 @@ int EventRenderer::GetActionsHeight() const
     }
 
     return event.actionsHeight;
+}
+
+void EventRenderer::DrawNiceRectangle(const wxRect & rect, const wxColor & color1, const wxColor & color2,const wxColor & color3,const wxColor & color4,const wxColor & color5) const
+{
+    {
+        wxRect background(rect);
+        background.x += 2;
+        background.width -= 4;
+        background.height -= 2;
+
+        background.height = 3;
+        dc.GradientFillLinear(background, color1, color2, wxSOUTH);
+
+        background.y += background.height;
+        background.height = rect.height - 2 - background.height;
+        dc.GradientFillLinear(background, color3, color4, wxSOUTH);
+    }
+    {
+        wxPoint border_points[8];
+        border_points[0] = wxPoint(2, 0);
+        border_points[1] = wxPoint(1, 1);
+        border_points[2] = wxPoint(1, rect.height - 4);
+        border_points[3] = wxPoint(3, rect.height - 2);
+        border_points[4] = wxPoint(rect.width - 4, rect.height - 2);
+        border_points[5] = wxPoint(rect.width - 2, rect.height - 4);
+        border_points[6] = wxPoint(rect.width - 2, 1);
+        border_points[7] = wxPoint(rect.width - 4, -1);
+
+        dc.SetPen(wxPen(color5));
+        dc.DrawLines(sizeof(border_points)/sizeof(wxPoint), border_points, rect.x, rect.y);
+    }
 }

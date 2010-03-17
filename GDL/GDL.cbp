@@ -61,14 +61,12 @@
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
-					<Add option="-DPYSUPPORT" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-D__WXDEBUG__" />
 					<Add option="-DWXUSINGDLL" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="C:\Libs\wxwidgets\include" />
-					<Add directory="C:\Python26\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -108,8 +106,6 @@
 					<Add option="-ladvapi32" />
 					<Add option="-lcomdlg32" />
 					<Add option="-loleaut32" />
-					<Add library="C:\Libs\boost_1_38_0\bin.v2\libs\python\build\gcc-mingw-4.3.2\release\threading-multi\boost_python-mgw43-mt-1_38.lib" />
-					<Add library="C:\Python26\libs\libpython26.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />

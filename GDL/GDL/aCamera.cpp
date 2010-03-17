@@ -161,16 +161,16 @@ bool ActZoomCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
         layer = action.GetParameter(1).GetPlainString();
 
     //Compatibilité Game Develop < 1.2.8699 :
-    unsigned int camera = 0;
+    unsigned int cameraNb = 0;
     if ( action.GetParameters().size() >= 3 )
-        camera = eval.EvalExp(action.GetParameter(2));
+        cameraNb = eval.EvalExp(action.GetParameter(2));
 
-    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
+    RuntimeCamera & camera = scene->GetLayer(layer).GetCamera(cameraNb);
 
     float newZoom = eval.EvalExp( action.GetParameter( 0 ) );
     if ( newZoom == 0 ) return false;
 
-    view.SetSize((scene->game->windowWidth/newZoom), (scene->game->windowHeight/newZoom));
+    camera.GetSFMLView().SetSize((camera.GetCameraInfo().size.x/newZoom), (camera.GetCameraInfo().size.y/newZoom));
 
     return true;
 }

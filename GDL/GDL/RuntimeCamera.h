@@ -15,6 +15,10 @@ class GD_API RuntimeCamera
 
         inline const sf::View & GetSFMLView() const { return sfmlView; };
         inline sf::View & GetSFMLView() { return sfmlView; };
+
+        inline const Camera & GetCameraInfo() const { return associatedCamera; };
+        inline Camera & GetCameraInfo() { return associatedCamera; };
+
     protected:
     private:
 

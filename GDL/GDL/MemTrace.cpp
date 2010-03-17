@@ -41,5 +41,4 @@ void MemTrace::Rapport()
         printf("\nUn \"%s\" non libéré ( adresse : %d)", nom.at(i).c_str(), adresse.at(i));
     }
     printf("\n------------------\n");
-    system("pause");
 }

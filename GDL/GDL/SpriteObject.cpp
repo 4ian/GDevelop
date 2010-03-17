@@ -291,18 +291,13 @@ bool SpriteObject::LoadResources(const ImageManager & imageMgr )
                 Sprite & sprite = GetAnimation( j ).GetDirectionToModify(k).ModSprite(l);
 
                 if ( imageMgr.images.find(sprite.GetImage()) != imageMgr.images.end() )
-                    sprite.SetSprite(imageMgr.images.find(sprite.GetImage())->second);
+                    sprite.SetSprite(sf::Sprite(imageMgr.images.find(sprite.GetImage())->second));
                 else
                 {
                     cout << "L'image \"" + sprite.GetImage() +  "\" pour l'objet nommé \"" + GetName() + "\" n'a pas pu être trouvée.";
-                    sprite.SetSprite(imageMgr.imageVide);
+                    sprite.SetSprite(sf::Sprite(imageMgr.imageVide));
                 }
             }
-            /*if ( GetAnimation( j ).GetDirectionToModify(k).HasNoSprites() )
-            {
-                GetAnimation( j ).GetDirectionToModify(k).AddSprite(Sprite());
-                GetAnimation( j ).GetDirectionToModify(k).ModSprite(GetAnimation( j ).GetDirectionToModify(k).GetSpritesNumber()-1).SetSprite(imageMgr.imageVide);
-            }*/
         }
     }
 

@@ -200,7 +200,7 @@ void register_classes_7(){
 
         }
     }
-
+/*
     bp::class_< sf::VideoMode >( "VideoMode", bp::init< >() )
         .def( bp::init< unsigned int, unsigned int, bp::optional< unsigned int > >(( bp::arg("width"), bp::arg("height"), bp::arg("bitsPerPixel")=(unsigned int)(32) )) )
         .def(
@@ -401,7 +401,7 @@ void register_classes_7(){
                 , ( bp::arg("factor") ) );
 
         }
-    }
+    }*/
 
 }
 #endif

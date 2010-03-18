@@ -56,6 +56,60 @@ double ExpMouseY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerne
     return scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), view).y;
 }
 
+double ExpCameraWidth( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    unsigned int camera = toInt(exprInstruction.parameters[1].GetPlainString());
+
+    return scene->GetLayer(
+                            exprInstruction.parameters[0].GetPlainString()
+                            ).GetCamera(camera).GetCameraInfo().size.x;
+}
+
+double ExpCameraHeight( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    unsigned int camera = toInt(exprInstruction.parameters[1].GetPlainString());
+
+    return scene->GetLayer(
+                            exprInstruction.parameters[0].GetPlainString()
+                            ).GetCamera(camera).GetCameraInfo().size.y;
+}
+
+double ExpCameraViewportLeft( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    unsigned int camera = toInt(exprInstruction.parameters[1].GetPlainString());
+
+    return scene->GetLayer(
+                            exprInstruction.parameters[0].GetPlainString()
+                            ).GetCamera(camera).GetCameraInfo().viewport.Left;
+}
+
+double ExpCameraViewportTop( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    unsigned int camera = toInt(exprInstruction.parameters[1].GetPlainString());
+
+    return scene->GetLayer(
+                            exprInstruction.parameters[0].GetPlainString()
+                            ).GetCamera(camera).GetCameraInfo().viewport.Top;
+}
+
+double ExpCameraViewportRight( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    unsigned int camera = toInt(exprInstruction.parameters[1].GetPlainString());
+
+    return scene->GetLayer(
+                            exprInstruction.parameters[0].GetPlainString()
+                            ).GetCamera(camera).GetCameraInfo().viewport.Right;
+}
+
+double ExpCameraViewportBottom( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    unsigned int camera = toInt(exprInstruction.parameters[1].GetPlainString());
+
+    return scene->GetLayer(
+                            exprInstruction.parameters[0].GetPlainString()
+                            ).GetCamera(camera).GetCameraInfo().viewport.Bottom;
+}
+
 double ExpCameraX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     unsigned int camera = 0;

@@ -22,7 +22,86 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
 
+/**
+ * Change the render zone of a camera
+ */
+bool ActCameraViewport( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+{
+    std::string layer = action.GetParameter(0).GetPlainString();
+    unsigned int cameraNb = eval.EvalExp(action.GetParameter(1));
 
+    RuntimeCamera & camera = scene->GetLayer(layer).GetCamera(cameraNb);
+
+    camera.GetCameraInfo().defaultViewport = false;
+    camera.GetCameraInfo().viewport.Left = eval.EvalExp(action.GetParameter(0));
+    camera.GetCameraInfo().viewport.Top = eval.EvalExp(action.GetParameter(1));
+    camera.GetCameraInfo().viewport.Right = eval.EvalExp(action.GetParameter(2));
+    camera.GetCameraInfo().viewport.Bottom = eval.EvalExp(action.GetParameter(3));
+    camera.GetSFMLView().SetViewport(camera.GetCameraInfo().viewport);
+}
+
+/**
+ * Change the size of a camera ( reset zoom )
+ */
+bool ActCameraSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+{
+    std::string layer = action.GetParameter(0).GetPlainString();
+    unsigned int cameraNb = eval.EvalExp(action.GetParameter(1));
+
+    RuntimeCamera & camera = scene->GetLayer(layer).GetCamera(cameraNb);
+
+    camera.GetCameraInfo().defaultSize = false;
+    camera.GetCameraInfo().size.x = eval.EvalExp(action.GetParameter(0));
+    camera.GetCameraInfo().size.y = eval.EvalExp(action.GetParameter(1));
+    camera.GetSFMLView().SetSize(camera.GetCameraInfo().size);
+}
+
+/**
+ * Add a camera to a layer
+ */
+bool ActAddCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+{
+    RuntimeLayer & layer = scene->GetLayer(action.GetParameter(0).GetPlainString());
+
+    Camera cameraInfo;
+
+    //Set the size of the camera
+    if ( !action.GetParameter(1).GetPlainString().empty() || !action.GetParameter(2).GetPlainString().empty() )
+        cameraInfo.defaultSize = false;
+
+    cameraInfo.size.x = eval.EvalExp(action.GetParameter(1));
+    cameraInfo.size.y = eval.EvalExp(action.GetParameter(2));
+
+    //Set the viewport
+    if ( !action.GetParameter(3).GetPlainString().empty() || !action.GetParameter(4).GetPlainString().empty() ||
+         !action.GetParameter(5).GetPlainString().empty() || !action.GetParameter(6).GetPlainString().empty())
+        cameraInfo.defaultViewport = false;
+
+    cameraInfo.viewport.Left = eval.EvalExp(action.GetParameter(3));
+    cameraInfo.viewport.Top = eval.EvalExp(action.GetParameter(4));
+    cameraInfo.viewport.Right = eval.EvalExp(action.GetParameter(5));
+    cameraInfo.viewport.Bottom = eval.EvalExp(action.GetParameter(6));
+
+    //Create a runtime camera from the camera
+    const sf::RenderWindow * window = scene->renderWindow;
+    RuntimeCamera camera(cameraInfo, window ? window->GetDefaultView() : sf::View() );
+
+    //Add the runtime camera to the layer
+    layer.AddCamera(camera);
+}
+
+
+/**
+ * Delete a camera of a layer
+ */
+bool ActDeleteCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+{
+    unsigned int cameraNb = eval.EvalExp(action.GetParameter(1));
+
+    RuntimeLayer & layer = scene->GetLayer(action.GetParameter(0).GetPlainString());
+
+    layer.DeleteCamera(cameraNb);
+}
 
 ////////////////////////////////////////////////////////////
 /// Fixe la caméra sur un objet, sans dépasser un cadre
@@ -206,5 +285,3 @@ bool ActRotateCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 
     return true;
 }
-
-#undef PARAM

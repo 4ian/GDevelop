@@ -10,3 +10,5 @@ Layer::~Layer()
 {
     //dtor
 }
+
+Camera Layer::badCamera;

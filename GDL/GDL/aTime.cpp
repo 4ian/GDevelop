@@ -72,6 +72,7 @@ bool ActPauseTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 
     //Il n'existe pas, on l'ajoute
     scene->timers.push_back( ManualTimer(timerName) );
+    scene->timers.back().SetPaused(true);
 
     return true;
 }
@@ -100,6 +101,7 @@ bool ActUnPauseTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 
     //Il n'existe pas, on l'ajoute
     scene->timers.push_back( ManualTimer(timerName) );
+    scene->timers.back().SetPaused(false);
 
     return true;
 }

@@ -289,7 +289,7 @@ void RuntimeScene::Render()
         {
             for (unsigned int cameraIndex = 0;cameraIndex < layers[layerIndex].GetCamerasNumber();++cameraIndex)
             {
-                RuntimeCamera & camera = layers.at(layerIndex).GetCamera(cameraIndex);
+                RuntimeCamera & camera = layers[layerIndex].GetCamera(cameraIndex);
 
                 //Prepare OpenGL rendering
                 renderWindow->RestoreGLStates();

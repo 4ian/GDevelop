@@ -21,6 +21,62 @@
 
 #include "GDL/Instruction.h"
 
+/**
+ * Test camera width
+ */
+bool CondCameraWidth( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+{
+    std::string layer = condition.GetParameter(0).GetPlainString();
+    unsigned int camera = eval.EvalExp(condition.GetParameter(1));
+
+    float width = scene->GetLayer(layer).GetCamera(camera).GetCameraInfo().size.x;
+
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && width == eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && width < eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && width > eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && width <= eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && width >= eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && width != eval.EvalExp( condition.GetParameter( 3 ) ) )
+        )
+    {
+        if ( !condition.IsInverted() ) return true;
+    }
+    else
+    {
+        if ( condition.IsInverted() ) return true;
+    }
+
+    return false;
+}
+
+/**
+ * Test camera height
+ */
+bool CondCameraHeight( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+{
+    std::string layer = condition.GetParameter(0).GetPlainString();
+    unsigned int camera = eval.EvalExp(condition.GetParameter(1));
+
+    float height = scene->GetLayer(layer).GetCamera(camera).GetCameraInfo().size.y;
+
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && height == eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && height < eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && height > eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && height <= eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && height >= eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && height != eval.EvalExp( condition.GetParameter( 3 ) ) )
+        )
+    {
+        if ( !condition.IsInverted() ) return true;
+    }
+    else
+    {
+        if ( condition.IsInverted() ) return true;
+    }
+
+    return false;
+}
+
 ////////////////////////////////////////////////////////////
 /// Test de la position X de la caméra
 ///

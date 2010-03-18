@@ -10,6 +10,11 @@ class GD_API RuntimeCamera
 {
     public:
         RuntimeCamera() {};
+
+        /**
+         * Create a runtime camera from a camera, and a defaultView which can
+         * be provided by a SFML window, used for default size.
+         */
         RuntimeCamera(const Camera & camera, const sf::View & defaultView);
         virtual ~RuntimeCamera();
 

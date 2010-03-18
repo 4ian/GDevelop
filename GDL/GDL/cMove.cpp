@@ -136,3 +136,19 @@ bool CondSeDirige( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 
     return isTrue;
 }
+
+/**
+ * Compare the angle of displacement of an object
+ */
+bool Object::CondAngleOfDisplacement( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+{
+    int angle = eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() );
+    int tolerance = eval.EvalExp( condition.GetParameter( 2 ), shared_from_this() );
+
+    unsigned int objectAngle = TotalForceAngle();
+
+    if ( objectAngle >= angle-tolerance && objectAngle <= angle+tolerance )
+        return !condition.IsInverted();
+
+    return condition.IsInverted();
+}

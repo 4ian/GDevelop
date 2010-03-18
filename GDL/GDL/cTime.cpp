@@ -62,7 +62,7 @@ bool CondTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const
 ////////////////////////////////////////////////////////////
 bool CondTimerPaused( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    string timerName = eval.EvalTxt(condition.GetParameter( 1 ));
+    string timerName = eval.EvalTxt(condition.GetParameter( 0 ));
 
     //Le timer existe il ? on parcourt la liste.
     for ( unsigned int i = 0;i < scene->timers.size();i++ )

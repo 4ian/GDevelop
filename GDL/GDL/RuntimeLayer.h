@@ -5,6 +5,9 @@
 #include "GDL/Layer.h"
 #include "GDL/RuntimeCamera.h"
 
+/**
+ * Layer used at runtime, containg RuntimeCamera.
+ */
 class GD_API RuntimeLayer
 {
     public:
@@ -20,13 +23,33 @@ class GD_API RuntimeLayer
 
         inline unsigned int GetCamerasNumber() const { return cameras.size(); };
 
-        inline void SetCamera(unsigned int n, RuntimeCamera & camera_) { cameras[n] = camera_; }
+        /**
+         * Add a camera during runtime
+         */
+        inline void AddCamera(const RuntimeCamera & camera) { cameras.push_back(camera); };
+
+        /**
+         * Delete a camera during runtime. Check if number is not out of range.
+         */
+        inline void DeleteCamera(unsigned int cameraNb)
+        {
+            if ( cameraNb >= GetCamerasNumber() ) return;
+            cameras.erase(cameras.begin() + cameraNb);
+        }
+
+        /**
+         * Get a camera. Check if number is not out of range.
+         */
         inline const RuntimeCamera & GetCamera(unsigned int n) const
         {
             if ( n >= GetCamerasNumber() ) return badCamera;
 
             return cameras[n];
         }
+
+        /**
+         * Get a camera. Check if number is not out of range.
+         */
         inline RuntimeCamera & GetCamera(unsigned int n)
         {
             if ( n >= GetCamerasNumber() ) return badCamera;
@@ -38,7 +61,7 @@ class GD_API RuntimeLayer
     private:
 
         Layer associatedLayer;
-        vector < RuntimeCamera > cameras; ///< Camera used during Runtime.
+        vector < RuntimeCamera > cameras; ///< Cameras used during Runtime.
 
         static RuntimeCamera badCamera;
 };

@@ -420,6 +420,22 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         DECLARE_END_OBJECT_CONDITION()
 
+        DECLARE_OBJECT_CONDITION("AngleOfDisplacement",
+                       _("Angle de déplacement"),
+                       _("Teste l'angle de déplacement d'un objet"),
+                       _("L'angle de déplacement de _PARAM0_ est de _PARAM1_ ( Tolérance : _PARAM2_° )"),
+                       _("Déplacement"),
+                       "res/conditions/vitesse24.png",
+                       "res/conditions/vitesse.png",
+                       &Object::CondAngleOfDisplacement);
+
+            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("expression", _("Angle ( en degrés )"), false, "")
+            DECLARE_PARAMETER("expression", _("Tolérance"), false, "")
+            MAIN_OBJECTS_IN_PARAMETER(0)
+
+        DECLARE_END_OBJECT_CONDITION()
+
         DECLARE_OBJECT_CONDITION("VarObjet",
                        _("Variable d'un objet"),
                        _("Teste si la valeur d'une variable d'un objet correspond au test effectué."),

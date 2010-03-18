@@ -32,10 +32,9 @@ class GD_API Layer
 
         inline unsigned int GetCamerasNumber() const { return cameras.size(); };
 
-        inline void SetCamera(unsigned int n, const Camera & camera_) { cameras[n] = camera_; }
-        inline const Camera & GetCamera(unsigned int n) const { return cameras[n]; }
-        inline Camera & GetCamera(unsigned int n) { return cameras[n]; }
-        inline void DeleteCamera(unsigned int n) { cameras.erase(cameras.begin()+n); }
+        inline const Camera & GetCamera(unsigned int n) const { if ( n >= GetCamerasNumber() ) return badCamera; return cameras[n]; }
+        inline Camera & GetCamera(unsigned int n) { if ( n >= GetCamerasNumber() ) return badCamera; return cameras[n]; }
+        inline void DeleteCamera(unsigned int n) { if ( n >= GetCamerasNumber() ) return; cameras.erase(cameras.begin()+n); }
 
     protected:
     private:
@@ -45,6 +44,8 @@ class GD_API Layer
         vector < Camera > cameras;
 
         string followLayer;
+
+        static Camera badCamera;
 };
 
 #endif // LAYER_H

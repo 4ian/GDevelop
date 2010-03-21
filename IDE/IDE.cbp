@@ -21,7 +21,6 @@
 					<Add option="-g" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
-					<Add option="-DPYSUPPORT" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-D__WXDEBUG__" />
@@ -34,6 +33,9 @@
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
+					<Add option="-lfreetype" />
+					<Add option="-lopenal32" />
+					<Add option="-lsndfile" />
 					<Add option="-lgdl.dll" />
 					<Add option="-lwxmsw29d_xrc" />
 					<Add option="-lwxmsw29d_richtext" />
@@ -55,9 +57,6 @@
 					<Add option="-lsfml-network-d.dll" />
 					<Add option="-lsfml-window-d.dll" />
 					<Add option="-lsfml-system-d.dll" />
-					<Add option="-lopenal32" />
-					<Add option="-lsndfile" />
-					<Add option="-lfreetype" />
 					<Add directory="bin\debug" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
@@ -128,7 +127,6 @@
 				<Option object_output="obj\dev" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-O3" />
@@ -149,6 +147,9 @@
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lopenal32" />
+					<Add option="-lsndfile" />
+					<Add option="-lfreetype" />
 					<Add option="-lgdl.dll" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -170,9 +171,6 @@
 					<Add option="-lsfml-network.dll" />
 					<Add option="-lsfml-window.dll" />
 					<Add option="-lsfml-system.dll" />
-					<Add option="-lopenal32" />
-					<Add option="-lsndfile" />
-					<Add option="-lfreetype" />
 					<Add directory="bin\dev" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll" />

@@ -116,6 +116,7 @@ class ChoixCondition: public wxDialog
 		void OnextSortCheckClick(wxCommandEvent& event);
 		void OnobjSortCheckClick(wxCommandEvent& event);
 		void OnmoreBtClick(wxCommandEvent& event);
+		void OnGlobalCheckSelect(wxCommandEvent& event);
 		//*)
         void OnABtClick(wxCommandEvent& event);
         void OnParamEdit(wxCommandEvent& event);

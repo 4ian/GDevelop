@@ -60,11 +60,18 @@ void EventRenderer::Render() const
                          renderingDatas.GetRenderZoneWidth()-renderingDatas.GetOrigineX(),
                          GetHeight());
 
-        DrawNiceRectangle(rect, renderingDatas.eventGradient1,
-                                renderingDatas.eventGradient2,
-                                renderingDatas.eventGradient3,
-                                renderingDatas.eventGradient4,
-                                renderingDatas.eventBorderColor);
+        if ( !event.selected )
+            DrawNiceRectangle(rect, renderingDatas.eventGradient1,
+                                    renderingDatas.eventGradient2,
+                                    renderingDatas.eventGradient3,
+                                    renderingDatas.eventGradient4,
+                                    renderingDatas.eventBorderColor);
+        else
+            DrawNiceRectangle(rect, renderingDatas.selectionColor,
+                                    renderingDatas.eventGradient2,
+                                    renderingDatas.eventGradient3,
+                                    renderingDatas.selectionColor,
+                                    renderingDatas.eventBorderColor);
     }
 
     dc.SetPen(renderingDatas.GetSelectedRectangleOutlinePen());

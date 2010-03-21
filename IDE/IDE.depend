@@ -118,7 +118,7 @@
 
 1253304887 c:\libs\wxwidgets\include\wx\osx\config_xcode.h
 
-1253304862 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+1253304862 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
 
 1253304918 c:\libs\wxwidgets\include\wx\setup_gccxml.h
 
@@ -1697,7 +1697,7 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1267733063 c:\users\florian\programmation\gamedevelop\gdl\gdl\object.h
+1268856361 c:\users\florian\programmation\gamedevelop\gdl\gdl\object.h
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 	<iostream>
@@ -1733,17 +1733,17 @@
 1256144090 c:\libs\sfml\include\sfml\config.hpp
 	<climits>
 
-1256144089 c:\libs\sfml\include\sfml\system\clock.hpp
+1268478195 c:\libs\sfml\include\sfml\system\clock.hpp
 	<SFML/Config.hpp>
 
 1267180884 c:\libs\sfml\include\sfml\system\err.hpp
 	<SFML/Config.hpp>
 	<ostream>
 
-1256144089 c:\libs\sfml\include\sfml\system\lock.hpp
+1268478196 c:\libs\sfml\include\sfml\system\lock.hpp
 	<SFML/System/NonCopyable.hpp>
 
-1263999379 c:\libs\sfml\include\sfml\system\noncopyable.hpp
+1268478196 c:\libs\sfml\include\sfml\system\noncopyable.hpp
 	<SFML/Config.hpp>
 
 1256144089 c:\libs\sfml\include\sfml\system\mutex.hpp
@@ -1836,11 +1836,11 @@
 	<SFML/System/NonCopyable.hpp>
 	<SFML/Window/Event.hpp>
 
-1256144090 c:\libs\sfml\include\sfml\window\videomode.hpp
+1268478196 c:\libs\sfml\include\sfml\window\videomode.hpp
 	<SFML/Config.hpp>
-	<cstdlib>
+	<vector>
 
-1267180884 c:\libs\sfml\include\sfml\window\window.hpp
+1268478196 c:\libs\sfml\include\sfml\window\window.hpp
 	<SFML/Window/Input.hpp>
 	<SFML/Window/VideoMode.hpp>
 	<SFML/Window/WindowHandle.hpp>
@@ -1955,7 +1955,7 @@
 	<SFML/System/Vector2.hpp>
 	<vector>
 
-1263999377 c:\libs\sfml\include\sfml\graphics\sprite.hpp
+1268478191 c:\libs\sfml\include\sfml\graphics\sprite.hpp
 	<SFML/System/Resource.hpp>
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Graphics/Rect.hpp>
@@ -8013,7 +8013,7 @@
 	<string>
 	<map>
 
-1266345067 c:\users\florian\programmation\gamedevelop\gdl\gdl\layer.h
+1268857916 c:\users\florian\programmation\gamedevelop\gdl\gdl\layer.h
 	<string>
 	<vector>
 	<SFML/Graphics.hpp>
@@ -8701,7 +8701,7 @@
 	<vector>
 	<wx/msgdlg.h>
 
-1267820472 source:c:\users\florian\programmation\gamedevelop\ide\choixcondition.cpp
+1269131475 source:c:\users\florian\programmation\gamedevelop\ide\choixcondition.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"ChoixCondition.h"
@@ -8754,7 +8754,7 @@
 	"Failure.h"
 	"TestRegistry.h"
 
-1264360532 c:\users\florian\programmation\gamedevelop\ide\choixcondition.h
+1269122576 c:\users\florian\programmation\gamedevelop\ide\choixcondition.h
 	"debugMem.h"
 	<wx/treectrl.h>
 	<wx/sizer.h>
@@ -8954,7 +8954,7 @@
 	"wx/dcclient.h"
 	"wx/window.h"
 
-1268240186 c:\users\florian\programmation\gamedevelop\ide\eventsrendererdatas.h
+1269103629 c:\users\florian\programmation\gamedevelop\ide\eventsrendererdatas.h
 	<wx/dc.h>
 	<wx/dcbuffer.h>
 	<wx/html/htmprint.h>
@@ -9272,12 +9272,12 @@
 	<SFML/Audio.hpp>
 	<string>
 
-1266328384 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimelayer.h
+1268857935 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimelayer.h
 	<SFML/Graphics.hpp>
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
 
-1266328384 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimecamera.h
+1268854765 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimecamera.h
 	"GDL/Camera.h"
 
 1264360629 c:\users\florian\programmation\gamedevelop\gdl\gdl\text.h
@@ -9794,47 +9794,6 @@
 
 1264360533 source:c:\users\florian\programmation\gamedevelop\ide\dossierrenderer.cpp
 
-1268237481 source:c:\users\florian\programmation\gamedevelop\ide\editactions.cpp
-	"debugMem.h"
-	"nommgr.h"
-	"CppUnitLite/TestHarness.h"
-	"EditActions.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/imaglist.h>
-	<wx/log.h>
-	<wx/image.h>
-	<wx/icon.h>
-	<wx/help.h>
-	<stdexcept>
-	"GDL/Event.h"
-	"GDL/Scene.h"
-	"GDL/Instruction.h"
-	"GDL/Game.h"
-	"GDL/ExtensionsManager.h"
-	"Clipboard.h"
-	"TranslateAction.h"
-	"MemTrace.h"
-	"ChoixAction.h"
-	"GDL/HelpFileAccess.h"
-
-1264360530 c:\users\florian\programmation\gamedevelop\ide\editactions.h
-	<wx/listctrl.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/menu.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	<wx/imaglist.h>
-	"GDL/Event.h"
-	"GDL/Scene.h"
-	"GDL/Game.h"
-
 1267213858 source:c:\users\florian\programmation\gamedevelop\ide\editcommentaire.cpp
 	"EditCommentaire.h"
 	<wx/intl.h>
@@ -9849,52 +9808,6 @@
 	<wx/button.h>
 	<wx/dialog.h>
 	"GDL/Event.h"
-
-1267820474 source:c:\users\florian\programmation\gamedevelop\ide\editconditions.cpp
-	"debugMem.h"
-	"nommgr.h"
-	"CppUnitLite/TestHarness.h"
-	<wx/msw/winundef.h>
-	"EditConditions.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/bitmap.h>
-	<wx/image.h>
-	<wx/imaglist.h>
-	<wx/icon.h>
-	<wx/help.h>
-	<wx/config.h>
-	<wx/log.h>
-	<stdexcept>
-	<wx/msw/winundef.h>
-	"GDL/Event.h"
-	"GDL/Scene.h"
-	"GDL/Game.h"
-	"GDL/ExtensionsManager.h"
-	"Clipboard.h"
-	"GDL/HelpFileAccess.h"
-	"TranslateCondition.h"
-	"ChoixCondition.h"
-	"MemTrace.h"
-
-1264360533 c:\users\florian\programmation\gamedevelop\ide\editconditions.h
-	<wx/msw/winundef.h>
-	<wx/listctrl.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/menu.h>
-	<wx/statline.h>
-	<wx/radiobut.h>
-	<wx/panel.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	<wx/msw/winundef.h>
-	"GDL/Event.h"
-	"GDL/Scene.h"
-	"GDL/Game.h"
 
 1267213859 source:c:\users\florian\programmation\gamedevelop\ide\editdossier.cpp
 	"EditDossier.h"
@@ -10173,7 +10086,7 @@
 	"GDL/Game.h"
 	"GDL/Scene.h"
 
-1268431645 source:c:\users\florian\programmation\gamedevelop\ide\editorevents.cpp
+1269182483 source:c:\users\florian\programmation\gamedevelop\ide\editorevents.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"EditorEvents.h"
@@ -10194,8 +10107,6 @@
 	<wx/dcbuffer.h>
 	"Game_Develop_EditorMain.h"
 	"GDL/Game.h"
-	"EditConditions.h"
-	"EditActions.h"
 	"TranslateCondition.h"
 	"TranslateAction.h"
 	<wx/msw/winundef.h>
@@ -10464,7 +10375,7 @@
 1264360534 c:\users\florian\programmation\gamedevelop\ide\gdauitabart.h
 	<wx/aui/auibook.h>
 
-1266686178 source:c:\users\florian\programmation\gamedevelop\ide\edittimescene.cpp
+1269092129 source:c:\users\florian\programmation\gamedevelop\ide\edittimescene.cpp
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
 	"EdittimeScene.h"
@@ -10487,7 +10398,7 @@
 	"ErrorCompilation.h"
 	"nommgr.h"
 
-1268241008 source:c:\users\florian\programmation\gamedevelop\ide\eventrenderer.cpp
+1269103666 source:c:\users\florian\programmation\gamedevelop\ide\eventrenderer.cpp
 	"EventRenderer.h"
 	"GDL/Event.h"
 	"GDL/ExtensionsManager.h"
@@ -10506,7 +10417,7 @@
 	"wx/hashmap.h"
 	"wx/bitmap.h"
 
-1268244949 source:c:\users\florian\programmation\gamedevelop\ide\eventsrendererdatas.cpp
+1269103629 source:c:\users\florian\programmation\gamedevelop\ide\eventsrendererdatas.cpp
 	"EventsRendererDatas.h"
 
 1265478447 source:c:\users\florian\programmation\gamedevelop\ide\extensions.cpp
@@ -10573,7 +10484,7 @@
 	<iostream>
 	<wx/dcbuffer.h>
 
-1268431524 source:c:\users\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
+1268502234 source:c:\users\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
 	"debugMem.h"
 	<wx/msw/winundef.h>
 	<wx/image.h>
@@ -13287,7 +13198,7 @@
 	<wx/button.h>
 	<wx/dialog.h>
 
-1267290476 source:c:\users\florian\programmation\gamedevelop\ide\mainfichier.cpp
+1269104411 source:c:\users\florian\programmation\gamedevelop\ide\mainfichier.cpp
 	<boost/shared_ptr.hpp>
 	"GDL/OpenSaveGame.h"
 	"GDL/ExtensionsManager.h"
@@ -13391,27 +13302,6 @@
 	<vector>
 	<iostream>
 	"MessagePlus.h"
-
-1264363198 source:c:\users\florian\programmation\gamedevelop\ide\minichoixobjet.cpp
-	"MiniChoixObjet.h"
-	<wx/intl.h>
-	<wx/string.h>
-	<sstream>
-	<string>
-	<vector>
-	<wx/log.h>
-	"GDL/Position.h"
-	"GDL/StdAlgo.h"
-	<stdexcept>
-
-1264360533 c:\users\florian\programmation\gamedevelop\ide\minichoixobjet.h
-	<wx/sizer.h>
-	<wx/listbox.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	"GDL/Position.h"
-	<string>
-	<vector>
 
 1264360532 source:c:\users\florian\programmation\gamedevelop\ide\modesimple.cpp
 	"ModeSimple.h"
@@ -13542,7 +13432,7 @@
 	"GDL/Game.h"
 	"GDL/OpenSaveGame.h"
 
-1267213857 source:c:\users\florian\programmation\gamedevelop\ide\preferences.cpp
+1269182430 source:c:\users\florian\programmation\gamedevelop\ide\preferences.cpp
 	"Preferences.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -13598,7 +13488,7 @@
 1268238535 source:c:\users\florian\programmation\gamedevelop\ide\renderer.cpp
 	"Renderer.h"
 
-1267821128 source:c:\users\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1269189144 source:c:\users\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<SFML/System.hpp>
@@ -13767,9 +13657,9 @@
 	"wx/msw/rcdefs.h"
 	"version.h"
 
-1253433586 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\msw\rcdefs.h
+1263934043 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1268431647 c:\users\florian\programmation\gamedevelop\ide\version.h
+1269189144 c:\users\florian\programmation\gamedevelop\ide\version.h
 
 1265563381 source:c:\users\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -13811,23 +13701,23 @@
 	"wx/convauto.h"
 	<stdio.h>
 
-1245778681 c:\libs\sfml\include\sfml\network.hpp
+1268478209 c:\libs\sfml\include\sfml\network.hpp
 	<SFML/System.hpp>
 	<SFML/Network/Ftp.hpp>
 	<SFML/Network/Http.hpp>
-	<SFML/Network/IPAddress.hpp>
+	<SFML/Network/IpAddress.hpp>
 	<SFML/Network/Packet.hpp>
 	<SFML/Network/Selector.hpp>
 	<SFML/Network/SocketTCP.hpp>
 	<SFML/Network/SocketUDP.hpp>
 
-1256144090 c:\libs\sfml\include\sfml\network\ftp.hpp
+1268478209 c:\libs\sfml\include\sfml\network\ftp.hpp
 	<SFML/System/NonCopyable.hpp>
 	<SFML/Network/SocketTCP.hpp>
 	<string>
 	<vector>
 
-1267180885 c:\libs\sfml\include\sfml\network\sockettcp.hpp
+1268478209 c:\libs\sfml\include\sfml\network\sockettcp.hpp
 	<SFML/Network/SocketHelper.hpp>
 	<vector>
 
@@ -13848,14 +13738,14 @@
 	<netdb.h>
 	<unistd.h>
 
-1259261301 c:\libs\sfml\include\sfml\network\http.hpp
+1268478209 c:\libs\sfml\include\sfml\network\http.hpp
 	<SFML/System/NonCopyable.hpp>
-	<SFML/Network/IPAddress.hpp>
+	<SFML/Network/IpAddress.hpp>
 	<SFML/Network/SocketTCP.hpp>
 	<map>
 	<string>
 
-1248631194 c:\libs\sfml\include\sfml\network\ipaddress.hpp
+1268478209 c:\libs\sfml\include\sfml\network\ipaddress.hpp
 	<SFML/Config.hpp>
 	<istream>
 	<ostream>
@@ -13873,7 +13763,7 @@
 	<map>
 	<SFML/Network/Selector.inl>
 
-1267180885 c:\libs\sfml\include\sfml\network\socketudp.hpp
+1268478209 c:\libs\sfml\include\sfml\network\socketudp.hpp
 	<SFML/Network/SocketHelper.hpp>
 	<vector>
 
@@ -13924,5 +13814,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/StdAlgo.h"
 
-1268427662 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
+1269189586 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
 

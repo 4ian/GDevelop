@@ -122,7 +122,7 @@ scene(scene_)
     wxStaticBoxSizer* StaticBoxSizer1;
     wxFlexGridSizer* FlexGridSizer1;
     wxBoxSizer* BoxSizer3;
-    
+
     Create(parent, wxID_ANY, _("Editer la condition"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(650,236));
     SetMinSize(wxSize(640,480));
@@ -213,8 +213,9 @@ scene(scene_)
     SetSizer(BoxSizer6);
     BoxSizer6->SetSizeHints(this);
     Center();
-    
+
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixCondition::OnConditionsTreeSelectionChanged);
+    Connect(ID_RADIOBUTTON2,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&ChoixCondition::OnGlobalCheckSelect);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnmoreBtClick);
     Connect(ID_CHECKBOX3,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnobjSortCheckClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnOkBtClick);
@@ -790,4 +791,9 @@ void ChoixCondition::OnmoreBtClick(wxCommandEvent& event)
     dialog.ShowModal();
 
     RefreshList();
+}
+
+void ChoixCondition::OnGlobalCheckSelect(wxCommandEvent& event)
+{
+    wxLogMessage(_("Attention. Cette option n'est présente que par compatibilité avec les anciennes versions de Game Develop.\nElle ne doit plus être utilisée dans les nouveaux jeux et pourrait être enlevée dans les prochaines versions."));
 }

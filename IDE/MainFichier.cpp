@@ -201,6 +201,8 @@ void Game_Develop_EditorFrame::SaveAs()
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event )
 {
+    if ( !CurrentGameIsValid() ) return;
+
     Compilation Dialog( this, GetCurrentGame().get() );
     Dialog.ShowModal();
 }
@@ -210,6 +212,8 @@ void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event 
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuPortableSelected( wxCommandEvent& event )
 {
+    if ( !CurrentGameIsValid() ) return;
+
     Portable dialog( this, GetCurrentGame().get() );
     dialog.ShowModal();
 }
@@ -265,6 +269,8 @@ void Game_Develop_EditorFrame::OnRecentClicked( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuFusionSelected(wxCommandEvent& event)
 {
+    if ( !CurrentGameIsValid() ) return;
+
     Fusion dialog(this, *GetCurrentGame());
     dialog.ShowModal();
 

@@ -69,6 +69,7 @@ class EventsRendererDatas
         wxColor eventConditionsGradient3;
         wxColor eventConditionsGradient4;
         wxColor eventConditionsBorderColor;
+        wxColor selectionColor;
 
     protected:
     private:

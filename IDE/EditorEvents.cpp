@@ -31,8 +31,6 @@
 
 #include "Game_Develop_EditorMain.h"
 #include "GDL/Game.h"
-#include "EditConditions.h"
-#include "EditActions.h"
 #include "TranslateCondition.h"
 #include "TranslateAction.h"
 #ifdef __WXMSW__

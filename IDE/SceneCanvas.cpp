@@ -504,6 +504,8 @@ void SceneCanvas::AddObjetSelected(float x, float y)
     newObject->InitializeFromInitialPosition(pos);
 
     scene.objectsInstances.AddObject(newObject);
+
+    newObject->LoadResources(game.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
 }
 
 ////////////////////////////////////////////////////////////

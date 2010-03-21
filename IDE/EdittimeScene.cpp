@@ -60,11 +60,22 @@ void EdittimeScene::RenderEdittimeScene()
 
     std::vector < sf::Shape > GUIelements;
 
-    //Affichage des objets
     for (unsigned int layerIndex =0;layerIndex<layers.size();++layerIndex)
     {
         if ( layers.at(layerIndex).GetVisibility() )
         {
+            //Prepare OpenGL rendering
+            renderWindow->RestoreGLStates();
+
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            gluPerspective(90.f, static_cast<double>(renderWindow->GetWidth())/static_cast<double>(renderWindow->GetHeight()), 1.f, 500.f);
+
+            glViewport(0,0, renderWindow->GetWidth(), renderWindow->GetHeight());
+
+            renderWindow->SaveGLStates();
+
+            //Render all objects
             for (unsigned int id = 0;id < allObjects.size();++id)
             {
                 if ( allObjects[id]->GetLayer() == layers.at(layerIndex).GetName())

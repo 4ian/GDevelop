@@ -592,7 +592,10 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     else if ( langChoice->GetSelection() == 1 )
         pConfig->Write( _T( "/Lang" ), "French" );
 
-    if ( changesNeedRestart ) wxLogMessage(_("Certains changements nécessitent de redémarrer Game Develop pour prendre effet."));
+    if ( changesNeedRestart )
+    {
+        wxLogMessage(_("Certains changements nécessitent de redémarrer Game Develop pour prendre effet."));
+    }
 
     EndModal( 1 );
 }

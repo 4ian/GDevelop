@@ -341,16 +341,6 @@ bool SpriteObject::Draw( sf::RenderWindow& window )
 
     window.Draw( GetCurrentSprite() );
 
-    //Debug Code
-    /*sf::Shape circle = sf::Shape::Circle(GetDrawableX()+GetCenterX(), GetDrawableY()+GetCenterY(), 10, sf::Color(0,255,0));
-    window.Draw(circle);
-
-    sf::Shape origineD = sf::Shape::Circle(GetDrawableX(), GetDrawableY(), 10, sf::Color(255,0,0));
-    window.Draw(origineD);
-
-    sf::Shape origine = sf::Shape::Circle(GetX(), GetY(), 10, sf::Color(0,0,255));
-    window.Draw(origine);*/
-
     return true;
 }
 

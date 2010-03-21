@@ -33,11 +33,12 @@ bool ActCameraViewport( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
     RuntimeCamera & camera = scene->GetLayer(layer).GetCamera(cameraNb);
 
     camera.GetCameraInfo().defaultViewport = false;
-    camera.GetCameraInfo().viewport.Left = eval.EvalExp(action.GetParameter(0));
-    camera.GetCameraInfo().viewport.Top = eval.EvalExp(action.GetParameter(1));
-    camera.GetCameraInfo().viewport.Right = eval.EvalExp(action.GetParameter(2));
-    camera.GetCameraInfo().viewport.Bottom = eval.EvalExp(action.GetParameter(3));
+    camera.GetCameraInfo().viewport.Left = eval.EvalExp(action.GetParameter(2));
+    camera.GetCameraInfo().viewport.Top = eval.EvalExp(action.GetParameter(3));
+    camera.GetCameraInfo().viewport.Right = eval.EvalExp(action.GetParameter(4));
+    camera.GetCameraInfo().viewport.Bottom = eval.EvalExp(action.GetParameter(5));
     camera.GetSFMLView().SetViewport(camera.GetCameraInfo().viewport);
+    return true;
 }
 
 /**
@@ -51,9 +52,10 @@ bool ActCameraSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
     RuntimeCamera & camera = scene->GetLayer(layer).GetCamera(cameraNb);
 
     camera.GetCameraInfo().defaultSize = false;
-    camera.GetCameraInfo().size.x = eval.EvalExp(action.GetParameter(0));
-    camera.GetCameraInfo().size.y = eval.EvalExp(action.GetParameter(1));
+    camera.GetCameraInfo().size.x = eval.EvalExp(action.GetParameter(2));
+    camera.GetCameraInfo().size.y = eval.EvalExp(action.GetParameter(3));
     camera.GetSFMLView().SetSize(camera.GetCameraInfo().size);
+    return true;
 }
 
 /**
@@ -88,6 +90,7 @@ bool ActAddCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 
     //Add the runtime camera to the layer
     layer.AddCamera(camera);
+    return true;
 }
 
 
@@ -101,6 +104,8 @@ bool ActDeleteCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     RuntimeLayer & layer = scene->GetLayer(action.GetParameter(0).GetPlainString());
 
     layer.DeleteCamera(cameraNb);
+
+    return true;
 }
 
 ////////////////////////////////////////////////////////////

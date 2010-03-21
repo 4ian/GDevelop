@@ -44,13 +44,13 @@ bool ActEnvoiDataNet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 
 #ifdef WINDOWS
     //Création de l'adresse internet à lancer
-    string appel = "start "+eval.EvalTxt(action.GetParameter(0))+
-                    "?data1="+data1+"\"&\"check1="+data1md5+
-                    "\"&\"data2="+data2+"\"&\"check2="+data2md5+
-                    "\"&\"data3="+data3+"\"&\"check3="+data3md5+
-                    "\"&\"data4="+data4+"\"&\"check4="+data4md5+
-                    "\"&\"data5="+data5+"\"&\"check5="+data5md5+
-                    "\"&\"data6="+data6+"\"&\"check6="+data6md5+"";
+    string appel = "start \"\" \""+eval.EvalTxt(action.GetParameter(0))+
+                    "?data1="+data1+"&check1="+data1md5+
+                    "&data2="+data2+"&check2="+data2md5+
+                    "&data3="+data3+"&check3="+data3md5+
+                    "&data4="+data4+"&check4="+data4md5+
+                    "&data5="+data5+"&check5="+data5md5+
+                    "&data6="+data6+"&check6="+data6md5+"\"";
 
     system(appel.c_str());
 #endif

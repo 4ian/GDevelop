@@ -89,21 +89,18 @@ bool CondSeDirige( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
                     force.SetX( ( (*obj2)->GetDrawableX() + (*obj2)->GetCenterX() ) - ( (*obj)->GetDrawableX() + (*obj)->GetCenterX() ) );
                     force.SetY( ( (*obj2)->GetDrawableY() + (*obj2)->GetCenterY() ) - ( (*obj)->GetDrawableY() + (*obj)->GetCenterY() ) );
 
-                    int angle = static_cast<int>(force.GetAngle()); //On récupère l'angle entre les deux objets
+                    float angle = force.GetAngle(); //On récupère l'angle entre les deux objets
 
-                    int angleObjet = static_cast<int>((*obj)->TotalForceAngle());
+                    float objectAngle = (*obj)->TotalForceAngle();
 
-                    while ( angle < 0 )
-                        angle += 360;
-                    while ( angle > 360 )
-                        angle -= 360;
+                    //Compute difference between two angles
+                    float diff = objectAngle - angle;
+                    while ( diff>180 )
+                        diff -= 360;
+                    while ( diff<-180 )
+                        diff += 360;
 
-                    while ( angleObjet < 0 )
-                        angleObjet += 360;
-                    while ( angleObjet > 360 )
-                        angleObjet -= 360;
-
-                    if ( fabs( static_cast<float>(angle - angleObjet) ) < eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) / 2 )
+                    if ( fabs( diff ) <= eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) / 2 )
                     {
                         if ( !condition.IsInverted() )
                         {
@@ -142,12 +139,19 @@ bool CondSeDirige( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
  */
 bool Object::CondAngleOfDisplacement( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    int angle = eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() );
-    int tolerance = eval.EvalExp( condition.GetParameter( 2 ), shared_from_this() );
+    if ( TotalForceLength() == 0) return condition.IsInverted();
 
-    unsigned int objectAngle = TotalForceAngle();
+    float angle = eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() );
+    float objectAngle = TotalForceAngle();
 
-    if ( objectAngle >= angle-tolerance && objectAngle <= angle+tolerance )
+    //Compute difference between two angles
+    float diff = objectAngle - angle;
+    while ( diff>180 )
+		diff -= 360;
+	while ( diff<-180 )
+		diff += 360;
+
+    if ( fabs(diff) <= (eval.EvalExp( condition.GetParameter( 2 ), shared_from_this())/2) )
         return !condition.IsInverted();
 
     return condition.IsInverted();

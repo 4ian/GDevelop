@@ -196,7 +196,7 @@
 	<File name="GDL\Layer.cpp" open="0" top="0" tabpos="13">
 		<Cursor position="141" topLine="0" />
 	</File>
-	<File name="GDL\Layer.h" open="1" top="0" tabpos="2">
+	<File name="GDL\Layer.h" open="0" top="0" tabpos="2">
 		<Cursor position="1277" topLine="22" />
 	</File>
 	<File name="GDL\ListVariable.cpp" open="0" top="0" tabpos="39">
@@ -223,7 +223,7 @@
 	<File name="GDL\ManualTimer.h" open="0" top="0" tabpos="18">
 		<Cursor position="933" topLine="30" />
 	</File>
-	<File name="GDL\MemTrace.cpp" open="1" top="0" tabpos="14">
+	<File name="GDL\MemTrace.cpp" open="0" top="0" tabpos="14">
 		<Cursor position="506" topLine="16" />
 	</File>
 	<File name="GDL\MemTrace.h" open="0" top="0" tabpos="77">
@@ -241,7 +241,7 @@
 	<File name="GDL\ObjInstancesHolder.h" open="0" top="0" tabpos="4">
 		<Cursor position="1987" topLine="67" />
 	</File>
-	<File name="GDL\Object.cpp" open="1" top="0" tabpos="7">
+	<File name="GDL\Object.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="4162" topLine="124" />
 	</File>
 	<File name="GDL\Object.h" open="0" top="0" tabpos="22">
@@ -310,8 +310,8 @@
 	<File name="GDL\RuntimeLayer.h" open="0" top="0" tabpos="2">
 		<Cursor position="911" topLine="14" />
 	</File>
-	<File name="GDL\RuntimeScene.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="9850" topLine="194" />
+	<File name="GDL\RuntimeScene.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="11066" topLine="335" />
 	</File>
 	<File name="GDL\RuntimeScene.h" open="0" top="0" tabpos="17">
 		<Cursor position="1852" topLine="60" />
@@ -349,8 +349,8 @@
 	<File name="GDL\SpriteInitialPositionPanel.h" open="0" top="0" tabpos="0">
 		<Cursor position="665" topLine="8" />
 	</File>
-	<File name="GDL\SpriteObject.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="10928" topLine="288" />
+	<File name="GDL\SpriteObject.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="12590" topLine="334" />
 	</File>
 	<File name="GDL\SpriteObject.h" open="0" top="0" tabpos="91">
 		<Cursor position="738" topLine="9" />
@@ -412,7 +412,7 @@
 	<File name="GDL\aMove.cpp" open="0" top="0" tabpos="47">
 		<Cursor position="10671" topLine="256" />
 	</File>
-	<File name="GDL\aNet.cpp" open="1" top="0" tabpos="15">
+	<File name="GDL\aNet.cpp" open="0" top="0" tabpos="15">
 		<Cursor position="2710" topLine="42" />
 	</File>
 	<File name="GDL\aObjet.cpp" open="0" top="0" tabpos="48">
@@ -475,7 +475,7 @@
 	<File name="GDL\cLayer.h" open="0" top="0" tabpos="6">
 		<Cursor position="333" topLine="0" />
 	</File>
-	<File name="GDL\cMove.cpp" open="1" top="0" tabpos="6">
+	<File name="GDL\cMove.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="4438" topLine="82" />
 	</File>
 	<File name="GDL\cObjet.cpp" open="0" top="0" tabpos="3">
@@ -577,7 +577,7 @@
 	<File name="GDL\tinyxml.cpp" open="0" top="0" tabpos="29">
 		<Cursor position="31696" topLine="1551" />
 	</File>
-	<File name="GDL\tinyxmlparser.cpp" open="0" top="0" tabpos="1">
+	<File name="GDL\tinyxmlparser.cpp" open="1" top="0" tabpos="1">
 		<Cursor position="0" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

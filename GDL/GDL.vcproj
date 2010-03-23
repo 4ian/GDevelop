@@ -173,231 +173,231 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\gdl\aADS.h"
+				RelativePath=".\GDL\aADS.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aAdvanced.h"
+				RelativePath=".\GDL\aAdvanced.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aCamera.h"
+				RelativePath=".\GDL\aCamera.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Access.h"
+				RelativePath=".\GDL\Access.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\actions.h"
+				RelativePath=".\GDL\actions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\AdvancedExtension.h"
+				RelativePath=".\GDL\AdvancedExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aEffects.h"
+				RelativePath=".\GDL\aEffects.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\AES.h"
+				RelativePath=".\GDL\AES.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aFichier.h"
+				RelativePath=".\GDL\aFichier.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aGUI.h"
+				RelativePath=".\GDL\aGUI.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\AjoutPlusImage.h"
+				RelativePath=".\GDL\AjoutPlusImage.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aJoystick.h"
+				RelativePath=".\GDL\aJoystick.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aLayer.h"
+				RelativePath=".\GDL\aLayer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\algo.h"
+				RelativePath=".\GDL\algo.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aMove.h"
+				RelativePath=".\GDL\aMove.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aMusic.h"
+				RelativePath=".\GDL\aMusic.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aNet.h"
+				RelativePath=".\GDL\aNet.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Animation.h"
+				RelativePath=".\GDL\Animation.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aObjet.h"
+				RelativePath=".\GDL\aObjet.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aPlans.h"
+				RelativePath=".\GDL\aPlans.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aPosition.h"
+				RelativePath=".\GDL\aPosition.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\AppelEvent.h"
+				RelativePath=".\GDL\AppelEvent.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aScale.h"
+				RelativePath=".\GDL\aScale.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aScene.h"
+				RelativePath=".\GDL\aScene.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aSouris.h"
+				RelativePath=".\GDL\aSouris.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aTexte.h"
+				RelativePath=".\GDL\aTexte.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aTime.h"
+				RelativePath=".\GDL\aTime.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\AudioExtension.h"
+				RelativePath=".\GDL\AudioExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aVariables.h"
+				RelativePath=".\GDL\aVariables.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aVisibilite.h"
+				RelativePath=".\GDL\aVisibilite.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aWindow.h"
+				RelativePath=".\GDL\aWindow.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\BaseDebugger.h"
+				RelativePath=".\GDL\BaseDebugger.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\BaseObjectExtension.h"
+				RelativePath=".\GDL\BaseObjectExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\BBDConditions.h"
+				RelativePath=".\GDL\BBDConditions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\BitmapGUIManager.h"
+				RelativePath=".\GDL\BitmapGUIManager.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\btAlignedAllocator.h"
+				RelativePath=".\GDL\btAlignedAllocator.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\btScalar.h"
+				RelativePath=".\GDL\btScalar.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cADS.h"
+				RelativePath=".\GDL\cADS.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Camera.h"
+				RelativePath=".\GDL\Camera.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\CameraExtension.h"
+				RelativePath=".\GDL\CameraExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cCamera.h"
+				RelativePath=".\GDL\cCamera.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cClavier.h"
+				RelativePath=".\GDL\cClavier.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cCollisions.h"
+				RelativePath=".\GDL\cCollisions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cFichier.h"
+				RelativePath=".\GDL\cFichier.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Chercher.h"
+				RelativePath=".\GDL\Chercher.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ChercherScene.h"
+				RelativePath=".\GDL\ChercherScene.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ChoixDossier.h"
+				RelativePath=".\GDL\ChoixDossier.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cJoystick.h"
+				RelativePath=".\GDL\cJoystick.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cLayer.h"
+				RelativePath=".\GDL\cLayer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cMove.h"
+				RelativePath=".\GDL\cMove.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cMusic.h"
+				RelativePath=".\GDL\cMusic.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cObjet.h"
+				RelativePath=".\GDL\cObjet.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Collisions.h"
+				RelativePath=".\GDL\Collisions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\conditions.h"
+				RelativePath=".\GDL\conditions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\constantes.h"
+				RelativePath=".\GDL\constantes.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cPlans.h"
+				RelativePath=".\GDL\cPlans.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cPos.h"
+				RelativePath=".\GDL\cPos.h"
 				>
 			</File>
 			<File
@@ -405,179 +405,183 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cScale.h"
+				RelativePath=".\GDL\cScale.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cScene.h"
+				RelativePath=".\GDL\cScene.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cSouris.h"
+				RelativePath=".\GDL\cSouris.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cTime.h"
+				RelativePath=".\GDL\cTime.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cVariables.h"
+				RelativePath=".\GDL\cVariables.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cVisibilite.h"
+				RelativePath=".\GDL\cVisibilite.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\DatFile.h"
+				RelativePath=".\GDL\DatFile.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Direction.h"
+				RelativePath=".\GDL\Direction.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Dossier.h"
+				RelativePath=".\GDL\Dossier.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\EditorImages.h"
+				RelativePath=".\GDL\EditorImages.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\EditorObjet.h"
+				RelativePath=".\GDL\EditorObjet.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\eFreeFunctions.h"
+				RelativePath=".\GDL\eFreeFunctions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\eObjectFunctions.h"
+				RelativePath=".\GDL\eObjectFunctions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ErrorReport.h"
+				RelativePath=".\GDL\ErrorReport.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Event.h"
+				RelativePath=".\GDL\Event.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\EventsPreprocessor.h"
+				RelativePath=".\GDL\EventsPreprocessor.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ExpressionInstruction.h"
+				RelativePath=".\GDL\ExpressionInstruction.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ExtensionBase.h"
+				RelativePath=".\GDL\ExtensionBase.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ExtensionsLoader.h"
+				RelativePath=".\GDL\ExtensionsLoader.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ExtensionsManager.h"
+				RelativePath=".\GDL\ExtensionsManager.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\FileExtension.h"
+				RelativePath=".\GDL\FileExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\FontManager.h"
+				RelativePath=".\GDL\FontManager.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Force.h"
+				RelativePath=".\GDL\Force.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Game.h"
+				RelativePath=".\GDL\Game.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\GDExpression.h"
+				RelativePath=".\GDL\GDExpression.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\gpl.h"
+				RelativePath=".\GDL\gpl.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Image.h"
+				RelativePath=".\GDL\HelpFileAccess.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ImageManager.h"
+				RelativePath=".\GDL\Image.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ImageStruct.h"
+				RelativePath=".\GDL\ImageManager.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Instruction.h"
+				RelativePath=".\GDL\ImageStruct.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\InterfaceExtension.h"
+				RelativePath=".\GDL\Instruction.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\JoystickExtension.h"
+				RelativePath=".\GDL\InterfaceExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\KeyboardExtension.h"
+				RelativePath=".\GDL\JoystickExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Layer.h"
+				RelativePath=".\GDL\KeyboardExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ListVariable.h"
+				RelativePath=".\GDL\Layer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\LoadingScreen.h"
+				RelativePath=".\GDL\ListVariable.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Log.h"
+				RelativePath=".\GDL\LoadingScreen.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\MainEditorCommand.h"
+				RelativePath=".\GDL\Log.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ManualTimer.h"
+				RelativePath=".\GDL\MainEditorCommand.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\md5.h"
+				RelativePath=".\GDL\ManualTimer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\MemTrace.h"
+				RelativePath=".\GDL\md5.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Modules.h"
+				RelativePath=".\GDL\MemTrace.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\MouseExtension.h"
+				RelativePath=".\GDL\Modules.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Music.h"
+				RelativePath=".\GDL\MouseExtension.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\Music.h"
 				>
 			</File>
 			<File
@@ -585,23 +589,23 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\NetworkExtension.h"
+				RelativePath=".\GDL\NetworkExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Object.h"
+				RelativePath=".\GDL\Object.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ObjectGroup.h"
+				RelativePath=".\GDL\ObjectGroup.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ObjectIdentifiersManager.h"
+				RelativePath=".\GDL\ObjectIdentifiersManager.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ObjectsConcerned.h"
+				RelativePath=".\GDL\ObjectsConcerned.h"
 				>
 			</File>
 			<File
@@ -609,115 +613,115 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ObjectType.h"
+				RelativePath=".\GDL\ObjectType.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ObjectWithOpacity.h"
+				RelativePath=".\GDL\ObjectWithOpacity.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ObjInstancesHolder.h"
+				RelativePath=".\GDL\ObjInstancesHolder.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\OpenSaveGame.h"
+				RelativePath=".\GDL\OpenSaveGame.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\OpenSaveLoadingScreen.h"
+				RelativePath=".\GDL\OpenSaveLoadingScreen.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Point.h"
+				RelativePath=".\GDL\Point.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Position.h"
+				RelativePath=".\GDL\Position.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\profile.h"
+				RelativePath=".\GDL\profile.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\PropImage.h"
+				RelativePath=".\GDL\PropImage.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\RessourcesLoader.h"
+				RelativePath=".\GDL\RessourcesLoader.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\RuntimeCamera.h"
+				RelativePath=".\GDL\RuntimeCamera.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\RuntimeGame.h"
+				RelativePath=".\GDL\RuntimeGame.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\RuntimeLayer.h"
+				RelativePath=".\GDL\RuntimeLayer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\RuntimeScene.h"
+				RelativePath=".\GDL\RuntimeScene.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Scene.h"
+				RelativePath=".\GDL\Scene.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\SceneExtension.h"
+				RelativePath=".\GDL\SceneExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_1.pypp.hpp"
+				RelativePath=".\GDL\sf_classes_1.pypp.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_2.pypp.hpp"
+				RelativePath=".\GDL\sf_classes_2.pypp.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_3.pypp.hpp"
+				RelativePath=".\GDL\sf_classes_3.pypp.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_4.pypp.hpp"
+				RelativePath=".\GDL\sf_classes_4.pypp.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_5.pypp.hpp"
+				RelativePath=".\GDL\sf_classes_5.pypp.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_6.pypp.hpp"
+				RelativePath=".\GDL\sf_classes_6.pypp.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_7.pypp.hpp"
+				RelativePath=".\GDL\sf_classes_7.pypp.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_enumerations.pypp.hpp"
+				RelativePath=".\GDL\sf_enumerations.pypp.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_free_functions.pypp.hpp"
+				RelativePath=".\GDL\sf_free_functions.pypp.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_global_variables.pypp.hpp"
+				RelativePath=".\GDL\sf_global_variables.pypp.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\singleton.h"
+				RelativePath=".\GDL\singleton.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Son.h"
+				RelativePath=".\GDL\Son.h"
 				>
 			</File>
 			<File
@@ -725,59 +729,59 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\SortBySurface.h"
+				RelativePath=".\GDL\SortBySurface.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\SoundManager.h"
+				RelativePath=".\GDL\SoundManager.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Sprite.h"
+				RelativePath=".\GDL\Sprite.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\SpriteExtension.h"
+				RelativePath=".\GDL\SpriteExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\SpriteInitialPositionPanel.h"
+				RelativePath=".\GDL\SpriteInitialPositionPanel.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\SpriteObject.h"
+				RelativePath=".\GDL\SpriteObject.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\StdAlgo.h"
+				RelativePath=".\GDL\StdAlgo.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Text.h"
+				RelativePath=".\GDL\Text.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\TimeExtension.h"
+				RelativePath=".\GDL\TimeExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\tinystr.h"
+				RelativePath=".\GDL\tinystr.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\tinyxml.h"
+				RelativePath=".\GDL\tinyxml.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Variable.h"
+				RelativePath=".\GDL\Variable.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\VariablesExtension.h"
+				RelativePath=".\GDL\VariablesExtension.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Version.h"
+				RelativePath=".\GDL\Version.h"
 				>
 			</File>
 			<File
@@ -785,11 +789,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\VersionWrapper.h"
+				RelativePath=".\GDL\VersionWrapper.h"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\WindowExtension.h"
+				RelativePath=".\GDL\WindowExtension.h"
 				>
 			</File>
 		</Filter>
@@ -805,223 +809,223 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\gdl\aADS.cpp"
+				RelativePath=".\GDL\aADS.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aAdvanced.cpp"
+				RelativePath=".\GDL\aAdvanced.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aCamera.cpp"
+				RelativePath=".\GDL\aCamera.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Access.cpp"
+				RelativePath=".\GDL\Access.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\actions.cpp"
+				RelativePath=".\GDL\actions.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\AdvancedExtension.cpp"
+				RelativePath=".\GDL\AdvancedExtension.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aEffects.cpp"
+				RelativePath=".\GDL\aEffects.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\AES.cpp"
+				RelativePath=".\GDL\AES.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aFichier.cpp"
+				RelativePath=".\GDL\aFichier.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aGUI.cpp"
+				RelativePath=".\GDL\aGUI.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\AjoutPlusImage.cpp"
+				RelativePath=".\GDL\AjoutPlusImage.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aJoystick.cpp"
+				RelativePath=".\GDL\aJoystick.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aLayer.cpp"
+				RelativePath=".\GDL\aLayer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\algo.cpp"
+				RelativePath=".\GDL\algo.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aMove.cpp"
+				RelativePath=".\GDL\aMove.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aMusic.cpp"
+				RelativePath=".\GDL\aMusic.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aNet.cpp"
+				RelativePath=".\GDL\aNet.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Animation.cpp"
+				RelativePath=".\GDL\Animation.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aObjet.cpp"
+				RelativePath=".\GDL\aObjet.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aPlans.cpp"
+				RelativePath=".\GDL\aPlans.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aPosition.cpp"
+				RelativePath=".\GDL\aPosition.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\AppelEvent.cpp"
+				RelativePath=".\GDL\AppelEvent.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aScale.cpp"
+				RelativePath=".\GDL\aScale.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aScene.cpp"
+				RelativePath=".\GDL\aScene.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aSouris.cpp"
+				RelativePath=".\GDL\aSouris.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aTexte.cpp"
+				RelativePath=".\GDL\aTexte.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aTime.cpp"
+				RelativePath=".\GDL\aTime.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\AudioExtension.cpp"
+				RelativePath=".\GDL\AudioExtension.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aVariables.cpp"
+				RelativePath=".\GDL\aVariables.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aVisibilite.cpp"
+				RelativePath=".\GDL\aVisibilite.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\aWindow.cpp"
+				RelativePath=".\GDL\aWindow.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\BaseDebugger.cpp"
+				RelativePath=".\GDL\BaseDebugger.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\BaseObjectExtension.cpp"
+				RelativePath=".\GDL\BaseObjectExtension.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\BaseObjectExtension2.cpp"
+				RelativePath=".\GDL\BaseObjectExtension2.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\BBDConditions.cpp"
+				RelativePath=".\GDL\BBDConditions.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\BitmapGUIManager.cpp"
+				RelativePath=".\GDL\BitmapGUIManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cADS.cpp"
+				RelativePath=".\GDL\cADS.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Camera.cpp"
+				RelativePath=".\GDL\Camera.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\CameraExtension.cpp"
+				RelativePath=".\GDL\CameraExtension.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cCamera.cpp"
+				RelativePath=".\GDL\cCamera.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cClavier.cpp"
+				RelativePath=".\GDL\cClavier.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cCollisions.cpp"
+				RelativePath=".\GDL\cCollisions.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cFichier.cpp"
+				RelativePath=".\GDL\cFichier.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Chercher.cpp"
+				RelativePath=".\GDL\Chercher.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ChercherScene.cpp"
+				RelativePath=".\GDL\ChercherScene.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ChoixDossier.cpp"
+				RelativePath=".\GDL\ChoixDossier.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cJoystick.cpp"
+				RelativePath=".\GDL\cJoystick.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cLayer.cpp"
+				RelativePath=".\GDL\cLayer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cMove.cpp"
+				RelativePath=".\GDL\cMove.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cMusic.cpp"
+				RelativePath=".\GDL\cMusic.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cObjet.cpp"
+				RelativePath=".\GDL\cObjet.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Collisions.cpp"
+				RelativePath=".\GDL\Collisions.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\conditions.cpp"
+				RelativePath=".\GDL\conditions.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cPlans.cpp"
+				RelativePath=".\GDL\cPlans.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cPos.cpp"
+				RelativePath=".\GDL\cPos.cpp"
 				>
 			</File>
 			<File
@@ -1029,179 +1033,179 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cScale.cpp"
+				RelativePath=".\GDL\cScale.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cScene.cpp"
+				RelativePath=".\GDL\cScene.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cSouris.cpp"
+				RelativePath=".\GDL\cSouris.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cTime.cpp"
+				RelativePath=".\GDL\cTime.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cVariables.cpp"
+				RelativePath=".\GDL\cVariables.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\cVisibilite.cpp"
+				RelativePath=".\GDL\cVisibilite.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\DatFile.cpp"
+				RelativePath=".\GDL\DatFile.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Direction.cpp"
+				RelativePath=".\GDL\Direction.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Dossier.cpp"
+				RelativePath=".\GDL\Dossier.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\EditorImages.cpp"
+				RelativePath=".\GDL\EditorImages.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\EditorObjet.cpp"
+				RelativePath=".\GDL\EditorObjet.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\eFreeFunctions.cpp"
+				RelativePath=".\GDL\eFreeFunctions.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\eObjectFunctions.cpp"
+				RelativePath=".\GDL\eObjectFunctions.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ErrorReport.cpp"
+				RelativePath=".\GDL\ErrorReport.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Event.cpp"
+				RelativePath=".\GDL\Event.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\EventsPreprocessor.cpp"
+				RelativePath=".\GDL\EventsPreprocessor.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ExpressionInstruction.cpp"
+				RelativePath=".\GDL\ExpressionInstruction.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ExtensionBase.cpp"
+				RelativePath=".\GDL\ExtensionBase.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ExtensionsLoader.cpp"
+				RelativePath=".\GDL\ExtensionsLoader.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ExtensionsManager.cpp"
+				RelativePath=".\GDL\ExtensionsManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\FileExtension.cpp"
+				RelativePath=".\GDL\FileExtension.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\FontManager.cpp"
+				RelativePath=".\GDL\FontManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Force.cpp"
+				RelativePath=".\GDL\Force.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\GDL\fparser\fparser.cc"
+				RelativePath=".\GDL\Game.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Game.cpp"
+				RelativePath=".\GDL\GDExpression.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\GDExpression.cpp"
+				RelativePath=".\GDL\gpl.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\gpl.cpp"
+				RelativePath=".\GDL\HelpFileAccess.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Image.cpp"
+				RelativePath=".\GDL\Image.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ImageManager.cpp"
+				RelativePath=".\GDL\ImageManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Instruction.cpp"
+				RelativePath=".\GDL\Instruction.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\InterfaceExtension.cpp"
+				RelativePath=".\GDL\InterfaceExtension.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\JoystickExtension.cpp"
+				RelativePath=".\GDL\JoystickExtension.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\KeyboardExtension.cpp"
+				RelativePath=".\GDL\KeyboardExtension.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Layer.cpp"
+				RelativePath=".\GDL\Layer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ListVariable.cpp"
+				RelativePath=".\GDL\ListVariable.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\LoadingScreen.cpp"
+				RelativePath=".\GDL\LoadingScreen.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Log.cpp"
+				RelativePath=".\GDL\Log.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\MainEditorCommand.cpp"
+				RelativePath=".\GDL\MainEditorCommand.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ManualTimer.cpp"
+				RelativePath=".\GDL\ManualTimer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\md5.cpp"
+				RelativePath=".\GDL\md5.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\MemTrace.cpp"
+				RelativePath=".\GDL\MemTrace.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Modules.cpp"
+				RelativePath=".\GDL\Modules.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\MouseExtension.cpp"
+				RelativePath=".\GDL\MouseExtension.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Music.cpp"
+				RelativePath=".\GDL\Music.cpp"
 				>
 			</File>
 			<File
@@ -1209,7 +1213,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\NetworkExtension.cpp"
+				RelativePath=".\GDL\NetworkExtension.cpp"
 				>
 			</File>
 			<File
@@ -1217,135 +1221,135 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Object.cpp"
+				RelativePath=".\GDL\Object.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ObjectGroup.cpp"
+				RelativePath=".\GDL\ObjectGroup.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ObjectIdentifiersManager.cpp"
+				RelativePath=".\GDL\ObjectIdentifiersManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ObjectsConcerned.cpp"
+				RelativePath=".\GDL\ObjectsConcerned.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ObjectType.cpp"
+				RelativePath=".\GDL\ObjectType.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ObjectWithOpacity.cpp"
+				RelativePath=".\GDL\ObjectWithOpacity.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\ObjInstancesHolder.cpp"
+				RelativePath=".\GDL\ObjInstancesHolder.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\OpenSaveGame.cpp"
+				RelativePath=".\GDL\OpenSaveGame.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\OpenSaveLoadingScreen.cpp"
+				RelativePath=".\GDL\OpenSaveLoadingScreen.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Point.cpp"
+				RelativePath=".\GDL\Point.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Position.cpp"
+				RelativePath=".\GDL\Position.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\profile.cpp"
+				RelativePath=".\GDL\profile.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\PropImage.cpp"
+				RelativePath=".\GDL\PropImage.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\RessourcesLoader.cpp"
+				RelativePath=".\GDL\RessourcesLoader.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\RuntimeCamera.cpp"
+				RelativePath=".\GDL\RuntimeCamera.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\RuntimeGame.cpp"
+				RelativePath=".\GDL\RuntimeGame.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\RuntimeLayer.cpp"
+				RelativePath=".\GDL\RuntimeLayer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\RuntimeScene.cpp"
+				RelativePath=".\GDL\RuntimeScene.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Scene.cpp"
+				RelativePath=".\GDL\Scene.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\SceneExtension.cpp"
+				RelativePath=".\GDL\SceneExtension.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_1.pypp.cpp"
+				RelativePath=".\GDL\sf_classes_1.pypp.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_2.pypp.cpp"
+				RelativePath=".\GDL\sf_classes_2.pypp.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_3.pypp.cpp"
+				RelativePath=".\GDL\sf_classes_3.pypp.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_4.pypp.cpp"
+				RelativePath=".\GDL\sf_classes_4.pypp.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_5.pypp.cpp"
+				RelativePath=".\GDL\sf_classes_5.pypp.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_6.pypp.cpp"
+				RelativePath=".\GDL\sf_classes_6.pypp.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_classes_7.pypp.cpp"
+				RelativePath=".\GDL\sf_classes_7.pypp.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_enumerations.pypp.cpp"
+				RelativePath=".\GDL\sf_enumerations.pypp.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_free_functions.pypp.cpp"
+				RelativePath=".\GDL\sf_free_functions.pypp.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\sf_global_variables.pypp.cpp"
+				RelativePath=".\GDL\sf_global_variables.pypp.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\singleton.cpp"
+				RelativePath=".\GDL\singleton.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Son.cpp"
+				RelativePath=".\GDL\Son.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\SoundManager.cpp"
+				RelativePath=".\GDL\SoundManager.cpp"
 				>
 			</File>
 			<File
@@ -1353,55 +1357,55 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Sprite.cpp"
+				RelativePath=".\GDL\Sprite.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\SpriteExtension.cpp"
+				RelativePath=".\GDL\SpriteExtension.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\SpriteInitialPositionPanel.cpp"
+				RelativePath=".\GDL\SpriteInitialPositionPanel.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\SpriteObject.cpp"
+				RelativePath=".\GDL\SpriteObject.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\StdAlgo.cpp"
+				RelativePath=".\GDL\StdAlgo.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Text.cpp"
+				RelativePath=".\GDL\Text.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\TimeExtension.cpp"
+				RelativePath=".\GDL\TimeExtension.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\tinystr.cpp"
+				RelativePath=".\GDL\tinystr.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\tinyxml.cpp"
+				RelativePath=".\GDL\tinyxml.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\tinyxmlerror.cpp"
+				RelativePath=".\GDL\tinyxmlerror.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\tinyxmlparser.cpp"
+				RelativePath=".\GDL\tinyxmlparser.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Variable.cpp"
+				RelativePath=".\GDL\Variable.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\VariablesExtension.cpp"
+				RelativePath=".\GDL\VariablesExtension.cpp"
 				>
 			</File>
 			<File
@@ -1409,11 +1413,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\VersionWrapper.cpp"
+				RelativePath=".\GDL\VersionWrapper.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\WindowExtension.cpp"
+				RelativePath=".\GDL\WindowExtension.cpp"
 				>
 			</File>
 		</Filter>

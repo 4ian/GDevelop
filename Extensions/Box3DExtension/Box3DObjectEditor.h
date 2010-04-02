@@ -33,13 +33,16 @@ freely, subject to the following restrictions:
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/statline.h>
+#include <wx/panel.h>
 #include <wx/bmpbuttn.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
+#include <wx/aui/aui.h>
 class Game;
 class Box3DObject;
 class MainEditorCommand;
+class EditorImages;
 
 class Box3DObjectEditor: public wxDialog
 {
@@ -49,6 +52,7 @@ class Box3DObjectEditor: public wxDialog
 		virtual ~Box3DObjectEditor();
 
 		//(*Declarations(Box3DObjectEditor)
+		wxPanel* Core;
 		wxStaticText* StaticText9;
 		wxTextCtrl* widthEdit;
 		wxTextCtrl* bottomTextureEdit;
@@ -65,6 +69,7 @@ class Box3DObjectEditor: public wxDialog
 		wxButton* cancelBt;
 		wxBitmapButton* topAddFromBt;
 		wxBitmapButton* leftAddFromBt;
+		wxButton* imageBankBt;
 		wxBitmapButton* backAddFromBt;
 		wxTextCtrl* leftTextureEdit;
 		wxTextCtrl* rightTextureEdit;
@@ -77,6 +82,7 @@ class Box3DObjectEditor: public wxDialog
 		wxBitmapButton* bottomAddFromBt;
 		wxTextCtrl* frontTextureEdit;
 		//*)
+		EditorImages * editorImagesPnl;
 
 	protected:
 
@@ -106,8 +112,10 @@ class Box3DObjectEditor: public wxDialog
 		static const long ID_TEXTCTRL6;
 		static const long ID_BITMAPBUTTON6;
 		static const long ID_STATICLINE1;
+		static const long ID_BUTTON3;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
+		static const long ID_PANEL1;
 		//*)
 
 	private:
@@ -115,11 +123,20 @@ class Box3DObjectEditor: public wxDialog
 		//(*Handlers(Box3DObjectEditor)
 		void OncancelBtClick(wxCommandEvent& event);
 		void OnokBtClick(wxCommandEvent& event);
+		void OnfrontAddFromBtClick(wxCommandEvent& event);
+		void OntopAddFromBtClick(wxCommandEvent& event);
+		void OnbottomAddFromBtClick(wxCommandEvent& event);
+		void OnleftAddFromBtClick(wxCommandEvent& event);
+		void OnrightAddFromBtClick(wxCommandEvent& event);
+		void OnbackAddFromBtClick(wxCommandEvent& event);
+		void OnimageBankBtClick(wxCommandEvent& event);
 		//*)
 
 		Game & game;
 		MainEditorCommand & mainEditorCommand;
 		Box3DObject & object;
+
+		wxAuiManager m_mgr; ///< Used to display the image bank editor
 
 		DECLARE_EVENT_TABLE()
 };

@@ -16,17 +16,17 @@
 	<File name="Box3DInitialPositionPanel.h" open="0" top="0" tabpos="0">
 		<Cursor position="969" topLine="0" />
 	</File>
-	<File name="Box3DObject.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="9551" topLine="252" />
+	<File name="Box3DObject.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="7085" topLine="186" />
 	</File>
 	<File name="Box3DObject.h" open="0" top="0" tabpos="1">
 		<Cursor position="969" topLine="0" />
 	</File>
-	<File name="Box3DObjectEditor.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="969" topLine="0" />
+	<File name="Box3DObjectEditor.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="14325" topLine="83" />
 	</File>
-	<File name="Box3DObjectEditor.h" open="0" top="0" tabpos="3">
-		<Cursor position="969" topLine="0" />
+	<File name="Box3DObjectEditor.h" open="1" top="1" tabpos="2">
+		<Cursor position="965" topLine="16" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="15072" topLine="292" />

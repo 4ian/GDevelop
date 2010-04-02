@@ -47,7 +47,6 @@
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
-					<Add option="-DPYSUPPORT" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-D__WXDEBUG__" />

@@ -190,6 +190,7 @@ void Box3DObject::SaveToXml(TiXmlElement * object)
 
 bool Box3DObject::LoadResources(const ImageManager & imageMgr )
 {
+    //Load all images from image manager
     frontTexture =  imageMgr.images.find(frontTextureName) != imageMgr.images.end() ?
                     imageMgr.images.find(frontTextureName)->second :
                     imageMgr.imageVide;

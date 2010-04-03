@@ -679,7 +679,7 @@ void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
 
     //Phase de dessin du texte final
     dc.SetFont(eventsRenderersDatas.GetFont());
-    wxString text = _("Utilisez le clic droit pour ajouter des évènements.\nVous pouvez ensuite double cliquer sur les évènements pour les éditer.");
+    wxString text = _("Utilisez le clic droit pour ajouter des évènements, actions et conditions.\nVous pouvez ensuite double cliquer sur les évènements pour les éditer.");
     dc.DrawLabel(text,
                 wxRect( (EventsPanel->GetSize().x-dc.GetMultiLineTextExtent(text).GetWidth())/2,Yposition+15,
                         (EventsPanel->GetSize().x+dc.GetMultiLineTextExtent(text).GetWidth())/2-(EventsPanel->GetSize().x-dc.GetMultiLineTextExtent(text).GetWidth())/2,0)

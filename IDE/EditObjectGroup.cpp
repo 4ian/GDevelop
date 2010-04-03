@@ -197,6 +197,7 @@ void EditObjectGroup::OnAddObjetSelected(wxCommandEvent& event)
     if ( dialog.ShowModal() == 1 )
     {
         string name = dialog.NomObjet;
+        if ( name == "" ) return;
 
         //On l'ajoute si il n'est pas déjà dans le groupe
         if ( !group.Find( name ) )

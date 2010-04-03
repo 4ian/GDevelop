@@ -405,22 +405,10 @@
 		<Unit filename="DossierRenderer.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Renderers\" />
 		</Unit>
-		<Unit filename="EditActions.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\" />
-		</Unit>
-		<Unit filename="EditActions.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\" />
-		</Unit>
 		<Unit filename="EditCommentaire.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\" />
 		</Unit>
 		<Unit filename="EditCommentaire.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\" />
-		</Unit>
-		<Unit filename="EditConditions.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\" />
-		</Unit>
-		<Unit filename="EditConditions.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\" />
 		</Unit>
 		<Unit filename="EditDossier.cpp">
@@ -611,12 +599,6 @@
 		<Unit filename="MessagePlus.h">
 			<Option virtualFolder="Racine\" />
 		</Unit>
-		<Unit filename="MiniChoixObjet.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\" />
-		</Unit>
-		<Unit filename="MiniChoixObjet.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\" />
-		</Unit>
 		<Unit filename="ModeSimple.cpp">
 			<Option virtualFolder="Editeur principal\Outils\" />
 		</Unit>
@@ -785,14 +767,11 @@
 					<wxFrame wxs="wxsmith/Game_Develop_Editorframe.wxs" src="Game_Develop_EditorMain.cpp" hdr="Game_Develop_EditorMain.h" name="Game_Develop_EditorFrame" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorObjets.wxs" src="EditorObjets.cpp" hdr="EditorObjets.h" name="EditorObjets" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorEvents.wxs" src="EditorEvents.cpp" hdr="EditorEvents.h" name="EditorEvents" language="CPP" />
-					<wxDialog wxs="wxsmith/EditConditions.wxs" src="EditConditions.cpp" hdr="EditConditions.h" name="EditConditions" language="CPP" />
-					<wxDialog wxs="wxsmith/EditActions.wxs" src="EditActions.cpp" hdr="EditActions.h" name="EditActions" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixCondition.wxs" src="ChoixCondition.cpp" hdr="ChoixCondition.h" name="ChoixCondition" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixAction.wxs" src="ChoixAction.cpp" hdr="ChoixAction.h" name="ChoixAction" language="CPP" />
 					<wxDialog wxs="wxsmith/EditorObjet.wxs" src="EditorObjet.cpp" hdr="EditorObjet.h" name="EditorObjet" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixObjet.wxs" src="ChoixObjet.cpp" hdr="ChoixObjet.h" name="ChoixObjet" language="CPP" />
 					<wxDialog wxs="wxsmith/EditExpression.wxs" src="EditExpression.cpp" hdr="EditExpression.h" name="EditExpression" language="CPP" />
-					<wxDialog wxs="wxsmith/MiniChoixObjet.wxs" src="MiniChoixObjet.cpp" hdr="MiniChoixObjet.h" name="MiniChoixObjet" language="CPP" />
 					<wxDialog wxs="wxsmith/EditOptionsPosition.wxs" src="EditOptionsPosition.cpp" hdr="EditOptionsPosition.h" name="EditOptionsPosition" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixBouton.wxs" src="ChoixBouton.cpp" hdr="ChoixBouton.h" name="ChoixBouton" language="CPP" />
 					<wxDialog wxs="wxsmith/EditPropScene.wxs" src="EditPropScene.cpp" hdr="EditPropScene.h" name="EditPropScene" language="CPP" />

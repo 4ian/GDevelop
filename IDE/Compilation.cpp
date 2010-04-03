@@ -417,7 +417,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         boost::shared_ptr<ExtensionBase> extension = extensionsManager->GetExtension(Jeu.extensionsUsed[i]);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() &&
-            extension->GetNameSpace() != "" )
+            ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" ) )
         {
             if ( WinCheck->GetValue() &&
                 wxCopyFile( "Extensions/"+Jeu.extensionsUsed[i]+".xgdw", repTemp + "/" + Jeu.extensionsUsed[i]+".xgdw", true ) == false )
@@ -641,9 +641,17 @@ wxString Compilation::GetTempDir()
     pConfig->Read( _T( "/Dossier/Compilation" ), result );
 
     wxString repTemp = *result;
-    if ( repTemp == "" )
+    if ( repTemp == "" ) //If the user has not forced a directory
     {
         repTemp = wxGetCwd();
+        if ( !wxFileName::IsDirWritable(repTemp) )
+            repTemp = wxFileName::GetHomeDir()+"/.Game Develop/";
+
+        if ( !wxFileName::IsDirWritable(repTemp) )
+            repTemp = wxFileName::GetHomeDir();
+
+        if ( !wxFileName::IsDirWritable(repTemp) )
+            wxMessageBox(_("Game Develop n'a pas réussi à trouver un répertoire temporaire pour la compilation.\nSi la compilation échoue, allez dans les préférences et choisissez un répertoire temporaire où vous avez les droits d'écriture."), _("La compilation risque d'échouer."), wxICON_EXCLAMATION);
     }
 
     return repTemp + "\\Compil";

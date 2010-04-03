@@ -71,7 +71,7 @@ mainEditorCommand(mainEditorCommand_)
     Notebook1->AddPage(sceneObjectsEditor, _("Objets"), false);
     Notebook1->AddPage(ObjetsGroups, _("Groupes d\'objets"), false);
     Notebook1->AddPage(globalObjectsEditor, _("Objets globaux à toutes les scènes"), false);
-
+    
     Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorObjets::OnResize);
     //*)
 

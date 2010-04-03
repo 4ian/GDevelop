@@ -86,6 +86,25 @@ class GD_API ObjectsConcerned
             if ( parent != NULL ) parent->AnObjectWasDeleted(object);
         }
 
+        /**
+         * Return a set with the identifier of the objects already concerned.
+         * Used by Merge function.
+         */
+        inline set < unsigned int > & GetAlreadyConcernedObjects()
+        {
+            return alreadyConcernedObjects;
+        }
+
+        /**
+         * Merge with another ObjectsConcerned class :
+         * Merge objectsPicked and objectsAlreadyConcerned.
+         */
+        inline void Merge(ObjectsConcerned & second)
+        {
+            objectsPicked.Merge(second.objectsPicked);
+            copy(second.GetAlreadyConcernedObjects().begin(), second.GetAlreadyConcernedObjects().end(), std::inserter(alreadyConcernedObjects, alreadyConcernedObjects.begin()));
+        }
+
         /** Objects already picked */
         ObjInstancesHolder objectsPicked;
 

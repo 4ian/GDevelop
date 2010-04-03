@@ -17,6 +17,7 @@
 #include "GDL/SpriteExtension.h"
 #include "GDL/SceneExtension.h"
 #include "GDL/AdvancedExtension.h"
+#include "GDL/CommonInstructionsExtension.h"
 #include "GDL/Object.h"
 
 #ifdef GDE
@@ -39,6 +40,7 @@ ExtensionsManager::ExtensionsManager()
 {
     //Load all extensions
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new CommonInstructionsExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new ExtensionSprite()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new VariablesExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new TimeExtension()));

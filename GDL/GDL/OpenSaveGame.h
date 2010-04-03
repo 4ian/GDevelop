@@ -43,12 +43,16 @@ private:
     void OpenGroupesObjets( vector < ObjectGroup > & list, TiXmlElement * elem );
     void OpenLayers( vector < Layer > & list, TiXmlElement * elem );
     static void OpenVariablesList(ListVariable & list, const TiXmlElement * elem);
+    static void OpenConditions(vector < Instruction > & list, const TiXmlElement * elem);
+    static void OpenActions(vector < Instruction > & list, const TiXmlElement * elem);
 
     void SavePositions( const vector < InitialPosition > & list, TiXmlElement * positions );
     void SaveObjects( const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects );
     void SaveGroupesObjets( const vector < ObjectGroup > & list, TiXmlElement * grpsobjets );
     void SaveLayers( const vector < Layer > & list, TiXmlElement * layers );
     static void SaveVariablesList(const ListVariable & list, TiXmlElement * elem);
+    static void SaveConditions(const vector < Instruction > & list, TiXmlElement * elem);
+    static void SaveActions(const vector < Instruction > & list, TiXmlElement * elem);
 };
 
 #endif // OPENSAVEGAME_H

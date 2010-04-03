@@ -563,107 +563,107 @@ void OpenSaveGame::OpenEvents(vector < Event > & list, TiXmlElement * elem)
         else
         {
             //Conditions
-            TiXmlElement *elemConditions = elemScene->FirstChildElement( "Conditions" );
-            if ( elemConditions != NULL )
-            {
-                elemConditions = elemConditions->FirstChildElement();
-
-                //Passage en revue des conditions
-                while ( elemConditions )
-                {
-                    Instruction instruction;
-
-                    TiXmlElement *elemPara = elemConditions->FirstChildElement( "Type" );
-                    if ( elemPara != NULL )
-                    {
-
-                        //Le premier "paramètre" est toujours le type
-                        instruction.SetType( elemPara->Attribute( "value" ));
-                        string LocStr = elemPara->Attribute( "loc" );
-                        string ContraireStr;
-                        if ( elemPara->Attribute( "Contraire" ) != NULL ) { ContraireStr = elemPara->Attribute( "Contraire" ); }
-                        else { MSG("Les informations sur le type-contraire d'un évènement manquent"); }
-
-                        instruction.SetInversion(false);
-                        instruction.SetLocal(true);
-                        if ( LocStr == "false" ) { instruction.SetLocal(false); }
-                        if ( ContraireStr == "true" ) { instruction.SetInversion(true); }
-
-                        vector < GDExpression > Para;
-
-                        elemPara = elemPara->NextSiblingElement();
-                        while ( elemPara )
-                        {
-                            string Parametre = elemPara->Attribute( "value" );
-                            Para.push_back( GDExpression(Parametre) );
-
-                            elemPara = elemPara->NextSiblingElement();
-                        }
-
-                        instruction.SetParameters( Para );
-
-                        EventToAdd.conditions.push_back( instruction );
-
-                    }
-                    else { MSG( _( "Aucune informations sur les paramètres d'une condition d'un évènement" ) ); }
-
-                    elemConditions = elemConditions->NextSiblingElement();
-                }
-            }
-            else { MSG( _( "Aucune informations sur les conditions d'un évènement" ) ); }
+            if ( elemScene->FirstChildElement( "Conditions" ) != NULL )
+                OpenConditions(EventToAdd.conditions, elemScene->FirstChildElement( "Conditions" ));
+            else
+                MSG( _( "Aucune informations sur les conditions d'un évènement" ) );
 
             //Actions
-            TiXmlElement *elemActions = elemScene->FirstChildElement( "Actions" );
-            if ( elemActions != NULL )
-            {
-                elemActions = elemActions->FirstChildElement();
+            if ( elemScene->FirstChildElement( "Actions" ) != NULL )
+                OpenActions(EventToAdd.actions, elemScene->FirstChildElement( "Actions" ));
+            else
+                MSG( _( "Aucune informations sur les actions d'un évènement" ) );
 
-                //Passage en revue des actions
-                while ( elemActions )
-                {
-                    Instruction instruction;
-
-                    TiXmlElement *elemPara = elemActions->FirstChildElement( "Type" );
-                    if ( elemPara != NULL )
-                    {
-
-                        //Le premier "paramètre" est toujours le type
-                        instruction.SetType( elemPara->Attribute( "value" ));
-                        string LocStr = elemPara->Attribute( "loc" );
-                        vector < GDExpression > Para;
-                        instruction.SetLocal(true);
-                        if ( LocStr == "false" ) { instruction.SetLocal(false); }
-
-
-                        elemPara = elemPara->NextSiblingElement();
-                        while ( elemPara )
-                        {
-                            string parameter = elemPara->Attribute( "value" );
-                            Para.push_back( GDExpression(parameter) );
-
-                            elemPara = elemPara->NextSiblingElement();
-                        }
-
-                        instruction.SetParameters(Para);
-                        EventToAdd.actions.push_back(instruction);
-
-                    }
-                    else { MSG( _( "Aucune informations sur les paramètres d'une action d'un évènement" ) ); }
-
-                    elemActions = elemActions->NextSiblingElement();
-                }
-            }
-            else { MSG( _( "Aucune informations sur les actions d'un évènement" ) ); }
-
-            //Sous évènements
+            //Subevents
             if ( elemScene->FirstChildElement( "Events" ) != NULL )
-            {
                 OpenEvents(EventToAdd.events, elemScene->FirstChildElement( "Events" ));
-            }
         }
 
         list.push_back( EventToAdd );
         elemScene = elemScene->NextSiblingElement();
+    }
+}
+
+void OpenSaveGame::OpenConditions(vector < Instruction > & conditions, const TiXmlElement * elem)
+{
+    const TiXmlElement * elemConditions = elem->FirstChildElement();
+
+    //Passage en revue des conditions
+    while ( elemConditions )
+    {
+        Instruction instruction;
+
+        //Read type and infos
+        const TiXmlElement *elemPara = elemConditions->FirstChildElement( "Type" );
+        if ( elemPara != NULL )
+        {
+            instruction.SetType( elemPara->Attribute( "value" ));
+            string LocStr = elemPara->Attribute( "loc" );
+            string ContraireStr;
+            if ( elemPara->Attribute( "Contraire" ) != NULL ) { ContraireStr = elemPara->Attribute( "Contraire" ); }
+            else { MSG("Les informations sur le type-contraire d'un évènement manquent"); }
+
+            instruction.SetInversion(false);
+            instruction.SetLocal(true);
+            if ( LocStr == "false" ) { instruction.SetLocal(false); }
+            if ( ContraireStr == "true" ) { instruction.SetInversion(true); }
+        }
+
+        //Read parameters
+        vector < GDExpression > parameters;
+        elemPara = elemConditions->FirstChildElement("Parametre");
+        while ( elemPara )
+        {
+            parameters.push_back( GDExpression(elemPara->Attribute( "value" )) );
+            elemPara = elemPara->NextSiblingElement("Parametre");
+        }
+        instruction.SetParameters( parameters );
+
+        //Read sub conditions
+        if ( elemConditions->FirstChildElement( "SubConditions" ) != NULL )
+            OpenConditions(instruction.GetSubInstructions(), elemConditions->FirstChildElement( "SubConditions" ));
+
+        conditions.push_back( instruction );
+
+        elemConditions = elemConditions->NextSiblingElement();
+    }
+}
+
+void OpenSaveGame::OpenActions(vector < Instruction > & actions, const TiXmlElement * elem)
+{
+    const TiXmlElement * elemActions = elem->FirstChildElement();
+
+    //Passage en revue des actions
+    while ( elemActions )
+    {
+        Instruction instruction;
+
+        //Read type and info
+        const TiXmlElement *elemPara = elemActions->FirstChildElement( "Type" );
+        if ( elemPara != NULL )
+        {
+            instruction.SetType( elemPara->Attribute( "value" ));
+            string LocStr = elemPara->Attribute( "loc" );
+            instruction.SetLocal(true);
+            if ( LocStr == "false" ) { instruction.SetLocal(false); }
+        }
+
+        //Read parameters
+        vector < GDExpression > parameters;
+        elemPara = elemActions->FirstChildElement("Parametre");
+        while ( elemPara )
+        {
+            parameters.push_back( GDExpression(elemPara->Attribute( "value" )) );
+            elemPara = elemPara->NextSiblingElement("Parametre");
+        }
+        instruction.SetParameters(parameters);
+
+        //Read sub actions
+        if ( elemActions->FirstChildElement( "SubActions" ) != NULL )
+            OpenActions(instruction.GetSubInstructions(), elemActions->FirstChildElement( "SubActions" ));
+
+        actions.push_back(instruction);
+        elemActions = elemActions->NextSiblingElement();
     }
 }
 
@@ -1132,79 +1132,15 @@ void OpenSaveGame::SaveEvents(const vector < Event > & list, TiXmlElement * even
         }
         else
         {
-
-            TiXmlElement * conditions;
-
             //Les conditions
-            conditions = new TiXmlElement( "Conditions" );
+            TiXmlElement * conditions = new TiXmlElement( "Conditions" );
             event->LinkEndChild( conditions );
-            if ( !list.at( j ).conditions.empty() )
-            {
-
-                for ( unsigned int k = 0;k < list.at( j ).conditions.size();k++ )
-                {
-                    //Pour chaque condition
-                    TiXmlElement * condition;
-
-                    condition = new TiXmlElement( "Condition" );
-                    conditions->LinkEndChild( condition );
-
-                    //Le type
-                    TiXmlElement * typeCondition;
-                    typeCondition = new TiXmlElement( "Type" );
-                    condition->LinkEndChild( typeCondition );
-
-                    typeCondition->SetAttribute( "value", list.at( j ).conditions.at( k ).GetType().c_str() );
-                    if ( list.at( j ).conditions.at( k ).IsLocal() ) { typeCondition->SetAttribute( "loc", "true" ); }
-                    else { typeCondition->SetAttribute( "loc", "false" ); }
-                    if ( list.at( j ).conditions.at( k ).IsInverted() ) { typeCondition->SetAttribute( "Contraire", "true" ); }
-                    else { typeCondition->SetAttribute( "Contraire", "false" ); }
-
-
-                    //Les autres paramètres
-                    for ( unsigned int l = 0;l < list.at( j ).conditions.at( k ).GetParameters().size();l++ )
-                    {
-                        TiXmlElement * Parametre = new TiXmlElement( "Parametre" );
-                        condition->LinkEndChild( Parametre );
-                        Parametre->SetAttribute( "value", list.at( j ).conditions.at( k ).GetParameter( l ).GetPlainString().c_str() );
-                    }
-                }
-            }
+            SaveConditions(list.at( j ).conditions, conditions);
 
             //Les actions
-            TiXmlElement * actions;
-            actions = new TiXmlElement( "Actions" );
+            TiXmlElement * actions = new TiXmlElement( "Actions" );
             event->LinkEndChild( actions );
-            if ( !list.at( j ).actions.empty() )
-            {
-                for ( unsigned int k = 0;k < list.at( j ).actions.size();k++ )
-                {
-                    //Pour chaque condition
-                    TiXmlElement * action;
-
-                    action = new TiXmlElement( "Action" );
-                    actions->LinkEndChild( action );
-
-                    //Le type
-                    TiXmlElement * typeAction;
-                    typeAction = new TiXmlElement( "Type" );
-                    action->LinkEndChild( typeAction );
-
-                    typeAction->SetAttribute( "value", list.at( j ).actions.at( k ).GetType().c_str() );
-                    if ( list.at( j ).actions.at( k ).IsLocal() ) { typeAction->SetAttribute( "loc", "true" ); }
-                    else { typeAction->SetAttribute( "loc", "false" ); }
-
-
-                    //Les autres paramètres
-                    for ( unsigned int l = 0;l < list.at( j ).actions.at( k ).GetParameters().size();l++ )
-                    {
-                        TiXmlElement * Parametre = new TiXmlElement( "Parametre" );
-                        action->LinkEndChild( Parametre );
-                        Parametre->SetAttribute( "value", list.at( j ).actions.at( k ).GetParameter( l ).GetPlainString().c_str() );
-                    }
-
-                }
-            }
+            SaveActions(list.at( j ).actions, actions);
 
             //Sous évènements
             if ( !list.at( j ).events.empty() )
@@ -1215,6 +1151,69 @@ void OpenSaveGame::SaveEvents(const vector < Event > & list, TiXmlElement * even
 
                 SaveEvents(list.at( j ).events, subevents);
             }
+        }
+    }
+}
+
+void OpenSaveGame::SaveActions(const vector < Instruction > & list, TiXmlElement * actions)
+{
+    for ( unsigned int k = 0;k < list.size();k++ )
+    {
+        //Pour chaque condition
+        TiXmlElement * action;
+
+        action = new TiXmlElement( "Action" );
+        actions->LinkEndChild( action );
+
+        //Le type
+        TiXmlElement * typeAction;
+        typeAction = new TiXmlElement( "Type" );
+        action->LinkEndChild( typeAction );
+
+        typeAction->SetAttribute( "value", list[k].GetType().c_str() );
+        if ( list[k].IsLocal() ) { typeAction->SetAttribute( "loc", "true" ); }
+        else { typeAction->SetAttribute( "loc", "false" ); }
+
+
+        //Les autres paramètres
+        for ( unsigned int l = 0;l < list[k].GetParameters().size();l++ )
+        {
+            TiXmlElement * Parametre = new TiXmlElement( "Parametre" );
+            action->LinkEndChild( Parametre );
+            Parametre->SetAttribute( "value", list[k].GetParameter( l ).GetPlainString().c_str() );
+        }
+
+    }
+}
+
+void OpenSaveGame::SaveConditions(const vector < Instruction > & list, TiXmlElement * conditions)
+{
+    for ( unsigned int k = 0;k < list.size();k++ )
+    {
+        //Pour chaque condition
+        TiXmlElement * condition;
+
+        condition = new TiXmlElement( "Condition" );
+        conditions->LinkEndChild( condition );
+
+        //Le type
+        TiXmlElement * typeCondition;
+        typeCondition = new TiXmlElement( "Type" );
+        condition->LinkEndChild( typeCondition );
+
+        typeCondition->SetAttribute( "value", list[k].GetType().c_str() );
+        if ( list[k].IsLocal() ) { typeCondition->SetAttribute( "loc", "true" ); }
+        else { typeCondition->SetAttribute( "loc", "false" ); }
+        if ( list[k].IsInverted() ) { typeCondition->SetAttribute( "Contraire", "true" ); }
+        else { typeCondition->SetAttribute( "Contraire", "false" ); }
+
+
+        //Les autres paramètres
+        for ( unsigned int l = 0;l < list[k].GetParameters().size();l++ )
+        {
+            TiXmlElement * Parametre = new TiXmlElement( "Parametre" );
+            condition->LinkEndChild( Parametre );
+            Parametre->SetAttribute( "value", list[k].GetParameter( l ).GetPlainString().c_str() );
         }
     }
 }

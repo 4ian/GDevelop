@@ -834,10 +834,11 @@ void EditorObjet::OnBoucleNonCheckSelect( wxCommandEvent& event )
 }
 
 /**
- * Display Image Editor
+ * Display Image Bank Editor
  */
 void EditorObjet::OnButton1Click( wxCommandEvent& event )
 {
+    //Update the window size
     if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
         SetSize(GetSize().GetWidth()+150, GetSize().GetHeight());
 

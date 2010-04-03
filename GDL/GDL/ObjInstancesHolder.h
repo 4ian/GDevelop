@@ -89,6 +89,11 @@ public:
      */
     ObjInstancesHolder CopyAndCloneAllObjects() const;
 
+    /**
+     * Merge this ObjInstancesHolder with the objects of another.
+     */
+    void Merge(ObjInstancesHolder & second);
+
     inline void Clear()
     {
         objectsInstances.clear();

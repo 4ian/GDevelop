@@ -517,7 +517,7 @@ void RuntimeScene::GestionObjets()
 bool RuntimeScene::LoadFromScene( const Scene & scene )
 {
     //Clear RuntimeScene datas
-    variables.variables.clear();
+    variables.Clear();
     objectsInstances.Clear();
     textes.clear();
     timers.clear();

@@ -550,21 +550,9 @@ string Evaluateur::EvalExpTxt( GDExpression & gdExpression, ObjSPtr obj1, ObjSPt
         }
 
         if ( object == boost::shared_ptr<Object>( ) )
-        {
             valeur = "";
-        }
-        //Propriétés des objets
-        else if ( !object->variablesObjet.variables.empty() )
-        {
-            for ( unsigned int i = 0;i < object->variablesObjet.variables.size();i++ )
-            {
-                //On parcourt chaque variable et teste le nom
-                if ( object->variablesObjet.variables.at( i ).GetName() == propObjet )
-                {
-                    valeur = object->variablesObjet.variables.at( i ).Gettexte();
-                }
-            }
-        }
+        else
+            valeur = object->variablesObjet.GetVariableText(propObjet);
 
         expression.replace( departObj, longObjet + 5, valeur );
     }
@@ -587,17 +575,7 @@ string Evaluateur::EvalExpTxt( GDExpression & gdExpression, ObjSPtr obj1, ObjSPt
         propObjet = propObjet.substr( propObjet.find( "[" ) + 1, propObjet.find( "]" ) - propObjet.find( "[" ) - 1 );
 
         //Les valeurs spéciales
-        if ( !scene.variables.variables.empty() )
-        {
-            for ( unsigned int i = 0;i < scene.variables.variables.size();i++ )
-            {
-                //On parcourt chaque variable et teste le nom
-                if ( scene.variables.variables.at( i ).GetName() == nomObjet )
-                {
-                    valeur = scene.variables.variables.at( i ).Gettexte();
-                }
-            }
-        }
+        valeur = scene.variables.GetVariableText(nomObjet);
 
         expression.replace( departObj, longObjet + 5, valeur );
     }
@@ -619,18 +597,7 @@ string Evaluateur::EvalExpTxt( GDExpression & gdExpression, ObjSPtr obj1, ObjSPt
         nomObjet = nomObjet.substr( 0, nomObjet.find( "[" ) );
         propObjet = propObjet.substr( propObjet.find( "[" ) + 1, propObjet.find( "]" ) - propObjet.find( "[" ) - 1 );
 
-        //Les valeurs spéciales
-        if ( !game.variables.variables.empty() )
-        {
-            for ( unsigned int i = 0;i < game.variables.variables.size();i++ )
-            {
-                //On parcourt chaque variable et teste le nom
-                if ( game.variables.variables.at( i ).GetName() == nomObjet )
-                {
-                    valeur = game.variables.variables.at( i ).Gettexte();
-                }
-            }
-        }
+        valeur = game.variables.GetVariableText(nomObjet);
 
         expression.replace( departObj, longObjet + 5, valeur );
     }

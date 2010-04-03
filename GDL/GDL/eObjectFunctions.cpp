@@ -117,10 +117,7 @@ double Object::ExpGetObjectZOrder( const RuntimeScene * scene, ObjectsConcerned 
 
 double Object::ExpGetObjectVariableValue( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    int varId = variablesObjet.FindVariable(exprInstruction.parameters[1].GetPlainString());
-    double varValue = varId != -1 ? variablesObjet.variables[varId].Getvalue() : 0;
-
-    return varValue;
+    return variablesObjet.GetVariableValue(exprInstruction.parameters[1].GetPlainString());
 }
 
 double Object::ExpGetDistanceBetweenObjects( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )

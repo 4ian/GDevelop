@@ -9,12 +9,6 @@
 #include <cmath>
 #include "GDL/cVariables.h"
 #include "GDL/Event.h"
-#include <iostream>
-#include <sstream>
-#include "GDL/Chercher.h"
-#include "GDL/algo.h"
-#include "GDL/Force.h"
-#include <iostream>
 #include "GDL/Access.h"
 #include <SFML/Window.hpp>
 #include "GDL/RuntimeScene.h"
@@ -27,8 +21,7 @@
  */
 bool Object::CondVarObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    int varId = variablesObjet.FindVariable(condition.GetParameter( 1 ).GetPlainString());
-    double varValue = varId != -1 ? variablesObjet.variables.at(varId).Getvalue() : 0;
+    double varValue = variablesObjet.GetVariableValue(condition.GetParameter( 1 ).GetPlainString());
 
     //Enfin, on teste vraiment.
     //optimisation : le test de signe en premier
@@ -51,8 +44,7 @@ bool Object::CondVarObjet( RuntimeScene * scene, ObjectsConcerned & objectsConce
  */
 bool Object::CondVarObjetTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    int varId = variablesObjet.FindVariable(condition.GetParameter( 1 ).GetPlainString());
-    string varValue = varId != -1 ? variablesObjet.variables[varId].Gettexte() : "";
+    string varValue = variablesObjet.GetVariableText(condition.GetParameter( 1 ).GetPlainString());
 
     //Enfin, on teste vraiment.
     //optimisation : le test de signe en premier
@@ -71,14 +63,7 @@ bool Object::CondVarObjetTxt( RuntimeScene * scene, ObjectsConcerned & objectsCo
  */
 bool Object::CondVarObjetDef( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    int varId = variablesObjet.FindVariable(condition.GetParameter( 1 ).GetPlainString());
-
-    //Enfin, on teste vraiment.
-    //optimisation : le test de signe en premier
-    if ( varId != -1)
-        return true;
-
-    return false;
+    return variablesObjet.HasVariable(condition.GetParameter( 1 ).GetPlainString());
 }
 
 ////////////////////////////////////////////////////////////
@@ -115,7 +100,7 @@ bool CondVarSceneTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 ////////////////////////////////////////////////////////////
 bool CondVarSceneDef( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    return CondVarDef(scene->variables, condition.GetParameter( 0 ).GetPlainString()) ^ condition.IsInverted();
+    return scene->variables.HasVariable( condition.GetParameter( 0 ).GetPlainString() ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////
@@ -152,51 +137,5 @@ bool CondVarGlobalTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 ////////////////////////////////////////////////////////////
 bool CondVarGlobalDef( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    return CondVarDef(scene->game->variables, condition.GetParameter( 0 ).GetPlainString()) ^ condition.IsInverted();
-}
-
-bool CondVar( const ListVariable & variables, string varName, short int compOperator, double valueToCompare )
-{
-    int varId = variables.FindVariable(varName);
-    double varValue = varId != -1 ? variables.variables[varId].Getvalue() : 0;
-
-    //Enfin, on teste vraiment.
-    //optimisation : le test de signe en premier
-    if (( compOperator == GDExpression::Equal && varValue == valueToCompare ) ||
-            ( compOperator == GDExpression::Inferior && varValue < valueToCompare ) ||
-            ( compOperator == GDExpression::Superior && varValue > valueToCompare ) ||
-            ( compOperator == GDExpression::InferiorOrEqual && varValue <= valueToCompare ) ||
-            ( compOperator == GDExpression::SuperiorOrEqual && varValue >= valueToCompare ) ||
-            ( compOperator == GDExpression::Different && varValue != valueToCompare )
-       )
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool CondVarTxt( const ListVariable & variables, string varName, short int compOperator, string valueToCompare )
-{
-    int varId = variables.FindVariable(varName);
-    string varValue = varId != -1 ? variables.variables[varId].Gettexte() : "";
-
-    //Enfin, on teste vraiment.
-    //optimisation : le test de signe en premier
-    if (( compOperator == GDExpression::Equal && varValue == valueToCompare ) ||
-        ( compOperator == GDExpression::Different && varValue != valueToCompare )
-       )
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool CondVarDef( const ListVariable & variables, string varName)
-{
-    int varId = variables.FindVariable(varName);
-    if ( varId != -1 ) return true;
-
-    return false;
+    return scene->game->variables.HasVariable( condition.GetParameter( 0 ).GetPlainString() ) ^ condition.IsInverted();
 }

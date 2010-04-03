@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include <vector>
 #include <string>
 #include <iostream>
@@ -21,6 +26,7 @@
 ////////////////////////////////////////////////////////////
 bool ActGetJoystickAxis( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
+    //Obtain axis and joystick
     unsigned int joystick = eval.EvalExp( action.GetParameter( 0 ) );
     string axisStr = eval.EvalTxt( action.GetParameter( 1 ) );
     sf::Joy::Axis axis;
@@ -33,20 +39,8 @@ bool ActGetJoystickAxis( RuntimeScene * scene, ObjectsConcerned & objectsConcern
     else if ( axisStr == "AxisPOV" ) axis = sf::Joy::AxisPOV;
     else return false;
 
-    //On cherche la variable
-    int ID = scene->variables.FindVariable( eval.EvalTxt( action.GetParameter( 2 ) ) );
-    if ( ID == -1 )
-    {
-        //Si elle n'existe pas, on la créer
-        scene->variables.variables.push_back( eval.EvalTxt( action.GetParameter( 2 ) ) );
-
-        //On reprend l'identifiant
-        ID = scene->variables.variables.size() - 1;
-
-    }
-
-    //On modifie la variable
-    scene->variables.variables.at( ID ) = scene->input->GetJoystickAxis(joystick, axis);
+    //Update variable value
+    scene->variables.ObtainVariable(eval.EvalTxt( action.GetParameter( 2 ) )) = scene->input->GetJoystickAxis(joystick, axis);
 
     return true;
 }

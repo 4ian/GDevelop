@@ -725,22 +725,18 @@ void OpenSaveGame::OpenLayers(vector < Layer > & list, TiXmlElement * elem)
 
 void OpenSaveGame::OpenVariablesList(ListVariable & list, const TiXmlElement * elem)
 {
-    list.variables.clear();
+    list.Clear();
     const TiXmlElement * elemScene = elem->FirstChildElement();
 
     //Passage en revue des évènements
     while ( elemScene )
     {
-        string name = "";
-        if ( elemScene->Attribute( "Name" ) != NULL ) { name = (elemScene->Attribute( "Name" ));}
-        else { MSG( "Les informations concernant le nom d'une variable manquent." ); }
-
-        Variable variable(name);
+        string name = elemScene->Attribute( "Name" ) != NULL ? elemScene->Attribute( "Name" ) : "";
+        Variable & variable = list.ObtainVariable(name);
 
         if ( elemScene->Attribute( "Value" ) != NULL ) { variable.Settexte(elemScene->Attribute( "Value" ));}
         else { MSG( "Les informations concernant la valeur d'une variable manquent." ); }
 
-        list.variables.push_back( variable );
         elemScene = elemScene->NextSiblingElement();
     }
 }
@@ -1260,13 +1256,14 @@ void OpenSaveGame::SaveLayers(const vector < Layer > & list, TiXmlElement * laye
 
 void OpenSaveGame::SaveVariablesList(const ListVariable & list, TiXmlElement * elem)
 {
-    for ( unsigned int j = 0;j < list.variables.size();j++ )
+    vector<Variable> variables = list.GetVariablesVector();
+    for ( unsigned int j = 0;j < variables.size();j++ )
     {
         TiXmlElement * variable = new TiXmlElement( "Variable" );
         elem->LinkEndChild( variable );
 
-        variable->SetAttribute("Name", list.variables[j].GetName().c_str());
-        variable->SetAttribute("Value", list.variables[j].Gettexte().c_str());
+        variable->SetAttribute("Name", variables[j].GetName().c_str());
+        variable->SetAttribute("Value", variables[j].Gettexte().c_str());
     }
 }
 

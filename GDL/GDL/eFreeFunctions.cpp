@@ -172,20 +172,13 @@ double ExpTime( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned,
 
 double ExpGetVariableValue( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    int varId = scene->variables.FindVariable(exprInstruction.parameters[0].GetPlainString());
-    double varValue = varId != -1 ? scene->variables.variables[varId].Getvalue() : 0;
-
-    return varValue;
+    return scene->variables.GetVariableValue( exprInstruction.parameters[0].GetPlainString() );
 }
 
 double ExpGetGlobalVariableValue( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    int varId = scene->game->variables.FindVariable(exprInstruction.parameters[0].GetPlainString());
-    double varValue = varId != -1 ? scene->game->variables.variables[varId].Getvalue() : 0;
-
-    return varValue;
+    return scene->game->variables.GetVariableValue( exprInstruction.parameters[0].GetPlainString() );
 }
-
 
 double ExpGetObjectCount( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {

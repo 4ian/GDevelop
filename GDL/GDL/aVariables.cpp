@@ -25,29 +25,20 @@
  */
 bool Object::ActModVarObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    //On cherche la variable
-    int ID = variablesObjet.FindVariable( action.GetParameter( 1 ).GetPlainString() );
-    if ( ID == -1 )
-    {
-        //Si elle n'existe pas, on la créer
-        variablesObjet.variables.push_back( Variable( action.GetParameter(1).GetPlainString() ) );
+    //Get the variable to modify
+    Variable & variable = variablesObjet.ObtainVariable( action.GetParameter( 1 ).GetPlainString() );
 
-        //On reprend l'identifiant
-        ID = variablesObjet.variables.size() - 1;
-    }
-
-
-    //On modifie la variable
+    //Update variable value
     if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Set )
-        variablesObjet.variables.at( ID ) = eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
+        variable = eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
     else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Add )
-        variablesObjet.variables.at( ID ) += eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
+        variable += eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
     else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Substract )
-        variablesObjet.variables.at( ID ) -= eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
+        variable -= eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
     else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Multiply )
-        variablesObjet.variables.at( ID ) *= eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
+        variable *= eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
     else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Divide )
-        variablesObjet.variables.at( ID ) /= eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
+        variable /= eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
 
     return true;
 }
@@ -64,49 +55,14 @@ bool Object::ActModVarObjet( RuntimeScene * scene, ObjectsConcerned & objectsCon
 ////////////////////////////////////////////////////////////
 bool Object::ActModVarObjetTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    //On cherche la variable
-    int ID = variablesObjet.FindVariable( action.GetParameter( 1 ).GetPlainString() );
-    if ( ID == -1 )
-    {
-        //Si elle n'existe pas, on la créer
-        variablesObjet.variables.push_back( Variable( action.GetParameter(1).GetPlainString() ) );
+    //Get the variable to modify
+    Variable & variable = variablesObjet.ObtainVariable( action.GetParameter( 1 ).GetPlainString() );
 
-        //On reprend l'identifiant
-        ID = variablesObjet.variables.size() - 1;
-    }
-
-    //On modifie la variable
+    //Update variable value
     if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Set )
-        variablesObjet.variables.at( ID ) = eval.EvalTxt( action.GetParameter( 2 ), shared_from_this()  );
+        variable = eval.EvalTxt( action.GetParameter( 2 ), shared_from_this()  );
     else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Add )
-        variablesObjet.variables.at( ID ) += eval.EvalTxt( action.GetParameter( 2 ), shared_from_this()  );
-
-    return true;
-}
-
-bool ModVar( ListVariable & variables, string varName, int modOperator, double value )
-{
-    //On cherche la variable
-    int ID = variables.FindVariable( varName );
-    if ( ID == -1 )
-    {
-        //Si elle n'existe pas, on la créer
-        variables.variables.push_back( Variable(varName) );
-        //On reprend l'identifiant
-        ID = variables.variables.size() - 1;
-    }
-
-    //On modifie la variable
-    if ( modOperator == GDExpression::Set )
-        variables.variables[ID] = value;
-    else if ( modOperator == GDExpression::Add )
-        variables.variables[ID] += value;
-    else if ( modOperator == GDExpression::Substract )
-        variables.variables[ID] -= value;
-    else if ( modOperator == GDExpression::Multiply )
-        variables.variables[ID] *= value;
-    else if ( modOperator == GDExpression::Divide )
-        variables.variables[ID] /= value;
+        variable += eval.EvalTxt( action.GetParameter( 2 ), shared_from_this()  );
 
     return true;
 }
@@ -135,27 +91,6 @@ bool ActModVarScene( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, 
 bool ActModVarGlobal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     return ModVar( scene->game->variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), eval.EvalExp( action.GetParameter( 1 ) ));
-}
-
-bool ModVarTxt( ListVariable & variables, string varName, int modOperator, string value )
-{
-    //On cherche la variable
-    int ID = variables.FindVariable( varName );
-    if ( ID == -1 )
-    {
-        //Si elle n'existe pas, on la créer
-        variables.variables.push_back( Variable(varName) );
-        //On reprend l'identifiant
-        ID = variables.variables.size() - 1;
-    }
-
-    //On modifie la variable
-    if ( modOperator == GDExpression::Set )
-        variables.variables[ID] = value;
-    else if ( modOperator == GDExpression::Add )
-        variables.variables[ID] += value;
-
-    return true;
 }
 
 ////////////////////////////////////////////////////////////

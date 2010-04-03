@@ -4,8 +4,8 @@
 
 using namespace std;
 
-Variable::Variable(string pNom) :
-nom(pNom),
+Variable::Variable(string name_) :
+name(name_),
 value(0),
 texte("")
 {

@@ -1,18 +1,13 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef AVARIABLES_H_INCLUDED
 #define AVARIABLES_H_INCLUDED
 
 #include <vector>
 #include <string>
-#include "GDL/Object.h"
-#include <cmath>
-#include "GDL/Collisions.h"
-#include "GDL/Event.h"
-#include <iostream>
-#include <sstream>
-#include "GDL/Chercher.h"
-#include "GDL/algo.h"
-#include "GDL/Force.h"
-#include <iostream>
 #include "GDL/Access.h"
 #include "GDL/ListVariable.h"
 #include "GDL/RuntimeScene.h"
@@ -25,11 +20,41 @@ bool ActModVarGlobalTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 /**
  * Helper function, only for internal ( ActModVarScene, ActModVarGlobal ) use.
  */
-bool ModVar( ListVariable & variables, string varName, string modOperator, double value );
+inline bool ModVar( ListVariable & variables, string varName, short int modOperator, double value )
+{
+    //Get the variable to modify
+    Variable & variable = variables.ObtainVariable( varName );
+
+    //Update variable value
+    if ( modOperator == GDExpression::Set )
+        variable = value;
+    else if ( modOperator == GDExpression::Add )
+        variable += value;
+    else if ( modOperator == GDExpression::Substract )
+        variable -= value;
+    else if ( modOperator == GDExpression::Multiply )
+        variable *= value;
+    else if ( modOperator == GDExpression::Divide )
+        variable /= value;
+
+    return true;
+};
 
 /**
  * Helper function, only for internal ( ActModVarSceneTxt, ActModVarGlobalTxt ) use.
  */
-bool ModVarTxt( ListVariable & variables, string varName, string modOperator, string value );
+inline bool ModVarTxt( ListVariable & variables, string varName, short int modOperator, string value )
+{
+    //Get the variable to modify
+    Variable & variable = variables.ObtainVariable( varName );
+
+    //Update variable value
+    if ( modOperator == GDExpression::Set )
+        variable = value;
+    else if ( modOperator == GDExpression::Add )
+        variable += value;
+
+    return true;
+}
 
 #endif // AVARIABLES_H_INCLUDED

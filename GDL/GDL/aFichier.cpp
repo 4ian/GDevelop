@@ -323,17 +323,8 @@ bool ActLireFichierExp( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
     double value;
     hdl.ToElement()->Attribute("value", &value);
 
-    //On cherche la variable
-    int ID = scene->variables.FindVariable( action.GetParameter( 2 ).GetPlainString() );
-    if ( ID == -1 )
-    {
-        //Si elle n'existe pas, on la créer
-        scene->variables.variables.push_back( Variable(action.GetParameter( 2 ).GetPlainString()) );
-        //On reprend l'identifiant
-        ID = scene->variables.variables.size() - 1;
-    }
-
-    scene->variables.variables.at( ID ) = value;
+    //Update variable value
+    scene->variables.ObtainVariable(action.GetParameter( 2 ).GetPlainString()) = value;
 
     return true;
 }
@@ -382,19 +373,8 @@ bool ActLireFichierTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
     //On stocke la valeur
     if ( hdl.ToElement()->Attribute("texte") == NULL ) return false;
 
-    string texte = hdl.ToElement()->Attribute("texte");
-
-    //On cherche la variable
-    int ID = scene->variables.FindVariable( action.GetParameter( 2 ).GetPlainString() );
-    if ( ID == -1 )
-    {
-        //Si elle n'existe pas, on la créer
-        scene->variables.variables.push_back( Variable(action.GetParameter( 2 ).GetPlainString()) );
-        //On reprend l'identifiant
-        ID = scene->variables.variables.size() - 1;
-    }
-
-    scene->variables.variables.at( ID ) = texte;
+    //Update variable texte
+    scene->variables.ObtainVariable( action.GetParameter( 2 ).GetPlainString() ) = hdl.ToElement()->Attribute("texte");
 
     return true;
 }

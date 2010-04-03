@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="CommonDialogsActions.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="12543" topLine="457" />
+	<File name="CommonDialogsActions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="13167" topLine="448" />
 	</File>
 	<File name="CommonDialogsActions.h" open="0" top="0" tabpos="3">
 		<Cursor position="1089" topLine="12" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="1417" topLine="42" />
+		<Cursor position="6107" topLine="28" />
 	</File>
 	<File name="dlib-17.12\dlib\all\source.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="614" topLine="0" />

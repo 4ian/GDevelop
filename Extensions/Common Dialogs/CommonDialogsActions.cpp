@@ -110,14 +110,7 @@ bool ActShowOpenFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     scene->pauseTime += timeSpent.GetElapsedTime();
 
     //Update the variable
-    int ID = scene->variables.FindVariable( action.GetParameter( 0 ).GetPlainString() );
-    if ( ID == -1 )
-    {
-        scene->variables.variables.push_back( Variable(action.GetParameter( 0 ).GetPlainString()) );
-        ID = scene->variables.variables.size() - 1;
-    }
-
-    scene->variables.variables.at( ID ) = result;
+    scene->variables.ObtainVariable(action.GetParameter( 0 ).GetPlainString()) = result;
 
     return true;
 }
@@ -147,14 +140,7 @@ bool ActShowYesNoMsgBox( RuntimeScene * scene, ObjectsConcerned & objectsConcern
     scene->pauseTime += timeSpent.GetElapsedTime();
 
     //Update the variable
-    int ID = scene->variables.FindVariable( action.GetParameter( 0 ).GetPlainString() );
-    if ( ID == -1 )
-    {
-        scene->variables.variables.push_back( Variable(action.GetParameter( 0 ).GetPlainString()) );
-        ID = scene->variables.variables.size() - 1;
-    }
-
-    scene->variables.variables.at( ID ) = result;
+    scene->variables.ObtainVariable(action.GetParameter( 0 ).GetPlainString()) = result;
 
     return true;
 }
@@ -270,7 +256,7 @@ LRESULT CALLBACK CInputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		case WM_CREATE:
             // font
             memset(&lfont, 0, sizeof(lfont));
-            lstrcpy(lfont.lfFaceName, _T("Arial"));
+            lstrcpy(lfont.lfFaceName, ("Arial"));
             lfont.lfHeight = 16;
             lfont.lfWeight = FW_NORMAL;//FW_BOLD;
             lfont.lfItalic = FALSE;
@@ -472,14 +458,7 @@ bool ActShowTextInput( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
     scene->pauseTime += timeSpent.GetElapsedTime();
 
     //Update the variable
-    int ID = scene->variables.FindVariable( action.GetParameter( 0 ).GetPlainString() );
-    if ( ID == -1 )
-    {
-        scene->variables.variables.push_back( Variable(action.GetParameter( 0 ).GetPlainString()) );
-        ID = scene->variables.variables.size() - 1;
-    }
-
-    scene->variables.variables.at( ID ) = result;
+    scene->variables.ObtainVariable(action.GetParameter( 0 ).GetPlainString()) = result;
 
     return true;
 }

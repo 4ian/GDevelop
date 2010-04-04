@@ -253,38 +253,41 @@ void DebuggerGUI::UpdateGUI()
     generalList->SetItem(5, 1, toString(scene.input->GetMouseX())+";"+toString(scene.input->GetMouseY()));
     generalList->SetItem(6, 1, toString(scene.GetTimeFromStart())+"s");
 
+    const vector < Variable > sceneVariables = scene.variables.GetVariablesVector();
+    const vector < Variable > gameVariables = scene.game->variables.GetVariablesVector();
+
     //Suppression des lignes en trop pour les variables
     while(generalList->GetItemCount() >
-            generalBaseItemCount + scene.variables.variables.size() + scene.game->variables.variables.size()+2)
+            generalBaseItemCount + sceneVariables.size() + gameVariables.size()+2)
         generalList->DeleteItem(generalBaseItemCount);
 
     //Rajout si au contraire il n'y en a pas assez
-    while(generalList->GetItemCount() < generalBaseItemCount + scene.variables.variables.size() + scene.game->variables.variables.size()+2)
+    while(generalList->GetItemCount() < generalBaseItemCount + sceneVariables.size() + gameVariables.size()+2)
         generalList->InsertItem(generalBaseItemCount, "");
 
     //Update scene variables
-    for (unsigned int i =0;i<scene.variables.variables.size();++i)
+    for (unsigned int i =0;i<sceneVariables.size();++i)
     {
-        generalList->SetItem(generalBaseItemCount+i, 0, scene.variables.variables[i].GetName());
-        generalList->SetItem(generalBaseItemCount+i, 1, scene.variables.variables[i].Gettexte());
+        generalList->SetItem(generalBaseItemCount+i, 0, sceneVariables[i].GetName());
+        generalList->SetItem(generalBaseItemCount+i, 1, sceneVariables[i].Gettexte());
         generalList->SetItemFont(generalBaseItemCount+i, *wxNORMAL_FONT);
     }
 
     //White space
-    generalList->SetItem(generalBaseItemCount+scene.variables.variables.size(), 0, "");
-    generalList->SetItem(generalBaseItemCount+scene.variables.variables.size(), 1, "");
+    generalList->SetItem(generalBaseItemCount+sceneVariables.size(), 0, "");
+    generalList->SetItem(generalBaseItemCount+sceneVariables.size(), 1, "");
 
     //Global variable title
-    generalList->SetItem(generalBaseItemCount+scene.variables.variables.size()+1, 0, _("Variables globales"));
-    generalList->SetItem(generalBaseItemCount+scene.variables.variables.size()+1, 1, "");
-    generalList->SetItemFont(generalBaseItemCount+scene.variables.variables.size()+1, font);
-    generalBaseAndVariablesItemCount = generalBaseItemCount+scene.variables.variables.size()+2;
+    generalList->SetItem(generalBaseItemCount+sceneVariables.size()+1, 0, _("Variables globales"));
+    generalList->SetItem(generalBaseItemCount+sceneVariables.size()+1, 1, "");
+    generalList->SetItemFont(generalBaseItemCount+sceneVariables.size()+1, font);
+    generalBaseAndVariablesItemCount = generalBaseItemCount+sceneVariables.size()+2;
 
     //Update global variables
-    for (unsigned int i =0;i<scene.game->variables.variables.size();++i)
+    for (unsigned int i =0;i<gameVariables.size();++i)
     {
-        generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, scene.game->variables.variables[i].GetName());
-        generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, scene.game->variables.variables[i].Gettexte());
+        generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, gameVariables[i].GetName());
+        generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, gameVariables[i].Gettexte());
         generalList->SetItemFont(generalBaseAndVariablesItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -390,21 +393,22 @@ void DebuggerGUI::UpdateGUI()
 
     currentLine += 2; //We have two lines to jump for "Variables"
 
+    const vector < Variable > objectVariables = allObjects[idObject]->variablesObjet.GetVariablesVector();
     //Suppression des lignes en trop pour les variables
-    while(objectList->GetItemCount() > baseItemCount+allObjects[idObject]->variablesObjet.variables.size())
-        objectList->DeleteItem(baseItemCount+allObjects[idObject]->variablesObjet.variables.size());
+    while(objectList->GetItemCount() > baseItemCount+objectVariables.size())
+        objectList->DeleteItem(baseItemCount+objectVariables.size());
 
     //Rajout si au contraire il n'y en a pas assez
-    while(objectList->GetItemCount() < baseItemCount+allObjects[idObject]->variablesObjet.variables.size())
+    while(objectList->GetItemCount() < baseItemCount+objectVariables.size())
     {
         objectList->InsertItem(baseItemCount, "");
     }
 
     //Mise à jour des variables
-    for (unsigned int i =0;i<allObjects[idObject]->variablesObjet.variables.size();++i)
+    for (unsigned int i =0;i<objectVariables.size();++i)
     {
-        objectList->SetItem(baseItemCount+i, 0, allObjects[idObject]->variablesObjet.variables[i].GetName());
-        objectList->SetItem(baseItemCount+i, 1, allObjects[idObject]->variablesObjet.variables[i].Gettexte());
+        objectList->SetItem(baseItemCount+i, 0, objectVariables[i].GetName());
+        objectList->SetItem(baseItemCount+i, 1, objectVariables[i].Gettexte());
     }
 }
 
@@ -505,15 +509,16 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     }
     else //Or a variable
     {
+        const vector < Variable > objectVariables = allObjects[idObject]->variablesObjet.GetVariablesVector();
         int idVariable = event.GetIndex() - ( 1+allObjects[idObject]->Object::GetNumberOfProperties()
                                               +2+allObjects[idObject]->GetNumberOfProperties()
                                               +2);
 
-        if ( idVariable >= 0 && idVariable < allObjects[idObject]->variablesObjet.variables.size() )
+        if ( idVariable >= 0 && idVariable < objectVariables.size() )
         {
-            string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une variable"), allObjects[idObject]->variablesObjet.variables[idVariable].Gettexte()).mb_str());
+            string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une variable"), objectVariables[idVariable].Gettexte()).mb_str());
 
-            allObjects[idObject]->variablesObjet.variables[idVariable] = newValue;
+            allObjects[idObject]->variablesObjet.ObtainVariable(objectVariables[idVariable].GetName()) = newValue;
         }
     }
 
@@ -524,23 +529,26 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
  */
 void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
 {
-    if ( event.GetIndex() < (generalBaseItemCount + scene.variables.variables.size()))
+    const vector < Variable > sceneVariables = scene.variables.GetVariablesVector();
+    const vector < Variable > gameVariables = scene.game->variables.GetVariablesVector();
+
+    if ( event.GetIndex() < (generalBaseItemCount + sceneVariables.size()))
     {
         int id = event.GetIndex() - ( generalBaseItemCount );
-        if (id < 0 || id > scene.variables.variables.size())
+        if (id < 0 || id > sceneVariables.size())
             return;
 
-        string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), scene.variables.variables[id].Gettexte()).mb_str());
-        scene.variables.variables[id].Settexte(newValue);
+        string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), sceneVariables[id].Gettexte()).mb_str());
+        scene.variables.ObtainVariable(sceneVariables[id].GetName()).Settexte(newValue);
     }
-    else if ( event.GetIndex() < ( generalBaseAndVariablesItemCount + scene.game->variables.variables.size()) )
+    else if ( event.GetIndex() < ( generalBaseAndVariablesItemCount + gameVariables.size()) )
     {
         int id = event.GetIndex() - ( generalBaseAndVariablesItemCount );
-        if (id < 0 || id > scene.game->variables.variables.size())
+        if (id < 0 || id > gameVariables.size())
             return;
 
-        string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"),scene.game->variables.variables[id].Gettexte()).mb_str());
-        scene.game->variables.variables[id].Settexte(newValue);
+        string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"),gameVariables[id].Gettexte()).mb_str());
+        scene.game->variables.ObtainVariable(gameVariables[id].GetName()).Settexte(newValue);
     }
 }
 
@@ -569,8 +577,7 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
     string variableName = string(wxGetTextFromUser(_("Entrez le nom de la nouvelle variable"), _("Ajout d'une variable de la scène")).mb_str());
 
     if ( variableName == "" ) return;
-
-    if ( scene.variables.FindVariable(variableName) != -1)
+    if ( scene.variables.HasVariable(variableName) )
     {
         wxLogMessage(_("Une variable avec ce nom existe déjà"));
         return;
@@ -578,9 +585,7 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
 
     string variableValue = string(wxGetTextFromUser(_("Entrez la valeur de la variable"), _("Ajout d'une variable de la scène")).mb_str());
 
-    Variable variable(variableName);
-    variable = variableValue;
-    scene.variables.variables.push_back(variable);
+    scene.variables.ObtainVariable(variableName) = variableValue;
 }
 
 /**
@@ -591,8 +596,7 @@ void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
     string variableName = string(wxGetTextFromUser(_("Entrez le nom de la nouvelle variable"), _("Ajout d'une variable globale")).mb_str());
 
     if ( variableName == "" ) return;
-
-    if ( scene.game->variables.FindVariable(variableName) != -1)
+    if ( scene.game->variables.HasVariable(variableName) )
     {
         wxLogMessage(_("Une variable avec ce nom existe déjà"));
         return;
@@ -600,9 +604,7 @@ void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
 
     string variableValue = string(wxGetTextFromUser(_("Entrez la valeur de la variable"), _("Ajout d'une variable globale")).mb_str());
 
-    Variable variable(variableName);
-    variable = variableValue;
-    scene.game->variables.variables.push_back(variable);
+    scene.game->variables.ObtainVariable(variableName) = variableValue;
 }
 
 void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )

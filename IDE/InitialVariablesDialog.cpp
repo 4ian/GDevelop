@@ -141,11 +141,12 @@ void InitialVariablesDialog::OntoolbarPanelResize(wxSizeEvent& event)
 void InitialVariablesDialog::Refresh()
 {
     variablesList->DeleteAllItems();
+    const vector<Variable> & variablesVector = variables.GetVariablesVector();
 
-    for (unsigned int i = 0;i<variables.variables.size();++i)
+    for (unsigned int i = 0;i<variablesVector.size();++i)
     {
-    	variablesList->InsertItem(i, variables.variables[i].GetName());
-    	variablesList->SetItem(i, 1, variables.variables[i].Gettexte());
+    	variablesList->InsertItem(i, variablesVector[i].GetName());
+    	variablesList->SetItem(i, 1, variablesVector[i].Gettexte());
     }
 }
 
@@ -169,13 +170,13 @@ void InitialVariablesDialog::OnAddVarSelected(wxCommandEvent& event)
     if ( variableName == "" )
         return;
 
-    if ( variables.FindVariable(variableName) != -1 )
+    if ( variables.HasVariable(variableName) )
     {
         wxLogMessage(_("Une variable portant ce nom existe déjà."));
         return;
     }
 
-    variables.variables.push_back(Variable(variableName));
+    variables.ObtainVariable(variableName);
     Refresh();
 }
 
@@ -184,17 +185,14 @@ void InitialVariablesDialog::OnAddVarSelected(wxCommandEvent& event)
  */
 void InitialVariablesDialog::OnDelVarSelected(wxCommandEvent& event)
 {
-    for (unsigned int i = 0;i<variables.variables.size();++i)
+    if ( !variables.HasVariable(selectedVariable) )
     {
-    	if ( variables.variables[i].GetName() == selectedVariable)
-    	{
-    	    variables.variables.erase(variables.variables.begin() + i);
-
-    	    Refresh();
-    	    return;
-    	}
+        wxLogMessage(_("Impossible de trouver la variable à supprimer"));
+        return;
     }
-    wxLogMessage(_("Impossible de trouver la variable à supprimer"));
+
+    variables.RemoveVariable(selectedVariable);
+    Refresh();
 }
 
 /**
@@ -202,18 +200,17 @@ void InitialVariablesDialog::OnDelVarSelected(wxCommandEvent& event)
  */
 void InitialVariablesDialog::OnEditVarSelected(wxCommandEvent& event)
 {
-    for (unsigned int i = 0;i<variables.variables.size();++i)
+    if ( !variables.HasVariable(selectedVariable) )
     {
-    	if ( variables.variables[i].GetName() == selectedVariable)
-    	{
-            string value = string(wxGetTextFromUser("Entrez la valeur initiale de la variable", "Valueur initiale").mb_str());
-            variables.variables[i].Settexte(value);
-
-    	    Refresh();
-    	    return;
-    	}
+        wxLogMessage(_("Impossible de trouver la variable à éditer"));
+        return;
     }
-    wxLogMessage(_("Impossible de trouver la variable à éditer"));
+
+    string value = string(wxGetTextFromUser("Entrez la valeur initiale de la variable", "Valeur initiale").mb_str());
+    variables.ObtainVariable(selectedVariable).Settexte(value);
+
+    Refresh();
+    return;
 }
 
 /**

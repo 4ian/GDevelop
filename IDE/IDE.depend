@@ -118,7 +118,7 @@
 
 1253308487 c:\libs\wxwidgets\include\wx\osx\config_xcode.h
 
-1253308462 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
+1253308462 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
 1253308518 c:\libs\wxwidgets\include\wx\setup_gccxml.h
 
@@ -6608,12 +6608,12 @@
 1264364228 c:\users\florian\programmation\gamedevelop\gdl\gdl\point.h
 	<string>
 
-1267736449 c:\users\florian\programmation\gamedevelop\gdl\gdl\listvariable.h
+1270314268 c:\users\florian\programmation\gamedevelop\gdl\gdl\listvariable.h
 	<vector>
 	<string>
 	"GDL/Variable.h"
 
-1264364229 c:\users\florian\programmation\gamedevelop\gdl\gdl\variable.h
+1270306991 c:\users\florian\programmation\gamedevelop\gdl\gdl\variable.h
 	<string>
 	<iostream>
 
@@ -8903,7 +8903,7 @@
 	<vector>
 	<stdio.h>
 
-1265747115 source:c:\users\florian\programmation\gamedevelop\ide\choixvariabledialog.cpp
+1270314493 source:c:\users\florian\programmation\gamedevelop\ide\choixvariabledialog.cpp
 	"ChoixVariableDialog.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -9139,7 +9139,7 @@
 1264364131 source:c:\users\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
 
-1266328160 source:c:\users\florian\programmation\gamedevelop\ide\debuggergui.cpp
+1270318289 source:c:\users\florian\programmation\gamedevelop\ide\debuggergui.cpp
 	"DebuggerGUI.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -10086,45 +10086,10 @@
 	"GDL/Game.h"
 	"GDL/Scene.h"
 
-1269195549 source:c:\users\florian\programmation\gamedevelop\ide\editorevents.cpp
-	"debugMem.h"
-	"CppUnitLite/TestHarness.h"
+1268249144 source:c:\users\florian\programmation\gamedevelop\ide\editoreventsactions.cpp
 	"EditorEvents.h"
-	<wx/bitmap.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/config.h>
-	<wx/gdicmn.h>
-	<wx/image.h>
-	<wx/bitmap.h>
-	<wx/statbmp.h>
-	<wx/settings.h>
-	<wx/log.h>
-	<wx/config.h>
-	<wx/help.h>
-	<wx/dc.h>
-	<wx/dcbuffer.h>
-	"Game_Develop_EditorMain.h"
-	"GDL/Game.h"
-	"TranslateCondition.h"
-	"TranslateAction.h"
-	<wx/msw/winundef.h>
-	"MemTrace.h"
-	"ChoixTemplateEvent.h"
-	"EditCommentaire.h"
-	"EditDossier.h"
-	"DossierRenderer.h"
-	"LinkRenderer.h"
-	"EditLink.h"
-	"CreateTemplate.h"
-	"CommentaireRenderer.h"
-	"EventRenderer.h"
+	"ChoixAction.h"
 	"Clipboard.h"
-	"GDL/StdAlgo.h"
-	"GDL/HelpFileAccess.h"
-	<time.h>
-	<gtk/gtk.h>
 
 1268340903 c:\users\florian\programmation\gamedevelop\ide\editorevents.h
 	<wx/sizer.h>
@@ -10154,28 +10119,6 @@
 	<string>
 	<vector>
 	"GDL/Event.h"
-
-1264364132 c:\users\florian\programmation\gamedevelop\ide\dossierrenderer.h
-
-1267896482 c:\users\florian\programmation\gamedevelop\ide\linkrenderer.h
-	"GDL/Event.h"
-	"Renderer.h"
-	<wx/dc.h>
-	<wx/dcbuffer.h>
-	"EventsRendererDatas.h"
-
-1268244495 c:\users\florian\programmation\gamedevelop\ide\eventrenderer.h
-	"GDL/Event.h"
-	<wx/dc.h>
-	<wx/dcbuffer.h>
-	<wx/html/htmprint.h>
-	"Renderer.h"
-	"EventsRendererDatas.h"
-
-1268249144 source:c:\users\florian\programmation\gamedevelop\ide\editoreventsactions.cpp
-	"EditorEvents.h"
-	"ChoixAction.h"
-	"Clipboard.h"
 
 1268249144 source:c:\users\florian\programmation\gamedevelop\ide\editoreventsconditions.cpp
 	"EditorEvents.h"
@@ -10221,7 +10164,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1267824000 source:c:\users\florian\programmation\gamedevelop\ide\editorobjectlist.cpp
+1270318867 source:c:\users\florian\programmation\gamedevelop\ide\editorobjectlist.cpp
 	"EditorObjectList.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -10411,6 +10354,14 @@
 	"TranslateCondition.h"
 	"TranslateAction.h"
 
+1268244495 c:\users\florian\programmation\gamedevelop\ide\eventrenderer.h
+	"GDL/Event.h"
+	<wx/dc.h>
+	<wx/dcbuffer.h>
+	<wx/html/htmprint.h>
+	"Renderer.h"
+	"EventsRendererDatas.h"
+
 1253308522 c:\libs\wxwidgets\include\wx\fs_mem.h
 	"wx/defs.h"
 	"wx/filesys.h"
@@ -10484,7 +10435,965 @@
 	<iostream>
 	<wx/dcbuffer.h>
 
-1268505834 source:c:\users\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
+1266970010 source:c:\users\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
+	"debugMem.h"
+	"MemTrace.h"
+	"nommgr.h"
+	<SFML/Graphics.hpp>
+	<wx/bitmap.h>
+	<wx/icon.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	"wx/aui/aui.h"
+	<wx/textctrl.h>
+	<wx/toolbar.h>
+	<wx/imaglist.h>
+	<wx/fileconf.h>
+	<wx/filename.h>
+	<wx/config.h>
+	<wx/msgdlg.h>
+	<wx/log.h>
+	<wx/fileconf.h>
+	<wx/artprov.h>
+	<wx/ribbon/bar.h>
+	<wx/ribbon/buttonbar.h>
+	<wx/ribbon/gallery.h>
+	<wx/ribbon/toolbar.h>
+	<iostream>
+	<string>
+	<list>
+	<sstream>
+	"wxSFMLCanvas.hpp"
+	"GDAuiTabArt.h"
+	<wx/msw/winundef.h>
+	"Game_Develop_EditorMain.h"
+	"GDL/StdAlgo.h"
+	"GDL/ChercherScene.h"
+	"GDL/OpenSaveGame.h"
+	"GDL/EditorImages.h"
+	"ChoixObjet.h"
+	"MyStatusBar.h"
+	"EditorObjets.h"
+	"EditorEvents.h"
+	"EditorScene.h"
+	"EditorObjectList.h"
+	"DnDFileEditor.h"
+	"ConsoleManager.h"
+	"ProjectManager.h"
+	"StartHerePage.h"
+
+1264364134 c:\users\florian\programmation\gamedevelop\ide\mystatusbar.h
+	<wx/app.h>
+	<wx/log.h>
+	<wx/frame.h>
+	<wx/statusbr.h>
+	<wx/timer.h>
+	<wx/checkbox.h>
+	<wx/statbmp.h>
+	<wx/menu.h>
+	<wx/msgdlg.h>
+	<wx/textdlg.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/bmpbuttn.h>
+	<wx/dcmemory.h>
+	<wx/datetime.h>
+	<wx/numdlg.h>
+	<wx/mdi.h>
+	"green.xpm"
+	"red.xpm"
+
+1253308522 c:\libs\wxwidgets\include\wx\numdlg.h
+	"wx/defs.h"
+	"wx/generic/numdlgg.h"
+
+1253308506 c:\libs\wxwidgets\include\wx\generic\numdlgg.h
+	"wx/defs.h"
+	"wx/dialog.h"
+
+1266939686 c:\users\florian\programmation\gamedevelop\ide\projectmanager.h
+	<wx/treectrl.h>
+	<wx/sizer.h>
+	<wx/menu.h>
+	<wx/panel.h>
+	<string>
+	<wx/ribbon/bar.h>
+	<wx/ribbon/buttonbar.h>
+	<wx/ribbon/gallery.h>
+	<wx/ribbon/toolbar.h>
+
+1266859991 c:\users\florian\programmation\gamedevelop\ide\startherepage.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+
+1264364131 source:c:\users\florian\programmation\gamedevelop\ide\generatepassword.cpp
+	"GeneratePassword.h"
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<string>
+	<SFML/System.hpp>
+
+1264364134 source:c:\users\florian\programmation\gamedevelop\ide\imageeditor.cpp
+	"ImageEditor.h"
+	<wx/intl.h>
+	<wx/string.h>
+
+1264364130 c:\users\florian\programmation\gamedevelop\ide\imageeditor.h
+	<wx/frame.h>
+
+1264366797 source:c:\users\florian\programmation\gamedevelop\ide\importimage.cpp
+	"ImportImage.h"
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/filedlg.h>
+	<wx/log.h>
+	<wx/animate.h>
+	<wx/animate.h>
+	<wx/filename.h>
+	"GDL/StdAlgo.h"
+
+1264364133 c:\users\florian\programmation\gamedevelop\ide\importimage.h
+	<wx/notebook.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/checkbox.h>
+	<wx/statline.h>
+	<wx/colordlg.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+
+1253308518 c:\libs\wxwidgets\include\wx\animate.h
+	"wx/defs.h"
+	"wx/animdecod.h"
+	"wx/control.h"
+	"wx/timer.h"
+	"wx/bitmap.h"
+	"wx/gtk/animate.h"
+	"wx/generic/animate.h"
+
+1253308524 c:\libs\wxwidgets\include\wx\animdecod.h
+	"wx/defs.h"
+	"wx/colour.h"
+	"wx/gdicmn.h"
+	"wx/log.h"
+	"wx/stream.h"
+
+1253308493 c:\libs\wxwidgets\include\wx\gtk\animate.h
+
+1253308506 c:\libs\wxwidgets\include\wx\generic\animate.h
+	"wx/bitmap.h"
+
+1270326847 source:c:\users\florian\programmation\gamedevelop\ide\initialvariablesdialog.cpp
+	"InitialVariablesDialog.h"
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/bitmap.h>
+	<wx/image.h>
+	<wx/textdlg.h>
+	<wx/log.h>
+	"GDL/ListVariable.h"
+
+1268241981 source:c:\users\florian\programmation\gamedevelop\ide\linkrenderer.cpp
+	"LinkRenderer.h"
+	"GDL/Event.h"
+	<wx/dc.h>
+	<wx/dcbuffer.h>
+	<wx/brush.h>
+	<wx/colour.h>
+	<wx/settings.h>
+	"GDL/StdAlgo.h"
+
+1267896482 c:\users\florian\programmation\gamedevelop\ide\linkrenderer.h
+	"GDL/Event.h"
+	"Renderer.h"
+	<wx/dc.h>
+	<wx/dcbuffer.h>
+	"EventsRendererDatas.h"
+
+1264366798 source:c:\users\florian\programmation\gamedevelop\ide\maj.cpp
+	"MAJ.h"
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/font.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	"CheckMAJ.h"
+	"tinyxml.h"
+	"GDL/StdAlgo.h"
+	"GDL/VersionWrapper.h"
+	<wx/log.h>
+	<wx/mimetype.h>
+
+1264364133 c:\users\florian\programmation\gamedevelop\ide\maj.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+
+1264364131 c:\users\florian\programmation\gamedevelop\ide\checkmaj.h
+
+1264364228 c:\users\florian\programmation\gamedevelop\gdl\gdl\versionwrapper.h
+	<string>
+	<vector>
+
+1267217460 source:c:\users\florian\programmation\gamedevelop\ide\mainaide.cpp
+	"debugMem.h"
+	"MemTrace.h"
+	"Game_Develop_EditorMain.h"
+	<wx/string.h>
+	<wx/mimetype.h>
+	"GDL/HelpFileAccess.h"
+	"Credits.h"
+	"MAJ.h"
+
+1264364134 c:\users\florian\programmation\gamedevelop\ide\credits.h
+	<wx/notebook.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/panel.h>
+	<wx/bmpbuttn.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+
+1269108011 source:c:\users\florian\programmation\gamedevelop\ide\mainfichier.cpp
+	<boost/shared_ptr.hpp>
+	"GDL/OpenSaveGame.h"
+	"GDL/ExtensionsManager.h"
+	"GDL/Game.h"
+	"Game_Develop_EditorMain.h"
+	"Compilation.h"
+	"Portable.h"
+	"Fusion.h"
+	"MessagePlus.h"
+	"ProjectManager.h"
+	"StartHerePage.h"
+
+1264364133 c:\users\florian\programmation\gamedevelop\ide\portable.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<wx/gauge.h>
+	"GDL/Game.h"
+	<string>
+	<vector>
+
+1264364133 c:\users\florian\programmation\gamedevelop\ide\messageplus.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/checkbox.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<string>
+	<vector>
+
+1266444799 source:c:\users\florian\programmation\gamedevelop\ide\mainoptions.cpp
+	"debugMem.h"
+	"MemTrace.h"
+	"Game_Develop_EditorMain.h"
+	"Preferences.h"
+	"wx/aui/aui.h"
+
+1267210401 c:\users\florian\programmation\gamedevelop\ide\preferences.h
+	<wx/notebook.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/radiobox.h>
+	<wx/textctrl.h>
+	<wx/checkbox.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/choice.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<wx/listbook.h>
+
+1253308520 c:\libs\wxwidgets\include\wx\listbook.h
+	"wx/defs.h"
+	"wx/bookctrl.h"
+
+1266788374 source:c:\users\florian\programmation\gamedevelop\ide\mainoutils.cpp
+	"debugMem.h"
+	"MemTrace.h"
+	"Game_Develop_EditorMain.h"
+	"mp3ogg.h"
+	"ConvertJRC.h"
+	"ModeSimple.h"
+	"ImportImage.h"
+
+1264364133 c:\users\florian\programmation\gamedevelop\ide\mp3ogg.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+
+1264364133 c:\users\florian\programmation\gamedevelop\ide\modesimple.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/checkbox.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+
+1264364130 source:c:\users\florian\programmation\gamedevelop\ide\messageplus.cpp
+	"nommgr.h"
+	<wx/artprov.h>
+	<wx/bitmap.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/config.h>
+	<string>
+	<vector>
+	<iostream>
+	"MessagePlus.h"
+
+1264364132 source:c:\users\florian\programmation\gamedevelop\ide\modesimple.cpp
+	"ModeSimple.h"
+	"nommgr.h"
+	<wx/config.h>
+	<wx/log.h>
+	<iostream>
+
+1264364133 source:c:\users\florian\programmation\gamedevelop\ide\mystatusbar.cpp
+	<wx/app.h>
+	<wx/log.h>
+	<wx/frame.h>
+	<wx/statusbr.h>
+	<wx/timer.h>
+	<wx/checkbox.h>
+	<wx/statbmp.h>
+	<wx/menu.h>
+	<wx/msgdlg.h>
+	<wx/textdlg.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/bmpbuttn.h>
+	<wx/dcmemory.h>
+	"MyStatusBar.h"
+	"GDL/BitmapGUIManager.h"
+	<wx/config.h>
+	<wx/datetime.h>
+	<wx/numdlg.h>
+	<wx/mdi.h>
+	"green.xpm"
+	"red.xpm"
+
+1264364133 source:c:\users\florian\programmation\gamedevelop\ide\objecttypechoice.cpp
+	"ObjectTypeChoice.h"
+	<wx/bitmap.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/imaglist.h>
+	<string>
+	<vector>
+	"gdTreeItemStringData.h"
+	"Extensions.h"
+	"GDL/ExtensionsManager.h"
+	"GDL/Game.h"
+
+1264364134 source:c:\users\florian\programmation\gamedevelop\ide\objectsonbadlayerbox.cpp
+	"ObjectsOnBadLayerBox.h"
+	<wx/artprov.h>
+	<wx/bitmap.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	"GDL/Layer.h"
+
+1267228292 source:c:\users\florian\programmation\gamedevelop\ide\playerunittests.cpp
+	"CppUnitLite/TestHarness.h"
+	"GDL/Object.h"
+	"GDL/aMove.h"
+	"GDL/cMove.h"
+	"GDL/Access.h"
+	"GDL/ObjectsConcerned.h"
+	<boost/shared_ptr.hpp>
+	<string>
+	<vector>
+	"GDL/SpriteObject.h"
+	"GDL/Object.h"
+	"GDL/RuntimeGame.h"
+	"windows.h"
+	<wx/msw/winundef.h>
+
+1264364227 c:\users\florian\programmation\gamedevelop\gdl\gdl\amove.h
+	<vector>
+	<string>
+	"GDL/Object.h"
+	<cmath>
+	"GDL/Event.h"
+	<iostream>
+	<sstream>
+	"GDL/Chercher.h"
+	"GDL/algo.h"
+	"GDL/Force.h"
+	<iostream>
+	"GDL/Access.h"
+	"GDL/RuntimeScene.h"
+
+1269379492 c:\users\florian\programmation\gamedevelop\gdl\gdl\access.h
+	"GDL/RuntimeScene.h"
+	"GDL/Game.h"
+
+1264364230 c:\users\florian\programmation\gamedevelop\gdl\gdl\cmove.h
+	<vector>
+	<string>
+	"GDL/Object.h"
+	<cmath>
+	"GDL/Event.h"
+	<iostream>
+	<sstream>
+	"GDL/Chercher.h"
+	"GDL/algo.h"
+	"GDL/Force.h"
+	<iostream>
+	"GDL/Access.h"
+	<SFML/Window.hpp>
+	"GDL/RuntimeScene.h"
+
+1269713045 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
+	"GDL/Object.h"
+	"GDL/ObjectGroup.h"
+	"GDL/ObjectType.h"
+	"GDL/ObjInstancesHolder.h"
+	<boost/shared_ptr.hpp>
+	<string>
+	<vector>
+
+1267283857 source:c:\users\florian\programmation\gamedevelop\ide\portable.cpp
+	"nommgr.h"
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<string>
+	<vector>
+	<wx/dirdlg.h>
+	<wx/log.h>
+	"Portable.h"
+	"GDL/Game.h"
+	"GDL/OpenSaveGame.h"
+
+1269186030 source:c:\users\florian\programmation\gamedevelop\ide\preferences.cpp
+	"Preferences.h"
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/fileconf.h>
+	<wx/filename.h>
+	<wx/config.h>
+	"wx/aui/aui.h"
+	<wx/filedlg.h>
+	<wx/colordlg.h>
+	<wx/help.h>
+	<wx/dirdlg.h>
+	<wx/log.h>
+	"GDL/HelpFileAccess.h"
+	<string>
+	<vector>
+	<iostream>
+
+1267296495 source:c:\users\florian\programmation\gamedevelop\ide\projectmanager.cpp
+	"ProjectManager.h"
+	<wx/bitmap.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/ribbon/bar.h>
+	<wx/ribbon/buttonbar.h>
+	<wx/ribbon/gallery.h>
+	<wx/ribbon/toolbar.h>
+	"Clipboard.h"
+	"Game_Develop_EditorMain.h"
+	"gdTreeItemGameData.h"
+	"GDL/ChercherScene.h"
+	"Extensions.h"
+	"EditPropJeu.h"
+	"InitialVariablesDialog.h"
+	"EditPropScene.h"
+
+1266534451 c:\users\florian\programmation\gamedevelop\ide\gdtreeitemgamedata.h
+	<string>
+	<wx/treectrl.h>
+
+1264364132 source:c:\users\florian\programmation\gamedevelop\ide\recentlist.cpp
+	"RecentList.h"
+
+1266012840 source:c:\users\florian\programmation\gamedevelop\ide\renderdialog.cpp
+	"RenderDialog.h"
+	<wx/intl.h>
+	<wx/string.h>
+	<iostream>
+
+1268242135 source:c:\users\florian\programmation\gamedevelop\ide\renderer.cpp
+	"Renderer.h"
+
+1269193458 source:c:\users\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+	"SceneCanvas.h"
+	<string>
+	<SFML/System.hpp>
+	<iostream>
+	<SFML/Graphics.hpp>
+	<vector>
+	<string>
+	"GDL/Object.h"
+	<cmath>
+	"GDL/Collisions.h"
+	"GDL/Event.h"
+	<iostream>
+	<sstream>
+	"GDL/Chercher.h"
+	"GDL/algo.h"
+	"GDL/StdAlgo.h"
+	"EditOptionsPosition.h"
+	<wx/log.h>
+	<wx/scrolbar.h>
+	<wx/msw/winundef.h>
+	"GDL/RuntimeScene.h"
+	"GDL/AppelEvent.h"
+	"GDL/Chercher.h"
+	"GDL/ExtensionsManager.h"
+	"GDL/ImageManager.h"
+	"GDL/RuntimeGame.h"
+	"DndTextSceneEditor.h"
+	<wx/cursor.h>
+
+1267819725 c:\users\florian\programmation\gamedevelop\gdl\gdl\appelevent.h
+	<SFML/System.hpp>
+	<iostream>
+	<SFML/Graphics.hpp>
+	<vector>
+	<string>
+	"GDL/Object.h"
+	<cmath>
+	"GDL/Event.h"
+	<iostream>
+	<sstream>
+	"GDL/Chercher.h"
+	"GDL/algo.h"
+	"GDL/Force.h"
+	"GDL/MemTrace.h"
+	"GDL/RuntimeScene.h"
+	"GDL/Access.h"
+
+1264364134 source:c:\users\florian\programmation\gamedevelop\ide\searchevents.cpp
+	"SearchEvents.h"
+	<wx/intl.h>
+	<wx/string.h>
+	<string>
+	<vector>
+	"GDL/Event.h"
+
+1264364133 source:c:\users\florian\programmation\gamedevelop\ide\signemodification.cpp
+	"SigneModification.h"
+	<wx/intl.h>
+	<wx/string.h>
+
+1264364132 source:c:\users\florian\programmation\gamedevelop\ide\signetest.cpp
+	"SigneTest.h"
+	<wx/intl.h>
+	<wx/string.h>
+
+1264364134 source:c:\users\florian\programmation\gamedevelop\ide\splashscreen.cpp
+	"nommgr.h"
+	<wx/dcclient.h>
+	<wx/dcmemory.h>
+	<wx/dcscreen.h>
+	"SplashScreen.h"
+
+1264364130 c:\users\florian\programmation\gamedevelop\ide\splashscreen.h
+	"nommgr.h"
+	<wx/bitmap.h>
+	<wx/dc.h>
+	<wx/timer.h>
+	<wx/frame.h>
+
+1267217460 source:c:\users\florian\programmation\gamedevelop\ide\startherepage.cpp
+	"StartHerePage.h"
+	<wx/bitmap.h>
+	<wx/font.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/config.h>
+	"GDL/HelpFileAccess.h"
+	<wx/mimetype.h>
+	"Game_Develop_EditorMain.h"
+
+1264364130 source:c:\users\florian\programmation\gamedevelop\ide\templateevents.cpp
+	"TemplateEvents.h"
+
+1264366798 source:c:\users\florian\programmation\gamedevelop\ide\translateaction.cpp
+	"debugMem.h"
+	"CppUnitLite/TestHarness.h"
+	"TranslateAction.h"
+	<string>
+	<vector>
+	<sstream>
+	<wx/log.h>
+	"MemTrace.h"
+	"GDL/StdAlgo.h"
+	"GDL/BitmapGUIManager.h"
+	"GDL/ExtensionBase.h"
+	"tinyxml.h"
+	<wx/wx.h>
+	<wx/bitmap.h>
+	<iostream>
+	<map>
+
+1264366798 source:c:\users\florian\programmation\gamedevelop\ide\translatecondition.cpp
+	"debugMem.h"
+	"nommgr.h"
+	"CppUnitLite/TestHarness.h"
+	<stdexcept>
+	<iostream>
+	<string>
+	<vector>
+	<wx/log.h>
+	<wx/wx.h>
+	<wx/bitmap.h>
+	"tinyxml.h"
+	"GDL/ExtensionBase.h"
+	"GDL/BitmapGUIManager.h"
+	"TranslateCondition.h"
+	"MemTrace.h"
+	"GDL/StdAlgo.h"
+
+1264364133 source:c:\users\florian\programmation\gamedevelop\ide\trueorfalse.cpp
+	"TrueOrFalse.h"
+	<wx/artprov.h>
+	<wx/bitmap.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+
+1264364130 source:c:\users\florian\programmation\gamedevelop\ide\debugmem.cpp
+	<list>
+	<iostream>
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+
+1266533959 source:c:\users\florian\programmation\gamedevelop\ide\gdtreeitemgamedata.cpp
+
+1266533959 source:c:\users\florian\programmation\gamedevelop\ide\gdtreeitemstringdata.cpp
+
+1264366798 source:c:\users\florian\programmation\gamedevelop\ide\gridsetup.cpp
+	"GridSetup.h"
+	<wx/intl.h>
+	<wx/string.h>
+	<wx/colordlg.h>
+	<wx/log.h>
+	"GDL/StdAlgo.h"
+
+1264364130 source:c:\users\florian\programmation\gamedevelop\ide\mp3ogg.cpp
+	"nommgr.h"
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/filedlg.h>
+	<wx/log.h>
+	<string>
+	<vector>
+	<wx/filename.h>
+	"mp3ogg.h"
+
+1266073934 source:c:\users\florian\programmation\gamedevelop\ide\resource.rc
+	"wx/msw/rcdefs.h"
+	"version.h"
+
+1253437186 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\msw\rcdefs.h
+
+1270381721 c:\users\florian\programmation\gamedevelop\ide\version.h
+
+1265566981 source:c:\users\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
+	"wxSFMLCanvas.hpp"
+	<gdk/gdkx.h>
+	<gtk/gtk.h>
+	<wx/gtk/win_gtk.h>
+	<iostream>
+
+1264364134 source:c:\users\florian\programmation\gamedevelop\ide\checkmaj.cpp
+	"nommgr.h"
+	<wx/log.h>
+	<wx/wx.h>
+	"wx/msgdlg.h"
+	<wx/protocol/http.h>
+	<wx/url.h>
+	<wx/wfstream.h>
+	<string>
+	<vector>
+	<iostream>
+	<fstream>
+	"SFML/Network.hpp"
+	"tinyxml.h"
+	"GDL/VersionWrapper.h"
+	"CheckMAJ.h"
+	"MAJ.h"
+
+1253308450 c:\libs\wxwidgets\include\wx\protocol\http.h
+	"wx/defs.h"
+	"wx/hashmap.h"
+	"wx/protocol/protocol.h"
+
+1253308450 c:\libs\wxwidgets\include\wx\protocol\protocol.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/stream.h"
+	"wx/socket.h"
+
+1253308520 c:\libs\wxwidgets\include\wx\socket.h
+	"wx/defs.h"
+	"wx/event.h"
+	"wx/sckaddr.h"
+	"wx/list.h"
+
+1253308525 c:\libs\wxwidgets\include\wx\sckaddr.h
+	"wx/defs.h"
+	"wx/string.h"
+
+1253308527 c:\libs\wxwidgets\include\wx\url.h
+	"wx/defs.h"
+	"wx/uri.h"
+	"wx/protocol/protocol.h"
+	"wx/protocol/http.h"
+
+1253308522 c:\libs\wxwidgets\include\wx\uri.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/arrstr.h"
+
+1253308518 c:\libs\wxwidgets\include\wx\wfstream.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/stream.h"
+	"wx/file.h"
+	"wx/ffile.h"
+
+1253308520 c:\libs\wxwidgets\include\wx\ffile.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/filefn.h"
+	"wx/convauto.h"
+	<stdio.h>
+
+1268481809 c:\libs\sfml\include\sfml\network.hpp
+	<SFML/System.hpp>
+	<SFML/Network/Ftp.hpp>
+	<SFML/Network/Http.hpp>
+	<SFML/Network/IpAddress.hpp>
+	<SFML/Network/Packet.hpp>
+	<SFML/Network/Selector.hpp>
+	<SFML/Network/SocketTCP.hpp>
+	<SFML/Network/SocketUDP.hpp>
+
+1268481809 c:\libs\sfml\include\sfml\network\ftp.hpp
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Network/SocketTCP.hpp>
+	<string>
+	<vector>
+
+1268481809 c:\libs\sfml\include\sfml\network\sockettcp.hpp
+	<SFML/Network/SocketHelper.hpp>
+	<vector>
+
+1244728046 c:\libs\sfml\include\sfml\network\sockethelper.hpp
+	<SFML/Config.hpp>
+	<SFML/Network/Win32/SocketHelper.hpp>
+	<SFML/Network/Unix/SocketHelper.hpp>
+
+1248634794 c:\libs\sfml\include\sfml\network\win32\sockethelper.hpp
+	<winsock2.h>
+
+1244728046 c:\libs\sfml\include\sfml\network\unix\sockethelper.hpp
+	<sys/types.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<netdb.h>
+	<unistd.h>
+
+1268481809 c:\libs\sfml\include\sfml\network\http.hpp
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Network/IpAddress.hpp>
+	<SFML/Network/SocketTCP.hpp>
+	<map>
+	<string>
+
+1268481809 c:\libs\sfml\include\sfml\network\ipaddress.hpp
+	<SFML/Config.hpp>
+	<istream>
+	<ostream>
+	<string>
+
+1259264901 c:\libs\sfml\include\sfml\network\packet.hpp
+	<SFML/Config.hpp>
+	<string>
+	<vector>
+
+1259350652 c:\libs\sfml\include\sfml\network\selector.hpp
+	<SFML/Network/SocketUDP.hpp>
+	<SFML/Network/SocketTCP.hpp>
+	<SFML/Network/SelectorBase.hpp>
+	<map>
+	<SFML/Network/Selector.inl>
+
+1268481809 c:\libs\sfml\include\sfml\network\socketudp.hpp
+	<SFML/Network/SocketHelper.hpp>
+	<vector>
+
+1259350652 c:\libs\sfml\include\sfml\network\selectorbase.hpp
+	<SFML/Config.hpp>
+	<SFML/Network/SocketHelper.hpp>
+	<map>
+
+1259350652 c:\libs\sfml\include\sfml\network\selector.inl
+
+1264364132 source:c:\users\florian\programmation\gamedevelop\ide\bugreport.cpp
+	"BugReport.h"
+	<wx/artprov.h>
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/font.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/textfile.h>
+	"GDL/VersionWrapper.h"
+	<string>
+	<vector>
+	<iostream>
+	<wx/wfstream.h>
+	<wx/txtstrm.h>
+
+1264364134 c:\users\florian\programmation\gamedevelop\ide\bugreport.h
+	<wx/notebook.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+
+1253308523 c:\libs\wxwidgets\include\wx\txtstrm.h
+	"wx/stream.h"
+	"wx/convauto.h"
+
+1267300287 source:c:\users\florian\programmation\gamedevelop\ide\credits.cpp
+	"Credits.h"
+	<wx/bitmap.h>
+	<wx/font.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/mimetype.h>
+	"GDL/VersionWrapper.h"
+	<string>
+	<vector>
+	<iostream>
+
+1264364129 source:c:\users\florian\programmation\gamedevelop\ide\compilationchecker.cpp
+	"CompilationChecker.h"
+	"GDL/Version.h"
+	"GDL/VersionWrapper.h"
+	"GDL/StdAlgo.h"
+
+1264364134 c:\users\florian\programmation\gamedevelop\ide\compilationchecker.h
+
+1270314043 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
+
+1270381690 source:c:\users\florian\programmation\gamedevelop\ide\editorevents.cpp
+	"debugMem.h"
+	"CppUnitLite/TestHarness.h"
+	"EditorEvents.h"
+	<wx/bitmap.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/config.h>
+	<wx/gdicmn.h>
+	<wx/image.h>
+	<wx/bitmap.h>
+	<wx/statbmp.h>
+	<wx/settings.h>
+	<wx/log.h>
+	<wx/config.h>
+	<wx/help.h>
+	<wx/dc.h>
+	<wx/dcbuffer.h>
+	"Game_Develop_EditorMain.h"
+	"GDL/Game.h"
+	"TranslateCondition.h"
+	"TranslateAction.h"
+	<wx/msw/winundef.h>
+	"MemTrace.h"
+	"ChoixTemplateEvent.h"
+	"EditCommentaire.h"
+	"EditDossier.h"
+	"DossierRenderer.h"
+	"LinkRenderer.h"
+	"EditLink.h"
+	"CreateTemplate.h"
+	"CommentaireRenderer.h"
+	"EventRenderer.h"
+	"Clipboard.h"
+	"GDL/StdAlgo.h"
+	"GDL/HelpFileAccess.h"
+	<time.h>
+	<gtk/gtk.h>
+
+1264364132 c:\users\florian\programmation\gamedevelop\ide\dossierrenderer.h
+
+1270381721 source:c:\users\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
 	"debugMem.h"
 	<wx/msw/winundef.h>
 	<wx/image.h>
@@ -10528,40 +11437,6 @@
 	"GDL/ExtensionsManager.h"
 	"GDL/SpriteExtension.h"
 	"GDL/ExtensionsLoader.h"
-
-1253308527 c:\libs\wxwidgets\include\wx\url.h
-	"wx/defs.h"
-	"wx/uri.h"
-	"wx/protocol/protocol.h"
-	"wx/protocol/http.h"
-
-1253308522 c:\libs\wxwidgets\include\wx\uri.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/string.h"
-	"wx/arrstr.h"
-
-1253308450 c:\libs\wxwidgets\include\wx\protocol\protocol.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/string.h"
-	"wx/stream.h"
-	"wx/socket.h"
-
-1253308520 c:\libs\wxwidgets\include\wx\socket.h
-	"wx/defs.h"
-	"wx/event.h"
-	"wx/sckaddr.h"
-	"wx/list.h"
-
-1253308525 c:\libs\wxwidgets\include\wx\sckaddr.h
-	"wx/defs.h"
-	"wx/string.h"
-
-1253308450 c:\libs\wxwidgets\include\wx\protocol\http.h
-	"wx/defs.h"
-	"wx/hashmap.h"
-	"wx/protocol/protocol.h"
 
 1253308518 c:\libs\wxwidgets\include\wx\splash.h
 	"wx/generic/splash.h"
@@ -12934,885 +13809,10 @@
 	<string>
 	<vector>
 
-1264364131 c:\users\florian\programmation\gamedevelop\ide\checkmaj.h
-
-1264364130 c:\users\florian\programmation\gamedevelop\ide\splashscreen.h
-	"nommgr.h"
-	<wx/bitmap.h>
-	<wx/dc.h>
-	<wx/timer.h>
-	<wx/frame.h>
-
-1264364134 c:\users\florian\programmation\gamedevelop\ide\bugreport.h
-	<wx/notebook.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-
-1264364134 c:\users\florian\programmation\gamedevelop\ide\compilationchecker.h
-
 1264364229 c:\users\florian\programmation\gamedevelop\gdl\gdl\fontmanager.h
 	<SFML/Graphics.hpp>
 	<string>
 	<vector>
 
 1264364229 c:\users\florian\programmation\gamedevelop\gdl\gdl\spriteextension.h
-
-1266970010 source:c:\users\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
-	"debugMem.h"
-	"MemTrace.h"
-	"nommgr.h"
-	<SFML/Graphics.hpp>
-	<wx/bitmap.h>
-	<wx/icon.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	"wx/aui/aui.h"
-	<wx/textctrl.h>
-	<wx/toolbar.h>
-	<wx/imaglist.h>
-	<wx/fileconf.h>
-	<wx/filename.h>
-	<wx/config.h>
-	<wx/msgdlg.h>
-	<wx/log.h>
-	<wx/fileconf.h>
-	<wx/artprov.h>
-	<wx/ribbon/bar.h>
-	<wx/ribbon/buttonbar.h>
-	<wx/ribbon/gallery.h>
-	<wx/ribbon/toolbar.h>
-	<iostream>
-	<string>
-	<list>
-	<sstream>
-	"wxSFMLCanvas.hpp"
-	"GDAuiTabArt.h"
-	<wx/msw/winundef.h>
-	"Game_Develop_EditorMain.h"
-	"GDL/StdAlgo.h"
-	"GDL/ChercherScene.h"
-	"GDL/OpenSaveGame.h"
-	"GDL/EditorImages.h"
-	"ChoixObjet.h"
-	"MyStatusBar.h"
-	"EditorObjets.h"
-	"EditorEvents.h"
-	"EditorScene.h"
-	"EditorObjectList.h"
-	"DnDFileEditor.h"
-	"ConsoleManager.h"
-	"ProjectManager.h"
-	"StartHerePage.h"
-
-1264364134 c:\users\florian\programmation\gamedevelop\ide\mystatusbar.h
-	<wx/app.h>
-	<wx/log.h>
-	<wx/frame.h>
-	<wx/statusbr.h>
-	<wx/timer.h>
-	<wx/checkbox.h>
-	<wx/statbmp.h>
-	<wx/menu.h>
-	<wx/msgdlg.h>
-	<wx/textdlg.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/bmpbuttn.h>
-	<wx/dcmemory.h>
-	<wx/datetime.h>
-	<wx/numdlg.h>
-	<wx/mdi.h>
-	"green.xpm"
-	"red.xpm"
-
-1253308522 c:\libs\wxwidgets\include\wx\numdlg.h
-	"wx/defs.h"
-	"wx/generic/numdlgg.h"
-
-1253308506 c:\libs\wxwidgets\include\wx\generic\numdlgg.h
-	"wx/defs.h"
-	"wx/dialog.h"
-
-1266939686 c:\users\florian\programmation\gamedevelop\ide\projectmanager.h
-	<wx/treectrl.h>
-	<wx/sizer.h>
-	<wx/menu.h>
-	<wx/panel.h>
-	<string>
-	<wx/ribbon/bar.h>
-	<wx/ribbon/buttonbar.h>
-	<wx/ribbon/gallery.h>
-	<wx/ribbon/toolbar.h>
-
-1266859991 c:\users\florian\programmation\gamedevelop\ide\startherepage.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-
-1264364131 source:c:\users\florian\programmation\gamedevelop\ide\generatepassword.cpp
-	"GeneratePassword.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<string>
-	<SFML/System.hpp>
-
-1264364134 source:c:\users\florian\programmation\gamedevelop\ide\imageeditor.cpp
-	"ImageEditor.h"
-	<wx/intl.h>
-	<wx/string.h>
-
-1264364130 c:\users\florian\programmation\gamedevelop\ide\imageeditor.h
-	<wx/frame.h>
-
-1264366797 source:c:\users\florian\programmation\gamedevelop\ide\importimage.cpp
-	"ImportImage.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/filedlg.h>
-	<wx/log.h>
-	<wx/animate.h>
-	<wx/animate.h>
-	<wx/filename.h>
-	"GDL/StdAlgo.h"
-
-1264364133 c:\users\florian\programmation\gamedevelop\ide\importimage.h
-	<wx/notebook.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/checkbox.h>
-	<wx/statline.h>
-	<wx/colordlg.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-
-1253308518 c:\libs\wxwidgets\include\wx\animate.h
-	"wx/defs.h"
-	"wx/animdecod.h"
-	"wx/control.h"
-	"wx/timer.h"
-	"wx/bitmap.h"
-	"wx/gtk/animate.h"
-	"wx/generic/animate.h"
-
-1253308524 c:\libs\wxwidgets\include\wx\animdecod.h
-	"wx/defs.h"
-	"wx/colour.h"
-	"wx/gdicmn.h"
-	"wx/log.h"
-	"wx/stream.h"
-
-1253308493 c:\libs\wxwidgets\include\wx\gtk\animate.h
-
-1253308506 c:\libs\wxwidgets\include\wx\generic\animate.h
-	"wx/bitmap.h"
-
-1264364130 source:c:\users\florian\programmation\gamedevelop\ide\initialvariablesdialog.cpp
-	"InitialVariablesDialog.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/bitmap.h>
-	<wx/image.h>
-	<wx/textdlg.h>
-	<wx/log.h>
-	"GDL/ListVariable.h"
-
-1268241981 source:c:\users\florian\programmation\gamedevelop\ide\linkrenderer.cpp
-	"LinkRenderer.h"
-	"GDL/Event.h"
-	<wx/dc.h>
-	<wx/dcbuffer.h>
-	<wx/brush.h>
-	<wx/colour.h>
-	<wx/settings.h>
-	"GDL/StdAlgo.h"
-
-1264366798 source:c:\users\florian\programmation\gamedevelop\ide\maj.cpp
-	"MAJ.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/font.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	"CheckMAJ.h"
-	"tinyxml.h"
-	"GDL/StdAlgo.h"
-	"GDL/VersionWrapper.h"
-	<wx/log.h>
-	<wx/mimetype.h>
-
-1264364133 c:\users\florian\programmation\gamedevelop\ide\maj.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-
-1264364228 c:\users\florian\programmation\gamedevelop\gdl\gdl\versionwrapper.h
-	<string>
-	<vector>
-
-1267217460 source:c:\users\florian\programmation\gamedevelop\ide\mainaide.cpp
-	"debugMem.h"
-	"MemTrace.h"
-	"Game_Develop_EditorMain.h"
-	<wx/string.h>
-	<wx/mimetype.h>
-	"GDL/HelpFileAccess.h"
-	"Credits.h"
-	"MAJ.h"
-
-1264364134 c:\users\florian\programmation\gamedevelop\ide\credits.h
-	<wx/notebook.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/panel.h>
-	<wx/bmpbuttn.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-
-1269108011 source:c:\users\florian\programmation\gamedevelop\ide\mainfichier.cpp
-	<boost/shared_ptr.hpp>
-	"GDL/OpenSaveGame.h"
-	"GDL/ExtensionsManager.h"
-	"GDL/Game.h"
-	"Game_Develop_EditorMain.h"
-	"Compilation.h"
-	"Portable.h"
-	"Fusion.h"
-	"MessagePlus.h"
-	"ProjectManager.h"
-	"StartHerePage.h"
-
-1264364133 c:\users\florian\programmation\gamedevelop\ide\portable.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	<wx/gauge.h>
-	"GDL/Game.h"
-	<string>
-	<vector>
-
-1264364133 c:\users\florian\programmation\gamedevelop\ide\messageplus.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/checkbox.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	<string>
-	<vector>
-
-1266444799 source:c:\users\florian\programmation\gamedevelop\ide\mainoptions.cpp
-	"debugMem.h"
-	"MemTrace.h"
-	"Game_Develop_EditorMain.h"
-	"Preferences.h"
-	"wx/aui/aui.h"
-
-1267210401 c:\users\florian\programmation\gamedevelop\ide\preferences.h
-	<wx/notebook.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/radiobox.h>
-	<wx/textctrl.h>
-	<wx/checkbox.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/choice.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	<wx/listbook.h>
-
-1253308520 c:\libs\wxwidgets\include\wx\listbook.h
-	"wx/defs.h"
-	"wx/bookctrl.h"
-
-1266788374 source:c:\users\florian\programmation\gamedevelop\ide\mainoutils.cpp
-	"debugMem.h"
-	"MemTrace.h"
-	"Game_Develop_EditorMain.h"
-	"mp3ogg.h"
-	"ConvertJRC.h"
-	"ModeSimple.h"
-	"ImportImage.h"
-
-1264364133 c:\users\florian\programmation\gamedevelop\ide\mp3ogg.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-
-1264364133 c:\users\florian\programmation\gamedevelop\ide\modesimple.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/checkbox.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-
-1264364130 source:c:\users\florian\programmation\gamedevelop\ide\messageplus.cpp
-	"nommgr.h"
-	<wx/artprov.h>
-	<wx/bitmap.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/config.h>
-	<string>
-	<vector>
-	<iostream>
-	"MessagePlus.h"
-
-1264364132 source:c:\users\florian\programmation\gamedevelop\ide\modesimple.cpp
-	"ModeSimple.h"
-	"nommgr.h"
-	<wx/config.h>
-	<wx/log.h>
-	<iostream>
-
-1264364133 source:c:\users\florian\programmation\gamedevelop\ide\mystatusbar.cpp
-	<wx/app.h>
-	<wx/log.h>
-	<wx/frame.h>
-	<wx/statusbr.h>
-	<wx/timer.h>
-	<wx/checkbox.h>
-	<wx/statbmp.h>
-	<wx/menu.h>
-	<wx/msgdlg.h>
-	<wx/textdlg.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/bmpbuttn.h>
-	<wx/dcmemory.h>
-	"MyStatusBar.h"
-	"GDL/BitmapGUIManager.h"
-	<wx/config.h>
-	<wx/datetime.h>
-	<wx/numdlg.h>
-	<wx/mdi.h>
-	"green.xpm"
-	"red.xpm"
-
-1264364133 source:c:\users\florian\programmation\gamedevelop\ide\objecttypechoice.cpp
-	"ObjectTypeChoice.h"
-	<wx/bitmap.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/imaglist.h>
-	<string>
-	<vector>
-	"gdTreeItemStringData.h"
-	"Extensions.h"
-	"GDL/ExtensionsManager.h"
-	"GDL/Game.h"
-
-1264364134 source:c:\users\florian\programmation\gamedevelop\ide\objectsonbadlayerbox.cpp
-	"ObjectsOnBadLayerBox.h"
-	<wx/artprov.h>
-	<wx/bitmap.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	"GDL/Layer.h"
-
-1267228292 source:c:\users\florian\programmation\gamedevelop\ide\playerunittests.cpp
-	"CppUnitLite/TestHarness.h"
-	"GDL/Object.h"
-	"GDL/aMove.h"
-	"GDL/cMove.h"
-	"GDL/Access.h"
-	"GDL/ObjectsConcerned.h"
-	<boost/shared_ptr.hpp>
-	<string>
-	<vector>
-	"GDL/SpriteObject.h"
-	"GDL/Object.h"
-	"GDL/RuntimeGame.h"
-	"windows.h"
-	<wx/msw/winundef.h>
-
-1264364227 c:\users\florian\programmation\gamedevelop\gdl\gdl\amove.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	"GDL/RuntimeScene.h"
-
-1269379492 c:\users\florian\programmation\gamedevelop\gdl\gdl\access.h
-	"GDL/RuntimeScene.h"
-	"GDL/Game.h"
-
-1264364230 c:\users\florian\programmation\gamedevelop\gdl\gdl\cmove.h
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	<iostream>
-	"GDL/Access.h"
-	<SFML/Window.hpp>
-	"GDL/RuntimeScene.h"
-
-1269713045 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
-	"GDL/Object.h"
-	"GDL/ObjectGroup.h"
-	"GDL/ObjectType.h"
-	"GDL/ObjInstancesHolder.h"
-	<boost/shared_ptr.hpp>
-	<string>
-	<vector>
-
-1267283857 source:c:\users\florian\programmation\gamedevelop\ide\portable.cpp
-	"nommgr.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<string>
-	<vector>
-	<wx/dirdlg.h>
-	<wx/log.h>
-	"Portable.h"
-	"GDL/Game.h"
-	"GDL/OpenSaveGame.h"
-
-1269186030 source:c:\users\florian\programmation\gamedevelop\ide\preferences.cpp
-	"Preferences.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/fileconf.h>
-	<wx/filename.h>
-	<wx/config.h>
-	"wx/aui/aui.h"
-	<wx/filedlg.h>
-	<wx/colordlg.h>
-	<wx/help.h>
-	<wx/dirdlg.h>
-	<wx/log.h>
-	"GDL/HelpFileAccess.h"
-	<string>
-	<vector>
-	<iostream>
-
-1267296495 source:c:\users\florian\programmation\gamedevelop\ide\projectmanager.cpp
-	"ProjectManager.h"
-	<wx/bitmap.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/ribbon/bar.h>
-	<wx/ribbon/buttonbar.h>
-	<wx/ribbon/gallery.h>
-	<wx/ribbon/toolbar.h>
-	"Clipboard.h"
-	"Game_Develop_EditorMain.h"
-	"gdTreeItemGameData.h"
-	"GDL/ChercherScene.h"
-	"Extensions.h"
-	"EditPropJeu.h"
-	"InitialVariablesDialog.h"
-	"EditPropScene.h"
-
-1266534451 c:\users\florian\programmation\gamedevelop\ide\gdtreeitemgamedata.h
-	<string>
-	<wx/treectrl.h>
-
-1264364132 source:c:\users\florian\programmation\gamedevelop\ide\recentlist.cpp
-	"RecentList.h"
-
-1266012840 source:c:\users\florian\programmation\gamedevelop\ide\renderdialog.cpp
-	"RenderDialog.h"
-	<wx/intl.h>
-	<wx/string.h>
-	<iostream>
-
-1268242135 source:c:\users\florian\programmation\gamedevelop\ide\renderer.cpp
-	"Renderer.h"
-
-1269193458 source:c:\users\florian\programmation\gamedevelop\ide\scenecanvas.cpp
-	"SceneCanvas.h"
-	<string>
-	<SFML/System.hpp>
-	<iostream>
-	<SFML/Graphics.hpp>
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Collisions.h"
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/StdAlgo.h"
-	"EditOptionsPosition.h"
-	<wx/log.h>
-	<wx/scrolbar.h>
-	<wx/msw/winundef.h>
-	"GDL/RuntimeScene.h"
-	"GDL/AppelEvent.h"
-	"GDL/Chercher.h"
-	"GDL/ExtensionsManager.h"
-	"GDL/ImageManager.h"
-	"GDL/RuntimeGame.h"
-	"DndTextSceneEditor.h"
-	<wx/cursor.h>
-
-1267819725 c:\users\florian\programmation\gamedevelop\gdl\gdl\appelevent.h
-	<SFML/System.hpp>
-	<iostream>
-	<SFML/Graphics.hpp>
-	<vector>
-	<string>
-	"GDL/Object.h"
-	<cmath>
-	"GDL/Event.h"
-	<iostream>
-	<sstream>
-	"GDL/Chercher.h"
-	"GDL/algo.h"
-	"GDL/Force.h"
-	"GDL/MemTrace.h"
-	"GDL/RuntimeScene.h"
-	"GDL/Access.h"
-
-1264364134 source:c:\users\florian\programmation\gamedevelop\ide\searchevents.cpp
-	"SearchEvents.h"
-	<wx/intl.h>
-	<wx/string.h>
-	<string>
-	<vector>
-	"GDL/Event.h"
-
-1264364133 source:c:\users\florian\programmation\gamedevelop\ide\signemodification.cpp
-	"SigneModification.h"
-	<wx/intl.h>
-	<wx/string.h>
-
-1264364132 source:c:\users\florian\programmation\gamedevelop\ide\signetest.cpp
-	"SigneTest.h"
-	<wx/intl.h>
-	<wx/string.h>
-
-1264364134 source:c:\users\florian\programmation\gamedevelop\ide\splashscreen.cpp
-	"nommgr.h"
-	<wx/dcclient.h>
-	<wx/dcmemory.h>
-	<wx/dcscreen.h>
-	"SplashScreen.h"
-
-1267217460 source:c:\users\florian\programmation\gamedevelop\ide\startherepage.cpp
-	"StartHerePage.h"
-	<wx/bitmap.h>
-	<wx/font.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/config.h>
-	"GDL/HelpFileAccess.h"
-	<wx/mimetype.h>
-	"Game_Develop_EditorMain.h"
-
-1264364130 source:c:\users\florian\programmation\gamedevelop\ide\templateevents.cpp
-	"TemplateEvents.h"
-
-1264366798 source:c:\users\florian\programmation\gamedevelop\ide\translateaction.cpp
-	"debugMem.h"
-	"CppUnitLite/TestHarness.h"
-	"TranslateAction.h"
-	<string>
-	<vector>
-	<sstream>
-	<wx/log.h>
-	"MemTrace.h"
-	"GDL/StdAlgo.h"
-	"GDL/BitmapGUIManager.h"
-	"GDL/ExtensionBase.h"
-	"tinyxml.h"
-	<wx/wx.h>
-	<wx/bitmap.h>
-	<iostream>
-	<map>
-
-1264366798 source:c:\users\florian\programmation\gamedevelop\ide\translatecondition.cpp
-	"debugMem.h"
-	"nommgr.h"
-	"CppUnitLite/TestHarness.h"
-	<stdexcept>
-	<iostream>
-	<string>
-	<vector>
-	<wx/log.h>
-	<wx/wx.h>
-	<wx/bitmap.h>
-	"tinyxml.h"
-	"GDL/ExtensionBase.h"
-	"GDL/BitmapGUIManager.h"
-	"TranslateCondition.h"
-	"MemTrace.h"
-	"GDL/StdAlgo.h"
-
-1264364133 source:c:\users\florian\programmation\gamedevelop\ide\trueorfalse.cpp
-	"TrueOrFalse.h"
-	<wx/artprov.h>
-	<wx/bitmap.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-
-1264364130 source:c:\users\florian\programmation\gamedevelop\ide\debugmem.cpp
-	<list>
-	<iostream>
-	<stdlib.h>
-	<stdio.h>
-	<string.h>
-
-1266533959 source:c:\users\florian\programmation\gamedevelop\ide\gdtreeitemgamedata.cpp
-
-1266533959 source:c:\users\florian\programmation\gamedevelop\ide\gdtreeitemstringdata.cpp
-
-1264366798 source:c:\users\florian\programmation\gamedevelop\ide\gridsetup.cpp
-	"GridSetup.h"
-	<wx/intl.h>
-	<wx/string.h>
-	<wx/colordlg.h>
-	<wx/log.h>
-	"GDL/StdAlgo.h"
-
-1264364130 source:c:\users\florian\programmation\gamedevelop\ide\mp3ogg.cpp
-	"nommgr.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/filedlg.h>
-	<wx/log.h>
-	<string>
-	<vector>
-	<wx/filename.h>
-	"mp3ogg.h"
-
-1266073934 source:c:\users\florian\programmation\gamedevelop\ide\resource.rc
-	"wx/msw/rcdefs.h"
-	"version.h"
-
-1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
-
-1269720862 c:\users\florian\programmation\gamedevelop\ide\version.h
-
-1265566981 source:c:\users\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
-	"wxSFMLCanvas.hpp"
-	<gdk/gdkx.h>
-	<gtk/gtk.h>
-	<wx/gtk/win_gtk.h>
-	<iostream>
-
-1264364134 source:c:\users\florian\programmation\gamedevelop\ide\checkmaj.cpp
-	"nommgr.h"
-	<wx/log.h>
-	<wx/wx.h>
-	"wx/msgdlg.h"
-	<wx/protocol/http.h>
-	<wx/url.h>
-	<wx/wfstream.h>
-	<string>
-	<vector>
-	<iostream>
-	<fstream>
-	"SFML/Network.hpp"
-	"tinyxml.h"
-	"GDL/VersionWrapper.h"
-	"CheckMAJ.h"
-	"MAJ.h"
-
-1253308518 c:\libs\wxwidgets\include\wx\wfstream.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/string.h"
-	"wx/stream.h"
-	"wx/file.h"
-	"wx/ffile.h"
-
-1253308520 c:\libs\wxwidgets\include\wx\ffile.h
-	"wx/defs.h"
-	"wx/string.h"
-	"wx/filefn.h"
-	"wx/convauto.h"
-	<stdio.h>
-
-1268481809 c:\libs\sfml\include\sfml\network.hpp
-	<SFML/System.hpp>
-	<SFML/Network/Ftp.hpp>
-	<SFML/Network/Http.hpp>
-	<SFML/Network/IpAddress.hpp>
-	<SFML/Network/Packet.hpp>
-	<SFML/Network/Selector.hpp>
-	<SFML/Network/SocketTCP.hpp>
-	<SFML/Network/SocketUDP.hpp>
-
-1268481809 c:\libs\sfml\include\sfml\network\ftp.hpp
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Network/SocketTCP.hpp>
-	<string>
-	<vector>
-
-1268481809 c:\libs\sfml\include\sfml\network\sockettcp.hpp
-	<SFML/Network/SocketHelper.hpp>
-	<vector>
-
-1244728046 c:\libs\sfml\include\sfml\network\sockethelper.hpp
-	<SFML/Config.hpp>
-	<SFML/Network/Win32/SocketHelper.hpp>
-	<SFML/Network/Unix/SocketHelper.hpp>
-
-1248634794 c:\libs\sfml\include\sfml\network\win32\sockethelper.hpp
-	<winsock2.h>
-
-1244728046 c:\libs\sfml\include\sfml\network\unix\sockethelper.hpp
-	<sys/types.h>
-	<sys/socket.h>
-	<netinet/in.h>
-	<netinet/tcp.h>
-	<arpa/inet.h>
-	<netdb.h>
-	<unistd.h>
-
-1268481809 c:\libs\sfml\include\sfml\network\http.hpp
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Network/IpAddress.hpp>
-	<SFML/Network/SocketTCP.hpp>
-	<map>
-	<string>
-
-1268481809 c:\libs\sfml\include\sfml\network\ipaddress.hpp
-	<SFML/Config.hpp>
-	<istream>
-	<ostream>
-	<string>
-
-1259264901 c:\libs\sfml\include\sfml\network\packet.hpp
-	<SFML/Config.hpp>
-	<string>
-	<vector>
-
-1259350652 c:\libs\sfml\include\sfml\network\selector.hpp
-	<SFML/Network/SocketUDP.hpp>
-	<SFML/Network/SocketTCP.hpp>
-	<SFML/Network/SelectorBase.hpp>
-	<map>
-	<SFML/Network/Selector.inl>
-
-1268481809 c:\libs\sfml\include\sfml\network\socketudp.hpp
-	<SFML/Network/SocketHelper.hpp>
-	<vector>
-
-1259350652 c:\libs\sfml\include\sfml\network\selectorbase.hpp
-	<SFML/Config.hpp>
-	<SFML/Network/SocketHelper.hpp>
-	<map>
-
-1259350652 c:\libs\sfml\include\sfml\network\selector.inl
-
-1264364132 source:c:\users\florian\programmation\gamedevelop\ide\bugreport.cpp
-	"BugReport.h"
-	<wx/artprov.h>
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/font.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/textfile.h>
-	"GDL/VersionWrapper.h"
-	<string>
-	<vector>
-	<iostream>
-	<wx/wfstream.h>
-	<wx/txtstrm.h>
-
-1253308523 c:\libs\wxwidgets\include\wx\txtstrm.h
-	"wx/stream.h"
-	"wx/convauto.h"
-
-1267300287 source:c:\users\florian\programmation\gamedevelop\ide\credits.cpp
-	"Credits.h"
-	<wx/bitmap.h>
-	<wx/font.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/mimetype.h>
-	"GDL/VersionWrapper.h"
-	<string>
-	<vector>
-	<iostream>
-
-1264364129 source:c:\users\florian\programmation\gamedevelop\ide\compilationchecker.cpp
-	"CompilationChecker.h"
-	"GDL/Version.h"
-	"GDL/VersionWrapper.h"
-	"GDL/StdAlgo.h"
-
-1269713045 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
 

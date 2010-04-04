@@ -798,7 +798,6 @@ void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
     if ( dialog.ShowModal() == 1 )
     {
         objects->at(i)->variablesObjet = dialog.variables;
-        cout << objects->at(i)->variablesObjet.variables.size()<< endl;
         if ( wasModifiedCallback ) *wasModifiedCallback = true;
     }
 }

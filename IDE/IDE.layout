@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
+	<ActiveTarget name="Debug - Edittime" />
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="9408" topLine="106" />
 	</File>
 	<File name="CheckMAJ.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="3588" topLine="92" />
 	</File>
-	<File name="ChoixAction.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="619" topLine="21" />
+	<File name="ChoixAction.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="27902" topLine="636" />
 	</File>
 	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="12">
 		<Cursor position="33109" topLine="770" />
@@ -22,8 +22,8 @@
 	<File name="ChoixTemplateEvent.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="445" topLine="3" />
 	</File>
-	<File name="ChoixVariableDialog.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="410" topLine="0" />
+	<File name="ChoixVariableDialog.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="9896" topLine="207" />
 	</File>
 	<File name="CommentaireRenderer.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="528" topLine="9" />
@@ -55,8 +55,8 @@
 	<File name="Credits.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="226" topLine="0" />
 	</File>
-	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="21">
-		<Cursor position="26006" topLine="587" />
+	<File name="DebuggerGUI.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="26008" topLine="542" />
 	</File>
 	<File name="DebuggerGUI.h" open="0" top="0" tabpos="0">
 		<Cursor position="0" topLine="93" />
@@ -127,8 +127,8 @@
 	<File name="EditorLayers.h" open="0" top="0" tabpos="10">
 		<Cursor position="2112" topLine="61" />
 	</File>
-	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="20470" topLine="393" />
+	<File name="EditorObjectList.cpp" open="1" top="0" tabpos="9">
+		<Cursor position="33061" topLine="775" />
 	</File>
 	<File name="EditorObjectList.h" open="0" top="0" tabpos="3">
 		<Cursor position="981" topLine="24" />
@@ -198,6 +198,9 @@
 	</File>
 	<File name="ImportImage.cpp" open="0" top="0" tabpos="25">
 		<Cursor position="325" topLine="0" />
+	</File>
+	<File name="InitialVariablesDialog.cpp" open="1" top="1" tabpos="10">
+		<Cursor position="8522" topLine="129" />
 	</File>
 	<File name="LinkRenderer.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="1165" topLine="27" />

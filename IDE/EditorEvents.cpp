@@ -1396,7 +1396,7 @@ TEST( Dialogues, EditorEvents )
 
     editor.OnCutSelected(unusedEvent);
     editor.OnMenuCopySelected(unusedEvent);
-    editor.OnMenuItem7Selected(unusedEvent);
+    //editor.OnMenuItem7Selected(unusedEvent);
     //editor.OnAddLienSelected(unusedEvent);
     editor.OnInsertEventSelected(unusedEvent);
     editor.OnSubEventMenuItemSelected(unusedEvent);

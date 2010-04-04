@@ -9139,7 +9139,7 @@
 1264364131 source:c:\users\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
 
-1270318289 source:c:\users\florian\programmation\gamedevelop\ide\debuggergui.cpp
+1270404547 source:c:\users\florian\programmation\gamedevelop\ide\debuggergui.cpp
 	"DebuggerGUI.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -9147,6 +9147,7 @@
 	<wx/string.h>
 	<wx/toolbar.h>
 	<wx/image.h>
+	<boost/weak_ptr.hpp>
 	"GDL/StdAlgo.h"
 	<wx/msw/winundef.h>
 	"GDL/ExtensionsManager.h"
@@ -9157,7 +9158,7 @@
 	<wx/textdlg.h>
 	<wx/msw/winundef.h>
 
-1264364130 c:\users\florian\programmation\gamedevelop\ide\debuggergui.h
+1270401146 c:\users\florian\programmation\gamedevelop\ide\debuggergui.h
 	<wx/listctrl.h>
 	<wx/treectrl.h>
 	<wx/notebook.h>
@@ -11147,7 +11148,7 @@
 
 1253437186 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\msw\rcdefs.h
 
-1270381721 c:\users\florian\programmation\gamedevelop\ide\version.h
+1270404550 c:\users\florian\programmation\gamedevelop\ide\version.h
 
 1265566981 source:c:\users\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

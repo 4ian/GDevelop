@@ -103,7 +103,7 @@ class DebuggerGUI: public wxPanel, public BaseDebugger
 
 		RuntimeScene & scene;
 
-		map < int, pair<string, wxTreeItemId> > objectsInTree;
+		map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> > objectsInTree;
 		map < string, wxTreeItemId > initialObjects;
 		bool mustRecreateTree;
 

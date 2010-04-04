@@ -8,6 +8,7 @@
 //*)
 #include <wx/toolbar.h>
 #include <wx/image.h>
+#include <boost/weak_ptr.hpp>
 #include "GDL/StdAlgo.h"
 
 #ifdef ___WXMSW___
@@ -320,61 +321,75 @@ void DebuggerGUI::UpdateGUI()
     ObjList allObjects = scene.objectsInstances.GetAllObjects();
     for(unsigned int i = 0;i<allObjects.size();++i)
     {
+        boost::weak_ptr<Object> weakPtrToObject = allObjects[i];
+
         //L'objet n'est pas dans l'arbre : on l'ajoute
-        if ( objectsInTree.find(i) == objectsInTree.end() )
+        if ( objectsInTree.find(weakPtrToObject) == objectsInTree.end() )
         {
-            wxTreeItemId objectItem = objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], toString(i));
-            objectsInTree[i] = pair<string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
+            char str[24];
+            snprintf(str, 24, "%p", allObjects[i].get());
+
+            wxTreeItemId objectItem = objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], str);
+            objectsInTree[weakPtrToObject] = pair<string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
         }
         else
         {
             //Si l'objet qui est dans l'arbre n'est pas le même, on le supprime et le reajoute au bon endroit
-            if ( objectsInTree[i].first != allObjects[i]->GetName() )
+            if ( objectsInTree[weakPtrToObject].first != allObjects[i]->GetName() )
             {
-                objectsTree->Delete(objectsInTree[i].second);
+                objectsTree->Delete(objectsInTree[weakPtrToObject].second);
                 wxTreeItemId objectItem = objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], toString(i));
-                objectsInTree[i] = pair<string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
+                objectsInTree[weakPtrToObject] = pair<string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
             }
         }
     }
 
     //Suppression des élements en trop
-    map < int, pair<string, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
-    map < int, pair<string, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
+    map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
+    map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
 
     for(;objectsInTreeIter != objectsInTreeEnd;++objectsInTreeIter)
     {
-        if ( (*objectsInTreeIter).first < 0 || static_cast<unsigned>((*objectsInTreeIter).first) > allObjects.size() )
+        if ( (*objectsInTreeIter).first.expired() )
         {
             objectsTree->Delete((*objectsInTreeIter).second.second); //Suppression de l'arbre
-            map < int, pair<string, wxTreeItemId> >::iterator temp = objectsInTreeIter;
+            map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator temp = objectsInTreeIter;
             objectsInTreeIter++;
             objectsInTree.erase(temp); //Suppression de la map
         }
     }
 
-
-    //Objet selectionné
+    //Obtain the shared_ptr to the selected object
     if ( !objectsTree->GetSelection().IsOk() )
         return;
 
-    int idObject = toInt(static_cast<string>(objectsTree->GetItemText( objectsTree->GetSelection() )));
-    if ( idObject < 0 || static_cast<unsigned>(idObject) >= allObjects.size() )
+    ObjSPtr object = boost::shared_ptr<Object>();
+    map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    {
+        if ( i->second.second == objectsTree->GetSelection() && !i->first.expired())
+        {
+            object = i->first.lock();
+            continue;
+        }
+    }
+
+    if ( object == boost::shared_ptr<Object>() )
         return;
 
-    objectName->SetLabel(allObjects[idObject]->GetName());
+    objectName->SetLabel(object->GetName());
 
     //Object selected has changed, recreate the enitre table.
     if ( objectChanged )
-        RecreateListForObject(allObjects[idObject]);
+        RecreateListForObject(object);
 
     string value, uselessName;
     unsigned int currentLine = 1; //We start a the second line, after "General"
 
     //Properties of base object
-    for (unsigned int i = 0;i<allObjects[idObject]->Object::GetNumberOfProperties();++i)
+    for (unsigned int i = 0;i<object->Object::GetNumberOfProperties();++i)
     {
-        allObjects[idObject]->Object::GetPropertyForDebugger(i, uselessName, value);
+        object->Object::GetPropertyForDebugger(i, uselessName, value);
         objectList->SetItem(currentLine, 1, value);
 
         currentLine++;
@@ -383,9 +398,9 @@ void DebuggerGUI::UpdateGUI()
     currentLine += 2; //We have two lines to jump for "Specific"
 
     //Specific properties of object
-    for (unsigned int i = 0;i<allObjects[idObject]->GetNumberOfProperties();++i)
+    for (unsigned int i = 0;i<object->GetNumberOfProperties();++i)
     {
-        allObjects[idObject]->GetPropertyForDebugger(i, uselessName, value);
+        object->GetPropertyForDebugger(i, uselessName, value);
         objectList->SetItem(currentLine, 1, value);
 
         currentLine++;
@@ -393,7 +408,7 @@ void DebuggerGUI::UpdateGUI()
 
     currentLine += 2; //We have two lines to jump for "Variables"
 
-    const vector < Variable > objectVariables = allObjects[idObject]->variablesObjet.GetVariablesVector();
+    const vector < Variable > objectVariables = object->variablesObjet.GetVariablesVector();
     //Suppression des lignes en trop pour les variables
     while(objectList->GetItemCount() > baseItemCount+objectVariables.size())
         objectList->DeleteItem(baseItemCount+objectVariables.size());
@@ -472,53 +487,62 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     if ( !objectsTree->GetSelection().IsOk() )
         return;
 
-    ObjList allObjects = scene.objectsInstances.GetAllObjects();
+    //Obtain the shared_ptr to the object
+    ObjSPtr object = boost::shared_ptr<Object>();
+    map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    {
+        if ( i->second.second == objectsTree->GetSelection() && !i->first.expired())
+        {
+            object = i->first.lock();
+            continue;
+        }
+    }
 
-    int idObject = toInt(static_cast<string>(objectsTree->GetItemText( objectsTree->GetSelection() )));
-    if ( idObject < 0 || static_cast<unsigned>(idObject) >= allObjects.size() )
+    if ( object == boost::shared_ptr<Object>() )
         return;
 
     //Check if we are trying to modify a "general" property
-    if ( event.GetIndex() < 1+allObjects[idObject]->Object::GetNumberOfProperties()) //1+ for include the "General"
+    if ( event.GetIndex() < 1+object->Object::GetNumberOfProperties()) //1+ for include the "General"
     {
         int propNb = event.GetIndex()-1;
 
         string uselessName, oldValue;
-        allObjects[idObject]->Object::GetPropertyForDebugger(propNb, uselessName, oldValue);
+        object->Object::GetPropertyForDebugger(propNb, uselessName, oldValue);
         string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), oldValue).mb_str());
 
-        if ( !allObjects[idObject]->Object::ChangeProperty(propNb, newValue) )
+        if ( !object->Object::ChangeProperty(propNb, newValue) )
         {
             wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entrée peut être incorrecte, ou la propriété en lecture seule."));
         }
     }
     //A specific property
-    else if ( event.GetIndex() < 1+allObjects[idObject]->Object::GetNumberOfProperties()
-                                +2+allObjects[idObject]->GetNumberOfProperties()) //+2 for include the "Specific"
+    else if ( event.GetIndex() < 1+object->Object::GetNumberOfProperties()
+                                +2+object->GetNumberOfProperties()) //+2 for include the "Specific"
     {
-        int propNb = event.GetIndex()-1-2-allObjects[idObject]->Object::GetNumberOfProperties();
+        int propNb = event.GetIndex()-1-2-object->Object::GetNumberOfProperties();
 
         string uselessName, oldValue;
-        allObjects[idObject]->GetPropertyForDebugger(propNb, uselessName, oldValue);
+        object->GetPropertyForDebugger(propNb, uselessName, oldValue);
         string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), oldValue).mb_str());
 
-        if ( !allObjects[idObject]->ChangeProperty(propNb, newValue) )
+        if ( !object->ChangeProperty(propNb, newValue) )
         {
             wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entrée peut être incorrecte, ou la propriété en lecture seule."));
         }
     }
     else //Or a variable
     {
-        const vector < Variable > objectVariables = allObjects[idObject]->variablesObjet.GetVariablesVector();
-        int idVariable = event.GetIndex() - ( 1+allObjects[idObject]->Object::GetNumberOfProperties()
-                                              +2+allObjects[idObject]->GetNumberOfProperties()
+        const vector < Variable > objectVariables = object->variablesObjet.GetVariablesVector();
+        int idVariable = event.GetIndex() - ( 1+object->Object::GetNumberOfProperties()
+                                              +2+object->GetNumberOfProperties()
                                               +2);
 
         if ( idVariable >= 0 && idVariable < objectVariables.size() )
         {
             string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une variable"), objectVariables[idVariable].Gettexte()).mb_str());
 
-            allObjects[idObject]->variablesObjet.ObtainVariable(objectVariables[idVariable].GetName()) = newValue;
+            object->variablesObjet.ObtainVariable(objectVariables[idVariable].GetName()) = newValue;
         }
     }
 

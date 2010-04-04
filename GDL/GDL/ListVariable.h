@@ -91,6 +91,24 @@ class GD_API ListVariable
         }
 
         /**
+         * Remove a variable
+         */
+        inline void RemoveVariable(const string & varName)
+        {
+            vector < Variable >::const_iterator end = variables.end();
+            for (vector < Variable >::iterator i = variables.begin();i != end;++i)
+            {
+            	if ( i->GetName() == varName)
+            	{
+                    variables.erase(i);
+                    return;
+            	}
+            }
+
+            return;
+        }
+
+        /**
          * Return the internal vector containing the variables.
          */
         inline const vector<Variable> & GetVariablesVector() const

@@ -22,6 +22,7 @@
 #include "GDL/profile.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Position.h"
+#include "GDL/LinkEvent.h" //TODO : Remove
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
@@ -99,6 +100,7 @@ RuntimeScene& RuntimeScene::operator=(const RuntimeScene & scene)
 {
     if( (this) != &scene )
     {
+        Scene::operator=(scene);
 
         this->renderWindow = scene.renderWindow;
         this->game = scene.game;
@@ -645,20 +647,22 @@ void RuntimeScene::PreprocessScene( const Game & Jeu )
 ////////////////////////////////////////////////////////////
 /// Insertion des liens
 ////////////////////////////////////////////////////////////
-void RuntimeScene::PreprocessEventList( const Game & Jeu, vector < Event > & listEvent )
+void RuntimeScene::PreprocessEventList( const Game & Jeu, vector < BaseEventSPtr > & listEvent )
 {
     for ( unsigned int i = 0;i < listEvent.size();i++ )
     {
-        if ( listEvent.at( i ).type == "Link" )
+        if ( dynamic_cast<LinkEvent*>(listEvent.at( i ).get()) != NULL ) //TODO : Move this
         {
+            LinkEvent * linkEvent = dynamic_cast<LinkEvent*>(listEvent.at( i ).get());
+
             //On récupère la scène à insérer
             vector< boost::shared_ptr<Scene> >::const_iterator scene =
-                find_if(Jeu.scenes.begin(), Jeu.scenes.end(), bind2nd(SceneHasName(), listEvent.at( i ).sceneLinked));
+                find_if(Jeu.scenes.begin(), Jeu.scenes.end(), bind2nd(SceneHasName(), linkEvent->sceneLinked));
 
             if ( scene == Jeu.scenes.end() ) return;
 
-            int start = listEvent.at( i ).start;
-            int end = listEvent.at( i ).end;
+            int start = linkEvent->start;
+            int end = linkEvent->end;
 
             if ( start == -1 && end == -1 ) //Doit on inclure tous les évènements ?
             {
@@ -692,14 +696,14 @@ void RuntimeScene::PreprocessEventList( const Game & Jeu, vector < Event > & lis
             for ( int insertion = start ; insertion <= end ;insertion++ ) //Insertion des évènements du lien
             {
                 if ( i+insertion < listEvent.size() )
-                    listEvent.insert( listEvent.begin() + i+insertion, (*scene)->events.at( insertion ) );
+                    listEvent.insert( listEvent.begin() + i+insertion, (*scene)->events.at( insertion )->Clone() );
                 else
-                    listEvent.push_back( (*scene)->events.at( insertion ) );
+                    listEvent.push_back( (*scene)->events.at( insertion )->Clone() );
             }
         }
-        else if ( !listEvent.at( i ).events.empty() )
+        if ( listEvent[i]->CanHaveSubEvents() )
         {
-            PreprocessEventList( Jeu, listEvent.at( i ).events);
+            PreprocessEventList( Jeu, listEvent[i]->GetSubEvents());
         }
     }
 }

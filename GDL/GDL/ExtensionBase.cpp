@@ -4,6 +4,7 @@
  */
 
 #include "GDL/ExtensionBase.h"
+#include "GDL/Event.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -41,6 +42,10 @@ useObject(false)
 #if defined(GDE)
 ,optional(false)
 #endif
+{
+}
+EventInfos::EventInfos() :
+instance(boost::shared_ptr<BaseEvent>())
 {
 }
 
@@ -96,6 +101,11 @@ const std::map<std::string, InstructionInfos > & ExtensionBase::GetAllConditions
 const std::map<std::string, ExpressionInfos > & ExtensionBase::GetAllExpressions() const
 {
     return expressionsInfos;
+}
+
+const std::map<std::string, EventInfos > & ExtensionBase::GetAllEvents() const
+{
+    return eventsInfos;
 }
 
 const std::map<std::string, InstructionInfos > & ExtensionBase::GetAllActionsForObject(std::string objectType) const
@@ -236,4 +246,12 @@ DestroyFunPtr ExtensionBase::GetDestroyObjectFunction(std::string objectType) co
         return objectsInfos.find(objectType)->second.destroyFunPtr;
 
     return NULL;
+}
+
+BaseEventSPtr ExtensionBase::CreateEvent(std::string eventType) const
+{
+    if ( eventsInfos.find(eventType) != eventsInfos.end())
+        return eventsInfos.find(eventType)->second.instance->Clone();
+
+    return boost::shared_ptr<BaseEvent>();
 }

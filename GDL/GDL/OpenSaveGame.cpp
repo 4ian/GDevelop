@@ -37,6 +37,9 @@
 #include "GDL/Layer.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/CommentEvent.h"
+#include "GDL/LinkEvent.h"
+#include "GDL/StandardEvent.h"
 #include <boost/shared_ptr.hpp>
 
 using namespace std;
@@ -492,94 +495,25 @@ void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement
     }
 }
 
-void OpenSaveGame::OpenEvents(vector < Event > & list, TiXmlElement * elem)
+void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElement * elem)
 {
-    TiXmlElement * elemScene = elem->FirstChildElement();
+    const TiXmlElement * elemScene = elem->FirstChildElement();
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
 
     //Passage en revue des évènements
     while ( elemScene )
     {
-        Event EventToAdd;
-        if ( elemScene->FirstChildElement( "Type" )->Attribute( "value" ) != NULL ) { EventToAdd.type = elemScene->FirstChildElement( "Type" )->Attribute( "value" );}
+        string type;
+        if ( elemScene->FirstChildElement( "Type" )->Attribute( "value" ) != NULL ) { type = elemScene->FirstChildElement( "Type" )->Attribute( "value" );}
         else { MSG( "Les informations concernant le type d'un évènement manquent." ); }
 
-        if ( EventToAdd.type == "Commentaire" )
+        BaseEventSPtr event = extensionsManager->CreateEvent(type);
+
+        if ( event != boost::shared_ptr<BaseEvent>())
         {
-            if ( elemScene->FirstChildElement( "Couleur" )->Attribute( "r" ) != NULL ) { int value;elemScene->FirstChildElement( "Couleur" )->QueryIntAttribute( "r", &value ); EventToAdd.r = value;}
-            else { MSG( "Les informations concernant la couleur d'un commentaire manquent." ); }
-            if ( elemScene->FirstChildElement( "Couleur" )->Attribute( "v" ) != NULL ) { int value;elemScene->FirstChildElement( "Couleur" )->QueryIntAttribute( "v", &value ); EventToAdd.v = value;}
-            else { MSG( "Les informations concernant la couleur d'un commentaire manquent." ); }
-            if ( elemScene->FirstChildElement( "Couleur" )->Attribute( "b" ) != NULL ) { int value;elemScene->FirstChildElement( "Couleur" )->QueryIntAttribute( "b", &value ); EventToAdd.b = value;}
-            else { MSG( "Les informations concernant la couleur d'un commentaire manquent." ); }
-            if ( elemScene->FirstChildElement( "Com1" )->Attribute( "value" ) != NULL ) { EventToAdd.com1 = elemScene->FirstChildElement( "Com1" )->Attribute( "value" );}
-            else { MSG( "Les informations concernant le texte 1 d'un commentaire manquent." ); }
-            if ( elemScene->FirstChildElement( "Com2" )->Attribute( "value" ) != NULL ) { EventToAdd.com2 = elemScene->FirstChildElement( "Com2" )->Attribute( "value" );}
-            else { MSG( "Les informations concernant le texte 2 d'un commentaire manquent." ); }
-
+            event->LoadFromXml(elemScene);
+            list.push_back( event );
         }
-        else if ( EventToAdd.type == "Dossier" )
-        {
-            if ( elemScene->FirstChildElement( "Couleur" )->Attribute( "r" ) != NULL ) { int value;elemScene->FirstChildElement( "Couleur" )->QueryIntAttribute( "r", &value ); EventToAdd.r = value;}
-            else { MSG( "Les informations concernant la couleur d'un dossier manquent." ); }
-            if ( elemScene->FirstChildElement( "Couleur" )->Attribute( "v" ) != NULL ) { int value;elemScene->FirstChildElement( "Couleur" )->QueryIntAttribute( "v", &value ); EventToAdd.v = value;}
-            else { MSG( "Les informations concernant la couleur d'un dossier manquent." ); }
-            if ( elemScene->FirstChildElement( "Couleur" )->Attribute( "b" ) != NULL ) { int value;elemScene->FirstChildElement( "Couleur" )->QueryIntAttribute( "b", &value ); EventToAdd.b = value;}
-            else { MSG( "Les informations concernant la couleur d'un dossier manquent." ); }
-            if ( elemScene->FirstChildElement( "Com1" )->Attribute( "value" ) != NULL ) { EventToAdd.com1 = elemScene->FirstChildElement( "Com1" )->Attribute( "value" );}
-            else { MSG( "Les informations concernant le nom d'un dossier manquent." ); }
-            if ( elemScene->FirstChildElement( "Com2" )->Attribute( "value" ) != NULL ) { EventToAdd.com2 = elemScene->FirstChildElement( "Com2" )->Attribute( "value" );}
-            else { MSG( "Les informations concernant le texte d'un dossier manquent." ); }
-
-            if ( elemScene->FirstChildElement( "Events" ) != NULL )
-            {
-                OpenEvents(EventToAdd.events, elemScene->FirstChildElement( "Events" ));
-            }
-
-        }
-        else if ( EventToAdd.type == "DossierFin" )
-        {
-            if ( elemScene->FirstChildElement( "Couleur" )->Attribute( "r" ) != NULL ) { int value;elemScene->FirstChildElement( "Couleur" )->QueryIntAttribute( "r", &value ); EventToAdd.r = value;}
-            else { MSG( "Les informations concernant la couleur d'un dossier manquent." ); }
-            if ( elemScene->FirstChildElement( "Couleur" )->Attribute( "v" ) != NULL ) { int value;elemScene->FirstChildElement( "Couleur" )->QueryIntAttribute( "v", &value ); EventToAdd.v = value;}
-            else { MSG( "Les informations concernant la couleur d'un dossier manquent." ); }
-            if ( elemScene->FirstChildElement( "Couleur" )->Attribute( "b" ) != NULL ) { int value;elemScene->FirstChildElement( "Couleur" )->QueryIntAttribute( "b", &value ); EventToAdd.b = value;}
-            else { MSG( "Les informations concernant la couleur d'un dossier manquent." ); }
-            if ( elemScene->FirstChildElement( "Com1" )->Attribute( "value" ) != NULL ) { EventToAdd.com1 = elemScene->FirstChildElement( "Com1" )->Attribute( "value" );}
-            else { MSG( "Les informations concernant le nom d'un dossier manquent." ); }
-            if ( elemScene->FirstChildElement( "Com2" )->Attribute( "value" ) != NULL ) { EventToAdd.com2 = elemScene->FirstChildElement( "Com2" )->Attribute( "value" );}
-            else { MSG( "Les informations concernant le texte d'un dossier manquent." ); }
-
-        }
-        else if ( EventToAdd.type == "Link" )
-        {
-            if ( elemScene->FirstChildElement( "Limites" )->Attribute( "start" ) != NULL ) { int value;elemScene->FirstChildElement( "Limites" )->QueryIntAttribute( "start", &value ); EventToAdd.start = value;}
-            else { MSG( "Les informations concernant le départ d'un lien manquent." ); }
-            if ( elemScene->FirstChildElement( "Limites" )->Attribute( "end" ) != NULL ) { int value;elemScene->FirstChildElement( "Limites" )->QueryIntAttribute( "end", &value ); EventToAdd.end = value;}
-            else { MSG( "Les informations concernant la fin d'un lien manquent." ); }
-            if ( elemScene->FirstChildElement( "Scene" )->Attribute( "value" ) != NULL ) { EventToAdd.sceneLinked = elemScene->FirstChildElement( "Scene" )->Attribute( "value" );}
-            else { MSG( "Les informations concernant le nom de la scène liée." ); }
-
-        }
-        else
-        {
-            //Conditions
-            if ( elemScene->FirstChildElement( "Conditions" ) != NULL )
-                OpenConditions(EventToAdd.conditions, elemScene->FirstChildElement( "Conditions" ));
-            else
-                MSG( _( "Aucune informations sur les conditions d'un évènement" ) );
-
-            //Actions
-            if ( elemScene->FirstChildElement( "Actions" ) != NULL )
-                OpenActions(EventToAdd.actions, elemScene->FirstChildElement( "Actions" ));
-            else
-                MSG( _( "Aucune informations sur les actions d'un évènement" ) );
-
-            //Subevents
-            if ( elemScene->FirstChildElement( "Events" ) != NULL )
-                OpenEvents(EventToAdd.events, elemScene->FirstChildElement( "Events" ));
-        }
-
-        list.push_back( EventToAdd );
         elemScene = elemScene->NextSiblingElement();
     }
 }
@@ -1028,7 +962,7 @@ void OpenSaveGame::SavePositions(const vector < InitialPosition > & list, TiXmlE
     }
 }
 
-void OpenSaveGame::SaveEvents(const vector < Event > & list, TiXmlElement * events)
+void OpenSaveGame::SaveEvents(const vector < BaseEventSPtr > & list, TiXmlElement * events)
 {
     for ( unsigned int j = 0;j < list.size();j++ )
     {
@@ -1038,116 +972,11 @@ void OpenSaveGame::SaveEvents(const vector < Event > & list, TiXmlElement * even
         event = new TiXmlElement( "Event" );
         events->LinkEndChild( event );
 
-        //Le type
-        TiXmlElement * type;
-        type = new TiXmlElement( "Type" );
+        TiXmlElement * type = new TiXmlElement( "Type" );
         event->LinkEndChild( type );
-        type->SetAttribute( "value", list.at( j ).type.c_str() );
+        type->SetAttribute( "value", list[j]->GetType().c_str() );
 
-        if ( list.at( j ).type == "Commentaire" )
-        {
-            //Enregistrement du commentaire
-            TiXmlElement * couleur;
-            couleur = new TiXmlElement( "Couleur" );
-            event->LinkEndChild( couleur );
-
-            couleur->SetDoubleAttribute( "r", list.at( j ).r );
-            couleur->SetDoubleAttribute( "v", list.at( j ).v );
-            couleur->SetDoubleAttribute( "b", list.at( j ).b );
-
-            TiXmlElement * com1;
-            com1 = new TiXmlElement( "Com1" );
-            event->LinkEndChild( com1 );
-            com1->SetAttribute( "value", list.at( j ).com1.c_str() );
-
-            TiXmlElement * com2;
-            com2 = new TiXmlElement( "Com2" );
-            event->LinkEndChild( com2 );
-            com2->SetAttribute( "value", list.at( j ).com2.c_str() );
-
-        }
-        else if ( list.at( j ).type == "Dossier" )
-        {
-            //Enregistrement du commentaire
-            TiXmlElement * couleur;
-            couleur = new TiXmlElement( "Couleur" );
-            event->LinkEndChild( couleur );
-
-            couleur->SetDoubleAttribute( "r", list.at( j ).r );
-            couleur->SetDoubleAttribute( "v", list.at( j ).v );
-            couleur->SetDoubleAttribute( "b", list.at( j ).b );
-
-            TiXmlElement * com1;
-            com1 = new TiXmlElement( "Com1" );
-            event->LinkEndChild( com1 );
-            com1->SetAttribute( "value", list.at( j ).com1.c_str() );
-
-            TiXmlElement * com2;
-            com2 = new TiXmlElement( "Com2" );
-            event->LinkEndChild( com2 );
-            com2->SetAttribute( "value", list.at( j ).com2.c_str() );
-
-        }
-        else if ( list.at( j ).type == "DossierFin" )
-        {
-            //Enregistrement du commentaire
-            TiXmlElement * couleur;
-            couleur = new TiXmlElement( "Couleur" );
-            event->LinkEndChild( couleur );
-
-            couleur->SetDoubleAttribute( "r", list.at( j ).r );
-            couleur->SetDoubleAttribute( "v", list.at( j ).v );
-            couleur->SetDoubleAttribute( "b", list.at( j ).b );
-
-            TiXmlElement * com1;
-            com1 = new TiXmlElement( "Com1" );
-            event->LinkEndChild( com1 );
-            com1->SetAttribute( "value", list.at( j ).com1.c_str() );
-
-            TiXmlElement * com2;
-            com2 = new TiXmlElement( "Com2" );
-            event->LinkEndChild( com2 );
-            com2->SetAttribute( "value", list.at( j ).com2.c_str() );
-
-        }
-        else if ( list.at( j ).type == "Link" )
-        {
-            //Enregistrement du commentaire
-            TiXmlElement * couleur;
-            couleur = new TiXmlElement( "Limites" );
-            event->LinkEndChild( couleur );
-
-            couleur->SetDoubleAttribute( "start", list.at( j ).start );
-            couleur->SetDoubleAttribute( "end", list.at( j ).end );
-
-            TiXmlElement * com1;
-            com1 = new TiXmlElement( "Scene" );
-            event->LinkEndChild( com1 );
-            com1->SetAttribute( "value", list.at( j ).sceneLinked.c_str() );
-
-        }
-        else
-        {
-            //Les conditions
-            TiXmlElement * conditions = new TiXmlElement( "Conditions" );
-            event->LinkEndChild( conditions );
-            SaveConditions(list.at( j ).conditions, conditions);
-
-            //Les actions
-            TiXmlElement * actions = new TiXmlElement( "Actions" );
-            event->LinkEndChild( actions );
-            SaveActions(list.at( j ).actions, actions);
-
-            //Sous évènements
-            if ( !list.at( j ).events.empty() )
-            {
-                TiXmlElement * subevents;
-                subevents = new TiXmlElement( "Events" );
-                event->LinkEndChild( subevents );
-
-                SaveEvents(list.at( j ).events, subevents);
-            }
-        }
+        list[j]->SaveToXml(event);
     }
 }
 

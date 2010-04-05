@@ -1,4 +1,7 @@
-
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include <iostream>
 #include <sstream>
 #include <SFML/System.hpp>
@@ -32,14 +35,19 @@ eval( *scene->game, *scene )
 
 int EventsExecutor::ExecuteEventsScene()
 {
-    BT_PROFILE("ExecuteEventsScene");
     ObjectsConcerned objectsConcerned(&scene->objectsInstances, &scene->objectGroups);
 
-    ExecuteEvents(scene->events, objectsConcerned);
+    for (unsigned int i = 0;i<scene->events.size();++i)
+    {
+        ObjectsConcerned objectsConcernedForEvent;
+        objectsConcernedForEvent.InheritsFrom(&objectsConcerned);
+
+        scene->events[i]->Execute(scene, objectsConcernedForEvent, eval);
+    }
 
     return nouvelleScene;
 }
-
+/*
 ////////////////////////////////////////////////////////////
 /// Execution des évènements
 ///
@@ -76,8 +84,8 @@ int EventsExecutor::ExecuteEvents(vector < Event > & events, ObjectsConcerned & 
     }
 
     return ActAllProcessed;
-}
-
+}*/
+/*
 ////////////////////////////////////////////////////////////
 /// Vérification des conditions
 ///
@@ -249,8 +257,8 @@ int EventsExecutor::ExecuteConditions( Event & event, ObjectsConcerned & objects
 
     }
     return CondFalse;
-}
-
+}*/
+/*
 ////////////////////////////////////////////////////////////
 /// Execution des actions
 ///
@@ -355,3 +363,4 @@ int EventsExecutor::ExecuteActions( Event & event, ObjectsConcerned & objectsCon
     //pour signaler qu'on a traité toutes les actions
     return ActAllProcessed;
 }
+*/

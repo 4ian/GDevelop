@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef EXTENSIONSMANAGER_H
 #define EXTENSIONSMANAGER_H
 #include <string>
@@ -151,12 +156,22 @@ class GD_API ExtensionsManager
         /**
          * Return a shared_ptr to a new object.
          */
-        virtual boost::shared_ptr<Object> CreateObject(unsigned int typeId, std::string name);
+        boost::shared_ptr<Object> CreateObject(unsigned int typeId, std::string name);
 
         /**
          * Return a shared_ptr to a new object, created by copying the source.
          */
-        virtual boost::shared_ptr<Object> CreateObject(boost::shared_ptr<Object> src);
+        boost::shared_ptr<Object> CreateObject(boost::shared_ptr<Object> src);
+
+        /**
+         * Check if an event type is available
+         */
+        bool HasEventType(std::string evenType) const;
+
+        /**
+         * Create a new event of given type
+         */
+        boost::shared_ptr<BaseEvent> CreateEvent(std::string eventType) const;
 
         /**
          * Get the typeId associated with a name

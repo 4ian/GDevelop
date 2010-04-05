@@ -79,7 +79,7 @@ class GD_API RuntimeScene : public Scene
         //-> Chargement à partir d'une scène
         bool LoadFromScene( const Scene & scene );
         void PreprocessScene( const Game & Jeu );
-        void PreprocessEventList( const Game & Jeu, vector < Event > & listEvent );
+        void PreprocessEventList( const Game & Jeu, vector < BaseEventSPtr > & listEvent );
 
         void ChangeRenderWindow(sf::RenderWindow * window);
 

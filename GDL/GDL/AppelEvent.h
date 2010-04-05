@@ -41,9 +41,9 @@ class GD_API EventsExecutor
         int ExecuteEventsScene();
 
     private:
-        int ExecuteEvents( vector < Event > & events, ObjectsConcerned & objectsConcernedParent);
-        int ExecuteConditions( Event & event, ObjectsConcerned & objectsConcerned, int startFrom = 0 );
-        int ExecuteActions( Event & event, ObjectsConcerned & objectsConcerned, int j);
+        /*int ExecuteEvents( vector < BaseEventSPtr > & events, ObjectsConcerned & objectsConcernedParent);*/
+        /*int ExecuteConditions( Event & event, ObjectsConcerned & objectsConcerned, int startFrom = 0 );
+        int ExecuteActions( Event & event, ObjectsConcerned & objectsConcerned, int j);*/
 
         int nouvelleScene;
 

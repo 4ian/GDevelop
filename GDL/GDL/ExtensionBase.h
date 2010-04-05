@@ -17,6 +17,7 @@ class Evaluateur;
 class Object;
 class ExtensionBase;
 class ExpressionInstruction;
+class BaseEvent;
 
 #if defined(GDE)
 class Game;
@@ -27,6 +28,7 @@ class MainEditorCommand;
 #endif
 
 typedef boost::shared_ptr<Object> ObjSPtr;
+typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
 
 //Declare typedefs for static/objects functions and expressions
 typedef bool (*InstructionFunPtr)( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
@@ -259,6 +261,26 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
             } else { instrInfo.smallicon = wxBitmap(16,16);}\
             instrInfo.shown = false;
 
+/**
+ * Declare a custom event
+ * @param name ( _must_ be the name of the associated class )
+ * @param fullname displayed in editor
+ * @param description displayed in editor
+ * @param group
+ * @param filename of a small icon
+ */
+#define DECLARE_EVENT(name_, fullname_, description_, group_, smallicon_, className_) { \
+            EventInfos eventInfo; \
+            std::string currentEventDeclarationName = name_;\
+            eventInfo.fullname = fullname_; \
+            eventInfo.description = description_; \
+            eventInfo.group = group_; \
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                eventInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { eventInfo.smallicon = wxBitmap(16,16);} \
+            eventInfo.instance = boost::shared_ptr<BaseEvent>(new className_); \
+            eventInfo.instance->SetType(GetNameSpace()+currentEventDeclarationName);
 
 #define MAIN_OBJECTS_IN_PARAMETER(x) instrInfo.mainObjects.push_back(x);
 #define MAIN_OBJECTS_IN_PARAMETERS(x, y) instrInfo.mainObjects.push_back(x); instrInfo.mainObjects.push_back(y);
@@ -314,6 +336,12 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
             instrInfo.expressionObjectFunPtr = (ExpressionObjectFunPtr)ptr;
+
+#define DECLARE_EVENT(name_, fullname_, description_, group_, smallicon_, className_) { \
+            EventInfos eventInfo; \
+            std::string currentEventDeclarationName = name_;\
+            eventInfo.instance = boost::shared_ptr<BaseEvent>(new className_); \
+            eventInfo.instance->SetType(GetNameSpace()+currentEventDeclarationName);
 
 #define DECLARE_PARAMETER(type, desc, useObj, objType) { \
                 ParameterInfo parameter; \
@@ -387,6 +415,11 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
 #define DECLARE_END_OBJECT_EXPRESSION() objInfos.expressionsInfos[currentExprDeclarationName]=instrInfo;\
             }
 
+/**
+ * Need to be added after DECLARE_EVENT
+ */
+#define DECLARE_END_EVENT() eventsInfos[GetNameSpace()+currentEventDeclarationName] = eventInfo; \
+            }
 
 
 /**
@@ -457,6 +490,27 @@ class GD_API ExpressionInfos
     std::vector < ParameterInfo > parameters;
     ExpressionFunPtr       expressionFunPtr;
     ExpressionObjectFunPtr expressionObjectFunPtr;
+};
+
+/**
+ * Contains user-friendly infos about event, only at edittime,
+ * and members needed to create an event
+ */
+class GD_API EventInfos
+{
+    public:
+
+    EventInfos();
+    virtual ~EventInfos() {};
+
+#if defined(GDE)
+    std::string fullname;
+    std::string description;
+    std::string group;
+    wxBitmap smallicon;
+#endif
+
+    BaseEventSPtr instance;
 };
 
 /**
@@ -565,6 +619,7 @@ class GD_API ExtensionBase
     const std::map<std::string, InstructionInfos > & GetAllActions() const;
     const std::map<std::string, InstructionInfos > & GetAllConditions() const;
     const std::map<std::string, ExpressionInfos > & GetAllExpressions() const;
+    const std::map<std::string, EventInfos > & GetAllEvents() const;
     const std::map<std::string, InstructionInfos > & GetAllActionsForObject(std::string objectType) const;
     const std::map<std::string, InstructionInfos > & GetAllConditionsForObject(std::string objectType) const;
     const std::map<std::string, ExpressionInfos > & GetAllExpressionsForObject(std::string objectType) const;
@@ -590,6 +645,12 @@ class GD_API ExtensionBase
      */
     DestroyFunPtr       GetDestroyObjectFunction(std::string objectType) const;
 
+    /**
+     * Create an custom event.
+     * Return NULL if eventType is not provided by the extension.
+     */
+    BaseEventSPtr CreateEvent(std::string eventType) const;
+
     inline std::string GetNameSpace() { return nameSpace; };
 
     protected :
@@ -612,6 +673,7 @@ class GD_API ExtensionBase
     std::map<std::string, InstructionInfos > conditionsInfos;
     std::map<std::string, InstructionInfos > actionsInfos;
     std::map<std::string, ExpressionInfos > expressionsInfos;
+    std::map<std::string, EventInfos > eventsInfos;
 
     static std::map<std::string, InstructionInfos > badConditionsInfos;
     static std::map<std::string, InstructionInfos > badActionsInfos;

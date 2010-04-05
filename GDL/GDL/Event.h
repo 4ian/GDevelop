@@ -12,44 +12,78 @@
 #include <cmath>
 #include "GDL/Log.h"
 #include "GDL/Instruction.h"
+class RuntimeScene;
+class ObjectsConcerned;
+class Instruction;
+class Evaluateur;
+class TiXmlElement;
+
+class BaseEvent;
+typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
 
 /**
- * @brief An event contains conditions to check and actions to do if conditions are true.
- * Events can also be comments, links and can have sub events
+ * @brief An event is an item of an event list.
+ * Events are not instance of Base Event, but instance of a derived class.
  */
-class GD_API Event
+class GD_API BaseEvent
 {
     public:
-        Event();
-        virtual ~Event();
+        BaseEvent() {};
+        virtual ~BaseEvent() {};
+        virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new BaseEvent(*this));}
 
-        /** For all events : Type of the event */
-        string type;
+        /**
+         * Call when the event has to be executed. Redefined by derived class.
+         */
+        virtual void Execute( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval ) {return;};
 
-        /** For event only : List of conditions of this event */
-        vector < Instruction > conditions;
-        /** For event only : List of actions of this event */
-        vector < Instruction > actions;
-        /** For event only : Sub events */
-        vector < Event > events;
+        /**
+         * Derived class have to redefine this function, so as to return true, if they are executable.
+         */
+        virtual bool IsExecutable() const {return false;};
 
-        /** For comment-event only : Color of the comment */
-        int r;
-        /** For comment-event only : Color of the comment */
-        int v;
-        /** For comment-event only : Color of the comment */
-        int b;
-        /** For comment-event only : The main comment */
-        string com1;
-        /** For comment-event only : The second comment */
-        string com2;
+        /**
+         * Derived class have to redefine this function, so as to return true, if they have sub events.
+         */
+        virtual bool CanHaveSubEvents() const {return false;}
 
-        /** For link-event only : Scene linked to name */
-        string sceneLinked;
-        /** For link-event only : First event to import */
-        int start;
-        /** For link-event only : Last event to import */
-        int end;
+        /**
+         * Return the sub events, if applicable.
+         */
+        virtual const vector < BaseEventSPtr > & GetSubEvents() const {return badSubEvents;};
+
+        /**
+         * Return the sub events, if applicable.
+         */
+        virtual vector < BaseEventSPtr > & GetSubEvents() {return badSubEvents;};
+
+        /**
+         * Event must be able to return all conditions vector they have.
+         * Used to preprocess the conditions.
+         */
+        virtual vector < vector<Instruction>* > GetAllConditionsVectors() { vector < vector<Instruction>* > noConditions; return noConditions; };
+
+        /**
+         * Event must be able to return all actions vector they have.
+         * Used to preprocess the actions.
+         */
+        virtual vector < vector<Instruction>* > GetAllActionsVectors() { vector < vector<Instruction>* > noActions; return noActions; };
+
+        /**
+         * Event must be able to return all expressions they have.
+         * Used to preprocess the expressions.
+         */
+        virtual vector < GDExpression* > GetAllExpressions() { vector < GDExpression* > noExpr; return noExpr;};
+
+        /**
+         * Save event to XML
+         */
+        virtual void SaveToXml(TiXmlElement * eventElem) const {}
+
+        /**
+         * Load event from XML
+         */
+        virtual void LoadFromXml(const TiXmlElement * eventElem) {}
 
 #ifdef GDE
         mutable bool conditionsHeightNeedUpdate;
@@ -58,6 +92,14 @@ class GD_API Event
         mutable unsigned int actionsHeight;
         bool selected;
 #endif
+
+        static vector <BaseEventSPtr> badSubEvents;
+
+        std::string GetType() const { return type; };
+        void SetType(std::string type_) { type = type_; };
+
+    private:
+        string type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
 };
 
 

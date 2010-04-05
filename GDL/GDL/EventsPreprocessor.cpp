@@ -1,9 +1,15 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/EventsPreprocessor.h"
 #include "GDL/conditions.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/CommonInstructions.h"
+#include "GDL/StandardEvent.h" //TODO : WhenEventChangesAreComplete Deleteme
 
 /**
  * Link each condition to its function.
@@ -127,19 +133,29 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
  * Link each actions/conditions to its function.
  * Check the validity of objects type passed to parameters
  */
-void EventsPreprocessor::PreprocessEvents(const RuntimeScene & scene, vector < Event > & events)
+void EventsPreprocessor::PreprocessEvents(const RuntimeScene & scene, vector < BaseEventSPtr > & events)
 {
     for ( unsigned int eId = 0; eId < events.size();++eId )
     {
         bool eventInvalid = false;
 
         //Preprocess actions and conditions
-        PreprocessConditions(scene, events[eId].conditions, eventInvalid);
-        PreprocessActions(scene, events[eId].actions);
+        vector < vector<Instruction>* > allConditionsVectors = events[eId]->GetAllConditionsVectors();
+        for (unsigned int i = 0;i<allConditionsVectors.size();++i)
+            PreprocessConditions(scene, *allConditionsVectors[i], eventInvalid);
+
+        vector < vector<Instruction>* > allActionsVectors = events[eId]->GetAllActionsVectors();
+        for (unsigned int i = 0;i<allActionsVectors.size();++i)
+            PreprocessActions(scene, *allActionsVectors[i]);
+
+        //Preprocess internal expressions used by the event
+        vector < GDExpression* > allExpressions = events[eId]->GetAllExpressions();
+        for (unsigned int i = 0;i<allExpressions.size();++i)
+            Evaluateur::PreprocessExpression(*allExpressions[i], scene);
 
         //Preprocess Sub events
-        if ( !events[eId].events.empty() )
-            PreprocessEvents(scene, events[eId].events);
+        if ( events[eId]->CanHaveSubEvents() )
+            PreprocessEvents(scene, events[eId]->GetSubEvents());
 
         if ( eventInvalid ) //If the event is invalid, we need to delete it.
         {
@@ -149,13 +165,14 @@ void EventsPreprocessor::PreprocessEvents(const RuntimeScene & scene, vector < E
     }
 }
 
-void EventsPreprocessor::DeleteUselessEvents(vector < Event > & events)
+void EventsPreprocessor::DeleteUselessEvents(vector < BaseEventSPtr > & events)
 {
     for ( unsigned int eId = events.size()-1; eId < events.size();--eId )
     {
-        if ( events[eId].type == "Commentaire" ) //Suppression des commentaires
+        if ( !events[eId]->IsExecutable() ) //Delete events that are not executable
             events.erase(events.begin() + eId);
-        else if ( !events[eId].events.empty() ) //Sous évènements
-            DeleteUselessEvents(events[eId].events);
+
+        if ( events[eId]->CanHaveSubEvents() ) //Process sub events, if any
+            DeleteUselessEvents(events[eId]->GetSubEvents());
     }
 }

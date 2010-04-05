@@ -31,7 +31,7 @@ void Music::SetBuffer(const char * newbuffer, std::size_t size)
         delete buffer;
 
     buffer = new char[size];
-    memcpy(buffer, newbuffer, size);
+    *buffer = *newbuffer;
 }
 
 bool Music::OpenFromMemory(std::size_t size)

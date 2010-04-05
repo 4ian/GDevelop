@@ -20,7 +20,7 @@ SceneExtension::SceneExtension()
                    _("Scène"),
                    "res/conditions/depart24.png",
                    "res/conditions/depart.png",
-                   NULL);
+                   &CondSceneBegins);
 
     DECLARE_END_CONDITION()
 

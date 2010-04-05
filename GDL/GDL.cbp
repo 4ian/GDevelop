@@ -412,6 +412,8 @@
 		<Unit filename="GDL\ChoixDossier.h" />
 		<Unit filename="GDL\Collisions.cpp" />
 		<Unit filename="GDL\Collisions.h" />
+		<Unit filename="GDL\CommentEvent.cpp" />
+		<Unit filename="GDL\CommentEvent.h" />
 		<Unit filename="GDL\CommonInstructions.cpp" />
 		<Unit filename="GDL\CommonInstructions.h" />
 		<Unit filename="GDL\CommonInstructionsExtension.cpp" />
@@ -467,6 +469,8 @@
 		<Unit filename="GDL\KeyboardExtension.h" />
 		<Unit filename="GDL\Layer.cpp" />
 		<Unit filename="GDL\Layer.h" />
+		<Unit filename="GDL\LinkComment.cpp" />
+		<Unit filename="GDL\LinkComment.h" />
 		<Unit filename="GDL\ListVariable.cpp" />
 		<Unit filename="GDL\ListVariable.h" />
 		<Unit filename="GDL\LoadingScreen.cpp" />
@@ -540,6 +544,8 @@
 		<Unit filename="GDL\SpriteInitialPositionPanel.h" />
 		<Unit filename="GDL\SpriteObject.cpp" />
 		<Unit filename="GDL\SpriteObject.h" />
+		<Unit filename="GDL\StandardEvent.cpp" />
+		<Unit filename="GDL\StandardEvent.h" />
 		<Unit filename="GDL\StdAlgo.cpp" />
 		<Unit filename="GDL\StdAlgo.h" />
 		<Unit filename="GDL\Text.cpp" />

@@ -34,7 +34,7 @@ class GD_API Scene
         bool standardSortMethod;
         string title; ///< Title displayed in the window
 
-        vector < Event >                        events;
+        vector < BaseEventSPtr >                events;
         vector < boost::shared_ptr<Object> >    initialObjects;
         vector < ObjectGroup >                  objectGroups;
         vector < InitialPosition >              initialObjectsPositions;

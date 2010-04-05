@@ -32,7 +32,9 @@ void Scene::Init(const Scene & scene)
     standardSortMethod = scene.standardSortMethod;
     title = scene.title;
 
-    events = scene.events;
+    events.clear();
+    for (unsigned int i =0;i<scene.events.size();++i)
+    	events.push_back( scene.events[i]->Clone() );
 
     initialObjects.clear();
     for (unsigned int i =0;i<scene.initialObjects.size();++i)

@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include <vector>
 #include <map>
 #include <string>
@@ -113,6 +118,29 @@ boost::shared_ptr<ExtensionBase> ExtensionsManager::GetExtension(string name) co
     }
 
     return boost::shared_ptr<ExtensionBase> ();
+}
+
+bool ExtensionsManager::HasEventType(std::string eventType) const
+{
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        if ( extensionsLoaded[i]->CreateEvent(eventType) != boost::shared_ptr<BaseEvent>() )
+            return true;
+    }
+
+    return false;
+}
+
+boost::shared_ptr<BaseEvent> ExtensionsManager::CreateEvent(std::string eventType) const
+{
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        boost::shared_ptr<BaseEvent> event = extensionsLoaded[i]->CreateEvent(eventType);
+        if ( event != boost::shared_ptr<BaseEvent>() )
+            return event;
+    }
+
+    return boost::shared_ptr<BaseEvent>();
 }
 
 const InstructionInfos & ExtensionsManager::GetActionInfos(string actionType) const

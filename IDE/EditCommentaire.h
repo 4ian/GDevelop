@@ -7,13 +7,13 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include "GDL/Event.h"
+#include "GDL/CommentEvent.h"
 
 class EditCommentaire: public wxDialog
 {
 	public:
 
-		EditCommentaire(wxWindow* parent, Event * pEvent);
+		EditCommentaire(wxWindow* parent, CommentEvent & event_);
 		virtual ~EditCommentaire();
 
 		//(*Declarations(EditCommentaire)
@@ -25,7 +25,7 @@ class EditCommentaire: public wxDialog
 		wxButton* AideBt;
 		//*)
 
-		Event * m_event;
+		CommentEvent & commentEvent;
 
 	protected:
 

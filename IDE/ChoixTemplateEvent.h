@@ -26,8 +26,8 @@ class ChoixTemplateEvent: public wxDialog
 		void Refresh();
 		void RefreshTree();
 
-		vector < TemplateEvents > ListeTemplates;
-		TemplateEvents TemplateFinal;
+		vector < TemplateEvents > templatesList;
+		TemplateEvents finalTemplate;
 
 		//(*Declarations(ChoixTemplateEvent)
 		wxTextCtrl* Param3Edit;
@@ -46,6 +46,7 @@ class ChoixTemplateEvent: public wxDialog
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticLine* StaticLine2;
+		wxFlexGridSizer* controlsSizer;
 		wxTextCtrl* Param1Edit;
 		wxStaticText* Txt4;
 		wxStaticText* Txt7;
@@ -58,6 +59,8 @@ class ChoixTemplateEvent: public wxDialog
 		wxTextCtrl* Param7Edit;
 		wxButton* AideBt;
 		//*)
+		vector < wxStaticText* > descriptionsTxt;
+		vector < wxTextCtrl* > parametersEdit;
 
 	protected:
 
@@ -102,7 +105,7 @@ class ChoixTemplateEvent: public wxDialog
 		wxTreeItemId item;
 
 		string ConvertParam(string Parametre, string ToReplace, string ReplaceBy);
-        void ProcessEvents(vector < Event > & events );
+        void ProcessEvents(vector < BaseEventSPtr > & events );
 
 		DECLARE_EVENT_TABLE()
 };

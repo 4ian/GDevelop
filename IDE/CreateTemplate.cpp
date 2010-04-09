@@ -65,8 +65,8 @@ BEGIN_EVENT_TABLE( CreateTemplate, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-CreateTemplate::CreateTemplate( wxWindow* parent, vector < Event > & pEvents ) :
-        events( pEvents )
+CreateTemplate::CreateTemplate( wxWindow* parent, vector < BaseEventSPtr > & events_ ) :
+events( events_ )
 {
     //(*Initialize(CreateTemplate)
     wxFlexGridSizer* FlexGridSizer4;
@@ -275,43 +275,53 @@ void CreateTemplate::OnCreateBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Remplace les paramètres par des _PARAMx_
 ////////////////////////////////////////////////////////////
-void CreateTemplate::ProcessEvents(vector < Event > & eventsToProcess, vector < std::pair<string, int> > parameters)
+void CreateTemplate::ProcessEvents(vector < BaseEventSPtr > & eventsToProcess, vector < std::pair<string, int> > parameters)
 {
     //On remplace dans chaque paramètre des actions et des conditions
     for ( unsigned int i = 0;i < eventsToProcess.size() ;i++ )
     {
-        for ( unsigned int nb = 0;nb < eventsToProcess.at( i ).conditions.size() ;nb++ )
+        vector < vector<Instruction>* > allConditionsVectors = eventsToProcess[i]->GetAllConditionsVectors();
+        for (unsigned int c = 0;c<allConditionsVectors.size();++c)
         {
-            vector < GDExpression > parametres = eventsToProcess.at( i ).conditions.at( nb ).GetParameters();
-            for ( unsigned int j = 0;j < parametres.size() ;j++ )
+            for ( unsigned int nb = 0;nb < allConditionsVectors[c]->size() ;nb++ )
             {
-                //On respecte bien l'ordre, du plus grand au plus petit
-                for ( unsigned int k = 0; k < parameters.size() ;k++ )
+                vector < GDExpression > parametres = allConditionsVectors[c]->at( nb ).GetParameters();
+                for ( unsigned int j = 0;j < parametres.size() ;j++ )
                 {
-                    string ReplaceBy = "_PARAM" + st( parameters.at( k ).second ) + "_";
-                    parametres.at( j ) = GDExpression( ConvertParam( parametres.at( j ).GetPlainString(), parameters.at( k ).first, ReplaceBy ) );
+                    //On respecte bien l'ordre, du plus grand au plus petit
+                    for ( unsigned int k = 0; k < parameters.size() ;k++ )
+                    {
+                        string ReplaceBy = "_PARAM" + st( parameters.at( k ).second ) + "_";
+                        parametres.at( j ) = GDExpression( ConvertParam( parametres.at( j ).GetPlainString(), parameters.at( k ).first, ReplaceBy ) );
+                    }
                 }
+                allConditionsVectors[c]->at( nb ).SetParameters(parametres);
             }
-            eventsToProcess.at( i ).conditions.at( nb ).SetParameters(parametres);
-        }
-        for ( unsigned int nb = 0;nb < eventsToProcess.at( i ).actions.size() ;nb++ )
-        {
-            vector < GDExpression > parametres = eventsToProcess.at( i ).actions.at( nb ).GetParameters();
-            for ( unsigned int j = 0;j < parametres.size() ;j++ )
-            {
-                //On respecte bien l'ordre, du plus grand au plus petit
-                for ( unsigned int k = 0; k < parameters.size() ;k++ )
-                {
-                    string ReplaceBy = "_PARAM" + st( parameters.at( k ).second ) + "_";
-                    parametres.at( j ) = GDExpression( ConvertParam( parametres.at( j ).GetPlainString(), parameters.at( k ).first, ReplaceBy ) );
-                }
-            }
-            eventsToProcess.at( i ).actions.at( nb ).SetParameters(parametres);
         }
 
+        vector < vector<Instruction>* > allActionsVectors = eventsToProcess[i]->GetAllActionsVectors();
+        for (unsigned int a = 0;a<allActionsVectors.size();++a)
+        {
+            for ( unsigned int nb = 0;nb < allActionsVectors[a]->size() ;nb++ )
+            {
+                vector < GDExpression > parametres = allActionsVectors[a]->at( nb ).GetParameters();
+                for ( unsigned int j = 0;j < parametres.size() ;j++ )
+                {
+                    //On respecte bien l'ordre, du plus grand au plus petit
+                    for ( unsigned int k = 0; k < parameters.size() ;k++ )
+                    {
+                        string ReplaceBy = "_PARAM" + st( parameters.at( k ).second ) + "_";
+                        parametres.at( j ) = GDExpression( ConvertParam( parametres.at( j ).GetPlainString(), parameters.at( k ).first, ReplaceBy ) );
+                    }
+                }
+                allActionsVectors[a]->at( nb ).SetParameters(parametres);
+            }
+        }
+
+
         //Les sous évènements aussi
-        if ( !eventsToProcess[i].events.empty() )
-            ProcessEvents(eventsToProcess[i].events, parameters);
+        if ( eventsToProcess[i]->CanHaveSubEvents() )
+            ProcessEvents(eventsToProcess[i]->GetSubEvents(), parameters);
     }
 }
 

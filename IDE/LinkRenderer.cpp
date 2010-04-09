@@ -12,7 +12,7 @@
 #include <wx/settings.h>
 #include "GDL/StdAlgo.h"
 
-LinkRenderer::LinkRenderer(wxBufferedPaintDC & dc_, const Event & event_, EventsRendererDatas & eventsRenderersDatas_) :
+LinkRenderer::LinkRenderer(wxBufferedPaintDC & dc_, const LinkEvent & event_, EventsRendererDatas & eventsRenderersDatas_) :
 dc(dc_),
 event(event_),
 renderingDatas(eventsRenderersDatas_)

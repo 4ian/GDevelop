@@ -11,7 +11,7 @@
 #include <wx/colour.h>
 #include <wx/settings.h>
 
-CommentaireRenderer::CommentaireRenderer(wxBufferedPaintDC & dc_, const Event & event_, EventsRendererDatas & eventsRenderersDatas_) :
+CommentaireRenderer::CommentaireRenderer(wxBufferedPaintDC & dc_, const CommentEvent & event_, EventsRendererDatas & eventsRenderersDatas_) :
 dc(dc_),
 event(event_),
 renderingDatas(eventsRenderersDatas_)

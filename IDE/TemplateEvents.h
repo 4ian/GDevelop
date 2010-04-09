@@ -1,14 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- * Contient un template
- *
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef TEMPLATEEVENTS_H
@@ -21,27 +13,26 @@
 
 using namespace std;
 
+/**
+ * Class representing an events template
+ */
 class TemplateEvents
 {
     public:
-        TemplateEvents();
-        virtual ~TemplateEvents();
+        TemplateEvents() {};
+        TemplateEvents(const TemplateEvents & other);
+        virtual ~TemplateEvents() {};
 
-        vector < Event > events;
-        string nom;
+        TemplateEvents& operator=(const TemplateEvents & other);
+
+        vector < BaseEventSPtr > events;
+        vector < string > parameters;
+        string name;
         string desc;
 
-        string param1;
-        string param2;
-        string param3;
-        string param4;
-        string param5;
-        string param6;
-        string param7;
-        string param8;
-
-    protected:
     private:
+
+        void Init(const TemplateEvents & other);
 };
 
 #endif // TEMPLATEEVENTS_H

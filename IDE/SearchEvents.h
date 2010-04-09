@@ -22,7 +22,7 @@ class SearchEvents: public wxDialog
 {
 	public:
 
-		SearchEvents(wxWindow* parent, vector < Event > events_);
+		SearchEvents(wxWindow* parent, vector < BaseEventSPtr > events_);
 		virtual ~SearchEvents();
 
 		//(*Declarations(SearchEvents)
@@ -68,7 +68,7 @@ class SearchEvents: public wxDialog
 		//(*Handlers(SearchEvents)
 		//*)
 
-		vector < Event > events;
+		vector < BaseEventSPtr > events;
 
 		DECLARE_EVENT_TABLE()
 };

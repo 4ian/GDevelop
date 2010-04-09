@@ -6,7 +6,7 @@
 #ifndef COMMENTAIRERENDERER_H
 #define COMMENTAIRERENDERER_H
 
-#include "GDL/Event.h"
+#include "GDL/CommentEvent.h"
 #include "Renderer.h"
 #include <wx/dc.h>
 #include <wx/dcbuffer.h>
@@ -15,7 +15,7 @@
 class CommentaireRenderer : public Renderer
 {
     public:
-        CommentaireRenderer(wxBufferedPaintDC & dc_, const Event & event_, EventsRendererDatas & eventsRenderersDatas_);
+        CommentaireRenderer(wxBufferedPaintDC & dc_, const CommentEvent & event_, EventsRendererDatas & eventsRenderersDatas_);
         virtual ~CommentaireRenderer() {};
 
         void Render() const;
@@ -24,7 +24,7 @@ class CommentaireRenderer : public Renderer
     protected:
     private:
         wxBufferedPaintDC & dc;
-        const Event & event;
+        const CommentEvent & event;
         EventsRendererDatas & renderingDatas;
 };
 

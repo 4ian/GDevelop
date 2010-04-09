@@ -22,7 +22,7 @@ class CreateTemplate: public wxDialog
 {
 	public:
 
-		CreateTemplate(wxWindow* parent, vector < Event > & pEvents);
+		CreateTemplate(wxWindow* parent, vector < BaseEventSPtr > & pEvents);
 		virtual ~CreateTemplate();
 
 		//(*Declarations(CreateTemplate)
@@ -114,10 +114,10 @@ class CreateTemplate: public wxDialog
 		void OnButton1Click(wxCommandEvent& event);
 		//*)
 
-        vector < Event > events;
+        vector < BaseEventSPtr > events;
 
 		string ConvertParam(string Parametre, string ToReplace, string ReplaceBy);
-        void ProcessEvents(vector < Event > & eventsToProcess, vector < std::pair<string, int> > parameters);
+        void ProcessEvents(vector < BaseEventSPtr > & eventsToProcess, vector < std::pair<string, int> > parameters);
 
 		DECLARE_EVENT_TABLE()
 };

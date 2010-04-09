@@ -6,7 +6,7 @@
 #ifndef LINKRENDERER_H
 #define LINKRENDERER_H
 
-#include "GDL/Event.h"
+#include "GDL/LinkEvent.h"
 #include "Renderer.h"
 #include <wx/dc.h>
 #include <wx/dcbuffer.h>
@@ -15,7 +15,7 @@
 class LinkRenderer : public Renderer
 {
     public:
-        LinkRenderer(wxBufferedPaintDC & dc_, const Event & event_, EventsRendererDatas & eventsRenderersDatas_);
+        LinkRenderer(wxBufferedPaintDC & dc_, const LinkEvent & event_, EventsRendererDatas & eventsRenderersDatas_);
         virtual ~LinkRenderer() {};
 
         void Render() const;
@@ -23,7 +23,7 @@ class LinkRenderer : public Renderer
     protected:
     private:
         wxBufferedPaintDC & dc;
-        const Event & event;
+        const LinkEvent & event;
         EventsRendererDatas & renderingDatas;
 };
 

@@ -22,7 +22,8 @@ BEGIN_EVENT_TABLE(EditCommentaire,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditCommentaire::EditCommentaire(wxWindow* parent, Event * pEvent)
+EditCommentaire::EditCommentaire(wxWindow* parent, CommentEvent & event_) :
+commentEvent(event_)
 {
 	//(*Initialize(EditCommentaire)
 	wxStaticBoxSizer* StaticBoxSizer2;
@@ -64,12 +65,10 @@ EditCommentaire::EditCommentaire(wxWindow* parent, Event * pEvent)
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditCommentaire::OnAideBtClick);
 	//*)
 
-	m_event = pEvent;
+	Com1Edit->SetValue( commentEvent.com1 );
+	Com2Edit->SetValue( commentEvent.com2 );
 
-	Com1Edit->SetValue( m_event->com1 );
-	Com2Edit->SetValue( m_event->com2 );
-
-	ColorBt->SetBackgroundColour(wxColour(m_event->r, m_event->v, m_event->b ));
+	ColorBt->SetBackgroundColour(wxColour(commentEvent.r, commentEvent.v, commentEvent.b ));
 }
 
 EditCommentaire::~EditCommentaire()
@@ -95,12 +94,12 @@ void EditCommentaire::OnColorBtClick(wxCommandEvent& event)
 
 void EditCommentaire::OnOkBtClick(wxCommandEvent& event)
 {
-    m_event->com1 = static_cast<string> ( Com1Edit->GetValue() );
-    m_event->com2 = static_cast<string> ( Com2Edit->GetValue() );
+    commentEvent.com1 = static_cast<string> ( Com1Edit->GetValue() );
+    commentEvent.com2 = static_cast<string> ( Com2Edit->GetValue() );
 
-    m_event->r = ColorBt->GetBackgroundColour().Red();
-    m_event->v = ColorBt->GetBackgroundColour().Green();
-    m_event->b = ColorBt->GetBackgroundColour().Blue();
+    commentEvent.r = ColorBt->GetBackgroundColour().Red();
+    commentEvent.v = ColorBt->GetBackgroundColour().Green();
+    commentEvent.b = ColorBt->GetBackgroundColour().Blue();
 
     EndModal(1);
 }

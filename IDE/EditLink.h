@@ -12,13 +12,13 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include "GDL/Event.h"
+#include "GDL/LinkEvent.h"
 
 class EditLink: public wxDialog
 {
 	public:
 
-		EditLink(wxWindow* parent, Event & pEvent);
+		EditLink(wxWindow* parent, LinkEvent & pEvent);
 		virtual ~EditLink();
 
 		//(*Declarations(EditLink)
@@ -41,7 +41,7 @@ class EditLink: public wxDialog
 		wxButton* AideBt;
 		//*)
 
-		Event & eventToEdit;
+		LinkEvent & eventToEdit;
 
 	protected:
 

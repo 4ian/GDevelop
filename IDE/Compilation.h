@@ -117,7 +117,7 @@ class Compilation: public wxDialog
 		//*)
 
         string CopyAndReduceFileName( string file, string & report );
-        void CopyEventsRes(const Game & Jeu, vector < Event > & events, string & report);
+        void CopyEventsRes(const Game & Jeu, vector < BaseEventSPtr > & events, string & report);
         void PrepareTempDir(string & report);
 		Game * m_jeu;
 		bool IsCompressing;

@@ -17,6 +17,7 @@ extern MemTrace MemTracer;
 
 Clipboard::Clipboard() :
 objectCopied(boost::shared_ptr<Object>()),
+eventCopied(boost::shared_ptr<BaseEvent>()),
 hasObject(false),
 hasEvent(false),
 hasAction(false),
@@ -75,13 +76,13 @@ bool Clipboard::HasObject()
     return false;
 }
 
-void Clipboard::SetEvent( const Event & event )
+void Clipboard::SetEvent( BaseEventSPtr event )
 {
     eventCopied = event;
     hasEvent = true;
 }
 
-Event Clipboard::GetEvent()
+BaseEventSPtr Clipboard::GetEvent()
 {
     return eventCopied;
 }

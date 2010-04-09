@@ -30,7 +30,7 @@ class EditorEvents: public wxPanel
 	public:
 
 
-        EditorEvents(wxWindow* parent, Game & game_, Scene & scene_, vector < Event > * events_, MainEditorCommand & mainEditorCommand_ );
+        EditorEvents(wxWindow* parent, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ );
 		virtual ~EditorEvents();
 
 		static void CreateRibbonPage(wxRibbonPage * page);
@@ -192,14 +192,14 @@ class EditorEvents: public wxPanel
 		void OnEditLinkMenuSelected(wxCommandEvent& event);
 		void OnEditCommentMenuSelected(wxCommandEvent& event);
 		//*)
-        void DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & maximalWidth, bool draw);
+        void DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & maximalWidth, bool draw);
         void OnSearchBtClick(wxCommandEvent& event);
         void ChangesMadeOnEvents();
-        void ResetEventsSizeCache(vector < Event > & eventsToReset);
+        void ResetEventsSizeCache(vector < BaseEventSPtr > & eventsToReset);
 
-        void DeselectAllEvents(vector < Event > & eventsToUnselected);
-        void DeselectAllActions(vector < Event > & eventsToUnselected);
-        void DeselectAllConditions(vector < Event > & eventsToUnselected);
+        void DeselectAllEvents(vector < BaseEventSPtr > & eventsToUnselected);
+        void DeselectAllActions(vector < BaseEventSPtr > & eventsToUnselected);
+        void DeselectAllConditions(vector < BaseEventSPtr > & eventsToUnselected);
 
         Instruction & GetLastSelectedInstruction();
         Instruction & GetSelectedInstruction(unsigned int nb);
@@ -207,11 +207,11 @@ class EditorEvents: public wxPanel
         vector < Instruction > * GetSelectedListOfInstructions(unsigned int nb);
         vector < Instruction > * GetLastSelectedListOfInstructions();
 
-        Event & GetLastSelectedEvent();
-        Event & GetSelectedEvent(unsigned int nb);
+        BaseEventSPtr GetLastSelectedEvent();
+        BaseEventSPtr GetSelectedEvent(unsigned int nb);
 
-        vector < Event > * GetSelectedListOfEvents(unsigned int nb);
-        vector < Event > * GetLastSelectedListOfEvents();
+        vector < BaseEventSPtr > * GetSelectedListOfEvents(unsigned int nb);
+        vector < BaseEventSPtr > * GetLastSelectedListOfEvents();
 
         SearchEvents * searchDialog;
 
@@ -224,13 +224,13 @@ class EditorEvents: public wxPanel
          * Reference to the scene edited
          */
 		Scene & scene;
-        vector < Event > * events; //Pointeur vers les évènements à modifier
+        vector < BaseEventSPtr > * events; //Pointeur vers les évènements à modifier
 
 		MainEditorCommand & mainEditorCommand;
 
         //Annulation
-        vector < vector < Event > > history; //Historique des changements
-        vector < vector < Event > > redoHistory; //Historique des changements pour "refaire"
+        vector < vector < BaseEventSPtr > > history; //Historique des changements
+        vector < vector < BaseEventSPtr > > redoHistory; //Historique des changements pour "refaire"
 
         unsigned int conditionsColumnWidth;
         EventsRendererDatas eventsRenderersDatas;
@@ -242,16 +242,16 @@ class EditorEvents: public wxPanel
         bool isResizingColumns;
 
         //Selection
-        vector < boost::tuple< vector < Event > *, unsigned int, vector < Instruction > *, unsigned int >
+        vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int >
                 > eventsSelected; ///<First: Pointer to the event list, 2nd: Number of the event in this list, 3rd: Pointer to the list of instruction, Second: index of the instruction in this list
         bool conditionsSelected;
         bool instructionsSelected;
 
-        vector < Event > unusedEventList;
+        vector < BaseEventSPtr > unusedEventList;
 
 		wxToolBar * toolbar;
 
-		static Event badEvent;
+		static BaseEventSPtr badEvent;
 		static Instruction badInstruction;
 
 		DECLARE_EVENT_TABLE()

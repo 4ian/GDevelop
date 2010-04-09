@@ -1,6 +1,6 @@
 #ifndef EDITDOSSIER_H
 #define EDITDOSSIER_H
-
+/*
 //(*Headers(EditDossier)
 #include <wx/sizer.h>
 #include <wx/textctrl.h>
@@ -52,5 +52,5 @@ class EditDossier: public wxDialog
 
 		DECLARE_EVENT_TABLE()
 };
-
+*/
 #endif

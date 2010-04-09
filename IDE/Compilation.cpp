@@ -667,37 +667,42 @@ void Compilation::OnNext2Click(wxCommandEvent& event)
     Notebook1->SetSelection(2);
 }
 
-void Compilation::CopyEventsRes(const Game & Jeu, vector < Event > & events, string & report)
+void Compilation::CopyEventsRes(const Game & Jeu, vector < BaseEventSPtr > & events, string & report)
 {
     for ( unsigned int j = 0;j < events.size() ;j++ )
     {
-        for ( unsigned int k = 0;k < events.at( j ).actions.size() ;k++ )
+        vector < vector<Instruction>* > allActionsVectors = events[j]->GetAllActionsVectors();
+        for (unsigned int i = 0;i<allActionsVectors.size();++i)
         {
-            if ( events.at( j ).actions.at( k ).GetType() == "PlaySound" || events.at( j ).actions.at( k ).GetType() == "PlaySoundCanal" )
+            for ( unsigned int k = 0;k < allActionsVectors[i]->size() ;k++ )
             {
-                StaticText2->SetLabel( events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString() );
-                //Copie et réduction du nom des sons
-                events.at( j ).actions.at( k ).SetParameter( 0, CopyAndReduceFileName( events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString(), report ));
-            }
-            if ( events.at( j ).actions.at( k ).GetType() == "PlayMusic" || events.at( j ).actions.at( k ).GetType() == "PlayMusicCanal" )
-            {
-                StaticText2->SetLabel( events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString() );
-                //Copie et réduction du nom des musiques
-                events.at( j ).actions.at( k ).SetParameter( 0 , CopyAndReduceFileName( events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString(), report ));
-            }
-            if ( events.at( j ).actions.at( k ).GetType() == "EcrireTexte" )
-            {
-                if ( events.at( j ).actions.at( k ).GetParameter( 5 ).GetPlainString() != "" )
+                if ( allActionsVectors[i]->at( k ).GetType() == "PlaySound" || allActionsVectors[i]->at( k ).GetType() == "PlaySoundCanal" )
                 {
-
-                    StaticText2->SetLabel( events.at( j ).actions.at( k ).GetParameter( 5 ).GetPlainString() );
+                    StaticText2->SetLabel( allActionsVectors[i]->at( k ).GetParameter( 0 ).GetPlainString() );
+                    //Copie et réduction du nom des sons
+                    allActionsVectors[i]->at( k ).SetParameter( 0, CopyAndReduceFileName( allActionsVectors[i]->at( k ).GetParameter( 0 ).GetPlainString(), report ));
+                }
+                if ( allActionsVectors[i]->at( k ).GetType() == "PlayMusic" || allActionsVectors[i]->at( k ).GetType() == "PlayMusicCanal" )
+                {
+                    StaticText2->SetLabel( allActionsVectors[i]->at( k ).GetParameter( 0 ).GetPlainString() );
                     //Copie et réduction du nom des musiques
-                    events.at( j ).actions.at( k ).SetParameter( 5, CopyAndReduceFileName( events.at( j ).actions.at( k ).GetParameter( 5 ).GetPlainString(), report ));
+                    allActionsVectors[i]->at( k ).SetParameter( 0 , CopyAndReduceFileName( allActionsVectors[i]->at( k ).GetParameter( 0 ).GetPlainString(), report ));
+                }
+                if ( allActionsVectors[i]->at( k ).GetType() == "EcrireTexte" )
+                {
+                    if ( allActionsVectors[i]->at( k ).GetParameter( 5 ).GetPlainString() != "" )
+                    {
+
+                        StaticText2->SetLabel( allActionsVectors[i]->at( k ).GetParameter( 5 ).GetPlainString() );
+                        //Copie et réduction du nom des musiques
+                        allActionsVectors[i]->at( k ).SetParameter( 5, CopyAndReduceFileName( allActionsVectors[i]->at( k ).GetParameter( 5 ).GetPlainString(), report ));
+                    }
                 }
             }
         }
-        if ( !events.at(j).events.empty() )
-            CopyEventsRes(Jeu, events.at(j).events, report);
+
+        if ( events.at(j)->CanHaveSubEvents() )
+            CopyEventsRes(Jeu, events.at(j)->GetSubEvents(), report);
     }
     wxSafeYield();
 

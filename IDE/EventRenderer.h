@@ -6,7 +6,7 @@
 #ifndef EVENTRENDERER_H
 #define EVENTRENDERER_H
 
-#include "GDL/Event.h"
+#include "GDL/StandardEvent.h"
 #include <wx/dc.h>
 #include <wx/dcbuffer.h>
 #include <wx/html/htmprint.h>
@@ -19,7 +19,7 @@
 class EventRenderer : public Renderer
 {
     public:
-        EventRenderer(wxBufferedPaintDC & dc_, const Event & event, EventsRendererDatas & eventsRenderersDatas_);
+        EventRenderer(wxBufferedPaintDC & dc_, const StandardEvent & event, EventsRendererDatas & eventsRenderersDatas_);
         virtual ~EventRenderer() {};
 
         void Render() const;
@@ -33,7 +33,7 @@ class EventRenderer : public Renderer
 
         //Datas for rendering
         wxBufferedPaintDC & dc;
-        const Event & event;
+        const StandardEvent & event;
         EventsRendererDatas & renderingDatas;
 };
 

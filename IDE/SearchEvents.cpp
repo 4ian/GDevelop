@@ -33,7 +33,7 @@ BEGIN_EVENT_TABLE(SearchEvents,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-SearchEvents::SearchEvents(wxWindow* parent, vector < Event > events_) :
+SearchEvents::SearchEvents(wxWindow* parent, vector < BaseEventSPtr > events_) :
 events(events_)
 {
 	//(*Initialize(SearchEvents)

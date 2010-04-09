@@ -16,6 +16,7 @@
 
 #include "tinyxml.h"
 #include "GDL/Game.h"
+#include "GDL/StdAlgo.h"
 #include "GDL/OpenSaveGame.h"
 #include "TemplateEvents.h"
 #include "GDL/HelpFileAccess.h"
@@ -64,7 +65,6 @@ ChoixTemplateEvent::ChoixTemplateEvent( wxWindow* parent )
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
     wxFlexGridSizer* FlexGridSizer2;
-    wxFlexGridSizer* FlexGridSizer6;
     wxFlexGridSizer* FlexGridSizer1;
 
     Create(parent, wxID_ANY, _("Choisir un modèle d\'évènement"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
@@ -96,57 +96,57 @@ ChoixTemplateEvent::ChoixTemplateEvent( wxWindow* parent )
     FlexGridSizer2->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     DesTxt = new wxStaticText(this, ID_STATICTEXT3, _("Selectionnez un modèle dans la liste"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     FlexGridSizer2->Add(DesTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer6 = new wxFlexGridSizer(0, 1, 0, 0);
-    FlexGridSizer6->AddGrowableCol(0);
+    controlsSizer = new wxFlexGridSizer(0, 1, 0, 0);
+    controlsSizer->AddGrowableCol(0);
     Txt1 = new wxStaticText(this, ID_STATICTEXT4, _("Description paramètre 1"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
     Txt1->Hide();
-    FlexGridSizer6->Add(Txt1, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Txt1, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Param1Edit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     Param1Edit->Hide();
-    FlexGridSizer6->Add(Param1Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Param1Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Txt2 = new wxStaticText(this, ID_STATICTEXT5, _("Description paramètre 2"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
     Txt2->Hide();
-    FlexGridSizer6->Add(Txt2, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Txt2, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param2Edit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
     Param2Edit->Hide();
-    FlexGridSizer6->Add(Param2Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Param2Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Txt3 = new wxStaticText(this, ID_STATICTEXT6, _("Description paramètre 3"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
     Txt3->Hide();
-    FlexGridSizer6->Add(Txt3, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Txt3, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param3Edit = new wxTextCtrl(this, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
     Param3Edit->Hide();
-    FlexGridSizer6->Add(Param3Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Param3Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Txt4 = new wxStaticText(this, ID_STATICTEXT8, _("Description paramètre 4"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
     Txt4->Hide();
-    FlexGridSizer6->Add(Txt4, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Txt4, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param4Edit = new wxTextCtrl(this, ID_TEXTCTRL4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
     Param4Edit->Hide();
-    FlexGridSizer6->Add(Param4Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Param4Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Txt5 = new wxStaticText(this, ID_STATICTEXT7, _("Description paramètre 5"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
     Txt5->Hide();
-    FlexGridSizer6->Add(Txt5, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Txt5, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param5Edit = new wxTextCtrl(this, ID_TEXTCTRL5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
     Param5Edit->Hide();
-    FlexGridSizer6->Add(Param5Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Param5Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Txt6 = new wxStaticText(this, ID_STATICTEXT9, _("Description paramètre 6"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
     Txt6->Hide();
-    FlexGridSizer6->Add(Txt6, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Txt6, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param6Edit = new wxTextCtrl(this, ID_TEXTCTRL6, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
     Param6Edit->Hide();
-    FlexGridSizer6->Add(Param6Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Param6Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Txt7 = new wxStaticText(this, ID_STATICTEXT10, _("Description paramètre 7"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
     Txt7->Hide();
-    FlexGridSizer6->Add(Txt7, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Txt7, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param7Edit = new wxTextCtrl(this, ID_TEXTCTRL7, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
     Param7Edit->Hide();
-    FlexGridSizer6->Add(Param7Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Param7Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Txt8 = new wxStaticText(this, ID_STATICTEXT11, _("Description paramètre 8"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
     Txt8->Hide();
-    FlexGridSizer6->Add(Txt8, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Txt8, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param8Edit = new wxTextCtrl(this, ID_TEXTCTRL8, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
     Param8Edit->Hide();
-    FlexGridSizer6->Add(Param8Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer2->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    controlsSizer->Add(Param8Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer2->Add(controlsSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer4->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
@@ -184,12 +184,12 @@ ChoixTemplateEvent::~ChoixTemplateEvent()
 
 void ChoixTemplateEvent::OnInsererBtClick( wxCommandEvent& event )
 {
-    if ( ListeTemplates.empty() )
+    if ( templatesList.empty() )
         return;
 
-    ProcessEvents(ListeTemplates.at( 0 ).events);
+    ProcessEvents(templatesList.at( 0 ).events);
 
-    TemplateFinal = ListeTemplates.at( 0 );
+    finalTemplate = templatesList.at( 0 );
     EndModal( 1 );
     return;
 }
@@ -198,47 +198,49 @@ void ChoixTemplateEvent::OnInsererBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Remplace les _PARAMx_ par les paramètres
 ////////////////////////////////////////////////////////////
-void ChoixTemplateEvent::ProcessEvents(vector < Event > & events )
+void ChoixTemplateEvent::ProcessEvents(vector < BaseEventSPtr > & events )
 {
     //Pour chaque évènement
     for ( unsigned int j = 0;j < events.size() ; j++ )
     {
-        //Pour chaque condition
-        for ( unsigned int k = 0;k < events.at( j ).conditions.size() ;k++ )
+        vector < vector<Instruction>* > allConditionsVectors = events[j]->GetAllConditionsVectors();
+        for ( unsigned int k = 0;k < allConditionsVectors.size() ;k++ )
         {
-            //Pour chaque paramètre
-            for ( unsigned int l = 0;l < events.at( j ).conditions.at( k ).GetParameters().size() ;l++ )
+            for (unsigned int l = 0;l<allConditionsVectors[k]->size();++l)
             {
-                events.at( j ).conditions.at( k ).SetParameter( l , ConvertParam( events.at( j ).conditions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM1_", static_cast<string>( Param1Edit->GetValue() ) ) );
-                events.at( j ).conditions.at( k ).SetParameter( l , ConvertParam( events.at( j ).conditions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM2_", static_cast<string>( Param2Edit->GetValue() ) ) );
-                events.at( j ).conditions.at( k ).SetParameter( l , ConvertParam( events.at( j ).conditions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM3_", static_cast<string>( Param3Edit->GetValue() ) ) );
-                events.at( j ).conditions.at( k ).SetParameter( l , ConvertParam( events.at( j ).conditions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM4_", static_cast<string>( Param4Edit->GetValue() ) ) );
-                events.at( j ).conditions.at( k ).SetParameter( l , ConvertParam( events.at( j ).conditions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM5_", static_cast<string>( Param5Edit->GetValue() ) ) );
-                events.at( j ).conditions.at( k ).SetParameter( l , ConvertParam( events.at( j ).conditions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM6_", static_cast<string>( Param6Edit->GetValue() ) ) );
-                events.at( j ).conditions.at( k ).SetParameter( l , ConvertParam( events.at( j ).conditions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM7_", static_cast<string>( Param7Edit->GetValue() ) ) );
-                events.at( j ).conditions.at( k ).SetParameter( l , ConvertParam( events.at( j ).conditions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM8_", static_cast<string>( Param8Edit->GetValue() ) ) );
-
+            	for (unsigned int m = 0;m<allConditionsVectors[k]->at(l).GetParameters().size();++m)
+            	{
+            	    unsigned int paramNb = 0;
+                    while ( paramNb < parametersEdit.size() )
+                    {
+                        string str = allConditionsVectors[k]->at(l).GetParameter(m).GetPlainString();
+                        allConditionsVectors[k]->at(l).SetParameter(m , ConvertParam( str, "_PARAM"+toString(paramNb+1)+"_", static_cast<string>( parametersEdit[paramNb]->GetValue() ) ) );
+                        paramNb++;
+                    }
+            	}
             }
         }
-        //Pour chaque condition
-        for ( unsigned int k = 0;k < events.at( j ).actions.size() ;k++ )
+
+        vector < vector<Instruction>* > allActionsVectors = events[j]->GetAllActionsVectors();
+        for ( unsigned int k = 0;k < allActionsVectors.size() ;k++ )
         {
-            //Pour chaque paramètre
-            for ( unsigned int l = 0;l < events.at( j ).actions.at( k ).GetParameters().size() ;l++ )
+            for (unsigned int l = 0;l<allActionsVectors[k]->size();++l)
             {
-                events.at( j ).actions.at( k ).SetParameter( l , ConvertParam( events.at( j ).actions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM1_", static_cast<string>( Param1Edit->GetValue() ) ) );
-                events.at( j ).actions.at( k ).SetParameter( l , ConvertParam( events.at( j ).actions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM2_", static_cast<string>( Param2Edit->GetValue() ) ) );
-                events.at( j ).actions.at( k ).SetParameter( l , ConvertParam( events.at( j ).actions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM3_", static_cast<string>( Param3Edit->GetValue() ) ) );
-                events.at( j ).actions.at( k ).SetParameter( l , ConvertParam( events.at( j ).actions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM4_", static_cast<string>( Param4Edit->GetValue() ) ) );
-                events.at( j ).actions.at( k ).SetParameter( l , ConvertParam( events.at( j ).actions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM5_", static_cast<string>( Param5Edit->GetValue() ) ) );
-                events.at( j ).actions.at( k ).SetParameter( l , ConvertParam( events.at( j ).actions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM6_", static_cast<string>( Param6Edit->GetValue() ) ) );
-                events.at( j ).actions.at( k ).SetParameter( l , ConvertParam( events.at( j ).actions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM7_", static_cast<string>( Param7Edit->GetValue() ) ) );
-                events.at( j ).actions.at( k ).SetParameter( l , ConvertParam( events.at( j ).actions.at( k ).GetParameter( l ).GetPlainString(), "_PARAM8_", static_cast<string>( Param8Edit->GetValue() ) ) );
+            	for (unsigned int m = 0;m<allActionsVectors[k]->at(l).GetParameters().size();++m)
+            	{
+            	    unsigned int paramNb = 0;
+                    while ( paramNb < parametersEdit.size() )
+                    {
+                        string str = allActionsVectors[k]->at(l).GetParameter(m).GetPlainString();
+                        allActionsVectors[k]->at(l).SetParameter(m , ConvertParam( str, "_PARAM"+toString(paramNb+1)+"_", static_cast<string>( parametersEdit[paramNb]->GetValue() ) ) );
+                        paramNb++;
+                    }
+            	}
             }
         }
 
         //Les sous évènements aussi
-        if ( !events[j].events.empty() ) ProcessEvents(events[j].events);
+        if ( events[j]->CanHaveSubEvents() ) ProcessEvents(events[j]->GetSubEvents());
     }
 }
 
@@ -256,7 +258,7 @@ void ChoixTemplateEvent::Refresh()
     if ( TemplateTree->GetItemText( item ) == _( "Tous les modèles" ) || TemplateTree->GetItemText( item ) == "")
         return;
 
-    ListeTemplates.clear();
+    templatesList.clear();
 
     //Ouverture du fichier selectionné
     wxString fichier = "Template/" + TemplateTree->GetItemText( item );
@@ -276,35 +278,28 @@ void ChoixTemplateEvent::Refresh()
     //Passage en revue des templates
     while ( elem )
     {
-        TemplateEvents TEtoAdd;
+        TemplateEvents newTemplate;
 
-        if ( elem->Attribute( "nom" ) != NULL ) { TEtoAdd.nom = elem->Attribute( "nom" ); }
-        else { wxLogWarning( "Les informations concernant le nom d'un template manquent." ); }
-        if ( elem->Attribute( "desc" ) != NULL ) { TEtoAdd.desc = elem->Attribute( "desc" ); }
+        //For backward compatibility with GD 1.3.8892 and inferior
+        if ( elem->Attribute( "nom" ) != NULL ) { newTemplate.name = elem->Attribute( "nom" ); }
+
+        if ( elem->Attribute( "name" ) != NULL ) { newTemplate.name = elem->Attribute( "name" ); }
+        if ( elem->Attribute( "desc" ) != NULL ) { newTemplate.desc = elem->Attribute( "desc" ); }
         else { wxLogWarning( "Les informations concernant la description d'un template manquent." ); }
-        if ( elem->Attribute( "param1" ) != NULL ) { TEtoAdd.param1 = elem->Attribute( "param1" ); }
-        else { wxLogWarning( "Les informations concernant le 1er paramètre d'un template manquent." ); }
-        if ( elem->Attribute( "param2" ) != NULL ) { TEtoAdd.param2 = elem->Attribute( "param2" ); }
-        else { wxLogWarning( "Les informations concernant le 2eme paramètre d'un template manquent." ); }
-        if ( elem->Attribute( "param3" ) != NULL ) { TEtoAdd.param3 = elem->Attribute( "param3" ); }
-        else { wxLogWarning( "Les informations concernant le 3eme paramètre d'un template manquent." ); }
-        if ( elem->Attribute( "param4" ) != NULL ) { TEtoAdd.param4 = elem->Attribute( "param4" ); }
-        else { wxLogWarning( "Les informations concernant le 4eme paramètre d'un template manquent." ); }
-        if ( elem->Attribute( "param5" ) != NULL ) { TEtoAdd.param5 = elem->Attribute( "param5" ); }
-        else { wxLogWarning( "Les informations concernant le 5eme paramètre d'un template manquent." ); }
-        if ( elem->Attribute( "param6" ) != NULL ) { TEtoAdd.param6 = elem->Attribute( "param6" ); }
-        else { wxLogWarning( "Les informations concernant le 6eme paramètre d'un template manquent." ); }
-        if ( elem->Attribute( "param7" ) != NULL ) { TEtoAdd.param7 = elem->Attribute( "param7" ); }
-        else { wxLogWarning( "Les informations concernant le 7eme paramètre d'un template manquent." ); }
-        if ( elem->Attribute( "param8" ) != NULL ) { TEtoAdd.param8 = elem->Attribute( "param8" ); }
-        else { wxLogWarning( "Les informations concernant le 8eme paramètre d'un template manquent." ); }
+
+        unsigned int i = 1;
+        while ( elem->Attribute(string("param"+toString(i)).c_str()) != NULL )
+        {
+            newTemplate.parameters.push_back(elem->Attribute(string("param"+toString(i)).c_str()));
+            ++i;
+        }
 
         if ( elem->FirstChildElement( "Events" ) != NULL )
-            OpenSaveGame::OpenEvents(TEtoAdd.events, elem->FirstChildElement( "Events" ));
+            OpenSaveGame::OpenEvents(newTemplate.events, elem->FirstChildElement( "Events" ));
         else
             wxLogWarning( _( "Les évènements du modèle d'évènement manquent." ) );
 
-        ListeTemplates.push_back( TEtoAdd );
+        templatesList.push_back( newTemplate );
         elem = elem->NextSiblingElement();
 
     }
@@ -343,75 +338,39 @@ void ChoixTemplateEvent::OnTemplateTreeSelectionChanged( wxTreeEvent& event )
     item = event.GetItem();
     Refresh();
 
-    int i = 0;
-    if ( ListeTemplates.empty() )
+    cout << "prea";
+    int j = 0;
+    if ( templatesList.empty() )
         return;
 
-    DesTxt->SetLabel( ListeTemplates.at( i ).desc );
-    if ( ListeTemplates.at( i ).param1 != "" )
-    {
-        Txt1->Show( true );
-        Param1Edit->Show( true );
-        Txt1->SetLabel( ListeTemplates.at( i ).param1 );
-    }
-    else { Txt1->Show( false );Param1Edit->Show( false ); }
+    cout << "a";
 
-    if ( ListeTemplates.at( i ).param2 != "" )
-    {
-        Txt2->Show( true );
-        Param2Edit->Show( true );
-        Txt2->SetLabel( ListeTemplates.at( i ).param2 );
-    }
-    else { Txt2->Show( false );Param2Edit->Show( false ); }
+    DesTxt->SetLabel( templatesList[j].desc );
 
-    if ( ListeTemplates.at( i ).param3 != "" )
+    //Add control if necessary
+    while ( descriptionsTxt.size() < templatesList[j].parameters.size() )
     {
-        Txt3->Show( true );
-        Param3Edit->Show( true );
-        Txt3->SetLabel( ListeTemplates.at( i ).param3 );
+        descriptionsTxt.push_back(new wxStaticText(this, wxID_ANY, _("Description"), wxDefaultPosition, wxDefaultSize, 0, toString(descriptionsTxt.size())));
+        controlsSizer->Add(descriptionsTxt.back(), 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+        parametersEdit.push_back(new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, toString(parametersEdit.size())));
+        controlsSizer->Add(parametersEdit.back(), 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     }
-    else { Txt3->Show( false );Param3Edit->Show( false ); }
 
-    if ( ListeTemplates.at( i ).param4 != "" )
+    //Hide all controls
+    for (unsigned int i = 0;i<descriptionsTxt.size();++i)
     {
-        Txt4->Show( true );
-        Param4Edit->Show( true );
-        Txt4->SetLabel( ListeTemplates.at( i ).param4 );
+    	descriptionsTxt[i]->Show(false);
+    	parametersEdit[i]->Show(false);
     }
-    else { Txt4->Show( false );Param4Edit->Show( false ); }
 
-    if ( ListeTemplates.at( i ).param5 != "" )
+    //Update control for each parameter
+    for (unsigned int i = 0;i<templatesList[j].parameters.size();++i)
     {
-        Txt5->Show( true );
-        Param5Edit->Show( true );
-        Txt5->SetLabel( ListeTemplates.at( i ).param5 );
+        cout << "showed" << i;
+    	descriptionsTxt[i]->Show(true);
+    	parametersEdit[i]->Show(true);
+    	descriptionsTxt[i]->SetLabel(templatesList[j].parameters[i]);
     }
-    else { Txt5->Show( false );Param5Edit->Show( false ); }
-
-    if ( ListeTemplates.at( i ).param6 != "" )
-    {
-        Txt6->Show( true );
-        Param6Edit->Show( true );
-        Txt6->SetLabel( ListeTemplates.at( i ).param6 );
-    }
-    else { Txt6->Show( false );Param6Edit->Show( false ); }
-
-    if ( ListeTemplates.at( i ).param7 != "" )
-    {
-        Txt7->Show( true );
-        Param7Edit->Show( true );
-        Txt7->SetLabel( ListeTemplates.at( i ).param7 );
-    }
-    else { Txt7->Show( false );Param7Edit->Show( false ); }
-
-    if ( ListeTemplates.at( i ).param8 != "" )
-    {
-        Txt8->Show( true );
-        Param8Edit->Show( true );
-        Txt8->SetLabel( ListeTemplates.at( i ).param8 );
-    }
-    else { Txt8->Show( false );Param8Edit->Show( false ); }
-
 
     Layout();
     Fit();

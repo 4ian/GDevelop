@@ -1,5 +1,5 @@
 #include "EditDossier.h"
-
+/*
 //(*InternalHeaders(EditDossier)
 #include <wx/intl.h>
 #include <wx/string.h>
@@ -126,3 +126,4 @@ void EditDossier::OnAideBtClick(wxCommandEvent& event)
     HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
     helpFileAccess->DisplaySection(22);
 }
+*/

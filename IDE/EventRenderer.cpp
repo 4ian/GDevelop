@@ -16,7 +16,7 @@
 #include "TranslateCondition.h"
 #include "TranslateAction.h"
 
-EventRenderer::EventRenderer(wxBufferedPaintDC & dc_, const Event & event_, EventsRendererDatas & eventsRenderersDatas_) :
+EventRenderer::EventRenderer(wxBufferedPaintDC & dc_, const StandardEvent & event_, EventsRendererDatas & eventsRenderersDatas_) :
 dc(dc_),
 event(event_),
 renderingDatas(eventsRenderersDatas_)
@@ -78,7 +78,7 @@ void EventRenderer::Render() const
 
     //Draw conditions
     int yCondition = renderingDatas.GetOrigineY();
-    if ( event.conditions.empty() )
+    if ( event.GetConditions().empty() )
     {
         //Pas de conditions, on affiche juste un petit message
         wxRect rect(renderingDatas.GetOrigineX(),
@@ -110,26 +110,18 @@ void EventRenderer::Render() const
         //Draw each conditions
         int indentWidth = 0;
         yCondition += 1;
-        for ( unsigned int j = 0;j < event.conditions.size();j++ )
+        for ( unsigned int j = 0;j < event.GetConditions().size();j++ )
         {
-            const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(event.conditions[j].GetType());
-
-            //"OR" text if needed
-            if ( event.type == "OR" && j != 0 )
-            {
-                dc.SetFont( renderingDatas.GetItalicSmallFont() );
-                dc.DrawText(_("ou"), renderingDatas.GetOrigineX() + indentWidth + sideSeparation, yCondition );
-                yCondition += 9;
-            }
+            const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(event.GetConditions()[j].GetType());
 
             //Draw needed icons
             int leftIconsWidth = 0;
-            if ( event.conditions[j].IsInverted() )
+            if ( event.GetConditions()[j].IsInverted() )
             {
                 dc.DrawBitmap( wxBitmap( "res/contraire.png", wxBITMAP_TYPE_ANY ), renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth, yCondition, true );
                 leftIconsWidth += 18;
             }
-            if ( !event.conditions[j].IsLocal() )
+            if ( !event.GetConditions()[j].IsLocal() )
             {
                 dc.DrawBitmap( wxBitmap( "res/global.png", wxBITMAP_TYPE_ANY ), renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth, yCondition, true );
                 leftIconsWidth += 18;
@@ -142,21 +134,21 @@ void EventRenderer::Render() const
 
             yCondition += separation;
 
-            if ( event.conditions[j].selected )
+            if ( event.GetConditions()[j].selected )
             {
                 dc.SetBrush(renderingDatas.GetSelectedRectangleFillBrush());
                 dc.SetPen(renderingDatas.GetSelectedRectangleOutlinePen());
                 dc.DrawRectangle(renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth + iconWidth,
                                  yCondition,
                                  renderingDatas.GetConditionsColumnWidth()-(renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth + iconWidth)-2,
-                                 event.conditions[j].renderedHeight);
+                                 event.GetConditions()[j].renderedHeight);
             }
 
             //Draw the condition icon
             dc.DrawBitmap( instructionInfos.smallicon, renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth, yCondition, true );
 
             //Draw the condition text
-            string TexteFinal = TranslateCondition::Translate(event.conditions[j], instructionInfos,  false, true);
+            string TexteFinal = TranslateCondition::Translate(event.GetConditions()[j], instructionInfos,  false, true);
             renderingDatas.GetHTMLRenderer().SetHtmlText(TexteFinal);
             wxArrayInt neededArray;
             renderingDatas.GetHTMLRenderer().Render(renderingDatas.GetOrigineX() + indentWidth + sideSeparation + leftIconsWidth + iconWidth, yCondition, neededArray);
@@ -164,9 +156,9 @@ void EventRenderer::Render() const
             yCondition += renderingDatas.GetHTMLRenderer().GetTotalHeight()+separation+1;
 
             //Indentation
-            if ( event.conditions[j].GetType() == "Repeat" ||
-                 event.conditions[j].GetType() == "ForEach" ||
-                 event.conditions[j].GetType() == "While" )
+            if ( event.GetConditions()[j].GetType() == "Repeat" ||
+                 event.GetConditions()[j].GetType() == "ForEach" ||
+                 event.GetConditions()[j].GetType() == "While" )
             {
                 indentWidth += 15;
             }
@@ -176,7 +168,7 @@ void EventRenderer::Render() const
 
     //Draw actions
     int yAction = renderingDatas.GetOrigineY();
-    if ( event.actions.empty() )
+    if ( event.GetActions().empty() )
     {
         dc.SetFont( renderingDatas.GetItalicFont() );
         dc.DrawText( _("Pas d'actions"), renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + 2, renderingDatas.GetOrigineY() +1 );
@@ -186,13 +178,13 @@ void EventRenderer::Render() const
         //Draw each actions
         int indentWidth = 0;
         yAction += 1;
-        for ( unsigned int j = 0;j < event.actions.size();j++ )
+        for ( unsigned int j = 0;j < event.GetActions().size();j++ )
         {
-            const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(event.actions[j].GetType());
+            const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(event.GetActions()[j].GetType());
 
             //Draw global icon, if needed.
             int leftIconsWidth = 0;
-            if ( !event.actions[j].IsLocal() )
+            if ( !event.GetActions()[j].IsLocal() )
             {
                 dc.DrawBitmap( wxBitmap( "res/global.png", wxBITMAP_TYPE_ANY ), renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + sideSeparation + leftIconsWidth, yAction, true );
                 leftIconsWidth += 18;
@@ -206,28 +198,28 @@ void EventRenderer::Render() const
             //Draw the bitmap of the action
             yAction += separation;
 
-            if ( event.actions[j].selected )
+            if ( event.GetActions()[j].selected )
             {
                 dc.SetBrush(renderingDatas.GetSelectedRectangleFillBrush());
                 dc.SetPen(renderingDatas.GetSelectedRectangleOutlinePen());
                 dc.DrawRectangle(renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + leftIconsWidth + iconWidth + sideSeparation,
                                  yAction,
                                  renderingDatas.GetRenderZoneWidth() - (renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + leftIconsWidth + iconWidth + sideSeparation)-2,
-                                 event.actions[j].renderedHeight);
+                                 event.GetActions()[j].renderedHeight);
             }
 
             dc.DrawBitmap( instructionInfos.smallicon, renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + sideSeparation + leftIconsWidth, yAction, true );
 
             //Draw the action text
-            renderingDatas.GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( event.actions[j], instructionInfos, false, true ));
+            renderingDatas.GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( event.GetActions()[j], instructionInfos, false, true ));
             wxArrayInt neededArray;
             renderingDatas.GetHTMLRenderer().Render(renderingDatas.GetOrigineX() + (renderingDatas.GetConditionsColumnWidth() - renderingDatas.GetOrigineX()) + indentWidth + leftIconsWidth + iconWidth + sideSeparation, yAction, neededArray);
 
             yAction += renderingDatas.GetHTMLRenderer().GetTotalHeight()+separation+1;
 
             //Indentation
-            if ( event.actions[j].GetType() == "Repeat" ||
-                 event.actions[j].GetType() == "ForEach" )
+            if ( event.GetActions()[j].GetType() == "Repeat" ||
+                 event.GetActions()[j].GetType() == "ForEach" )
             {
                 indentWidth += 15;
             }
@@ -257,15 +249,15 @@ int EventRenderer::GetConditionsHeight() const
     const int separation = 1;
     const int sideSeparation = 1;
 
-    for ( unsigned int j = 0;j < event.conditions.size();j++ )
+    for ( unsigned int j = 0;j < event.GetConditions().size();j++ )
     {
-        if (event.conditions[j].renderedHeightNeedUpdate == true)
+        if (event.GetConditions()[j].renderedHeightNeedUpdate == true)
             event.conditionsHeightNeedUpdate = true;
     }
 
     if ( event.conditionsHeightNeedUpdate )
     {
-        if (  event.conditions.empty() )
+        if (  event.GetConditions().empty() )
             event.conditionsHeight = 17+1; //Taille nécessaire pour afficher "Pas de conditions" et "Pas d'actions"
         else
         {
@@ -277,20 +269,16 @@ int EventRenderer::GetConditionsHeight() const
             int yCondition = 0;
             int indentWidth = 0;
             yCondition += 1;
-            for ( unsigned int j = 0;j < event.conditions.size();j++ )
+            for ( unsigned int j = 0;j < event.GetConditions().size();j++ )
             {
-                const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(event.conditions[j].GetType());
-
-                //Petit espace pour le "ou" si besoin
-                if ( event.type == "OR" && j != 0 )
-                    yCondition += 9;
+                const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(event.GetConditions()[j].GetType());
 
                 //Largeur prise par les icones
                 int leftIconsWidth = 0;
-                if ( event.conditions[j].IsInverted() )
+                if ( event.GetConditions()[j].IsInverted() )
                     leftIconsWidth += 18;
 
-                if ( !event.conditions[j].IsLocal() )
+                if ( !event.GetConditions()[j].IsLocal() )
                     leftIconsWidth += 18;
 
                 //Largeur libre pour le texte
@@ -301,16 +289,16 @@ int EventRenderer::GetConditionsHeight() const
                 yCondition += separation;
 
                 //Calcul de la hauteur prise par le texte
-                renderingDatas.GetHTMLRenderer().SetHtmlText(TranslateCondition::Translate(event.conditions[j], instructionInfos, false, true));
+                renderingDatas.GetHTMLRenderer().SetHtmlText(TranslateCondition::Translate(event.GetConditions()[j], instructionInfos, false, true));
                 yCondition += renderingDatas.GetHTMLRenderer().GetTotalHeight()+separation+1;
 
-                event.conditions[j].renderedHeight = renderingDatas.GetHTMLRenderer().GetTotalHeight();
-                event.conditions[j].renderedHeightNeedUpdate = false;
+                event.GetConditions()[j].renderedHeight = renderingDatas.GetHTMLRenderer().GetTotalHeight();
+                event.GetConditions()[j].renderedHeightNeedUpdate = false;
 
                 //Indentation
-                if ( event.conditions[j].GetType() == "Repeat" ||
-                     event.conditions[j].GetType() == "ForEach" ||
-                     event.conditions[j].GetType() == "While" )
+                if ( event.GetConditions()[j].GetType() == "Repeat" ||
+                     event.GetConditions()[j].GetType() == "ForEach" ||
+                     event.GetConditions()[j].GetType() == "While" )
                 {
                     indentWidth += 15;
                 }
@@ -334,15 +322,15 @@ int EventRenderer::GetActionsHeight() const
     const int separation = 1;
     const int sideSeparation = 1;
 
-    for ( unsigned int j = 0;j < event.actions.size();j++ )
+    for ( unsigned int j = 0;j < event.GetActions().size();j++ )
     {
-        if (event.actions[j].renderedHeightNeedUpdate == true)
+        if (event.GetActions()[j].renderedHeightNeedUpdate == true)
             event.actionsHeightNeedUpdate = true;
     }
 
     if ( event.actionsHeightNeedUpdate )
     {
-        if ( event.actions.empty() )
+        if ( event.GetActions().empty() )
             event.actionsHeightNeedUpdate = 17+1; //Taille nécessaire pour afficher "Pas de conditions" et "Pas d'actions"
         else
         {
@@ -354,13 +342,13 @@ int EventRenderer::GetActionsHeight() const
             int yAction = 0;
             int indentWidth = 0;
             yAction += 1;
-            for ( unsigned int j = 0;j < event.actions.size();j++ )
+            for ( unsigned int j = 0;j < event.GetActions().size();j++ )
             {
-                const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(event.actions[j].GetType());
+                const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(event.GetActions()[j].GetType());
 
                 //Largeur prise par les icones
                 int leftIconsWidth = 0;
-                if ( !event.actions[j].IsLocal() )
+                if ( !event.GetActions()[j].IsLocal() )
                     leftIconsWidth += 18;
 
                 //Largeur libre pour le texte
@@ -371,15 +359,15 @@ int EventRenderer::GetActionsHeight() const
                 yAction += separation;
 
                 //Calcul de la hauteur prise par le texte
-                renderingDatas.GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( event.actions[j], instructionInfos, false, true ));
+                renderingDatas.GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( event.GetActions()[j], instructionInfos, false, true ));
                 yAction += renderingDatas.GetHTMLRenderer().GetTotalHeight()+separation+1;
 
-                event.actions[j].renderedHeight = renderingDatas.GetHTMLRenderer().GetTotalHeight();
-                event.actions[j].renderedHeightNeedUpdate = false;
+                event.GetActions()[j].renderedHeight = renderingDatas.GetHTMLRenderer().GetTotalHeight();
+                event.GetActions()[j].renderedHeightNeedUpdate = false;
 
                 //Indentation
-                if ( event.actions[j].GetType() == "Repeat" ||
-                     event.actions[j].GetType() == "ForEach" )
+                if ( event.GetActions()[j].GetType() == "Repeat" ||
+                     event.GetActions()[j].GetType() == "ForEach" )
                 {
                     indentWidth += 15;
                 }

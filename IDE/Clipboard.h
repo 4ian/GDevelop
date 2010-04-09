@@ -23,8 +23,8 @@ public:
     ObjSPtr GetObject();
     bool HasObject();
 
-    void SetEvent( const Event & event );
-    Event GetEvent();
+    void SetEvent( BaseEventSPtr event );
+    BaseEventSPtr GetEvent();
     bool HasEvent();
 
     void SetAction( const Instruction & action );
@@ -43,7 +43,7 @@ private:
     ObjSPtr objectCopied;
     bool hasObject;
 
-    Event eventCopied;
+    BaseEventSPtr eventCopied;
     bool hasEvent;
 
     Instruction actionCopied;

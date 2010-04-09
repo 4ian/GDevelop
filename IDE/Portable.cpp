@@ -130,38 +130,42 @@ void Portable::OnButton1Click(wxCommandEvent& event)
         wxSafeYield();
     }
 
-    for ( unsigned int i = 0;i < Jeu.scenes.size();i++ )
+    for ( unsigned int s = 0;s < Jeu.scenes.size();s++ )
     {
-        for ( unsigned int j = 0;j < Jeu.scenes[i]->events.size() ;j++ )
+        for ( unsigned int j = 0;j < Jeu.scenes[s]->events.size() ;j++ )
         {
-            for ( unsigned int k = 0;k < Jeu.scenes[i]->events.at( j ).actions.size() ;k++ )
+            vector < vector<Instruction>* > allActionsVectors = Jeu.scenes[s]->events[j]->GetAllActionsVectors();
+            for (unsigned int i = 0;i<allActionsVectors.size();++i)
             {
-                if ( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetType() == "PlaySound" || Jeu.scenes[i]->events.at( j ).actions.at( k ).GetType() == "PlaySoundCanal" )
+                for ( unsigned int k = 0;k < allActionsVectors[i]->size() ;k++ )
                 {
-                    StaticText2->SetLabel( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString() );
-                    //Copie et réduction du nom des sons
-                    Jeu.scenes[i]->events.at( j ).actions.at( k ).SetParameter( 0, CopyAndReduceFileName( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString(), rep ));
-                }
-                if ( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetType() == "PlayMusic" || Jeu.scenes[i]->events.at( j ).actions.at( k ).GetType() == "PlayMusicCanal" )
-                {
-                    StaticText2->SetLabel( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString() );
-                    //Copie et réduction du nom des musiques
-                    Jeu.scenes[i]->events.at( j ).actions.at( k ).SetParameter( 0, CopyAndReduceFileName( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 0 ).GetPlainString(), rep ));
-                }
-                if ( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetType() == "EcrireTexte" )
-                {
-                    if ( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 5 ).GetPlainString() != "" )
+                    if ( allActionsVectors[i]->at(k).GetType() == "PlaySound" || allActionsVectors[i]->at(k).GetType() == "PlaySoundCanal" )
                     {
-
-                        StaticText2->SetLabel( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 5 ).GetPlainString() );
+                        StaticText2->SetLabel( allActionsVectors[i]->at(k).GetParameter( 0 ).GetPlainString() );
+                        //Copie et réduction du nom des sons
+                        allActionsVectors[i]->at(k).SetParameter( 0, CopyAndReduceFileName( allActionsVectors[i]->at(k).GetParameter( 0 ).GetPlainString(), rep ));
+                    }
+                    if ( allActionsVectors[i]->at(k).GetType() == "PlayMusic" || allActionsVectors[i]->at(k).GetType() == "PlayMusicCanal" )
+                    {
+                        StaticText2->SetLabel( allActionsVectors[i]->at(k).GetParameter( 0 ).GetPlainString() );
                         //Copie et réduction du nom des musiques
-                        Jeu.scenes[i]->events.at( j ).actions.at( k ).SetParameter( 5, CopyAndReduceFileName( Jeu.scenes[i]->events.at( j ).actions.at( k ).GetParameter( 5 ).GetPlainString(), rep ));
+                        allActionsVectors[i]->at(k).SetParameter( 0, CopyAndReduceFileName( allActionsVectors[i]->at(k).GetParameter( 0 ).GetPlainString(), rep ));
+                    }
+                    if ( allActionsVectors[i]->at(k).GetType() == "EcrireTexte" )
+                    {
+                        if ( allActionsVectors[i]->at(k).GetParameter( 5 ).GetPlainString() != "" )
+                        {
+
+                            StaticText2->SetLabel( allActionsVectors[i]->at(k).GetParameter( 5 ).GetPlainString() );
+                            //Copie et réduction du nom des musiques
+                            allActionsVectors[i]->at(k).SetParameter( 5, CopyAndReduceFileName( allActionsVectors[i]->at(k).GetParameter( 5 ).GetPlainString(), rep ));
+                        }
                     }
                 }
             }
         }
         wxSafeYield();
-        AvancementGauge->SetValue(i/Jeu.scenes.size()*100/3+33);
+        AvancementGauge->SetValue(s/Jeu.scenes.size()*100/3+33);
     }
 
     wxSafeYield();
@@ -172,7 +176,7 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     Jeu.portable = false;
 
     AvancementGauge->SetValue(100);
-    wxLogMessage(_("Le jeu est disponible dans le répertoire choisi sous le nom de Game.gdg ."));
+    wxLogMessage(_("Le jeu est disponible dans le répertoire choisi sous le nom de Game.gdg."));
 }
 
 string Portable::CopyAndReduceFileName( string file, string rep )

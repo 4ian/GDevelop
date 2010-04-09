@@ -37,7 +37,7 @@ BEGIN_EVENT_TABLE(EditLink,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditLink::EditLink(wxWindow* parent, Event & pEvent) :
+EditLink::EditLink(wxWindow* parent, LinkEvent & pEvent) :
 eventToEdit(pEvent)
 {
 	//(*Initialize(EditLink)

@@ -31,6 +31,7 @@
 
 #include "Game_Develop_EditorMain.h"
 #include "GDL/Game.h"
+#include "GDL/ExtensionsManager.h"
 #include "TranslateCondition.h"
 #include "TranslateAction.h"
 #ifdef __WXMSW__
@@ -126,10 +127,10 @@ BEGIN_EVENT_TABLE( EditorEvents, wxPanel )
     //*)
 END_EVENT_TABLE()
 
-Event EditorEvents::badEvent;
+BaseEventSPtr EditorEvents::badEvent(new BaseEvent);
 Instruction EditorEvents::badInstruction;
 
-EditorEvents::EditorEvents( wxWindow* parent, Game & game_, Scene & scene_, vector < Event > * events_, MainEditorCommand & mainEditorCommand_ ) :
+EditorEvents::EditorEvents( wxWindow* parent, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ ) :
 game(game_),
 scene(scene_),
 events(events_),
@@ -557,18 +558,18 @@ void EditorEvents::OnEventsPanelResize( wxSizeEvent& event )
 ////////////////////////////////////////////////////////////
 /// Remise à zéro des variables contenant les tailles des évènements
 ////////////////////////////////////////////////////////////
-void EditorEvents::ResetEventsSizeCache(vector < Event > & eventsToReset)
+void EditorEvents::ResetEventsSizeCache(vector < BaseEventSPtr > & eventsToReset)
 {
-    vector<Event>::iterator e = eventsToReset.begin();
-    vector<Event>::const_iterator end = eventsToReset.end();
+    vector<BaseEventSPtr>::iterator e = eventsToReset.begin();
+    vector<BaseEventSPtr>::const_iterator end = eventsToReset.end();
 
     for(;e != end;++e)
     {
-        e->conditionsHeightNeedUpdate = true;
-        e->actionsHeightNeedUpdate = true;
+        (*e)->conditionsHeightNeedUpdate = true;
+        (*e)->actionsHeightNeedUpdate = true;
 
-        if ( !e->events.empty() )
-            ResetEventsSizeCache(e->events);
+        if ( (*e)->CanHaveSubEvents() )
+            ResetEventsSizeCache((*e)->GetSubEvents());
     }
 }
 
@@ -614,12 +615,12 @@ vector < Instruction > * EditorEvents::GetSelectedListOfInstructions(unsigned in
     return boost::tuples::get<2>(eventsSelected[nb]);
 }
 
-Event & EditorEvents::GetLastSelectedEvent()
+BaseEventSPtr EditorEvents::GetLastSelectedEvent()
 {
     return GetSelectedEvent(eventsSelected.size()-1);
 }
 
-Event & EditorEvents::GetSelectedEvent(unsigned int nb)
+BaseEventSPtr EditorEvents::GetSelectedEvent(unsigned int nb)
 {
     if ( nb >= eventsSelected.size() || boost::tuples::get<1>(eventsSelected[nb]) >= boost::tuples::get<0>(eventsSelected[nb])->size() )
         return badEvent;
@@ -627,12 +628,12 @@ Event & EditorEvents::GetSelectedEvent(unsigned int nb)
     return boost::tuples::get<0>(eventsSelected[nb])->at(boost::tuples::get<1>(eventsSelected[nb]));
 }
 
-vector < Event > * EditorEvents::GetLastSelectedListOfEvents()
+vector < BaseEventSPtr > * EditorEvents::GetLastSelectedListOfEvents()
 {
     return GetSelectedListOfEvents(eventsSelected.size()-1);
 }
 
-vector < Event > * EditorEvents::GetSelectedListOfEvents(unsigned int nb)
+vector < BaseEventSPtr > * EditorEvents::GetSelectedListOfEvents(unsigned int nb)
 {
     if ( nb >= eventsSelected.size() )
         return NULL;
@@ -695,7 +696,7 @@ void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
 /// Cette fonction est récursive en cas de sous évènements.
 /// Met aussi à jour eventTreeSelected avec l'évènement selectionné.
 ////////////////////////////////////////////////////////////
-void EditorEvents::DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & parentMaximalWidth, bool draw)
+void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & parentMaximalWidth, bool draw)
 {
     int positionScrollbar = ScrollBar1->GetThumbPosition();
     const int separation = 3;
@@ -714,14 +715,14 @@ void EditorEvents::DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, i
         //Get a renderer for the event
         bool normalEvent = false;
         Renderer * renderer = NULL;
-        if ( list[i].type == "Commentaire" )
-            renderer = new CommentaireRenderer(dc, list.at( i ), eventsRenderersDatas);
-        else if ( list[i].type == "Link" )
-            renderer = new LinkRenderer(dc, list.at( i ), eventsRenderersDatas);
-        else
+        if ( dynamic_cast<CommentEvent*>(list.at( i ).get()) != NULL )
+            renderer = new CommentaireRenderer(dc, *dynamic_cast<CommentEvent*>(list.at( i ).get()), eventsRenderersDatas);
+        else if ( dynamic_cast<LinkEvent*>(list.at( i ).get()) != NULL )
+            renderer = new LinkRenderer(dc, *dynamic_cast<LinkEvent*>(list.at( i ).get()), eventsRenderersDatas);
+        else if ( dynamic_cast<StandardEvent*>(list.at( i ).get()) != NULL )
         {
             normalEvent = true;
-            renderer = new EventRenderer(dc, list.at( i ), eventsRenderersDatas);
+            renderer = new EventRenderer(dc, *dynamic_cast<StandardEvent*>(list.at( i ).get()), eventsRenderersDatas);
         }
 
         //Hit test
@@ -729,8 +730,10 @@ void EditorEvents::DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, i
              MouseY <= Yposition+positionScrollbar+renderer->GetHeight() )
         {
 
-            if ( list[i].type != "Commentaire" && list[i].type != "Link")
+            if ( dynamic_cast<StandardEvent*>(list.at( i ).get()) != NULL )
             {
+                StandardEvent & event = *dynamic_cast<StandardEvent*>(list.at( i ).get());
+
                 if ( MouseX <= conditionsColumnWidth)
                 {
                     if ( !conditionsSelected )
@@ -741,29 +744,29 @@ void EditorEvents::DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, i
 
                     //Test for click on a condition
                     unsigned int conditionsY = 1;
-                    for (unsigned int c = 0;c<list[i].conditions.size();++c)
+                    for (unsigned int c = 0;c<event.GetConditions().size();++c)
                     {
                         conditionsY += 1;
                         if ( MouseY >= Yposition+positionScrollbar+conditionsY &&
-                             MouseY <= Yposition+positionScrollbar+conditionsY+list[i].conditions[c].renderedHeight)
+                             MouseY <= Yposition+positionScrollbar+conditionsY+event.GetConditions()[c].renderedHeight)
                         {
                             //If we have some events selected, deselect them.
                             if ( !instructionsSelected ) DeselectAllEvents(*events);
                             instructionsSelected = true;
 
-                            list[i].conditions[c].selected = true;
-                            eventsSelected.push_back(boost::make_tuple(&list, i, &list[i].conditions, c));
+                            event.GetConditions()[c].selected = true;
+                            eventsSelected.push_back(boost::make_tuple(&list, i, &event.GetConditions(), c));
                         }
-                        conditionsY += list[i].conditions[c].renderedHeight+2;
+                        conditionsY += event.GetConditions()[c].renderedHeight+2;
                     }
                     //Test for a click on "No conditions"
-                    if ( list[i].conditions.empty() && MouseY <= Yposition+positionScrollbar+18)
+                    if ( event.GetConditions().empty() && MouseY <= Yposition+positionScrollbar+18)
                     {
                         //If we have some events selected, deselect them.
                         if ( !instructionsSelected ) DeselectAllEvents(*events);
                         instructionsSelected = true;
 
-                        eventsSelected.push_back(boost::make_tuple(&list, i, &list[i].conditions, 0));
+                        eventsSelected.push_back(boost::make_tuple(&list, i, &event.GetConditions(), 0));
                     }
                 }
                 else
@@ -775,29 +778,29 @@ void EditorEvents::DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, i
                     }
 
                     unsigned int actionsY = 1;
-                    for (unsigned int a = 0;a<list[i].actions.size();++a)
+                    for (unsigned int a = 0;a<event.GetActions().size();++a)
                     {
                         actionsY += 1;
                         if ( MouseY >= Yposition+positionScrollbar+actionsY &&
-                             MouseY <= Yposition+positionScrollbar+actionsY+list[i].actions[a].renderedHeight)
+                             MouseY <= Yposition+positionScrollbar+actionsY+event.GetActions()[a].renderedHeight)
                          {
                             //If we have some events selected, deselect them.
                             if ( !instructionsSelected ) DeselectAllEvents(*events);
                             instructionsSelected = true;
 
-                            list[i].actions[a].selected = true;
-                            eventsSelected.push_back(boost::make_tuple(&list, i, &list[i].actions, a));
+                            event.GetActions()[a].selected = true;
+                            eventsSelected.push_back(boost::make_tuple(&list, i, &event.GetActions(), a));
                          }
-                        actionsY += list[i].actions[a].renderedHeight+2;
+                        actionsY += event.GetActions()[a].renderedHeight+2;
                     }
                     //Test for a click on "No actions"
-                    if ( list[i].actions.empty() )
+                    if ( event.GetActions().empty() )
                     {
                         //If we have some events selected, deselect them.
                         if ( !instructionsSelected ) DeselectAllEvents(*events);
                         instructionsSelected = true;
 
-                        eventsSelected.push_back(boost::make_tuple(&list, i, &list[i].actions, 0));
+                        eventsSelected.push_back(boost::make_tuple(&list, i, &event.GetActions(), 0));
                     }
                 }
 
@@ -806,14 +809,14 @@ void EditorEvents::DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, i
                 {
                     eventsSelected.push_back(boost::make_tuple(&list, i,              //Useful part
                                                                (vector<Instruction>*)NULL, 0)); //Useless
-                    list[i].selected = true;
+                    list[i]->selected = true;
                 }
             }
             else //Simple event selection
             {
                 eventsSelected.push_back(boost::make_tuple(&list, i,              //Useful part
                                                            (vector<Instruction>*)NULL, 0)); //Useless
-                list[i].selected = true;
+                list[i]->selected = true;
             }
         }
 
@@ -831,10 +834,10 @@ void EditorEvents::DrawEvents(vector < Event > & list, wxBufferedPaintDC & dc, i
         delete renderer;
 
         //Sub events
-        if ( !list[i].events.empty() )
+        if ( list[i]->CanHaveSubEvents() )
         {
             Yposition += separation;
-            DrawEvents(list[i].events, dc, Yposition, initialXposition+32, maximalWidth, draw);
+            DrawEvents(list[i]->GetSubEvents(), dc, Yposition, initialXposition+32, maximalWidth, draw);
         }
 
         Yposition += separation;
@@ -862,8 +865,8 @@ void EditorEvents::OnDelEventSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnDelConditionsSelected( wxCommandEvent& event )
 {
-    for (unsigned int i = 0;i<eventsSelected.size();++i)
-    	GetSelectedEvent(i).conditions.clear();
+    /*for (unsigned int i = 0;i<eventsSelected.size();++i)
+    	GetSelectedEvent(i).conditions.clear();*/ //TODO : Recreate
 
     ChangesMadeOnEvents();
 }
@@ -873,8 +876,8 @@ void EditorEvents::OnDelConditionsSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnDelActionsSelected( wxCommandEvent& event )
 {
-    for (unsigned int i = 0;i<eventsSelected.size();++i)
-    	GetSelectedEvent(i).actions.clear();
+    /*for (unsigned int i = 0;i<eventsSelected.size();++i)
+    	GetSelectedEvent(i).actions.clear(); */ //TODO : Recreate
 
     ChangesMadeOnEvents();
 }
@@ -890,12 +893,12 @@ void EditorEvents::OnTemplateBtClick( wxCommandEvent& event )
         return;
     }
 
-    ChoixTemplateEvent Dialog( this );
-    if ( Dialog.ShowModal() == 1 )
+    ChoixTemplateEvent dialog( this );
+    if ( dialog.ShowModal() == 1 )
     {
         //Insertion des évènements ( déjà personnalisés )
-        for ( unsigned int i = 0;i < Dialog.TemplateFinal.events.size();i++ )
-            GetLastSelectedListOfEvents()->push_back( Dialog.TemplateFinal.events.at( i ) );
+        for ( unsigned int i = 0;i < dialog.finalTemplate.events.size();i++ )
+            GetLastSelectedListOfEvents()->push_back( dialog.finalTemplate.events.at( i ) );
 
     }
 
@@ -911,9 +914,10 @@ void EditorEvents::OnMenuItem7Selected( wxCommandEvent& event )
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
-    Event eventToAdd;
-    eventToAdd.type = "Commentaire";
-    EditCommentaire Dialog( this, &eventToAdd );
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+    BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Comment");
+    EditCommentaire Dialog( this, *static_cast<CommentEvent*>(eventToAdd.get()) );
     if ( Dialog.ShowModal() == 1 )
     {
         if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
@@ -935,7 +939,9 @@ void EditorEvents::OnInsertEventSelected( wxCommandEvent& event )
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
-    Event eventToAdd;
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+    BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Standard");
 
     if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
         GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
@@ -956,9 +962,12 @@ void EditorEvents::OnSubEventMenuItemSelected(wxCommandEvent& event)
         wxLogStatus(_("Aucun endroit où insérer le sous évènement"));
         return;
     }
+    if ( !GetLastSelectedEvent()->CanHaveSubEvents() ) return;
 
-    Event eventToAdd;
-    GetLastSelectedEvent().events.push_back(eventToAdd);
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Standard");
+
+    GetLastSelectedEvent()->GetSubEvents().push_back(eventToAdd);
 
     ChangesMadeOnEvents();
 }
@@ -972,9 +981,11 @@ void EditorEvents::OnAddLienSelected( wxCommandEvent& event )
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
-    Event eventToAdd;
-    eventToAdd.type = "Link";
-    EditLink dialog( this, eventToAdd );
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+    BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Link");
+
+    EditLink dialog( this, *static_cast<LinkEvent*>(eventToAdd.get()) );
     if ( dialog.ShowModal() == 1 )
     {
         if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
@@ -1055,10 +1066,10 @@ void EditorEvents::OnMenuPasteAfterSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnPasteAsASubEventSelected(wxCommandEvent& event)
 {
-    if ( eventsSelected.empty() ) return;
+    if ( eventsSelected.empty() || !GetLastSelectedEvent()->CanHaveSubEvents() ) return;
 
     Clipboard * clipboard = Clipboard::getInstance();
-    GetLastSelectedEvent().events.push_back( clipboard->GetEvent() );
+    GetLastSelectedEvent()->GetSubEvents().push_back( clipboard->GetEvent() );
 
     ChangesMadeOnEvents();
 }
@@ -1068,9 +1079,9 @@ void EditorEvents::OnPasteAsASubEventSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnDelSubEventsSelected(wxCommandEvent& event)
 {
-    if ( eventsSelected.empty() ) return;
+    if ( eventsSelected.empty() || !GetLastSelectedEvent()->CanHaveSubEvents()  ) return;
 
-    GetLastSelectedEvent().events.clear();
+    GetLastSelectedEvent()->GetSubEvents().clear();
 
     ChangesMadeOnEvents();
 }
@@ -1088,7 +1099,8 @@ void EditorEvents::OnAideBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnCreateTemplateBtClick( wxCommandEvent& event )
 {
-    if ( eventsSelected.empty() );
+    if ( eventsSelected.empty() )
+        eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
     CreateTemplate dialog( this, *GetLastSelectedListOfEvents() );
     dialog.ShowModal();
@@ -1099,9 +1111,9 @@ void EditorEvents::OnCreateTemplateBtClick( wxCommandEvent& event )
  */
 void EditorEvents::OnEditLinkMenuSelected(wxCommandEvent& event)
 {
-    Event & eventSelected = GetLastSelectedEvent();
+    BaseEventSPtr eventSelected = GetLastSelectedEvent();
 
-    EditLink dialog( this, eventSelected );
+    EditLink dialog( this, *static_cast<LinkEvent*>(eventSelected.get()) );
     if ( dialog.ShowModal() == 1 )
         ChangesMadeOnEvents();
 }
@@ -1111,9 +1123,9 @@ void EditorEvents::OnEditLinkMenuSelected(wxCommandEvent& event)
  */
 void EditorEvents::OnEditCommentMenuSelected(wxCommandEvent& event)
 {
-    Event & eventSelected = GetLastSelectedEvent();
+    BaseEventSPtr eventSelected = GetLastSelectedEvent();
 
-    EditCommentaire dialog( this, &eventSelected );
+    EditCommentaire dialog( this, *static_cast<CommentEvent*>(eventSelected.get()) );
     if ( dialog.ShowModal() == 1 )
         ChangesMadeOnEvents();
 }
@@ -1134,23 +1146,25 @@ void EditorEvents::OnEventsPanelLeftDClick( wxMouseEvent& event )
     EventsPanel->Update();
 
     //Event specific edition
-    Event & eventSelected = GetLastSelectedEvent();
-    if ( eventSelected.type == "Commentaire" )
+    BaseEventSPtr eventSelected = GetLastSelectedEvent();
+    if ( dynamic_cast<CommentEvent*>(eventSelected.get()) != NULL )
     {
         wxCommandEvent unusedEvent;
         OnEditCommentMenuSelected(unusedEvent);
     }
-    else if ( eventSelected.type == "Link" )
+    else if ( dynamic_cast<LinkEvent*>(eventSelected.get()) != NULL)
     {
         wxCommandEvent unusedEvent;
         OnEditLinkMenuSelected(unusedEvent);
     }
-    else
+    else if ( dynamic_cast<StandardEvent*>(eventSelected.get()) != NULL)
     {
+        StandardEvent * standardEvent = dynamic_cast<StandardEvent*>(eventSelected.get());
+
         if ( conditionsSelected )
         {
             wxCommandEvent unusedEvent;
-            if ( !eventSelected.conditions.empty() )
+            if ( !standardEvent->GetConditions().empty() )
                 OneEditConditionMenuSelected(unusedEvent);
             else
                 OnAddConditionMenuSelected(unusedEvent);
@@ -1158,7 +1172,7 @@ void EditorEvents::OnEventsPanelLeftDClick( wxMouseEvent& event )
         else
         {
             wxCommandEvent unusedEvent;
-            if ( !eventSelected.actions.empty() )
+            if ( !standardEvent->GetActions().empty() )
                 OnEditActionMenuSelected(unusedEvent);
             else
                 OnAddActionMenuSelected(unusedEvent);
@@ -1225,25 +1239,31 @@ void EditorEvents::OnEventsPanelRightUp( wxMouseEvent& event )
     EventsPanel->Update();
 
     //Event specific menu
-    Event & eventSelected = GetLastSelectedEvent();
-    if ( eventSelected.type == "Commentaire" )
+    BaseEventSPtr eventSelected = GetLastSelectedEvent();
+    if ( dynamic_cast<CommentEvent*>(eventSelected.get()) != NULL )
     {
         PopupMenu( &commentMenu );
     }
-    else if ( eventSelected.type == "Link" )
+    if ( dynamic_cast<LinkEvent*>(eventSelected.get()) != NULL )
     {
         PopupMenu( &linkMenu );
     }
-    else if ( instructionsSelected && conditionsSelected )
+    else if ( dynamic_cast<StandardEvent*>(eventSelected.get()) != NULL
+              && instructionsSelected && conditionsSelected )
     {
-        if ( !GetLastSelectedEvent().conditions.empty() )
+        StandardEvent * standardEvent = dynamic_cast<StandardEvent*>(eventSelected.get());
+
+        if ( !standardEvent->GetConditions().empty() )
             PopupMenu( &conditionsMenu );
         else
             PopupMenu( &noConditionsMenu );
     }
-    else if ( instructionsSelected && !conditionsSelected )
+    else if ( dynamic_cast<StandardEvent*>(eventSelected.get()) != NULL
+              && instructionsSelected && !conditionsSelected )
     {
-        if ( !GetLastSelectedEvent().actions.empty() )
+        StandardEvent * standardEvent = dynamic_cast<StandardEvent*>(eventSelected.get());
+
+        if ( !standardEvent->GetActions().empty() )
             PopupMenu( &actionsMenu );
         else
             PopupMenu( &noActionsMenu );
@@ -1334,43 +1354,51 @@ void EditorEvents::OnEventsPanelLeftDown(wxMouseEvent& event)
         isResizingColumns = true;
 }
 
-void EditorEvents::DeselectAllEvents(vector < Event > & eventsToUnselected)
+void EditorEvents::DeselectAllEvents(vector < BaseEventSPtr > & eventsToUnselected)
 {
     eventsSelected.clear();
 
     for (unsigned int i = 0;i<eventsToUnselected.size();++i)
     {
-    	eventsToUnselected[i].selected = false;
-    	if ( !eventsToUnselected[i].events.empty() )
-            DeselectAllEvents(eventsToUnselected[i].events);
+    	eventsToUnselected[i]->selected = false;
+    	if ( eventsToUnselected[i]->CanHaveSubEvents() )
+            DeselectAllEvents(eventsToUnselected[i]->GetSubEvents());
     }
 }
 
-void EditorEvents::DeselectAllActions(vector < Event > & eventsToUnselected)
+void EditorEvents::DeselectAllActions(vector < BaseEventSPtr > & eventsToUnselected)
 {
     eventsSelected.clear();
 
-    for (unsigned int i = 0;i<eventsToUnselected.size();++i)
+    for (unsigned int eId = 0;eId<eventsToUnselected.size();++eId)
     {
-        for (unsigned int a = 0;a<eventsToUnselected[i].actions.size();++a)
-            eventsToUnselected[i].actions[a].selected = false;
+        vector < vector<Instruction>* > allActionsVectors = eventsToUnselected[eId]->GetAllActionsVectors();
+        for (unsigned int i = 0;i<allActionsVectors.size();++i)
+        {
+            for (unsigned int j = 0;j<allActionsVectors[i]->size();++j)
+                allActionsVectors[i]->at(j).selected = false;
+        }
 
-    	if ( !eventsToUnselected[i].events.empty() )
-            DeselectAllActions(eventsToUnselected[i].events);
+    	if ( eventsToUnselected[eId]->CanHaveSubEvents() )
+            DeselectAllActions(eventsToUnselected[eId]->GetSubEvents());
     }
 }
 
-void EditorEvents::DeselectAllConditions(vector < Event > & eventsToUnselected)
+void EditorEvents::DeselectAllConditions(vector < BaseEventSPtr > & eventsToUnselected)
 {
     eventsSelected.clear();
 
-    for (unsigned int i = 0;i<eventsToUnselected.size();++i)
+    for (unsigned int eId = 0;eId<eventsToUnselected.size();++eId)
     {
-        for (unsigned int c = 0;c<eventsToUnselected[i].conditions.size();++c)
-            eventsToUnselected[i].conditions[c].selected = false;
+        vector < vector<Instruction>* > allConditionsVector = eventsToUnselected[eId]->GetAllConditionsVectors();
+        for (unsigned int i = 0;i<allConditionsVector.size();++i)
+        {
+            for (unsigned int j = 0;j<allConditionsVector[i]->size();++j)
+                allConditionsVector[i]->at(j).selected = false;
+        }
 
-    	if ( !eventsToUnselected[i].events.empty() )
-            DeselectAllConditions(eventsToUnselected[i].events);
+    	if ( eventsToUnselected[eId]->CanHaveSubEvents() )
+            DeselectAllConditions(eventsToUnselected[eId]->GetSubEvents());
     }
 }
 
@@ -1490,3 +1518,5 @@ void EditorEvents::OnEventsPanelSetFocus(wxFocusEvent& event)
     ConnectEvents();
 }
 
+//TODO : Bug when no events are inserted and click on add template
+//TODO : Selection de plusieurs events

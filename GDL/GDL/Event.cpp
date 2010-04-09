@@ -6,3 +6,15 @@
 #include "GDL/Event.h"
 
 vector <BaseEventSPtr> BaseEvent::badSubEvents;
+
+BaseEvent::BaseEvent()
+#ifdef GDE
+:
+conditionsHeightNeedUpdate(true),
+conditionsHeight(0),
+actionsHeightNeedUpdate(true),
+actionsHeight(0),
+selected(false)
+#endif
+{
+}

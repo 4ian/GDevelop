@@ -146,3 +146,5 @@ void SoundManager::SetGlobalVolume(float volume)
             musics[i]->UpdateVolume();
     }
 }
+
+//TODO : Try Timitidy for MID

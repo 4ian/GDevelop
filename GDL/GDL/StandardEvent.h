@@ -32,6 +32,7 @@ class StandardEvent : public BaseEvent
 
         const vector < Instruction > & GetConditions() const { return conditions; };
         vector < Instruction > & GetConditions() { return conditions; };
+        void SetConditions(vector < Instruction > & conditions_) { conditions = conditions_; };
         const vector < Instruction > & GetActions() const { return actions; };
         vector < Instruction > & GetActions() { return actions; };
 

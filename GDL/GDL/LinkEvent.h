@@ -8,6 +8,9 @@
 
 #include <boost/shared_ptr.hpp>
 #include "Event.h"
+#include <vector>
+class Game;
+class RuntimeScene;
 
 class LinkEvent : public BaseEvent
 {
@@ -18,6 +21,8 @@ class LinkEvent : public BaseEvent
 
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         virtual void LoadFromXml(const TiXmlElement * eventElem);
+
+        virtual void Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
 
         string sceneLinked;
         int start;

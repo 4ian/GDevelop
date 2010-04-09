@@ -428,6 +428,8 @@
 		<Unit filename="GDL\EditorImages.h" />
 		<Unit filename="GDL\EditorObjet.cpp" />
 		<Unit filename="GDL\EditorObjet.h" />
+		<Unit filename="GDL\EmptyEvent.cpp" />
+		<Unit filename="GDL\EmptyEvent.h" />
 		<Unit filename="GDL\ErrorReport.cpp" />
 		<Unit filename="GDL\ErrorReport.h" />
 		<Unit filename="GDL\Event.cpp" />
@@ -448,6 +450,8 @@
 		<Unit filename="GDL\FileExtension.h" />
 		<Unit filename="GDL\FontManager.cpp" />
 		<Unit filename="GDL\FontManager.h" />
+		<Unit filename="GDL\ForEachEvent.cpp" />
+		<Unit filename="GDL\ForEachEvent.h" />
 		<Unit filename="GDL\Force.cpp" />
 		<Unit filename="GDL\Force.h" />
 		<Unit filename="GDL\GDExpression.cpp" />
@@ -469,8 +473,8 @@
 		<Unit filename="GDL\KeyboardExtension.h" />
 		<Unit filename="GDL\Layer.cpp" />
 		<Unit filename="GDL\Layer.h" />
-		<Unit filename="GDL\LinkComment.cpp" />
-		<Unit filename="GDL\LinkComment.h" />
+		<Unit filename="GDL\LinkEvent.cpp" />
+		<Unit filename="GDL\LinkEvent.h" />
 		<Unit filename="GDL\ListVariable.cpp" />
 		<Unit filename="GDL\ListVariable.h" />
 		<Unit filename="GDL\LoadingScreen.cpp" />
@@ -517,6 +521,8 @@
 		<Unit filename="GDL\Position.h" />
 		<Unit filename="GDL\PropImage.cpp" />
 		<Unit filename="GDL\PropImage.h" />
+		<Unit filename="GDL\RepeatEvent.cpp" />
+		<Unit filename="GDL\RepeatEvent.h" />
 		<Unit filename="GDL\RessourcesLoader.cpp" />
 		<Unit filename="GDL\RessourcesLoader.h" />
 		<Unit filename="GDL\RuntimeCamera.cpp" />
@@ -561,6 +567,8 @@
 			<Option weight="64" />
 		</Unit>
 		<Unit filename="GDL\VersionWrapper.h" />
+		<Unit filename="GDL\WhileEvent.cpp" />
+		<Unit filename="GDL\WhileEvent.h" />
 		<Unit filename="GDL\WindowExtension.cpp" />
 		<Unit filename="GDL\WindowExtension.h" />
 		<Unit filename="GDL\aADS.cpp" />

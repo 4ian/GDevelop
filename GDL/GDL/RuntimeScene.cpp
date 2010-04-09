@@ -22,7 +22,6 @@
 #include "GDL/profile.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Position.h"
-#include "GDL/LinkEvent.h" //TODO : Remove
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
@@ -647,63 +646,12 @@ void RuntimeScene::PreprocessScene( const Game & Jeu )
 ////////////////////////////////////////////////////////////
 /// Insertion des liens
 ////////////////////////////////////////////////////////////
-void RuntimeScene::PreprocessEventList( const Game & Jeu, vector < BaseEventSPtr > & listEvent )
+void RuntimeScene::PreprocessEventList( const Game & game, vector < BaseEventSPtr > & listEvent )
 {
     for ( unsigned int i = 0;i < listEvent.size();i++ )
     {
-        if ( dynamic_cast<LinkEvent*>(listEvent.at( i ).get()) != NULL ) //TODO : Move this
-        {
-            LinkEvent * linkEvent = dynamic_cast<LinkEvent*>(listEvent.at( i ).get());
-
-            //On récupère la scène à insérer
-            vector< boost::shared_ptr<Scene> >::const_iterator scene =
-                find_if(Jeu.scenes.begin(), Jeu.scenes.end(), bind2nd(SceneHasName(), linkEvent->sceneLinked));
-
-            if ( scene == Jeu.scenes.end() ) return;
-
-            int start = linkEvent->start;
-            int end = linkEvent->end;
-
-            if ( start == -1 && end == -1 ) //Doit on inclure tous les évènements ?
-            {
-                start = 0;
-                end = (*scene)->events.size() - 1;
-            }
-            else //Ou inclure juste certains évènements
-            {
-                start--; //On réduit les numéros car l'éditeur de scènes commence à 1
-                end--;
-            }
-
-            //On teste la validité de l'insertion
-            if ( start < 0 || static_cast<unsigned>(start) >= (*scene)->events.size() )
-            {
-                errors.Add( "Impossible d'insérer les évènements du lien", "", "", i, 2 );
-                return;
-            }
-            if ( end < 0 || static_cast<unsigned>(end) >= (*scene)->events.size() )
-            {
-                errors.Add( "Impossible d'insérer les évènements du lien", "", "", i, 2 );
-                return;
-            }
-            if ( start > end )
-            {
-                errors.Add( "Impossible d'insérer les évènements du lien ( la fin est avant le départ )", "", "", i, 2 );
-                return;
-            }
-
-            listEvent.erase( listEvent.begin() + i ); //Suppression du lien
-            for ( int insertion = start ; insertion <= end ;insertion++ ) //Insertion des évènements du lien
-            {
-                if ( i+insertion < listEvent.size() )
-                    listEvent.insert( listEvent.begin() + i+insertion, (*scene)->events.at( insertion )->Clone() );
-                else
-                    listEvent.push_back( (*scene)->events.at( insertion )->Clone() );
-            }
-        }
+        listEvent[i]->Preprocess(game, *this, listEvent, i);
         if ( listEvent[i]->CanHaveSubEvents() )
-        {
-            PreprocessEventList( Jeu, listEvent[i]->GetSubEvents());
-        }
+            PreprocessEventList( game, listEvent[i]->GetSubEvents());
     }
 }

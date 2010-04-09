@@ -17,6 +17,7 @@ class ObjectsConcerned;
 class Instruction;
 class Evaluateur;
 class TiXmlElement;
+class Game;
 
 class BaseEvent;
 typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
@@ -28,7 +29,7 @@ typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
 class GD_API BaseEvent
 {
     public:
-        BaseEvent() {};
+        BaseEvent();
         virtual ~BaseEvent() {};
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new BaseEvent(*this));}
 
@@ -85,6 +86,11 @@ class GD_API BaseEvent
          */
         virtual void LoadFromXml(const TiXmlElement * eventElem) {}
 
+        /**
+         * Called when a scene is loaded.
+         */
+        virtual void Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList) {};
+
 #ifdef GDE
         mutable bool conditionsHeightNeedUpdate;
         mutable unsigned int conditionsHeight;
@@ -93,13 +99,13 @@ class GD_API BaseEvent
         bool selected;
 #endif
 
-        static vector <BaseEventSPtr> badSubEvents;
-
         std::string GetType() const { return type; };
         void SetType(std::string type_) { type = type_; };
 
     private:
         string type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
+
+        static vector <BaseEventSPtr> badSubEvents;
 };
 
 

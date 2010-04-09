@@ -37,8 +37,7 @@
 #include "GDL/Layer.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/CommentEvent.h"
-#include "GDL/LinkEvent.h"
+#include "GDL/EmptyEvent.h"
 #include "GDL/StandardEvent.h"
 #include <boost/shared_ptr.hpp>
 
@@ -504,16 +503,54 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
     while ( elemScene )
     {
         string type;
+
         if ( elemScene->FirstChildElement( "Type" )->Attribute( "value" ) != NULL ) { type = elemScene->FirstChildElement( "Type" )->Attribute( "value" );}
         else { MSG( "Les informations concernant le type d'un évènement manquent." ); }
+
+        //Legacy code --- Compatibility with Game Develop 1.3.8892 and inferior
+        bool isLegacyOrEvent = false;
+        if ( type == "AND" ) type = "BuiltinCommonInstructions::Standard";
+        else if ( type == "Link" ) type = "BuiltinCommonInstructions::Link";
+        else if ( type == "Commentaire" ) type = "BuiltinCommonInstructions::Comment";
+        else if ( type == "OR" )
+        {
+            type = "BuiltinCommonInstructions::Standard";
+            isLegacyOrEvent = true;
+        }
+        //End of Legacy code --- Compatibility with Game Develop 1.3.8892 and inferior
 
         BaseEventSPtr event = extensionsManager->CreateEvent(type);
 
         if ( event != boost::shared_ptr<BaseEvent>())
         {
             event->LoadFromXml(elemScene);
-            list.push_back( event );
+
+            //Legacy code --- Compatibility with Game Develop 1.3.8892 and inferior
+            if ( isLegacyOrEvent )
+            {
+                StandardEvent * legacyOrEvent = dynamic_cast<StandardEvent *>(event.get());
+                if (legacyOrEvent != NULL)
+                {
+                    //Create a or condition
+                    Instruction newConditionOr("BuiltinCommonInstructions::Or");
+                    vector < Instruction > conditions = legacyOrEvent->GetConditions();
+                    newConditionOr.SetSubInstructions(conditions);
+
+                    //Add conditions as sub conditions
+                    vector < Instruction > newConditions;
+                    newConditions.push_back(newConditionOr);
+
+                    //Replace all with the new or condition
+                    legacyOrEvent->SetConditions(newConditions);
+                }
+            }
+            //End of Legacy code --- Compatibility with Game Develop 1.3.8892 and inferior
         }
+        else
+            event = boost::shared_ptr<BaseEvent>(new EmptyEvent);
+
+        list.push_back( event );
+
         elemScene = elemScene->NextSiblingElement();
     }
 }
@@ -1122,28 +1159,32 @@ void OpenSaveGame::RecreatePaths(string file)
         wxSafeYield();
     }
 
-    for ( unsigned int i = 0;i < game.scenes.size();i++ )
+    for ( unsigned int s = 0;s < game.scenes.size();s++ )
     {
-        for ( unsigned int j = 0;j < game.scenes[i]->events.size() ;j++ )
+        for ( unsigned int j = 0;j < game.scenes[s]->events.size() ;j++ )
         {
-            for ( unsigned int k = 0;k < game.scenes[i]->events[j].actions.size() ;k++ )
+            vector < vector<Instruction>* > allActionsVectors = game.scenes[s]->events[j]->GetAllActionsVectors();
+            for (unsigned int i = 0;i<allActionsVectors.size();++i)
             {
-                if ( game.scenes[i]->events[j].actions[k].GetType() == "PlaySound" || game.scenes[i]->events[j].actions[k].GetType() == "PlaySoundCanal" )
+                for ( unsigned int k = 0;k < allActionsVectors[i]->size() ;k++ )
                 {
-                    //Rajout répertoire
-                    game.scenes[i]->events[j].actions[k].SetParameter(0, GDExpression(rep + game.scenes[i]->events[j].actions[k].GetParameter(0).GetPlainString()));
-                }
-                if ( game.scenes[i]->events[j].actions[k].GetType() == "PlayMusic" || game.scenes[i]->events[j].actions[k].GetType() == "PlayMusicCanal" )
-                {
-                    //Rajout répertoire
-                    game.scenes[i]->events[j].actions[k].SetParameter(0, GDExpression(rep + game.scenes[i]->events[j].actions[k].GetParameter(0).GetPlainString()));
-                }
-                if ( game.scenes[i]->events[j].actions[k].GetType() == "EcrireTexte" )
-                {
-                    if ( game.scenes[i]->events[j].actions[k].GetParameter(5).GetPlainString() != "" )
+                    if ( allActionsVectors[i]->at(k).GetType() == "PlaySound" || allActionsVectors[i]->at(k).GetType() == "PlaySoundCanal" )
                     {
                         //Rajout répertoire
-                        game.scenes[i]->events[j].actions[k].SetParameter(5, GDExpression(rep + game.scenes[i]->events[j].actions[k].GetParameter(5).GetPlainString()));
+                        allActionsVectors[i]->at(k).SetParameter(0, GDExpression(rep + allActionsVectors[i]->at(k).GetParameter(0).GetPlainString()));
+                    }
+                    if ( allActionsVectors[i]->at(k).GetType() == "PlayMusic" || allActionsVectors[i]->at(k).GetType() == "PlayMusicCanal" )
+                    {
+                        //Rajout répertoire
+                        allActionsVectors[i]->at(k).SetParameter(0, GDExpression(rep + allActionsVectors[i]->at(k).GetParameter(0).GetPlainString()));
+                    }
+                    if ( allActionsVectors[i]->at(k).GetType() == "EcrireTexte" )
+                    {
+                        if ( allActionsVectors[i]->at(k).GetParameter(5).GetPlainString() != "" )
+                        {
+                            //Rajout répertoire
+                            allActionsVectors[i]->at(k).SetParameter(5, GDExpression(rep + allActionsVectors[i]->at(k).GetParameter(5).GetPlainString()));
+                        }
                     }
                 }
             }

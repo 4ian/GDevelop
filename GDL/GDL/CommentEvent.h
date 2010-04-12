@@ -13,7 +13,7 @@ class TiXmlElement;
 class CommentEvent : public BaseEvent
 {
     public:
-        CommentEvent() : BaseEvent() {};
+        CommentEvent() : BaseEvent(), r(255), v(230), b(109) {};
         virtual ~CommentEvent() {};
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new CommentEvent(*this));}
 

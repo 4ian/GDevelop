@@ -38,7 +38,10 @@
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/EmptyEvent.h"
+#include "GDL/ForEachEvent.h"
+#include "GDL/WhileEvent.h"
 #include "GDL/StandardEvent.h"
+#include "GDL/RepeatEvent.h"
 #include <boost/shared_ptr.hpp>
 
 using namespace std;
@@ -507,7 +510,7 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
         if ( elemScene->FirstChildElement( "Type" )->Attribute( "value" ) != NULL ) { type = elemScene->FirstChildElement( "Type" )->Attribute( "value" );}
         else { MSG( "Les informations concernant le type d'un évènement manquent." ); }
 
-        //Legacy code --- Compatibility with Game Develop 1.3.8892 and inferior
+        //Compatibility code --- with Game Develop 1.3.8892 and inferior
         bool isLegacyOrEvent = false;
         if ( type == "AND" ) type = "BuiltinCommonInstructions::Standard";
         else if ( type == "Link" ) type = "BuiltinCommonInstructions::Link";
@@ -517,7 +520,7 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
             type = "BuiltinCommonInstructions::Standard";
             isLegacyOrEvent = true;
         }
-        //End of Legacy code --- Compatibility with Game Develop 1.3.8892 and inferior
+        //End of Compatibility code --- with Game Develop 1.3.8892 and inferior
 
         BaseEventSPtr event = extensionsManager->CreateEvent(type);
 
@@ -525,7 +528,7 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
         {
             event->LoadFromXml(elemScene);
 
-            //Legacy code --- Compatibility with Game Develop 1.3.8892 and inferior
+            //Compatibility code --- with Game Develop 1.3.8892 and inferior
             if ( isLegacyOrEvent )
             {
                 StandardEvent * legacyOrEvent = dynamic_cast<StandardEvent *>(event.get());
@@ -544,7 +547,7 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
                     legacyOrEvent->SetConditions(newConditions);
                 }
             }
-            //End of Legacy code --- Compatibility with Game Develop 1.3.8892 and inferior
+            //End of Compatibility code --- Compatibility with Game Develop 1.3.8892 and inferior
         }
         else
             event = boost::shared_ptr<BaseEvent>(new EmptyEvent);
@@ -552,6 +555,176 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
         list.push_back( event );
 
         elemScene = elemScene->NextSiblingElement();
+    }
+
+    AdaptEventsFromGD138892(list);
+}
+
+/**
+ * Adapt events that comes from Game Develop 1.3.8892 and inferior
+ * -> Transform legacy Repeat, While, ForEach condition/action into
+ *    structure of event of different type
+ */
+void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
+{
+    for (unsigned int eId = 0;eId < list.size();++eId)
+    {
+        StandardEvent * event = dynamic_cast<StandardEvent*>(list[eId].get());
+        bool abordAndRestartEvent = false;
+
+        if ( event != NULL )
+        {
+            for (unsigned int c = 0;c<event->GetConditions().size();++c)
+            {
+                if ( event->GetConditions()[c].GetType() == "Repeat"  )
+                {
+                    //Split conditions
+                    vector < Instruction > oldConditions = event->GetConditions();
+                    vector < Instruction > eventNewConditions;
+                    vector < Instruction > subEventConditions;
+                    copy(oldConditions.begin(), oldConditions.begin()+c, back_inserter(eventNewConditions));
+                    copy(oldConditions.begin()+c+1, oldConditions.end(), back_inserter(subEventConditions));
+
+                    //Create the new event
+                    RepeatEvent * subEvent = new RepeatEvent;
+                    subEvent->SetType("BuiltinCommonInstructions::Repeat");
+                    subEvent->SetConditions(subEventConditions);
+                    subEvent->SetActions(event->GetActions());
+                    subEvent->SetSubEvents(event->GetSubEvents());
+                    subEvent->SetRepeatExpression(event->GetConditions()[c].GetParameter(0).GetPlainString());
+
+                    //Insert the new event and modify the current
+                    BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
+                    event->GetSubEvents().clear();
+                    event->GetSubEvents().push_back(subEventSPtr);
+                    event->GetActions().clear();
+                    event->SetConditions(eventNewConditions);
+
+                    abordAndRestartEvent = true; break;
+                }
+                else if ( event->GetConditions()[c].GetType() == "ForEach"  )
+                {
+                    //Split conditions
+                    vector < Instruction > oldConditions = event->GetConditions();
+                    vector < Instruction > eventNewConditions;
+                    vector < Instruction > subEventConditions;
+                    copy(oldConditions.begin(), oldConditions.begin()+c, back_inserter(eventNewConditions));
+                    copy(oldConditions.begin()+c+1, oldConditions.end(), back_inserter(subEventConditions));
+
+                    //Create the new event
+                    ForEachEvent * subEvent = new ForEachEvent;
+                    subEvent->SetType("BuiltinCommonInstructions::ForEach");
+                    subEvent->SetConditions(subEventConditions);
+                    subEvent->SetActions(event->GetActions());
+                    subEvent->SetSubEvents(event->GetSubEvents());
+                    subEvent->SetObjectToPick(event->GetConditions()[c].GetParameter(0).GetPlainString());
+
+                    //Insert the new event and modify the current
+                    BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
+                    event->GetSubEvents().clear();
+                    event->GetSubEvents().push_back(subEventSPtr);
+                    event->GetActions().clear();
+                    event->SetConditions(eventNewConditions);
+
+                    abordAndRestartEvent = true; break;
+                }
+                else if ( event->GetConditions()[c].GetType() == "While"  )
+                {
+                    //Split conditions
+                    vector < Instruction > oldConditions = event->GetConditions();
+                    vector < Instruction > eventNewConditions;
+                    vector < Instruction > subEventConditions;
+                    vector < Instruction > whileConditions;
+                    copy(oldConditions.begin(), oldConditions.begin()+c, back_inserter(eventNewConditions));
+                    copy(oldConditions.begin()+c+1, oldConditions.begin()+c+1, back_inserter(whileConditions));
+
+                    if ( c+2 < oldConditions.size() )
+                        copy(oldConditions.begin()+c+2, oldConditions.end(), back_inserter(subEventConditions));
+
+                    //Create the new event
+                    WhileEvent * subEvent = new WhileEvent;
+                    subEvent->SetType("BuiltinCommonInstructions::While");
+                    subEvent->SetConditions(subEventConditions);
+                    subEvent->SetActions(event->GetActions());
+                    subEvent->SetSubEvents(event->GetSubEvents());
+                    subEvent->SetWhileConditions(whileConditions);
+
+                    //Insert the new event and modify the current
+                    BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
+                    event->GetSubEvents().clear();
+                    event->GetSubEvents().push_back(subEventSPtr);
+                    event->GetActions().clear();
+                    event->SetConditions(eventNewConditions);
+
+                    abordAndRestartEvent = true; break;
+                }
+            }
+
+            if ( abordAndRestartEvent ) //If the event has been modified, restart processing the event
+            {
+                --eId;
+                continue;
+            }
+
+            for (unsigned int a = 0;a<event->GetActions().size();++a)
+            {
+                if ( event->GetActions()[a].GetType() == "Repeat"  )
+                {
+                    //Split conditions
+                    vector < Instruction > oldActions = event->GetActions();
+                    vector < Instruction > eventNewActions;
+                    vector < Instruction > subEventActions;
+                    copy(oldActions.begin(), oldActions.begin()+a, back_inserter(eventNewActions));
+                    copy(oldActions.begin()+a+1, oldActions.end(), back_inserter(subEventActions));
+
+                    //Create the new event
+                    RepeatEvent * subEvent = new RepeatEvent;
+                    subEvent->SetType("BuiltinCommonInstructions::Repeat");
+                    subEvent->SetActions(subEventActions);
+                    subEvent->SetSubEvents(event->GetSubEvents());
+                    subEvent->SetRepeatExpression(event->GetActions()[a].GetParameter(0).GetPlainString());
+
+                    //Insert the new event and modify the current
+                    BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
+                    event->GetSubEvents().clear();
+                    event->GetSubEvents().push_back(subEventSPtr);
+                    event->SetActions(eventNewActions);
+
+                    abordAndRestartEvent = true; break;
+                }
+                else if ( event->GetActions()[a].GetType() == "ForEach"  )
+                {
+                    //Split conditions
+                    vector < Instruction > oldActions = event->GetActions();
+                    vector < Instruction > eventNewActions;
+                    vector < Instruction > subEventActions;
+                    copy(oldActions.begin(), oldActions.begin()+a, back_inserter(eventNewActions));
+                    copy(oldActions.begin()+a+1, oldActions.end(), back_inserter(subEventActions));
+
+                    //Create the new event
+                    ForEachEvent * subEvent = new ForEachEvent;
+                    subEvent->SetType("BuiltinCommonInstructions::ForEach");
+                    subEvent->SetActions(subEventActions);
+                    subEvent->SetSubEvents(event->GetSubEvents());
+                    subEvent->SetObjectToPick(event->GetActions()[a].GetParameter(0).GetPlainString());
+
+                    //Insert the new event and modify the current
+                    BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
+                    event->GetSubEvents().clear();
+                    event->GetSubEvents().push_back(subEventSPtr);
+                    event->SetActions(eventNewActions);
+
+                    abordAndRestartEvent = true; break;
+                }
+
+            }
+
+            if ( abordAndRestartEvent ) //If the event has been modified, restart processing the event
+            {
+                --eId;
+                continue;
+            }
+        }
     }
 }
 

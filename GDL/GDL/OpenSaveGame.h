@@ -34,6 +34,10 @@ public:
     static void OpenConditions(vector < Instruction > & list, const TiXmlElement * elem);
     static void OpenActions(vector < Instruction > & list, const TiXmlElement * elem);
 
+    //Compatibility code --- with Game Develop 1.3.8892 and inferior
+    static void AdaptEventsFromGD138892(vector < BaseEventSPtr > & list);
+    //End of Compatibility code --- with Game Develop 1.3.8892 and inferior
+
 protected:
 private:
 

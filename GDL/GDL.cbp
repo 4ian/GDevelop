@@ -18,6 +18,7 @@
 					<Add option="-Wall" />
 					<Add option="-pg" />
 					<Add option="-g" />
+					<Add option="-m32" />
 					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
@@ -55,6 +56,7 @@
 					<Add option="-Wall" />
 					<Add option="-pg" />
 					<Add option="-g" />
+					<Add option="-m32" />
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGDE" />
@@ -123,6 +125,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
@@ -157,13 +160,13 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGDE" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
-					<Add option="-DPYSUPPORT" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
@@ -209,8 +212,6 @@
 					<Add option="-ladvapi32" />
 					<Add option="-lcomdlg32" />
 					<Add option="-loleaut32" />
-					<Add library="C:\Libs\boost_1_38_0\bin.v2\libs\python\build\gcc-mingw-4.3.2\release\threading-multi\boost_python-mgw43-mt-1_38.lib" />
-					<Add library="C:\Python26\libs\libpython26.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
@@ -228,9 +229,10 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
-					<Add option="-DRELEASE" />
+					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
 				</Compiler>
@@ -263,13 +265,13 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGDE" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
-					<Add option="-DRELEASE" />
+					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
-					<Add option="-DPYSUPPORT" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
@@ -315,8 +317,6 @@
 					<Add option="-ladvapi32" />
 					<Add option="-lcomdlg32" />
 					<Add option="-loleaut32" />
-					<Add library="C:\Libs\boost_1_38_0\bin.v2\libs\python\build\gcc-mingw-4.3.2\release\threading-multi\boost_python-mgw43-mt-1_38.lib" />
-					<Add library="C:\Python26\libs\libpython26.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
@@ -335,6 +335,7 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
 					<Add option="-DGDP" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
@@ -712,6 +713,7 @@
 				<Scheme minor_max="1" build_max="0" rev_max="0" rev_rand_max="9" build_times_to_increment_minor="1" />
 				<Settings autoincrement="0" date_declarations="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="GDL/Version.h" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>
 			<wxsmith version="1">
 				<resources>

@@ -18,7 +18,7 @@ FontManager::FontManager()
 FontManager::~FontManager()
 {
     //Need to explicit delete fonts
-    for ( map<string, sf::Font*>::iterator it=fonts.begin() ; it != fonts.end(); it++ )
+    for ( map<string, sf::Font*>::iterator it=fonts.begin() ; it != fonts.end(); ++it )
         delete (*it).second;
 }
 

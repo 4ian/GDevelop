@@ -28,11 +28,19 @@ class WhileEvent : public BaseEvent
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};
         virtual vector < BaseEventSPtr > & GetSubEvents() {return events;};
+        void SetSubEvents(vector < BaseEventSPtr > & subEvents_) {events = subEvents_;};
 
         const vector < Instruction > & GetConditions() const { return conditions; };
         vector < Instruction > & GetConditions() { return conditions; };
+        void SetConditions(vector < Instruction > & conditions_) { conditions = conditions_; };
+
         const vector < Instruction > & GetActions() const { return actions; };
         vector < Instruction > & GetActions() { return actions; };
+        void SetActions(vector < Instruction > & actions_) { actions = actions_; };
+
+        const vector < Instruction > & GetWhileConditions() const { return whileConditions; };
+        vector < Instruction > & GetWhileConditions() { return whileConditions; };
+        void SetWhileConditions(vector < Instruction > & whileConditions_) { whileConditions = whileConditions_; };
 
         virtual vector < vector<Instruction>* > GetAllConditionsVectors();
         virtual vector < vector<Instruction>* > GetAllActionsVectors();

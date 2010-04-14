@@ -33,16 +33,12 @@
 #include "gdTreeItemStringData.h"
 #include "Extensions.h"
 #include "GDL/HelpFileAccess.h"
-
 #include "GDL/StdAlgo.h"
-#include "TranslateAction.h"
-
-
+#include "GDL/TranslateAction.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Chercher.h"
-
 #include "ChoixObjet.h"
 #include "EditExpression.h"
 #include "EditTexte.h"

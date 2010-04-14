@@ -20,7 +20,7 @@
 
 #include "SearchEvents.h"
 #include "GDL/MainEditorCommand.h"
-#include "EventsRendererDatas.h"
+#include "GDL/EventsRenderingHelper.h"
 
 #include "GDL/Game.h"
 
@@ -233,7 +233,6 @@ class EditorEvents: public wxPanel
         vector < vector < BaseEventSPtr > > redoHistory; //Historique des changements pour "refaire"
 
         unsigned int conditionsColumnWidth;
-        EventsRendererDatas eventsRenderersDatas;
 
         //Position du clic
         int MouseX;

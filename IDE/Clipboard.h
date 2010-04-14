@@ -14,8 +14,6 @@
 class Clipboard
 {
 public:
-    Clipboard();
-    virtual ~Clipboard();
     static Clipboard * getInstance();
     static void kill();
 
@@ -40,6 +38,9 @@ public:
     bool HasCondition();
 
 private:
+    Clipboard();
+    virtual ~Clipboard();
+
     ObjSPtr objectCopied;
     bool hasObject;
 

@@ -5,7 +5,7 @@
 		<Option title="IDE" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Editeurs\Choix\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Options\;Fichiers\;LIB TinyXml\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Renderers\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\EditorEvents\Events\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
+		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Editeurs\Choix\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Options\;Fichiers\;LIB TinyXml\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Renderers\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
 		<Build>
 			<Target title="Debug - Edittime">
 				<Option output="bin\debug\GDEditor" prefix_auto="1" extension_auto="1" />
@@ -19,6 +19,7 @@
 					<Add option="-Wall" />
 					<Add option="-pg" />
 					<Add option="-g" />
+					<Add option="-m32" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -74,6 +75,7 @@
 				<Compiler>
 					<Add option="-O3" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DPYSUPPORT" />
@@ -131,6 +133,7 @@
 				<Compiler>
 					<Add option="-O3" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DPYSUPPORT" />
@@ -178,7 +181,7 @@
 					<Add directory="C:\Libs\SFML\extlibs\libs-mingw" />
 				</Linker>
 				<ExtraCommands>
-					<Add after="c:\Program Files\VideoLAN\VLC\vlc.exe C:\Windows\Media\chimes.wav --play-and-exit" />
+					<Add after="c:\Program Files (x86)\VideoLAN\VLC\vlc.exe C:\Windows\Media\chimes.wav --play-and-exit" />
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
@@ -192,16 +195,13 @@
 			<Add option="-DGD_API=__declspec(dllimport)" />
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
-			<Add directory="C:\Users\Florian\Programmation\GameDevelop\GDL" />
+			<Add directory="..\GDL" />
 			<Add directory="c:\Libs\SFML\include" />
 			<Add directory="C:\Libs\CppUnitLite" />
-			<Add directory="C:\Libs\dlib-17.12" />
-			<Add directory="C:\Users\Florian\Programmation\nwidgets" />
-			<Add directory="C:\Libs\fparser" />
 			<Add directory="C:\Libs\boost_1_38_0" />
-			<Add directory="C:\Python26\include" />
 			<Add directory="C:\Libs\wxspellchecker\include" />
 			<Add directory="C:\Libs\wxspellchecker\" />
+			<Add directory="CppUnitLite\" />
 		</Compiler>
 		<Linker>
 			<Add library="opengl32" />
@@ -220,26 +220,9 @@
 			<Add library="libwsock32.a" />
 			<Add library="libodbc32.a" />
 			<Add library="imm32" />
-			<Add library="C:\Python26\libs\libpython26.a" />
-			<Add library="C:\Libs\boost_1_38_0\bin.v2\libs\python\build\gcc-mingw-4.3.2\release\threading-multi\boost_python-mgw43-mt-1_38.lib" />
 			<Add library="Ws2_32" />
 			<Add library="winmm" />
 		</Linker>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\Failure.cpp">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\SimpleString.cpp">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\Test.cpp">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\TestRegistry.cpp">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
-		<Unit filename="..\..\..\..\..\Libs\CppUnitLite\CppUnitLite\TestResult.cpp">
-			<Option virtualFolder="LIB CppUnitLite\" />
-		</Unit>
 		<Unit filename="BugReport.cpp">
 			<Option weight="60" />
 			<Option virtualFolder="Racine\" />
@@ -356,6 +339,39 @@
 		<Unit filename="ConvertJRC.h">
 			<Option virtualFolder="Editeur principal\Outils\" />
 		</Unit>
+		<Unit filename="CppUnitLite\CppUnitLite\Failure.cpp">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="CppUnitLite\CppUnitLite\Failure.h">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="CppUnitLite\CppUnitLite\SimpleString.cpp">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="CppUnitLite\CppUnitLite\SimpleString.h">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="CppUnitLite\CppUnitLite\Test.cpp">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="CppUnitLite\CppUnitLite\Test.h">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="CppUnitLite\CppUnitLite\TestHarness.h">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="CppUnitLite\CppUnitLite\TestRegistry.cpp">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="CppUnitLite\CppUnitLite\TestRegistry.h">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="CppUnitLite\CppUnitLite\TestResult.cpp">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
+		<Unit filename="CppUnitLite\CppUnitLite\TestResult.h">
+			<Option virtualFolder="LIB CppUnitLite\" />
+		</Unit>
 		<Unit filename="CreateTemplate.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Templates\" />
 		</Unit>
@@ -399,22 +415,10 @@
 		<Unit filename="DndTextSceneEditor.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\" />
 		</Unit>
-		<Unit filename="DossierRenderer.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Renderers\" />
-		</Unit>
-		<Unit filename="DossierRenderer.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Renderers\" />
-		</Unit>
 		<Unit filename="EditCommentaire.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\" />
 		</Unit>
 		<Unit filename="EditCommentaire.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\" />
-		</Unit>
-		<Unit filename="EditDossier.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\" />
-		</Unit>
-		<Unit filename="EditDossier.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\" />
 		</Unit>
 		<Unit filename="EditExpression.cpp">
@@ -518,12 +522,6 @@
 		</Unit>
 		<Unit filename="ErrorCompilation.h">
 			<Option virtualFolder="Editeur principal\Fichier\" />
-		</Unit>
-		<Unit filename="EventRenderer.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Renderers\" />
-		</Unit>
-		<Unit filename="EventRenderer.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Renderers\" />
 		</Unit>
 		<Unit filename="EventsRendererDatas.cpp" />
 		<Unit filename="EventsRendererDatas.h" />
@@ -690,18 +688,6 @@
 		<Unit filename="TemplateEvents.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Templates\" />
 		</Unit>
-		<Unit filename="TranslateAction.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Events\" />
-		</Unit>
-		<Unit filename="TranslateAction.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Events\" />
-		</Unit>
-		<Unit filename="TranslateCondition.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Events\" />
-		</Unit>
-		<Unit filename="TranslateCondition.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Events\" />
-		</Unit>
 		<Unit filename="TrueOrFalse.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
 		</Unit>
@@ -837,6 +823,7 @@
 				<Scheme minor_max="1" build_max="0" rev_max="0" rev_rand_max="9" build_times_to_increment_minor="1" />
 				<Settings autoincrement="0" date_declarations="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="C:\Users\Florian\Programmation\Game Develop SVN\conf" header_path="version.h" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>
 		</Extensions>
 	</Project>

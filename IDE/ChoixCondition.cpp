@@ -36,7 +36,7 @@
 #include <wx/msgdlg.h>
 #include "gdTreeItemStringData.h"
 #include "GDL/HelpFileAccess.h"
-#include "TranslateCondition.h"
+#include "GDL/TranslateCondition.h"
 #include "EditExpression.h"
 #include "EditTexte.h"
 #include "ChoixObjet.h"

@@ -36,7 +36,6 @@
 #include <stdexcept>
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
-#include <boost/python.hpp>
 #include <SFML/System.hpp>
 #include "CppUnitLite/TestHarness.h"
 
@@ -50,8 +49,6 @@
 #include "ConsoleManager.h"
 #include "BugReport.h"
 
-#include "TranslateAction.h"
-#include "TranslateCondition.h"
 #include "CompilationChecker.h"
 #include "Clipboard.h"
 
@@ -60,7 +57,8 @@
 #include "GDL/SoundManager.h"
 #include "GDL/FontManager.h"
 #include "GDL/HelpFileAccess.h"
-
+#include "GDL/TranslateAction.h"
+#include "GDL/TranslateCondition.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/SpriteExtension.h"
 #include "GDL/ExtensionsLoader.h"
@@ -191,8 +189,6 @@ bool Game_Develop_EditorApp::OnInit()
     wxBitmap bitmap;
     bitmap.LoadFile( wxString("res/splash.png"), wxBITMAP_TYPE_PNG );
     SplashScreen * splash = new SplashScreen(bitmap, 2, 0, -1, wxNO_BORDER | wxFRAME_SHAPED);
-
-    Py_Initialize();
 
     //Création du fichier de détection des erreurs
     wxFile errorDetectFile("errordetect.dat", wxFile::write);

@@ -28,28 +28,20 @@
 #include <wx/help.h>
 #include <wx/dc.h>
 #include <wx/dcbuffer.h>
-
-#include "Game_Develop_EditorMain.h"
 #include "GDL/Game.h"
 #include "GDL/ExtensionsManager.h"
-#include "TranslateCondition.h"
-#include "TranslateAction.h"
+#include "GDL/StandardEvent.h"
+#include "GDL/StdAlgo.h"
+#include "GDL/HelpFileAccess.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-#include "MemTrace.h"
+#include "Clipboard.h"
 #include "ChoixTemplateEvent.h"
 #include "EditCommentaire.h"
-#include "EditDossier.h"
-#include "DossierRenderer.h"
-#include "LinkRenderer.h"
 #include "EditLink.h"
 #include "CreateTemplate.h"
-#include "CommentaireRenderer.h"
-#include "EventRenderer.h"
-#include "Clipboard.h"
-#include "GDL/StdAlgo.h"
-#include "GDL/HelpFileAccess.h"
+#include "Game_Develop_EditorMain.h"
 #include <time.h>
 
 #ifdef __WXGTK__
@@ -565,8 +557,7 @@ void EditorEvents::ResetEventsSizeCache(vector < BaseEventSPtr > & eventsToReset
 
     for(;e != end;++e)
     {
-        (*e)->conditionsHeightNeedUpdate = true;
-        (*e)->actionsHeightNeedUpdate = true;
+        (*e)->eventRenderingNeedUpdate = true;
 
         if ( (*e)->CanHaveSubEvents() )
             ResetEventsSizeCache((*e)->GetSubEvents());
@@ -646,6 +637,8 @@ vector < BaseEventSPtr > * EditorEvents::GetSelectedListOfEvents(unsigned int nb
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
 {
+    EventsRenderingHelper * eventsRenderingHelper = EventsRenderingHelper::getInstance();
+
     wxBufferedPaintDC dc( EventsPanel ); //Création obligatoire du wxBufferedPaintDC
     EventsPanel->SetBackgroundStyle( wxBG_STYLE_PAINT );
 
@@ -670,8 +663,7 @@ void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
     int maximalWidth = 0;
 
     //Setup renderings datas which are constants.
-    eventsRenderersDatas.SetRenderZoneWidth(EventsPanel->GetSize().x);
-    eventsRenderersDatas.SetConditionsColumnWidth(conditionsColumnWidth);
+    eventsRenderingHelper->SetConditionsColumnWidth(conditionsColumnWidth);
 
     instructionsSelected = false;
 
@@ -679,7 +671,7 @@ void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
     DrawEvents(*events, dc, Yposition, initialXposition, maximalWidth, true);
 
     //Phase de dessin du texte final
-    dc.SetFont(eventsRenderersDatas.GetFont());
+    dc.SetFont(eventsRenderingHelper->GetFont());
     wxString text = _("Utilisez le clic droit pour ajouter des évènements, actions et conditions.\nVous pouvez ensuite double cliquer sur les évènements pour les éditer.");
     dc.DrawLabel(text,
                 wxRect( (EventsPanel->GetSize().x-dc.GetMultiLineTextExtent(text).GetWidth())/2,Yposition+15,
@@ -698,6 +690,8 @@ void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & parentMaximalWidth, bool draw)
 {
+    EventsRenderingHelper * eventsRenderingHelper = EventsRenderingHelper::getInstance();
+
     int positionScrollbar = ScrollBar1->GetThumbPosition();
     const int separation = 3;
 
@@ -708,28 +702,14 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
         //i+1 permet de commencer la numérotation à 1
         if ( draw )
         {
-            dc.SetFont( eventsRenderersDatas.GetFont() );
+            dc.SetFont( eventsRenderingHelper->GetFont() );
             dc.DrawText(st(i+1), initialXposition-(dc.GetTextExtent(st(i+1)).GetWidth()+2), Yposition);
-        }
-
-        //Get a renderer for the event
-        bool normalEvent = false;
-        Renderer * renderer = NULL;
-        if ( dynamic_cast<CommentEvent*>(list.at( i ).get()) != NULL )
-            renderer = new CommentaireRenderer(dc, *dynamic_cast<CommentEvent*>(list.at( i ).get()), eventsRenderersDatas);
-        else if ( dynamic_cast<LinkEvent*>(list.at( i ).get()) != NULL )
-            renderer = new LinkRenderer(dc, *dynamic_cast<LinkEvent*>(list.at( i ).get()), eventsRenderersDatas);
-        else if ( dynamic_cast<StandardEvent*>(list.at( i ).get()) != NULL )
-        {
-            normalEvent = true;
-            renderer = new EventRenderer(dc, *dynamic_cast<StandardEvent*>(list.at( i ).get()), eventsRenderersDatas);
         }
 
         //Hit test
         if ( MouseY >= Yposition+positionScrollbar &&
-             MouseY <= Yposition+positionScrollbar+renderer->GetHeight() )
+             MouseY <= Yposition+positionScrollbar+list[i]->GetRenderedHeight() )
         {
-
             if ( dynamic_cast<StandardEvent*>(list.at( i ).get()) != NULL )
             {
                 StandardEvent & event = *dynamic_cast<StandardEvent*>(list.at( i ).get());
@@ -755,6 +735,7 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
                             instructionsSelected = true;
 
                             event.GetConditions()[c].selected = true;
+                            list[i]->eventRenderingNeedUpdate = true;
                             eventsSelected.push_back(boost::make_tuple(&list, i, &event.GetConditions(), c));
                         }
                         conditionsY += event.GetConditions()[c].renderedHeight+2;
@@ -765,6 +746,7 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
                         //If we have some events selected, deselect them.
                         if ( !instructionsSelected ) DeselectAllEvents(*events);
                         instructionsSelected = true;
+                        list[i]->eventRenderingNeedUpdate = true;
 
                         eventsSelected.push_back(boost::make_tuple(&list, i, &event.GetConditions(), 0));
                     }
@@ -789,6 +771,7 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
                             instructionsSelected = true;
 
                             event.GetActions()[a].selected = true;
+                            list[i]->eventRenderingNeedUpdate = true;
                             eventsSelected.push_back(boost::make_tuple(&list, i, &event.GetActions(), a));
                          }
                         actionsY += event.GetActions()[a].renderedHeight+2;
@@ -799,6 +782,7 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
                         //If we have some events selected, deselect them.
                         if ( !instructionsSelected ) DeselectAllEvents(*events);
                         instructionsSelected = true;
+                        list[i]->eventRenderingNeedUpdate = true;
 
                         eventsSelected.push_back(boost::make_tuple(&list, i, &event.GetActions(), 0));
                     }
@@ -810,6 +794,7 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
                     eventsSelected.push_back(boost::make_tuple(&list, i,              //Useful part
                                                                (vector<Instruction>*)NULL, 0)); //Useless
                     list[i]->selected = true;
+                    list[i]->eventRenderingNeedUpdate = true;
                 }
             }
             else //Simple event selection
@@ -817,21 +802,18 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
                 eventsSelected.push_back(boost::make_tuple(&list, i,              //Useful part
                                                            (vector<Instruction>*)NULL, 0)); //Useless
                 list[i]->selected = true;
+                    list[i]->eventRenderingNeedUpdate = true;
             }
         }
 
         //Render
-        eventsRenderersDatas.SetOrigineX(initialXposition);
-        eventsRenderersDatas.SetOrigineY(Yposition);
-        if ( Yposition + renderer->GetHeight() + positionScrollbar >= positionScrollbar &&
-             Yposition + positionScrollbar < ( positionScrollbar + EventsPanel->GetSize().y ) &&
-             draw)
+        if ( draw )
         {
-            renderer->Render();
+            int width = EventsPanel->GetSize().x-initialXposition;
+            list[i]->Render(dc, initialXposition, Yposition, width < 0 ? 0 : width );
         }
 
-        Yposition += renderer->GetHeight();
-        delete renderer;
+        Yposition += list[i]->GetRenderedHeight();
 
         //Sub events
         if ( list[i]->CanHaveSubEvents() )
@@ -1360,7 +1342,12 @@ void EditorEvents::DeselectAllEvents(vector < BaseEventSPtr > & eventsToUnselect
 
     for (unsigned int i = 0;i<eventsToUnselected.size();++i)
     {
-    	eventsToUnselected[i]->selected = false;
+        if ( eventsToUnselected[i]->selected )
+        {
+            eventsToUnselected[i]->selected = false;
+            eventsToUnselected[i]->eventRenderingNeedUpdate = true;
+        }
+
     	if ( eventsToUnselected[i]->CanHaveSubEvents() )
             DeselectAllEvents(eventsToUnselected[i]->GetSubEvents());
     }
@@ -1376,7 +1363,14 @@ void EditorEvents::DeselectAllActions(vector < BaseEventSPtr > & eventsToUnselec
         for (unsigned int i = 0;i<allActionsVectors.size();++i)
         {
             for (unsigned int j = 0;j<allActionsVectors[i]->size();++j)
-                allActionsVectors[i]->at(j).selected = false;
+            {
+                if ( allActionsVectors[i]->at(j).selected )
+                {
+                    allActionsVectors[i]->at(j).selected = false;
+                    eventsToUnselected[eId]->eventRenderingNeedUpdate = true;
+                }
+
+            }
         }
 
     	if ( eventsToUnselected[eId]->CanHaveSubEvents() )
@@ -1394,7 +1388,13 @@ void EditorEvents::DeselectAllConditions(vector < BaseEventSPtr > & eventsToUnse
         for (unsigned int i = 0;i<allConditionsVector.size();++i)
         {
             for (unsigned int j = 0;j<allConditionsVector[i]->size();++j)
-                allConditionsVector[i]->at(j).selected = false;
+            {
+                if ( allConditionsVector[i]->at(j).selected )
+                {
+                    allConditionsVector[i]->at(j).selected = false;
+                    eventsToUnselected[eId]->eventRenderingNeedUpdate = true;
+                }
+            }
         }
 
     	if ( eventsToUnselected[eId]->CanHaveSubEvents() )
@@ -1518,5 +1518,4 @@ void EditorEvents::OnEventsPanelSetFocus(wxFocusEvent& event)
     ConnectEvents();
 }
 
-//TODO : Bug when no events are inserted and click on add template
 //TODO : Selection de plusieurs events

@@ -670,5 +670,3 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
 
     return;
 }
-
-//TODO : Use an "AllObjects" list with an number in this list to identify object is not verify good. Better to use shared_ptr ?

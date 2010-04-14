@@ -325,16 +325,31 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
 void SceneCanvas::OnMotion( wxMouseEvent &event )
 {
     //Milles merci laurent.
-    int mouseXInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(scene.input->GetMouseX(), 0).x);
-    int mouseYInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(0, scene.input->GetMouseY()).y);
+    int mouseXInScene = 0;
+    int mouseYInScene = 0;
 
-    wxString Xstr = st( mouseXInScene );
-    wxString Ystr = st( mouseYInScene );
+    wxString Xstr;
+    wxString Ystr;
 
     if ( !scene.editing )
-        wxLogStatus( wxString( _( "Position " ) ) + Xstr + wxString( _( ";" ) ) + Ystr + wxString( _( "." ) ) );
+    {
+        mouseXInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(scene.input->GetMouseX(), 0, scene.GetLayer("").GetCamera(0).GetSFMLView()).x);
+        mouseYInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(0, scene.input->GetMouseY(), scene.GetLayer("").GetCamera(0).GetSFMLView()).y);
+        Xstr = st( mouseXInScene );
+        Ystr = st( mouseYInScene );
+
+        wxLogStatus( wxString( _( "Position " ) ) + Xstr + wxString( _( ";" ) ) + Ystr + wxString( _( ". ( Calque de base, Caméra 0 )" ) ) );
+    }
     else
+    {
+        mouseXInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(scene.input->GetMouseX(), 0).x);
+        mouseYInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(0, scene.input->GetMouseY()).y);
+
+        Xstr = st( mouseXInScene );
+        Ystr = st( mouseYInScene );
+
         wxLogStatus( wxString( _( "Position " ) ) + Xstr + wxString( _( ";" ) ) + Ystr + wxString( _( ". SHIFT pour sélection multiple, clic droit pour plus d'options." ) ) );
+    }
 
     //Le reste concerne juste le mode édition
     if ( scene.running )

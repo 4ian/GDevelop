@@ -5,6 +5,11 @@
 
 #ifndef STANDARDEVENT_H
 #define STANDARDEVENT_H
+#if defined(GDE)
+#include <wx/bitmap.h>
+#include <wx/dcbuffer.h>
+#include <wx/html/htmprint.h>
+#endif
 #include <boost/shared_ptr.hpp>
 #include "Event.h"
 class RuntimeScene;
@@ -16,7 +21,7 @@ class TiXmlElement;
 class StandardEvent : public BaseEvent
 {
     public:
-        StandardEvent() : BaseEvent() {};
+        StandardEvent();
         StandardEvent(const StandardEvent & event);
         virtual ~StandardEvent() {};
 
@@ -52,6 +57,13 @@ class StandardEvent : public BaseEvent
         vector < Instruction > conditions;
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
+
+#ifdef GDE
+        virtual void RenderInBitmap() const;
+
+        int GetConditionsHeight() const;
+        int GetActionsHeight() const;
+#endif
 };
 
 #endif // STANDARDEVENT_H

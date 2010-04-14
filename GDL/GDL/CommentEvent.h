@@ -26,6 +26,13 @@ class CommentEvent : public BaseEvent
 
         string com1;
         string com2;
+
+    private:
+
+#ifdef GDE
+        virtual void RenderInBitmap() const;
+        unsigned int CalculateNecessaryHeight() const;
+#endif
 };
 
 #endif // COMMENTEVENT_H

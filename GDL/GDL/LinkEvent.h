@@ -15,7 +15,7 @@ class RuntimeScene;
 class LinkEvent : public BaseEvent
 {
     public:
-        LinkEvent(): BaseEvent() {};
+        LinkEvent(): BaseEvent(), start(0), end(0) {};
         virtual ~LinkEvent() {};
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new LinkEvent(*this));}
 
@@ -29,6 +29,10 @@ class LinkEvent : public BaseEvent
         int end;
 
     private:
+#ifdef GDE
+        virtual void RenderInBitmap() const;
+        unsigned int CalculateNecessaryHeight() const;
+#endif
 };
 
 #endif // LINKCOMMENT_H

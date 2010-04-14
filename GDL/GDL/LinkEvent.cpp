@@ -5,6 +5,8 @@
 
 #include "GDL/LinkEvent.h"
 #include "GDL/OpenSaveGame.h"
+#include "GDL/EventsRenderingHelper.h"
+#include "GDL/StdAlgo.h"
 #include "tinyxml.h"
 #include "RuntimeScene.h"
 #include "Game.h"
@@ -34,7 +36,6 @@ void LinkEvent::SaveToXml(TiXmlElement * eventElem) const
 
 void LinkEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
-    cout << "LOADEDD!!!!!!!!!!!!!";
     if ( eventElem->FirstChildElement( "Limites" )->Attribute( "start" ) != NULL ) { int value;eventElem->FirstChildElement( "Limites" )->QueryIntAttribute( "start", &value ); start = value;}
     else { cout <<"Les informations concernant le départ d'un lien manquent."; }
     if ( eventElem->FirstChildElement( "Limites" )->Attribute( "end" ) != NULL ) { int value;eventElem->FirstChildElement( "Limites" )->QueryIntAttribute( "end", &value ); end = value;}
@@ -63,7 +64,6 @@ void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector 
         end--;
     }
 
-    cout << "start" << start << "end" << end;
 
     //On teste la validité de l'insertion
     if ( start < 0 || static_cast<unsigned>(start) >= (*sceneLinkedIter)->events.size() )
@@ -91,3 +91,62 @@ void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector 
             eventList.push_back( (*sceneLinkedIter)->events.at( insertion )->Clone() );
     }
 }
+
+#if defined(GDE)
+/**
+ * Render the event in the bitmap
+ */
+void LinkEvent::RenderInBitmap() const
+{
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+
+    //Get sizes and recreate the bitmap
+    unsigned int renderedHeight = CalculateNecessaryHeight();
+    renderedEventBitmap.Create(renderedWidth, renderedHeight, -1);
+
+    //Prepare DC and constants
+    wxMemoryDC dc;
+    dc.SelectObject(renderedEventBitmap);
+
+    if ( !selected )
+    {
+        dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
+        dc.SetPen( wxPen( wxColour( 255, 255, 255 ), 5, wxSOLID ) );
+    }
+    else
+    {
+        dc.SetPen(wxPen(wxColour(0, 0, 0), 1));
+        dc.SetBrush(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)));
+    }
+
+    dc.DrawRectangle(0, 0, renderedWidth, renderedHeight);
+    dc.DrawBitmap( wxBitmap( "res/link48.png", wxBITMAP_TYPE_ANY ), 4, 0 + 4, true);
+
+    dc.SetTextForeground( wxColour( 0, 0, 0 ) );
+    dc.SetTextBackground( wxColour( 255, 255, 255 ) );
+    dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
+    dc.DrawText( _("Lien vers la scène ")+sceneLinked, 56, 0 + 16 );
+    wxRect lien = dc.GetTextExtent(_("Lien vers la scène ")+sceneLinked);
+
+    dc.SetFont( wxFont( 10, wxDEFAULT, wxNORMAL, wxNORMAL ) );
+    if ( start == -1 && end == -1 )
+        dc.DrawText( _("Inclure tous les évènements"), lien.GetWidth()+56+10, 0 + 18 );
+    else
+        dc.DrawText( "Inclure les évènements "+toString(start)+" à "+toString(end), lien.GetWidth()+56+10, 0 + 18 );
+}
+
+/**
+ * Precompute height for the link
+ */
+unsigned int LinkEvent::CalculateNecessaryHeight() const
+{
+    wxMemoryDC dc;
+    dc.SelectObject(renderedEventBitmap);
+
+    dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
+    wxRect lien = dc.GetTextExtent(_("Lien vers la scène "));
+
+    return lien.GetHeight()+32;
+}
+
+#endif

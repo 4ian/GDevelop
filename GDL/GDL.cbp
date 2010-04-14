@@ -437,6 +437,8 @@
 		<Unit filename="GDL\Event.h" />
 		<Unit filename="GDL\EventsPreprocessor.cpp" />
 		<Unit filename="GDL\EventsPreprocessor.h" />
+		<Unit filename="GDL\EventsRenderingHelper.cpp" />
+		<Unit filename="GDL\EventsRenderingHelper.h" />
 		<Unit filename="GDL\ExpressionInstruction.cpp" />
 		<Unit filename="GDL\ExpressionInstruction.h" />
 		<Unit filename="GDL\ExtensionBase.cpp" />
@@ -559,6 +561,10 @@
 		<Unit filename="GDL\Text.h" />
 		<Unit filename="GDL\TimeExtension.cpp" />
 		<Unit filename="GDL\TimeExtension.h" />
+		<Unit filename="GDL\TranslateAction.cpp" />
+		<Unit filename="GDL\TranslateAction.h" />
+		<Unit filename="GDL\TranslateCondition.cpp" />
+		<Unit filename="GDL\TranslateCondition.h" />
 		<Unit filename="GDL\Variable.cpp" />
 		<Unit filename="GDL\Variable.h" />
 		<Unit filename="GDL\VariablesExtension.cpp" />

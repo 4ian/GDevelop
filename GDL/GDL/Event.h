@@ -10,6 +10,9 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#if defined(GDE)
+#include <wx/dcbuffer.h>
+#endif
 #include "GDL/Log.h"
 #include "GDL/Instruction.h"
 class RuntimeScene;
@@ -91,16 +94,49 @@ class GD_API BaseEvent
          */
         virtual void Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList) {};
 
-#ifdef GDE
-        mutable bool conditionsHeightNeedUpdate;
-        mutable unsigned int conditionsHeight;
-        mutable bool actionsHeightNeedUpdate;
-        mutable unsigned int actionsHeight;
-        bool selected;
-#endif
-
         std::string GetType() const { return type; };
         void SetType(std::string type_) { type = type_; };
+
+#ifdef GDE
+        /**
+         * Called by event editor to draw the event. Call the internal RenderInBitmap() function
+         * if the event has to be redraw.
+         */
+        void Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
+        {
+            if (eventRenderingNeedUpdate)
+            {
+                renderedWidth = width;
+                RenderInBitmap();
+            }
+
+            if( renderedEventBitmap.IsOk() ) dc.DrawBitmap(renderedEventBitmap, x, y);
+        }
+
+        /**
+         * Return the rendered event bitmap height.
+         */
+        unsigned int GetRenderedHeight() const
+        {
+            if (eventRenderingNeedUpdate) RenderInBitmap();
+
+            return renderedEventBitmap.IsOk() ? renderedEventBitmap.GetHeight() : 0;
+        };
+
+        bool            selected;
+        mutable bool    eventRenderingNeedUpdate; ///<Automatically set to true/false by the events editor
+#endif
+
+    protected:
+#ifdef GDE
+        /**
+         * Derived class have to redefine this function to draw themselves.
+         */
+        virtual void RenderInBitmap() const {};
+
+        mutable wxBitmap        renderedEventBitmap; ///<Event renders itself into this bitmap
+        mutable unsigned int    renderedWidth; ///<Automatically setted to a value by the events editor before rendering
+#endif
 
     private:
         string type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.

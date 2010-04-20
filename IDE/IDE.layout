@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug - Edittime" />
+	<ActiveTarget name="Development - Edittime" />
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="9408" topLine="106" />
 	</File>
 	<File name="CheckMAJ.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="3588" topLine="92" />
 	</File>
-	<File name="ChoixAction.cpp" open="1" top="0" tabpos="4">
+	<File name="ChoixAction.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="18696" topLine="400" />
 	</File>
-	<File name="ChoixCondition.cpp" open="1" top="0" tabpos="5">
+	<File name="ChoixAction.h" open="0" top="0" tabpos="0">
+		<Cursor position="0" topLine="27" />
+	</File>
+	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="757" topLine="21" />
 	</File>
 	<File name="ChoixObjet.cpp" open="0" top="0" tabpos="0">
@@ -33,12 +36,6 @@
 	</File>
 	<File name="Clipboard.h" open="0" top="0" tabpos="17">
 		<Cursor position="941" topLine="10" />
-	</File>
-	<File name="CommentaireRenderer.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="348" topLine="6" />
-	</File>
-	<File name="CommentaireRenderer.h" open="1" top="0" tabpos="2">
-		<Cursor position="201" topLine="0" />
 	</File>
 	<File name="Compilation.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="34347" topLine="666" />
@@ -71,7 +68,7 @@
 		<Cursor position="226" topLine="0" />
 	</File>
 	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="21334" topLine="444" />
+		<Cursor position="28185" topLine="636" />
 	</File>
 	<File name="DebuggerGUI.h" open="0" top="0" tabpos="0">
 		<Cursor position="2773" topLine="93" />
@@ -83,16 +80,10 @@
 		<Cursor position="335" topLine="0" />
 	</File>
 	<File name="DndTextObjectsEditor.cpp" open="0" top="0" tabpos="20">
-		<Cursor position="296" topLine="0" />
+		<Cursor position="426" topLine="0" />
 	</File>
 	<File name="DndTextSceneEditor.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="239" topLine="0" />
-	</File>
-	<File name="EditCommentaire.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="741" topLine="9" />
-	</File>
-	<File name="EditCommentaire.h" open="0" top="0" tabpos="3">
-		<Cursor position="559" topLine="13" />
 	</File>
 	<File name="EditExpression.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="21688" topLine="319" />
@@ -102,12 +93,6 @@
 	</File>
 	<File name="EditLayer.h" open="0" top="0" tabpos="6">
 		<Cursor position="2582" topLine="62" />
-	</File>
-	<File name="EditLink.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="1237" topLine="168" />
-	</File>
-	<File name="EditLink.h" open="0" top="0" tabpos="7">
-		<Cursor position="936" topLine="43" />
 	</File>
 	<File name="EditObjectGroup.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="9095" topLine="184" />
@@ -124,20 +109,20 @@
 	<File name="EditPropScene.cpp" open="0" top="0" tabpos="14">
 		<Cursor position="361" topLine="0" />
 	</File>
-	<File name="EditorEvents.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="36518" topLine="540" />
+	<File name="EditorEvents.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="35312" topLine="529" />
 	</File>
-	<File name="EditorEvents.h" open="1" top="0" tabpos="9">
-		<Cursor position="7970" topLine="216" />
+	<File name="EditorEvents.h" open="1" top="0" tabpos="3">
+		<Cursor position="8320" topLine="218" />
 	</File>
-	<File name="EditorEventsActions.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="1649" topLine="20" />
+	<File name="EditorEventsActions.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="571" topLine="0" />
 	</File>
-	<File name="EditorEventsConditions.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="765" topLine="0" />
+	<File name="EditorEventsConditions.cpp" open="1" top="1" tabpos="5">
+		<Cursor position="1524" topLine="24" />
 	</File>
 	<File name="EditorLayers.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="15611" topLine="408" />
+		<Cursor position="7344" topLine="146" />
 	</File>
 	<File name="EditorLayers.h" open="0" top="0" tabpos="10">
 		<Cursor position="2112" topLine="61" />
@@ -175,7 +160,7 @@
 	<File name="EventsRendererDatas.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="164" topLine="0" />
 	</File>
-	<File name="EventsRendererDatas.h" open="1" top="0" tabpos="3">
+	<File name="EventsRendererDatas.h" open="0" top="0" tabpos="3">
 		<Cursor position="226" topLine="6" />
 	</File>
 	<File name="Extensions.cpp" open="0" top="0" tabpos="1">
@@ -193,7 +178,7 @@
 	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2790" topLine="90" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="8">
+	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="1494" topLine="34" />
 	</File>
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="3">
@@ -210,12 +195,6 @@
 	</File>
 	<File name="InitialVariablesDialog.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="8522" topLine="129" />
-	</File>
-	<File name="LinkRenderer.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="350" topLine="5" />
-	</File>
-	<File name="LinkRenderer.h" open="0" top="0" tabpos="6">
-		<Cursor position="158" topLine="0" />
 	</File>
 	<File name="MAJ.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="253" topLine="12" />
@@ -253,14 +232,8 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="22" topLine="0" />
 	</File>
-	<File name="Renderer.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="87" topLine="0" />
-	</File>
-	<File name="Renderer.h" open="0" top="0" tabpos="0">
-		<Cursor position="340" topLine="0" />
-	</File>
-	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="12793" topLine="318" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="4376" topLine="107" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="16">
 		<Cursor position="1209" topLine="24" />

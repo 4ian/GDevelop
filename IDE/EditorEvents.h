@@ -44,12 +44,13 @@ class EditorEvents: public wxPanel
 		wxMenuItem* MenuItem7;
 		wxMenuItem* MenuItem25;
 		wxMenu* MenuItem9;
+		wxMenu* MenuItem36;
 		wxMenuItem* MenuItem2;
 		wxMenuItem* MenuItem1;
 		wxMenuItem* MenuItem4;
+		wxMenuItem* MenuItem14;
 		wxScrollBar* ScrollBar1;
-		wxMenu commentMenu;
-		wxMenu linkMenu;
+		wxMenuItem* MenuItem15;
 		wxMenuItem* MenuItem22;
 		wxPanel* Panel1;
 		wxMenuItem* MenuItem32;
@@ -118,8 +119,6 @@ class EditorEvents: public wxPanel
 		static const long ID_MENUITEM13;
 		static const long ID_MENUITEM12;
 		static const long ID_MENUITEM14;
-		static const long ID_MENUITEM15;
-		static const long ID_MENUITEM16;
 		//*)
 		static const long ID_TEMPLATEBUTTON;
 		static const long ID_CREATETEMPLATEBUTTON;

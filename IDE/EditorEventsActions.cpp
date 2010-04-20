@@ -43,6 +43,7 @@ void EditorEvents::OnAddActionMenuSelected(wxCommandEvent& event)
 
         GetLastSelectedListOfInstructions()->push_back(instruction);
 
+        GetLastSelectedEvent()->eventRenderingNeedUpdate = true;
         ChangesMadeOnEvents();
     }
 }

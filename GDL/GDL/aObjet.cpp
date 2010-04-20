@@ -111,7 +111,6 @@ bool ActAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcern
     for ( ; obj != obj_end; ++obj )
     {
         objectsConcerned.objectsPicked.AddObject(*obj);
-        //TODO : Encore utile ?
     }
 
     return true;

@@ -46,7 +46,7 @@ SceneExtension::SceneExtension()
                    _("Scène"),
                    "res/actions/goscene24.png",
                    "res/actions/goscene.png",
-                   NULL);
+                   &ActScene);
 
         DECLARE_PARAMETER("", _("Nom de la scène"), false, "")
 
@@ -59,7 +59,7 @@ SceneExtension::SceneExtension()
                    _("Scène"),
                    "res/actions/quit24.png",
                    "res/actions/quit.png",
-                   NULL);
+                   &ActQuit);
 
     DECLARE_END_ACTION()
 

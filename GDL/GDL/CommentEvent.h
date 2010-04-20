@@ -10,6 +10,13 @@
 #include "Event.h"
 class TiXmlElement;
 
+#if defined(GDE)
+class Scene;
+class Game;
+class MainEditorCommand;
+class wxWindow;
+#endif
+
 class CommentEvent : public BaseEvent
 {
     public:
@@ -27,9 +34,13 @@ class CommentEvent : public BaseEvent
         string com1;
         string com2;
 
+#if defined(GDE)
+        virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
+#endif
+
     private:
 
-#ifdef GDE
+#if defined(GDE)
         virtual void RenderInBitmap() const;
         unsigned int CalculateNecessaryHeight() const;
 #endif

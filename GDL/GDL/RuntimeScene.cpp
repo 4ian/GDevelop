@@ -22,6 +22,7 @@
 #include "GDL/profile.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Position.h"
+#include "GDL/ObjectsConcerned.h"
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
@@ -44,7 +45,8 @@ firstLoop(true),
 realElapsedTime(0),
 elapsedTime(0),
 timeScale(1),
-timeFromStart(0)
+timeFromStart(0),
+specialAction(-1)
 {
     //ctor
     soundManager = SoundManager::getInstance();
@@ -167,11 +169,15 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         GestionMusique();
 
         //Gestions des évènements
-        //TODO : Optimisation
-        EventsExecutor eventsExecutor(this);
-        int NouvelleScene = eventsExecutor.ExecuteEventsScene();
-        if ( NouvelleScene != -1 )
-            return NouvelleScene; //La scène veut autre chose que continuer.
+        ObjectsConcerned objectsConcerned(&objectsInstances, &objectGroups);
+        Evaluateur eval(*game, *this);
+        for (unsigned int i = 0;i<events.size();++i)
+        {
+            ObjectsConcerned objectsConcernedForEvent;
+            objectsConcernedForEvent.InheritsFrom(&objectsConcerned);
+
+            events[i]->Execute(this, objectsConcernedForEvent, eval);
+        }
 
         //Gestions post-évènements
         GestionObjets();
@@ -187,7 +193,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         if ( firstLoop ) firstLoop = false; //On n'est plus la première fois
     }
 
-    return -1;
+    return specialAction;
 }
 
 ////////////////////////////////////////////////////////////
@@ -320,7 +326,7 @@ void RuntimeScene::Render()
                 }
 
                 //Texts
-                AfficheTexte(layers.at(layerIndex).GetName());
+                DisplayLegacyTexts(layers.at(layerIndex).GetName());
             }
         }
     }
@@ -413,7 +419,7 @@ bool RuntimeScene::OrderObjectsByZOrder( ObjList & objList )
 ////////////////////////////////////////////////////////////
 /// Affiche le texte
 ////////////////////////////////////////////////////////////
-bool RuntimeScene::AfficheTexte(string layer)
+bool RuntimeScene::DisplayLegacyTexts(string layer)
 {
     for ( unsigned int i = 0;i < textes.size();i++ )
     {
@@ -511,6 +517,10 @@ void RuntimeScene::GestionObjets()
     }
 }
 
+void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
+{
+    specialAction = scene;
+}
 
 ////////////////////////////////////////////////////////////
 /// Ouvre un jeu, et stocke dans les tableaux passés en paramétres.

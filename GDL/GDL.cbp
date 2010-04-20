@@ -425,6 +425,12 @@
 		<Unit filename="GDL\Direction.h" />
 		<Unit filename="GDL\Dossier.cpp" />
 		<Unit filename="GDL\Dossier.h" />
+		<Unit filename="GDL\EditComment.cpp" />
+		<Unit filename="GDL\EditComment.h" />
+		<Unit filename="GDL\EditForEachEvent.cpp" />
+		<Unit filename="GDL\EditForEachEvent.h" />
+		<Unit filename="GDL\EditLink.cpp" />
+		<Unit filename="GDL\EditLink.h" />
 		<Unit filename="GDL\EditorImages.cpp" />
 		<Unit filename="GDL\EditorImages.h" />
 		<Unit filename="GDL\EditorObjet.cpp" />
@@ -724,6 +730,9 @@
 			<wxsmith version="1">
 				<resources>
 					<wxPanel wxs="wxsmith/EditorImages.wxs" src="GDL/EditorImages.cpp" hdr="GDL/EditorImages.h" name="EditorImages" language="CPP" />
+					<wxDialog wxs="wxsmith/EditLink.wxs" src="GDL/EditLink.cpp" hdr="GDL/EditLink.h" name="EditLink" language="CPP" />
+					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDL/EditComment.cpp" hdr="GDL/EditComment.h" name="EditComment" language="CPP" />
+					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDL/EditForEachEvent.cpp" hdr="GDL/EditForEachEvent.h" name="EditForEachEvent" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

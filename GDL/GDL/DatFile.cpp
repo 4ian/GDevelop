@@ -184,7 +184,11 @@ char* DatFile::GetFile (std::string filename)
             m_buffer = new char[(m_entries[i].size)];
             //Simple error catch
             if (m_buffer==NULL)
+            {
+                cout << "Unable to allocate a buffer of length " << (m_entries[i].size) << " when loading " << filename << endl;
                 return (NULL);
+            }
+
             //Opening the DAT file ot read the file datas needed
             datfile.open (m_datfile.c_str(), std::ifstream::in | std::ifstream::binary);
             if (datfile.is_open())
@@ -196,8 +200,10 @@ char* DatFile::GetFile (std::string filename)
                 //We can close the DAT file
                 datfile.close();
                 //Returning the buffer
+                cout << "Successfully loaded " << filename << endl;
                 return (m_buffer);
             }
+            cout << "Unable to open internal file when loading " << filename << endl;
         }
     }
     //Finally, there is no such file in our DAT file

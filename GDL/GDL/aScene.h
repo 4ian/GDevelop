@@ -20,4 +20,7 @@
 
 using namespace std;
 
+bool ActQuit( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+bool ActScene( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+
 #endif // ASCENE_H

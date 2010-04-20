@@ -49,6 +49,14 @@ class StandardEvent : public BaseEvent
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
+#if defined(GDE)
+        /**
+         * Called when user click on the event
+         */
+        virtual void OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
+                                 bool & conditionsSelected, bool & instructionsSelected);
+#endif
+
     private:
         void Init(const StandardEvent & event);
         bool ExecuteConditions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval );
@@ -58,11 +66,8 @@ class StandardEvent : public BaseEvent
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
 
-#ifdef GDE
+#if defined(GDE)
         virtual void RenderInBitmap() const;
-
-        int GetConditionsHeight() const;
-        int GetActionsHeight() const;
 #endif
 };
 

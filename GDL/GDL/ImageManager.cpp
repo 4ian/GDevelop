@@ -10,7 +10,7 @@
 
 void MessageLoading( string message, float avancement )
 {
-    cout << "Chargement :" << message; //TODO : Must change that
+    cout << "Chargement :" << message << endl; //TODO : Must change that
 } //Prototype de la fonction pour renvoyer un message
 
 ImageManager::ImageManager()

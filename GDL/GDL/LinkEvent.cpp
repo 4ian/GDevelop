@@ -13,6 +13,10 @@
 #include "Event.h"
 #include <iostream>
 
+#if defined(GDE)
+#include "GDL/EditLink.h"
+#endif
+
 using namespace std;
 
 void LinkEvent::SaveToXml(TiXmlElement * eventElem) const
@@ -93,13 +97,17 @@ void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector 
 }
 
 #if defined(GDE)
+void LinkEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+{
+    EditLink dialog(parent_, *this);
+    dialog.ShowModal();
+}
+
 /**
  * Render the event in the bitmap
  */
 void LinkEvent::RenderInBitmap() const
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
-
     //Get sizes and recreate the bitmap
     unsigned int renderedHeight = CalculateNecessaryHeight();
     renderedEventBitmap.Create(renderedWidth, renderedHeight, -1);

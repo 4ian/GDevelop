@@ -12,6 +12,12 @@
 class Game;
 class RuntimeScene;
 
+#if defined(GDE)
+class Scene;
+class MainEditorCommand;
+class wxWindow;
+#endif
+
 class LinkEvent : public BaseEvent
 {
     public:
@@ -27,6 +33,10 @@ class LinkEvent : public BaseEvent
         string sceneLinked;
         int start;
         int end;
+
+#if defined(GDE)
+        virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
+#endif
 
     private:
 #ifdef GDE

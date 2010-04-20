@@ -82,6 +82,7 @@ class GD_API RuntimeScene : public Scene
         void PreprocessEventList( const Game & Jeu, vector < BaseEventSPtr > & listEvent );
 
         void ChangeRenderWindow(sf::RenderWindow * window);
+        void GotoSceneWhenEventsAreFinished(int scene);
 
         //-> Gestion de la boucle de jeu
         int RenderAndStep(unsigned int nbStep);
@@ -98,6 +99,7 @@ class GD_API RuntimeScene : public Scene
         inline float GetTimeFromStart() const { return timeFromStart; };
         inline bool IsFirstLoop() const { return firstLoop; };
 
+
         bool StopMusic();
 
     protected:
@@ -105,7 +107,7 @@ class GD_API RuntimeScene : public Scene
         //Fonctions supplémentaires pour une RuntimeScene
         //-> Gestion de la boucle de jeu
         void Render();
-        bool AfficheTexte(string layer = "");
+        bool DisplayLegacyTexts(string layer = "");
         bool OrderObjectsByZOrder( ObjList & objList );
         void GestionObjets();
         void ManageRenderTargetEvents();
@@ -123,6 +125,7 @@ class GD_API RuntimeScene : public Scene
         float elapsedTime;
         float timeScale;
         float timeFromStart;
+        int   specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
 
         static RuntimeLayer badLayer;
 };

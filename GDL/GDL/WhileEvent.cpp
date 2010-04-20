@@ -5,6 +5,13 @@
 #include "Access.h"
 #include "GDL/OpenSaveGame.h"
 
+#if defined(GDE)
+#include "GDL/EventsRenderingHelper.h"
+#include "GDL/ExtensionsManager.h"
+#include "GDL/TranslateAction.h"
+#include "GDL/TranslateCondition.h"
+#endif
+
 /**
  * Check the conditions, and launch actions and subevents if necessary
  */
@@ -145,6 +152,162 @@ void WhileEvent::LoadFromXml(const TiXmlElement * eventElem)
     if ( eventElem->FirstChildElement( "Events" ) != NULL )
         OpenSaveGame::OpenEvents(events, eventElem->FirstChildElement( "Events" ));
 }
+
+#if defined(GDE)
+
+void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
+                         bool & conditionsSelected, bool & instructionsSelected)
+{
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    const int repeatHeight = 20;
+
+    if ( y <= whileConditionsHeight)
+    {
+        conditionsSelected = true;
+
+        int cId = renderingHelper->GetConditionAt(whileConditions, x-0, y-0);
+        if ( cId >= 0 && static_cast<unsigned>(cId) < whileConditions.size() )
+        {
+            //Update event and condition selection information
+            whileConditions[cId].selected = true;
+            eventRenderingNeedUpdate = true;
+
+            //Update editor selection information
+            instructionsSelected = true;
+            boost::tuples::get<2>(eventsSelected.back()) = &whileConditions;
+            boost::tuples::get<3>(eventsSelected.back()) = cId;
+
+            return;
+        }
+        else if ( y <= 18 )
+        {
+            //Update event selection information
+            eventRenderingNeedUpdate = true;
+
+            //Update selection information
+            instructionsSelected = true;
+            boost::tuples::get<2>(eventsSelected.back()) = &whileConditions;
+            boost::tuples::get<3>(eventsSelected.back()) = 0;
+
+            return;
+        }
+    }
+
+    y -= whileConditionsHeight+repeatHeight; //Substract the height of the "For Each object ..." text so as to simplify the tests
+    if ( y < 0 ) return;
+
+    if ( static_cast<unsigned>(x) <= renderingHelper->GetConditionsColumnWidth())
+    {
+        conditionsSelected = true;
+
+        int cId = renderingHelper->GetConditionAt(conditions, x-0, y-0);
+
+        if ( cId >= 0 && static_cast<unsigned>(cId) < conditions.size() )
+        {
+            //Update event and conditions selection information
+            conditions[cId].selected = true;
+            eventRenderingNeedUpdate = true;
+
+            //Update editor selection information
+            instructionsSelected = true;
+            boost::tuples::get<2>(eventsSelected.back()) = &conditions;
+            boost::tuples::get<3>(eventsSelected.back()) = cId;
+
+            return;
+        }
+        else if ( y <= 18 )
+        {
+            //Update event selection information
+            eventRenderingNeedUpdate = true;
+
+            //Update selection information
+            instructionsSelected = true;
+            boost::tuples::get<2>(eventsSelected.back()) = &conditions;
+            boost::tuples::get<3>(eventsSelected.back()) = 0;
+
+            return;
+        }
+    }
+    else
+    {
+        conditionsSelected = false;
+
+        int aId = renderingHelper->GetActionAt(actions, x-0, y-0);
+
+        if ( aId >= 0 && static_cast<unsigned>(aId) < actions.size()  )
+        {
+            //Update event and action selection information
+            actions[aId].selected = true;
+            eventRenderingNeedUpdate = true;
+
+            //Update selection information
+            instructionsSelected = true;
+            boost::tuples::get<2>(eventsSelected.back()) = &actions;
+            boost::tuples::get<3>(eventsSelected.back()) = aId;
+        }
+        else
+        {
+            //Update event selection information
+            eventRenderingNeedUpdate = true;
+
+            //Update selection information
+            instructionsSelected = true;
+            boost::tuples::get<2>(eventsSelected.back()) = &actions;
+            boost::tuples::get<3>(eventsSelected.back()) = 0;
+        }
+    }
+}
+
+/**
+ * Render the event in the bitmap
+ */
+void WhileEvent::RenderInBitmap() const
+{
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    const int repeatHeight = 20;
+
+    //Get sizes and recreate the bitmap
+    int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
+    int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, renderedWidth-renderingHelper->GetConditionsColumnWidth());
+    whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, renderedWidth-80);
+    renderedEventBitmap.Create(renderedWidth, ( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + whileConditionsHeight + repeatHeight +2, -1);
+
+    //Prepare renderers and constants
+    wxMemoryDC dc;
+    dc.SelectObject(renderedEventBitmap);
+
+    //Draw event rectangle
+    dc.SetPen(*wxTRANSPARENT_PEN);
+    dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
+    dc.Clear();
+    wxRect rect(0, 0, renderedWidth, renderedEventBitmap.GetHeight());
+
+    if ( !selected )
+        renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->eventGradient1, renderingHelper->eventGradient2, renderingHelper->eventGradient3, renderingHelper->eventGradient4, renderingHelper->eventBorderColor);
+    else
+        renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->selectionColor, renderingHelper->eventGradient2, renderingHelper->eventGradient3, renderingHelper->selectionColor, renderingHelper->eventBorderColor);
+
+    //While text
+    dc.SetFont( renderingHelper->GetBoldFont() );
+    dc.DrawText( _("Tant que :"), 2, 1 );
+
+    //Draw "while conditions"
+    whileConditionsHeight = 2;
+    whileConditionsHeight += renderingHelper->DrawConditionsList(whileConditions, dc, 80, 2, renderedWidth-80);
+
+    dc.SetFont( renderingHelper->GetBoldFont() );
+    dc.DrawText( _("Répéter :"), 2, whileConditionsHeight);
+
+    renderingHelper->DrawConditionsList(conditions, dc, 0, whileConditionsHeight+repeatHeight, renderingHelper->GetConditionsColumnWidth());
+    renderingHelper->DrawActionsList(actions, dc, renderingHelper->GetConditionsColumnWidth(), whileConditionsHeight+repeatHeight, renderedWidth-renderingHelper->GetConditionsColumnWidth());
+
+    eventRenderingNeedUpdate = false;
+}
+
+void WhileEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+{
+}
+#endif
 
 /**
  * Initialize from another WhileEvent.

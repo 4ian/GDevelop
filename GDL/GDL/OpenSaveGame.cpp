@@ -569,17 +569,20 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
 {
     for (unsigned int eId = 0;eId < list.size();++eId)
     {
-        StandardEvent * event = dynamic_cast<StandardEvent*>(list[eId].get());
         bool abordAndRestartEvent = false;
 
-        if ( event != NULL )
+        vector < vector < Instruction > * > conditionsVectors = list[eId]->GetAllConditionsVectors();
+        vector < vector < Instruction > * > actionsVectors = list[eId]->GetAllActionsVectors();
+
+        for (unsigned int l = 0;l<conditionsVectors.size();++l)
         {
-            for (unsigned int c = 0;c<event->GetConditions().size();++c)
+            vector < Instruction > * conditions = conditionsVectors[l];
+            for (unsigned int c = 0;conditions != NULL && c<(*conditions).size();++c)
             {
-                if ( event->GetConditions()[c].GetType() == "Repeat"  )
+                if ( (*conditions)[c].GetType() == "Repeat"  )
                 {
                     //Split conditions
-                    vector < Instruction > oldConditions = event->GetConditions();
+                    vector < Instruction > oldConditions = (*conditions);
                     vector < Instruction > eventNewConditions;
                     vector < Instruction > subEventConditions;
                     copy(oldConditions.begin(), oldConditions.begin()+c, back_inserter(eventNewConditions));
@@ -589,23 +592,29 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                     RepeatEvent * subEvent = new RepeatEvent;
                     subEvent->SetType("BuiltinCommonInstructions::Repeat");
                     subEvent->SetConditions(subEventConditions);
-                    subEvent->SetActions(event->GetActions());
-                    subEvent->SetSubEvents(event->GetSubEvents());
-                    subEvent->SetRepeatExpression(event->GetConditions()[c].GetParameter(0).GetPlainString());
+
+                    if ( !actionsVectors.empty() && actionsVectors[0] != NULL ) //Assume first member of actions vector is the main action list
+                        subEvent->SetActions(*actionsVectors[0]);
+
+                    subEvent->SetSubEvents(list[eId]->GetSubEvents());
+                    subEvent->SetRepeatExpression((*conditions)[c].GetParameter(0).GetPlainString());
 
                     //Insert the new event and modify the current
                     BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
-                    event->GetSubEvents().clear();
-                    event->GetSubEvents().push_back(subEventSPtr);
-                    event->GetActions().clear();
-                    event->SetConditions(eventNewConditions);
+                    list[eId]->GetSubEvents().clear();
+                    list[eId]->GetSubEvents().push_back(subEventSPtr);
+
+                    if ( !actionsVectors.empty() && actionsVectors[0] != NULL ) //Assume first member of actions vector is the main action list
+                        actionsVectors[0]->clear();
+
+                    *conditions = eventNewConditions;
 
                     abordAndRestartEvent = true; break;
                 }
-                else if ( event->GetConditions()[c].GetType() == "ForEach"  )
+                else if ( (*conditions)[c].GetType() == "ForEach"  )
                 {
                     //Split conditions
-                    vector < Instruction > oldConditions = event->GetConditions();
+                    vector < Instruction > oldConditions = (*conditions);
                     vector < Instruction > eventNewConditions;
                     vector < Instruction > subEventConditions;
                     copy(oldConditions.begin(), oldConditions.begin()+c, back_inserter(eventNewConditions));
@@ -615,23 +624,29 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                     ForEachEvent * subEvent = new ForEachEvent;
                     subEvent->SetType("BuiltinCommonInstructions::ForEach");
                     subEvent->SetConditions(subEventConditions);
-                    subEvent->SetActions(event->GetActions());
-                    subEvent->SetSubEvents(event->GetSubEvents());
-                    subEvent->SetObjectToPick(event->GetConditions()[c].GetParameter(0).GetPlainString());
+
+                    if ( !actionsVectors.empty() && actionsVectors[0] != NULL ) //Assume first member of actions vector is the main action list
+                        subEvent->SetActions(*actionsVectors[0]);
+
+                    subEvent->SetSubEvents(list[eId]->GetSubEvents());
+                    subEvent->SetObjectToPick((*conditions)[c].GetParameter(0).GetPlainString());
 
                     //Insert the new event and modify the current
                     BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
-                    event->GetSubEvents().clear();
-                    event->GetSubEvents().push_back(subEventSPtr);
-                    event->GetActions().clear();
-                    event->SetConditions(eventNewConditions);
+                    list[eId]->GetSubEvents().clear();
+                    list[eId]->GetSubEvents().push_back(subEventSPtr);
+
+                    if ( !actionsVectors.empty() && actionsVectors[0] != NULL ) //Assume first member of actions vector is the main action list
+                        actionsVectors[0]->clear();
+
+                    *conditions = eventNewConditions;
 
                     abordAndRestartEvent = true; break;
                 }
-                else if ( event->GetConditions()[c].GetType() == "While"  )
+                else if ( (*conditions)[c].GetType() == "While"  )
                 {
                     //Split conditions
-                    vector < Instruction > oldConditions = event->GetConditions();
+                    vector < Instruction > oldConditions = (*conditions);
                     vector < Instruction > eventNewConditions;
                     vector < Instruction > subEventConditions;
                     vector < Instruction > whileConditions;
@@ -645,33 +660,46 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                     WhileEvent * subEvent = new WhileEvent;
                     subEvent->SetType("BuiltinCommonInstructions::While");
                     subEvent->SetConditions(subEventConditions);
-                    subEvent->SetActions(event->GetActions());
-                    subEvent->SetSubEvents(event->GetSubEvents());
+
+                    if ( !actionsVectors.empty() && actionsVectors[0] != NULL ) //Assume first member of actions vector is the main action list
+                        subEvent->SetActions(*actionsVectors[0]);
+
+                    subEvent->SetSubEvents(list[eId]->GetSubEvents());
                     subEvent->SetWhileConditions(whileConditions);
 
                     //Insert the new event and modify the current
                     BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
-                    event->GetSubEvents().clear();
-                    event->GetSubEvents().push_back(subEventSPtr);
-                    event->GetActions().clear();
-                    event->SetConditions(eventNewConditions);
+                    list[eId]->GetSubEvents().clear();
+                    list[eId]->GetSubEvents().push_back(subEventSPtr);
+
+                    if ( !actionsVectors.empty() && actionsVectors[0] != NULL ) //Assume first member of actions vector is the main action list
+                        actionsVectors[0]->clear();
+
+                    *conditions = eventNewConditions;
 
                     abordAndRestartEvent = true; break;
                 }
             }
-
             if ( abordAndRestartEvent ) //If the event has been modified, restart processing the event
-            {
-                --eId;
-                continue;
-            }
+                break;
+        }
 
-            for (unsigned int a = 0;a<event->GetActions().size();++a)
+        if ( abordAndRestartEvent ) //If the event has been modified, restart processing the event
+        {
+            --eId;
+            continue;
+        }
+
+        for (unsigned int l = 0;l<actionsVectors.size();++l)
+        {
+            vector < Instruction > * actions = actionsVectors[l];
+
+            for (unsigned int a = 0;actions != NULL && a<(*actions).size();++a)
             {
-                if ( event->GetActions()[a].GetType() == "Repeat"  )
+                if ( (*actions)[a].GetType() == "Repeat"  )
                 {
                     //Split conditions
-                    vector < Instruction > oldActions = event->GetActions();
+                    vector < Instruction > oldActions = (*actions);
                     vector < Instruction > eventNewActions;
                     vector < Instruction > subEventActions;
                     copy(oldActions.begin(), oldActions.begin()+a, back_inserter(eventNewActions));
@@ -681,21 +709,21 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                     RepeatEvent * subEvent = new RepeatEvent;
                     subEvent->SetType("BuiltinCommonInstructions::Repeat");
                     subEvent->SetActions(subEventActions);
-                    subEvent->SetSubEvents(event->GetSubEvents());
-                    subEvent->SetRepeatExpression(event->GetActions()[a].GetParameter(0).GetPlainString());
+                    subEvent->SetSubEvents(list[eId]->GetSubEvents());
+                    subEvent->SetRepeatExpression((*actions)[a].GetParameter(0).GetPlainString());
 
                     //Insert the new event and modify the current
                     BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
-                    event->GetSubEvents().clear();
-                    event->GetSubEvents().push_back(subEventSPtr);
-                    event->SetActions(eventNewActions);
+                    list[eId]->GetSubEvents().clear();
+                    list[eId]->GetSubEvents().push_back(subEventSPtr);
+                    (*actions) = eventNewActions;
 
                     abordAndRestartEvent = true; break;
                 }
-                else if ( event->GetActions()[a].GetType() == "ForEach"  )
+                else if ( (*actions)[a].GetType() == "ForEach"  )
                 {
                     //Split conditions
-                    vector < Instruction > oldActions = event->GetActions();
+                    vector < Instruction > oldActions = (*actions);
                     vector < Instruction > eventNewActions;
                     vector < Instruction > subEventActions;
                     copy(oldActions.begin(), oldActions.begin()+a, back_inserter(eventNewActions));
@@ -705,26 +733,29 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                     ForEachEvent * subEvent = new ForEachEvent;
                     subEvent->SetType("BuiltinCommonInstructions::ForEach");
                     subEvent->SetActions(subEventActions);
-                    subEvent->SetSubEvents(event->GetSubEvents());
-                    subEvent->SetObjectToPick(event->GetActions()[a].GetParameter(0).GetPlainString());
+                    subEvent->SetSubEvents(list[eId]->GetSubEvents());
+                    subEvent->SetObjectToPick((*actions)[a].GetParameter(0).GetPlainString());
 
                     //Insert the new event and modify the current
                     BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
-                    event->GetSubEvents().clear();
-                    event->GetSubEvents().push_back(subEventSPtr);
-                    event->SetActions(eventNewActions);
+                    list[eId]->GetSubEvents().clear();
+                    list[eId]->GetSubEvents().push_back(subEventSPtr);
+                    (*actions) = eventNewActions;
 
                     abordAndRestartEvent = true; break;
                 }
-
             }
-
             if ( abordAndRestartEvent ) //If the event has been modified, restart processing the event
-            {
-                --eId;
-                continue;
-            }
+                break;
         }
+        if ( abordAndRestartEvent ) //If the event has been modified, restart processing the event
+        {
+            --eId;
+            continue;
+        }
+
+        if ( list[eId]->CanHaveSubEvents() )
+            AdaptEventsFromGD138892(list[eId]->GetSubEvents());
     }
 }
 

@@ -13,13 +13,19 @@ class Instruction;
 class Evaluateur;
 class TiXmlElement;
 
+#if defined(GDE)
+class Scene;
+class MainEditorCommand;
+class wxWindow;
+#endif
+
 /**
  * Foreach event is a standard event that pick an object of a list each time it is repeated
  */
 class ForEachEvent : public BaseEvent
 {
     public:
-        ForEachEvent() : objectsToPick("") {};
+        ForEachEvent();
         ForEachEvent(const ForEachEvent & event);
         virtual ~ForEachEvent() {};
 
@@ -53,6 +59,19 @@ class ForEachEvent : public BaseEvent
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
+#if defined(GDE)
+        /**
+         * Called when user click on the event
+         */
+        virtual void OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
+                                 bool & conditionsSelected, bool & instructionsSelected);
+
+        /**
+         * Called when the user want to edit the event
+         */
+        virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
+#endif
+
     private:
         void Init(const ForEachEvent & event);
         bool ExecuteConditions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval );
@@ -62,6 +81,11 @@ class ForEachEvent : public BaseEvent
         vector < Instruction > conditions;
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
+
+#ifdef GDE
+        virtual void RenderInBitmap() const;
+        bool objectsToPickSelected;
+#endif
 };
 
 #endif // FOREACHEVENT_H

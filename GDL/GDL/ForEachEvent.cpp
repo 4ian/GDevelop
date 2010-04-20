@@ -6,6 +6,20 @@
 #include "RuntimeScene.h"
 #include "tinyxml.h"
 
+#if defined(GDE)
+#include "GDL/EventsRenderingHelper.h"
+#include "GDL/EditForEachEvent.h"
+#endif
+
+ForEachEvent::ForEachEvent() :
+BaseEvent(),
+objectsToPick("")
+#if defined(GDE)
+,objectsToPickSelected(false)
+#endif
+{
+}
+
 /**
  * Check the conditions, and launch actions and subevents if necessary
  */
@@ -140,6 +154,144 @@ void ForEachEvent::LoadFromXml(const TiXmlElement * eventElem)
     if ( eventElem->FirstChildElement( "Events" ) != NULL )
         OpenSaveGame::OpenEvents(events, eventElem->FirstChildElement( "Events" ));
 }
+
+
+#if defined(GDE)
+void ForEachEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
+                         bool & conditionsSelected, bool & instructionsSelected)
+{
+    const int forEachTextHeight = 20;
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+
+    //Test selection for the "For Each object..."
+    if ( y <= forEachTextHeight )
+    {
+        objectsToPickSelected = true;
+        return;
+    }
+
+    //Test selection of actions/conditions
+    objectsToPickSelected = false;
+    y -= forEachTextHeight; //Substract the height of the "For Each object ..." text so as to simplify the tests
+    if ( x <= renderingHelper->GetConditionsColumnWidth())
+    {
+        conditionsSelected = true;
+
+        int cId = renderingHelper->GetConditionAt(conditions, x-0, y-0);
+
+        if ( cId >= 0 && cId < conditions.size() )
+        {
+            //Update event and conditions selection information
+            conditions[cId].selected = true;
+            eventRenderingNeedUpdate = true;
+
+            //Update editor selection information
+            instructionsSelected = true;
+            boost::tuples::get<2>(eventsSelected.back()) = &conditions;
+            boost::tuples::get<3>(eventsSelected.back()) = cId;
+
+            return;
+        }
+        else if ( y <= 18 )
+        {
+            //Update event selection information
+            eventRenderingNeedUpdate = true;
+
+            //Update selection information
+            instructionsSelected = true;
+            boost::tuples::get<2>(eventsSelected.back()) = &conditions;
+            boost::tuples::get<3>(eventsSelected.back()) = 0;
+
+            return;
+        }
+    }
+    else
+    {
+        conditionsSelected = false;
+
+        int aId = renderingHelper->GetActionAt(actions, x-0, y-0);
+
+        if ( aId >= 0 && aId < actions.size()  )
+        {
+            //Update event and action selection information
+            actions[aId].selected = true;
+            eventRenderingNeedUpdate = true;
+
+            //Update selection information
+            instructionsSelected = true;
+            boost::tuples::get<2>(eventsSelected.back()) = &actions;
+            boost::tuples::get<3>(eventsSelected.back()) = aId;
+        }
+        else
+        {
+            //Update event selection information
+            eventRenderingNeedUpdate = true;
+
+            //Update selection information
+            instructionsSelected = true;
+            boost::tuples::get<2>(eventsSelected.back()) = &actions;
+            boost::tuples::get<3>(eventsSelected.back()) = 0;
+        }
+    }
+}
+
+/**
+ * Render the event in the bitmap
+ */
+void ForEachEvent::RenderInBitmap() const
+{
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    const int forEachTextHeight = 20;
+
+    //Get sizes and recreate the bitmap
+    int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
+    int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, renderedWidth-renderingHelper->GetConditionsColumnWidth());
+    renderedEventBitmap.Create(renderedWidth, ( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + forEachTextHeight, -1);
+
+    //Prepare renderers and constants
+    wxMemoryDC dc;
+    dc.SelectObject(renderedEventBitmap);
+
+    //Draw event rectangle
+    dc.SetPen(*wxTRANSPARENT_PEN);
+    dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
+    dc.Clear();
+    {
+        wxRect rect(0, 0, renderedWidth, renderedEventBitmap.GetHeight());
+
+        if ( !selected )
+            renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->eventGradient1, renderingHelper->eventGradient2, renderingHelper->eventGradient3,
+                                                renderingHelper->eventGradient4, renderingHelper->eventBorderColor);
+        else
+            renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->selectionColor, renderingHelper->eventGradient2, renderingHelper->eventGradient3,
+                                                renderingHelper->selectionColor, renderingHelper->eventBorderColor);
+    }
+
+    //"For Each" text selection
+    if ( objectsToPickSelected )
+    {
+        dc.SetBrush(renderingHelper->GetSelectedRectangleFillBrush());
+        dc.SetPen(renderingHelper->GetSelectedRectangleOutlinePen());
+        dc.DrawRectangle(1, 1, renderedWidth-2, forEachTextHeight-2);
+    }
+
+    //For Each text
+    dc.SetFont( renderingHelper->GetBoldFont() );
+    dc.DrawText( _("Pour chaque objet") + objectsToPick.GetPlainString() + _(", répéter :"), 0 + 2, 0 + 1 );
+
+    //Draw actions and conditions
+    renderingHelper->DrawConditionsList(conditions, dc, 0, forEachTextHeight, renderingHelper->GetConditionsColumnWidth());
+    renderingHelper->DrawActionsList(actions, dc, renderingHelper->GetConditionsColumnWidth(), forEachTextHeight, renderedWidth-renderingHelper->GetConditionsColumnWidth());
+
+    eventRenderingNeedUpdate = false;
+}
+
+void ForEachEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+{
+    EditForEachEvent dialog(parent_, *this);
+    dialog.ShowModal();
+}
+#endif
 
 /**
  * Initialize from another ForEachEvent.

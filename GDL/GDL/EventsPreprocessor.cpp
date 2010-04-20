@@ -9,7 +9,6 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/CommonInstructions.h"
-#include "GDL/StandardEvent.h" //TODO : WhenEventChangesAreComplete Deleteme
 
 /**
  * Link each condition to its function.

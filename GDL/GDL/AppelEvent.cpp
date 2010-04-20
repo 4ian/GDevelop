@@ -35,15 +35,6 @@ eval( *scene->game, *scene )
 
 int EventsExecutor::ExecuteEventsScene()
 {
-    ObjectsConcerned objectsConcerned(&scene->objectsInstances, &scene->objectGroups);
-
-    for (unsigned int i = 0;i<scene->events.size();++i)
-    {
-        ObjectsConcerned objectsConcernedForEvent;
-        objectsConcernedForEvent.InheritsFrom(&objectsConcerned);
-
-        scene->events[i]->Execute(scene, objectsConcernedForEvent, eval);
-    }
 
     return nouvelleScene;
 }

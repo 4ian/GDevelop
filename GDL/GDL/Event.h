@@ -22,6 +22,13 @@ class Evaluateur;
 class TiXmlElement;
 class Game;
 
+#if defined(GDE)
+class Scene;
+class Game;
+class MainEditorCommand;
+class wxWindow;
+#endif
+
 class BaseEvent;
 typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
 
@@ -97,14 +104,14 @@ class GD_API BaseEvent
         std::string GetType() const { return type; };
         void SetType(std::string type_) { type = type_; };
 
-#ifdef GDE
+#if defined(GDE)
         /**
          * Called by event editor to draw the event. Call the internal RenderInBitmap() function
          * if the event has to be redraw.
          */
         void Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
         {
-            if (eventRenderingNeedUpdate)
+            if (eventRenderingNeedUpdate || width != renderedWidth)
             {
                 renderedWidth = width;
                 RenderInBitmap();
@@ -116,26 +123,41 @@ class GD_API BaseEvent
         /**
          * Return the rendered event bitmap height.
          */
-        unsigned int GetRenderedHeight() const
+        unsigned int GetRenderedHeight(unsigned int width) const
         {
-            if (eventRenderingNeedUpdate) RenderInBitmap();
+            if (eventRenderingNeedUpdate || width != renderedWidth)
+            {
+                renderedWidth = width;
+                RenderInBitmap();
+            }
 
             return renderedEventBitmap.IsOk() ? renderedEventBitmap.GetHeight() : 0;
         };
+
+        /**
+         * Called when user click on the event
+         */
+        virtual void OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
+                                 bool & conditionsSelected, bool & instructionsSelected) {};
+
+        /**
+         * Called when the user want to edit the event
+         */
+        virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_) {};
 
         bool            selected;
         mutable bool    eventRenderingNeedUpdate; ///<Automatically set to true/false by the events editor
 #endif
 
     protected:
-#ifdef GDE
+#if defined(GDE)
         /**
          * Derived class have to redefine this function to draw themselves.
          */
         virtual void RenderInBitmap() const {};
 
         mutable wxBitmap        renderedEventBitmap; ///<Event renders itself into this bitmap
-        mutable unsigned int    renderedWidth; ///<Automatically setted to a value by the events editor before rendering
+        mutable unsigned int    renderedWidth; ///<Automatically setted to a value before rendering
 #endif
 
     private:

@@ -8,6 +8,10 @@
 #include "GDL/EventsRenderingHelper.h"
 #include "tinyxml.h"
 
+#if defined(GDE)
+#include "GDL/EditComment.h"
+#endif
+
 void CommentEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * color;
@@ -42,6 +46,11 @@ void CommentEvent::LoadFromXml(const TiXmlElement * eventElem)
 }
 
 #if defined(GDE)
+void CommentEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+{
+    EditComment dialog(parent_, *this);
+    dialog.ShowModal();
+}
 
 /**
  * Render the event in the bitmap

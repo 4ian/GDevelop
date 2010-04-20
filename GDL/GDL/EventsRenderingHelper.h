@@ -4,6 +4,8 @@
 
 #include <wx/dc.h>
 #include <wx/html/htmprint.h>
+#include <vector>
+class Instruction;
 
 /**
  * Class providing default colors, fonts, infos and drawing functions so as to
@@ -16,6 +18,13 @@ class GD_API EventsRenderingHelper
         static void kill();
 
         void DrawNiceRectangle(wxDC & dc, const wxRect & rect, const wxColor & color1, const wxColor & color2,const wxColor & color3,const wxColor & color4,const wxColor & color5) const;
+
+        int DrawConditionsList(const std::vector < Instruction > & conditions, wxDC & dc, const int x, const int y, const int width);
+        int DrawActionsList(const std::vector < Instruction > & actions, wxDC & dc, int x, int y, int width);
+        unsigned int GetRenderedConditionsListHeight(const std::vector < Instruction > & conditions, int width);
+        unsigned int GetRenderedActionsListHeight(const std::vector < Instruction > & actions, int width);
+        int GetConditionAt(const std::vector < Instruction > & conditions, int x, int y);
+        int GetActionAt(const std::vector < Instruction > & actions, int x, int y);
 
         inline unsigned int GetConditionsColumnWidth() const {return conditionsColumnWidth;};
         inline void SetConditionsColumnWidth(unsigned int conditionsColumnWidth_) { conditionsColumnWidth = conditionsColumnWidth_; };
@@ -34,6 +43,9 @@ class GD_API EventsRenderingHelper
 
         inline const wxFont & GetBigFont() const {return bigFont;};
         inline wxFont & GetBigFont() {return bigFont;};
+
+        inline const wxFont & GetBoldFont() const {return boldFont;};
+        inline wxFont & GetBoldFont() {return boldFont;};
 
         inline const wxFont & GetFont() const {return font;};
         inline wxFont & GetFont() {return font;};
@@ -73,11 +85,13 @@ class GD_API EventsRenderingHelper
         wxBrush selectedRectangleFill;
         wxFont font;
         wxFont bigFont;
+        wxFont boldFont;
         wxFont italicFont;
         wxFont italicSmallFont;
         wxHtmlDCRenderer htmlRenderer;
 
         static EventsRenderingHelper *singleton;
+        wxBitmap fakeBmp;
 };
 
 #endif // EventsRenderingHelper_H

@@ -19,7 +19,7 @@ class TiXmlElement;
 class RepeatEvent : public BaseEvent
 {
     public:
-        RepeatEvent() : repeatNumberExpression("") {};
+        RepeatEvent();
         RepeatEvent(const RepeatEvent & event);
         virtual ~RepeatEvent() {};
 
@@ -53,6 +53,19 @@ class RepeatEvent : public BaseEvent
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
+#if defined(GDE)
+        /**
+         * Called when user click on the event
+         */
+        virtual void OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
+                                 bool & conditionsSelected, bool & instructionsSelected);
+
+        /**
+         * Called when the user want to edit the event
+         */
+        virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
+#endif
+
     private:
         void Init(const RepeatEvent & event);
         bool ExecuteConditions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval );
@@ -62,6 +75,11 @@ class RepeatEvent : public BaseEvent
         vector < Instruction > conditions;
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
+
+#ifdef GDE
+        virtual void RenderInBitmap() const;
+        bool repeatNumberExpressionSelected;
+#endif
 };
 
 #endif // REPEATEVENT_H

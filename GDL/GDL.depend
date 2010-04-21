@@ -8545,7 +8545,7 @@
 	"GDL/ExtensionsManager.h"
 	"GDL/ObjectGroup.h"
 
-1271874015 d:\florian\programmation\gamedevelop\gdl\\gdl\chooseobject.h
+1271884449 d:\florian\programmation\gamedevelop\gdl\\gdl\chooseobject.h
 	<wx/treectrl.h>
 	<wx/notebook.h>
 	<wx/sizer.h>
@@ -13782,7 +13782,7 @@
 	<windows.h>
 	<dlfcn.h>
 
-1271883326 d:\florian\programmation\gamedevelop\gdl\\gdl\version.h
+1271884730 d:\florian\programmation\gamedevelop\gdl\\gdl\version.h
 
 1267736982 source:d:\florian\programmation\gamedevelop\gdl\gdl\log.cpp
 	<string>
@@ -13792,4 +13792,75 @@
 1264364232 source:d:\florian\programmation\gamedevelop\gdl\gdl\versionwrapper.cpp
 	"GDL/VersionWrapper.h"
 	"GDL/Version.h"
+
+1271882921 source:d:\florian\programmation\gamedevelop\gdl\gdl\linkevent.cpp
+	"GDL/LinkEvent.h"
+	"GDL/OpenSaveGame.h"
+	"GDL/EventsRenderingHelper.h"
+	"GDL/StdAlgo.h"
+	"tinyxml.h"
+	"RuntimeScene.h"
+	"Game.h"
+	"Event.h"
+	<iostream>
+	"GDL/EditLink.h"
+
+1271877446 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
+	"GDL/Object.h"
+	"GDL/Scene.h"
+	"GDL/ListVariable.h"
+	"GDL/Dossier.h"
+	<string>
+	<vector>
+	"GDL/Image.h"
+	"GDL/LoadingScreen.h"
+
+1271366321 d:\florian\programmation\gamedevelop\gdl\\gdl\editlink.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/statline.h>
+	<wx/radiobut.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	"GDL/LinkEvent.h"
+
+1271882921 source:d:\florian\programmation\gamedevelop\gdl\gdl\runtimescene.cpp
+	<SFML/System.hpp>
+	<SFML/Graphics.hpp>
+	<SFML/OpenGL.hpp>
+	<exception>
+	<stdexcept>
+	<sstream>
+	"GDL/RuntimeScene.h"
+	"GDL/Scene.h"
+	"GDL/Game.h"
+	"GDL/ImageManager.h"
+	"GDL/Chercher.h"
+	"GDL/ChercherScene.h"
+	"GDL/AppelEvent.h"
+	"GDL/ExtensionsManager.h"
+	"GDL/Layer.h"
+	"GDL/EventsPreprocessor.h"
+	"GDL/profile.h"
+	"GDL/ExtensionsManager.h"
+	"GDL/Position.h"
+	"GDL/ObjectsConcerned.h"
+
+1244728046 c:\libs\sfml\include\sfml\opengl.hpp
+	<SFML/Config.hpp>
+	<windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+
+1266599926 d:\florian\programmation\gamedevelop\gdl\\gdl\chercherscene.h
+	<string>
+	"GDL/Scene.h"
+	<boost/shared_ptr.hpp>
 

@@ -35,6 +35,7 @@ class GD_API ChooseObject: public wxDialog
 		wxMenu Menu2;
 		wxMenu Menu1;
 		wxNotebook* Notebook1;
+		wxTreeCtrl* globalObjectGroups;
 		wxMenuItem* MenuItem1;
 		wxMenuItem* MenuItem4;
 		wxButton* AucunBt;
@@ -62,6 +63,7 @@ class GD_API ChooseObject: public wxDialog
 		wxTreeItemId item;
 		wxTreeItemId itemGroups;
 		wxTreeItemId itemGlobal;
+		wxTreeItemId itemGlobalGroups;
 
 	protected:
 
@@ -73,6 +75,7 @@ class GD_API ChooseObject: public wxDialog
 		static const long ID_TREECTRL1;
 		static const long ID_TREECTRL2;
 		static const long ID_TREECTRL3;
+		static const long ID_TREECTRL4;
 		static const long ID_NOTEBOOK1;
 		static const long ID_STATICLINE1;
 		static const long ID_BUTTON1;
@@ -99,6 +102,9 @@ class GD_API ChooseObject: public wxDialog
 		void OnglobalObjectsListSelectionChanged(wxTreeEvent& event);
 		void OnglobalObjectsListItemRightClick(wxTreeEvent& event);
 		void OnglobalObjectsListItemActivated(wxTreeEvent& event);
+		void OnglobalObjectGroupsItemActivated(wxTreeEvent& event);
+		void OnglobalObjectGroupsSelectionChanged(wxTreeEvent& event);
+		void OnglobalObjectGroupsItemRightClick(wxTreeEvent& event);
 		//*)
 
 		wxImageList * imageList;

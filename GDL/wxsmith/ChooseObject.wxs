@@ -29,7 +29,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-										<label>Choisissez un des objets de la scène.&#x0A;Pour ajouter ou modifier des objets,&#x0A;utilisez l&apos;éditeur des objets.</label>
+										<label>Choisissez un des objets de la scène. Pour ajouter ou&#x0A; modifier des objets, utilisez l&apos;éditeur des objets.</label>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -54,7 +54,7 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
-					<size>263,216</size>
+					<size>413,227</size>
 					<object class="notebookpage">
 						<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="ObjetsList" member="yes">
 							<pos>-71,-11</pos>
@@ -87,6 +87,17 @@
 							<handler function="OnglobalObjectsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
 						</object>
 						<label>Objets globaux</label>
+					</object>
+					<object class="notebookpage">
+						<object class="wxTreeCtrl" name="ID_TREECTRL4" variable="globalObjectGroups" member="yes">
+							<pos>-71,-11</pos>
+							<size>281,190</size>
+							<tooltip>Choisissez un objet dans la liste</tooltip>
+							<handler function="OnglobalObjectGroupsItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
+							<handler function="OnglobalObjectGroupsItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
+							<handler function="OnglobalObjectGroupsSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+						</object>
+						<label>Groupes globaux</label>
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -130,7 +141,7 @@
 						<option>1</option>
 					</object>
 				</object>
-				<flag>wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+				<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
 			</object>
 		</object>

@@ -20,7 +20,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionsLoader.h"
 
-#include "gdTreeItemStringData.h"
+#include "GDL/gdTreeItemStringData.h"
 
 //(*IdInit(Extensions)
 const long Extensions::ID_STATICBITMAP3 = wxNewId();

@@ -27,6 +27,9 @@ class EditorObjets: public wxPanel
 		wxNotebook* Notebook1;
 		EditorObjetsGroups* ObjetsGroups;
 		EditorObjectList* sceneObjectsEditor;
+		EditorObjetsGroups* globalObjectsGroups;
+		wxNotebook* Notebook2;
+		wxNotebook* Notebook3;
 		EditorObjectList* globalObjectsEditor;
 		//*)
 
@@ -35,7 +38,10 @@ class EditorObjets: public wxPanel
 		//(*Identifiers(EditorObjets)
 		static const long ID_CUSTOM3;
 		static const long ID_CUSTOM1;
+		static const long ID_NOTEBOOK2;
 		static const long ID_CUSTOM2;
+		static const long ID_CUSTOM4;
+		static const long ID_NOTEBOOK3;
 		static const long ID_NOTEBOOK1;
 		//*)
 		static const long ID_BITMAPBUTTON1;

@@ -49,14 +49,12 @@
 extern MemTrace MemTracer;
 
 //(*IdInit(EditorEvents)
-const long EditorEvents::ID_PANEL1 = wxNewId();
 const long EditorEvents::ID_PANEL2 = wxNewId();
 const long EditorEvents::ID_SCROLLBAR1 = wxNewId();
 const long EditorEvents::ID_SCROLLBAR2 = wxNewId();
 const long EditorEvents::idEventInsert = wxNewId();
 const long EditorEvents::idMenuCom = wxNewId();
 const long EditorEvents::idMenuSubEvent = wxNewId();
-const long EditorEvents::idMenuLien = wxNewId();
 const long EditorEvents::ID_MENUITEM1 = wxNewId();
 const long EditorEvents::idMenuEventDel = wxNewId();
 const long EditorEvents::idMenuUndo = wxNewId();
@@ -99,7 +97,7 @@ const long EditorEvents::ID_SEARCHBUTTON = wxNewId();
 const long EditorEvents::idRibbonEvent = wxNewId();
 const long EditorEvents::idRibbonCom = wxNewId();
 const long EditorEvents::idRibbonSubEvent = wxNewId();
-const long EditorEvents::idRibbonLink = wxNewId();
+const long EditorEvents::idRibbonSomeEvent = wxNewId();
 const long EditorEvents::idRibbonDelEvent = wxNewId();
 const long EditorEvents::idRibbonUndo = wxNewId();
 const long EditorEvents::idRibbonRedo = wxNewId();
@@ -109,6 +107,8 @@ const long EditorEvents::idRibbonPaste = wxNewId();
 const long EditorEvents::idRibbonTemplate = wxNewId();
 const long EditorEvents::idRibbonCreateTemplate = wxNewId();
 const long EditorEvents::idRibbonHelp = wxNewId();
+
+vector < std::pair<long, std::string> > EditorEvents::idForEventTypesMenu;
 
 BEGIN_EVENT_TABLE( EditorEvents, wxPanel )
     //(*EventTable(EditorEvents)
@@ -133,27 +133,15 @@ isResizingColumns(false)
     wxFlexGridSizer* FlexGridSizer3;
     wxMenuItem* MenuItem11;
     wxMenuItem* MenuItem29;
-    wxFlexGridSizer* FlexGridSizer2;
     wxMenuItem* MenuItem27;
     wxMenuItem* MenuItem20;
     wxMenuItem* MenuItem28;
     wxMenuItem* MenuItem23;
     wxMenuItem* editMenuItem;
     wxMenu* MenuItem5;
-    wxFlexGridSizer* FlexGridSizer1;
     wxMenuItem* MenuItem19;
 
     Create(parent, wxID_ANY, wxDefaultPosition, wxSize(536,252), 0, _T("wxID_ANY"));
-    FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
-    FlexGridSizer1->AddGrowableCol(0);
-    FlexGridSizer1->AddGrowableRow(1);
-    FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
-    FlexGridSizer2->AddGrowableCol(0);
-    FlexGridSizer2->AddGrowableRow(0);
-    Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(-1,0), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
-    Panel1->SetBackgroundColour(wxColour(255,255,255));
-    FlexGridSizer2->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
     FlexGridSizer3->AddGrowableCol(0);
     FlexGridSizer3->AddGrowableRow(0);
@@ -166,22 +154,19 @@ isResizingColumns(false)
     horizontalScrollbar->SetScrollbar(0, 1, 10, 1);
     horizontalScrollbar->Hide();
     FlexGridSizer3->Add(horizontalScrollbar, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    SetSizer(FlexGridSizer1);
+    SetSizer(FlexGridSizer3);
     MenuItem8 = new wxMenuItem((&ContextMenu), idEventInsert, _("Insérer un évènement\tINSERT"), wxEmptyString, wxITEM_NORMAL);
     MenuItem8->SetBitmap(wxBitmap(wxImage(_T("res/eventaddicon.png"))));
     ContextMenu.Append(MenuItem8);
     MenuItem7 = new wxMenuItem((&ContextMenu), idMenuCom, _("Insérer un commentaire"), wxEmptyString, wxITEM_NORMAL);
     MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/commentaireaddicon.png"))));
     ContextMenu.Append(MenuItem7);
-    MenuItem9 = new wxMenu();
-    SubEventMenuItem = new wxMenuItem(MenuItem9, idMenuSubEvent, _("Un sous évènement"), wxEmptyString, wxITEM_NORMAL);
+    eventTypesMenu = new wxMenu();
+    SubEventMenuItem = new wxMenuItem(eventTypesMenu, idMenuSubEvent, _("Un sous évènement"), wxEmptyString, wxITEM_NORMAL);
     SubEventMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/subeventaddicon.png"))));
-    MenuItem9->Append(SubEventMenuItem);
-    MenuItem12 = new wxMenuItem(MenuItem9, idMenuLien, _("Un lien"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem12->SetBitmap(wxBitmap(wxImage(_T("res/lienaddicon.png"))));
-    MenuItem9->Append(MenuItem12);
-    ContextMenu.Append(ID_MENUITEM1, _("Insérer..."), MenuItem9, wxEmptyString);
+    eventTypesMenu->Append(SubEventMenuItem);
+    eventTypesMenu->AppendSeparator();
+    ContextMenu.Append(ID_MENUITEM1, _("Insérer..."), eventTypesMenu, wxEmptyString);
     ContextMenu.AppendSeparator();
     MenuItem1 = new wxMenuItem((&ContextMenu), idMenuEventDel, _("Supprimer cet évènement\tDEL"), _("Supprimer l\'évènement complet ( Action et Condition ) de la scène"), wxITEM_NORMAL);
     MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
@@ -284,10 +269,8 @@ isResizingColumns(false)
     MenuItem33->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
     noActionsMenu.Append(MenuItem33);
     noActionsMenu.AppendSeparator();
-    FlexGridSizer1->SetSizeHints(this);
+    FlexGridSizer3->SetSizeHints(this);
 
-    Panel1->Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&EditorEvents::OnEventsPanelKeyUp,0,this);
-    Panel1->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorEvents::OnPanel1Resize,0,this);
     EventsPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EditorEvents::OnEventsPanelPaint,0,this);
     EventsPanel->Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&EditorEvents::OnEventsPanelKeyUp,0,this);
     EventsPanel->Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorEvents::OnEventsPanelSetFocus,0,this);
@@ -308,7 +291,6 @@ isResizingColumns(false)
     Connect(idEventInsert,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnInsertEventSelected);
     Connect(idMenuCom,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnMenuItem7Selected);
     Connect(idMenuSubEvent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnSubEventMenuItemSelected);
-    Connect(idMenuLien,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnAddLienSelected);
     Connect(idMenuEventDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelEventSelected);
     Connect(idMenuUndo,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnUndoSelected);
     Connect(idMenuRedo,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnRedoSelected);
@@ -346,52 +328,16 @@ isResizingColumns(false)
     Connect( ID_SEARCHBUTTON, wxEVT_COMMAND_TOOL_CLICKED, ( wxObjectEventFunction )&EditorEvents::OnSearchBtClick );
     Connect( ID_HELPBUTTON, wxEVT_COMMAND_TOOL_CLICKED, ( wxObjectEventFunction )&EditorEvents::OnAideBtClick );
 
-    toolbar = new wxToolBar( Panel1, -1, wxDefaultPosition, wxDefaultSize,
-                             wxTB_FLAT | wxTB_NODIVIDER | wxTB_HORIZONTAL );
-
-    toolbar->ClearTools();
-    toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( idEventInsert, wxT( "Insérer un évènement" ), wxBitmap( wxImage( "res/eventaddicon.png" ) ), _( "Insérer un évènement" ) );
-    toolbar->AddTool( idMenuSubEvent, wxT( "Insérer un sous-évènement" ), wxBitmap( wxImage( "res/subeventaddicon.png" ) ), _( "Insérer un sous-évènement" ) );
-    toolbar->AddTool( idMenuCom, wxT( "Insérer un commentaire" ), wxBitmap( wxImage( "res/commentaireaddicon.png" ) ), _( "Insérer un commentaire" ) );
-    toolbar->AddTool( idMenuLien, wxT( "Insérer un lien vers des évènements" ), wxBitmap( wxImage( "res/lienaddicon.png" ) ), _( "Insérer un lien vers des évènements" ) );
-    toolbar->AddSeparator();
-    toolbar->AddTool( idMenuEventDel, wxT( "Supprimer l'évènement selectionné" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _( "Supprimer l'évènement selectionné" ) );
-    toolbar->AddSeparator();
-    toolbar->AddTool( ID_TEMPLATEBUTTON, wxT( "Modèle d'évènements" ), wxBitmap( wxImage( "res/templateicon.png" ) ), _( "Ajouter des évènements depuis un modèle" ) );
-    toolbar->AddTool( ID_CREATETEMPLATEBUTTON, wxT( "Création de modèle d'évènements" ), wxBitmap( wxImage( "res/addtemplateicon.png" ) ), _( "Créer un modèle d'évènements depuis la scène" ) );
-    toolbar->AddSeparator();
-    toolbar->AddTool( idMenuUndo, wxT( "Annuler les modifications précédentes" ), wxBitmap( wxImage( "res/undo.png" ) ), _( "Annuler les modifications précédentes" ) );
-    toolbar->AddTool( idMenuRedo, wxT( "Rétablir les modifications annulées" ), wxBitmap( wxImage( "res/redo.png" ) ), _( "Rétablir les modifications annulées" ) );
-    toolbar->AddSeparator();
-    toolbar->AddTool( idMenuCopy, wxT( "Copier l'évènement selectionné" ), wxBitmap( wxImage( "res/copyicon.png" ) ), _( "Copier l'évènement selectionné" ) );
-    toolbar->AddTool( idMenuCut, wxT( "Couper l'évènement selectionné" ), wxBitmap( wxImage( "res/cuticon.png" ) ), _( "Couper l'évènement selectionné" ) );
-    toolbar->AddTool( idMenuPasteApres, wxT( "Coller après l'évènement selectionné" ), wxBitmap( wxImage( "res/pasteicon.png" ) ), _( "Coller après l'évènement selectionné" ) );
-
-    toolbar->AddSeparator();
-    toolbar->AddTool( ID_SEARCHBUTTON, wxT( "Rechercher dans les évènements" ), wxBitmap( wxImage( "res/searchicon.png" ) ), _( "Rechercher dans les évènements" ) );
-    toolbar->AddSeparator();
-    toolbar->AddTool( ID_HELPBUTTON, wxT( "Aide" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _( "Aide de l'éditeur d'évènements" ) );
-    toolbar->AddSeparator();
-    toolbar->Realize();
-
     //On vérifie si on est pas en mode simple.
     wxConfigBase * pConfig = wxConfigBase::Get();
 
     bool result = false;
     pConfig->Read("/ModeSimple", &result);
 
-    //TODO : Desactiver ceci quand implementé
-    toolbar->EnableTool(ID_SEARCHBUTTON, false);
-
     //Désactivation d'options du menu en mode simple
     if ( result )
     {
-        toolbar->EnableTool(idMenuSubEvent, false);
-        toolbar->EnableTool(idMenuLien, false);
-        toolbar->EnableTool(ID_CREATETEMPLATEBUTTON, false);
         SubEventMenuItem->Enable(false);
-        MenuItem12->Enable(false);
         MenuItem2->Enable(false);
         MenuItem3->Enable(false);
         MenuItem15->Enable(false);
@@ -403,11 +349,44 @@ isResizingColumns(false)
     noActionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
     noConditionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
 
-    //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
-#ifdef __WXGTK__
-    wxSize tbSize = toolbar->GetSize();
-    gtk_widget_set_usize( toolbar->m_widget, tbSize.GetWidth(), tbSize.GetHeight() );
-#endif
+    //Adding events types
+    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
+
+    //Insert extension objects actions
+	for (unsigned int i = 0;i<extensions.size();++i)
+	{
+	    //Verify if that extension is enabled
+	    if ( find(game.extensionsUsed.begin(),
+                  game.extensionsUsed.end(),
+                  extensions[i]->GetName()) == game.extensionsUsed.end() )
+            continue;
+
+        //Add each event type provided
+	    std::map<std::string, EventInfos > allEventsProvidedByExtension = extensions[i]->GetAllEvents();
+        for(std::map<string, EventInfos>::const_iterator it = allEventsProvidedByExtension.begin(); it != allEventsProvidedByExtension.end(); ++it)
+        {
+            //Find an identifier for the menu item
+            long id = wxID_ANY;
+            for (vector < std::pair<long, std::string> >::iterator idIter = idForEventTypesMenu.begin();
+                 idIter != idForEventTypesMenu.end();
+                 ++idIter)
+            {
+            	if ( idIter->second == it->first )
+                    id = idIter->first;
+            }
+            if ( id == wxID_ANY )
+            {
+                id = wxNewId();
+                idForEventTypesMenu.push_back(std::make_pair(id, it->first));
+            }
+
+            wxMenuItem * menuItem = new wxMenuItem(eventTypesMenu, id, it->second.fullname, it->second.description);
+            menuItem->SetBitmap(it->second.smallicon);
+            eventTypesMenu->Append(menuItem);
+            Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnInsertSomeEventSelected);
+        }
+	}
 
     searchDialog = new SearchEvents(this, unusedEventList);
 }
@@ -427,7 +406,7 @@ void EditorEvents::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonEvent, !hideLabels ? _("Ajouter un évènement") : "", wxBitmap("res/eventadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonSubEvent, !hideLabels ? _("Ajouter un sous-évènement") : "", wxBitmap("res/subeventadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonCom, !hideLabels ? _("Ajouter un commentaire") : "", wxBitmap("res/commentaireadd24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonLink, !hideLabels ? _("Ajout. un lien") : "", wxBitmap("res/lienadd24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddDropdownButton(idRibbonSomeEvent, !hideLabels ? _("Ajouter...") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Suppression"), wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -464,7 +443,7 @@ void EditorEvents::ConnectEvents()
 {
     mainEditorCommand.GetMainEditor()->Connect(idRibbonEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnInsertEventSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonCom, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnMenuItem7Selected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonLink, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnAddLienSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonSomeEvent, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&EditorEvents::OnAddSomeEventSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonSubEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnSubEventMenuItemSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonDelEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnDelEventSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnUndoSelected, NULL, this);
@@ -488,15 +467,6 @@ EditorEvents::~EditorEvents()
     noConditionsMenu.Remove(noConditionsMenu.FindItemByPosition(noConditionsMenu.GetMenuItemCount()-1));
     //(*Destroy(EditorEvents)
     //*)
-}
-
-////////////////////////////////////////////////////////////
-/// Mise à jour de la taille de la toolbar
-/// quand on redimensionne le panel
-////////////////////////////////////////////////////////////
-void EditorEvents::OnPanel1Resize( wxSizeEvent& event )
-{
-    toolbar->SetSize(Panel1->GetSize().x, -1);
 }
 
 ////////////////////////////////////////////////////////////
@@ -690,7 +660,7 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
 
         //Hit test
         if ( MouseY >= Yposition+positionScrollbar &&
-             MouseY <= Yposition+positionScrollbar+renderedHeight )
+             MouseY <= Yposition+positionScrollbar+static_cast<signed>(renderedHeight) )
         {
             eventsSelected.push_back(boost::make_tuple(&list, i,              //Useful part
                                                        (vector<Instruction>*)NULL, 0)); //Useless
@@ -700,7 +670,7 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
         }
 
         //Render
-        if ( Yposition + renderedHeight + positionScrollbar >= positionScrollbar &&
+        if ( Yposition + static_cast<signed>(renderedHeight) + positionScrollbar >= positionScrollbar &&
              Yposition + positionScrollbar < ( positionScrollbar + EventsPanel->GetSize().y ) &&
              draw)
         {
@@ -785,6 +755,45 @@ void EditorEvents::OnTemplateBtClick( wxCommandEvent& event )
     ChangesMadeOnEvents();
 }
 
+/**
+ * Click on "Add..." in ribbon
+ */
+void EditorEvents::OnAddSomeEventSelected(wxRibbonButtonBarEvent& evt)
+{
+    evt.PopupMenu(eventTypesMenu);
+}
+
+/**
+ * Add a custom event by clicking on it in the event type menu
+ */
+void EditorEvents::OnInsertSomeEventSelected( wxCommandEvent& event )
+{
+    //Retrieve event type
+    string eventType;
+    for (unsigned int i = 0;i<idForEventTypesMenu.size();++i)
+    {
+    	if ( idForEventTypesMenu[i].first == event.GetId() )
+            eventType = idForEventTypesMenu[i].second;
+    }
+
+    if ( eventsSelected.empty() )
+        eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
+
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+    if ( !extensionsManager->HasEventType(eventType) ) return;
+    BaseEventSPtr eventToAdd = extensionsManager->CreateEvent(eventType);
+    eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
+
+    //Adding event
+    if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
+        GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
+    else
+        GetLastSelectedListOfEvents()->push_back( eventToAdd );
+
+    ChangesMadeOnEvents();
+
+}
 
 ////////////////////////////////////////////////////////////
 /// Insertion d'un commentaire
@@ -798,6 +807,14 @@ void EditorEvents::OnMenuItem7Selected( wxCommandEvent& event )
 
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Comment");
     eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
+
+    //Adding event
+    if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
+        GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
+    else
+        GetLastSelectedListOfEvents()->push_back( eventToAdd );
+
+    ChangesMadeOnEvents();
 }
 
 
@@ -813,6 +830,14 @@ void EditorEvents::OnInsertEventSelected( wxCommandEvent& event )
 
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Standard");
     eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
+
+    //Adding event
+    if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
+        GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
+    else
+        GetLastSelectedListOfEvents()->push_back( eventToAdd );
+
+    ChangesMadeOnEvents();
 }
 
 
@@ -828,6 +853,7 @@ void EditorEvents::OnSubEventMenuItemSelected(wxCommandEvent& event)
     }
     if ( !GetLastSelectedEvent()->CanHaveSubEvents() ) return;
 
+    //Creating the event
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Standard");
 
@@ -845,11 +871,19 @@ void EditorEvents::OnAddLienSelected( wxCommandEvent& event )
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
+    //Creating the event
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Link");
 
     eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
+
+    //Adding event
+    if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
+        GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
+    else
+        GetLastSelectedListOfEvents()->push_back( eventToAdd );
+
+    ChangesMadeOnEvents();
 }
 
 

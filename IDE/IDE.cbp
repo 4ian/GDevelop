@@ -5,7 +5,7 @@
 		<Option title="IDE" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Editeurs\Choix\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Options\;Fichiers\;LIB TinyXml\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
+		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Options\;Fichiers\;LIB TinyXml\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
 		<Build>
 			<Target title="Debug - Edittime">
 				<Option output="bin\debug\GDEditor" prefix_auto="1" extension_auto="1" />
@@ -278,12 +278,6 @@
 		</Unit>
 		<Unit filename="ChoixLayer.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\Editeur calques\" />
-		</Unit>
-		<Unit filename="ChoixObjet.cpp">
-			<Option virtualFolder="Editeurs\Choix\" />
-		</Unit>
-		<Unit filename="ChoixObjet.h">
-			<Option virtualFolder="Editeurs\Choix\" />
 		</Unit>
 		<Unit filename="ChoixObjetExpression.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
@@ -726,7 +720,6 @@
 					<wxDialog wxs="wxsmith/ChoixCondition.wxs" src="ChoixCondition.cpp" hdr="ChoixCondition.h" name="ChoixCondition" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixAction.wxs" src="ChoixAction.cpp" hdr="ChoixAction.h" name="ChoixAction" language="CPP" />
 					<wxDialog wxs="wxsmith/EditorObjet.wxs" src="EditorObjet.cpp" hdr="EditorObjet.h" name="EditorObjet" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoixObjet.wxs" src="ChoixObjet.cpp" hdr="ChoixObjet.h" name="ChoixObjet" language="CPP" />
 					<wxDialog wxs="wxsmith/EditExpression.wxs" src="EditExpression.cpp" hdr="EditExpression.h" name="EditExpression" language="CPP" />
 					<wxDialog wxs="wxsmith/EditOptionsPosition.wxs" src="EditOptionsPosition.cpp" hdr="EditOptionsPosition.h" name="EditOptionsPosition" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixBouton.wxs" src="ChoixBouton.cpp" hdr="ChoixBouton.h" name="ChoixBouton" language="CPP" />

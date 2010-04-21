@@ -11,7 +11,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/ObjectGroup.h"
-#include "ChoixObjet.h"
+#include "GDL/ChooseObject.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -193,10 +193,10 @@ void EditObjectGroup::OnObjetsListItemRightClick(wxTreeEvent& event)
 
 void EditObjectGroup::OnAddObjetSelected(wxCommandEvent& event)
 {
-    ChoixObjet dialog(this, game, scene, false);
+    ChooseObject dialog(this, game, scene, false);
     if ( dialog.ShowModal() == 1 )
     {
-        string name = dialog.NomObjet;
+        string name = dialog.objectChosen;
         if ( name == "" ) return;
 
         //On l'ajoute si il n'est pas déjà dans le groupe

@@ -30,7 +30,7 @@
 #include <wx/help.h>
 #include <wx/msgdlg.h>
 #include <wx/config.h>
-#include "gdTreeItemStringData.h"
+#include "GDL/gdTreeItemStringData.h"
 #include "Extensions.h"
 #include "GDL/HelpFileAccess.h"
 #include "GDL/StdAlgo.h"
@@ -39,8 +39,8 @@
 #include "GDL/Game.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Chercher.h"
-#include "ChoixObjet.h"
-#include "EditExpression.h"
+#include "GDL/ChooseObject.h"
+#include "GDL/EditExpression.h"
 #include "EditTexte.h"
 #include "ChoixClavier.h"
 #include "GDL/BitmapGUIManager.h"
@@ -489,10 +489,10 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
     {
         if ( instructionInfos.parameters[i].type == "objet" )
         {
-            ChoixObjet Dialog(this, game, scene, true, instructionInfos.parameters[i].objectType);
+            ChooseObject Dialog(this, game, scene, true, instructionInfos.parameters[i].objectType);
             if ( Dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(Dialog.NomObjet);
+                ParaEdit.at(i)->SetValue(Dialog.objectChosen);
             }
             return;
         }

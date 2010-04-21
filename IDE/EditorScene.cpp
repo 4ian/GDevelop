@@ -18,7 +18,7 @@
 #include "Game_Develop_EditorMain.h"
 #include "GDL/MainEditorCommand.h"
 #include "SceneCanvas.h"
-#include "ChoixObjet.h"
+#include "GDL/ChooseObject.h"
 #include "EditorEvents.h"
 #include "GDL/HelpFileAccess.h"
 #include "GridSetup.h"
@@ -100,7 +100,7 @@ externalWindow(this)
 	//(*Initialize(EditorScene)
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer1;
-	
+
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, _T("wxID_ANY"));
 	SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -135,7 +135,7 @@ externalWindow(this)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Panel2->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnPanel2Resize,0,this);
 	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnScrollBar2Scroll);
 	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnScrollBar2Scroll);
@@ -560,10 +560,10 @@ void EditorScene::OnOrigineBtClick(wxCommandEvent & event )
 ////////////////////////////////////////////////////////////
 void EditorScene::OnChoisirObjetBtClick( wxCommandEvent & event )
 {
-    ChoixObjet Dialog( this, game, scene, false );
+    ChooseObject Dialog( this, game, scene, false );
     if ( Dialog.ShowModal() == 1 )
     {
-        sceneCanvas->scene.objectToAdd = Dialog.NomObjet;
+        sceneCanvas->scene.objectToAdd = Dialog.objectChosen;
     }
 }
 

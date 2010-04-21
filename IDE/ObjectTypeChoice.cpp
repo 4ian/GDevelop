@@ -9,7 +9,7 @@
 #include <wx/imaglist.h>
 #include <string>
 #include <vector>
-#include "gdTreeItemStringData.h"
+#include "GDL/gdTreeItemStringData.h"
 
 #include "Extensions.h"
 #include "GDL/ExtensionsManager.h"

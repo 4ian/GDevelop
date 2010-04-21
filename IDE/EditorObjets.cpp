@@ -41,7 +41,10 @@ extern MemTrace MemTracer;
 //(*IdInit(EditorObjets)
 const long EditorObjets::ID_CUSTOM3 = wxNewId();
 const long EditorObjets::ID_CUSTOM1 = wxNewId();
+const long EditorObjets::ID_NOTEBOOK2 = wxNewId();
 const long EditorObjets::ID_CUSTOM2 = wxNewId();
+const long EditorObjets::ID_CUSTOM4 = wxNewId();
+const long EditorObjets::ID_NOTEBOOK3 = wxNewId();
 const long EditorObjets::ID_NOTEBOOK1 = wxNewId();
 //*)
 const long EditorObjets::ID_BITMAPBUTTON1 = wxNewId();
@@ -64,14 +67,20 @@ mainEditorCommand(mainEditorCommand_)
     MemTracer.AddObj( "Editeur d'objets", ( long )this );
     //(*Initialize(EditorObjets)
     Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
-    Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(128,168), wxNB_MULTILINE, _T("ID_NOTEBOOK1"));
-    sceneObjectsEditor = new EditorObjectList(Notebook1, game, &scene.initialObjects, mainEditorCommand, &scene.wasModified);
-    ObjetsGroups = new EditorObjetsGroups(Notebook1, game, scene, &scene.objectGroups, mainEditorCommand);
-    globalObjectsEditor = new EditorObjectList(Notebook1, game, &game.globalObjects, mainEditorCommand, &scene.wasModified);
-    Notebook1->AddPage(sceneObjectsEditor, _("Objets"), false);
-    Notebook1->AddPage(ObjetsGroups, _("Groupes d\'objets"), false);
-    Notebook1->AddPage(globalObjectsEditor, _("Objets globaux à toutes les scènes"), false);
-    
+    Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(128,168), 0, _T("ID_NOTEBOOK1"));
+    Notebook2 = new wxNotebook(Notebook1, ID_NOTEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK2"));
+    sceneObjectsEditor = new EditorObjectList(Notebook2, game, &scene.initialObjects, mainEditorCommand, &scene.wasModified);
+    ObjetsGroups = new EditorObjetsGroups(Notebook2, game, scene, &scene.objectGroups, mainEditorCommand);
+    Notebook2->AddPage(sceneObjectsEditor, _("Objets"), false);
+    Notebook2->AddPage(ObjetsGroups, _("Groupes d\'objets"), false);
+    Notebook3 = new wxNotebook(Notebook1, ID_NOTEBOOK3, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK3"));
+    globalObjectsEditor = new EditorObjectList(Notebook3, game, &game.globalObjects, mainEditorCommand, &scene.wasModified);
+    globalObjectsGroups = new EditorObjetsGroups(Notebook3, game, scene, &game.objectGroups, mainEditorCommand);
+    Notebook3->AddPage(globalObjectsEditor, _("Objets globaux"), false);
+    Notebook3->AddPage(globalObjectsGroups, _("Groupes globaux"), false);
+    Notebook1->AddPage(Notebook2, _("Scène"), false);
+    Notebook1->AddPage(Notebook3, _("Global à tout le jeu"), false);
+
     Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorObjets::OnResize);
     //*)
 
@@ -91,10 +100,7 @@ mainEditorCommand(mainEditorCommand_)
     pConfig->Read("/ModeSimple", &result);
 
     if ( result )
-    {
-        Notebook1->RemovePage(2);
         Notebook1->RemovePage(1);
-    }
 }
 
 EditorObjets::~EditorObjets()

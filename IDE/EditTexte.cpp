@@ -4,7 +4,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "EditExpression.h"
+#include "GDL/EditExpression.h"
 #include <wx/textdlg.h>
 #include "GDL/Game.h"
 #include "GDL/Scene.h"

@@ -61,7 +61,7 @@ extern MemTrace MemTracer;
 #include "GDL/ChercherScene.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/EditorImages.h"
-#include "ChoixObjet.h"
+#include "GDL/ChooseObject.h"
 #include "MyStatusBar.h"
 #include "EditorObjets.h"
 #include "EditorEvents.h"

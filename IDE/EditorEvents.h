@@ -43,7 +43,6 @@ class EditorEvents: public wxPanel
 		wxMenuItem* MenuItem33;
 		wxMenuItem* MenuItem7;
 		wxMenuItem* MenuItem25;
-		wxMenu* MenuItem9;
 		wxMenu* MenuItem36;
 		wxMenuItem* MenuItem2;
 		wxMenuItem* MenuItem1;
@@ -52,7 +51,6 @@ class EditorEvents: public wxPanel
 		wxScrollBar* ScrollBar1;
 		wxMenuItem* MenuItem15;
 		wxMenuItem* MenuItem22;
-		wxPanel* Panel1;
 		wxMenuItem* MenuItem32;
 		wxMenuItem* MenuItem17;
 		wxMenuItem* MenuItem13;
@@ -61,7 +59,6 @@ class EditorEvents: public wxPanel
 		wxMenuItem* MenuItem10;
 		wxMenu noConditionsMenu;
 		wxMenu actionsMenu;
-		wxMenuItem* MenuItem12;
 		wxMenuItem* MenuItem24;
 		wxMenuItem* MenuItem3;
 		wxPanel* EventsPanel;
@@ -70,6 +67,7 @@ class EditorEvents: public wxPanel
 		wxMenuItem* MenuItem21;
 		wxMenuItem* MenuItem16;
 		wxMenuItem* MenuItem18;
+		wxMenu* eventTypesMenu;
 		wxMenuItem* MenuItem30;
 		wxMenuItem* SubEventMenuItem;
 		wxMenu conditionsMenu;
@@ -78,14 +76,12 @@ class EditorEvents: public wxPanel
 	protected:
 
 		//(*Identifiers(EditorEvents)
-		static const long ID_PANEL1;
 		static const long ID_PANEL2;
 		static const long ID_SCROLLBAR1;
 		static const long ID_SCROLLBAR2;
 		static const long idEventInsert;
 		static const long idMenuCom;
 		static const long idMenuSubEvent;
-		static const long idMenuLien;
 		static const long ID_MENUITEM1;
 		static const long idMenuEventDel;
 		static const long idMenuUndo;
@@ -128,7 +124,7 @@ class EditorEvents: public wxPanel
 		static const long idRibbonEvent;
 		static const long idRibbonCom;
 		static const long idRibbonSubEvent;
-		static const long idRibbonLink;
+		static const long idRibbonSomeEvent;
 		static const long idRibbonDelEvent;
 		static const long idRibbonUndo;
 		static const long idRibbonRedo;
@@ -138,6 +134,7 @@ class EditorEvents: public wxPanel
 		static const long idRibbonTemplate;
 		static const long idRibbonCreateTemplate;
 		static const long idRibbonHelp;
+		static vector < std::pair<long, std::string> > idForEventTypesMenu;
 
 	private:
 
@@ -157,7 +154,6 @@ class EditorEvents: public wxPanel
 		void OnAideBtClick(wxCommandEvent& event);
 		void OnCreateTemplateBtClick(wxCommandEvent& event);
 		void OnAddLienSelected(wxCommandEvent& event);
-		void OnPanel1Resize(wxSizeEvent& event);
 		void OnEventsPanelPaint(wxPaintEvent& event);
 		void OnScrollBar1ScrollChanged(wxScrollEvent& event);
 		void OnEventsPanelLeftDClick(wxMouseEvent& event);
@@ -193,6 +189,8 @@ class EditorEvents: public wxPanel
 		//*)
         void DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & maximalWidth, bool draw);
         void OnSearchBtClick(wxCommandEvent& event);
+		void OnInsertSomeEventSelected(wxCommandEvent& event);
+		void OnAddSomeEventSelected(wxRibbonButtonBarEvent& evt);
         void ChangesMadeOnEvents();
         void ResetEventsSizeCache(vector < BaseEventSPtr > & eventsToReset);
 
@@ -224,7 +222,6 @@ class EditorEvents: public wxPanel
          */
 		Scene & scene;
         vector < BaseEventSPtr > * events; //Pointeur vers les évènements à modifier
-
 		MainEditorCommand & mainEditorCommand;
 
         //Annulation
@@ -246,8 +243,6 @@ class EditorEvents: public wxPanel
         bool instructionsSelected;
 
         vector < BaseEventSPtr > unusedEventList;
-
-		wxToolBar * toolbar;
 
 		static BaseEventSPtr badEvent;
 		static Instruction badInstruction;

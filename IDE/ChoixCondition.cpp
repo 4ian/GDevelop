@@ -34,12 +34,12 @@
 #include <wx/config.h>
 #include <wx/log.h>
 #include <wx/msgdlg.h>
-#include "gdTreeItemStringData.h"
+#include "GDL/gdTreeItemStringData.h"
 #include "GDL/HelpFileAccess.h"
 #include "GDL/TranslateCondition.h"
-#include "EditExpression.h"
+#include "GDL/EditExpression.h"
 #include "EditTexte.h"
-#include "ChoixObjet.h"
+#include "GDL/ChooseObject.h"
 #include "ChoixBouton.h"
 #include "ChoixClavier.h"
 #include "GDL/BitmapGUIManager.h"
@@ -561,37 +561,37 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
     {
         if ( instructionInfos.parameters[i].type == "objet" )
         {
-            ChoixObjet Dialog(this, game, scene, true, instructionInfos.parameters[i].objectType);
-            if ( Dialog.ShowModal() == 1 )
+            ChooseObject dialog(this, game, scene, true, instructionInfos.parameters[i].objectType);
+            if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(Dialog.NomObjet);
+                ParaEdit.at(i)->SetValue(dialog.objectChosen);
             }
             return;
         }
         else if (  instructionInfos.parameters[i].type == "expression" )
         {
-            EditExpression Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
-            if ( Dialog.ShowModal() == 1 )
+            EditExpression dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
+            if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(Dialog.expression);
+                ParaEdit.at(i)->SetValue(dialog.expression);
             }
             return;
         }
         else if ( instructionInfos.parameters[i].type == "mouse" )
         {
-            ChoixBouton Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ));
-            if ( Dialog.ShowModal() == 1 )
+            ChoixBouton dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ));
+            if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(Dialog.bouton);
+                ParaEdit.at(i)->SetValue(dialog.bouton);
             }
             return;
         }
         else if ( instructionInfos.parameters[i].type == "key" )
         {
-            ChoixClavier Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ));
-            if ( Dialog.ShowModal() == 1 )
+            ChoixClavier dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ));
+            if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(Dialog.touche);
+                ParaEdit.at(i)->SetValue(dialog.touche);
             }
             return;
         }
@@ -605,10 +605,10 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionInfos.parameters[i].type == "texte" )
         {
-            EditTexte Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
-            if ( Dialog.ShowModal() == 1 )
+            EditTexte dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
+            if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(Dialog.texteFinal);
+                ParaEdit.at(i)->SetValue(dialog.texteFinal);
             }
             return;
         }

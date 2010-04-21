@@ -17,7 +17,7 @@
 
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Chercher.h"
-#include "ChoixObjet.h"
+#include "GDL/ChooseObject.h"
 #include "ConsoleManager.h"
 #include "ChoixLayer.h"
 #include <wx/textdlg.h>
@@ -633,10 +633,10 @@ void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
 
 void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
 {
-    ChoixObjet dialog( this, *scene.game, scene, false );
+    ChooseObject dialog( this, *scene.game, scene, false );
     if ( dialog.ShowModal() != 1 ) return;
 
-    string objectWanted = dialog.NomObjet;
+    string objectWanted = dialog.objectChosen;
     int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, objectWanted );
     int IDglobalObject = Picker::PickOneObject( &scene.game->globalObjects, objectWanted );
 

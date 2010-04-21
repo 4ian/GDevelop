@@ -288,7 +288,7 @@ void ForEachEvent::RenderInBitmap() const
 
 void ForEachEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
-    EditForEachEvent dialog(parent_, *this);
+    EditForEachEvent dialog(parent_, *this, game_, scene_);
     dialog.ShowModal();
 }
 #endif

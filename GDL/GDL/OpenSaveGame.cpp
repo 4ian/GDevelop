@@ -151,6 +151,10 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         game.extensionsUsed.push_back("BuiltinWindow");
         game.extensionsUsed.push_back("BuiltinTime");
     }
+    if ( major <= 1 && minor <= 3 && build <= 8892 && revision <= 44771)
+    {
+        game.extensionsUsed.push_back("BuiltinCommonInstructions");
+    }
 
     elem = hdl.FirstChildElement().FirstChildElement( "Info" ).Element();
     if ( elem )

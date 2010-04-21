@@ -13,8 +13,8 @@
 CommonInstructionsExtension::CommonInstructionsExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinCommonInstructions",
-                          _(""),
-                          _(""),
+                          _("Évènements standards"),
+                          _("Extension apportant des types d'évènements de base, intégrée en standard."),
                           "Compil Games",
                           "Freeware")
 
@@ -31,54 +31,54 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     DECLARE_EVENT("Standard",
                   "Evenement standard",
-                  "Evenement standard",
-                  "Evenements standards",
+                  "Evenement standard : Actions qui sont lancées si des conditions sont vérifiées",
                   "",
+                  "res/eventaddicon.png",
                   StandardEvent)
 
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("Link",
-                  "Evenement lien",
-                  "Evenement lien",
-                  "Evenements standards",
+                  "Lien",
+                  "Lien vers des évènements d'une autre scène",
                   "",
+                  "res/lienaddicon.png",
                   LinkEvent)
 
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("Comment",
                   "Commentaire",
-                  "Evenement commentaire",
-                  "Evenements standards",
+                  "Un évènement permettant d'ajouter un commentaire dans la liste des évènements",
                   "",
+                  "res/comment.png",
                   CommentEvent)
 
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("While",
                   "Tant que",
-                  "Evenement while",
-                  "Evenements standards",
+                  "Répète des conditions et actions tant que certaines conditions ne sont pas vérifiées",
                   "",
+                  "res/while.png",
                   WhileEvent)
 
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("Repeat",
-                  "Repeat",
-                  "Evenement repeat",
-                  "Evenements standards",
+                  "Répéter",
+                  "Répète un certain nombre de fois des conditions et actions",
                   "",
+                  "res/repeat.png",
                   RepeatEvent)
 
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("ForEach",
-                  "ForEachEvent",
-                  "Evenement ForEach",
-                  "Evenements standards",
+                  "Pour chaque objet",
+                  "Répète des conditions et actions en prenant à chaque fois un objet ayant le nom indiqué",
                   "",
+                  "res/foreach.png",
                   ForEachEvent)
 
     DECLARE_END_EVENT()

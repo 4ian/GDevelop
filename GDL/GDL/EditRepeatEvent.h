@@ -1,8 +1,9 @@
 #if defined(GDE)
-#ifndef EDITFOREACHEVENT_H
-#define EDITFOREACHEVENT_H
 
-//(*Headers(EditForEachEvent)
+#ifndef EDITREPEATEVENT_H
+#define EDITREPEATEVENT_H
+
+//(*Headers(EditRepeatEvent)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -13,35 +14,36 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include "GDL/ForEachEvent.h"
 class Game;
 class Scene;
+class RepeatEvent;
 
-class EditForEachEvent: public wxDialog
+/**
+ * Editor for Repeat events.
+ */
+class EditRepeatEvent: public wxDialog
 {
 	public:
 
-		EditForEachEvent(wxWindow* parent, ForEachEvent & event_, Game & game_, Scene & scene_);
-		virtual ~EditForEachEvent();
+		EditRepeatEvent(wxWindow* parent, RepeatEvent & event_, Game & game_, Scene & scene_);
+		virtual ~EditRepeatEvent();
 
-		//(*Declarations(EditForEachEvent)
+		//(*Declarations(EditRepeatEvent)
+		wxBitmapButton* expressionBt;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
 		wxButton* cancelBt;
 		wxStaticLine* StaticLine2;
-		wxBitmapButton* objectBt;
 		wxStaticLine* StaticLine1;
-		wxTextCtrl* objectEdit;
+		wxTextCtrl* expressionEdit;
 		wxButton* okBt;
 		wxStaticBitmap* StaticBitmap3;
 		//*)
 
-		ForEachEvent & eventEdited;
-
 	protected:
 
-		//(*Identifiers(EditForEachEvent)
+		//(*Identifiers(EditRepeatEvent)
 		static const long ID_STATICBITMAP3;
 		static const long ID_STATICTEXT3;
 		static const long ID_PANEL1;
@@ -56,12 +58,13 @@ class EditForEachEvent: public wxDialog
 
 	private:
 
-		//(*Handlers(EditForEachEvent)
+		//(*Handlers(EditRepeatEvent)
+		void OnexpressionBtClick(wxCommandEvent& event);
 		void OnokBtClick(wxCommandEvent& event);
 		void OncancelBtClick(wxCommandEvent& event);
-		void OnobjectBtClick(wxCommandEvent& event);
 		//*)
 
+		RepeatEvent & event;
 		Game & game;
 		Scene & scene;
 

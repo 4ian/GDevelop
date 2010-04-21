@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxDialog" name="EditForEachEvent">
-		<title>Edition de l&apos;évènement &quot;Pour chaque objet&quot;</title>
+	<object class="wxDialog" name="EditRepeatEvent">
+		<title>Edition de l&apos;évènement Répéter</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
@@ -17,7 +17,7 @@
 								<cols>3</cols>
 								<object class="sizeritem">
 									<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
-										<bitmap>res/foreach48.png</bitmap>
+										<bitmap>res/repeat.png</bitmap>
 									</object>
 									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -25,8 +25,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-										<label>Les conditions et actions seront répétées pour chacun des objets ayant le nom indiqué.</label>
-										<size>253,60</size>
+										<label>Les conditions et actions seront répétées le nombre de fois indiquées.</label>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -55,7 +54,7 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-							<label>Répeter l&apos;évènement pour chaque objet :</label>
+							<label>Nombre de répétitions :</label>
 						</object>
 						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -66,16 +65,16 @@
 							<cols>3</cols>
 							<growablecols>0</growablecols>
 							<object class="sizeritem">
-								<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="objectEdit" member="yes" />
+								<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="expressionEdit" member="yes" />
 								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
-								<object class="wxBitmapButton" name="ID_BITMAPBUTTON1" variable="objectBt" member="yes">
-									<bitmap>res/objeticon.png</bitmap>
+								<object class="wxBitmapButton" name="ID_BITMAPBUTTON1" variable="expressionBt" member="yes">
+									<bitmap>res/expressionicon.png</bitmap>
 									<default>1</default>
-									<handler function="OnobjectBtClick" entry="EVT_BUTTON" />
+									<handler function="OnexpressionBtClick" entry="EVT_BUTTON" />
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>

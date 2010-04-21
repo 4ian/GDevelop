@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="GDL\AES.cpp" open="1" top="0" tabpos="25">
+	<File name="GDL\AES.cpp" open="0" top="0" tabpos="25">
 		<Cursor position="1429" topLine="24" />
 	</File>
 	<File name="GDL\AES.h" open="0" top="0" tabpos="7">
 		<Cursor position="3931" topLine="75" />
 	</File>
-	<File name="GDL\Access.cpp" open="0" top="0" tabpos="26">
-		<Cursor position="3351" topLine="90" />
+	<File name="GDL\Access.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="17997" topLine="441" />
 	</File>
 	<File name="GDL\Access.h" open="0" top="0" tabpos="13">
 		<Cursor position="222" topLine="0" />
@@ -25,17 +25,17 @@
 	<File name="GDL\Animation.h" open="0" top="0" tabpos="90">
 		<Cursor position="334" topLine="0" />
 	</File>
-	<File name="GDL\AppelEvent.cpp" open="1" top="0" tabpos="13">
-		<Cursor position="958" topLine="22" />
+	<File name="GDL\AppelEvent.cpp" open="0" top="0" tabpos="13">
+		<Cursor position="10560" topLine="250" />
 	</File>
-	<File name="GDL\AppelEvent.h" open="1" top="0" tabpos="12">
+	<File name="GDL\AppelEvent.h" open="0" top="0" tabpos="12">
 		<Cursor position="1183" topLine="18" />
 	</File>
 	<File name="GDL\BaseDebugger.h" open="0" top="0" tabpos="5">
 		<Cursor position="81" topLine="0" />
 	</File>
 	<File name="GDL\BaseObjectExtension.cpp" open="0" top="0" tabpos="11">
-		<Cursor position="20172" topLine="412" />
+		<Cursor position="144" topLine="0" />
 	</File>
 	<File name="GDL\BitmapGUIManager.cpp" open="0" top="0" tabpos="24">
 		<Cursor position="1705" topLine="18" />
@@ -49,7 +49,7 @@
 	<File name="GDL\Camera.h" open="0" top="0" tabpos="23">
 		<Cursor position="148" topLine="0" />
 	</File>
-	<File name="GDL\CameraExtension.cpp" open="1" top="0" tabpos="22">
+	<File name="GDL\CameraExtension.cpp" open="0" top="0" tabpos="22">
 		<Cursor position="16813" topLine="273" />
 	</File>
 	<File name="GDL\Chercher.cpp" open="0" top="0" tabpos="7">
@@ -70,6 +70,9 @@
 	<File name="GDL\ChoixDossier.h" open="0" top="0" tabpos="10">
 		<Cursor position="320" topLine="0" />
 	</File>
+	<File name="GDL\ChooseObject.cpp" open="1" top="1" tabpos="14">
+		<Cursor position="18" topLine="0" />
+	</File>
 	<File name="GDL\Collisions.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="0" topLine="0" />
 	</File>
@@ -85,14 +88,17 @@
 	<File name="GDL\CommonInstructions.h" open="0" top="0" tabpos="0">
 		<Cursor position="145" topLine="0" />
 	</File>
-	<File name="GDL\CommonInstructionsExtension.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="439" topLine="0" />
+	<File name="GDL\CommonInstructionsExtension.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="1337" topLine="14" />
 	</File>
 	<File name="GDL\CommonInstructionsExtension.h" open="0" top="0" tabpos="0">
 		<Cursor position="147" topLine="0" />
 	</File>
 	<File name="GDL\DatFile.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="6264" topLine="168" />
+		<Cursor position="5236" topLine="147" />
+	</File>
+	<File name="GDL\DatFile.h" open="0" top="0" tabpos="0">
+		<Cursor position="1039" topLine="5" />
 	</File>
 	<File name="GDL\Direction.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="692" topLine="33" />
@@ -107,16 +113,16 @@
 		<Cursor position="3" topLine="0" />
 	</File>
 	<File name="GDL\EditComment.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="4633" topLine="83" />
+		<Cursor position="4696" topLine="83" />
 	</File>
 	<File name="GDL\EditComment.h" open="0" top="0" tabpos="0">
 		<Cursor position="449" topLine="4" />
 	</File>
-	<File name="GDL\EditForEachEvent.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="1309" topLine="12" />
+	<File name="GDL\EditForEachEvent.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="244" topLine="0" />
 	</File>
 	<File name="GDL\EditForEachEvent.h" open="0" top="0" tabpos="0">
-		<Cursor position="288" topLine="0" />
+		<Cursor position="462" topLine="10" />
 	</File>
 	<File name="GDL\EditLink.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="9616" topLine="160" />
@@ -124,14 +130,20 @@
 	<File name="GDL\EditLink.h" open="0" top="0" tabpos="0">
 		<Cursor position="369" topLine="0" />
 	</File>
+	<File name="GDL\EditRepeatEvent.cpp" open="1" top="0" tabpos="12">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="GDL\EditRepeatEvent.h" open="1" top="0" tabpos="13">
+		<Cursor position="1592" topLine="39" />
+	</File>
 	<File name="GDL\EditorImages.cpp" open="0" top="0" tabpos="11">
 		<Cursor position="16145" topLine="267" />
 	</File>
 	<File name="GDL\EditorImages.h" open="0" top="0" tabpos="28">
 		<Cursor position="137" topLine="0" />
 	</File>
-	<File name="GDL\EditorObjet.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="5057" topLine="129" />
+	<File name="GDL\EditorObjet.cpp" open="1" top="0" tabpos="10">
+		<Cursor position="34138" topLine="446" />
 	</File>
 	<File name="GDL\EditorObjet.h" open="0" top="0" tabpos="2">
 		<Cursor position="7946" topLine="233" />
@@ -157,10 +169,10 @@
 	<File name="GDL\EventsPreprocessor.h" open="0" top="0" tabpos="13">
 		<Cursor position="307" topLine="0" />
 	</File>
-	<File name="GDL\EventsRenderingHelper.cpp" open="1" top="0" tabpos="5">
+	<File name="GDL\EventsRenderingHelper.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="12283" topLine="267" />
 	</File>
-	<File name="GDL\EventsRenderingHelper.h" open="1" top="0" tabpos="4">
+	<File name="GDL\EventsRenderingHelper.h" open="0" top="0" tabpos="4">
 		<Cursor position="3062" topLine="63" />
 	</File>
 	<File name="GDL\ExpressionInstruction.cpp" open="0" top="0" tabpos="0">
@@ -170,10 +182,10 @@
 		<Cursor position="1006" topLine="5" />
 	</File>
 	<File name="GDL\ExtensionBase.cpp" open="0" top="0" tabpos="12">
-		<Cursor position="2226" topLine="78" />
+		<Cursor position="1000" topLine="29" />
 	</File>
-	<File name="GDL\ExtensionBase.h" open="0" top="0" tabpos="7">
-		<Cursor position="24751" topLine="602" />
+	<File name="GDL\ExtensionBase.h" open="0" top="0" tabpos="1">
+		<Cursor position="21557" topLine="481" />
 	</File>
 	<File name="GDL\ExtensionsLoader.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="4837" topLine="129" />
@@ -182,10 +194,10 @@
 		<Cursor position="336" topLine="0" />
 	</File>
 	<File name="GDL\ExtensionsManager.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="16980" topLine="437" />
+		<Cursor position="16980" topLine="424" />
 	</File>
 	<File name="GDL\ExtensionsManager.h" open="0" top="0" tabpos="5">
-		<Cursor position="85" topLine="0" />
+		<Cursor position="5547" topLine="126" />
 	</File>
 	<File name="GDL\FontManager.cpp" open="0" top="0" tabpos="12">
 		<Cursor position="432" topLine="3" />
@@ -193,29 +205,29 @@
 	<File name="GDL\FontManager.h" open="0" top="0" tabpos="12">
 		<Cursor position="491" topLine="4" />
 	</File>
-	<File name="GDL\ForEachEvent.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="7821" topLine="240" />
+	<File name="GDL\ForEachEvent.cpp" open="0" top="0" tabpos="6">
+		<Cursor position="10171" topLine="272" />
 	</File>
-	<File name="GDL\ForEachEvent.h" open="1" top="0" tabpos="2">
+	<File name="GDL\ForEachEvent.h" open="0" top="0" tabpos="2">
 		<Cursor position="2425" topLine="56" />
 	</File>
 	<File name="GDL\Force.cpp" open="0" top="0" tabpos="14">
-		<Cursor position="1528" topLine="59" />
+		<Cursor position="142" topLine="2" />
 	</File>
 	<File name="GDL\Force.h" open="0" top="0" tabpos="15">
 		<Cursor position="829" topLine="33" />
 	</File>
 	<File name="GDL\GDExpression.cpp" open="0" top="0" tabpos="12">
-		<Cursor position="173" topLine="0" />
+		<Cursor position="1004" topLine="10" />
 	</File>
 	<File name="GDL\GDExpression.h" open="0" top="0" tabpos="15">
-		<Cursor position="578" topLine="11" />
+		<Cursor position="3838" topLine="84" />
 	</File>
 	<File name="GDL\Game.cpp" open="0" top="0" tabpos="11">
-		<Cursor position="2066" topLine="55" />
+		<Cursor position="1069" topLine="11" />
 	</File>
 	<File name="GDL\Game.h" open="0" top="0" tabpos="16">
-		<Cursor position="1263" topLine="28" />
+		<Cursor position="1263" topLine="22" />
 	</File>
 	<File name="GDL\HelpFileAccess.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="118" topLine="0" />
@@ -230,7 +242,7 @@
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="GDL\ImageManager.cpp" open="0" top="0" tabpos="83">
-		<Cursor position="249" topLine="0" />
+		<Cursor position="289" topLine="0" />
 	</File>
 	<File name="GDL\ImageManager.h" open="0" top="0" tabpos="0">
 		<Cursor position="623" topLine="3" />
@@ -253,7 +265,7 @@
 	<File name="GDL\Layer.h" open="0" top="0" tabpos="10">
 		<Cursor position="927" topLine="15" />
 	</File>
-	<File name="GDL\LinkEvent.cpp" open="1" top="0" tabpos="7">
+	<File name="GDL\LinkEvent.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="4148" topLine="93" />
 	</File>
 	<File name="GDL\LinkEvent.h" open="0" top="0" tabpos="4">
@@ -299,7 +311,7 @@
 		<Cursor position="5664" topLine="115" />
 	</File>
 	<File name="GDL\Music.cpp" open="0" top="0" tabpos="14">
-		<Cursor position="436" topLine="12" />
+		<Cursor position="485" topLine="10" />
 	</File>
 	<File name="GDL\ObjInstancesHolder.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="850" topLine="2" />
@@ -334,8 +346,8 @@
 	<File name="GDL\ObjectsConcerned.h" open="0" top="0" tabpos="4">
 		<Cursor position="3300" topLine="90" />
 	</File>
-	<File name="GDL\OpenSaveGame.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="30040" topLine="670" />
+	<File name="GDL\OpenSaveGame.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="4616" topLine="126" />
 	</File>
 	<File name="GDL\OpenSaveGame.h" open="0" top="0" tabpos="18">
 		<Cursor position="1223" topLine="17" />
@@ -352,14 +364,14 @@
 	<File name="GDL\PropImage.h" open="0" top="0" tabpos="17">
 		<Cursor position="292" topLine="1" />
 	</File>
-	<File name="GDL\RepeatEvent.cpp" open="1" top="0" tabpos="11">
-		<Cursor position="9343" topLine="250" />
+	<File name="GDL\RepeatEvent.cpp" open="0" top="0" tabpos="11">
+		<Cursor position="308" topLine="0" />
 	</File>
-	<File name="GDL\RepeatEvent.h" open="1" top="0" tabpos="10">
+	<File name="GDL\RepeatEvent.h" open="0" top="0" tabpos="10">
 		<Cursor position="2931" topLine="50" />
 	</File>
 	<File name="GDL\RessourcesLoader.cpp" open="0" top="0" tabpos="11">
-		<Cursor position="3013" topLine="72" />
+		<Cursor position="4155" topLine="114" />
 	</File>
 	<File name="GDL\RessourcesLoader.h" open="0" top="0" tabpos="31">
 		<Cursor position="1331" topLine="57" />
@@ -382,11 +394,11 @@
 	<File name="GDL\RuntimeLayer.h" open="0" top="0" tabpos="2">
 		<Cursor position="911" topLine="14" />
 	</File>
-	<File name="GDL\RuntimeScene.cpp" open="1" top="0" tabpos="14">
-		<Cursor position="5208" topLine="155" />
+	<File name="GDL\RuntimeScene.cpp" open="0" top="0" tabpos="14">
+		<Cursor position="13954" topLine="436" />
 	</File>
-	<File name="GDL\RuntimeScene.h" open="1" top="0" tabpos="15">
-		<Cursor position="3617" topLine="95" />
+	<File name="GDL\RuntimeScene.h" open="0" top="0" tabpos="15">
+		<Cursor position="2711" topLine="57" />
 	</File>
 	<File name="GDL\Scene.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="934" topLine="22" />
@@ -395,7 +407,7 @@
 		<Cursor position="898" topLine="9" />
 	</File>
 	<File name="GDL\SceneExtension.cpp" open="0" top="0" tabpos="58">
-		<Cursor position="790" topLine="2" />
+		<Cursor position="1977" topLine="0" />
 	</File>
 	<File name="GDL\SceneExtension.h" open="0" top="0" tabpos="0">
 		<Cursor position="52" topLine="0" />
@@ -430,10 +442,10 @@
 	<File name="GDL\SpriteObject.h" open="0" top="0" tabpos="91">
 		<Cursor position="738" topLine="9" />
 	</File>
-	<File name="GDL\StandardEvent.cpp" open="1" top="0" tabpos="8">
+	<File name="GDL\StandardEvent.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="1596" topLine="43" />
 	</File>
-	<File name="GDL\StandardEvent.h" open="1" top="0" tabpos="9">
+	<File name="GDL\StandardEvent.h" open="0" top="0" tabpos="9">
 		<Cursor position="2883" topLine="24" />
 	</File>
 	<File name="GDL\StdAlgo.cpp" open="0" top="0" tabpos="42">
@@ -481,22 +493,22 @@
 	<File name="GDL\VersionWrapper.h" open="0" top="0" tabpos="2">
 		<Cursor position="162" topLine="0" />
 	</File>
-	<File name="GDL\WhileEvent.cpp" open="1" top="0" tabpos="26">
+	<File name="GDL\WhileEvent.cpp" open="0" top="0" tabpos="26">
 		<Cursor position="5639" topLine="146" />
 	</File>
-	<File name="GDL\WhileEvent.h" open="1" top="0" tabpos="1">
+	<File name="GDL\WhileEvent.h" open="0" top="0" tabpos="1">
 		<Cursor position="1982" topLine="49" />
 	</File>
 	<File name="GDL\WindowExtension.cpp" open="0" top="0" tabpos="59">
 		<Cursor position="320" topLine="0" />
 	</File>
-	<File name="GDL\aADS.cpp" open="1" top="0" tabpos="18">
+	<File name="GDL\aADS.cpp" open="0" top="0" tabpos="18">
 		<Cursor position="6706" topLine="132" />
 	</File>
 	<File name="GDL\aAdvanced.cpp" open="0" top="0" tabpos="17">
 		<Cursor position="469" topLine="0" />
 	</File>
-	<File name="GDL\aCamera.cpp" open="1" top="0" tabpos="21">
+	<File name="GDL\aCamera.cpp" open="0" top="0" tabpos="21">
 		<Cursor position="9244" topLine="240" />
 	</File>
 	<File name="GDL\aCamera.h" open="0" top="0" tabpos="16">
@@ -532,11 +544,11 @@
 	<File name="GDL\aPosition.cpp" open="0" top="0" tabpos="50">
 		<Cursor position="81" topLine="0" />
 	</File>
-	<File name="GDL\aScene.cpp" open="1" top="0" tabpos="17">
-		<Cursor position="562" topLine="0" />
+	<File name="GDL\aScene.cpp" open="0" top="0" tabpos="17">
+		<Cursor position="633" topLine="6" />
 	</File>
-	<File name="GDL\aScene.h" open="1" top="0" tabpos="16">
-		<Cursor position="0" topLine="0" />
+	<File name="GDL\aScene.h" open="0" top="0" tabpos="16">
+		<Cursor position="422" topLine="0" />
 	</File>
 	<File name="GDL\aTexte.cpp" open="0" top="0" tabpos="16">
 		<Cursor position="1487" topLine="30" />
@@ -638,7 +650,7 @@
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="GDL\eFreeFunctions.cpp" open="0" top="0" tabpos="22">
-		<Cursor position="8494" topLine="160" />
+		<Cursor position="9311" topLine="173" />
 	</File>
 	<File name="GDL\eFreeFunctions.h" open="0" top="0" tabpos="8">
 		<Cursor position="1950" topLine="7" />
@@ -650,7 +662,7 @@
 		<Cursor position="271" topLine="0" />
 	</File>
 	<File name="GDL\gpl.h" open="0" top="0" tabpos="0">
-		<Cursor position="284" topLine="1" />
+		<Cursor position="165" topLine="0" />
 	</File>
 	<File name="GDL\md5.cpp" open="0" top="0" tabpos="18">
 		<Cursor position="1651" topLine="342" />

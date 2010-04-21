@@ -10,6 +10,7 @@
 
 #if defined(GDE)
 #include "GDL/EventsRenderingHelper.h"
+#include "GDL/EditRepeatEvent.h"
 #endif
 
 RepeatEvent::RepeatEvent() :
@@ -285,7 +286,8 @@ void RepeatEvent::RenderInBitmap() const
 
 void RepeatEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
-    //TODO
+    EditRepeatEvent dialog(parent_, *this, game_, scene_);
+    dialog.ShowModal();
 }
 #endif
 

@@ -50,7 +50,6 @@ void LinkEvent::LoadFromXml(const TiXmlElement * eventElem)
 
 void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
 {
-    cout << "called";
     //Scene containing the event to insert
     vector< boost::shared_ptr<Scene> >::const_iterator sceneLinkedIter =
         find_if(game.scenes.begin(), game.scenes.end(), bind2nd(SceneHasName(), sceneLinked));

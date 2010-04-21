@@ -67,7 +67,7 @@ RuntimeScene::~RuntimeScene()
     //dtor
 }
 
-RuntimeScene::RuntimeScene(const RuntimeScene & scene) : Scene(scene)
+void RuntimeScene::Init(const RuntimeScene & scene)
 {
     renderWindow = scene.renderWindow;
     game = scene.game;
@@ -95,6 +95,12 @@ RuntimeScene::RuntimeScene(const RuntimeScene & scene) : Scene(scene)
     elapsedTime = scene.elapsedTime;
     timeScale = scene.timeScale;
     timeFromStart = scene.timeFromStart;
+    specialAction = scene.specialAction;
+}
+
+RuntimeScene::RuntimeScene(const RuntimeScene & scene) : Scene(scene)
+{
+    Init(scene);
 }
 
 RuntimeScene& RuntimeScene::operator=(const RuntimeScene & scene)
@@ -102,33 +108,7 @@ RuntimeScene& RuntimeScene::operator=(const RuntimeScene & scene)
     if( (this) != &scene )
     {
         Scene::operator=(scene);
-
-        this->renderWindow = scene.renderWindow;
-        this->game = scene.game;
-        this->soundManager = scene.soundManager;
-        this->input = scene.input;
-        #ifdef GDE
-        this->debugger = scene.debugger;
-        #endif
-        this->running = scene.running;
-
-        this->objectsInstances = scene.objectsInstances.CopyAndCloneAllObjects();
-
-        this->variables = scene.variables;
-        this->textes = scene.textes;
-        this->timers = scene.timers;
-        this->pauseTime = scene.pauseTime;
-        this->backgroundColorR = scene.backgroundColorR;
-        this->backgroundColorG = scene.backgroundColorG;
-        this->backgroundColorB = scene.backgroundColorB;
-        this->errors = scene.errors;
-
-        this->firstLoop = scene.firstLoop;
-        this->isFullScreen = scene.isFullScreen;
-        this->realElapsedTime = scene.realElapsedTime;
-        this->elapsedTime = scene.elapsedTime;
-        this->timeScale = scene.timeScale;
-        this->timeFromStart = scene.timeFromStart;
+        Init(scene);
     }
 
     return *this;
@@ -137,7 +117,10 @@ RuntimeScene& RuntimeScene::operator=(const RuntimeScene & scene)
 void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
 {
     if ( newWindow == NULL )
-        cout << "Try to change renderWindow to a NULL window.";
+    {
+        cout << "Try to change renderWindow to a NULL window." << endl;
+        return;
+    }
 
     renderWindow = newWindow;
     input = &renderWindow->GetInput();
@@ -528,7 +511,6 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
 bool RuntimeScene::LoadFromScene( const Scene & scene )
 {
     //Clear RuntimeScene datas
-    variables.Clear();
     objectsInstances.Clear();
     textes.clear();
     timers.clear();
@@ -538,6 +520,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     realElapsedTime = 0;
     pauseTime = 0;
     timeFromStart = 0;
+    specialAction = -1;
 
     //Copy inherited datas
     initialObjects = scene.initialObjects;
@@ -551,6 +534,9 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     title = scene.title;
     standardSortMethod = scene.standardSortMethod;
 
+    //Add global object groups
+    copy(game->objectGroups.begin(), game->objectGroups.end(), back_inserter(objectGroups));
+
     //Initialize runtime layers
     sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->windowWidth, game->windowHeight ) );
     for (unsigned int i = 0;i<initialLayers.size();++i)
@@ -559,32 +545,18 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     }
 
     //Load resources of initial objects
-    try
+    for (unsigned int i = 0; i < scene.initialObjects.size();++i)
     {
-        for (unsigned int i = 0; i < scene.initialObjects.size();++i)
-        {
-            MessageLoading( "Chargement des images de l'objet : " + scene.initialObjects.at( i )->GetName(), i + 1 / scene.initialObjects.size()*100 / 3 + 33 );
-            scene.initialObjects[i]->LoadResources(game->imageManager);
-        }
-    }
-    catch ( std::out_of_range& e )
-    {
-        std::cout << "Out of range: " << e.what() << "\n";
+        MessageLoading( "Loading object resources : " + scene.initialObjects.at( i )->GetName(), i + 1 / scene.initialObjects.size()*100 / 3 + 33 );
+        scene.initialObjects[i]->LoadResources(game->imageManager);
     }
 
     //Load resources of global objects
     //TODO : Make this only one time during game
-    try
+    for (unsigned int i = 0; i < game->globalObjects.size();++i)
     {
-        for (unsigned int i = 0; i < game->globalObjects.size();++i)
-        {
-            MessageLoading( "Chargement des images de l'objet : " + game->globalObjects[i]->GetName(), i + 1 /  game->globalObjects.size()*100 / 3 + 33 );
-            game->globalObjects[i]->LoadResources(game->imageManager);
-        }
-    }
-    catch ( std::out_of_range& e )
-    {
-        std::cout << "Out of range: " << e.what() << "\n";
+        MessageLoading( "Loading object resources : " + game->globalObjects[i]->GetName(), i + 1 /  game->globalObjects.size()*100 / 3 + 33 );
+        game->globalObjects[i]->LoadResources(game->imageManager);
     }
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
@@ -592,7 +564,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     //Create object instances which are originally positionned on scene
     for(unsigned int i = 0;i < scene.initialObjectsPositions.size();++i)
     {
-        MessageLoading( "Positionnement de l'objet : " + scene.initialObjectsPositions[i].objectName, i + 1 / scene.initialObjectsPositions.size()*100 / 3 + 33 );
+        MessageLoading( "Placing object : " + scene.initialObjectsPositions[i].objectName, i + 1 / scene.initialObjectsPositions.size()*100 / 3 + 33 );
 
         int IDsceneObject = Picker::PickOneObject( &initialObjects, scene.initialObjectsPositions[i].objectName );
         int IDglobalObject = Picker::PickOneObject( &game->globalObjects, scene.initialObjectsPositions[i].objectName );
@@ -633,7 +605,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     //Preprocess events
     PreprocessScene( *game );
 
-    MessageLoading( "Chargement de la scène terminé", 100 );
+    MessageLoading( "Loading finished", 100 );
 
     return true;
 }

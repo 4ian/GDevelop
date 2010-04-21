@@ -67,11 +67,12 @@ void Game::Init(const Game & game)
     for (unsigned int i =0;i<game.scenes.size();++i)
     	scenes.push_back( boost::shared_ptr<Scene>(new Scene(*game.scenes[i])) );
 
-    //Initial
     variables = game.variables;
+    objectGroups = game.objectGroups;
 
     #if defined(GDE)
     gameFile = game.gameFile;
+    imagesWereModified = game.imagesWereModified;
     #endif
 }
 

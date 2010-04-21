@@ -104,6 +104,8 @@ class GD_API RuntimeScene : public Scene
 
     protected:
 
+        void Init(const RuntimeScene & scene);
+
         //Fonctions supplémentaires pour une RuntimeScene
         //-> Gestion de la boucle de jeu
         void Render();

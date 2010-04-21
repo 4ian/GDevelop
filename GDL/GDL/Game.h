@@ -52,6 +52,7 @@ class GD_API Game
 
         vector < boost::shared_ptr<Scene> >     scenes;
         vector < boost::shared_ptr<Object> >    globalObjects;
+        vector < ObjectGroup >                  objectGroups;
 
         //Initial
         ListVariable variables;

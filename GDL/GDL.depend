@@ -38,7 +38,7 @@
 	"GDL/RuntimeScene.h"
 	"GDL/Game.h"
 
-1271790035 d:\florian\programmation\gamedevelop\gdl\\gdl\runtimescene.h
+1271877975 d:\florian\programmation\gamedevelop\gdl\\gdl\runtimescene.h
 	"GDL/MemTrace.h"
 	<iostream>
 	<sstream>
@@ -7978,7 +7978,7 @@
 	"GDL/Game.h"
 	"GDL/ImageManager.h"
 
-1267736450 d:\florian\programmation\gamedevelop\gdl\\gdl\game.h
+1271877446 d:\florian\programmation\gamedevelop\gdl\\gdl\game.h
 	"GDL/Object.h"
 	"GDL/Scene.h"
 	"GDL/ListVariable.h"
@@ -9146,6 +9146,28 @@
 	<string>
 	<wx/treectrl.h>
 
+1271876104 source:d:\florian\programmation\gamedevelop\gdl\gdl\editforeachevent.cpp
+	"EditForEachEvent.h"
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	"GDL/ForEachEvent.h"
+	"GDL/ChooseObject.h"
+
+1271868836 d:\florian\programmation\gamedevelop\gdl\gdl\editforeachevent.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/bmpbuttn.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	"GDL/ForEachEvent.h"
+
 1271366824 source:d:\florian\programmation\gamedevelop\gdl\gdl\editlink.cpp
 	"EditLink.h"
 	<wx/bitmap.h>
@@ -9177,6 +9199,27 @@
 	<vector>
 	"GDL/Image.h"
 	<cmath>
+
+1271876104 source:d:\florian\programmation\gamedevelop\gdl\gdl\editrepeatevent.cpp
+	"EditRepeatEvent.h"
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	"GDL/EditExpression.h"
+	"GDL/RepeatEvent.h"
+
+1271873639 d:\florian\programmation\gamedevelop\gdl\gdl\editrepeatevent.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/bmpbuttn.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
 
 1267909936 source:d:\florian\programmation\gamedevelop\gdl\gdl\editorimages.cpp
 	"GDL/EditorImages.h"
@@ -9933,7 +9976,7 @@
 	<string>
 	<vector>
 
-1271790035 d:\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
+1271877975 d:\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
 	"GDL/MemTrace.h"
 	<iostream>
 	<sstream>
@@ -9986,7 +10029,7 @@
 	"GDL/gpl.h"
 	<cmath>
 
-1271856667 source:d:\florian\programmation\gamedevelop\gdl\gdl\game.cpp
+1271877503 source:d:\florian\programmation\gamedevelop\gdl\gdl\game.cpp
 	"GDL/Game.h"
 	"GDL/MemTrace.h"
 	"GDL/ExtensionsManager.h"
@@ -10031,40 +10074,6 @@
 
 1268861488 source:d:\florian\programmation\gamedevelop\gdl\gdl\layer.cpp
 	"GDL/Layer.h"
-
-1271452033 source:d:\florian\programmation\gamedevelop\gdl\gdl\linkevent.cpp
-	"GDL/LinkEvent.h"
-	"GDL/OpenSaveGame.h"
-	"GDL/EventsRenderingHelper.h"
-	"GDL/StdAlgo.h"
-	"tinyxml.h"
-	"RuntimeScene.h"
-	"Game.h"
-	"Event.h"
-	<iostream>
-	"GDL/EditLink.h"
-
-1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
-	"GDL/Object.h"
-	"GDL/Scene.h"
-	"GDL/ListVariable.h"
-	"GDL/Dossier.h"
-	<string>
-	<vector>
-	"GDL/Image.h"
-	"GDL/LoadingScreen.h"
-
-1271366321 d:\florian\programmation\gamedevelop\gdl\\gdl\editlink.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/statline.h>
-	<wx/radiobut.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	"GDL/LinkEvent.h"
 
 1271278748 source:d:\florian\programmation\gamedevelop\gdl\gdl\listvariable.cpp
 	"GDL/ListVariable.h"
@@ -12353,7 +12362,7 @@
 	"GDL/ObjectType.h"
 	"GDL/profile.h"
 
-1271856619 source:d:\florian\programmation\gamedevelop\gdl\gdl\opensavegame.cpp
+1271882433 source:d:\florian\programmation\gamedevelop\gdl\gdl\opensavegame.cpp
 	<wx/wx.h>
 	"GDL/StdAlgo.h"
 	<string>
@@ -12469,43 +12478,6 @@
 	<SFML/Graphics.hpp>
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
-
-1271790035 source:d:\florian\programmation\gamedevelop\gdl\gdl\runtimescene.cpp
-	<SFML/System.hpp>
-	<SFML/Graphics.hpp>
-	<SFML/OpenGL.hpp>
-	<exception>
-	<stdexcept>
-	<sstream>
-	"GDL/RuntimeScene.h"
-	"GDL/Scene.h"
-	"GDL/Game.h"
-	"GDL/ImageManager.h"
-	"GDL/Chercher.h"
-	"GDL/ChercherScene.h"
-	"GDL/AppelEvent.h"
-	"GDL/ExtensionsManager.h"
-	"GDL/Layer.h"
-	"GDL/EventsPreprocessor.h"
-	"GDL/profile.h"
-	"GDL/ExtensionsManager.h"
-	"GDL/Position.h"
-	"GDL/ObjectsConcerned.h"
-
-1244728046 c:\libs\sfml\include\sfml\opengl.hpp
-	<SFML/Config.hpp>
-	<windows.h>
-	<GL/gl.h>
-	<GL/glu.h>
-	<GL/gl.h>
-	<GL/glu.h>
-	<OpenGL/gl.h>
-	<OpenGL/glu.h>
-
-1266599926 d:\florian\programmation\gamedevelop\gdl\\gdl\chercherscene.h
-	<string>
-	"GDL/Scene.h"
-	<boost/shared_ptr.hpp>
 
 1270460440 source:d:\florian\programmation\gamedevelop\gdl\gdl\scene.cpp
 	"GDL/Scene.h"
@@ -13810,7 +13782,7 @@
 	<windows.h>
 	<dlfcn.h>
 
-1271874016 d:\florian\programmation\gamedevelop\gdl\\gdl\version.h
+1271883326 d:\florian\programmation\gamedevelop\gdl\\gdl\version.h
 
 1267736982 source:d:\florian\programmation\gamedevelop\gdl\gdl\log.cpp
 	<string>

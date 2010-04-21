@@ -174,6 +174,11 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     if ( elem )
         OpenObjects(game.globalObjects, elem);
 
+    //Global object groups
+    elem = hdl.FirstChildElement().FirstChildElement( "ObjectGroups" ).Element();
+    if ( elem )
+        OpenGroupesObjets(game.objectGroups, elem);
+
     //Global variables
     elem = hdl.FirstChildElement().FirstChildElement( "Variables" ).Element();
     if ( elem )
@@ -1047,6 +1052,11 @@ bool OpenSaveGame::SaveToFile(string file)
     root->LinkEndChild( objects );
     SaveObjects(game.globalObjects, objects);
 
+    //Global object groups
+    TiXmlElement * globalObjectGroups = new TiXmlElement( "ObjectGroups" );
+    root->LinkEndChild( globalObjectGroups );
+    SaveGroupesObjets(game.objectGroups, globalObjectGroups);
+
     //Global variables
     TiXmlElement * variables = new TiXmlElement( "Variables" );
     root->LinkEndChild( variables );
@@ -1069,13 +1079,9 @@ bool OpenSaveGame::SaveToFile(string file)
             scene->SetDoubleAttribute( "b", game.scenes[i]->backgroundColorB );
             scene->SetAttribute( "titre", game.scenes[i]->title.c_str() );
 
-            if ( !game.scenes[i]->objectGroups.empty() )
-            {
-                TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
-                scene->LinkEndChild( grpsobjets );
-
-                SaveGroupesObjets(game.scenes[i]->objectGroups, grpsobjets);
-            }
+            TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
+            scene->LinkEndChild( grpsobjets );
+            SaveGroupesObjets(game.scenes[i]->objectGroups, grpsobjets);
 
             TiXmlElement * objets = new TiXmlElement( "Objets" );
             scene->LinkEndChild( objets );

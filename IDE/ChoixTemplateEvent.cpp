@@ -15,7 +15,6 @@
 #include <dirent.h>
 
 #include "tinyxml.h"
-#include "GDL/Game.h"
 #include "GDL/StdAlgo.h"
 #include "GDL/OpenSaveGame.h"
 #include "TemplateEvents.h"
@@ -338,12 +337,9 @@ void ChoixTemplateEvent::OnTemplateTreeSelectionChanged( wxTreeEvent& event )
     item = event.GetItem();
     Refresh();
 
-    cout << "prea";
     int j = 0;
     if ( templatesList.empty() )
         return;
-
-    cout << "a";
 
     DesTxt->SetLabel( templatesList[j].desc );
 
@@ -366,7 +362,6 @@ void ChoixTemplateEvent::OnTemplateTreeSelectionChanged( wxTreeEvent& event )
     //Update control for each parameter
     for (unsigned int i = 0;i<templatesList[j].parameters.size();++i)
     {
-        cout << "showed" << i;
     	descriptionsTxt[i]->Show(true);
     	parametersEdit[i]->Show(true);
     	descriptionsTxt[i]->SetLabel(templatesList[j].parameters[i]);

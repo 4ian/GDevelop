@@ -13,7 +13,6 @@
 #include <wx/dialog.h>
 //*)
 #include "tinyxml.h"
-#include "GDL/Game.h" // Mettre à jour les chemins
 #include "TemplateEvents.h"
 
 class ChoixTemplateEvent: public wxDialog

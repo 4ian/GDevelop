@@ -11,8 +11,8 @@
 //*)
 #include <string>
 #include <vector>
-#include "GDL/Game.h"
-#include "GDL/Scene.h"
+class Game;
+class Scene;
 
 using namespace std;
 

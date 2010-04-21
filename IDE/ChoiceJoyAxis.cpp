@@ -6,8 +6,8 @@
 //*)
 #include <string>
 #include <vector>
-#include "GDL/Game.h"
-#include "GDL/Scene.h"
+class Game;
+class Scene;
 #include "EditTexte.h"
 
 using namespace std;

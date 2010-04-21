@@ -1694,304 +1694,32 @@
 	<assert.h>
 	<string.h>
 
-1264364132 source:d:\florian\programmation\gamedevelop\ide\choicefile.cpp
+1271878984 source:d:\florian\programmation\gamedevelop\ide\choicefile.cpp
 	"ChoiceFile.h"
 	<wx/intl.h>
 	<wx/string.h>
 	"EditTexte.h"
 
-1264364134 d:\florian\programmation\gamedevelop\ide\choicefile.h
+1271878984 d:\florian\programmation\gamedevelop\ide\choicefile.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
 	<wx/statline.h>
 	<wx/button.h>
 	<wx/dialog.h>
-	"GDL/Game.h"
 	"GDL/Scene.h"
 	<string>
 	<vector>
 
-1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
-	"GDL/Object.h"
-	"GDL/Scene.h"
-	"GDL/ListVariable.h"
-	"GDL/Dossier.h"
-	<string>
+1270414716 d:\florian\programmation\gamedevelop\gdl\gdl\scene.h
 	<vector>
-	"GDL/Image.h"
-	"GDL/LoadingScreen.h"
-
-1268859962 d:\florian\programmation\gamedevelop\gdl\gdl\object.h
-	<SFML/System.hpp>
-	<SFML/Graphics.hpp>
-	<iostream>
 	<string>
-	<vector>
 	<boost/shared_ptr.hpp>
-	<boost/enable_shared_from_this.hpp>
-	"GDL/Force.h"
-	"GDL/constantes.h"
-	"GDL/Sprite.h"
-	"GDL/ListVariable.h"
-	"GDL/Animation.h"
-	"GDL/ErrorReport.h"
-	"GDL/ObjectType.h"
-	<wx/wx.h>
-
-1267184485 c:\libs\sfml\include\sfml\system.hpp
-	<SFML/Config.hpp>
-	<SFML/System/Clock.hpp>
-	<SFML/System/Err.hpp>
-	<SFML/System/Lock.hpp>
-	<SFML/System/Mutex.hpp>
-	<SFML/System/Randomizer.hpp>
-	<SFML/System/Sleep.hpp>
-	<SFML/System/String.hpp>
-	<SFML/System/Thread.hpp>
-	<SFML/System/ThreadLocal.hpp>
-	<SFML/System/ThreadLocalPtr.hpp>
-	<SFML/System/Utf.hpp>
-	<SFML/System/Vector2.hpp>
-	<SFML/System/Vector3.hpp>
-
-1256147690 c:\libs\sfml\include\sfml\config.hpp
-	<climits>
-
-1268481795 c:\libs\sfml\include\sfml\system\clock.hpp
-	<SFML/Config.hpp>
-
-1267184484 c:\libs\sfml\include\sfml\system\err.hpp
-	<SFML/Config.hpp>
-	<ostream>
-
-1268481796 c:\libs\sfml\include\sfml\system\lock.hpp
-	<SFML/System/NonCopyable.hpp>
-
-1268481796 c:\libs\sfml\include\sfml\system\noncopyable.hpp
-	<SFML/Config.hpp>
-
-1256147689 c:\libs\sfml\include\sfml\system\mutex.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-
-1256147689 c:\libs\sfml\include\sfml\system\randomizer.hpp
-	<SFML/Config.hpp>
-
-1256147689 c:\libs\sfml\include\sfml\system\sleep.hpp
-	<SFML/Config.hpp>
-
-1267184484 c:\libs\sfml\include\sfml\system\string.hpp
-	<SFML/Config.hpp>
-	<locale>
-	<string>
-
-1259264900 c:\libs\sfml\include\sfml\system\thread.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<cstdlib>
-
-1256147689 c:\libs\sfml\include\sfml\system\threadlocal.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<cstdlib>
-
-1256147689 c:\libs\sfml\include\sfml\system\threadlocalptr.hpp
-	<SFML/System/ThreadLocal.hpp>
-	<SFML/System/ThreadLocalPtr.inl>
-
-1256147689 c:\libs\sfml\include\sfml\system\threadlocalptr.inl
-
-1267184484 c:\libs\sfml\include\sfml\system\utf.hpp
-	<SFML/Config.hpp>
-	<algorithm>
-	<locale>
-	<string>
-	<stdlib.h>
-	<SFML/System/Utf.inl>
-
-1259264900 c:\libs\sfml\include\sfml\system\utf.inl
-
-1256147689 c:\libs\sfml\include\sfml\system\vector2.hpp
-	<SFML/System/Vector2.inl>
-
-1256147689 c:\libs\sfml\include\sfml\system\vector2.inl
-
-1256147689 c:\libs\sfml\include\sfml\system\vector3.hpp
-	<SFML/System/Vector3.inl>
-
-1256147689 c:\libs\sfml\include\sfml\system\vector3.inl
-
-1264002980 c:\libs\sfml\include\sfml\graphics.hpp
-	<SFML/Window.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Font.hpp>
-	<SFML/Graphics/Glyph.hpp>
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/Renderer.hpp>
-	<SFML/Graphics/RenderImage.hpp>
-	<SFML/Graphics/RenderWindow.hpp>
-	<SFML/Graphics/Shader.hpp>
-	<SFML/Graphics/Shape.hpp>
-	<SFML/Graphics/Sprite.hpp>
-	<SFML/Graphics/Text.hpp>
-	<SFML/Graphics/View.hpp>
-
-1267184485 c:\libs\sfml\include\sfml\window.hpp
-	<SFML/System.hpp>
-	<SFML/Window/Context.hpp>
-	<SFML/Window/ContextSettings.hpp>
-	<SFML/Window/Event.hpp>
-	<SFML/Window/Input.hpp>
-	<SFML/Window/VideoMode.hpp>
-	<SFML/Window/Window.hpp>
-	<SFML/Window/WindowStyle.hpp>
-
-1259264901 c:\libs\sfml\include\sfml\window\context.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-
-1259264901 c:\libs\sfml\include\sfml\window\contextsettings.hpp
-
-1264002980 c:\libs\sfml\include\sfml\window\event.hpp
-	<SFML/Config.hpp>
-
-1267184484 c:\libs\sfml\include\sfml\window\input.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Window/Event.hpp>
-
-1268481796 c:\libs\sfml\include\sfml\window\videomode.hpp
-	<SFML/Config.hpp>
-	<vector>
-
-1268481796 c:\libs\sfml\include\sfml\window\window.hpp
-	<SFML/Window/Input.hpp>
-	<SFML/Window/VideoMode.hpp>
-	<SFML/Window/WindowHandle.hpp>
-	<SFML/Window/ContextSettings.hpp>
-	<SFML/Window/WindowStyle.hpp>
-	<SFML/System/Clock.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<string>
-
-1244728046 c:\libs\sfml\include\sfml\window\windowhandle.hpp
-	<SFML/Config.hpp>
-
-1264002980 c:\libs\sfml\include\sfml\window\windowstyle.hpp
-
-1261922598 c:\libs\sfml\include\sfml\graphics\color.hpp
-	<SFML/Config.hpp>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\font.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/System/Vector2.hpp>
-	<SFML/System/String.hpp>
-	<SFML/Graphics/Glyph.hpp>
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<map>
-	<string>
-	<vector>
-
-1267184484 c:\libs\sfml\include\sfml\system\resource.hpp
-	<SFML/System/Lock.hpp>
-	<SFML/System/Mutex.hpp>
-	<set>
-	<SFML/System/Resource.inl>
-	<SFML/System/ResourcePtr.inl>
-
-1267184484 c:\libs\sfml\include\sfml\system\resource.inl
-
-1256147689 c:\libs\sfml\include\sfml\system\resourceptr.inl
-
-1261922598 c:\libs\sfml\include\sfml\graphics\glyph.hpp
-	<SFML/Config.hpp>
-	<SFML/Graphics/Rect.hpp>
-
-1248634793 c:\libs\sfml\include\sfml\graphics\rect.hpp
-	<SFML/System/Vector2.hpp>
-	<algorithm>
-	<SFML/Graphics/Rect.inl>
-
-1248634793 c:\libs\sfml\include\sfml\graphics\rect.inl
-
-1267184483 c:\libs\sfml\include\sfml\graphics\image.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<string>
-	<vector>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\renderer.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/Graphics/Matrix3.hpp>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\drawable.hpp
-	<SFML/System/Vector2.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Matrix3.hpp>
-
-1248634793 c:\libs\sfml\include\sfml\graphics\matrix3.hpp
-	<SFML/Config.hpp>
-	<SFML/System/Vector2.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<math.h>
-	<SFML/Graphics/Matrix3.inl>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\matrix3.inl
-
-1267184483 c:\libs\sfml\include\sfml\graphics\renderimage.hpp
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/RenderTarget.hpp>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\rendertarget.hpp
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<SFML/Graphics/Renderer.hpp>
-	<SFML/Graphics/View.hpp>
-
-1264002977 c:\libs\sfml\include\sfml\graphics\view.hpp
-	<SFML/Config.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<SFML/Graphics/Matrix3.hpp>
-	<SFML/System/Vector2.hpp>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\renderwindow.hpp
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/RenderTarget.hpp>
-	<SFML/Window/Window.hpp>
-	<string>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\shader.hpp
-	<SFML/Config.hpp>
-	<SFML/Graphics/Image.hpp>
-	<SFML/System/Vector2.hpp>
-	<SFML/System/Vector3.hpp>
-	<map>
-	<string>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\shape.hpp
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/System/Vector2.hpp>
-	<vector>
-
-1268481791 c:\libs\sfml\include\sfml\graphics\sprite.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/Graphics/Rect.hpp>
-
-1264002977 c:\libs\sfml\include\sfml\graphics\text.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/System/String.hpp>
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/Graphics/Font.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<string>
+	"GDL/Event.h"
+	"GDL/Object.h"
+	"GDL/ObjectGroup.h"
+	"GDL/Position.h"
+	"GDL/Layer.h"
 
 1215879485 c:\libs\boost_1_38_0\boost\shared_ptr.hpp
 	<boost/config.hpp>
@@ -3188,29 +2916,6 @@
 
 1215865279 c:\libs\boost_1_38_0\boost\memory_order.hpp
 
-1131205229 c:\libs\boost_1_38_0\boost\enable_shared_from_this.hpp
-	<boost/weak_ptr.hpp>
-	<boost/shared_ptr.hpp>
-	<boost/assert.hpp>
-	<boost/config.hpp>
-
-1215862636 c:\libs\boost_1_38_0\boost\weak_ptr.hpp
-	<memory>
-	<boost/detail/shared_count.hpp>
-	<boost/shared_ptr.hpp>
-
-1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
-	<iostream>
-	<vector>
-	<string>
-	<cmath>
-	"GDL/Log.h"
-	"GDL/Event.h"
-
-1267736664 d:\florian\programmation\gamedevelop\gdl\gdl\log.h
-	<string>
-	<vector>
-
 1271367154 d:\florian\programmation\gamedevelop\gdl\gdl\event.h
 	<iostream>
 	<vector>
@@ -3231,6 +2936,10 @@
 
 1253308521 c:\libs\wxwidgets\include\wx\dcclient.h
 	"wx/dc.h"
+
+1267736664 d:\florian\programmation\gamedevelop\gdl\gdl\log.h
+	<string>
+	<vector>
 
 1267911590 d:\florian\programmation\gamedevelop\gdl\gdl\instruction.h
 	<string>
@@ -6636,6 +6345,296 @@
 	<boost/bimap/support/map_type_by.hpp>
 	<boost/bimap/relation/detail/access_builder.hpp>
 
+1268859962 d:\florian\programmation\gamedevelop\gdl\gdl\object.h
+	<SFML/System.hpp>
+	<SFML/Graphics.hpp>
+	<iostream>
+	<string>
+	<vector>
+	<boost/shared_ptr.hpp>
+	<boost/enable_shared_from_this.hpp>
+	"GDL/Force.h"
+	"GDL/constantes.h"
+	"GDL/Sprite.h"
+	"GDL/ListVariable.h"
+	"GDL/Animation.h"
+	"GDL/ErrorReport.h"
+	"GDL/ObjectType.h"
+	<wx/wx.h>
+
+1267184485 c:\libs\sfml\include\sfml\system.hpp
+	<SFML/Config.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/System/Err.hpp>
+	<SFML/System/Lock.hpp>
+	<SFML/System/Mutex.hpp>
+	<SFML/System/Randomizer.hpp>
+	<SFML/System/Sleep.hpp>
+	<SFML/System/String.hpp>
+	<SFML/System/Thread.hpp>
+	<SFML/System/ThreadLocal.hpp>
+	<SFML/System/ThreadLocalPtr.hpp>
+	<SFML/System/Utf.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/Vector3.hpp>
+
+1256147690 c:\libs\sfml\include\sfml\config.hpp
+	<climits>
+
+1268481795 c:\libs\sfml\include\sfml\system\clock.hpp
+	<SFML/Config.hpp>
+
+1267184484 c:\libs\sfml\include\sfml\system\err.hpp
+	<SFML/Config.hpp>
+	<ostream>
+
+1268481796 c:\libs\sfml\include\sfml\system\lock.hpp
+	<SFML/System/NonCopyable.hpp>
+
+1268481796 c:\libs\sfml\include\sfml\system\noncopyable.hpp
+	<SFML/Config.hpp>
+
+1256147689 c:\libs\sfml\include\sfml\system\mutex.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+
+1256147689 c:\libs\sfml\include\sfml\system\randomizer.hpp
+	<SFML/Config.hpp>
+
+1256147689 c:\libs\sfml\include\sfml\system\sleep.hpp
+	<SFML/Config.hpp>
+
+1267184484 c:\libs\sfml\include\sfml\system\string.hpp
+	<SFML/Config.hpp>
+	<locale>
+	<string>
+
+1259264900 c:\libs\sfml\include\sfml\system\thread.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<cstdlib>
+
+1256147689 c:\libs\sfml\include\sfml\system\threadlocal.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<cstdlib>
+
+1256147689 c:\libs\sfml\include\sfml\system\threadlocalptr.hpp
+	<SFML/System/ThreadLocal.hpp>
+	<SFML/System/ThreadLocalPtr.inl>
+
+1256147689 c:\libs\sfml\include\sfml\system\threadlocalptr.inl
+
+1267184484 c:\libs\sfml\include\sfml\system\utf.hpp
+	<SFML/Config.hpp>
+	<algorithm>
+	<locale>
+	<string>
+	<stdlib.h>
+	<SFML/System/Utf.inl>
+
+1259264900 c:\libs\sfml\include\sfml\system\utf.inl
+
+1256147689 c:\libs\sfml\include\sfml\system\vector2.hpp
+	<SFML/System/Vector2.inl>
+
+1256147689 c:\libs\sfml\include\sfml\system\vector2.inl
+
+1256147689 c:\libs\sfml\include\sfml\system\vector3.hpp
+	<SFML/System/Vector3.inl>
+
+1256147689 c:\libs\sfml\include\sfml\system\vector3.inl
+
+1264002980 c:\libs\sfml\include\sfml\graphics.hpp
+	<SFML/Window.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Font.hpp>
+	<SFML/Graphics/Glyph.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/Renderer.hpp>
+	<SFML/Graphics/RenderImage.hpp>
+	<SFML/Graphics/RenderWindow.hpp>
+	<SFML/Graphics/Shader.hpp>
+	<SFML/Graphics/Shape.hpp>
+	<SFML/Graphics/Sprite.hpp>
+	<SFML/Graphics/Text.hpp>
+	<SFML/Graphics/View.hpp>
+
+1267184485 c:\libs\sfml\include\sfml\window.hpp
+	<SFML/System.hpp>
+	<SFML/Window/Context.hpp>
+	<SFML/Window/ContextSettings.hpp>
+	<SFML/Window/Event.hpp>
+	<SFML/Window/Input.hpp>
+	<SFML/Window/VideoMode.hpp>
+	<SFML/Window/Window.hpp>
+	<SFML/Window/WindowStyle.hpp>
+
+1259264901 c:\libs\sfml\include\sfml\window\context.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+
+1259264901 c:\libs\sfml\include\sfml\window\contextsettings.hpp
+
+1264002980 c:\libs\sfml\include\sfml\window\event.hpp
+	<SFML/Config.hpp>
+
+1267184484 c:\libs\sfml\include\sfml\window\input.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Window/Event.hpp>
+
+1268481796 c:\libs\sfml\include\sfml\window\videomode.hpp
+	<SFML/Config.hpp>
+	<vector>
+
+1268481796 c:\libs\sfml\include\sfml\window\window.hpp
+	<SFML/Window/Input.hpp>
+	<SFML/Window/VideoMode.hpp>
+	<SFML/Window/WindowHandle.hpp>
+	<SFML/Window/ContextSettings.hpp>
+	<SFML/Window/WindowStyle.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<string>
+
+1244728046 c:\libs\sfml\include\sfml\window\windowhandle.hpp
+	<SFML/Config.hpp>
+
+1264002980 c:\libs\sfml\include\sfml\window\windowstyle.hpp
+
+1261922598 c:\libs\sfml\include\sfml\graphics\color.hpp
+	<SFML/Config.hpp>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\font.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/String.hpp>
+	<SFML/Graphics/Glyph.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<map>
+	<string>
+	<vector>
+
+1267184484 c:\libs\sfml\include\sfml\system\resource.hpp
+	<SFML/System/Lock.hpp>
+	<SFML/System/Mutex.hpp>
+	<set>
+	<SFML/System/Resource.inl>
+	<SFML/System/ResourcePtr.inl>
+
+1267184484 c:\libs\sfml\include\sfml\system\resource.inl
+
+1256147689 c:\libs\sfml\include\sfml\system\resourceptr.inl
+
+1261922598 c:\libs\sfml\include\sfml\graphics\glyph.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Rect.hpp>
+
+1248634793 c:\libs\sfml\include\sfml\graphics\rect.hpp
+	<SFML/System/Vector2.hpp>
+	<algorithm>
+	<SFML/Graphics/Rect.inl>
+
+1248634793 c:\libs\sfml\include\sfml\graphics\rect.inl
+
+1267184483 c:\libs\sfml\include\sfml\graphics\image.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<string>
+	<vector>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\renderer.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\drawable.hpp
+	<SFML/System/Vector2.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+
+1248634793 c:\libs\sfml\include\sfml\graphics\matrix3.hpp
+	<SFML/Config.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<math.h>
+	<SFML/Graphics/Matrix3.inl>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\matrix3.inl
+
+1267184483 c:\libs\sfml\include\sfml\graphics\renderimage.hpp
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/RenderTarget.hpp>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\rendertarget.hpp
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<SFML/Graphics/Renderer.hpp>
+	<SFML/Graphics/View.hpp>
+
+1264002977 c:\libs\sfml\include\sfml\graphics\view.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+	<SFML/System/Vector2.hpp>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\renderwindow.hpp
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/RenderTarget.hpp>
+	<SFML/Window/Window.hpp>
+	<string>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\shader.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/Vector3.hpp>
+	<map>
+	<string>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\shape.hpp
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/System/Vector2.hpp>
+	<vector>
+
+1268481791 c:\libs\sfml\include\sfml\graphics\sprite.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Rect.hpp>
+
+1264002977 c:\libs\sfml\include\sfml\graphics\text.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/System/String.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Font.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<string>
+
+1131205229 c:\libs\boost_1_38_0\boost\enable_shared_from_this.hpp
+	<boost/weak_ptr.hpp>
+	<boost/shared_ptr.hpp>
+	<boost/assert.hpp>
+	<boost/config.hpp>
+
+1215862636 c:\libs\boost_1_38_0\boost\weak_ptr.hpp
+	<memory>
+	<boost/detail/shared_count.hpp>
+	<boost/shared_ptr.hpp>
+
+1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
+	<iostream>
+	<vector>
+	<string>
+	<cmath>
+	"GDL/Log.h"
+	"GDL/Event.h"
+
 1267820436 d:\florian\programmation\gamedevelop\gdl\gdl\constantes.h
 
 1267820206 d:\florian\programmation\gamedevelop\gdl\gdl\sprite.h
@@ -7970,16 +7969,6 @@
 1253308510 c:\libs\wxwidgets\include\wx\cocoa\mdi.h
 	"wx/frame.h"
 
-1270414716 d:\florian\programmation\gamedevelop\gdl\gdl\scene.h
-	<vector>
-	<string>
-	<boost/shared_ptr.hpp>
-	"GDL/Event.h"
-	"GDL/Object.h"
-	"GDL/ObjectGroup.h"
-	"GDL/Position.h"
-	"GDL/Layer.h"
-
 1267736714 d:\florian\programmation\gamedevelop\gdl\gdl\objectgroup.h
 	<vector>
 	<string>
@@ -8002,19 +7991,7 @@
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 
-1267821124 d:\florian\programmation\gamedevelop\gdl\gdl\dossier.h
-	<string>
-	<vector>
-
-1267820920 d:\florian\programmation\gamedevelop\gdl\gdl\image.h
-	<string>
-	<vector>
-
-1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.h
-	<string>
-	<vector>
-
-1264364130 d:\florian\programmation\gamedevelop\ide\edittexte.h
+1271879069 d:\florian\programmation\gamedevelop\ide\edittexte.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
@@ -8023,20 +8000,16 @@
 	<wx/dialog.h>
 	<string>
 	<vector>
-	"GDL/Game.h"
-	"GDL/Scene.h"
 
-1264364132 source:d:\florian\programmation\gamedevelop\ide\choicejoyaxis.cpp
+1271878984 source:d:\florian\programmation\gamedevelop\ide\choicejoyaxis.cpp
 	"ChoiceJoyAxis.h"
 	<wx/intl.h>
 	<wx/string.h>
 	<string>
 	<vector>
-	"GDL/Game.h"
-	"GDL/Scene.h"
 	"EditTexte.h"
 
-1264364134 d:\florian\programmation\gamedevelop\ide\choicejoyaxis.h
+1271878984 d:\florian\programmation\gamedevelop\ide\choicejoyaxis.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/radiobox.h>
@@ -8045,8 +8018,6 @@
 	<wx/dialog.h>
 	<string>
 	<vector>
-	"GDL/Game.h"
-	"GDL/Scene.h"
 
 1271873746 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
 	"ChoixAction.h"
@@ -8132,6 +8103,28 @@
 	"wx/dynarray.h"
 	"wx/treebase.h"
 	"wx/hashmap.h"
+
+1271877446 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
+	"GDL/Object.h"
+	"GDL/Scene.h"
+	"GDL/ListVariable.h"
+	"GDL/Dossier.h"
+	<string>
+	<vector>
+	"GDL/Image.h"
+	"GDL/LoadingScreen.h"
+
+1267821124 d:\florian\programmation\gamedevelop\gdl\gdl\dossier.h
+	<string>
+	<vector>
+
+1267820920 d:\florian\programmation\gamedevelop\gdl\gdl\image.h
+	<string>
+	<vector>
+
+1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.h
+	<string>
+	<vector>
 
 1253308522 c:\libs\wxwidgets\include\wx\colordlg.h
 	"wx/defs.h"
@@ -8799,7 +8792,7 @@
 	<wx/image.h>
 	<wx/string.h>
 
-1270848978 source:d:\florian\programmation\gamedevelop\ide\choixtemplateevent.cpp
+1271882921 source:d:\florian\programmation\gamedevelop\ide\choixtemplateevent.cpp
 	"ChoixTemplateEvent.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -8812,13 +8805,12 @@
 	<sys/types.h>
 	<dirent.h>
 	"tinyxml.h"
-	"GDL/Game.h"
 	"GDL/StdAlgo.h"
 	"GDL/OpenSaveGame.h"
 	"TemplateEvents.h"
 	"GDL/HelpFileAccess.h"
 
-1270494864 d:\florian\programmation\gamedevelop\ide\choixtemplateevent.h
+1271879069 d:\florian\programmation\gamedevelop\ide\choixtemplateevent.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -8829,7 +8821,6 @@
 	<wx/button.h>
 	<wx/dialog.h>
 	"tinyxml.h"
-	"GDL/Game.h"
 	"TemplateEvents.h"
 
 1270840430 d:\florian\programmation\gamedevelop\ide\templateevents.h
@@ -9087,7 +9078,7 @@
 	<iostream>
 	"tinyxml.h"
 
-1271872970 source:d:\florian\programmation\gamedevelop\ide\debuggergui.cpp
+1271882921 source:d:\florian\programmation\gamedevelop\ide\debuggergui.cpp
 	"DebuggerGUI.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -9120,7 +9111,7 @@
 	"GDL/BaseDebugger.h"
 	<wx/msw/winundef.h>
 
-1271790035 d:\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
+1271877975 d:\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
 	"GDL/MemTrace.h"
 	<iostream>
 	<sstream>
@@ -9619,7 +9610,7 @@
 	<string>
 	<vector>
 
-1266689736 d:\florian\programmation\gamedevelop\ide\editorobjets.h
+1271883269 d:\florian\programmation\gamedevelop\ide\editorobjets.h
 	<wx/notebook.h>
 	<wx/panel.h>
 	"EditorObjectList.h"
@@ -9948,14 +9939,12 @@
 	<wx/dialog.h>
 	"GDL/Scene.h"
 
-1271873746 source:d:\florian\programmation\gamedevelop\ide\edittexte.cpp
+1271879069 source:d:\florian\programmation\gamedevelop\ide\edittexte.cpp
 	"EditTexte.h"
 	<wx/intl.h>
 	<wx/string.h>
 	"GDL/EditExpression.h"
 	<wx/textdlg.h>
-	"GDL/Game.h"
-	"GDL/Scene.h"
 
 1271855819 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
 	"debugMem.h"
@@ -10143,7 +10132,7 @@
 	"GDL/ListVariable.h"
 	<wx/msw/winundef.h>
 
-1269978308 source:d:\florian\programmation\gamedevelop\ide\editorobjets.cpp
+1271879647 source:d:\florian\programmation\gamedevelop\ide\editorobjets.cpp
 	<wx/msw/winundef.h>
 	"debugMem.h"
 	"EditorObjets.h"
@@ -10192,7 +10181,7 @@
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
-1271872970 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
+1271879647 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
 	"EditorScene.h"
 	<wx/settings.h>
 	<wx/intl.h>
@@ -11122,7 +11111,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1271873746 d:\florian\programmation\gamedevelop\ide\version.h
+1271883435 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -11273,5 +11262,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/StdAlgo.h"
 
-1271874016 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1271883326 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

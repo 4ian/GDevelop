@@ -6,8 +6,8 @@
 //*)
 #include "GDL/EditExpression.h"
 #include <wx/textdlg.h>
-#include "GDL/Game.h"
-#include "GDL/Scene.h"
+class Game;
+class Scene;
 
 //(*IdInit(EditTexte)
 const long EditTexte::ID_TEXTCTRL1 = wxNewId();

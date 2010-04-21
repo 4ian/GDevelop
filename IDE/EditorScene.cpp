@@ -167,7 +167,7 @@ externalWindow(this)
     Connect(ID_DEBUGBUTTON,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorScene::OnDebugBtClick);
 
 	//Initialisation des éditeurs
-    objectsEditor = new EditorObjets(this, game, scene, &scene.initialObjects, mainEditorCommand);
+    objectsEditor = new EditorObjets(this, game, scene, mainEditorCommand);
     layersEditor = new EditorLayers(this, game, scene, &scene.initialLayers, mainEditorCommand);
     sceneCanvas->SetScrollbars(ScrollBar1, ScrollBar2);
     debugger = new DebuggerGUI(this, sceneCanvas->scene);

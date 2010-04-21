@@ -9,7 +9,8 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include "GDL/Game.h"
+class Game;
+class Scene;
 #include "GDL/Scene.h"
 #include <string>
 #include <vector>

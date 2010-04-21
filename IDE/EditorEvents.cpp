@@ -1036,6 +1036,8 @@ void EditorEvents::OnEventsPanelLeftDClick( wxMouseEvent& event )
     else
         eventSelected->EditEvent(this, game, scene, mainEditorCommand);
 
+    eventSelected->eventRenderingNeedUpdate = true;
+    ChangesMadeOnEvents();
 }
 
 ////////////////////////////////////////////////////////////

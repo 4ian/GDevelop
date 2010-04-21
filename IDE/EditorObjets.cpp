@@ -58,40 +58,52 @@ BEGIN_EVENT_TABLE( EditorObjets, wxPanel )
     //*)
 END_EVENT_TABLE()
 
-EditorObjets::EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand_) :
+EditorObjets::EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_) :
 game(game_),
 scene(scene_),
-objects(objects_),
 mainEditorCommand(mainEditorCommand_)
 {
     MemTracer.AddObj( "Editeur d'objets", ( long )this );
     //(*Initialize(EditorObjets)
     Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
     Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(128,168), 0, _T("ID_NOTEBOOK1"));
-    Notebook2 = new wxNotebook(Notebook1, ID_NOTEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK2"));
-    sceneObjectsEditor = new EditorObjectList(Notebook2, game, &scene.initialObjects, mainEditorCommand, &scene.wasModified);
-    ObjetsGroups = new EditorObjetsGroups(Notebook2, game, scene, &scene.objectGroups, mainEditorCommand);
-    Notebook2->AddPage(sceneObjectsEditor, _("Objets"), false);
-    Notebook2->AddPage(ObjetsGroups, _("Groupes d\'objets"), false);
-    Notebook3 = new wxNotebook(Notebook1, ID_NOTEBOOK3, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK3"));
-    globalObjectsEditor = new EditorObjectList(Notebook3, game, &game.globalObjects, mainEditorCommand, &scene.wasModified);
-    globalObjectsGroups = new EditorObjetsGroups(Notebook3, game, scene, &game.objectGroups, mainEditorCommand);
-    Notebook3->AddPage(globalObjectsEditor, _("Objets globaux"), false);
-    Notebook3->AddPage(globalObjectsGroups, _("Groupes globaux"), false);
-    Notebook1->AddPage(Notebook2, _("Scène"), false);
-    Notebook1->AddPage(Notebook3, _("Global à tout le jeu"), false);
+    sceneNotebook = new wxNotebook(Notebook1, ID_NOTEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK2"));
+    sceneObjectsEditor = new EditorObjectList(sceneNotebook, game, &scene.initialObjects, mainEditorCommand, &scene.wasModified);
+    ObjetsGroups = new EditorObjetsGroups(sceneNotebook, game, scene, &scene.objectGroups, mainEditorCommand);
+    sceneNotebook->AddPage(sceneObjectsEditor, _("Objets"), false);
+    sceneNotebook->AddPage(ObjetsGroups, _("Groupes d\'objets"), false);
+    globalNotebook = new wxNotebook(Notebook1, ID_NOTEBOOK3, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK3"));
+    globalObjectsEditor = new EditorObjectList(globalNotebook, game, &game.globalObjects, mainEditorCommand, &scene.wasModified);
+    globalObjectsGroups = new EditorObjetsGroups(globalNotebook, game, scene, &game.objectGroups, mainEditorCommand);
+    globalNotebook->AddPage(globalObjectsEditor, _("Objets globaux"), false);
+    globalNotebook->AddPage(globalObjectsGroups, _("Groupes globaux"), false);
+    Notebook1->AddPage(sceneNotebook, _("Scène"), false);
+    Notebook1->AddPage(globalNotebook, _("Global à tout le jeu"), false);
 
     Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorObjets::OnResize);
     //*)
 
-    imageList = new wxImageList( 16, 16 );
-    imageList->Add(( wxBitmap( "res/objeticon.png", wxBITMAP_TYPE_ANY ) ) );
-    imageList->Add(( wxBitmap( "res/groupeobjeticon.png", wxBITMAP_TYPE_ANY ) ) );
-    Notebook1->AssignImageList(imageList);
+    globalNotebookImageList = new wxImageList( 16, 16 );
+    globalNotebookImageList->Add(( wxBitmap( "res/objeticon.png", wxBITMAP_TYPE_ANY ) ) );
+    globalNotebookImageList->Add(( wxBitmap( "res/groupeobjeticon.png", wxBITMAP_TYPE_ANY ) ) );
+    globalNotebook->AssignImageList(globalNotebookImageList);
+
+    sceneNotebookImageList = new wxImageList( 16, 16 );
+    sceneNotebookImageList->Add(( wxBitmap( "res/objeticon.png", wxBITMAP_TYPE_ANY ) ) );
+    sceneNotebookImageList->Add(( wxBitmap( "res/groupeobjeticon.png", wxBITMAP_TYPE_ANY ) ) );
+    sceneNotebook->AssignImageList(sceneNotebookImageList);
+
+    notebookImageList = new wxImageList( 16, 16 );
+    notebookImageList->Add(wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY));
+    notebookImageList->Add(wxBitmap("res/window.png", wxBITMAP_TYPE_ANY));
+    Notebook1->AssignImageList(notebookImageList);
 
     Notebook1->SetPageImage(0,0);
     Notebook1->SetPageImage(1,1);
-    Notebook1->SetPageImage(2,0);
+    sceneNotebook->SetPageImage(0,0);
+    sceneNotebook->SetPageImage(1,1);
+    globalNotebook->SetPageImage(0,0);
+    globalNotebook->SetPageImage(1,1);
 
     //On vérifie si on est pas en mode simple.
     wxConfigBase * pConfig = wxConfigBase::Get();

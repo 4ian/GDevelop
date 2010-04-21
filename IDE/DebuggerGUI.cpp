@@ -354,7 +354,7 @@ void DebuggerGUI::UpdateGUI()
         {
             objectsTree->Delete((*objectsInTreeIter).second.second); //Suppression de l'arbre
             map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator temp = objectsInTreeIter;
-            objectsInTreeIter++;
+            objectsInTreeIter--;
             objectsInTree.erase(temp); //Suppression de la map
         }
     }

@@ -20,16 +20,16 @@ class EditorObjets: public wxPanel
 {
 	public:
 
-		EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand_);
+		EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
 		virtual ~EditorObjets();
 
 		//(*Declarations(EditorObjets)
+		wxNotebook* sceneNotebook;
 		wxNotebook* Notebook1;
 		EditorObjetsGroups* ObjetsGroups;
 		EditorObjectList* sceneObjectsEditor;
 		EditorObjetsGroups* globalObjectsGroups;
-		wxNotebook* Notebook2;
-		wxNotebook* Notebook3;
+		wxNotebook* globalNotebook;
 		EditorObjectList* globalObjectsEditor;
 		//*)
 
@@ -56,9 +56,9 @@ class EditorObjets: public wxPanel
 		void OnResize(wxSizeEvent& event);
 		//*)
 
-		wxImageList* imageList;
-		wxImageList* objectsImagesList;
-        wxToolBar * toolbar;
+		wxImageList* sceneNotebookImageList;
+		wxImageList* globalNotebookImageList;
+		wxImageList* notebookImageList;
 
         /**
          * Reference to game containing the datas to edit
@@ -69,13 +69,8 @@ class EditorObjets: public wxPanel
          * Reference to scene edited
          */
 		Scene & scene;
-		vector < boost::shared_ptr<Object> > * objects;
 
 		MainEditorCommand & mainEditorCommand;
-
-        //Item sélectionné
-        wxTreeItemId item;
-        string ancienNom;
 
 		DECLARE_EVENT_TABLE()
 };

@@ -92,7 +92,7 @@ class Extension : public ExtensionBase
 
             DECLARE_ACTION("ShowYesNoMsgBox",
                            _("Afficher une boite de message Oui/Non"),
-                           _("Affiche une fenêtre permettant de choisir entre oui ou non.\nLa réponse sera enregistrée dans la variable de la scène indiquée."),
+                           _("Affiche une fenêtre permettant de choisir entre oui ou non.\nLa réponse ( \"yes\" ou \"no\" ) sera enregistrée dans la variable de la scène indiquée."),
                            _("Ouvrir une fenêtre Oui/Non, et enregistrer le résultat dans _PARAM0_"),
                            _("Interfaces"),
                            "res/actions/msgbox24.png",

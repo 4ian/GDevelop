@@ -96,7 +96,7 @@ bool ActShowOpenFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     toGetFileName.nMaxFile = MAX_PATH;
     toGetFileName.lpstrFilter = NULL;
     toGetFileName.nFilterIndex = 1;
-    toGetFileName.Flags = OFN_PATHMUSTEXIST;
+    toGetFileName.Flags = OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;;
 
     if(GetOpenFileName(&toGetFileName) == TRUE)
         result = filePath;

@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1267997203 source:c:\users\florian\programmation\gamedevelop\extensions\common dialogs\extension.cpp
+1271797469 source:d:\florian\programmation\gamedevelop\extensions\common dialogs\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"CommonDialogsActions.h"
 	<boost/version.hpp>
 
-1267821122 c:\users\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
+1270484196 d:\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
 	<string>
 	<vector>
 	<map>
@@ -1283,7 +1283,7 @@
 
 1253308487 c:\libs\wxwidgets\include\wx\osx\config_xcode.h
 
-1253308462 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
+1253308462 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
 1253308518 c:\libs\wxwidgets\include\wx\setup_gccxml.h
 
@@ -4139,13 +4139,13 @@
 1253308510 c:\libs\wxwidgets\include\wx\cocoa\mdi.h
 	"wx/frame.h"
 
-1270310498 c:\users\florian\programmation\gamedevelop\gdl\gdl\version.h
+1271967419 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 
-1267997203 c:\users\florian\programmation\gamedevelop\extensions\common dialogs\commondialogsactions.h
+1267997204 d:\florian\programmation\gamedevelop\extensions\common dialogs\commondialogsactions.h
 
 1225731031 c:\libs\boost_1_38_0\boost\version.hpp
 
-1268426914 source:c:\users\florian\programmation\gamedevelop\extensions\common dialogs\commondialogsactions.cpp
+1270312426 source:d:\florian\programmation\gamedevelop\extensions\common dialogs\commondialogsactions.cpp
 	"GDL/aGUI.h"
 	<vector>
 	<string>
@@ -4166,7 +4166,7 @@
 	"nwidgets/OpenFile.h"
 	"nwidgets/TextInput.h"
 
-1264364231 c:\users\florian\programmation\gamedevelop\gdl\gdl\agui.h
+1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\agui.h
 	"GDL/aGUI.h"
 	<vector>
 	<string>
@@ -4178,7 +4178,7 @@
 	"GDL/Access.h"
 	"GDL/RuntimeScene.h"
 
-1268859961 c:\users\florian\programmation\gamedevelop\gdl\gdl\object.h
+1268859962 d:\florian\programmation\gamedevelop\gdl\gdl\object.h
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 	<iostream>
@@ -4460,7 +4460,7 @@
 	<boost/detail/shared_count.hpp>
 	<boost/shared_ptr.hpp>
 
-1267736448 c:\users\florian\programmation\gamedevelop\gdl\gdl\force.h
+1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
 	<iostream>
 	<vector>
 	<string>
@@ -4468,25 +4468,26 @@
 	"GDL/Log.h"
 	"GDL/Event.h"
 
-1267736663 c:\users\florian\programmation\gamedevelop\gdl\gdl\log.h
+1267736664 d:\florian\programmation\gamedevelop\gdl\gdl\log.h
 	<string>
 	<vector>
 
-1267911366 c:\users\florian\programmation\gamedevelop\gdl\gdl\event.h
+1271367154 d:\florian\programmation\gamedevelop\gdl\gdl\event.h
 	<iostream>
 	<vector>
 	<string>
 	<cmath>
+	<wx/dcbuffer.h>
 	"GDL/Log.h"
 	"GDL/Instruction.h"
 
-1267911589 c:\users\florian\programmation\gamedevelop\gdl\gdl\instruction.h
+1267911590 d:\florian\programmation\gamedevelop\gdl\gdl\instruction.h
 	<string>
 	<vector>
 	<iostream>
 	"GDL/GDExpression.h"
 
-1267056026 c:\users\florian\programmation\gamedevelop\gdl\gdl\gdexpression.h
+1267056028 d:\florian\programmation\gamedevelop\gdl\gdl\gdexpression.h
 	<string>
 	<vector>
 	<iostream>
@@ -4495,17 +4496,17 @@
 	"GDL/ExpressionInstruction.h"
 	"GDL/ObjectIdentifiersManager.h"
 
-1265744836 c:\users\florian\programmation\gamedevelop\gdl\gdl\fparser\fparser.hh
+1265744838 d:\florian\programmation\gamedevelop\gdl\gdl\fparser\fparser.hh
 	<string>
 	<vector>
 	<iostream>
 
-1264364231 c:\users\florian\programmation\gamedevelop\gdl\gdl\expressioninstruction.h
+1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\expressioninstruction.h
 	<vector>
 	<string>
 	<boost/shared_ptr.hpp>
 
-1266085245 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectidentifiersmanager.h
+1266085246 d:\florian\programmation\gamedevelop\gdl\gdl\objectidentifiersmanager.h
 	<string>
 	<boost/bimap/bimap.hpp>
 
@@ -7884,45 +7885,45 @@
 	<boost/bimap/support/map_type_by.hpp>
 	<boost/bimap/relation/detail/access_builder.hpp>
 
-1267820434 c:\users\florian\programmation\gamedevelop\gdl\gdl\constantes.h
+1267820436 d:\florian\programmation\gamedevelop\gdl\gdl\constantes.h
 
-1267820205 c:\users\florian\programmation\gamedevelop\gdl\gdl\sprite.h
+1267820206 d:\florian\programmation\gamedevelop\gdl\gdl\sprite.h
 	<SFML/Graphics.hpp>
 	"GDL/Point.h"
 	<string>
 
-1264364228 c:\users\florian\programmation\gamedevelop\gdl\gdl\point.h
+1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\point.h
 	<string>
 
-1270309334 c:\users\florian\programmation\gamedevelop\gdl\gdl\listvariable.h
+1270314270 d:\florian\programmation\gamedevelop\gdl\gdl\listvariable.h
 	<vector>
 	<string>
 	"GDL/Variable.h"
 
-1270306991 c:\users\florian\programmation\gamedevelop\gdl\gdl\variable.h
+1270306992 d:\florian\programmation\gamedevelop\gdl\gdl\variable.h
 	<string>
 	<iostream>
 
-1267821122 c:\users\florian\programmation\gamedevelop\gdl\gdl\animation.h
+1267821124 d:\florian\programmation\gamedevelop\gdl\gdl\animation.h
 	<iostream>
 	<SFML/Graphics.hpp>
 	<string>
 	<vector>
 	"GDL/Direction.h"
 
-1264364231 c:\users\florian\programmation\gamedevelop\gdl\gdl\direction.h
+1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\direction.h
 	<string>
 	<vector>
 	<SFML/Graphics.hpp>
 	"GDL/Sprite.h"
 
-1267736303 c:\users\florian\programmation\gamedevelop\gdl\gdl\errorreport.h
+1267736304 d:\florian\programmation\gamedevelop\gdl\gdl\errorreport.h
 	<string>
 	<vector>
 
-1264364230 c:\users\florian\programmation\gamedevelop\gdl\gdl\objecttype.h
+1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\objecttype.h
 
-1267736191 c:\users\florian\programmation\gamedevelop\gdl\gdl\chercher.h
+1267736192 d:\florian\programmation\gamedevelop\gdl\gdl\chercher.h
 	"GDL/tinyxml.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -7936,7 +7937,7 @@
 	"GDL/Image.h"
 	"GDL/ObjectGroup.h"
 
-1264364230 c:\users\florian\programmation\gamedevelop\gdl\gdl\tinyxml.h
+1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\tinyxml.h
 	<ctype.h>
 	<stdio.h>
 	<stdlib.h>
@@ -7947,15 +7948,15 @@
 	<sstream>
 	"GDL/tinystr.h"
 
-1264364229 c:\users\florian\programmation\gamedevelop\gdl\gdl\tinystr.h
+1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\tinystr.h
 	<assert.h>
 	<string.h>
 
-1267820918 c:\users\florian\programmation\gamedevelop\gdl\gdl\image.h
+1267820920 d:\florian\programmation\gamedevelop\gdl\gdl\image.h
 	<string>
 	<vector>
 
-1267736712 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectgroup.h
+1267736714 d:\florian\programmation\gamedevelop\gdl\gdl\objectgroup.h
 	<vector>
 	<string>
 	<set>
@@ -7963,11 +7964,11 @@
 	"GDL/ObjectType.h"
 	"GDL/ObjectIdentifiersManager.h"
 
-1269379492 c:\users\florian\programmation\gamedevelop\gdl\gdl\access.h
+1269379494 d:\florian\programmation\gamedevelop\gdl\gdl\access.h
 	"GDL/RuntimeScene.h"
 	"GDL/Game.h"
 
-1267738306 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
+1271877975 d:\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
 	"GDL/MemTrace.h"
 	<iostream>
 	<sstream>
@@ -7992,11 +7993,11 @@
 	"GDL/BaseDebugger.h"
 	"GDL/profile.h"
 
-1264364230 c:\users\florian\programmation\gamedevelop\gdl\gdl\memtrace.h
+1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\memtrace.h
 	<string>
 	<vector>
 
-1266599924 c:\users\florian\programmation\gamedevelop\gdl\gdl\scene.h
+1270414716 d:\florian\programmation\gamedevelop\gdl\gdl\scene.h
 	<vector>
 	<string>
 	<boost/shared_ptr.hpp>
@@ -8006,25 +8007,25 @@
 	"GDL/Position.h"
 	"GDL/Layer.h"
 
-1267736980 c:\users\florian\programmation\gamedevelop\gdl\gdl\position.h
+1267736982 d:\florian\programmation\gamedevelop\gdl\gdl\position.h
 	<string>
 	<map>
 
-1268861516 c:\users\florian\programmation\gamedevelop\gdl\gdl\layer.h
+1268861518 d:\florian\programmation\gamedevelop\gdl\gdl\layer.h
 	<string>
 	<vector>
 	<SFML/Graphics.hpp>
 	"GDL/Camera.h"
 
-1266336048 c:\users\florian\programmation\gamedevelop\gdl\gdl\camera.h
+1266336050 d:\florian\programmation\gamedevelop\gdl\gdl\camera.h
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 
-1266445930 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimegame.h
+1266445932 d:\florian\programmation\gamedevelop\gdl\gdl\runtimegame.h
 	"GDL/Game.h"
 	"GDL/ImageManager.h"
 
-1267736449 c:\users\florian\programmation\gamedevelop\gdl\gdl\game.h
+1271877446 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
 	"GDL/Object.h"
 	"GDL/Scene.h"
 	"GDL/ListVariable.h"
@@ -8034,15 +8035,15 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1267821122 c:\users\florian\programmation\gamedevelop\gdl\gdl\dossier.h
+1267821124 d:\florian\programmation\gamedevelop\gdl\gdl\dossier.h
 	<string>
 	<vector>
 
-1267736449 c:\users\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.h
+1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.h
 	<string>
 	<vector>
 
-1266854665 c:\users\florian\programmation\gamedevelop\gdl\gdl\imagemanager.h
+1266854666 d:\florian\programmation\gamedevelop\gdl\gdl\imagemanager.h
 	<SFML/System.hpp>
 	"GDL/ListVariable.h"
 	"GDL/Game.h"
@@ -8051,7 +8052,7 @@
 	<vector>
 	<string>
 
-1267820375 c:\users\florian\programmation\gamedevelop\gdl\gdl\algo.h
+1267820376 d:\florian\programmation\gamedevelop\gdl\gdl\algo.h
 	<sstream>
 	<string>
 	<iostream>
@@ -8059,7 +8060,7 @@
 	<vector>
 	<stdio.h>
 
-1264364227 c:\users\florian\programmation\gamedevelop\gdl\gdl\son.h
+1264364228 d:\florian\programmation\gamedevelop\gdl\gdl\son.h
 	<SFML/Audio.hpp>
 	<string>
 	<vector>
@@ -8114,25 +8115,23 @@
 	<SFML/System/Thread.hpp>
 	<vector>
 
-1264364229 c:\users\florian\programmation\gamedevelop\gdl\gdl\music.h
+1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\music.h
 	<SFML/Audio.hpp>
 	<string>
 
-1264360630 c:\users\florian\programmation\gamedevelop\gdl\gdl\sortbyplan.h
-
-1268861535 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimelayer.h
+1268861536 d:\florian\programmation\gamedevelop\gdl\gdl\runtimelayer.h
 	<SFML/Graphics.hpp>
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
 
-1268858365 c:\users\florian\programmation\gamedevelop\gdl\gdl\runtimecamera.h
+1268858366 d:\florian\programmation\gamedevelop\gdl\gdl\runtimecamera.h
 	"GDL/Camera.h"
 
-1264364229 c:\users\florian\programmation\gamedevelop\gdl\gdl\text.h
+1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\text.h
 	<SFML/Graphics.hpp>
 	<string>
 
-1267819725 c:\users\florian\programmation\gamedevelop\gdl\gdl\soundmanager.h
+1267819726 d:\florian\programmation\gamedevelop\gdl\gdl\soundmanager.h
 	<SFML/Audio.hpp>
 	"GDL/constantes.h"
 	"GDL/Son.h"
@@ -8140,18 +8139,18 @@
 	<string>
 	<vector>
 
-1264364230 c:\users\florian\programmation\gamedevelop\gdl\gdl\manualtimer.h
+1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\manualtimer.h
 	<string>
 
-1269645540 c:\users\florian\programmation\gamedevelop\gdl\gdl\objinstancesholder.h
+1269645542 d:\florian\programmation\gamedevelop\gdl\gdl\objinstancesholder.h
 	"GDL/Object.h"
 	<string>
 	<map>
 
-1267736191 c:\users\florian\programmation\gamedevelop\gdl\gdl\basedebugger.h
+1267736192 d:\florian\programmation\gamedevelop\gdl\gdl\basedebugger.h
 	<SFML/System.hpp>
 
-1264364228 c:\users\florian\programmation\gamedevelop\gdl\gdl\profile.h
+1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\profile.h
 	"GDL/btScalar.h"
 	"GDL/btAlignedAllocator.h"
 	<new>
@@ -8165,7 +8164,7 @@
 	<time.h>
 	<sys/time.h>
 
-1264364227 c:\users\florian\programmation\gamedevelop\gdl\gdl\btscalar.h
+1264364228 d:\florian\programmation\gamedevelop\gdl\gdl\btscalar.h
 	<math.h>
 	<stdlib.h>
 	<cstdlib>
@@ -8178,10 +8177,10 @@
 	<assert.h>
 	<assert.h>
 
-1264364229 c:\users\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
+1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
 	"GDL/btScalar.h"
 
-1269713045 c:\users\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
+1269713046 d:\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
 	"GDL/Object.h"
 	"GDL/ObjectGroup.h"
 	"GDL/ObjectType.h"
@@ -8190,24 +8189,24 @@
 	<string>
 	<vector>
 
-1267997201 c:\users\florian\programmation\gamedevelop\extensions\common dialogs\nwidgets\messagebox.h
+1267997202 d:\florian\programmation\gamedevelop\extensions\common dialogs\nwidgets\messagebox.h
 	"dlib/gui_widgets.h"
 	"ColorBox.h"
 	<sstream>
 	<string>
 
-1267997202 c:\users\florian\programmation\gamedevelop\extensions\common dialogs\nwidgets\colorbox.h
+1267997204 d:\florian\programmation\gamedevelop\extensions\common dialogs\nwidgets\colorbox.h
 	"dlib/gui_widgets.h"
 	<sstream>
 	<string>
 
-1267997202 c:\users\florian\programmation\gamedevelop\extensions\common dialogs\nwidgets\yesnomsgbox.h
+1267997204 d:\florian\programmation\gamedevelop\extensions\common dialogs\nwidgets\yesnomsgbox.h
 	"dlib/gui_widgets.h"
 	"ColorBox.h"
 	<sstream>
 	<string>
 
-1267997201 c:\users\florian\programmation\gamedevelop\extensions\common dialogs\nwidgets\openfile.h
+1267997202 d:\florian\programmation\gamedevelop\extensions\common dialogs\nwidgets\openfile.h
 	"dlib/gui_widgets.h"
 	"dlib/gui_core.h"
 	<string>
@@ -8224,11 +8223,16 @@
 	<sstream>
 	<string>
 
-1267997202 c:\users\florian\programmation\gamedevelop\extensions\common dialogs\nwidgets\textinput.h
+1267997204 d:\florian\programmation\gamedevelop\extensions\common dialogs\nwidgets\textinput.h
 	"dlib/gui_widgets.h"
 	"ColorBox.h"
 	<sstream>
 	<string>
 
-1253304862 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+1253308462 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
+
+1253308525 c:\libs\wxwidgets\include\wx\dcbuffer.h
+	"wx/dcmemory.h"
+	"wx/dcclient.h"
+	"wx/window.h"
 

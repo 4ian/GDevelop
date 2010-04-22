@@ -15,6 +15,7 @@
 					<Add option="-Wall" />
 					<Add option="-pg" />
 					<Add option="-g" />
+					<Add option="-m32" />
 					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
@@ -45,6 +46,7 @@
 					<Add option="-Wall" />
 					<Add option="-pg" />
 					<Add option="-g" />
+					<Add option="-m32" />
 					<Add option="-DGDE" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
@@ -110,6 +112,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DRELEASE" />
@@ -139,6 +142,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DGDE" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DRELEASE" />
@@ -204,6 +208,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
@@ -233,6 +238,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DGDE" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
@@ -299,6 +305,7 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
 					<Add option="-DGDP" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />

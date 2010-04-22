@@ -203,7 +203,7 @@ char* DatFile::GetFile (std::string filename)
                 cout << "Successfully loaded " << filename << endl;
                 return (m_buffer);
             }
-            cout << "Unable to open internal file when loading " << filename << endl;
+            cout << "Unable to open file " << m_datfile << " when loading " << filename << endl;
         }
     }
     //Finally, there is no such file in our DAT file

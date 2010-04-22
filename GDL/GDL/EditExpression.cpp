@@ -1,3 +1,5 @@
+#if defined(GDE)
+
 #include "GDL/EditExpression.h"
 
 //(*InternalHeaders(EditExpression)
@@ -726,3 +728,4 @@ void EditExpression::OnintBtClick(wxCommandEvent& event)
 	ExpressionEdit->SetValue(expression);
     RefreshExpressionEdit();
 }
+#endif

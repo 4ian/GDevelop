@@ -527,7 +527,12 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     objectGroups = scene.objectGroups;
     initialLayers = scene.initialLayers;
     variables = scene.variables;
-    events = scene.events;
+
+    events.clear();
+    for (unsigned int i =0;i<scene.events.size();++i)
+    	events.push_back( scene.events[i]->Clone() );
+    cout << events.size();
+
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;
     backgroundColorB = scene.backgroundColorB;

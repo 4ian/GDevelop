@@ -27,11 +27,17 @@ bool Music::OpenFromFile(const string & filename)
 
 void Music::SetBuffer(const char * newbuffer, std::size_t size)
 {
+    if ( newbuffer == NULL )
+    {
+        cout << "Tried to change buffer of a music to a NULL buffer";
+        return;
+    }
+
     if ( buffer != NULL )
         delete buffer;
 
     buffer = new char[size];
-    *buffer = *newbuffer;
+    memcpy(buffer, newbuffer, size);
 }
 
 bool Music::OpenFromMemory(std::size_t size)

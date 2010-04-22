@@ -1,3 +1,5 @@
+#if defined(GDE)
+
 #ifndef EDITEXPRESSION_H
 #define EDITEXPRESSION_H
 
@@ -150,4 +152,5 @@ class GD_API EditExpression: public wxDialog
 		DECLARE_EVENT_TABLE()
 };
 
+#endif
 #endif

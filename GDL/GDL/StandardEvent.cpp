@@ -240,11 +240,11 @@ void StandardEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
 void StandardEvent::Init(const StandardEvent & event)
 {
     events.clear();
-    for (unsigned int i =0;i<events.size();++i)
-    	events.push_back( events[i]->Clone() );
+    for (unsigned int i =0;i<event.events.size();++i)
+    	events.push_back( event.events[i]->Clone() );
 
-    conditions = conditions;
-    actions = actions;
+    conditions = event.conditions;
+    actions = event.actions;
 }
 
 /**

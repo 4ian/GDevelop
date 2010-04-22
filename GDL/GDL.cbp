@@ -413,6 +413,8 @@
 		<Unit filename="GDL\ChoixDossier.h" />
 		<Unit filename="GDL\ChooseObject.cpp" />
 		<Unit filename="GDL\ChooseObject.h" />
+		<Unit filename="GDL\ChooseObjectExpression.cpp" />
+		<Unit filename="GDL\ChooseObjectExpression.h" />
 		<Unit filename="GDL\Collisions.cpp" />
 		<Unit filename="GDL\Collisions.h" />
 		<Unit filename="GDL\CommentEvent.cpp" />
@@ -429,6 +431,8 @@
 		<Unit filename="GDL\Dossier.h" />
 		<Unit filename="GDL\EditComment.cpp" />
 		<Unit filename="GDL\EditComment.h" />
+		<Unit filename="GDL\EditExpression.cpp" />
+		<Unit filename="GDL\EditExpression.h" />
 		<Unit filename="GDL\EditForEachEvent.cpp" />
 		<Unit filename="GDL\EditForEachEvent.h" />
 		<Unit filename="GDL\EditLink.cpp" />
@@ -682,6 +686,8 @@
 		<Unit filename="GDL\fparser\fparser.cc">
 			<Option virtualFolder="LIB fparser\" />
 		</Unit>
+		<Unit filename="GDL\gdTreeItemStringData.cpp" />
+		<Unit filename="GDL\gdTreeItemStringData.h" />
 		<Unit filename="GDL\gpl.cpp" />
 		<Unit filename="GDL\gpl.h" />
 		<Unit filename="GDL\md5.cpp">
@@ -739,6 +745,7 @@
 					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDL/EditComment.cpp" hdr="GDL/EditComment.h" name="EditComment" language="CPP" />
 					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDL/EditForEachEvent.cpp" hdr="GDL/EditForEachEvent.h" name="EditForEachEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDL/EditRepeatEvent.cpp" hdr="GDL/EditRepeatEvent.h" name="EditRepeatEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/EditExpression.wxs" src="GDL/EditExpression.cpp" hdr="GDL/EditExpression.h" name="EditExpression" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

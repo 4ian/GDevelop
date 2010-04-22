@@ -559,7 +559,10 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
             //End of Compatibility code --- Compatibility with Game Develop 1.3.8892 and inferior
         }
         else
+        {
+            cout << "Unknown event of type " << type;
             event = boost::shared_ptr<BaseEvent>(new EmptyEvent);
+        }
 
         list.push_back( event );
 

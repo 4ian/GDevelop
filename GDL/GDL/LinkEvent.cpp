@@ -56,37 +56,40 @@ void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector 
 
     if ( sceneLinkedIter == game.scenes.end() ) return;
 
-    if ( start == -1 && end == -1 ) //Do we need to include all events ?
+    int firstEvent = start;
+    int lastEvent = end;
+
+    if ( firstEvent == -1 && lastEvent == -1 ) //Do we need to include all events ?
     {
-        start = 0;
-        end = (*sceneLinkedIter)->events.size() - 1;
+        firstEvent = 0;
+        lastEvent = (*sceneLinkedIter)->events.size() - 1;
     }
     else
     {
-        start--; //The numbers start at 1 in the events editor
-        end--;
+        firstEvent--; //The numbers start at 1 in the events editor
+        lastEvent--;
     }
 
 
     //On teste la validité de l'insertion
-    if ( start < 0 || static_cast<unsigned>(start) >= (*sceneLinkedIter)->events.size() )
+    if ( firstEvent < 0 || static_cast<unsigned>(firstEvent) >= (*sceneLinkedIter)->events.size() )
     {
         scene.errors.Add( "Impossible d'insérer les évènements du lien ( Début invalide )", "", "", indexOfTheEventInThisList, 2 );
         return;
     }
-    if ( end < 0 || static_cast<unsigned>(end) >= (*sceneLinkedIter)->events.size() )
+    if ( lastEvent < 0 || static_cast<unsigned>(lastEvent) >= (*sceneLinkedIter)->events.size() )
     {
         scene.errors.Add( "Impossible d'insérer les évènements du lien ( Fin invalide )", "", "", indexOfTheEventInThisList, 2 );
         return;
     }
-    if ( start > end )
+    if ( firstEvent > lastEvent )
     {
         scene.errors.Add( "Impossible d'insérer les évènements du lien ( la fin est avant le départ )", "", "", indexOfTheEventInThisList, 2 );
         return;
     }
 
     eventList.erase( eventList.begin() + indexOfTheEventInThisList ); //Suppression du lien
-    for ( int insertion = start ; insertion <= end ;insertion++ ) //Insertion des évènements du lien
+    for ( int insertion = firstEvent ; insertion <= lastEvent ;insertion++ ) //Insertion des évènements du lien
     {
         if ( indexOfTheEventInThisList+insertion < eventList.size() )
             eventList.insert( eventList.begin() + indexOfTheEventInThisList+insertion, (*sceneLinkedIter)->events.at( insertion )->Clone() );

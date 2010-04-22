@@ -279,12 +279,6 @@
 		<Unit filename="ChoixLayer.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\Editeur calques\" />
 		</Unit>
-		<Unit filename="ChoixObjetExpression.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
-		</Unit>
-		<Unit filename="ChoixObjetExpression.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
-		</Unit>
 		<Unit filename="ChoixTemplateEvent.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Templates\" />
 		</Unit>
@@ -402,12 +396,6 @@
 		</Unit>
 		<Unit filename="DndTextSceneEditor.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\" />
-		</Unit>
-		<Unit filename="EditExpression.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
-		</Unit>
-		<Unit filename="EditExpression.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
 		</Unit>
 		<Unit filename="EditLayer.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\Editeur calques\" />
@@ -666,8 +654,6 @@
 		</Unit>
 		<Unit filename="gdTreeItemGameData.cpp" />
 		<Unit filename="gdTreeItemGameData.h" />
-		<Unit filename="gdTreeItemStringData.cpp" />
-		<Unit filename="gdTreeItemStringData.h" />
 		<Unit filename="gridSetup.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\" />
 		</Unit>
@@ -720,7 +706,6 @@
 					<wxDialog wxs="wxsmith/ChoixCondition.wxs" src="ChoixCondition.cpp" hdr="ChoixCondition.h" name="ChoixCondition" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixAction.wxs" src="ChoixAction.cpp" hdr="ChoixAction.h" name="ChoixAction" language="CPP" />
 					<wxDialog wxs="wxsmith/EditorObjet.wxs" src="EditorObjet.cpp" hdr="EditorObjet.h" name="EditorObjet" language="CPP" />
-					<wxDialog wxs="wxsmith/EditExpression.wxs" src="EditExpression.cpp" hdr="EditExpression.h" name="EditExpression" language="CPP" />
 					<wxDialog wxs="wxsmith/EditOptionsPosition.wxs" src="EditOptionsPosition.cpp" hdr="EditOptionsPosition.h" name="EditOptionsPosition" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixBouton.wxs" src="ChoixBouton.cpp" hdr="ChoixBouton.h" name="ChoixBouton" language="CPP" />
 					<wxDialog wxs="wxsmith/EditPropScene.wxs" src="EditPropScene.cpp" hdr="EditPropScene.h" name="EditPropScene" language="CPP" />

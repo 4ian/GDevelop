@@ -315,7 +315,11 @@ void EditOptionsPosition::OnOkBtClick(wxCommandEvent& event)
         position.layer = "";
 
     int objetId = Picker::PickOneObject(&scene.initialObjects, position.objectName);
-    if ( objetId != -1 ) scene.initialObjects[objetId]->UpdateInitialPositionFromPanel(customPanel, position);
+    int objetGlobalId = Picker::PickOneObject(&game.globalObjects, position.objectName);
+    if ( objetId != -1 )
+        scene.initialObjects[objetId]->UpdateInitialPositionFromPanel(customPanel, position);
+    else if  (objetGlobalId != -1)
+        game.globalObjects[objetGlobalId]->UpdateInitialPositionFromPanel(customPanel, position);
 
     EndModal(1);
 }

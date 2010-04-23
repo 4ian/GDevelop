@@ -12,7 +12,9 @@ GDExpression Instruction::badExpression("");
 Instruction::Instruction(string type_) :
 function(NULL),
 objectFunction(NULL),
-type(type_)
+type(type_),
+isLocal(true),
+inverted(false)
 #if defined(GDE)
 ,renderedHeightNeedUpdate(true),
 renderedHeight(0),
@@ -57,7 +59,9 @@ selected(false)
 
 Instruction::Instruction() :
 function(NULL),
-objectFunction(NULL)
+objectFunction(NULL),
+isLocal(true),
+inverted(false)
 #if defined(GDE)
 ,renderedHeightNeedUpdate(true),
 renderedHeight(0),

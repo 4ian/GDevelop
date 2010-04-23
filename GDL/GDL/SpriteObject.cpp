@@ -423,8 +423,8 @@ bool SpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
     else if ( propertyNb == 1 ) {return SetDirec(toInt(newValue)); }
     else if ( propertyNb == 2 ) { return SetSprite(toInt(newValue)); }
     else if ( propertyNb == 3 ) { SetOpacity(toInt(newValue)); }
-    else if ( propertyNb == 4 ) {SetScaleX(toInt(newValue));}
-    else if ( propertyNb == 5 ) {SetScaleY(toInt(newValue));}
+    else if ( propertyNb == 4 ) {SetScaleX(toFloat(newValue));}
+    else if ( propertyNb == 5 ) {SetScaleY(toFloat(newValue));}
 
     return true;
 }

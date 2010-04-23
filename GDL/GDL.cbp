@@ -388,8 +388,6 @@
 		<Unit filename="GDL\AjoutPlusImage.h" />
 		<Unit filename="GDL\Animation.cpp" />
 		<Unit filename="GDL\Animation.h" />
-		<Unit filename="GDL\AppelEvent.cpp" />
-		<Unit filename="GDL\AppelEvent.h" />
 		<Unit filename="GDL\AudioExtension.cpp" />
 		<Unit filename="GDL\AudioExtension.h" />
 		<Unit filename="GDL\BBDConditions.cpp" />

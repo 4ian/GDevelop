@@ -31,6 +31,10 @@
 #include "GDL/Version.h"
 #include "GDL/ExtensionBase.h"
 
+#if defined(GDE)
+#include <wx/log.h>
+#endif
+
 #if defined(WINDOWS)
     #include <windows.h>
     typedef HINSTANCE Handle;
@@ -162,55 +166,57 @@ void ExtensionsLoader::LoadExtensionInManager(std::string fullpath)
             ExtensionBase * extensionPtr = create_extension();
             boost::shared_ptr<ExtensionBase> extension(extensionPtr, destroy_extension);
 
+            string error;
+
             //Perform safety check about the compilation
             if ( !extensionPtr->compilationInfo.informationCompleted )
-            {
-                cout << "Unable to load extension " << fullpath << " ( Compilation info not filled )." << endl;
-            }
+                error += "Compilation information not filled.\n";
+
             #if defined(GDE)
-            else if ( extensionPtr->compilationInfo.runtimeOnly )
-            {
-                cout << "Unable to load extension " << fullpath << " ( For runtime only )." << endl;
-            }
-            else if ( extensionPtr->compilationInfo.wxWidgetsMajorVersion != wxMAJOR_VERSION ||
+            if ( extensionPtr->compilationInfo.runtimeOnly )
+                error += "Extension compiled for runtime only.\n";
+
+            if ( extensionPtr->compilationInfo.wxWidgetsMajorVersion != wxMAJOR_VERSION ||
                       extensionPtr->compilationInfo.wxWidgetsMinorVersion != wxMINOR_VERSION ||
                       extensionPtr->compilationInfo.wxWidgetsReleaseNumber != wxRELEASE_NUMBER ||
                       extensionPtr->compilationInfo.wxWidgetsSubReleaseNumber != wxSUBRELEASE_NUMBER )
-            {
-                cout << "Unable to load extension " << fullpath << " ( Not the same wxWidgets version )." << endl;
-            }
+                error += "Not the same wxWidgets version.\n";
             #endif
             #if defined(__GNUC__)
-            else if ( extensionPtr->compilationInfo.gccMajorVersion != __GNUC__ ||
+            if ( extensionPtr->compilationInfo.gccMajorVersion != __GNUC__ ||
                       extensionPtr->compilationInfo.gccMinorVersion != __GNUC_MINOR__ ||
                       extensionPtr->compilationInfo.gccPatchLevel != __GNUC_PATCHLEVEL__ )
-            {
-                cout << "Unable to load extension " << fullpath << " ( Not the same GNU Compiler version )." << endl;
-            }
-            #endif
-            else if ( extensionPtr->compilationInfo.sfmlMajorVersion != 2 ||
-                      extensionPtr->compilationInfo.sfmlMinorVersion != 0 )
-            {
-                cout << "Unable to load extension " << fullpath << " ( Not the same SFML version )." << endl;
-            }
-            else if ( extensionPtr->compilationInfo.boostVersion != BOOST_VERSION )
-            {
-                cout << "Unable to load extension " << fullpath << " ( Not the same Boost version )." << endl;
-            }
-            else
-            {
-                if ( extensionPtr->compilationInfo.gdlVersion != RC_FILEVERSION_STRING)
-                {
-                    char beep = 7;
-                    cout << endl;
-                    cout << "-- WARNING ! --" << beep << endl;
-                    cout << "Compiled with a different version of GDL." << endl;
-                    cout << "---------------" << endl;
-                }
+                error += "Not the same GNU Compiler version.\n";
 
-                extensionsManager->AddExtension(extension);
+            #endif
+            if ( extensionPtr->compilationInfo.sfmlMajorVersion != 2 ||
+                      extensionPtr->compilationInfo.sfmlMinorVersion != 0 )
+                error += "Not the same SFML version.\n";
+
+            if ( extensionPtr->compilationInfo.boostVersion != BOOST_VERSION )
+                error += "Not the same Boost version.\n";
+
+            if ( extensionPtr->compilationInfo.gdlVersion != RC_FILEVERSION_STRING)
+                error += "Not the same GDL version.\n";
+
+            if ( !error.empty() )
+            {
+                char beep = 7;
+                cout << "-- WARNING ! --" << beep << endl;
+                cout << "Bad extension " + fullpath + " loaded :\n" + error;
+                cout << "---------------" << endl;
+
+                #if defined(GDE) && defined(RELEASE)
+                wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" présente des erreurs :\n")) + error + string(_("\nL'extension n'a pas été chargée. Prenez contact avec le développeur pour plus d'informations." ));
+                wxLogWarning(userMsg);
+                #endif
+                #if defined(RELEASE) //Load extension despite errors in non release build
                 return;
+                #endif
             }
+
+            extensionsManager->AddExtension(extension);
+            return;
         }
     }
 }

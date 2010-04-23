@@ -560,7 +560,7 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
         }
         else
         {
-            cout << "Unknown event of type " << type;
+            cout << "Unknown event of type " << type << endl;
             event = boost::shared_ptr<BaseEvent>(new EmptyEvent);
         }
 
@@ -664,6 +664,17 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                     vector < Instruction > whileConditions;
                     copy(oldConditions.begin(), oldConditions.begin()+c, back_inserter(eventNewConditions));
                     copy(oldConditions.begin()+c+1, oldConditions.begin()+c+1, back_inserter(whileConditions));
+
+                    //Inverting condition if while first parameter is false
+                    if ( (*conditions)[c].GetParameter(0).GetPlainString() == "Faux" || (*conditions)[c].GetParameter(0).GetPlainString() == "False" )
+                    {
+                        Instruction notCondition("BuiltinCommonInstructions::Not");
+                        notCondition.SetSubInstructions(whileConditions);
+
+                        //Replace condition by the NOT condition
+                        whileConditions.clear();
+                        whileConditions.push_back(notCondition);
+                    }
 
                     if ( c+2 < oldConditions.size() )
                         copy(oldConditions.begin()+c+2, oldConditions.end(), back_inserter(subEventConditions));
@@ -1262,6 +1273,13 @@ void OpenSaveGame::SaveActions(const vector < Instruction > & list, TiXmlElement
             Parametre->SetAttribute( "value", list[k].GetParameter( l ).GetPlainString().c_str() );
         }
 
+        //Sub instructions
+        if ( !list[k].GetSubInstructions().empty() )
+        {
+            TiXmlElement * subActions = new TiXmlElement( "SubActions" );
+            action->LinkEndChild(subActions);
+            SaveActions(list[k].GetSubInstructions() , subActions);
+        }
     }
 }
 
@@ -1270,14 +1288,11 @@ void OpenSaveGame::SaveConditions(const vector < Instruction > & list, TiXmlElem
     for ( unsigned int k = 0;k < list.size();k++ )
     {
         //Pour chaque condition
-        TiXmlElement * condition;
-
-        condition = new TiXmlElement( "Condition" );
+        TiXmlElement * condition = new TiXmlElement( "Condition" );
         conditions->LinkEndChild( condition );
 
         //Le type
-        TiXmlElement * typeCondition;
-        typeCondition = new TiXmlElement( "Type" );
+        TiXmlElement * typeCondition = new TiXmlElement( "Type" );
         condition->LinkEndChild( typeCondition );
 
         typeCondition->SetAttribute( "value", list[k].GetType().c_str() );
@@ -1286,13 +1301,20 @@ void OpenSaveGame::SaveConditions(const vector < Instruction > & list, TiXmlElem
         if ( list[k].IsInverted() ) { typeCondition->SetAttribute( "Contraire", "true" ); }
         else { typeCondition->SetAttribute( "Contraire", "false" ); }
 
-
         //Les autres paramètres
         for ( unsigned int l = 0;l < list[k].GetParameters().size();l++ )
         {
             TiXmlElement * Parametre = new TiXmlElement( "Parametre" );
             condition->LinkEndChild( Parametre );
             Parametre->SetAttribute( "value", list[k].GetParameter( l ).GetPlainString().c_str() );
+        }
+
+        //Sub instructions
+        if ( !list[k].GetSubInstructions().empty() )
+        {
+            TiXmlElement * subConditions = new TiXmlElement( "SubConditions" );
+            condition->LinkEndChild(subConditions);
+            SaveConditions(list[k].GetSubInstructions(), subConditions);
         }
     }
 }

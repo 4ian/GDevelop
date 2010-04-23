@@ -45,7 +45,7 @@ bool ConditionForEachObject( RuntimeScene * scene, ObjectsConcerned & objectsCon
 }
 
 /**
- * Common instruction testing sub conditions
+ * Common instruction testing if one or more sub conditions are true
  */
 bool ConditionOr( RuntimeScene * scene, ObjectsConcerned & finalObjectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
@@ -72,4 +72,20 @@ bool ConditionOr( RuntimeScene * scene, ObjectsConcerned & finalObjectsConcerned
     }
 
     return isTrue;
+}
+
+/**
+ * Common instruction testing sub conditions, inversing the result
+ */
+bool ConditionNot( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+{
+    for ( unsigned int k = 0; k < condition.GetSubInstructions().size(); ++k )
+    {
+        eval.SetObjectsConcerned(&objectsConcerned);
+        if ( condition.GetSubInstructions()[k].function != NULL &&
+             !condition.GetSubInstructions()[k].function( scene, objectsConcerned, condition.GetSubInstructions()[k], eval ) )
+            return true; //Return true ( We are in a NOT condition ) as soon as a condition is false
+    }
+
+    return false; //Return false ( We are in a NOT condition )
 }

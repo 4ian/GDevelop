@@ -277,7 +277,7 @@ void ForEachEvent::RenderInBitmap() const
 
     //For Each text
     dc.SetFont( renderingHelper->GetBoldFont() );
-    dc.DrawText( _("Pour chaque objet") + objectsToPick.GetPlainString() + _(", répéter :"), 0 + 2, 0 + 1 );
+    dc.DrawText( _("Pour chaque objet") + " " + objectsToPick.GetPlainString() + _(", répéter :"), 0 + 2, 0 + 1 );
 
     //Draw actions and conditions
     renderingHelper->DrawConditionsList(conditions, dc, 0, forEachTextHeight, renderingHelper->GetConditionsColumnWidth());

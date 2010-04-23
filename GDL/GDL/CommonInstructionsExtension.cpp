@@ -29,9 +29,20 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     DECLARE_END_CONDITION()
 
+    DECLARE_CONDITION("Not",
+                   _("Non"),
+                   _("Non"),
+                   _("Non"),
+                   _("Non"),
+                   "res/conditions/depart24.png",
+                   "res/conditions/depart.png",
+                   &ConditionNot);
+
+    DECLARE_END_CONDITION()
+
     DECLARE_EVENT("Standard",
-                  "Evenement standard",
-                  "Evenement standard : Actions qui sont lancées si des conditions sont vérifiées",
+                  _("Évènement standard"),
+                  "Évènement standard : Actions qui sont lancées si des conditions sont vérifiées",
                   "",
                   "res/eventaddicon.png",
                   StandardEvent)
@@ -39,7 +50,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("Link",
-                  "Lien",
+                  _("Lien"),
                   "Lien vers des évènements d'une autre scène",
                   "",
                   "res/lienaddicon.png",
@@ -48,7 +59,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("Comment",
-                  "Commentaire",
+                  _("Commentaire"),
                   "Un évènement permettant d'ajouter un commentaire dans la liste des évènements",
                   "",
                   "res/comment.png",
@@ -57,7 +68,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("While",
-                  "Tant que",
+                  _("Tant que"),
                   "Répète des conditions et actions tant que certaines conditions ne sont pas vérifiées",
                   "",
                   "res/while.png",
@@ -66,7 +77,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("Repeat",
-                  "Répéter",
+                  _("Répéter"),
                   "Répète un certain nombre de fois des conditions et actions",
                   "",
                   "res/repeat.png",
@@ -75,7 +86,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("ForEach",
-                  "Pour chaque objet",
+                  _("Pour chaque objet"),
                   "Répète des conditions et actions en prenant à chaque fois un objet ayant le nom indiqué",
                   "",
                   "res/foreach.png",

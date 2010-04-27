@@ -165,17 +165,21 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
     {
         conditionsSelected = true;
 
-        int cId = renderingHelper->GetConditionAt(whileConditions, x-0, y-0);
-        if ( cId >= 0 && static_cast<unsigned>(cId) < whileConditions.size() )
+        vector < Instruction > * conditionsListSelected = NULL;
+        unsigned int conditionIdInList = 0;
+
+        bool found = renderingHelper->GetConditionAt(whileConditions, x-0, y-0, conditionsListSelected, conditionIdInList);
+
+        if ( found )
         {
-            //Update event and condition selection information
-            whileConditions[cId].selected = true;
+            //Update event and conditions selection information
+            if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
             eventRenderingNeedUpdate = true;
 
             //Update editor selection information
             instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &whileConditions;
-            boost::tuples::get<3>(eventsSelected.back()) = cId;
+            boost::tuples::get<2>(eventsSelected.back()) = conditionsListSelected;
+            boost::tuples::get<3>(eventsSelected.back()) = conditionIdInList;
 
             return;
         }
@@ -196,22 +200,25 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
     y -= whileConditionsHeight+repeatHeight; //Substract the height of the "For Each object ..." text so as to simplify the tests
     if ( y < 0 ) return;
 
-    if ( static_cast<unsigned>(x) <= renderingHelper->GetConditionsColumnWidth())
+    if ( x <= renderingHelper->GetConditionsColumnWidth())
     {
         conditionsSelected = true;
 
-        int cId = renderingHelper->GetConditionAt(conditions, x-0, y-0);
+        vector < Instruction > * conditionsListSelected = NULL;
+        unsigned int conditionIdInList = 0;
 
-        if ( cId >= 0 && static_cast<unsigned>(cId) < conditions.size() )
+        bool found = renderingHelper->GetConditionAt(conditions, x-0, y-0, conditionsListSelected, conditionIdInList);
+
+        if ( found )
         {
             //Update event and conditions selection information
-            conditions[cId].selected = true;
+            if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
             eventRenderingNeedUpdate = true;
 
             //Update editor selection information
             instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &conditions;
-            boost::tuples::get<3>(eventsSelected.back()) = cId;
+            boost::tuples::get<2>(eventsSelected.back()) = conditionsListSelected;
+            boost::tuples::get<3>(eventsSelected.back()) = conditionIdInList;
 
             return;
         }
@@ -232,18 +239,21 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
     {
         conditionsSelected = false;
 
-        int aId = renderingHelper->GetActionAt(actions, x-0, y-0);
+        vector < Instruction > * actionsListSelected = NULL;
+        unsigned int actionIdInList = 0;
 
-        if ( aId >= 0 && static_cast<unsigned>(aId) < actions.size()  )
+        bool found = renderingHelper->GetActionAt(actions, x-0, y-0, actionsListSelected, actionIdInList);
+
+        if ( found )
         {
             //Update event and action selection information
-            actions[aId].selected = true;
+            if ( actionIdInList < actionsListSelected->size() ) (*actionsListSelected)[actionIdInList].selected = true;
             eventRenderingNeedUpdate = true;
 
             //Update selection information
             instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &actions;
-            boost::tuples::get<3>(eventsSelected.back()) = aId;
+            boost::tuples::get<2>(eventsSelected.back()) = actionsListSelected;
+            boost::tuples::get<3>(eventsSelected.back()) = actionIdInList;
         }
         else
         {

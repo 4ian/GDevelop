@@ -89,10 +89,6 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
         return 18;
     }
 
-
-    htmlRenderer.SetDC(&dc);
-    htmlRenderer.SetStandardFonts( 8 );
-
     //Draw Conditions rectangle
     wxRect rect(x, y, width, conditionsHeight);
     DrawNiceRectangle(dc, rect, eventConditionsGradient1,
@@ -106,6 +102,10 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
     for ( unsigned int j = 0;j < conditions.size();j++ )
     {
         const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(conditions[j].GetType());
+
+        //Prepare html renderer. Need to be do for each conditions as dc can have been changed by sub conditions.
+        GetHTMLRenderer().SetDC(&dc);
+        GetHTMLRenderer().SetStandardFonts( 8 );
 
         //Draw needed icons
         int leftIconsWidth = 0;
@@ -147,6 +147,16 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
         GetHTMLRenderer().Render(x + sideSeparation + leftIconsWidth + iconWidth, yCondition, neededArray);
 
         yCondition += GetHTMLRenderer().GetTotalHeight()+separation+1;
+
+        //Draw sub conditions
+        if ( !conditions[j].GetSubInstructions().empty() )
+            yCondition += DrawConditionsList(conditions[j].GetSubInstructions(), dc, x + sideSeparation + leftIconsWidth + iconWidth + 18, yCondition, width-18);
+        else if ( instructionInfos.canHaveSubInstructions )
+        {
+            dc.SetFont( GetItalicFont() );
+            dc.DrawText( _("Pas de sous conditions"), x + sideSeparation + leftIconsWidth + iconWidth + 18, yCondition );
+            yCondition += 18;
+        }
     }
     yCondition += 3;
 
@@ -167,14 +177,15 @@ int EventsRenderingHelper::DrawActionsList(const vector < Instruction > & action
         return 18;
     }
 
-    htmlRenderer.SetDC(&dc);
-    htmlRenderer.SetStandardFonts( 8 );
-
     //Draw each actions
     int yAction = y + 1;
     for ( unsigned int j = 0;j < actions.size();j++ )
     {
         const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(actions[j].GetType());
+
+        //Prepare html renderer. Need to be do for each actions as dc can have been changed by sub actions.
+        GetHTMLRenderer().SetDC(&dc);
+        GetHTMLRenderer().SetStandardFonts( 8 );
 
         //Draw global icon, if needed.
         int leftIconsWidth = 0;
@@ -222,6 +233,7 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
 
     const int separation = 1;
     const int sideSeparation = 1;
+    const int iconWidth = 18;
 
     if ( conditions.empty() )
         return 18; //Taille nécessaire pour afficher "Pas de conditions" et "Pas d'actions"
@@ -229,15 +241,15 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
     wxMemoryDC dc;
     dc.SelectObject(fakeBmp);
 
-    //La classe de rendu de HTML
-    GetHTMLRenderer().SetDC(&dc); //On a besoin du même DC que pour le rendu
-    GetHTMLRenderer().SetStandardFonts( 8 );
-    const int iconWidth = 18;
 
     int yCondition = 1;
     for ( unsigned int j = 0;j < conditions.size();j++ )
     {
         const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(conditions[j].GetType());
+
+        //Prepare html renderer. Need to be do for each conditions as dc can have been changed by sub conditions.
+        GetHTMLRenderer().SetDC(&dc);
+        GetHTMLRenderer().SetStandardFonts( 8 );
 
         //Largeur prise par les icones
         int leftIconsWidth = 0;
@@ -260,6 +272,11 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
 
         conditions[j].renderedHeight = GetHTMLRenderer().GetTotalHeight();
         conditions[j].renderedHeightNeedUpdate = false;
+
+        if ( !conditions[j].GetSubInstructions().empty() )
+            yCondition += GetRenderedConditionsListHeight(conditions[j].GetSubInstructions(), width-18);
+        else if ( instructionInfos.canHaveSubInstructions )
+            yCondition += 18;
     }
     yCondition += 3;
     return yCondition;
@@ -271,6 +288,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
 
     const int separation = 1;
     const int sideSeparation = 1;
+    const int iconWidth = 18;
 
     if ( actions.empty() )
         return 18; //Taille nécessaire pour afficher "Pas d'actions"
@@ -279,14 +297,15 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
     dc.SelectObject(fakeBmp);
 
     //La classe de rendu de HTML
-    GetHTMLRenderer().SetDC(&dc); //On a besoin du même DC que pour le rendu
-    GetHTMLRenderer().SetStandardFonts( 8 );
-    const int iconWidth = 18;
 
     int yAction = 1;
     for ( unsigned int j = 0;j < actions.size();j++ )
     {
         const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(actions[j].GetType());
+
+        //Prepare html renderer. Need to be do for each actions as dc can have been changed by sub actions.
+        GetHTMLRenderer().SetDC(&dc);
+        GetHTMLRenderer().SetStandardFonts( 8 );
 
         //Largeur prise par les icones
         int leftIconsWidth = 0;
@@ -312,22 +331,51 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
     return yAction;
 }
 
-int EventsRenderingHelper::GetConditionAt(const vector < Instruction > & conditions, int x, int y)
+bool EventsRenderingHelper::GetConditionAt(vector < Instruction > & conditions, int x, int y, vector < Instruction > *& conditionList, unsigned int & conditionIdInList)
 {
+    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+
     unsigned int conditionsY = 1;
     for (unsigned int c = 0;c<conditions.size();++c)
     {
+        const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(conditions[c].GetType());
+
         conditionsY += 1;
         if ( y >= conditionsY && y <= conditionsY+conditions[c].renderedHeight)
         {
-            return c;
+            conditionList = &conditions;
+            conditionIdInList = c;
+            return true;
         }
+
         conditionsY += conditions[c].renderedHeight+2;
+
+        //Check also sub conditions
+        if ( !conditions[c].GetSubInstructions().empty() )
+        {
+            if ( GetConditionAt(conditions[c].GetSubInstructions(), x-18, y-conditionsY, conditionList, conditionIdInList) )
+                return true;
+
+            //Add subconditions height
+            for (unsigned int sc = 0;sc<conditions[c].GetSubInstructions().size();++sc)
+                conditionsY += conditions[c].GetSubInstructions()[sc].renderedHeight+2;
+            conditionsY += 3;
+        }
+        else if ( instructionInfos.canHaveSubInstructions )
+        {
+            if ( y >= conditionsY && y <= conditionsY+18 )
+            {
+                conditionList = &conditions[c].GetSubInstructions();
+                conditionIdInList = 0;
+                return true;
+            }
+            conditionsY += 18;
+        }
     }
-    return -1;
+    return false;
 }
 
-int EventsRenderingHelper::GetActionAt(const vector < Instruction > & actions, int x, int y)
+bool EventsRenderingHelper::GetActionAt(vector < Instruction > & actions, int x, int y, vector < Instruction > *& actionList, unsigned int & actionIdInList)
 {
     unsigned int actionsY = 1;
     for (unsigned int a = 0;a<actions.size();++a)
@@ -335,11 +383,13 @@ int EventsRenderingHelper::GetActionAt(const vector < Instruction > & actions, i
         actionsY += 1;
         if ( y >= actionsY && y <= actionsY+actions[a].renderedHeight)
          {
-            return a;
+            actionList = &actions;
+            actionIdInList = a;
+            return true;
          }
         actionsY += actions[a].renderedHeight+2;
     }
-    return -1;
+    return false;
 }
 
 EventsRenderingHelper * EventsRenderingHelper::getInstance()

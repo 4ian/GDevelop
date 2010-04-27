@@ -23,8 +23,18 @@ class GD_API EventsRenderingHelper
         int DrawActionsList(const std::vector < Instruction > & actions, wxDC & dc, int x, int y, int width);
         unsigned int GetRenderedConditionsListHeight(const std::vector < Instruction > & conditions, int width);
         unsigned int GetRenderedActionsListHeight(const std::vector < Instruction > & actions, int width);
-        int GetConditionAt(const std::vector < Instruction > & conditions, int x, int y);
-        int GetActionAt(const std::vector < Instruction > & actions, int x, int y);
+
+        /**
+         * Get a condition under a point in a list.
+         * Return true if a condition was found, in which case conditionList and conditionIdInList are completed
+         */
+        bool GetConditionAt(std::vector < Instruction > & conditions, int x, int y, std::vector < Instruction > *& conditionList, unsigned int & conditionIdInList);
+
+        /**
+         * Get an action under a point in a list.
+         * Return true if an action was found, in which case actionList and actionIdInList are completed
+         */
+        bool GetActionAt(std::vector < Instruction > & actions, int x, int y, std::vector < Instruction > *& actionList, unsigned int & actionIdInList);
 
         inline unsigned int GetConditionsColumnWidth() const {return conditionsColumnWidth;};
         inline void SetConditionsColumnWidth(unsigned int conditionsColumnWidth_) { conditionsColumnWidth = conditionsColumnWidth_; };

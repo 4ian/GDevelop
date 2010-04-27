@@ -145,8 +145,6 @@ void ExtensionsLoader::LoadAllExtensionsAvailable()
 ////////////////////////////////////////////////////////////
 void ExtensionsLoader::LoadExtensionInManager(std::string fullpath)
 {
-    cout << "Load " << fullpath << endl;
-
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
     Handle extensionHdl = OpenLibrary(fullpath.c_str());
     if(extensionHdl == NULL){
@@ -198,6 +196,9 @@ void ExtensionsLoader::LoadExtensionInManager(std::string fullpath)
 
             if ( extensionPtr->compilationInfo.gdlVersion != RC_FILEVERSION_STRING)
                 error += "Not the same GDL version.\n";
+
+            if ( extensionPtr->compilationInfo.sizeOfpInt != sizeof(int*))
+                error += "Not the same architecture.\n";
 
             if ( !error.empty() )
             {

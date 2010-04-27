@@ -38,6 +38,7 @@
 					<Add option="-lsfml-audio-d.dll" />
 					<Add option="-lsfml-graphics-d.dll" />
 					<Add option="-lsfml-window-d.dll" />
+					<Add option="-lsfml-network-d.dll" />
 					<Add option="-lsfml-system-d.dll" />
 					<Add option="-lgmon" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
@@ -98,6 +99,7 @@
 					<Add option="-lsfml-audio-d.dll" />
 					<Add option="-lsfml-graphics-d.dll" />
 					<Add option="-lsfml-window-d.dll" />
+					<Add option="-lsfml-network-d.dll" />
 					<Add option="-lsfml-system-d.dll" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
@@ -145,6 +147,7 @@
 					<Add option="-lsfml-audio.dll" />
 					<Add option="-lsfml-graphics.dll" />
 					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-network.dll" />
 					<Add option="-lsfml-system.dll" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
@@ -202,6 +205,7 @@
 					<Add option="-lsfml-audio.dll" />
 					<Add option="-lsfml-graphics.dll" />
 					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-network.dll" />
 					<Add option="-lsfml-system.dll" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
@@ -249,6 +253,7 @@
 					<Add option="-lsfml-audio.dll" />
 					<Add option="-lsfml-graphics.dll" />
 					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-network.dll" />
 					<Add option="-lsfml-system.dll" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
@@ -307,6 +312,7 @@
 					<Add option="-lsfml-audio.dll" />
 					<Add option="-lsfml-graphics.dll" />
 					<Add option="-lsfml-window.dll" />
+					<Add option="-lsfml-network.dll" />
 					<Add option="-lsfml-system.dll" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
@@ -349,6 +355,7 @@
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
 					<Add option="-lsfml-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />

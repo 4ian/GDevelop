@@ -20,23 +20,27 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     DECLARE_CONDITION("Or",
                    _("Ou"),
-                   _("Ou"),
-                   _("Ou"),
-                   _("Ou"),
-                   "res/conditions/depart24.png",
-                   "res/conditions/depart.png",
+                   _("Renvoie vraie si une seule des sous conditions est vraie"),
+                   _("Si une de ces condition est vraie :"),
+                   _("Avancé"),
+                   "res/conditions/toujours24.png",
+                   "res/conditions/toujours.png",
                    &ConditionOr);
+
+        DECLARE_CAN_HAVE_SUB_CONDITION();
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("Not",
                    _("Non"),
-                   _("Non"),
-                   _("Non"),
-                   _("Non"),
-                   "res/conditions/depart24.png",
-                   "res/conditions/depart.png",
+                   _("Renvoie l'inverse du résultat des sous conditions"),
+                   _("Inverser le résultat logique de ces conditions :"),
+                   _("Avancé"),
+                   "res/conditions/toujours24.png",
+                   "res/conditions/toujours.png",
                    &ConditionNot);
+
+        DECLARE_CAN_HAVE_SUB_CONDITION();
 
     DECLARE_END_CONDITION()
 

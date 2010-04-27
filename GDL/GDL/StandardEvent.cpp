@@ -174,18 +174,21 @@ void StandardEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
     {
         conditionsSelected = true;
 
-        int cId = renderingHelper->GetConditionAt(conditions, x-0, y-0);
+        vector < Instruction > * conditionsListSelected = NULL;
+        unsigned int conditionIdInList = 0;
 
-        if ( cId >= 0 && cId < conditions.size() )
+        bool found = renderingHelper->GetConditionAt(conditions, x-0, y-0, conditionsListSelected, conditionIdInList);
+
+        if ( found )
         {
             //Update event and conditions selection information
-            conditions[cId].selected = true;
+            if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
             eventRenderingNeedUpdate = true;
 
             //Update editor selection information
             instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &conditions;
-            boost::tuples::get<3>(eventsSelected.back()) = cId;
+            boost::tuples::get<2>(eventsSelected.back()) = conditionsListSelected;
+            boost::tuples::get<3>(eventsSelected.back()) = conditionIdInList;
 
             return;
         }
@@ -206,18 +209,21 @@ void StandardEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
     {
         conditionsSelected = false;
 
-        int aId = renderingHelper->GetActionAt(actions, x-0, y-0);
+        vector < Instruction > * actionsListSelected = NULL;
+        unsigned int actionIdInList = 0;
 
-        if ( aId >= 0 && aId < actions.size()  )
+        bool found = renderingHelper->GetActionAt(actions, x-0, y-0, actionsListSelected, actionIdInList);
+
+        if ( found )
         {
             //Update event and action selection information
-            actions[aId].selected = true;
+            if ( actionIdInList < actionsListSelected->size() ) (*actionsListSelected)[actionIdInList].selected = true;
             eventRenderingNeedUpdate = true;
 
             //Update selection information
             instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &actions;
-            boost::tuples::get<3>(eventsSelected.back()) = aId;
+            boost::tuples::get<2>(eventsSelected.back()) = actionsListSelected;
+            boost::tuples::get<3>(eventsSelected.back()) = actionIdInList;
         }
         else
         {

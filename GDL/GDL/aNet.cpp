@@ -3,7 +3,8 @@
 #include "GDL/Access.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/md5.h"
-
+#include <SFML/Network.hpp>
+#include <fstream>
 
 
 ////////////////////////////////////////////////////////////
@@ -45,24 +46,24 @@ bool ActEnvoiDataNet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 #ifdef WINDOWS
     //Création de l'adresse internet à lancer
     string appel = "start \"\" \""+eval.EvalTxt(action.GetParameter(0))+
-                    "?data1="+data1+"&check1="+data1md5+
-                    "&data2="+data2+"&check2="+data2md5+
-                    "&data3="+data3+"&check3="+data3md5+
-                    "&data4="+data4+"&check4="+data4md5+
-                    "&data5="+data5+"&check5="+data5md5+
-                    "&data6="+data6+"&check6="+data6md5+"\"";
+                   "?data1="+data1+"&check1="+data1md5+
+                   "&data2="+data2+"&check2="+data2md5+
+                   "&data3="+data3+"&check3="+data3md5+
+                   "&data4="+data4+"&check4="+data4md5+
+                   "&data5="+data5+"&check5="+data5md5+
+                   "&data6="+data6+"&check6="+data6md5+"\"";
 
     system(appel.c_str());
 #endif
 #ifdef LINUX
     //Nécessite le paquet xdg-utils
     string appel = "xdg-open \""+eval.EvalTxt(action.GetParameter(0))+
-                    "?data1="+data1+"&check1="+data1md5+
-                    "&data2="+data2+"&check2="+data2md5+
-                    "&data3="+data3+"&check3="+data3md5+
-                    "&data4="+data4+"&check4="+data4md5+
-                    "&data5="+data5+"&check5="+data5md5+
-                    "&data6="+data6+"&check6="+data6md5+"\"";
+                   "?data1="+data1+"&check1="+data1md5+
+                   "&data2="+data2+"&check2="+data2md5+
+                   "&data3="+data3+"&check3="+data3md5+
+                   "&data4="+data4+"&check4="+data4md5+
+                   "&data5="+data5+"&check5="+data5md5+
+                   "&data6="+data6+"&check6="+data6md5+"\"";
 
     system(appel.c_str());
 #endif
@@ -70,4 +71,30 @@ bool ActEnvoiDataNet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     return true;
 }
 
-#undef PARAM
+bool ActDownloadFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+{
+    // Create Http
+    sf::Http Http;
+    Http.SetHost(eval.EvalTxt(action.GetParameter(0)));
+
+    // Create request
+    sf::Http::Request Request;
+    Request.SetMethod(sf::Http::Request::Get);
+    Request.SetURI(eval.EvalTxt(action.GetParameter(1)));
+
+    // Send request & Get response
+    sf::Http::Response datas = Http.SendRequest(Request);
+
+    string ofilename = eval.EvalTxt(action.GetParameter(2));
+    ofstream ofile(ofilename.c_str(), ios_base::binary);
+    if ( ofile.is_open() )
+    {
+        ofile.write(datas.GetBody().c_str(),datas.GetBody().size());
+        ofile.close();
+
+        return true;
+    }
+
+    cout << "Downloading file : Unable to open output file " << ofilename;
+    return false;
+}

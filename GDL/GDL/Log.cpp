@@ -28,14 +28,18 @@ bool GD_API InitLog()
     string date = DATE;
     string month = MONTH;
     string year = YEAR;
-    string fulldate = "Build du "+date+"/"+month+"/"+year+"\n";
+    string fulldate = "Built "+date+"/"+month+"/"+year+"\n";
 
     #ifdef LINUX
-        string sys = "Systeme cible : Linux\n";
+        string sys = "Target system : Linux, ";
     #endif
     #ifdef WINDOWS
-        string sys = "Systeme cible : Windows\n";
+        string sys = "Target system : Windows, ";
     #endif
+    if(sizeof(int*) == 4)
+        sys += "32-bits\n";
+    else if(sizeof(int*) == 8)
+        sys += "64-bits\n";
 
     printf(version.c_str());
     printf(fulldate.c_str());

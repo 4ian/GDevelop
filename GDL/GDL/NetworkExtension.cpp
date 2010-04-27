@@ -28,4 +28,19 @@ NetworkExtension::NetworkExtension()
         DECLARE_PARAMETER_OPTIONAL("texte", _("Donnée 6"), false, "")
 
     DECLARE_END_ACTION()
+
+    DECLARE_ACTION("DownloadFile",
+                   _("Télécharger un fichier"),
+                   _("Télécharge un fichier depuis un site web."),
+                   _("Télécharger le fichier _PARAM1_ depuis _PARAM0_ sous le nom de _PARAM2_"),
+                   _("Réseau"),
+                   "res/actions/net24.png",
+                   "res/actions/net.png",
+                   &ActDownloadFile);
+
+        DECLARE_PARAMETER("texte", _("Site web ( Par exemple : www.monsite.com )"), false, "")
+        DECLARE_PARAMETER("texte", _("Chemin du fichier ( Par exemple : /dossier/fichier.txt )"), false, "")
+        DECLARE_PARAMETER("texte", _("Enregistrer le fichier sous le nom"), false, "")
+
+    DECLARE_END_ACTION()
 }

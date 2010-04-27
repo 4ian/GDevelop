@@ -285,6 +285,9 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
 #define MAIN_OBJECTS_IN_PARAMETER(x) instrInfo.mainObjects.push_back(x);
 #define MAIN_OBJECTS_IN_PARAMETERS(x, y) instrInfo.mainObjects.push_back(x); instrInfo.mainObjects.push_back(y);
 
+#define DECLARE_CAN_HAVE_SUB_CONDITION() instrInfo.canHaveSubInstructions = true;
+#define DECLARE_CAN_HAVE_SUB_ACTION() instrInfo.canHaveSubInstructions = true;
+
 #else //Condition, actions and expressions declare less thing in runtime only
 
 #define DECLARE_THE_EXTENSION(name_, fullname_, description_, author_, license_) name = name_; \
@@ -360,6 +363,9 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
 #define MAIN_OBJECTS_IN_PARAMETER(x)
 #define MAIN_OBJECTS_IN_PARAMETERS(x, y)
 
+#define DECLARE_CAN_HAVE_SUB_CONDITION()
+#define DECLARE_CAN_HAVE_SUB_ACTION()
+
 //Emulate wxWidgets internationalization macro
 #ifndef _
 #define _(x) x // "Emule" la macro de WxWidgets
@@ -421,7 +427,6 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
 #define DECLARE_END_EVENT() eventsInfos[GetNameSpace()+currentEventDeclarationName] = eventInfo; \
             }
 
-
 /**
  * ParameterInfo contains user-friendly info about a parameter, only at edittime,
  * and information about what a parameter need
@@ -462,6 +467,7 @@ class GD_API InstructionInfos
     wxBitmap icon;
     wxBitmap smallicon;
     std::vector < int > mainObjects;
+    bool canHaveSubInstructions;
 #endif
     std::vector < ParameterInfo > parameters;
     InstructionFunPtr       instructionFunPtr;
@@ -571,6 +577,7 @@ class GD_API CompilationInfos
     #endif
 
     std::string gdlVersion;
+    int sizeOfpInt;
 };
 
 /**

@@ -66,7 +66,7 @@ ExtensionsManager::ExtensionsManager()
 ////////////////////////////////////////////////////////////
 bool ExtensionsManager::AddExtension(boost::shared_ptr<ExtensionBase> extension)
 {
-    cout << "Chargement de " << extension->GetName() << endl;
+    cout << "New extension added to manager : " << extension->GetName() << endl;
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
     	if ( extensionsLoaded[i]->GetName() == extension->GetName() )

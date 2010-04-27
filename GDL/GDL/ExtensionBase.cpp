@@ -34,6 +34,9 @@ expressionObjectFunPtr(NULL)
 InstructionInfos::InstructionInfos() :
 instructionFunPtr(NULL),
 instructionObjectFunPtr(NULL)
+#if defined(GDE)
+,canHaveSubInstructions(false)
+#endif
 {
 }
 

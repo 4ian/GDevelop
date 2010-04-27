@@ -168,10 +168,10 @@ void EventsPreprocessor::DeleteUselessEvents(vector < BaseEventSPtr > & events)
 {
     for ( unsigned int eId = events.size()-1; eId < events.size();--eId )
     {
-        if ( !events[eId]->IsExecutable() ) //Delete events that are not executable
-            events.erase(events.begin() + eId);
-
         if ( events[eId]->CanHaveSubEvents() ) //Process sub events, if any
             DeleteUselessEvents(events[eId]->GetSubEvents());
+
+        if ( !events[eId]->IsExecutable() ) //Delete events that are not executable
+            events.erase(events.begin() + eId);
     }
 }

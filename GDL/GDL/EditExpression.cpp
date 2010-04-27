@@ -574,6 +574,8 @@ string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo)
 
 void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
 {
+    if ( !itemObj.IsOk() ) return;
+
     gdTreeItemStringData * associatedData = dynamic_cast<gdTreeItemStringData*>(ObjList->GetItemData(itemObj));
     if ( associatedData != NULL )
     {
@@ -599,6 +601,8 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
 
 void EditExpression::OnAddValBtClick(wxCommandEvent& event)
 {
+    if ( !itemVal.IsOk() ) return;
+
     gdTreeItemStringData * associatedData = dynamic_cast<gdTreeItemStringData*>(ValList->GetItemData(itemVal));
     if ( associatedData != NULL )
     {

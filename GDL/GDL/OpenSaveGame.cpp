@@ -621,6 +621,9 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
 
                     *conditions = eventNewConditions;
 
+                    if ( conditions->empty() )
+                        list[eId] = subEventSPtr;
+
                     abordAndRestartEvent = true; break;
                 }
                 else if ( (*conditions)[c].GetType() == "ForEach"  )
@@ -653,6 +656,9 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
 
                     *conditions = eventNewConditions;
 
+                    if ( conditions->empty() )
+                        list[eId] = subEventSPtr;
+
                     abordAndRestartEvent = true; break;
                 }
                 else if ( (*conditions)[c].GetType() == "While"  )
@@ -663,7 +669,8 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                     vector < Instruction > subEventConditions;
                     vector < Instruction > whileConditions;
                     copy(oldConditions.begin(), oldConditions.begin()+c, back_inserter(eventNewConditions));
-                    copy(oldConditions.begin()+c+1, oldConditions.begin()+c+1, back_inserter(whileConditions));
+                    if ( oldConditions.size() > c+1 )
+                        copy(oldConditions.begin()+c+1, oldConditions.begin()+c+2, back_inserter(whileConditions));
 
                     //Inverting condition if while first parameter is false
                     if ( (*conditions)[c].GetParameter(0).GetPlainString() == "Faux" || (*conditions)[c].GetParameter(0).GetPlainString() == "False" )
@@ -699,6 +706,9 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                         actionsVectors[0]->clear();
 
                     *conditions = eventNewConditions;
+
+                    if ( conditions->empty() )
+                        list[eId] = subEventSPtr;
 
                     abordAndRestartEvent = true; break;
                 }

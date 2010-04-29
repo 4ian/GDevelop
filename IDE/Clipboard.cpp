@@ -78,13 +78,13 @@ bool Clipboard::HasObject()
 
 void Clipboard::SetEvent( BaseEventSPtr event )
 {
-    eventCopied = event;
+    eventCopied = event->Clone();
     hasEvent = true;
 }
 
 BaseEventSPtr Clipboard::GetEvent()
 {
-    return eventCopied;
+    return eventCopied->Clone();
 }
 
 bool Clipboard::HasEvent()

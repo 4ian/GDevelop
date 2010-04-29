@@ -487,8 +487,6 @@
 		<Unit filename="ErrorCompilation.h">
 			<Option virtualFolder="Editeur principal\Fichier\" />
 		</Unit>
-		<Unit filename="EventsRendererDatas.cpp" />
-		<Unit filename="EventsRendererDatas.h" />
 		<Unit filename="Extensions.cpp" />
 		<Unit filename="Extensions.h" />
 		<Unit filename="Fusion.cpp">

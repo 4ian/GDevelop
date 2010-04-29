@@ -197,6 +197,7 @@ class EditorEvents: public wxPanel
         void DeselectAllEvents(vector < BaseEventSPtr > & eventsToUnselected);
         void DeselectAllActions(vector < BaseEventSPtr > & eventsToUnselected);
         void DeselectAllConditions(vector < BaseEventSPtr > & eventsToUnselected);
+        void DeselectAllInstructions(BaseEventSPtr parentEvent, vector<Instruction> & instrsToUnselected);
 
         Instruction & GetLastSelectedInstruction();
         Instruction & GetSelectedInstruction(unsigned int nb);

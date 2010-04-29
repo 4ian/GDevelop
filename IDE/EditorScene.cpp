@@ -410,12 +410,15 @@ void EditorScene::OnEditionBtClick( wxCommandEvent & event )
 
 EditorScene::~EditorScene()
 {
+	std::cout << "Debug Message : Start destructor of EditorScene" << endl;
 	//(*Destroy(EditorScene)
 	//*)
 	m_mgr.UnInit();
+	std::cout << "Debug Message : Start deleting in destructor of EditorScene" << endl;
 	delete objectsEditor;
 	delete layersEditor;
 	delete debugger;
+	std::cout << "Debug Message : END deleting in destructor of EditorScene" << endl;
 }
 
 void EditorScene::SetToolbarEdition()

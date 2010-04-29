@@ -21,7 +21,6 @@
 #include <wx/msw/winundef.h>
 #endif
 #include "GDL/RuntimeScene.h"
-#include "GDL/AppelEvent.h"
 #include "GDL/Chercher.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ImageManager.h"

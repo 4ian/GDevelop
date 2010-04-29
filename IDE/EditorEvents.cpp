@@ -699,7 +699,7 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
 void EditorEvents::OnDelEventSelected( wxCommandEvent& event )
 {
     for (unsigned int i = 0;i<eventsSelected.size();++i)
-    	GetSelectedListOfEvents(i)->erase(GetSelectedListOfEvents(i)->begin() + eventsSelected[i].get<1>());
+    	GetSelectedListOfEvents(i)->erase(GetSelectedListOfEvents(i)->begin() + boost::tuples::get<1>(eventsSelected[i]));
 
     eventsSelected.clear();
 
@@ -1229,17 +1229,7 @@ void EditorEvents::DeselectAllActions(vector < BaseEventSPtr > & eventsToUnselec
     {
         vector < vector<Instruction>* > allActionsVectors = eventsToUnselected[eId]->GetAllActionsVectors();
         for (unsigned int i = 0;i<allActionsVectors.size();++i)
-        {
-            for (unsigned int j = 0;j<allActionsVectors[i]->size();++j)
-            {
-                if ( allActionsVectors[i]->at(j).selected )
-                {
-                    allActionsVectors[i]->at(j).selected = false;
-                    eventsToUnselected[eId]->eventRenderingNeedUpdate = true;
-                }
-
-            }
-        }
+            DeselectAllInstructions(eventsToUnselected[eId], *allActionsVectors[i]);
 
     	if ( eventsToUnselected[eId]->CanHaveSubEvents() )
             DeselectAllActions(eventsToUnselected[eId]->GetSubEvents());
@@ -1254,22 +1244,26 @@ void EditorEvents::DeselectAllConditions(vector < BaseEventSPtr > & eventsToUnse
     {
         vector < vector<Instruction>* > allConditionsVector = eventsToUnselected[eId]->GetAllConditionsVectors();
         for (unsigned int i = 0;i<allConditionsVector.size();++i)
-        {
-            for (unsigned int j = 0;j<allConditionsVector[i]->size();++j)
-            {
-                if ( allConditionsVector[i]->at(j).selected )
-                {
-                    allConditionsVector[i]->at(j).selected = false;
-                    eventsToUnselected[eId]->eventRenderingNeedUpdate = true;
-                }
-            }
-        }
+            DeselectAllInstructions(eventsToUnselected[eId], *allConditionsVector[i]);
 
     	if ( eventsToUnselected[eId]->CanHaveSubEvents() )
             DeselectAllConditions(eventsToUnselected[eId]->GetSubEvents());
     }
 }
 
+void EditorEvents::DeselectAllInstructions(BaseEventSPtr parentEvent, vector<Instruction> & instrsToUnselected)
+{
+    for (unsigned int j = 0;j<instrsToUnselected.size();++j)
+    {
+        if ( instrsToUnselected[j].selected )
+        {
+            instrsToUnselected[j].selected = false;
+            parentEvent->eventRenderingNeedUpdate = true;
+        }
+
+        DeselectAllInstructions(parentEvent, instrsToUnselected[j].GetSubInstructions());
+    }
+}
 
 ////////////////////////////////////////////////////////////
 /// Tests unitaires

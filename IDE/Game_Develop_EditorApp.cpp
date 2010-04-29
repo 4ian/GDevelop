@@ -125,8 +125,6 @@ bool Game_Develop_EditorApp::OnInit()
     wxInitAllImageHandlers();
     //*)
 
-    CompilationChecker::EnsureCorrectGDLVersion();
-
     //Load configuration
     wxString ConfigPath = wxFileName::GetHomeDir() + "/.Game Develop/";
     if ( !wxDirExists( ConfigPath ) )
@@ -159,6 +157,15 @@ bool Game_Develop_EditorApp::OnInit()
         }
         // This sets the decimal point to be '.', whatever the language defined !
         wxSetlocale(LC_NUMERIC, "C");        // didn't understand why "C"...
+    }
+
+    //Safety check for gdl.dll
+    bool sameGDLdllAsDuringCompilation = CompilationChecker::EnsureCorrectGDLVersion();
+    if ( !sameGDLdllAsDuringCompilation )
+    {
+        wxLogError(_("La version du fichier GDL.dll ( ou GDL.so ) semble être incorrecte. Veuillez réinstaller Game Develop afin que le programme fonctionne correctement.\n"
+                     "Si le problème persiste, assurez vous qu'il n'existe pas une nouvelle version de Game Develop sur le site officiel : http://www.compilgames.net\n"
+                     "Si non, prenez contact avec l'auteur."));
     }
 
     //Set help file

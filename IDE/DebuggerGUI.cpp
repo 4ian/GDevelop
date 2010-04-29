@@ -584,13 +584,22 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
     if ( !objectsTree->GetSelection().IsOk() )
         return;
 
-    ObjList allObjects = scene.objectsInstances.GetAllObjects();
+    //Obtain the shared_ptr to the object
+    ObjSPtr object = boost::shared_ptr<Object>();
+    map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    {
+        if ( i->second.second == objectsTree->GetSelection() && !i->first.expired())
+        {
+            object = i->first.lock();
+            continue;
+        }
+    }
 
-    int idObject = toInt(static_cast<string>(objectsTree->GetItemText( objectsTree->GetSelection() )));
-    if ( idObject < 0 || static_cast<unsigned>(idObject) >= allObjects.size() )
+    if ( object == boost::shared_ptr<Object>() )
         return;
 
-    allObjects[idObject]->SetName("");
+    object->SetName(""); //Simply set the name to nothing to let the object be deleted
 }
 
 /**

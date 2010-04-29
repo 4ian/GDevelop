@@ -397,7 +397,8 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
     }
 
     EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), *game, *(*scene), mainEditorCommand);
-    mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+data->GetSecondString(), true, wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY));
+    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+data->GetSecondString(), true, wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY)) )
+        wxLogError(_("Impossible d'ajouter le nouvel onglet !"));
 }
 
 /**
@@ -678,7 +679,9 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
 
         if ( sceneEditorPtr != NULL && &sceneEditorPtr->scene == (*scene).get())
         {
-            mainEditor.GetEditorsNotebook()->DeletePage(k);
+            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
+                wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
+
             k--;
         }
     }
@@ -747,7 +750,9 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
 
         if ( sceneEditorPtr != NULL && &sceneEditorPtr->scene == (*scene).get())
         {
-            mainEditor.GetEditorsNotebook()->DeletePage(k);
+            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
+                wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
+
             k--;
         }
     }
@@ -910,7 +915,9 @@ void ProjectManager::CloseGame(Game * game)
             if ( sceneBelongToGame )
             {
     cout << "Delete" << endl;
-                mainEditor.GetEditorsNotebook()->DeletePage(k);
+                if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
+                    wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
+    cout << "ENDDelete" << endl;
                 k--;
             }
         }
@@ -920,7 +927,9 @@ void ProjectManager::CloseGame(Game * game)
             if ( &imagesEditorPtr->game == game)
             {
     cout << "DeleteImageEditor" << endl;
-                mainEditor.GetEditorsNotebook()->DeletePage(k);
+                if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
+                    wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
+    cout << "ENDDelete" << endl;
                 k--;
             }
         }

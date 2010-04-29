@@ -3,7 +3,7 @@
 #include "GDL/VersionWrapper.h"
 #include "GDL/StdAlgo.h"
 
-void CompilationChecker::EnsureCorrectGDLVersion()
+bool CompilationChecker::EnsureCorrectGDLVersion()
 {
     string versionString =  toString(GDLVersionWrapper::Major()) + ", " + toString(GDLVersionWrapper::Minor()) + ", " +
                             toString(GDLVersionWrapper::Build()) + ", " + toString(GDLVersionWrapper::Revision());
@@ -17,5 +17,9 @@ void CompilationChecker::EnsureCorrectGDLVersion()
         cout << "GDL DLL Version :" << versionString << endl;
         cout << "Compiled with version :" << RC_FILEVERSION_STRING << endl;
         cout << "---------------" << endl;
+
+        return false;
     }
+
+    return true;
 }

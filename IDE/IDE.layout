@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug - Edittime" />
+	<ActiveTarget name="Release - Edittime" />
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="9408" topLine="106" />
 	</File>
@@ -118,14 +118,14 @@
 	<File name="EditTexte.h" open="0" top="0" tabpos="17">
 		<Cursor position="538" topLine="9" />
 	</File>
-	<File name="EditorEvents.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="60054" topLine="1246" />
+	<File name="EditorEvents.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="31841" topLine="499" />
 	</File>
 	<File name="EditorEvents.h" open="1" top="0" tabpos="2">
 		<Cursor position="7325" topLine="184" />
 	</File>
-	<File name="EditorEventsActions.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="724" topLine="0" />
+	<File name="EditorEventsActions.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="743" topLine="3" />
 	</File>
 	<File name="EditorEventsConditions.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="597" topLine="21" />
@@ -154,7 +154,7 @@
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="1" top="0" tabpos="7">
+	<File name="EditorScene.cpp" open="1" top="0" tabpos="6">
 		<Cursor position="21939" topLine="392" />
 	</File>
 	<File name="EditorScene.h" open="0" top="0" tabpos="11">
@@ -190,7 +190,7 @@
 	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="2442" topLine="206" />
 	</File>
-	<File name="Game_Develop_EditorMain.h" open="1" top="0" tabpos="6">
+	<File name="Game_Develop_EditorMain.h" open="1" top="0" tabpos="5">
 		<Cursor position="2261" topLine="70" />
 	</File>
 	<File name="ImportImage.cpp" open="0" top="0" tabpos="25">
@@ -226,8 +226,8 @@
 	<File name="Preferences.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="33680" topLine="559" />
 	</File>
-	<File name="ProjectManager.cpp" open="1" top="1" tabpos="5">
-		<Cursor position="35812" topLine="829" />
+	<File name="ProjectManager.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="35496" topLine="811" />
 	</File>
 	<File name="ProjectManager.h" open="0" top="0" tabpos="2">
 		<Cursor position="1133" topLine="10" />

@@ -192,7 +192,7 @@ class EditorEvents: public wxPanel
 		void OnInsertSomeEventSelected(wxCommandEvent& event);
 		void OnAddSomeEventSelected(wxRibbonButtonBarEvent& evt);
         void ChangesMadeOnEvents();
-        void ResetEventsSizeCache(vector < BaseEventSPtr > & eventsToReset);
+        void SetEventsNeedUpdate(vector < BaseEventSPtr > & eventsToReset);
 
         void DeselectAllEvents(vector < BaseEventSPtr > & eventsToUnselected);
         void DeselectAllActions(vector < BaseEventSPtr > & eventsToUnselected);

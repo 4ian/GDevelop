@@ -488,26 +488,26 @@ void EditorEvents::OnhorizontalScrollbarScroll(wxScrollEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnEventsPanelResize( wxSizeEvent& event )
 {
-    ResetEventsSizeCache(*events);
+    SetEventsNeedUpdate(*events);
 
     EventsPanel->Refresh();
     EventsPanel->Update();
 }
 
-////////////////////////////////////////////////////////////
-/// Remise à zéro des variables contenant les tailles des évènements
-////////////////////////////////////////////////////////////
-void EditorEvents::ResetEventsSizeCache(vector < BaseEventSPtr > & eventsToReset)
+/**
+ * Mark all events as must be redraw
+ */
+void EditorEvents::SetEventsNeedUpdate(vector < BaseEventSPtr > & eventsToRefresh)
 {
-    vector<BaseEventSPtr>::iterator e = eventsToReset.begin();
-    vector<BaseEventSPtr>::const_iterator end = eventsToReset.end();
+    vector<BaseEventSPtr>::iterator e = eventsToRefresh.begin();
+    vector<BaseEventSPtr>::const_iterator end = eventsToRefresh.end();
 
     for(;e != end;++e)
     {
         (*e)->eventRenderingNeedUpdate = true;
 
         if ( (*e)->CanHaveSubEvents() )
-            ResetEventsSizeCache((*e)->GetSubEvents());
+            SetEventsNeedUpdate((*e)->GetSubEvents());
     }
 }
 
@@ -517,7 +517,7 @@ void EditorEvents::ResetEventsSizeCache(vector < BaseEventSPtr > & eventsToReset
 void EditorEvents::ChangesMadeOnEvents()
 {
     //Mise à jour de l'historique d'annulation
-    history.push_back(*events);
+    history.push_back(CloneVectorOfEvents(*events));
     redoHistory.clear();
 
     scene.wasModified = true;
@@ -1064,7 +1064,7 @@ void EditorEvents::OnEventsPanelLeftUp(wxMouseEvent& event)
     if ( isResizingColumns )
     {
         conditionsColumnWidth = event.GetX();
-        ResetEventsSizeCache(*events);
+        SetEventsNeedUpdate(*events);
         isResizingColumns = false;
     }
 
@@ -1158,8 +1158,8 @@ void EditorEvents::OnUndoSelected(wxCommandEvent& event)
     if ( history.size() < 2 )
         return;
 
-    redoHistory.push_back(*events); //On pourra revenir à l'état actuel avec "Refaire"
-    *events = history.at( history.size() - 2 ); //-2 car le dernier élément est la liste d'évènement actuelle
+    redoHistory.push_back(CloneVectorOfEvents(*events)); //On pourra revenir à l'état actuel avec "Refaire"
+    *events = CloneVectorOfEvents(history.at( history.size() - 2 )); //-2 car le dernier élément est la liste d'évènement actuelle
     history.pop_back();
 
     EventsPanel->Refresh();
@@ -1176,8 +1176,8 @@ void EditorEvents::OnRedoSelected(wxCommandEvent& event)
     if ( redoHistory.empty() )
         return;
 
-    history.push_back(redoHistory.back()); //Le dernier élément est la liste d'évènement actuellement éditée
-    *events = redoHistory.back();
+    history.push_back(CloneVectorOfEvents(redoHistory.back())); //Le dernier élément est la liste d'évènement actuellement éditée
+    *events = CloneVectorOfEvents(redoHistory.back());
     redoHistory.pop_back();
 
     EventsPanel->Refresh();

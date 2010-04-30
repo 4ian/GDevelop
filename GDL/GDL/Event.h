@@ -10,9 +10,8 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#if defined(GDE)
-#include <wx/dcbuffer.h>
-#endif
+#include <vector>
+#include <boost/shared_ptr.hpp>
 #include "GDL/Log.h"
 #include "GDL/Instruction.h"
 class RuntimeScene;
@@ -23,6 +22,7 @@ class TiXmlElement;
 class Game;
 
 #if defined(GDE)
+#include <wx/dcbuffer.h>
 class Scene;
 class Game;
 class MainEditorCommand;
@@ -166,6 +166,9 @@ class GD_API BaseEvent
         static vector <BaseEventSPtr> badSubEvents;
 };
 
-
+/**
+ * Helper function for copying vector of shared_ptr of events
+ */
+std::vector < BaseEventSPtr > CloneVectorOfEvents(const vector < BaseEventSPtr > & events);
 
 #endif // EVENT_H

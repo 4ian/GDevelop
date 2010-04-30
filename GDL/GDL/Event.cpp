@@ -16,3 +16,16 @@ renderedWidth(1)
 #endif
 {
 }
+
+std::vector < BaseEventSPtr > GD_API CloneVectorOfEvents(const vector < BaseEventSPtr > & events)
+{
+    std::vector < BaseEventSPtr > newVector;
+
+    vector<BaseEventSPtr>::const_iterator e = events.begin();
+    vector<BaseEventSPtr>::const_iterator end = events.end();
+
+    for(;e != end;++e)
+        newVector.push_back((*e)->Clone());
+
+    return newVector;
+}

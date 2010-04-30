@@ -85,7 +85,7 @@
 	<File name="GDL\CommentEvent.h" open="0" top="0" tabpos="25">
 		<Cursor position="933" topLine="14" />
 	</File>
-	<File name="GDL\CommonInstructions.cpp" open="1" top="1" tabpos="19">
+	<File name="GDL\CommonInstructions.cpp" open="1" top="0" tabpos="14">
 		<Cursor position="1168" topLine="19" />
 	</File>
 	<File name="GDL\CommonInstructions.h" open="0" top="0" tabpos="4">
@@ -121,8 +121,8 @@
 	<File name="GDL\EditComment.h" open="0" top="0" tabpos="0">
 		<Cursor position="449" topLine="4" />
 	</File>
-	<File name="GDL\EditExpression.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="35673" topLine="695" />
+	<File name="GDL\EditExpression.cpp" open="1" top="0" tabpos="15">
+		<Cursor position="32167" topLine="572" />
 	</File>
 	<File name="GDL\EditExpression.h" open="0" top="0" tabpos="11">
 		<Cursor position="0" topLine="0" />
@@ -172,8 +172,8 @@
 	<File name="GDL\Event.h" open="0" top="0" tabpos="20">
 		<Cursor position="863" topLine="33" />
 	</File>
-	<File name="GDL\EventsPreprocessor.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="273" topLine="0" />
+	<File name="GDL\EventsPreprocessor.cpp" open="1" top="0" tabpos="16">
+		<Cursor position="8001" topLine="142" />
 	</File>
 	<File name="GDL\EventsPreprocessor.h" open="0" top="0" tabpos="13">
 		<Cursor position="307" topLine="0" />
@@ -322,7 +322,7 @@
 	<File name="GDL\Music.cpp" open="0" top="0" tabpos="34">
 		<Cursor position="595" topLine="19" />
 	</File>
-	<File name="GDL\NetworkExtension.cpp" open="1" top="0" tabpos="18">
+	<File name="GDL\NetworkExtension.cpp" open="1" top="0" tabpos="13">
 		<Cursor position="1850" topLine="11" />
 	</File>
 	<File name="GDL\ObjInstancesHolder.cpp" open="0" top="0" tabpos="3">
@@ -544,10 +544,10 @@
 	<File name="GDL\aMove.cpp" open="0" top="0" tabpos="47">
 		<Cursor position="10671" topLine="256" />
 	</File>
-	<File name="GDL\aNet.cpp" open="1" top="0" tabpos="16">
+	<File name="GDL\aNet.cpp" open="1" top="0" tabpos="11">
 		<Cursor position="3721" topLine="65" />
 	</File>
-	<File name="GDL\aNet.h" open="1" top="0" tabpos="17">
+	<File name="GDL\aNet.h" open="1" top="0" tabpos="12">
 		<Cursor position="223" topLine="0" />
 	</File>
 	<File name="GDL\aObjet.cpp" open="0" top="0" tabpos="48">

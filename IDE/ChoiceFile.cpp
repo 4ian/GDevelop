@@ -64,7 +64,7 @@ mainObjectsName(mainObjectsName_)
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoiceFile::OncancelBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoiceFile::OnadvancedBtClick);
 	//*)
-    fileEdit->SetValue(file);
+    fileEdit->ChangeValue(file);
 }
 
 ChoiceFile::~ChoiceFile()
@@ -79,7 +79,7 @@ void ChoiceFile::OnadvancedBtClick(wxCommandEvent& event)
     if ( dialog.ShowModal() == 1 )
     {
         file = dialog.texteFinal;
-        fileEdit->SetValue(file);
+        fileEdit->ChangeValue(file);
     }
 }
 

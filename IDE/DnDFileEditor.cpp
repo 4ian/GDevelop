@@ -8,7 +8,7 @@ bool DnDFileEditor::OnDropFiles(wxCoord x, wxCoord y,
     size_t nFiles = filenames.GetCount();
     if ( nFiles < 1 ) return false;
 
-    mainEditor.Open(filenames[0].mb_str());
+    mainEditor.Open(string(filenames[0].mb_str()));
 
     return true;
 }

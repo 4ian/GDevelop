@@ -11,8 +11,8 @@
 #include "GDL/Object.h"
 #include "GDL/RuntimeGame.h"
 
-#include "windows.h"
 #ifdef ___WXMSW___
+#include "windows.h"
 #include <wx/msw/winundef.h>
 #endif
 

@@ -9,7 +9,7 @@
 #ifdef __WXGTK__
     #include <gdk/gdkx.h>
     #include <gtk/gtk.h>
-    #include <wx/gtk/win_gtk.h>
+    #include <wx/gtk/private/win_gtk.h>
 #endif
 
 #include <iostream>
@@ -46,7 +46,12 @@ wxControl(Parent, Id, Position, Size, Style)
         // GTK implementation requires to go deeper to find the low-level X11 identifier of the widget
         gtk_widget_realize(m_wxwindow);
         gtk_widget_set_double_buffered(m_wxwindow, false);
-        GdkWindow* Win = GTK_PIZZA(m_wxwindow)->bin_window;
+
+        GtkWidget* privHandle = m_wxwindow;
+        wxPizza * pizza = WX_PIZZA(privHandle);
+        GtkWidget * widget = GTK_WIDGET(pizza);
+
+        GdkWindow* Win = widget->window;
         XFlush(GDK_WINDOW_XDISPLAY(Win));
         sf::RenderWindow::Create(GDK_WINDOW_XWINDOW(Win));
 

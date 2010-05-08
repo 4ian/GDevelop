@@ -399,7 +399,7 @@ void ChoixAction::RefreshFromAction()
 
     //Update parameters values
     for ( unsigned int i = 0;i < Param.size();i++ )
-        ParaEdit.at(i)->SetValue( Param.at( i ).GetPlainString() );
+        ParaEdit.at(i)->ChangeValue( Param.at( i ).GetPlainString() );
 
     for ( unsigned int i = 0;i < MaxPara;i++ )
     {
@@ -492,7 +492,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             ChooseObject Dialog(this, game, scene, true, instructionInfos.parameters[i].objectType);
             if ( Dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(Dialog.objectChosen);
+                ParaEdit.at(i)->ChangeValue(Dialog.objectChosen);
             }
             return;
         }
@@ -501,7 +501,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             EditExpression Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
             if ( Dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(Dialog.expression);
+                ParaEdit.at(i)->ChangeValue(Dialog.expression);
             }
             return;
         }
@@ -510,7 +510,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             EditTexte Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
             if ( Dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(Dialog.texteFinal);
+                ParaEdit.at(i)->ChangeValue(Dialog.texteFinal);
             }
             return;
         }
@@ -523,7 +523,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
                 wxString v; v << static_cast<int>(color.Green());
                 wxString b; b << static_cast<int>(color.Blue());
 
-                ParaEdit.at(i)->SetValue(r+";"+v+";"+b);
+                ParaEdit.at(i)->ChangeValue(r+";"+v+";"+b);
             }
             return;
         }
@@ -534,7 +534,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             if ( dialog.GetPath() != "" )
             {
-                ParaEdit.at(i)->SetValue(static_cast<string> ( dialog.GetPath() ));
+                ParaEdit.at(i)->ChangeValue(static_cast<string> ( dialog.GetPath() ));
             }
 
             return;
@@ -546,7 +546,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             if ( dialog.GetPath() != "" )
             {
-                ParaEdit.at(i)->SetValue(static_cast<string> ( dialog.GetPath() ));
+                ParaEdit.at(i)->ChangeValue(static_cast<string> ( dialog.GetPath() ));
             }
 
             return;
@@ -558,7 +558,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             if ( dialog.GetPath() != "" )
             {
-                ParaEdit.at(i)->SetValue(static_cast<string> ( dialog.GetPath() ));
+                ParaEdit.at(i)->ChangeValue(static_cast<string> ( dialog.GetPath() ));
             }
 
             return;
@@ -569,15 +569,15 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             int retour = dialog.ShowModal();
 
             if ( retour == 1 )
-                ParaEdit.at(i)->SetValue("=");
+                ParaEdit.at(i)->ChangeValue("=");
             if ( retour == 2 )
-                ParaEdit.at(i)->SetValue("+");
+                ParaEdit.at(i)->ChangeValue("+");
             if ( retour == 3 )
-                ParaEdit.at(i)->SetValue("-");
+                ParaEdit.at(i)->ChangeValue("-");
             if ( retour == 4 )
-                ParaEdit.at(i)->SetValue("*");
+                ParaEdit.at(i)->ChangeValue("*");
             if ( retour == 5 )
-                ParaEdit.at(i)->SetValue("/");
+                ParaEdit.at(i)->ChangeValue("/");
 
             return;
         }
@@ -586,7 +586,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             GeneratePassword dialog(this);
 
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->SetValue(dialog.mdp);
+                ParaEdit.at(i)->ChangeValue(dialog.mdp);
 
             return;
         }
@@ -594,11 +594,11 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         {
             if (wxMessageBox("Choisissez Oui ou Non pour compléter ce paramètre :", "Oui ou non",wxYES_NO ) == wxYES)
             {
-                ParaEdit.at(i)->SetValue(_("oui"));
+                ParaEdit.at(i)->ChangeValue(_("oui"));
             }
             else
             {
-                ParaEdit.at(i)->SetValue(_("non"));
+                ParaEdit.at(i)->ChangeValue(_("non"));
             }
 
             return;
@@ -607,7 +607,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         {
             ChoixLayer dialog(this, scene.initialLayers);
             if( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->SetValue(dialog.layerChosen);
+                ParaEdit.at(i)->ChangeValue(dialog.layerChosen);
 
             return;
         }
@@ -615,7 +615,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         {
             ChoiceJoyAxis dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
             if( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->SetValue(dialog.joyaxis);
+                ParaEdit.at(i)->ChangeValue(dialog.joyaxis);
 
             return;
         }
@@ -623,7 +623,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         {
             ChoiceFile dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->SetValue(dialog.file);
+                ParaEdit.at(i)->ChangeValue(dialog.file);
 
             return;
         }
@@ -648,7 +648,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             if ( dialog.ShowModal() == 1 )
             {
                 object->variablesObjet = dialog.variables;
-                ParaEdit.at(i)->SetValue(dialog.selectedVariable);
+                ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
             }
 
             return;
@@ -659,7 +659,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             if ( dialog.ShowModal() == 1 )
             {
                 scene.variables = dialog.variables;
-                ParaEdit.at(i)->SetValue(dialog.selectedVariable);
+                ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
             }
 
             return;
@@ -670,7 +670,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             if ( dialog.ShowModal() == 1 )
             {
                 game.variables = dialog.variables;
-                ParaEdit.at(i)->SetValue(dialog.selectedVariable);
+                ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
             }
 
             return;
@@ -737,7 +737,7 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
             Param.push_back(GDExpression(""));
         }
         else
-            Param.push_back(GDExpression(ParaEdit.at(i)->GetValue().mb_str()));
+            Param.push_back(GDExpression(string(ParaEdit.at(i)->GetValue().mb_str())));
     }
 
     if ( LocaliseCheck->GetValue() )

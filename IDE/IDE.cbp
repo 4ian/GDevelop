@@ -8,6 +8,7 @@
 		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Options\;Fichiers\;LIB TinyXml\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
 		<Build>
 			<Target title="Debug - Edittime">
+				<Option platforms="Windows;" />
 				<Option output="bin\debug\GDEditor" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin\debug" />
 				<Option object_output="obj\debug" />
@@ -20,11 +21,18 @@
 					<Add option="-pg" />
 					<Add option="-g" />
 					<Add option="-m32" />
+					<Add option="-pipe" />
+					<Add option="-mthreads" />
+					<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
+					<Add option="-DGDE" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-D__WXDEBUG__" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
 					<Add option="-DWXUSINGDLL" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="C:\Libs\wxwidgets\include" />
@@ -58,6 +66,24 @@
 					<Add option="-lsfml-network-d.dll" />
 					<Add option="-lsfml-window-d.dll" />
 					<Add option="-lsfml-system-d.dll" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add library="libkernel32.a" />
+					<Add library="libuser32.a" />
+					<Add library="libgdi32.a" />
+					<Add library="libwinspool.a" />
+					<Add library="libcomdlg32.a" />
+					<Add library="libadvapi32.a" />
+					<Add library="libshell32.a" />
+					<Add library="libole32.a" />
+					<Add library="liboleaut32.a" />
+					<Add library="libuuid.a" />
+					<Add library="libcomctl32.a" />
+					<Add library="libwsock32.a" />
+					<Add library="libodbc32.a" />
+					<Add library="imm32" />
+					<Add library="Ws2_32" />
+					<Add library="winmm" />
 					<Add directory="bin\debug" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
@@ -66,6 +92,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
+				<Option platforms="Windows;" />
 				<Option output="bin\release\GDEditor" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin\release" />
 				<Option object_output="obj\release" />
@@ -76,11 +103,18 @@
 					<Add option="-O3" />
 					<Add option="-Wall" />
 					<Add option="-m32" />
+					<Add option="-pipe" />
+					<Add option="-mthreads" />
+					<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
+					<Add option="-DGDE" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DPYSUPPORT" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DwxDEBUG_LEVEL=0" />
 					<Add option="-DWXUSINGDLL" />
@@ -116,6 +150,24 @@
 					<Add option="-lopenal32" />
 					<Add option="-lsndfile" />
 					<Add option="-lfreetype" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add library="libkernel32.a" />
+					<Add library="libuser32.a" />
+					<Add library="libgdi32.a" />
+					<Add library="libwinspool.a" />
+					<Add library="libcomdlg32.a" />
+					<Add library="libadvapi32.a" />
+					<Add library="libshell32.a" />
+					<Add library="libole32.a" />
+					<Add library="liboleaut32.a" />
+					<Add library="libuuid.a" />
+					<Add library="libcomctl32.a" />
+					<Add library="libwsock32.a" />
+					<Add library="libodbc32.a" />
+					<Add library="imm32" />
+					<Add library="Ws2_32" />
+					<Add library="winmm" />
 					<Add directory="bin\release" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll" />
@@ -124,6 +176,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
+				<Option platforms="Windows;" />
 				<Option output="bin\dev\GDEditor" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin\dev" />
 				<Option object_output="obj\dev" />
@@ -134,11 +187,18 @@
 					<Add option="-O3" />
 					<Add option="-Wall" />
 					<Add option="-m32" />
+					<Add option="-pipe" />
+					<Add option="-mthreads" />
+					<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
+					<Add option="-DGDE" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DPYSUPPORT" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DwxDEBUG_LEVEL=0" />
 					<Add option="-DWXUSINGDLL" />
@@ -174,6 +234,24 @@
 					<Add option="-lsfml-network.dll" />
 					<Add option="-lsfml-window.dll" />
 					<Add option="-lsfml-system.dll" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add library="libkernel32.a" />
+					<Add library="libuser32.a" />
+					<Add library="libgdi32.a" />
+					<Add library="libwinspool.a" />
+					<Add library="libcomdlg32.a" />
+					<Add library="libadvapi32.a" />
+					<Add library="libshell32.a" />
+					<Add library="libole32.a" />
+					<Add library="liboleaut32.a" />
+					<Add library="libuuid.a" />
+					<Add library="libcomctl32.a" />
+					<Add library="libwsock32.a" />
+					<Add library="libodbc32.a" />
+					<Add library="imm32" />
+					<Add library="Ws2_32" />
+					<Add library="winmm" />
 					<Add directory="bin\dev" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll" />
@@ -185,16 +263,102 @@
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
+			<Target title="Linux - Release - Edittime">
+				<Option platforms="Windows;Unix;" />
+				<Option output="bin\release\GDEditor" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin\release" />
+				<Option object_output="obj\release" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-finput-charset=iso-8859-1" />
+					<Add option="-fno-stack-protector" />
+					<Add option="`wx-config --cppflags`" />
+					<Add option="`pkg-config gtk+-2.0 --cflags`" />
+					<Add option="-DGDE" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl" />
+					<Add option="`wx-config --libs all`" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGLU" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="bin\release" />
+					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+				</Linker>
+			</Target>
+			<Target title="Linux - Debug - Edittime">
+				<Option platforms="Windows;Unix;" />
+				<Option output="bin\debug\GDEditor" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin\debug" />
+				<Option object_output="obj\debug" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-m32" />
+					<Add option="-finput-charset=iso-8859-1" />
+					<Add option="-fno-stack-protector" />
+					<Add option="`wx-config --cppflags`" />
+					<Add option="`pkg-config gtk+-2.0 --cflags`" />
+					<Add option="-DGDE" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-lgdl" />
+					<Add option="`wx-config --libs all`" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGLU" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="bin\debug" />
+					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add option="-pipe" />
-			<Add option="-mthreads" />
-			<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
-			<Add option="-DGDE" />
-			<Add option="-DGD_API=__declspec(dllimport)" />
-			<Add option="-D__GNUWIN32__" />
-			<Add option="-D__WXMSW__" />
 			<Add directory="..\GDL" />
 			<Add directory="c:\Libs\SFML\include" />
 			<Add directory="C:\Libs\CppUnitLite" />
@@ -203,26 +367,6 @@
 			<Add directory="C:\Libs\wxspellchecker\" />
 			<Add directory="CppUnitLite\" />
 		</Compiler>
-		<Linker>
-			<Add library="opengl32" />
-			<Add library="glu32" />
-			<Add library="libkernel32.a" />
-			<Add library="libuser32.a" />
-			<Add library="libgdi32.a" />
-			<Add library="libwinspool.a" />
-			<Add library="libcomdlg32.a" />
-			<Add library="libadvapi32.a" />
-			<Add library="libshell32.a" />
-			<Add library="libole32.a" />
-			<Add library="liboleaut32.a" />
-			<Add library="libuuid.a" />
-			<Add library="libcomctl32.a" />
-			<Add library="libwsock32.a" />
-			<Add library="libodbc32.a" />
-			<Add library="imm32" />
-			<Add library="Ws2_32" />
-			<Add library="winmm" />
-		</Linker>
 		<Unit filename="BugReport.cpp">
 			<Option weight="60" />
 			<Option virtualFolder="Racine\" />
@@ -519,6 +663,12 @@
 		<Unit filename="GeneratePassword.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
 		</Unit>
+		<Unit filename="GridSetup.cpp">
+			<Option virtualFolder="Editeurs\Editeur Scene\" />
+		</Unit>
+		<Unit filename="GridSetup.h">
+			<Option virtualFolder="Editeurs\Editeur Scene\" />
+		</Unit>
 		<Unit filename="ImageEditor.cpp" />
 		<Unit filename="ImageEditor.h" />
 		<Unit filename="ImportImage.cpp">
@@ -652,12 +802,6 @@
 		</Unit>
 		<Unit filename="gdTreeItemGameData.cpp" />
 		<Unit filename="gdTreeItemGameData.h" />
-		<Unit filename="gridSetup.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\" />
-		</Unit>
-		<Unit filename="gridSetup.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\" />
-		</Unit>
 		<Unit filename="mp3ogg.cpp">
 			<Option virtualFolder="Editeur principal\Outils\" />
 		</Unit>

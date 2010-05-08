@@ -489,7 +489,7 @@ void ChoixCondition::RefreshFromCondition()
     GridSizer1->Layout();
 
     for ( unsigned int i = 0;i < Param.size();i++ )
-        ParaEdit.at(i)->SetValue( Param[i].GetPlainString() );
+        ParaEdit.at(i)->ChangeValue( Param[i].GetPlainString() );
 
     if ( Loc )
     {
@@ -564,7 +564,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             ChooseObject dialog(this, game, scene, true, instructionInfos.parameters[i].objectType);
             if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(dialog.objectChosen);
+                ParaEdit.at(i)->ChangeValue(dialog.objectChosen);
             }
             return;
         }
@@ -573,7 +573,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             EditExpression dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
             if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(dialog.expression);
+                ParaEdit.at(i)->ChangeValue(dialog.expression);
             }
             return;
         }
@@ -582,7 +582,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             ChoixBouton dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ));
             if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(dialog.bouton);
+                ParaEdit.at(i)->ChangeValue(dialog.bouton);
             }
             return;
         }
@@ -591,7 +591,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             ChoixClavier dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ));
             if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(dialog.touche);
+                ParaEdit.at(i)->ChangeValue(dialog.touche);
             }
             return;
         }
@@ -599,7 +599,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         {
             ChoiceFile dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->SetValue(dialog.file);
+                ParaEdit.at(i)->ChangeValue(dialog.file);
 
             return;
         }
@@ -608,7 +608,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             EditTexte dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
             if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->SetValue(dialog.texteFinal);
+                ParaEdit.at(i)->ChangeValue(dialog.texteFinal);
             }
             return;
         }
@@ -618,17 +618,17 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             int retour = dialog.ShowModal();
 
             if ( retour == 1 )
-                ParaEdit.at(i)->SetValue("=");
+                ParaEdit.at(i)->ChangeValue("=");
             if ( retour == 2 )
-                ParaEdit.at(i)->SetValue(">");
+                ParaEdit.at(i)->ChangeValue(">");
             if ( retour == 3 )
-                ParaEdit.at(i)->SetValue("<");
+                ParaEdit.at(i)->ChangeValue("<");
             if ( retour == 4 )
-                ParaEdit.at(i)->SetValue(">=");
+                ParaEdit.at(i)->ChangeValue(">=");
             if ( retour == 5 )
-                ParaEdit.at(i)->SetValue("<=");
+                ParaEdit.at(i)->ChangeValue("<=");
             if ( retour == 6 )
-                ParaEdit.at(i)->SetValue("!=");
+                ParaEdit.at(i)->ChangeValue("!=");
 
             return;
         }
@@ -636,16 +636,16 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         {
             TrueOrFalse dialog(this, _("Choisissez Vrai ou Faux pour remplir le paramètre"), _("Vrai ou Faux"));
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->SetValue(_("Vrai"));
+                ParaEdit.at(i)->ChangeValue(_("Vrai"));
             else
-                ParaEdit.at(i)->SetValue(_("Faux"));
+                ParaEdit.at(i)->ChangeValue(_("Faux"));
         }
         else if ( instructionInfos.parameters[i].type == "yesorno" )
         {
             if (wxMessageBox("Choisissez Oui ou Non pour compléter ce paramètre :", "Oui ou non",wxYES_NO ) == wxYES)
-                ParaEdit.at(i)->SetValue(_("oui"));
+                ParaEdit.at(i)->ChangeValue(_("oui"));
             else
-                ParaEdit.at(i)->SetValue(_("non"));
+                ParaEdit.at(i)->ChangeValue(_("non"));
 
             return;
         }
@@ -653,7 +653,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         {
             ChoixLayer dialog(this, scene.initialLayers);
             if( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->SetValue(dialog.layerChosen);
+                ParaEdit.at(i)->ChangeValue(dialog.layerChosen);
 
             return;
         }
@@ -661,7 +661,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         {
             ChoiceJoyAxis dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
             if( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->SetValue(dialog.joyaxis);
+                ParaEdit.at(i)->ChangeValue(dialog.joyaxis);
 
             return;
         }
@@ -686,7 +686,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             if ( dialog.ShowModal() == 1 )
             {
                 object->variablesObjet = dialog.variables;
-                ParaEdit.at(i)->SetValue(dialog.selectedVariable);
+                ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
             }
 
             return;
@@ -697,7 +697,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             if ( dialog.ShowModal() == 1 )
             {
                 scene.variables = dialog.variables;
-                ParaEdit.at(i)->SetValue(dialog.selectedVariable);
+                ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
             }
 
             return;
@@ -708,7 +708,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             if ( dialog.ShowModal() == 1 )
             {
                 game.variables = dialog.variables;
-                ParaEdit.at(i)->SetValue(dialog.selectedVariable);
+                ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
             }
 
             return;
@@ -745,7 +745,7 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
 
     for ( unsigned int i = 0;i < instructionInfos.parameters.size();i++ )
     {
-        Param.push_back( GDExpression(ParaEdit.at(i)->GetValue().mb_str()) );
+        Param.push_back( GDExpression(string(ParaEdit.at(i)->GetValue().mb_str())) );
     }
 
     if ( ContraireCheck->GetValue() )

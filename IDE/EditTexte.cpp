@@ -99,7 +99,7 @@ mainObjectsName(mainObjectsName_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTexte::OnAnnulerBtClick);
 	//*)
 
-	TexteEdit->SetValue(texte);
+	TexteEdit->ChangeValue(texte);
 }
 
 EditTexte::~EditTexte()

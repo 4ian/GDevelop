@@ -348,7 +348,7 @@ void ImportImage::OnBrowseGIFBtClick(wxCommandEvent& event)
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )
-        FileGIFEdit->SetValue( dialog.GetPath() );
+        FileGIFEdit->ChangeValue( dialog.GetPath() );
 
 }
 
@@ -397,7 +397,7 @@ void ImportImage::OnbrowseRPGBtClick(wxCommandEvent& event)
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )
-        fileRPGEdit->SetValue( dialog.GetPath() );
+        fileRPGEdit->ChangeValue( dialog.GetPath() );
 }
 
 ////////////////////////////////////////////////////////////
@@ -409,7 +409,7 @@ void ImportImage::OnBrowseSSBtClick(wxCommandEvent& event)
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )
-        fileSSEdit->SetValue( dialog.GetPath() );
+        fileSSEdit->ChangeValue( dialog.GetPath() );
 }
 
 ////////////////////////////////////////////////////////////

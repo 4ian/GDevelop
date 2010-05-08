@@ -13,6 +13,10 @@
 #include <wx/log.h>
 #include "GDL/ListVariable.h"
 
+#ifdef __WXGTK__
+#include <gtk/gtk.h>
+#endif
+
 //(*IdInit(ChoixVariableDialog)
 const long ChoixVariableDialog::ID_STATICBITMAP1 = wxNewId();
 const long ChoixVariableDialog::ID_STATICTEXT6 = wxNewId();

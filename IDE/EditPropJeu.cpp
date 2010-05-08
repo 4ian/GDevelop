@@ -298,40 +298,40 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
     //*)
 
     m_jeu = pJeu;
-    NomEdit->SetValue( m_jeu->name );
-    AuteurEdit->SetValue( m_jeu->author );
+    NomEdit->ChangeValue( m_jeu->name );
+    AuteurEdit->ChangeValue( m_jeu->author );
 
-    HeightEdit->SetValue( st( m_jeu->windowHeight ) );
-    WidthEdit->SetValue( st( m_jeu->windowWidth ) );
+    HeightEdit->ChangeValue( st( m_jeu->windowHeight ) );
+    WidthEdit->ChangeValue( st( m_jeu->windowWidth ) );
 
     afficherEcranCheck->SetValue( true );
     if ( !m_jeu->loadingScreen.afficher )
         afficherEcranCheck->SetValue( false );
 
 
-    widthECEdit->SetValue( st( m_jeu->loadingScreen.width ) );
-    heightECEdit->SetValue( st( m_jeu->loadingScreen.height ) );
+    widthECEdit->ChangeValue( st( m_jeu->loadingScreen.width ) );
+    heightECEdit->ChangeValue( st( m_jeu->loadingScreen.height ) );
 
     texteCheck->SetValue( true );
     if ( !m_jeu->loadingScreen.texte )
         texteCheck->SetValue( false );
 
-    texteXPosEdit->SetValue( st( m_jeu->loadingScreen.texteXPos ) );
-    texteYPosEdit->SetValue( st( m_jeu->loadingScreen.texteYPos ) );
-    texteEdit->SetValue( m_jeu->loadingScreen.texteChargement );
+    texteXPosEdit->ChangeValue( st( m_jeu->loadingScreen.texteXPos ) );
+    texteYPosEdit->ChangeValue( st( m_jeu->loadingScreen.texteYPos ) );
+    texteEdit->ChangeValue( m_jeu->loadingScreen.texteChargement );
 
     pourcentCheck->SetValue( false );
     if ( m_jeu->loadingScreen.pourcent )
         pourcentCheck->SetValue( true );
 
-    pourcentXPosEdit->SetValue( st( m_jeu->loadingScreen.pourcentXPos ) );
-    pourcentYPosEdit->SetValue( st( m_jeu->loadingScreen.pourcentYPos ) );
+    pourcentXPosEdit->ChangeValue( st( m_jeu->loadingScreen.pourcentXPos ) );
+    pourcentYPosEdit->ChangeValue( st( m_jeu->loadingScreen.pourcentYPos ) );
 
     imageCheck->SetValue( false );
     if ( m_jeu->loadingScreen.image )
         imageCheck->SetValue( true );
 
-    imageEdit->SetValue( m_jeu->loadingScreen.imageFichier );
+    imageEdit->ChangeValue( m_jeu->loadingScreen.imageFichier );
 
     borderCheck->SetValue(m_jeu->loadingScreen.border);
     smoothCheck->SetValue(m_jeu->loadingScreen.smooth);
@@ -693,7 +693,7 @@ void EditPropJeu::OnBrowseBtClick(wxCommandEvent& event)
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )
-        imageEdit->SetValue(dialog.GetPath());
+        imageEdit->ChangeValue(dialog.GetPath());
 }
 
 void EditPropJeu::OnFPSmaxCheckClick(wxCommandEvent& event)

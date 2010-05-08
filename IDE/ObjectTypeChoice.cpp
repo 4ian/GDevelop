@@ -177,7 +177,7 @@ void ObjectTypeChoice::OnobjectsListItemSelect(wxListEvent& event)
     if ( extension == boost::shared_ptr<ExtensionBase> () )
         return;
 
-    infoEdit->SetValue(extension->GetExtensionObjectInfo(selectedObjectType));
+    infoEdit->ChangeValue(extension->GetExtensionObjectInfo(selectedObjectType));
     iconBmp->SetBitmap(extension->GetExtensionObjectBitmap(selectedObjectType));
 }
 

@@ -218,7 +218,7 @@ void Extensions::OnExtensionsListSelect(wxCommandEvent& event)
     {
         if ( extensionsInstalled[i]->GetName() == associatedData->GetData() )
         {
-            infoEdit->SetValue(extensionsInstalled[i]->GetInfo());
+            infoEdit->ChangeValue(extensionsInstalled[i]->GetInfo());
             authorTxt->SetLabel(extensionsInstalled[i]->GetAuthor());
             licenseTxt->SetLabel(extensionsInstalled[i]->GetLicense());
 

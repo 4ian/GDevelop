@@ -193,47 +193,47 @@ void StartHerePage::Refresh()
 
 void StartHerePage::Onrecent1BtClick(wxCommandEvent& event)
 {
-    mainEditor.Open(recent1Bt->GetLabel().mb_str());
+    mainEditor.Open(string(recent1Bt->GetLabel().mb_str()));
 }
 
 void StartHerePage::Onrecent2BtClick(wxCommandEvent& event)
 {
-    mainEditor.Open(recent2Bt->GetLabel().mb_str());
+    mainEditor.Open(string(recent2Bt->GetLabel().mb_str()));
 }
 
 void StartHerePage::Onrecent3BtClick(wxCommandEvent& event)
 {
-    mainEditor.Open(recent3Bt->GetLabel().mb_str());
+    mainEditor.Open(string(recent3Bt->GetLabel().mb_str()));
 }
 
 void StartHerePage::Onrecent4BtClick(wxCommandEvent& event)
 {
-    mainEditor.Open(recent4Bt->GetLabel().mb_str());
+    mainEditor.Open(string(recent4Bt->GetLabel().mb_str()));
 }
 
 void StartHerePage::Onrecent5BtClick(wxCommandEvent& event)
 {
-    mainEditor.Open(recent5Bt->GetLabel().mb_str());
+    mainEditor.Open(string(recent5Bt->GetLabel().mb_str()));
 }
 
 void StartHerePage::Onrecent6BtClick(wxCommandEvent& event)
 {
-    mainEditor.Open(recent6Bt->GetLabel().mb_str());
+    mainEditor.Open(string(recent6Bt->GetLabel().mb_str()));
 }
 
 void StartHerePage::Onrecent7BtClick(wxCommandEvent& event)
 {
-    mainEditor.Open(recent7Bt->GetLabel().mb_str());
+    mainEditor.Open(string(recent7Bt->GetLabel().mb_str()));
 }
 
 void StartHerePage::Onrecent8BtClick(wxCommandEvent& event)
 {
-    mainEditor.Open(recent8Bt->GetLabel().mb_str());
+    mainEditor.Open(string(recent8Bt->GetLabel().mb_str()));
 }
 
 void StartHerePage::Onrecent9BtClick(wxCommandEvent& event)
 {
-    mainEditor.Open(recent9Bt->GetLabel().mb_str());
+    mainEditor.Open(string(recent9Bt->GetLabel().mb_str()));
 }
 
 void StartHerePage::OnguideBtClick(wxCommandEvent& event)

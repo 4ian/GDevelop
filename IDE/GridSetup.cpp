@@ -89,8 +89,8 @@ b(b_)
 	//*)
 
 	snapCheck->SetValue(snap);
-	widthEdit->SetValue(toString(gridWidth));
-	heightEdit->SetValue(toString(gridHeight));
+	widthEdit->ChangeValue(toString(gridWidth));
+	heightEdit->ChangeValue(toString(gridHeight));
     colorPanel->SetBackgroundColour( wxColor(r,g,b) );
 }
 

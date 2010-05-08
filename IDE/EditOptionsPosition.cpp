@@ -211,10 +211,10 @@ scene(scene_)
     //Initializing controls with values
     objectNameTxt->SetLabel( position.objectName );
 
-    XEdit->SetValue( toString(position.x) );
-    YEdit->SetValue( toString(position.y) );
-    widthEdit->SetValue( toString(position.width) );
-    heightEdit->SetValue( toString(position.height) );
+    XEdit->ChangeValue( toString(position.x) );
+    YEdit->ChangeValue( toString(position.y) );
+    widthEdit->ChangeValue( toString(position.width) );
+    heightEdit->ChangeValue( toString(position.height) );
     if ( position.personalizedSize )
     {
         sizeCheck->SetValue(true);
@@ -234,7 +234,7 @@ scene(scene_)
     if ( position.layer == "" )
         layerChoice->SetStringSelection(_("Calque de base"));
 
-    zOrderEdit->SetValue( st(position.zOrder) );
+    zOrderEdit->ChangeValue( st(position.zOrder) );
 
     //Create the object-specific panel, if it has one.
     wxPanel * returnedPanel = NULL;

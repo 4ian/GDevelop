@@ -110,11 +110,11 @@ void GeneratePassword::OnCreerBtClick(wxCommandEvent& event)
     longEdit->GetValue().ToLong(&number);
     if ( number < 1 ) return;
 
-    mdpEdit->SetValue("");
+    mdpEdit->ChangeValue("");
     for (unsigned int i = 0;i<static_cast<unsigned>(number);i++)
     {
         int nb = sf::Randomizer::Random(0, 41);
-        mdpEdit->SetValue(mdpEdit->GetValue()+carac.substr(nb,1));
+        mdpEdit->ChangeValue(mdpEdit->GetValue()+carac.substr(nb,1));
     }
 }
 

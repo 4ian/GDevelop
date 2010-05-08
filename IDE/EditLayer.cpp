@@ -159,7 +159,7 @@ tempLayer(layer_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditLayer::OncancelBtClick);
 	//*)
 
-	nameEdit->SetValue(layer.GetName());
+	nameEdit->ChangeValue(layer.GetName());
 	visibilityCheck->SetValue(layer.GetVisibility());
 
 	//Impossible de modifier le nom du calque de base

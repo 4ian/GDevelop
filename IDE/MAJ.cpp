@@ -153,7 +153,7 @@ void MAJ::OnVerifMAJBtClick(wxCommandEvent& event)
     if ( elem->Attribute( "Lien") != NULL )
          lien = elem->Attribute( "Lien");
 
-    infoEdit->SetValue(info);
+    infoEdit->ChangeValue(info);
     LienBt->SetLabel(lien);
 
     return;

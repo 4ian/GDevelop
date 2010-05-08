@@ -461,9 +461,9 @@ changesNeedRestart(false)
         wxString result;
 
         if ( pConfig->Read( _T( "/EditeursExternes/Image" ), &result ) )
-            EditeurImageEdit->SetValue( result );
+            EditeurImageEdit->ChangeValue( result );
         if ( pConfig->Read( _T( "/Dossier/Compilation" ), &result ) )
-            DossierTempCompEdit->SetValue( result );
+            DossierTempCompEdit->ChangeValue( result );
     }
 
     {
@@ -798,7 +798,7 @@ void Preferences::OnBrowseDossierTempBtClick( wxCommandEvent& event )
 
     if ( dialog.GetPath() != "" )
     {
-        DossierTempCompEdit->SetValue(dialog.GetPath());
+        DossierTempCompEdit->ChangeValue(dialog.GetPath());
     }
 }
 
@@ -809,7 +809,7 @@ void Preferences::OnBrowseEditionImageClick(wxCommandEvent& event)
 
     if ( dialog.GetPath() != "" )
     {
-        EditeurImageEdit->SetValue(dialog.GetPath());
+        EditeurImageEdit->ChangeValue(dialog.GetPath());
     }
 }
 

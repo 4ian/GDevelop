@@ -90,7 +90,7 @@ scene(scene_)
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditRepeatEvent::OncancelBtClick);
 	//*)
 
-	expressionEdit->SetValue(event.GetRepeatExpression());
+	expressionEdit->ChangeValue(event.GetRepeatExpression());
 }
 
 EditRepeatEvent::~EditRepeatEvent()
@@ -105,7 +105,7 @@ void EditRepeatEvent::OnexpressionBtClick(wxCommandEvent& )
     vector < string > mainObjectsName;
     EditExpression dialog(this, string( expressionEdit->GetValue().mb_str() ), game, scene, true, mainObjectsName);
     if ( dialog.ShowModal() == 1 )
-        expressionEdit->SetValue(dialog.expression);
+        expressionEdit->ChangeValue(dialog.expression);
 
     return;
 }

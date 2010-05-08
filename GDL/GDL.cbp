@@ -5,9 +5,10 @@
 		<Option title="GDL" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="LIB fparser\;md5\;AES\;" />
+		<Option virtualFolders="Math parser\LIB fparser\;Math parser\;AES\;md5\;" />
 		<Build>
 			<Target title="Debug">
+				<Option platforms="Windows;" />
 				<Option output="..\Runtime\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
@@ -47,6 +48,7 @@
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
+				<Option platforms="Windows;" />
 				<Option output="..\IDE\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
@@ -118,6 +120,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
+				<Option platforms="Windows;" />
 				<Option output="..\Runtime\bin\release\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
@@ -155,6 +158,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
+				<Option platforms="Windows;" />
 				<Option output="..\IDE\bin\release\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
@@ -224,6 +228,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development">
+				<Option platforms="Windows;" />
 				<Option output="..\Runtime\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
@@ -261,6 +266,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
+				<Option platforms="Windows;" />
 				<Option output="..\IDE\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
@@ -331,6 +337,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
+				<Option platforms="Windows;Unix;" />
 				<Option output="..\Runtime\bin\release\libgdl.so" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
@@ -352,6 +359,95 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGLU" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+				</Linker>
+			</Target>
+			<Target title="Linux - Release - Edittime">
+				<Option platforms="Windows;Unix;" />
+				<Option output="..\IDE\bin\release\libgdl.so" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-finput-charset=iso-8859-1" />
+					<Add option="-m32" />
+					<Add option="`wx-config --cppflags`" />
+					<Add option="`pkg-config gtk+-2.0 --cflags`" />
+					<Add option="-DGDE" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="`wx-config --libs all`" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGLU" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+				</Linker>
+			</Target>
+			<Target title="Linux - Debug - Edittime">
+				<Option platforms="Windows;Unix;" />
+				<Option output="..\IDE\bin\debug\libgdl.so" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Debug\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-finput-charset=iso-8859-1" />
+					<Add option="-m32" />
+					<Add option="`wx-config --cppflags`" />
+					<Add option="`pkg-config gtk+-2.0 --cflags`" />
+					<Add option="-DGDE" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
@@ -478,6 +574,12 @@
 		<Unit filename="GDL\Force.h" />
 		<Unit filename="GDL\GDExpression.cpp" />
 		<Unit filename="GDL\GDExpression.h" />
+		<Unit filename="GDL\GDMathParser.cpp">
+			<Option virtualFolder="Math parser\" />
+		</Unit>
+		<Unit filename="GDL\GDMathParser.h">
+			<Option virtualFolder="Math parser\" />
+		</Unit>
 		<Unit filename="GDL\Game.cpp" />
 		<Unit filename="GDL\Game.h" />
 		<Unit filename="GDL\HelpFileAccess.cpp" />
@@ -689,7 +791,7 @@
 		<Unit filename="GDL\eObjectFunctions.cpp" />
 		<Unit filename="GDL\eObjectFunctions.h" />
 		<Unit filename="GDL\fparser\fparser.cc">
-			<Option virtualFolder="LIB fparser\" />
+			<Option virtualFolder="Math parser\LIB fparser\" />
 		</Unit>
 		<Unit filename="GDL\gdTreeItemStringData.cpp" />
 		<Unit filename="GDL\gdTreeItemStringData.h" />

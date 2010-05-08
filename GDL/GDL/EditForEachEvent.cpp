@@ -91,7 +91,7 @@ scene(scene_)
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditForEachEvent::OncancelBtClick);
 	//*)
 
-    objectEdit->SetValue(eventEdited.GetObjectToPick());
+    objectEdit->ChangeValue(eventEdited.GetObjectToPick());
 }
 
 EditForEachEvent::~EditForEachEvent()
@@ -116,7 +116,7 @@ void EditForEachEvent::OnobjectBtClick(wxCommandEvent& event)
 {
     ChooseObject dialog(this, game, scene, true, string(objectEdit->GetValue().mb_str()));
     if ( dialog.ShowModal() == 1 )
-        objectEdit->SetValue(dialog.objectChosen);
+        objectEdit->ChangeValue(dialog.objectChosen);
 
     return;
 }

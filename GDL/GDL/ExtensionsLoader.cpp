@@ -109,6 +109,12 @@ void ExtensionsLoader::LoadAllExtensionsAvailable()
     rep = opendir( directory.c_str() );
     int l = 0;
 
+    if ( rep == NULL )
+    {
+        cout << "Unable to open Extensions directory." << endl;
+        return;
+    }
+
     while (( lecture = readdir( rep ) ) )
     {
         string lec = lecture->d_name;

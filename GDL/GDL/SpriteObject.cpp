@@ -387,7 +387,7 @@ wxPanel * SpriteObject::CreateInitialPositionPanel( wxWindow* parent, const Game
 {
     SpriteInitialPositionPanel * panel = new SpriteInitialPositionPanel(parent);
 
-    panel->DirectionEdit->SetValue(ToString( position.angle ));
+    panel->DirectionEdit->ChangeValue(ToString( position.angle ));
 
     for (unsigned int i = 0;i<GetAnimationsNumber();i++ )
         panel->AnimationCombo->Append(ToString(i));

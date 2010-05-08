@@ -607,7 +607,7 @@ void EditorObjet::RefreshImages()
         if ( direction < object.GetAnimation( animation ).GetDirectionsNumber() )
         {
             //Temps
-            TempsEdit->SetValue( stFromFloat( object.GetAnimation( animation ).GetDirection( direction ).GetTimeBetweenFrames() ) );
+            TempsEdit->ChangeValue( stFromFloat( object.GetAnimation( animation ).GetDirection( direction ).GetTimeBetweenFrames() ) );
 
             //Boucle
             if ( object.GetAnimation( animation ).GetDirection( direction ).IsLooping() )

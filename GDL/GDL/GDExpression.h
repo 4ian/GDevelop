@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "GDL/fparser/fparser.hh"
+#include "GDL/GDMathParser.h"
 #include <boost/shared_ptr.hpp>
 #include "GDL/ExpressionInstruction.h"
 #include "GDL/ObjectIdentifiersManager.h"
@@ -110,7 +110,7 @@ class GD_API GDExpression
         mutable unsigned int    oID; ///< Object identifier, if expression contains an object name.
         mutable bool    oIDcomputed;
 
-        FunctionParser  mathExpression; ///<Object representing the mathemathic expression to parse and evaluate.
+        GDMathParser  mathExpression; ///<Object representing the mathemathic expression to parse and evaluate.
         std::vector < ExpressionInstruction > mathExpressionFunctions; ///< The functions to call to generate the values of the parameters to pass to the mathematic expression when evaluating.
         bool            isPreprocessed; ///<Indicate if the functions to call and the mathematic expression have been preprocessed.
 

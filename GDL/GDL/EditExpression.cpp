@@ -264,7 +264,7 @@ mainObjectsName(mainObjectsName_)
     imageListVal->Add(( wxBitmap( "res/actions/net.png", wxBITMAP_TYPE_ANY ) ) );
     ValList->AssignImageList( imageListVal );
 
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
 	RefreshLists();
 }
 
@@ -376,73 +376,8 @@ void EditExpression::RefreshLists()
         }
 	}
 
-    /*dossier = ObjList->AppendItem( ObjList->GetRootItem(), _( "Positions" ), 1 );
-    ObjList->AppendItem( dossier, _( "Position x d'un objet" ), 0 );
-    ObjList->AppendItem( dossier, _( "Position y d'un objet" ), 0 );
-    ObjList->AppendItem( dossier, _( "Position x d'un point d'un objet" ), 0 );
-    ObjList->AppendItem( dossier, _( "Position y d'un point d'un objet" ), 0 );
-    ObjList->AppendItem( dossier, _( "Distance entre deux objets" ), 0 );
-    ObjList->AppendItem( dossier, _( "Distance au carré entre deux objets" ), 0 );
-
-    dossier = ObjList->AppendItem( ObjList->GetRootItem(), _( "Déplacement" ), 2 );
-    ObjList->AppendItem( dossier, _( "Force moyenne en X" ), 0 );
-    ObjList->AppendItem( dossier, _( "Force moyenne en Y" ), 0 );
-    ObjList->AppendItem( dossier, _( "Angle moyen des forces" ), 0 );
-    ObjList->AppendItem( dossier, _( "Longueur moyenne des forces" ), 0 );
-
-    dossier = ObjList->AppendItem( ObjList->GetRootItem(), _( "Direction" ), 3 );
-    ObjList->AppendItem( dossier, _( "Numéro de direction d'un objet" ), 0 );
-
-    dossier = ObjList->AppendItem( ObjList->GetRootItem(), _( "Animations et images" ), 4 );
-    ObjList->AppendItem( dossier, _( "Numéro d'animation d'un objet" ), 0 );
-    ObjList->AppendItem( dossier, _( "Numéro de l'image d'un objet" ), 0 );
-
-    dossier = ObjList->AppendItem( ObjList->GetRootItem(), _( "Taille" ), 17 );
-    ObjList->AppendItem( dossier, _( "Echelle de la largeur d'un objet" ), 0 );
-    ObjList->AppendItem( dossier, _( "Echelle de la hauteur d'un objet" ), 0 );
-
-    dossier = ObjList->AppendItem( ObjList->GetRootItem(), _( "Variables" ), 5 );
-    ObjList->AppendItem( dossier, _( "Valeur d'une variable" ), 0 );
-
-    dossier = ObjList->AppendItem( ObjList->GetRootItem(), _( "Visibilité" ), 7 );
-    ObjList->AppendItem( dossier, _( "Plan d'un objet" ), 0 );
-
-    dossier = ObjList->AppendItem( ObjList->GetRootItem(), _( "Autre" ), 0 );
-    ObjList->AppendItem( dossier, _( "Nombre d'objets concernés" ), 0 );
-    ObjList->AppendItem( dossier, _( "Largeur d'un objet" ), 0 );
-    ObjList->AppendItem( dossier, _( "Hauteur d'un objet" ), 0 );*/
     ObjList->Expand(ObjList->GetRootItem());
-
-    /*ValList->AppendItem( ValList->GetRootItem(), _( "Nombre aléatoire" ), 0 );
-
-    dossier = ValList->AppendItem( ValList->GetRootItem(), _( "Variables" ), 5 );
-    ValList->AppendItem( dossier, _( "Valeur d'une variable globale" ),0 );
-    ValList->AppendItem( dossier, _( "Valeur d'une variable de la scène" ),0 );
-
-    dossier = ValList->AppendItem( ValList->GetRootItem(), _( "Caméra" ), 10 );
-    ValList->AppendItem( dossier, _( "Position X de la caméra" ),0 );
-    ValList->AppendItem( dossier, _( "Position Y de la caméra" ),0 );
-    ValList->AppendItem( dossier, _( "Rotation de la caméra" ),0 );
-
-    dossier = ValList->AppendItem( ValList->GetRootItem(), _( "Souris" ), 11 );
-    ValList->AppendItem( dossier, _( "Position X de la souris" ),0 );
-    ValList->AppendItem( dossier, _( "Position Y de la souris" ),0 );
-
-    ValList->AppendItem( ValList->GetRootItem(), _( "Temps écoulé depuis la dernière image" ), 0 );
-    ValList->AppendItem( ValList->GetRootItem(), _( "Temps écoulé depuis le début de la scène" ), 0 );
-    ValList->AppendItem( ValList->GetRootItem(), _( "Echelle du temps" ), 0 );
-
-    dossier = ValList->AppendItem( ValList->GetRootItem(), _( "Temps" ),0 );
-    ValList->AppendItem( dossier, _( "Heure" ),0 );
-    ValList->AppendItem( dossier, _( "Minutes" ),0 );
-    ValList->AppendItem( dossier, _( "Secondes" ),0 );
-    ValList->AppendItem( dossier, _( "Numéro du jour dans la semaine" ),0 );
-    ValList->AppendItem( dossier, _( "Numéro du jour dans le mois" ),0 );
-    ValList->AppendItem( dossier, _( "Numéro du jour dans l'année" ),0 );
-    ValList->AppendItem( dossier, _( "Années depuis 1900" ),0 );*/
-
     ValList->Expand(ValList->GetRootItem());
-
 }
 
 void EditExpression::RefreshExpressionEdit()
@@ -493,56 +428,56 @@ void EditExpression::RefreshExpressionEdit()
 void EditExpression::OnPlusBtClick(wxCommandEvent& event)
 {
     expression += "+";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnMinusBtClick(wxCommandEvent& event)
 {
     expression += "-";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnMultBtClick(wxCommandEvent& event)
 {
     expression += "*";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnDivBtClick(wxCommandEvent& event)
 {
     expression += "/";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnPOBtClick(wxCommandEvent& event)
 {
     expression += "(";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnPFBtClick(wxCommandEvent& event)
 {
     expression += ")";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnCosBtClick(wxCommandEvent& event)
 {
     expression += "cos";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnSinBtClick(wxCommandEvent& event)
 {
     expression += "sin";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
@@ -593,7 +528,7 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
 
         expression += "OBJ("+object+"["+associatedData->GetString()+"]"+parametersStr+")";
 
-        ExpressionEdit->SetValue(expression);
+        ExpressionEdit->ChangeValue(expression);
         RefreshExpressionEdit();
         return;
     }
@@ -618,7 +553,7 @@ void EditExpression::OnAddValBtClick(wxCommandEvent& event)
 
         expression += "VAL("+associatedData->GetString()+parametersStr+")";
 
-        ExpressionEdit->SetValue(expression);
+        ExpressionEdit->ChangeValue(expression);
         RefreshExpressionEdit();
         return;
     }
@@ -652,84 +587,84 @@ void EditExpression::OnValListItemDoubleClicked(wxTreeEvent& event)
 void EditExpression::OnButton2Click(wxCommandEvent& event)
 {
     expression += "^";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnButton3Click(wxCommandEvent& event)
 {
     expression += "E";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnBitmapButton2Click(wxCommandEvent& event)
 {
     expression += "sqrt(";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnBitmapButton1Click(wxCommandEvent& event)
 {
     expression += "nthroot(x,n)";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnButton4Click(wxCommandEvent& event)
 {
     expression += "exp(";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnButton1Click(wxCommandEvent& event)
 {
     expression += "log(";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnButton5Click(wxCommandEvent& event)
 {
     expression += "tan";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnButton6Click(wxCommandEvent& event)
 {
     expression += "abs";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnButton7Click(wxCommandEvent& event)
 {
     expression += "acos";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnButton8Click(wxCommandEvent& event)
 {
     expression += "asin";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnButton9Click(wxCommandEvent& event)
 {
     expression += "atan";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 
 void EditExpression::OnintBtClick(wxCommandEvent& event)
 {
     expression += "int(";
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->ChangeValue(expression);
     RefreshExpressionEdit();
 }
 #endif

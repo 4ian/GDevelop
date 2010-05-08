@@ -131,8 +131,8 @@ image(pImage)
 	//*)
 
     LissageCheck->SetValue(image.smooth);
-    NomEdit->SetValue(image.nom);
-    FichierEdit->SetValue(image.fichier);
+    NomEdit->ChangeValue(image.nom);
+    FichierEdit->ChangeValue(image.fichier);
 
 }
 

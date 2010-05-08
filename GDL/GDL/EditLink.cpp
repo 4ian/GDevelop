@@ -50,7 +50,7 @@ eventToEdit(pEvent)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
-	
+
 	Create(parent, wxID_ANY, _("Créer un lien vers une autre scène"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -116,7 +116,7 @@ eventToEdit(pEvent)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditLink::OnStartEditText);
 	Connect(ID_TEXTCTRL3,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditLink::OnEndEditText);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditLink::OnOkBtClick);
@@ -124,12 +124,12 @@ eventToEdit(pEvent)
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditLink::OnAideBtClick);
 	//*)
 
-	NomSceneEdit->SetValue(eventToEdit.sceneLinked);
+	NomSceneEdit->ChangeValue(eventToEdit.sceneLinked);
 	if ( eventToEdit.start != -1 && eventToEdit.end != -1 )
 	{
 	    OnlyEventsCheck->SetValue(true);
-	    StartEdit->SetValue(st(eventToEdit.start));
-	    EndEdit->SetValue(st(eventToEdit.end));
+	    StartEdit->ChangeValue(st(eventToEdit.start));
+	    EndEdit->ChangeValue(st(eventToEdit.end));
 	}
 }
 

@@ -104,19 +104,23 @@ onlyObjectOfType(onlyObjectOfType_)
 	SetSizer(FlexGridSizer1);
 	editMenuItem = new wxMenuItem((&Menu1), ID_MENUITEM2, _("Choisir cet objet"), wxEmptyString, wxITEM_NORMAL);
 	Menu1.Append(editMenuItem);
+	#ifdef __WXMSW__
 	    Menu1.Remove(editMenuItem);
 	    wxFont boldFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	    editMenuItem->SetFont(boldFont);
 	    Menu1.Append(editMenuItem);
+	#endif
 	Menu1.AppendSeparator();
 	MenuItem1 = new wxMenuItem((&Menu1), ID_MENUITEM1, _("Pour ajouter des objets, utilisez l\'éditeur d\'objets"), wxEmptyString, wxITEM_NORMAL);
 	Menu1.Append(MenuItem1);
 	editGroupMenuItem = new wxMenuItem((&Menu2), ID_MENUITEM3, _("Choisir ce groupe"), wxEmptyString, wxITEM_NORMAL);
 	Menu2.Append(editGroupMenuItem);
+	#ifdef __WXMSW__
 	    Menu2.Remove(editGroupMenuItem);
 	    wxFont boldFont2(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	    editGroupMenuItem->SetFont(boldFont2);
 	    Menu2.Append(editGroupMenuItem);
+	#endif
 	Menu2.AppendSeparator();
 	MenuItem4 = new wxMenuItem((&Menu2), ID_MENUITEM4, _("Pour ajouter des groupes, utilisez l\'éditeur de groupes d\'objets"), wxEmptyString, wxITEM_NORMAL);
 	Menu2.Append(MenuItem4);

@@ -24,8 +24,7 @@ bool ActionForEachObject( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 bool ConditionForEachObject( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
     //Need to copy the old objectsConcerned object to evaluate properly the arguments
-    ObjectsConcerned originalObjectsConcerned = objectsConcerned;
-    eval.SetObjectsConcerned(&originalObjectsConcerned);
+    ObjectsConcerned objectsConcernedForExpressions = objectsConcerned;
 
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     bool isTrue = false;
@@ -34,7 +33,7 @@ bool ConditionForEachObject( RuntimeScene * scene, ObjectsConcerned & objectsCon
 	ObjList::const_iterator obj_end = list.end();
     for ( ; obj != obj_end; ++obj )
     {
-        if ( ((*obj).get()->*condition.objectFunction)(scene, objectsConcerned, condition, eval) ^ condition.IsInverted())
+        if ( ((*obj).get()->*condition.objectFunction)(scene, objectsConcernedForExpressions, condition, eval) ^ condition.IsInverted())
         {
             isTrue = true;
             objectsConcerned.objectsPicked.AddObject( *obj );

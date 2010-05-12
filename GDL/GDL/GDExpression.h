@@ -41,6 +41,9 @@ class GD_API GDExpression
          */
         inline short int GetAsModOperator() const { return modOperator; };
 
+        /**
+         * Get the object identifier representing the object
+         */
         inline unsigned int GetAsObjectIdentifier() const
         {
             if ( !oIDcomputed )
@@ -54,28 +57,35 @@ class GD_API GDExpression
         }
 
         /**
-         * Parse the formula with the parameters in mathExpression.
+         * Evaluate as a math expression and return the result
          */
-        inline int ParseMathExpression(std::string formula, std::string parameters)
-        {
-            return mathExpression.Parse(formula, parameters);
-        }
+        double GetAsMathExpressionResult(RuntimeScene & scene,
+                                         ObjectsConcerned & objectsConcerned,
+                                         ObjSPtr obj1 = boost::shared_ptr<Object>( ),
+                                         ObjSPtr obj2 = boost::shared_ptr<Object>( )) const
+         {
+            vector < double > parametersValues;
+
+            for (unsigned int i = 0;i<mathExpressionFunctions.size();++i)
+                parametersValues.push_back((mathExpressionFunctions[i].function)(&scene, objectsConcerned, obj1, obj2, mathExpressionFunctions[i]));
+
+            if ( parametersValues.empty() ) parametersValues.push_back(0);
+
+            return mathExpression.Eval(&parametersValues[0]);
+         }
 
         /**
-         * Evaluate mathExpression with theses parameters.
-         * Must have preprocessed ( parsed ) the mathExpression before,
-         * and constructed a array of paremeters thanks to mathExpressionFunctions.
+         * Evaluate as a text expression and return the result
          */
-        inline double EvalMathExpression(const double * parametersValues)
-        {
-            return mathExpression.Eval(parametersValues);
-        }
+        std::string GetAsTextExpressionResult(RuntimeScene & scene,
+                                              ObjectsConcerned & objectsConcerned,
+                                              ObjSPtr obj1 = boost::shared_ptr<Object>( ),
+                                              ObjSPtr obj2 = boost::shared_ptr<Object>( )) const;
 
         /**
-         * Remove all functions to call to evaluate parameters of mathExpression.
-         * Only do this before (re)parsing the math expression.
+         * Preprocess expressions in order to allow evaluation as text or math expression.
          */
-        inline void ClearMathExprFunctions() { mathExpressionFunctions.clear(); }
+        bool PreprocessExpressions(RuntimeScene & scene);
 
         /**
          * Add a function to call to evaluate parameters of mathExpression.
@@ -86,9 +96,6 @@ class GD_API GDExpression
          * Get the functions to call to evaluate parameters of mathExpression.
          */
         inline const std::vector < ExpressionInstruction > & GetMathExprFunctions() const { return mathExpressionFunctions; }
-
-        inline bool IsPreprocessed() const { return isPreprocessed; }
-        inline void SetPreprocessed() { isPreprocessed = true; }
 
         enum compOperator
         {
@@ -104,15 +111,25 @@ class GD_API GDExpression
     protected:
     private:
 
+        /**
+         * Preprocess the math expression, in order to allow its evaluation.
+         */
+        bool PreprocessMathExpression(RuntimeScene & scene);
+
+        /**
+         * Preprocess the text expression, in order to allow its evaluation.
+         */
+        bool PreprocessTextExpression(RuntimeScene & scene);
+
         std::string     plainString; ///<The plain expression
         char            compOperator; ///<Char representing a comparison operator. Computed at creation.
         char            modOperator; ///<Char representing a modification operator. Computed at creation.
-        mutable unsigned int    oID; ///< Object identifier, if expression contains an object name.
+        mutable unsigned int    oID; ///< Object identifier, if expression contains an object name. Automatically computed when needed.
         mutable bool    oIDcomputed;
 
         GDMathParser  mathExpression; ///<Object representing the mathemathic expression to parse and evaluate.
         std::vector < ExpressionInstruction > mathExpressionFunctions; ///< The functions to call to generate the values of the parameters to pass to the mathematic expression when evaluating.
-        bool            isPreprocessed; ///<Indicate if the functions to call and the mathematic expression have been preprocessed.
+        bool            isMathExpressionPreprocessed; ///<Indicate if the functions to call and the mathematic expression have been preprocessed.
 
 };
 

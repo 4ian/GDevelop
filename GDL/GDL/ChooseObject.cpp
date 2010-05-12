@@ -250,22 +250,22 @@ void ChooseObject::Refresh()
 
 void ChooseObject::OnChoisirBtClick(wxCommandEvent& event)
 {
-    if ( Notebook1->GetSelection() == 0 && ObjetsList->GetItemText( item ) != _( "Tous les objets de la scène" ) )
+    if ( Notebook1->GetSelection() == 0 && item.IsOk() && ObjetsList->GetItemText( item ) != _( "Tous les objets de la scène" ) )
     {
         objectChosen = static_cast<string>(ObjetsList->GetItemText( item ));
         EndModal(1);
     }
-    else if ( GroupesList->IsEnabled() && Notebook1->GetSelection() == 1 && GroupesList->GetItemText( itemGroups ) != _( "Tous les groupes de la scène" ) )
+    else if ( GroupesList->IsEnabled() && itemGroups.IsOk() && Notebook1->GetSelection() == 1 && GroupesList->GetItemText( itemGroups ) != _( "Tous les groupes de la scène" ) )
     {
         objectChosen = static_cast<string>(GroupesList->GetItemText( itemGroups ));
         EndModal(1);
     }
-    else if ( Notebook1->GetSelection() == 2 && GroupesList->GetItemText( itemGlobal ) != _( "Tous les objets globaux" ) )
+    else if ( Notebook1->GetSelection() == 2 && itemGlobal.IsOk() && GroupesList->GetItemText( itemGlobal ) != _( "Tous les objets globaux" ) )
     {
         objectChosen = static_cast<string>(GroupesList->GetItemText( itemGlobal ));
         EndModal(1);
     }
-    else if ( Notebook1->GetSelection() == 3 && globalObjectGroups->GetItemText( itemGlobalGroups ) != _( "Tous les groupes globaux" ) )
+    else if ( Notebook1->GetSelection() == 3 && itemGlobalGroups.IsOk() && globalObjectGroups->GetItemText( itemGlobalGroups ) != _( "Tous les groupes globaux" ) )
     {
         objectChosen = static_cast<string>(globalObjectGroups->GetItemText( itemGlobalGroups ));
         EndModal(1);

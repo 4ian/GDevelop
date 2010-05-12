@@ -28,11 +28,6 @@
  */
 bool CondCollision( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    BT_PROFILE("Collision");
-
-    ObjectsConcerned originalObjectsConcerned = objectsConcerned;
-    eval.SetObjectsConcerned(&originalObjectsConcerned);
-
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());
     if ( condition.GetParameter( 1 ).GetPlainString() == condition.GetParameter( 0 ).GetPlainString())
@@ -113,10 +108,6 @@ bool CondCollision( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
  */
 bool CondCollisionNP( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-
-    ObjectsConcerned originalObjectsConcerned = objectsConcerned;
-    eval.SetObjectsConcerned(&originalObjectsConcerned);
-
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());
     if ( condition.GetParameter( 1 ).GetPlainString() == condition.GetParameter( 0 ).GetPlainString())

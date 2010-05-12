@@ -28,8 +28,7 @@
 ////////////////////////////////////////////////////////////
 bool CondNbObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    ObjectsConcerned originalObjectsConcerned = objectsConcerned;
-    eval.SetObjectsConcerned(&originalObjectsConcerned);
+    ObjectsConcerned objectsConcernedForExpressions = objectsConcerned;
 
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     bool isTrue = false;

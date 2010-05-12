@@ -95,8 +95,7 @@ bool SpriteObject::CondDirection( RuntimeScene * scene, ObjectsConcerned & objec
  */
 bool CondEstTourne( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    ObjectsConcerned originalObjectsConcerned = objectsConcerned;
-    eval.SetObjectsConcerned(&originalObjectsConcerned);
+    ObjectsConcerned objectsConcernedForExpressions = objectsConcerned;
 
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());

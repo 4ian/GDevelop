@@ -71,7 +71,7 @@
 		<Cursor position="3156" topLine="97" />
 	</File>
 	<File name="Credits.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="226" topLine="0" />
+		<Cursor position="2181" topLine="40" />
 	</File>
 	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="24631" topLine="484" />
@@ -80,7 +80,7 @@
 		<Cursor position="2773" topLine="93" />
 	</File>
 	<File name="Demarrage.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="404" topLine="13" />
+		<Cursor position="2801" topLine="120" />
 	</File>
 	<File name="DnDFileEditor.cpp" open="0" top="0" tabpos="13">
 		<Cursor position="322" topLine="0" />
@@ -154,8 +154,8 @@
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="21939" topLine="392" />
+	<File name="EditorScene.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="5659" topLine="107" />
 	</File>
 	<File name="EditorScene.h" open="0" top="0" tabpos="11">
 		<Cursor position="516" topLine="15" />
@@ -167,7 +167,7 @@
 		<Cursor position="429" topLine="23" />
 	</File>
 	<File name="Extensions.cpp" open="0" top="0" tabpos="21">
-		<Cursor position="12113" topLine="315" />
+		<Cursor position="11989" topLine="318" />
 	</File>
 	<File name="Extensions.h" open="0" top="0" tabpos="2">
 		<Cursor position="1971" topLine="58" />

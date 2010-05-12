@@ -45,6 +45,6 @@ RenderDialog::~RenderDialog()
  */
 void RenderDialog::OnResize(wxSizeEvent& event)
 {
-    renderCanvas->wxWindowBase::SetSize(event.GetSize());
+    renderCanvas->wxWindowBase::SetVirtualSize(event.GetSize());
     renderCanvas->sf::RenderWindow::SetSize(event.GetSize().GetWidth(), event.GetSize().GetHeight());
 }

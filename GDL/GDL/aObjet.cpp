@@ -64,8 +64,8 @@ bool ActCreate( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const
 
     //Ajout à la liste d'objet et configuration de sa position
     newObject->errors = &scene->errors;
-    newObject->SetX( eval.EvalExp( action.GetParameter( 1 ) ) );
-    newObject->SetY( eval.EvalExp( action.GetParameter( 2 ) ) );
+    newObject->SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) );
+    newObject->SetY( action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) );
 
     //Compatibilité avec les versions de Game Develop précédentes
     if ( action.GetParameters().size() > 3 )

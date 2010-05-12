@@ -114,7 +114,7 @@ bool ActUnPauseTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 ////////////////////////////////////////////////////////////
 bool ActChangeTimeScale( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    scene->SetTimeScale(eval.EvalExp(action.GetParameter(0)));
+    scene->SetTimeScale(action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     return true;
 }

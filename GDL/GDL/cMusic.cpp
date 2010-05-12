@@ -24,7 +24,7 @@ bool CondMusicPlaying( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
     bool Ok = false;
     bool OkContraire = false;
 
-    int canal = static_cast<int> ( eval.EvalExp(condition.GetParameter(0)));
+    int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
@@ -62,7 +62,7 @@ bool CondMusicPaused( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     bool Ok = false;
     bool OkContraire = false;
 
-    int canal = static_cast<int> ( eval.EvalExp(condition.GetParameter(0)));
+    int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
@@ -100,7 +100,7 @@ bool CondMusicStopped( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
     bool Ok = false;
     bool OkContraire = false;
 
-    int canal = static_cast<int> ( eval.EvalExp(condition.GetParameter(0)));
+    int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
@@ -141,7 +141,7 @@ bool CondSoundPlaying( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
     bool Ok = false;
     bool OkContraire = false;
 
-    int canal = static_cast<int> ( eval.EvalExp(condition.GetParameter(0)));
+    int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
@@ -177,7 +177,7 @@ bool CondSoundPaused( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     bool Ok = false;
     bool OkContraire = false;
 
-    int canal = static_cast<int> ( eval.EvalExp(condition.GetParameter(0)));
+    int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
@@ -216,7 +216,7 @@ bool CondSoundStopped( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
     bool Ok = false;
     bool OkContraire = false;
 
-    int canal = static_cast<int> ( eval.EvalExp(condition.GetParameter(0)));
+    int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
@@ -259,11 +259,11 @@ bool CondGlobalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 
     float volume = soundManager->GetGlobalVolume();
 
-    if (   (condition.GetParameter(1).GetAsCompOperator() == GDExpression::Equal && volume == eval.EvalExp(condition.GetParameter(0)))
-        || (condition.GetParameter(1).GetAsCompOperator() == GDExpression::Inferior && volume < eval.EvalExp(condition.GetParameter(0)))
-        || (condition.GetParameter(1).GetAsCompOperator() == GDExpression::Superior && volume > eval.EvalExp(condition.GetParameter(0)))
-        || (condition.GetParameter(1).GetAsCompOperator() == GDExpression::InferiorOrEqual && volume <= eval.EvalExp(condition.GetParameter(0)))
-        || (condition.GetParameter(1).GetAsCompOperator() == GDExpression::SuperiorOrEqual && volume >= eval.EvalExp(condition.GetParameter(0))))
+    if (   (condition.GetParameter(1).GetAsCompOperator() == GDExpression::Equal && volume == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned))
+        || (condition.GetParameter(1).GetAsCompOperator() == GDExpression::Inferior && volume < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned))
+        || (condition.GetParameter(1).GetAsCompOperator() == GDExpression::Superior && volume > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned))
+        || (condition.GetParameter(1).GetAsCompOperator() == GDExpression::InferiorOrEqual && volume <= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned))
+        || (condition.GetParameter(1).GetAsCompOperator() == GDExpression::SuperiorOrEqual && volume >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned)))
     {
         Ok = true;
         OkContraire = false;
@@ -294,7 +294,7 @@ bool CondSoundCanalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConce
     bool Ok = false;
     bool OkContraire = false;
 
-    int canal = static_cast<int> ( eval.EvalExp(condition.GetParameter(0)));
+    int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
         scene->errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
@@ -304,11 +304,11 @@ bool CondSoundCanalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConce
     SoundManager * soundManager = SoundManager::getInstance();
     float volume = soundManager->GetSoundOnChannel(canal)->sound.GetVolume();
 
-    if (   (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Equal && volume == eval.EvalExp(condition.GetParameter(1)))
-        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Inferior && volume < eval.EvalExp(condition.GetParameter(1)))
-        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Superior && volume > eval.EvalExp(condition.GetParameter(1)))
-        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::InferiorOrEqual && volume <= eval.EvalExp(condition.GetParameter(1)))
-        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::SuperiorOrEqual && volume >= eval.EvalExp(condition.GetParameter(1))))
+    if (   (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Equal && volume == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
+        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Inferior && volume < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
+        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Superior && volume > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
+        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::InferiorOrEqual && volume <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
+        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::SuperiorOrEqual && volume >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned)))
     {
         Ok = true;
         OkContraire = false;
@@ -340,7 +340,7 @@ bool CondMusicCanalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConce
     bool Ok = false;
     bool OkContraire = false;
 
-    int canal = static_cast<int> ( eval.EvalExp(condition.GetParameter(0)));
+    int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
         scene->errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
@@ -350,11 +350,11 @@ bool CondMusicCanalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConce
     SoundManager * soundManager = SoundManager::getInstance();
     float volume = soundManager->GetMusicOnChannel(canal)->music.GetVolume();
 
-    if (   (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Equal && volume == eval.EvalExp(condition.GetParameter(1)))
-        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Inferior && volume < eval.EvalExp(condition.GetParameter(1)))
-        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Superior && volume > eval.EvalExp(condition.GetParameter(1)))
-        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::InferiorOrEqual && volume <= eval.EvalExp(condition.GetParameter(1)))
-        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::SuperiorOrEqual && volume >= eval.EvalExp(condition.GetParameter(1))))
+    if (   (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Equal && volume == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
+        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Inferior && volume < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
+        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Superior && volume > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
+        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::InferiorOrEqual && volume <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
+        || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::SuperiorOrEqual && volume >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned)))
     {
         Ok = true;
         OkContraire = false;

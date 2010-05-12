@@ -33,19 +33,19 @@ bool ActEcrireTexte( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, 
 {
     Text texte;
     texte.text.SetString(eval.EvalTxt(action.GetParameter(0) ) );
-    texte.text.SetPosition(eval.EvalExp(action.GetParameter(1) ), eval.EvalExp(action.GetParameter(2) ));
+    texte.text.SetPosition(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned), action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     vector < GDExpression > colors = SpliterStringToVector <GDExpression> (action.GetParameter(3).GetPlainString(), ';');
 
     if ( colors.size() > 2 )
     {
         texte.text.SetColor(sf::Color(
-                                static_cast<int>(eval.EvalExp( colors[0] )),
-                                static_cast<int>(eval.EvalExp( colors[1] )),
-                                static_cast<int>(eval.EvalExp( colors[2] )) ));
+                                static_cast<int>(colors[0].GetAsMathExpressionResult(scene, objectsConcerned)),
+                                static_cast<int>(colors[1].GetAsMathExpressionResult(scene, objectsConcerned)),
+                                static_cast<int>(colors[2].GetAsMathExpressionResult(scene, objectsConcerned)) ));
     }
 
-    texte.text.SetCharacterSize(eval.EvalExp(action.GetParameter(4) ));
+    texte.text.SetCharacterSize(action.GetParameter(4).GetAsMathExpressionResult(scene, objectsConcerned));
 
     texte.fontName = action.GetParameter(5).GetPlainString();
 

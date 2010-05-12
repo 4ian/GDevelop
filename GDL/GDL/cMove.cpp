@@ -38,12 +38,12 @@ bool Object::CondArret( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
  */
 bool Object::CondVitesse( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && TotalForceLength() == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && TotalForceLength() < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && TotalForceLength() > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && TotalForceLength() <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && TotalForceLength() >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && TotalForceLength() != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && TotalForceLength() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && TotalForceLength() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && TotalForceLength() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && TotalForceLength() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && TotalForceLength() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && TotalForceLength() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -99,7 +99,7 @@ bool CondSeDirige( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
                     while ( diff<-180 )
                         diff += 360;
 
-                    if ( fabs( diff ) <= eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) / 2 )
+                    if ( fabs( diff ) <= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) / 2 )
                     {
                         if ( !condition.IsInverted() )
                         {
@@ -140,7 +140,7 @@ bool Object::CondAngleOfDisplacement( RuntimeScene * scene, ObjectsConcerned & o
 {
     if ( TotalForceLength() == 0) return condition.IsInverted();
 
-    float angle = eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() );
+    float angle = condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() );
     float objectAngle = TotalForceAngle();
 
     //Compute difference between two angles
@@ -150,7 +150,7 @@ bool Object::CondAngleOfDisplacement( RuntimeScene * scene, ObjectsConcerned & o
 	while ( diff<-180 )
 		diff += 360;
 
-    if ( fabs(diff) <= (eval.EvalExp( condition.GetParameter( 2 ), shared_from_this())/2) )
+    if ( fabs(diff) <= (condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())/2) )
         return !condition.IsInverted();
 
     return condition.IsInverted();

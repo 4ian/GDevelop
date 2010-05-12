@@ -67,7 +67,7 @@ class GD_API GDExpression
             vector < double > parametersValues;
 
             for (unsigned int i = 0;i<mathExpressionFunctions.size();++i)
-                parametersValues.push_back((mathExpressionFunctions[i].function)(&scene, objectsConcerned, obj1, obj2, mathExpressionFunctions[i]));
+                parametersValues.push_back((mathExpressionFunctions[i].function)(scene, objectsConcerned, obj1, obj2, mathExpressionFunctions[i]));
 
             if ( parametersValues.empty() ) parametersValues.push_back(0);
 

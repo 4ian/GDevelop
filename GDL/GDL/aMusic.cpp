@@ -64,7 +64,7 @@ bool ActPlaySound( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
     if ( action.GetParameters().size() > 2 )
     {
         if ( action.GetParameter(2).GetPlainString() != "" )
-            soundManager->sounds.back()->SetVolume(eval.EvalExp(action.GetParameter(2)));
+            soundManager->sounds.back()->SetVolume(action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
         else
             soundManager->sounds.back()->SetVolume(100);
     }
@@ -86,7 +86,7 @@ bool ActPlaySound( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 ////////////////////////////////////////////////////////////
 bool ActPlaySoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    int canal = static_cast<int> ( eval.EvalExp(action.GetParameter(1)) );
+    int canal = static_cast<int> ( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) );
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
@@ -119,7 +119,7 @@ bool ActPlaySoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
     if ( action.GetParameters().size() > 3 )
     {
         if ( action.GetParameter(3).GetPlainString() != "" )
-            soundManager->GetSoundOnChannel(canal)->SetVolume(eval.EvalExp(action.GetParameter(3)));
+            soundManager->GetSoundOnChannel(canal)->SetVolume(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned));
         else
             soundManager->GetSoundOnChannel(canal)->SetVolume(100);
     }
@@ -136,7 +136,7 @@ bool ActPlaySoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 ////////////////////////////////////////////////////////////
 bool ActStopSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    int canal = static_cast<int> ( eval.EvalExp(action.GetParameter(0)));
+    int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
@@ -161,7 +161,7 @@ bool ActStopSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 ////////////////////////////////////////////////////////////
 bool ActPauseSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    int canal = static_cast<int> ( eval.EvalExp(action.GetParameter(0)));
+    int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
@@ -186,7 +186,7 @@ bool ActPauseSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 ////////////////////////////////////////////////////////////
 bool ActRePlaySoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    int canal = static_cast<int> ( eval.EvalExp(action.GetParameter(0)));
+    int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
@@ -236,7 +236,7 @@ bool ActPlayMusic( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
     if ( action.GetParameters().size() > 2 )
     {
         if ( action.GetParameter(2).GetPlainString() != "" )
-            music->SetVolume(eval.EvalExp(action.GetParameter(2)));
+            music->SetVolume(action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
         else
             music->SetVolume(100);
     }
@@ -256,7 +256,7 @@ bool ActPlayMusic( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 ////////////////////////////////////////////////////////////
 bool ActPlayMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    int canal = static_cast<int> ( eval.EvalExp(action.GetParameter(1)));
+    int canal = static_cast<int> ( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
@@ -287,7 +287,7 @@ bool ActPlayMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
     if ( action.GetParameters().size() > 3 )
     {
         if ( action.GetParameter(3).GetPlainString() != "" )
-            music->SetVolume(eval.EvalExp(action.GetParameter(3)));
+            music->SetVolume(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned));
         else
             music->SetVolume(100);
     }
@@ -302,7 +302,7 @@ bool ActPlayMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 ////////////////////////////////////////////////////////////
 bool ActStopMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    int canal = static_cast<int> ( eval.EvalExp(action.GetParameter(0)));
+    int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
@@ -327,7 +327,7 @@ bool ActStopMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 ////////////////////////////////////////////////////////////
 bool ActPauseMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    int canal = static_cast<int> ( eval.EvalExp(action.GetParameter(0)));
+    int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
@@ -352,7 +352,7 @@ bool ActPauseMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 ////////////////////////////////////////////////////////////
 bool ActRePlayMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    int canal = static_cast<int> ( eval.EvalExp(action.GetParameter(0)));
+    int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
@@ -379,7 +379,7 @@ bool ActRePlayMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 ////////////////////////////////////////////////////////////
 bool ActModVolumeSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    int canal = static_cast<int> (eval.EvalExp(action.GetParameter(0)));
+    int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
@@ -391,15 +391,15 @@ bool ActModVolumeSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsCon
     soundManager = SoundManager::getInstance();
 
     if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
-        soundManager->GetSoundOnChannel(canal)->SetVolume(eval.EvalExp(action.GetParameter(1)));
+        soundManager->GetSoundOnChannel(canal)->SetVolume(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Add)
-        soundManager->GetSoundOnChannel(canal)->SetVolume(soundManager->GetSoundOnChannel(canal)->GetVolume() + eval.EvalExp(action.GetParameter(1)));
+        soundManager->GetSoundOnChannel(canal)->SetVolume(soundManager->GetSoundOnChannel(canal)->GetVolume() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Substract)
-        soundManager->GetSoundOnChannel(canal)->SetVolume(soundManager->GetSoundOnChannel(canal)->GetVolume() - eval.EvalExp(action.GetParameter(1)));
+        soundManager->GetSoundOnChannel(canal)->SetVolume(soundManager->GetSoundOnChannel(canal)->GetVolume() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Multiply)
-        soundManager->GetSoundOnChannel(canal)->SetVolume(soundManager->GetSoundOnChannel(canal)->GetVolume() * eval.EvalExp(action.GetParameter(1)));
+        soundManager->GetSoundOnChannel(canal)->SetVolume(soundManager->GetSoundOnChannel(canal)->GetVolume() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Divide)
-        soundManager->GetSoundOnChannel(canal)->SetVolume(soundManager->GetSoundOnChannel(canal)->GetVolume() / eval.EvalExp(action.GetParameter(1)));
+        soundManager->GetSoundOnChannel(canal)->SetVolume(soundManager->GetSoundOnChannel(canal)->GetVolume() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     return true;
 }
@@ -415,7 +415,7 @@ bool ActModVolumeSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsCon
 ////////////////////////////////////////////////////////////
 bool ActModVolumeMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    int canal = static_cast<int> (eval.EvalExp(action.GetParameter(0)));
+    int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
@@ -427,15 +427,15 @@ bool ActModVolumeMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsCon
     soundManager = SoundManager::getInstance();
 
     if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
-        soundManager->GetMusicOnChannel(canal)->SetVolume(eval.EvalExp(action.GetParameter(1)));
+        soundManager->GetMusicOnChannel(canal)->SetVolume(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Add)
-        soundManager->GetMusicOnChannel(canal)->SetVolume(soundManager->GetMusicOnChannel(canal)->GetVolume() + eval.EvalExp(action.GetParameter(1)));
+        soundManager->GetMusicOnChannel(canal)->SetVolume(soundManager->GetMusicOnChannel(canal)->GetVolume() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Substract)
-        soundManager->GetMusicOnChannel(canal)->SetVolume(soundManager->GetMusicOnChannel(canal)->GetVolume() - eval.EvalExp(action.GetParameter(1)));
+        soundManager->GetMusicOnChannel(canal)->SetVolume(soundManager->GetMusicOnChannel(canal)->GetVolume() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Multiply)
-        soundManager->GetMusicOnChannel(canal)->SetVolume(soundManager->GetMusicOnChannel(canal)->GetVolume() * eval.EvalExp(action.GetParameter(1)));
+        soundManager->GetMusicOnChannel(canal)->SetVolume(soundManager->GetMusicOnChannel(canal)->GetVolume() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Divide)
-        soundManager->GetMusicOnChannel(canal)->SetVolume(soundManager->GetMusicOnChannel(canal)->GetVolume() / eval.EvalExp(action.GetParameter(1)));
+        soundManager->GetMusicOnChannel(canal)->SetVolume(soundManager->GetMusicOnChannel(canal)->GetVolume() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     return true;
 }
@@ -452,15 +452,15 @@ bool ActModGlobalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConcern
     SoundManager * soundManager = SoundManager::getInstance();
 
     if (action.GetParameter(1).GetPlainString().empty() || action.GetParameter(1).GetAsModOperator() == GDExpression::Set)
-        soundManager->SetGlobalVolume(eval.EvalExp(action.GetParameter(0)));
+        soundManager->SetGlobalVolume(action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(1).GetAsModOperator() == GDExpression::Add)
-        soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() + eval.EvalExp(action.GetParameter(0)));
+        soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() + action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(1).GetAsModOperator() == GDExpression::Substract)
-        soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() - eval.EvalExp(action.GetParameter(0)));
+        soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() - action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(1).GetAsModOperator() == GDExpression::Multiply)
-        soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() * eval.EvalExp(action.GetParameter(0)));
+        soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() * action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(1).GetAsModOperator() == GDExpression::Divide)
-        soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() / eval.EvalExp(action.GetParameter(0)));
+        soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() / action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     return true;
 }

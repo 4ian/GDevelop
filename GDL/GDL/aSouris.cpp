@@ -35,8 +35,8 @@ bool ActCentreSourisY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 
 bool ActSetSourisXY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    float newX = eval.EvalExp(action.GetParameter(0));
-    float newY = eval.EvalExp(action.GetParameter(1));
+    float newX = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    float newY = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     scene->renderWindow->SetCursorPosition( newX, newY );
 

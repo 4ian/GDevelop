@@ -187,7 +187,7 @@ bool ActEcrireFichierExp( RuntimeScene * scene, ObjectsConcerned & objectsConcer
     //Ecriture dans le groupe
     if ( hdl.Element() != NULL )
     {
-        hdl.Element()->SetDoubleAttribute("value", eval.EvalExp(action.GetParameter(2)));
+        hdl.Element()->SetDoubleAttribute("value", action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
     }
     else { scene->errors.Add("Erreur interne : Le groupe finale aurait dû être valide.", "", "", -1, 2); }
 

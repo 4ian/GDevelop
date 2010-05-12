@@ -47,15 +47,15 @@ bool SpriteObject::ActPlayAnimation( RuntimeScene * scene, ObjectsConcerned & ob
 bool SpriteObject::ActChangeAnimation( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetAnim(static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetAnim(static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetAnim(static_cast<int>(GetAnimationNb() + eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetAnim(static_cast<int>(GetAnimationNb() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetAnim(static_cast<int>(GetAnimationNb() - eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetAnim(static_cast<int>(GetAnimationNb() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetAnim(static_cast<int>(GetAnimationNb() * eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetAnim(static_cast<int>(GetAnimationNb() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetAnim(static_cast<int>(GetAnimationNb() / eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetAnim(static_cast<int>(GetAnimationNb() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
 
     return true;
 }
@@ -67,15 +67,15 @@ bool SpriteObject::ActChangeAnimation( RuntimeScene * scene, ObjectsConcerned & 
 bool SpriteObject::ActChangeDirection( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetDirec(gdRound((eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
+        SetDirec(gdRound((action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetDirec(gdRound((GetDirectionNb() + eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
+        SetDirec(gdRound((GetDirectionNb() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetDirec(gdRound((GetDirectionNb() - eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
+        SetDirec(gdRound((GetDirectionNb() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetDirec(gdRound((GetDirectionNb() * eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
+        SetDirec(gdRound((GetDirectionNb() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetDirec(gdRound((GetDirectionNb() / eval.EvalExp( action.GetParameter( 1 ), shared_from_this()))));
+        SetDirec(gdRound((GetDirectionNb() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
 
     return true;
 }
@@ -141,8 +141,8 @@ bool ActTourneVers( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 bool SpriteObject::ActTourneVersPos( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
 	//Work around for a Visual C++ internal compiler error (!)
-	double y = eval.EvalExp(action.GetParameter( 2 ), shared_from_this()) - (GetDrawableY()+GetCenterY());
-	double x = eval.EvalExp(action.GetParameter( 1 ), shared_from_this()) - (GetDrawableX()+GetCenterX());
+	double y = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()) - (GetDrawableY()+GetCenterY());
+	double x = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()) - (GetDrawableX()+GetCenterX());
     int angle = atan2(y,x) * 180 / 3.14;
 
     if ( GetAnimation( GetAnimationNb() ).typeNormal )
@@ -182,15 +182,15 @@ bool SpriteObject::ActTourneVersPos( RuntimeScene * scene, ObjectsConcerned & ob
 bool SpriteObject::ActChangeSprite( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetSprite(static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetSprite(static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetSprite(static_cast<int>(GetSpriteNb() + eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetSprite(static_cast<int>(GetSpriteNb() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetSprite(static_cast<int>(GetSpriteNb() - eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetSprite(static_cast<int>(GetSpriteNb() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetSprite(static_cast<int>(GetSpriteNb() * eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetSprite(static_cast<int>(GetSpriteNb() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetSprite(static_cast<int>(GetSpriteNb() / eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetSprite(static_cast<int>(GetSpriteNb() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
 
     return true;
 }

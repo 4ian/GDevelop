@@ -139,9 +139,9 @@ bool ActRebondir( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
 bool Object::ActAddForceXY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     Force forceToAdd;
-    forceToAdd.SetX( eval.EvalExp( action.GetParameter( 1 ), shared_from_this()  ) );
-    forceToAdd.SetY( eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  ) );
-    forceToAdd.SetClearing( eval.EvalExp( action.GetParameter( 3 ), shared_from_this()  ) );
+    forceToAdd.SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()  ) );
+    forceToAdd.SetY( action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()  ) );
+    forceToAdd.SetClearing( action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()  ) );
     Forces.push_back( forceToAdd );
 
     return true;
@@ -154,9 +154,9 @@ bool Object::ActAddForceAL( RuntimeScene * scene, ObjectsConcerned & objectsConc
 {
     //Ajout de la force
     Force forceToAdd;
-    forceToAdd.SetAngle( eval.EvalExp( action.GetParameter( 1 ), shared_from_this() ) );
-    forceToAdd.SetLength( eval.EvalExp( action.GetParameter( 2 ), shared_from_this() ) );
-    forceToAdd.SetClearing( eval.EvalExp( action.GetParameter( 3 ), shared_from_this() ) );
+    forceToAdd.SetAngle( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) );
+    forceToAdd.SetLength( action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) );
+    forceToAdd.SetClearing( action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) );
     Forces.push_back( forceToAdd );
 
     return true;
@@ -186,8 +186,8 @@ bool ActAddForceVers( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     for ( ; obj != obj_end; ++obj )
     {
         Force forceToAdd;
-        forceToAdd.SetLength( eval.EvalExp( action.GetParameter( 2 ), *obj , list2[0] ) );
-        forceToAdd.SetClearing( eval.EvalExp( action.GetParameter( 3 ), *obj, list2[0]  ) );
+        forceToAdd.SetLength( action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj , list2[0] ) );
+        forceToAdd.SetClearing( action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, list2[0]  ) );
         forceToAdd.SetAngle( atan2(( list2[0]->GetDrawableY() + list2[0]->GetCenterY() ) - ( (*obj)->GetDrawableY() + (*obj)->GetCenterY() ),
                                  ( list2[0]->GetDrawableX() + list2[0]->GetCenterX() ) - ( (*obj)->GetDrawableX() + (*obj)->GetCenterX() ) )
                                  * 180 / 3.14 );
@@ -204,12 +204,12 @@ bool ActAddForceVers( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 bool Object::ActAddForceVersPos( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     Force forceToAdd;
-    forceToAdd.SetLength( eval.EvalExp( action.GetParameter( 3 ), shared_from_this()) );
-    forceToAdd.SetClearing( eval.EvalExp( action.GetParameter( 4 ), shared_from_this() ) );
+    forceToAdd.SetLength( action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()) );
+    forceToAdd.SetClearing( action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) );
 
 	//Workaround Visual C++ internal error (!) by using temporary doubles.
-	double y = eval.EvalExp(action.GetParameter( 2 ), shared_from_this() ) - (GetDrawableY()+GetCenterY());
-	double x = eval.EvalExp(action.GetParameter( 1 ), shared_from_this() ) - (GetDrawableX()+GetCenterX());
+	double y = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) - (GetDrawableY()+GetCenterY());
+	double x = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) - (GetDrawableX()+GetCenterX());
     forceToAdd.SetAngle( atan2(y,x) * 180 / 3.14 );
 
     Forces.push_back( forceToAdd );
@@ -235,23 +235,23 @@ bool Object::ActAddForceTournePos( RuntimeScene * scene, ObjectsConcerned & obje
     //Angle en degré entre les deux objets
 
 	//Workaround Visual C++ internal error (!) by using temporary doubles.
-	double y = ( GetDrawableY() + GetCenterY()) - eval.EvalExp( action.GetParameter( 2 ), shared_from_this() );
-	double x = ( GetDrawableX() + GetCenterX() ) - eval.EvalExp( action.GetParameter( 1 ), shared_from_this() );
+	double y = ( GetDrawableY() + GetCenterY()) - action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() );
+	double x = ( GetDrawableX() + GetCenterX() ) - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() );
     float angle = atan2(y,x) * 180 / 3.14;
-    float newangle = angle + eval.EvalExp( action.GetParameter( 3 ), shared_from_this());
+    float newangle = angle + action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
 
     //position actuelle de l'objet 1 par rapport à l'objet centre
-    int oldX = ( GetDrawableX() + GetCenterX() ) - eval.EvalExp( action.GetParameter( 1 ), shared_from_this() );
-    int oldY = ( GetDrawableY() + GetCenterY() ) - eval.EvalExp( action.GetParameter( 2 ), shared_from_this() );
+    int oldX = ( GetDrawableX() + GetCenterX() ) - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() );
+    int oldY = ( GetDrawableY() + GetCenterY() ) - action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() );
 
     //nouvelle position à atteindre
-    int newX = cos(newangle/180.f*3.14f) * eval.EvalExp( action.GetParameter( 4 ), shared_from_this());
-    int newY = sin(newangle/180.f*3.14f) * eval.EvalExp( action.GetParameter( 4 ), shared_from_this());
+    int newX = cos(newangle/180.f*3.14f) * action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
+    int newY = sin(newangle/180.f*3.14f) * action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
 
     Force forceToAdd;
     forceToAdd.SetX( newX-oldX );
     forceToAdd.SetY( newY-oldY );
-    forceToAdd.SetClearing( eval.EvalExp( action.GetParameter( 5 ), shared_from_this()) );
+    forceToAdd.SetClearing( action.GetParameter( 5 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()) );
 
     Forces.push_back( forceToAdd );
 
@@ -284,20 +284,20 @@ bool ActAddForceTourne( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
         float angle = atan2(( (*obj)->GetDrawableY() + (*obj)->GetCenterY()) - ( list2[0]->GetDrawableY() + list2[0]->GetCenterY() ),
                             ( (*obj)->GetDrawableX() + (*obj)->GetCenterX() ) - ( list2[0]->GetDrawableX() + list2[0]->GetCenterX() ) )
                              * 180 / 3.14;
-        float newangle = angle + eval.EvalExp( action.GetParameter( 2 ), *obj, list2[0]);
+        float newangle = angle + action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, list2[0]);
 
         //position actuelle de l'objet 1 par rapport à l'objet centre
         int oldX = ( (*obj)->GetDrawableX() + (*obj)->GetCenterX() ) - ( list2[0]->GetDrawableX() + list2[0]->GetCenterX() );
         int oldY = ( (*obj)->GetDrawableY() + (*obj)->GetCenterY()) - ( list2[0]->GetDrawableY() + list2[0]->GetCenterY());
 
         //nouvelle position à atteindre
-        int newX = cos(newangle/180.f*3.14f) * eval.EvalExp( action.GetParameter( 3 ), *obj, list2[0]  );
-        int newY = sin(newangle/180.f*3.14f) * eval.EvalExp( action.GetParameter( 3 ), *obj, list2[0]  );
+        int newX = cos(newangle/180.f*3.14f) * action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, list2[0]  );
+        int newY = sin(newangle/180.f*3.14f) * action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, list2[0]  );
 
         Force forceToAdd;
         forceToAdd.SetX( newX-oldX );
         forceToAdd.SetY( newY-oldY );
-        forceToAdd.SetClearing( eval.EvalExp( action.GetParameter( 4 ), *obj, list2[0] ) );
+        forceToAdd.SetClearing( action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, list2[0] ) );
 
         (*obj)->Forces.push_back( forceToAdd );
     }

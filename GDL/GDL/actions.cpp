@@ -30,9 +30,9 @@ bool ActSceneBackground( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 
     if ( colors.size() > 2 )
     {
-        scene->backgroundColorR = eval.EvalExp( colors[0] );
-        scene->backgroundColorG = eval.EvalExp( colors[1] );
-        scene->backgroundColorB = eval.EvalExp( colors[2] );
+        scene->backgroundColorR = colors[0].GetAsMathExpressionResult(scene, objectsConcerned);
+        scene->backgroundColorG = colors[1].GetAsMathExpressionResult(scene, objectsConcerned);
+        scene->backgroundColorB = colors[2].GetAsMathExpressionResult(scene, objectsConcerned);
     }
 
     return true;

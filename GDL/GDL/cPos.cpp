@@ -28,12 +28,12 @@
 bool Object::CondPosX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
     //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetX() == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetX() < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetX() > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetX() <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetX() >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetX() != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetX() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetX() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetX() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetX() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetX() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetX() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -48,12 +48,12 @@ bool Object::CondPosX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 bool Object::CondPosY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
     //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetY() == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetY() < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetY() > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetY() <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetY() >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetY() != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetY() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetY() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetY() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetY() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetY() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetY() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -96,12 +96,12 @@ bool CondDistance( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
                 float Y = (*obj)->GetDrawableY()+(*obj)->GetCenterY() - ((*obj2)->GetDrawableY()+(*obj2)->GetCenterY());
 
                 //optimisation : le test de signe en premier
-                if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && gpl::sqrt(X*X+Y*Y) == eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) ) ||
-                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && gpl::sqrt(X*X+Y*Y) < eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) ) ||
-                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && gpl::sqrt(X*X+Y*Y) > eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) ) ||
-                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && gpl::sqrt(X*X+Y*Y) <= eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) ) ||
-                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && gpl::sqrt(X*X+Y*Y) >= eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) ) ||
-                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && gpl::sqrt(X*X+Y*Y) != eval.EvalExp( condition.GetParameter( 2 ), *obj, *obj2 ) )
+                if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && gpl::sqrt(X*X+Y*Y) == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
+                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && gpl::sqrt(X*X+Y*Y) < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
+                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && gpl::sqrt(X*X+Y*Y) > condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
+                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && gpl::sqrt(X*X+Y*Y) <= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
+                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && gpl::sqrt(X*X+Y*Y) >= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
+                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && gpl::sqrt(X*X+Y*Y) != condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) )
                    )
                 {
                     if ( !condition.IsInverted() )

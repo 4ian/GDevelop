@@ -25,12 +25,12 @@ bool Object::CondVarObjet( RuntimeScene * scene, ObjectsConcerned & objectsConce
 
     //Enfin, on teste vraiment.
     //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && varValue == eval.EvalExp( condition.GetParameter( 2 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && varValue < eval.EvalExp( condition.GetParameter( 2 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && varValue > eval.EvalExp( condition.GetParameter( 2 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && varValue <= eval.EvalExp( condition.GetParameter( 2 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && varValue >= eval.EvalExp( condition.GetParameter( 2 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && varValue != eval.EvalExp( condition.GetParameter( 2 ), shared_from_this() ) )
+    if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && varValue == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && varValue < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && varValue > condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && varValue <= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && varValue >= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && varValue != condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -76,7 +76,7 @@ bool Object::CondVarObjetDef( RuntimeScene * scene, ObjectsConcerned & objectsCo
 ////////////////////////////////////////////////////////////
 bool CondVarScene( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    return CondVar(scene->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), eval.EvalExp( condition.GetParameter( 1 ) ) ) ^ condition.IsInverted();
+    return CondVar(scene->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////
@@ -113,7 +113,7 @@ bool CondVarSceneDef( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 ////////////////////////////////////////////////////////////
 bool CondVarGlobal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
-    return CondVar(scene->game->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), eval.EvalExp( condition.GetParameter( 1 ) ) ) ^ condition.IsInverted();
+    return CondVar(scene->game->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////

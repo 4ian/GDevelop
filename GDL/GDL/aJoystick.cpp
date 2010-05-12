@@ -27,7 +27,7 @@
 bool ActGetJoystickAxis( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     //Obtain axis and joystick
-    unsigned int joystick = eval.EvalExp( action.GetParameter( 0 ) );
+    unsigned int joystick = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
     string axisStr = eval.EvalTxt( action.GetParameter( 1 ) );
     sf::Joy::Axis axis;
     if ( axisStr == "AxisX" ) axis = sf::Joy::AxisX;

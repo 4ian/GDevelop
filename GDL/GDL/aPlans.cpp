@@ -28,15 +28,15 @@
 bool Object::ActChangeZOrder( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetZOrder( static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this() )) );
+        SetZOrder( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )) );
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetZOrder( GetZOrder() + static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this() )) );
+        SetZOrder( GetZOrder() + static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )) );
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetZOrder( GetZOrder() - static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this() )) );
+        SetZOrder( GetZOrder() - static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )) );
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetZOrder( GetZOrder() * static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this() )) );
+        SetZOrder( GetZOrder() * static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )) );
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetZOrder( GetZOrder() / static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this() )) );
+        SetZOrder( GetZOrder() / static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )) );
 
     return true;
 }

@@ -28,7 +28,7 @@ repeatNumberExpression("")
 void RepeatEvent::Execute( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval )
 {
     eval.SetObjectsConcerned(&objectsConcerned);
-    int nbRepeat = eval.EvalExp(repeatNumberExpression);
+    int nbRepeat = repeatNumberExpression.GetAsMathExpressionResult(scene, objectsConcerned);
 
     for (unsigned int r = 0;r<static_cast<unsigned>(nbRepeat);++r)
     {

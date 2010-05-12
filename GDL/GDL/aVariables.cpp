@@ -30,15 +30,15 @@ bool Object::ActModVarObjet( RuntimeScene * scene, ObjectsConcerned & objectsCon
 
     //Update variable value
     if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Set )
-        variable = eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
+        variable = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()  );
     else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Add )
-        variable += eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
+        variable += action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()  );
     else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Substract )
-        variable -= eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
+        variable -= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()  );
     else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Multiply )
-        variable *= eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
+        variable *= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()  );
     else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Divide )
-        variable /= eval.EvalExp( action.GetParameter( 2 ), shared_from_this()  );
+        variable /= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()  );
 
     return true;
 }
@@ -77,7 +77,7 @@ bool Object::ActModVarObjetTxt( RuntimeScene * scene, ObjectsConcerned & objects
 ////////////////////////////////////////////////////////////
 bool ActModVarScene( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    return ModVar( scene->variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), eval.EvalExp( action.GetParameter( 1 ) ));
+    return ModVar( scene->variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
 }
 
 ////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ bool ActModVarScene( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, 
 ////////////////////////////////////////////////////////////
 bool ActModVarGlobal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    return ModVar( scene->game->variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), eval.EvalExp( action.GetParameter( 1 ) ));
+    return ModVar( scene->game->variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
 }
 
 ////////////////////////////////////////////////////////////

@@ -28,15 +28,15 @@
 bool ActCameraViewport( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     std::string layer = action.GetParameter(0).GetPlainString();
-    unsigned int cameraNb = eval.EvalExp(action.GetParameter(1));
+    unsigned int cameraNb = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     RuntimeCamera & camera = scene->GetLayer(layer).GetCamera(cameraNb);
 
     camera.GetCameraInfo().defaultViewport = false;
-    camera.GetCameraInfo().viewport.Left = eval.EvalExp(action.GetParameter(2));
-    camera.GetCameraInfo().viewport.Top = eval.EvalExp(action.GetParameter(3));
-    camera.GetCameraInfo().viewport.Right = eval.EvalExp(action.GetParameter(4));
-    camera.GetCameraInfo().viewport.Bottom = eval.EvalExp(action.GetParameter(5));
+    camera.GetCameraInfo().viewport.Left = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    camera.GetCameraInfo().viewport.Top = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    camera.GetCameraInfo().viewport.Right = action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    camera.GetCameraInfo().viewport.Bottom = action.GetParameter( 5 ).GetAsMathExpressionResult(scene, objectsConcerned);
     camera.GetSFMLView().SetViewport(camera.GetCameraInfo().viewport);
     return true;
 }
@@ -47,13 +47,13 @@ bool ActCameraViewport( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 bool ActCameraSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     std::string layer = action.GetParameter(0).GetPlainString();
-    unsigned int cameraNb = eval.EvalExp(action.GetParameter(1));
+    unsigned int cameraNb = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     RuntimeCamera & camera = scene->GetLayer(layer).GetCamera(cameraNb);
 
     camera.GetCameraInfo().defaultSize = false;
-    camera.GetCameraInfo().size.x = eval.EvalExp(action.GetParameter(2));
-    camera.GetCameraInfo().size.y = eval.EvalExp(action.GetParameter(3));
+    camera.GetCameraInfo().size.x = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    camera.GetCameraInfo().size.y = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
     camera.GetSFMLView().SetSize(camera.GetCameraInfo().size);
     return true;
 }
@@ -71,18 +71,18 @@ bool ActAddCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
     if ( !action.GetParameter(1).GetPlainString().empty() || !action.GetParameter(2).GetPlainString().empty() )
         cameraInfo.defaultSize = false;
 
-    cameraInfo.size.x = eval.EvalExp(action.GetParameter(1));
-    cameraInfo.size.y = eval.EvalExp(action.GetParameter(2));
+    cameraInfo.size.x = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    cameraInfo.size.y = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     //Set the viewport
     if ( !action.GetParameter(3).GetPlainString().empty() || !action.GetParameter(4).GetPlainString().empty() ||
          !action.GetParameter(5).GetPlainString().empty() || !action.GetParameter(6).GetPlainString().empty())
         cameraInfo.defaultViewport = false;
 
-    cameraInfo.viewport.Left = eval.EvalExp(action.GetParameter(3));
-    cameraInfo.viewport.Top = eval.EvalExp(action.GetParameter(4));
-    cameraInfo.viewport.Right = eval.EvalExp(action.GetParameter(5));
-    cameraInfo.viewport.Bottom = eval.EvalExp(action.GetParameter(6));
+    cameraInfo.viewport.Left = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    cameraInfo.viewport.Top = action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    cameraInfo.viewport.Right = action.GetParameter( 5 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    cameraInfo.viewport.Bottom = action.GetParameter( 6 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     //Create a runtime camera from the camera
     const sf::RenderWindow * window = scene->renderWindow;
@@ -99,7 +99,7 @@ bool ActAddCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
  */
 bool ActDeleteCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
-    unsigned int cameraNb = eval.EvalExp(action.GetParameter(1));
+    unsigned int cameraNb = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     RuntimeLayer & layer = scene->GetLayer(action.GetParameter(0).GetPlainString());
 
@@ -133,7 +133,7 @@ bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;
     if ( action.GetParameters().size() >= 8 )
-        camera = eval.EvalExp(action.GetParameter(7));
+        camera = action.GetParameter(7).GetAsMathExpressionResult(scene, objectsConcerned);
 
     sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
@@ -153,28 +153,28 @@ bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
     }
 
     //Si on est dans le cadre
-    if ( list[0]->GetX() > eval.EvalExp(action.GetParameter( 1 ))
-        && list[0]->GetX() < eval.EvalExp(action.GetParameter( 3 ))
-        && list[0]->GetY() > eval.EvalExp(action.GetParameter( 2 ))
-        && list[0]->GetY() < eval.EvalExp(action.GetParameter( 4 ))
+    if ( list[0]->GetX() > action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned)
+        && list[0]->GetX() < action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned)
+        && list[0]->GetY() > action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned)
+        && list[0]->GetY() < action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned)
         )
     {
         view.SetCenter(list[0]->GetX() + decalementX, list[0]->GetY() + decalementY);
     }
 
     //Si on n'est pas dedans.
-    if ( ( list[0]->GetX() < eval.EvalExp(action.GetParameter( 1 ))
-        || list[0]->GetX() > eval.EvalExp(action.GetParameter( 3 )) )
-        && list[0]->GetY() > eval.EvalExp(action.GetParameter( 2 ))
-        && list[0]->GetY() < eval.EvalExp(action.GetParameter( 4 )) )
+    if ( ( list[0]->GetX() < action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned)
+        || list[0]->GetX() > action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) )
+        && list[0]->GetY() > action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned)
+        && list[0]->GetY() < action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned) )
 
     {
         view.SetCenter(view.GetCenter().x, list[0]->GetY() + decalementY);
     }
-    if ( ( list[0]->GetY() < eval.EvalExp(action.GetParameter( 2 ))
-        || list[0]->GetY() > eval.EvalExp(action.GetParameter( 4 )) )
-        && list[0]->GetX() > eval.EvalExp(action.GetParameter( 1 ))
-        && list[0]->GetX() < eval.EvalExp(action.GetParameter( 3 )))
+    if ( ( list[0]->GetY() < action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned)
+        || list[0]->GetY() > action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned) )
+        && list[0]->GetX() > action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned)
+        && list[0]->GetX() < action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned))
     {
         view.SetCenter(list[0]->GetX() + decalementX, view.GetCenter().y);
     }
@@ -208,7 +208,7 @@ bool ActCentreCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;
     if ( action.GetParameters().size() >= 4 )
-        camera = eval.EvalExp(action.GetParameter(3));
+        camera = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
@@ -247,11 +247,11 @@ bool ActZoomCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int cameraNb = 0;
     if ( action.GetParameters().size() >= 3 )
-        cameraNb = eval.EvalExp(action.GetParameter(2));
+        cameraNb = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     RuntimeCamera & camera = scene->GetLayer(layer).GetCamera(cameraNb);
 
-    float newZoom = eval.EvalExp( action.GetParameter( 0 ) );
+    float newZoom = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
     if ( newZoom == 0 ) return false;
 
     camera.GetSFMLView().SetSize((camera.GetCameraInfo().size.x/newZoom), (camera.GetCameraInfo().size.y/newZoom));
@@ -277,11 +277,11 @@ bool ActRotateCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;
     if ( action.GetParameters().size() >= 4 )
-        camera = eval.EvalExp(action.GetParameter(3));
+        camera = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
-    float value = eval.EvalExp( action.GetParameter( 0 ) );
+    float value = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
     if ( action.GetParameter( 1 ).GetPlainString().empty() || action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Set ) view.SetRotation(value);
     else if ( action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Add ) view.SetRotation(view.GetRotation()+value);
     else if ( action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Substract ) view.SetRotation(view.GetRotation()-value);

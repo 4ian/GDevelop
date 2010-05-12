@@ -23,31 +23,31 @@ bool SpriteObject::ActChangeScale( RuntimeScene * scene, ObjectsConcerned & obje
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleX(newScale);
         SetScaleY(newScale);
     }
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleX(GetScaleX()+newScale);
         SetScaleY(GetScaleY()+newScale);
     }
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleX(GetScaleX()-newScale);
         SetScaleY(GetScaleY()-newScale);
     }
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleX(GetScaleX()*newScale);
         SetScaleY(GetScaleY()*newScale);
     }
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleX(GetScaleX()/newScale);
         SetScaleY(GetScaleY()/newScale);
     }
@@ -67,27 +67,27 @@ bool SpriteObject::ActChangeScaleWidth( RuntimeScene * scene, ObjectsConcerned &
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleX(newScale);
     }
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleX(GetScaleX()+newScale);
     }
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleX(GetScaleX()-newScale);
     }
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleX(GetScaleX()*newScale);
     }
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleX(GetScaleX()/newScale);
     }
 
@@ -106,27 +106,27 @@ bool SpriteObject::ActChangeScaleHeight( RuntimeScene * scene, ObjectsConcerned 
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleY(newScale);
     }
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleY(GetScaleY()+newScale);
     }
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleY(GetScaleY()-newScale);
     }
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleY(GetScaleY()*newScale);
     }
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
     {
-        float newScale = eval.EvalExp( action.GetParameter( 1 ), shared_from_this());
+        float newScale = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
         SetScaleY(GetScaleY()/newScale);
     }
 

@@ -40,7 +40,7 @@ bool CondTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const
         //On cherche le nom du timer
         if ( scene->timers[i].GetName() == timerName )
         {
-            if ( scene->timers[i].GetTime() >= eval.EvalExp( condition.GetParameter( 0 ) ) )
+            if ( scene->timers[i].GetTime() >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) )
             {
                 if ( condition.IsInverted() ) return false;
                 return true;
@@ -98,12 +98,12 @@ bool CondTimeScale( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier
-    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && ( scene->GetTimeScale() ) == eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && ( scene->GetTimeScale() ) < eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && ( scene->GetTimeScale() ) > eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && ( scene->GetTimeScale() ) <= eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && ( scene->GetTimeScale() ) >= eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && ( scene->GetTimeScale() ) != eval.EvalExp( condition.GetParameter( 0 ) ) )
+    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && ( scene->GetTimeScale() ) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && ( scene->GetTimeScale() ) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && ( scene->GetTimeScale() ) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && ( scene->GetTimeScale() ) <= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && ( scene->GetTimeScale() ) >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && ( scene->GetTimeScale() ) != condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) )
        )
     {
         Ok = true; //Cette condition est vrai

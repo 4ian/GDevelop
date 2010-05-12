@@ -11,9 +11,9 @@ bool SpriteObject::ActChangeColor( RuntimeScene * scene, ObjectsConcerned & obje
 
     if ( colors.size() < 3 ) return false; //La couleur est incorrecte
 
-    SetColor(  eval.EvalExp( colors[0] ),
-               eval.EvalExp( colors[1] ),
-               eval.EvalExp( colors[2] ));
+    SetColor(  colors[0].GetAsMathExpressionResult(scene, objectsConcerned),
+               colors[1].GetAsMathExpressionResult(scene, objectsConcerned),
+               colors[2].GetAsMathExpressionResult(scene, objectsConcerned));
 
     return true;
 }
@@ -32,10 +32,10 @@ bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene * scene, ObjectsCon
     if ( src == scene->game->imageManager.images.end() ) return false;
 
     //Make sure the coordinates are correct.
-    int destX = eval.EvalExp(action.GetParameter(2), shared_from_this());
+    int destX = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
     if ( destX < 0 || static_cast<unsigned>(destX) >= dest.GetWidth()) return false;
 
-    int destY = eval.EvalExp(action.GetParameter(3), shared_from_this());
+    int destY = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
     if ( destY < 0 || static_cast<unsigned>(destY) >= dest.GetWidth()) return false;
 
     bool applyAlpha = false;
@@ -61,9 +61,9 @@ bool SpriteObject::ActCreateMaskFromColorOnActualImage( RuntimeScene * scene, Ob
 
     if ( colors.size() < 3 ) return false; //La couleur est incorrecte
 
-    dest.CreateMaskFromColor(  sf::Color(  eval.EvalExp( colors[0] ),
-                                           eval.EvalExp( colors[1] ),
-                                           eval.EvalExp( colors[2] )));
+    dest.CreateMaskFromColor(  sf::Color(  colors[0].GetAsMathExpressionResult(scene, objectsConcerned),
+                                           colors[1].GetAsMathExpressionResult(scene, objectsConcerned),
+                                           colors[2].GetAsMathExpressionResult(scene, objectsConcerned)));
 
     return true;
 }

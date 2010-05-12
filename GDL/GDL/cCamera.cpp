@@ -27,16 +27,16 @@
 bool CondCameraWidth( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
     std::string layer = condition.GetParameter(0).GetPlainString();
-    unsigned int camera = eval.EvalExp(condition.GetParameter(1));
+    unsigned int camera = condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     float width = scene->GetLayer(layer).GetCamera(camera).GetCameraInfo().size.x;
 
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && width == eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && width < eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && width > eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && width <= eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && width >= eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && width != eval.EvalExp( condition.GetParameter( 3 ) ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && width == condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && width < condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && width > condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && width <= condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && width >= condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && width != condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) )
         )
     {
         if ( !condition.IsInverted() ) return true;
@@ -55,16 +55,16 @@ bool CondCameraWidth( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 bool CondCameraHeight( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
 {
     std::string layer = condition.GetParameter(0).GetPlainString();
-    unsigned int camera = eval.EvalExp(condition.GetParameter(1));
+    unsigned int camera = condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     float height = scene->GetLayer(layer).GetCamera(camera).GetCameraInfo().size.y;
 
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && height == eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && height < eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && height > eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && height <= eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && height >= eval.EvalExp( condition.GetParameter( 3 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && height != eval.EvalExp( condition.GetParameter( 3 ) ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && height == condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && height < condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && height > condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && height <= condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && height >= condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && height != condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) )
         )
     {
         if ( !condition.IsInverted() ) return true;
@@ -95,18 +95,18 @@ bool CondCameraX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;
     if ( condition.GetParameters().size() >= 4 )
-        camera = eval.EvalExp(condition.GetParameter(3));
+        camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier
-    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && (view.GetCenter().x - view.GetSize().x/2) == eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && (view.GetCenter().x - view.GetSize().x/2) < eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && (view.GetCenter().x - view.GetSize().x/2) > eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && (view.GetCenter().x - view.GetSize().x/2) <= eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && (view.GetCenter().x - view.GetSize().x/2) >= eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && (view.GetCenter().x - view.GetSize().x/2) != eval.EvalExp( condition.GetParameter( 0 ) ) )
+    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && (view.GetCenter().x - view.GetSize().x/2) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && (view.GetCenter().x - view.GetSize().x/2) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && (view.GetCenter().x - view.GetSize().x/2) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && (view.GetCenter().x - view.GetSize().x/2) <= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && (view.GetCenter().x - view.GetSize().x/2) >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && (view.GetCenter().x - view.GetSize().x/2) != condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) )
         )
     {
         if ( !condition.IsInverted() ) return true;
@@ -138,18 +138,18 @@ bool CondCameraY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;
     if ( condition.GetParameters().size() >= 4 )
-        camera = eval.EvalExp(condition.GetParameter(3));
+        camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier
-    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && (view.GetCenter().y - view.GetSize().y/2) == eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && (view.GetCenter().y - view.GetSize().y/2) < eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && (view.GetCenter().y - view.GetSize().y/2) > eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && (view.GetCenter().y - view.GetSize().y/2) <= eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && (view.GetCenter().y - view.GetSize().y/2) >= eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && (view.GetCenter().y - view.GetSize().y/2) != eval.EvalExp( condition.GetParameter( 0 ) ) )
+    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && (view.GetCenter().y - view.GetSize().y/2) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && (view.GetCenter().y - view.GetSize().y/2) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && (view.GetCenter().y - view.GetSize().y/2) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && (view.GetCenter().y - view.GetSize().y/2) <= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && (view.GetCenter().y - view.GetSize().y/2) >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && (view.GetCenter().y - view.GetSize().y/2) != condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) )
        )
     {
         if ( !condition.IsInverted() ) return true;
@@ -180,18 +180,18 @@ bool CondCameraAngle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;
     if ( condition.GetParameters().size() >= 4 )
-        camera = eval.EvalExp(condition.GetParameter(3));
+        camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier
-    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && (view.GetRotation()) == eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && (view.GetRotation()) < eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && (view.GetRotation()) > eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && (view.GetRotation()) <= eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && (view.GetRotation()) >= eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && (view.GetRotation()) != eval.EvalExp( condition.GetParameter( 0 ) ) )
+    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && (view.GetRotation()) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && (view.GetRotation()) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && (view.GetRotation()) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && (view.GetRotation()) <= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && (view.GetRotation()) >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && (view.GetRotation()) != condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) )
        )
     {
         if ( !condition.IsInverted() ) return true;

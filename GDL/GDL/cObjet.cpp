@@ -34,12 +34,12 @@ bool CondNbObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     bool isTrue = false;
 
     //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && list.size() == eval.EvalExp( condition.GetParameter( 1 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && list.size() < eval.EvalExp( condition.GetParameter( 1 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && list.size() > eval.EvalExp( condition.GetParameter( 1 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && list.size() <= eval.EvalExp( condition.GetParameter( 1 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && list.size() >= eval.EvalExp( condition.GetParameter( 1 ) ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && list.size() != eval.EvalExp( condition.GetParameter( 1 ) ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && list.size() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && list.size() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && list.size() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && list.size() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && list.size() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && list.size() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions) )
        )
     {
         //Le nombre d'objet est ok

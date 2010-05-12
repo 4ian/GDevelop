@@ -40,8 +40,8 @@ bool ActSetFullScreen( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 bool ActSetWindowSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
 {
     #ifdef GDP
-    scene->game->windowWidth = eval.EvalExp(action.GetParameter(0));
-    scene->game->windowHeight = eval.EvalExp(action.GetParameter(1));
+    scene->game->windowWidth = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    scene->game->windowHeight = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     if ( scene->game->fullscreen )
     {

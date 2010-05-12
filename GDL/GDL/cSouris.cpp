@@ -36,7 +36,7 @@ bool CondSourisX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;
     if ( condition.GetParameters().size() >= 4 )
-        camera = eval.EvalExp(condition.GetParameter(3));
+        camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
@@ -45,12 +45,12 @@ bool CondSourisX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier
-    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && ( mouseX ) == eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && ( mouseX ) < eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && ( mouseX ) > eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && ( mouseX ) <= eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && ( mouseX ) >= eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && ( mouseX ) != eval.EvalExp( condition.GetParameter( 0 ) ) )
+    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && ( mouseX ) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && ( mouseX ) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && ( mouseX ) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && ( mouseX ) <= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && ( mouseX ) >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && ( mouseX ) != condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) )
        )
     {
         if ( !condition.IsInverted()) return true;
@@ -80,7 +80,7 @@ bool CondSourisY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;
     if ( condition.GetParameters().size() >= 4 )
-        camera = eval.EvalExp(condition.GetParameter(3));
+        camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
 
@@ -88,12 +88,12 @@ bool CondSourisY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     int mouseY = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), view).y;
 
     //optimisation : test du signe en premier
-    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && ( mouseY ) == eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && ( mouseY ) < eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && ( mouseY ) > eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && ( mouseY ) <= eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && ( mouseY ) >= eval.EvalExp( condition.GetParameter( 0 ) ) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && ( mouseY ) != eval.EvalExp( condition.GetParameter( 0 ) ) )
+    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && ( mouseY ) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && ( mouseY ) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && ( mouseY ) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && ( mouseY ) <= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && ( mouseY ) >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && ( mouseY ) != condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) )
        )
     {
         if ( !condition.IsInverted()) return true;
@@ -163,7 +163,7 @@ bool CondSourisSurObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcern
                 {
                     if  ( (*obj)->GetDrawableX() < mouseXInTheLayer &&
                         ( (*obj)->GetDrawableX() + (*obj)->GetWidth() ) > mouseXInTheLayer &&
-                        (*obj)->GetDrawableY() < mouseYInTheLayer &&
+                          (*obj)->GetDrawableY() < mouseYInTheLayer &&
                         ( (*obj)->GetDrawableY() + (*obj)->GetHeight() ) > mouseYInTheLayer )
                     {
                         int ClicX = static_cast<int>( mouseXInTheLayer - (*obj)->GetDrawableX() );

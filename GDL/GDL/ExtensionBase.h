@@ -17,6 +17,7 @@ class Evaluateur;
 class Object;
 class ExtensionBase;
 class ExpressionInstruction;
+class StrExpressionInstruction;
 class BaseEvent;
 
 #if defined(GDE)
@@ -31,15 +32,16 @@ typedef boost::shared_ptr<Object> ObjSPtr;
 typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
 
 //Declare typedefs for static/objects functions and expressions
-typedef bool (*InstructionFunPtr)( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-typedef bool (Object::*InstructionObjectFunPtr)( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-typedef double (*ExpressionFunPtr)( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & expression );
-typedef double (Object::*ExpressionObjectFunPtr)( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & expression );
+typedef bool (*InstructionFunPtr)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+typedef bool (Object::*InstructionObjectFunPtr)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+typedef double (*ExpressionFunPtr)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & expression );
+typedef double (Object::*ExpressionObjectFunPtr)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & expression );
+typedef std::string (*StrExpressionFunPtr)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & expression );
+typedef std::string (Object::*StrExpressionObjectFunPtr)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & expression );
 
 //Declare typedefs for objects creations/destructions functions
 typedef void (*DestroyFunPtr)(Object*);
 typedef Object * (*CreateFunPtr)(std::string name);
-typedef Object * (*CreateByCopyFunPtr)(Object *);
 
 #if defined(GDE) //Condition, Action and expressions declare more thing in editor
 
@@ -173,14 +175,13 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
  * @param Function for creation from another object
  * @param Function for destroying the object
  */
-#define DECLARE_OBJECT(name_, fullname_, informations_, icon_, createFunPtrP, createByCopyFunPtrP, destroyFunPtrP) { \
+#define DECLARE_OBJECT(name_, fullname_, informations_, icon_, createFunPtrP, destroyFunPtrP) { \
             ExtensionObjectInfos objInfos; \
             std::string currentObjectDeclarationName = name_; \
             objInfos.fullname = std::string(fullname_.mb_str());\
             objInfos.informations = std::string(informations_.mb_str());\
             objInfos.icon = wxBitmap(icon_, wxBITMAP_TYPE_ANY); \
             objInfos.createFunPtr = createFunPtrP;\
-            objInfos.createByCopyFunPtr = createByCopyFunPtrP;\
             objInfos.destroyFunPtr = destroyFunPtrP;
 
 /**
@@ -188,6 +189,8 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
  * @param name
  * @param fullname displayed in editor
  * @param description displayed in editor
+ * @param group displayed in editor
+ * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
 #define DECLARE_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
@@ -207,6 +210,8 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
  * @param name
  * @param fullname displayed in editor
  * @param description displayed in editor
+ * @param group displayed in editor
+ * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
 #define DECLARE_OBJECT_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
@@ -226,6 +231,8 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
  * @param name
  * @param fullname displayed in editor
  * @param description displayed in editor
+ * @param group displayed in editor
+ * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
 #define DECLARE_HIDDEN_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
@@ -246,12 +253,100 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
  * @param name
  * @param fullname displayed in editor
  * @param description displayed in editor
+ * @param group displayed in editor
+ * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
 #define DECLARE_OBJECT_HIDDEN_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
             instrInfo.expressionObjectFunPtr = (ExpressionObjectFunPtr)ptr;\
+            instrInfo.fullname = fullname_; \
+            instrInfo.description = description_; \
+            instrInfo.group = group_; \
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.smallicon = wxBitmap(16,16);}\
+            instrInfo.shown = false;
+
+/**
+ * Declare a string expression
+ * @param name
+ * @param fullname displayed in editor
+ * @param description displayed in editor
+ * @param group displayed in editor
+ * @param filename for a small icon displayed in editor ( 16*16 )
+ * @param Function
+ */
+#define DECLARE_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+            StrExpressionInfos instrInfo; \
+            std::string currentExprDeclarationName = name_;\
+            instrInfo.strExpressionFunPtr = ptr;\
+            instrInfo.fullname = fullname_; \
+            instrInfo.description = description_; \
+            instrInfo.group = group_; \
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.smallicon = wxBitmap(16,16);}
+
+/**
+ * Declare an object string expression
+ * @param name
+ * @param fullname displayed in editor
+ * @param description displayed in editor
+ * @param group displayed in editor
+ * @param filename for a small icon displayed in editor ( 16*16 )
+ * @param Function
+ */
+#define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+            StrExpressionInfos instrInfo; \
+            std::string currentExprDeclarationName = name_;\
+            instrInfo.strExpressionObjectFunPtr = (StrExpressionObjectFunPtr)ptr;\
+            instrInfo.fullname = fullname_; \
+            instrInfo.description = description_; \
+            instrInfo.group = group_; \
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.smallicon = wxBitmap(16,16);}
+
+/**
+ * Declare an hidden string expression ( not displayed in editor )
+ * @param name
+ * @param fullname displayed in editor
+ * @param description displayed in editor
+ * @param group displayed in editor
+ * @param filename for a small icon displayed in editor ( 16*16 )
+ * @param Function
+ */
+#define DECLARE_HIDDEN_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+            StrExpressionInfos instrInfo; \
+            std::string currentExprDeclarationName = name_;\
+            instrInfo.strExpressionFunPtr = ptr;\
+            instrInfo.fullname = fullname_; \
+            instrInfo.description = description_; \
+            instrInfo.group = group_; \
+            if ( wxFile::Exists(smallicon_) )\
+            {\
+                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
+            } else { instrInfo.smallicon = wxBitmap(16,16);}\
+            instrInfo.shown = false;
+
+/**
+ * Declare an hidden object string expression ( not displayed in editor )
+ * @param name
+ * @param fullname displayed in editor
+ * @param description displayed in editor
+ * @param group displayed in editor
+ * @param filename for a small icon displayed in editor ( 16*16 )
+ * @param Function
+ */
+#define DECLARE_OBJECT_HIDDEN_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+            StrExpressionInfos instrInfo; \
+            std::string currentExprDeclarationName = name_;\
+            instrInfo.strExpressionObjectFunPtr = (StrExpressionObjectFunPtr)ptr;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -340,6 +435,26 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
             std::string currentExprDeclarationName = name_;\
             instrInfo.expressionObjectFunPtr = (ExpressionObjectFunPtr)ptr;
 
+#define DECLARE_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
+            StrExpressionInfos instrInfo; \
+            std::string currentExprDeclarationName = name_;\
+            instrInfo.strExpressionFunPtr = ptr;
+
+#define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
+            StrExpressionInfos instrInfo; \
+            std::string currentExprDeclarationName = name_;\
+            instrInfo.strExpressionObjectFunPtr = (StrExpressionObjectFunPtr)ptr;
+
+#define DECLARE_HIDDEN_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
+            StrExpressionInfos instrInfo; \
+            std::string currentExprDeclarationName = name_;\
+            instrInfo.strExpressionFunPtr = ptr;
+
+#define DECLARE_OBJECT_HIDDEN_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
+            StrExpressionInfos instrInfo; \
+            std::string currentExprDeclarationName = name_;\
+            instrInfo.strExpressionObjectFunPtr = (StrExpressionObjectFunPtr)ptr;
+
 #define DECLARE_EVENT(name_, fullname_, description_, group_, smallicon_, className_) { \
             EventInfos eventInfo; \
             std::string currentEventDeclarationName = name_;\
@@ -415,6 +530,13 @@ typedef Object * (*CreateByCopyFunPtr)(Object *);
  */
 #define DECLARE_END_EXPRESSION() expressionsInfos[GetNameSpace()+currentExprDeclarationName]=instrInfo;\
             }
+
+/**
+ * Need to be added after DECLARE_STR_EXPRESSION and all actions/conditions/expressions.
+ */
+#define DECLARE_END_STR_EXPRESSION() strExpressionsInfos[GetNameSpace()+currentExprDeclarationName]=instrInfo;\
+            }
+
 /**
  * Need to be added after DECLARE_OBJECT_EXPRESSION and all actions/conditions/expressions.
  */
@@ -499,6 +621,30 @@ class GD_API ExpressionInfos
 };
 
 /**
+ * Contains user-friendly infos about expressions, only at edittime,
+ * and members needed to setup an expression
+ */
+class GD_API StrExpressionInfos
+{
+    public:
+
+    StrExpressionInfos();
+    virtual ~StrExpressionInfos() {};
+
+#if defined(GDE)
+    std::string fullname;
+    std::string description;
+    std::string group;
+    bool shown;
+    wxBitmap smallicon;
+#endif
+
+    std::vector < ParameterInfo > parameters;
+    StrExpressionFunPtr       strExpressionFunPtr;
+    StrExpressionObjectFunPtr strExpressionObjectFunPtr;
+};
+
+/**
  * Contains user-friendly infos about event, only at edittime,
  * and members needed to create an event
  */
@@ -537,11 +683,11 @@ class GD_API ExtensionObjectInfos
 
     DestroyFunPtr destroyFunPtr;
     CreateFunPtr createFunPtr;
-    CreateByCopyFunPtr createByCopyFunPtr;
 
     std::map<std::string, InstructionInfos > conditionsInfos;
     std::map<std::string, InstructionInfos > actionsInfos;
     std::map<std::string, ExpressionInfos > expressionsInfos;
+    std::map<std::string, StrExpressionInfos > strExpressionsInfos;
 };
 
 class GD_API CompilationInfos
@@ -618,6 +764,9 @@ class GD_API ExtensionBase
     ExpressionFunPtr        GetExpressionFunctionPtr(std::string expressionName) const;
     ExpressionObjectFunPtr  GetObjectExpressionFunctionPtr(std::string objectType, std::string expressionName) const;
 
+    StrExpressionFunPtr        GetStrExpressionFunctionPtr(std::string expressionName) const;
+    StrExpressionObjectFunPtr  GetObjectStrExpressionFunctionPtr(std::string objectType, std::string expressionName) const;
+
     /**
      * Get objects types provided by the extension
      */
@@ -626,10 +775,12 @@ class GD_API ExtensionBase
     const std::map<std::string, InstructionInfos > & GetAllActions() const;
     const std::map<std::string, InstructionInfos > & GetAllConditions() const;
     const std::map<std::string, ExpressionInfos > & GetAllExpressions() const;
+    const std::map<std::string, StrExpressionInfos > & GetAllStrExpressions() const;
     const std::map<std::string, EventInfos > & GetAllEvents() const;
     const std::map<std::string, InstructionInfos > & GetAllActionsForObject(std::string objectType) const;
     const std::map<std::string, InstructionInfos > & GetAllConditionsForObject(std::string objectType) const;
     const std::map<std::string, ExpressionInfos > & GetAllExpressionsForObject(std::string objectType) const;
+    const std::map<std::string, StrExpressionInfos > & GetAllStrExpressionsForObject(std::string objectType) const;
 
     #if defined(GDE)
     std::string GetExtensionObjectName(std::string objectType) const;
@@ -641,11 +792,6 @@ class GD_API ExtensionBase
      * Return a function to create the object if the type is handled by the extension
      */
     CreateFunPtr        GetObjectCreationFunctionPtr(std::string objectType) const;
-
-    /**
-     * Return a function to create the object if the type is handled by the extension
-     */
-    CreateByCopyFunPtr  GetObjectCreationByCopyFunctionPtr(std::string objectType) const;
 
     /**
      * Make sure that the object from an extension is deleted by the same extension.
@@ -680,11 +826,13 @@ class GD_API ExtensionBase
     std::map<std::string, InstructionInfos > conditionsInfos;
     std::map<std::string, InstructionInfos > actionsInfos;
     std::map<std::string, ExpressionInfos > expressionsInfos;
+    std::map<std::string, StrExpressionInfos > strExpressionsInfos;
     std::map<std::string, EventInfos > eventsInfos;
 
     static std::map<std::string, InstructionInfos > badConditionsInfos;
     static std::map<std::string, InstructionInfos > badActionsInfos;
     static std::map<std::string, ExpressionInfos > badExpressionsInfos;
+    static std::map<std::string, StrExpressionInfos > badStrExpressionsInfos;
 
     private:
 

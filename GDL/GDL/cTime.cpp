@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -30,17 +30,17 @@
 /// Paramètre 2 : Nom du timer
 ///
 ////////////////////////////////////////////////////////////
-bool CondTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    string timerName = eval.EvalTxt(condition.GetParameter( 1 ));
+    string timerName = condition.GetParameter( 1 ).GetAsTextExpressionResult(scene, objectsConcerned);
 
     //Le timer existe il ? on parcourt la liste.
-    for ( unsigned int i = 0;i < scene->timers.size();i++ )
+    for ( unsigned int i = 0;i < scene.timers.size();i++ )
     {
         //On cherche le nom du timer
-        if ( scene->timers[i].GetName() == timerName )
+        if ( scene.timers[i].GetName() == timerName )
         {
-            if ( scene->timers[i].GetTime() >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) )
+            if ( scene.timers[i].GetTime() >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) )
             {
                 if ( condition.IsInverted() ) return false;
                 return true;
@@ -60,17 +60,17 @@ bool CondTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const
 /// Type : TimerPaused
 /// Paramètre 1 : Nom du timer
 ////////////////////////////////////////////////////////////
-bool CondTimerPaused( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondTimerPaused( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    string timerName = eval.EvalTxt(condition.GetParameter( 0 ));
+    string timerName = condition.GetParameter( 0 ).GetAsTextExpressionResult(scene, objectsConcerned);
 
     //Le timer existe il ? on parcourt la liste.
-    for ( unsigned int i = 0;i < scene->timers.size();i++ )
+    for ( unsigned int i = 0;i < scene.timers.size();i++ )
     {
         //On cherche le nom du timer
-        if ( scene->timers[i].GetName() == timerName )
+        if ( scene.timers[i].GetName() == timerName )
         {
-            if (scene->timers[i].IsPaused())
+            if (scene.timers[i].IsPaused())
             {
                 if ( condition.IsInverted() ) return false;
                     return true;
@@ -92,18 +92,18 @@ bool CondTimerPaused( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /// Paramètre 2 : Signe de comparaison
 ///
 ////////////////////////////////////////////////////////////
-bool CondTimeScale( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondTimeScale( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     bool Ok = false;
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier
-    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && ( scene->GetTimeScale() ) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && ( scene->GetTimeScale() ) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && ( scene->GetTimeScale() ) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && ( scene->GetTimeScale() ) <= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && ( scene->GetTimeScale() ) >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
-            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && ( scene->GetTimeScale() ) != condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) )
+    if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && ( scene.GetTimeScale() ) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && ( scene.GetTimeScale() ) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && ( scene.GetTimeScale() ) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && ( scene.GetTimeScale() ) <= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && ( scene.GetTimeScale() ) >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && ( scene.GetTimeScale() ) != condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) )
        )
     {
         Ok = true; //Cette condition est vrai

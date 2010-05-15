@@ -15,7 +15,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -25,12 +25,12 @@
 /**
  * Change the render zone of a camera
  */
-bool ActCameraViewport( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActCameraViewport( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     std::string layer = action.GetParameter(0).GetPlainString();
     unsigned int cameraNb = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    RuntimeCamera & camera = scene->GetLayer(layer).GetCamera(cameraNb);
+    RuntimeCamera & camera = scene.GetLayer(layer).GetCamera(cameraNb);
 
     camera.GetCameraInfo().defaultViewport = false;
     camera.GetCameraInfo().viewport.Left = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned);
@@ -44,12 +44,12 @@ bool ActCameraViewport( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 /**
  * Change the size of a camera ( reset zoom )
  */
-bool ActCameraSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActCameraSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     std::string layer = action.GetParameter(0).GetPlainString();
     unsigned int cameraNb = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    RuntimeCamera & camera = scene->GetLayer(layer).GetCamera(cameraNb);
+    RuntimeCamera & camera = scene.GetLayer(layer).GetCamera(cameraNb);
 
     camera.GetCameraInfo().defaultSize = false;
     camera.GetCameraInfo().size.x = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned);
@@ -61,9 +61,9 @@ bool ActCameraSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 /**
  * Add a camera to a layer
  */
-bool ActAddCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActAddCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    RuntimeLayer & layer = scene->GetLayer(action.GetParameter(0).GetPlainString());
+    RuntimeLayer & layer = scene.GetLayer(action.GetParameter(0).GetPlainString());
 
     Camera cameraInfo;
 
@@ -85,7 +85,7 @@ bool ActAddCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
     cameraInfo.viewport.Bottom = action.GetParameter( 6 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     //Create a runtime camera from the camera
-    const sf::RenderWindow * window = scene->renderWindow;
+    const sf::RenderWindow * window = scene.renderWindow;
     RuntimeCamera camera(cameraInfo, window ? window->GetDefaultView() : sf::View() );
 
     //Add the runtime camera to the layer
@@ -97,11 +97,11 @@ bool ActAddCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 /**
  * Delete a camera of a layer
  */
-bool ActDeleteCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActDeleteCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     unsigned int cameraNb = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    RuntimeLayer & layer = scene->GetLayer(action.GetParameter(0).GetPlainString());
+    RuntimeLayer & layer = scene.GetLayer(action.GetParameter(0).GetPlainString());
 
     layer.DeleteCamera(cameraNb);
 
@@ -119,7 +119,7 @@ bool ActDeleteCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /// Paramètre 5 : Ymax
 /// Paramètre 6 : Calque
 ////////////////////////////////////////////////////////////
-bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActFixCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
 
@@ -135,7 +135,7 @@ bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
     if ( action.GetParameters().size() >= 8 )
         camera = action.GetParameter(7).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
+    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     float decalementX = 0;
     float decalementY = 0;
@@ -143,13 +143,13 @@ bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
     //Prise en compte des déplacements de l'objet
     if ( action.GetParameters().size() < 6 )
     {
-        decalementX = ( list[0]->TotalForceX() * scene->GetElapsedTime() );
-        decalementY = ( list[0]->TotalForceY() * scene->GetElapsedTime() );
+        decalementX = ( list[0]->TotalForceX() * scene.GetElapsedTime() );
+        decalementY = ( list[0]->TotalForceY() * scene.GetElapsedTime() );
     }
     else if ( action.GetParameter(5).GetPlainString() != "no" && action.GetParameter(5).GetPlainString() != "non")
     {
-        decalementX = ( list[0]->TotalForceX() * scene->GetElapsedTime() );
-        decalementY = ( list[0]->TotalForceY() * scene->GetElapsedTime() );
+        decalementX = ( list[0]->TotalForceX() * scene.GetElapsedTime() );
+        decalementY = ( list[0]->TotalForceY() * scene.GetElapsedTime() );
     }
 
     //Si on est dans le cadre
@@ -191,7 +191,7 @@ bool ActFixCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 /// Paramètre 2 : Prise en compte du déplacement ( Oui/Non )
 /// Paramètre 3 : Calque
 ////////////////////////////////////////////////////////////
-bool ActCentreCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActCentreCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
 
@@ -210,18 +210,18 @@ bool ActCentreCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     if ( action.GetParameters().size() >= 4 )
         camera = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
+    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //Prise en compte des déplacements de l'objet
     if ( action.GetParameters().size() < 2 )
     {
-        decalementX = ( list[0]->TotalForceX() * scene->GetElapsedTime() );
-        decalementY = ( list[0]->TotalForceY() * scene->GetElapsedTime() );
+        decalementX = ( list[0]->TotalForceX() * scene.GetElapsedTime() );
+        decalementY = ( list[0]->TotalForceY() * scene.GetElapsedTime() );
     }
     else if ( action.GetParameter(1).GetPlainString() != "no" && action.GetParameter(1).GetPlainString() != "non")
     {
-        decalementX = ( list[0]->TotalForceX() * scene->GetElapsedTime() );
-        decalementY = ( list[0]->TotalForceY() * scene->GetElapsedTime() );
+        decalementX = ( list[0]->TotalForceX() * scene.GetElapsedTime() );
+        decalementY = ( list[0]->TotalForceY() * scene.GetElapsedTime() );
     }
 
     view.SetCenter(list[0]->GetX() + decalementX,
@@ -237,7 +237,7 @@ bool ActCentreCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /// Paramètre 1 : Nouvelle valeur
 /// Paramètre 2 : Calque
 ////////////////////////////////////////////////////////////
-bool ActZoomCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActZoomCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
@@ -249,7 +249,7 @@ bool ActZoomCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
     if ( action.GetParameters().size() >= 3 )
         cameraNb = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    RuntimeCamera & camera = scene->GetLayer(layer).GetCamera(cameraNb);
+    RuntimeCamera & camera = scene.GetLayer(layer).GetCamera(cameraNb);
 
     float newZoom = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
     if ( newZoom == 0 ) return false;
@@ -267,7 +267,7 @@ bool ActZoomCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 /// Paramètre 2 : Signe de la modification
 /// Paramètre 3 : Calque
 ////////////////////////////////////////////////////////////
-bool ActRotateCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActRotateCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
@@ -279,7 +279,7 @@ bool ActRotateCamera( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     if ( action.GetParameters().size() >= 4 )
         camera = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
+    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     float value = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
     if ( action.GetParameter( 1 ).GetPlainString().empty() || action.GetParameter( 1 ).GetAsModOperator() == GDExpression::Set ) view.SetRotation(value);

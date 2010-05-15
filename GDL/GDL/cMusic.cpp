@@ -6,7 +6,7 @@
 #include "GDL/Object.h"
 #include "GDL/Event.h"
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include <iostream>
 #include "GDL/Access.h"
 #include "GDL/SoundManager.h"
@@ -19,7 +19,7 @@
 /// Type : MusicPlayed
 /// Paramètre 1 : Canal
 ////////////////////////////////////////////////////////////
-bool CondMusicPlaying( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondMusicPlaying( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     bool Ok = false;
     bool OkContraire = false;
@@ -28,7 +28,7 @@ bool CondMusicPlaying( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
-        scene->errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
         return false;
     }
 
@@ -57,7 +57,7 @@ bool CondMusicPlaying( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 /// Type : MusicPaused
 /// Paramètre 1 : Canal
 ////////////////////////////////////////////////////////////
-bool CondMusicPaused( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondMusicPaused( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     bool Ok = false;
     bool OkContraire = false;
@@ -66,7 +66,7 @@ bool CondMusicPaused( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
-        scene->errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
         return false;
     }
 
@@ -95,7 +95,7 @@ bool CondMusicPaused( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /// Type : MusicStopped
 /// Paramètre 1 : Canal
 ////////////////////////////////////////////////////////////
-bool CondMusicStopped( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondMusicStopped( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     bool Ok = false;
     bool OkContraire = false;
@@ -104,7 +104,7 @@ bool CondMusicStopped( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
-        scene->errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
         return false;
     }
 
@@ -134,7 +134,7 @@ bool CondMusicStopped( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 /// Type : SoundPlaying
 /// Paramètre 1 : Canal
 ////////////////////////////////////////////////////////////
-bool CondSoundPlaying( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondSoundPlaying( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     SoundManager * soundManager = SoundManager::getInstance();
 
@@ -145,7 +145,7 @@ bool CondSoundPlaying( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
-        scene->errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
         return false;
     }
 
@@ -172,7 +172,7 @@ bool CondSoundPlaying( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 /// Type : SoundPaused
 /// Paramètre 1 : Canal
 ////////////////////////////////////////////////////////////
-bool CondSoundPaused( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondSoundPaused( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     bool Ok = false;
     bool OkContraire = false;
@@ -181,7 +181,7 @@ bool CondSoundPaused( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
-        scene->errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
         return false;
     }
 
@@ -211,7 +211,7 @@ bool CondSoundPaused( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /// Type : SoundStopped
 /// Paramètre 1 : Canal
 ////////////////////////////////////////////////////////////
-bool CondSoundStopped( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondSoundStopped( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     bool Ok = false;
     bool OkContraire = false;
@@ -220,7 +220,7 @@ bool CondSoundStopped( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
-        scene->errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
         return false;
     }
 
@@ -250,7 +250,7 @@ bool CondSoundStopped( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 /// Paramètre 1 : Volume à tester
 /// Paramètre 2 : Signe du test
 ////////////////////////////////////////////////////////////
-bool CondGlobalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondGlobalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     bool Ok = false;
     bool OkContraire = false;
@@ -289,7 +289,7 @@ bool CondGlobalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 /// Paramètre 2 : Volume à tester
 /// Paramètre 3 : Signe du test
 ////////////////////////////////////////////////////////////
-bool CondSoundCanalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondSoundCanalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     bool Ok = false;
     bool OkContraire = false;
@@ -297,7 +297,7 @@ bool CondSoundCanalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConce
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
-        scene->errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
         return false;
     }
 
@@ -335,7 +335,7 @@ bool CondSoundCanalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConce
 /// Paramètre 2 : Volume à tester
 /// Paramètre 3 : Signe du test
 ////////////////////////////////////////////////////////////
-bool CondMusicCanalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondMusicCanalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     bool Ok = false;
     bool OkContraire = false;
@@ -343,7 +343,7 @@ bool CondMusicCanalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConce
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
-        scene->errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
         return false;
     }
 

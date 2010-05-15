@@ -10,7 +10,7 @@
 #include <wx/string.h>
 //*)
 #include <sstream>
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include <wx/help.h>
 
 //(*IdInit(EditLink)
@@ -128,8 +128,8 @@ eventToEdit(pEvent)
 	if ( eventToEdit.start != -1 && eventToEdit.end != -1 )
 	{
 	    OnlyEventsCheck->SetValue(true);
-	    StartEdit->ChangeValue(st(eventToEdit.start));
-	    EndEdit->ChangeValue(st(eventToEdit.end));
+	    StartEdit->ChangeValue(ToString(eventToEdit.start));
+	    EndEdit->ChangeValue(ToString(eventToEdit.end));
 	}
 }
 

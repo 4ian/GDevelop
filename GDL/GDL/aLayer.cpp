@@ -6,7 +6,7 @@
 #include "GDL/Object.h"
 #include "GDL/Event.h"
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
@@ -14,9 +14,9 @@
 /**
  * Change the layer of an object
  */
-bool Object::ActChangeLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActChangeLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    SetLayer(eval.EvalTxt(action.GetParameter(1), shared_from_this()));
+    SetLayer(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()));
 
     return true;
 }
@@ -24,11 +24,11 @@ bool Object::ActChangeLayer( RuntimeScene * scene, ObjectsConcerned & objectsCon
 /**
  * Show a layer
  */
-bool ActShowLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActShowLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     string layer = action.GetParameter(0).GetPlainString();
 
-    scene->GetLayer(layer).SetVisibility(true);
+    scene.GetLayer(layer).SetVisibility(true);
 
     return true;
 }
@@ -36,11 +36,11 @@ bool ActShowLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 /**
  * Hide a layer
  */
-bool ActHideLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActHideLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     string layer = action.GetParameter(0).GetPlainString();
 
-    scene->GetLayer(layer).SetVisibility(false);
+    scene.GetLayer(layer).SetVisibility(false);
 
     return true;
 }

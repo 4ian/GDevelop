@@ -13,7 +13,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include <iostream>
 
 //Toutes les conditions
@@ -38,6 +38,6 @@
 #include "GDL/cScale.h"
 
 //Les "autres" conditions
-bool CondEgal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
+bool CondEgal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
 #endif // CONDITIONS_H_INCLUDED

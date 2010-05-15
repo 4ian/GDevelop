@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -26,7 +26,7 @@
 /**
  * Test a collision between two sprites objects
  */
-bool CondCollision( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());
@@ -106,7 +106,7 @@ bool CondCollision( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 /**
  * Test a collision between two sprites objects with only theirs coordinates/size.
  */
-bool CondCollisionNP( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondCollisionNP( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());

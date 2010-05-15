@@ -10,7 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/ListVariable.h"
@@ -18,12 +18,12 @@
 #include "GDL/GDExpression.h"
 #include "GDL/Access.h"
 
-bool CondVarScene( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-bool CondVarSceneTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-bool CondVarSceneDef( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-bool CondVarGlobal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-bool CondVarGlobalTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-bool CondVarGlobalDef( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
+bool CondVarScene( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondVarSceneTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondVarSceneDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondVarGlobal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondVarGlobalTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondVarGlobalDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
 /**
  * Helper function, only for internal use.

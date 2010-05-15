@@ -31,7 +31,7 @@
 #include "GDL/HelpFileAccess.h"
 
 #include "GDL/Game.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/MemTrace.h"
 #include "GDL/ChoixDossier.h"
 #include "GDL/PropImage.h"
@@ -386,7 +386,7 @@ void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
             wxLogStatus( Status + Noms[i] );
 
             //Vérifier que l'image n'est pas déjà dans la liste
-            if ( ChercherNomImage(game.images, static_cast<string>(Noms[i])) == -1 )
+            if ( FindImage(game.images, static_cast<string>(Noms[i])) == -1 )
             {
                 //On ajoute l'image
                 Image image;
@@ -425,7 +425,7 @@ void EditorImages::OnDelImageBtClick( wxCommandEvent& event )
     wxTreeItemId ItemNul = NULL;
     if ( Item != ItemNul && BanqueImageList->GetRootItem() != Item )
     {
-        int i = ChercherNomImage( game.images, ( string ) BanqueImageList->GetItemText( Item ) );
+        int i = FindImage( game.images, ( string ) BanqueImageList->GetItemText( Item ) );
         if ( i != -1 )
         {
             //On enlève l'image
@@ -506,7 +506,7 @@ void EditorImages::OnBanqueImageListSelectionChanged( wxTreeEvent& event )
     if ( BanqueImageList->GetChildrenCount( m_itemSelected ) == 0)
     {
         //Zone d'aperçu de l'image
-        int i = ChercherNomImage( game.images, nom );
+        int i = FindImage( game.images, nom );
         if ( i != -1 )
         {
             fileImageSelected = game.images.at( i ).fichier;
@@ -525,7 +525,7 @@ void EditorImages::OnBanqueImageListEndLabelEdit( wxTreeEvent& event )
     if ( !event.IsEditCancelled() )
     {
         //Si le nom n'existe pas
-        if ( ChercherNomImage( game.images, ( string ) event.GetLabel() ) != -1 )
+        if ( FindImage( game.images, ( string ) event.GetLabel() ) != -1 )
         {
             wxLogWarning( _( "Impossible de renommer l'image : une autre image porte déjà ce nom." ) );
             Refresh();
@@ -533,7 +533,7 @@ void EditorImages::OnBanqueImageListEndLabelEdit( wxTreeEvent& event )
         }
         else
         {
-            int i = ChercherNomImage( game.images, m_NomItem );
+            int i = FindImage( game.images, m_NomItem );
             if ( i != -1 )
             {
                 game.images.at( i ).nom = event.GetLabel();
@@ -611,7 +611,7 @@ void EditorImages::Refresh()
 ////////////////////////////////////////////////////////////
 void EditorImages::OnModFileImage( wxCommandEvent& event )
 {
-    int i = ChercherNomImage( game.images, ( string ) BanqueImageList->GetItemText( m_itemSelected ) );
+    int i = FindImage( game.images, ( string ) BanqueImageList->GetItemText( m_itemSelected ) );
     if ( i == -1 )
     {
         wxLogStatus( _( "L'image à modifier n'a pas été trouvée." ) );
@@ -641,7 +641,7 @@ void EditorImages::OnChercherBtClick( wxCommandEvent& event )
     string name = static_cast<string>( wxGetTextFromUser( _( "Entrez le nom de l'image à rechercher" ), _( "Chercher une image" ) ) );
     if ( name == "" ) return;
 
-    int i = ChercherNomImage( game.images, name );
+    int i = FindImage( game.images, name );
     if ( i != -1 )
     {
         //On en a trouvé un, on le sélectionne.
@@ -758,7 +758,7 @@ void EditorImages::OnMenuItem6Selected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorImages::OnModPropSelected(wxCommandEvent& event)
 {
-    int i = ChercherNomImage( game.images, static_cast< string > ( BanqueImageList->GetItemText( m_itemSelected ) ));
+    int i = FindImage( game.images, static_cast< string > ( BanqueImageList->GetItemText( m_itemSelected ) ));
     if ( i == -1 )
     {
         wxLogStatus( _( "L'image à modifier n'a pas été trouvée." ) );
@@ -799,7 +799,7 @@ void EditorImages::OnOpenPaintProgramClick(wxCommandEvent& event)
 
     if ( result != "" )
     {
-        int i = ChercherNomImage( game.images, static_cast< string > ( BanqueImageList->GetItemText( m_itemSelected ) ));
+        int i = FindImage( game.images, static_cast< string > ( BanqueImageList->GetItemText( m_itemSelected ) ));
         if ( i == -1 )
         {
             wxExecute(result);
@@ -855,7 +855,7 @@ void EditorImages::OnMoveUpSelected(wxCommandEvent& event)
 
     if ( dossierId == -1 )
     {
-        int i = ChercherNomImage( game.images, name );
+        int i = FindImage( game.images, name );
         if ( i == -1 )
         {
             wxLogStatus( _( "L'image à déplacer n'a pas été trouvée." ) );
@@ -930,7 +930,7 @@ void EditorImages::OnMoveDownSelected(wxCommandEvent& event)
     //Toutes les images
     if ( dossierId == -1 )
     {
-        int i = ChercherNomImage( game.images, name );
+        int i = FindImage( game.images, name );
         if ( i == -1 )
         {
             wxLogStatus( _( "L'image à déplacer n'a pas été trouvée." ) );

@@ -41,7 +41,6 @@ ExtensionSprite::ExtensionSprite()
                    _("Objet animé, composé d'animations et directions contenant des images."),
                    "Extensions/spriteicon.png",
                    &CreateSpriteObject,
-                   &CreateSpriteObjectByCopy,
                    &DestroySpriteObject);
 
         DECLARE_OBJECT_ACTION("Opacity",

@@ -6,10 +6,10 @@
 #include <iostream>
 #include <sstream>
 #include <iostream>
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 
-bool ActGetJoystickAxis( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+bool ActGetJoystickAxis( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 #endif // AJOYSTICK_H

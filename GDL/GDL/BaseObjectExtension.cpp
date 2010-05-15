@@ -22,7 +22,6 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                    _("Objet de base"),
                    "res/objeticon24.png",
                    &CreateBaseObject,
-                   &CreateBaseObjectByCopy,
                    &DestroyBaseObject);
 
         DECLARE_OBJECT_CONDITION("PosX",

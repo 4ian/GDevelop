@@ -13,17 +13,17 @@
 #endif
 #ifdef GDE
     #include <wx/wx.h>
-    #include "GDL/StdAlgo.h"
+    #include "GDL/CommonTools.h"
     #define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
     #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
-    #define ToString(x) st(x) // Méthode de conversion int vers string
+    #define ToString(x)ToString(x) // Méthode de conversion int vers string
 #endif
 
 #include <string>
 #include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml.h"
 
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"

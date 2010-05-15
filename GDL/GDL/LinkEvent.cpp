@@ -6,7 +6,7 @@
 #include "GDL/LinkEvent.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/EventsRenderingHelper.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "tinyxml.h"
 #include "RuntimeScene.h"
 #include "Game.h"
@@ -142,7 +142,7 @@ void LinkEvent::RenderInBitmap() const
     if ( start == -1 && end == -1 )
         dc.DrawText( _("Inclure tous les évènements"), lien.GetWidth()+56+10, 0 + 18 );
     else
-        dc.DrawText( "Inclure les évènements "+toString(start)+" à "+toString(end), lien.GetWidth()+56+10, 0 + 18 );
+        dc.DrawText( "Inclure les évènements "+ToString(start)+" à "+ToString(end), lien.GetWidth()+56+10, 0 + 18 );
 }
 
 /**

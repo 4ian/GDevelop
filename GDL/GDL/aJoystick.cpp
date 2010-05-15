@@ -11,7 +11,7 @@
 
 #include "GDL/Object.h"
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
@@ -24,11 +24,11 @@
 /// Paramètre 2 : Axe
 /// Paramètre 3 : Variable de la scène
 ////////////////////////////////////////////////////////////
-bool ActGetJoystickAxis( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActGetJoystickAxis( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //Obtain axis and joystick
     unsigned int joystick = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
-    string axisStr = eval.EvalTxt( action.GetParameter( 1 ) );
+    string axisStr = action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned);
     sf::Joy::Axis axis;
     if ( axisStr == "AxisX" ) axis = sf::Joy::AxisX;
     else if ( axisStr == "AxisY" ) axis = sf::Joy::AxisY;
@@ -40,7 +40,7 @@ bool ActGetJoystickAxis( RuntimeScene * scene, ObjectsConcerned & objectsConcern
     else return false;
 
     //Update variable value
-    scene->variables.ObtainVariable(eval.EvalTxt( action.GetParameter( 2 ) )) = scene->input->GetJoystickAxis(joystick, axis);
+    scene.variables.ObtainVariable(action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned)) = scene.input->GetJoystickAxis(joystick, axis);
 
     return true;
 }

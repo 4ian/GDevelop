@@ -7,6 +7,7 @@
 #include "GDL/GDMathParser.h"
 #include <boost/shared_ptr.hpp>
 #include "GDL/ExpressionInstruction.h"
+#include "GDL/StrExpressionInstruction.h"
 #include "GDL/ObjectIdentifiersManager.h"
 class Object;
 class RuntimeScene;
@@ -59,12 +60,12 @@ class GD_API GDExpression
         /**
          * Evaluate as a math expression and return the result
          */
-        double GetAsMathExpressionResult(RuntimeScene & scene,
+        double GetAsMathExpressionResult(const RuntimeScene & scene,
                                          ObjectsConcerned & objectsConcerned,
                                          ObjSPtr obj1 = boost::shared_ptr<Object>( ),
                                          ObjSPtr obj2 = boost::shared_ptr<Object>( )) const
          {
-            vector < double > parametersValues;
+            std::vector < double > parametersValues;
 
             for (unsigned int i = 0;i<mathExpressionFunctions.size();++i)
                 parametersValues.push_back((mathExpressionFunctions[i].function)(scene, objectsConcerned, obj1, obj2, mathExpressionFunctions[i]));
@@ -77,7 +78,7 @@ class GD_API GDExpression
         /**
          * Evaluate as a text expression and return the result
          */
-        std::string GetAsTextExpressionResult(RuntimeScene & scene,
+        std::string GetAsTextExpressionResult(const RuntimeScene & scene,
                                               ObjectsConcerned & objectsConcerned,
                                               ObjSPtr obj1 = boost::shared_ptr<Object>( ),
                                               ObjSPtr obj2 = boost::shared_ptr<Object>( )) const;
@@ -85,23 +86,24 @@ class GD_API GDExpression
         /**
          * Preprocess expressions in order to allow evaluation as text or math expression.
          */
-        bool PreprocessExpressions(RuntimeScene & scene);
+        bool PreprocessExpressions(const RuntimeScene & scene);
+
+        #if defined(GDE)
+        std::string GetFirstErrorDuringPreprocessingText() { return firstErrorStr; };
+        size_t GetFirstErrorDuringPreprocessingPosition() { return firstErrorPos; };
+        #endif
 
         /**
-         * Add a function to call to evaluate parameters of mathExpression.
+         * Enumeration of available comparison operators
          */
-        inline void AddMathExprFunction(const ExpressionInstruction & exprInstruction) { mathExpressionFunctions.push_back(exprInstruction); };
-
-        /**
-         * Get the functions to call to evaluate parameters of mathExpression.
-         */
-        inline const std::vector < ExpressionInstruction > & GetMathExprFunctions() const { return mathExpressionFunctions; }
-
         enum compOperator
         {
             Equal, Inferior, Superior, InferiorOrEqual, SuperiorOrEqual, Different, Undefined
         };
 
+        /**
+         * Enumeration of available modification operators
+         */
         enum modOperator
         {
             Set, Add, Substract, Multiply, Divide, UndefinedModification
@@ -114,12 +116,12 @@ class GD_API GDExpression
         /**
          * Preprocess the math expression, in order to allow its evaluation.
          */
-        bool PreprocessMathExpression(RuntimeScene & scene);
+        bool PreprocessMathExpression(const RuntimeScene & scene);
 
         /**
          * Preprocess the text expression, in order to allow its evaluation.
          */
-        bool PreprocessTextExpression(RuntimeScene & scene);
+        bool PreprocessTextExpression(const RuntimeScene & scene);
 
         std::string     plainString; ///<The plain expression
         char            compOperator; ///<Char representing a comparison operator. Computed at creation.
@@ -127,10 +129,20 @@ class GD_API GDExpression
         mutable unsigned int    oID; ///< Object identifier, if expression contains an object name. Automatically computed when needed.
         mutable bool    oIDcomputed;
 
-        GDMathParser  mathExpression; ///<Object representing the mathemathic expression to parse and evaluate.
+        mutable GDMathParser  mathExpression; ///<Object representing the mathemathic expression to parse and evaluate.
         std::vector < ExpressionInstruction > mathExpressionFunctions; ///< The functions to call to generate the values of the parameters to pass to the mathematic expression when evaluating.
-        bool            isMathExpressionPreprocessed; ///<Indicate if the functions to call and the mathematic expression have been preprocessed.
+        bool            isMathExpressionPreprocessed; ///<Indicate if the functions to call and the mathematic expression have been generated.
 
+        std::vector < StrExpressionInstruction > textExpressionFunctions; ///< The functions to call to generate the text
+        bool            isTextExpressionPreprocessed; ///<Indicate if the functions to call have been generated.
+
+        #if defined(GDE)
+        std::string firstErrorStr;
+        size_t firstErrorPos;
+        #endif
 };
+
+std::string ExpToStr(const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction);
+double ExpToNumber(const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction);
 
 #endif // GDEXPRESSION_H

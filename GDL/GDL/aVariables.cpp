@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -23,7 +23,7 @@
 /**
  * Modify a variable of an object
  */
-bool Object::ActModVarObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActModVarObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //Get the variable to modify
     Variable & variable = variablesObjet.ObtainVariable( action.GetParameter( 1 ).GetPlainString() );
@@ -53,16 +53,16 @@ bool Object::ActModVarObjet( RuntimeScene * scene, ObjectsConcerned & objectsCon
 /// Paramètre 3 : Texte
 /// Paramètre 4 : Type de modif ( mettre à,  ajouter... )
 ////////////////////////////////////////////////////////////
-bool Object::ActModVarObjetTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActModVarObjetTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //Get the variable to modify
     Variable & variable = variablesObjet.ObtainVariable( action.GetParameter( 1 ).GetPlainString() );
 
     //Update variable value
     if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Set )
-        variable = eval.EvalTxt( action.GetParameter( 2 ), shared_from_this()  );
+        variable = action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()  );
     else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Add )
-        variable += eval.EvalTxt( action.GetParameter( 2 ), shared_from_this()  );
+        variable += action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()  );
 
     return true;
 }
@@ -75,9 +75,9 @@ bool Object::ActModVarObjetTxt( RuntimeScene * scene, ObjectsConcerned & objects
 /// Paramètre 2 : Valeur
 /// Paramètre 3 : Type de modif ( mettre à, soustraire, ajouter... )
 ////////////////////////////////////////////////////////////
-bool ActModVarScene( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActModVarScene( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    return ModVar( scene->variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    return ModVar( scene.variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
 }
 
 ////////////////////////////////////////////////////////////
@@ -88,9 +88,9 @@ bool ActModVarScene( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, 
 /// Paramètre 2 : Valeur
 /// Paramètre 3 : Type de modif ( mettre à, soustraire, ajouter... )
 ////////////////////////////////////////////////////////////
-bool ActModVarGlobal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActModVarGlobal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    return ModVar( scene->game->variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    return ModVar( scene.game->variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
 }
 
 ////////////////////////////////////////////////////////////
@@ -101,9 +101,9 @@ bool ActModVarGlobal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /// Paramètre 3 : Texte
 /// Paramètre 4 : Type de modif ( mettre à, soustraire, ajouter... )
 ////////////////////////////////////////////////////////////
-bool ActModVarSceneTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActModVarSceneTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    return ModVarTxt( scene->variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), eval.EvalTxt( action.GetParameter( 1 ) ));
+    return ModVarTxt( scene.variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned));
 }
 
 ////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ bool ActModVarSceneTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 /// Paramètre 3 : Texte
 /// Paramètre 4 : Type de modif ( mettre à, soustraire, ajouter... )
 ////////////////////////////////////////////////////////////
-bool ActModVarGlobalTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActModVarGlobalTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    return ModVarTxt( scene->game->variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), eval.EvalTxt( action.GetParameter( 1 ) ));
+    return ModVarTxt( scene.game->variables, action.GetParameter( 0 ).GetPlainString(), action.GetParameter( 2 ).GetAsModOperator(), action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned));
 }

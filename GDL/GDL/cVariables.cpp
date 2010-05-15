@@ -19,7 +19,7 @@
 /**
  * Test a variable of an object
  */
-bool Object::CondVarObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Object::CondVarObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     double varValue = variablesObjet.GetVariableValue(condition.GetParameter( 1 ).GetPlainString());
 
@@ -42,14 +42,14 @@ bool Object::CondVarObjet( RuntimeScene * scene, ObjectsConcerned & objectsConce
 /**
  * Test the text of a variable of an object
  */
-bool Object::CondVarObjetTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Object::CondVarObjetTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     string varValue = variablesObjet.GetVariableText(condition.GetParameter( 1 ).GetPlainString());
 
     //Enfin, on teste vraiment.
     //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && varValue == eval.EvalTxt( condition.GetParameter( 2 ), shared_from_this() ) ) ||
-        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && varValue != eval.EvalTxt( condition.GetParameter( 2 ), shared_from_this() ) )
+    if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && varValue == condition.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && varValue != condition.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -61,7 +61,7 @@ bool Object::CondVarObjetTxt( RuntimeScene * scene, ObjectsConcerned & objectsCo
 /**
  * Test if a variable of an object is defined
  */
-bool Object::CondVarObjetDef( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Object::CondVarObjetDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     return variablesObjet.HasVariable(condition.GetParameter( 1 ).GetPlainString());
 }
@@ -74,9 +74,9 @@ bool Object::CondVarObjetDef( RuntimeScene * scene, ObjectsConcerned & objectsCo
 /// Paramètre 2 : Valeur à tester
 /// Paramètre 3 : Type de comparaison
 ////////////////////////////////////////////////////////////
-bool CondVarScene( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondVarScene( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    return CondVar(scene->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
+    return CondVar(scene.variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////
@@ -87,9 +87,9 @@ bool CondVarScene( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 /// Paramètre 2 : Chaine à tester
 /// Paramètre 3 : Type de comparaison
 ////////////////////////////////////////////////////////////
-bool CondVarSceneTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondVarSceneTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    return CondVarTxt(scene->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), eval.EvalTxt( condition.GetParameter( 1 ) ) ) ^ condition.IsInverted();
+    return CondVarTxt(scene.variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////
@@ -98,9 +98,9 @@ bool CondVarSceneTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /// Type : VarGlobalDef
 /// Paramètre 1 : Nom Variable
 ////////////////////////////////////////////////////////////
-bool CondVarSceneDef( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondVarSceneDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    return scene->variables.HasVariable( condition.GetParameter( 0 ).GetPlainString() ) ^ condition.IsInverted();
+    return scene.variables.HasVariable( condition.GetParameter( 0 ).GetPlainString() ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////
@@ -111,9 +111,9 @@ bool CondVarSceneDef( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /// Paramètre 2 : Valeur à tester
 /// Paramètre 3 : Type de comparaison
 ////////////////////////////////////////////////////////////
-bool CondVarGlobal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondVarGlobal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    return CondVar(scene->game->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
+    return CondVar(scene.game->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////
@@ -124,9 +124,9 @@ bool CondVarGlobal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 /// Paramètre 2 : Chaine à tester
 /// Paramètre 3 : Type de comparaison
 ////////////////////////////////////////////////////////////
-bool CondVarGlobalTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondVarGlobalTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    return CondVarTxt(scene->game->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), eval.EvalTxt( condition.GetParameter( 1 ) ) ) ^ condition.IsInverted();
+    return CondVarTxt(scene.game->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////
@@ -135,7 +135,7 @@ bool CondVarGlobalTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 /// Type : VarGlobalDef
 /// Paramètre 1 : Nom Variable
 ////////////////////////////////////////////////////////////
-bool CondVarGlobalDef( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondVarGlobalDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    return scene->game->variables.HasVariable( condition.GetParameter( 0 ).GetPlainString() ) ^ condition.IsInverted();
+    return scene.game->variables.HasVariable( condition.GetParameter( 0 ).GetPlainString() ) ^ condition.IsInverted();
 }

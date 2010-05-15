@@ -25,9 +25,8 @@ repeatNumberExpression("")
 /**
  * Check the conditions, and launch actions and subevents if necessary
  */
-void RepeatEvent::Execute( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval )
+void RepeatEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
-    eval.SetObjectsConcerned(&objectsConcerned);
     int nbRepeat = repeatNumberExpression.GetAsMathExpressionResult(scene, objectsConcerned);
 
     for (unsigned int r = 0;r<static_cast<unsigned>(nbRepeat);++r)
@@ -35,16 +34,16 @@ void RepeatEvent::Execute( RuntimeScene * scene, ObjectsConcerned & objectsConce
         ObjectsConcerned objectsConcernedForEvent;
         objectsConcernedForEvent.InheritsFrom(&objectsConcerned);
 
-        if ( ExecuteConditions( scene, objectsConcernedForEvent, eval ) == true )
+        if ( ExecuteConditions( scene, objectsConcernedForEvent) == true )
         {
-            ExecuteActions( scene, objectsConcernedForEvent, eval );
+            ExecuteActions( scene, objectsConcernedForEvent);
 
             for (unsigned int i = 0;i<events.size();++i)
             {
                 ObjectsConcerned objectsConcernedForSubEvent;
                 objectsConcernedForSubEvent.InheritsFrom(&objectsConcernedForEvent);
 
-                events[i]->Execute(scene, objectsConcernedForSubEvent, eval);
+                events[i]->Execute(scene, objectsConcernedForSubEvent);
             }
         }
     }
@@ -53,13 +52,12 @@ void RepeatEvent::Execute( RuntimeScene * scene, ObjectsConcerned & objectsConce
 /**
  * Check if all conditions are true
  */
-bool RepeatEvent::ExecuteConditions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval )
+bool RepeatEvent::ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
     for ( unsigned int k = 0; k < conditions.size(); ++k )
     {
-        eval.SetObjectsConcerned(&objectsConcerned);
         if ( conditions[k].function != NULL &&
-             !conditions[k].function( scene, objectsConcerned, conditions[k], eval ) )
+             !conditions[k].function( scene, objectsConcerned, conditions[k]) )
             return false; //Return false as soon as a condition is false
     }
 
@@ -69,13 +67,12 @@ bool RepeatEvent::ExecuteConditions( RuntimeScene * scene, ObjectsConcerned & ob
 /**
  * Run actions of the event
  */
-void RepeatEvent::ExecuteActions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval )
+void RepeatEvent::ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
     for ( unsigned int k = 0; k < actions.size();k++ )
     {
-        eval.SetObjectsConcerned(&objectsConcerned);
         if ( actions[k].function != NULL )
-            actions[k].function( scene, objectsConcerned, actions[k], eval );
+            actions[k].function( scene, objectsConcerned, actions[k]);
     }
 
     return;

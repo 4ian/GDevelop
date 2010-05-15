@@ -24,10 +24,10 @@
 #include <sstream>
 #include "GDL/MemTrace.h"
 #include "GDL/ErrorReport.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 
 #ifdef GDE
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #endif
 
 using namespace std;
@@ -183,8 +183,8 @@ bool Object::ChangeProperty(unsigned int propertyNb, string newValue)
         string xValue = newValue.substr(0, separationPos);
         string yValue = newValue.substr(separationPos+1, newValue.length());
 
-        SetX(toInt(xValue));
-        SetY(toInt(yValue));
+        SetX(ToInt(xValue));
+        SetY(ToInt(yValue));
     }
     else if ( propertyNb == 1 ) {return false;}
     else if ( propertyNb == 2 )
@@ -197,7 +197,7 @@ bool Object::ChangeProperty(unsigned int propertyNb, string newValue)
             SetHidden(false);
     }
     else if ( propertyNb == 3 ) { layer = newValue; }
-    else if ( propertyNb == 4 ) {SetZOrder(toInt(newValue));}
+    else if ( propertyNb == 4 ) {SetZOrder(ToInt(newValue));}
     else if ( propertyNb == 5 ) {return false;}
     else if ( propertyNb == 6 ) {return false;}
     else if ( propertyNb == 7 ) {return false;}

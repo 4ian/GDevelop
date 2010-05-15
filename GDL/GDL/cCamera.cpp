@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -24,12 +24,12 @@
 /**
  * Test camera width
  */
-bool CondCameraWidth( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondCameraWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     std::string layer = condition.GetParameter(0).GetPlainString();
     unsigned int camera = condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    float width = scene->GetLayer(layer).GetCamera(camera).GetCameraInfo().size.x;
+    float width = scene.GetLayer(layer).GetCamera(camera).GetCameraInfo().size.x;
 
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && width == condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && width < condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
@@ -52,12 +52,12 @@ bool CondCameraWidth( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /**
  * Test camera height
  */
-bool CondCameraHeight( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondCameraHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     std::string layer = condition.GetParameter(0).GetPlainString();
     unsigned int camera = condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    float height = scene->GetLayer(layer).GetCamera(camera).GetCameraInfo().size.y;
+    float height = scene.GetLayer(layer).GetCamera(camera).GetCameraInfo().size.y;
 
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && height == condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && height < condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
@@ -85,7 +85,7 @@ bool CondCameraHeight( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 /// Paramètre 2 : Signe du test
 /// Paramètre 3 : Calque
 ////////////////////////////////////////////////////////////
-bool CondCameraX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondCameraX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
@@ -97,7 +97,7 @@ bool CondCameraX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     if ( condition.GetParameters().size() >= 4 )
         camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
+    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier
@@ -128,7 +128,7 @@ bool CondCameraX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
 /// Paramètre 2 : Signe du test
 /// Paramètre 3 : Calque
 ////////////////////////////////////////////////////////////
-bool CondCameraY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondCameraY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
@@ -140,7 +140,7 @@ bool CondCameraY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     if ( condition.GetParameters().size() >= 4 )
         camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
+    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier
@@ -170,7 +170,7 @@ bool CondCameraY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
 /// Paramètre 2 : Signe du test
 /// Paramètre 3 : Calque
 ////////////////////////////////////////////////////////////
-bool CondCameraAngle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondCameraAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
@@ -182,7 +182,7 @@ bool CondCameraAngle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     if ( condition.GetParameters().size() >= 4 )
         camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
+    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier

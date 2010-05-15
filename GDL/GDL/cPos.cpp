@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -25,7 +25,7 @@
 /**
  * Test X position of an object
  */
-bool Object::CondPosX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Object::CondPosX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetX() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -45,7 +45,7 @@ bool Object::CondPosX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 /**
  * Test Y position of an object
  */
-bool Object::CondPosY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Object::CondPosY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetY() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -71,7 +71,7 @@ bool Object::CondPosY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 /// Paramètre 3 : Valeur
 /// Paramètre 4 : Signe du test
 ////////////////////////////////////////////////////////////
-bool CondDistance( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondDistance( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     ObjectsConcerned objectsConcernedForExpressions = objectsConcerned;
 

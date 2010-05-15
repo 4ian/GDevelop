@@ -4,7 +4,7 @@
 #include <vector>
 #include "GDL/RuntimeScene.h"
 
-bool ActEnvoiDataNet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActDownloadFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+bool ActEnvoiDataNet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActDownloadFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 #endif // ANET_H

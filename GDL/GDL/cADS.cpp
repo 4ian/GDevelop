@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -25,7 +25,7 @@
 /**
  * Test the number of the current animation of an object
  */
-bool SpriteObject::CondAnim( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool SpriteObject::CondAnim( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetAnimationNb() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -45,7 +45,7 @@ bool SpriteObject::CondAnim( RuntimeScene * scene, ObjectsConcerned & objectsCon
 /**
  * Test if the current animation of an object is stopped
  */
-bool SpriteObject::CondAnimStopped( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool SpriteObject::CondAnimStopped( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
    return IsAnimationStopped();
 }
@@ -53,7 +53,7 @@ bool SpriteObject::CondAnimStopped( RuntimeScene * scene, ObjectsConcerned & obj
 /**
  * Test the number of the current sprite ( image ) of a sprite object
  */
-bool SpriteObject::CondSprite( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool SpriteObject::CondSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetSpriteNb() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -73,7 +73,7 @@ bool SpriteObject::CondSprite( RuntimeScene * scene, ObjectsConcerned & objectsC
 /**
  * Test the current direction of a sprite object
  */
-bool SpriteObject::CondDirection( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool SpriteObject::CondDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetDirectionNb() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -93,7 +93,7 @@ bool SpriteObject::CondDirection( RuntimeScene * scene, ObjectsConcerned & objec
 /**
  * Test if a sprite object is turned toward another
  */
-bool CondEstTourne( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondEstTourne( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     ObjectsConcerned objectsConcernedForExpressions = objectsConcerned;
 

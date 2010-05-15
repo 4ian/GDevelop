@@ -153,13 +153,12 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
 
         //Gestions des évènements
         ObjectsConcerned objectsConcerned(&objectsInstances, &objectGroups);
-        Evaluateur eval(*game, *this);
         for (unsigned int i = 0;i<events.size();++i)
         {
             ObjectsConcerned objectsConcernedForEvent;
             objectsConcernedForEvent.InheritsFrom(&objectsConcerned);
 
-            events[i]->Execute(this, objectsConcernedForEvent, eval);
+            events[i]->Execute(*this, objectsConcernedForEvent);
         }
 
         //Gestions post-évènements
@@ -564,8 +563,6 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
         game->globalObjects[i]->LoadResources(game->imageManager);
     }
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
-
     //Create object instances which are originally positionned on scene
     for(unsigned int i = 0;i < scene.initialObjectsPositions.size();++i)
     {
@@ -577,9 +574,9 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
         ObjSPtr newObject = boost::shared_ptr<Object> ();
 
         if ( IDsceneObject != -1 ) //We check first scene's objects' list.
-            newObject = extensionManager->CreateObject(initialObjects[IDsceneObject]);
+            newObject = initialObjects[IDsceneObject]->Clone();
         else if ( IDglobalObject != -1 ) //Then the global object list
-            newObject = extensionManager->CreateObject(game->globalObjects.at( IDglobalObject ));
+            newObject = game->globalObjects.at( IDglobalObject )->Clone();
         else
         {
             string nom = scene.initialObjectsPositions[i].objectName;

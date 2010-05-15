@@ -29,7 +29,7 @@ class StandardEvent : public BaseEvent
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new StandardEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual void Execute( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval );
+        virtual void Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};
@@ -59,8 +59,8 @@ class StandardEvent : public BaseEvent
 
     private:
         void Init(const StandardEvent & event);
-        bool ExecuteConditions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval );
-        void ExecuteActions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval );
+        bool ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
+        void ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
 
         vector < Instruction > conditions;
         vector < Instruction > actions;

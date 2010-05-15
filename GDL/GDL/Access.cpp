@@ -41,7 +41,7 @@ Evaluateur::~Evaluateur()
  * Expression function needed for adding a constant text to the expression
  * ( For example, in 5*VAL(TempsFrame[])+1, 5* and +1 are constants. )
  */
-string ExpConstantText( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction)
+string ExpConstantText( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction)
 {
     return exprInstruction.parameters[0].GetPlainString();
 }
@@ -49,11 +49,11 @@ string ExpConstantText( const RuntimeScene * scene, ObjectsConcerned * objectsCo
 /**
  * Expression function needed for calling objects expressions functions
  */
-double ExpObjectFunction( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction)
+double ExpObjectFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction)
 {
     //We need an object to pass to the function
     ObjSPtr object = boost::shared_ptr<Object>();
-    ObjList list = objectsConcerned->Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() );
+    ObjList list = objectsConcerned.Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() );
 
     if ( !list.empty() )
     {
@@ -318,7 +318,7 @@ void Evaluateur::AddGlobalFunctionCall(GDExpression & expr, string & plainExpres
 }
 
 void Evaluateur::PreprocessExpression(GDExpression & expr, const RuntimeScene & scene)
-{
+{/*
     string expression = expr.GetPlainString();
     string mathPlainExpression = expr.GetPlainString();
 
@@ -413,7 +413,7 @@ void Evaluateur::PreprocessExpression(GDExpression & expr, const RuntimeScene & 
         }
     }
 
-    expr.SetPreprocessed();
+    expr.SetPreprocessed();*/
 }
 
 ////////////////////////////////////////////////////////////
@@ -421,7 +421,7 @@ void Evaluateur::PreprocessExpression(GDExpression & expr, const RuntimeScene & 
 ////////////////////////////////////////////////////////////
 double Evaluateur::EvalExp(GDExpression & expression, ObjSPtr obj1, ObjSPtr obj2) const
 {
-    BT_PROFILE("EvalExp");
+   /* BT_PROFILE("EvalExp");
 
     if ( !expression.IsPreprocessed() ) PreprocessExpression(expression, scene);
 
@@ -437,7 +437,7 @@ double Evaluateur::EvalExp(GDExpression & expression, ObjSPtr obj1, ObjSPtr obj2
 
 	if ( vals.empty() ) vals.push_back(0);
 
-    return expression.EvalMathExpression(&vals[0]);
+    return expression.EvalMathExpression(&vals[0]);*/
 }
 
 

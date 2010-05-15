@@ -4,12 +4,12 @@
 #include "GDL/ImageManager.h"
 #include "GDL/tinyxml.h"
 #include "GDL/Position.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include <SFML/Graphics.hpp>
 
 #ifdef GDE
 #include <wx/wx.h>
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
 #include "GDL/EditorObjet.h"
 #include "GDL/SpriteInitialPositionPanel.h"
@@ -360,7 +360,7 @@ bool SpriteObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
     //Generate a thumbnail from the first animation
     if ( IsValid(0,0,0) )
     {
-        int idImage = ChercherNomImage(game.images, GetAnimation(0).GetDirection(0).GetSprite(0).GetImage());
+        int idImage = FindImage(game.images, GetAnimation(0).GetDirection(0).GetSprite(0).GetImage());
         if ( idImage != -1 )
         {
             if ( !wxFileExists(game.images.at( idImage ).fichier) ) return false;
@@ -403,28 +403,28 @@ void SpriteObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositi
     SpriteInitialPositionPanel * spritePanel = dynamic_cast<SpriteInitialPositionPanel*>(panel);
     if (spritePanel == NULL) return;
 
-    position.angle = toInt(string(spritePanel->DirectionEdit->GetValue().mb_str()));
-    position.floatInfos["animation"] = toInt(string(spritePanel->AnimationCombo->GetValue().mb_str()));
+    position.angle = ToInt(string(spritePanel->DirectionEdit->GetValue().mb_str()));
+    position.floatInfos["animation"] = ToInt(string(spritePanel->AnimationCombo->GetValue().mb_str()));
 }
 
 void SpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Animation");     value = toString(GetAnimationNb());}
-    else if ( propertyNb == 1 ) {name = _("Direction");     value = toString(GetDirectionNb());}
-    else if ( propertyNb == 2 ) {name = _("Image");         value = toString(GetSpriteNb());}
-    else if ( propertyNb == 3 ) {name = _("Opacité");       value = toString(GetOpacity());}
-    else if ( propertyNb == 4 ) {name = _("Echelle X de la taille");       value = toString(GetScaleX());}
-    else if ( propertyNb == 5 ) {name = _("Echelle Y de la taille");       value = toString(GetScaleY());}
+    if      ( propertyNb == 0 ) {name = _("Animation");     value = ToString(GetAnimationNb());}
+    else if ( propertyNb == 1 ) {name = _("Direction");     value = ToString(GetDirectionNb());}
+    else if ( propertyNb == 2 ) {name = _("Image");         value = ToString(GetSpriteNb());}
+    else if ( propertyNb == 3 ) {name = _("Opacité");       value = ToString(GetOpacity());}
+    else if ( propertyNb == 4 ) {name = _("Echelle X de la taille");       value = ToString(GetScaleX());}
+    else if ( propertyNb == 5 ) {name = _("Echelle Y de la taille");       value = ToString(GetScaleY());}
 }
 
 bool SpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
-    if ( propertyNb == 0 ) { return SetAnim(toInt(newValue)); }
-    else if ( propertyNb == 1 ) {return SetDirec(toInt(newValue)); }
-    else if ( propertyNb == 2 ) { return SetSprite(toInt(newValue)); }
-    else if ( propertyNb == 3 ) { SetOpacity(toInt(newValue)); }
-    else if ( propertyNb == 4 ) {SetScaleX(toFloat(newValue));}
-    else if ( propertyNb == 5 ) {SetScaleY(toFloat(newValue));}
+    if ( propertyNb == 0 ) { return SetAnim(ToInt(newValue)); }
+    else if ( propertyNb == 1 ) {return SetDirec(ToInt(newValue)); }
+    else if ( propertyNb == 2 ) { return SetSprite(ToInt(newValue)); }
+    else if ( propertyNb == 3 ) { SetOpacity(ToInt(newValue)); }
+    else if ( propertyNb == 4 ) {SetScaleX(ToFloat(newValue));}
+    else if ( propertyNb == 5 ) {SetScaleY(ToFloat(newValue));}
 
     return true;
 }
@@ -813,7 +813,7 @@ void SpriteObject::SetAngle(float newAngle)
     if ( !GetAnimation( m_animCourant ).typeNormal )
         SetDirec(newAngle);
     else
-        SetDirec(static_cast<int>(gdRound((static_cast<int>(newAngle)%360)/45.f))%8);
+        SetDirec(static_cast<int>(GDRound((static_cast<int>(newAngle)%360)/45.f))%8);
 }
 
 /**

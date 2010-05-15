@@ -3,7 +3,7 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/Instruction.h"
 #include "GDL/Access.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include <vector>
 #include <string>
 
@@ -13,10 +13,10 @@
 /// Type : FileExists
 /// Paramètre 1 : Chemin du fichier
 ////////////////////////////////////////////////////////////
-bool CondFileExists( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondFileExists( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     TiXmlDocument doc;
-    if ( !doc.LoadFile(eval.EvalTxt(condition.GetParameter(0)).c_str()) && doc.ErrorId() == 2)
+    if ( !doc.LoadFile(condition.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str()) && doc.ErrorId() == 2)
     {
         if ( condition.IsInverted() )
             return true;
@@ -35,12 +35,12 @@ bool CondFileExists( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, 
 /// Paramètre 1 : Chemin du fichier
 /// Paramètre 2 : Groupe à tester
 ////////////////////////////////////////////////////////////
-bool CondGroupExists( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondGroupExists( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     TiXmlDocument doc;
-    if ( !doc.LoadFile(eval.EvalTxt(condition.GetParameter(0)).c_str() ) && doc.ErrorId() == 2)
+    if ( !doc.LoadFile(condition.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str() ) && doc.ErrorId() == 2)
     {
-        scene->errors.Add("Impossible d'ouvrir le fichier "+condition.GetParameter(0).GetPlainString()+" : "+string(doc.ErrorDesc()), "", "", -1, 2);
+        scene.errors.Add("Impossible d'ouvrir le fichier "+condition.GetParameter(0).GetPlainString()+" : "+string(doc.ErrorDesc()), "", "", -1, 2);
 
         if ( condition.IsInverted() )
             return true;
@@ -50,7 +50,7 @@ bool CondGroupExists( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     TiXmlHandle hdl( &doc );
 
     //Découpage des groupes
-    istringstream groupsStr( eval.EvalTxt(condition.GetParameter(1)) );
+    istringstream groupsStr( condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
     string Str;
     vector < string > groups;
     while ( std::getline( groupsStr, Str, '/' ) )

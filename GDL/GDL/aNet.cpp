@@ -27,14 +27,14 @@
 /// Paramètre 7 : Donnée 5 ( texte )
 /// Paramètre 8 : Donnée 6 ( texte )
 ////////////////////////////////////////////////////////////
-bool ActEnvoiDataNet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActEnvoiDataNet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    string data1 = eval.EvalTxt(action.GetParameter(2)); //On récupère les données
-    string data2 = eval.EvalTxt(action.GetParameter(3));
-    string data3 = eval.EvalTxt(action.GetParameter(4));
-    string data4 = eval.EvalTxt(action.GetParameter(5));
-    string data5 = eval.EvalTxt(action.GetParameter(6));
-    string data6 = eval.EvalTxt(action.GetParameter(7));
+    string data1 = action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned); //On récupère les données
+    string data2 = action.GetParameter(3).GetAsTextExpressionResult(scene, objectsConcerned);
+    string data3 = action.GetParameter(4).GetAsTextExpressionResult(scene, objectsConcerned);
+    string data4 = action.GetParameter(5).GetAsTextExpressionResult(scene, objectsConcerned);
+    string data5 = action.GetParameter(6).GetAsTextExpressionResult(scene, objectsConcerned);
+    string data6 = action.GetParameter(7).GetAsTextExpressionResult(scene, objectsConcerned);
 
     string data1md5 = md5(data1+action.GetParameter(1).GetPlainString()); //On leur ajoute le mot de passe
     string data2md5 = md5(data2+action.GetParameter(1).GetPlainString()); //Et on effectue la somme de contrôle
@@ -45,7 +45,7 @@ bool ActEnvoiDataNet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 
 #ifdef WINDOWS
     //Création de l'adresse internet à lancer
-    string appel = "start \"\" \""+eval.EvalTxt(action.GetParameter(0))+
+    string appel = "start \"\" \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+
                    "?data1="+data1+"&check1="+data1md5+
                    "&data2="+data2+"&check2="+data2md5+
                    "&data3="+data3+"&check3="+data3md5+
@@ -57,7 +57,7 @@ bool ActEnvoiDataNet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 #endif
 #ifdef LINUX
     //Nécessite le paquet xdg-utils
-    string appel = "xdg-open \""+eval.EvalTxt(action.GetParameter(0))+
+    string appel = "xdg-open \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+
                    "?data1="+data1+"&check1="+data1md5+
                    "&data2="+data2+"&check2="+data2md5+
                    "&data3="+data3+"&check3="+data3md5+
@@ -71,21 +71,21 @@ bool ActEnvoiDataNet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
     return true;
 }
 
-bool ActDownloadFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActDownloadFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     // Create Http
     sf::Http Http;
-    Http.SetHost(eval.EvalTxt(action.GetParameter(0)));
+    Http.SetHost(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
 
     // Create request
     sf::Http::Request Request;
     Request.SetMethod(sf::Http::Request::Get);
-    Request.SetURI(eval.EvalTxt(action.GetParameter(1)));
+    Request.SetURI(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned));
 
     // Send request & Get response
     sf::Http::Response datas = Http.SendRequest(Request);
 
-    string ofilename = eval.EvalTxt(action.GetParameter(2));
+    string ofilename = action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned);
     ofstream ofile(ofilename.c_str(), ios_base::binary);
     if ( ofile.is_open() )
     {

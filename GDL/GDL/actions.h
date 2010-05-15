@@ -30,6 +30,6 @@
 #include "GDL/aLayer.h"
 #include "GDL/aScale.h"
 
-bool ActSceneBackground( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+bool ActSceneBackground( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 #endif // ACTIONS_H_INCLUDED

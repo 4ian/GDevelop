@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -25,7 +25,7 @@
 /**
  * Change the X position of an object
  */
-bool Object::ActMettreX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActMettreX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
         SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) );
@@ -44,7 +44,7 @@ bool Object::ActMettreX( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 /**
  * Change the Y position of an object
  */
-bool Object::ActMettreY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActMettreY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //On modifie la position Y
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
@@ -65,7 +65,7 @@ bool Object::ActMettreY( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 /**
  * Change the X and Y position of an object
  */
-bool Object::ActMettreXY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActMettreXY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //On modifie la position X
     if ( action.GetParameter( 2 ).GetPlainString().empty() || action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set)
@@ -104,7 +104,7 @@ bool Object::ActMettreXY( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 /// Paramètre 3 : Distance
 /// Paramètre 4 : Angle
 ////////////////////////////////////////////////////////////
-bool ActMettreAutour( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActMettreAutour( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
     ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetAsObjectIdentifier(), action.IsGlobal());
@@ -139,7 +139,7 @@ bool ActMettreAutour( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /// Paramètre 4 : Distance
 /// Paramètre 5 : Angle
 ////////////////////////////////////////////////////////////
-bool Object::ActMettreAutourPos( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActMettreAutourPos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )
                                            + cos(action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )/180*3.14)*action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )

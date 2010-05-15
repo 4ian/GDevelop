@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -38,7 +38,7 @@ struct est_fini
 /// Paramètre 2 : Bouclage ( facultatif )
 /// Paramètre 3 : Volume ( facultatif )
 ////////////////////////////////////////////////////////////
-bool ActPlaySound( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActPlaySound( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     sf::Clock Latence;
 
@@ -70,7 +70,7 @@ bool ActPlaySound( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
     }
 
 
-    scene->pauseTime += Latence.GetElapsedTime();
+    scene.pauseTime += Latence.GetElapsedTime();
 
     return true;
 }
@@ -84,13 +84,13 @@ bool ActPlaySound( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 /// Paramètre 3 : Bouclage ( fac )
 /// Paramètre 4 : Volume ( fac )
 ////////////////////////////////////////////////////////////
-bool ActPlaySoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActPlaySoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) );
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
-        scene->errors.Add("Canal invalide pour jouer le son", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour jouer le son", "", "", -1, 1);
         return false;
     }
 
@@ -134,13 +134,13 @@ bool ActPlaySoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 /// Type : StopSoundCanal
 /// Paramètre 1 : Canal
 ////////////////////////////////////////////////////////////
-bool ActStopSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActStopSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
-        scene->errors.Add("Canal invalide pour jouer le son", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour jouer le son", "", "", -1, 1);
         return false;
     }
 
@@ -159,13 +159,13 @@ bool ActStopSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 /// Type : PauseSoundCanal
 /// Paramètre 1 : Canal
 ////////////////////////////////////////////////////////////
-bool ActPauseSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActPauseSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
-        scene->errors.Add("Canal invalide pour jouer le son", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour jouer le son", "", "", -1, 1);
         return false;
     }
 
@@ -184,13 +184,13 @@ bool ActPauseSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 /// Type : RePlaySoundCanal
 /// Paramètre 1 : Canal
 ////////////////////////////////////////////////////////////
-bool ActRePlaySoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActRePlaySoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
-        scene->errors.Add("Canal invalide pour jouer le son", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour jouer le son", "", "", -1, 1);
         return false;
     }
 
@@ -211,7 +211,7 @@ bool ActRePlaySoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 /// Paramètre 2 : Bouclage ( facultatif )
 /// Paramètre 3 : Volume ( facultatif )
 ////////////////////////////////////////////////////////////
-bool ActPlayMusic( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActPlayMusic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     SoundManager * soundManager = SoundManager::getInstance();
     RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
@@ -254,13 +254,13 @@ bool ActPlayMusic( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 /// Paramètre 2 : Canal
 /// Paramètre 3 : Bouclage ( facultatif )
 ////////////////////////////////////////////////////////////
-bool ActPlayMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActPlayMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
-        scene->errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
         return false;
     }
 
@@ -300,13 +300,13 @@ bool ActPlayMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 /// Type : StopMusicCanal
 /// Paramètre 1 : Canal
 ////////////////////////////////////////////////////////////
-bool ActStopMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActStopMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
-        scene->errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
         return false;
     }
 
@@ -325,13 +325,13 @@ bool ActStopMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 /// Type : PauseMusicCanal
 /// Paramètre 1 : Canal
 ////////////////////////////////////////////////////////////
-bool ActPauseMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActPauseMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
-        scene->errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
         return false;
     }
 
@@ -350,13 +350,13 @@ bool ActPauseMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 /// Type : RePlayMusicCanal
 /// Paramètre 1 : Canal
 ////////////////////////////////////////////////////////////
-bool ActRePlayMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActRePlayMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
-        scene->errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
         return false;
     }
 
@@ -377,13 +377,13 @@ bool ActRePlayMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 /// Paramètre 2 : Volume
 /// Paramètre 3 : Signe ( facultatif )
 ////////////////////////////////////////////////////////////
-bool ActModVolumeSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActModVolumeSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_SON )
     {
-        scene->errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
         return false;
     }
 
@@ -413,13 +413,13 @@ bool ActModVolumeSoundCanal( RuntimeScene * scene, ObjectsConcerned & objectsCon
 /// Paramètre 2 : Volume
 /// Paramètre 3 : Signe ( facultatif )
 ////////////////////////////////////////////////////////////
-bool ActModVolumeMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActModVolumeMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
     {
-        scene->errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
+        scene.errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
         return false;
     }
 
@@ -447,7 +447,7 @@ bool ActModVolumeMusicCanal( RuntimeScene * scene, ObjectsConcerned & objectsCon
 /// Paramètre 2 : Volume
 /// Paramètre 3 : Signe ( facultatif )
 ////////////////////////////////////////////////////////////
-bool ActModGlobalVolume( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActModGlobalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     SoundManager * soundManager = SoundManager::getInstance();
 

@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include <iostream>
 #include "GDL/RuntimeScene.h"
 #include "GDL/Access.h"

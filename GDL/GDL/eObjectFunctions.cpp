@@ -15,17 +15,17 @@
 
 using namespace std;
 
-double Object::ExpGetObjectX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double Object::ExpGetObjectX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return GetX();
 }
 
-double Object::ExpGetObjectY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double Object::ExpGetObjectY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return GetY();
 }
 
-double SpriteObject::ExpGetObjectX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double SpriteObject::ExpGetObjectX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     if ( exprInstruction.parameters.size() > 1 )
     {
@@ -41,7 +41,7 @@ double SpriteObject::ExpGetObjectX( const RuntimeScene * scene, ObjectsConcerned
     return GetX();
 }
 
-double SpriteObject::ExpGetObjectY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double SpriteObject::ExpGetObjectY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     if ( exprInstruction.parameters.size() > 1 )
     {
@@ -55,75 +55,75 @@ double SpriteObject::ExpGetObjectY( const RuntimeScene * scene, ObjectsConcerned
     return GetY();
 }
 
-double SpriteObject::ExpGetObjectDirection( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double SpriteObject::ExpGetObjectDirection( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return GetDirectionNb();
 }
 
-double SpriteObject::ExpGetObjectSpriteNb( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double SpriteObject::ExpGetObjectSpriteNb( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return GetSpriteNb();
 }
 
-double SpriteObject::ExpGetObjectAnimationNb( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double SpriteObject::ExpGetObjectAnimationNb( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return GetAnimationNb();
 }
 
-double Object::ExpGetObjectTotalForceX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double Object::ExpGetObjectTotalForceX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return TotalForceX();
 }
 
-double Object::ExpGetObjectTotalForceY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double Object::ExpGetObjectTotalForceY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return TotalForceY();
 }
 
-double Object::ExpGetObjectTotalForceAngle( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double Object::ExpGetObjectTotalForceAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return TotalForceAngle();
 }
 
-double Object::ExpGetObjectTotalForceLength( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double Object::ExpGetObjectTotalForceLength( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return TotalForceLength();
 }
 
-double Object::ExpGetObjectWidth( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double Object::ExpGetObjectWidth( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return GetWidth();
 }
 
-double Object::ExpGetObjectHeight( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double Object::ExpGetObjectHeight( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return GetHeight();
 }
 
-double SpriteObject::ExpGetObjectScaleX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double SpriteObject::ExpGetObjectScaleX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return GetScaleX();
 }
 
-double SpriteObject::ExpGetObjectScaleY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double SpriteObject::ExpGetObjectScaleY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return GetScaleY();
 }
 
-double Object::ExpGetObjectZOrder( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double Object::ExpGetObjectZOrder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return GetZOrder();
 }
 
-double Object::ExpGetObjectVariableValue( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double Object::ExpGetObjectVariableValue( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return variablesObjet.GetVariableValue(exprInstruction.parameters[1].GetPlainString());
 }
 
-double Object::ExpGetDistanceBetweenObjects( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double Object::ExpGetDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     ObjSPtr object2 = boost::shared_ptr<Object>( );
-    ObjList list2 = objectsConcerned->Pick( exprInstruction.parameters[1].GetAsObjectIdentifier() );
+    ObjList list2 = objectsConcerned.Pick( exprInstruction.parameters[1].GetAsObjectIdentifier() );
 
     if ( !list2.empty() )
     {
@@ -152,10 +152,10 @@ double Object::ExpGetDistanceBetweenObjects( const RuntimeScene * scene, Objects
     return 0;
 }
 
-double Object::ExpGetSqDistanceBetweenObjects( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double Object::ExpGetSqDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     ObjSPtr object2 = boost::shared_ptr<Object>( );
-    ObjList list2 = objectsConcerned->Pick( exprInstruction.parameters[1].GetAsObjectIdentifier() );
+    ObjList list2 = objectsConcerned.Pick( exprInstruction.parameters[1].GetAsObjectIdentifier() );
 
     if ( !list2.empty() )
     {
@@ -187,10 +187,10 @@ double Object::ExpGetSqDistanceBetweenObjects( const RuntimeScene * scene, Objec
 /**
  * Return the table containing the mapping between expressions name and functions
  */
-const std::map<std::string, double (Object::*)( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )> &
+const std::map<std::string, double (Object::*)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )> &
 GetExpObjectBuiltinTable()
 {
-    static std::map<std::string, double (Object::*)( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )> expObjectBuiltinTable;
+    static std::map<std::string, double (Object::*)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )> expObjectBuiltinTable;
     if ( expObjectBuiltinTable.empty() )
     {
         //expObjectBuiltinTable["x"]            = &Object::ExpGetObjectX;

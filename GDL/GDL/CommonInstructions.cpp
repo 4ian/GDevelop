@@ -6,14 +6,14 @@
 /**
  * Common instruction for executing instruction on each object "Foo".
  */
-bool ActionForEachObject( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
 
 	ObjList::iterator obj = list.begin();
 	ObjList::const_iterator obj_end = list.end();
     for ( ; obj != obj_end; ++obj )
-        ((*obj).get()->*action.objectFunction)(scene, objectsConcerned, action, eval);
+        ((*obj).get()->*action.objectFunction)(scene, objectsConcerned, action);
 
     return true;
 }
@@ -21,7 +21,7 @@ bool ActionForEachObject( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 /**
  * Common instruction for testing instruction on each object "Foo".
  */
-bool ConditionForEachObject( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool ConditionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //Need to copy the old objectsConcerned object to evaluate properly the arguments
     ObjectsConcerned objectsConcernedForExpressions = objectsConcerned;
@@ -33,7 +33,7 @@ bool ConditionForEachObject( RuntimeScene * scene, ObjectsConcerned & objectsCon
 	ObjList::const_iterator obj_end = list.end();
     for ( ; obj != obj_end; ++obj )
     {
-        if ( ((*obj).get()->*condition.objectFunction)(scene, objectsConcernedForExpressions, condition, eval) ^ condition.IsInverted())
+        if ( ((*obj).get()->*condition.objectFunction)(scene, objectsConcernedForExpressions, condition) ^ condition.IsInverted())
         {
             isTrue = true;
             objectsConcerned.objectsPicked.AddObject( *obj );
@@ -46,7 +46,7 @@ bool ConditionForEachObject( RuntimeScene * scene, ObjectsConcerned & objectsCon
 /**
  * Common instruction testing if one or more sub conditions are true
  */
-bool ConditionOr( RuntimeScene * scene, ObjectsConcerned & finalObjectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool ConditionOr( RuntimeScene & scene, ObjectsConcerned & finalObjectsConcerned, const Instruction & condition )
 {
     bool isTrue = false;
     ObjectsConcerned objectsConcernedParent = finalObjectsConcerned;
@@ -58,10 +58,9 @@ bool ConditionOr( RuntimeScene * scene, ObjectsConcerned & finalObjectsConcerned
         //Re use objects concerned from parent at each condition
         ObjectsConcerned objectsConcerned;
         objectsConcerned.InheritsFrom(&objectsConcernedParent);
-        eval.SetObjectsConcerned(&objectsConcerned);
 
         if ( condition.GetSubInstructions()[k].function != NULL )
-            ok = condition.GetSubInstructions()[k].function( scene, objectsConcerned, condition.GetSubInstructions()[k], eval );
+            ok = condition.GetSubInstructions()[k].function( scene, objectsConcerned, condition.GetSubInstructions()[k]);
 
         if ( ok ) //Condition is true ? Remember objects picked and set the "Or" condition true.
         {
@@ -76,13 +75,12 @@ bool ConditionOr( RuntimeScene * scene, ObjectsConcerned & finalObjectsConcerned
 /**
  * Common instruction testing sub conditions, inversing the result
  */
-bool ConditionNot( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool ConditionNot( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     for ( unsigned int k = 0; k < condition.GetSubInstructions().size(); ++k )
     {
-        eval.SetObjectsConcerned(&objectsConcerned);
         if ( condition.GetSubInstructions()[k].function != NULL &&
-             !condition.GetSubInstructions()[k].function( scene, objectsConcerned, condition.GetSubInstructions()[k], eval ) )
+             !condition.GetSubInstructions()[k].function( scene, objectsConcerned, condition.GetSubInstructions()[k]) )
             return true; //Return true ( We are in a NOT condition ) as soon as a condition is false
     }
 

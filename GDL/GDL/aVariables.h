@@ -12,10 +12,10 @@
 #include "GDL/ListVariable.h"
 #include "GDL/RuntimeScene.h"
 
-bool ActModVarScene( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActModVarGlobal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActModVarSceneTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActModVarGlobalTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+bool ActModVarScene( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActModVarGlobal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActModVarSceneTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActModVarGlobalTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 /**
  * Helper function, only for internal ( ActModVarScene, ActModVarGlobal ) use.

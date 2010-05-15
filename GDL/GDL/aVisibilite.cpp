@@ -11,7 +11,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -21,7 +21,7 @@
 /**
  * Opacity action for sprites objects
  */
-bool SpriteObject::ActOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
         SetOpacity( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
@@ -40,7 +40,7 @@ bool SpriteObject::ActOpacity( RuntimeScene * scene, ObjectsConcerned & objectsC
 /**
  * Hide an object
  */
-bool Object::ActCacheObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActCacheObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     SetHidden();
 
@@ -50,7 +50,7 @@ bool Object::ActCacheObjet( RuntimeScene * scene, ObjectsConcerned & objectsConc
 /**
  * Show an object
  */
-bool Object::ActMontreObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActMontreObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     SetHidden(false);
 

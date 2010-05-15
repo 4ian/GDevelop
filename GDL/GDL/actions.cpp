@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -24,15 +24,15 @@
 /// Type : SceneBackground
 /// Paramètre 1 : Nouvelle couleur
 ////////////////////////////////////////////////////////////
-bool ActSceneBackground( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActSceneBackground( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    vector < GDExpression > colors = SpliterStringToVector <GDExpression> (action.GetParameter(0).GetPlainString(), ';');
+    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(0).GetPlainString(), ';');
 
     if ( colors.size() > 2 )
     {
-        scene->backgroundColorR = colors[0].GetAsMathExpressionResult(scene, objectsConcerned);
-        scene->backgroundColorG = colors[1].GetAsMathExpressionResult(scene, objectsConcerned);
-        scene->backgroundColorB = colors[2].GetAsMathExpressionResult(scene, objectsConcerned);
+        scene.backgroundColorR = ToInt(colors[0]);
+        scene.backgroundColorG = ToInt(colors[1]);
+        scene.backgroundColorB = ToInt(colors[2]);
     }
 
     return true;

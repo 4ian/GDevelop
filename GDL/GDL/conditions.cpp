@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -32,7 +32,7 @@
 /// OBJETS CONCERNES. PREFERER UTILISER LES CONDITIONS
 /// APPROPRIEES
 ////////////////////////////////////////////////////////////
-bool CondEgal( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondEgal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     bool isTrue = false;
 

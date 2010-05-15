@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -26,24 +26,24 @@
 /// Type : ResetTimer
 /// Paramètre 1 : Nom du timer
 ////////////////////////////////////////////////////////////
-bool ActResetTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActResetTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    string timerName = eval.EvalTxt(action.GetParameter( 0 ));
+    string timerName = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
 
     //Le timer existe il ? on parcourt la liste.
-    for ( unsigned int i = 0;i < scene->timers.size();i++ )
+    for ( unsigned int i = 0;i < scene.timers.size();i++ )
     {
         //On cherche le nom du timer
-        if ( scene->timers[i].GetName() == timerName )
+        if ( scene.timers[i].GetName() == timerName )
         {
             //On l'a trouvé !
-            scene->timers[i].Reset();
+            scene.timers[i].Reset();
             return true;
         }
     }
 
     //Il n'existe pas, on l'ajoute
-    scene->timers.push_back( ManualTimer(timerName) );
+    scene.timers.push_back( ManualTimer(timerName) );
 
     return true;
 }
@@ -54,25 +54,25 @@ bool ActResetTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 /// Type : PauseTimer
 /// Paramètre 1 : Nom du timer
 ////////////////////////////////////////////////////////////
-bool ActPauseTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActPauseTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    string timerName = eval.EvalTxt(action.GetParameter( 0 ));
+    string timerName = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
 
     //Le timer existe il ? on parcourt la liste.
-    for ( unsigned int i = 0;i < scene->timers.size();i++ )
+    for ( unsigned int i = 0;i < scene.timers.size();i++ )
     {
         //On cherche le nom du timer
-        if ( scene->timers[i].GetName() == timerName )
+        if ( scene.timers[i].GetName() == timerName )
         {
             //On l'a trouvé !
-            scene->timers[i].SetPaused(true);
+            scene.timers[i].SetPaused(true);
             return true;
         }
     }
 
     //Il n'existe pas, on l'ajoute
-    scene->timers.push_back( ManualTimer(timerName) );
-    scene->timers.back().SetPaused(true);
+    scene.timers.push_back( ManualTimer(timerName) );
+    scene.timers.back().SetPaused(true);
 
     return true;
 }
@@ -83,25 +83,25 @@ bool ActPauseTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 /// Type : UnPauseTimer
 /// Paramètre 1 : Nom du timer
 ////////////////////////////////////////////////////////////
-bool ActUnPauseTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActUnPauseTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    string timerName = eval.EvalTxt(action.GetParameter( 0 ));
+    string timerName = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
 
     //Le timer existe il ? on parcourt la liste.
-    for ( unsigned int i = 0;i < scene->timers.size();i++ )
+    for ( unsigned int i = 0;i < scene.timers.size();i++ )
     {
         //On cherche le nom du timer
-        if ( scene->timers[i].GetName() == timerName )
+        if ( scene.timers[i].GetName() == timerName )
         {
             //On l'a trouvé !
-            scene->timers[i].SetPaused(false);
+            scene.timers[i].SetPaused(false);
             return true;
         }
     }
 
     //Il n'existe pas, on l'ajoute
-    scene->timers.push_back( ManualTimer(timerName) );
-    scene->timers.back().SetPaused(false);
+    scene.timers.push_back( ManualTimer(timerName) );
+    scene.timers.back().SetPaused(false);
 
     return true;
 }
@@ -112,9 +112,9 @@ bool ActUnPauseTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /// Type : ChangeTimeScale
 /// Paramètre 1 : Nouvelle échelle du temps
 ////////////////////////////////////////////////////////////
-bool ActChangeTimeScale( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActChangeTimeScale( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    scene->SetTimeScale(action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    scene.SetTimeScale(action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     return true;
 }

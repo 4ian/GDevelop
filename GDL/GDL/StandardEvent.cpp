@@ -21,18 +21,18 @@ BaseEvent()
 /**
  * Check the conditions, and launch actions and subevents if necessary
  */
-void StandardEvent::Execute( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval )
+void StandardEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
-    if ( ExecuteConditions( scene, objectsConcerned, eval ) == true )
+    if ( ExecuteConditions( scene, objectsConcerned) == true )
     {
-        ExecuteActions( scene, objectsConcerned, eval );
+        ExecuteActions( scene, objectsConcerned);
 
         for (unsigned int i = 0;i<events.size();++i)
         {
             ObjectsConcerned objectsConcernedForSubEvent;
             objectsConcernedForSubEvent.InheritsFrom(&objectsConcerned);
 
-            events[i]->Execute(scene, objectsConcernedForSubEvent, eval);
+            events[i]->Execute(scene, objectsConcernedForSubEvent);
         }
     }
 }
@@ -40,13 +40,12 @@ void StandardEvent::Execute( RuntimeScene * scene, ObjectsConcerned & objectsCon
 /**
  * Check if all conditions are true
  */
-bool StandardEvent::ExecuteConditions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval )
+bool StandardEvent::ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
     for ( unsigned int k = 0; k < conditions.size(); ++k )
     {
-        eval.SetObjectsConcerned(&objectsConcerned);
         if ( conditions[k].function != NULL &&
-             !conditions[k].function( scene, objectsConcerned, conditions[k], eval ) )
+             !conditions[k].function( scene, objectsConcerned, conditions[k]) )
             return false; //Return false as soon as a condition is false
     }
 
@@ -57,13 +56,12 @@ bool StandardEvent::ExecuteConditions( RuntimeScene * scene, ObjectsConcerned & 
  * Run actions of the event
  */
 //TODO : Make "Scene" and "Quit" real actions
-void StandardEvent::ExecuteActions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval )
+void StandardEvent::ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
     for ( unsigned int k = 0; k < actions.size();k++ )
     {
-        eval.SetObjectsConcerned(&objectsConcerned);
         if ( actions[k].function != NULL )
-            actions[k].function( scene, objectsConcerned, actions[k], eval );
+            actions[k].function( scene, objectsConcerned, actions[k]);
     }
 
     return;

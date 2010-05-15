@@ -46,7 +46,7 @@ class GD_API BaseEvent
         /**
          * Call when the event has to be executed. Redefined by derived class.
          */
-        virtual void Execute( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval ) {return;};
+        virtual void Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned ) {return;};
 
         /**
          * Derived class have to redefine this function, so as to return true, if they are executable.

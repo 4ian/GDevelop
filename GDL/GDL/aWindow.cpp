@@ -14,20 +14,20 @@ using namespace std;
 /// Type : SetFullScreen
 /// Paramètre 1 : Oui ou non ( non si vide )
 ////////////////////////////////////////////////////////////
-bool ActSetFullScreen( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActSetFullScreen( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     #ifdef GDP
-    if ( ( action.GetParameter(0).GetPlainString() == "yes" || action.GetParameter(0).GetPlainString() == "oui" ) && !scene->game->fullscreen )
+    if ( ( action.GetParameter(0).GetPlainString() == "yes" || action.GetParameter(0).GetPlainString() == "oui" ) && !scene.game->fullscreen )
     {
-        scene->game->fullscreen = true;
-        scene->renderWindow->Create( sf::VideoMode( scene->game->windowWidth, scene->game->windowHeight, 32 ), scene->title, sf::Style::Close | sf::Style::Fullscreen );
-        scene->ChangeRenderWindow(scene->renderWindow);
+        scene.game->fullscreen = true;
+        scene.renderWindow->Create( sf::VideoMode( scene.game->windowWidth, scene.game->windowHeight, 32 ), scene.title, sf::Style::Close | sf::Style::Fullscreen );
+        scene.ChangeRenderWindow(scene.renderWindow);
     }
-    else if ( ( action.GetParameter(0).GetPlainString() == "no" || action.GetParameter(0).GetPlainString() == "non" ) && scene->game->fullscreen )
+    else if ( ( action.GetParameter(0).GetPlainString() == "no" || action.GetParameter(0).GetPlainString() == "non" ) && scene.game->fullscreen )
     {
-        scene->game->fullscreen = false;
-        scene->renderWindow->Create( sf::VideoMode( scene->game->windowWidth, scene->game->windowHeight, 32 ), scene->title, sf::Style::Close );
-        scene->ChangeRenderWindow(scene->renderWindow);
+        scene.game->fullscreen = false;
+        scene.renderWindow->Create( sf::VideoMode( scene.game->windowWidth, scene.game->windowHeight, 32 ), scene.title, sf::Style::Close );
+        scene.ChangeRenderWindow(scene.renderWindow);
     }
     #endif
 
@@ -37,21 +37,21 @@ bool ActSetFullScreen( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 /**
  * Change window size
  */
-bool ActSetWindowSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActSetWindowSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     #ifdef GDP
-    scene->game->windowWidth = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
-    scene->game->windowHeight = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    scene.game->windowWidth = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    scene.game->windowHeight = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    if ( scene->game->fullscreen )
+    if ( scene.game->fullscreen )
     {
-        scene->renderWindow->Create( sf::VideoMode( scene->game->windowWidth, scene->game->windowHeight, 32 ), scene->title, sf::Style::Close | sf::Style::Fullscreen );
-        scene->ChangeRenderWindow(scene->renderWindow);
+        scene.renderWindow->Create( sf::VideoMode( scene.game->windowWidth, scene.game->windowHeight, 32 ), scene.title, sf::Style::Close | sf::Style::Fullscreen );
+        scene.ChangeRenderWindow(scene.renderWindow);
     }
     else
     {
-        scene->renderWindow->Create( sf::VideoMode( scene->game->windowWidth, scene->game->windowHeight, 32 ), scene->title, sf::Style::Close );
-        scene->ChangeRenderWindow(scene->renderWindow);
+        scene.renderWindow->Create( sf::VideoMode( scene.game->windowWidth, scene.game->windowHeight, 32 ), scene.title, sf::Style::Close );
+        scene.ChangeRenderWindow(scene.renderWindow);
     }
     #endif
 

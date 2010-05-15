@@ -9,7 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -26,7 +26,7 @@
 /// Paramètre 2 : Nombre à tester
 /// Paramètre 3 : Signe du test
 ////////////////////////////////////////////////////////////
-bool CondNbObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondNbObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     ObjectsConcerned objectsConcernedForExpressions = objectsConcerned;
 
@@ -68,7 +68,7 @@ bool CondNbObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
 /// Type : AjoutObjConcern
 /// Paramètre 1 : Objet à ajouter
 ////////////////////////////////////////////////////////////
-bool CondAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondAjoutObjConcern( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), true);
 
@@ -88,7 +88,7 @@ bool CondAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 /// Type : AjoutHasard
 /// Paramètre 1 : Objet à ajouter
 ////////////////////////////////////////////////////////////
-bool CondAjoutHasard( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondAjoutHasard( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
 

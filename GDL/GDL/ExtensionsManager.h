@@ -112,6 +112,18 @@ class GD_API ExtensionsManager
         const ExpressionInfos & GetObjectExpressionInfos(string objectType, string exprType) const;
 
         /**
+         * Get information about a string expression from its type
+         * Works for static expressions.
+         */
+        const StrExpressionInfos & GetStrExpressionInfos(string exprType) const;
+
+        /**
+         * Get information about a string expression from its type
+         * Works for object expressions.
+         */
+        const StrExpressionInfos & GetObjectStrExpressionInfos(string objectType, string exprType) const;
+
+        /**
          * Get a pointer to a ( static ) action
          * @return Pointer to the action, NULL if this latter does not exist.
          */
@@ -152,16 +164,34 @@ class GD_API ExtensionsManager
          * @return Pointer to the expression, NULL if this latter does not exist.
          */
         ExpressionObjectFunPtr GetObjectExpressionFunctionPtr(unsigned int objectTypeId, string name) const;
+        /**
+         * Verifying if a ( static ) string expression exists
+         * @return true if the ( static ) string expression exists
+         */
+        bool HasStrExpression(string name) const;
+
+        /**
+         * Get a pointer to a ( static ) string expression
+         * @return Pointer to the string expression, NULL if this latter does not exist.
+         */
+        StrExpressionFunPtr GetStrExpressionFunctionPtr(string name) const;
+
+        /**
+         * Verifying if a ( object ) string expression exists
+         * @return true if the ( object ) string expression exists
+         */
+        bool HasObjectStrExpression(unsigned int objectTypeId, string name) const;
+
+        /**
+         * Get a pointer to a ( object ) string expression
+         * @return Pointer to the string expression, NULL if this latter does not exist.
+         */
+        StrExpressionObjectFunPtr GetObjectStrExpressionFunctionPtr(unsigned int objectTypeId, string name) const;
 
         /**
          * Return a shared_ptr to a new object.
          */
         boost::shared_ptr<Object> CreateObject(unsigned int typeId, std::string name);
-
-        /**
-         * Return a shared_ptr to a new object, created by copying the source.
-         */
-        boost::shared_ptr<Object> CreateObject(boost::shared_ptr<Object> src);
 
         /**
          * Check if an event type is available
@@ -222,7 +252,6 @@ class GD_API ExtensionsManager
 
         vector < boost::shared_ptr<ExtensionBase> > extensionsLoaded;
         vector < CreateFunPtr >             creationFunctionTable;
-        vector < CreateByCopyFunPtr >       creationByCopyFunctionTable;
         vector < DestroyFunPtr >            destroyFunctionTable;
 
         typedef boost::bimaps::bimap < string, unsigned int > StringToTypeIdBiMap;
@@ -230,6 +259,7 @@ class GD_API ExtensionsManager
 
         static InstructionInfos badInstructionInfos;
         static ExpressionInfos badExpressionInfos;
+        static StrExpressionInfos badStrExpressionInfos;
 
         static ExtensionsManager *_singleton;
 };

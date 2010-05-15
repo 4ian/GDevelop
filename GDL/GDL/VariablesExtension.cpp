@@ -161,6 +161,10 @@ VariablesExtension::VariablesExtension()
         DECLARE_PARAMETER("text", _("Nom de la variable"), false, "")
     DECLARE_END_EXPRESSION()
 
+    DECLARE_STR_EXPRESSION("variableString", _("Variable de la scène"), _("Variable de la scène"), _("Variables"), "res/actions/var.png", &ExpGetVariableString)
+        DECLARE_PARAMETER("text", _("Nom de la variable"), false, "")
+    DECLARE_END_STR_EXPRESSION()
+
     DECLARE_EXPRESSION("globalVariable", _("Variable globale"), _("Variable globale"), _("Variables"), "res/actions/var.png", &ExpGetGlobalVariableValue)
         DECLARE_PARAMETER("text", _("Nom de la variable globale"), false, "")
     DECLARE_END_EXPRESSION()

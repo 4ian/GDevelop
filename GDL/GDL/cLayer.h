@@ -8,6 +8,6 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/Instruction.h"
 
-bool CondLayerVisible( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
+bool CondLayerVisible( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
 #endif // CLAYER_H

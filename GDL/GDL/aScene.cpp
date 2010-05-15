@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -20,21 +20,21 @@
 
 using namespace std;
 
-bool ActQuit( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActQuit( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    scene->GotoSceneWhenEventsAreFinished(-2);
+    scene.GotoSceneWhenEventsAreFinished(-2);
     return true;
 }
 
-bool ActScene( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActScene( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    string returnNom = eval.EvalTxt(action.GetParameter(0));
+    string returnNom = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
 
-    for ( unsigned int i = 0;i < scene->game->scenes.size() ; ++i )
+    for ( unsigned int i = 0;i < scene.game->scenes.size() ; ++i )
     {
-        if ( scene->game->scenes[i]->GetName() == returnNom )
+        if ( scene.game->scenes[i]->GetName() == returnNom )
         {
-            scene->GotoSceneWhenEventsAreFinished(i);
+            scene.GotoSceneWhenEventsAreFinished(i);
             return true;
         }
     }

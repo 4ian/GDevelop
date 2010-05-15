@@ -7,50 +7,50 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
 #include <SFML/Graphics.hpp>
 #include "GDL/RuntimeScene.h"
 
-bool ActCentreSouris( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActCentreSouris( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    scene->renderWindow->SetCursorPosition(scene->renderWindow->GetWidth()/2, scene->renderWindow->GetHeight()/2 );
+    scene.renderWindow->SetCursorPosition(scene.renderWindow->GetWidth()/2, scene.renderWindow->GetHeight()/2 );
 
     return true;
 }
 
-bool ActCentreSourisX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActCentreSourisX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    scene->renderWindow->SetCursorPosition(scene->renderWindow->GetWidth()/2, scene->input->GetMouseY() );
+    scene.renderWindow->SetCursorPosition(scene.renderWindow->GetWidth()/2, scene.input->GetMouseY() );
     return true;
 }
 
-bool ActCentreSourisY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActCentreSourisY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    scene->renderWindow->SetCursorPosition(scene->input->GetMouseX(), scene->renderWindow->GetHeight()/2 );
+    scene.renderWindow->SetCursorPosition(scene.input->GetMouseX(), scene.renderWindow->GetHeight()/2 );
     return true;
 }
 
-bool ActSetSourisXY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActSetSourisXY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     float newX = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
     float newY = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    scene->renderWindow->SetCursorPosition( newX, newY );
+    scene.renderWindow->SetCursorPosition( newX, newY );
 
     return true;
 }
 
-bool ActCacheSouris( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActCacheSouris( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    scene->renderWindow->ShowMouseCursor(false);
+    scene.renderWindow->ShowMouseCursor(false);
     return true;
 }
 
-bool ActMontreSouris( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActMontreSouris( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    scene->renderWindow->ShowMouseCursor(true);
+    scene.renderWindow->ShowMouseCursor(true);
     return true;
 }

@@ -483,8 +483,6 @@
 		<Unit filename="GDL\AES.h">
 			<Option virtualFolder="AES\" />
 		</Unit>
-		<Unit filename="GDL\Access.cpp" />
-		<Unit filename="GDL\Access.h" />
 		<Unit filename="GDL\AdvancedExtension.cpp" />
 		<Unit filename="GDL\AdvancedExtension.h" />
 		<Unit filename="GDL\AjoutPlusImage.cpp" />
@@ -524,6 +522,8 @@
 		<Unit filename="GDL\CommonInstructions.h" />
 		<Unit filename="GDL\CommonInstructionsExtension.cpp" />
 		<Unit filename="GDL\CommonInstructionsExtension.h" />
+		<Unit filename="GDL\CommonTools.cpp" />
+		<Unit filename="GDL\CommonTools.h" />
 		<Unit filename="GDL\DatFile.cpp" />
 		<Unit filename="GDL\DatFile.h" />
 		<Unit filename="GDL\Direction.cpp" />
@@ -676,8 +676,8 @@
 		<Unit filename="GDL\SpriteObject.h" />
 		<Unit filename="GDL\StandardEvent.cpp" />
 		<Unit filename="GDL\StandardEvent.h" />
-		<Unit filename="GDL\StdAlgo.cpp" />
-		<Unit filename="GDL\StdAlgo.h" />
+		<Unit filename="GDL\StrExpressionInstruction.cpp" />
+		<Unit filename="GDL\StrExpressionInstruction.h" />
 		<Unit filename="GDL\Text.cpp" />
 		<Unit filename="GDL\Text.h" />
 		<Unit filename="GDL\TimeExtension.cpp" />
@@ -743,8 +743,6 @@
 		<Unit filename="GDL\aWindow.h" />
 		<Unit filename="GDL\actions.cpp" />
 		<Unit filename="GDL\actions.h" />
-		<Unit filename="GDL\algo.cpp" />
-		<Unit filename="GDL\algo.h" />
 		<Unit filename="GDL\btAlignedAllocator.h" />
 		<Unit filename="GDL\btScalar.h" />
 		<Unit filename="GDL\cADS.cpp" />

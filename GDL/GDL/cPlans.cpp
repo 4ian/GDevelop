@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -24,7 +24,7 @@
 /**
  * Test Z order of an object
  */
-bool Object::CondZOrder( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Object::CondZOrder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetZOrder() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetZOrder() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||

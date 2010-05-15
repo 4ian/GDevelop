@@ -14,11 +14,12 @@ using namespace std;
 std::map<std::string, InstructionInfos > ExtensionBase::badConditionsInfos;
 std::map<std::string, InstructionInfos > ExtensionBase::badActionsInfos;
 std::map<std::string, ExpressionInfos > ExtensionBase::badExpressionsInfos;
+std::map<std::string, StrExpressionInfos > ExtensionBase::badStrExpressionsInfos;
+
 
 ExtensionObjectInfos::ExtensionObjectInfos() :
 destroyFunPtr(NULL),
-createFunPtr(NULL),
-createByCopyFunPtr(NULL)
+createFunPtr(NULL)
 {
 }
 
@@ -28,6 +29,15 @@ shown(true),
 #endif
 expressionFunPtr(NULL),
 expressionObjectFunPtr(NULL)
+{
+}
+
+StrExpressionInfos::StrExpressionInfos() :
+#if defined(GDE)
+shown(true),
+#endif
+strExpressionFunPtr(NULL),
+strExpressionObjectFunPtr(NULL)
 {
 }
 
@@ -106,6 +116,11 @@ const std::map<std::string, ExpressionInfos > & ExtensionBase::GetAllExpressions
     return expressionsInfos;
 }
 
+const std::map<std::string, StrExpressionInfos > & ExtensionBase::GetAllStrExpressions() const
+{
+    return strExpressionsInfos;
+}
+
 const std::map<std::string, EventInfos > & ExtensionBase::GetAllEvents() const
 {
     return eventsInfos;
@@ -133,6 +148,14 @@ const std::map<std::string, ExpressionInfos > & ExtensionBase::GetAllExpressions
         return objectsInfos.find(objectType)->second.expressionsInfos;
 
     return badExpressionsInfos;
+}
+
+const std::map<std::string, StrExpressionInfos > & ExtensionBase::GetAllStrExpressionsForObject(std::string objectType) const
+{
+    if ( objectsInfos.find(objectType) != objectsInfos.end())
+        return objectsInfos.find(objectType)->second.strExpressionsInfos;
+
+    return badStrExpressionsInfos;
 }
 
 #if defined(GDE)
@@ -227,18 +250,29 @@ ExpressionObjectFunPtr  ExtensionBase::GetObjectExpressionFunctionPtr(std::strin
     return NULL;
 }
 
-CreateFunPtr ExtensionBase::GetObjectCreationFunctionPtr(std::string objectType) const
+StrExpressionFunPtr        ExtensionBase::GetStrExpressionFunctionPtr(std::string expressionName) const
 {
-    if ( objectsInfos.find(objectType) != objectsInfos.end())
-        return objectsInfos.find(objectType)->second.createFunPtr;
+    if ( strExpressionsInfos.find(expressionName) != strExpressionsInfos.end())
+        return strExpressionsInfos.find(expressionName)->second.strExpressionFunPtr;
 
     return NULL;
 }
 
-CreateByCopyFunPtr ExtensionBase::GetObjectCreationByCopyFunctionPtr(std::string objectType) const
+StrExpressionObjectFunPtr  ExtensionBase::GetObjectStrExpressionFunctionPtr(std::string objectType, std::string expressionName) const
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
-        return objectsInfos.find(objectType)->second.createByCopyFunPtr;
+    {
+        if ( objectsInfos.find(objectType)->second.strExpressionsInfos.find(expressionName) != objectsInfos.find(objectType)->second.strExpressionsInfos.end())
+            return objectsInfos.find(objectType)->second.strExpressionsInfos.find(expressionName)->second.strExpressionObjectFunPtr;
+    }
+
+    return NULL;
+}
+
+CreateFunPtr ExtensionBase::GetObjectCreationFunctionPtr(std::string objectType) const
+{
+    if ( objectsInfos.find(objectType) != objectsInfos.end())
+        return objectsInfos.find(objectType)->second.createFunPtr;
 
     return NULL;
 }

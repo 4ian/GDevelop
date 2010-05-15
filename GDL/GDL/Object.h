@@ -50,6 +50,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
         Object(string name);
         virtual ~Object();
+        virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new Object(*this));}
 
         /**
          * Called by RuntimeScene at loading
@@ -211,51 +212,51 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         ErrorReport * errors;
 
         //Actions
-        bool ActMettreX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActMettreY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActMettreXY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActMettreAutourPos( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActChangeLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActAddForceXY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActAddForceAL( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActAddForceVersPos( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActArreter( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActAddForceTournePos( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActDelete( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActChangeZOrder( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActModVarObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActModVarObjetTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActCacheObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActMontreObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActDuplicate( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+        bool ActMettreX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActMettreY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActMettreXY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActMettreAutourPos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActChangeLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActAddForceXY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActAddForceAL( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActAddForceVersPos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActArreter( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActAddForceTournePos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActDelete( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActChangeZOrder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActModVarObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActModVarObjetTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActCacheObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActMontreObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActDuplicate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         //Conditions
-        bool CondLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondArret( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondAngleOfDisplacement( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondVitesse( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondZOrder( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondPosX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondPosY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondVarObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondVarObjetTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondVarObjetDef( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondInvisibleObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondVisibleObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
+        bool CondLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondArret( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondAngleOfDisplacement( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondVitesse( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondZOrder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondPosX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondPosY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondVarObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondVarObjetTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondVarObjetDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondInvisibleObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondVisibleObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
         //Expressions
-        double ExpGetObjectX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectTotalForceX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectTotalForceY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectTotalForceAngle( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectTotalForceLength( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectWidth( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectHeight( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectZOrder( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectVariableValue( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetSqDistanceBetweenObjects( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetDistanceBetweenObjects( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectTotalForceX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectTotalForceY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectTotalForceAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectTotalForceLength( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectWidth( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectHeight( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectZOrder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectVariableValue( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetSqDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 
     protected:
 
@@ -272,22 +273,22 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 };
 
 //Actions
-bool ActCreate( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActMettreAutour( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActAjoutHasard( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActRebondir( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActEcarter( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActAddForceVers( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActAddForceTourne( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActMoveObjects( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+bool ActCreate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActMettreAutour( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActAjoutObjConcern( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActAjoutHasard( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActRebondir( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActEcarter( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActAddForceVers( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActAddForceTourne( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActMoveObjects( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 //Conditions
-bool CondSeDirige( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-bool CondDistance( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-bool CondNbObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-bool CondAjoutObjConcern( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-bool CondAjoutHasard( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
+bool CondSeDirige( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondDistance( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondNbObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondAjoutObjConcern( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondAjoutHasard( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
 /**
  * As extensions, need to provide creations and destruction functions

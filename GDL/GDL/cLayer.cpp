@@ -10,7 +10,7 @@
 #include "GDL/Object.h"
 #include "GDL/Event.h"
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/Instruction.h"
@@ -19,9 +19,9 @@
 /**
  * Test the layer of an object
  */
-bool Object::CondLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Object::CondLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    if ( GetLayer() == eval.EvalTxt( condition.GetParameter( 1 ), shared_from_this() ))
+    if ( GetLayer() == condition.GetParameter( 1 ).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()) )
         return true;
 
     return false;
@@ -30,12 +30,12 @@ bool Object::CondLayer( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 /**
  * Test if a layer is visible
  */
-bool CondLayerVisible( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondLayerVisible( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     string layer = condition.GetParameter(0).GetPlainString();
     bool isTrue = false;
 
-    if ( scene->GetLayer(layer).GetVisibility() )
+    if ( scene.GetLayer(layer).GetVisibility() )
         isTrue = true;
 
     if ( condition.IsInverted() )

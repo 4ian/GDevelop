@@ -8,7 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -22,12 +22,12 @@
 /// Paramètre 1 : Numéro du joystick
 /// Paramètre 2 : Bouton à tester
 ////////////////////////////////////////////////////////////
-bool CondJoystickButtonDown( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondJoystickButtonDown( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     unsigned int joystick = condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
     unsigned int button = condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    bool Ok = scene->input->IsJoystickButtonDown(joystick, button);
+    bool Ok = scene.input->IsJoystickButtonDown(joystick, button);
 
     if ( condition.IsInverted() ) return !Ok;
     return Ok;
@@ -42,12 +42,12 @@ bool CondJoystickButtonDown( RuntimeScene * scene, ObjectsConcerned & objectsCon
 /// Paramètre 3 : Valeur à tester
 /// Paramètre 4 : Signe du test
 ////////////////////////////////////////////////////////////
-bool CondJoystickAxis( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondJoystickAxis( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     bool Ok = false;
 
     unsigned int joystick = condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
-    string axisStr = eval.EvalTxt( condition.GetParameter( 1 ) );
+    string axisStr = condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned);
     sf::Joy::Axis axis;
     if ( axisStr == "AxisX" ) axis = sf::Joy::AxisX;
     else if ( axisStr == "AxisY" ) axis = sf::Joy::AxisY;
@@ -59,12 +59,12 @@ bool CondJoystickAxis( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
     else return false;
 
     //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && scene->input->GetJoystickAxis(joystick, axis) == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) ||
-            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && scene->input->GetJoystickAxis(joystick, axis) < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) ||
-            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && scene->input->GetJoystickAxis(joystick, axis) > condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) ||
-            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && scene->input->GetJoystickAxis(joystick, axis) <= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) ||
-            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && scene->input->GetJoystickAxis(joystick, axis) >= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) ||
-            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && scene->input->GetJoystickAxis(joystick, axis) != condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned)
+    if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && scene.input->GetJoystickAxis(joystick, axis) == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned)) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && scene.input->GetJoystickAxis(joystick, axis) < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned)) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && scene.input->GetJoystickAxis(joystick, axis) > condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned)) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && scene.input->GetJoystickAxis(joystick, axis) <= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned)) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && scene.input->GetJoystickAxis(joystick, axis) >= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned)) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && scene.input->GetJoystickAxis(joystick, axis) != condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned))
        )
        Ok = true;
 

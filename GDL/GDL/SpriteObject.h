@@ -26,6 +26,7 @@ class SpriteObject : public Object
 
         SpriteObject(std::string name_);
         virtual ~SpriteObject() {};
+        virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new SpriteObject(*this));}
 
         virtual bool LoadResources(const ImageManager & imageMgr );
         virtual bool InitializeFromInitialPosition(const InitialPosition & position);
@@ -126,37 +127,37 @@ class SpriteObject : public Object
         unsigned int GetColorB() const;
 
         //Conditions
-        bool CondAnim( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondSprite( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondDirection( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondAnimStopped( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondScaleWidth( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondScaleHeight( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool CondOpacityObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
+        bool CondAnim( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondAnimStopped( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondScaleWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondScaleHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondOpacityObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
         //Actions
-        bool ActOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActChangeAnimation( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActChangeDirection( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActChangeSprite( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActPauseAnimation( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActPlayAnimation( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActTourneVersPos( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActChangeColor( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActChangeScale( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActChangeScaleWidth( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActChangeScaleHeight( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActCopyImageOnImageOfSprite( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActCreateMaskFromColorOnActualImage( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+        bool ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActChangeAnimation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActChangeDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActChangeSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActPauseAnimation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActPlayAnimation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActTourneVersPos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActChangeScale( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActChangeScaleWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActChangeScaleHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActCreateMaskFromColorOnActualImage( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         //Expressions
-        double ExpGetObjectX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectDirection( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectSpriteNb( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectAnimationNb( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectScaleX( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectScaleY( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectDirection( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectSpriteNb( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectAnimationNb( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectScaleX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpGetObjectScaleY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 
     private:
 
@@ -192,13 +193,13 @@ class SpriteObject : public Object
 };
 
 //Conditions
-bool CondSourisSurObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-bool CondEstTourne( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-bool CondCollision( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval  );
-bool CondCollisionNP( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval  );
+bool CondSourisSurObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondEstTourne( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondCollisionNP( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
 //Actions
-bool ActTourneVers( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+bool ActTourneVers( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 GD_API void DestroySpriteObject(Object * object);
 GD_API Object * CreateSpriteObject(std::string name);

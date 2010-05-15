@@ -19,7 +19,7 @@
 #include "GDL/ImageManager.h"
 #include "GDL/Object.h"
 #include "GDL/Event.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Son.h"
 #include "GDL/Music.h"
 #include "GDL/constantes.h"

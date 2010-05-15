@@ -9,12 +9,12 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/RuntimeScene.h"
 #include "GDL/Access.h"
 
-bool CondKeyPressed( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
+bool CondKeyPressed( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
 #endif // CCLAVIER_H_INCLUDED

@@ -61,7 +61,7 @@ void Game::Init(const Game & game)
 
     globalObjects.clear();
     for (unsigned int i =0;i<game.globalObjects.size();++i)
-    	globalObjects.push_back( extensionManager->CreateObject(game.globalObjects[i]) );
+    	globalObjects.push_back( game.globalObjects[i]->Clone() );
 
     scenes.clear();
     for (unsigned int i =0;i<game.scenes.size();++i)

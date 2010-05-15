@@ -9,7 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -29,20 +29,20 @@
 /// Paramètre 6 : Police
 /// Paramètre 7 : Calque
 ////////////////////////////////////////////////////////////
-bool ActEcrireTexte( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActEcrireTexte( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     Text texte;
-    texte.text.SetString(eval.EvalTxt(action.GetParameter(0) ) );
+    texte.text.SetString(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned) );
     texte.text.SetPosition(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned), action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
-    vector < GDExpression > colors = SpliterStringToVector <GDExpression> (action.GetParameter(3).GetPlainString(), ';');
+    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(3).GetPlainString(), ';');
 
     if ( colors.size() > 2 )
     {
         texte.text.SetColor(sf::Color(
-                                static_cast<int>(colors[0].GetAsMathExpressionResult(scene, objectsConcerned)),
-                                static_cast<int>(colors[1].GetAsMathExpressionResult(scene, objectsConcerned)),
-                                static_cast<int>(colors[2].GetAsMathExpressionResult(scene, objectsConcerned)) ));
+                                ToInt(colors[0]),
+                                ToInt(colors[1]),
+                                ToInt(colors[2]) ));
     }
 
     texte.text.SetCharacterSize(action.GetParameter(4).GetAsMathExpressionResult(scene, objectsConcerned));
@@ -53,7 +53,7 @@ bool ActEcrireTexte( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, 
     if ( action.GetParameters().size() >= 7 )
         texte.layer = action.GetParameter(6).GetPlainString();
 
-    scene->textes.push_back(texte);
+    scene.textes.push_back(texte);
 
     return true;
 }

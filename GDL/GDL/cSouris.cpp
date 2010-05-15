@@ -9,7 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -26,7 +26,7 @@
 /// Paramètre 2 : Signe du test
 /// Paramètre 3 : Calque
 ////////////////////////////////////////////////////////////
-bool CondSourisX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondSourisX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
@@ -38,10 +38,10 @@ bool CondSourisX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     if ( condition.GetParameters().size() >= 4 )
         camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
+    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //On calcule la position de la souris dans le calque donné
-    int mouseX = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), view).x;
+    int mouseX = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), view).x;
 
     //Enfin, on teste vraiment.
     //optimisation : test du signe en premier
@@ -70,7 +70,7 @@ bool CondSourisX( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
 /// Paramètre 2 : Position à tester
 /// Paramètre 3 : Signe du test
 ////////////////////////////////////////////////////////////
-bool CondSourisY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondSourisY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
@@ -82,10 +82,10 @@ bool CondSourisY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
     if ( condition.GetParameters().size() >= 4 )
         camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    sf::View & view = scene->GetLayer(layer).GetCamera(camera).GetSFMLView();
+    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     //On calcule la position de la souris dans le calque donné
-    int mouseY = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), view).y;
+    int mouseY = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), view).y;
 
     //optimisation : test du signe en premier
     if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && ( mouseY ) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
@@ -113,17 +113,17 @@ bool CondSourisY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
 /// Type : SourisBouton
 /// Paramètre 1 : Bouton à tester
 ////////////////////////////////////////////////////////////
-bool CondSourisBouton( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondSourisBouton( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     bool Ok = false;
 
     string Key = condition.GetParameter( 0 ).GetPlainString();
 
-    if ( Key == "Left" ) { Ok = scene->input->IsMouseButtonDown( sf::Mouse::Left ); }
-    if ( Key == "Right" ) { Ok = scene->input->IsMouseButtonDown( sf::Mouse::Right ); }
-    if ( Key == "Middle" ) { Ok = scene->input->IsMouseButtonDown( sf::Mouse::Middle ); }
-    if ( Key == "XButton1" ) { Ok = scene->input->IsMouseButtonDown( sf::Mouse::XButton1 ); }
-    if ( Key == "XButton2" ) { Ok = scene->input->IsMouseButtonDown( sf::Mouse::XButton2 ); }
+    if ( Key == "Left" ) { Ok = scene.input->IsMouseButtonDown( sf::Mouse::Left ); }
+    if ( Key == "Right" ) { Ok = scene.input->IsMouseButtonDown( sf::Mouse::Right ); }
+    if ( Key == "Middle" ) { Ok = scene.input->IsMouseButtonDown( sf::Mouse::Middle ); }
+    if ( Key == "XButton1" ) { Ok = scene.input->IsMouseButtonDown( sf::Mouse::XButton1 ); }
+    if ( Key == "XButton2" ) { Ok = scene.input->IsMouseButtonDown( sf::Mouse::XButton2 ); }
 
     if ( condition.IsInverted() ) return !Ok;
     return Ok;
@@ -136,7 +136,7 @@ bool CondSourisBouton( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 /// Type : SourisSurObjet
 /// Paramètre 1 : Objet à tester
 ////////////////////////////////////////////////////////////
-bool CondSourisSurObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondSourisSurObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     bool isTrue = false;
@@ -148,18 +148,18 @@ bool CondSourisSurObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcern
         accurate = false;
 
     //Pour chaque objet concerné
-    for (unsigned int layerIndex = 0;layerIndex < scene->layers.size();++layerIndex)
+    for (unsigned int layerIndex = 0;layerIndex < scene.layers.size();++layerIndex)
     {
-        for (unsigned int cameraIndex = 0;cameraIndex < scene->layers[layerIndex].GetCamerasNumber();++cameraIndex)
+        for (unsigned int cameraIndex = 0;cameraIndex < scene.layers[layerIndex].GetCamerasNumber();++cameraIndex)
         {
-            int mouseXInTheLayer = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), scene->layers[layerIndex].GetCamera(cameraIndex).GetSFMLView()).x;
-            int mouseYInTheLayer = scene->renderWindow->ConvertCoords(scene->input->GetMouseX(), scene->input->GetMouseY(), scene->layers[layerIndex].GetCamera(cameraIndex).GetSFMLView()).y;
+            int mouseXInTheLayer = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), scene.layers[layerIndex].GetCamera(cameraIndex).GetSFMLView()).x;
+            int mouseYInTheLayer = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), scene.layers[layerIndex].GetCamera(cameraIndex).GetSFMLView()).y;
 
             ObjList::iterator obj = list.begin();
             ObjList::const_iterator obj_end = list.end();
             for ( ; obj != obj_end; ++obj )
             {
-                if ( (*obj)->GetLayer() == scene->layers[layerIndex].GetName())
+                if ( (*obj)->GetLayer() == scene.layers[layerIndex].GetName())
                 {
                     if  ( (*obj)->GetDrawableX() < mouseXInTheLayer &&
                         ( (*obj)->GetDrawableX() + (*obj)->GetWidth() ) > mouseXInTheLayer &&

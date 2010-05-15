@@ -15,23 +15,23 @@
 /**
  * Check the conditions, and launch actions and subevents if necessary
  */
-void WhileEvent::Execute( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval )
+void WhileEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
-    while (ExecuteWhileConditions( scene, objectsConcerned, eval))
+    while (ExecuteWhileConditions( scene, objectsConcerned))
     {
         ObjectsConcerned objectsConcernedForEvent;
         objectsConcernedForEvent.InheritsFrom(&objectsConcerned);
 
-        if ( ExecuteConditions( scene, objectsConcernedForEvent, eval ) == true )
+        if ( ExecuteConditions( scene, objectsConcernedForEvent) == true )
         {
-            ExecuteActions( scene, objectsConcernedForEvent, eval );
+            ExecuteActions( scene, objectsConcernedForEvent);
 
             for (unsigned int i = 0;i<events.size();++i)
             {
                 ObjectsConcerned objectsConcernedForSubEvent;
                 objectsConcernedForSubEvent.InheritsFrom(&objectsConcernedForEvent);
 
-                events[i]->Execute(scene, objectsConcernedForSubEvent, eval);
+                events[i]->Execute(scene, objectsConcernedForSubEvent);
             }
         }
     }
@@ -40,13 +40,12 @@ void WhileEvent::Execute( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 /**
  * Check if all conditions are true
  */
-bool WhileEvent::ExecuteConditions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval )
+bool WhileEvent::ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
     for ( unsigned int k = 0; k < conditions.size(); ++k )
     {
-        eval.SetObjectsConcerned(&objectsConcerned);
         if ( conditions[k].function != NULL &&
-             !conditions[k].function( scene, objectsConcerned, conditions[k], eval ) )
+             !conditions[k].function( scene, objectsConcerned, conditions[k]) )
             return false; //Return false as soon as a condition is false
     }
 
@@ -56,13 +55,12 @@ bool WhileEvent::ExecuteConditions( RuntimeScene * scene, ObjectsConcerned & obj
 /**
  * Check if "while conditions" are true
  */
-bool WhileEvent::ExecuteWhileConditions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval )
+bool WhileEvent::ExecuteWhileConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
     for ( unsigned int k = 0; k < whileConditions.size(); ++k )
     {
-        eval.SetObjectsConcerned(&objectsConcerned);
         if ( whileConditions[k].function != NULL &&
-             !whileConditions[k].function( scene, objectsConcerned, whileConditions[k], eval ) )
+             !whileConditions[k].function( scene, objectsConcerned, whileConditions[k]) )
             return false; //Return false as soon as a condition is false
     }
 
@@ -72,13 +70,12 @@ bool WhileEvent::ExecuteWhileConditions( RuntimeScene * scene, ObjectsConcerned 
 /**
  * Run actions of the event
  */
-void WhileEvent::ExecuteActions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval )
+void WhileEvent::ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
     for ( unsigned int k = 0; k < actions.size();k++ )
     {
-        eval.SetObjectsConcerned(&objectsConcerned);
         if ( actions[k].function != NULL )
-            actions[k].function( scene, objectsConcerned, actions[k], eval );
+            actions[k].function( scene, objectsConcerned, actions[k]);
     }
 
     return;

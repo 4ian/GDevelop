@@ -9,15 +9,15 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 
-bool ActResetTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActPauseTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActUnPauseTimer( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActChangeTimeScale( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+bool ActResetTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActPauseTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActUnPauseTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActChangeTimeScale( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 #endif // ATIME_H_INCLUDED

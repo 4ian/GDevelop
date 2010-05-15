@@ -11,7 +11,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -24,7 +24,7 @@
 /**
  * Test the opacity of a sprite object
  */
-bool SpriteObject::CondOpacityObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool SpriteObject::CondOpacityObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetOpacity() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -44,7 +44,7 @@ bool SpriteObject::CondOpacityObjet( RuntimeScene * scene, ObjectsConcerned & ob
 /**
  * Test if an object is hidden
  */
-bool Object::CondInvisibleObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Object::CondInvisibleObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     if ( IsHidden() )
         return true;
@@ -55,7 +55,7 @@ bool Object::CondInvisibleObjet( RuntimeScene * scene, ObjectsConcerned & object
 /**
  * Test if an object is not hidden
  */
-bool Object::CondVisibleObjet( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Object::CondVisibleObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     if ( !IsHidden() )
         return true;

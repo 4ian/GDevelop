@@ -9,7 +9,7 @@
 #include "GDL/ObjectsConcerned.h"
 #include <vector>
 #include <string>
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include <stdio.h>
 
 using namespace std;
@@ -17,17 +17,17 @@ using namespace std;
 /**
  * Launch a file
  */
-bool ActLaunchFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActLaunchFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
 #ifdef WINDOWS
     //Création de l'adresse internet à lancer
-    string appel = "start \"\" \""+eval.EvalTxt(action.GetParameter(0))+"\""; //quotes are important
+    string appel = "start \"\" \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+"\""; //quotes are important
 
     system(appel.c_str());
 #endif
 #ifdef LINUX
     //Nécessite le paquet xdg-utils
-    string appel = "xdg-open \""+eval.EvalTxt(action.GetParameter(0))+"\"";
+    string appel = "xdg-open \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+"\"";
 
     system(appel.c_str());
 #endif
@@ -38,9 +38,9 @@ bool ActLaunchFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 /**
  * Execute a command
  */
-bool ActExecuteCmd( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActExecuteCmd( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    system(eval.EvalTxt(action.GetParameter(0)).c_str());
+    system(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str());
 
     return true;
 }
@@ -51,9 +51,9 @@ bool ActExecuteCmd( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 /// Type : EcrireFichierExp
 /// Paramètre 1 : Nom du fichier
 ////////////////////////////////////////////////////////////
-bool ActDeleteFichier( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActDeleteFichier( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    remove(eval.EvalTxt(action.GetParameter(0)).c_str());
+    remove(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str());
 
     return true;
 }
@@ -65,15 +65,15 @@ bool ActDeleteFichier( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
 /// Paramètre 1 : Nom du fichier
 /// Paramètre 2 : Groupe
 ////////////////////////////////////////////////////////////
-bool ActDeleteGroupFichier( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActDeleteGroupFichier( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    TiXmlDocument doc(eval.EvalTxt(action.GetParameter(0)).c_str()); //On tente de charger le fichier, pour garder la structure.
+    TiXmlDocument doc(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str()); //On tente de charger le fichier, pour garder la structure.
     doc.LoadFile(); //On ne se préoccupe pas du retour.
 
     TiXmlHandle hdl( &doc );
 
     //Découpage des groupes
-    istringstream groupsStr( eval.EvalTxt(action.GetParameter(1)) );
+    istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
     string Str;
     vector < string > groups;
     while ( std::getline( groupsStr, Str, '/' ) )
@@ -84,7 +84,7 @@ bool ActDeleteGroupFichier( RuntimeScene * scene, ObjectsConcerned & objectsConc
 
     if ( groups.empty() )
     {
-        scene->errors.Add("Aucun groupe disponible à supprimer", "", "", -1, 2);
+        scene.errors.Add("Aucun groupe disponible à supprimer", "", "", -1, 2);
         return false;
     }
     groups.push_back("");
@@ -92,7 +92,7 @@ bool ActDeleteGroupFichier( RuntimeScene * scene, ObjectsConcerned & objectsConc
     //Création si besoin est de la racine
     if ( hdl.FirstChildElement(groups.at(0).c_str()).Element() == NULL )
     {
-        scene->errors.Add("Impossible d'accéder au groupe à supprimer", "", "", -1, 2);
+        scene.errors.Add("Impossible d'accéder au groupe à supprimer", "", "", -1, 2);
     }
 
 
@@ -107,9 +107,9 @@ bool ActDeleteGroupFichier( RuntimeScene * scene, ObjectsConcerned & objectsConc
         if ( i >= (groups.size()-1)-1 )
         {
             hdl.ToNode()->RemoveChild(hdl.FirstChildElement(groups.at(i).c_str()).ToNode());
-            if ( !doc.SaveFile( eval.EvalTxt(action.GetParameter(0)).c_str() ) )
+            if ( !doc.SaveFile( action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str() ) )
             {
-                scene->errors.Add("Impossible d'enregistrer dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
+                scene.errors.Add("Impossible d'enregistrer dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
                 return false;
             }
             return true;
@@ -118,7 +118,7 @@ bool ActDeleteGroupFichier( RuntimeScene * scene, ObjectsConcerned & objectsConc
         hdl = hdl.FirstChildElement(groups.at(i).c_str());
     }
 
-    scene->errors.Add("Aucun groupe du nom indiqué à supprimer", "", "", -1, 2);
+    scene.errors.Add("Aucun groupe du nom indiqué à supprimer", "", "", -1, 2);
     return false;
 }
 
@@ -130,15 +130,15 @@ bool ActDeleteGroupFichier( RuntimeScene * scene, ObjectsConcerned & objectsConc
 /// Paramètre 2 : Groupe
 /// Paramètre 3 : Expression à écrire
 ////////////////////////////////////////////////////////////
-bool ActEcrireFichierExp( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActEcrireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    TiXmlDocument doc(eval.EvalTxt(action.GetParameter(0)).c_str()); //On tente de charger le fichier, pour garder la structure.
+    TiXmlDocument doc(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str()); //On tente de charger le fichier, pour garder la structure.
     doc.LoadFile(); //On ne se préoccupe pas du retour.
 
     TiXmlHandle hdl( &doc );
 
     //Découpage des groupes
-    istringstream groupsStr( eval.EvalTxt(action.GetParameter(1)) );
+    istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
     string Str;
     vector < string > groups;
     while ( std::getline( groupsStr, Str, '/' ) )
@@ -149,7 +149,7 @@ bool ActEcrireFichierExp( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 
     if ( groups.empty() )
     {
-        scene->errors.Add("Aucun groupe dans lequel enregistrer la valeur.", "", "", -1, 2);
+        scene.errors.Add("Aucun groupe dans lequel enregistrer la valeur.", "", "", -1, 2);
         return false;
     }
 
@@ -189,11 +189,11 @@ bool ActEcrireFichierExp( RuntimeScene * scene, ObjectsConcerned & objectsConcer
     {
         hdl.Element()->SetDoubleAttribute("value", action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
     }
-    else { scene->errors.Add("Erreur interne : Le groupe finale aurait dû être valide.", "", "", -1, 2); }
+    else { scene.errors.Add("Erreur interne : Le groupe finale aurait dû être valide.", "", "", -1, 2); }
 
-    if ( !doc.SaveFile( eval.EvalTxt(action.GetParameter(0)).c_str() ) )
+    if ( !doc.SaveFile( action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str() ) )
     {
-        scene->errors.Add("Impossible d'enregistrer dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
+        scene.errors.Add("Impossible d'enregistrer dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
         return false;
     }
 
@@ -208,15 +208,15 @@ bool ActEcrireFichierExp( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 /// Paramètre 2 : Groupe
 /// Paramètre 3 : Expression texte à écrire
 ////////////////////////////////////////////////////////////
-bool ActEcrireFichierTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActEcrireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    TiXmlDocument doc(eval.EvalTxt(action.GetParameter(0)).c_str()); //On tente de charger le fichier, pour garder la structure.
+    TiXmlDocument doc(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str()); //On tente de charger le fichier, pour garder la structure.
     doc.LoadFile(); //On ne se préoccupe pas du retour.
 
     TiXmlHandle hdl( &doc );
 
     //Découpage des groupes
-    istringstream groupsStr( eval.EvalTxt(action.GetParameter(1)) );
+    istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
     string Str;
     vector < string > groups;
     while ( std::getline( groupsStr, Str, '/' ) )
@@ -227,7 +227,7 @@ bool ActEcrireFichierTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 
     if ( groups.empty() )
     {
-        scene->errors.Add("Aucun groupe dans lequel enregistrer la valeur.", "", "", -1, 2);
+        scene.errors.Add("Aucun groupe dans lequel enregistrer la valeur.", "", "", -1, 2);
         return false;
     }
 
@@ -265,13 +265,13 @@ bool ActEcrireFichierTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcer
     //Ecriture dans le groupe
     if ( hdl.Element() != NULL )
     {
-        hdl.Element()->SetAttribute("texte", eval.EvalTxt(action.GetParameter(2)).c_str());
+        hdl.Element()->SetAttribute("texte", action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned).c_str());
     }
-    else { scene->errors.Add("Erreur interne : Le groupe final aurait dû être valide.", "", "", -1, 2); }
+    else { scene.errors.Add("Erreur interne : Le groupe final aurait dû être valide.", "", "", -1, 2); }
 
-    if ( !doc.SaveFile( eval.EvalTxt(action.GetParameter(0)).c_str() ) )
+    if ( !doc.SaveFile( action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str() ) )
     {
-        scene->errors.Add("Impossible d'enregistrer dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
+        scene.errors.Add("Impossible d'enregistrer dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
         return false;
     }
 
@@ -286,19 +286,19 @@ bool ActEcrireFichierTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 /// Paramètre 2 : Groupe
 /// Paramètre 3 : Variable ( de la scène ) dans laquelle stocker la valeur
 ////////////////////////////////////////////////////////////
-bool ActLireFichierExp( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActLireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     TiXmlDocument doc;
-    if ( !doc.LoadFile(eval.EvalTxt(action.GetParameter(0)).c_str() ) && doc.ErrorId() == 2) //Tente de charger le fichier en tant que fichier xml pour préserver sa structure
+    if ( !doc.LoadFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str() ) && doc.ErrorId() == 2) //Tente de charger le fichier en tant que fichier xml pour préserver sa structure
     {
-        scene->errors.Add("Impossible d'ouvrir le fichier "+action.GetParameter(0).GetPlainString()+" : "+string(doc.ErrorDesc()), "", "", -1, 2);
+        scene.errors.Add("Impossible d'ouvrir le fichier "+action.GetParameter(0).GetPlainString()+" : "+string(doc.ErrorDesc()), "", "", -1, 2);
         return false;
     }
 
     TiXmlHandle hdl( &doc );
 
     //Découpage des groupes
-    istringstream groupsStr( eval.EvalTxt(action.GetParameter(1)) );
+    istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
     string Str;
     vector < string > groups;
     while ( std::getline( groupsStr, Str, '/' ) )
@@ -312,7 +312,7 @@ bool ActLireFichierExp( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
         {
-            scene->errors.Add("Impossible d'accéder à "+action.GetParameter(1).GetPlainString()+" dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
+            scene.errors.Add("Impossible d'accéder à "+action.GetParameter(1).GetPlainString()+" dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
             return false;
         }
         hdl = hdl.FirstChildElement(groups.at(i).c_str());
@@ -324,7 +324,7 @@ bool ActLireFichierExp( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
     hdl.ToElement()->Attribute("value", &value);
 
     //Update variable value
-    scene->variables.ObtainVariable(action.GetParameter( 2 ).GetPlainString()) = value;
+    scene.variables.ObtainVariable(action.GetParameter( 2 ).GetPlainString()) = value;
 
     return true;
 }
@@ -338,19 +338,19 @@ bool ActLireFichierExp( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 /// Paramètre 2 : Groupe
 /// Paramètre 3 : Variable ( de la scène ) dans laquelle stocker la valeur
 ////////////////////////////////////////////////////////////
-bool ActLireFichierTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActLireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     TiXmlDocument doc;
-    if ( !doc.LoadFile(eval.EvalTxt(action.GetParameter(0)).c_str() ) && doc.ErrorId() == 2) //Tente de charger le fichier en tant que fichier xml pour préserver sa structure
+    if ( !doc.LoadFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str() ) && doc.ErrorId() == 2) //Tente de charger le fichier en tant que fichier xml pour préserver sa structure
     {
-        scene->errors.Add("Impossible d'ouvrir le fichier "+action.GetParameter(0).GetPlainString()+" : "+string(doc.ErrorDesc()), "", "", -1, 2);
+        scene.errors.Add("Impossible d'ouvrir le fichier "+action.GetParameter(0).GetPlainString()+" : "+string(doc.ErrorDesc()), "", "", -1, 2);
         return false;
     }
 
     TiXmlHandle hdl( &doc );
 
     //Découpage des groupes
-    istringstream groupsStr( eval.EvalTxt(action.GetParameter(1)) );
+    istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
     string Str;
     vector < string > groups;
     while ( std::getline( groupsStr, Str, '/' ) )
@@ -364,7 +364,7 @@ bool ActLireFichierTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
         {
-            scene->errors.Add("Impossible d'accéder à "+action.GetParameter(1).GetPlainString()+" dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
+            scene.errors.Add("Impossible d'accéder à "+action.GetParameter(1).GetPlainString()+" dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
             return false;
         }
         hdl = hdl.FirstChildElement(groups.at(i).c_str());
@@ -374,7 +374,7 @@ bool ActLireFichierTxt( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
     if ( hdl.ToElement()->Attribute("texte") == NULL ) return false;
 
     //Update variable texte
-    scene->variables.ObtainVariable( action.GetParameter( 2 ).GetPlainString() ) = hdl.ToElement()->Attribute("texte");
+    scene.variables.ObtainVariable( action.GetParameter( 2 ).GetPlainString() ) = hdl.ToElement()->Attribute("texte");
 
     return true;
 }

@@ -5,7 +5,7 @@
 #include "GDL/Object.h"
 #include "GDL/Event.h"
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Access.h"
 #include "GDL/SpriteObject.h"
 #include "GDL/RuntimeScene.h"
@@ -19,7 +19,7 @@
 /// Paramètre 2 : Taille
 /// Paramètre 3 : Signe de la modification
 ////////////////////////////////////////////////////////////
-bool SpriteObject::ActChangeScale( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActChangeScale( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
     {
@@ -63,7 +63,7 @@ bool SpriteObject::ActChangeScale( RuntimeScene * scene, ObjectsConcerned & obje
 /// Paramètre 2 : Taille
 /// Paramètre 3 : Signe de la modification
 ////////////////////////////////////////////////////////////
-bool SpriteObject::ActChangeScaleWidth( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActChangeScaleWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
     {
@@ -102,7 +102,7 @@ bool SpriteObject::ActChangeScaleWidth( RuntimeScene * scene, ObjectsConcerned &
 /// Paramètre 2 : Taille
 /// Paramètre 3 : Signe de la modification
 ////////////////////////////////////////////////////////////
-bool SpriteObject::ActChangeScaleHeight( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActChangeScaleHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
     {

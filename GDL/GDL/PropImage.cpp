@@ -13,7 +13,7 @@
 #include <wx/dcbuffer.h>
 #include <wx/filedlg.h>
 #include "GDL/BitmapGUIManager.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 
 //(*IdInit(PropImage)
 const long PropImage::ID_STATICTEXT1 = wxNewId();
@@ -188,8 +188,8 @@ void PropImage::OnapercuPanelPaint(wxPaintEvent& event)
         return;
 
     wxBitmap bmp( FichierEdit->GetValue(), wxBITMAP_TYPE_ANY);
-    widthTxt->SetLabel(toString(bmp.GetWidth()) + " pixels");
-    heightTxt->SetLabel(toString(bmp.GetHeight()) + " pixels");
+    widthTxt->SetLabel(ToString(bmp.GetWidth()) + " pixels");
+    heightTxt->SetLabel(ToString(bmp.GetHeight()) + " pixels");
 
     //Mise à jour des scrollbars
     scrollWidth->SetScrollbar(scrollWidth->GetThumbPosition(),

@@ -23,7 +23,7 @@ class WhileEvent : public BaseEvent
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new WhileEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual void Execute( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval );
+        virtual void Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};
@@ -63,9 +63,9 @@ class WhileEvent : public BaseEvent
 
     private:
         void Init(const WhileEvent & event);
-        bool ExecuteWhileConditions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval );
-        bool ExecuteConditions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval );
-        void ExecuteActions( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Evaluateur & eval );
+        bool ExecuteWhileConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
+        bool ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
+        void ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
 
         vector < Instruction > whileConditions;
         vector < Instruction > conditions;

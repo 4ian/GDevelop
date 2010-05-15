@@ -9,7 +9,7 @@
 #include "GDL/Game.h"
 #include <string>
 #include "GDL/tinyxml.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 
 using namespace std;
 

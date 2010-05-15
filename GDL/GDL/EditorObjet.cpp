@@ -26,10 +26,10 @@
 #include <wx/msgdlg.h>
 
 #include "GDL/HelpFileAccess.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/Animation.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
 #include "GDL/AjoutPlusImage.h"
 #include "GDL/BitmapGUIManager.h"
@@ -523,7 +523,7 @@ void EditorObjet::RefreshFromObjet()
     AnimationsBox->Clear();
     for ( unsigned int i = 0;i < object.GetAnimationsNumber();i++ )
     {
-        string num = st( i );
+        string num =ToString( i );
         AnimationsBox->Append( num );
     }
     if ( !object.HasNoAnimations() )
@@ -607,7 +607,7 @@ void EditorObjet::RefreshImages()
         if ( direction < object.GetAnimation( animation ).GetDirectionsNumber() )
         {
             //Temps
-            TempsEdit->ChangeValue( stFromFloat( object.GetAnimation( animation ).GetDirection( direction ).GetTimeBetweenFrames() ) );
+            TempsEdit->ChangeValue( ToString( object.GetAnimation( animation ).GetDirection( direction ).GetTimeBetweenFrames() ) );
 
             //Boucle
             if ( object.GetAnimation( animation ).GetDirection( direction ).IsLooping() )
@@ -741,7 +741,7 @@ void EditorObjet::OnAddAnimBtClick( wxCommandEvent& event )
     Animation AnimToadd;
     object.AddAnimation( AnimToadd );
 
-    string num = st( object.GetAnimationsNumber() - 1 );
+    string num =ToString( object.GetAnimationsNumber() - 1 );
 
     AnimationsBox->Append( num );
 
@@ -1024,7 +1024,7 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
         dc.DrawRectangle(wxRect(2+i*48+i*3-decalage,2,50,50));
 
         //On cherche l'ID de l'image à afficher
-        int j = ChercherNomImage( game.images, directionToDisplay.GetSprite(i).GetImage() );
+        int j = FindImage( game.images, directionToDisplay.GetSprite(i).GetImage() );
         if ( j != -1 )
         {
             wxBitmap bmp( game.images.at( j ).fichier, wxBITMAP_TYPE_ANY);
@@ -1110,7 +1110,7 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
     if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirection( direction ).GetSpritesNumber() )
     {
         const Sprite & sprite = object.GetAnimation( animation ).GetDirection( direction ).GetSprite(selectedImage);
-        int j = ChercherNomImage( game.images, sprite.GetImage() );
+        int j = FindImage( game.images, sprite.GetImage() );
         if ( j != -1 )
         {
             //Chargement de l'image
@@ -1484,7 +1484,7 @@ void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
     {
         Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).ModSprite(selectedImage);
 
-        int j = ChercherNomImage( game.images, sprite.GetImage() );
+        int j = FindImage( game.images, sprite.GetImage() );
         if ( j == -1 ) return;
 
         //Tailles nécessaire pour placer le point
@@ -1598,10 +1598,10 @@ void EditorObjet::OnModPointPrecisSelected(wxCommandEvent& event)
 
         selectedPoint = name;
 
-        string x_str = static_cast<string>(wxGetTextFromUser(_("Entrez la position X du point par rapport à l'image"), "Position X du point", st(sprite.GetPoint(name).GetX())));
-        string y_str = static_cast<string>(wxGetTextFromUser(_("Entrez la position Y du point par rapport à l'image"), "Position Y du point", st(sprite.GetPoint(name).GetY())));
+        string x_str = static_cast<string>(wxGetTextFromUser(_("Entrez la position X du point par rapport à l'image"), "Position X du point",ToString(sprite.GetPoint(name).GetX())));
+        string y_str = static_cast<string>(wxGetTextFromUser(_("Entrez la position Y du point par rapport à l'image"), "Position Y du point",ToString(sprite.GetPoint(name).GetY())));
 
-        MovePoint(sprite, name, toInt(x_str), toInt(y_str));
+        MovePoint(sprite, name, ToInt(x_str), ToInt(y_str));
 
         //Repositionnement pour les autres sprites si besoin
         if ( posEverywhereMenuItem->IsChecked() )
@@ -1609,7 +1609,7 @@ void EditorObjet::OnModPointPrecisSelected(wxCommandEvent& event)
             for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesNumber();++i)
             {
                 MovePoint(object.GetAnimation( animation ).GetDirectionToModify( direction ).ModSprite(i),
-                          name, toInt(x_str), toInt(y_str));
+                          name, ToInt(x_str), ToInt(y_str));
             }
         }
     }

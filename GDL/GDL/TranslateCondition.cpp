@@ -17,7 +17,7 @@
 #include "GDL/BitmapGUIManager.h"
 #include "GDL/TranslateCondition.h"
 #include "MemTrace.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 
 using namespace std;
 
@@ -40,14 +40,14 @@ string TranslateCondition::Translate(const Instruction & condition, const Instru
     //Remplacement des _PARAMx_ par la valeur des paramètres
     for (unsigned int i =0;i<infos.parameters.size();++i)
     {
-        while ( trad.find( "_PARAM"+toString(i)+"_" ) != string::npos )
+        while ( trad.find( "_PARAM"+ToString(i)+"_" ) != string::npos )
         {
             string parameter = condition.GetParameter( i ).GetPlainString();
             if ( useHTML ) RemoveHTMLTags(parameter);
             if ( useHTML ) AddHTMLToParameter(parameter, infos.parameters[i].type); //Mise en forme du paramètre
 
-            trad.replace(   trad.find( "_PARAM"+toString(i)+"_" ), //Chaine à remplacer
-                            string("_PARAM"+toString(i)+"_").length(), //Longueur de la chaine
+            trad.replace(   trad.find( "_PARAM"+ToString(i)+"_" ), //Chaine à remplacer
+                            string("_PARAM"+ToString(i)+"_").length(), //Longueur de la chaine
                             parameter );
         }
     }

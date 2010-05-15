@@ -22,8 +22,6 @@ standardSortMethod(true)
 
 void Scene::Init(const Scene & scene)
 {
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
-
     name = scene.name;
 
     backgroundColorR = scene.backgroundColorR;
@@ -38,7 +36,7 @@ void Scene::Init(const Scene & scene)
 
     initialObjects.clear();
     for (unsigned int i =0;i<scene.initialObjects.size();++i)
-    	initialObjects.push_back( extensionManager->CreateObject(scene.initialObjects[i]) );
+    	initialObjects.push_back( scene.initialObjects[i]->Clone() );
 
     objectGroups = scene.objectGroups;
     initialObjectsPositions = scene.initialObjectsPositions;

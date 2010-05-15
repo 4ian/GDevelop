@@ -9,7 +9,7 @@
 #include <vector>
 #include <sstream>
 #include <wx/log.h>
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/BitmapGUIManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/TranslateAction.h"
@@ -37,14 +37,14 @@ string TranslateAction::Translate(const Instruction & action, const InstructionI
     //Remplacement des _PARAMx_ par la valeur des paramètres
     for (unsigned int i =0;i<infos.parameters.size();++i)
     {
-        while ( trad.find( "_PARAM"+toString(i)+"_" ) != string::npos )
+        while ( trad.find( "_PARAM"+ToString(i)+"_" ) != string::npos )
         {
             string parameter = action.GetParameter( i ).GetPlainString();
             if ( useHTML ) RemoveHTMLTags(parameter);
             if ( useHTML ) AddHTMLToParameter(parameter, infos.parameters[i].type);
 
-            trad.replace(   trad.find( "_PARAM"+toString(i)+"_" ), //Chaine à remplacer
-                            string("_PARAM"+toString(i)+"_").length(), //Longueur de la chaine
+            trad.replace(   trad.find( "_PARAM"+ToString(i)+"_" ), //Chaine à remplacer
+                            string("_PARAM"+ToString(i)+"_").length(), //Longueur de la chaine
                             parameter );
         }
     }

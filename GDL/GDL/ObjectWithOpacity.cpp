@@ -19,7 +19,7 @@ void ObjectWithOpacity::SetOpacity(int val)
 /**
  * Test the opacity
  */
-bool ObjectWithOpacity::CondOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool ObjectWithOpacity::CondOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetOpacity() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -39,7 +39,7 @@ bool ObjectWithOpacity::CondOpacity( RuntimeScene * scene, ObjectsConcerned & ob
 /**
  * Modify opacity
  */
-bool ObjectWithOpacity::ActOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ObjectWithOpacity::ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
         SetOpacity( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
@@ -56,7 +56,7 @@ bool ObjectWithOpacity::ActOpacity( RuntimeScene * scene, ObjectsConcerned & obj
 }
 
 
-double ObjectWithOpacity::ExpOpacity( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double ObjectWithOpacity::ExpOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return opacity;
 }

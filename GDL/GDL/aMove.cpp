@@ -13,7 +13,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -29,7 +29,7 @@
 /// Paramètre 1 : Objet à faire rebondir
 /// Paramètre 2 : Objet contre lequel il rebond ( ne bougera pas )
 ////////////////////////////////////////////////////////////
-bool ActEcarter( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActEcarter( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
     ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetAsObjectIdentifier(), action.IsGlobal());
@@ -84,7 +84,7 @@ bool ActEcarter( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, cons
 /// Paramètre 1 : Objet à faire rebondir
 /// Paramètre 2 : Objet contre lequel il rebond ( ne bougera pas )
 ////////////////////////////////////////////////////////////
-bool ActRebondir( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActRebondir( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
     ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetAsObjectIdentifier(), action.IsGlobal());
@@ -136,7 +136,7 @@ bool ActRebondir( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, con
 /**
  * Add a force to an object, with coordinates
  */
-bool Object::ActAddForceXY( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActAddForceXY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     Force forceToAdd;
     forceToAdd.SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()  ) );
@@ -150,7 +150,7 @@ bool Object::ActAddForceXY( RuntimeScene * scene, ObjectsConcerned & objectsConc
 /**
  * Add a force to an object, with angle and length
  */
-bool Object::ActAddForceAL( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActAddForceAL( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //Ajout de la force
     Force forceToAdd;
@@ -173,7 +173,7 @@ bool Object::ActAddForceAL( RuntimeScene * scene, ObjectsConcerned & objectsConc
 /// Paramètre 3 : longueur  de la force
 /// Paramètre 4 : Diffusion de la force
 ////////////////////////////////////////////////////////////
-bool ActAddForceVers( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActAddForceVers( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
     ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetAsObjectIdentifier(), action.IsGlobal());
@@ -201,7 +201,7 @@ bool ActAddForceVers( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /**
  * Add a force toward a position
  */
-bool Object::ActAddForceVersPos( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActAddForceVersPos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     Force forceToAdd;
     forceToAdd.SetLength( action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()) );
@@ -220,7 +220,7 @@ bool Object::ActAddForceVersPos( RuntimeScene * scene, ObjectsConcerned & object
 /**
  * Remove all forces of an object
  */
-bool Object::ActArreter( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActArreter( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     Forces.clear();
 
@@ -230,7 +230,7 @@ bool Object::ActArreter( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 /**
  * Add a force to an object so as it turns around a position
  */
-bool Object::ActAddForceTournePos( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool Object::ActAddForceTournePos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //Angle en degré entre les deux objets
 
@@ -268,7 +268,7 @@ bool Object::ActAddForceTournePos( RuntimeScene * scene, ObjectsConcerned & obje
 /// Paramètre 4 : Distance
 /// Paramètre 5 : Diffusion de la force
 ////////////////////////////////////////////////////////////
-bool ActAddForceTourne( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActAddForceTourne( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
     ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetAsObjectIdentifier(), action.IsGlobal());

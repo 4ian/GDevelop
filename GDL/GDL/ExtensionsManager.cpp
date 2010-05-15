@@ -37,6 +37,7 @@ namespace gdp
 ExtensionsManager *ExtensionsManager::_singleton = NULL;
 InstructionInfos ExtensionsManager::badInstructionInfos;
 ExpressionInfos ExtensionsManager::badExpressionInfos;
+StrExpressionInfos ExtensionsManager::badStrExpressionInfos;
 
 /**
  * Initializing Extension Manager
@@ -83,7 +84,6 @@ bool ExtensionsManager::AddExtension(boost::shared_ptr<ExtensionBase> extension)
 
         //Adding creations and destruction functions
         creationFunctionTable.push_back( extension->GetObjectCreationFunctionPtr(objectsTypes[i]) );
-        creationByCopyFunctionTable.push_back( extension->GetObjectCreationByCopyFunctionPtr(objectsTypes[i]) );
         destroyFunctionTable.push_back( extension->GetDestroyObjectFunction(objectsTypes[i]) );
     }
 
@@ -209,6 +209,34 @@ const ExpressionInfos & ExtensionsManager::GetExpressionInfos(string exprType) c
     }
 
     return badExpressionInfos;
+}
+
+const StrExpressionInfos & ExtensionsManager::GetObjectStrExpressionInfos(string objectType, string exprType) const
+{
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        const vector < string > & objects = extensionsLoaded[i]->GetExtensionObjectsTypes();
+        if ( find(objects.begin(), objects.end(), objectType) != objects.end())
+        {
+            const std::map<string, StrExpressionInfos> & allObjectStrExpressions = extensionsLoaded[i]->GetAllStrExpressionsForObject(objectType);
+            if ( allObjectStrExpressions.find(exprType) != allObjectStrExpressions.end() )
+                return allObjectStrExpressions.find(exprType)->second;
+        }
+    }
+
+    return badStrExpressionInfos;
+}
+
+const StrExpressionInfos & ExtensionsManager::GetStrExpressionInfos(string exprType) const
+{
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        const std::map<string, StrExpressionInfos> & allExpr = extensionsLoaded[i]->GetAllStrExpressions();
+        if ( allExpr.find(exprType) != allExpr.end() )
+            return allExpr.find(exprType)->second;
+    }
+
+    return badStrExpressionInfos;
 }
 
 bool ExtensionsManager::HasAction(string name) const
@@ -433,6 +461,81 @@ ExpressionObjectFunPtr ExtensionsManager::GetObjectExpressionFunctionPtr(unsigne
     return NULL;
 }
 
+
+bool ExtensionsManager::HasStrExpression(string name) const
+{
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        if ( extensionsLoaded[i]->GetStrExpressionFunctionPtr(name) != NULL )
+            return true;
+    }
+
+    return false;
+}
+
+StrExpressionFunPtr ExtensionsManager::GetStrExpressionFunctionPtr(string name) const
+{
+    //We can afford performing a search each time this function is called,
+    //as the function ptr will be stocked in a map and attributed to instructions
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        if ( extensionsLoaded[i]->GetStrExpressionFunctionPtr(name) != NULL )
+            return extensionsLoaded[i]->GetStrExpressionFunctionPtr(name);
+    }
+
+    return NULL;
+}
+
+bool ExtensionsManager::HasObjectStrExpression(unsigned int objectTypeId, string name) const
+{
+    //Need to find the name of the type associated with the typeId as
+    //extensions are not aware of the typeId of the objects they provide.
+    string objectType;
+    if ( extObjectNameToTypeId.right.find(objectTypeId) != extObjectNameToTypeId.right.end() )
+        objectType = extObjectNameToTypeId.right.find(objectTypeId)->second;
+
+    //First check in extensions that really define the object
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        if ( extensionsLoaded[i]->GetObjectStrExpressionFunctionPtr(objectType, name) != NULL )
+            return true;
+
+        //All objects inherit from base object
+        if ( extensionsLoaded[i]->GetObjectStrExpressionFunctionPtr("", name) != NULL )
+            return true;
+    }
+
+    return false;
+}
+
+StrExpressionObjectFunPtr ExtensionsManager::GetObjectStrExpressionFunctionPtr(unsigned int objectTypeId, string name) const
+{
+    //Need to find the name of the type associated with the typeId as
+    //extensions are not aware of the typeId of the objects they provide.
+    string objectType;
+    if ( extObjectNameToTypeId.right.find(objectTypeId) != extObjectNameToTypeId.right.end() )
+        objectType = extObjectNameToTypeId.right.find(objectTypeId)->second;
+
+    //We can afford performing a search each time this function is called,
+    //as the function ptr will be stocked in a map and attributed to expressions
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        //Check first extensions that really provide the object
+        if ( extensionsLoaded[i]->GetObjectStrExpressionFunctionPtr(objectType, name) != NULL )
+            return extensionsLoaded[i]->GetObjectStrExpressionFunctionPtr(objectType, name);
+    }
+
+    //Then check bases
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        //All objects inherit from base object
+        if ( extensionsLoaded[i]->GetObjectStrExpressionFunctionPtr("", name) != NULL )
+            return extensionsLoaded[i]->GetObjectStrExpressionFunctionPtr("", name);
+    }
+
+    return NULL;
+}
+
 boost::shared_ptr<Object> ExtensionsManager::CreateObject(unsigned int typeId, std::string name)
 {
     if ( typeId >= creationFunctionTable.size() )
@@ -445,20 +548,6 @@ boost::shared_ptr<Object> ExtensionsManager::CreateObject(unsigned int typeId, s
     Object * object = creationFunctionTable[typeId](name);
     object->SetTypeId(typeId);
 
-    return boost::shared_ptr<Object> (object, destroyFunctionTable[typeId]);
-}
-
-boost::shared_ptr<Object> ExtensionsManager::CreateObject(boost::shared_ptr<Object> src)
-{
-    unsigned int typeId = src->GetTypeId();
-    if ( typeId >= creationFunctionTable.size() )
-    {
-        cout << "Tried to create an object by copy with a bad typeId ( " << typeId << " )." << endl;
-        typeId = 0;
-    }
-
-    //Create a new object by copying src.
-    Object * object = creationByCopyFunctionTable[typeId](src.get());
     return boost::shared_ptr<Object> (object, destroyFunctionTable[typeId]);
 }
 

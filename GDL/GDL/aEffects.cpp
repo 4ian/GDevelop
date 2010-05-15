@@ -5,15 +5,15 @@
 /**
  * Change the color filter of a sprite
  */
-bool SpriteObject::ActChangeColor( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    vector < GDExpression > colors = SpliterStringToVector <GDExpression> (eval.EvalTxt(action.GetParameter(1), shared_from_this()), ';');
+    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), ';');
 
     if ( colors.size() < 3 ) return false; //La couleur est incorrecte
 
-    SetColor(  colors[0].GetAsMathExpressionResult(scene, objectsConcerned),
-               colors[1].GetAsMathExpressionResult(scene, objectsConcerned),
-               colors[2].GetAsMathExpressionResult(scene, objectsConcerned));
+    SetColor(  ToInt(colors[0]),
+               ToInt(colors[1]),
+               ToInt(colors[2]) );
 
     return true;
 }
@@ -21,15 +21,15 @@ bool SpriteObject::ActChangeColor( RuntimeScene * scene, ObjectsConcerned & obje
 /**
  * Copy the image of the current image of a Sprite object, and only this object.
  */
-bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
     currentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
     sf::Image & dest = currentSprite->GetSpriteOwnImage();
 
-    std::map < string, sf::Image >::const_iterator src = scene->game->imageManager.images.find(eval.EvalTxt(action.GetParameter(1), shared_from_this()));
-    if ( src == scene->game->imageManager.images.end() ) return false;
+    std::map < string, sf::Image >::const_iterator src = scene.game->imageManager.images.find(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()));
+    if ( src == scene.game->imageManager.images.end() ) return false;
 
     //Make sure the coordinates are correct.
     int destX = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
@@ -50,20 +50,18 @@ bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene * scene, ObjectsCon
     return true;
 }
 
-bool SpriteObject::ActCreateMaskFromColorOnActualImage( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActCreateMaskFromColorOnActualImage( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
     currentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
     sf::Image & dest = currentSprite->GetSpriteOwnImage();
 
-    vector < GDExpression > colors = SpliterStringToVector <GDExpression> (eval.EvalTxt(action.GetParameter(1), shared_from_this()), ';');
+    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), ';');
 
     if ( colors.size() < 3 ) return false; //La couleur est incorrecte
 
-    dest.CreateMaskFromColor(  sf::Color(  colors[0].GetAsMathExpressionResult(scene, objectsConcerned),
-                                           colors[1].GetAsMathExpressionResult(scene, objectsConcerned),
-                                           colors[2].GetAsMathExpressionResult(scene, objectsConcerned)));
+    dest.CreateMaskFromColor(  sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2])));
 
     return true;
 }

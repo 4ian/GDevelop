@@ -12,7 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
 #include "GDL/Access.h"
@@ -24,7 +24,7 @@
 /**
  * Test if an object don't move.
  */
-bool Object::CondArret( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Object::CondArret( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     if ( TotalForceLength() == 0 )
         return true;
@@ -36,7 +36,7 @@ bool Object::CondArret( RuntimeScene * scene, ObjectsConcerned & objectsConcerne
 /**
  * Test the speed of an object
  */
-bool Object::CondVitesse( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Object::CondVitesse( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && TotalForceLength() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && TotalForceLength() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -60,7 +60,7 @@ bool Object::CondVitesse( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 /// Paramètre 2 : Objet
 /// Paramètre 3 : Angle de tolérance
 ////////////////////////////////////////////////////////////
-bool CondSeDirige( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool CondSeDirige( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     ObjectsConcerned objectsConcernedForExpressions = objectsConcerned;
 
@@ -136,7 +136,7 @@ bool CondSeDirige( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, co
 /**
  * Compare the angle of displacement of an object
  */
-bool Object::CondAngleOfDisplacement( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Object::CondAngleOfDisplacement( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     if ( TotalForceLength() == 0) return condition.IsInverted();
 

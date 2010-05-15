@@ -12,8 +12,8 @@
 #include "GDL/SpriteObject.h"
 #include "GDL/Event.h"
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
@@ -24,7 +24,7 @@ typedef boost::shared_ptr<Object> ObjSPtr;
 /**
  * Pause the current animation of a sprite object
  */
-bool SpriteObject::ActPauseAnimation( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActPauseAnimation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     StopAnimation();
 
@@ -34,7 +34,7 @@ bool SpriteObject::ActPauseAnimation( RuntimeScene * scene, ObjectsConcerned & o
 /**
  * Play the current animation of a sprite object
  */
-bool SpriteObject::ActPlayAnimation( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActPlayAnimation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     PlayAnimation();
 
@@ -44,7 +44,7 @@ bool SpriteObject::ActPlayAnimation( RuntimeScene * scene, ObjectsConcerned & ob
 /**
  * Change animation of a sprite object
  */
-bool SpriteObject::ActChangeAnimation( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActChangeAnimation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
         SetAnim(static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
@@ -64,18 +64,18 @@ bool SpriteObject::ActChangeAnimation( RuntimeScene * scene, ObjectsConcerned & 
 /**
  * Change the direction of a sprite object
  */
-bool SpriteObject::ActChangeDirection( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActChangeDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetDirec(gdRound((action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
+        SetDirec(GDRound((action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetDirec(gdRound((GetDirectionNb() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
+        SetDirec(GDRound((GetDirectionNb() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetDirec(gdRound((GetDirectionNb() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
+        SetDirec(GDRound((GetDirectionNb() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetDirec(gdRound((GetDirectionNb() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
+        SetDirec(GDRound((GetDirectionNb() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetDirec(gdRound((GetDirectionNb() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
+        SetDirec(GDRound((GetDirectionNb() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
 
     return true;
 }
@@ -83,7 +83,7 @@ bool SpriteObject::ActChangeDirection( RuntimeScene * scene, ObjectsConcerned & 
 /**
  * Turn a sprite object toward another
  */
-bool ActTourneVers( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActTourneVers( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
     ObjList list2 = objectsConcerned.Pick(action.GetParameter( 1 ).GetAsObjectIdentifier(), action.IsGlobal());
@@ -138,7 +138,7 @@ bool ActTourneVers( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 /**
  * Turn a sprite object toward a position
  */
-bool SpriteObject::ActTourneVersPos( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActTourneVersPos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
 	//Work around for a Visual C++ internal compiler error (!)
 	double y = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()) - (GetDrawableY()+GetCenterY());
@@ -179,7 +179,7 @@ bool SpriteObject::ActTourneVersPos( RuntimeScene * scene, ObjectsConcerned & ob
 /**
  * Change the current sprite (image) of a sprite object
  */
-bool SpriteObject::ActChangeSprite( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool SpriteObject::ActChangeSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
         SetSprite(static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));

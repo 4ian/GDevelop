@@ -30,10 +30,10 @@ class GD_API Instruction
         Instruction();
         virtual ~Instruction();
 
-        typedef bool (*ptrFunction)( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction, const Evaluateur & eval );
+        typedef bool (*ptrFunction)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction );
         ptrFunction function; ///<Main function to be called.
 
-        typedef bool (Object::*ptrObjectFunction)( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction, const Evaluateur & eval );
+        typedef bool (Object::*ptrObjectFunction)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction );
         ptrObjectFunction objectFunction; ///<Function to call on each object, if the instruction need one.
 
         /** Access type

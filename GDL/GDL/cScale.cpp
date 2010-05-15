@@ -6,7 +6,7 @@
 #include "GDL/Object.h"
 #include "GDL/Event.h"
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/SpriteObject.h"
@@ -16,7 +16,7 @@
 /**
  * Test the width scale of a sprite object
  */
-bool SpriteObject::CondScaleWidth( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool SpriteObject::CondScaleWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetScaleX() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -36,7 +36,7 @@ bool SpriteObject::CondScaleWidth( RuntimeScene * scene, ObjectsConcerned & obje
 /**
  * Test the height scale of a sprite object
  */
-bool SpriteObject::CondScaleHeight( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool SpriteObject::CondScaleHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetScaleY() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||

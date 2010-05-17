@@ -3,6 +3,8 @@
 
 #include "GDL/fparser/fparser.hh"
 #include <cmath>
+#include <vector>
+#include <string>
 #include "gpl.h"
 
 double DistanceMathFunction(const double* p);
@@ -16,6 +18,9 @@ class GDMathParser: public FunctionParser
  public:
     GDMathParser();
     virtual ~GDMathParser() {};
+
+    static std::vector < std::string > GetAllMathFunctions();
+    static std::string GetAllMathSeparator();
 };
 
 

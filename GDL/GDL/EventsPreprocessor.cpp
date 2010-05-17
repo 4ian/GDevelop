@@ -59,7 +59,7 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
 
         //Preprocessing expressions
         for( unsigned int instrId=0;instrId<conditions[cId].GetParameters().size();++instrId)
-            conditions[cId].GetParameter(instrId).PreprocessExpressions(scene);
+            conditions[cId].GetParameter(instrId).PrepareForEvaluation(*scene.game, scene);
 
         if (conditions[cId].GetType() == "")
             eventHasToBeDeleted = true;
@@ -118,7 +118,7 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
 
         //Preprocessing expressions
         for( unsigned int instrId=0;instrId<actions[aId].GetParameters().size();++instrId)
-            actions[aId].GetParameter(instrId).PreprocessExpressions(scene);
+            actions[aId].GetParameter(instrId).PrepareForEvaluation(*scene.game, scene);
 
         //Preprocess subactions
         if ( !actions[aId].GetSubInstructions().empty() )
@@ -150,7 +150,7 @@ void EventsPreprocessor::PreprocessEvents(const RuntimeScene & scene, vector < B
         //Preprocess internal expressions used by the event
         vector < GDExpression* > allExpressions = events[eId]->GetAllExpressions();
         for (unsigned int i = 0;i<allExpressions.size();++i)
-            allExpressions[i]->PreprocessExpressions(scene);
+            allExpressions[i]->PrepareForEvaluation(*scene.game, scene);
 
         //Preprocess Sub events
         if ( events[eId]->CanHaveSubEvents() )

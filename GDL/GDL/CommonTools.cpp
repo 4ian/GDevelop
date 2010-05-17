@@ -3,23 +3,27 @@
  *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "GDL/algo.h"
-#include "GDL/Log.h"
-#include "GDL/Object.h"
-#include <iostream>
-#include <sstream>
+
 #include <string>
+#include <sstream>
+#include <iostream>
 #include <vector>
-#include <cmath>
-#include "GDL/Chercher.h"
-#include <stdio.h>
-#include <SFML/System.hpp>
+#include "GDL/CommonTools.h"
+#include "GDL/Image.h"
+
+int GD_API FindImage( const vector < Image > & list, const string & chaine )
+{
+    for ( unsigned int i = 0;i < list.size();i++ )
+    {
+        if ( list[i].nom == chaine )
+            return i;
+    }
+    return -1;
+}
 
 //Découpage en fonction d'un séparateur
 int Spliter(string Tableau[] , string chaine, char separateur, int longueur)
 {
-    EcrireLog(" Algo", "Appel de Spliter avec "+chaine);
-
     istringstream iss( chaine );
     string mot;
     int i = 0;
@@ -41,10 +45,7 @@ int Spliter(string Tableau[] , string chaine, char separateur, int longueur)
     }
 
 
-    EcrireLog(" Algo", "Appel de Spliter FIN");
-
     return i;
-
 }
 
 int SpliterV(vector <string> *Tableau , string chaine, char separateur)
@@ -76,7 +77,7 @@ int SpliterVInt(vector <int> *Tableau , string chaine, char separateur)
     int i = 0;
     while ( std::getline( iss, mot, separateur ) )
     {
-        Tableau->push_back( atoi(mot.c_str()));
+        Tableau->push_back( ToInt(mot));
         i++;
     }
 
@@ -85,11 +86,4 @@ int SpliterVInt(vector <int> *Tableau , string chaine, char separateur)
 
     return i;
 
-}
-
-std::string ToString( int i )
-{
-    std::ostringstream ss;
-    ss << i;
-    return ss.str();
 }

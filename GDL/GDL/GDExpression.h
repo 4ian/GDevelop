@@ -12,6 +12,8 @@
 class Object;
 class RuntimeScene;
 class ObjectsConcerned;
+class Game;
+class Scene;
 
 typedef boost::shared_ptr<Object> ObjSPtr;
 
@@ -86,7 +88,17 @@ class GD_API GDExpression
         /**
          * Preprocess expressions in order to allow evaluation as text or math expression.
          */
-        bool PreprocessExpressions(const RuntimeScene & scene);
+        bool PrepareForEvaluation(const Game & game, const Scene & scene);
+
+        /**
+         * Preprocess the math expression, in order to allow its evaluation.
+         */
+        bool PrepareForMathEvaluationOnly(const Game & game, const Scene & scene);
+
+        /**
+         * Preprocess the text expression, in order to allow its evaluation.
+         */
+        bool PrepareForTextEvaluationOnly(const Game & game, const Scene & scene);
 
         #if defined(GDE)
         std::string GetFirstErrorDuringPreprocessingText() { return firstErrorStr; };
@@ -109,19 +121,7 @@ class GD_API GDExpression
             Set, Add, Substract, Multiply, Divide, UndefinedModification
         };
 
-
-    protected:
     private:
-
-        /**
-         * Preprocess the math expression, in order to allow its evaluation.
-         */
-        bool PreprocessMathExpression(const RuntimeScene & scene);
-
-        /**
-         * Preprocess the text expression, in order to allow its evaluation.
-         */
-        bool PreprocessTextExpression(const RuntimeScene & scene);
 
         std::string     plainString; ///<The plain expression
         char            compOperator; ///<Char representing a comparison operator. Computed at creation.

@@ -137,37 +137,24 @@ std::string GDExpression::GetAsTextExpressionResult(const RuntimeScene & scene, 
     return result;
 }
 
-bool GDExpression::PreprocessExpressions(const RuntimeScene & scene)
+bool GDExpression::PrepareForEvaluation(const Game & game, const Scene & scene)
 {
-    PreprocessMathExpression(scene);
-    PreprocessTextExpression(scene);
+    PrepareForMathEvaluationOnly(game, scene);
+    PrepareForTextEvaluationOnly(game, scene);
 
     return true;
 }
 
-bool GDExpression::PreprocessMathExpression(const RuntimeScene & scene)
+bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene & scene)
 {
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
     string expression = GetPlainString();
     string mathPlainExpression;
     mathExpressionFunctions.clear();
 
     //Constants
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-    const string possibleSeparator = " ,+-*/.;()#^";
-    vector < string > mathFunctions;
-    mathFunctions.push_back("cos");
-    mathFunctions.push_back("sin");
-    mathFunctions.push_back("tan");
-    mathFunctions.push_back("acos");
-    mathFunctions.push_back("asin");
-    mathFunctions.push_back("atan");
-    mathFunctions.push_back("sqrt");
-    mathFunctions.push_back("int");
-    mathFunctions.push_back("abs");
-    mathFunctions.push_back("log");
-    mathFunctions.push_back("exp");
-    mathFunctions.push_back("nthroot");
-    mathFunctions.push_back("E");
+    vector < string > mathFunctions = GDMathParser::GetAllMathFunctions();
+    const string possibleSeparator = GDMathParser::GetAllMathSeparator();
 
     size_t parsePosition = 0;
     unsigned int xNb = 0;
@@ -193,52 +180,61 @@ bool GDExpression::PreprocessMathExpression(const RuntimeScene & scene)
         if ( !nameIsFunction )
         {
             parameters.push_back(GDExpression(nameBefore));
-            functionNameEnd = expression.find_first_of("( ", nameEnd);
+            functionNameEnd = expression.find_first_of(" (", nameEnd);
             if ( nameEnd+1 < expression.length()) functionName = expression.substr(nameEnd+1, functionNameEnd-(nameEnd+1));
-        }
-
-        //Identify parameters
-        size_t parametersEnd = expression.find_first_of("(", functionNameEnd)+1;
-        size_t level = 0;
-        string currentParameterStr;
-        while ( parametersEnd < expression.length() && !(expression[parametersEnd] == ')' && level == 0) )
-        {
-            if ( expression[parametersEnd] == '(' ) level++;
-            if ( expression[parametersEnd] == ')' ) level--;
-
-            if ( (expression[parametersEnd] == ',' && level == 0) )
+            if ( functionNameEnd == string::npos )
             {
-                GDExpression currentParameter(currentParameterStr);
-                currentParameter.PreprocessExpressions(scene);
-                parameters.push_back(currentParameter);
-
-                currentParameterStr.clear();
+                functionName = "";
+                functionNameEnd = expression.length()-1;
             }
-            else currentParameterStr += expression[parametersEnd];
-
-            parametersEnd++;
         }
-        GDExpression lastParameter(currentParameterStr);
-        lastParameter.PreprocessExpressions(scene);
-        parameters.push_back(lastParameter);
 
-        //Add instruction to the list of instructions to call to generate parameters
+        //Try to find an instruction with the same name
         ExpressionInstruction instruction;
-        if ( nameIsFunction && extensionsManager->HasExpression(functionName) )
+        bool isMathFunction = find(mathFunctions.begin(), mathFunctions.end(), functionName) != mathFunctions.end();
+        if ( !isMathFunction && nameIsFunction && extensionsManager->HasExpression(functionName) )
         {
             instruction.function = (extensionsManager->GetExpressionFunctionPtr(functionName));
-            instruction.parameters = (parameters);
         }
-        else if ( !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeIdOfObject(*scene.game, scene, nameBefore), nameBefore) )
+        else if ( !isMathFunction && !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, nameBefore), nameBefore) )
         {
             instruction.function = &ExpObjectFunction;
-            instruction.objectFunction = extensionsManager->GetObjectExpressionFunctionPtr(GetTypeIdOfObject(*scene.game, scene, nameBefore), nameBefore);
-            instruction.parameters = (parameters);
+            instruction.objectFunction = extensionsManager->GetObjectExpressionFunctionPtr(GetTypeIdOfObject(game, scene, nameBefore), nameBefore);
         }
 
-        bool isMathFunction = find(mathFunctions.begin(), mathFunctions.end(), functionName) != mathFunctions.end();
-        if ( !isMathFunction && instruction.function != NULL ) //A function was found
+        if( !isMathFunction && instruction.function != NULL ) //Add the function
         {
+            //Identify parameters
+            size_t parametersEnd = expression.find_first_of("(", functionNameEnd);
+            string currentParameterStr;
+            if ( parametersEnd != string::npos )
+            {
+                size_t level = 0;
+                parametersEnd++;
+
+                while ( parametersEnd < expression.length() && !(expression[parametersEnd] == ')' && level == 0) )
+                {
+                    if ( expression[parametersEnd] == '(' ) level++;
+                    if ( expression[parametersEnd] == ')' ) level--;
+
+                    if ( (expression[parametersEnd] == ',' && level == 0) )
+                    {
+                        GDExpression currentParameter(currentParameterStr);
+                        currentParameter.PrepareForEvaluation(game, scene);
+                        parameters.push_back(currentParameter);
+
+                        currentParameterStr.clear();
+                    }
+                    else currentParameterStr += expression[parametersEnd];
+
+                    parametersEnd++;
+                }
+                GDExpression lastParameter(currentParameterStr);
+                lastParameter.PrepareForEvaluation(game, scene);
+                parameters.push_back(lastParameter);
+            }
+            instruction.parameters = (parameters);
+
             mathExpressionFunctions.push_back(instruction);
             xNb++;
 
@@ -250,7 +246,7 @@ bool GDExpression::PreprocessMathExpression(const RuntimeScene & scene)
             firstPointPos = expression.find(".", parametersEnd+1);
             firstParPos = expression.find("(", parametersEnd+1);
         }
-        else
+        else //Math function or math constant : Pass it.
         {
             mathPlainExpression += expression.substr(parsePosition, functionNameEnd+1-parsePosition);
             parsePosition = functionNameEnd+1;
@@ -261,14 +257,17 @@ bool GDExpression::PreprocessMathExpression(const RuntimeScene & scene)
 
     mathPlainExpression += expression.substr(parsePosition, expression.length());
 
+    //Generate parameter list for math parser
     string parametersStr;
     for (unsigned int i = 1;i<=xNb;++i)
         parametersStr += "x"+ToString(i)+",";
 
+    //Parse math expression
     if ( -1 != mathExpression.Parse(mathPlainExpression, parametersStr))
     {
         #if defined(GDE)
         firstErrorStr = mathExpression.ErrorMsg();
+        cout << firstErrorStr;
         #endif
         mathExpression.Parse("0", "");
 
@@ -278,129 +277,24 @@ bool GDExpression::PreprocessMathExpression(const RuntimeScene & scene)
 
     isMathExpressionPreprocessed = true;
     return true;
-/*
-    {
-        size_t objectExpressionStart = expression.find( "OBJ(" );
-        size_t valExpressionStart = expression.find( "VAL(" );
-        size_t gblExpressionStart = expression.find( "GBL(" );
-        while ( objectExpressionStart != string::npos ||
-                valExpressionStart != string::npos ||
-                gblExpressionStart != string::npos )
-        {
-            //There is an object expression first.
-            if ( objectExpressionStart != string::npos &&
-                 objectExpressionStart < valExpressionStart &&
-                 objectExpressionStart < gblExpressionStart)
-            {
-                AddObjectFunctionCall(*this, expression, scene);
-            }
-            //There is an value expression first.
-            else if ( valExpressionStart != string::npos &&
-                      valExpressionStart < objectExpressionStart &&
-                      valExpressionStart < gblExpressionStart)
-            {
-                AddFunctionCall(*this, expression, scene);
-            }
-            //There is an global expression first.
-            else if ( gblExpressionStart != string::npos &&
-                      gblExpressionStart < objectExpressionStart &&
-                      gblExpressionStart < valExpressionStart)
-            {
-                AddGlobalFunctionCall(*this, expression, scene);
-            }
-
-            objectExpressionStart = expression.find( "OBJ(" );
-            valExpressionStart = expression.find( "VAL(" );
-            gblExpressionStart = expression.find( "GBL(" );
-        }
-
-        if ( expression.length() > 0 ) AddConstantFunctionCall(*this, expression, expression.length());
-    }
-
-    {
-        unsigned int xNb = 0;
-        size_t objectExpressionStart = mathPlainExpression.find( "OBJ(" );
-        size_t valExpressionStart = mathPlainExpression.find( "VAL(" );
-        size_t gblExpressionStart = mathPlainExpression.find( "GBL(" );
-        while ( objectExpressionStart != string::npos ||
-                valExpressionStart != string::npos ||
-                gblExpressionStart != string::npos )
-        {
-            //There is an object expression first.
-            if ( objectExpressionStart != string::npos &&
-                 objectExpressionStart < valExpressionStart &&
-                 objectExpressionStart < gblExpressionStart)
-            {
-                mathPlainExpression.replace(objectExpressionStart,
-                                            mathPlainExpression.find(")", objectExpressionStart)-objectExpressionStart+1,
-                                            "x"+ToString(xNb));
-            }
-            //There is an value expression first.
-            else if ( valExpressionStart != string::npos &&
-                      valExpressionStart < objectExpressionStart &&
-                      valExpressionStart < gblExpressionStart)
-            {
-                mathPlainExpression.replace(valExpressionStart,
-                                            mathPlainExpression.find(")", valExpressionStart)-valExpressionStart+1,
-                                            "x"+ToString(xNb));
-            }
-            //There is an global expression first.
-            else if ( gblExpressionStart != string::npos &&
-                      gblExpressionStart < objectExpressionStart &&
-                      gblExpressionStart < valExpressionStart)
-            {
-                mathPlainExpression.replace(gblExpressionStart,
-                                            mathPlainExpression.find(")", gblExpressionStart)-gblExpressionStart+1,
-                                            "x"+ToString(xNb));
-            }
-
-            objectExpressionStart = mathPlainExpression.find( "OBJ(" );
-            valExpressionStart = mathPlainExpression.find( "VAL(" );
-            gblExpressionStart = mathPlainExpression.find( "GBL(" );
-            xNb++;
-        }
-
-        string parametersStr;
-        for (unsigned int i = 0;i<=xNb;++i)
-            parametersStr += "x"+ToString(i)+",";
-
-        if ( -1 != mathExpression.Parse(mathPlainExpression, parametersStr))
-        {
-            mathExpression.Parse("0", "");
-        }
-    }*/
 }
 
-bool GDExpression::PreprocessTextExpression(const RuntimeScene & scene)
+bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene & scene)
 {
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
     string expression = GetPlainString();
-    string mathPlainExpression;
-    mathExpressionFunctions.clear();
-    vector < string > mathFunctions;
-    mathFunctions.push_back("cos");
-    mathFunctions.push_back("sin");
-    mathFunctions.push_back("tan");
-    mathFunctions.push_back("acos");
-    mathFunctions.push_back("asin");
-    mathFunctions.push_back("atan");
-    mathFunctions.push_back("sqrt");
-    mathFunctions.push_back("int");
-    mathFunctions.push_back("abs");
-    mathFunctions.push_back("log");
-    mathFunctions.push_back("exp");
-    mathFunctions.push_back("nthroot");
-    mathFunctions.push_back("E");
+    textExpressionFunctions.clear();
 
     //Constants
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-    const string possibleSeparator = " ,+-*/.;()#^";
+    vector < string > mathFunctions = GDMathParser::GetAllMathFunctions();
+    const string possibleSeparator = GDMathParser::GetAllMathSeparator();
 
     size_t parsePosition = 0;
 
+    //Searching for first token.
     size_t firstPointPos = expression.find(".");
     size_t firstParPos = expression.find("(");
     size_t firstQuotePos = expression.find("\"");
-
     while ( firstPointPos != string::npos || firstParPos != string::npos || firstQuotePos != string::npos )
     {
         if ( firstQuotePos < firstPointPos && firstQuotePos < firstParPos ) //Adding a constant text
@@ -456,6 +350,7 @@ bool GDExpression::PreprocessTextExpression(const RuntimeScene & scene)
             string functionName = nameBefore;
             size_t functionNameEnd = nameEnd;
             vector < GDExpression > parameters;
+            cout << "STRfunctionName " << functionName << endl;
 
             bool nameIsFunction = firstPointPos > firstParPos;
             if ( !nameIsFunction )
@@ -477,7 +372,6 @@ bool GDExpression::PreprocessTextExpression(const RuntimeScene & scene)
                 if ( (expression[parametersEnd] == ',' && level == 0) )
                 {
                     GDExpression currentParameter(currentParameterStr);
-                    currentParameter.PreprocessExpressions(scene);
                     parameters.push_back(currentParameter);
 
                     currentParameterStr.clear();
@@ -487,7 +381,6 @@ bool GDExpression::PreprocessTextExpression(const RuntimeScene & scene)
                 parametersEnd++;
             }
             GDExpression lastParameter(currentParameterStr);
-            lastParameter.PreprocessExpressions(scene);
             parameters.push_back(lastParameter);
 
             //Add instruction to the list of instructions to call to generate parameters
@@ -496,35 +389,41 @@ bool GDExpression::PreprocessTextExpression(const RuntimeScene & scene)
             if ( nameIsFunction && extensionsManager->HasStrExpression(functionName) )
             {
                 instruction.function = (extensionsManager->GetStrExpressionFunctionPtr(functionName));
+
+                //Preparing parameters
+                for (unsigned int i = 0;i<parameters.size();++i)
+                	parameters[i].PrepareForEvaluation(game, scene);
                 instruction.parameters = (parameters);
             }
-            else if ( !nameIsFunction && extensionsManager->HasObjectStrExpression(GetTypeIdOfObject(*scene.game, scene, nameBefore), nameBefore) )
+            else if ( !nameIsFunction && extensionsManager->HasObjectStrExpression(GetTypeIdOfObject(game, scene, nameBefore), nameBefore) )
             {
                 instruction.function = &ExpObjectStrFunction;
-                instruction.objectFunction = extensionsManager->GetObjectStrExpressionFunctionPtr(GetTypeIdOfObject(*scene.game, scene, nameBefore), nameBefore);
+                instruction.objectFunction = extensionsManager->GetObjectStrExpressionFunctionPtr(GetTypeIdOfObject(game, scene, nameBefore), nameBefore);
+
+                //Preparing parameters
+                for (unsigned int i = 0;i<parameters.size();++i)
+                	parameters[i].PrepareForEvaluation(game, scene);
                 instruction.parameters = (parameters);
             }
             //Support for implicit conversion from math result to string
-            else if ( isMathFunction || extensionsManager->HasExpression(functionName) || extensionsManager->HasObjectExpression(GetTypeIdOfObject(*scene.game, scene, nameBefore), nameBefore) )
+            else if ( isMathFunction || extensionsManager->HasExpression(functionName) || extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, nameBefore), nameBefore) )
             {
-                //BUG when decommenting this :
-                /*vector < GDExpression > implicitConversionParameters;
+                vector < GDExpression > implicitConversionParameters;
                 GDExpression implicitMathExpression(expression.substr(nameStart, parametersEnd+1-nameStart));
-                implicitMathExpression.PreprocessExpressions(scene);
-
+                implicitMathExpression.PrepareForMathEvaluationOnly(game, scene);
                 implicitConversionParameters.push_back(implicitMathExpression);
-                cout << "Implicit conversion : " << implicitConversionParameters[0].GetPlainString();
 
                 instruction.function = &ExpToStr;
-                instruction.parameters = (implicitConversionParameters);*/
+                instruction.parameters = (implicitConversionParameters);
             }
 
-            if ( instruction.function == NULL ) //A function was found
+            if ( instruction.function == NULL ) //Function was not found
             {
                 #if defined(GDE)
                 firstErrorPos = nameStart;
                 firstErrorStr = _("Fonction non reconnue.");
                 #endif
+                textExpressionFunctions.clear();
                 isTextExpressionPreprocessed = true;
                 return false;
 
@@ -534,9 +433,40 @@ bool GDExpression::PreprocessTextExpression(const RuntimeScene & scene)
             parsePosition = parametersEnd+1;
         }
 
+        //Searching for next token
+        size_t firstPlusPos = expression.find("+", parsePosition);
         firstPointPos = expression.find(".", parsePosition);
         firstParPos = expression.find("(", parsePosition);
         firstQuotePos = expression.find("\"", parsePosition);
+
+        //Checking for a + between token
+        if ( (firstPointPos != string::npos || firstParPos != string::npos || firstQuotePos != string::npos ))
+        {
+            size_t nextTokenPos = firstPointPos;
+            if ( firstParPos < nextTokenPos ) nextTokenPos = firstParPos;
+            if ( firstQuotePos < nextTokenPos ) nextTokenPos = firstQuotePos;
+
+            if (nextTokenPos < firstPlusPos)
+            {
+                    #if defined(GDE)
+                    firstErrorPos = -1;
+                    firstErrorStr = _("+ manquant entre deux chaines.");
+                    #endif
+                    textExpressionFunctions.clear();
+                    isTextExpressionPreprocessed = true;
+                    return false;
+            }
+            else if ( expression.find("+", firstPlusPos+1) < nextTokenPos )
+            {
+                    #if defined(GDE)
+                    firstErrorPos = firstPlusPos;
+                    firstErrorStr = _("Symbole manquant entre deux +.");
+                    #endif
+                    textExpressionFunctions.clear();
+                    isTextExpressionPreprocessed = true;
+                    return false;
+            }
+        }
     }
 
     isTextExpressionPreprocessed = true;

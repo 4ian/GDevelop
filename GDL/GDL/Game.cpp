@@ -2,8 +2,15 @@
 #include "GDL/MemTrace.h"
 #include "GDL/ExtensionsManager.h"
 
+#if defined(GDE)
+#include <wx/wx.h>
+#elif !defined(_)
+#define _(x) x
+#endif
+
+
 Game::Game() :
-name("Application"),
+name(_("Projet")),
 windowWidth(800),
 windowHeight(600),
 maxFPS(60),

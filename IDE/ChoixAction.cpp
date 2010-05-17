@@ -33,7 +33,7 @@
 #include "GDL/gdTreeItemStringData.h"
 #include "Extensions.h"
 #include "GDL/HelpFileAccess.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/TranslateAction.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
@@ -188,7 +188,7 @@ scene(scene_)
     //Pour chaque paramètres
     for ( unsigned int i = 0;i < MaxPara;i++ )
     {
-        const string num = st( i );
+        const string num =ToString( i );
 
         //Bouton radio pour facultatif ou pas
         ParaFac.push_back(new wxCheckBox( this, ID_CHECKARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, num ));

@@ -44,7 +44,7 @@
 #include "GDL/Game.h"
 #include "GDL/OpenSaveGame.h"
 #include <wx/log.h>
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "RecentList.h"
 class RuntimeGame;
 class ProjectManager;

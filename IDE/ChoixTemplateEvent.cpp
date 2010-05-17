@@ -15,7 +15,7 @@
 #include <dirent.h>
 
 #include "tinyxml.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
 #include "TemplateEvents.h"
 #include "GDL/HelpFileAccess.h"
@@ -213,7 +213,7 @@ void ChoixTemplateEvent::ProcessEvents(vector < BaseEventSPtr > & events )
                     while ( paramNb < parametersEdit.size() )
                     {
                         string str = allConditionsVectors[k]->at(l).GetParameter(m).GetPlainString();
-                        allConditionsVectors[k]->at(l).SetParameter(m , ConvertParam( str, "_PARAM"+toString(paramNb+1)+"_", static_cast<string>( parametersEdit[paramNb]->GetValue() ) ) );
+                        allConditionsVectors[k]->at(l).SetParameter(m , ConvertParam( str, "_PARAM"+ToString(paramNb+1)+"_", static_cast<string>( parametersEdit[paramNb]->GetValue() ) ) );
                         paramNb++;
                     }
             	}
@@ -231,7 +231,7 @@ void ChoixTemplateEvent::ProcessEvents(vector < BaseEventSPtr > & events )
                     while ( paramNb < parametersEdit.size() )
                     {
                         string str = allActionsVectors[k]->at(l).GetParameter(m).GetPlainString();
-                        allActionsVectors[k]->at(l).SetParameter(m , ConvertParam( str, "_PARAM"+toString(paramNb+1)+"_", static_cast<string>( parametersEdit[paramNb]->GetValue() ) ) );
+                        allActionsVectors[k]->at(l).SetParameter(m , ConvertParam( str, "_PARAM"+ToString(paramNb+1)+"_", static_cast<string>( parametersEdit[paramNb]->GetValue() ) ) );
                         paramNb++;
                     }
             	}
@@ -287,9 +287,9 @@ void ChoixTemplateEvent::Refresh()
         else { wxLogWarning( "Les informations concernant la description d'un template manquent." ); }
 
         unsigned int i = 1;
-        while ( elem->Attribute(string("param"+toString(i)).c_str()) != NULL )
+        while ( elem->Attribute(string("param"+ToString(i)).c_str()) != NULL )
         {
-            newTemplate.parameters.push_back(elem->Attribute(string("param"+toString(i)).c_str()));
+            newTemplate.parameters.push_back(elem->Attribute(string("param"+ToString(i)).c_str()));
             ++i;
         }
 
@@ -346,9 +346,9 @@ void ChoixTemplateEvent::OnTemplateTreeSelectionChanged( wxTreeEvent& event )
     //Add control if necessary
     while ( descriptionsTxt.size() < templatesList[j].parameters.size() )
     {
-        descriptionsTxt.push_back(new wxStaticText(this, wxID_ANY, _("Description"), wxDefaultPosition, wxDefaultSize, 0, toString(descriptionsTxt.size())));
+        descriptionsTxt.push_back(new wxStaticText(this, wxID_ANY, _("Description"), wxDefaultPosition, wxDefaultSize, 0, ToString(descriptionsTxt.size())));
         controlsSizer->Add(descriptionsTxt.back(), 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-        parametersEdit.push_back(new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, toString(parametersEdit.size())));
+        parametersEdit.push_back(new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, ToString(parametersEdit.size())));
         controlsSizer->Add(parametersEdit.back(), 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     }
 

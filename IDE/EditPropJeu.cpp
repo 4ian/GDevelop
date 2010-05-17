@@ -13,7 +13,7 @@
 #include <wx/string.h>
 //*)
 #include "sstream"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <wx/filedlg.h>
@@ -301,31 +301,31 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
     NomEdit->ChangeValue( m_jeu->name );
     AuteurEdit->ChangeValue( m_jeu->author );
 
-    HeightEdit->ChangeValue( st( m_jeu->windowHeight ) );
-    WidthEdit->ChangeValue( st( m_jeu->windowWidth ) );
+    HeightEdit->ChangeValue(ToString( m_jeu->windowHeight ) );
+    WidthEdit->ChangeValue(ToString( m_jeu->windowWidth ) );
 
     afficherEcranCheck->SetValue( true );
     if ( !m_jeu->loadingScreen.afficher )
         afficherEcranCheck->SetValue( false );
 
 
-    widthECEdit->ChangeValue( st( m_jeu->loadingScreen.width ) );
-    heightECEdit->ChangeValue( st( m_jeu->loadingScreen.height ) );
+    widthECEdit->ChangeValue(ToString( m_jeu->loadingScreen.width ) );
+    heightECEdit->ChangeValue(ToString( m_jeu->loadingScreen.height ) );
 
     texteCheck->SetValue( true );
     if ( !m_jeu->loadingScreen.texte )
         texteCheck->SetValue( false );
 
-    texteXPosEdit->ChangeValue( st( m_jeu->loadingScreen.texteXPos ) );
-    texteYPosEdit->ChangeValue( st( m_jeu->loadingScreen.texteYPos ) );
+    texteXPosEdit->ChangeValue(ToString( m_jeu->loadingScreen.texteXPos ) );
+    texteYPosEdit->ChangeValue(ToString( m_jeu->loadingScreen.texteYPos ) );
     texteEdit->ChangeValue( m_jeu->loadingScreen.texteChargement );
 
     pourcentCheck->SetValue( false );
     if ( m_jeu->loadingScreen.pourcent )
         pourcentCheck->SetValue( true );
 
-    pourcentXPosEdit->ChangeValue( st( m_jeu->loadingScreen.pourcentXPos ) );
-    pourcentYPosEdit->ChangeValue( st( m_jeu->loadingScreen.pourcentYPos ) );
+    pourcentXPosEdit->ChangeValue(ToString( m_jeu->loadingScreen.pourcentXPos ) );
+    pourcentYPosEdit->ChangeValue(ToString( m_jeu->loadingScreen.pourcentYPos ) );
 
     imageCheck->SetValue( false );
     if ( m_jeu->loadingScreen.image )

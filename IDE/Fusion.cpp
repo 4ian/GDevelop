@@ -21,7 +21,7 @@
 
 #endif
 
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/ChercherScene.h"
 #include "GDL/OpenSaveGame.h"
@@ -135,14 +135,14 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
     {
         for(unsigned int i = 0;i<secondGame.images.size();i++)
         {
-            if ( ChercherNomImage( game.images, secondGame.images.at(i).nom ) != -1)
+            if ( FindImage( game.images, secondGame.images.at(i).nom ) != -1)
             {
                 wxString depart = _("Une image nommé \"");
                 wxString fin = _("\" est déjà présente dans le jeu. Voulez vous la remplacer ?");
                 if (wxMessageBox(depart+secondGame.images.at(i).nom+fin, "Une image de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
-                    game.images.erase(game.images.begin() + ChercherNomImage( game.images, secondGame.images.at(i).nom ));
+                    game.images.erase(game.images.begin() + FindImage( game.images, secondGame.images.at(i).nom ));
                     game.images.push_back(secondGame.images.at(i));
                 }
 

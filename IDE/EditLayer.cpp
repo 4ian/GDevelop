@@ -7,7 +7,7 @@
 //*)
 #include <wx/log.h>
 #include <cstdlib>
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 
 //(*IdInit(EditLayer)
 const long EditLayer::ID_STATICTEXT1 = wxNewId();
@@ -168,7 +168,7 @@ tempLayer(layer_)
 
 
     for (unsigned int i = 0;i<layer.GetCamerasNumber();++i)
-    	cameraChoice->Append(toString(i));
+    	cameraChoice->Append(ToString(i));
 
     cameraChoice->SetSelection(0);
     RefreshCameraSettings();
@@ -204,7 +204,7 @@ void EditLayer::OnokBtClick(wxCommandEvent& event)
 
 void EditLayer::OnaddCameraBtClick(wxCommandEvent& event)
 {
-    cameraChoice->Append(toString(tempLayer.GetCamerasNumber()));
+    cameraChoice->Append(ToString(tempLayer.GetCamerasNumber()));
     tempLayer.SetCamerasNumber(tempLayer.GetCamerasNumber()+1);
 }
 
@@ -235,8 +235,8 @@ void EditLayer::RefreshCameraSettings()
         cameraWidthEdit->Enable(true);
         cameraHeightEdit->Enable(true);
 
-        cameraWidthEdit->ChangeValue(toString(camera.size.x));
-        cameraHeightEdit->ChangeValue(toString(camera.size.y));
+        cameraWidthEdit->ChangeValue(ToString(camera.size.x));
+        cameraHeightEdit->ChangeValue(ToString(camera.size.y));
     }
 
     viewportX1Edit->SetBackgroundColour(wxColour(255,255,255));
@@ -264,10 +264,10 @@ void EditLayer::RefreshCameraSettings()
         viewportY1Edit->Enable(true);
         viewportY2Edit->Enable(true);
 
-        viewportX1Edit->ChangeValue(toString(camera.viewport.Left));
-        viewportY1Edit->ChangeValue(toString(camera.viewport.Top));
-        viewportX2Edit->ChangeValue(toString(camera.viewport.Right));
-        viewportY2Edit->ChangeValue(toString(camera.viewport.Bottom));
+        viewportX1Edit->ChangeValue(ToString(camera.viewport.Left));
+        viewportY1Edit->ChangeValue(ToString(camera.viewport.Top));
+        viewportX2Edit->ChangeValue(ToString(camera.viewport.Right));
+        viewportY2Edit->ChangeValue(ToString(camera.viewport.Bottom));
     }
 }
 

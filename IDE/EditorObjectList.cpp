@@ -25,14 +25,14 @@
 #include "GDL/Object.h"
 #include "GDL/Chercher.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "MemTrace.h"
 #include "Clipboard.h"
 #include <algorithm>
 #include <numeric>
 #include "EditorObjetsGroups.h"
 #include "GDL/BitmapGUIManager.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "DndTextObjectsEditor.h"
 #include "ObjectTypeChoice.h"
 #include "InitialVariablesDialog.h"
@@ -472,7 +472,7 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     {
         i++;
         name =  _("Nouvel objet")+wxString(" ");
-        wxString Num = st( i );
+        wxString Num =ToString( i );
 
         name += Num;
     }
@@ -657,8 +657,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     }
 
     //Add a new object of selected type to objects list
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-    ObjSPtr object = extensionsManager->CreateObject(clipboard->GetObject());
+    ObjSPtr object = clipboard->GetObject()->Clone();
 
     wxString name =  _( "Copie de " ) + object->GetName();
     int i = 0;
@@ -668,7 +667,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     {
         i++;
         name =  _( "Copie de " ) + object->GetName();
-        wxString Num = st( i );
+        wxString Num =ToString( i );
 
         name += Num;
 

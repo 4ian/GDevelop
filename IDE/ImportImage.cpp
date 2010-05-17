@@ -13,7 +13,7 @@
 #include <wx/animate.h>
 #include <wx/filename.h>
 
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 
 
 //(*IdInit(ImportImage)
@@ -359,7 +359,7 @@ void ImportImage::OnFileGIFEditText(wxCommandEvent& event)
 {
     wxAnimation animation;
     if ( animation.LoadFile(FileGIFEdit->GetValue()) )
-        nbImageGIFBt->SetLabel(_("Nombre d'images : ")+st(animation.GetFrameCount()));
+        nbImageGIFBt->SetLabel(_("Nombre d'images : ")+ToString(animation.GetFrameCount()));
     else
         nbImageGIFBt->SetLabel(_("Nombre d'images : ?"));
 }
@@ -382,7 +382,7 @@ void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
     for (unsigned int i = 0;i<animation.GetFrameCount();++i)
     {
     	wxImage img = animation.GetFrame(i);
-    	img.SaveFile(path+"/"+DecomposeGIFEdit->GetValue()+st(i)+".png", wxBITMAP_TYPE_PNG);
+    	img.SaveFile(path+"/"+DecomposeGIFEdit->GetValue()+ToString(i)+".png", wxBITMAP_TYPE_PNG);
     }
 
     wxLogMessage(_("Décomposition du GIF terminé !"));
@@ -419,7 +419,7 @@ void ImportImage::OnfileRPGEditText(wxCommandEvent& event)
 {
     wxImage image;
     if ( image.LoadFile(fileRPGEdit->GetValue()) )
-        tailleImageRPGEdit->SetLabel(_("Taille d'une image : ")+st(image.GetWidth()/4)+"x"+st(image.GetHeight()/4));
+        tailleImageRPGEdit->SetLabel(_("Taille d'une image : ")+ToString(image.GetWidth()/4)+"x"+ToString(image.GetHeight()/4));
     else
         tailleImageRPGEdit->SetLabel(_("Taille d'une image : ?x?"));
 }
@@ -455,7 +455,7 @@ void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
             if ( j == 1 ) direc = "L";
             if ( j == 2 ) direc = "R";
             if ( j == 3 ) direc = "U";
-            subImage.SaveFile(path+"/"+decomposeRPGEdit->GetValue()+direc+st(i)+".png", wxBITMAP_TYPE_PNG);
+            subImage.SaveFile(path+"/"+decomposeRPGEdit->GetValue()+direc+ToString(i)+".png", wxBITMAP_TYPE_PNG);
         }
     }
 
@@ -483,38 +483,38 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
     wxFileName filename(fileSSEdit->GetValue());
     wxString path = filename.GetPath();
 
-    int lineNb = toInt(static_cast<string>(linesSSEdit->GetValue()));
+    int lineNb = ToInt(static_cast<string>(linesSSEdit->GetValue()));
     if ( lineNb <= 0 )
     {
         wxLogWarning(_("Le nombre de ligne est invalide : Le minimum est une ligne."));
         return;
     }
 
-    int columnNb = toInt(static_cast<string>(columnsSSEdit->GetValue()));
+    int columnNb = ToInt(static_cast<string>(columnsSSEdit->GetValue()));
     if ( columnNb <= 0 )
     {
         wxLogWarning(_("Le nombre de colonnes est invalide : Le minimum est une colonne."));
         return;
     }
 
-    int origineX = toInt(static_cast<string>(origineXEdit->GetValue()));
-    int origineY = toInt(static_cast<string>(origineYEdit->GetValue()));
+    int origineX = ToInt(static_cast<string>(origineXEdit->GetValue()));
+    int origineY = ToInt(static_cast<string>(origineYEdit->GetValue()));
 
-    int width = toInt(static_cast<string>(widthSSEdit->GetValue()));
-    int height = toInt(static_cast<string>(heightSSEdit->GetValue()));
+    int width = ToInt(static_cast<string>(widthSSEdit->GetValue()));
+    int height = ToInt(static_cast<string>(heightSSEdit->GetValue()));
     if ( width <= 0 || height <= 0)
     {
         wxLogWarning(_("La taille d'un sprite est invalide."));
         return;
     }
 
-    int spaceH = toInt(static_cast<string>(spaceHSSEdit->GetValue()));
+    int spaceH = ToInt(static_cast<string>(spaceHSSEdit->GetValue()));
     if ( spaceH < 0 )
     {
         wxLogWarning(_("L'espacement horizontal est invalide ( doit être supérieur ou égal à 0 )."));
         return;
     }
-    int spaceV = toInt(static_cast<string>(spaceVSSEdit->GetValue()));
+    int spaceV = ToInt(static_cast<string>(spaceVSSEdit->GetValue()));
     if ( spaceV < 0 )
     {
         wxLogWarning(_("L'espacement vertical est invalide ( doit être supérieur ou égal à 0 )."));
@@ -534,7 +534,7 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
             imageRect.SetWidth(width);
             imageRect.SetHeight(height);
 
-            image.GetSubImage(imageRect).SaveFile(path+"/"+decomposeSSEdit->GetValue()+"l"+toString(line)+"c"+toString(column)+".png", wxBITMAP_TYPE_PNG);
+            image.GetSubImage(imageRect).SaveFile(path+"/"+decomposeSSEdit->GetValue()+"l"+ToString(line)+"c"+ToString(column)+".png", wxBITMAP_TYPE_PNG);
 
             X += width + spaceH;
         }

@@ -9,7 +9,7 @@
 #include <wx/toolbar.h>
 #include <wx/image.h>
 #include <boost/weak_ptr.hpp>
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 
 #ifdef ___WXMSW___
 #include <wx/msw/winundef.h>
@@ -246,13 +246,13 @@ void DebuggerGUI::UpdateGUI()
         return;
 
     //Général
-    generalList->SetItem(0, 1, toString(1/scene.GetElapsedTime())+_(" i/s"));
-    generalList->SetItem(1, 1, toString(scene.GetElapsedTime())+"s");
-    generalList->SetItem(2, 1, toString(scene.objectsInstances.GetAllObjects().size()));
-    generalList->SetItem(3, 1, toString(scene.game->images.size()));
-    generalList->SetItem(4, 1, toString(scene.game->windowWidth)+"*"+toString(scene.game->windowHeight));
-    generalList->SetItem(5, 1, toString(scene.input->GetMouseX())+";"+toString(scene.input->GetMouseY()));
-    generalList->SetItem(6, 1, toString(scene.GetTimeFromStart())+"s");
+    generalList->SetItem(0, 1, ToString(1/scene.GetElapsedTime())+_(" i/s"));
+    generalList->SetItem(1, 1, ToString(scene.GetElapsedTime())+"s");
+    generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
+    generalList->SetItem(3, 1, ToString(scene.game->images.size()));
+    generalList->SetItem(4, 1, ToString(scene.game->windowWidth)+"*"+ToString(scene.game->windowHeight));
+    generalList->SetItem(5, 1, ToString(scene.input->GetMouseX())+";"+ToString(scene.input->GetMouseY()));
+    generalList->SetItem(6, 1, ToString(scene.GetTimeFromStart())+"s");
 
     const vector < Variable > sceneVariables = scene.variables.GetVariablesVector();
     const vector < Variable > gameVariables = scene.game->variables.GetVariablesVector();
@@ -338,7 +338,7 @@ void DebuggerGUI::UpdateGUI()
             if ( objectsInTree[weakPtrToObject].first != allObjects[i]->GetName() )
             {
                 objectsTree->Delete(objectsInTree[weakPtrToObject].second);
-                wxTreeItemId objectItem = objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], toString(i));
+                wxTreeItemId objectItem = objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], ToString(i));
                 objectsInTree[weakPtrToObject] = pair<string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
             }
         }
@@ -649,14 +649,13 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, objectWanted );
     int IDglobalObject = Picker::PickOneObject( &scene.game->globalObjects, objectWanted );
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
     ObjSPtr newObject = boost::shared_ptr<Object> ();
 
     //Creation of the object
     if ( IDsceneObject != -1)
-        newObject = extensionManager->CreateObject(scene.initialObjects[IDsceneObject]);
+        newObject = scene.initialObjects[IDsceneObject]->Clone();
     else if ( IDglobalObject != -1)
-        newObject = extensionManager->CreateObject(scene.game->globalObjects[IDglobalObject]);
+        newObject = scene.game->globalObjects[IDglobalObject]->Clone();
     else
     {
         wxLogWarning(_("Impossible de créer l'objet."));
@@ -666,8 +665,8 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     //Initialisation
     newObject->errors = &scene.errors;
 
-    int x = toInt(string(wxGetTextFromUser(_("Entrez la position X de l'objet"), _("Ajout d'un objet")).mb_str()));
-    int y = toInt(string(wxGetTextFromUser(_("Entrez la position Y de l'objet"), _("Ajout d'un objet")).mb_str()));
+    int x = ToInt(string(wxGetTextFromUser(_("Entrez la position X de l'objet"), _("Ajout d'un objet")).mb_str()));
+    int y = ToInt(string(wxGetTextFromUser(_("Entrez la position Y de l'objet"), _("Ajout d'un objet")).mb_str()));
     newObject->SetX( x );
     newObject->SetY( y );
 

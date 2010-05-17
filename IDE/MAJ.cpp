@@ -10,7 +10,7 @@
 //*)
 #include "CheckMAJ.h"
 #include "tinyxml.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/VersionWrapper.h"
 #include <wx/log.h>
 #include <wx/mimetype.h>
@@ -141,7 +141,7 @@ void MAJ::OnVerifMAJBtClick(wxCommandEvent& event)
     int Revision = 0;
     elem->QueryIntAttribute( "Revision", &Revision );
 
-    versionMAJTxt->SetLabel(st(Major)+"."+st(Minor)+"."+st(Build)+"."+st(Revision));
+    versionMAJTxt->SetLabel(ToString(Major)+"."+ToString(Minor)+"."+ToString(Build)+"."+ToString(Revision));
 
     elem = hdl.FirstChildElement().FirstChildElement("Info").Element();
 

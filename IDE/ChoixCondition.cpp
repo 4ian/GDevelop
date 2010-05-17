@@ -52,7 +52,7 @@
 
 #include <string>
 #include <vector>
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "MemTrace.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
@@ -231,7 +231,7 @@ scene(scene_)
     {
         //Un sizer
 
-        string num = st( i );
+        string num =ToString( i );
 
         //Bouton radio pour facultatif ou pas
         ParaFac.push_back(new wxCheckBox( this, ID_CHECKARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, num ));

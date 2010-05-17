@@ -8,7 +8,7 @@
 //*)
 #include <wx/config.h>
 #include <wx/log.h>
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Position.h"
 #include "ObjectsOnBadLayerBox.h"
 #include "EditLayer.h"
@@ -206,7 +206,7 @@ void EditorLayers::OnAddSelected(wxCommandEvent& event)
     while ( alreadyExist )
     {
         ++nb;
-        name = _("Nouveau calque ") + toString(nb);
+        name = _("Nouveau calque ") + ToString(nb);
 
         alreadyExist = false;
         for (unsigned int i = 0;i<layers->size();++i)

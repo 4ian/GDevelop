@@ -17,7 +17,7 @@
 #include "GDL/Collisions.h"
 #include "GDL/Event.h"
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ImageManager.h"

@@ -17,7 +17,7 @@
 
 #include "GDL/Game.h"
 #include "GDL/OpenSaveGame.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 
 using namespace std;
 
@@ -291,7 +291,7 @@ void CreateTemplate::ProcessEvents(vector < BaseEventSPtr > & eventsToProcess, v
                     //On respecte bien l'ordre, du plus grand au plus petit
                     for ( unsigned int k = 0; k < parameters.size() ;k++ )
                     {
-                        string ReplaceBy = "_PARAM" + st( parameters.at( k ).second ) + "_";
+                        string ReplaceBy = "_PARAM" +ToString( parameters.at( k ).second ) + "_";
                         parametres.at( j ) = GDExpression( ConvertParam( parametres.at( j ).GetPlainString(), parameters.at( k ).first, ReplaceBy ) );
                     }
                 }
@@ -310,7 +310,7 @@ void CreateTemplate::ProcessEvents(vector < BaseEventSPtr > & eventsToProcess, v
                     //On respecte bien l'ordre, du plus grand au plus petit
                     for ( unsigned int k = 0; k < parameters.size() ;k++ )
                     {
-                        string ReplaceBy = "_PARAM" + st( parameters.at( k ).second ) + "_";
+                        string ReplaceBy = "_PARAM" +ToString( parameters.at( k ).second ) + "_";
                         parametres.at( j ) = GDExpression( ConvertParam( parametres.at( j ).GetPlainString(), parameters.at( k ).first, ReplaceBy ) );
                     }
                 }

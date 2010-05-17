@@ -244,7 +244,7 @@ void ProjectManager::Refresh()
 
         //Extensions
         gdTreeItemGameData * extensionsItemData = new gdTreeItemGameData("Extensions", "", mainEditor.games[i].get());
-        projectsTree->AppendItem(projectItem, _("Extensions") + " (" + toString(mainEditor.games[i]->extensionsUsed.size()) + ")", 3 ,3, extensionsItemData);
+        projectsTree->AppendItem(projectItem, _("Extensions") + " (" + ToString(mainEditor.games[i]->extensionsUsed.size()) + ")", 3 ,3, extensionsItemData);
     }
 
     projectsTree->ExpandAll();
@@ -309,7 +309,7 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
     {
         EditExtensionsOfGame(game);
 
-        projectsTree->SetItemText(selectedItem, _("Extensions") + " (" + toString(game->extensionsUsed.size()) + ")");
+        projectsTree->SetItemText(selectedItem, _("Extensions") + " (" + ToString(game->extensionsUsed.size()) + ")");
     }
 }
 
@@ -595,7 +595,7 @@ void ProjectManager::AddSceneToGame(Game * game)
     int i = 1;
     while(find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), newSceneName)) != game->scenes.end())
     {
-        newSceneName = _("Nouvelle scène") + " " + toString(i);
+        newSceneName = _("Nouvelle scène") + " " + ToString(i);
         ++i;
     }
 
@@ -790,7 +790,7 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     int i = 1;
     while(find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), newSceneName)) != game->scenes.end())
     {
-        newSceneName = _("Copie de") + " " + newScene->GetName() + " " + toString(i);
+        newSceneName = _("Copie de") + " " + newScene->GetName() + " " + ToString(i);
         ++i;
     }
 

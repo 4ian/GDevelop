@@ -24,7 +24,7 @@
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
 #include "GDL/Chercher.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "MemTrace.h"
 #include "Clipboard.h"
 #include <algorithm>
@@ -79,7 +79,7 @@ mainEditorCommand(mainEditorCommand_)
     globalNotebook->AddPage(globalObjectsGroups, _("Groupes globaux"), false);
     Notebook1->AddPage(sceneNotebook, _("Scène"), false);
     Notebook1->AddPage(globalNotebook, _("Global à tout le jeu"), false);
-    
+
     Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorObjets::OnResize);
     //*)
 

@@ -12,8 +12,8 @@
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/algo.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
+#include "GDL/CommonTools.h"
 #include "EditOptionsPosition.h"
 #include <wx/log.h>
 #include <wx/scrolbar.h>
@@ -334,8 +334,8 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
     {
         mouseXInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(scene.input->GetMouseX(), 0, scene.GetLayer("").GetCamera(0).GetSFMLView()).x);
         mouseYInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(0, scene.input->GetMouseY(), scene.GetLayer("").GetCamera(0).GetSFMLView()).y);
-        Xstr = st( mouseXInScene );
-        Ystr = st( mouseYInScene );
+        Xstr =ToString( mouseXInScene );
+        Ystr =ToString( mouseYInScene );
 
         wxLogStatus( wxString( _( "Position " ) ) + Xstr + wxString( _( ";" ) ) + Ystr + wxString( _( ". ( Calque de base, Caméra 0 )" ) ) );
     }
@@ -344,8 +344,8 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
         mouseXInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(scene.input->GetMouseX(), 0).x);
         mouseYInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(0, scene.input->GetMouseY()).y);
 
-        Xstr = st( mouseXInScene );
-        Ystr = st( mouseYInScene );
+        Xstr =ToString( mouseXInScene );
+        Ystr =ToString( mouseYInScene );
 
         wxLogStatus( wxString( _( "Position " ) ) + Xstr + wxString( _( ";" ) ) + Ystr + wxString( _( ". SHIFT pour sélection multiple, clic droit pour plus d'options." ) ) );
     }
@@ -480,9 +480,9 @@ void SceneCanvas::AddObjetSelected(float x, float y)
     ObjSPtr newObject = boost::shared_ptr<Object> ();
 
     if ( IDsceneObject != -1 ) //We check first scene's objects' list.
-        newObject = extensionManager->CreateObject(sceneEdited.initialObjects[IDsceneObject]);
+        newObject = sceneEdited.initialObjects[IDsceneObject]->Clone();
     else if ( IDglobalObject != -1 ) //Then the global object list
-        newObject = extensionManager->CreateObject(gameEdited.globalObjects[IDglobalObject]);
+        newObject = gameEdited.globalObjects[IDglobalObject]->Clone();
 
     if ( newObject == boost::shared_ptr<Object> () )
     {

@@ -58,7 +58,7 @@ void Clipboard::kill()
 void Clipboard::SetObject( ObjSPtr object )
 {
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-    objectCopied = extensionsManager->CreateObject(object);
+    objectCopied = object->Clone();
 
     hasObject = true;
 }

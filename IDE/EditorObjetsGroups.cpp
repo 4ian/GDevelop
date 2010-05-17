@@ -18,7 +18,7 @@
 #include "GDL/Object.h"
 #include "GDL/Game.h"
 #include "Game_Develop_EditorMain.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "EditObjectGroup.h"
 #include "GDL/HelpFileAccess.h"
 #ifdef __WXMSW__
@@ -359,7 +359,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
             != objectsGroups->end() )
     {
         ++i;
-        name =  _( "Nouveau groupe" )+" "+st (i);
+        name =  _( "Nouveau groupe" )+" "+ ToString(i);
     }
     NewGroup.SetName( string(name.mb_str()) );
 

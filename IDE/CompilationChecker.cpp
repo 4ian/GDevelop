@@ -1,12 +1,12 @@
 #include "CompilationChecker.h"
 #include "GDL/Version.h"
 #include "GDL/VersionWrapper.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 
 bool CompilationChecker::EnsureCorrectGDLVersion()
 {
-    string versionString =  toString(GDLVersionWrapper::Major()) + ", " + toString(GDLVersionWrapper::Minor()) + ", " +
-                            toString(GDLVersionWrapper::Build()) + ", " + toString(GDLVersionWrapper::Revision());
+    string versionString =  ToString(GDLVersionWrapper::Major()) + ", " + ToString(GDLVersionWrapper::Minor()) + ", " +
+                            ToString(GDLVersionWrapper::Build()) + ", " + ToString(GDLVersionWrapper::Revision());
 
     if (versionString != RC_FILEVERSION_STRING)
     {

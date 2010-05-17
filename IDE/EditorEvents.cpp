@@ -31,7 +31,7 @@
 #include "GDL/Game.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/StandardEvent.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/HelpFileAccess.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -606,7 +606,7 @@ void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
     //On récupère la position de dessin initiale
     int Yposition = -( ScrollBar1->GetThumbPosition() );
     int positionScrollbar = ScrollBar1->GetThumbPosition();
-    int initialXposition = 2 + dc.GetTextExtent(st(events->size())).GetWidth() + 2 - horizontalScrollbar->GetThumbPosition();
+    int initialXposition = 2 + dc.GetTextExtent(ToString(events->size())).GetWidth() + 2 - horizontalScrollbar->GetThumbPosition();
     int maximalWidth = 0;
 
     //Setup renderings datas which are constants.
@@ -652,7 +652,7 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
         if ( draw )
         {
             dc.SetFont( eventsRenderingHelper->GetFont() );
-            dc.DrawText(st(i+1), initialXposition-(dc.GetTextExtent(st(i+1)).GetWidth()+2), Yposition);
+            dc.DrawText(ToString(i+1), initialXposition-(dc.GetTextExtent(ToString(i+1)).GetWidth()+2), Yposition);
         }
 
         int width = EventsPanel->GetSize().x-initialXposition;
@@ -923,6 +923,7 @@ void EditorEvents::OnMenuPasteSelected( wxCommandEvent& event )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
     Clipboard * clipboard = Clipboard::getInstance();
+    if ( !clipboard->HasEvent() ) return;
 
     if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
         GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), clipboard->GetEvent() );
@@ -941,6 +942,7 @@ void EditorEvents::OnMenuPasteAfterSelected( wxCommandEvent& event )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
     Clipboard * clipboard = Clipboard::getInstance();
+    if ( !clipboard->HasEvent() ) return;
 
     if ( boost::tuples::get<1>(eventsSelected[0])+1 < GetLastSelectedListOfEvents()->size() )
         GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0])+1, clipboard->GetEvent() );
@@ -958,6 +960,8 @@ void EditorEvents::OnPasteAsASubEventSelected(wxCommandEvent& event)
     if ( eventsSelected.empty() || !GetLastSelectedEvent()->CanHaveSubEvents() ) return;
 
     Clipboard * clipboard = Clipboard::getInstance();
+    if ( !clipboard->HasEvent() ) return;
+
     GetLastSelectedEvent()->GetSubEvents().push_back( clipboard->GetEvent() );
 
     ChangesMadeOnEvents();

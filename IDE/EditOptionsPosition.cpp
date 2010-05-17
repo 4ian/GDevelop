@@ -12,7 +12,7 @@
 #include "GDL/Chercher.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/HelpFileAccess.h"
 #include <sstream>
 #include <string>
@@ -211,10 +211,10 @@ scene(scene_)
     //Initializing controls with values
     objectNameTxt->SetLabel( position.objectName );
 
-    XEdit->ChangeValue( toString(position.x) );
-    YEdit->ChangeValue( toString(position.y) );
-    widthEdit->ChangeValue( toString(position.width) );
-    heightEdit->ChangeValue( toString(position.height) );
+    XEdit->ChangeValue( ToString(position.x) );
+    YEdit->ChangeValue( ToString(position.y) );
+    widthEdit->ChangeValue( ToString(position.width) );
+    heightEdit->ChangeValue( ToString(position.height) );
     if ( position.personalizedSize )
     {
         sizeCheck->SetValue(true);
@@ -234,7 +234,7 @@ scene(scene_)
     if ( position.layer == "" )
         layerChoice->SetStringSelection(_("Calque de base"));
 
-    zOrderEdit->ChangeValue( st(position.zOrder) );
+    zOrderEdit->ChangeValue(ToString(position.zOrder) );
 
     //Create the object-specific panel, if it has one.
     wxPanel * returnedPanel = NULL;
@@ -308,7 +308,7 @@ void EditOptionsPosition::OnOkBtClick(wxCommandEvent& event)
     else
         position.personalizedSize = false;
 
-    position.zOrder = toInt(string(zOrderEdit->GetValue().mb_str()));
+    position.zOrder = ToInt(string(zOrderEdit->GetValue().mb_str()));
 
     position.layer = static_cast<string>(layerChoice->GetStringSelection());
     if ( layerChoice->GetStringSelection() == _("Calque de base"))

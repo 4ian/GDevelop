@@ -169,8 +169,6 @@ TEST( Player, conditionsMove )
     condition.SetParameters(params);
     condition.SetLocal(false);
     condition.SetInversion(false);
-    Evaluateur eval(game, scene);
     ObjectsConcerned objectsConcerned(&scene.objectsInstances, &scene.objectGroups);
-    eval.SetObjectsConcerned(&objectsConcerned);
 
 }

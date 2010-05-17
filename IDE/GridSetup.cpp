@@ -6,7 +6,7 @@
 //*)
 #include <wx/colordlg.h>
 #include <wx/log.h>
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 
 //(*IdInit(GridSetup)
 const long GridSetup::ID_STATICTEXT3 = wxNewId();
@@ -89,8 +89,8 @@ b(b_)
 	//*)
 
 	snapCheck->SetValue(snap);
-	widthEdit->ChangeValue(toString(gridWidth));
-	heightEdit->ChangeValue(toString(gridHeight));
+	widthEdit->ChangeValue(ToString(gridWidth));
+	heightEdit->ChangeValue(ToString(gridHeight));
     colorPanel->SetBackgroundColour( wxColor(r,g,b) );
 }
 
@@ -104,19 +104,19 @@ GridSetup::~GridSetup()
 void GridSetup::OnokBtClick(wxCommandEvent& event)
 {
     snap = snapCheck->GetValue();
-    if ( toInt(static_cast<string>(widthEdit->GetValue())) < 1)
+    if ( ToInt(static_cast<string>(widthEdit->GetValue())) < 1)
     {
         wxLogWarning(_("La largeur de la grille est incorrecte."));
         return;
     }
-    if ( toInt(static_cast<string>(heightEdit->GetValue())) < 1)
+    if ( ToInt(static_cast<string>(heightEdit->GetValue())) < 1)
     {
         wxLogWarning(_("La hauteur de la grille est incorrecte."));
         return;
     }
 
-    gridWidth = toInt(static_cast<string>(widthEdit->GetValue()));
-    gridHeight = toInt(static_cast<string>(heightEdit->GetValue()));
+    gridWidth = ToInt(static_cast<string>(widthEdit->GetValue()));
+    gridHeight = ToInt(static_cast<string>(heightEdit->GetValue()));
 
     EndModal(1);
 }

@@ -312,7 +312,7 @@ void Game_Develop_EditorApp::OnUnhandledException()
         for (unsigned int i = 0;i<Frame->games.size();++i)
         {
             OpenSaveGame save(*Frame->games[i]);
-            save.SaveToFile("recup"+toString(i)+".gdg");
+            save.SaveToFile("recup"+ToString(i)+".gdg");
         }
 
     }
@@ -338,7 +338,7 @@ bool Game_Develop_EditorApp::OnExceptionInMainLoop()
         for (unsigned int i = 0;i<Frame->games.size();++i)
         {
             OpenSaveGame save(*Frame->games[i]);
-            save.SaveToFile("recup"+toString(i)+".gdg");
+            save.SaveToFile("recup"+ToString(i)+".gdg");
         }
     }
     catch(...)

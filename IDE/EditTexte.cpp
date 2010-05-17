@@ -116,7 +116,14 @@ void EditTexte::OnAnnulerBtClick(wxCommandEvent& event)
 
 void EditTexte::OnOkBtClick(wxCommandEvent& event)
 {
-    texteFinal = static_cast<string>(TexteEdit->GetValue());
+    texteFinal = string(TexteEdit->GetValue().mb_str());
+
+    GDExpression expressionTest(texteFinal);
+    if ( !expressionTest.PrepareForTextEvaluationOnly(game, scene) )
+    {
+        wxLogWarning(wxString(expressionTest.GetFirstErrorDuringPreprocessingText()));
+    }
+
     EndModal(1);
 }
 

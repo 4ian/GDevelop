@@ -22,7 +22,7 @@
 #include "EditorEvents.h"
 #include "GDL/HelpFileAccess.h"
 #include "GridSetup.h"
-#include "ChoixLayer.h"
+#include "GDL/ChooseLayer.h"
 #include "GDAuiTabArt.h"
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
@@ -575,7 +575,7 @@ void EditorScene::OnChoisirObjetBtClick( wxCommandEvent & event )
 ////////////////////////////////////////////////////////////
 void EditorScene::OnChoisirLayerBtClick( wxCommandEvent & event )
 {
-    ChoixLayer Dialog( this, scene.initialLayers );
+    ChooseLayer Dialog( this, scene.initialLayers );
     if ( Dialog.ShowModal() == 1 )
     {
         sceneCanvas->scene.addOnLayer = Dialog.layerChosen;

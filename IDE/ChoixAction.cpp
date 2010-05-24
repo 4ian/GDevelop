@@ -46,7 +46,7 @@
 #include "GDL/BitmapGUIManager.h"
 #include "SigneModification.h"
 #include "GeneratePassword.h"
-#include "ChoixLayer.h"
+#include "GDL/ChooseLayer.h"
 #include "ChoiceJoyAxis.h"
 #include "ChoiceFile.h"
 #include "ChoixVariableDialog.h"
@@ -505,7 +505,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             }
             return;
         }
-        else if ( instructionInfos.parameters[i].type == "texte" )
+        else if ( instructionInfos.parameters[i].type == "text" )
         {
             EditTexte Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
             if ( Dialog.ShowModal() == 1 )
@@ -605,7 +605,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         }
         else if ( instructionInfos.parameters[i].type == "layer" )
         {
-            ChoixLayer dialog(this, scene.initialLayers);
+            ChooseLayer dialog(this, scene.initialLayers);
             if( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.layerChosen);
 

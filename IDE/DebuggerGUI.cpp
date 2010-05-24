@@ -19,7 +19,7 @@
 #include "GDL/Chercher.h"
 #include "GDL/ChooseObject.h"
 #include "ConsoleManager.h"
-#include "ChoixLayer.h"
+#include "GDL/ChooseLayer.h"
 #include <wx/textdlg.h>
 
 #ifdef ___WXMSW___
@@ -670,7 +670,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     newObject->SetX( x );
     newObject->SetY( y );
 
-    ChoixLayer layerDialog(this, scene.initialLayers);
+    ChooseLayer layerDialog(this, scene.initialLayers);
     layerDialog.ShowModal();
     newObject->SetLayer( layerDialog.layerChosen );
 

@@ -10,6 +10,7 @@
 #include "GDL/SpriteObject.h"
 #include "GDL/Object.h"
 #include "GDL/RuntimeGame.h"
+#include "GDL/GDExpression.h"
 
 #ifdef ___WXMSW___
 #include "windows.h"
@@ -18,7 +19,7 @@
 
 using namespace std;
 
-TEST( Player, ObjectsConcerned )
+TEST( Runtime, ObjectsConcerned )
 {
     ObjInstancesHolder objectsList;
     objectsList.AddObject(boost::shared_ptr<Object>(new Object("blueBall")));
@@ -113,7 +114,7 @@ TEST( Player, ObjectsConcerned )
 
 }
 
-TEST( Player, Forces )
+TEST( Runtime, Forces )
 {
     Force force;
     force.SetX(500);
@@ -130,7 +131,7 @@ TEST( Player, Forces )
 }
 
 
-TEST( Player, actionsMove )
+TEST( Runtime, actionsMove )
 {
     Object * object = new Object("testobj");
 
@@ -146,7 +147,7 @@ TEST( Player, actionsMove )
     scene.objectsInstances.AddObject(boost::shared_ptr<Object>(object));
 }
 
-TEST( Player, conditionsMove )
+TEST( Runtime, conditionsMove )
 {
     Object * object = new Object("testobj");
 
@@ -171,4 +172,49 @@ TEST( Player, conditionsMove )
     condition.SetInversion(false);
     ObjectsConcerned objectsConcerned(&scene.objectsInstances, &scene.objectGroups);
 
+}
+
+TEST( Runtime, Expressions )
+{
+    ObjSPtr object(new Object("object"));
+    Scene scene;
+    scene.initialObjects.push_back(object);
+    Game game;
+
+    {
+        GDExpression expression("cos(3.5)+random(5)");
+        CHECK_EQUAL(true, expression.PrepareForMathEvaluationOnly(game, scene));
+    }
+    {
+        GDExpression expression("5+object.x()+random(5)");
+        CHECK_EQUAL(true, expression.PrepareForMathEvaluationOnly(game, scene));
+    }
+    {
+        GDExpression expression("5+object.x(5)+random(5)");
+        CHECK_EQUAL(false, expression.PrepareForMathEvaluationOnly(game, scene));
+    }
+    {
+        GDExpression expression("5+object.x(5,4)+random(5)");
+        CHECK_EQUAL(false, expression.PrepareForMathEvaluationOnly(game, scene));
+    }
+    {
+        GDExpression expression("(cos(5+abs(3))/(asin(0.1)*acos(0.55)))^3+cos(5+abs(3))/(asin(0.1)*acos(0.55))");
+        CHECK_EQUAL(true, expression.PrepareForMathEvaluationOnly(game, scene));
+    }
+    {
+        GDExpression expression("(cos(5+abs(3))/(asin(0.1)*acos(0.55)))^3+cos(5+abs(3)/(asin(0.1)*acos(0.55))");
+        CHECK_EQUAL(false, expression.PrepareForMathEvaluationOnly(game, scene));
+    }
+    {
+        GDExpression expression("\"Salut\" + \"Ok\" + cos(5) + \" <- \"");
+        CHECK_EQUAL(true, expression.PrepareForTextEvaluationOnly(game, scene));
+    }
+    {
+        GDExpression expression("\"Salut\" + \"Ok\" cos(5) + \" <- \"");
+        CHECK_EQUAL(false, expression.PrepareForTextEvaluationOnly(game, scene) );
+    }
+    {
+        GDExpression expression("\"Salut\" + \"Ok\" ++ cos(5) + \" <- \"");
+        CHECK_EQUAL(false, expression.PrepareForTextEvaluationOnly(game, scene) );
+    }
 }

@@ -417,12 +417,6 @@
 		<Unit filename="ChoixCondition.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
 		</Unit>
-		<Unit filename="ChoixLayer.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\Editeur calques\" />
-		</Unit>
-		<Unit filename="ChoixLayer.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\Editeur calques\" />
-		</Unit>
 		<Unit filename="ChoixTemplateEvent.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Templates\" />
 		</Unit>
@@ -890,7 +884,6 @@
 					<wxPanel wxs="wxsmith/EditorLayers.wxs" src="EditorLayers.cpp" hdr="EditorLayers.h" name="EditorLayers" language="CPP" />
 					<wxDialog wxs="wxsmith/EditLayer.wxs" src="EditLayer.cpp" hdr="EditLayer.h" name="EditLayer" language="CPP" />
 					<wxDialog wxs="wxsmith/ObjectsOnBadLayerBox.wxs" src="ObjectsOnBadLayerBox.cpp" hdr="ObjectsOnBadLayerBox.h" name="ObjectsOnBadLayerBox" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoixLayer.wxs" src="ChoixLayer.cpp" hdr="ChoixLayer.h" name="ChoixLayer" language="CPP" />
 					<wxPanel wxs="wxsmith/DebuggerGUI.wxs" src="DebuggerGUI.cpp" hdr="DebuggerGUI.h" name="DebuggerGUI" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoiceJoyAxis.wxs" src="ChoiceJoyAxis.cpp" hdr="ChoiceJoyAxis.h" name="ChoiceJoyAxis" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoiceFile.wxs" src="ChoiceFile.cpp" hdr="ChoiceFile.h" name="ChoiceFile" language="CPP" />

@@ -2,6 +2,7 @@
 #define EDITTEXTE_H
 
 //(*Headers(EditTexte)
+#include <wx/treectrl.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -26,15 +27,18 @@ class EditTexte: public wxDialog
 		//(*Declarations(EditTexte)
 		wxButton* OkBt;
 		wxStaticText* StaticText2;
-		wxButton* VarGlobalTxtEdit;
+		wxButton* Button1;
 		wxStaticText* StaticText1;
+		wxStaticText* StaticText3;
+		wxTreeCtrl* ObjList;
 		wxTextCtrl* TexteEdit;
 		wxStaticLine* StaticLine2;
-		wxButton* VarSceneTxtEdit;
 		wxStaticLine* StaticLine1;
+		wxTreeCtrl* TreeCtrl1;
+		wxButton* AddPropBt;
 		wxButton* InsertBt;
 		wxButton* AnnulerBt;
-		wxButton* VarObjTxtEdit;
+		wxStaticText* StaticText4;
 		//*)
 		string texteFinal;
 
@@ -43,12 +47,15 @@ class EditTexte: public wxDialog
 		//(*Identifiers(EditTexte)
 		static const long ID_TEXTCTRL1;
 		static const long ID_STATICLINE1;
+		static const long ID_STATICTEXT3;
 		static const long ID_STATICTEXT2;
 		static const long ID_BUTTON3;
 		static const long ID_STATICTEXT1;
-		static const long ID_BUTTON4;
-		static const long ID_BUTTON5;
-		static const long ID_BUTTON6;
+		static const long ID_TREECTRL1;
+		static const long ID_BUTTON10;
+		static const long ID_STATICTEXT4;
+		static const long ID_TREECTRL2;
+		static const long ID_BUTTON7;
 		static const long ID_STATICLINE2;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON1;

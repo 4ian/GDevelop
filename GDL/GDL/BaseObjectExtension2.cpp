@@ -19,6 +19,22 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
     DECLARE_END_ACTION()
 
+    DECLARE_ACTION("CreateByName",
+                   _("Créer un objet de part son nom"),
+                   _("Créer un objet à la position spécifiée"),
+                   _("Créer l'objet ayant le nom _PARAM0_ à la position _PARAM1_;_PARAM2_"),
+                   _("Objets"),
+                   "res/actions/create24.png",
+                   "res/actions/create.png",
+                   &ActCreateByName);
+
+        DECLARE_PARAMETER("text", _("Texte représentant le nom de l'objet à créer"), true, "")
+        DECLARE_PARAMETER("expression", _("Position X"), false, "")
+        DECLARE_PARAMETER("expression", _("Position Y"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( calque de base si vide )"), false, "")
+
+    DECLARE_END_ACTION()
+
     DECLARE_ACTION("AjoutObjConcern",
                    _("Prendre en compte des objets"),
                    _("Prend en compte tous les objets ainsi nommés de la scène."),

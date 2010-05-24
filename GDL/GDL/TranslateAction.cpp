@@ -90,7 +90,7 @@ string TranslateAction::LabelFromType(string type)
         return static_cast<string>(_("Choisir la police"));
     else if ( type == "color" )
         return static_cast<string>(_("Choisir la couleur"));
-    else if ( type == "texte" )
+    else if ( type == "text" )
         return static_cast<string>(_("Editer le texte"));
     else if ( type == "musicfile" )
         return static_cast<string>(_("Choisir la musique"));
@@ -136,7 +136,7 @@ wxBitmap TranslateAction::BitmapFromType(string type)
         return bitmapGUIManager->policeBt;
     else if ( type == "color" )
         return bitmapGUIManager->colorBt;
-    else if ( type == "texte" )
+    else if ( type == "text" )
         return bitmapGUIManager->texteBt;
     else if ( type == "musicfile" )
         return bitmapGUIManager->musicBt;
@@ -178,7 +178,7 @@ string TranslateAction::AddHTMLToParameter(string & parameter, string type)
         parameter = "<b>"+parameter+"</b>";
     /*else if ( type == "color" )
         return bitmapGUIManager->colorBt;
-    else if ( type == "texte" )
+    else if ( type == "text" )
         return bitmapGUIManager->texteBt;*/
     else if ( type == "musicfile" )
         parameter = "<b>"+parameter+"</b>";

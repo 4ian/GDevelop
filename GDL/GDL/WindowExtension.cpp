@@ -21,7 +21,7 @@ WindowExtension::WindowExtension()
                    "res/actions/texte.png",
                    &ActEcrireTexte);
 
-        DECLARE_PARAMETER("texte", _("Texte"), false, "")
+        DECLARE_PARAMETER("text", _("Texte"), false, "")
         DECLARE_PARAMETER("expression", _("Position X"), false, "")
         DECLARE_PARAMETER("expression", _("Position Y"), false, "")
         DECLARE_PARAMETER("color", _("Couleur"), false, "")

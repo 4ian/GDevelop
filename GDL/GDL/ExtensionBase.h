@@ -461,15 +461,17 @@ typedef Object * (*CreateFunPtr)(std::string name);
             eventInfo.instance = boost::shared_ptr<BaseEvent>(new className_); \
             eventInfo.instance->SetType(GetNameSpace()+currentEventDeclarationName);
 
-#define DECLARE_PARAMETER(type, desc, useObj, objType) { \
+#define DECLARE_PARAMETER(type_, desc, useObj, objType) { \
                 ParameterInfo parameter; \
+                parameter.type = type_; \
                 parameter.useObject = useObj; \
                 parameter.objectType = GetNameSpace()+objType; \
                 instrInfo.parameters.push_back(parameter); \
                 }
 
-#define DECLARE_PARAMETER_OPTIONAL(type, desc, useObj, objType) { \
+#define DECLARE_PARAMETER_OPTIONAL(type_, desc, useObj, objType) { \
                 ParameterInfo parameter; \
+                parameter.type = type_; \
                 parameter.useObject = useObj; \
                 parameter.objectType = GetNameSpace()+objType; \
                 instrInfo.parameters.push_back(parameter); \
@@ -562,9 +564,9 @@ class GD_API ParameterInfo
 
     bool useObject;
     std::string objectType;
+    std::string type;
 
 #if defined(GDE)
-    std::string type;
     std::string description;
     bool optional;
 #endif

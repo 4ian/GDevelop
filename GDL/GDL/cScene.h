@@ -4,7 +4,6 @@
 class RuntimeScene;
 class ObjectsConcerned;
 class Instruction;
-class Evaluateur;
 
 bool CondSceneBegins( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 bool CondAlways( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );

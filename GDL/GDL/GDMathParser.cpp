@@ -57,6 +57,7 @@ std::vector < std::string > GDMathParser::GetAllMathFunctions()
         mathFunctions.push_back("ln");
         mathFunctions.push_back("max");
         mathFunctions.push_back("min");
+        mathFunctions.push_back("nthroot");
         mathFunctions.push_back("pow");
         mathFunctions.push_back("rint");
         mathFunctions.push_back("sec");
@@ -68,18 +69,6 @@ std::vector < std::string > GDMathParser::GetAllMathFunctions()
         mathFunctions.push_back("tan");
         mathFunctions.push_back("tanh");
         mathFunctions.push_back("trunc");
-
-        /*
-        mathFunctions.push_back("cos");
-        mathFunctions.push_back("tan");
-        mathFunctions.push_back("asin");
-        mathFunctions.push_back("atan");
-        mathFunctions.push_back("sqrt");
-        mathFunctions.push_back("int");
-        mathFunctions.push_back("log");
-        mathFunctions.push_back("exp");
-        mathFunctions.push_back("nthroot");
-        mathFunctions.push_back("E");*/
     }
 
     return mathFunctions;
@@ -87,5 +76,5 @@ std::vector < std::string > GDMathParser::GetAllMathFunctions()
 
 std::string GDMathParser::GetAllMathSeparator()
 {
-    return " ,+-*/%.<>=&|;()#^![]{}~:";
+    return " ,+-*/%.<>=&|;()#^![]{}~";
 }

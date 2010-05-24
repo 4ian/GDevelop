@@ -274,6 +274,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
 //Actions
 bool ActCreate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActCreateByName( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActMettreAutour( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActAjoutObjConcern( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActAjoutHasard( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

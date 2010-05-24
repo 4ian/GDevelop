@@ -125,15 +125,23 @@ MouseExtension::MouseExtension()
     DECLARE_END_CONDITION()
 
     DECLARE_EXPRESSION("mouseX", _("Position X de la souris"), _("Position X de la souris"), _("Souris"), "res/actions/mouse.png", &ExpMouseX)
+        DECLARE_PARAMETER_OPTIONAL("layer", _("Calque"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("camera", _("Caméra"), false, "")
     DECLARE_END_EXPRESSION()
 
     DECLARE_HIDDEN_EXPRESSION("SourisX", _("Position X de la souris"), _("Position X de la souris"), _("Souris"), "res/actions/mouse.png", &ExpMouseX)
+        DECLARE_PARAMETER_OPTIONAL("layer", _("Calque"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("camera", _("Caméra"), false, "")
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("mouseY", _("Position Y de la souris"), _("Position Y de la souris"), _("Souris"), "res/actions/mouse.png", &ExpMouseY)
+        DECLARE_PARAMETER_OPTIONAL("layer", _("Calque"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("camera", _("Caméra"), false, "")
     DECLARE_END_EXPRESSION()
 
     DECLARE_HIDDEN_EXPRESSION("SourisY", _("Position Y de la souris"), _("Position Y de la souris"), _("Souris"), "res/actions/mouse.png", &ExpMouseY)
+        DECLARE_PARAMETER_OPTIONAL("layer", _("Calque"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("camera", _("Caméra"), false, "")
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("random", _("Valeur aléatoire"), _("Valeur aléatoire"), _("Aléatoire"), "res/actions/position.png", &ExpRandom)

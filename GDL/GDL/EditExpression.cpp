@@ -20,6 +20,7 @@
 #include "GDL/gdTreeItemStringData.h"
 
 #include "GDL/ChooseObject.h"
+#include "GDL/ChooseLayer.h"
 #include "GDL/ChooseObjectExpression.h"
 
 #include <string>
@@ -30,6 +31,7 @@ using namespace std;
 //(*IdInit(EditExpression)
 const long EditExpression::ID_TEXTCTRL1 = wxNewId();
 const long EditExpression::ID_BUTTON1 = wxNewId();
+const long EditExpression::ID_STATICTEXT5 = wxNewId();
 const long EditExpression::ID_STATICTEXT1 = wxNewId();
 const long EditExpression::ID_BUTTON2 = wxNewId();
 const long EditExpression::ID_BUTTON3 = wxNewId();
@@ -98,6 +100,9 @@ mainObjectsName(mainObjectsName_)
 	FlexGridSizer2->Add(ExpressionEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(OkBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	errorTxt = new wxStaticText(this, ID_STATICTEXT5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	errorTxt->SetForegroundColour(wxColour(120,0,0));
+	FlexGridSizer2->Add(errorTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Editer l\'expression"));
 	FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
@@ -284,6 +289,20 @@ void EditExpression::OnExpressionEditText(wxCommandEvent& event)
 {
     expression = static_cast<string>( ExpressionEdit->GetValue() );
     RefreshExpressionEdit();
+
+    GDExpression expressionTest(expression);
+    if ( !expressionTest.PrepareForMathEvaluationOnly(game, scene) )
+    {
+        errorTxt->SetLabel(expressionTest.GetFirstErrorDuringPreprocessingText());
+        if ( expressionTest.GetFirstErrorDuringPreprocessingPosition() != string::npos )
+        {
+            ExpressionEdit->SetStyle(expressionTest.GetFirstErrorDuringPreprocessingPosition(), expressionTest.GetFirstErrorDuringPreprocessingPosition()+1, wxColour(120,0,0) );
+        }
+    }
+    else
+    {
+        errorTxt->SetLabel("");
+    }
 }
 
 void EditExpression::RefreshLists()
@@ -500,7 +519,19 @@ string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo)
     }
     else if ( parameterInfo.type == "text" )
     {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Paramètre"), "", this));
+        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Paramètre"), "\"\"", this));
+        return param;
+    }
+    else if ( parameterInfo.type == "layer" )
+    {
+        ChooseLayer dialog(this, scene.initialLayers);
+        if ( dialog.ShowModal() == 0 ) return "";
+
+        return dialog.layerChosen;
+    }
+    else if ( parameterInfo.type == "camera" )
+    {
+        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Numéro de la caméra"), "0", this));
         return param;
     }
 
@@ -524,9 +555,12 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
 
         string parametersStr;
         for (unsigned int i = 1;i<infos.parameters.size();++i)
-            parametersStr += "["+ShowParameterDialog(infos.parameters[i])+"]";
+        {
+            if ( i != 1 ) parametersStr += ",";
+            parametersStr += ShowParameterDialog(infos.parameters[i]);
+        }
 
-        expression += "OBJ("+object+"["+associatedData->GetString()+"]"+parametersStr+")";
+        expression += object+"."+associatedData->GetString()+"("+parametersStr+")";
 
         ExpressionEdit->ChangeValue(expression);
         RefreshExpressionEdit();
@@ -547,11 +581,12 @@ void EditExpression::OnAddValBtClick(wxCommandEvent& event)
 
         string parametersStr;
         for (unsigned int i = 0;i<infos.parameters.size();++i)
-            parametersStr += "["+ShowParameterDialog(infos.parameters[i])+"]";
+        {
+            if ( i != 0 ) parametersStr += ",";
+            parametersStr += ShowParameterDialog(infos.parameters[i]);
+        }
 
-        if ( parametersStr == "" ) parametersStr = "[]";
-
-        expression += "VAL("+associatedData->GetString()+parametersStr+")";
+        expression += associatedData->GetString()+"("+parametersStr+")";
 
         ExpressionEdit->ChangeValue(expression);
         RefreshExpressionEdit();

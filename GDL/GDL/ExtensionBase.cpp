@@ -42,11 +42,11 @@ strExpressionObjectFunPtr(NULL)
 }
 
 InstructionInfos::InstructionInfos() :
+#if defined(GDE)
+canHaveSubInstructions(false),
+#endif
 instructionFunPtr(NULL),
 instructionObjectFunPtr(NULL)
-#if defined(GDE)
-,canHaveSubInstructions(false)
-#endif
 {
 }
 
@@ -80,6 +80,7 @@ void ExtensionBase::SetNameSpace(std::string nameSpace_)
         name == "BuiltinNetwork"||
         name == "BuiltinScene"||
         name == "BuiltinAdvanced" ||
+        name == "BuiltinCommonConversions" ||
         name == "CommonDialogs") //New name for BuiltinInterface
     {
         nameSpace = "";

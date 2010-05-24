@@ -13,6 +13,7 @@ class Object;
 class RuntimeScene;
 class ObjectsConcerned;
 class Game;
+class ParameterInfo;
 class Scene;
 
 typedef boost::shared_ptr<Object> ObjSPtr;
@@ -122,6 +123,16 @@ class GD_API GDExpression
         };
 
     private:
+
+        /**
+         * Tool function to add a parameter
+         */
+        bool AddParameterToList(const Game & game, const Scene & scene, std::vector < GDExpression > & parameters, std::string parameterStr, std::vector < ParameterInfo > parametersInfos, const size_t positionInExpression);
+
+        /**
+         * Tool function to prepare a parameter
+         */
+        bool PrepareParameter(const Game & game, const Scene & scene, GDExpression & parameter, const ParameterInfo & parametersInfo, const size_t positionInExpression);
 
         std::string     plainString; ///<The plain expression
         char            compOperator; ///<Char representing a comparison operator. Computed at creation.

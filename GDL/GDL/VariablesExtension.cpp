@@ -36,7 +36,7 @@ VariablesExtension::VariablesExtension()
                    &CondVarSceneTxt);
 
         DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
-        DECLARE_PARAMETER("texte", _("Texte à tester"), false, "")
+        DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
         DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
 
     DECLARE_END_CONDITION()
@@ -79,7 +79,7 @@ VariablesExtension::VariablesExtension()
                    &CondVarGlobalTxt);
 
         DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
-        DECLARE_PARAMETER("texte", _("Texte à tester"), false, "")
+        DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
         DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
 
     DECLARE_END_CONDITION()
@@ -122,7 +122,7 @@ VariablesExtension::VariablesExtension()
                    &ActModVarSceneTxt);
 
         DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
-        DECLARE_PARAMETER("texte", _("Texte"), false, "")
+        DECLARE_PARAMETER("text", _("Texte"), false, "")
         DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
 
     DECLARE_END_ACTION()
@@ -152,7 +152,7 @@ VariablesExtension::VariablesExtension()
                    &ActModVarGlobalTxt);
 
         DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
-        DECLARE_PARAMETER("texte", _("Texte"), false, "")
+        DECLARE_PARAMETER("text", _("Texte"), false, "")
         DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
 
     DECLARE_END_ACTION()

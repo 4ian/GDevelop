@@ -89,7 +89,7 @@ string TranslateCondition::LabelFromType( string type )
         return static_cast<string>(_( "Choisir le fichier" ));
     else if ( type == "color" )
         return static_cast<string>(_( "Choisir la couleur" ));
-    else if ( type == "texte" )
+    else if ( type == "text" )
         return static_cast<string>(_( "Choisir le texte" ));
     else if ( type == "key" )
         return static_cast<string>(_( "Choisir la touche" ));
@@ -133,7 +133,7 @@ wxBitmap TranslateCondition::BitmapFromType( string type )
         return bitmapGUIManager->fileBt;
     else if ( type == "color" )
         return bitmapGUIManager->colorBt;
-    else if ( type == "texte" )
+    else if ( type == "text" )
         return bitmapGUIManager->texteBt;
     else if ( type == "key" )
         return bitmapGUIManager->keyBt;
@@ -173,7 +173,7 @@ string TranslateCondition::AddHTMLToParameter(string & parameter, string type)
         parameter = "<i>"+parameter+"</i>";
     /*else if ( type == "color" )
         parameter = parameter;
-    else if ( type == "texte" )
+    else if ( type == "text" )
         return bitmapGUIManager->texteBt;*/
     else if ( type == "key" )
         parameter = "<b>"+parameter+"</b>";

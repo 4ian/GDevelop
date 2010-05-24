@@ -1,7 +1,6 @@
 #include "GDL/CommonInstructions.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
-#include "GDL/Access.h"
 
 /**
  * Common instruction for executing instruction on each object "Foo".

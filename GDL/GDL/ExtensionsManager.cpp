@@ -23,6 +23,7 @@
 #include "GDL/SceneExtension.h"
 #include "GDL/AdvancedExtension.h"
 #include "GDL/CommonInstructionsExtension.h"
+#include "GDL/CommonConversionsExtension.h"
 #include "GDL/Object.h"
 
 #ifdef GDE
@@ -47,6 +48,7 @@ ExtensionsManager::ExtensionsManager()
     //Load all extensions
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new CommonInstructionsExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new CommonConversionsExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new ExtensionSprite()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new VariablesExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new TimeExtension()));
@@ -196,6 +198,14 @@ const ExpressionInfos & ExtensionsManager::GetObjectExpressionInfos(string objec
         }
     }
 
+    //Then check base
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        const std::map<string, ExpressionInfos> & allObjectExpressions = extensionsLoaded[i]->GetAllExpressionsForObject("");
+        if ( allObjectExpressions.find(exprType) != allObjectExpressions.end() )
+            return allObjectExpressions.find(exprType)->second;
+    }
+
     return badExpressionInfos;
 }
 
@@ -222,6 +232,14 @@ const StrExpressionInfos & ExtensionsManager::GetObjectStrExpressionInfos(string
             if ( allObjectStrExpressions.find(exprType) != allObjectStrExpressions.end() )
                 return allObjectStrExpressions.find(exprType)->second;
         }
+    }
+
+    //Then check bases
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        const std::map<string, StrExpressionInfos> & allObjectStrExpressions = extensionsLoaded[i]->GetAllStrExpressionsForObject("");
+        if ( allObjectStrExpressions.find(exprType) != allObjectStrExpressions.end() )
+            return allObjectStrExpressions.find(exprType)->second;
     }
 
     return badStrExpressionInfos;

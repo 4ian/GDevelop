@@ -278,7 +278,7 @@ void RepeatEvent::RenderInBitmap() const
 
     //Repeat text
     dc.SetFont( renderingHelper->GetBoldFont() );
-    dc.DrawText( _("Répéter ") + repeatNumberExpression.GetPlainString() + _(" fois :"), 0 + 2, 0 + 1 );
+    dc.DrawText( _("Répéter") + " " + repeatNumberExpression.GetPlainString() + " " + _("fois :"), 0 + 2, 0 + 1 );
 
     //Draw actions and conditions
     renderingHelper->DrawConditionsList(conditions, dc, 0, repeatTextHeight, renderingHelper->GetConditionsColumnWidth());

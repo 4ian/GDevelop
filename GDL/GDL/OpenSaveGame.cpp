@@ -131,7 +131,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         }
     }
 
-    //Compatibility with version with no extension
+    //Compatibility code
     game.extensionsUsed.clear();
     if ( major <= 1 && minor <= 2 && build <= 7630 && revision <= 38327)
     {
@@ -151,10 +151,21 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         game.extensionsUsed.push_back("BuiltinWindow");
         game.extensionsUsed.push_back("BuiltinTime");
     }
+    //End of Compatibility code
+    //Compatibility code --- with Game Develop 1.3.8892 and inferior
     if ( major <= 1 && minor <= 3 && build <= 8892 && revision <= 44771)
     {
         game.extensionsUsed.push_back("BuiltinCommonInstructions");
     }
+    //End of Compatibility code --- with Game Develop 1.3.8892 and inferior
+
+    //Compatibility code --- with Game Develop 1.3.9262 and inferior
+    if ( major <= 1 && minor <= 3 && build <= 9262 && revision <= 46622)
+    {
+        game.extensionsUsed.push_back("BuiltinCommonConversions");
+        notBackwardCompatible = true;
+    }
+    //End of Compatibility code --- with Game Develop 1.3.9262 and inferior
 
     elem = hdl.FirstChildElement().FirstChildElement( "Info" ).Element();
     if ( elem )
@@ -229,6 +240,16 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 
         elem = elem->NextSiblingElement();
     }
+
+    //Compatibility code --- with Game Develop 1.3.9262 and inferior
+    if ( major <= 1 && minor <= 3 && build <= 9262 && revision <= 46622)
+    {
+        for (unsigned int i = 0;i<game.scenes.size();++i)
+        {
+            AdaptExpressionsFromGD139262(game.scenes[i]->events, game, *game.scenes[i]);
+        }
+    }
+    //End of Compatibility code --- with Game Develop 1.3.9262 and inferior
 
     if ( notBackwardCompatible )
     {
@@ -569,7 +590,9 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
         elemScene = elemScene->NextSiblingElement();
     }
 
+    //Compatibility code --- with Game Develop 1.3.8892 and inferior
     AdaptEventsFromGD138892(list);
+    //End of Compatibility code --- Compatibility with Game Develop 1.3.8892 and inferior
 }
 
 /**
@@ -791,6 +814,263 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
             AdaptEventsFromGD138892(list[eId]->GetSubEvents());
     }
 }
+
+std::string AdaptLegacyMathExpression(std::string expression, Game & game, Scene & scene)
+{
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+    cout << "expression : " << expression << endl;
+    string newExpression;
+    size_t lastPos = 0;
+    {
+        size_t objectExpressionStart = expression.find( "OBJ(" );
+        size_t valExpressionStart = expression.find( "VAL(" );
+        size_t gblExpressionStart = expression.find( "GBL(" );
+        while ( objectExpressionStart != string::npos ||
+                valExpressionStart != string::npos ||
+                gblExpressionStart != string::npos )
+        {
+            size_t parametersStart = string::npos;
+            string functionName;
+
+            //There is an object expression first.
+            if ( objectExpressionStart != string::npos &&
+                 objectExpressionStart < valExpressionStart &&
+                 objectExpressionStart < gblExpressionStart)
+            {
+                if ( objectExpressionStart != lastPos ) newExpression += expression.substr(lastPos, objectExpressionStart-lastPos);
+
+                size_t bracket = expression.find( "[", objectExpressionStart );
+                size_t bracket2 = expression.find( "]", objectExpressionStart );
+                string objectName;
+                if ( bracket != string::npos ) objectName = expression.substr(objectExpressionStart+4, bracket-(objectExpressionStart+4));
+                if ( bracket2 != string::npos ) functionName = expression.substr(bracket+1, bracket2-bracket-1);
+
+                //Handle old style of variable access
+                if ( !extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
+                    newExpression += objectName+".variable"+"("+functionName;
+                else
+                    newExpression += objectName+"."+functionName+"(";
+
+                parametersStart = bracket2+1;
+            }
+            //There is an value expression first.
+            else if ( valExpressionStart != string::npos &&
+                      valExpressionStart < objectExpressionStart &&
+                      valExpressionStart < gblExpressionStart)
+            {
+                if ( valExpressionStart != lastPos ) newExpression += expression.substr(lastPos, valExpressionStart-lastPos);
+
+                size_t bracket = expression.find( "[", valExpressionStart );
+                if ( bracket != string::npos ) functionName = expression.substr(valExpressionStart+4, bracket-(valExpressionStart+4));
+
+                //Handle old style of variable access
+                if ( !extensionsManager->HasExpression(functionName) )
+                    newExpression += "variable("+functionName;
+                else
+                    newExpression += functionName+"(";
+
+                parametersStart = bracket+1;
+            }
+            //There is an global expression first.
+            else if ( gblExpressionStart != string::npos &&
+                      gblExpressionStart < objectExpressionStart &&
+                      gblExpressionStart < valExpressionStart)
+            {
+                if ( gblExpressionStart != lastPos ) newExpression += expression.substr(lastPos, gblExpressionStart-lastPos);
+
+                size_t bracket = expression.find( "[", gblExpressionStart );
+                if ( bracket != string::npos ) functionName = expression.substr(gblExpressionStart+4, bracket-(gblExpressionStart+4));
+
+                //Global expressions were always global variables
+                newExpression += "globalVariable("+functionName;
+
+                parametersStart = bracket+1;
+            }
+
+            //Adding parameters
+            size_t pos = parametersStart;
+            bool firstParam = true;
+            while ( pos < expression.length() && expression[pos] != ')')
+            {
+
+                if (expression[pos] == '[' && !firstParam ) newExpression += ',';
+                else if (expression[pos] == '[' && firstParam ) firstParam = false;
+                else if (expression[pos] == ']') ;
+                else newExpression += expression[pos];
+
+                pos++;
+            }
+
+            lastPos = pos;
+
+            objectExpressionStart = expression.find( "OBJ(", lastPos+1 );
+            valExpressionStart = expression.find( "VAL(", lastPos+1 );
+            gblExpressionStart = expression.find( "GBL(", lastPos+1 );
+        }
+
+        if ( expression.length() > lastPos ) newExpression += expression.substr(lastPos, expression.length());
+    }
+    cout << "newExpression : " << newExpression << endl;
+
+    return newExpression;
+}
+
+std::string AdaptLegacyTextExpression(std::string expression, Game & game, Scene & scene)
+{
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+    cout << "STRexpression : " << expression << endl;
+    string newExpression;
+    size_t lastPos = 0;
+    {
+        size_t objectExpressionStart = expression.find( "OBJ(" );
+        size_t valExpressionStart = expression.find( "VAL(" );
+        size_t gblExpressionStart = expression.find( "GBL(" );
+        while ( objectExpressionStart != string::npos ||
+                valExpressionStart != string::npos ||
+                gblExpressionStart != string::npos )
+        {
+            string functionName;
+
+            //There is an object expression first.
+            if ( objectExpressionStart != string::npos &&
+                 objectExpressionStart < valExpressionStart &&
+                 objectExpressionStart < gblExpressionStart)
+            {
+                if ( objectExpressionStart != lastPos ) newExpression += "\""+expression.substr(lastPos, objectExpressionStart-lastPos)+"\" + ";
+
+                size_t bracket = expression.find( "[", objectExpressionStart );
+                size_t bracket2 = expression.find( "]", objectExpressionStart );
+                string objectName;
+                if ( bracket != string::npos ) objectName = expression.substr(objectExpressionStart+4, bracket-(objectExpressionStart+4));
+                if ( bracket2 != string::npos ) functionName = expression.substr(bracket+1, bracket2-bracket-1);
+
+                //Handle old style of variable access
+                if ( !extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
+                    newExpression += objectName+".variableString("+functionName+")";
+
+                lastPos = bracket2+1;
+            }
+            //There is an value expression first.
+            else if ( valExpressionStart != string::npos &&
+                      valExpressionStart < objectExpressionStart &&
+                      valExpressionStart < gblExpressionStart)
+            {
+                if ( valExpressionStart != lastPos ) newExpression += "\""+expression.substr(lastPos, valExpressionStart-lastPos);
+
+                size_t bracket = expression.find( "[", valExpressionStart );
+                if ( bracket != string::npos ) functionName = expression.substr(valExpressionStart+4, bracket-(valExpressionStart+4))+"\" + ";
+
+                //Handle old style of variable access
+                if ( !extensionsManager->HasExpression(functionName) )
+                    newExpression += "variableString("+functionName+")";
+
+                lastPos = bracket+1;
+            }
+            //There is an global expression first.
+            else if ( gblExpressionStart != string::npos &&
+                      gblExpressionStart < objectExpressionStart &&
+                      gblExpressionStart < valExpressionStart)
+            {
+                if ( gblExpressionStart != lastPos ) newExpression += "\""+expression.substr(lastPos, gblExpressionStart-lastPos);
+
+                size_t bracket = expression.find( "[", gblExpressionStart );
+                if ( bracket != string::npos ) functionName = expression.substr(gblExpressionStart+4, bracket-(gblExpressionStart+4))+"\" + ";
+
+                //Global expressions were always global variables
+                newExpression += "globalVariableString("+functionName+")";
+
+                lastPos = bracket+1;
+            }
+
+            objectExpressionStart = expression.find( "OBJ(", lastPos );
+            valExpressionStart = expression.find( "VAL(", lastPos );
+            gblExpressionStart = expression.find( "GBL(", lastPos );
+        }
+
+        if ( expression.length() > lastPos ) newExpression += " + \""+expression.substr(lastPos, expression.length())+"\"";
+    }
+    cout << "newSTRExpression : " << newExpression << endl;
+
+    return newExpression;
+}
+
+/**
+ * Adapt expressions that comes from Game Develop 1.3.9262 and inferior
+ * -> Transform legacy OBJ, VAL and GBL into C++ style function calls
+ */
+void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list, Game & game, Scene & scene)
+{
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    cout << "adapt";
+
+    for (unsigned int eId = 0;eId < list.size();++eId)
+    {
+        vector < GDExpression * > eventExpressions = list[eId]->GetAllExpressions();
+
+        //Adapt expression of events
+        for (unsigned int l = 0;l<eventExpressions.size();++l)
+            *eventExpressions[l] = GDExpression(AdaptLegacyMathExpression(eventExpressions[l]->GetPlainString(), game, scene));
+
+        vector < vector < Instruction > * > conditionsVectors = list[eId]->GetAllConditionsVectors();
+        vector < vector < Instruction > * > actionsVectors = list[eId]->GetAllActionsVectors();
+
+        //Adapt expression of conditions
+        for (unsigned int i = 0;i<conditionsVectors.size();++i)
+        {
+        	for (unsigned int j = 0;j<conditionsVectors[i]->size();++j)
+        	{
+        	    unsigned int paramNb = conditionsVectors[i]->at(j).GetParameters().size();
+                InstructionInfos instructionInfos = extensionsManager->GetConditionInfos(conditionsVectors[i]->at(j).GetType());
+
+                for (unsigned int p = 0;p<paramNb;++p)
+                {
+                    if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "expression" )
+                        conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyMathExpression(conditionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
+                    if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "text" )
+                        conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(conditionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
+                }
+        	}
+        }
+
+        //Adapt expression of actions
+        for (unsigned int i = 0;i<actionsVectors.size();++i)
+        {
+        	for (unsigned int j = 0;j<actionsVectors[i]->size();++j)
+        	{
+        	    unsigned int paramNb = actionsVectors[i]->at(j).GetParameters().size();
+                InstructionInfos instructionInfos = extensionsManager->GetActionInfos(actionsVectors[i]->at(j).GetType());
+
+                //Special adaptations for some actions
+                if ( actionsVectors[i]->at(j).GetType() == "Create" )
+                {
+                    if ( actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("CAL\"") != string::npos ||
+                         actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("OBJ(") != string::npos ||
+                         actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("GBL(") != string::npos ||
+                         actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("VAL(") != string::npos )
+                    {
+                        actionsVectors[i]->at(j).SetType("CreateByName");
+                        instructionInfos = extensionsManager->GetActionInfos(actionsVectors[i]->at(j).GetType());
+                    }
+                }
+
+                for (unsigned int p = 0;p<paramNb;++p)
+                {
+                    if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "expression" )
+                        actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyMathExpression(actionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
+                    if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "text" )
+                        actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(actionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
+                }
+        	}
+        }
+
+        if ( list[eId]->CanHaveSubEvents() )
+            AdaptExpressionsFromGD139262(list[eId]->GetSubEvents(), game, scene);
+    }
+}
+
+
 
 void OpenSaveGame::OpenConditions(vector < Instruction > & conditions, const TiXmlElement * elem)
 {

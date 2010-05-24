@@ -296,7 +296,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             DECLARE_PARAMETER("objet", _("Objet"), true, "")
             DECLARE_PARAMETER("objectvar", _("Nom de la variable"), false, "")
-            DECLARE_PARAMETER("texte", _("Texte"), false, "")
+            DECLARE_PARAMETER("text", _("Texte"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -463,7 +463,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             DECLARE_PARAMETER("objet", _("Objet"), true, "")
             DECLARE_PARAMETER("objectvar", _("Nom de la variable"), false, "")
-            DECLARE_PARAMETER("texte", _("Texte à tester"), false, "")
+            DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -552,7 +552,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         DECLARE_OBJECT_EXPRESSION("variable", _("Variable d'un objet"), _("Variable d'un objets"), _("Variables"), "res/actions/var.png", &Object::ExpGetObjectVariableValue)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
-            DECLARE_PARAMETER("text", _("Nom de la variable"), false, "")
+            DECLARE_PARAMETER("", _("Nom de la variable"), false, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
     DECLARE_END_OBJECT()

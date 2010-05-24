@@ -510,6 +510,8 @@
 		<Unit filename="GDL\ChercherScene.h" />
 		<Unit filename="GDL\ChoixDossier.cpp" />
 		<Unit filename="GDL\ChoixDossier.h" />
+		<Unit filename="GDL\ChooseLayer.cpp" />
+		<Unit filename="GDL\ChooseLayer.h" />
 		<Unit filename="GDL\ChooseObject.cpp" />
 		<Unit filename="GDL\ChooseObject.h" />
 		<Unit filename="GDL\ChooseObjectExpression.cpp" />
@@ -518,6 +520,10 @@
 		<Unit filename="GDL\Collisions.h" />
 		<Unit filename="GDL\CommentEvent.cpp" />
 		<Unit filename="GDL\CommentEvent.h" />
+		<Unit filename="GDL\CommonConversions.cpp" />
+		<Unit filename="GDL\CommonConversions.h" />
+		<Unit filename="GDL\CommonConversionsExtension.cpp" />
+		<Unit filename="GDL\CommonConversionsExtension.h" />
 		<Unit filename="GDL\CommonInstructions.cpp" />
 		<Unit filename="GDL\CommonInstructions.h" />
 		<Unit filename="GDL\CommonInstructionsExtension.cpp" />
@@ -753,6 +759,8 @@
 		<Unit filename="GDL\cClavier.h" />
 		<Unit filename="GDL\cCollisions.cpp" />
 		<Unit filename="GDL\cCollisions.h" />
+		<Unit filename="GDL\cEffects.cpp" />
+		<Unit filename="GDL\cEffects.h" />
 		<Unit filename="GDL\cFichier.cpp" />
 		<Unit filename="GDL\cFichier.h" />
 		<Unit filename="GDL\cJoystick.cpp" />
@@ -846,6 +854,7 @@
 				<resources>
 					<wxPanel wxs="wxsmith/EditorImages.wxs" src="GDL/EditorImages.cpp" hdr="GDL/EditorImages.h" name="EditorImages" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseObject.wxs" src="GDL/ChooseObject.cpp" hdr="GDL/ChooseObject.h" name="ChooseObject" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseLayer.wxs" src="GDL/ChooseLayer.cpp" hdr="GDL/ChooseLayer.h" name="ChooseLayer" language="CPP" />
 					<wxDialog wxs="wxsmith/EditLink.wxs" src="GDL/EditLink.cpp" hdr="GDL/EditLink.h" name="EditLink" language="CPP" />
 					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDL/EditComment.cpp" hdr="GDL/EditComment.h" name="EditComment" language="CPP" />
 					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDL/EditForEachEvent.cpp" hdr="GDL/EditForEachEvent.h" name="EditForEachEvent" language="CPP" />

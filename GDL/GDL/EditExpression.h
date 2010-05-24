@@ -60,6 +60,7 @@ class GD_API EditExpression: public wxDialog
 		wxStaticText* StaticText4;
 		wxButton* PFBt;
 		wxButton* Button8;
+		wxStaticText* errorTxt;
 		//*)
 
 		string expression;
@@ -75,6 +76,7 @@ class GD_API EditExpression: public wxDialog
 		//(*Identifiers(EditExpression)
 		static const long ID_TEXTCTRL1;
 		static const long ID_BUTTON1;
+		static const long ID_STATICTEXT5;
 		static const long ID_STATICTEXT1;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON3;

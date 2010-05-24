@@ -309,6 +309,22 @@ ExtensionSprite::ExtensionSprite()
 
         DECLARE_END_OBJECT_CONDITION()
 
+        DECLARE_OBJECT_CONDITION("BlendMode",
+                       _("Mode d'affichage"),
+                       _("Teste le numéro du mode d'affichage actuellement employé par un objet"),
+                       _("Le numéro du mode d'affichage de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                       _("Effets"),
+                       "res/conditions/opacity24.png",
+                       "res/conditions/opacity.png",
+                       &SpriteObject::CondBlendMode);
+
+            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("expression", _("Valeur à tester ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), false, "")
+            DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+            MAIN_OBJECTS_IN_PARAMETER(0)
+
+        DECLARE_END_OBJECT_CONDITION()
+
         DECLARE_OBJECT_ACTION("CopyImageOnImageOfSprite",
                        _("Copier une image sur celle d'un objet"),
                        _("Copie une image sur celle d'un objet."),
@@ -319,7 +335,7 @@ ExtensionSprite::ExtensionSprite()
                        &SpriteObject::ActCopyImageOnImageOfSprite);
 
             DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
-            DECLARE_PARAMETER("texte", _("Nom de l'image source"), false, "")
+            DECLARE_PARAMETER("text", _("Nom de l'image source"), false, "")
             DECLARE_PARAMETER("expression", _("Position X"), false, "")
             DECLARE_PARAMETER("expression", _("Position Y"), false, "")
             DECLARE_PARAMETER("yesorno", _("Utiliser la transparence de la source ( non si vide )"), false, "")
@@ -357,17 +373,32 @@ ExtensionSprite::ExtensionSprite()
 
         DECLARE_END_OBJECT_ACTION()
 
+        DECLARE_OBJECT_ACTION("ChangeBlendMode",
+                       _("Changer le mode d'affichage"),
+                       _("Change le numéro de mode d'affichage d'un objet.\nLe mode d'affichage par défaut est 0 ( Alpha )."),
+                       _("Changer le numéro de mode d'affichage de _PARAM0_ en _PARAM1_"),
+                       _("Effets"),
+                       "res/actions/color24.png",
+                       "res/actions/color.png",
+                       &SpriteObject::ActBlendMode);
+
+            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("expression", _("Mode ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), false, "")
+            MAIN_OBJECTS_IN_PARAMETER(0)
+
+        DECLARE_END_OBJECT_ACTION()
+
         DECLARE_OBJECT_HIDDEN_EXPRESSION("x", _("Position X d'un point"), _("Position X d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectX)
 
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
-            DECLARE_PARAMETER("texte", _("Nom du point"), false, "")
+            DECLARE_PARAMETER_OPTIONAL("text", _("Nom du point"), false, "")
 
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_HIDDEN_EXPRESSION("y", _("Position Y d'un point"), _("Position Y d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectY)
 
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
-            DECLARE_PARAMETER("texte", _("Nom du point"), false, "")
+            DECLARE_PARAMETER_OPTIONAL("text", _("Nom du point"), false, "")
 
         DECLARE_END_OBJECT_EXPRESSION()
 

@@ -19,6 +19,20 @@ bool SpriteObject::ActChangeColor( RuntimeScene & scene, ObjectsConcerned & obje
 }
 
 /**
+ * Changing blending mode for sprites objects
+ */
+bool SpriteObject::ActBlendMode( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    int blendModeRequested = static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    if ( blendModeRequested == 0 ) SetBlendMode(sf::Blend::Alpha);
+    else if ( blendModeRequested == 1 ) SetBlendMode(sf::Blend::Add);
+    else if ( blendModeRequested == 2 ) SetBlendMode(sf::Blend::Multiply);
+    else if ( blendModeRequested == 3 ) SetBlendMode(sf::Blend::None);
+
+    return true;
+}
+
+/**
  * Copy the image of the current image of a Sprite object, and only this object.
  */
 bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )

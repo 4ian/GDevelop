@@ -39,6 +39,7 @@ fullscreen(false)
     extensionsUsed.push_back("BuiltinAdvanced");
     extensionsUsed.push_back("Sprite");
     extensionsUsed.push_back("BuiltinCommonInstructions");
+    extensionsUsed.push_back("BuiltinCommonConversions");
 }
 
 

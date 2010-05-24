@@ -30,6 +30,7 @@ currentSprite( NULL ),
 needUpdateCurrentSprite(true),
 cacheAnimationSizeNeedUpdate(true),
 opacity( 255 ),
+blendMode(sf::Blend::Alpha),
 scaleX( 1 ),
 scaleY( 1 ),
 colorR( 255 ),
@@ -413,8 +414,12 @@ void SpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name
     else if ( propertyNb == 1 ) {name = _("Direction");     value = ToString(GetDirectionNb());}
     else if ( propertyNb == 2 ) {name = _("Image");         value = ToString(GetSpriteNb());}
     else if ( propertyNb == 3 ) {name = _("Opacité");       value = ToString(GetOpacity());}
-    else if ( propertyNb == 4 ) {name = _("Echelle X de la taille");       value = ToString(GetScaleX());}
-    else if ( propertyNb == 5 ) {name = _("Echelle Y de la taille");       value = ToString(GetScaleY());}
+    else if ( propertyNb == 4 ) {name = _("Méthode d'affichage");   if ( blendMode == 0) value = "0 (Alpha)";
+                                                                    else if ( blendMode == 1) value = "1 (Add)";
+                                                                    else if ( blendMode == 2) value = "2 (Multiply)";
+                                                                    else if ( blendMode == 3) value = "3 (None)";}
+    else if ( propertyNb == 5 ) {name = _("Echelle X de la taille");       value = ToString(GetScaleX());}
+    else if ( propertyNb == 6 ) {name = _("Echelle Y de la taille");       value = ToString(GetScaleY());}
 }
 
 bool SpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -423,15 +428,23 @@ bool SpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
     else if ( propertyNb == 1 ) {return SetDirec(ToInt(newValue)); }
     else if ( propertyNb == 2 ) { return SetSprite(ToInt(newValue)); }
     else if ( propertyNb == 3 ) { SetOpacity(ToInt(newValue)); }
-    else if ( propertyNb == 4 ) {SetScaleX(ToFloat(newValue));}
-    else if ( propertyNb == 5 ) {SetScaleY(ToFloat(newValue));}
+    else if ( propertyNb == 4 )
+    {
+        int blendModeRequested = ToInt(newValue);
+        if ( blendModeRequested == 0 ) SetBlendMode(sf::Blend::Alpha);
+        else if ( blendModeRequested == 1 ) SetBlendMode(sf::Blend::Add);
+        else if ( blendModeRequested == 2 ) SetBlendMode(sf::Blend::Multiply);
+        else if ( blendModeRequested == 3 ) SetBlendMode(sf::Blend::None);
+    }
+    else if ( propertyNb == 5 ) {SetScaleX(ToFloat(newValue));}
+    else if ( propertyNb == 6 ) {SetScaleY(ToFloat(newValue));}
 
     return true;
 }
 
 unsigned int SpriteObject::GetNumberOfProperties() const
 {
-    return 6;
+    return 7;
 }
 #endif
 
@@ -531,6 +544,7 @@ void SpriteObject::UpdateCurrentSprite() const
     //Mise à jour du sprite SFML avec les propriétés de l'objet
     currentSprite->ModSprite().SetScale( scaleX, scaleY );
     currentSprite->ModSprite().SetColor( sf::Color( colorR, colorV, colorB, opacity ) );
+    currentSprite->ModSprite().SetBlendMode( blendMode );
 
     if ( GetAnimation(m_animCourant).typeNormal )
     {

@@ -45,7 +45,7 @@ bool Object::ActDuplicate( RuntimeScene & scene, ObjectsConcerned & objectsConce
 bool ActCreate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //On récupère l'ID de l'objet à créer
-    string objectWanted = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
+    string objectWanted = action.GetParameter(0).GetPlainString();
     int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, objectWanted );
     int IDglobalObject = Picker::PickOneObject( &scene.game->globalObjects, objectWanted );
 
@@ -79,6 +79,46 @@ bool ActCreate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const
     return true;
 }
 
+
+/**
+ * Create a new object using his name
+ */
+bool ActCreateByName( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    //On récupère l'ID de l'objet à créer
+    string objectWanted = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
+    int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, objectWanted );
+    int IDglobalObject = Picker::PickOneObject( &scene.game->globalObjects, objectWanted );
+
+    ObjSPtr newObject = boost::shared_ptr<Object> ();
+
+    if ( IDsceneObject != -1)
+        newObject = scene.initialObjects[IDsceneObject]->Clone();
+    else if ( IDglobalObject != -1)
+        newObject = scene.game->globalObjects[IDglobalObject]->Clone();
+    else
+    {
+        scene.errors.Add("L'objet à créer ("+objectWanted+") n'existe pas dans la liste des objets", "", "", -1, 1);
+        return false;
+    }
+
+    //Ajout à la liste d'objet et configuration de sa position
+    newObject->errors = &scene.errors;
+    newObject->SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) );
+    newObject->SetY( action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) );
+
+    //Compatibilité avec les versions de Game Develop précédentes
+    if ( action.GetParameters().size() > 3 )
+        newObject->SetLayer( action.GetParameter(3).GetAsTextExpressionResult(scene, objectsConcerned) );
+
+    //Add object to scene and let it be concerned by futures actions
+    scene.objectsInstances.AddObject(newObject);
+    objectsConcerned.objectsPicked.AddObject( newObject );
+
+    objectsConcerned.AddAnObjectConcerned(newObject->GetObjectIdentifier());
+
+    return true;
+}
 
 /**
  * Delete an object ( renaming it to "" cause it to be deleted by RuntimeScene )

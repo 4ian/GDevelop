@@ -33,26 +33,20 @@ double ExpTimeScale( const RuntimeScene & scene, ObjectsConcerned & objectsConce
 
 double ExpMouseX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    unsigned int camera = 0;
-    if ( exprInstruction.parameters.size() > 1 ) //Compatibility with Game Develop < 1.2.8699
-        camera = ToInt(exprInstruction.parameters[1].GetPlainString());
+    string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetPlainString(); //Compatibility with Game Develop < 1.3.9262
+    unsigned int camera = exprInstruction.parameters.size() > 1 ? ToInt(exprInstruction.parameters[1].GetPlainString()) : 0; //Compatibility with Game Develop < 1.2.8699
 
-    const sf::View & view = scene.GetLayer(
-                                            exprInstruction.parameters[0].GetPlainString()
-                                            ).GetCamera(camera).GetSFMLView();
+    const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
     return scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), view).x;
 }
 
 double ExpMouseY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    unsigned int camera = 0;
-    if ( exprInstruction.parameters.size() > 1 ) //Compatibility with Game Develop < 1.2.8699
-        camera = ToInt(exprInstruction.parameters[1].GetPlainString());
+    string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetPlainString(); //Compatibility with Game Develop < 1.3.9262
+    unsigned int camera = exprInstruction.parameters.size() > 1 ? ToInt(exprInstruction.parameters[1].GetPlainString()) : 0; //Compatibility with Game Develop < 1.2.8699
 
-    const sf::View & view = scene.GetLayer(
-                                            exprInstruction.parameters[0].GetPlainString()
-                                            ).GetCamera(camera).GetSFMLView();
+    const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
     return scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), view).y;
 }
 
@@ -112,35 +106,28 @@ double ExpCameraViewportBottom( const RuntimeScene & scene, ObjectsConcerned & o
 
 double ExpCameraX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    unsigned int camera = 0;
-    if ( exprInstruction.parameters.size() > 1 ) //Compatibility with Game Develop < 1.2.8699
-        camera = ToInt(exprInstruction.parameters[1].GetPlainString());
+    string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetPlainString(); //Compatibility with Game Develop < 1.3.9262
+    unsigned int camera = exprInstruction.parameters.size() > 1 ? ToInt(exprInstruction.parameters[1].GetPlainString()) : 0; //Compatibility with Game Develop < 1.2.8699
 
-    const sf::View & view = scene.GetLayer(
-                                            exprInstruction.parameters[0].GetPlainString()
-                                            ).GetCamera(camera).GetSFMLView();
+    const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
     return view.GetCenter().x-view.GetSize().x/2;
 }
 
 double ExpCameraY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    unsigned int camera = 0;
-    if ( exprInstruction.parameters.size() > 1 ) //Compatibility with Game Develop < 1.2.8699
-        camera = ToInt(exprInstruction.parameters[1].GetPlainString());
+    string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetPlainString(); //Compatibility with Game Develop < 1.3.9262
+    unsigned int camera = exprInstruction.parameters.size() > 1 ? ToInt(exprInstruction.parameters[1].GetPlainString()) : 0; //Compatibility with Game Develop < 1.2.8699
 
-    const sf::View & view = scene.GetLayer(
-                                            exprInstruction.parameters[0].GetPlainString()
-                                            ).GetCamera(camera).GetSFMLView();
+    const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
     return view.GetCenter().y-view.GetSize().y/2;
 }
 
 double ExpCameraRotation( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    unsigned int camera = 0;
-    if ( exprInstruction.parameters.size() > 1 ) //Compatibility with Game Develop < 1.2.8699
-        camera = ToInt(exprInstruction.parameters[1].GetPlainString());
+    string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetPlainString(); //Compatibility with Game Develop < 1.3.9262
+    unsigned int camera = exprInstruction.parameters.size() > 1 ? ToInt(exprInstruction.parameters[1].GetPlainString()) : 0; //Compatibility with Game Develop < 1.2.8699
 
-    return scene.GetLayer(exprInstruction.parameters[0].GetPlainString()).GetCamera(camera).GetSFMLView().GetRotation();
+    return scene.GetLayer(layer).GetCamera(camera).GetSFMLView().GetRotation();
 }
 
 double ExpTime( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )

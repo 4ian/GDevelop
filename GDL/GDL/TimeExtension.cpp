@@ -21,7 +21,7 @@ TimeExtension::TimeExtension()
                    &CondTimer);
 
         DECLARE_PARAMETER("expression", _("Temps en secondes"), false, "");
-        DECLARE_PARAMETER("texte", _("Nom du chronomètre"), false, "");
+        DECLARE_PARAMETER("text", _("Nom du chronomètre"), false, "");
 
     DECLARE_END_CONDITION()
 
@@ -48,7 +48,7 @@ TimeExtension::TimeExtension()
                    "res/conditions/timerPaused.png",
                    &CondTimerPaused);
 
-        DECLARE_PARAMETER("texte", _("Nom du chronomètre"), false, "");
+        DECLARE_PARAMETER("text", _("Nom du chronomètre"), false, "");
 
     DECLARE_END_CONDITION()
 
@@ -61,7 +61,7 @@ TimeExtension::TimeExtension()
                    "res/actions/timer.png",
                    &ActResetTimer);
 
-        DECLARE_PARAMETER("texte", _("Nom du chronomètre"), false, "");
+        DECLARE_PARAMETER("text", _("Nom du chronomètre"), false, "");
 
     DECLARE_END_ACTION()
 
@@ -74,7 +74,7 @@ TimeExtension::TimeExtension()
                    "res/actions/pauseTimer.png",
                    &ActPauseTimer);
 
-        DECLARE_PARAMETER("texte", _("Nom du chronomètre"), false, "");
+        DECLARE_PARAMETER("text", _("Nom du chronomètre"), false, "");
 
     DECLARE_END_ACTION()
 
@@ -87,7 +87,7 @@ TimeExtension::TimeExtension()
                    "res/actions/unPauseTimer.png",
                    &ActUnPauseTimer);
 
-        DECLARE_PARAMETER("texte", _("Nom du chronomètre"), false, "");
+        DECLARE_PARAMETER("text", _("Nom du chronomètre"), false, "");
 
     DECLARE_END_ACTION()
 

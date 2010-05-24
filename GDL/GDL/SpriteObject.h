@@ -116,6 +116,9 @@ class SpriteObject : public Object
         void SetOpacity(int val);
         inline int GetOpacity() const {return opacity;};
 
+        inline void SetBlendMode(const sf::Blend::Mode & val) { blendMode = val; };
+        inline sf::Blend::Mode GetBlendMode() const {return blendMode;};
+
         inline void SetScaleX(float val) { if ( val > 0 ) scaleX = val; needUpdateCurrentSprite = true; };
         inline float GetScaleX() const { return scaleX; };
         inline void SetScaleY(float val) { if ( val > 0 ) scaleY = val; needUpdateCurrentSprite = true; };
@@ -134,9 +137,11 @@ class SpriteObject : public Object
         bool CondScaleWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool CondScaleHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool CondOpacityObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondBlendMode( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
         //Actions
         bool ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActBlendMode( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActChangeAnimation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActChangeDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActChangeSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
@@ -177,6 +182,7 @@ class SpriteObject : public Object
         mutable bool cacheAnimationSizeNeedUpdate;
 
         int opacity;
+        sf::Blend::Mode blendMode;
 
         float scaleX;
         float scaleY;

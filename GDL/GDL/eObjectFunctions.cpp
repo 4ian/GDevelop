@@ -183,28 +183,3 @@ double Object::ExpGetSqDistanceBetweenObjects( const RuntimeScene & scene, Objec
     }
     return 0;
 }
-
-/**
- * Return the table containing the mapping between expressions name and functions
- */
-const std::map<std::string, double (Object::*)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )> &
-GetExpObjectBuiltinTable()
-{
-    static std::map<std::string, double (Object::*)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )> expObjectBuiltinTable;
-    if ( expObjectBuiltinTable.empty() )
-    {
-        //expObjectBuiltinTable["x"]            = &Object::ExpGetObjectX;
-        //expObjectBuiltinTable["y"]            = &Object::ExpGetObjectY;
-        //expObjectBuiltinTable["forceX"]       = &Object::ExpGetObjectTotalForceX;
-        //expObjectBuiltinTable["forceY"]       = &Object::ExpGetObjectTotalForceY;
-        //expObjectBuiltinTable["angle"]        = expObjectBuiltinTable["forceAngle"]     = &Object::ExpGetObjectTotalForceAngle;
-        //expObjectBuiltinTable["longueur"]     = expObjectBuiltinTable["forceLength"]    = &Object::ExpGetObjectTotalForceLength;
-        //expObjectBuiltinTable["largeur"]      = expObjectBuiltinTable["width"]          = &Object::ExpGetObjectWidth;
-        //expObjectBuiltinTable["hauteur"]      = expObjectBuiltinTable["height"]         = &Object::ExpGetObjectHeight;
-        //expObjectBuiltinTable["plan"]         = expObjectBuiltinTable["zOrder"]         = &Object::ExpGetObjectZOrder;
-        //expObjectBuiltinTable["distance"]     = &Object::ExpGetDistanceBetweenObjects;
-        //expObjectBuiltinTable["sqDistance"]   = &Object::ExpGetSqDistanceBetweenObjects;
-    }
-
-    return expObjectBuiltinTable;
-}

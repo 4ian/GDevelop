@@ -684,10 +684,6 @@
 		<Unit filename="GDL\StandardEvent.h" />
 		<Unit filename="GDL\StrExpressionInstruction.cpp" />
 		<Unit filename="GDL\StrExpressionInstruction.h" />
-		<Unit filename="GDL\StringExpressions.cpp" />
-		<Unit filename="GDL\StringExpressions.h" />
-		<Unit filename="GDL\StringInstructionsExtension.cpp" />
-		<Unit filename="GDL\StringInstructionsExtension.h" />
 		<Unit filename="GDL\Text.cpp" />
 		<Unit filename="GDL\Text.h" />
 		<Unit filename="GDL\TimeExtension.cpp" />

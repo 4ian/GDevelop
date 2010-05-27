@@ -916,80 +916,160 @@ std::string AdaptLegacyMathExpression(std::string expression, Game & game, Scene
     return newExpression;
 }
 
+std::string AddBackSlashBeforeQuotes(std::string text)
+{
+    size_t foundPos=text.find("\"");
+    while(foundPos != string::npos)
+    {
+        if(foundPos != string::npos) text.replace(foundPos,2,"\\\"");
+        foundPos=text.find("\"", foundPos+2);
+    }
+
+    return text;
+}
+
 std::string AdaptLegacyTextExpression(std::string expression, Game & game, Scene & scene)
 {
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
 
     cout << "STRexpression : " << expression << endl;
     string newExpression;
+    bool firstToken = true;
     size_t lastPos = 0;
     {
-        size_t objectExpressionStart = expression.find( "OBJ(" );
-        size_t valExpressionStart = expression.find( "VAL(" );
-        size_t gblExpressionStart = expression.find( "GBL(" );
+        size_t objectExpressionStart = expression.find( "TXT\"OBJ(" );
+        size_t valExpressionStart = expression.find( "TXT\"VAL(" );
+        size_t gblExpressionStart = expression.find( "TXT\"GBL(" );
+        size_t calExpressionStart = expression.find( "CAL\"" );
         while ( objectExpressionStart != string::npos ||
                 valExpressionStart != string::npos ||
-                gblExpressionStart != string::npos )
+                gblExpressionStart != string::npos ||
+                calExpressionStart != string::npos )
         {
             string functionName;
 
             //There is an object expression first.
             if ( objectExpressionStart != string::npos &&
                  objectExpressionStart < valExpressionStart &&
-                 objectExpressionStart < gblExpressionStart)
+                 objectExpressionStart < gblExpressionStart &&
+                 objectExpressionStart < calExpressionStart)
             {
-                if ( objectExpressionStart != lastPos ) newExpression += "\""+expression.substr(lastPos, objectExpressionStart-lastPos)+"\" + ";
+                //Add constant text before
+                if ( objectExpressionStart != lastPos )
+                {
+                    if ( !firstToken ) newExpression += " + ";
+                    newExpression += "\""+AddBackSlashBeforeQuotes(expression.substr(lastPos, objectExpressionStart-lastPos))+"\"";
+
+                    firstToken = false;
+                }
+
+                if ( !firstToken ) newExpression += " + ";
 
                 size_t bracket = expression.find( "[", objectExpressionStart );
                 size_t bracket2 = expression.find( "]", objectExpressionStart );
                 string objectName;
-                if ( bracket != string::npos ) objectName = expression.substr(objectExpressionStart+4, bracket-(objectExpressionStart+4));
+                if ( bracket != string::npos ) objectName = expression.substr(objectExpressionStart+8, bracket-(objectExpressionStart+8));
                 if ( bracket2 != string::npos ) functionName = expression.substr(bracket+1, bracket2-bracket-1);
 
                 //Handle old style of variable access
                 if ( !extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
                     newExpression += objectName+".variableString("+functionName+")";
 
-                lastPos = bracket2+1;
+                lastPos = bracket2+3;
+                firstToken = false;
             }
             //There is an value expression first.
             else if ( valExpressionStart != string::npos &&
                       valExpressionStart < objectExpressionStart &&
-                      valExpressionStart < gblExpressionStart)
+                      valExpressionStart < gblExpressionStart &&
+                      valExpressionStart < calExpressionStart)
             {
-                if ( valExpressionStart != lastPos ) newExpression += "\""+expression.substr(lastPos, valExpressionStart-lastPos);
+                //Add constant text before
+                if ( valExpressionStart != lastPos )
+                {
+                    if ( !firstToken ) newExpression += " + ";
+                    newExpression += "\""+AddBackSlashBeforeQuotes(expression.substr(lastPos, valExpressionStart-lastPos))+"\"";
+
+                    firstToken = false;
+                }
+
+                if ( !firstToken ) newExpression += " + ";
 
                 size_t bracket = expression.find( "[", valExpressionStart );
-                if ( bracket != string::npos ) functionName = expression.substr(valExpressionStart+4, bracket-(valExpressionStart+4))+"\" + ";
+                if ( bracket != string::npos ) functionName = expression.substr(valExpressionStart+8, bracket-(valExpressionStart+8));
 
                 //Handle old style of variable access
                 if ( !extensionsManager->HasExpression(functionName) )
                     newExpression += "variableString("+functionName+")";
 
-                lastPos = bracket+1;
+                lastPos = bracket+4;
+                firstToken = false;
             }
             //There is an global expression first.
             else if ( gblExpressionStart != string::npos &&
                       gblExpressionStart < objectExpressionStart &&
-                      gblExpressionStart < valExpressionStart)
+                      gblExpressionStart < valExpressionStart &&
+                      gblExpressionStart < calExpressionStart)
             {
-                if ( gblExpressionStart != lastPos ) newExpression += "\""+expression.substr(lastPos, gblExpressionStart-lastPos);
+                //Add constant text before
+                if ( gblExpressionStart != lastPos )
+                {
+                    if ( !firstToken ) newExpression += " + ";
+                    newExpression += "\""+AddBackSlashBeforeQuotes(expression.substr(lastPos, gblExpressionStart-lastPos))+"\"";
+
+                    firstToken = false;
+                }
+
+                if ( !firstToken ) newExpression += " + ";
 
                 size_t bracket = expression.find( "[", gblExpressionStart );
-                if ( bracket != string::npos ) functionName = expression.substr(gblExpressionStart+4, bracket-(gblExpressionStart+4))+"\" + ";
+                if ( bracket != string::npos ) functionName = expression.substr(gblExpressionStart+8, bracket-(gblExpressionStart+8));
 
                 //Global expressions were always global variables
                 newExpression += "globalVariableString("+functionName+")";
 
-                lastPos = bracket+1;
+                lastPos = bracket+4;
+                firstToken = false;
+            }
+            //There is an CAL"" expression first.
+            else if ( calExpressionStart != string::npos &&
+                      calExpressionStart < objectExpressionStart &&
+                      calExpressionStart < valExpressionStart &&
+                      calExpressionStart < gblExpressionStart)
+            {
+                //Add constant text before
+                if ( calExpressionStart != lastPos )
+                {
+                    if ( !firstToken ) newExpression += " + ";
+                    newExpression += "\""+AddBackSlashBeforeQuotes(expression.substr(lastPos, calExpressionStart-lastPos))+"\"";
+
+                    firstToken = false;
+                }
+
+                if ( !firstToken ) newExpression += " + ";
+
+                size_t endQuotePos = expression.find( "\"", calExpressionStart+4 );
+                if ( endQuotePos != string::npos ) functionName = expression.substr(calExpressionStart+4, endQuotePos-(calExpressionStart+4));
+
+                functionName = AdaptLegacyMathExpression(functionName, game, scene);
+
+                newExpression += "ToString("+functionName+")";
+                lastPos = endQuotePos+1;
+                firstToken = false;
             }
 
-            objectExpressionStart = expression.find( "OBJ(", lastPos );
-            valExpressionStart = expression.find( "VAL(", lastPos );
-            gblExpressionStart = expression.find( "GBL(", lastPos );
+            objectExpressionStart = expression.find( "TXT\"OBJ(", lastPos );
+            valExpressionStart = expression.find( "TXT\"VAL(", lastPos );
+            gblExpressionStart = expression.find( "TXT\"GBL(", lastPos );
+            calExpressionStart = expression.find( "CAL\"", lastPos );
         }
 
-        if ( expression.length() > lastPos ) newExpression += " + \""+expression.substr(lastPos, expression.length())+"\"";
+        //Add last constant text
+        if ( expression.length() > lastPos )
+        {
+            if ( !firstToken ) newExpression += " + ";
+            newExpression += "\""+AddBackSlashBeforeQuotes(expression.substr(lastPos, expression.length()))+"\"";
+        }
     }
     cout << "newSTRExpression : " << newExpression << endl;
 

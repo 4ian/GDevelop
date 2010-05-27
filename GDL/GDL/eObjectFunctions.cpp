@@ -120,6 +120,11 @@ double Object::ExpGetObjectVariableValue( const RuntimeScene & scene, ObjectsCon
     return variablesObjet.GetVariableValue(exprInstruction.parameters[1].GetPlainString());
 }
 
+string Object::ExpGetObjectVariableString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction )
+{
+    return variablesObjet.GetVariableText(exprInstruction.parameters[1].GetPlainString());
+}
+
 double Object::ExpGetDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     ObjSPtr object2 = boost::shared_ptr<Object>( );

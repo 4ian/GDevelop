@@ -188,39 +188,6 @@ size_t GetMinimalParametersNumber(const std::vector < ParameterInfo > & paramete
     return nb;
 }
 
-std::vector < GDExpression > SplitParameters(const std::string & parametersStr)
-{
-    //Identify parameters
-    vector < GDExpression > parameters;
-    size_t pos = 0;
-    char previousChar = '(';
-    bool takeSymbolsInAccount = true;
-    size_t level = 0;
-    string currentParameterStr;
-    while ( pos < parametersStr.length() && !(parametersStr[pos] == ')' && level == 0) )
-    {
-        //Be sure we are not in quotes
-        if ( parametersStr[pos] == '\"' && previousChar != '\\') takeSymbolsInAccount = !takeSymbolsInAccount;
-
-        //So as to be sure paranthesis don't belong to a parameter
-        if ( parametersStr[pos] == '(' && takeSymbolsInAccount ) level++;
-        if ( parametersStr[pos] == ')' && takeSymbolsInAccount ) level--;
-
-        //Add the character to the current parameter or terminate the latter
-        if ( (parametersStr[pos] == ',' && level == 0) && takeSymbolsInAccount )
-        {
-            parameters.push_back(GDExpression(currentParameterStr));
-
-            currentParameterStr.clear();
-        }
-        else currentParameterStr += parametersStr[pos];
-
-        previousChar = parametersStr[pos];
-        pos++;
-    }
-    parameters.push_back(GDExpression(currentParameterStr));
-}
-
 bool GDExpression::PrepareForEvaluation(const Game & game, const Scene & scene)
 {
     bool ok = true;

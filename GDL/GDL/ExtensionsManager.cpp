@@ -24,6 +24,7 @@
 #include "GDL/AdvancedExtension.h"
 #include "GDL/CommonInstructionsExtension.h"
 #include "GDL/CommonConversionsExtension.h"
+#include "GDL/StringInstructionsExtension.h"
 #include "GDL/Object.h"
 
 #ifdef GDE
@@ -49,6 +50,7 @@ ExtensionsManager::ExtensionsManager()
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new CommonInstructionsExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new CommonConversionsExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new StringInstructionsExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new ExtensionSprite()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new VariablesExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new TimeExtension()));

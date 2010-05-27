@@ -65,6 +65,7 @@ instance(boost::shared_ptr<BaseEvent>())
 void ExtensionBase::SetNameSpace(std::string nameSpace_)
 {
     //For backward compatibility
+    //or for extension without namespace
     if (name == "Sprite" ||
         name == "BuiltinObject" ||
         name == "BuiltinAudio" ||
@@ -81,6 +82,7 @@ void ExtensionBase::SetNameSpace(std::string nameSpace_)
         name == "BuiltinScene"||
         name == "BuiltinAdvanced" ||
         name == "BuiltinCommonConversions" ||
+        name == "BuiltinStringInstructions" ||
         name == "CommonDialogs") //New name for BuiltinInterface
     {
         nameSpace = "";

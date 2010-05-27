@@ -22,6 +22,7 @@
 #include "GDL/ChooseObject.h"
 #include "GDL/ChooseLayer.h"
 #include "GDL/ChooseObjectExpression.h"
+#include "GDL/ChooseVariableDialog.h"
 
 #include <string>
 #include <vector>
@@ -78,6 +79,7 @@ mainObjectsName(mainObjectsName_)
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer5;
 	wxFlexGridSizer* FlexGridSizer2;
+	wxFlexGridSizer* FlexGridSizer7;
 	wxGridSizer* GridSizer1;
 	wxBoxSizer* BoxSizer1;
 	wxFlexGridSizer* FlexGridSizer6;
@@ -100,9 +102,11 @@ mainObjectsName(mainObjectsName_)
 	FlexGridSizer2->Add(ExpressionEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(OkBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
 	errorTxt = new wxStaticText(this, ID_STATICTEXT5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	errorTxt->SetForegroundColour(wxColour(120,0,0));
-	FlexGridSizer2->Add(errorTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer7->Add(errorTxt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Editer l\'expression"));
 	FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
@@ -269,7 +273,7 @@ mainObjectsName(mainObjectsName_)
     imageListVal->Add(( wxBitmap( "res/actions/net.png", wxBITMAP_TYPE_ANY ) ) );
     ValList->AssignImageList( imageListVal );
 
-	ExpressionEdit->ChangeValue(expression);
+	ExpressionEdit->SetValue(expression);
 	RefreshLists();
 }
 
@@ -282,6 +286,13 @@ EditExpression::~EditExpression()
 
 void EditExpression::OnOkBtClick(wxCommandEvent& event)
 {
+    GDExpression expressionTest(expression);
+    if ( !expressionTest.PrepareForMathEvaluationOnly(game, scene) )
+    {
+        if ( wxMessageBox(_("L'expression est mal formulée. Êtes vous sûr de vouloir valider cette expression ?"), _("L'expression contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+            return;
+    }
+
     EndModal(1);
 }
 
@@ -316,7 +327,7 @@ void EditExpression::RefreshLists()
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
-    //Insert extension objects actions
+    //Insert extension objects expressions
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -528,6 +539,20 @@ string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo)
         if ( dialog.ShowModal() == 0 ) return "";
 
         return dialog.layerChosen;
+    }
+    else if ( parameterInfo.type == "scenevar" )
+    {
+        ChooseVariableDialog dialog(this, scene.variables);
+        if ( dialog.ShowModal() == 0 ) return "";
+
+        return dialog.selectedVariable;
+    }
+    else if ( parameterInfo.type == "globalvar" )
+    {
+        ChooseVariableDialog dialog(this, game.variables);
+        if ( dialog.ShowModal() == 0 ) return "";
+
+        return dialog.selectedVariable;
     }
     else if ( parameterInfo.type == "camera" )
     {

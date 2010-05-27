@@ -546,6 +546,12 @@ typedef Object * (*CreateFunPtr)(std::string name);
             }
 
 /**
+ * Need to be added after DECLARE_OBJECT_EXPRESSION and all actions/conditions/expressions.
+ */
+#define DECLARE_END_OBJECT_STR_EXPRESSION() objInfos.strExpressionsInfos[currentExprDeclarationName]=instrInfo;\
+            }
+
+/**
  * Need to be added after DECLARE_EVENT
  */
 #define DECLARE_END_EVENT() eventsInfos[GetNameSpace()+currentEventDeclarationName] = eventInfo; \

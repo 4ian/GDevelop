@@ -48,7 +48,7 @@ SceneExtension::SceneExtension()
                    "res/actions/goscene.png",
                    &ActScene);
 
-        DECLARE_PARAMETER("", _("Nom de la scène"), false, "")
+        DECLARE_PARAMETER("text", _("Nom de la scène"), false, "")
 
     DECLARE_END_ACTION()
 

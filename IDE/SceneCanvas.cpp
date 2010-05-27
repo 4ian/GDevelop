@@ -98,6 +98,62 @@ void SceneCanvas::OnKey( wxKeyEvent& evt )
             wxCommandEvent unused;
             OnDelObjetSelected(unused);
         }
+        else if ( evt.GetKeyCode() == WXK_DOWN )
+        {
+            for (unsigned int i = 0;i<scene.objectsSelected.size();++i)
+            {
+                ObjSPtr object = scene.objectsSelected.at(i);
+
+                int idPos = GetInitialPositionFromObject(object);
+                if ( idPos != -1 )
+                {
+                    sceneEdited.initialObjectsPositions[idPos].y += 1;
+                    object->SetY(object->GetY()+1);
+                }
+            }
+        }
+        else if ( evt.GetKeyCode() == WXK_UP )
+        {
+            for (unsigned int i = 0;i<scene.objectsSelected.size();++i)
+            {
+                ObjSPtr object = scene.objectsSelected.at(i);
+
+                int idPos = GetInitialPositionFromObject(object);
+                if ( idPos != -1 )
+                {
+                    sceneEdited.initialObjectsPositions[idPos].y -= 1;
+                    object->SetY(object->GetY()-1);
+                }
+            }
+        }
+        else if ( evt.GetKeyCode() == WXK_RIGHT )
+        {
+            for (unsigned int i = 0;i<scene.objectsSelected.size();++i)
+            {
+                ObjSPtr object = scene.objectsSelected.at(i);
+
+                int idPos = GetInitialPositionFromObject(object);
+                if ( idPos != -1 )
+                {
+                    sceneEdited.initialObjectsPositions[idPos].x += 1;
+                    object->SetX(object->GetX()+1);
+                }
+            }
+        }
+        else if ( evt.GetKeyCode() == WXK_LEFT )
+        {
+            for (unsigned int i = 0;i<scene.objectsSelected.size();++i)
+            {
+                ObjSPtr object = scene.objectsSelected.at(i);
+
+                int idPos = GetInitialPositionFromObject(object);
+                if ( idPos != -1 )
+                {
+                    sceneEdited.initialObjectsPositions[idPos].x -= 1;
+                    object->SetX(object->GetX()-1);
+                }
+            }
+        }
     }
     evt.StopPropagation();
 }

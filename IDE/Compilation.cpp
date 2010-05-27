@@ -417,7 +417,8 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         boost::shared_ptr<ExtensionBase> extension = extensionsManager->GetExtension(Jeu.extensionsUsed[i]);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() &&
-            ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" ) && extension->GetName() != "BuiltinCommonInstructions" )
+            ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" )
+            && extension->GetName() != "BuiltinCommonInstructions" ) //Extension with a namespace but builtin
         {
             if ( WinCheck->GetValue() &&
                 wxCopyFile( "Extensions/"+Jeu.extensionsUsed[i]+".xgdw", repTemp + "/" + Jeu.extensionsUsed[i]+".xgdw", true ) == false )

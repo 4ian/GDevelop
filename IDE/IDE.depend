@@ -1,17 +1,29 @@
 # depslib dependency file v1.0
-1264364136 source:d:\florian\programmation\gamedevelop\ide\errorcompilation.cpp
-	"ErrorCompilation.h"
-	"nommgr.h"
+1272817738 source:d:\florian\programmation\gamedevelop\ide\extensions.cpp
+	"Extensions.h"
+	<stdio.h>
+	<fstream>
+	<sys/types.h>
+	<dirent.h>
+	<wx/clntdata.h>
+	"GDL/ExtensionBase.h"
+	"GDL/Object.h"
+	"GDL/Game.h"
+	"GDL/ExtensionsManager.h"
+	"GDL/ExtensionsLoader.h"
+	"GDL/gdTreeItemStringData.h"
 
-1264364134 d:\florian\programmation\gamedevelop\ide\errorcompilation.h
+1264364134 d:\florian\programmation\gamedevelop\ide\extensions.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
+	<wx/checklst.h>
 	<wx/statline.h>
 	<wx/panel.h>
 	<wx/statbmp.h>
 	<wx/button.h>
 	<wx/dialog.h>
+	<boost/shared_ptr.hpp>
 	<string>
 	<vector>
 
@@ -1385,6 +1397,99 @@
 
 1253308454 c:\libs\wxwidgets\include\wx\palmos\textctrl.h
 
+1253308518 c:\libs\wxwidgets\include\wx\checklst.h
+	"wx/listbox.h"
+	"wx/univ/checklst.h"
+	"wx/msw/wince/checklst.h"
+	"wx/msw/checklst.h"
+	"wx/motif/checklst.h"
+	"wx/gtk/checklst.h"
+	"wx/gtk1/checklst.h"
+	"wx/osx/checklst.h"
+	"wx/cocoa/checklst.h"
+	"wx/os2/checklst.h"
+
+1253308518 c:\libs\wxwidgets\include\wx\listbox.h
+	"wx/defs.h"
+	"wx/ctrlsub.h"
+	"wx/univ/listbox.h"
+	"wx/msw/listbox.h"
+	"wx/motif/listbox.h"
+	"wx/gtk/listbox.h"
+	"wx/gtk1/listbox.h"
+	"wx/osx/listbox.h"
+	"wx/os2/listbox.h"
+	"wx/cocoa/listbox.h"
+
+1253308519 c:\libs\wxwidgets\include\wx\ctrlsub.h
+	"wx/defs.h"
+	"wx/arrstr.h"
+	"wx/control.h"
+	"wx/msw/ctrlsub.h"
+	"wx/motif/ctrlsub.h"
+
+1253308465 c:\libs\wxwidgets\include\wx\msw\ctrlsub.h
+
+1253308444 c:\libs\wxwidgets\include\wx\motif\ctrlsub.h
+	"wx/dynarray.h"
+	"wx/generic/ctrlsub.h"
+
+1253308506 c:\libs\wxwidgets\include\wx\generic\ctrlsub.h
+	"wx/dynarray.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\listbox.h
+	"wx/scrolwin.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\listbox.h
+	"wx/dynarray.h"
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\listbox.h
+	"wx/ctrlsub.h"
+	"wx/clntdata.h"
+
+1253308493 c:\libs\wxwidgets\include\wx\gtk\listbox.h
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\listbox.h
+	"wx/list.h"
+
+1253308487 c:\libs\wxwidgets\include\wx\osx\listbox.h
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253308473 c:\libs\wxwidgets\include\wx\os2\listbox.h
+	"wx/dynarray.h"
+
+1253308509 c:\libs\wxwidgets\include\wx\cocoa\listbox.h
+	"wx/cocoa/NSTableView.h"
+	"wx/dynarray.h"
+
+1253308511 c:\libs\wxwidgets\include\wx\cocoa\nstableview.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\checklst.h
+
+1253308461 c:\libs\wxwidgets\include\wx\msw\wince\checklst.h
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\checklst.h
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\checklst.h
+	"wx/listbox.h"
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\checklst.h
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\checklst.h
+
+1253308487 c:\libs\wxwidgets\include\wx\osx\checklst.h
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\checklst.h
+
+1253308474 c:\libs\wxwidgets\include\wx\os2\checklst.h
+	<stddef.h>
+	"wx/defs.h"
+
 1253308523 c:\libs\wxwidgets\include\wx\statline.h
 	"wx/defs.h"
 	"wx/control.h"
@@ -1671,55 +1776,6 @@
 
 1253308473 c:\libs\wxwidgets\include\wx\os2\dialog.h
 	"wx/panel.h"
-
-1264364132 d:\florian\programmation\gamedevelop\ide\nommgr.h
-
-1264364130 source:d:\florian\programmation\gamedevelop\ide\tinyxmlparser.cpp
-	<ctype.h>
-	<stddef.h>
-	"tinyxml.h"
-
-1264364132 d:\florian\programmation\gamedevelop\ide\tinyxml.h
-	<ctype.h>
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
-	<assert.h>
-	<string>
-	<iostream>
-	<sstream>
-	"tinystr.h"
-
-1264364136 d:\florian\programmation\gamedevelop\ide\tinystr.h
-	<assert.h>
-	<string.h>
-
-1272817225 source:d:\florian\programmation\gamedevelop\ide\choicefile.cpp
-	"ChoiceFile.h"
-	<wx/intl.h>
-	<wx/string.h>
-	"EditTexte.h"
-
-1271878984 d:\florian\programmation\gamedevelop\ide\choicefile.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/statline.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	"GDL/Scene.h"
-	<string>
-	<vector>
-
-1270414716 d:\florian\programmation\gamedevelop\gdl\gdl\scene.h
-	<vector>
-	<string>
-	<boost/shared_ptr.hpp>
-	"GDL/Event.h"
-	"GDL/Object.h"
-	"GDL/ObjectGroup.h"
-	"GDL/Position.h"
-	"GDL/Layer.h"
 
 1215879485 c:\libs\boost_1_38_0\boost\shared_ptr.hpp
 	<boost/config.hpp>
@@ -2916,6 +2972,1519 @@
 
 1215865279 c:\libs\boost_1_38_0\boost\memory_order.hpp
 
+1274984691 d:\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
+	<string>
+	<vector>
+	<map>
+	<boost/shared_ptr.hpp>
+	<wx/bitmap.h>
+	<wx/file.h>
+	<wx/wx.h>
+
+1253308527 c:\libs\wxwidgets\include\wx\file.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/filefn.h"
+	"wx/strconv.h"
+
+1253308527 c:\libs\wxwidgets\include\wx\wx.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/dynarray.h"
+	"wx/list.h"
+	"wx/hash.h"
+	"wx/string.h"
+	"wx/hashmap.h"
+	"wx/arrstr.h"
+	"wx/intl.h"
+	"wx/log.h"
+	"wx/event.h"
+	"wx/app.h"
+	"wx/utils.h"
+	"wx/stream.h"
+	"wx/memory.h"
+	"wx/math.h"
+	"wx/stopwatch.h"
+	"wx/timer.h"
+	"wx/module.h"
+	"wx/wxcrt.h"
+	"wx/wxcrtvararg.h"
+	"wx/window.h"
+	"wx/containr.h"
+	"wx/panel.h"
+	"wx/toplevel.h"
+	"wx/frame.h"
+	"wx/gdicmn.h"
+	"wx/gdiobj.h"
+	"wx/region.h"
+	"wx/bitmap.h"
+	"wx/image.h"
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/dc.h"
+	"wx/dcclient.h"
+	"wx/dcmemory.h"
+	"wx/dcprint.h"
+	"wx/dcscreen.h"
+	"wx/button.h"
+	"wx/menuitem.h"
+	"wx/menu.h"
+	"wx/pen.h"
+	"wx/brush.h"
+	"wx/palette.h"
+	"wx/icon.h"
+	"wx/cursor.h"
+	"wx/dialog.h"
+	"wx/settings.h"
+	"wx/msgdlg.h"
+	"wx/cmndata.h"
+	"wx/dataobj.h"
+	"wx/control.h"
+	"wx/ctrlsub.h"
+	"wx/bmpbuttn.h"
+	"wx/checkbox.h"
+	"wx/checklst.h"
+	"wx/choice.h"
+	"wx/scrolbar.h"
+	"wx/stattext.h"
+	"wx/statbmp.h"
+	"wx/statbox.h"
+	"wx/listbox.h"
+	"wx/radiobox.h"
+	"wx/radiobut.h"
+	"wx/textctrl.h"
+	"wx/slider.h"
+	"wx/gauge.h"
+	"wx/scrolwin.h"
+	"wx/dirdlg.h"
+	"wx/toolbar.h"
+	"wx/combobox.h"
+	"wx/layout.h"
+	"wx/sizer.h"
+	"wx/statusbr.h"
+	"wx/choicdlg.h"
+	"wx/textdlg.h"
+	"wx/filedlg.h"
+	"wx/mdi.h"
+	"wx/validate.h"
+	"wx/valtext.h"
+
+1253308513 c:\libs\wxwidgets\include\wx\app.h
+	"wx/event.h"
+	"wx/build.h"
+	"wx/cmdargs.h"
+	"wx/init.h"
+	"wx/intl.h"
+	"wx/log.h"
+	"wx/unix/app.h"
+	"wx/palmos/app.h"
+	"wx/msw/app.h"
+	"wx/motif/app.h"
+	"wx/mgl/app.h"
+	"wx/dfb/app.h"
+	"wx/gtk/app.h"
+	"wx/gtk1/app.h"
+	"wx/x11/app.h"
+	"wx/osx/app.h"
+	"wx/cocoa/app.h"
+	"wx/os2/app.h"
+	"wx/univ/theme.h"
+
+1253308520 c:\libs\wxwidgets\include\wx\build.h
+	"wx/version.h"
+
+1253308524 c:\libs\wxwidgets\include\wx\cmdargs.h
+	"wx/arrstr.h"
+
+1253308521 c:\libs\wxwidgets\include\wx\init.h
+	"wx/defs.h"
+	"wx/chartype.h"
+
+1253308441 c:\libs\wxwidgets\include\wx\unix\app.h
+	<signal.h>
+
+1253308453 c:\libs\wxwidgets\include\wx\palmos\app.h
+	"wx/event.h"
+	"wx/icon.h"
+
+1253308462 c:\libs\wxwidgets\include\wx\msw\app.h
+	"wx/event.h"
+	"wx/icon.h"
+	"wx/msw/wrapwin.h"
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\app.h
+	"wx/event.h"
+	"wx/hashmap.h"
+
+1253308482 c:\libs\wxwidgets\include\wx\mgl\app.h
+	"wx/frame.h"
+	"wx/icon.h"
+	"wx/vidmode.h"
+
+1253308519 c:\libs\wxwidgets\include\wx\frame.h
+	"wx/toplevel.h"
+	"wx/statusbr.h"
+	"wx/univ/frame.h"
+	"wx/palmos/frame.h"
+	"wx/msw/frame.h"
+	"wx/gtk/frame.h"
+	"wx/gtk1/frame.h"
+	"wx/motif/frame.h"
+	"wx/osx/frame.h"
+	"wx/cocoa/frame.h"
+	"wx/os2/frame.h"
+
+1253308520 c:\libs\wxwidgets\include\wx\statusbr.h
+	"wx/defs.h"
+	"wx/window.h"
+	"wx/list.h"
+	"wx/dynarray.h"
+	"wx/univ/statusbr.h"
+	"wx/palmos/statusbr.h"
+	"wx/msw/statusbar.h"
+	"wx/generic/statusbr.h"
+	"wx/osx/statusbr.h"
+	"wx/generic/statusbr.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\statusbr.h
+	"wx/univ/inpcons.h"
+	"wx/arrstr.h"
+
+1253308454 c:\libs\wxwidgets\include\wx\palmos\statusbr.h
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\statusbar.h
+	"wx/vector.h"
+	"wx/tooltip.h"
+
+1253308527 c:\libs\wxwidgets\include\wx\vector.h
+	"wx/defs.h"
+	<vector>
+	"wx/utils.h"
+	"wx/scopeguard.h"
+	"wx/meta/movable.h"
+	"wx/meta/if.h"
+	"wx/beforestd.h"
+	<new>
+	"wx/afterstd.h"
+
+1253308515 c:\libs\wxwidgets\include\wx\scopeguard.h
+	"wx/defs.h"
+	"wx/except.h"
+
+1253308518 c:\libs\wxwidgets\include\wx\except.h
+	"wx/defs.h"
+
+1253308441 c:\libs\wxwidgets\include\wx\meta\movable.h
+	"wx/defs.h"
+	"wx/string.h"
+
+1253308441 c:\libs\wxwidgets\include\wx\meta\if.h
+	"wx/defs.h"
+
+1253308518 c:\libs\wxwidgets\include\wx\tooltip.h
+	"wx/defs.h"
+	"wx/msw/tooltip.h"
+	"wx/gtk/tooltip.h"
+	"wx/gtk1/tooltip.h"
+	"wx/osx/tooltip.h"
+	"wx/cocoa/tooltip.h"
+	"wx/os2/tooltip.h"
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\tooltip.h
+	"wx/object.h"
+	"wx/gdicmn.h"
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\tooltip.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/object.h"
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\tooltip.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/object.h"
+
+1253308487 c:\libs\wxwidgets\include\wx\osx\tooltip.h
+	"wx/string.h"
+	"wx/event.h"
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\tooltip.h
+	"wx/object.h"
+
+1253308474 c:\libs\wxwidgets\include\wx\os2\tooltip.h
+
+1253308506 c:\libs\wxwidgets\include\wx\generic\statusbr.h
+	"wx/defs.h"
+	"wx/pen.h"
+	"wx/arrstr.h"
+
+1253308488 c:\libs\wxwidgets\include\wx\osx\statusbr.h
+
+1253308438 c:\libs\wxwidgets\include\wx\univ\frame.h
+
+1253308453 c:\libs\wxwidgets\include\wx\palmos\frame.h
+
+1253308465 c:\libs\wxwidgets\include\wx\msw\frame.h
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\frame.h
+
+1253308446 c:\libs\wxwidgets\include\wx\gtk1\frame.h
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\frame.h
+
+1253308488 c:\libs\wxwidgets\include\wx\osx\frame.h
+	"wx/window.h"
+	"wx/toolbar.h"
+	"wx/accel.h"
+	"wx/icon.h"
+
+1253308521 c:\libs\wxwidgets\include\wx\toolbar.h
+	"wx/defs.h"
+	"wx/tbarbase.h"
+	"wx/univ/toolbar.h"
+	"wx/palmos/toolbar.h"
+	"wx/msw/toolbar.h"
+	"wx/msw/wince/tbarwce.h"
+	"wx/motif/toolbar.h"
+	"wx/gtk/tbargtk.h"
+	"wx/gtk1/tbargtk.h"
+	"wx/osx/toolbar.h"
+	"wx/cocoa/toolbar.h"
+	"wx/os2/toolbar.h"
+
+1253308518 c:\libs\wxwidgets\include\wx\tbarbase.h
+	"wx/defs.h"
+	"wx/bitmap.h"
+	"wx/list.h"
+	"wx/control.h"
+
+1253308438 c:\libs\wxwidgets\include\wx\univ\toolbar.h
+	"wx/button.h"
+
+1253308453 c:\libs\wxwidgets\include\wx\palmos\toolbar.h
+	"wx/dynarray.h"
+
+1253308462 c:\libs\wxwidgets\include\wx\msw\toolbar.h
+	"wx/dynarray.h"
+	"wx/imaglist.h"
+
+1253308521 c:\libs\wxwidgets\include\wx\imaglist.h
+	"wx/generic/imaglist.h"
+	"wx/msw/imaglist.h"
+	"wx/osx/imaglist.h"
+	"wx/palmos/imaglist.h"
+
+1253308505 c:\libs\wxwidgets\include\wx\generic\imaglist.h
+	"wx/defs.h"
+	"wx/list.h"
+	"wx/icon.h"
+
+1253308462 c:\libs\wxwidgets\include\wx\msw\imaglist.h
+	"wx/bitmap.h"
+
+1253308486 c:\libs\wxwidgets\include\wx\osx\imaglist.h
+	"wx/defs.h"
+	"wx/list.h"
+	"wx/icon.h"
+
+1253308453 c:\libs\wxwidgets\include\wx\palmos\imaglist.h
+	"wx/bitmap.h"
+
+1253308461 c:\libs\wxwidgets\include\wx\msw\wince\tbarwce.h
+	"wx/dynarray.h"
+	"wx/msw/toolbar.h"
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\toolbar.h
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\tbargtk.h
+
+1253308446 c:\libs\wxwidgets\include\wx\gtk1\tbargtk.h
+
+1253308486 c:\libs\wxwidgets\include\wx\osx\toolbar.h
+	"wx/tbarbase.h"
+	"wx/dynarray.h"
+
+1253308509 c:\libs\wxwidgets\include\wx\cocoa\toolbar.h
+
+1253308473 c:\libs\wxwidgets\include\wx\os2\toolbar.h
+	"wx/timer.h"
+	"wx/tbarbase.h"
+
+1253308527 c:\libs\wxwidgets\include\wx\timer.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/longlong.h"
+	"wx/event.h"
+	"wx/stopwatch.h"
+	"wx/utils.h"
+
+1253308517 c:\libs\wxwidgets\include\wx\stopwatch.h
+	"wx/defs.h"
+	"wx/longlong.h"
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\frame.h
+
+1253308475 c:\libs\wxwidgets\include\wx\os2\frame.h
+	"wx/os2/wxrsc.h"
+
+1253308475 c:\libs\wxwidgets\include\wx\os2\wxrsc.h
+
+1253308517 c:\libs\wxwidgets\include\wx\vidmode.h
+
+1253308457 c:\libs\wxwidgets\include\wx\dfb\app.h
+	"wx/dfb/dfbptr.h"
+	"wx/vidmode.h"
+
+1253308493 c:\libs\wxwidgets\include\wx\gtk\app.h
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\app.h
+	"wx/frame.h"
+	"wx/icon.h"
+	"wx/strconv.h"
+
+1253308467 c:\libs\wxwidgets\include\wx\x11\app.h
+	"wx/gdicmn.h"
+	"wx/event.h"
+
+1253308486 c:\libs\wxwidgets\include\wx\osx\app.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/gdicmn.h"
+	"wx/event.h"
+
+1253308509 c:\libs\wxwidgets\include\wx\cocoa\app.h
+	"wx/osx/core/cfref.h"
+
+1253308473 c:\libs\wxwidgets\include\wx\os2\app.h
+	<types.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/time.h>
+	<sys/types.h>
+	<unistd.h>
+	<utils.h>
+	<types.h>
+	"wx/event.h"
+	"wx/icon.h"
+
+1253308438 c:\libs\wxwidgets\include\wx\univ\theme.h
+	"wx/string.h"
+
+1253308515 c:\libs\wxwidgets\include\wx\module.h
+	"wx/object.h"
+	"wx/list.h"
+	"wx/arrstr.h"
+	"wx/dynarray.h"
+
+1253308521 c:\libs\wxwidgets\include\wx\dcclient.h
+	"wx/dc.h"
+
+1253308520 c:\libs\wxwidgets\include\wx\dcmemory.h
+	"wx/dc.h"
+	"wx/bitmap.h"
+
+1253308527 c:\libs\wxwidgets\include\wx\dcprint.h
+	"wx/defs.h"
+	"wx/dc.h"
+
+1253308521 c:\libs\wxwidgets\include\wx\dcscreen.h
+	"wx/defs.h"
+	"wx/dc.h"
+
+1253308514 c:\libs\wxwidgets\include\wx\menuitem.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/univ/menuitem.h"
+	"wx/palmos/menuitem.h"
+	"wx/msw/menuitem.h"
+	"wx/motif/menuitem.h"
+	"wx/gtk/menuitem.h"
+	"wx/gtk1/menuitem.h"
+	"wx/osx/menuitem.h"
+	"wx/cocoa/menuitem.h"
+	"wx/os2/menuitem.h"
+
+1253308438 c:\libs\wxwidgets\include\wx\univ\menuitem.h
+
+1253308453 c:\libs\wxwidgets\include\wx\palmos\menuitem.h
+	"wx/ownerdrw.h"
+
+1253308523 c:\libs\wxwidgets\include\wx\ownerdrw.h
+	"wx/defs.h"
+	"wx/bitmap.h"
+	"wx/colour.h"
+	"wx/font.h"
+
+1253308462 c:\libs\wxwidgets\include\wx\msw\menuitem.h
+	"wx/ownerdrw.h"
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\menuitem.h
+	"wx/bitmap.h"
+
+1253308493 c:\libs\wxwidgets\include\wx\gtk\menuitem.h
+	"wx/bitmap.h"
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\menuitem.h
+	"wx/bitmap.h"
+
+1253308486 c:\libs\wxwidgets\include\wx\osx\menuitem.h
+	"wx/defs.h"
+	"wx/bitmap.h"
+
+1253308509 c:\libs\wxwidgets\include\wx\cocoa\menuitem.h
+	"wx/hashmap.h"
+	"wx/bitmap.h"
+	"wx/cocoa/ObjcRef.h"
+
+1253308473 c:\libs\wxwidgets\include\wx\os2\menuitem.h
+	"wx/defs.h"
+	"wx/os2/private.h"
+	"wx/ownerdrw.h"
+
+1253308522 c:\libs\wxwidgets\include\wx\menu.h
+	"wx/defs.h"
+	"wx/list.h"
+	"wx/window.h"
+	"wx/menuitem.h"
+	"wx/univ/menu.h"
+	"wx/palmos/menu.h"
+	"wx/msw/menu.h"
+	"wx/motif/menu.h"
+	"wx/gtk/menu.h"
+	"wx/gtk1/menu.h"
+	"wx/osx/menu.h"
+	"wx/cocoa/menu.h"
+	"wx/os2/menu.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\menu.h
+	"wx/accel.h"
+	"wx/dynarray.h"
+
+1253308453 c:\libs\wxwidgets\include\wx\palmos\menu.h
+	"wx/accel.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253308463 c:\libs\wxwidgets\include\wx\msw\menu.h
+	"wx/accel.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\menu.h
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/arrstr.h"
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\menu.h
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\menu.h
+
+1253308487 c:\libs\wxwidgets\include\wx\osx\menu.h
+	"wx/arrstr.h"
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\menu.h
+	"wx/cocoa/NSMenu.h"
+	"wx/accel.h"
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\nsmenu.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1253308474 c:\libs\wxwidgets\include\wx\os2\menu.h
+	"wx/accel.h"
+	"wx/list.h"
+	"wx/dynarray.h"
+
+1253308518 c:\libs\wxwidgets\include\wx\settings.h
+	"wx/colour.h"
+	"wx/font.h"
+
+1253308521 c:\libs\wxwidgets\include\wx\msgdlg.h
+	"wx/defs.h"
+	"wx/dialog.h"
+	"wx/stockitem.h"
+	"wx/generic/msgdlgg.h"
+	"wx/cocoa/msgdlg.h"
+	"wx/palmos/msgdlg.h"
+	"wx/msw/msgdlg.h"
+	"wx/motif/msgdlg.h"
+	"wx/gtk/msgdlg.h"
+	"wx/osx/msgdlg.h"
+	"wx/os2/msgdlg.h"
+
+1253308521 c:\libs\wxwidgets\include\wx\stockitem.h
+	"wx/defs.h"
+	"wx/chartype.h"
+	"wx/string.h"
+	"wx/accel.h"
+
+1253308506 c:\libs\wxwidgets\include\wx\generic\msgdlgg.h
+
+1253308509 c:\libs\wxwidgets\include\wx\cocoa\msgdlg.h
+	"wx/msgdlg.h"
+	"wx/generic/msgdlgg.h"
+
+1253308453 c:\libs\wxwidgets\include\wx\palmos\msgdlg.h
+
+1253308462 c:\libs\wxwidgets\include\wx\msw\msgdlg.h
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\msgdlg.h
+
+1253308493 c:\libs\wxwidgets\include\wx\gtk\msgdlg.h
+
+1253308486 c:\libs\wxwidgets\include\wx\osx\msgdlg.h
+
+1253308473 c:\libs\wxwidgets\include\wx\os2\msgdlg.h
+
+1253308516 c:\libs\wxwidgets\include\wx\dataobj.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/bitmap.h"
+	"wx/list.h"
+	"wx/arrstr.h"
+	"wx/msw/ole/dataform.h"
+	"wx/motif/dataform.h"
+	"wx/gtk/dataform.h"
+	"wx/gtk1/dataform.h"
+	"wx/x11/dataform.h"
+	"wx/osx/dataform.h"
+	"wx/cocoa/dataform.h"
+	"wx/os2/dataform.h"
+	"wx/msw/ole/dataobj.h"
+	"wx/motif/dataobj.h"
+	"wx/x11/dataobj.h"
+	"wx/gtk/dataobj.h"
+	"wx/gtk1/dataobj.h"
+	"wx/osx/dataobj.h"
+	"wx/cocoa/dataobj.h"
+	"wx/os2/dataobj.h"
+	"wx/msw/ole/dataobj2.h"
+	"wx/gtk/dataobj2.h"
+	"wx/gtk1/dataobj2.h"
+	"wx/x11/dataobj2.h"
+	"wx/motif/dataobj2.h"
+	"wx/osx/dataobj2.h"
+	"wx/cocoa/dataobj2.h"
+	"wx/os2/dataobj2.h"
+
+1253308459 c:\libs\wxwidgets\include\wx\msw\ole\dataform.h
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\dataform.h
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\dataform.h
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\dataform.h
+
+1253308467 c:\libs\wxwidgets\include\wx\x11\dataform.h
+
+1253308487 c:\libs\wxwidgets\include\wx\osx\dataform.h
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\dataform.h
+
+1253308474 c:\libs\wxwidgets\include\wx\os2\dataform.h
+
+1253308459 c:\libs\wxwidgets\include\wx\msw\ole\dataobj.h
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\dataobj.h
+
+1253308467 c:\libs\wxwidgets\include\wx\x11\dataobj.h
+
+1253308495 c:\libs\wxwidgets\include\wx\gtk\dataobj.h
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\dataobj.h
+
+1253308488 c:\libs\wxwidgets\include\wx\osx\dataobj.h
+
+1253308511 c:\libs\wxwidgets\include\wx\cocoa\dataobj.h
+
+1253308477 c:\libs\wxwidgets\include\wx\os2\dataobj.h
+
+1253308459 c:\libs\wxwidgets\include\wx\msw\ole\dataobj2.h
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\dataobj2.h
+
+1253308448 c:\libs\wxwidgets\include\wx\gtk1\dataobj2.h
+
+1253308468 c:\libs\wxwidgets\include\wx\x11\dataobj2.h
+
+1253308444 c:\libs\wxwidgets\include\wx\motif\dataobj2.h
+
+1253308487 c:\libs\wxwidgets\include\wx\osx\dataobj2.h
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\dataobj2.h
+
+1253308475 c:\libs\wxwidgets\include\wx\os2\dataobj2.h
+
+1253308518 c:\libs\wxwidgets\include\wx\bmpbuttn.h
+	"wx/defs.h"
+	"wx/button.h"
+	"wx/univ/bmpbuttn.h"
+	"wx/msw/bmpbuttn.h"
+	"wx/motif/bmpbuttn.h"
+	"wx/gtk/bmpbuttn.h"
+	"wx/gtk1/bmpbuttn.h"
+	"wx/osx/bmpbuttn.h"
+	"wx/cocoa/bmpbuttn.h"
+	"wx/os2/bmpbuttn.h"
+	"wx/palmos/bmpbuttn.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\bmpbuttn.h
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\bmpbuttn.h
+	"wx/button.h"
+	"wx/bitmap.h"
+	"wx/brush.h"
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\bmpbuttn.h
+	"wx/motif/bmpmotif.h"
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\bmpbuttn.h
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\bmpbuttn.h
+
+1253308487 c:\libs\wxwidgets\include\wx\osx\bmpbuttn.h
+	"wx/button.h"
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\bmpbuttn.h
+	"wx/cocoa/NSButton.h"
+
+1253308474 c:\libs\wxwidgets\include\wx\os2\bmpbuttn.h
+	"wx/button.h"
+	"wx/dcclient.h"
+
+1253308453 c:\libs\wxwidgets\include\wx\palmos\bmpbuttn.h
+	"wx/button.h"
+	"wx/bitmap.h"
+
+1253308521 c:\libs\wxwidgets\include\wx\checkbox.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/checkbox.h"
+	"wx/msw/checkbox.h"
+	"wx/motif/checkbox.h"
+	"wx/gtk/checkbox.h"
+	"wx/gtk1/checkbox.h"
+	"wx/osx/checkbox.h"
+	"wx/cocoa/checkbox.h"
+	"wx/os2/checkbox.h"
+	"wx/palmos/checkbox.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\checkbox.h
+	"wx/button.h"
+
+1253308462 c:\libs\wxwidgets\include\wx\msw\checkbox.h
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\checkbox.h
+
+1253308493 c:\libs\wxwidgets\include\wx\gtk\checkbox.h
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\checkbox.h
+
+1253308487 c:\libs\wxwidgets\include\wx\osx\checkbox.h
+
+1253308509 c:\libs\wxwidgets\include\wx\cocoa\checkbox.h
+	"wx/cocoa/NSButton.h"
+
+1253308473 c:\libs\wxwidgets\include\wx\os2\checkbox.h
+	"wx/control.h"
+
+1253308453 c:\libs\wxwidgets\include\wx\palmos\checkbox.h
+
+1253308525 c:\libs\wxwidgets\include\wx\choice.h
+	"wx/defs.h"
+	"wx/ctrlsub.h"
+	"wx/univ/choice.h"
+	"wx/msw/wince/choicece.h"
+	"wx/msw/choice.h"
+	"wx/motif/choice.h"
+	"wx/gtk/choice.h"
+	"wx/gtk1/choice.h"
+	"wx/osx/choice.h"
+	"wx/cocoa/choice.h"
+	"wx/os2/choice.h"
+	"wx/palmos/choice.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\choice.h
+	"wx/combobox.h"
+
+1253308520 c:\libs\wxwidgets\include\wx\combobox.h
+	"wx/defs.h"
+	"wx/ctrlsub.h"
+	"wx/textentry.h"
+	"wx/univ/combobox.h"
+	"wx/msw/combobox.h"
+	"wx/motif/combobox.h"
+	"wx/gtk/combobox.h"
+	"wx/gtk1/combobox.h"
+	"wx/osx/combobox.h"
+	"wx/cocoa/combobox.h"
+	"wx/os2/combobox.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\combobox.h
+	"wx/combo.h"
+
+1253308520 c:\libs\wxwidgets\include\wx\combo.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/renderer.h"
+	"wx/bitmap.h"
+	"wx/msw/combo.h"
+	"wx/generic/combo.h"
+
+1253308518 c:\libs\wxwidgets\include\wx\renderer.h
+	"wx/gdicmn.h"
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/bitmap.h"
+	"wx/string.h"
+
+1253308462 c:\libs\wxwidgets\include\wx\msw\combo.h
+	"wx/timer.h"
+
+1253308505 c:\libs\wxwidgets\include\wx\generic\combo.h
+
+1253308465 c:\libs\wxwidgets\include\wx\msw\combobox.h
+	"wx/choice.h"
+	"wx/textentry.h"
+
+1253308444 c:\libs\wxwidgets\include\wx\motif\combobox.h
+	"wx/choice.h"
+	"wx/textentry.h"
+
+1253308495 c:\libs\wxwidgets\include\wx\gtk\combobox.h
+	"wx/choice.h"
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\combobox.h
+	"wx/defs.h"
+	"wx/object.h"
+
+1253308488 c:\libs\wxwidgets\include\wx\osx\combobox.h
+	"wx/containr.h"
+	"wx/choice.h"
+
+1253308511 c:\libs\wxwidgets\include\wx\cocoa\combobox.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+	"wx/textctrl.h"
+	"wx/dynarray.h"
+
+1253308477 c:\libs\wxwidgets\include\wx\os2\combobox.h
+	"wx/choice.h"
+	"wx/textentry.h"
+
+1253308461 c:\libs\wxwidgets\include\wx\msw\wince\choicece.h
+	"wx/defs.h"
+	"wx/dynarray.h"
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\choice.h
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\choice.h
+	"wx/clntdata.h"
+	"wx/dynarray.h"
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\choice.h
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\choice.h
+
+1253308487 c:\libs\wxwidgets\include\wx\osx\choice.h
+	"wx/control.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\choice.h
+	"wx/cocoa/NSMenu.h"
+
+1253308474 c:\libs\wxwidgets\include\wx\os2\choice.h
+
+1253308453 c:\libs\wxwidgets\include\wx\palmos\choice.h
+
+1253308516 c:\libs\wxwidgets\include\wx\scrolbar.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/scrolbar.h"
+	"wx/msw/scrolbar.h"
+	"wx/motif/scrolbar.h"
+	"wx/gtk/scrolbar.h"
+	"wx/gtk1/scrolbar.h"
+	"wx/osx/scrolbar.h"
+	"wx/cocoa/scrolbar.h"
+	"wx/os2/scrolbar.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\scrolbar.h
+	"wx/univ/scrarrow.h"
+	"wx/renderer.h"
+
+1253308438 c:\libs\wxwidgets\include\wx\univ\scrarrow.h
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\scrolbar.h
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\scrolbar.h
+
+1253308495 c:\libs\wxwidgets\include\wx\gtk\scrolbar.h
+	"wx/defs.h"
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\scrolbar.h
+	"wx/defs.h"
+
+1253308488 c:\libs\wxwidgets\include\wx\osx\scrolbar.h
+
+1253308511 c:\libs\wxwidgets\include\wx\cocoa\scrolbar.h
+	"wx/cocoa/NSScroller.h"
+
+1253308511 c:\libs\wxwidgets\include\wx\cocoa\nsscroller.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+	"wx/cocoa/ObjcRef.h"
+
+1253308477 c:\libs\wxwidgets\include\wx\os2\scrolbar.h
+	"wx/scrolbar.h"
+
+1253308526 c:\libs\wxwidgets\include\wx\statbox.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/statbox.h"
+	"wx/msw/statbox.h"
+	"wx/motif/statbox.h"
+	"wx/gtk/statbox.h"
+	"wx/gtk1/statbox.h"
+	"wx/osx/statbox.h"
+	"wx/cocoa/statbox.h"
+	"wx/os2/statbox.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\statbox.h
+
+1253308465 c:\libs\wxwidgets\include\wx\msw\statbox.h
+
+1253308444 c:\libs\wxwidgets\include\wx\motif\statbox.h
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\statbox.h
+
+1253308448 c:\libs\wxwidgets\include\wx\gtk1\statbox.h
+
+1253308487 c:\libs\wxwidgets\include\wx\osx\statbox.h
+	"wx/control.h"
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\statbox.h
+	"wx/cocoa/NSBox.h"
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\nsbox.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1253308475 c:\libs\wxwidgets\include\wx\os2\statbox.h
+	"wx/control.h"
+
+1253308522 c:\libs\wxwidgets\include\wx\radiobox.h
+	"wx/ctrlsub.h"
+	"wx/dynarray.h"
+	"wx/univ/radiobox.h"
+	"wx/msw/radiobox.h"
+	"wx/motif/radiobox.h"
+	"wx/gtk/radiobox.h"
+	"wx/gtk1/radiobox.h"
+	"wx/osx/radiobox.h"
+	"wx/cocoa/radiobox.h"
+	"wx/os2/radiobox.h"
+	"wx/palmos/radiobox.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\radiobox.h
+	"wx/statbox.h"
+	"wx/dynarray.h"
+
+1253308463 c:\libs\wxwidgets\include\wx\msw\radiobox.h
+	"wx/statbox.h"
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\radiobox.h
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\radiobox.h
+	"wx/bitmap.h"
+	"wx/list.h"
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\radiobox.h
+	"wx/bitmap.h"
+
+1253308487 c:\libs\wxwidgets\include\wx\osx\radiobox.h
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\radiobox.h
+
+1253308475 c:\libs\wxwidgets\include\wx\os2\radiobox.h
+
+1253308453 c:\libs\wxwidgets\include\wx\palmos\radiobox.h
+
+1253308516 c:\libs\wxwidgets\include\wx\radiobut.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/radiobut.h"
+	"wx/msw/radiobut.h"
+	"wx/motif/radiobut.h"
+	"wx/gtk/radiobut.h"
+	"wx/gtk1/radiobut.h"
+	"wx/osx/radiobut.h"
+	"wx/cocoa/radiobut.h"
+	"wx/os2/radiobut.h"
+	"wx/palmos/radiobut.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\radiobut.h
+	"wx/checkbox.h"
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\radiobut.h
+
+1253308444 c:\libs\wxwidgets\include\wx\motif\radiobut.h
+
+1253308495 c:\libs\wxwidgets\include\wx\gtk\radiobut.h
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\radiobut.h
+
+1253308488 c:\libs\wxwidgets\include\wx\osx\radiobut.h
+
+1253308511 c:\libs\wxwidgets\include\wx\cocoa\radiobut.h
+	"wx/cocoa/NSButton.h"
+
+1253308477 c:\libs\wxwidgets\include\wx\os2\radiobut.h
+	"wx/control.h"
+
+1253308454 c:\libs\wxwidgets\include\wx\palmos\radiobut.h
+
+1253308517 c:\libs\wxwidgets\include\wx\slider.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/slider.h"
+	"wx/msw/slider.h"
+	"wx/motif/slider.h"
+	"wx/gtk/slider.h"
+	"wx/gtk1/slider.h"
+	"wx/osx/slider.h"
+	"wx/cocoa/slider.h"
+	"wx/os2/slider.h"
+	"wx/palmos/slider.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\slider.h
+	"wx/univ/scrthumb.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\scrthumb.h
+	"wx/timer.h"
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\slider.h
+
+1253308444 c:\libs\wxwidgets\include\wx\motif\slider.h
+	"wx/control.h"
+
+1253308495 c:\libs\wxwidgets\include\wx\gtk\slider.h
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\slider.h
+
+1253308489 c:\libs\wxwidgets\include\wx\osx\slider.h
+	"wx/control.h"
+	"wx/slider.h"
+	"wx/stattext.h"
+
+1253308511 c:\libs\wxwidgets\include\wx\cocoa\slider.h
+	"wx/cocoa/NSSlider.h"
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\nsslider.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+	"wx/cocoa/ObjcRef.h"
+
+1253308478 c:\libs\wxwidgets\include\wx\os2\slider.h
+	"wx/control.h"
+
+1253308454 c:\libs\wxwidgets\include\wx\palmos\slider.h
+
+1253308518 c:\libs\wxwidgets\include\wx\gauge.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/gauge.h"
+	"wx/msw/gauge.h"
+	"wx/motif/gauge.h"
+	"wx/gtk/gauge.h"
+	"wx/gtk1/gauge.h"
+	"wx/osx/gauge.h"
+	"wx/cocoa/gauge.h"
+	"wx/os2/gauge.h"
+
+1253308439 c:\libs\wxwidgets\include\wx\univ\gauge.h
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\gauge.h
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\gauge.h
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\gauge.h
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\gauge.h
+
+1253308487 c:\libs\wxwidgets\include\wx\osx\gauge.h
+	"wx/control.h"
+
+1253308509 c:\libs\wxwidgets\include\wx\cocoa\gauge.h
+
+1253308473 c:\libs\wxwidgets\include\wx\os2\gauge.h
+
+1253308517 c:\libs\wxwidgets\include\wx\dirdlg.h
+	"wx/dialog.h"
+	"wx/generic/dirdlgg.h"
+	"wx/generic/dirdlgg.h"
+	"wx/generic/dirdlgg.h"
+	"wx/msw/dirdlg.h"
+	"wx/gtk/dirdlg.h"
+	"wx/generic/dirdlgg.h"
+	"wx/osx/dirdlg.h"
+	"wx/cocoa/dirdlg.h"
+	"wx/generic/dirdlgg.h"
+
+1253308506 c:\libs\wxwidgets\include\wx\generic\dirdlgg.h
+	"wx/dialog.h"
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\dirdlg.h
+
+1253308493 c:\libs\wxwidgets\include\wx\gtk\dirdlg.h
+
+1253308486 c:\libs\wxwidgets\include\wx\osx\dirdlg.h
+
+1253308509 c:\libs\wxwidgets\include\wx\cocoa\dirdlg.h
+
+1253308515 c:\libs\wxwidgets\include\wx\layout.h
+	"wx/object.h"
+
+1253308520 c:\libs\wxwidgets\include\wx\choicdlg.h
+	"wx/generic/choicdgg.h"
+
+1253308505 c:\libs\wxwidgets\include\wx\generic\choicdgg.h
+	"wx/dynarray.h"
+	"wx/dialog.h"
+
+1253308517 c:\libs\wxwidgets\include\wx\textdlg.h
+	"wx/generic/textdlgg.h"
+
+1253308506 c:\libs\wxwidgets\include\wx\generic\textdlgg.h
+	"wx/defs.h"
+	"wx/dialog.h"
+	"wx/valtext.h"
+	"wx/textctrl.h"
+
+1253308515 c:\libs\wxwidgets\include\wx\valtext.h
+	"wx/defs.h"
+	"wx/validate.h"
+
+1253308523 c:\libs\wxwidgets\include\wx\filedlg.h
+	"wx/defs.h"
+	"wx/dialog.h"
+	"wx/arrstr.h"
+	"wx/generic/filedlgg.h"
+	"wx/msw/filedlg.h"
+	"wx/motif/filedlg.h"
+	"wx/gtk/filedlg.h"
+	"wx/gtk1/filedlg.h"
+	"wx/osx/filedlg.h"
+	"wx/cocoa/filedlg.h"
+	"wx/os2/filedlg.h"
+	"wx/generic/filedlgg.h"
+
+1253308506 c:\libs\wxwidgets\include\wx\generic\filedlgg.h
+	"wx/listctrl.h"
+	"wx/datetime.h"
+	"wx/filefn.h"
+	"wx/artprov.h"
+	"wx/filedlg.h"
+	"wx/generic/filectrlg.h"
+
+1253308524 c:\libs\wxwidgets\include\wx\listctrl.h
+	"wx/defs.h"
+	"wx/listbase.h"
+	"wx/msw/listctrl.h"
+	"wx/osx/listctrl.h"
+	"wx/generic/listctrl.h"
+
+1253308527 c:\libs\wxwidgets\include\wx\listbase.h
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/gdicmn.h"
+	"wx/event.h"
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\listctrl.h
+	"wx/textctrl.h"
+	"wx/dynarray.h"
+	"wx/vector.h"
+
+1253308486 c:\libs\wxwidgets\include\wx\osx\listctrl.h
+	"wx/defs.h"
+	"wx/generic/listctrl.h"
+
+1253308505 c:\libs\wxwidgets\include\wx\generic\listctrl.h
+	"wx/scrolwin.h"
+	"wx/textctrl.h"
+
+1253308522 c:\libs\wxwidgets\include\wx\artprov.h
+	"wx/string.h"
+	"wx/bitmap.h"
+	"wx/icon.h"
+	"wx/iconbndl.h"
+
+1253308506 c:\libs\wxwidgets\include\wx\generic\filectrlg.h
+	"wx/panel.h"
+	"wx/listctrl.h"
+	"wx/filectrl.h"
+	"wx/filename.h"
+
+1253308522 c:\libs\wxwidgets\include\wx\filectrl.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/event.h"
+	"wx/gtk/filectrl.h"
+	"wx/generic/filectrlg.h"
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\filectrl.h
+	"wx/control.h"
+	"wx/filectrl.h"
+
+1253308520 c:\libs\wxwidgets\include\wx\filename.h
+	"wx/arrstr.h"
+	"wx/filefn.h"
+	"wx/datetime.h"
+	"wx/intl.h"
+	"wx/longlong.h"
+	"wx/file.h"
+
+1253308464 c:\libs\wxwidgets\include\wx\msw\filedlg.h
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\filedlg.h
+
+1253308495 c:\libs\wxwidgets\include\wx\gtk\filedlg.h
+	"wx/gtk/filectrl.h"
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\filedlg.h
+	"wx/generic/filedlgg.h"
+
+1253308488 c:\libs\wxwidgets\include\wx\osx\filedlg.h
+
+1253308511 c:\libs\wxwidgets\include\wx\cocoa\filedlg.h
+
+1253308477 c:\libs\wxwidgets\include\wx\os2\filedlg.h
+
+1253308527 c:\libs\wxwidgets\include\wx\mdi.h
+	"wx/defs.h"
+	"wx/frame.h"
+	"wx/menu.h"
+	"wx/generic/mdig.h"
+	"wx/msw/mdi.h"
+	"wx/gtk/mdi.h"
+	"wx/gtk1/mdi.h"
+	"wx/osx/mdi.h"
+	"wx/cocoa/mdi.h"
+
+1253308506 c:\libs\wxwidgets\include\wx\generic\mdig.h
+	"wx/panel.h"
+
+1253308465 c:\libs\wxwidgets\include\wx\msw\mdi.h
+	"wx/frame.h"
+
+1253308495 c:\libs\wxwidgets\include\wx\gtk\mdi.h
+	"wx/frame.h"
+
+1253308446 c:\libs\wxwidgets\include\wx\gtk1\mdi.h
+	"wx/frame.h"
+
+1253308488 c:\libs\wxwidgets\include\wx\osx\mdi.h
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\mdi.h
+	"wx/frame.h"
+
+1274984585 d:\florian\programmation\gamedevelop\gdl\gdl\object.h
+	<SFML/System.hpp>
+	<SFML/Graphics.hpp>
+	<iostream>
+	<string>
+	<vector>
+	<boost/shared_ptr.hpp>
+	<boost/enable_shared_from_this.hpp>
+	"GDL/Force.h"
+	"GDL/constantes.h"
+	"GDL/Sprite.h"
+	"GDL/ListVariable.h"
+	"GDL/Animation.h"
+	"GDL/ErrorReport.h"
+	"GDL/ObjectType.h"
+	<wx/wx.h>
+
+1267184485 c:\libs\sfml\include\sfml\system.hpp
+	<SFML/Config.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/System/Err.hpp>
+	<SFML/System/Lock.hpp>
+	<SFML/System/Mutex.hpp>
+	<SFML/System/Randomizer.hpp>
+	<SFML/System/Sleep.hpp>
+	<SFML/System/String.hpp>
+	<SFML/System/Thread.hpp>
+	<SFML/System/ThreadLocal.hpp>
+	<SFML/System/ThreadLocalPtr.hpp>
+	<SFML/System/Utf.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/Vector3.hpp>
+
+1256147690 c:\libs\sfml\include\sfml\config.hpp
+	<climits>
+
+1268481795 c:\libs\sfml\include\sfml\system\clock.hpp
+	<SFML/Config.hpp>
+
+1267184484 c:\libs\sfml\include\sfml\system\err.hpp
+	<SFML/Config.hpp>
+	<ostream>
+
+1268481796 c:\libs\sfml\include\sfml\system\lock.hpp
+	<SFML/System/NonCopyable.hpp>
+
+1268481796 c:\libs\sfml\include\sfml\system\noncopyable.hpp
+	<SFML/Config.hpp>
+
+1256147689 c:\libs\sfml\include\sfml\system\mutex.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+
+1256147689 c:\libs\sfml\include\sfml\system\randomizer.hpp
+	<SFML/Config.hpp>
+
+1256147689 c:\libs\sfml\include\sfml\system\sleep.hpp
+	<SFML/Config.hpp>
+
+1267184484 c:\libs\sfml\include\sfml\system\string.hpp
+	<SFML/Config.hpp>
+	<locale>
+	<string>
+
+1259264900 c:\libs\sfml\include\sfml\system\thread.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<cstdlib>
+
+1256147689 c:\libs\sfml\include\sfml\system\threadlocal.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<cstdlib>
+
+1256147689 c:\libs\sfml\include\sfml\system\threadlocalptr.hpp
+	<SFML/System/ThreadLocal.hpp>
+	<SFML/System/ThreadLocalPtr.inl>
+
+1256147689 c:\libs\sfml\include\sfml\system\threadlocalptr.inl
+
+1267184484 c:\libs\sfml\include\sfml\system\utf.hpp
+	<SFML/Config.hpp>
+	<algorithm>
+	<locale>
+	<string>
+	<stdlib.h>
+	<SFML/System/Utf.inl>
+
+1259264900 c:\libs\sfml\include\sfml\system\utf.inl
+
+1256147689 c:\libs\sfml\include\sfml\system\vector2.hpp
+	<SFML/System/Vector2.inl>
+
+1256147689 c:\libs\sfml\include\sfml\system\vector2.inl
+
+1256147689 c:\libs\sfml\include\sfml\system\vector3.hpp
+	<SFML/System/Vector3.inl>
+
+1256147689 c:\libs\sfml\include\sfml\system\vector3.inl
+
+1264002980 c:\libs\sfml\include\sfml\graphics.hpp
+	<SFML/Window.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Font.hpp>
+	<SFML/Graphics/Glyph.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/Renderer.hpp>
+	<SFML/Graphics/RenderImage.hpp>
+	<SFML/Graphics/RenderWindow.hpp>
+	<SFML/Graphics/Shader.hpp>
+	<SFML/Graphics/Shape.hpp>
+	<SFML/Graphics/Sprite.hpp>
+	<SFML/Graphics/Text.hpp>
+	<SFML/Graphics/View.hpp>
+
+1267184485 c:\libs\sfml\include\sfml\window.hpp
+	<SFML/System.hpp>
+	<SFML/Window/Context.hpp>
+	<SFML/Window/ContextSettings.hpp>
+	<SFML/Window/Event.hpp>
+	<SFML/Window/Input.hpp>
+	<SFML/Window/VideoMode.hpp>
+	<SFML/Window/Window.hpp>
+	<SFML/Window/WindowStyle.hpp>
+
+1259264901 c:\libs\sfml\include\sfml\window\context.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+
+1259264901 c:\libs\sfml\include\sfml\window\contextsettings.hpp
+
+1264002980 c:\libs\sfml\include\sfml\window\event.hpp
+	<SFML/Config.hpp>
+
+1267184484 c:\libs\sfml\include\sfml\window\input.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Window/Event.hpp>
+
+1268481796 c:\libs\sfml\include\sfml\window\videomode.hpp
+	<SFML/Config.hpp>
+	<vector>
+
+1268481796 c:\libs\sfml\include\sfml\window\window.hpp
+	<SFML/Window/Input.hpp>
+	<SFML/Window/VideoMode.hpp>
+	<SFML/Window/WindowHandle.hpp>
+	<SFML/Window/ContextSettings.hpp>
+	<SFML/Window/WindowStyle.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<string>
+
+1244728046 c:\libs\sfml\include\sfml\window\windowhandle.hpp
+	<SFML/Config.hpp>
+
+1264002980 c:\libs\sfml\include\sfml\window\windowstyle.hpp
+
+1261922598 c:\libs\sfml\include\sfml\graphics\color.hpp
+	<SFML/Config.hpp>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\font.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/String.hpp>
+	<SFML/Graphics/Glyph.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<map>
+	<string>
+	<vector>
+
+1267184484 c:\libs\sfml\include\sfml\system\resource.hpp
+	<SFML/System/Lock.hpp>
+	<SFML/System/Mutex.hpp>
+	<set>
+	<SFML/System/Resource.inl>
+	<SFML/System/ResourcePtr.inl>
+
+1267184484 c:\libs\sfml\include\sfml\system\resource.inl
+
+1256147689 c:\libs\sfml\include\sfml\system\resourceptr.inl
+
+1261922598 c:\libs\sfml\include\sfml\graphics\glyph.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Rect.hpp>
+
+1248634793 c:\libs\sfml\include\sfml\graphics\rect.hpp
+	<SFML/System/Vector2.hpp>
+	<algorithm>
+	<SFML/Graphics/Rect.inl>
+
+1248634793 c:\libs\sfml\include\sfml\graphics\rect.inl
+
+1267184483 c:\libs\sfml\include\sfml\graphics\image.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<string>
+	<vector>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\renderer.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\drawable.hpp
+	<SFML/System/Vector2.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+
+1248634793 c:\libs\sfml\include\sfml\graphics\matrix3.hpp
+	<SFML/Config.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<math.h>
+	<SFML/Graphics/Matrix3.inl>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\matrix3.inl
+
+1267184483 c:\libs\sfml\include\sfml\graphics\renderimage.hpp
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/RenderTarget.hpp>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\rendertarget.hpp
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<SFML/Graphics/Renderer.hpp>
+	<SFML/Graphics/View.hpp>
+
+1264002977 c:\libs\sfml\include\sfml\graphics\view.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+	<SFML/System/Vector2.hpp>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\renderwindow.hpp
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/RenderTarget.hpp>
+	<SFML/Window/Window.hpp>
+	<string>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\shader.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/Vector3.hpp>
+	<map>
+	<string>
+
+1267184483 c:\libs\sfml\include\sfml\graphics\shape.hpp
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/System/Vector2.hpp>
+	<vector>
+
+1268481791 c:\libs\sfml\include\sfml\graphics\sprite.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Rect.hpp>
+
+1264002977 c:\libs\sfml\include\sfml\graphics\text.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/System/String.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Font.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<string>
+
+1131205229 c:\libs\boost_1_38_0\boost\enable_shared_from_this.hpp
+	<boost/weak_ptr.hpp>
+	<boost/shared_ptr.hpp>
+	<boost/assert.hpp>
+	<boost/config.hpp>
+
+1215862636 c:\libs\boost_1_38_0\boost\weak_ptr.hpp
+	<memory>
+	<boost/detail/shared_count.hpp>
+	<boost/shared_ptr.hpp>
+
+1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
+	<iostream>
+	<vector>
+	<string>
+	<cmath>
+	"GDL/Log.h"
+	"GDL/Event.h"
+
+1267736664 d:\florian\programmation\gamedevelop\gdl\gdl\log.h
+	<string>
+	<vector>
+
 1273756713 d:\florian\programmation\gamedevelop\gdl\gdl\event.h
 	<iostream>
 	<vector>
@@ -2926,10 +4495,6 @@
 	"GDL/Log.h"
 	"GDL/Instruction.h"
 	<wx/dcbuffer.h>
-
-1267736664 d:\florian\programmation\gamedevelop\gdl\gdl\log.h
-	<string>
-	<vector>
 
 1273756713 d:\florian\programmation\gamedevelop\gdl\gdl\instruction.h
 	<string>
@@ -6355,303 +7920,6 @@
 	"wx/dcclient.h"
 	"wx/window.h"
 
-1253308520 c:\libs\wxwidgets\include\wx\dcmemory.h
-	"wx/dc.h"
-	"wx/bitmap.h"
-
-1253308521 c:\libs\wxwidgets\include\wx\dcclient.h
-	"wx/dc.h"
-
-1274716722 d:\florian\programmation\gamedevelop\gdl\gdl\object.h
-	<SFML/System.hpp>
-	<SFML/Graphics.hpp>
-	<iostream>
-	<string>
-	<vector>
-	<boost/shared_ptr.hpp>
-	<boost/enable_shared_from_this.hpp>
-	"GDL/Force.h"
-	"GDL/constantes.h"
-	"GDL/Sprite.h"
-	"GDL/ListVariable.h"
-	"GDL/Animation.h"
-	"GDL/ErrorReport.h"
-	"GDL/ObjectType.h"
-	<wx/wx.h>
-
-1267184485 c:\libs\sfml\include\sfml\system.hpp
-	<SFML/Config.hpp>
-	<SFML/System/Clock.hpp>
-	<SFML/System/Err.hpp>
-	<SFML/System/Lock.hpp>
-	<SFML/System/Mutex.hpp>
-	<SFML/System/Randomizer.hpp>
-	<SFML/System/Sleep.hpp>
-	<SFML/System/String.hpp>
-	<SFML/System/Thread.hpp>
-	<SFML/System/ThreadLocal.hpp>
-	<SFML/System/ThreadLocalPtr.hpp>
-	<SFML/System/Utf.hpp>
-	<SFML/System/Vector2.hpp>
-	<SFML/System/Vector3.hpp>
-
-1256147690 c:\libs\sfml\include\sfml\config.hpp
-	<climits>
-
-1268481795 c:\libs\sfml\include\sfml\system\clock.hpp
-	<SFML/Config.hpp>
-
-1267184484 c:\libs\sfml\include\sfml\system\err.hpp
-	<SFML/Config.hpp>
-	<ostream>
-
-1268481796 c:\libs\sfml\include\sfml\system\lock.hpp
-	<SFML/System/NonCopyable.hpp>
-
-1268481796 c:\libs\sfml\include\sfml\system\noncopyable.hpp
-	<SFML/Config.hpp>
-
-1256147689 c:\libs\sfml\include\sfml\system\mutex.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-
-1256147689 c:\libs\sfml\include\sfml\system\randomizer.hpp
-	<SFML/Config.hpp>
-
-1256147689 c:\libs\sfml\include\sfml\system\sleep.hpp
-	<SFML/Config.hpp>
-
-1267184484 c:\libs\sfml\include\sfml\system\string.hpp
-	<SFML/Config.hpp>
-	<locale>
-	<string>
-
-1259264900 c:\libs\sfml\include\sfml\system\thread.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<cstdlib>
-
-1256147689 c:\libs\sfml\include\sfml\system\threadlocal.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<cstdlib>
-
-1256147689 c:\libs\sfml\include\sfml\system\threadlocalptr.hpp
-	<SFML/System/ThreadLocal.hpp>
-	<SFML/System/ThreadLocalPtr.inl>
-
-1256147689 c:\libs\sfml\include\sfml\system\threadlocalptr.inl
-
-1267184484 c:\libs\sfml\include\sfml\system\utf.hpp
-	<SFML/Config.hpp>
-	<algorithm>
-	<locale>
-	<string>
-	<stdlib.h>
-	<SFML/System/Utf.inl>
-
-1259264900 c:\libs\sfml\include\sfml\system\utf.inl
-
-1256147689 c:\libs\sfml\include\sfml\system\vector2.hpp
-	<SFML/System/Vector2.inl>
-
-1256147689 c:\libs\sfml\include\sfml\system\vector2.inl
-
-1256147689 c:\libs\sfml\include\sfml\system\vector3.hpp
-	<SFML/System/Vector3.inl>
-
-1256147689 c:\libs\sfml\include\sfml\system\vector3.inl
-
-1264002980 c:\libs\sfml\include\sfml\graphics.hpp
-	<SFML/Window.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Font.hpp>
-	<SFML/Graphics/Glyph.hpp>
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/Renderer.hpp>
-	<SFML/Graphics/RenderImage.hpp>
-	<SFML/Graphics/RenderWindow.hpp>
-	<SFML/Graphics/Shader.hpp>
-	<SFML/Graphics/Shape.hpp>
-	<SFML/Graphics/Sprite.hpp>
-	<SFML/Graphics/Text.hpp>
-	<SFML/Graphics/View.hpp>
-
-1267184485 c:\libs\sfml\include\sfml\window.hpp
-	<SFML/System.hpp>
-	<SFML/Window/Context.hpp>
-	<SFML/Window/ContextSettings.hpp>
-	<SFML/Window/Event.hpp>
-	<SFML/Window/Input.hpp>
-	<SFML/Window/VideoMode.hpp>
-	<SFML/Window/Window.hpp>
-	<SFML/Window/WindowStyle.hpp>
-
-1259264901 c:\libs\sfml\include\sfml\window\context.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-
-1259264901 c:\libs\sfml\include\sfml\window\contextsettings.hpp
-
-1264002980 c:\libs\sfml\include\sfml\window\event.hpp
-	<SFML/Config.hpp>
-
-1267184484 c:\libs\sfml\include\sfml\window\input.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Window/Event.hpp>
-
-1268481796 c:\libs\sfml\include\sfml\window\videomode.hpp
-	<SFML/Config.hpp>
-	<vector>
-
-1268481796 c:\libs\sfml\include\sfml\window\window.hpp
-	<SFML/Window/Input.hpp>
-	<SFML/Window/VideoMode.hpp>
-	<SFML/Window/WindowHandle.hpp>
-	<SFML/Window/ContextSettings.hpp>
-	<SFML/Window/WindowStyle.hpp>
-	<SFML/System/Clock.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<string>
-
-1244728046 c:\libs\sfml\include\sfml\window\windowhandle.hpp
-	<SFML/Config.hpp>
-
-1264002980 c:\libs\sfml\include\sfml\window\windowstyle.hpp
-
-1261922598 c:\libs\sfml\include\sfml\graphics\color.hpp
-	<SFML/Config.hpp>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\font.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/System/Vector2.hpp>
-	<SFML/System/String.hpp>
-	<SFML/Graphics/Glyph.hpp>
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<map>
-	<string>
-	<vector>
-
-1267184484 c:\libs\sfml\include\sfml\system\resource.hpp
-	<SFML/System/Lock.hpp>
-	<SFML/System/Mutex.hpp>
-	<set>
-	<SFML/System/Resource.inl>
-	<SFML/System/ResourcePtr.inl>
-
-1267184484 c:\libs\sfml\include\sfml\system\resource.inl
-
-1256147689 c:\libs\sfml\include\sfml\system\resourceptr.inl
-
-1261922598 c:\libs\sfml\include\sfml\graphics\glyph.hpp
-	<SFML/Config.hpp>
-	<SFML/Graphics/Rect.hpp>
-
-1248634793 c:\libs\sfml\include\sfml\graphics\rect.hpp
-	<SFML/System/Vector2.hpp>
-	<algorithm>
-	<SFML/Graphics/Rect.inl>
-
-1248634793 c:\libs\sfml\include\sfml\graphics\rect.inl
-
-1267184483 c:\libs\sfml\include\sfml\graphics\image.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<string>
-	<vector>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\renderer.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/Graphics/Matrix3.hpp>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\drawable.hpp
-	<SFML/System/Vector2.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Matrix3.hpp>
-
-1248634793 c:\libs\sfml\include\sfml\graphics\matrix3.hpp
-	<SFML/Config.hpp>
-	<SFML/System/Vector2.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<math.h>
-	<SFML/Graphics/Matrix3.inl>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\matrix3.inl
-
-1267184483 c:\libs\sfml\include\sfml\graphics\renderimage.hpp
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/RenderTarget.hpp>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\rendertarget.hpp
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<SFML/Graphics/Renderer.hpp>
-	<SFML/Graphics/View.hpp>
-
-1264002977 c:\libs\sfml\include\sfml\graphics\view.hpp
-	<SFML/Config.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<SFML/Graphics/Matrix3.hpp>
-	<SFML/System/Vector2.hpp>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\renderwindow.hpp
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/RenderTarget.hpp>
-	<SFML/Window/Window.hpp>
-	<string>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\shader.hpp
-	<SFML/Config.hpp>
-	<SFML/Graphics/Image.hpp>
-	<SFML/System/Vector2.hpp>
-	<SFML/System/Vector3.hpp>
-	<map>
-	<string>
-
-1267184483 c:\libs\sfml\include\sfml\graphics\shape.hpp
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/System/Vector2.hpp>
-	<vector>
-
-1268481791 c:\libs\sfml\include\sfml\graphics\sprite.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/Graphics/Rect.hpp>
-
-1264002977 c:\libs\sfml\include\sfml\graphics\text.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/System/String.hpp>
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/Graphics/Font.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<string>
-
-1131205229 c:\libs\boost_1_38_0\boost\enable_shared_from_this.hpp
-	<boost/weak_ptr.hpp>
-	<boost/shared_ptr.hpp>
-	<boost/assert.hpp>
-	<boost/config.hpp>
-
-1215862636 c:\libs\boost_1_38_0\boost\weak_ptr.hpp
-	<memory>
-	<boost/detail/shared_count.hpp>
-	<boost/shared_ptr.hpp>
-
-1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
-	<iostream>
-	<vector>
-	<string>
-	<cmath>
-	"GDL/Log.h"
-	"GDL/Event.h"
-
 1267820436 d:\florian\programmation\gamedevelop\gdl\gdl\constantes.h
 
 1267820206 d:\florian\programmation\gamedevelop\gdl\gdl\sprite.h
@@ -6690,1301 +7958,25 @@
 
 1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\objecttype.h
 
-1253308527 c:\libs\wxwidgets\include\wx\wx.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/dynarray.h"
-	"wx/list.h"
-	"wx/hash.h"
-	"wx/string.h"
-	"wx/hashmap.h"
-	"wx/arrstr.h"
-	"wx/intl.h"
-	"wx/log.h"
-	"wx/event.h"
-	"wx/app.h"
-	"wx/utils.h"
-	"wx/stream.h"
-	"wx/memory.h"
-	"wx/math.h"
-	"wx/stopwatch.h"
-	"wx/timer.h"
-	"wx/module.h"
-	"wx/wxcrt.h"
-	"wx/wxcrtvararg.h"
-	"wx/window.h"
-	"wx/containr.h"
-	"wx/panel.h"
-	"wx/toplevel.h"
-	"wx/frame.h"
-	"wx/gdicmn.h"
-	"wx/gdiobj.h"
-	"wx/region.h"
-	"wx/bitmap.h"
-	"wx/image.h"
-	"wx/colour.h"
-	"wx/font.h"
-	"wx/dc.h"
-	"wx/dcclient.h"
-	"wx/dcmemory.h"
-	"wx/dcprint.h"
-	"wx/dcscreen.h"
-	"wx/button.h"
-	"wx/menuitem.h"
-	"wx/menu.h"
-	"wx/pen.h"
-	"wx/brush.h"
-	"wx/palette.h"
-	"wx/icon.h"
-	"wx/cursor.h"
-	"wx/dialog.h"
-	"wx/settings.h"
-	"wx/msgdlg.h"
-	"wx/cmndata.h"
-	"wx/dataobj.h"
-	"wx/control.h"
-	"wx/ctrlsub.h"
-	"wx/bmpbuttn.h"
-	"wx/checkbox.h"
-	"wx/checklst.h"
-	"wx/choice.h"
-	"wx/scrolbar.h"
-	"wx/stattext.h"
-	"wx/statbmp.h"
-	"wx/statbox.h"
-	"wx/listbox.h"
-	"wx/radiobox.h"
-	"wx/radiobut.h"
-	"wx/textctrl.h"
-	"wx/slider.h"
-	"wx/gauge.h"
-	"wx/scrolwin.h"
-	"wx/dirdlg.h"
-	"wx/toolbar.h"
-	"wx/combobox.h"
-	"wx/layout.h"
-	"wx/sizer.h"
-	"wx/statusbr.h"
-	"wx/choicdlg.h"
-	"wx/textdlg.h"
-	"wx/filedlg.h"
-	"wx/mdi.h"
-	"wx/validate.h"
-	"wx/valtext.h"
-
-1253308513 c:\libs\wxwidgets\include\wx\app.h
-	"wx/event.h"
-	"wx/build.h"
-	"wx/cmdargs.h"
-	"wx/init.h"
-	"wx/intl.h"
-	"wx/log.h"
-	"wx/unix/app.h"
-	"wx/palmos/app.h"
-	"wx/msw/app.h"
-	"wx/motif/app.h"
-	"wx/mgl/app.h"
-	"wx/dfb/app.h"
-	"wx/gtk/app.h"
-	"wx/gtk1/app.h"
-	"wx/x11/app.h"
-	"wx/osx/app.h"
-	"wx/cocoa/app.h"
-	"wx/os2/app.h"
-	"wx/univ/theme.h"
-
-1253308520 c:\libs\wxwidgets\include\wx\build.h
-	"wx/version.h"
-
-1253308524 c:\libs\wxwidgets\include\wx\cmdargs.h
-	"wx/arrstr.h"
-
-1253308521 c:\libs\wxwidgets\include\wx\init.h
-	"wx/defs.h"
-	"wx/chartype.h"
-
-1253308441 c:\libs\wxwidgets\include\wx\unix\app.h
-	<signal.h>
-
-1253308453 c:\libs\wxwidgets\include\wx\palmos\app.h
-	"wx/event.h"
-	"wx/icon.h"
-
-1253308462 c:\libs\wxwidgets\include\wx\msw\app.h
-	"wx/event.h"
-	"wx/icon.h"
-	"wx/msw/wrapwin.h"
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\app.h
-	"wx/event.h"
-	"wx/hashmap.h"
-
-1253308482 c:\libs\wxwidgets\include\wx\mgl\app.h
-	"wx/frame.h"
-	"wx/icon.h"
-	"wx/vidmode.h"
-
-1253308519 c:\libs\wxwidgets\include\wx\frame.h
-	"wx/toplevel.h"
-	"wx/statusbr.h"
-	"wx/univ/frame.h"
-	"wx/palmos/frame.h"
-	"wx/msw/frame.h"
-	"wx/gtk/frame.h"
-	"wx/gtk1/frame.h"
-	"wx/motif/frame.h"
-	"wx/osx/frame.h"
-	"wx/cocoa/frame.h"
-	"wx/os2/frame.h"
-
-1253308520 c:\libs\wxwidgets\include\wx\statusbr.h
-	"wx/defs.h"
-	"wx/window.h"
-	"wx/list.h"
-	"wx/dynarray.h"
-	"wx/univ/statusbr.h"
-	"wx/palmos/statusbr.h"
-	"wx/msw/statusbar.h"
-	"wx/generic/statusbr.h"
-	"wx/osx/statusbr.h"
-	"wx/generic/statusbr.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\statusbr.h
-	"wx/univ/inpcons.h"
-	"wx/arrstr.h"
-
-1253308454 c:\libs\wxwidgets\include\wx\palmos\statusbr.h
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\statusbar.h
-	"wx/vector.h"
-	"wx/tooltip.h"
-
-1253308527 c:\libs\wxwidgets\include\wx\vector.h
-	"wx/defs.h"
+1271877446 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
+	"GDL/Object.h"
+	"GDL/Scene.h"
+	"GDL/ListVariable.h"
+	"GDL/Dossier.h"
+	<string>
 	<vector>
-	"wx/utils.h"
-	"wx/scopeguard.h"
-	"wx/meta/movable.h"
-	"wx/meta/if.h"
-	"wx/beforestd.h"
-	<new>
-	"wx/afterstd.h"
-
-1253308515 c:\libs\wxwidgets\include\wx\scopeguard.h
-	"wx/defs.h"
-	"wx/except.h"
-
-1253308518 c:\libs\wxwidgets\include\wx\except.h
-	"wx/defs.h"
-
-1253308441 c:\libs\wxwidgets\include\wx\meta\movable.h
-	"wx/defs.h"
-	"wx/string.h"
-
-1253308441 c:\libs\wxwidgets\include\wx\meta\if.h
-	"wx/defs.h"
-
-1253308518 c:\libs\wxwidgets\include\wx\tooltip.h
-	"wx/defs.h"
-	"wx/msw/tooltip.h"
-	"wx/gtk/tooltip.h"
-	"wx/gtk1/tooltip.h"
-	"wx/osx/tooltip.h"
-	"wx/cocoa/tooltip.h"
-	"wx/os2/tooltip.h"
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\tooltip.h
-	"wx/object.h"
-	"wx/gdicmn.h"
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\tooltip.h
-	"wx/defs.h"
-	"wx/string.h"
-	"wx/object.h"
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\tooltip.h
-	"wx/defs.h"
-	"wx/string.h"
-	"wx/object.h"
-
-1253308487 c:\libs\wxwidgets\include\wx\osx\tooltip.h
-	"wx/string.h"
-	"wx/event.h"
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\tooltip.h
-	"wx/object.h"
-
-1253308474 c:\libs\wxwidgets\include\wx\os2\tooltip.h
-
-1253308506 c:\libs\wxwidgets\include\wx\generic\statusbr.h
-	"wx/defs.h"
-	"wx/pen.h"
-	"wx/arrstr.h"
-
-1253308488 c:\libs\wxwidgets\include\wx\osx\statusbr.h
-
-1253308438 c:\libs\wxwidgets\include\wx\univ\frame.h
-
-1253308453 c:\libs\wxwidgets\include\wx\palmos\frame.h
-
-1253308465 c:\libs\wxwidgets\include\wx\msw\frame.h
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\frame.h
-
-1253308446 c:\libs\wxwidgets\include\wx\gtk1\frame.h
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\frame.h
-
-1253308488 c:\libs\wxwidgets\include\wx\osx\frame.h
-	"wx/window.h"
-	"wx/toolbar.h"
-	"wx/accel.h"
-	"wx/icon.h"
-
-1253308521 c:\libs\wxwidgets\include\wx\toolbar.h
-	"wx/defs.h"
-	"wx/tbarbase.h"
-	"wx/univ/toolbar.h"
-	"wx/palmos/toolbar.h"
-	"wx/msw/toolbar.h"
-	"wx/msw/wince/tbarwce.h"
-	"wx/motif/toolbar.h"
-	"wx/gtk/tbargtk.h"
-	"wx/gtk1/tbargtk.h"
-	"wx/osx/toolbar.h"
-	"wx/cocoa/toolbar.h"
-	"wx/os2/toolbar.h"
-
-1253308518 c:\libs\wxwidgets\include\wx\tbarbase.h
-	"wx/defs.h"
-	"wx/bitmap.h"
-	"wx/list.h"
-	"wx/control.h"
-
-1253308438 c:\libs\wxwidgets\include\wx\univ\toolbar.h
-	"wx/button.h"
-
-1253308453 c:\libs\wxwidgets\include\wx\palmos\toolbar.h
-	"wx/dynarray.h"
-
-1253308462 c:\libs\wxwidgets\include\wx\msw\toolbar.h
-	"wx/dynarray.h"
-	"wx/imaglist.h"
-
-1253308521 c:\libs\wxwidgets\include\wx\imaglist.h
-	"wx/generic/imaglist.h"
-	"wx/msw/imaglist.h"
-	"wx/osx/imaglist.h"
-	"wx/palmos/imaglist.h"
-
-1253308505 c:\libs\wxwidgets\include\wx\generic\imaglist.h
-	"wx/defs.h"
-	"wx/list.h"
-	"wx/icon.h"
-
-1253308462 c:\libs\wxwidgets\include\wx\msw\imaglist.h
-	"wx/bitmap.h"
-
-1253308486 c:\libs\wxwidgets\include\wx\osx\imaglist.h
-	"wx/defs.h"
-	"wx/list.h"
-	"wx/icon.h"
-
-1253308453 c:\libs\wxwidgets\include\wx\palmos\imaglist.h
-	"wx/bitmap.h"
-
-1253308461 c:\libs\wxwidgets\include\wx\msw\wince\tbarwce.h
-	"wx/dynarray.h"
-	"wx/msw/toolbar.h"
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\toolbar.h
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\tbargtk.h
-
-1253308446 c:\libs\wxwidgets\include\wx\gtk1\tbargtk.h
-
-1253308486 c:\libs\wxwidgets\include\wx\osx\toolbar.h
-	"wx/tbarbase.h"
-	"wx/dynarray.h"
-
-1253308509 c:\libs\wxwidgets\include\wx\cocoa\toolbar.h
-
-1253308473 c:\libs\wxwidgets\include\wx\os2\toolbar.h
-	"wx/timer.h"
-	"wx/tbarbase.h"
-
-1253308527 c:\libs\wxwidgets\include\wx\timer.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/longlong.h"
-	"wx/event.h"
-	"wx/stopwatch.h"
-	"wx/utils.h"
-
-1253308517 c:\libs\wxwidgets\include\wx\stopwatch.h
-	"wx/defs.h"
-	"wx/longlong.h"
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\frame.h
-
-1253308475 c:\libs\wxwidgets\include\wx\os2\frame.h
-	"wx/os2/wxrsc.h"
-
-1253308475 c:\libs\wxwidgets\include\wx\os2\wxrsc.h
-
-1253308517 c:\libs\wxwidgets\include\wx\vidmode.h
-
-1253308457 c:\libs\wxwidgets\include\wx\dfb\app.h
-	"wx/dfb/dfbptr.h"
-	"wx/vidmode.h"
-
-1253308493 c:\libs\wxwidgets\include\wx\gtk\app.h
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\app.h
-	"wx/frame.h"
-	"wx/icon.h"
-	"wx/strconv.h"
-
-1253308467 c:\libs\wxwidgets\include\wx\x11\app.h
-	"wx/gdicmn.h"
-	"wx/event.h"
-
-1253308486 c:\libs\wxwidgets\include\wx\osx\app.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/gdicmn.h"
-	"wx/event.h"
-
-1253308509 c:\libs\wxwidgets\include\wx\cocoa\app.h
-	"wx/osx/core/cfref.h"
-
-1253308473 c:\libs\wxwidgets\include\wx\os2\app.h
-	<types.h>
-	<sys/ioctl.h>
-	<sys/select.h>
-	<sys/time.h>
-	<sys/types.h>
-	<unistd.h>
-	<utils.h>
-	<types.h>
-	"wx/event.h"
-	"wx/icon.h"
-
-1253308438 c:\libs\wxwidgets\include\wx\univ\theme.h
-	"wx/string.h"
-
-1253308515 c:\libs\wxwidgets\include\wx\module.h
-	"wx/object.h"
-	"wx/list.h"
-	"wx/arrstr.h"
-	"wx/dynarray.h"
-
-1253308527 c:\libs\wxwidgets\include\wx\dcprint.h
-	"wx/defs.h"
-	"wx/dc.h"
-
-1253308521 c:\libs\wxwidgets\include\wx\dcscreen.h
-	"wx/defs.h"
-	"wx/dc.h"
-
-1253308514 c:\libs\wxwidgets\include\wx\menuitem.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/univ/menuitem.h"
-	"wx/palmos/menuitem.h"
-	"wx/msw/menuitem.h"
-	"wx/motif/menuitem.h"
-	"wx/gtk/menuitem.h"
-	"wx/gtk1/menuitem.h"
-	"wx/osx/menuitem.h"
-	"wx/cocoa/menuitem.h"
-	"wx/os2/menuitem.h"
-
-1253308438 c:\libs\wxwidgets\include\wx\univ\menuitem.h
-
-1253308453 c:\libs\wxwidgets\include\wx\palmos\menuitem.h
-	"wx/ownerdrw.h"
-
-1253308523 c:\libs\wxwidgets\include\wx\ownerdrw.h
-	"wx/defs.h"
-	"wx/bitmap.h"
-	"wx/colour.h"
-	"wx/font.h"
-
-1253308462 c:\libs\wxwidgets\include\wx\msw\menuitem.h
-	"wx/ownerdrw.h"
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\menuitem.h
-	"wx/bitmap.h"
-
-1253308493 c:\libs\wxwidgets\include\wx\gtk\menuitem.h
-	"wx/bitmap.h"
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\menuitem.h
-	"wx/bitmap.h"
-
-1253308486 c:\libs\wxwidgets\include\wx\osx\menuitem.h
-	"wx/defs.h"
-	"wx/bitmap.h"
-
-1253308509 c:\libs\wxwidgets\include\wx\cocoa\menuitem.h
-	"wx/hashmap.h"
-	"wx/bitmap.h"
-	"wx/cocoa/ObjcRef.h"
-
-1253308473 c:\libs\wxwidgets\include\wx\os2\menuitem.h
-	"wx/defs.h"
-	"wx/os2/private.h"
-	"wx/ownerdrw.h"
-
-1253308522 c:\libs\wxwidgets\include\wx\menu.h
-	"wx/defs.h"
-	"wx/list.h"
-	"wx/window.h"
-	"wx/menuitem.h"
-	"wx/univ/menu.h"
-	"wx/palmos/menu.h"
-	"wx/msw/menu.h"
-	"wx/motif/menu.h"
-	"wx/gtk/menu.h"
-	"wx/gtk1/menu.h"
-	"wx/osx/menu.h"
-	"wx/cocoa/menu.h"
-	"wx/os2/menu.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\menu.h
-	"wx/accel.h"
-	"wx/dynarray.h"
-
-1253308453 c:\libs\wxwidgets\include\wx\palmos\menu.h
-	"wx/accel.h"
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1253308463 c:\libs\wxwidgets\include\wx\msw\menu.h
-	"wx/accel.h"
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\menu.h
-	"wx/colour.h"
-	"wx/font.h"
-	"wx/arrstr.h"
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\menu.h
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\menu.h
-
-1253308487 c:\libs\wxwidgets\include\wx\osx\menu.h
-	"wx/arrstr.h"
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\menu.h
-	"wx/cocoa/NSMenu.h"
-	"wx/accel.h"
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\nsmenu.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-
-1253308474 c:\libs\wxwidgets\include\wx\os2\menu.h
-	"wx/accel.h"
-	"wx/list.h"
-	"wx/dynarray.h"
-
-1253308518 c:\libs\wxwidgets\include\wx\settings.h
-	"wx/colour.h"
-	"wx/font.h"
-
-1253308521 c:\libs\wxwidgets\include\wx\msgdlg.h
-	"wx/defs.h"
-	"wx/dialog.h"
-	"wx/stockitem.h"
-	"wx/generic/msgdlgg.h"
-	"wx/cocoa/msgdlg.h"
-	"wx/palmos/msgdlg.h"
-	"wx/msw/msgdlg.h"
-	"wx/motif/msgdlg.h"
-	"wx/gtk/msgdlg.h"
-	"wx/osx/msgdlg.h"
-	"wx/os2/msgdlg.h"
-
-1253308521 c:\libs\wxwidgets\include\wx\stockitem.h
-	"wx/defs.h"
-	"wx/chartype.h"
-	"wx/string.h"
-	"wx/accel.h"
-
-1253308506 c:\libs\wxwidgets\include\wx\generic\msgdlgg.h
-
-1253308509 c:\libs\wxwidgets\include\wx\cocoa\msgdlg.h
-	"wx/msgdlg.h"
-	"wx/generic/msgdlgg.h"
-
-1253308453 c:\libs\wxwidgets\include\wx\palmos\msgdlg.h
-
-1253308462 c:\libs\wxwidgets\include\wx\msw\msgdlg.h
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\msgdlg.h
-
-1253308493 c:\libs\wxwidgets\include\wx\gtk\msgdlg.h
-
-1253308486 c:\libs\wxwidgets\include\wx\osx\msgdlg.h
-
-1253308473 c:\libs\wxwidgets\include\wx\os2\msgdlg.h
-
-1253308516 c:\libs\wxwidgets\include\wx\dataobj.h
-	"wx/defs.h"
-	"wx/string.h"
-	"wx/bitmap.h"
-	"wx/list.h"
-	"wx/arrstr.h"
-	"wx/msw/ole/dataform.h"
-	"wx/motif/dataform.h"
-	"wx/gtk/dataform.h"
-	"wx/gtk1/dataform.h"
-	"wx/x11/dataform.h"
-	"wx/osx/dataform.h"
-	"wx/cocoa/dataform.h"
-	"wx/os2/dataform.h"
-	"wx/msw/ole/dataobj.h"
-	"wx/motif/dataobj.h"
-	"wx/x11/dataobj.h"
-	"wx/gtk/dataobj.h"
-	"wx/gtk1/dataobj.h"
-	"wx/osx/dataobj.h"
-	"wx/cocoa/dataobj.h"
-	"wx/os2/dataobj.h"
-	"wx/msw/ole/dataobj2.h"
-	"wx/gtk/dataobj2.h"
-	"wx/gtk1/dataobj2.h"
-	"wx/x11/dataobj2.h"
-	"wx/motif/dataobj2.h"
-	"wx/osx/dataobj2.h"
-	"wx/cocoa/dataobj2.h"
-	"wx/os2/dataobj2.h"
-
-1253308459 c:\libs\wxwidgets\include\wx\msw\ole\dataform.h
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\dataform.h
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\dataform.h
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\dataform.h
-
-1253308467 c:\libs\wxwidgets\include\wx\x11\dataform.h
-
-1253308487 c:\libs\wxwidgets\include\wx\osx\dataform.h
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\dataform.h
-
-1253308474 c:\libs\wxwidgets\include\wx\os2\dataform.h
-
-1253308459 c:\libs\wxwidgets\include\wx\msw\ole\dataobj.h
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\dataobj.h
-
-1253308467 c:\libs\wxwidgets\include\wx\x11\dataobj.h
-
-1253308495 c:\libs\wxwidgets\include\wx\gtk\dataobj.h
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\dataobj.h
-
-1253308488 c:\libs\wxwidgets\include\wx\osx\dataobj.h
-
-1253308511 c:\libs\wxwidgets\include\wx\cocoa\dataobj.h
-
-1253308477 c:\libs\wxwidgets\include\wx\os2\dataobj.h
-
-1253308459 c:\libs\wxwidgets\include\wx\msw\ole\dataobj2.h
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\dataobj2.h
-
-1253308448 c:\libs\wxwidgets\include\wx\gtk1\dataobj2.h
-
-1253308468 c:\libs\wxwidgets\include\wx\x11\dataobj2.h
-
-1253308444 c:\libs\wxwidgets\include\wx\motif\dataobj2.h
-
-1253308487 c:\libs\wxwidgets\include\wx\osx\dataobj2.h
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\dataobj2.h
-
-1253308475 c:\libs\wxwidgets\include\wx\os2\dataobj2.h
-
-1253308519 c:\libs\wxwidgets\include\wx\ctrlsub.h
-	"wx/defs.h"
-	"wx/arrstr.h"
-	"wx/control.h"
-	"wx/msw/ctrlsub.h"
-	"wx/motif/ctrlsub.h"
-
-1253308465 c:\libs\wxwidgets\include\wx\msw\ctrlsub.h
-
-1253308444 c:\libs\wxwidgets\include\wx\motif\ctrlsub.h
-	"wx/dynarray.h"
-	"wx/generic/ctrlsub.h"
-
-1253308506 c:\libs\wxwidgets\include\wx\generic\ctrlsub.h
-	"wx/dynarray.h"
-
-1253308518 c:\libs\wxwidgets\include\wx\bmpbuttn.h
-	"wx/defs.h"
-	"wx/button.h"
-	"wx/univ/bmpbuttn.h"
-	"wx/msw/bmpbuttn.h"
-	"wx/motif/bmpbuttn.h"
-	"wx/gtk/bmpbuttn.h"
-	"wx/gtk1/bmpbuttn.h"
-	"wx/osx/bmpbuttn.h"
-	"wx/cocoa/bmpbuttn.h"
-	"wx/os2/bmpbuttn.h"
-	"wx/palmos/bmpbuttn.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\bmpbuttn.h
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\bmpbuttn.h
-	"wx/button.h"
-	"wx/bitmap.h"
-	"wx/brush.h"
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\bmpbuttn.h
-	"wx/motif/bmpmotif.h"
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\bmpbuttn.h
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\bmpbuttn.h
-
-1253308487 c:\libs\wxwidgets\include\wx\osx\bmpbuttn.h
-	"wx/button.h"
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\bmpbuttn.h
-	"wx/cocoa/NSButton.h"
-
-1253308474 c:\libs\wxwidgets\include\wx\os2\bmpbuttn.h
-	"wx/button.h"
-	"wx/dcclient.h"
-
-1253308453 c:\libs\wxwidgets\include\wx\palmos\bmpbuttn.h
-	"wx/button.h"
-	"wx/bitmap.h"
-
-1253308521 c:\libs\wxwidgets\include\wx\checkbox.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/checkbox.h"
-	"wx/msw/checkbox.h"
-	"wx/motif/checkbox.h"
-	"wx/gtk/checkbox.h"
-	"wx/gtk1/checkbox.h"
-	"wx/osx/checkbox.h"
-	"wx/cocoa/checkbox.h"
-	"wx/os2/checkbox.h"
-	"wx/palmos/checkbox.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\checkbox.h
-	"wx/button.h"
-
-1253308462 c:\libs\wxwidgets\include\wx\msw\checkbox.h
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\checkbox.h
-
-1253308493 c:\libs\wxwidgets\include\wx\gtk\checkbox.h
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\checkbox.h
-
-1253308487 c:\libs\wxwidgets\include\wx\osx\checkbox.h
-
-1253308509 c:\libs\wxwidgets\include\wx\cocoa\checkbox.h
-	"wx/cocoa/NSButton.h"
-
-1253308473 c:\libs\wxwidgets\include\wx\os2\checkbox.h
-	"wx/control.h"
-
-1253308453 c:\libs\wxwidgets\include\wx\palmos\checkbox.h
-
-1253308518 c:\libs\wxwidgets\include\wx\checklst.h
-	"wx/listbox.h"
-	"wx/univ/checklst.h"
-	"wx/msw/wince/checklst.h"
-	"wx/msw/checklst.h"
-	"wx/motif/checklst.h"
-	"wx/gtk/checklst.h"
-	"wx/gtk1/checklst.h"
-	"wx/osx/checklst.h"
-	"wx/cocoa/checklst.h"
-	"wx/os2/checklst.h"
-
-1253308518 c:\libs\wxwidgets\include\wx\listbox.h
-	"wx/defs.h"
-	"wx/ctrlsub.h"
-	"wx/univ/listbox.h"
-	"wx/msw/listbox.h"
-	"wx/motif/listbox.h"
-	"wx/gtk/listbox.h"
-	"wx/gtk1/listbox.h"
-	"wx/osx/listbox.h"
-	"wx/os2/listbox.h"
-	"wx/cocoa/listbox.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\listbox.h
-	"wx/scrolwin.h"
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\listbox.h
-	"wx/dynarray.h"
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\listbox.h
-	"wx/ctrlsub.h"
-	"wx/clntdata.h"
-
-1253308493 c:\libs\wxwidgets\include\wx\gtk\listbox.h
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\listbox.h
-	"wx/list.h"
-
-1253308487 c:\libs\wxwidgets\include\wx\osx\listbox.h
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1253308473 c:\libs\wxwidgets\include\wx\os2\listbox.h
-	"wx/dynarray.h"
-
-1253308509 c:\libs\wxwidgets\include\wx\cocoa\listbox.h
-	"wx/cocoa/NSTableView.h"
-	"wx/dynarray.h"
-
-1253308511 c:\libs\wxwidgets\include\wx\cocoa\nstableview.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\checklst.h
-
-1253308461 c:\libs\wxwidgets\include\wx\msw\wince\checklst.h
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\checklst.h
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\checklst.h
-	"wx/listbox.h"
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\checklst.h
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\checklst.h
-
-1253308487 c:\libs\wxwidgets\include\wx\osx\checklst.h
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\checklst.h
-
-1253308474 c:\libs\wxwidgets\include\wx\os2\checklst.h
-	<stddef.h>
-	"wx/defs.h"
-
-1253308525 c:\libs\wxwidgets\include\wx\choice.h
-	"wx/defs.h"
-	"wx/ctrlsub.h"
-	"wx/univ/choice.h"
-	"wx/msw/wince/choicece.h"
-	"wx/msw/choice.h"
-	"wx/motif/choice.h"
-	"wx/gtk/choice.h"
-	"wx/gtk1/choice.h"
-	"wx/osx/choice.h"
-	"wx/cocoa/choice.h"
-	"wx/os2/choice.h"
-	"wx/palmos/choice.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\choice.h
-	"wx/combobox.h"
-
-1253308520 c:\libs\wxwidgets\include\wx\combobox.h
-	"wx/defs.h"
-	"wx/ctrlsub.h"
-	"wx/textentry.h"
-	"wx/univ/combobox.h"
-	"wx/msw/combobox.h"
-	"wx/motif/combobox.h"
-	"wx/gtk/combobox.h"
-	"wx/gtk1/combobox.h"
-	"wx/osx/combobox.h"
-	"wx/cocoa/combobox.h"
-	"wx/os2/combobox.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\combobox.h
-	"wx/combo.h"
-
-1253308520 c:\libs\wxwidgets\include\wx\combo.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/renderer.h"
-	"wx/bitmap.h"
-	"wx/msw/combo.h"
-	"wx/generic/combo.h"
-
-1253308518 c:\libs\wxwidgets\include\wx\renderer.h
-	"wx/gdicmn.h"
-	"wx/colour.h"
-	"wx/font.h"
-	"wx/bitmap.h"
-	"wx/string.h"
-
-1253308462 c:\libs\wxwidgets\include\wx\msw\combo.h
-	"wx/timer.h"
-
-1253308505 c:\libs\wxwidgets\include\wx\generic\combo.h
-
-1253308465 c:\libs\wxwidgets\include\wx\msw\combobox.h
-	"wx/choice.h"
-	"wx/textentry.h"
-
-1253308444 c:\libs\wxwidgets\include\wx\motif\combobox.h
-	"wx/choice.h"
-	"wx/textentry.h"
-
-1253308495 c:\libs\wxwidgets\include\wx\gtk\combobox.h
-	"wx/choice.h"
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\combobox.h
-	"wx/defs.h"
-	"wx/object.h"
-
-1253308488 c:\libs\wxwidgets\include\wx\osx\combobox.h
-	"wx/containr.h"
-	"wx/choice.h"
-
-1253308511 c:\libs\wxwidgets\include\wx\cocoa\combobox.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-	"wx/textctrl.h"
-	"wx/dynarray.h"
-
-1253308477 c:\libs\wxwidgets\include\wx\os2\combobox.h
-	"wx/choice.h"
-	"wx/textentry.h"
-
-1253308461 c:\libs\wxwidgets\include\wx\msw\wince\choicece.h
-	"wx/defs.h"
-	"wx/dynarray.h"
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\choice.h
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\choice.h
-	"wx/clntdata.h"
-	"wx/dynarray.h"
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\choice.h
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\choice.h
-
-1253308487 c:\libs\wxwidgets\include\wx\osx\choice.h
-	"wx/control.h"
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\choice.h
-	"wx/cocoa/NSMenu.h"
-
-1253308474 c:\libs\wxwidgets\include\wx\os2\choice.h
-
-1253308453 c:\libs\wxwidgets\include\wx\palmos\choice.h
-
-1253308516 c:\libs\wxwidgets\include\wx\scrolbar.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/scrolbar.h"
-	"wx/msw/scrolbar.h"
-	"wx/motif/scrolbar.h"
-	"wx/gtk/scrolbar.h"
-	"wx/gtk1/scrolbar.h"
-	"wx/osx/scrolbar.h"
-	"wx/cocoa/scrolbar.h"
-	"wx/os2/scrolbar.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\scrolbar.h
-	"wx/univ/scrarrow.h"
-	"wx/renderer.h"
-
-1253308438 c:\libs\wxwidgets\include\wx\univ\scrarrow.h
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\scrolbar.h
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\scrolbar.h
-
-1253308495 c:\libs\wxwidgets\include\wx\gtk\scrolbar.h
-	"wx/defs.h"
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\scrolbar.h
-	"wx/defs.h"
-
-1253308488 c:\libs\wxwidgets\include\wx\osx\scrolbar.h
-
-1253308511 c:\libs\wxwidgets\include\wx\cocoa\scrolbar.h
-	"wx/cocoa/NSScroller.h"
-
-1253308511 c:\libs\wxwidgets\include\wx\cocoa\nsscroller.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-	"wx/cocoa/ObjcRef.h"
-
-1253308477 c:\libs\wxwidgets\include\wx\os2\scrolbar.h
-	"wx/scrolbar.h"
-
-1253308526 c:\libs\wxwidgets\include\wx\statbox.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/statbox.h"
-	"wx/msw/statbox.h"
-	"wx/motif/statbox.h"
-	"wx/gtk/statbox.h"
-	"wx/gtk1/statbox.h"
-	"wx/osx/statbox.h"
-	"wx/cocoa/statbox.h"
-	"wx/os2/statbox.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\statbox.h
-
-1253308465 c:\libs\wxwidgets\include\wx\msw\statbox.h
-
-1253308444 c:\libs\wxwidgets\include\wx\motif\statbox.h
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\statbox.h
-
-1253308448 c:\libs\wxwidgets\include\wx\gtk1\statbox.h
-
-1253308487 c:\libs\wxwidgets\include\wx\osx\statbox.h
-	"wx/control.h"
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\statbox.h
-	"wx/cocoa/NSBox.h"
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\nsbox.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-
-1253308475 c:\libs\wxwidgets\include\wx\os2\statbox.h
-	"wx/control.h"
-
-1253308522 c:\libs\wxwidgets\include\wx\radiobox.h
-	"wx/ctrlsub.h"
-	"wx/dynarray.h"
-	"wx/univ/radiobox.h"
-	"wx/msw/radiobox.h"
-	"wx/motif/radiobox.h"
-	"wx/gtk/radiobox.h"
-	"wx/gtk1/radiobox.h"
-	"wx/osx/radiobox.h"
-	"wx/cocoa/radiobox.h"
-	"wx/os2/radiobox.h"
-	"wx/palmos/radiobox.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\radiobox.h
-	"wx/statbox.h"
-	"wx/dynarray.h"
-
-1253308463 c:\libs\wxwidgets\include\wx\msw\radiobox.h
-	"wx/statbox.h"
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\radiobox.h
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\radiobox.h
-	"wx/bitmap.h"
-	"wx/list.h"
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\radiobox.h
-	"wx/bitmap.h"
-
-1253308487 c:\libs\wxwidgets\include\wx\osx\radiobox.h
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\radiobox.h
-
-1253308475 c:\libs\wxwidgets\include\wx\os2\radiobox.h
-
-1253308453 c:\libs\wxwidgets\include\wx\palmos\radiobox.h
-
-1253308516 c:\libs\wxwidgets\include\wx\radiobut.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/radiobut.h"
-	"wx/msw/radiobut.h"
-	"wx/motif/radiobut.h"
-	"wx/gtk/radiobut.h"
-	"wx/gtk1/radiobut.h"
-	"wx/osx/radiobut.h"
-	"wx/cocoa/radiobut.h"
-	"wx/os2/radiobut.h"
-	"wx/palmos/radiobut.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\radiobut.h
-	"wx/checkbox.h"
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\radiobut.h
-
-1253308444 c:\libs\wxwidgets\include\wx\motif\radiobut.h
-
-1253308495 c:\libs\wxwidgets\include\wx\gtk\radiobut.h
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\radiobut.h
-
-1253308488 c:\libs\wxwidgets\include\wx\osx\radiobut.h
-
-1253308511 c:\libs\wxwidgets\include\wx\cocoa\radiobut.h
-	"wx/cocoa/NSButton.h"
-
-1253308477 c:\libs\wxwidgets\include\wx\os2\radiobut.h
-	"wx/control.h"
-
-1253308454 c:\libs\wxwidgets\include\wx\palmos\radiobut.h
-
-1253308517 c:\libs\wxwidgets\include\wx\slider.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/slider.h"
-	"wx/msw/slider.h"
-	"wx/motif/slider.h"
-	"wx/gtk/slider.h"
-	"wx/gtk1/slider.h"
-	"wx/osx/slider.h"
-	"wx/cocoa/slider.h"
-	"wx/os2/slider.h"
-	"wx/palmos/slider.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\slider.h
-	"wx/univ/scrthumb.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\scrthumb.h
-	"wx/timer.h"
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\slider.h
-
-1253308444 c:\libs\wxwidgets\include\wx\motif\slider.h
-	"wx/control.h"
-
-1253308495 c:\libs\wxwidgets\include\wx\gtk\slider.h
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\slider.h
-
-1253308489 c:\libs\wxwidgets\include\wx\osx\slider.h
-	"wx/control.h"
-	"wx/slider.h"
-	"wx/stattext.h"
-
-1253308511 c:\libs\wxwidgets\include\wx\cocoa\slider.h
-	"wx/cocoa/NSSlider.h"
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\nsslider.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-	"wx/cocoa/ObjcRef.h"
-
-1253308478 c:\libs\wxwidgets\include\wx\os2\slider.h
-	"wx/control.h"
-
-1253308454 c:\libs\wxwidgets\include\wx\palmos\slider.h
-
-1253308518 c:\libs\wxwidgets\include\wx\gauge.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/gauge.h"
-	"wx/msw/gauge.h"
-	"wx/motif/gauge.h"
-	"wx/gtk/gauge.h"
-	"wx/gtk1/gauge.h"
-	"wx/osx/gauge.h"
-	"wx/cocoa/gauge.h"
-	"wx/os2/gauge.h"
-
-1253308439 c:\libs\wxwidgets\include\wx\univ\gauge.h
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\gauge.h
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\gauge.h
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\gauge.h
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\gauge.h
-
-1253308487 c:\libs\wxwidgets\include\wx\osx\gauge.h
-	"wx/control.h"
-
-1253308509 c:\libs\wxwidgets\include\wx\cocoa\gauge.h
-
-1253308473 c:\libs\wxwidgets\include\wx\os2\gauge.h
-
-1253308517 c:\libs\wxwidgets\include\wx\dirdlg.h
-	"wx/dialog.h"
-	"wx/generic/dirdlgg.h"
-	"wx/generic/dirdlgg.h"
-	"wx/generic/dirdlgg.h"
-	"wx/msw/dirdlg.h"
-	"wx/gtk/dirdlg.h"
-	"wx/generic/dirdlgg.h"
-	"wx/osx/dirdlg.h"
-	"wx/cocoa/dirdlg.h"
-	"wx/generic/dirdlgg.h"
-
-1253308506 c:\libs\wxwidgets\include\wx\generic\dirdlgg.h
-	"wx/dialog.h"
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\dirdlg.h
-
-1253308493 c:\libs\wxwidgets\include\wx\gtk\dirdlg.h
-
-1253308486 c:\libs\wxwidgets\include\wx\osx\dirdlg.h
-
-1253308509 c:\libs\wxwidgets\include\wx\cocoa\dirdlg.h
-
-1253308515 c:\libs\wxwidgets\include\wx\layout.h
-	"wx/object.h"
-
-1253308520 c:\libs\wxwidgets\include\wx\choicdlg.h
-	"wx/generic/choicdgg.h"
-
-1253308505 c:\libs\wxwidgets\include\wx\generic\choicdgg.h
-	"wx/dynarray.h"
-	"wx/dialog.h"
-
-1253308517 c:\libs\wxwidgets\include\wx\textdlg.h
-	"wx/generic/textdlgg.h"
-
-1253308506 c:\libs\wxwidgets\include\wx\generic\textdlgg.h
-	"wx/defs.h"
-	"wx/dialog.h"
-	"wx/valtext.h"
-	"wx/textctrl.h"
-
-1253308515 c:\libs\wxwidgets\include\wx\valtext.h
-	"wx/defs.h"
-	"wx/validate.h"
-
-1253308523 c:\libs\wxwidgets\include\wx\filedlg.h
-	"wx/defs.h"
-	"wx/dialog.h"
-	"wx/arrstr.h"
-	"wx/generic/filedlgg.h"
-	"wx/msw/filedlg.h"
-	"wx/motif/filedlg.h"
-	"wx/gtk/filedlg.h"
-	"wx/gtk1/filedlg.h"
-	"wx/osx/filedlg.h"
-	"wx/cocoa/filedlg.h"
-	"wx/os2/filedlg.h"
-	"wx/generic/filedlgg.h"
-
-1253308506 c:\libs\wxwidgets\include\wx\generic\filedlgg.h
-	"wx/listctrl.h"
-	"wx/datetime.h"
-	"wx/filefn.h"
-	"wx/artprov.h"
-	"wx/filedlg.h"
-	"wx/generic/filectrlg.h"
-
-1253308524 c:\libs\wxwidgets\include\wx\listctrl.h
-	"wx/defs.h"
-	"wx/listbase.h"
-	"wx/msw/listctrl.h"
-	"wx/osx/listctrl.h"
-	"wx/generic/listctrl.h"
-
-1253308527 c:\libs\wxwidgets\include\wx\listbase.h
-	"wx/colour.h"
-	"wx/font.h"
-	"wx/gdicmn.h"
-	"wx/event.h"
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\listctrl.h
-	"wx/textctrl.h"
-	"wx/dynarray.h"
-	"wx/vector.h"
-
-1253308486 c:\libs\wxwidgets\include\wx\osx\listctrl.h
-	"wx/defs.h"
-	"wx/generic/listctrl.h"
-
-1253308505 c:\libs\wxwidgets\include\wx\generic\listctrl.h
-	"wx/scrolwin.h"
-	"wx/textctrl.h"
-
-1253308522 c:\libs\wxwidgets\include\wx\artprov.h
-	"wx/string.h"
-	"wx/bitmap.h"
-	"wx/icon.h"
-	"wx/iconbndl.h"
-
-1253308506 c:\libs\wxwidgets\include\wx\generic\filectrlg.h
-	"wx/panel.h"
-	"wx/listctrl.h"
-	"wx/filectrl.h"
-	"wx/filename.h"
-
-1253308522 c:\libs\wxwidgets\include\wx\filectrl.h
-	"wx/defs.h"
-	"wx/string.h"
-	"wx/event.h"
-	"wx/gtk/filectrl.h"
-	"wx/generic/filectrlg.h"
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\filectrl.h
-	"wx/control.h"
-	"wx/filectrl.h"
-
-1253308520 c:\libs\wxwidgets\include\wx\filename.h
-	"wx/arrstr.h"
-	"wx/filefn.h"
-	"wx/datetime.h"
-	"wx/intl.h"
-	"wx/longlong.h"
-	"wx/file.h"
-
-1253308527 c:\libs\wxwidgets\include\wx\file.h
-	"wx/defs.h"
-	"wx/string.h"
-	"wx/filefn.h"
-	"wx/strconv.h"
-
-1253308464 c:\libs\wxwidgets\include\wx\msw\filedlg.h
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\filedlg.h
-
-1253308495 c:\libs\wxwidgets\include\wx\gtk\filedlg.h
-	"wx/gtk/filectrl.h"
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\filedlg.h
-	"wx/generic/filedlgg.h"
-
-1253308488 c:\libs\wxwidgets\include\wx\osx\filedlg.h
-
-1253308511 c:\libs\wxwidgets\include\wx\cocoa\filedlg.h
-
-1253308477 c:\libs\wxwidgets\include\wx\os2\filedlg.h
-
-1253308527 c:\libs\wxwidgets\include\wx\mdi.h
-	"wx/defs.h"
-	"wx/frame.h"
-	"wx/menu.h"
-	"wx/generic/mdig.h"
-	"wx/msw/mdi.h"
-	"wx/gtk/mdi.h"
-	"wx/gtk1/mdi.h"
-	"wx/osx/mdi.h"
-	"wx/cocoa/mdi.h"
-
-1253308506 c:\libs\wxwidgets\include\wx\generic\mdig.h
-	"wx/panel.h"
-
-1253308465 c:\libs\wxwidgets\include\wx\msw\mdi.h
-	"wx/frame.h"
-
-1253308495 c:\libs\wxwidgets\include\wx\gtk\mdi.h
-	"wx/frame.h"
-
-1253308446 c:\libs\wxwidgets\include\wx\gtk1\mdi.h
-	"wx/frame.h"
-
-1253308488 c:\libs\wxwidgets\include\wx\osx\mdi.h
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\mdi.h
-	"wx/frame.h"
+	"GDL/Image.h"
+	"GDL/LoadingScreen.h"
+
+1270414716 d:\florian\programmation\gamedevelop\gdl\gdl\scene.h
+	<vector>
+	<string>
+	<boost/shared_ptr.hpp>
+	"GDL/Event.h"
+	"GDL/Object.h"
+	"GDL/ObjectGroup.h"
+	"GDL/Position.h"
+	"GDL/Layer.h"
 
 1267736714 d:\florian\programmation\gamedevelop\gdl\gdl\objectgroup.h
 	<vector>
@@ -8008,16 +8000,33 @@
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 
-1274387563 d:\florian\programmation\gamedevelop\ide\edittexte.h
-	<wx/treectrl.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/statline.h>
-	<wx/button.h>
-	<wx/dialog.h>
+1267821124 d:\florian\programmation\gamedevelop\gdl\gdl\dossier.h
 	<string>
 	<vector>
+
+1267820920 d:\florian\programmation\gamedevelop\gdl\gdl\image.h
+	<string>
+	<vector>
+
+1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.h
+	<string>
+	<vector>
+
+1273867366 d:\florian\programmation\gamedevelop\gdl\gdl\extensionsmanager.h
+	<string>
+	<iostream>
+	<vector>
+	<boost/shared_ptr.hpp>
+	<boost/bimap/bimap.hpp>
+	"GDL/ExtensionBase.h"
+
+1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\extensionsloader.h
+	<string>
+	<vector>
+
+1271873356 d:\florian\programmation\gamedevelop\gdl\gdl\gdtreeitemstringdata.h
+	<string>
+	<wx/treectrl.h>
 
 1253308528 c:\libs\wxwidgets\include\wx\treectrl.h
 	"wx/defs.h"
@@ -8049,13 +8058,61 @@
 	"wx/treebase.h"
 	"wx/hashmap.h"
 
-1271878984 source:d:\florian\programmation\gamedevelop\ide\choicejoyaxis.cpp
+1264364130 source:d:\florian\programmation\gamedevelop\ide\tinyxmlparser.cpp
+	<ctype.h>
+	<stddef.h>
+	"tinyxml.h"
+
+1264364132 d:\florian\programmation\gamedevelop\ide\tinyxml.h
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<string>
+	<iostream>
+	<sstream>
+	"tinystr.h"
+
+1264364136 d:\florian\programmation\gamedevelop\ide\tinystr.h
+	<assert.h>
+	<string.h>
+
+1274985025 source:d:\florian\programmation\gamedevelop\ide\choicefile.cpp
+	"ChoiceFile.h"
+	<wx/intl.h>
+	<wx/string.h>
+	"GDL/EditTextDialog.h"
+
+1271878984 d:\florian\programmation\gamedevelop\ide\choicefile.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/statline.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	"GDL/Scene.h"
+	<string>
+	<vector>
+
+1274985452 d:\florian\programmation\gamedevelop\gdl\gdl\edittextdialog.h
+	<wx/treectrl.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/statline.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<string>
+	<vector>
+
+1274985025 source:d:\florian\programmation\gamedevelop\ide\choicejoyaxis.cpp
 	"ChoiceJoyAxis.h"
 	<wx/intl.h>
 	<wx/string.h>
 	<string>
 	<vector>
-	"EditTexte.h"
+	"GDL/EditTextDialog.h"
 
 1271878984 d:\florian\programmation\gamedevelop\ide\choicejoyaxis.h
 	<wx/sizer.h>
@@ -8067,7 +8124,7 @@
 	<string>
 	<vector>
 
-1274609730 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
+1274986382 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
 	"ChoixAction.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -8094,7 +8151,7 @@
 	"GDL/Chercher.h"
 	"GDL/ChooseObject.h"
 	"GDL/EditExpression.h"
-	"EditTexte.h"
+	"GDL/EditTextDialog.h"
 	"ChoixClavier.h"
 	"GDL/BitmapGUIManager.h"
 	"SigneModification.h"
@@ -8102,7 +8159,7 @@
 	"GDL/ChooseLayer.h"
 	"ChoiceJoyAxis.h"
 	"ChoiceFile.h"
-	"ChoixVariableDialog.h"
+	"GDL/ChooseVariableDialog.h"
 
 1264364132 d:\florian\programmation\gamedevelop\ide\choixaction.h
 	<wx/treectrl.h>
@@ -8119,28 +8176,6 @@
 	<wx/bmpbuttn.h>
 	"GDL/Scene.h"
 	"GDL/Game.h"
-	<string>
-	<vector>
-
-1271877446 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
-	"GDL/Object.h"
-	"GDL/Scene.h"
-	"GDL/ListVariable.h"
-	"GDL/Dossier.h"
-	<string>
-	<vector>
-	"GDL/Image.h"
-	"GDL/LoadingScreen.h"
-
-1267821124 d:\florian\programmation\gamedevelop\gdl\gdl\dossier.h
-	<string>
-	<vector>
-
-1267820920 d:\florian\programmation\gamedevelop\gdl\gdl\image.h
-	<string>
-	<vector>
-
-1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\loadingscreen.h
 	<string>
 	<vector>
 
@@ -8485,24 +8520,6 @@
 1253308506 c:\libs\wxwidgets\include\wx\generic\helpext.h
 	"wx/helpbase.h"
 
-1271873356 d:\florian\programmation\gamedevelop\gdl\gdl\gdtreeitemstringdata.h
-	<string>
-	<wx/treectrl.h>
-
-1264364134 d:\florian\programmation\gamedevelop\ide\extensions.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/checklst.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/statbmp.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	<boost/shared_ptr.hpp>
-	<string>
-	<vector>
-
 1267218244 d:\florian\programmation\gamedevelop\gdl\gdl\helpfileaccess.h
 	<string>
 	<wx/help.h>
@@ -8531,23 +8548,6 @@
 	<map>
 	<wx/bitmap.h>
 	"GDL/Instruction.h"
-
-1273867366 d:\florian\programmation\gamedevelop\gdl\gdl\extensionsmanager.h
-	<string>
-	<iostream>
-	<vector>
-	<boost/shared_ptr.hpp>
-	<boost/bimap/bimap.hpp>
-	"GDL/ExtensionBase.h"
-
-1274292051 d:\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
-	<string>
-	<vector>
-	<map>
-	<boost/shared_ptr.hpp>
-	<wx/bitmap.h>
-	<wx/file.h>
-	<wx/wx.h>
 
 1267736192 d:\florian\programmation\gamedevelop\gdl\gdl\chercher.h
 	"GDL/tinyxml.h"
@@ -8595,7 +8595,7 @@
 	<string>
 	<vector>
 
-1274127107 d:\florian\programmation\gamedevelop\gdl\gdl\editexpression.h
+1274814375 d:\florian\programmation\gamedevelop\gdl\gdl\editexpression.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -8652,7 +8652,7 @@
 	<string>
 	<vector>
 
-1264364134 d:\florian\programmation\gamedevelop\ide\choixvariabledialog.h
+1274985452 d:\florian\programmation\gamedevelop\gdl\gdl\choosevariabledialog.h
 	<wx/listctrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -8691,7 +8691,7 @@
 	<vector>
 	<wx/msgdlg.h>
 
-1274609730 source:d:\florian\programmation\gamedevelop\ide\choixcondition.cpp
+1274986382 source:d:\florian\programmation\gamedevelop\ide\choixcondition.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"ChoixCondition.h"
@@ -8711,7 +8711,7 @@
 	"GDL/HelpFileAccess.h"
 	"GDL/TranslateCondition.h"
 	"GDL/EditExpression.h"
-	"EditTexte.h"
+	"GDL/EditTextDialog.h"
 	"GDL/ChooseObject.h"
 	"ChoixBouton.h"
 	"ChoixClavier.h"
@@ -8720,7 +8720,7 @@
 	"GDL/ChooseLayer.h"
 	"ChoiceJoyAxis.h"
 	"ChoiceFile.h"
-	"ChoixVariableDialog.h"
+	"GDL/ChooseVariableDialog.h"
 	"Extensions.h"
 	<string>
 	<vector>
@@ -8844,20 +8844,6 @@
 	"GDL/tinyxml.h"
 	"GDL/CommonTools.h"
 
-1272726603 source:d:\florian\programmation\gamedevelop\ide\choixvariabledialog.cpp
-	"ChoixVariableDialog.h"
-	<wx/bitmap.h>
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/bitmap.h>
-	<wx/image.h>
-	<wx/textdlg.h>
-	<wx/log.h>
-	"GDL/ListVariable.h"
-	<gtk/gtk.h>
-
 1273866307 source:d:\florian\programmation\gamedevelop\ide\clipboard.cpp
 	<boost/shared_ptr.hpp>
 	"Clipboard.h"
@@ -8873,7 +8859,7 @@
 	"GDL/Scene.h"
 	"GDL/Instruction.h"
 
-1272221231 source:d:\florian\programmation\gamedevelop\ide\compilation.cpp
+1274897510 source:d:\florian\programmation\gamedevelop\ide\compilation.cpp
 	"nommgr.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -8908,6 +8894,8 @@
 	"ErrorCompilation.h"
 	"GDL/HelpFileAccess.h"
 	<wx/msw/winundef.h>
+
+1264364132 d:\florian\programmation\gamedevelop\ide\nommgr.h
 
 1253308523 c:\libs\wxwidgets\include\wx\dir.h
 	"wx/longlong.h"
@@ -8947,6 +8935,18 @@
 	"wx/event.h"
 	"wx/stream.h"
 	"wx/utils.h"
+
+1264364134 d:\florian\programmation\gamedevelop\ide\errorcompilation.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<string>
+	<vector>
 
 1264364134 source:d:\florian\programmation\gamedevelop\ide\tinyxmlerror.cpp
 	"tinyxml.h"
@@ -9942,13 +9942,6 @@
 	<wx/dialog.h>
 	"GDL/Scene.h"
 
-1274473097 source:d:\florian\programmation\gamedevelop\ide\edittexte.cpp
-	"EditTexte.h"
-	<wx/intl.h>
-	<wx/string.h>
-	"GDL/EditExpression.h"
-	<wx/textdlg.h>
-
 1274123670 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
@@ -10184,47 +10177,6 @@
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
-1274609730 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
-	"EditorScene.h"
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/string.h>
-	<wx/aui/aui.h>
-	<wx/toolbar.h>
-	<wx/config.h>
-	<wx/brush.h>
-	<wx/log.h>
-	<wx/dcclient.h>
-	"GDL/Game.h"
-	"GDL/RuntimeGame.h"
-	"GDL/ImageManager.h"
-	"Game_Develop_EditorMain.h"
-	"GDL/MainEditorCommand.h"
-	"SceneCanvas.h"
-	"GDL/ChooseObject.h"
-	"EditorEvents.h"
-	"GDL/HelpFileAccess.h"
-	"GridSetup.h"
-	"GDL/ChooseLayer.h"
-	"GDAuiTabArt.h"
-	<wx/ribbon/bar.h>
-	<wx/ribbon/buttonbar.h>
-	<wx/ribbon/toolbar.h>
-	<gtk/gtk.h>
-
-1264364134 d:\florian\programmation\gamedevelop\ide\gridsetup.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/checkbox.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/button.h>
-	<wx/dialog.h>
-
-1264364136 d:\florian\programmation\gamedevelop\ide\gdauitabart.h
-	<wx/aui/auibook.h>
-
 1269095730 source:d:\florian\programmation\gamedevelop\ide\edittimescene.cpp
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
@@ -10244,6 +10196,10 @@
 	<OpenGL/gl.h>
 	<OpenGL/glu.h>
 
+1264364136 source:d:\florian\programmation\gamedevelop\ide\errorcompilation.cpp
+	"ErrorCompilation.h"
+	"nommgr.h"
+
 1272727521 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
 	<gdk/gdkx.h>
@@ -10253,24 +10209,6 @@
 
 1253308491 c:\libs\wxwidgets\include\wx\gtk\private\win_gtk.h
 	<gtk/gtkfixed.h>
-
-1272817738 source:d:\florian\programmation\gamedevelop\ide\extensions.cpp
-	"Extensions.h"
-	<stdio.h>
-	<fstream>
-	<sys/types.h>
-	<dirent.h>
-	<wx/clntdata.h>
-	"GDL/ExtensionBase.h"
-	"GDL/Object.h"
-	"GDL/Game.h"
-	"GDL/ExtensionsManager.h"
-	"GDL/ExtensionsLoader.h"
-	"GDL/gdTreeItemStringData.h"
-
-1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\extensionsloader.h
-	<string>
-	<vector>
 
 1273765322 source:d:\florian\programmation\gamedevelop\ide\fusion.cpp
 	"Fusion.h"
@@ -10317,6 +10255,9 @@
 	<wx/renderer.h>
 	<iostream>
 	<wx/dcbuffer.h>
+
+1264364136 d:\florian\programmation\gamedevelop\ide\gdauitabart.h
+	<wx/aui/auibook.h>
 
 1274379168 source:d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
 	"debugMem.h"
@@ -10577,6 +10518,16 @@
 	<wx/colordlg.h>
 	<wx/log.h>
 	"GDL/CommonTools.h"
+
+1264364134 d:\florian\programmation\gamedevelop\ide\gridsetup.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/checkbox.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/button.h>
+	<wx/dialog.h>
 
 1264364136 source:d:\florian\programmation\gamedevelop\ide\imageeditor.cpp
 	"ImageEditor.h"
@@ -10857,7 +10808,7 @@
 	<wx/string.h>
 	"GDL/Layer.h"
 
-1274608177 source:d:\florian\programmation\gamedevelop\ide\playerunittests.cpp
+1274809930 source:d:\florian\programmation\gamedevelop\ide\playerunittests.cpp
 	"CppUnitLite/TestHarness.h"
 	"GDL/Object.h"
 	"GDL/aMove.h"
@@ -11092,7 +11043,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1274731036 d:\florian\programmation\gamedevelop\ide\version.h
+1274988827 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -11243,5 +11194,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1274730937 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1274988263 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

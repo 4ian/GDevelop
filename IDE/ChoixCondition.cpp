@@ -38,7 +38,7 @@
 #include "GDL/HelpFileAccess.h"
 #include "GDL/TranslateCondition.h"
 #include "GDL/EditExpression.h"
-#include "EditTexte.h"
+#include "GDL/EditTextDialog.h"
 #include "GDL/ChooseObject.h"
 #include "ChoixBouton.h"
 #include "ChoixClavier.h"
@@ -47,7 +47,7 @@
 #include "GDL/ChooseLayer.h"
 #include "ChoiceJoyAxis.h"
 #include "ChoiceFile.h"
-#include "ChoixVariableDialog.h"
+#include "GDL/ChooseVariableDialog.h"
 #include "Extensions.h"
 
 #include <string>
@@ -605,10 +605,10 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionInfos.parameters[i].type == "text" )
         {
-            EditTexte dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
+            EditTextDialog dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
             if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->ChangeValue(dialog.texteFinal);
+                ParaEdit.at(i)->ChangeValue(dialog.returnedText);
             }
             return;
         }
@@ -682,7 +682,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             else
                 return;
 
-            ChoixVariableDialog dialog(this, object->variablesObjet);
+            ChooseVariableDialog dialog(this, object->variablesObjet);
             if ( dialog.ShowModal() == 1 )
             {
                 object->variablesObjet = dialog.variables;
@@ -693,7 +693,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionInfos.parameters[i].type == "scenevar" )
         {
-            ChoixVariableDialog dialog(this, scene.variables);
+            ChooseVariableDialog dialog(this, scene.variables);
             if ( dialog.ShowModal() == 1 )
             {
                 scene.variables = dialog.variables;
@@ -704,7 +704,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionInfos.parameters[i].type == "globalvar" )
         {
-            ChoixVariableDialog dialog(this, game.variables);
+            ChooseVariableDialog dialog(this, game.variables);
             if ( dialog.ShowModal() == 1 )
             {
                 game.variables = dialog.variables;

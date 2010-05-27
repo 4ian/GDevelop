@@ -205,6 +205,32 @@ TEST( Runtime, Expressions )
         GDExpression expression("(cos(5+abs(3))/(asin(0.1)*acos(0.55)))^3+cos(5+abs(3)/(asin(0.1)*acos(0.55))");
         CHECK_EQUAL(false, expression.PrepareForMathEvaluationOnly(game, scene));
     }
+}
+
+
+TEST( Runtime, StrExpressions )
+{
+    ObjSPtr object(new Object("object"));
+    Scene scene;
+    scene.initialObjects.push_back(object);
+    Game game;
+
+    {
+        GDExpression expression("\"Salut\"");
+        CHECK_EQUAL(true, expression.PrepareForTextEvaluationOnly(game, scene));
+    }
+    {
+        GDExpression expression("\"Salut \"+object.variableString(maVariable)");
+        CHECK_EQUAL(true, expression.PrepareForTextEvaluationOnly(game, scene));
+    }
+    {
+        GDExpression expression("object.x()");
+        CHECK_EQUAL(true, expression.PrepareForTextEvaluationOnly(game, scene));
+    }
+    {
+        GDExpression expression("\"X :\" + object.x()");
+        CHECK_EQUAL(true, expression.PrepareForTextEvaluationOnly(game, scene));
+    }
     {
         GDExpression expression("\"Salut\" + \"Ok\" + cos(5) + \" <- \"");
         CHECK_EQUAL(true, expression.PrepareForTextEvaluationOnly(game, scene));

@@ -8,7 +8,7 @@
 #include <vector>
 class Game;
 class Scene;
-#include "EditTexte.h"
+#include "GDL/EditTextDialog.h"
 
 using namespace std;
 
@@ -90,9 +90,9 @@ ChoiceJoyAxis::~ChoiceJoyAxis()
 
 void ChoiceJoyAxis::OnadvancedBtClick(wxCommandEvent& event)
 {
-    EditTexte dialog(this, joyaxis, game, scene, canSelectGroup, mainObjectsName);
+    EditTextDialog dialog(this, joyaxis, game, scene, canSelectGroup, mainObjectsName);
     if ( dialog.ShowModal() == 1 )
-        joyaxis = dialog.texteFinal;
+        joyaxis = dialog.returnedText;
 }
 
 void ChoiceJoyAxis::OnaxisRadioSelect(wxCommandEvent& event)

@@ -138,8 +138,10 @@ externalWindow(this)
 
 	Panel2->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnPanel2Resize,0,this);
 	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnScrollBar2Scroll);
+	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&EditorScene::OnScrollBar2Scroll);
 	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnScrollBar2Scroll);
 	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnScrollBar1Scroll);
+	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&EditorScene::OnScrollBar1Scroll);
 	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnScrollBar1Scroll);
 	sceneCanvas->Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorScene::OnsceneCanvasSetFocus,0,this);
 	Panel4->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnPanel4Resize,0,this);
@@ -536,6 +538,8 @@ void EditorScene::OnScrollBar2Scroll(wxScrollEvent& event)
 
     int newY = position-(ScrollBar2->GetRange()/2)+(sceneCanvas->GetHeight()/2);
     sceneCanvas->scene.view.SetCenter( sceneCanvas->scene.view.GetCenter().x, newY);
+
+    sceneCanvas->ManualRefresh();
 }
 
 ////////////////////////////////////////////////////////////
@@ -547,6 +551,8 @@ void EditorScene::OnScrollBar1Scroll(wxScrollEvent& event)
 
     int newX = position-(ScrollBar1->GetRange()/2)+(sceneCanvas->GetWidth()/2);
     sceneCanvas->scene.view.SetCenter( newX,  sceneCanvas->scene.view.GetCenter().y);
+
+    sceneCanvas->ManualRefresh();
 }
 
 ////////////////////////////////////////////////////////////

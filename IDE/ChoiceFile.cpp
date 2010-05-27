@@ -4,7 +4,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "EditTexte.h"
+#include "GDL/EditTextDialog.h"
 class Game;
 class Scene;
 
@@ -75,10 +75,10 @@ ChoiceFile::~ChoiceFile()
 
 void ChoiceFile::OnadvancedBtClick(wxCommandEvent& event)
 {
-    EditTexte dialog(this, file, game, scene, canSelectGroup, mainObjectsName);
+    EditTextDialog dialog(this, file, game, scene, canSelectGroup, mainObjectsName);
     if ( dialog.ShowModal() == 1 )
     {
-        file = dialog.texteFinal;
+        file = dialog.returnedText;
         fileEdit->ChangeValue(file);
     }
 }

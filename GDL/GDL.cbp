@@ -516,6 +516,8 @@
 		<Unit filename="GDL\ChooseObject.h" />
 		<Unit filename="GDL\ChooseObjectExpression.cpp" />
 		<Unit filename="GDL\ChooseObjectExpression.h" />
+		<Unit filename="GDL\ChooseVariableDialog.cpp" />
+		<Unit filename="GDL\ChooseVariableDialog.h" />
 		<Unit filename="GDL\Collisions.cpp" />
 		<Unit filename="GDL\Collisions.h" />
 		<Unit filename="GDL\CommentEvent.cpp" />
@@ -546,6 +548,8 @@
 		<Unit filename="GDL\EditLink.h" />
 		<Unit filename="GDL\EditRepeatEvent.cpp" />
 		<Unit filename="GDL\EditRepeatEvent.h" />
+		<Unit filename="GDL\EditTextDialog.cpp" />
+		<Unit filename="GDL\EditTextDialog.h" />
 		<Unit filename="GDL\EditorImages.cpp" />
 		<Unit filename="GDL\EditorImages.h" />
 		<Unit filename="GDL\EditorObjet.cpp" />
@@ -864,6 +868,8 @@
 					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDL/EditForEachEvent.cpp" hdr="GDL/EditForEachEvent.h" name="EditForEachEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDL/EditRepeatEvent.cpp" hdr="GDL/EditRepeatEvent.h" name="EditRepeatEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditExpression.wxs" src="GDL/EditExpression.cpp" hdr="GDL/EditExpression.h" name="EditExpression" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseVariableDialog.wxs" src="GDL/ChooseVariableDialog.cpp" hdr="GDL/ChooseVariableDialog.h" name="ChooseVariableDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditTextDialog.wxs" src="GDL/EditTextDialog.cpp" hdr="GDL/EditTextDialog.h" name="EditTextDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

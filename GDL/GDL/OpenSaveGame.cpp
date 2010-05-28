@@ -163,6 +163,8 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     if ( major <= 1 && minor <= 3 && build <= 9262 && revision <= 46622)
     {
         game.extensionsUsed.push_back("BuiltinCommonConversions");
+        game.extensionsUsed.push_back("BuiltinStringInstructions");
+
         notBackwardCompatible = true;
     }
     //End of Compatibility code --- with Game Develop 1.3.9262 and inferior

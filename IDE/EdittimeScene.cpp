@@ -21,10 +21,14 @@ gridB( 255 ),
 isMovingObject( false ),
 isResizingX( false ),
 isResizingY( false ),
+xRectangleSelection(0),
+yRectangleSelection(0),
+xEndRectangleSelection(0),
+yEndRectangleSelection(0),
 colorGUI( 0 ),
 colorPlus( true ),
-selection( sf::Shape::Rectangle( 0, 0, 10, 10, sf::Color( 100, 255, 255 ), 1 ) ),
 isMoving( false ),
+isSelecting(false),
 deplacementOX( 0 ),
 deplacementOY( 0 )
 {
@@ -133,8 +137,21 @@ void EdittimeScene::RenderEdittimeScene()
         }
     }
 
+    //Affichage de la grille
+    if ( grid )
+        RenderGrid();
+
+    //Draw GUI Elements
     for (unsigned int i = 0;i<GUIelements.size();++i)
     	renderWindow->Draw(GUIelements[i]);
+
+    if ( isSelecting )
+    {
+        sf::Shape selection = sf::Shape::Rectangle(xRectangleSelection, yRectangleSelection,
+                                                   xEndRectangleSelection, yEndRectangleSelection,
+                                                   sf::Color( 0, 0, 200, 40 ), 1, sf::Color( 0, 0, 255, 128 ) );
+        renderWindow->Draw(selection);
+    }
 
     //Affichage de l'objet à insérer en semi transparent
     if ( objectToAdd != "" )
@@ -170,9 +187,6 @@ void EdittimeScene::RenderEdittimeScene()
         catch ( ... ) { }
     }
 
-    //Affichage de la grille
-    if ( grid )
-        RenderGrid();
 
     renderWindow->RestoreGLStates();
     renderWindow->Display();

@@ -9567,7 +9567,7 @@
 	<string>
 	<vector>
 
-1273765128 d:\florian\programmation\gamedevelop\ide\scenecanvas.h
+1275081230 d:\florian\programmation\gamedevelop\ide\scenecanvas.h
 	<SFML/Graphics.hpp>
 	<SFML/System.hpp>
 	"wxSFMLCanvas.hpp"
@@ -9606,7 +9606,7 @@
 1274717533 d:\florian\programmation\gamedevelop\gdl\gdl\spriteobject.h
 	"GDL/Object.h"
 
-1264878682 d:\florian\programmation\gamedevelop\ide\edittimescene.h
+1275079510 d:\florian\programmation\gamedevelop\ide\edittimescene.h
 	<SFML/Graphics.hpp>
 	"GDL/RuntimeScene.h"
 	"GDL/Game.h"
@@ -10177,7 +10177,48 @@
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
-1269095730 source:d:\florian\programmation\gamedevelop\ide\edittimescene.cpp
+1274988825 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
+	"EditorScene.h"
+	<wx/settings.h>
+	<wx/intl.h>
+	<wx/string.h>
+	<wx/aui/aui.h>
+	<wx/toolbar.h>
+	<wx/config.h>
+	<wx/brush.h>
+	<wx/log.h>
+	<wx/dcclient.h>
+	"GDL/Game.h"
+	"GDL/RuntimeGame.h"
+	"GDL/ImageManager.h"
+	"Game_Develop_EditorMain.h"
+	"GDL/MainEditorCommand.h"
+	"SceneCanvas.h"
+	"GDL/ChooseObject.h"
+	"EditorEvents.h"
+	"GDL/HelpFileAccess.h"
+	"GridSetup.h"
+	"GDL/ChooseLayer.h"
+	"GDAuiTabArt.h"
+	<wx/ribbon/bar.h>
+	<wx/ribbon/buttonbar.h>
+	<wx/ribbon/toolbar.h>
+	<gtk/gtk.h>
+
+1264364134 d:\florian\programmation\gamedevelop\ide\gridsetup.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/checkbox.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/button.h>
+	<wx/dialog.h>
+
+1264364136 d:\florian\programmation\gamedevelop\ide\gdauitabart.h
+	<wx/aui/auibook.h>
+
+1275080059 source:d:\florian\programmation\gamedevelop\ide\edittimescene.cpp
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
 	"EdittimeScene.h"
@@ -10255,9 +10296,6 @@
 	<wx/renderer.h>
 	<iostream>
 	<wx/dcbuffer.h>
-
-1264364136 d:\florian\programmation\gamedevelop\ide\gdauitabart.h
-	<wx/aui/auibook.h>
 
 1274379168 source:d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
 	"debugMem.h"
@@ -10518,16 +10556,6 @@
 	<wx/colordlg.h>
 	<wx/log.h>
 	"GDL/CommonTools.h"
-
-1264364134 d:\florian\programmation\gamedevelop\ide\gridsetup.h
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/checkbox.h>
-	<wx/statline.h>
-	<wx/panel.h>
-	<wx/button.h>
-	<wx/dialog.h>
 
 1264364136 source:d:\florian\programmation\gamedevelop\ide\imageeditor.cpp
 	"ImageEditor.h"
@@ -10937,7 +10965,7 @@
 	<wx/string.h>
 	<iostream>
 
-1274989512 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1275080528 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<SFML/System.hpp>
@@ -11043,7 +11071,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1274989633 d:\florian\programmation\gamedevelop\ide\version.h
+1275081238 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -11194,33 +11222,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1274989429 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
-
-1274988825 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
-	"EditorScene.h"
-	<wx/settings.h>
-	<wx/intl.h>
-	<wx/string.h>
-	<wx/aui/aui.h>
-	<wx/toolbar.h>
-	<wx/config.h>
-	<wx/brush.h>
-	<wx/log.h>
-	<wx/dcclient.h>
-	"GDL/Game.h"
-	"GDL/RuntimeGame.h"
-	"GDL/ImageManager.h"
-	"Game_Develop_EditorMain.h"
-	"GDL/MainEditorCommand.h"
-	"SceneCanvas.h"
-	"GDL/ChooseObject.h"
-	"EditorEvents.h"
-	"GDL/HelpFileAccess.h"
-	"GridSetup.h"
-	"GDL/ChooseLayer.h"
-	"GDAuiTabArt.h"
-	<wx/ribbon/bar.h>
-	<wx/ribbon/buttonbar.h>
-	<wx/ribbon/toolbar.h>
-	<gtk/gtk.h>
+1275071793 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

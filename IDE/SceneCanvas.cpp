@@ -159,7 +159,7 @@ void SceneCanvas::OnKey( wxKeyEvent& evt )
 }
 
 
-void SceneCanvas::OnUpdate()
+void SceneCanvas::Refresh()
 {
     //On vérifie qu'on ne doit pas mettre à jour la scène
     if ( !scene.running || scene.editing )
@@ -193,7 +193,11 @@ void SceneCanvas::OnUpdate()
         scene.RenderWithoutStep();
     else
         scene.RenderEdittimeScene();
+}
 
+void SceneCanvas::OnUpdate()
+{
+    Refresh();
     UpdateScrollbars();
 }
 
@@ -217,13 +221,13 @@ void SceneCanvas::UpdateScrollbars()
     //On agrandit les scrollbars si besoin est
     if ( (thumbY+0) <= 0 || (thumbY+GetHeight()) >= scrollBar2->GetRange())
     {
-        int ajout = 400;
+        int ajout = GetHeight();
         scrollBar2->SetScrollbar(thumbY+ajout/2, GetHeight(), scrollBar2->GetRange()+ajout, GetHeight());
     }
 
     if ( (thumbX+0) <= 0 || (thumbX+GetWidth()) >= scrollBar1->GetRange())
     {
-        int ajout = 400;
+        int ajout = GetWidth();
         scrollBar1->SetScrollbar(thumbX+ajout/2, GetWidth(), scrollBar1->GetRange()+ajout, GetWidth());
     }
 }
@@ -274,21 +278,33 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
 
     ObjSPtr object = scene.FindSmallestObject();
 
-    //Suppression de la selection
-    if ( object == boost::shared_ptr<Object> () || /*Si clic n'importe où */
-        (( !scene.input->IsKeyDown(sf::Key::LShift) && !scene.input->IsKeyDown(sf::Key::RShift) ) && /*Ou si clic sur un objet sans Shift*/
-         find(scene.objectsSelected.begin(), scene.objectsSelected.end(), object) == scene.objectsSelected.end() ))
+    int mouseX = ConvertCoords(scene.input->GetMouseX(), 0).x;
+    int mouseY = ConvertCoords(0, scene.input->GetMouseY()).y;
+
+    //Suppress selection
+    if ( (!scene.input->IsKeyDown(sf::Key::LShift) && !scene.input->IsKeyDown(sf::Key::RShift)) && //Check that shift is not pressed
+        ( object == boost::shared_ptr<Object> () || //If no object is clicked
+         find(scene.objectsSelected.begin(), scene.objectsSelected.end(), object) == scene.objectsSelected.end()) ) //Or an object which is not currently selected.
     {
         scene.objectsSelected.clear();
         scene.xObjectsSelected.clear();
         scene.yObjectsSelected.clear();
+
+    }
+
+    //Manage selection area
+    if ( object == boost::shared_ptr<Object> () ) //If no object is clicked
+    {
+        //Creation
+        scene.isSelecting = true;
+        scene.xRectangleSelection = mouseX;
+        scene.yRectangleSelection = mouseY;
+        scene.xEndRectangleSelection = mouseX;
+        scene.yEndRectangleSelection = mouseY;
     }
 
     //On ajoute l'objet surligné dans les objets à bouger
     if ( object == boost::shared_ptr<Object> () ) return;
-
-    int mouseX = ConvertCoords(scene.input->GetMouseX(), 0).x;
-    int mouseY = ConvertCoords(0, scene.input->GetMouseY()).y;
 
     //Verify if user want to resize the object
     if (    scene.objectsSelected.size() == 1 &&
@@ -322,7 +338,7 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
         scene.isResizingX = false;
         scene.isResizingY = false;
     }
-    else
+    else //Add object to selection
     {
         if ( find(scene.objectsSelected.begin(), scene.objectsSelected.end(), object) == scene.objectsSelected.end() )
         {
@@ -365,10 +381,45 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
         }
     }
 
+    //Select object thanks to the selection area
+    if ( scene.isSelecting )
+    {
+        //Origin must be at the top left of the area
+        if ( scene.xEndRectangleSelection < scene.xRectangleSelection) std::swap(scene.xEndRectangleSelection, scene.xRectangleSelection);
+        if ( scene.yEndRectangleSelection < scene.yRectangleSelection) std::swap(scene.yEndRectangleSelection, scene.yRectangleSelection);
+
+        ObjList allObjects = scene.objectsInstances.GetAllObjects();
+
+        for (unsigned int id = 0;id < allObjects.size();++id)
+        {
+            //Find and add to selection all objects of the selection area
+            ObjSPtr object = allObjects[id];
+            if ( object->GetX() >= scene.xRectangleSelection &&
+                 object->GetX()+object->GetWidth() <= scene.xEndRectangleSelection &&
+                 object->GetY() >= scene.yRectangleSelection &&
+                 object->GetY()+object->GetHeight() <= scene.yEndRectangleSelection )
+             {
+                int IDInitialPosition = GetInitialPositionFromObject(object);
+                if ( IDInitialPosition != -1)
+                {
+                    if ( find(scene.objectsSelected.begin(), scene.objectsSelected.end(), object) == scene.objectsSelected.end() )
+                    {
+                        scene.objectsSelected.push_back(object);
+
+                        //Et on renseigne sa position de départ :
+                        scene.xObjectsSelected.push_back(object->GetX());
+                        scene.yObjectsSelected.push_back(object->GetY());
+                    }
+                }
+             }
+        }
+    }
+
     scene.isResizingX = false;
     scene.isResizingY = false;
     scene.isMovingObject = false;
     scene.isRotatingObject = false;
+    scene.isSelecting = false;
 }
 
 ////////////////////////////////////////////////////////////
@@ -499,6 +550,11 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
                 object->SetY( newY );
             }
         }
+    }
+    if ( scene.isSelecting )
+    {
+        scene.xEndRectangleSelection = mouseXInScene;
+        scene.yEndRectangleSelection = mouseYInScene;
     }
 
 }

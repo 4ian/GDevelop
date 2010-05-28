@@ -62,10 +62,15 @@ class EdittimeScene : public RuntimeScene
         int xDecalement;
         int yDecalement;
 
+        //Rectangle de selection
+        float xRectangleSelection;
+        float yRectangleSelection;
+        float xEndRectangleSelection;
+        float yEndRectangleSelection;
+
         //Affichage de rectangles autour des selections
         int colorGUI;
         bool colorPlus;
-        sf::Shape selection;
 
         //Remember cursor old position
         int oldMouseX;
@@ -73,6 +78,7 @@ class EdittimeScene : public RuntimeScene
 
         //Déplacement avec la souris ( clic molette )
         bool isMoving;
+        bool isSelecting;
         int deplacementOX;
         int deplacementOY;
 

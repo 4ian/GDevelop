@@ -51,7 +51,7 @@ public :
     MainEditorCommand & mainEditorCommand;
 
     void Reload();
-    inline void ManualRefresh() { OnUpdate(); };
+    inline void ManualRefresh() { Refresh(); };
     void UpdateScrollbars();
 
     void SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_);
@@ -63,6 +63,7 @@ private :
 
     //Mise à jour
     virtual void OnUpdate();
+    void Refresh();
     void UpdateContextMenu();
 
     //Interaction

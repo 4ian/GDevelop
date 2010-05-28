@@ -423,8 +423,6 @@
 		<Unit filename="ChoixTemplateEvent.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Templates\" />
 		</Unit>
-		<Unit filename="ChoixVariableDialog.cpp" />
-		<Unit filename="ChoixVariableDialog.h" />
 		<Unit filename="Clipboard.cpp">
 			<Option virtualFolder="Racine\" />
 		</Unit>
@@ -564,12 +562,6 @@
 		</Unit>
 		<Unit filename="EditPropScene.h">
 			<Option virtualFolder="Editeur principal\Autres\" />
-		</Unit>
-		<Unit filename="EditTexte.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
-		</Unit>
-		<Unit filename="EditTexte.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
 		</Unit>
 		<Unit filename="EditorEvents.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
@@ -853,7 +845,6 @@
 					<wxDialog wxs="wxsmith/EditDossier.wxs" src="EditDossier.cpp" hdr="EditDossier.h" name="EditDossier" language="CPP" />
 					<wxDialog wxs="wxsmith/MessagePlus.wxs" src="MessagePlus.cpp" hdr="MessagePlus.h" name="MessagePlus" language="CPP" />
 					<wxDialog wxs="wxsmith/Compilation.wxs" src="Compilation.cpp" hdr="Compilation.h" name="Compilation" language="CPP" />
-					<wxDialog wxs="wxsmith/EditTexte.wxs" src="EditTexte.cpp" hdr="EditTexte.h" name="EditTexte" language="CPP" />
 					<wxDialog wxs="wxsmith/Demarrage.wxs" src="Demarrage.cpp" hdr="Demarrage.h" name="Demarrage" language="CPP" />
 					<wxDialog wxs="wxsmith/ConvertJRC.wxs" src="ConvertJRC.cpp" hdr="ConvertJRC.h" name="ConvertJRC" language="CPP" />
 					<wxDialog wxs="wxsmith/Portable.wxs" src="Portable.cpp" hdr="Portable.h" name="Portable" language="CPP" />
@@ -892,7 +883,6 @@
 					<wxDialog wxs="wxsmith/ObjectTypeChoice.wxs" src="ObjectTypeChoice.cpp" hdr="ObjectTypeChoice.h" name="ObjectTypeChoice" language="CPP" />
 					<wxPanel wxs="wxsmith/SpriteInitialPositionPanel.wxs" src="SpriteInitialPositionPanel.cpp" hdr="SpriteInitialPositionPanel.h" name="SpriteInitialPositionPanel" language="CPP" />
 					<wxDialog wxs="wxsmith/InitialVariablesDialog.wxs" src="InitialVariablesDialog.cpp" hdr="InitialVariablesDialog.h" name="InitialVariablesDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoixVariableDialog.wxs" src="ChoixVariableDialog.cpp" hdr="ChoixVariableDialog.h" name="ChoixVariableDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/TextObjectEditor.wxs" src="TextObjectEditor.cpp" hdr="TextObjectEditor.h" name="TextObjectEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/DrawerObjectEditor.wxs" src="DrawerObjectEditor.cpp" hdr="DrawerObjectEditor.h" name="DrawerObjectEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="RenderDialog.cpp" hdr="RenderDialog.h" name="RenderDialog" language="CPP" />

@@ -216,7 +216,7 @@ toolbar(NULL)
         mainEditorCommand.GetMainEditor()->Connect(idRibbonPaintProgram, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnOpenPaintProgramClick, NULL, this);
         mainEditorCommand.GetMainEditor()->Connect(idRibbonSearch, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnChercherBtClick, NULL, this);
         mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnAideBtClick, NULL, this);
-        mainEditorCommand.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::Refresh, NULL, this);
+        mainEditorCommand.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnRefreshBtClick, NULL, this);
     }
 
 
@@ -487,6 +487,7 @@ void EditorImages::OnMoreOptions( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorImages::OnRefreshBtClick( wxCommandEvent& event )
 {
+    game.imagesWereModified = true;
     Refresh();
 }
 

@@ -150,7 +150,7 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
 
         //Draw sub conditions
         if ( !conditions[j].GetSubInstructions().empty() )
-            yCondition += DrawConditionsList(conditions[j].GetSubInstructions(), dc, x + sideSeparation + leftIconsWidth + iconWidth + 18, yCondition, width-18);
+            yCondition += DrawConditionsList(conditions[j].GetSubInstructions(), dc, x + sideSeparation + leftIconsWidth + iconWidth + 18, yCondition, width-(sideSeparation + leftIconsWidth + iconWidth + 18));
         else if ( instructionInfos.canHaveSubInstructions )
         {
             dc.SetFont( GetItalicFont() );

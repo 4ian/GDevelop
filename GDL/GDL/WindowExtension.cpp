@@ -15,7 +15,7 @@ WindowExtension::WindowExtension()
     DECLARE_ACTION("EcrireTexte",
                    _("Afficher un texte"),
                    _("Affiche le texte spécifié à l'écran."),
-                   _("Afficher \"_PARAM0_\" en _PARAM1_;_PARAM2_ ( couleur : _PARAM3_ , taille : _PARAM4_, police : _PARAM5_ )"),
+                   _("Afficher _PARAM0_ en _PARAM1_;_PARAM2_ ( couleur : _PARAM3_ , taille : _PARAM4_, police : _PARAM5_ )"),
                    _("Scène"),
                    "res/actions/texte24.png",
                    "res/actions/texte.png",

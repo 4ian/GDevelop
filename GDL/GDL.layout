@@ -46,8 +46,8 @@
 	<File name="GDL\Camera.h" open="0" top="0" tabpos="23">
 		<Cursor position="148" topLine="0" />
 	</File>
-	<File name="GDL\CameraExtension.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="16397" topLine="295" />
+	<File name="GDL\CameraExtension.cpp" open="1" top="0" tabpos="11">
+		<Cursor position="12815" topLine="213" />
 	</File>
 	<File name="GDL\Chercher.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="83" topLine="0" />
@@ -409,8 +409,8 @@
 	<File name="GDL\ObjectsConcerned.h" open="0" top="0" tabpos="4">
 		<Cursor position="3300" topLine="90" />
 	</File>
-	<File name="GDL\OpenSaveGame.cpp" open="1" top="1" tabpos="5">
-		<Cursor position="5637" topLine="152" />
+	<File name="GDL\OpenSaveGame.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="5976" topLine="152" />
 	</File>
 	<File name="GDL\OpenSaveGame.h" open="0" top="0" tabpos="6">
 		<Cursor position="2686" topLine="30" />
@@ -574,8 +574,8 @@
 	<File name="GDL\WhileEvent.h" open="0" top="0" tabpos="22">
 		<Cursor position="3085" topLine="32" />
 	</File>
-	<File name="GDL\WindowExtension.cpp" open="0" top="0" tabpos="17">
-		<Cursor position="961" topLine="0" />
+	<File name="GDL\WindowExtension.cpp" open="1" top="0" tabpos="12">
+		<Cursor position="1872" topLine="12" />
 	</File>
 	<File name="GDL\aADS.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="3578" topLine="42" />

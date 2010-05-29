@@ -53,7 +53,6 @@ class Extension : public ExtensionBase
                            _("Objet affichant un texte"),
                            "Extensions/texticon.png",
                            &CreateTextObject,
-                           &CreateTextObjectByCopy,
                            &DestroyTextObject);
 
                 DECLARE_OBJECT_ACTION("String",
@@ -66,7 +65,7 @@ class Extension : public ExtensionBase
                                &TextObject::ActString);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
-                    DECLARE_PARAMETER("texte", _("Texte"), false, "")
+                    DECLARE_PARAMETER("text", _("Texte"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -82,7 +81,7 @@ class Extension : public ExtensionBase
                                &TextObject::CondString);
 
                     DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
-                    DECLARE_PARAMETER("texte", _("Texte à tester"), false, "")
+                    DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -264,6 +263,7 @@ class Extension : public ExtensionBase
             #endif
 
             compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
+            compilationInfo.sizeOfpInt = sizeof(int*);
 
             compilationInfo.informationCompleted = true;
         }

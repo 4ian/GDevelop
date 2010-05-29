@@ -54,6 +54,7 @@ class TextObject : public Object
 
         TextObject(std::string name_);
         virtual ~TextObject() {};
+        virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new TextObject(*this));}
 
         virtual bool LoadResources(const ImageManager & imageMgr );
         virtual bool InitializeFromInitialPosition(const InitialPosition & position);
@@ -112,26 +113,26 @@ class TextObject : public Object
         inline unsigned int GetColorB() const { return colorB; };
 
         //ACE for string
-        bool CondString( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool ActString( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+        bool CondString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         //ACE for font and size
-        bool ActFont( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool CondSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool ActSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+        bool ActFont( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         //ACE for opacity
-        bool CondOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool ActOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        double ExpOpacity( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        bool CondOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        double ExpOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 
         //ACE for angle
-        bool CondAngle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval );
-        bool ActAngle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        double ExpAngle( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        bool CondAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        double ExpAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 
         //Action for color
-        bool ActChangeColor( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+        bool ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
     private:
 

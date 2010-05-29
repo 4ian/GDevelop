@@ -15,6 +15,7 @@
 					<Add option="-Wall" />
 					<Add option="-pg" />
 					<Add option="-g" />
+					<Add option="-m32" />
 					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
@@ -43,11 +44,11 @@
 					<Add option="-Wall" />
 					<Add option="-pg" />
 					<Add option="-g" />
+					<Add option="-m32" />
 					<Add option="-DGDE" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
-					<Add option="-DPYSUPPORT" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-D__WXDEBUG__" />
@@ -109,6 +110,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DRELEASE" />
@@ -136,6 +138,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DGDE" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DRELEASE" />
@@ -201,6 +204,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
@@ -228,6 +232,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DGDE" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
@@ -294,6 +299,7 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
 					<Add option="-DGDP" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
@@ -319,6 +325,89 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\release" />
+					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+				</Linker>
+			</Target>
+			<Target title="Linux - Release - Edittime">
+				<Option output="..\..\IDE\bin\release\Extensions\TextObject.xgdle" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Release Edittime\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-finput-charset=iso-8859-1" />
+					<Add option="-m32" />
+					<Add option="`wx-config --cppflags`" />
+					<Add option="`pkg-config gtk+-2.0 --cflags`" />
+					<Add option="-DGDE" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl" />
+					<Add option="`wx-config --libs all`" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="..\..\IDE\bin\release" />
+					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+				</Linker>
+			</Target>
+			<Target title="Linux - Debug - Edittime">
+				<Option output="..\..\IDE\bin\debug\Extensions\TextObject.xgdle" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Debug Edittime\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-finput-charset=iso-8859-1" />
+					<Add option="-m32" />
+					<Add option="`wx-config --cppflags`" />
+					<Add option="`pkg-config gtk+-2.0 --cflags`" />
+					<Add option="-DGDE" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-lgdl" />
+					<Add option="`wx-config --libs all`" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="..\..\IDE\bin\debug" />
 					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
 				</Linker>
 			</Target>

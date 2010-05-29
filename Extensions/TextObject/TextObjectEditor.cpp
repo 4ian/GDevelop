@@ -119,8 +119,8 @@ object(object_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TextObjectEditor::OnokBtClick);
 	//*)
 
-	textEdit->SetValue(object.GetString());
-	fontEdit->SetValue(object.GetFont());
+	textEdit->ChangeValue(object.GetString());
+	fontEdit->ChangeValue(object.GetFont());
 	sizeEdit->SetValue(object.GetCharacterSize());
 	colorBt->SetBackgroundColour(wxColour(object.GetColorR(), object.GetColorG(), object.GetColorB()));
 }
@@ -158,7 +158,7 @@ void TextObjectEditor::OnfontBtClick(wxCommandEvent& event)
 
     if ( dialog.GetPath() != "" )
     {
-        fontEdit->SetValue(dialog.GetPath());
+        fontEdit->ChangeValue(dialog.GetPath());
     }
 }
 

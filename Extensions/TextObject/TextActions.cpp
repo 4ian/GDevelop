@@ -29,42 +29,42 @@ freely, subject to the following restrictions:
 #include "GDL/Instruction.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 
 
 /**
  * Change the string
  */
-bool TextObject::ActString( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool TextObject::ActString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter(2).GetAsModOperator() == GDExpression::Set )
-        text.SetString( eval.EvalTxt(action.GetParameter(1), shared_from_this()) );
+        text.SetString( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()) );
     else if ( action.GetParameter(2).GetAsModOperator() == GDExpression::Add )
-        text.SetString( string(text.GetString()) + eval.EvalTxt(action.GetParameter(1), shared_from_this()) );
+        text.SetString( string(text.GetString()) + action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()) );
 
     return true;
 }
 
-bool TextObject::ActFont( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool TextObject::ActFont( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    SetFont(eval.EvalTxt(action.GetParameter(1), shared_from_this()));
+    SetFont(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()));
 
     return true;
 }
 
 
-bool TextObject::ActSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool TextObject::ActSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetCharacterSize( static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetCharacterSize( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetCharacterSize( GetCharacterSize() + static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetCharacterSize( GetCharacterSize() + static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetCharacterSize( GetCharacterSize() - static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetCharacterSize( GetCharacterSize() - static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetCharacterSize( GetCharacterSize() * static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetCharacterSize( GetCharacterSize() * static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetCharacterSize( GetCharacterSize() / static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetCharacterSize( GetCharacterSize() / static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
 
     return true;
 }
@@ -73,18 +73,18 @@ bool TextObject::ActSize( RuntimeScene * scene, ObjectsConcerned & objectsConcer
 /**
  * Modify opacity
  */
-bool TextObject::ActOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool TextObject::ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetOpacity( static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOpacity( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetOpacity( GetOpacity() + static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOpacity( GetOpacity() + static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetOpacity( GetOpacity() - static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOpacity( GetOpacity() - static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetOpacity( GetOpacity() * static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOpacity( GetOpacity() * static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetOpacity( GetOpacity() / static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOpacity( GetOpacity() / static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
 
     return true;
 }
@@ -92,15 +92,15 @@ bool TextObject::ActOpacity( RuntimeScene * scene, ObjectsConcerned & objectsCon
 /**
  * Change the color of the texte
  */
-bool TextObject::ActChangeColor( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool TextObject::ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    vector < string > colors = SpliterStringToVector <string> (eval.EvalTxt(action.GetParameter(1), shared_from_this()), ';');
+    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), ';');
 
     if ( colors.size() < 3 ) return false; //La couleur est incorrecte
 
-    colorR = toInt(colors[0]);
-    colorG = toInt(colors[1]);
-    colorB = toInt(colors[2]);
+    colorR = ToInt(colors[0]);
+    colorG = ToInt(colors[1]);
+    colorB = ToInt(colors[2]);
 
     return true;
 }
@@ -109,18 +109,18 @@ bool TextObject::ActChangeColor( RuntimeScene * scene, ObjectsConcerned & object
 /**
  * Modify angle
  */
-bool TextObject::ActAngle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool TextObject::ActAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetAngle( static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetAngle( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetAngle( GetAngle() + static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetAngle( GetAngle() + static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetAngle( GetAngle() - static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetAngle( GetAngle() - static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetAngle( GetAngle() * static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetAngle( GetAngle() * static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetAngle( GetAngle() / static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetAngle( GetAngle() / static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
 
     return true;
 }

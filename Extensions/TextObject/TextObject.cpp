@@ -35,14 +35,14 @@ freely, subject to the following restrictions:
 
 #ifdef GDE
 #include <wx/wx.h>
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
 #include "TextObjectEditor.h"
 #endif
 
 TextObject::TextObject(std::string name_) :
 Object(name_),
-text("Text"),
+text("Text", FontManager->getInstance()->GetFont("")),
 opacity( 255 ),
 colorR( 255 ),
 colorG( 255 ),
@@ -139,8 +139,6 @@ bool TextObject::LoadResources(const ImageManager & imageMgr )
  */
 bool TextObject::InitializeFromInitialPosition(const InitialPosition & position)
 {
-    //TODO
-
     return true;
 }
 
@@ -195,29 +193,27 @@ void TextObject::EditObject( wxWindow* parent, Game & game, MainEditorCommand & 
 
 wxPanel * TextObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
 {
-    //TODO
     return NULL;
 }
 
 void TextObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position)
 {
-    //TODO
 }
 
 void TextObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Texte");                     value = text.GetString();}
     else if ( propertyNb == 1 ) {name = _("Police");                    value = fontName;}
-    else if ( propertyNb == 2 ) {name = _("Taille de caractères");      value = toString(GetCharacterSize());}
-    else if ( propertyNb == 3 ) {name = _("Couleur");       value = toString(colorR)+";"+toString(colorG)+";"+toString(colorB);}
-    else if ( propertyNb == 4 ) {name = _("Opacité");       value = toString(GetOpacity());}
+    else if ( propertyNb == 2 ) {name = _("Taille de caractères");      value = ToString(GetCharacterSize());}
+    else if ( propertyNb == 3 ) {name = _("Couleur");       value = ToString(colorR)+";"+ToString(colorG)+";"+ToString(colorB);}
+    else if ( propertyNb == 4 ) {name = _("Opacité");       value = ToString(GetOpacity());}
 }
 
 bool TextObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if      ( propertyNb == 0 ) { text.SetString(newValue); return true; }
     else if ( propertyNb == 1 ) { SetFont(newValue); }
-    else if ( propertyNb == 2 ) { SetCharacterSize(toInt(newValue)); }
+    else if ( propertyNb == 2 ) { SetCharacterSize(ToInt(newValue)); }
     else if ( propertyNb == 3 )
     {
         string r, gb, g, b;
@@ -241,9 +237,9 @@ bool TextObject::ChangeProperty(unsigned int propertyNb, string newValue)
             b = gb.substr(separationPos+1, gb.length());
         }
 
-        SetColor(toInt(r), toInt(g), toInt(b));
+        SetColor(ToInt(r), ToInt(g), ToInt(b));
     }
-    else if ( propertyNb == 4 ) { SetOpacity(toInt(newValue)); }
+    else if ( propertyNb == 4 ) { SetOpacity(ToInt(newValue)); }
 
     return true;
 }

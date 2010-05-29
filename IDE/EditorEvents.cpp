@@ -660,13 +660,14 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
 
         //Hit test
         if ( MouseY >= Yposition+positionScrollbar &&
-             MouseY <= Yposition+positionScrollbar+static_cast<signed>(renderedHeight) )
+             MouseY <= Yposition+positionScrollbar+static_cast<signed>(renderedHeight) &&
+             MouseX-initialXposition >= 0 )
         {
             eventsSelected.push_back(boost::make_tuple(&list, i,              //Useful part
                                                        (vector<Instruction>*)NULL, 0)); //Useless
             list[i]->selected = true;
             list[i]->eventRenderingNeedUpdate = true;
-            list[i]->OnSingleClick(MouseX, MouseY-(Yposition+positionScrollbar), eventsSelected, conditionsSelected, instructionsSelected);
+            list[i]->OnSingleClick(MouseX-initialXposition, MouseY-(Yposition+positionScrollbar), eventsSelected, conditionsSelected, instructionsSelected);
         }
 
         //Render

@@ -30,15 +30,15 @@ freely, subject to the following restrictions:
 #include "GDL/RuntimeScene.h"
 #include "DrawerObject.h"
 
-bool DrawerObject::CondOutlineSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool DrawerObject::CondOutlineSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetOutlineSize() == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetOutlineSize() < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetOutlineSize() > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetOutlineSize() <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetOutlineSize() >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetOutlineSize() != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetOutlineSize() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetOutlineSize() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetOutlineSize() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetOutlineSize() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetOutlineSize() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetOutlineSize() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
        return true;
@@ -51,15 +51,15 @@ bool DrawerObject::CondOutlineSize( RuntimeScene * scene, ObjectsConcerned & obj
 /**
  * Test the fill color opacity
  */
-bool DrawerObject::CondFillOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool DrawerObject::CondFillOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetFillOpacity() == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetFillOpacity() < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetFillOpacity() > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetFillOpacity() <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetFillOpacity() >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetFillOpacity() != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetFillOpacity() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetFillOpacity() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetFillOpacity() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetFillOpacity() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetFillOpacity() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetFillOpacity() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
        return true;
@@ -71,15 +71,15 @@ bool DrawerObject::CondFillOpacity( RuntimeScene * scene, ObjectsConcerned & obj
 /**
  * Test the opacity
  */
-bool DrawerObject::CondOutlineOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool DrawerObject::CondOutlineOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetOutlineOpacity() == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetOutlineOpacity() < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetOutlineOpacity() > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetOutlineOpacity() <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetOutlineOpacity() >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetOutlineOpacity() != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetOutlineOpacity() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetOutlineOpacity() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetOutlineOpacity() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetOutlineOpacity() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetOutlineOpacity() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetOutlineOpacity() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
        return true;

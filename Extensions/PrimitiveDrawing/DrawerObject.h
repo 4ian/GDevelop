@@ -53,6 +53,7 @@ class DrawerObject : public Object
 
         DrawerObject(std::string name_);
         virtual ~DrawerObject() {};
+        virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new DrawerObject(*this));}
 
         virtual bool LoadResources(const ImageManager & imageMgr );
         virtual bool InitializeFromInitialPosition(const InitialPosition & position);
@@ -118,23 +119,23 @@ class DrawerObject : public Object
         inline bool AreCoordinatesAbsolute() { return absoluteCoordinates; }
 
         //Setup
-        bool ActFillColor( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActFillOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActOutlineColor( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActOutlineOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActOutlineSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+        bool ActFillColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActFillOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActOutlineColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActOutlineOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActOutlineSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
-        bool CondFillOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool CondOutlineOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool CondOutlineSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+        bool CondFillOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondOutlineOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondOutlineSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         //Shapes
-        bool ActRectangle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActLine( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-        bool ActCircle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+        bool ActRectangle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActLine( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActCircle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
-        double ExpFillOpacity( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpOutlineOpacity( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpFillOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpOutlineOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
     private:
 
         vector < sf::Shape > shapesToDraw;
@@ -160,7 +161,7 @@ class DrawerObject : public Object
         #endif
 };
 
-bool ActCopyImageOnAnother( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+bool ActCopyImageOnAnother( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 void DestroyDrawerObject(Object * object);
 Object * CreateDrawerObject(std::string name);

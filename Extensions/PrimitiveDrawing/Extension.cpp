@@ -45,7 +45,7 @@ class Extension : public ExtensionBase
                           _("Dessin primitif"),
                           _("Extension permettant de dessiner directement des formes et de manipuler des images."),
                           "Compil Games",
-                          "Freeware")
+                          "zlib/libpng License ( Open Source )")
 
             //Declaration of all objects available
             DECLARE_OBJECT("Drawer",
@@ -53,7 +53,6 @@ class Extension : public ExtensionBase
                            _("Objet permettant de dessiner à l'écran"),
                            "Extensions/primitivedrawingicon.png",
                            &CreateDrawerObject,
-                           &CreateDrawerObjectByCopy,
                            &DestroyDrawerObject);
 
                 DECLARE_OBJECT_ACTION("Rectangle",
@@ -247,8 +246,8 @@ class Extension : public ExtensionBase
                            "res/actions/opacity.png",
                            &ActCopyImageOnAnother);
 
-                DECLARE_PARAMETER("texte", _("Nom de l'image à modifier"), false, "")
-                DECLARE_PARAMETER("texte", _("Nom de l'image source"), false, "")
+                DECLARE_PARAMETER("text", _("Nom de l'image à modifier"), false, "")
+                DECLARE_PARAMETER("text", _("Nom de l'image source"), false, "")
                 DECLARE_PARAMETER("expression", _("Position X"), false, "")
                 DECLARE_PARAMETER("expression", _("Position Y"), false, "")
 
@@ -293,6 +292,7 @@ class Extension : public ExtensionBase
             #endif
 
             compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
+            compilationInfo.sizeOfpInt = sizeof(int*);
 
             compilationInfo.informationCompleted = true;
         }

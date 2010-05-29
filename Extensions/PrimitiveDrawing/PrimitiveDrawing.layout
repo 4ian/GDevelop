@@ -1,34 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="DrawerActions.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="1069" topLine="20" />
+	<File name="DrawerActions.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="1133" topLine="30" />
 	</File>
-	<File name="DrawerConditions.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="980" topLine="0" />
+	<File name="DrawerConditions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="1007" topLine="3" />
 	</File>
 	<File name="DrawerExpressions.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="980" topLine="0" />
+		<Cursor position="1450" topLine="2" />
 	</File>
 	<File name="DrawerObject.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="980" topLine="36" />
+		<Cursor position="7389" topLine="205" />
 	</File>
-	<File name="DrawerObject.h" open="0" top="0" tabpos="6">
-		<Cursor position="6919" topLine="141" />
+	<File name="DrawerObject.h" open="0" top="0" tabpos="3">
+		<Cursor position="1546" topLine="43" />
 	</File>
-	<File name="DrawerObjectEditor.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="9971" topLine="175" />
+	<File name="DrawerObjectEditor.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="8800" topLine="129" />
 	</File>
 	<File name="DrawerObjectEditor.h" open="0" top="0" tabpos="0">
 		<Cursor position="1372" topLine="36" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="13372" topLine="31" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="12986" topLine="214" />
 	</File>
 	<File name="..\..\GDL\GDL\tinystr.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="247" topLine="30" />
 	</File>
 	<File name="..\..\GDL\GDL\tinystr.h" open="0" top="0" tabpos="0">
 		<Cursor position="1734" topLine="36" />
+	</File>
+	<File name="..\..\GDL\GDL\tinyxmlparser.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="9043" topLine="342" />
 	</File>
 </CodeBlocks_layout_file>

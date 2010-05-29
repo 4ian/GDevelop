@@ -35,7 +35,7 @@ freely, subject to the following restrictions:
 
 #ifdef GDE
 #include <wx/wx.h>
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
 #include "DrawerObjectEditor.h"
 #endif
@@ -240,22 +240,20 @@ void DrawerObject::EditObject( wxWindow* parent, Game & game, MainEditorCommand 
 
 wxPanel * DrawerObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
 {
-    //TODO
     return NULL;
 }
 
 void DrawerObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position)
 {
-    //TODO
 }
 
 void DrawerObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Couleur de remplissage");    value = toString(fillColorR)+";"+toString(fillColorG)+";"+toString(fillColorB);}
-    else if ( propertyNb == 1 ) {name = _("Opacité du remplissage");    value = toString(fillOpacity);}
-    else if ( propertyNb == 2 ) {name = _("Taille du contour");         value = toString(outlineSize);}
-    else if ( propertyNb == 3 ) {name = _("Couleur du contour");        value = toString(outlineColorR)+";"+toString(outlineColorG)+";"+toString(outlineColorB);}
-    else if ( propertyNb == 4 ) {name = _("Opacité du contour");        value = toString(outlineOpacity);}
+    if      ( propertyNb == 0 ) {name = _("Couleur de remplissage");    value = ToString(fillColorR)+";"+ToString(fillColorG)+";"+ToString(fillColorB);}
+    else if ( propertyNb == 1 ) {name = _("Opacité du remplissage");    value = ToString(fillOpacity);}
+    else if ( propertyNb == 2 ) {name = _("Taille du contour");         value = ToString(outlineSize);}
+    else if ( propertyNb == 3 ) {name = _("Couleur du contour");        value = ToString(outlineColorR)+";"+ToString(outlineColorG)+";"+ToString(outlineColorB);}
+    else if ( propertyNb == 4 ) {name = _("Opacité du contour");        value = ToString(outlineOpacity);}
 }
 
 bool DrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -283,10 +281,10 @@ bool DrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
             b = gb.substr(separationPos+1, gb.length());
         }
 
-        SetFillColor(toInt(r), toInt(g), toInt(b));
+        SetFillColor(ToInt(r), ToInt(g), ToInt(b));
     }
-    else if ( propertyNb == 1 ) { SetFillOpacity(toInt(newValue)); }
-    else if ( propertyNb == 2 ) { SetOutlineSize(toInt(newValue)); }
+    else if ( propertyNb == 1 ) { SetFillOpacity(ToInt(newValue)); }
+    else if ( propertyNb == 2 ) { SetOutlineSize(ToInt(newValue)); }
     else if ( propertyNb == 3 )
     {
         string r, gb, g, b;
@@ -310,9 +308,9 @@ bool DrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
             b = gb.substr(separationPos+1, gb.length());
         }
 
-        SetOutlineColor(toInt(r), toInt(g), toInt(b));
+        SetOutlineColor(ToInt(r), ToInt(g), ToInt(b));
     }
-    else if ( propertyNb == 4 ) { SetOutlineOpacity(toInt(newValue)); }
+    else if ( propertyNb == 4 ) { SetOutlineOpacity(ToInt(newValue)); }
 
     return true;
 }

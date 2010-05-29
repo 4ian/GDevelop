@@ -30,12 +30,12 @@ freely, subject to the following restrictions:
 #include "GDL/ObjectsConcerned.h"
 #include "DrawerObject.h"
 
-double DrawerObject::ExpFillOpacity( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double DrawerObject::ExpFillOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return fillOpacity;
 }
 
-double DrawerObject::ExpOutlineOpacity( const RuntimeScene * scene, ObjectsConcerned * objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double DrawerObject::ExpOutlineOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return outlineOpacity;
 }

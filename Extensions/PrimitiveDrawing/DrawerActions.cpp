@@ -28,21 +28,21 @@ freely, subject to the following restrictions:
 #include "GDL/Instruction.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "DrawerObject.h"
 
-bool DrawerObject::ActOutlineSize( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool DrawerObject::ActOutlineSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetOutlineSize( static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOutlineSize( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetOutlineSize( GetOutlineSize() + static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOutlineSize( GetOutlineSize() + static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetOutlineSize( GetOutlineSize() - static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOutlineSize( GetOutlineSize() - static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetOutlineSize( GetOutlineSize() * static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOutlineSize( GetOutlineSize() * static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetOutlineSize( GetOutlineSize() / static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOutlineSize( GetOutlineSize() / static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
 
     return true;
 }
@@ -50,18 +50,18 @@ bool DrawerObject::ActOutlineSize( RuntimeScene * scene, ObjectsConcerned & obje
 /**
  * Modify fill color opacity
  */
-bool DrawerObject::ActFillOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool DrawerObject::ActFillOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetFillOpacity( static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetFillOpacity( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetFillOpacity( GetFillOpacity() + static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetFillOpacity( GetFillOpacity() + static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetFillOpacity( GetFillOpacity() - static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetFillOpacity( GetFillOpacity() - static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetFillOpacity( GetFillOpacity() * static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetFillOpacity( GetFillOpacity() * static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetFillOpacity( GetFillOpacity() / static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetFillOpacity( GetFillOpacity() / static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
 
     return true;
 }
@@ -69,18 +69,18 @@ bool DrawerObject::ActFillOpacity( RuntimeScene * scene, ObjectsConcerned & obje
 /**
  * Modify opacity
  */
-bool DrawerObject::ActOutlineOpacity( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool DrawerObject::ActOutlineOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetOutlineOpacity( static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOutlineOpacity( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetOutlineOpacity( GetOutlineOpacity() + static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOutlineOpacity( GetOutlineOpacity() + static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetOutlineOpacity( GetOutlineOpacity() - static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOutlineOpacity( GetOutlineOpacity() - static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetOutlineOpacity( GetOutlineOpacity() * static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOutlineOpacity( GetOutlineOpacity() * static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetOutlineOpacity( GetOutlineOpacity() / static_cast<int>(eval.EvalExp( action.GetParameter( 1 ), shared_from_this())));
+        SetOutlineOpacity( GetOutlineOpacity() / static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
 
     return true;
 }
@@ -88,15 +88,15 @@ bool DrawerObject::ActOutlineOpacity( RuntimeScene * scene, ObjectsConcerned & o
 /**
  * Change the fill color
  */
-bool DrawerObject::ActFillColor( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool DrawerObject::ActFillColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    vector < string > colors = SpliterStringToVector <string> (eval.EvalTxt(action.GetParameter(1), shared_from_this()), ';');
+    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), ';');
 
     if ( colors.size() < 3 ) return false; //La couleur est incorrecte
 
-    fillColorR = toInt(colors[0]);
-    fillColorG = toInt(colors[1]);
-    fillColorB = toInt(colors[2]);
+    fillColorR = ToInt(colors[0]);
+    fillColorG = ToInt(colors[1]);
+    fillColorB = ToInt(colors[2]);
 
     return true;
 }
@@ -104,28 +104,28 @@ bool DrawerObject::ActFillColor( RuntimeScene * scene, ObjectsConcerned & object
 /**
  * Change the color of the outline
  */
-bool DrawerObject::ActOutlineColor( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool DrawerObject::ActOutlineColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    vector < string > colors = SpliterStringToVector <string> (eval.EvalTxt(action.GetParameter(1), shared_from_this()), ';');
+    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), ';');
 
     if ( colors.size() < 3 ) return false; //La couleur est incorrecte
 
-    outlineColorR = toInt(colors[0]);
-    outlineColorG = toInt(colors[1]);
-    outlineColorB = toInt(colors[2]);
+    outlineColorR = ToInt(colors[0]);
+    outlineColorG = ToInt(colors[1]);
+    outlineColorB = ToInt(colors[2]);
 
     return true;
 }
 
-bool DrawerObject::ActRectangle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool DrawerObject::ActRectangle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     float Xgap = absoluteCoordinates ? 0 : GetX();
     float Ygap = absoluteCoordinates ? 0 : GetY();
 
-    shapesToDraw.push_back(sf::Shape::Rectangle(eval.EvalExp(action.GetParameter(1), shared_from_this())+Xgap,
-                                                eval.EvalExp(action.GetParameter(2), shared_from_this())+Ygap,
-                                                eval.EvalExp(action.GetParameter(3), shared_from_this())+Xgap,
-                                                eval.EvalExp(action.GetParameter(4), shared_from_this())+Ygap,
+    shapesToDraw.push_back(sf::Shape::Rectangle(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Xgap,
+                                                action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Ygap,
+                                                action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Xgap,
+                                                action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Ygap,
                                                 sf::Color(fillColorR, fillColorG, fillColorB, fillOpacity),
                                                 outlineSize,
                                                 sf::Color(outlineColorR, outlineColorG, outlineColorB, outlineOpacity)
@@ -134,16 +134,16 @@ bool DrawerObject::ActRectangle( RuntimeScene * scene, ObjectsConcerned & object
     return true;
 }
 
-bool DrawerObject::ActLine( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool DrawerObject::ActLine( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     float Xgap = absoluteCoordinates ? 0 : GetX();
     float Ygap = absoluteCoordinates ? 0 : GetY();
 
-    shapesToDraw.push_back(sf::Shape::Line(eval.EvalExp(action.GetParameter(1), shared_from_this())+Xgap,
-                                                eval.EvalExp(action.GetParameter(2), shared_from_this())+Ygap,
-                                                eval.EvalExp(action.GetParameter(3), shared_from_this())+Xgap,
-                                                eval.EvalExp(action.GetParameter(4), shared_from_this())+Ygap,
-                                                eval.EvalExp(action.GetParameter(5), shared_from_this()),
+    shapesToDraw.push_back(sf::Shape::Line(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Xgap,
+                                                action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Ygap,
+                                                action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Xgap,
+                                                action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Ygap,
+                                                action.GetParameter( 5 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()),
                                                 sf::Color(fillColorR, fillColorG, fillColorB, fillOpacity),
                                                 outlineSize,
                                                 sf::Color(outlineColorR, outlineColorG, outlineColorB, outlineOpacity)
@@ -152,14 +152,14 @@ bool DrawerObject::ActLine( RuntimeScene * scene, ObjectsConcerned & objectsConc
     return true;
 }
 
-bool DrawerObject::ActCircle( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool DrawerObject::ActCircle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     float Xgap = absoluteCoordinates ? 0 : GetX();
     float Ygap = absoluteCoordinates ? 0 : GetY();
 
-    shapesToDraw.push_back(sf::Shape::Circle(eval.EvalExp(action.GetParameter(1), shared_from_this())+Xgap,
-                                                eval.EvalExp(action.GetParameter(2), shared_from_this())+Ygap,
-                                                eval.EvalExp(action.GetParameter(3), shared_from_this()),
+    shapesToDraw.push_back(sf::Shape::Circle(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Xgap,
+                                                action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Ygap,
+                                                action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()),
                                                 sf::Color(fillColorR, fillColorG, fillColorB, fillOpacity),
                                                 outlineSize,
                                                 sf::Color(outlineColorR, outlineColorG, outlineColorB, outlineOpacity)
@@ -168,19 +168,19 @@ bool DrawerObject::ActCircle( RuntimeScene * scene, ObjectsConcerned & objectsCo
     return true;
 }
 
-bool ActCopyImageOnAnother( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActCopyImageOnAnother( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    std::map < string, sf::Image >::iterator dest = scene->game->imageManager.images.find(eval.EvalTxt(action.GetParameter(0)));
-    if ( dest == scene->game->imageManager.images.end() ) return false;
+    std::map < string, sf::Image >::iterator dest = scene.game->imageManager.images.find(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    if ( dest == scene.game->imageManager.images.end() ) return false;
 
-    std::map < string, sf::Image >::const_iterator src = scene->game->imageManager.images.find(eval.EvalTxt(action.GetParameter(1)));
-    if ( src == scene->game->imageManager.images.end() ) return false;
+    std::map < string, sf::Image >::const_iterator src = scene.game->imageManager.images.find(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned));
+    if ( src == scene.game->imageManager.images.end() ) return false;
 
     //Make sure the coordinates are correct.
-    int destX = eval.EvalExp(action.GetParameter(2));
+    int destX = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned);
     if ( destX < 0 || static_cast<unsigned>(destX) >= dest->second.GetWidth()) return false;
 
-    int destY = eval.EvalExp(action.GetParameter(3));
+    int destY = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
     if ( destY < 0 || static_cast<unsigned>(destY) >= dest->second.GetWidth()) return false;
 
     dest->second.Copy(src->second, destX, destY);

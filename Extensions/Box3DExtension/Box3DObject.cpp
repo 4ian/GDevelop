@@ -36,7 +36,7 @@ freely, subject to the following restrictions:
 
 #ifdef GDE
 #include <wx/wx.h>
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
 #include "Box3DObjectEditor.h"
 #include "Box3DInitialPositionPanel.h"
@@ -432,15 +432,15 @@ wxPanel * Box3DObject::CreateInitialPositionPanel( wxWindow* parent, const Game 
     Box3DInitialPositionPanel * panel = new Box3DInitialPositionPanel(parent);
 
     if ( position.floatInfos.find("z") != position.floatInfos.end())
-        panel->zEdit->SetValue(toString( position.floatInfos.find("z")->second));
+        panel->zEdit->ChangeValue(ToString( position.floatInfos.find("z")->second));
 
-    panel->yawEdit->SetValue(toString(position.angle));
+    panel->yawEdit->ChangeValue(ToString(position.angle));
 
     if ( position.floatInfos.find("pitch") != position.floatInfos.end())
-        panel->pitchEdit->SetValue(toString(position.floatInfos.find("pitch")->second));
+        panel->pitchEdit->ChangeValue(ToString(position.floatInfos.find("pitch")->second));
 
     if ( position.floatInfos.find("roll") != position.floatInfos.end())
-        panel->rollEdit->SetValue(toString(position.floatInfos.find("roll")->second));
+        panel->rollEdit->ChangeValue(ToString(position.floatInfos.find("roll")->second));
 
     return panel;
 }
@@ -450,32 +450,32 @@ void Box3DObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
     Box3DInitialPositionPanel * box3DPanel = dynamic_cast<Box3DInitialPositionPanel*>(panel);
     if (box3DPanel == NULL) return;
 
-    position.floatInfos["z"] = toInt(string(box3DPanel->zEdit->GetValue().mb_str()));
-    position.angle = toInt(string(box3DPanel->yawEdit->GetValue().mb_str()));
-    position.floatInfos["pitch"] = toInt(string(box3DPanel->pitchEdit->GetValue().mb_str()));
-    position.floatInfos["roll"] = toInt(string(box3DPanel->rollEdit->GetValue().mb_str()));
+    position.floatInfos["z"] = ToInt(string(box3DPanel->zEdit->GetValue().mb_str()));
+    position.angle = ToInt(string(box3DPanel->yawEdit->GetValue().mb_str()));
+    position.floatInfos["pitch"] = ToInt(string(box3DPanel->pitchEdit->GetValue().mb_str()));
+    position.floatInfos["roll"] = ToInt(string(box3DPanel->rollEdit->GetValue().mb_str()));
 }
 
 void Box3DObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Largeur");       value = toString(width);}
-    else if ( propertyNb == 1 ) {name = _("Hauteur");       value = toString(height);}
-    else if ( propertyNb == 2 ) {name = _("Profondeur");    value = toString(depth);}
-    else if ( propertyNb == 3 ) {name = _("Coordonnée Z");  value = toString(zPosition);}
-    else if ( propertyNb == 4 ) {name = _("Yaw");           value = toString(yaw);}
-    else if ( propertyNb == 5 ) {name = _("Pitch");         value = toString(pitch);}
-    else if ( propertyNb == 6 ) {name = _("Roll");          value = toString(roll);}
+    if      ( propertyNb == 0 ) {name = _("Largeur");       value = ToString(width);}
+    else if ( propertyNb == 1 ) {name = _("Hauteur");       value = ToString(height);}
+    else if ( propertyNb == 2 ) {name = _("Profondeur");    value = ToString(depth);}
+    else if ( propertyNb == 3 ) {name = _("Coordonnée Z");  value = ToString(zPosition);}
+    else if ( propertyNb == 4 ) {name = _("Yaw");           value = ToString(yaw);}
+    else if ( propertyNb == 5 ) {name = _("Pitch");         value = ToString(pitch);}
+    else if ( propertyNb == 6 ) {name = _("Roll");          value = ToString(roll);}
 }
 
 bool Box3DObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
-    if      ( propertyNb == 0 ) {width = toInt(newValue);}
-    else if ( propertyNb == 1 ) {height = toInt(newValue);}
-    else if ( propertyNb == 2 ) {depth = toInt(newValue);}
-    else if ( propertyNb == 3 ) {zPosition = toInt(newValue);}
-    else if ( propertyNb == 4 ) {yaw = toInt(newValue);}
-    else if ( propertyNb == 5 ) {pitch = toInt(newValue);}
-    else if ( propertyNb == 6 ) {roll = toInt(newValue);}
+    if      ( propertyNb == 0 ) {width = ToInt(newValue);}
+    else if ( propertyNb == 1 ) {height = ToInt(newValue);}
+    else if ( propertyNb == 2 ) {depth = ToInt(newValue);}
+    else if ( propertyNb == 3 ) {zPosition = ToInt(newValue);}
+    else if ( propertyNb == 4 ) {yaw = ToInt(newValue);}
+    else if ( propertyNb == 5 ) {pitch = ToInt(newValue);}
+    else if ( propertyNb == 6 ) {roll = ToInt(newValue);}
 
     return true;
 }

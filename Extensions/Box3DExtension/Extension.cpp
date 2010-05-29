@@ -52,7 +52,6 @@ class Extension : public ExtensionBase
                            _("Objet affichant une boite en 3D"),
                            "Extensions/Box3Dicon.png",
                            &CreateBox3DObject,
-                           &CreateBox3DObjectByCopy,
                            &DestroyBox3DObject);
 
                 DECLARE_OBJECT_ACTION("Width",
@@ -340,6 +339,7 @@ class Extension : public ExtensionBase
             #endif
 
             compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
+            compilationInfo.sizeOfpInt = sizeof(int*);
 
             compilationInfo.informationCompleted = true;
         }

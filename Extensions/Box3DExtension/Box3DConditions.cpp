@@ -30,14 +30,14 @@ freely, subject to the following restrictions:
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/RuntimeScene.h"
 
-bool Box3DObject::CondWidth( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Box3DObject::CondWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && width == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && width < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && width > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && width <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && width >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && width != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && width == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && width < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && width > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && width <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && width >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && width != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -46,14 +46,14 @@ bool Box3DObject::CondWidth( RuntimeScene * scene, ObjectsConcerned & objectsCon
     return false;
 }
 
-bool Box3DObject::CondHeight( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Box3DObject::CondHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && height == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && height < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && height > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && height <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && height >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && height != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && height == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && height < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && height > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && height <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && height >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && height != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -62,14 +62,14 @@ bool Box3DObject::CondHeight( RuntimeScene * scene, ObjectsConcerned & objectsCo
     return false;
 }
 
-bool Box3DObject::CondDepth( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Box3DObject::CondDepth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && depth == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && depth < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && depth > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && depth <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && depth >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && depth != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && depth == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && depth < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && depth > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && depth <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && depth >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && depth != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -78,14 +78,14 @@ bool Box3DObject::CondDepth( RuntimeScene * scene, ObjectsConcerned & objectsCon
     return false;
 }
 
-bool Box3DObject::CondZPosition( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Box3DObject::CondZPosition( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && zPosition == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && zPosition < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && zPosition > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && zPosition <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && zPosition >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && zPosition != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && zPosition == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && zPosition < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && zPosition > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && zPosition <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && zPosition >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && zPosition != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -94,14 +94,14 @@ bool Box3DObject::CondZPosition( RuntimeScene * scene, ObjectsConcerned & object
     return false;
 }
 
-bool Box3DObject::CondYaw( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Box3DObject::CondYaw( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && yaw == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && yaw < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && yaw > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && yaw <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && yaw >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && yaw != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && yaw == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && yaw < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && yaw > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && yaw <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && yaw >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && yaw != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -110,14 +110,14 @@ bool Box3DObject::CondYaw( RuntimeScene * scene, ObjectsConcerned & objectsConce
     return false;
 }
 
-bool Box3DObject::CondPitch( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Box3DObject::CondPitch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && pitch == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && pitch < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && pitch > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && pitch <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && pitch >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && pitch != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && pitch == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && pitch < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && pitch > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && pitch <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && pitch >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && pitch != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -126,14 +126,14 @@ bool Box3DObject::CondPitch( RuntimeScene * scene, ObjectsConcerned & objectsCon
     return false;
 }
 
-bool Box3DObject::CondRoll( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & condition, const Evaluateur & eval )
+bool Box3DObject::CondRoll( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && roll == eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && roll < eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && roll > eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && roll <= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && roll >= eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && roll != eval.EvalExp( condition.GetParameter( 1 ), shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && roll == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && roll < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && roll > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && roll <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && roll >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && roll != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;

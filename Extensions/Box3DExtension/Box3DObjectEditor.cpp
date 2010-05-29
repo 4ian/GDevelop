@@ -34,7 +34,7 @@ freely, subject to the following restrictions:
 #include <wx/string.h>
 //*)
 #include "GDL/Game.h"
-#include "GDL/StdAlgo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
 #include "GDL/EditorImages.h"
 
@@ -194,16 +194,16 @@ object(object_)
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Box3DObjectEditor::OncancelBtClick);
 	//*)
 
-	frontTextureEdit->SetValue(object.frontTextureName);
-	topTextureEdit->SetValue(object.topTextureName);
-	bottomTextureEdit->SetValue(object.bottomTextureName);
-	leftTextureEdit->SetValue(object.leftTextureName);
-	rightTextureEdit->SetValue(object.rightTextureName);
-	backTextureEdit->SetValue(object.backTextureName);
+	frontTextureEdit->ChangeValue(object.frontTextureName);
+	topTextureEdit->ChangeValue(object.topTextureName);
+	bottomTextureEdit->ChangeValue(object.bottomTextureName);
+	leftTextureEdit->ChangeValue(object.leftTextureName);
+	rightTextureEdit->ChangeValue(object.rightTextureName);
+	backTextureEdit->ChangeValue(object.backTextureName);
 
-	widthEdit->SetValue(toString(object.GetWidth()));
-	heightEdit->SetValue(toString(object.GetHeight()));
-	depthEdit->SetValue(toString(object.GetDepth()));
+	widthEdit->ChangeValue(ToString(object.GetWidth()));
+	heightEdit->ChangeValue(ToString(object.GetHeight()));
+	depthEdit->ChangeValue(ToString(object.GetDepth()));
 
     //Init the image bank editor
     editorImagesPnl = new EditorImages( this, game, mainEditorCommand );
@@ -246,9 +246,9 @@ void Box3DObjectEditor::OnokBtClick(wxCommandEvent& event)
 	object.rightTextureName = string(rightTextureEdit->GetValue().mb_str());
 	object.backTextureName = string(backTextureEdit->GetValue().mb_str());
 
-	object.SetWidth(toInt(string(widthEdit->GetValue().mb_str())));
-	object.SetHeight(toInt(string(heightEdit->GetValue().mb_str())));
-	object.SetDepth(toInt(string(depthEdit->GetValue().mb_str())));
+	object.SetWidth(ToInt(string(widthEdit->GetValue().mb_str())));
+	object.SetHeight(ToInt(string(heightEdit->GetValue().mb_str())));
+	object.SetDepth(ToInt(string(depthEdit->GetValue().mb_str())));
 
     EndModal(1);
 }
@@ -262,7 +262,7 @@ void Box3DObjectEditor::OnfrontAddFromBtClick(wxCommandEvent& event)
         return;
     }
 
-    frontTextureEdit->SetValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    frontTextureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
 }
 
 void Box3DObjectEditor::OntopAddFromBtClick(wxCommandEvent& event)
@@ -273,7 +273,7 @@ void Box3DObjectEditor::OntopAddFromBtClick(wxCommandEvent& event)
         return;
     }
 
-    topTextureEdit->SetValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    topTextureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
 }
 
 
@@ -285,7 +285,7 @@ void Box3DObjectEditor::OnbottomAddFromBtClick(wxCommandEvent& event)
         return;
     }
 
-    bottomTextureEdit->SetValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    bottomTextureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
 }
 
 void Box3DObjectEditor::OnleftAddFromBtClick(wxCommandEvent& event)
@@ -296,7 +296,7 @@ void Box3DObjectEditor::OnleftAddFromBtClick(wxCommandEvent& event)
         return;
     }
 
-    leftTextureEdit->SetValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    leftTextureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
 }
 
 void Box3DObjectEditor::OnrightAddFromBtClick(wxCommandEvent& event)
@@ -307,7 +307,7 @@ void Box3DObjectEditor::OnrightAddFromBtClick(wxCommandEvent& event)
         return;
     }
 
-    rightTextureEdit->SetValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    rightTextureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
 }
 
 void Box3DObjectEditor::OnbackAddFromBtClick(wxCommandEvent& event)
@@ -318,7 +318,7 @@ void Box3DObjectEditor::OnbackAddFromBtClick(wxCommandEvent& event)
         return;
     }
 
-    backTextureEdit->SetValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    backTextureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
 }
 
 /**

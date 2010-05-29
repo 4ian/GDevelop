@@ -58,7 +58,7 @@ class Extension : public ExtensionBase
 
                 DECLARE_PARAMETER("file", _("Fichier source"), false, "")
                 DECLARE_PARAMETER("file", _("Fichier de destination"), false, "")
-                DECLARE_PARAMETER("texte", _("Mot de passe ( 24 caractères )"), false, "")
+                DECLARE_PARAMETER("text", _("Mot de passe ( 24 caractères )"), false, "")
                 MAIN_OBJECTS_IN_PARAMETER(0)
 
             DECLARE_END_ACTION()
@@ -74,7 +74,7 @@ class Extension : public ExtensionBase
 
                 DECLARE_PARAMETER("file", _("Fichier source"), false, "")
                 DECLARE_PARAMETER("file", _("Fichier de destination"), false, "")
-                DECLARE_PARAMETER("texte", _("Mot de passe ( 24 caractères )"), false, "")
+                DECLARE_PARAMETER("text", _("Mot de passe ( 24 caractères )"), false, "")
                 MAIN_OBJECTS_IN_PARAMETER(0)
 
             DECLARE_END_ACTION()
@@ -118,6 +118,7 @@ class Extension : public ExtensionBase
             #endif
 
             compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
+            compilationInfo.sizeOfpInt = sizeof(int*);
 
             compilationInfo.informationCompleted = true;
         }

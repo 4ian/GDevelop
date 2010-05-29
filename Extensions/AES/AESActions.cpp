@@ -33,10 +33,10 @@ freely, subject to the following restrictions:
 #include <fstream>
 #include <string>
 
-bool ActEncryptFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActEncryptFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    ifstream ifile(eval.EvalTxt(action.GetParameter(0)).c_str(),ios_base::binary);
-    ofstream ofile(eval.EvalTxt(action.GetParameter(1)).c_str(),ios_base::binary);
+    ifstream ifile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str(),ios_base::binary);
+    ofstream ofile(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned).c_str(),ios_base::binary);
 
     // get file size
     ifile.seekg(0,ios_base::end);
@@ -53,7 +53,7 @@ bool ActEncryptFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, 
     AES crypt;
     crypt.SetParameters(192);
 
-    crypt.StartEncryption(reinterpret_cast<const unsigned char*>(eval.EvalTxt(action.GetParameter(2)).c_str()));
+    crypt.StartEncryption(reinterpret_cast<const unsigned char*>(action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned).c_str()));
     crypt.Encrypt(reinterpret_cast<const unsigned char*>(ibuffer),reinterpret_cast<unsigned char*>(obuffer),size/16);
 
     ofile.write(obuffer,size);
@@ -67,10 +67,10 @@ bool ActEncryptFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, 
     return true;
 }
 
-bool ActDecryptFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActDecryptFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    ifstream ifile(eval.EvalTxt(action.GetParameter(0)).c_str(),ios_base::binary);
-    ofstream ofile(eval.EvalTxt(action.GetParameter(1)).c_str(),ios_base::binary);
+    ifstream ifile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str(),ios_base::binary);
+    ofstream ofile(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned).c_str(),ios_base::binary);
 
     // get file size
     ifile.seekg(0,ios_base::end);
@@ -87,7 +87,7 @@ bool ActDecryptFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, 
     AES crypt;
     crypt.SetParameters(192);
 
-    crypt.StartDecryption(reinterpret_cast<const unsigned char*>(eval.EvalTxt(action.GetParameter(2)).c_str()));
+    crypt.StartDecryption(reinterpret_cast<const unsigned char*>(action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned).c_str()));
     crypt.Decrypt(reinterpret_cast<const unsigned char*>(ibuffer),reinterpret_cast<unsigned char*>(obuffer),size/16);
 
     ofile.write(obuffer,size);

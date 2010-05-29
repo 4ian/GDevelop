@@ -32,7 +32,7 @@ class ObjectsConcerned;
 class Instruction;
 class Evaluateur;
 
-bool ActEncryptFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActDecryptFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+bool ActEncryptFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActDecryptFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 #endif // AESACTIONS_H_INCLUDED

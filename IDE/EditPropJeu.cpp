@@ -19,6 +19,7 @@
 #include <wx/filedlg.h>
 #include <wx/config.h>
 #include "GDL/HelpFileAccess.h"
+#include "GDL/FontManager.h"
 
 #include "GDL/Game.h"
 
@@ -655,7 +656,7 @@ void EditPropJeu::OnButton2Click(wxCommandEvent& event)
 
     sf::Sprite sprite( image );
 
-    sf::Text Chargement( static_cast<string>(texteEdit->GetValue()) );
+    sf::Text Chargement( static_cast<string>(texteEdit->GetValue()), *FontManager::getInstance()->GetFont("") );
     Chargement.SetPosition(texteXPos, texteYPos);
     App.Draw( Chargement );
 

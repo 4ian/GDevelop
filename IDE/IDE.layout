@@ -118,14 +118,14 @@
 	<File name="EditOptionsPosition.h" open="0" top="0" tabpos="0">
 		<Cursor position="601" topLine="6" />
 	</File>
-	<File name="EditPropJeu.cpp" open="0" top="0" tabpos="18">
-		<Cursor position="302" topLine="15" />
+	<File name="EditPropJeu.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="524" topLine="1" />
 	</File>
 	<File name="EditPropScene.cpp" open="0" top="0" tabpos="19">
 		<Cursor position="7522" topLine="209" />
 	</File>
-	<File name="EditorEvents.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="50525" topLine="973" />
+	<File name="EditorEvents.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="38084" topLine="645" />
 	</File>
 	<File name="EditorEvents.h" open="0" top="0" tabpos="2">
 		<Cursor position="6969" topLine="175" />
@@ -160,16 +160,16 @@
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="27652" topLine="665" />
+	<File name="EditorScene.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="32655" topLine="665" />
 	</File>
 	<File name="EditorScene.h" open="0" top="0" tabpos="8">
 		<Cursor position="3114" topLine="105" />
 	</File>
-	<File name="EdittimeScene.cpp" open="1" top="1" tabpos="3">
-		<Cursor position="6112" topLine="126" />
+	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="6625" topLine="126" />
 	</File>
-	<File name="EdittimeScene.h" open="1" top="0" tabpos="2">
+	<File name="EdittimeScene.h" open="0" top="0" tabpos="2">
 		<Cursor position="1631" topLine="58" />
 	</File>
 	<File name="Extensions.cpp" open="0" top="0" tabpos="21">
@@ -250,10 +250,10 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="22" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="1">
+	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="6876" topLine="177" />
 	</File>
-	<File name="SceneCanvas.h" open="1" top="0" tabpos="5">
+	<File name="SceneCanvas.h" open="0" top="0" tabpos="4">
 		<Cursor position="1343" topLine="43" />
 	</File>
 	<File name="SearchEvents.cpp" open="0" top="0" tabpos="10">

@@ -28,12 +28,14 @@ class Fusion: public wxDialog
 		//(*Declarations(Fusion)
 		wxStaticText* StaticText2;
 		wxButton* FermerBt;
+		wxCheckBox* groupsCheck;
 		wxCheckBox* ScenesCheck;
 		wxStaticBitmap* StaticBitmap1;
 		wxButton* FusionBt;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticLine* StaticLine2;
+		wxCheckBox* objectsCheck;
 		wxStaticLine* StaticLine1;
 		wxCheckBox* ImageCheck;
 		//*)
@@ -47,6 +49,8 @@ class Fusion: public wxDialog
 		static const long ID_STATICLINE1;
 		static const long ID_CHECKBOX1;
 		static const long ID_CHECKBOX2;
+		static const long ID_CHECKBOX3;
+		static const long ID_CHECKBOX4;
 		static const long ID_STATICLINE2;
 		static const long ID_STATICTEXT2;
 		static const long ID_BUTTON1;

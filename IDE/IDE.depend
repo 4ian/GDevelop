@@ -9821,7 +9821,7 @@
 	"GDL/Position.h"
 	"GDL/Object.h"
 
-1273765162 source:d:\florian\programmation\gamedevelop\ide\editpropjeu.cpp
+1275134900 source:d:\florian\programmation\gamedevelop\ide\editpropjeu.cpp
 	"EditPropJeu.h"
 	"nommgr.h"
 	<wx/bitmap.h>
@@ -9837,6 +9837,7 @@
 	<wx/filedlg.h>
 	<wx/config.h>
 	"GDL/HelpFileAccess.h"
+	"GDL/FontManager.h"
 	"GDL/Game.h"
 
 1264364134 d:\florian\programmation\gamedevelop\ide\editpropjeu.h
@@ -10251,9 +10252,13 @@
 1253308491 c:\libs\wxwidgets\include\wx\gtk\private\win_gtk.h
 	<gtk/gtkfixed.h>
 
-1273765322 source:d:\florian\programmation\gamedevelop\ide\fusion.cpp
+1275219415 source:d:\florian\programmation\gamedevelop\ide\fusion.cpp
 	"Fusion.h"
-	"nommgr.h"
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
 	<wx/filedlg.h>
 	<string>
 	<vector>
@@ -10264,7 +10269,7 @@
 	"GDL/ChercherScene.h"
 	"GDL/OpenSaveGame.h"
 
-1266590064 d:\florian\programmation\gamedevelop\ide\fusion.h
+1275216664 d:\florian\programmation\gamedevelop\ide\fusion.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/checkbox.h>
@@ -10888,7 +10893,7 @@
 	<SFML/Window.hpp>
 	"GDL/RuntimeScene.h"
 
-1269713046 d:\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
+1275166177 d:\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
 	"GDL/Object.h"
 	"GDL/ObjectGroup.h"
 	"GDL/ObjectType.h"
@@ -11071,7 +11076,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1275131185 d:\florian\programmation\gamedevelop\ide\version.h
+1275219415 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -11222,5 +11227,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1275132242 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1275152808 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

@@ -362,21 +362,24 @@ void ChoixTemplateEvent::OnTemplateTreeSelectionChanged( wxTreeEvent& event )
     //Update control for each parameter
     for (unsigned int i = 0;i<templatesList[j].parameters.size();++i)
     {
-    	descriptionsTxt[i]->Show(true);
-    	parametersEdit[i]->Show(true);
-    	descriptionsTxt[i]->SetLabel(templatesList[j].parameters[i]);
+        if ( templatesList[j].parameters[i] != "" )
+        {
+            descriptionsTxt[i]->Show(true);
+            parametersEdit[i]->Show(true);
+            descriptionsTxt[i]->SetLabel(templatesList[j].parameters[i]);
+        }
     }
 
     Layout();
     Fit();
 }
 
-string ChoixTemplateEvent::ConvertParam( string Parametre, string ToReplace, string ReplaceBy )
+string ChoixTemplateEvent::ConvertParam( string parameter, const string & toReplace, const string & replaceBy )
 {
-    if ( Parametre.find( ToReplace ) != string::npos )
-        Parametre.replace( Parametre.find( ToReplace ), ToReplace.length(), ReplaceBy );
+    if ( parameter.find( toReplace ) != string::npos )
+        parameter.replace( parameter.find( toReplace ), toReplace.length(), replaceBy );
 
-    return Parametre;
+    return parameter;
 }
 
 void ChoixTemplateEvent::OnAideBtClick(wxCommandEvent& event)

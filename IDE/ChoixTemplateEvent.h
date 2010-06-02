@@ -103,7 +103,7 @@ class ChoixTemplateEvent: public wxDialog
 		//*)
 		wxTreeItemId item;
 
-		string ConvertParam(string Parametre, string ToReplace, string ReplaceBy);
+		string ConvertParam( string parameter, const string & toReplace, const string & replaceBy );
         void ProcessEvents(vector < BaseEventSPtr > & events );
 
 		DECLARE_EVENT_TABLE()

@@ -161,7 +161,7 @@
 		<Cursor position="248" topLine="0" />
 	</File>
 	<File name="EditorScene.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="32655" topLine="665" />
+		<Cursor position="28605" topLine="512" />
 	</File>
 	<File name="EditorScene.h" open="0" top="0" tabpos="8">
 		<Cursor position="3114" topLine="105" />
@@ -178,8 +178,8 @@
 	<File name="Extensions.h" open="0" top="0" tabpos="2">
 		<Cursor position="1971" topLine="58" />
 	</File>
-	<File name="Fusion.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="6580" topLine="178" />
+	<File name="Fusion.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="6230" topLine="99" />
 	</File>
 	<File name="Fusion.h" open="0" top="0" tabpos="0">
 		<Cursor position="441" topLine="3" />

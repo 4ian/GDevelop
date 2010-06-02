@@ -330,8 +330,8 @@ ExtensionSprite::ExtensionSprite()
                        _("Copie une image sur celle d'un objet."),
                        _("Copier l'image _PARAM1_ sur celle de _PARAM0_ à l'emplacement _PARAM2_;_PARAM3_"),
                        _("Effets"),
-                       "res/actions/opacity24.png",
-                       "res/actions/opacity.png",
+                       "res/actions/copy24.png",
+                       "res/actions/copy.png",
                        &SpriteObject::ActCopyImageOnImageOfSprite);
 
             DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")

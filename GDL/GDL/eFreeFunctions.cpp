@@ -13,7 +13,10 @@ using namespace std;
 
 double ExpRandom( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    return sf::Randomizer::Random(0, exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned, obj1, obj2));
+    double max = exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned, obj1, obj2);
+    if ( max < 0 ) return 0;
+
+    return sf::Randomizer::Random(0, max);
 }
 
 double ExpTimeDelta( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )

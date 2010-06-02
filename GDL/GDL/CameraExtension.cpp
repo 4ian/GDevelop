@@ -213,7 +213,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("CentreCamera",
                    _("Centrer la caméra sur un objet"),
                    _("Centre la caméra sur l'objet indiqué.\nIl est préférable d'appeler cette action vers la fin des évènements, quand toutes les actions\nde positionnement et de déplacement de l'objet ont été effectuées."),
-                   _("Centrer la caméra sur _PARAM0_ ( calque : _PARAM1_, caméra : _PARAM2_ )"),
+                   _("Centrer la caméra sur _PARAM0_ ( calque : _PARAM2_, caméra : _PARAM3_ )"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png",

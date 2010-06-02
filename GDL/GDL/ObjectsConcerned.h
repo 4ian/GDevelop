@@ -105,6 +105,15 @@ class GD_API ObjectsConcerned
             copy(second.GetAlreadyConcernedObjects().begin(), second.GetAlreadyConcernedObjects().end(), std::inserter(alreadyConcernedObjects, alreadyConcernedObjects.begin()));
         }
 
+        /**
+         * Reset all objects picked and already concerned objets.
+         */
+        inline void Reset()
+        {
+            objectsPicked.Clear();
+            alreadyConcernedObjects.clear();
+        }
+
         /** Objects already picked */
         ObjInstancesHolder objectsPicked;
 

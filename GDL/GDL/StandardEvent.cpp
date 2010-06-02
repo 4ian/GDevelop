@@ -55,7 +55,6 @@ bool StandardEvent::ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & 
 /**
  * Run actions of the event
  */
-//TODO : Make "Scene" and "Quit" real actions
 void StandardEvent::ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
     for ( unsigned int k = 0; k < actions.size();k++ )

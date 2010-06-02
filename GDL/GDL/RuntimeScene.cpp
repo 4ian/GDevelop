@@ -22,6 +22,7 @@
 #include "GDL/profile.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Position.h"
+#include "GDL/FontManager.h"
 #include "GDL/ObjectsConcerned.h"
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
@@ -229,10 +230,12 @@ void RuntimeScene::RenderWithoutStep()
 #ifndef RELEASE
 void RuntimeScene::DisplayProfile(CProfileIterator * iter, int x, int & y)
 {
+    FontManager * fontManager = FontManager::getInstance();
+
     y += 15;
     while ( !iter->Is_Done() )
     {
-        sf::Text text;
+        sf::Text text("", *fontManager->GetFont(""));
         text.SetCharacterSize(12);
         ostringstream texte;
         if ( CProfileManager::Get_Frame_Count_Since_Reset() != 0 )

@@ -6,7 +6,8 @@
 
 using namespace std;
 
-Text::Text()
+Text::Text() :
+text("", *FontManager::getInstance()->GetFont(""))
 {
     //ctor
 }

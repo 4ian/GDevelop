@@ -1,3 +1,5 @@
+#if defined(GDE)
+
 #ifndef EDITTEXTE_H
 #define EDITTEXTE_H
 
@@ -97,4 +99,5 @@ class GD_API EditTextDialog: public wxDialog
 		DECLARE_EVENT_TABLE()
 };
 
+#endif
 #endif

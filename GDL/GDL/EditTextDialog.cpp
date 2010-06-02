@@ -1,3 +1,4 @@
+#if defined(GDE)
 #include "GDL/EditTextDialog.h"
 
 //(*InternalHeaders(EditTextDialog)
@@ -457,3 +458,4 @@ void EditTextDialog::OnTreeCtrl1SelectionChanged(wxTreeEvent& event)
 {
     itemVal = event.GetItem();
 }
+#endif

@@ -1,3 +1,5 @@
+#if defined(GDE)
+
 #include "GDL/ChooseVariableDialog.h"
 
 //(*InternalHeaders(ChooseVariableDialog)
@@ -237,3 +239,4 @@ void ChooseVariableDialog::OnvariablesListItemSelect(wxListEvent& event)
 {
     selectedVariable = event.GetText();
 }
+#endif

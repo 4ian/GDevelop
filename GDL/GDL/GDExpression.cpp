@@ -379,8 +379,8 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
         #if defined(GDE)
         firstErrorStr = mathExpression.ErrorMsg();
         firstErrorPos = string::npos;
-        #endif
         cout << firstErrorStr << " in " << expression<< endl;
+        #endif
         mathExpressionFunctions.clear();
         mathExpression.Parse("0", "");
 

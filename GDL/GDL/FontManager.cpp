@@ -28,14 +28,31 @@ FontManager::~FontManager()
 ////////////////////////////////////////////////////////////
 const sf::Font * FontManager::GetFont(string fontName)
 {
-    if (fontName == "") return &sf::Font::GetDefaultFont();
-
-    if ( fonts.find(fontName) != fonts.end() )
+    //Use default font
+    if (fontName == "")
     {
-        return fonts[fontName];
+        static sf::Font defaultFont;
+        static bool loaded = false;
+
+        if ( !loaded )
+        {
+            static const char data[] =
+            {
+                #include "GDL/Arial.hpp"
+            };
+
+            defaultFont.LoadFromMemory(data, sizeof(data));
+            loaded = true;
+        }
+
+        return &defaultFont;
     }
 
-    //Chargement de la police
+    //Find an already loaded font
+    if ( fonts.find(fontName) != fonts.end() )
+        return fonts[fontName];
+
+    //Load an new font
     RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
     fonts[fontName] = ressourcesLoader->LoadFont(fontName);
 

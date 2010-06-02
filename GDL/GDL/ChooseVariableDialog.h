@@ -1,3 +1,5 @@
+#if defined(GDE)
+
 #ifndef CHOIXVARIABLEDIALOG_H
 #define CHOIXVARIABLEDIALOG_H
 
@@ -81,4 +83,5 @@ class GD_API ChooseVariableDialog: public wxDialog
 		DECLARE_EVENT_TABLE()
 };
 
+#endif
 #endif

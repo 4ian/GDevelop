@@ -408,11 +408,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
             std::string currentObjActionDeclarationName = name; \
             instrInfo.instructionObjectFunPtr = (InstructionObjectFunPtr)ptr;
 
-#define DECLARE_OBJECT(name_, fullname, informations, icon, createFunPtrP, createByCopyFunPtrP, destroyFunPtrP) { \
+#define DECLARE_OBJECT(name_, fullname, informations, icon, createFunPtrP, destroyFunPtrP) { \
             ExtensionObjectInfos objInfos; \
             std::string currentObjectDeclarationName = name_; \
             objInfos.createFunPtr = createFunPtrP;\
-            objInfos.createByCopyFunPtr = createByCopyFunPtrP;\
             objInfos.destroyFunPtr = destroyFunPtrP;
 
 #define DECLARE_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
@@ -465,6 +464,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
                 ParameterInfo parameter; \
                 parameter.type = type_; \
                 parameter.useObject = useObj; \
+                parameter.optional = false; \
                 parameter.objectType = GetNameSpace()+objType; \
                 instrInfo.parameters.push_back(parameter); \
                 }
@@ -473,6 +473,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
                 ParameterInfo parameter; \
                 parameter.type = type_; \
                 parameter.useObject = useObj; \
+                parameter.optional = true; \
                 parameter.objectType = GetNameSpace()+objType; \
                 instrInfo.parameters.push_back(parameter); \
                 }
@@ -571,10 +572,10 @@ class GD_API ParameterInfo
     bool useObject;
     std::string objectType;
     std::string type;
+    bool optional;
 
 #if defined(GDE)
     std::string description;
-    bool optional;
 #endif
 };
 

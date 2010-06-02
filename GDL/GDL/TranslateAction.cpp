@@ -66,7 +66,6 @@ void TranslateAction::RemoveHTMLTags(string & str)
 
     while ( str.find(">") != string::npos)
         str.replace( str.find( ">" ), 1, "&gt;" );
-
 }
 
 ////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 /**
 
-Game Develop - AES Extension
+Game Develop - Function Extension
 Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 #include "GDL/Version.h"
 #include "FunctionActions.h"
 #include "FunctionEvent.h"
+#include "FunctionExpressions.h"
 #include <boost/version.hpp>
 
 /**
@@ -53,8 +54,8 @@ class Extension : public ExtensionBase
                            _("Lance une fonction"),
                            _("Lancer _PARAM0_"),
                            _("Fonctions"),
-                           "res/actions/camera24.png",
-                           "res/actions/camera.png",
+                           "res/actions/function24.png",
+                           "res/actions/function.png",
                            &ActLaunchFunction);
 
                 DECLARE_PARAMETER("", _("Nom de la fonction"), false, "")
@@ -72,10 +73,21 @@ class Extension : public ExtensionBase
                           _("Fonction"),
                           "Évènement fonction : L'évènement lancé uniquement grâce à l'action \"Lancer une fonction\"",
                           "",
-                          "res/eventaddicon.png",
+                          "res/function.png",
                           FunctionEvent)
 
             DECLARE_END_EVENT()
+
+            DECLARE_STR_EXPRESSION("CurrentFunctionParameter",
+                           _("Paramètre de la fonction actuel"),
+                           _("Renvoi le texte contenue dans un paramètre de la fonction actuellement lancée"),
+                           _("Fonction"),
+                           "res/function.png",
+                           &ExpGetFunctionParameter)
+
+                DECLARE_PARAMETER("expression", _("Numéro du paramètre ( Commence à 0 ! )"), false, "")
+
+            DECLARE_END_STR_EXPRESSION()
 
             CompleteCompilationInformation();
         };

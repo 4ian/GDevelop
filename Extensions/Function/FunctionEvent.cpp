@@ -1,3 +1,28 @@
+/**
+
+Game Develop - Function Extension
+Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+    1. The origin of this software must not be misrepresented; you must not
+    claim that you wrote the original software. If you use this software
+    in a product, an acknowledgment in the product documentation would be
+    appreciated but is not required.
+
+    2. Altered source versions must be plainly marked as such, and must not be
+    misrepresented as being the original software.
+
+    3. This notice may not be removed or altered from any source
+    distribution.
+
+*/
 
 #include "GDL/OpenSaveGame.h"
 #include "FunctionEvent.h"
@@ -9,7 +34,8 @@
 #include "GDL/EventsRenderingHelper.h"
 #endif
 
-std::map < const Game*, std::map < const Scene* , std::map < std::string, FunctionEvent* > > > FunctionEvent::functionsList;
+std::map < const Scene* , std::map < std::string, FunctionEvent* > > FunctionEvent::functionsList;
+std::map < const Scene* , std::vector < std::string >* > FunctionEvent::currentFunctionParameter;
 
 FunctionEvent::FunctionEvent() :
 BaseEvent(),
@@ -23,8 +49,11 @@ name("MyFunction")
 /**
  * Check the conditions, and launch actions and subevents if necessary
  */
-void FunctionEvent::Launch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
+void FunctionEvent::Launch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, std::vector < string > parameters )
 {
+    std::vector < std::string > * parentFunctionParameters = currentFunctionParameter[&scene];
+    currentFunctionParameter[&scene] = &parameters;
+
     if ( ExecuteConditions( scene, objectsConcerned) == true )
     {
         ExecuteActions( scene, objectsConcerned);
@@ -37,6 +66,8 @@ void FunctionEvent::Launch( RuntimeScene & scene, ObjectsConcerned & objectsConc
             events[i]->Execute(scene, objectsConcernedForSubEvent);
         }
     }
+
+    currentFunctionParameter[&scene] = parentFunctionParameters;
 }
 
 /**
@@ -138,7 +169,7 @@ void FunctionEvent::LoadFromXml(const TiXmlElement * eventElem)
  */
 void FunctionEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
 {
-    ReferenceFunction(&game, &scene);
+    ReferenceFunction(&scene);
 }
 
 /**
@@ -152,9 +183,9 @@ FunctionEvent::~FunctionEvent()
 /**
  * Add function to functions list
  */
-void FunctionEvent::ReferenceFunction(const Game * game, Scene * scene)
+void FunctionEvent::ReferenceFunction(Scene * scene)
 {
-    functionsList[game][scene][name] = this;
+    functionsList[scene][name] = this;
 }
 
 /**
@@ -162,20 +193,15 @@ void FunctionEvent::ReferenceFunction(const Game * game, Scene * scene)
  */
 void FunctionEvent::UnreferenceFunction()
 {
-    std::map < const Game*, std::map < const Scene* , std::map < std::string, FunctionEvent* > > >::iterator giter = functionsList.begin();
-    std::map < const Game*, std::map < const Scene* , std::map < std::string, FunctionEvent* > > >::const_iterator gend = functionsList.end();
-    for (;giter!=gend;++giter)
+    std::map < const Scene* , std::map < std::string, FunctionEvent* > >::iterator siter = functionsList.begin();
+    std::map < const Scene* , std::map < std::string, FunctionEvent* > >::const_iterator send = functionsList.end();
+    for (;siter!=send;++siter)
     {
-        std::map < const Scene* , std::map < std::string, FunctionEvent* > >::iterator siter = giter->second.begin();
-        std::map < const Scene* , std::map < std::string, FunctionEvent* > >::const_iterator send = giter->second.end();
-        for (;siter!=send;++siter)
+        std::map < std::string, FunctionEvent* >::iterator fiter = siter->second.begin();
+        std::map < std::string, FunctionEvent* >::const_iterator fend = siter->second.end();
+        for (;fiter!=fend;++fiter)
         {
-            std::map < std::string, FunctionEvent* >::iterator fiter = siter->second.begin();
-            std::map < std::string, FunctionEvent* >::const_iterator fend = siter->second.end();
-            for (;fiter!=fend;++fiter)
-            {
-                if ( fiter->second == this ) fiter->second = NULL;
-            }
+            if ( fiter->second == this ) fiter->second = NULL;
         }
     }
 }

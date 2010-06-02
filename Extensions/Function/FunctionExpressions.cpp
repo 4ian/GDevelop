@@ -24,14 +24,23 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef AESACTIONS_H_INCLUDED
-#define AESACTIONS_H_INCLUDED
+#include "GDL/Object.h"
+#include "GDL/RuntimeScene.h"
+#include "GDL/ObjectsConcerned.h"
+#include "GDL/ExpressionInstruction.h"
+#include "GDL/CommonTools.h"
+#include "FunctionEvent.h"
+#include <vector>
+#include <string>
 
-class RuntimeScene;
-class ObjectsConcerned;
-class Instruction;
-class Evaluateur;
+using namespace std;
 
-bool ActLaunchFunction( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+std::string ExpGetFunctionParameter( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction )
+{
+    if ( FunctionEvent::currentFunctionParameter[&scene] == NULL) return "";
 
-#endif // AESACTIONS_H_INCLUDED
+    int id = exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned);
+    if ( id < 0 || id >= FunctionEvent::currentFunctionParameter[&scene]->size() ) return "";
+
+    return FunctionEvent::currentFunctionParameter[&scene]->at(id);
+}

@@ -1,6 +1,6 @@
 /**
 
-Game Develop - AES Extension
+Game Develop - Function Extension
 Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -32,11 +32,14 @@ freely, subject to the following restrictions:
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+
+using namespace std;
 
 bool ActLaunchFunction( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //Find function
-    FunctionEvent * eventPtr = FunctionEvent::functionsList[scene.game][&scene][action.GetParameter(0).GetPlainString()];
+    FunctionEvent * eventPtr = FunctionEvent::functionsList[&scene][action.GetParameter(0).GetPlainString()];
     if ( eventPtr == NULL ) return false;
 
     //Find objects concerned to transfer
@@ -49,7 +52,12 @@ bool ActLaunchFunction( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
         functionObjectsConcerned = &newObjectsConcerned;
     }
 
-    eventPtr->Launch(scene, *functionObjectsConcerned);
+    vector < string > params;
+
+    for (unsigned int i = 2;i<action.GetParameters().size();++i)
+    	params.push_back(action.GetParameters()[i].GetAsTextExpressionResult(scene, objectsConcerned));
+
+    eventPtr->Launch(scene, *functionObjectsConcerned, params);
 
     return true;
 }

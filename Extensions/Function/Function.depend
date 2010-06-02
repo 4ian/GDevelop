@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1275152551 source:d:\florian\programmation\gamedevelop\extensions\function\functionactions.cpp
+1275493484 source:d:\florian\programmation\gamedevelop\extensions\function\functionactions.cpp
 	"GDL/Access.h"
 	"GDL/Instruction.h"
 	"GDL/ObjectsConcerned.h"
@@ -8,6 +8,7 @@
 	<iostream>
 	<fstream>
 	<string>
+	<vector>
 
 1269379494 d:\florian\programmation\gamedevelop\gdl\gdl\access.h
 	"GDL/RuntimeScene.h"
@@ -8129,7 +8130,7 @@
 1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
 	"GDL/btScalar.h"
 
-1269713046 d:\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
+1275166177 d:\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
 	"GDL/Object.h"
 	"GDL/ObjectGroup.h"
 	"GDL/ObjectType.h"
@@ -8138,11 +8139,11 @@
 	<string>
 	<vector>
 
-1275155775 d:\florian\programmation\gamedevelop\extensions\function\functionevent.h
+1275492185 d:\florian\programmation\gamedevelop\extensions\function\functionevent.h
 	<boost/shared_ptr.hpp>
 	"GDL/Event.h"
 
-1275155938 source:d:\florian\programmation\gamedevelop\extensions\function\functionevent.cpp
+1275492159 source:d:\florian\programmation\gamedevelop\extensions\function\functionevent.cpp
 	"GDL/OpenSaveGame.h"
 	"FunctionEvent.h"
 	"GDL/ObjectsConcerned.h"
@@ -8276,14 +8277,15 @@
 	"wx/intl.h"
 	"wx/cmndata.h"
 
-1275153978 source:d:\florian\programmation\gamedevelop\extensions\function\extension.cpp
+1275492251 source:d:\florian\programmation\gamedevelop\extensions\function\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"FunctionActions.h"
 	"FunctionEvent.h"
+	"FunctionExpressions.h"
 	<boost/version.hpp>
 
-1274984691 d:\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
+1275335922 d:\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
 	<string>
 	<vector>
 	<map>
@@ -8292,9 +8294,9 @@
 	<wx/file.h>
 	<wx/wx.h>
 
-1275152808 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1275493501 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 
-1275153430 d:\florian\programmation\gamedevelop\extensions\function\functionactions.h
+1275489586 d:\florian\programmation\gamedevelop\extensions\function\functionactions.h
 
 1225731031 c:\libs\boost_1_38_0\boost\version.hpp
 
@@ -8315,4 +8317,19 @@
 	<stddef.h>
 	"GDL/tinyxml.h"
 	<windows.h>
+
+1275493956 source:d:\florian\programmation\gamedevelop\extensions\function\functionexpressions.cpp
+	"GDL/Object.h"
+	"GDL/RuntimeScene.h"
+	"GDL/ObjectsConcerned.h"
+	"GDL/ExpressionInstruction.h"
+	"GDL/CommonTools.h"
+	"FunctionEvent.h"
+	<vector>
+	<string>
+
+1275489625 d:\florian\programmation\gamedevelop\extensions\function\functionexpressions.h
+	<vector>
+	<string>
+	<boost/shared_ptr.hpp>
 

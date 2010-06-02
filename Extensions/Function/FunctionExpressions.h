@@ -24,14 +24,19 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef AESACTIONS_H_INCLUDED
-#define AESACTIONS_H_INCLUDED
+#ifndef FUNCTIONEXPRESSIONS_H
+#define FUNCTIONEXPRESSIONS_H
+
+#include <vector>
+#include <string>
+#include <boost/shared_ptr.hpp>
 
 class RuntimeScene;
-class ObjectsConcerned;
-class Instruction;
-class Evaluateur;
+class Object;
+class ExpressionInstruction;
+class StrExpressionInstruction;
+typedef boost::shared_ptr<Object> ObjSPtr;
 
-bool ActLaunchFunction( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+std::string ExpGetFunctionParameter( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction );
 
-#endif // AESACTIONS_H_INCLUDED
+#endif // FUNCTIONEXPRESSIONS_H

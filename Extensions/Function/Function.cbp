@@ -420,9 +420,17 @@
 		<Linker>
 			<Add directory="C:\Libs\SFML\lib\mingw" />
 		</Linker>
+		<Unit filename="Extension.cpp" />
 		<Unit filename="FunctionActions.cpp" />
 		<Unit filename="FunctionActions.h" />
-		<Unit filename="Extension.cpp" />
+		<Unit filename="FunctionEvent.cpp" />
+		<Unit filename="FunctionEvent.h" />
+		<Unit filename="..\..\GDL\GDL\tinystr.cpp" />
+		<Unit filename="..\..\GDL\GDL\tinystr.h" />
+		<Unit filename="..\..\GDL\GDL\tinyxml.cpp" />
+		<Unit filename="..\..\GDL\GDL\tinyxml.h" />
+		<Unit filename="..\..\GDL\GDL\tinyxmlerror.cpp" />
+		<Unit filename="..\..\GDL\GDL\tinyxmlparser.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

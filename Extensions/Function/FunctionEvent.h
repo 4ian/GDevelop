@@ -1,3 +1,29 @@
+/**
+
+Game Develop - Function Extension
+Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+    1. The origin of this software must not be misrepresented; you must not
+    claim that you wrote the original software. If you use this software
+    in a product, an acknowledgment in the product documentation would be
+    appreciated but is not required.
+
+    2. Altered source versions must be plainly marked as such, and must not be
+    misrepresented as being the original software.
+
+    3. This notice may not be removed or altered from any source
+    distribution.
+
+*/
+
 #ifndef FUNCTIONEVENT_H
 #define FUNCTIONEVENT_H
 
@@ -16,7 +42,8 @@ class wxWindow;
 #endif
 
 /**
- * Foreach event is a standard event that pick an object of a list each time it is repeated
+ * Function event is an event which is executed by an action ( This action can pass to the function parameters and objects concerned )
+ * Functions are referenced in a (static) std::map so as to let action call them.
  */
 class FunctionEvent : public BaseEvent
 {
@@ -32,11 +59,12 @@ class FunctionEvent : public BaseEvent
         virtual void Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned ) {}; //Execute does not do anything, as function are launched by actions
 
         virtual void Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
-        virtual void Launch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
+        virtual void Launch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, std::vector < string > parameters_ );
 
-        static std::map < const Game*, std::map < const Scene* , std::map < std::string, FunctionEvent* > > > functionsList; ///< Static map containing all functions, associated with their game, scene and name
+        static std::map < const Scene* , std::map < std::string, FunctionEvent* > > functionsList; ///< Static map containing all functions, associated with their game, scene and name
+        static std::map < const Scene* , std::vector < std::string >* > currentFunctionParameter; ///< Static map containing the parameters of the current function
         void UnreferenceFunction();
-        void ReferenceFunction(const Game *, Scene *);
+        void ReferenceFunction(Scene *);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};

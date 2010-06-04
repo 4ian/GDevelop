@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
+	<ActiveTarget name="Release - Edittime" />
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="9408" topLine="106" />
 	</File>
 	<File name="CheckMAJ.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="3588" topLine="92" />
+		<Cursor position="2739" topLine="75" />
 	</File>
 	<File name="ChoiceFile.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="3956" topLine="60" />
@@ -28,11 +28,11 @@
 	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="1183" topLine="32" />
 	</File>
-	<File name="ChoixTemplateEvent.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="17968" topLine="315" />
+	<File name="ChoixTemplateEvent.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="18697" topLine="354" />
 	</File>
-	<File name="ChoixTemplateEvent.h" open="0" top="0" tabpos="15">
-		<Cursor position="331" topLine="0" />
+	<File name="ChoixTemplateEvent.h" open="1" top="0" tabpos="3">
+		<Cursor position="2460" topLine="77" />
 	</File>
 	<File name="Clipboard.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="535" topLine="4" />
@@ -142,8 +142,8 @@
 	<File name="EditorLayers.h" open="0" top="0" tabpos="10">
 		<Cursor position="2112" topLine="61" />
 	</File>
-	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="17">
-		<Cursor position="30101" topLine="687" />
+	<File name="EditorObjectList.cpp" open="1" top="1" tabpos="15">
+		<Cursor position="27081" topLine="479" />
 	</File>
 	<File name="EditorObjectList.h" open="0" top="0" tabpos="3">
 		<Cursor position="981" topLine="24" />

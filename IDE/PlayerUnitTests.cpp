@@ -182,19 +182,19 @@ TEST( Runtime, Expressions )
     Game game;
 
     {
-        GDExpression expression("cos(3.5)+random(5)");
+        GDExpression expression("cos(3.5)+Random(5)");
         CHECK_EQUAL(true, expression.PrepareForMathEvaluationOnly(game, scene));
     }
     {
-        GDExpression expression("5+object.x()+random(5)");
+        GDExpression expression("5+object.x()+Random(5)");
         CHECK_EQUAL(true, expression.PrepareForMathEvaluationOnly(game, scene));
     }
     {
-        GDExpression expression("5+object.x(5)+random(5)");
+        GDExpression expression("5+object.x(5)+Random(5)");
         CHECK_EQUAL(false, expression.PrepareForMathEvaluationOnly(game, scene));
     }
     {
-        GDExpression expression("5+object.x(5,4)+random(5)");
+        GDExpression expression("5+object.x(5,4)+Random(5)");
         CHECK_EQUAL(false, expression.PrepareForMathEvaluationOnly(game, scene));
     }
     {
@@ -220,15 +220,15 @@ TEST( Runtime, StrExpressions )
         CHECK_EQUAL(true, expression.PrepareForTextEvaluationOnly(game, scene));
     }
     {
-        GDExpression expression("\"Salut \"+object.variableString(maVariable)");
+        GDExpression expression("\"Salut \"+object.VariableString(maVariable)");
         CHECK_EQUAL(true, expression.PrepareForTextEvaluationOnly(game, scene));
     }
     {
-        GDExpression expression("object.x()");
+        GDExpression expression("object.X()");
         CHECK_EQUAL(true, expression.PrepareForTextEvaluationOnly(game, scene));
     }
     {
-        GDExpression expression("\"X :\" + object.x()");
+        GDExpression expression("\"X :\" + object.X()");
         CHECK_EQUAL(true, expression.PrepareForTextEvaluationOnly(game, scene));
     }
     {

@@ -188,6 +188,18 @@ size_t GetMinimalParametersNumber(const std::vector < ParameterInfo > & paramete
     return nb;
 }
 
+std::string ReplaceTildesBySpaces(std::string text)
+{
+    size_t foundPos=text.find("~");
+    while(foundPos != string::npos)
+    {
+        if(foundPos != string::npos) text.replace(foundPos,1," ");
+        foundPos=text.find("~", foundPos+1);
+    }
+
+    return text;
+}
+
 bool GDExpression::PrepareForEvaluation(const Game & game, const Scene & scene)
 {
     bool ok = true;
@@ -223,6 +235,7 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
         nameStart++;
 
         string nameBefore = expression.substr(nameStart, nameEnd-nameStart);
+        string objectName = ReplaceTildesBySpaces(nameBefore);
 
         //Identify function name
         string functionName = nameBefore;
@@ -232,7 +245,7 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
         bool nameIsFunction = firstPointPos > firstParPos;
         if ( !nameIsFunction )
         {
-            parameters.push_back(GDExpression(nameBefore));
+            parameters.push_back(GDExpression(objectName));
             functionNameEnd = expression.find_first_of(" (", nameEnd);
             if ( nameEnd+1 < expression.length()) functionName = expression.substr(nameEnd+1, functionNameEnd-(nameEnd+1));
             if ( functionNameEnd == string::npos )
@@ -255,11 +268,11 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
                 instruction.function = (extensionsManager->GetExpressionFunctionPtr(functionName));
                 instructionInfos = extensionsManager->GetExpressionInfos(functionName);
             }
-            else if ( !isMathFunction && !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, nameBefore), functionName) )
+            else if ( !isMathFunction && !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
             {
                 instruction.function = &ExpObjectFunction;
-                instruction.objectFunction = extensionsManager->GetObjectExpressionFunctionPtr(GetTypeIdOfObject(game, scene, nameBefore), functionName);
-                instructionInfos = extensionsManager->GetObjectExpressionInfos(extensionsManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, nameBefore)), functionName);
+                instruction.objectFunction = extensionsManager->GetObjectExpressionFunctionPtr(GetTypeIdOfObject(game, scene, objectName), functionName);
+                instructionInfos = extensionsManager->GetObjectExpressionInfos(extensionsManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, objectName)), functionName);
             }
 
             if( !isMathFunction && instruction.function != NULL ) //Add the function
@@ -324,9 +337,6 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
                         firstErrorStr += _("Attendu ( au maximum ) :");
                         firstErrorStr += ToString(instructionInfos.parameters.size());
                         #endif
-                        cout << "ToString(instructionInfos.parameters.size())" << ToString(instructionInfos.parameters.size()) << endl;
-                        cout << "parameters.size()" << parameters.size() << endl;
-                        cout << "GetMinimalParametersNumber(instructionInfos.parameters)" << GetMinimalParametersNumber(instructionInfos.parameters) << endl;
                         mathExpressionFunctions.clear();
                         mathExpression.Parse("0", "");
 
@@ -459,6 +469,7 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
             nameStart++;
 
             string nameBefore = expression.substr(nameStart, nameEnd-nameStart);
+            string objectName = ReplaceTildesBySpaces(nameBefore);
 
             //Identify function name
             string functionName = nameBefore;
@@ -468,7 +479,7 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
             bool nameIsFunction = firstPointPos > firstParPos;
             if ( !nameIsFunction )
             {
-                parameters.push_back(GDExpression(nameBefore));
+                parameters.push_back(GDExpression(objectName));
                 functionNameEnd = expression.find_first_of("( ", nameEnd);
                 if ( nameEnd+1 < expression.length()) functionName = expression.substr(nameEnd+1, functionNameEnd-(nameEnd+1));
             }
@@ -533,10 +544,10 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
 
                 instruction.parameters = (parameters);
             }
-            else if ( !nameIsFunction && extensionsManager->HasObjectStrExpression(GetTypeIdOfObject(game, scene, nameBefore), functionName) )
+            else if ( !nameIsFunction && extensionsManager->HasObjectStrExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
             {
                 instruction.function = &ExpObjectStrFunction;
-                instruction.objectFunction = extensionsManager->GetObjectStrExpressionFunctionPtr(GetTypeIdOfObject(game, scene, nameBefore), functionName);
+                instruction.objectFunction = extensionsManager->GetObjectStrExpressionFunctionPtr(GetTypeIdOfObject(game, scene, objectName), functionName);
                 vector < ParameterInfo > parametersInfos = extensionsManager->GetObjectStrExpressionInfos(extensionsManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, nameBefore)), functionName).parameters;
 
                 //Testing the number of parameters
@@ -561,7 +572,7 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
                 instruction.parameters = (parameters);
             }
             //Support for implicit conversion from math result to string
-            else if ( isMathFunction || extensionsManager->HasExpression(functionName) || extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, nameBefore), nameBefore) )
+            else if ( isMathFunction || extensionsManager->HasExpression(functionName) || extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
             {
                 vector < GDExpression > implicitConversionParameters;
                 GDExpression implicitMathExpression(expression.substr(nameStart, parametersEnd+1-nameStart));

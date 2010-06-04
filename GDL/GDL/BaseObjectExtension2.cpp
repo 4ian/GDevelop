@@ -1,5 +1,6 @@
 #include "GDL/BaseObjectExtension.h"
 #include "GDL/Object.h"
+#include "GDL/eFreeFunctions.h"
 
 void BaseObjectExtension::DeclareExtensionSecondPart()
 {
@@ -226,4 +227,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         MAIN_OBJECTS_IN_PARAMETER(0)
 
     DECLARE_END_CONDITION()
+
+    DECLARE_EXPRESSION("Count", _("Nombre d'objets"), _("Compte le nombre d'objets indiqué actuellement concernés"), _("Objets"), "res/conditions/nbObjet.png", &ExpGetObjectCount)
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
+    DECLARE_END_EXPRESSION()
 }

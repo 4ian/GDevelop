@@ -16,6 +16,7 @@
 #include <wx/textdlg.h>
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
+#include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/gdTreeItemStringData.h"
 
@@ -585,7 +586,7 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
             parametersStr += ShowParameterDialog(infos.parameters[i]);
         }
 
-        expression += object+"."+associatedData->GetString()+"("+parametersStr+")";
+        expression += ReplaceSpacesByTildes(object)+"."+associatedData->GetString()+"("+parametersStr+")";
 
         ExpressionEdit->ChangeValue(expression);
         RefreshExpressionEdit();

@@ -20,6 +20,7 @@
 #endif
 
 #include <string>
+#include <cctype>
 #include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml.h"
 
@@ -821,7 +822,6 @@ std::string AdaptLegacyMathExpression(std::string expression, Game & game, Scene
 {
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
 
-    cout << "expression : " << expression << endl;
     string newExpression;
     size_t lastPos = 0;
     {
@@ -848,11 +848,18 @@ std::string AdaptLegacyMathExpression(std::string expression, Game & game, Scene
                 if ( bracket != string::npos ) objectName = expression.substr(objectExpressionStart+4, bracket-(objectExpressionStart+4));
                 if ( bracket2 != string::npos ) functionName = expression.substr(bracket+1, bracket2-bracket-1);
 
+                std::string functionNameWithNewCase = functionName;
+                if ( !functionNameWithNewCase.empty()) functionNameWithNewCase[0] = toupper(functionNameWithNewCase[0]);
+
                 //Handle old style of variable access
-                if ( !extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
-                    newExpression += objectName+".variable"+"("+functionName;
+                if ( functionName == "count" )
+                {
+                    newExpression += "Count("+objectName;
+                }
+                else if ( !extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionNameWithNewCase) )
+                    newExpression += ReplaceSpacesByTildes(objectName)+".Variable("+functionName;
                 else
-                    newExpression += objectName+"."+functionName+"(";
+                    newExpression += ReplaceSpacesByTildes(objectName)+"."+functionNameWithNewCase+"(";
 
                 parametersStart = bracket2+1;
             }
@@ -866,11 +873,14 @@ std::string AdaptLegacyMathExpression(std::string expression, Game & game, Scene
                 size_t bracket = expression.find( "[", valExpressionStart );
                 if ( bracket != string::npos ) functionName = expression.substr(valExpressionStart+4, bracket-(valExpressionStart+4));
 
+                std::string functionNameWithNewCase = functionName;
+                if ( !functionNameWithNewCase.empty()) functionNameWithNewCase[0] = toupper(functionNameWithNewCase[0]);
+
                 //Handle old style of variable access
-                if ( !extensionsManager->HasExpression(functionName) )
-                    newExpression += "variable("+functionName;
+                if ( !extensionsManager->HasExpression(functionNameWithNewCase) )
+                    newExpression += "Variable("+functionName;
                 else
-                    newExpression += functionName+"(";
+                    newExpression += functionNameWithNewCase+"(";
 
                 parametersStart = bracket+1;
             }
@@ -885,7 +895,7 @@ std::string AdaptLegacyMathExpression(std::string expression, Game & game, Scene
                 if ( bracket != string::npos ) functionName = expression.substr(gblExpressionStart+4, bracket-(gblExpressionStart+4));
 
                 //Global expressions were always global variables
-                newExpression += "globalVariable("+functionName;
+                newExpression += "GlobalVariable("+functionName;
 
                 parametersStart = bracket+1;
             }
@@ -913,7 +923,6 @@ std::string AdaptLegacyMathExpression(std::string expression, Game & game, Scene
 
         if ( expression.length() > lastPos ) newExpression += expression.substr(lastPos, expression.length());
     }
-    cout << "newExpression : " << newExpression << endl;
 
     return newExpression;
 }
@@ -934,7 +943,6 @@ std::string AdaptLegacyTextExpression(std::string expression, Game & game, Scene
 {
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
 
-    cout << "STRexpression : " << expression << endl;
     string newExpression;
     bool firstToken = true;
     size_t lastPos = 0;
@@ -974,8 +982,7 @@ std::string AdaptLegacyTextExpression(std::string expression, Game & game, Scene
                 if ( bracket2 != string::npos ) functionName = expression.substr(bracket+1, bracket2-bracket-1);
 
                 //Handle old style of variable access
-                if ( !extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
-                    newExpression += objectName+".variableString("+functionName+")";
+                newExpression += ReplaceSpacesByTildes(objectName)+".VariableString("+functionName+")";
 
                 lastPos = bracket2+3;
                 firstToken = false;
@@ -1001,8 +1008,7 @@ std::string AdaptLegacyTextExpression(std::string expression, Game & game, Scene
                 if ( bracket != string::npos ) functionName = expression.substr(valExpressionStart+8, bracket-(valExpressionStart+8));
 
                 //Handle old style of variable access
-                if ( !extensionsManager->HasExpression(functionName) )
-                    newExpression += "variableString("+functionName+")";
+                newExpression += "VariableString("+functionName+")";
 
                 lastPos = bracket+4;
                 firstToken = false;
@@ -1028,7 +1034,7 @@ std::string AdaptLegacyTextExpression(std::string expression, Game & game, Scene
                 if ( bracket != string::npos ) functionName = expression.substr(gblExpressionStart+8, bracket-(gblExpressionStart+8));
 
                 //Global expressions were always global variables
-                newExpression += "globalVariableString("+functionName+")";
+                newExpression += "GlobalVariableString("+functionName+")";
 
                 lastPos = bracket+4;
                 firstToken = false;
@@ -1073,7 +1079,6 @@ std::string AdaptLegacyTextExpression(std::string expression, Game & game, Scene
             newExpression += "\""+AddBackSlashBeforeQuotes(expression.substr(lastPos, expression.length()))+"\"";
         }
     }
-    cout << "newSTRExpression : " << newExpression << endl;
 
     return newExpression;
 }
@@ -1085,7 +1090,6 @@ std::string AdaptLegacyTextExpression(std::string expression, Game & game, Scene
 void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list, Game & game, Scene & scene)
 {
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-    cout << "adapt";
 
     for (unsigned int eId = 0;eId < list.size();++eId)
     {

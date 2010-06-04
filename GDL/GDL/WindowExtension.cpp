@@ -58,10 +58,10 @@ WindowExtension::WindowExtension()
 
     DECLARE_END_ACTION()
 
-    DECLARE_EXPRESSION("screenWidth", "Largeur de la résolution actuelle", "Largeur de la résolution actuelle", "Ecran", "", &ExpGetScreenWidth)
+    DECLARE_EXPRESSION("ScreenWidth", "Largeur de la résolution actuelle", "Largeur de la résolution actuelle", "Ecran", "", &ExpGetScreenWidth)
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("screenHeight", "Hauteur de la résolution actuelle", "Hauteur de la résolution actuelle", "Ecran", "", &ExpGetScreenHeight)
+    DECLARE_EXPRESSION("ScreenHeight", "Hauteur de la résolution actuelle", "Hauteur de la résolution actuelle", "Ecran", "", &ExpGetScreenHeight)
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("colorDepth", "Profondeur de couleur de la résolution actuelle", "Profondeur de couleur de la résolution actuelle", "Ecran", "", &ExpGetScreenColorDepth)
+    DECLARE_EXPRESSION("ColorDepth", "Profondeur de couleur de la résolution actuelle", "Profondeur de couleur de la résolution actuelle", "Ecran", "", &ExpGetScreenColorDepth)
     DECLARE_END_EXPRESSION()
 }

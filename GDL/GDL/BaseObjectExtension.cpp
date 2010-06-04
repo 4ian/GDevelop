@@ -484,78 +484,78 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         DECLARE_END_OBJECT_CONDITION()
 
-        DECLARE_OBJECT_EXPRESSION("x", _("Position X"), _("Position X de l'objet"), _("Position"), "res/actions/position.png", &Object::ExpGetObjectX)
+        DECLARE_OBJECT_EXPRESSION("X", _("Position X"), _("Position X de l'objet"), _("Position"), "res/actions/position.png", &Object::ExpGetObjectX)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("y", _("Position Y"), _("Position Y de l'objet"), _("Position"), "res/actions/position.png", &Object::ExpGetObjectY)
+        DECLARE_OBJECT_EXPRESSION("Y", _("Position Y"), _("Position Y de l'objet"), _("Position"), "res/actions/position.png", &Object::ExpGetObjectY)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("forceX", _("Force moyenne en X"), _("Force moyenne en X"), _("Déplacement"), "res/actions/force.png", &Object::ExpGetObjectTotalForceX)
+        DECLARE_OBJECT_EXPRESSION("ForceX", _("Force moyenne en X"), _("Force moyenne en X"), _("Déplacement"), "res/actions/force.png", &Object::ExpGetObjectTotalForceX)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("forceY", _("Force moyenne en Y"), _("Force moyenne en Y"), _("Déplacement"), "res/actions/force.png", &Object::ExpGetObjectTotalForceY)
+        DECLARE_OBJECT_EXPRESSION("ForceY", _("Force moyenne en Y"), _("Force moyenne en Y"), _("Déplacement"), "res/actions/force.png", &Object::ExpGetObjectTotalForceY)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("forceAngle", _("Angle moyen des forces"), _("Angle moyen des forces"), _("Déplacement"), "res/actions/force.png", &Object::ExpGetObjectTotalForceAngle)
+        DECLARE_OBJECT_EXPRESSION("ForceAngle", _("Angle moyen des forces"), _("Angle moyen des forces"), _("Déplacement"), "res/actions/force.png", &Object::ExpGetObjectTotalForceAngle)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_HIDDEN_EXPRESSION("angle", _("Angle moyen des forces"), _("Angle moyen des forces"), _("Déplacement"), "res/actions/force.png", &Object::ExpGetObjectTotalForceAngle)
+        DECLARE_OBJECT_HIDDEN_EXPRESSION("Angle", _("Angle moyen des forces"), _("Angle moyen des forces"), _("Déplacement"), "res/actions/force.png", &Object::ExpGetObjectTotalForceAngle)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("forceLength", _("Longueur moyenne des forces"), _("Longueur moyenne des forces"), _("Déplacement"), "res/actions/force.png", &Object::ExpGetObjectTotalForceLength)
+        DECLARE_OBJECT_EXPRESSION("ForceLength", _("Longueur moyenne des forces"), _("Longueur moyenne des forces"), _("Déplacement"), "res/actions/force.png", &Object::ExpGetObjectTotalForceLength)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_HIDDEN_EXPRESSION("longueur", _("Longueur moyenne des forces"), _("Longueur moyenne des forces"), _("Déplacement"), "res/actions/force.png", &Object::ExpGetObjectTotalForceLength)
+        DECLARE_OBJECT_HIDDEN_EXPRESSION("Longueur", _("Longueur moyenne des forces"), _("Longueur moyenne des forces"), _("Déplacement"), "res/actions/force.png", &Object::ExpGetObjectTotalForceLength)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("width", _("Largeur d'un objet"), _("Largeur d'un objet"), _("Taille"), "res/actions/scaleWidth.png", &Object::ExpGetObjectWidth)
+        DECLARE_OBJECT_EXPRESSION("Width", _("Largeur d'un objet"), _("Largeur d'un objet"), _("Taille"), "res/actions/scaleWidth.png", &Object::ExpGetObjectWidth)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_HIDDEN_EXPRESSION("largeur", _("Largeur d'un objet"), _("Largeur d'un objet"), _("Taille"), "res/actions/scaleWidth.png", &Object::ExpGetObjectWidth)
+        DECLARE_OBJECT_HIDDEN_EXPRESSION("Largeur", _("Largeur d'un objet"), _("Largeur d'un objet"), _("Taille"), "res/actions/scaleWidth.png", &Object::ExpGetObjectWidth)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("height", _("Hauteur d'un objet"), _("Hauteur d'un objet"), _("Taille"), "res/actions/scaleHeight.png", &Object::ExpGetObjectHeight)
+        DECLARE_OBJECT_EXPRESSION("Height", _("Hauteur d'un objet"), _("Hauteur d'un objet"), _("Taille"), "res/actions/scaleHeight.png", &Object::ExpGetObjectHeight)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_HIDDEN_EXPRESSION("hauteur", _("Hauteur d'un objet"), _("Hauteur d'un objet"), _("Taille"), "res/actions/scaleHeight.png", &Object::ExpGetObjectHeight)
+        DECLARE_OBJECT_HIDDEN_EXPRESSION("Hauteur", _("Hauteur d'un objet"), _("Hauteur d'un objet"), _("Taille"), "res/actions/scaleHeight.png", &Object::ExpGetObjectHeight)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("zOrder", _("Plan d'un objet"), _("Plan d'un objet"), _("Visibilité"), "res/actions/planicon.png", &Object::ExpGetObjectZOrder)
+        DECLARE_OBJECT_EXPRESSION("ZOrder", _("Plan d'un objet"), _("Plan d'un objet"), _("Visibilité"), "res/actions/planicon.png", &Object::ExpGetObjectZOrder)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_HIDDEN_EXPRESSION("plan", _("Plan d'un objet"), _("Plan d'un objet"), _("Visibilité"), "res/actions/planicon.png", &Object::ExpGetObjectZOrder)
+        DECLARE_OBJECT_HIDDEN_EXPRESSION("Plan", _("Plan d'un objet"), _("Plan d'un objet"), _("Visibilité"), "res/actions/planicon.png", &Object::ExpGetObjectZOrder)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("distance", _("Distance entre deux objets"), _("Distance entre deux objets"), _("Position"), "res/conditions/distance.png", &Object::ExpGetDistanceBetweenObjects)
-            DECLARE_PARAMETER("object", _("Objet"), true, "")
-            DECLARE_PARAMETER("object", _("Objet"), true, "")
-        DECLARE_END_OBJECT_EXPRESSION()
-
-        DECLARE_OBJECT_EXPRESSION("sqDistance", _("Distance au carré entre deux objets"), _("Distance au carré entre deux objets"), _("Position"), "res/conditions/distance.png", &Object::ExpGetSqDistanceBetweenObjects)
+        DECLARE_OBJECT_EXPRESSION("Distance", _("Distance entre deux objets"), _("Distance entre deux objets"), _("Position"), "res/conditions/distance.png", &Object::ExpGetDistanceBetweenObjects)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("variable", _("Variable d'un objet"), _("Variable d'un objet"), _("Variables"), "res/actions/var.png", &Object::ExpGetObjectVariableValue)
+        DECLARE_OBJECT_EXPRESSION("SqDistance", _("Distance au carré entre deux objets"), _("Distance au carré entre deux objets"), _("Position"), "res/conditions/distance.png", &Object::ExpGetSqDistanceBetweenObjects)
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
+        DECLARE_END_OBJECT_EXPRESSION()
+
+        DECLARE_OBJECT_EXPRESSION("Variable", _("Variable d'un objet"), _("Variable d'un objet"), _("Variables"), "res/actions/var.png", &Object::ExpGetObjectVariableValue)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("objectvar", _("Nom de la variable"), false, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_STR_EXPRESSION("variable", _("Variable d'un objet"), _("Texte d'une variable d'un objet"), _("Variables"), "res/actions/var.png", &Object::ExpGetObjectVariableString)
+        DECLARE_OBJECT_STR_EXPRESSION("Variable", _("Variable d'un objet"), _("Texte d'une variable d'un objet"), _("Variables"), "res/actions/var.png", &Object::ExpGetObjectVariableString)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("objectvar", _("Nom de la variable"), false, "")
         DECLARE_END_OBJECT_STR_EXPRESSION()

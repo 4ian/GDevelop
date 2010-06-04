@@ -388,57 +388,59 @@ ExtensionSprite::ExtensionSprite()
 
         DECLARE_END_OBJECT_ACTION()
 
-        DECLARE_OBJECT_HIDDEN_EXPRESSION("x", _("Position X d'un point"), _("Position X d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectX)
+        DECLARE_OBJECT_HIDDEN_EXPRESSION("X", _("Position X d'un point"), _("Position X d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectX)
 
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER_OPTIONAL("text", _("Nom du point"), false, "")
 
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_HIDDEN_EXPRESSION("y", _("Position Y d'un point"), _("Position Y d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectY)
+        DECLARE_OBJECT_HIDDEN_EXPRESSION("Y", _("Position Y d'un point"), _("Position Y d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectY)
 
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER_OPTIONAL("text", _("Nom du point"), false, "")
 
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("pointX", _("Position X d'un point"), _("Position X d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectX)
+        DECLARE_OBJECT_EXPRESSION("PointX", _("Position X d'un point"), _("Position X d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectX)
 
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("text", _("Nom du point"), false, "")
 
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("pointY", _("Position Y d'un point"), _("Position Y d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectY)
+        DECLARE_OBJECT_EXPRESSION("PointY", _("Position Y d'un point"), _("Position Y d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectY)
 
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("text", _("Nom du point"), false, "")
 
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_HIDDEN_EXPRESSION("direc", _("Direction"), _("Direction de l'objet"), _("Direction"), "res/actions/direction.png", &SpriteObject::ExpGetObjectDirection)
-        DECLARE_END_OBJECT_EXPRESSION()
-
-        DECLARE_OBJECT_EXPRESSION("direction", _("Direction"), _("Direction de l'objet"), _("Direction"), "res/actions/direction.png", &SpriteObject::ExpGetObjectDirection)
+        DECLARE_OBJECT_HIDDEN_EXPRESSION("Direc", _("Direction"), _("Direction de l'objet"), _("Direction"), "res/actions/direction.png", &SpriteObject::ExpGetObjectDirection)
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_HIDDEN_EXPRESSION("anim", _("Animation"), _("Animation de l'objet"), _("Animation et images"), "res/actions/animation.png", &SpriteObject::ExpGetObjectAnimationNb)
-        DECLARE_END_OBJECT_EXPRESSION()
-
-        DECLARE_OBJECT_EXPRESSION("animation", _("Animation"), _("Animation de l'objet"), _("Animation et images"), "res/actions/animation.png", &SpriteObject::ExpGetObjectAnimationNb)
+        DECLARE_OBJECT_EXPRESSION("Direction", _("Direction"), _("Direction de l'objet"), _("Direction"), "res/actions/direction.png", &SpriteObject::ExpGetObjectDirection)
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("sprite", _("Image"), _("Numéro de l'image de l'objet"), _("Animations et images"), "res/actions/sprite.png", &SpriteObject::ExpGetObjectSpriteNb)
+        DECLARE_OBJECT_HIDDEN_EXPRESSION("Anim", _("Animation"), _("Animation de l'objet"), _("Animation et images"), "res/actions/animation.png", &SpriteObject::ExpGetObjectAnimationNb)
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("scaleX", _("Echelle de la taille en largeur"), _("Echelle de la taille en largeur"), _("Taille"), "res/actions/scaleWidth.png", &SpriteObject::ExpGetObjectScaleX)
+        DECLARE_OBJECT_EXPRESSION("Animation", _("Animation"), _("Animation de l'objet"), _("Animation et images"), "res/actions/animation.png", &SpriteObject::ExpGetObjectAnimationNb)
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("scaleY", _("Echelle de la taille en hauteur"), _("Echelle de la taille en hauteur"), _("Taille"), "res/actions/scaleHeight.png", &SpriteObject::ExpGetObjectScaleY)
+        DECLARE_OBJECT_EXPRESSION("Sprite", _("Image"), _("Numéro de l'image de l'objet"), _("Animations et images"), "res/actions/sprite.png", &SpriteObject::ExpGetObjectSpriteNb)
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
+        DECLARE_END_OBJECT_EXPRESSION()
+
+        DECLARE_OBJECT_EXPRESSION("ScaleX", _("Echelle de la taille en largeur"), _("Echelle de la taille en largeur"), _("Taille"), "res/actions/scaleWidth.png", &SpriteObject::ExpGetObjectScaleX)
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
+        DECLARE_END_OBJECT_EXPRESSION()
+
+        DECLARE_OBJECT_EXPRESSION("ScaleY", _("Echelle de la taille en hauteur"), _("Echelle de la taille en hauteur"), _("Taille"), "res/actions/scaleHeight.png", &SpriteObject::ExpGetObjectScaleY)
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
         DECLARE_END_OBJECT_EXPRESSION()
 

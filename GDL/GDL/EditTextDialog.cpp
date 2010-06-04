@@ -15,6 +15,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/Chercher.h"
+#include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/gdTreeItemStringData.h"
 
@@ -407,7 +408,7 @@ void EditTextDialog::OnAddPropBtClick(wxCommandEvent& event)
             parametersStr += ShowParameterDialog(infos.parameters[i], object);
         }
 
-        TexteEdit->WriteText(object+"."+associatedData->GetString()+"("+parametersStr+")");
+        TexteEdit->WriteText(ReplaceSpacesByTildes(object)+"."+associatedData->GetString()+"("+parametersStr+")");
         return;
     }
 }

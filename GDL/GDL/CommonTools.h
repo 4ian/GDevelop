@@ -64,6 +64,11 @@ std::string ToString( const T & value )
     return oss.str();
 }
 
+/**
+ * Replace all spaces by tildes in a string
+ */
+std::string ReplaceSpacesByTildes(std::string text);
+
 int Spliter(string Tableau[] , string chaine, char separateur, int longueur = -1);
 int SpliterV(vector <string> *Tableau , string chaine, char separateur);
 int SpliterVInt(vector <int> *Tableau , string chaine, char separateur);

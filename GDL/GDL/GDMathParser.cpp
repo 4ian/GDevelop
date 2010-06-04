@@ -76,5 +76,5 @@ std::vector < std::string > GDMathParser::GetAllMathFunctions()
 
 std::string GDMathParser::GetAllMathSeparator()
 {
-    return " ,+-*/%.<>=&|;()#^![]{}~";
+    return " ,+-*/%.<>=&|;()#^![]{}";
 }

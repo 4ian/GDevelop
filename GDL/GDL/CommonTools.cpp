@@ -11,6 +11,18 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Image.h"
 
+std::string ReplaceSpacesByTildes(std::string text)
+{
+    size_t foundPos=text.find(" ");
+    while(foundPos != string::npos)
+    {
+        if(foundPos != string::npos) text.replace(foundPos,1,"~");
+        foundPos=text.find(" ", foundPos+1);
+    }
+
+    return text;
+}
+
 int GD_API FindImage( const vector < Image > & list, const string & chaine )
 {
     for ( unsigned int i = 0;i < list.size();i++ )

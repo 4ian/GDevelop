@@ -104,24 +104,24 @@ TimeExtension::TimeExtension()
 
     DECLARE_END_ACTION()
 
-    DECLARE_EXPRESSION("timeDelta", _("Temps écoulé depuis la dernière image"), _("Temps écoulé depuis la dernière image"), _("Temps"), "res/actions/time.png", &ExpTimeDelta)
+    DECLARE_EXPRESSION("TimeDelta", _("Temps écoulé depuis la dernière image"), _("Temps écoulé depuis la dernière image"), _("Temps"), "res/actions/time.png", &ExpTimeDelta)
     DECLARE_END_EXPRESSION()
     DECLARE_HIDDEN_EXPRESSION("TempsFrame", _("Temps écoulé depuis la dernière image"), _("Temps écoulé depuis la dernière image"), _("Temps"), "res/actions/time.png", &ExpTimeDelta)
     DECLARE_END_EXPRESSION()
     DECLARE_HIDDEN_EXPRESSION("ElapsedTime", _("Temps écoulé depuis la dernière image"), _("Temps écoulé depuis la dernière image"), _("Temps"), "res/actions/time.png", &ExpTimeDelta)
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("timeFromStart", _("Temps écoulé depuis le début de la scène"), _("Temps écoulé depuis le début de la scène"), _("Temps"), "res/actions/time.png", &ExpTimeFromStart)
+    DECLARE_EXPRESSION("TimeFromStart", _("Temps écoulé depuis le début de la scène"), _("Temps écoulé depuis le début de la scène"), _("Temps"), "res/actions/time.png", &ExpTimeFromStart)
     DECLARE_END_EXPRESSION()
     DECLARE_HIDDEN_EXPRESSION("TempsDebut", _("Temps écoulé depuis le début de la scène"), _("Temps écoulé depuis le début de la scène"), _("Temps"), "res/actions/time.png", &ExpTimeFromStart)
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("timeScale", _("Echelle du temps"), _("Echelle du temps"), _("Temps"), "res/actions/time.png", &ExpTimeScale)
+    DECLARE_EXPRESSION("TimeScale", _("Echelle du temps"), _("Echelle du temps"), _("Temps"), "res/actions/time.png", &ExpTimeScale)
     DECLARE_END_EXPRESSION()
     DECLARE_HIDDEN_EXPRESSION("TimeScale", _("Echelle du temps"), _("Echelle du temps"), _("Temps"), "res/actions/time.png", &ExpTimeScale)
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("time", _("Temps actuel"), _("Temps actuel"), _("Temps"), "res/actions/time.png", &ExpTime)
+    DECLARE_EXPRESSION("Time", _("Temps actuel"), _("Temps actuel"), _("Temps"), "res/actions/time.png", &ExpTime)
         DECLARE_PARAMETER("text", _("Valeur à récupérer :\n\nHeure : hour\nMinutes : min\nSecondes : sec\nJour du mois: mday\nAnnées depuis 1900 : year\nJours depuis dimanche :wday\nJours depuis le 1er Janvier : yday"), false, "")
     DECLARE_END_EXPRESSION()
 }

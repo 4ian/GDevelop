@@ -391,28 +391,28 @@ ExtensionSprite::ExtensionSprite()
         DECLARE_OBJECT_HIDDEN_EXPRESSION("X", _("Position X d'un point"), _("Position X d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectX)
 
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
-            DECLARE_PARAMETER_OPTIONAL("text", _("Nom du point"), false, "")
+            DECLARE_PARAMETER_OPTIONAL("", _("Nom du point"), false, "")
 
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_HIDDEN_EXPRESSION("Y", _("Position Y d'un point"), _("Position Y d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectY)
 
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
-            DECLARE_PARAMETER_OPTIONAL("text", _("Nom du point"), false, "")
+            DECLARE_PARAMETER_OPTIONAL("", _("Nom du point"), false, "")
 
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("PointX", _("Position X d'un point"), _("Position X d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectX)
 
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
-            DECLARE_PARAMETER("text", _("Nom du point"), false, "")
+            DECLARE_PARAMETER("", _("Nom du point"), false, "")
 
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("PointY", _("Position Y d'un point"), _("Position Y d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectY)
 
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
-            DECLARE_PARAMETER("text", _("Nom du point"), false, "")
+            DECLARE_PARAMETER("", _("Nom du point"), false, "")
 
         DECLARE_END_OBJECT_EXPRESSION()
 

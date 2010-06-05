@@ -29,6 +29,7 @@
 bool ActResetTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     string timerName = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
+    if ( timerName == "" ) return false;
 
     //Le timer existe il ? on parcourt la liste.
     for ( unsigned int i = 0;i < scene.timers.size();i++ )
@@ -57,6 +58,7 @@ bool ActResetTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
 bool ActPauseTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     string timerName = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
+    if ( timerName == "" ) return false;
 
     //Le timer existe il ? on parcourt la liste.
     for ( unsigned int i = 0;i < scene.timers.size();i++ )
@@ -86,6 +88,7 @@ bool ActPauseTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
 bool ActUnPauseTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     string timerName = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
+    if ( timerName == "" ) return false;
 
     //Le timer existe il ? on parcourt la liste.
     for ( unsigned int i = 0;i < scene.timers.size();i++ )

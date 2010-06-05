@@ -299,7 +299,14 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
                         //Add the character to the current parameter or terminate the latter
                         if ( (expression[parametersEnd] == ',' && level == 0) && takeSymbolsInAccount )
                         {
-                            if ( !AddParameterToList(game, scene, parameters, currentParameterStr, instructionInfos.parameters, parametersEnd) ) return false;
+                            if ( !AddParameterToList(game, scene, parameters, currentParameterStr, instructionInfos.parameters, parametersEnd) )
+                            {
+                                mathExpressionFunctions.clear();
+                                mathExpression.Parse("0", "");
+
+                                isMathExpressionPreprocessed = true;
+                                return false;
+                            }
 
                             currentParameterStr.clear();
                         }
@@ -310,7 +317,14 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
                     }
                     if ( currentParameterStr.find_first_not_of(" ") != string::npos ) //Add last parameter if needed
                     {
-                        if ( !AddParameterToList(game, scene, parameters, currentParameterStr, instructionInfos.parameters, parametersEnd) ) return false;
+                        if ( !AddParameterToList(game, scene, parameters, currentParameterStr, instructionInfos.parameters, parametersEnd) )
+                        {
+                            mathExpressionFunctions.clear();
+                            mathExpression.Parse("0", "");
+
+                            isMathExpressionPreprocessed = true;
+                            return false;
+                        }
                     }
 
                     if(parametersEnd == expression.length() || expression[parametersEnd] != ')')
@@ -319,7 +333,6 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
                         firstErrorStr = _("Parenthèses non fermées");
                         firstErrorPos = parametersEnd-1;
                         #endif
-                        cout << "Parantheses" << " in " << expression;
                         mathExpressionFunctions.clear();
                         mathExpression.Parse("0", "");
 
@@ -418,6 +431,19 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
     size_t firstPointPos = expression.find(".");
     size_t firstParPos = expression.find("(");
     size_t firstQuotePos = expression.find("\"");
+
+    if ( firstPointPos == string::npos && firstParPos == string::npos && firstQuotePos == string::npos  )
+    {
+        #if defined(GDE)
+        firstErrorPos = 0;
+        firstErrorStr = _("L'expression est invalide ou vide. Entrez un texte ( entouré de guillemets ) ou une fonction.");
+        #endif
+        textExpressionFunctions.clear();
+
+        isTextExpressionPreprocessed = true;
+        return false;
+    }
+
     while ( firstPointPos != string::npos || firstParPos != string::npos || firstQuotePos != string::npos )
     {
         if ( firstQuotePos < firstPointPos && firstQuotePos < firstParPos ) //Adding a constant text
@@ -512,6 +538,19 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
                 previousChar = expression[parametersEnd];
                 parametersEnd++;
             }
+
+            if ( parametersEnd == expression.length() || expression[parametersEnd] != ')' )
+            {
+                #if defined(GDE)
+                firstErrorPos = parametersEnd-1;
+                firstErrorStr = _("Parenthèses non fermées");
+                #endif
+                textExpressionFunctions.clear();
+
+                isTextExpressionPreprocessed = true;
+                return false;
+            }
+
             GDExpression lastParameter(currentParameterStr);
             parameters.push_back(lastParameter);
 
@@ -528,7 +567,7 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
                 {
                     #if defined(GDE)
                     firstErrorPos = functionNameEnd;
-                    firstErrorStr = _("Nombre de paramètre incorrect.");
+                    firstErrorStr = _("Nombre de paramètres incorrect.");
                     #endif
                     textExpressionFunctions.clear();
 
@@ -539,7 +578,13 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
                 //Preparing parameters
                 for (unsigned int i = 0;i<parameters.size() && i<parametersInfos.size();++i)
                 {
-                    if ( !PrepareParameter(game, scene, parameters[i], parametersInfos[i], functionNameEnd) ) return false;
+                    if ( !PrepareParameter(game, scene, parameters[i], parametersInfos[i], functionNameEnd) )
+                    {
+                        textExpressionFunctions.clear();
+
+                        isTextExpressionPreprocessed = true;
+                        return false;
+                    }
                 }
 
                 instruction.parameters = (parameters);
@@ -555,7 +600,7 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
                 {
                     #if defined(GDE)
                     firstErrorPos = functionNameEnd;
-                    firstErrorStr = _("Nombre de paramètre incorrect.");
+                    firstErrorStr = _("Nombre de paramètres incorrect.");
                     #endif
                     textExpressionFunctions.clear();
 
@@ -566,7 +611,13 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
                 //Preparing parameters
                 for (unsigned int i = 0;i<parameters.size() && i<parametersInfos.size();++i)
                 {
-                    if ( !PrepareParameter(game, scene, parameters[i], parametersInfos[i], functionNameEnd) ) return false;
+                    if ( !PrepareParameter(game, scene, parameters[i], parametersInfos[i], functionNameEnd) )
+                    {
+                        textExpressionFunctions.clear();
+
+                        isTextExpressionPreprocessed = true;
+                        return false;
+                    }
                 }
 
                 instruction.parameters = (parameters);

@@ -28,7 +28,6 @@
  */
 bool Object::ActDuplicate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
 
     ObjSPtr newObject = Clone();
 

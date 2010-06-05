@@ -33,6 +33,7 @@
 bool CondTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     string timerName = condition.GetParameter( 1 ).GetAsTextExpressionResult(scene, objectsConcerned);
+    if ( timerName == "" ) return false;
 
     //Le timer existe il ? on parcourt la liste.
     for ( unsigned int i = 0;i < scene.timers.size();i++ )
@@ -63,6 +64,7 @@ bool CondTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const
 bool CondTimerPaused( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     string timerName = condition.GetParameter( 0 ).GetAsTextExpressionResult(scene, objectsConcerned);
+    if ( timerName == "" ) return false;
 
     //Le timer existe il ? on parcourt la liste.
     for ( unsigned int i = 0;i < scene.timers.size();i++ )

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release - Edittime" />
+	<ActiveTarget name="Development - Edittime" />
 	<File name="GDL\AES.cpp" open="0" top="0" tabpos="25">
 		<Cursor position="2100" topLine="46" />
 	</File>
@@ -124,10 +124,10 @@
 	<File name="GDL\CommonInstructionsExtension.h" open="0" top="0" tabpos="0">
 		<Cursor position="108" topLine="0" />
 	</File>
-	<File name="GDL\CommonTools.cpp" open="1" top="0" tabpos="37">
+	<File name="GDL\CommonTools.cpp" open="1" top="0" tabpos="22">
 		<Cursor position="222" topLine="0" />
 	</File>
-	<File name="GDL\CommonTools.h" open="1" top="0" tabpos="38">
+	<File name="GDL\CommonTools.h" open="1" top="0" tabpos="23">
 		<Cursor position="1186" topLine="42" />
 	</File>
 	<File name="GDL\DatFile.cpp" open="0" top="0" tabpos="32">
@@ -154,7 +154,7 @@
 	<File name="GDL\EditComment.h" open="0" top="0" tabpos="0">
 		<Cursor position="449" topLine="4" />
 	</File>
-	<File name="GDL\EditExpression.cpp" open="1" top="0" tabpos="36">
+	<File name="GDL\EditExpression.cpp" open="1" top="0" tabpos="21">
 		<Cursor position="20210" topLine="275" />
 	</File>
 	<File name="GDL\EditExpression.h" open="0" top="0" tabpos="15">
@@ -259,19 +259,19 @@
 	<File name="GDL\ForEachEvent.h" open="0" top="0" tabpos="16">
 		<Cursor position="3497" topLine="56" />
 	</File>
-	<File name="GDL\Force.cpp" open="0" top="0" tabpos="14">
-		<Cursor position="142" topLine="2" />
+	<File name="GDL\Force.cpp" open="1" top="1" tabpos="45">
+		<Cursor position="411" topLine="8" />
 	</File>
-	<File name="GDL\Force.h" open="0" top="0" tabpos="15">
-		<Cursor position="829" topLine="33" />
+	<File name="GDL\Force.h" open="1" top="0" tabpos="44">
+		<Cursor position="899" topLine="29" />
 	</File>
 	<File name="GDL\GDExpression.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="26223" topLine="589" />
+		<Cursor position="16117" topLine="371" />
 	</File>
 	<File name="GDL\GDExpression.h" open="0" top="0" tabpos="6">
 		<Cursor position="2947" topLine="69" />
 	</File>
-	<File name="GDL\GDMathParser.cpp" open="1" top="0" tabpos="34">
+	<File name="GDL\GDMathParser.cpp" open="1" top="0" tabpos="19">
 		<Cursor position="2444" topLine="45" />
 	</File>
 	<File name="GDL\GDMathParser.h" open="0" top="0" tabpos="21">
@@ -376,11 +376,11 @@
 	<File name="GDL\ObjInstancesHolder.h" open="0" top="0" tabpos="5">
 		<Cursor position="1082" topLine="32" />
 	</File>
-	<File name="GDL\Object.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="703" topLine="26" />
+	<File name="GDL\Object.cpp" open="1" top="0" tabpos="46">
+		<Cursor position="3448" topLine="106" />
 	</File>
-	<File name="GDL\Object.h" open="0" top="0" tabpos="4">
-		<Cursor position="12112" topLine="243" />
+	<File name="GDL\Object.h" open="1" top="0" tabpos="42">
+		<Cursor position="13089" topLine="141" />
 	</File>
 	<File name="GDL\ObjectGroup.cpp" open="0" top="0" tabpos="20">
 		<Cursor position="1270" topLine="40" />
@@ -410,7 +410,7 @@
 		<Cursor position="3422" topLine="81" />
 	</File>
 	<File name="GDL\OpenSaveGame.cpp" open="1" top="0" tabpos="12">
-		<Cursor position="40986" topLine="917" />
+		<Cursor position="37659" topLine="839" />
 	</File>
 	<File name="GDL\OpenSaveGame.h" open="1" top="0" tabpos="13">
 		<Cursor position="1446" topLine="23" />
@@ -491,7 +491,7 @@
 		<Cursor position="618" topLine="9" />
 	</File>
 	<File name="GDL\SpriteExtension.cpp" open="1" top="0" tabpos="10">
-		<Cursor position="21985" topLine="482" />
+		<Cursor position="19945" topLine="392" />
 	</File>
 	<File name="GDL\SpriteInitialPositionPanel.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="572" topLine="32" />
@@ -829,7 +829,7 @@
 	<File name="GDL\eFreeFunctions.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="9206" topLine="165" />
 	</File>
-	<File name="GDL\eFreeFunctions.h" open="1" top="0" tabpos="35">
+	<File name="GDL\eFreeFunctions.h" open="1" top="0" tabpos="20">
 		<Cursor position="3662" topLine="8" />
 	</File>
 	<File name="GDL\eObjectFunctions.cpp" open="0" top="0" tabpos="5">

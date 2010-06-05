@@ -61,12 +61,12 @@ Instruction::Instruction() :
 function(NULL),
 objectFunction(NULL),
 isLocal(true),
-inverted(false)
 #if defined(GDE)
-,renderedHeightNeedUpdate(true),
+renderedHeightNeedUpdate(true),
 renderedHeight(0),
-selected(false)
+selected(false),
 #endif
+inverted(false)
 {
     //ctor
     parameters.reserve(8);

@@ -242,8 +242,8 @@ class Extension : public ExtensionBase
                            _("Copie une image sur une autre."),
                            _("Copier l'image _PARAM1_ sur _PARAM0_ à l'emplacement _PARAM2_;_PARAM3_"),
                            _("Images"),
-                           "res/actions/opacity24.png",
-                           "res/actions/opacity.png",
+                           "res/actions/copy24.png",
+                           "res/actions/copu.png",
                            &ActCopyImageOnAnother);
 
                 DECLARE_PARAMETER("text", _("Nom de l'image à modifier"), false, "")

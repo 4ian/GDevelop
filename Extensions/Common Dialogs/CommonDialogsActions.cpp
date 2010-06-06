@@ -57,20 +57,20 @@ using namespace std;
 /**
  * Display a simple message box.
  */
-bool ActShowMsgBox( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActShowMsgBox( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     sf::Clock timeSpent;
 
     //Display the box
     #if defined(WINDOWS)
-    MessageBox(NULL, eval.EvalTxt(action.GetParameter(0)).c_str(), eval.EvalTxt(action.GetParameter(1)).c_str(), MB_ICONINFORMATION);
+    MessageBox(NULL, action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str(), action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned).c_str(), MB_ICONINFORMATION);
     #endif
     #if defined(LINUX)
-    nw::MsgBox msgBox(eval.EvalTxt(action.GetParameter(1)), eval.EvalTxt(action.GetParameter(0)));
+    nw::MsgBox msgBox(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned), action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
     msgBox.wait_until_closed();
     #endif
 
-    scene->pauseTime += timeSpent.GetElapsedTime(); //Don't take the time spent in this function in account.
+    scene.pauseTime += timeSpent.GetElapsedTime(); //Don't take the time spent in this function in account.
 
     return true;
 }
@@ -78,7 +78,7 @@ bool ActShowMsgBox( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, c
 /**
  * Display an "open file" dialog
  */
-bool ActShowOpenFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActShowOpenFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     sf::Clock timeSpent;
 
@@ -102,15 +102,15 @@ bool ActShowOpenFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
         result = filePath;
     #endif
     #if defined(LINUX)
-    nw::OpenFile * dialog = new nw::OpenFile(eval.EvalTxt(action.GetParameter(1)), true, result);
+    nw::OpenFile * dialog = new nw::OpenFile(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), true, result);
     dialog->wait_until_closed();
     #endif
 
     //Don't take the time spent in this function in account.
-    scene->pauseTime += timeSpent.GetElapsedTime();
+    scene.pauseTime += timeSpent.GetElapsedTime();
 
     //Update the variable
-    scene->variables.ObtainVariable(action.GetParameter( 0 ).GetPlainString()) = result;
+    scene.variables.ObtainVariable(action.GetParameter( 0 ).GetPlainString()) = result;
 
     return true;
 }
@@ -118,7 +118,7 @@ bool ActShowOpenFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned,
 /**
  * Show a message box with Yes/No buttons
  */
-bool ActShowYesNoMsgBox( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActShowYesNoMsgBox( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     sf::Clock timeSpent;
 
@@ -126,21 +126,21 @@ bool ActShowYesNoMsgBox( RuntimeScene * scene, ObjectsConcerned & objectsConcern
 
     //Display the box
     #if defined(WINDOWS)
-    if( MessageBox(NULL, eval.EvalTxt(action.GetParameter(1)).c_str(), eval.EvalTxt(action.GetParameter(2)).c_str(), MB_ICONQUESTION | MB_YESNO) == IDYES)
+    if( MessageBox(NULL, action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned).c_str(), action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned).c_str(), MB_ICONQUESTION | MB_YESNO) == IDYES)
         result = "yes";
     else
         result = "no";
     #endif
     #if defined(LINUX)
-    nw::YesNoMsgBox dialog(eval.EvalTxt(action.GetParameter(2)), eval.EvalTxt(action.GetParameter(1)), result);
+    nw::YesNoMsgBox dialog(action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned), action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned), result);
     dialog.wait_until_closed();
     #endif
 
     //Don't take the time spent in this function in account.
-    scene->pauseTime += timeSpent.GetElapsedTime();
+    scene.pauseTime += timeSpent.GetElapsedTime();
 
     //Update the variable
-    scene->variables.ObtainVariable(action.GetParameter( 0 ).GetPlainString()) = result;
+    scene.variables.ObtainVariable(action.GetParameter( 0 ).GetPlainString()) = result;
 
     return true;
 }
@@ -438,7 +438,7 @@ BOOL CInputBox::DoModal(LPCTSTR szCaption, LPCTSTR szPrompt)
 /**
  * Show a dialog so as to get a text from user
  */
-bool ActShowTextInput( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval )
+bool ActShowTextInput( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     sf::Clock timeSpent;
     string result;
@@ -446,19 +446,19 @@ bool ActShowTextInput( RuntimeScene * scene, ObjectsConcerned & objectsConcerned
     //Display the box
     #if defined(WINDOWS)
     CInputBox ibox(NULL);
-    if (ibox.DoModal(eval.EvalTxt(action.GetParameter(2)).c_str(), eval.EvalTxt(action.GetParameter(1)).c_str()))
+    if (ibox.DoModal(action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned).c_str(), action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned).c_str()))
         result = ibox.Text;
     #endif
     #if defined(LINUX)
-    nw::TextInput dialog(eval.EvalTxt(action.GetParameter(2)), eval.EvalTxt(action.GetParameter(1)), result);
+    nw::TextInput dialog(action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned), action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned), result);
     dialog.wait_until_closed();
     #endif
 
     //Don't take the time spent in this function in account.
-    scene->pauseTime += timeSpent.GetElapsedTime();
+    scene.pauseTime += timeSpent.GetElapsedTime();
 
     //Update the variable
-    scene->variables.ObtainVariable(action.GetParameter( 0 ).GetPlainString()) = result;
+    scene.variables.ObtainVariable(action.GetParameter( 0 ).GetPlainString()) = result;
 
     return true;
 }

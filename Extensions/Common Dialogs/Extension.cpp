@@ -56,8 +56,8 @@ class Extension : public ExtensionBase
                            "res/actions/msgbox.png",
                            &ActShowMsgBox);
 
-                DECLARE_PARAMETER("texte", _("Message"), false, "")
-                DECLARE_PARAMETER("texte", _("Titre"), false, "")
+                DECLARE_PARAMETER("text", _("Message"), false, "")
+                DECLARE_PARAMETER("text", _("Titre"), false, "")
 
             DECLARE_END_ACTION()
 
@@ -71,7 +71,7 @@ class Extension : public ExtensionBase
                            &ActShowOpenFile);
 
                 DECLARE_PARAMETER("scenevar", _("Variable de la scène où enregistrer le résultat"), false, "")
-                DECLARE_PARAMETER("texte", _("Titre"), false, "")
+                DECLARE_PARAMETER("text", _("Titre"), false, "")
 
             DECLARE_END_ACTION()
 
@@ -85,8 +85,8 @@ class Extension : public ExtensionBase
                            &ActShowTextInput);
 
                 DECLARE_PARAMETER("scenevar", _("Variable de la scène où enregistrer le résultat"), false, "")
-                DECLARE_PARAMETER("texte", _("Message"), false, "")
-                DECLARE_PARAMETER("texte", _("Titre"), false, "")
+                DECLARE_PARAMETER("text", _("Message"), false, "")
+                DECLARE_PARAMETER("text", _("Titre"), false, "")
 
             DECLARE_END_ACTION()
 
@@ -100,8 +100,8 @@ class Extension : public ExtensionBase
                            &ActShowYesNoMsgBox);
 
                 DECLARE_PARAMETER("scenevar", _("Variable de la scène où enregistrer le résultat"), false, "")
-                DECLARE_PARAMETER("texte", _("Message"), false, "")
-                DECLARE_PARAMETER("texte", _("Titre"), false, "")
+                DECLARE_PARAMETER("text", _("Message"), false, "")
+                DECLARE_PARAMETER("text", _("Titre"), false, "")
 
             DECLARE_END_ACTION()
 
@@ -144,6 +144,7 @@ class Extension : public ExtensionBase
             #endif
 
             compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
+            compilationInfo.sizeOfpInt = sizeof(int*);
 
             compilationInfo.informationCompleted = true;
         }

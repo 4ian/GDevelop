@@ -32,9 +32,9 @@ class ObjectsConcerned;
 class Instruction;
 class Evaluateur;
 
-bool ActShowMsgBox( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActShowOpenFile( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActShowYesNoMsgBox( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
-bool ActShowTextInput( RuntimeScene * scene, ObjectsConcerned & objectsConcerned, const Instruction & action, const Evaluateur & eval );
+bool ActShowMsgBox( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActShowOpenFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActShowYesNoMsgBox( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActShowTextInput( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 #endif // AESACTIONS_H_INCLUDED

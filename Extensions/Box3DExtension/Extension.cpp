@@ -278,23 +278,23 @@ class Extension : public ExtensionBase
 
                 DECLARE_END_OBJECT_CONDITION()
 
-                DECLARE_OBJECT_EXPRESSION("depth", _("Profondeur de la boite 3D"), _("Profondeur de la boite 3D"), _("Taille"), "res/actions/scaleHeight.png", &Box3DObject::ExpGetDepth)
+                DECLARE_OBJECT_EXPRESSION("Depth", _("Profondeur de la boite 3D"), _("Profondeur de la boite 3D"), _("Taille"), "res/actions/scaleHeight.png", &Box3DObject::ExpGetDepth)
                     DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                 DECLARE_END_OBJECT_EXPRESSION()
 
-                DECLARE_OBJECT_EXPRESSION("z", _("Position Z"), _("Position Z"), _("Position"), "res/actions/scaleHeight.png", &Box3DObject::ExpGetZPosition)
+                DECLARE_OBJECT_EXPRESSION("Z", _("Position Z"), _("Position Z"), _("Position"), "res/actions/scaleHeight.png", &Box3DObject::ExpGetZPosition)
                     DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                 DECLARE_END_OBJECT_EXPRESSION()
 
-                DECLARE_OBJECT_EXPRESSION("yaw", _("Yaw"), _("Yaw"), _("Angle"), "res/actions/scaleHeight.png", &Box3DObject::ExpGetYaw)
+                DECLARE_OBJECT_EXPRESSION("Yaw", _("Yaw"), _("Yaw"), _("Angle"), "res/actions/scaleHeight.png", &Box3DObject::ExpGetYaw)
                     DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                 DECLARE_END_OBJECT_EXPRESSION()
 
-                DECLARE_OBJECT_EXPRESSION("pitch", _("Pitch"), _("Pitch"), _("Angle"), "res/actions/scaleHeight.png", &Box3DObject::ExpGetPitch)
+                DECLARE_OBJECT_EXPRESSION("Pitch", _("Pitch"), _("Pitch"), _("Angle"), "res/actions/scaleHeight.png", &Box3DObject::ExpGetPitch)
                     DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                 DECLARE_END_OBJECT_EXPRESSION()
 
-                DECLARE_OBJECT_EXPRESSION("roll", _("Roll"), _("Roll"), _("Angle"), "res/actions/scaleHeight.png", &Box3DObject::ExpGetRoll)
+                DECLARE_OBJECT_EXPRESSION("Roll", _("Roll"), _("Roll"), _("Angle"), "res/actions/scaleHeight.png", &Box3DObject::ExpGetRoll)
                     DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                 DECLARE_END_OBJECT_EXPRESSION()
 

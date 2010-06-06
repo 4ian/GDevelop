@@ -78,7 +78,7 @@ class Extension : public ExtensionBase
 
             DECLARE_END_EVENT()
 
-            DECLARE_STR_EXPRESSION("CurrentFunctionParameter",
+            DECLARE_STR_EXPRESSION("Parameter",
                            _("Paramètre de la fonction actuel"),
                            _("Renvoi le texte contenue dans un paramètre de la fonction actuellement lancée"),
                            _("Fonction"),

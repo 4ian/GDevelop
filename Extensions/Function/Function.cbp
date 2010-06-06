@@ -425,6 +425,8 @@
 		<Unit filename="FunctionActions.h" />
 		<Unit filename="FunctionEvent.cpp" />
 		<Unit filename="FunctionEvent.h" />
+		<Unit filename="FunctionExpressions.cpp" />
+		<Unit filename="FunctionExpressions.h" />
 		<Unit filename="..\..\GDL\GDL\tinystr.cpp" />
 		<Unit filename="..\..\GDL\GDL\tinystr.h" />
 		<Unit filename="..\..\GDL\GDL\tinyxml.cpp" />

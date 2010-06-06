@@ -153,6 +153,5 @@ class TextObject : public Object
 
 void DestroyTextObject(Object * object);
 Object * CreateTextObject(std::string name);
-Object * CreateTextObjectByCopy(Object * object);
 
 #endif // TEXTOBJECT_H

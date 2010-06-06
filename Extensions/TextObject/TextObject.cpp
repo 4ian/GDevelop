@@ -42,7 +42,7 @@ freely, subject to the following restrictions:
 
 TextObject::TextObject(std::string name_) :
 Object(name_),
-text("Text", FontManager->getInstance()->GetFont("")),
+text("Text"),
 opacity( 255 ),
 colorR( 255 ),
 colorG( 255 ),
@@ -352,14 +352,3 @@ Object * CreateTextObject(std::string name)
     return new TextObject(name);
 }
 
-/**
- * Function creating an extension Object from another.
- * Game Develop can not directly create an extension object.
- *
- * Note that it is safe to do the static cast, as this function
- * is called owing to the typeId of the object to copy.
- */
-Object * CreateTextObjectByCopy(Object * object)
-{
-    return new TextObject(*static_cast<TextObject *>(object));
-}

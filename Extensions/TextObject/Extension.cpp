@@ -214,11 +214,11 @@ class Extension : public ExtensionBase
 
                 DECLARE_END_OBJECT_CONDITION()
 
-                DECLARE_OBJECT_EXPRESSION("opacity", _("Opacité"), _("Opacité"), _("Opacité"), "res/actions/opacity.png", &TextObject::GetOpacity)
+                DECLARE_OBJECT_EXPRESSION("Opacity", _("Opacité"), _("Opacité"), _("Opacité"), "res/actions/opacity.png", &TextObject::GetOpacity)
                     DECLARE_PARAMETER("object", _("Objet"), true, "Text")
                 DECLARE_END_OBJECT_EXPRESSION()
 
-                DECLARE_OBJECT_EXPRESSION("angle", _("Angle"), _("Angle"), _("Rotation"), "res/actions/rotate.png", &TextObject::GetAngle)
+                DECLARE_OBJECT_EXPRESSION("Angle", _("Angle"), _("Angle"), _("Rotation"), "res/actions/rotate.png", &TextObject::GetAngle)
                     DECLARE_PARAMETER("object", _("Objet"), true, "Text")
                 DECLARE_END_OBJECT_EXPRESSION()
 

@@ -58,8 +58,11 @@ mainObjectsName(mainObjectsName_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
-
+	
 	Create(parent, wxID_ANY, _("Editer le texte"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
+	wxIcon FrameIcon;
+	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/texteicon.png"))));
+	SetIcon(FrameIcon);
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
@@ -127,7 +130,7 @@ mainObjectsName(mainObjectsName_)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 	Center();
-
+	
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditTextDialog::OnTexteEditText);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnOkBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnAnnulerBtClick);

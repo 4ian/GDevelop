@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxDialog" name="EditTexte">
+	<object class="wxDialog" name="EditTextDialog">
 		<title>Editer le texte</title>
 		<centered>1</centered>
+		<extra_code>wxIcon FrameIcon;&#x0A;FrameIcon.CopyFromBitmap(wxBitmap(wxImage(__T(&quot;res/texteicon.png&quot;))));&#x0A;SetIcon(FrameIcon);</extra_code>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">

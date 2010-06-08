@@ -26,7 +26,7 @@
 ////////////////////////////////////////////////////////////
 bool ActSceneBackground( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(0).GetPlainString(), ';');
+    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned), ';');
 
     if ( colors.size() > 2 )
     {

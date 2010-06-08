@@ -555,7 +555,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             DECLARE_PARAMETER("objectvar", _("Nom de la variable"), false, "")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_STR_EXPRESSION("Variable", _("Variable d'un objet"), _("Texte d'une variable d'un objet"), _("Variables"), "res/actions/var.png", &Object::ExpGetObjectVariableString)
+        DECLARE_OBJECT_STR_EXPRESSION("VariableString", _("Variable d'un objet"), _("Texte d'une variable d'un objet"), _("Variables"), "res/actions/var.png", &Object::ExpGetObjectVariableString)
             DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("objectvar", _("Nom de la variable"), false, "")
         DECLARE_END_OBJECT_STR_EXPRESSION()

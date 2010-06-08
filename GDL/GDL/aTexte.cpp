@@ -35,7 +35,7 @@ bool ActEcrireTexte( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, 
     texte.text.SetString(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned) );
     texte.text.SetPosition(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned), action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
-    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(3).GetPlainString(), ';');
+    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(3).GetAsTextExpressionResult(scene, objectsConcerned), ';');
 
     if ( colors.size() > 2 )
     {

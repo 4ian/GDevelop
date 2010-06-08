@@ -87,7 +87,7 @@ mainObjectsName(mainObjectsName_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxGridSizer* GridSizer2;
-
+	
 	Create(parent, wxID_ANY, _("Editer l\'expression"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	SetClientSize(wxSize(583,314));
 	wxIcon FrameIcon;
@@ -200,7 +200,7 @@ mainObjectsName(mainObjectsName_)
 	FlexGridSizer1->Add(StaticBoxSizer1, 2, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->SetSizeHints(this);
-
+	
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditExpression::OnExpressionEditText);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnOkBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnPlusBtClick);

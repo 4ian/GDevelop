@@ -932,7 +932,7 @@ std::string AddBackSlashBeforeQuotes(std::string text)
     size_t foundPos=text.find("\"");
     while(foundPos != string::npos)
     {
-        if(foundPos != string::npos) text.replace(foundPos,2,"\\\"");
+        if(foundPos != string::npos) text.replace(foundPos,1,"\\\"");
         foundPos=text.find("\"", foundPos+2);
     }
 
@@ -1114,7 +1114,7 @@ void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list,
                 {
                     if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "expression" )
                         conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyMathExpression(conditionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
-                    if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "text" )
+                    if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color") )
                         conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(conditionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
                 }
         	}
@@ -1145,7 +1145,7 @@ void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list,
                 {
                     if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "expression" )
                         actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyMathExpression(actionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
-                    if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "text" )
+                    if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color") )
                         actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(actionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
                 }
         	}

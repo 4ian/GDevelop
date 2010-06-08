@@ -364,6 +364,8 @@ ribbonSceneEditorButtonBar(NULL)
     SetSize(900,740);
     Center();
 
+    Maximize(true);
+
     if ( FileToOpen != "" )
         Open(FileToOpen);
 }

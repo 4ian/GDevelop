@@ -64,6 +64,9 @@ mainObjectsName(mainObjectsName_)
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoiceFile::OncancelBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoiceFile::OnadvancedBtClick);
 	//*)
+
+	if ( file.empty() ) file = "\"\"";
+
     fileEdit->ChangeValue(file);
 }
 

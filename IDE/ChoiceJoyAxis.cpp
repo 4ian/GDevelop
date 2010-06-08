@@ -72,13 +72,13 @@ mainObjectsName(mainObjectsName_)
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoiceJoyAxis::OnadvancedBtClick);
 	//*)
 
-	if ( joyaxis == "AxisX" ) axisRadio->SetSelection(0);
-	else if ( joyaxis == "AxisY" ) axisRadio->SetSelection(1);
-	else if ( joyaxis == "AxisZ" ) axisRadio->SetSelection(2);
-	else if ( joyaxis == "AxisR" ) axisRadio->SetSelection(3);
-	else if ( joyaxis == "AxisU" ) axisRadio->SetSelection(4);
-	else if ( joyaxis == "AxisY" ) axisRadio->SetSelection(5);
-	else joyaxis = "AxisX";
+	if ( joyaxis == "\"AxisX\"" ) axisRadio->SetSelection(0);
+	else if ( joyaxis == "\"AxisY\"" ) axisRadio->SetSelection(1);
+	else if ( joyaxis == "\"AxisZ\"" ) axisRadio->SetSelection(2);
+	else if ( joyaxis == "\"AxisR\"" ) axisRadio->SetSelection(3);
+	else if ( joyaxis == "\"AxisU\"" ) axisRadio->SetSelection(4);
+	else if ( joyaxis == "\"AxisY\"" ) axisRadio->SetSelection(5);
+	else joyaxis = "\"AxisX\"";
 }
 
 ChoiceJoyAxis::~ChoiceJoyAxis()
@@ -97,12 +97,12 @@ void ChoiceJoyAxis::OnadvancedBtClick(wxCommandEvent& event)
 
 void ChoiceJoyAxis::OnaxisRadioSelect(wxCommandEvent& event)
 {
-	if ( axisRadio->GetSelection() == 0 ) joyaxis = "AxisX";
-	else if ( axisRadio->GetSelection() == 1 ) joyaxis = "AxisY";
-	else if ( axisRadio->GetSelection() == 2 ) joyaxis = "AxisZ";
-	else if ( axisRadio->GetSelection() == 3 ) joyaxis = "AxisR";
-	else if ( axisRadio->GetSelection() == 4 ) joyaxis = "AxisU";
-	else if ( axisRadio->GetSelection() == 5 ) joyaxis = "AxisY";
+	if ( axisRadio->GetSelection() == 0 ) joyaxis = "\"AxisX\"";
+	else if ( axisRadio->GetSelection() == 1 ) joyaxis = "\"AxisY\"";
+	else if ( axisRadio->GetSelection() == 2 ) joyaxis = "\"AxisZ\"";
+	else if ( axisRadio->GetSelection() == 3 ) joyaxis = "\"AxisR\"";
+	else if ( axisRadio->GetSelection() == 4 ) joyaxis = "\"AxisU\"";
+	else if ( axisRadio->GetSelection() == 5 ) joyaxis = "\"AxisY\"";
 }
 
 void ChoiceJoyAxis::OnokBtClick(wxCommandEvent& event)

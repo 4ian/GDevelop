@@ -17,8 +17,8 @@ extern MemTrace MemTracer;
 
 Clipboard::Clipboard() :
 objectCopied(boost::shared_ptr<Object>()),
-eventCopied(boost::shared_ptr<BaseEvent>()),
 hasObject(false),
+eventCopied(boost::shared_ptr<BaseEvent>()),
 hasEvent(false),
 hasAction(false),
 hasCondition(false),
@@ -57,7 +57,6 @@ void Clipboard::kill()
 
 void Clipboard::SetObject( ObjSPtr object )
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
     objectCopied = object->Clone();
 
     hasObject = true;

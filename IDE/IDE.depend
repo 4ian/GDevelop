@@ -8078,7 +8078,7 @@
 	<assert.h>
 	<string.h>
 
-1274985025 source:d:\florian\programmation\gamedevelop\ide\choicefile.cpp
+1275823691 source:d:\florian\programmation\gamedevelop\ide\choicefile.cpp
 	"ChoiceFile.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -8095,7 +8095,7 @@
 	<string>
 	<vector>
 
-1275335668 d:\florian\programmation\gamedevelop\gdl\gdl\edittextdialog.h
+1275845862 d:\florian\programmation\gamedevelop\gdl\gdl\edittextdialog.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -8106,7 +8106,7 @@
 	<string>
 	<vector>
 
-1274985025 source:d:\florian\programmation\gamedevelop\ide\choicejoyaxis.cpp
+1275849132 source:d:\florian\programmation\gamedevelop\ide\choicejoyaxis.cpp
 	"ChoiceJoyAxis.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -8124,7 +8124,7 @@
 	<string>
 	<vector>
 
-1274986382 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
+1275849183 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
 	"ChoixAction.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -8691,7 +8691,7 @@
 	<vector>
 	<wx/msgdlg.h>
 
-1274986382 source:d:\florian\programmation\gamedevelop\ide\choixcondition.cpp
+1275849183 source:d:\florian\programmation\gamedevelop\ide\choixcondition.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"ChoixCondition.h"
@@ -8844,7 +8844,7 @@
 	"GDL/tinyxml.h"
 	"GDL/CommonTools.h"
 
-1273866307 source:d:\florian\programmation\gamedevelop\ide\clipboard.cpp
+1275770250 source:d:\florian\programmation\gamedevelop\ide\clipboard.cpp
 	<boost/shared_ptr.hpp>
 	"Clipboard.h"
 	"MemTrace.h"
@@ -10449,7 +10449,7 @@
 
 1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\spriteextension.h
 
-1273765162 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
+1275849629 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
 	"debugMem.h"
 	"MemTrace.h"
 	"nommgr.h"
@@ -11077,7 +11077,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1275676873 d:\florian\programmation\gamedevelop\ide\version.h
+1276019812 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -11228,5 +11228,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1275593671 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1275937806 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

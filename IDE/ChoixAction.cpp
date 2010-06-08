@@ -523,7 +523,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
                 wxString v; v << static_cast<int>(color.Green());
                 wxString b; b << static_cast<int>(color.Blue());
 
-                ParaEdit.at(i)->ChangeValue(r+";"+v+";"+b);
+                ParaEdit.at(i)->ChangeValue("\""+r+";"+v+";"+b+"\"");
             }
             return;
         }
@@ -724,6 +724,43 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
     if (ParaEdit.size() < instructionInfos.parameters.size())
     {
         wxLogWarning(_("Trop peu de paramètres. Ceci peut être dû à un bug de Game Develop."));
+        return;
+    }
+
+    //Check for validity of parameters
+    bool parametersHaveErrors = false;
+    string message;
+    size_t parameterNb = string::npos;
+    for ( unsigned int i = 0;i < instructionInfos.parameters.size();i++ )
+    {
+        //Do not check optional parameters which are desactivated
+        if ( !ParaFac.at(i)->IsShown() || (ParaFac.at(i)->IsShown() && ParaFac.at(i)->GetValue()))
+        {
+            GDExpression parameterExpression(string(ParaEdit.at(i)->GetValue().mb_str())) ;
+
+            if (  (instructionInfos.parameters[i].type == "text" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
+                ||(instructionInfos.parameters[i].type == "file" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
+                ||(instructionInfos.parameters[i].type == "color" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
+                ||(instructionInfos.parameters[i].type == "joyaxis" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
+                ||(instructionInfos.parameters[i].type == "expression" && !parameterExpression.PrepareForMathEvaluationOnly(game, scene)))
+            {
+                if ( message == "" )
+                {
+                    message = parameterExpression.GetFirstErrorDuringPreprocessingText();
+                    parameterNb = i+1;
+                }
+
+                parametersHaveErrors = true;
+                ParaEdit[i]->SetBackgroundColour(wxColour(255, 194, 191));
+            }
+            else
+                ParaEdit[i]->SetBackgroundColour(wxColour(255, 255, 255));
+        }
+    }
+
+    if ( parametersHaveErrors )
+    {
+        wxLogWarning(wxString::Format(_("Erreur dans le paramètre n°%i : %s\n\nVeuillez le corriger afin de valider l'action."), parameterNb, message.c_str()));
         return;
     }
 

@@ -82,6 +82,9 @@ const long EditorScene::idRibbonPause = wxNewId();
 const long EditorScene::idRibbonResetGlobalVars = wxNewId();
 const long EditorScene::idRibbonDebugger = wxNewId();
 
+const long EditorScene::idRibbonUndo = wxNewId();
+const long EditorScene::idRibbonRedo = wxNewId();
+
 const long EditorScene::idRibbonHelp = wxNewId();
 
 
@@ -243,6 +246,8 @@ void EditorScene::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
         bar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Editeur de calques") : "", wxBitmap("res/layers24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonChooseObject, !hideLabels ? _("Choisir un objet") : "", wxBitmap("res/addobjet24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonChooseLayer, !hideLabels ? _("Choisir un calque") : "", wxBitmap("res/selectlayer24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonUndo, !hideLabels ? _("Annuler") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonRedo, !hideLabels ? _("Refaire") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonOrigine, !hideLabels ? _("Revenir à l'origine") : "", wxBitmap("res/center24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonOriginalZoom, !hideLabels ? _("Zoom initial") : "", wxBitmap("res/zoom24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonGrid, !hideLabels ? _("Grille") : "", wxBitmap("res/grid24.png", wxBITMAP_TYPE_ANY));
@@ -254,7 +259,6 @@ void EditorScene::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
         bar->AddButton(idRibbonPlay, !hideLabels ? _("Jouer") : "", wxBitmap("res/starticon24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonPlayWin, !hideLabels ? _("Jouer dans une fenêtre") : "", wxBitmap("res/startwindow24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", wxBitmap("res/pauseicon24.png", wxBITMAP_TYPE_ANY));
-        //bar->AddButton(idRibbonResetGlobalVars, !hideLabels ? _("Effacer variables gbl.") : "", wxBitmap("res/resetVar24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", wxBitmap("res/bug24.png", wxBITMAP_TYPE_ANY));
     }
 
@@ -274,6 +278,8 @@ void EditorScene::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonOriginalZoom, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnZoomInitBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonGrid, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnGridBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonGridSetup, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnGridSetupBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&EditorScene::OnUndoBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&EditorScene::OnRedoBtClick, NULL, this);
 
     mainEditorCommand.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnRefreshBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonPlay, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnPlayBtClick, NULL, this);
@@ -413,6 +419,8 @@ void EditorScene::OnEditionBtClick( wxCommandEvent & event )
 EditorScene::~EditorScene()
 {
 	std::cout << "Debug Message : Start destructor of EditorScene" << endl;
+    wxCommandEvent event;
+
 	//(*Destroy(EditorScene)
 	//*)
 	m_mgr.UnInit();
@@ -604,6 +612,30 @@ void EditorScene::OnGridBtClick( wxCommandEvent & event )
     sceneCanvas->scene.grid = !sceneCanvas->scene.grid;
 }
 
+void EditorScene::OnUndoBtClick( wxCommandEvent & event )
+{
+    if ( sceneCanvas->history.size() < 2 )
+        return;
+
+    sceneCanvas->redoHistory.push_back(sceneCanvas->sceneEdited.initialObjectsPositions); //On pourra revenir à l'état actuel avec "Refaire"
+    sceneCanvas->sceneEdited.initialObjectsPositions = sceneCanvas->history.at( sceneCanvas->history.size() - 2 ); //-2 car le dernier élément est la liste d'évènement actuelle
+    sceneCanvas->history.pop_back();
+
+    sceneCanvas->Reload();
+}
+
+void EditorScene::OnRedoBtClick( wxCommandEvent & event )
+{
+    if ( sceneCanvas->redoHistory.empty() )
+        return;
+
+    sceneCanvas->history.push_back(sceneCanvas->redoHistory.back()); //Le dernier élément est la liste d'évènement actuellement éditée
+    sceneCanvas->sceneEdited.initialObjectsPositions = sceneCanvas->redoHistory.back();
+    sceneCanvas->redoHistory.pop_back();
+
+    sceneCanvas->Reload();
+}
+
 ////////////////////////////////////////////////////////////
 /// Activer/Desactiver la grille
 ////////////////////////////////////////////////////////////
@@ -672,6 +704,21 @@ void EditorScene::OnHelpBtClick( wxCommandEvent & event )
 {
     HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
     helpFileAccess->DisplaySection(12);
+}
+
+void EditorScene::ForceRefreshRibbonAndConnect()
+{
+    if ( notebook->GetPageText(notebook->GetSelection()) == _("Scène") )
+    {
+        CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->scene.editing);
+        mainEditorCommand.GetRibbon()->SetActivePage(3);
+        ConnectEvents();
+    }
+    else if ( notebook->GetPageText(notebook->GetSelection()) == _("Evènements") )
+    {
+        mainEditorCommand.GetRibbon()->SetActivePage(4);
+        eventsEditor->ConnectEvents();
+    }
 }
 
 /**

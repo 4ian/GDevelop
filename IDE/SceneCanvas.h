@@ -50,10 +50,17 @@ public :
 
     MainEditorCommand & mainEditorCommand;
 
+    /**
+     * Call this method when any changes are made so as to manage undo/redo.
+     */
+    void ChangesMade();
+    vector < vector < InitialPosition > > history; //History of changes
+    vector < vector < InitialPosition > > redoHistory; //Histoy of changes so as to "redo"
+
     void Reload();
     inline void ManualRefresh() { Refresh(); };
-    void UpdateScrollbars();
 
+    void UpdateScrollbars();
     void SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_);
 
     void OnAddObjetSelected(wxCommandEvent & event);

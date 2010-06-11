@@ -31,15 +31,14 @@ class Extensions: public wxDialog
 		//(*Declarations(Extensions)
 		wxStaticText* authorTxt;
 		wxCheckListBox* ExtensionsList;
+		wxStaticText* StaticText2;
 		wxButton* FermerBt;
 		wxTextCtrl* infoEdit;
-		wxButton* uninstallExtensionBt;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
 		wxStaticText* StaticText5;
 		wxStaticLine* StaticLine1;
-		wxButton* installNewExtensionBt;
 		wxStaticText* licenseTxt;
 		wxStaticText* StaticText4;
 		wxStaticBitmap* StaticBitmap3;
@@ -63,8 +62,7 @@ class Extensions: public wxDialog
 		static const long ID_STATICTEXT7;
 		static const long ID_STATICBITMAP2;
 		static const long ID_STATICBITMAP4;
-		static const long ID_BUTTON1;
-		static const long ID_BUTTON2;
+		static const long ID_STATICTEXT2;
 		static const long ID_BUTTON3;
 		//*)
 

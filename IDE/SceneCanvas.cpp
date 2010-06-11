@@ -201,6 +201,13 @@ void SceneCanvas::OnUpdate()
     UpdateScrollbars();
 }
 
+void SceneCanvas::ChangesMade()
+{
+    //Mise à jour de l'historique d'annulation
+    history.push_back(sceneEdited.initialObjectsPositions);
+    redoHistory.clear();
+}
+
 ////////////////////////////////////////////////////////////
 /// Met à jour les barres de défilements
 ////////////////////////////////////////////////////////////
@@ -364,6 +371,8 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnLeftUp( wxMouseEvent &event )
 {
+    if ( !scene.editing ) return;
+
     //Relachement de la souris :
     //Pour les objets selectionnés, leurs nouvelle
     //position de départ est celle où ils sont.
@@ -420,6 +429,8 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
     scene.isMovingObject = false;
     scene.isRotatingObject = false;
     scene.isSelecting = false;
+
+    ChangesMade();
 }
 
 ////////////////////////////////////////////////////////////
@@ -585,7 +596,6 @@ void SceneCanvas::AddObjetSelected(float x, float y)
 
     if ( scene.objectToAdd == "" ) { wxLogMessage( _( "Vous n'avez selectionné aucun objet à ajouter.\nSélectionnez en un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils." ) ); return;}
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
     int IDsceneObject = Picker::PickOneObject( &sceneEdited.initialObjects, scene.objectToAdd );
     int IDglobalObject = Picker::PickOneObject( &gameEdited.globalObjects, scene.objectToAdd );
 
@@ -632,6 +642,8 @@ void SceneCanvas::AddObjetSelected(float x, float y)
     scene.objectsInstances.AddObject(newObject);
 
     newObject->LoadResources(game.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
+
+    ChangesMade();
 }
 
 ////////////////////////////////////////////////////////////
@@ -694,6 +706,8 @@ void SceneCanvas::OnLayerUpSelected(wxCommandEvent & event)
             scene.objectsSelected[i]->SetLayer(layerName);
         }
     }
+
+    ChangesMade();
 }
 
 ////////////////////////////////////////////////////////////
@@ -717,6 +731,8 @@ void SceneCanvas::OnLayerDownSelected(wxCommandEvent & event)
             scene.objectsSelected[i]->SetLayer(layerName);
         }
     }
+
+    ChangesMade();
 }
 
 ////////////////////////////////////////////////////////////
@@ -758,6 +774,7 @@ void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
         {
             Reload();
         }
+        ChangesMade();
     }
 
     return;
@@ -795,6 +812,8 @@ void SceneCanvas::OnDelObjetSelected(wxCommandEvent & event)
     scene.objectsSelected.clear();
     scene.xObjectsSelected.clear();
     scene.yObjectsSelected.clear();
+
+    ChangesMade();
 }
 
 ////////////////////////////////////////////////////////////

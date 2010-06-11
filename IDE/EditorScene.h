@@ -32,6 +32,9 @@ class EditorEvents;
 
 using namespace std;
 
+/**
+ * EditorScene manage and contains all editors needed so as to edit a scene.
+ */
 class EditorScene: public wxPanel
 {
 	public:
@@ -60,7 +63,16 @@ class EditorScene: public wxPanel
 		Scene & scene;
 
         static wxRibbonButtonBar * CreateRibbonPage(wxRibbonPage * page);
+
+        /**
+         * Tool function so as to easily create toolbars for edition or preview
+         */
         static void CreateToolsBar(wxRibbonButtonBar * bar, bool editing);
+
+        /**
+         * Can be called by parent so as to refresh ribbon for this editor.
+         */
+        void ForceRefreshRibbonAndConnect();
 
 	protected:
 
@@ -105,6 +117,8 @@ class EditorScene: public wxPanel
         static const long idRibbonOriginalZoom;
         static const long idRibbonGrid;
         static const long idRibbonGridSetup;
+        static const long idRibbonUndo;
+        static const long idRibbonRedo;
 
         //Preview mode identifiers
         static const long idRibbonRefresh;
@@ -158,6 +172,9 @@ class EditorScene: public wxPanel
 
         void OnObjectsEditor( wxCommandEvent & event );
         void OnLayersEditor( wxCommandEvent & event );
+
+        void OnUndoBtClick( wxCommandEvent & event );
+        void OnRedoBtClick( wxCommandEvent & event );
 
         void OnHelpBtClick( wxCommandEvent & event );
 

@@ -1,6 +1,12 @@
 # depslib dependency file v1.0
-1272817738 source:d:\florian\programmation\gamedevelop\ide\extensions.cpp
+1276279209 source:d:\florian\programmation\gamedevelop\ide\extensions.cpp
 	"Extensions.h"
+	<wx/bitmap.h>
+	<wx/settings.h>
+	<wx/font.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
 	<stdio.h>
 	<fstream>
 	<sys/types.h>
@@ -13,7 +19,7 @@
 	"GDL/ExtensionsLoader.h"
 	"GDL/gdTreeItemStringData.h"
 
-1264364134 d:\florian\programmation\gamedevelop\ide\extensions.h
+1276279142 d:\florian\programmation\gamedevelop\ide\extensions.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
@@ -2972,6 +2978,10 @@
 
 1215865279 c:\libs\boost_1_38_0\boost\memory_order.hpp
 
+1253308518 c:\libs\wxwidgets\include\wx\settings.h
+	"wx/colour.h"
+	"wx/font.h"
+
 1275335922 d:\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
 	<string>
 	<vector>
@@ -3494,10 +3504,6 @@
 	"wx/accel.h"
 	"wx/list.h"
 	"wx/dynarray.h"
-
-1253308518 c:\libs\wxwidgets\include\wx\settings.h
-	"wx/colour.h"
-	"wx/font.h"
 
 1253308521 c:\libs\wxwidgets\include\wx\msgdlg.h
 	"wx/defs.h"
@@ -9529,7 +9535,7 @@
 	"wx/ribbon/control.h"
 	"wx/ribbon/art.h"
 
-1266854776 d:\florian\programmation\gamedevelop\gdl\gdl\editorimages.h
+1276291142 d:\florian\programmation\gamedevelop\gdl\gdl\editorimages.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/menu.h>
@@ -9545,7 +9551,7 @@
 	<wx/ribbon/buttonbar.h>
 	<iostream>
 
-1268341506 d:\florian\programmation\gamedevelop\ide\editorscene.h
+1276290822 d:\florian\programmation\gamedevelop\ide\editorscene.h
 	<wx/sizer.h>
 	<wx/aui/aui.h>
 	<wx/panel.h>
@@ -9567,7 +9573,7 @@
 	<string>
 	<vector>
 
-1275081230 d:\florian\programmation\gamedevelop\ide\scenecanvas.h
+1276113383 d:\florian\programmation\gamedevelop\ide\scenecanvas.h
 	<SFML/Graphics.hpp>
 	<SFML/System.hpp>
 	"wxSFMLCanvas.hpp"
@@ -10184,7 +10190,7 @@
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
-1274988825 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
+1276288410 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
 	"EditorScene.h"
 	<wx/settings.h>
 	<wx/intl.h>
@@ -10449,7 +10455,7 @@
 
 1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\spriteextension.h
 
-1275849629 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
+1276291349 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
 	"debugMem.h"
 	"MemTrace.h"
 	"nommgr.h"
@@ -10939,29 +10945,6 @@
 	<vector>
 	<iostream>
 
-1273766515 source:d:\florian\programmation\gamedevelop\ide\projectmanager.cpp
-	"ProjectManager.h"
-	<wx/bitmap.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/ribbon/bar.h>
-	<wx/ribbon/buttonbar.h>
-	<wx/ribbon/gallery.h>
-	<wx/ribbon/toolbar.h>
-	"Clipboard.h"
-	"Game_Develop_EditorMain.h"
-	"gdTreeItemGameData.h"
-	"GDL/ChercherScene.h"
-	"Extensions.h"
-	"EditPropJeu.h"
-	"InitialVariablesDialog.h"
-	"EditPropScene.h"
-
-1266534452 d:\florian\programmation\gamedevelop\ide\gdtreeitemgamedata.h
-	<string>
-	<wx/treectrl.h>
-
 1264364134 source:d:\florian\programmation\gamedevelop\ide\recentlist.cpp
 	"RecentList.h"
 
@@ -10971,7 +10954,7 @@
 	<wx/string.h>
 	<iostream>
 
-1275081229 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1276114463 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<SFML/System.hpp>
@@ -11077,7 +11060,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1276019812 d:\florian\programmation\gamedevelop\ide\version.h
+1276291350 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -11228,5 +11211,32 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1275937806 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1276280601 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+
+1276284089 source:d:\florian\programmation\gamedevelop\ide\projectmanager.cpp
+	"ProjectManager.h"
+	<wx/bitmap.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/ribbon/bar.h>
+	<wx/ribbon/buttonbar.h>
+	<wx/ribbon/gallery.h>
+	<wx/ribbon/toolbar.h>
+	"Clipboard.h"
+	"Game_Develop_EditorMain.h"
+	"gdTreeItemGameData.h"
+	"GDL/ChercherScene.h"
+	"Extensions.h"
+	"EditPropJeu.h"
+	"InitialVariablesDialog.h"
+	"EditPropScene.h"
+
+1266534452 d:\florian\programmation\gamedevelop\ide\gdtreeitemgamedata.h
+	<string>
+	<wx/treectrl.h>
+
+1253308462 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+
+1253437186 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\msw\rcdefs.h
 

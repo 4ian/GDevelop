@@ -398,7 +398,9 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
 
     EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), *game, *(*scene), mainEditorCommand);
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+data->GetSecondString(), true, wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY)) )
+    {
         wxLogError(_("Impossible d'ajouter le nouvel onglet !"));
+    }
 }
 
 /**

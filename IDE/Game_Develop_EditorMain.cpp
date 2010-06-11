@@ -476,6 +476,13 @@ void Game_Develop_EditorFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
         style |= wxAUI_NB_CLOSE_ON_ACTIVE_TAB;
         editorsNotebook->SetWindowStyleFlag(style);
     }
+
+    //Update ribbon for new selected editor
+    EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(event.GetSelection()));
+    EditorImages * imagesEditorPtr = dynamic_cast<EditorImages*>(editorsNotebook->GetPage(event.GetSelection()));
+
+    if ( sceneEditorPtr != NULL ) sceneEditorPtr->ForceRefreshRibbonAndConnect();
+    //if ( imagesEditorPtr != NULL ) imagesEditorPtr->ForceRefreshRibbonAndConnect(); //TODO
 }
 
 void Game_Develop_EditorFrame::LoadSkin(wxRibbonBar * bar)

@@ -46,6 +46,11 @@ class GD_API EditorImages: public wxPanel
 
 		static void CreateRibbonPage(wxRibbonPage * page);
 
+        /**
+         * Can be called by parent so as to refresh ribbon for this editor.
+         */
+        //void ForceRefreshRibbonAndConnect();
+
 	protected:
 
 		//(*Identifiers(EditorImages)

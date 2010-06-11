@@ -707,9 +707,9 @@ void EditorImages::DossierBt( wxCommandEvent& event )
 }
 
 
-////////////////////////////////////////////////////////////
-/// Ajouter une image déjà existante au dossier
-////////////////////////////////////////////////////////////
+/**
+ * Add an image to the folder
+ */
 void EditorImages::OnMenuItem5Selected(wxCommandEvent& event)
 {
     string name = static_cast<string>( wxGetTextFromUser( _( "Entrez le nom de l'image à ajouter" ), _( "Ajouter une image au dossier" ) ) );
@@ -732,9 +732,9 @@ void EditorImages::OnMenuItem5Selected(wxCommandEvent& event)
     BanqueImageList->AppendItem(BanqueImageList->GetRootItem(), name);
 }
 
-////////////////////////////////////////////////////////////
-/// Supprimer l'image du dossier seulement
-////////////////////////////////////////////////////////////
+/**
+ * Suppress an image only from the current folder
+ */
 void EditorImages::OnMenuItem6Selected(wxCommandEvent& event)
 {
     wxTreeItemId Item = m_itemSelected;
@@ -754,9 +754,9 @@ void EditorImages::OnMenuItem6Selected(wxCommandEvent& event)
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Modifier les propriétés de l'image
-////////////////////////////////////////////////////////////
+/**
+ * Modify image properties
+ */
 void EditorImages::OnModPropSelected(wxCommandEvent& event)
 {
     int i = FindImage( game.images, static_cast< string > ( BanqueImageList->GetItemText( m_itemSelected ) ));
@@ -779,9 +779,9 @@ void EditorImages::OnBanqueImageListItemActivated1(wxTreeEvent& event)
     OnModPropSelected( eventUseless );
 }
 
-////////////////////////////////////////////////////////////
-/// Ouvrir le programme d'édition d'image.
-////////////////////////////////////////////////////////////
+/**
+ * Open an external image edition program
+ */
 void EditorImages::OnOpenPaintProgramClick(wxCommandEvent& event)
 {
 
@@ -811,9 +811,9 @@ void EditorImages::OnOpenPaintProgramClick(wxCommandEvent& event)
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Affichage de l'apercu de l'image
-////////////////////////////////////////////////////////////
+/**
+ * Display a preview of the selected image
+ */
 void EditorImages::OnapercuPanelPaint(wxPaintEvent& event)
 {
     wxPaintDC dc( apercuPanel ); //Création obligatoire du wxBufferedPaintDC
@@ -847,9 +847,9 @@ void EditorImages::OnapercuPanelPaint(wxPaintEvent& event)
                   true /* use mask */);
 }
 
-////////////////////////////////////////////////////////////
-/// Déplacement vers le haut de la liste
-////////////////////////////////////////////////////////////
+/**
+ * Move up an image
+ */
 void EditorImages::OnMoveUpSelected(wxCommandEvent& event)
 {
     string name = static_cast< string > ( BanqueImageList->GetItemText( m_itemSelected ));
@@ -924,6 +924,9 @@ void EditorImages::OnMoveUpSelected(wxCommandEvent& event)
     }
 }
 
+/**
+ * Move down an image
+ */
 void EditorImages::OnMoveDownSelected(wxCommandEvent& event)
 {
     string name = static_cast< string > ( BanqueImageList->GetItemText( m_itemSelected ));

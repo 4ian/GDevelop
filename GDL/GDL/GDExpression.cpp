@@ -110,7 +110,7 @@ std::string ExpObjectStrFunction( const RuntimeScene & scene, ObjectsConcerned &
     if ( object != boost::shared_ptr<Object>() )
         return (object.get()->*exprInstruction.objectFunction)(scene, objectsConcerned, obj1, obj2, exprInstruction);
     else
-        return 0;
+        return "";
 }
 
 std::string GDExpression::GetAsTextExpressionResult(const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2) const

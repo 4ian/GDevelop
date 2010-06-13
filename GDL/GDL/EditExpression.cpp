@@ -560,7 +560,7 @@ string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo)
         string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Numéro de la caméra"), "0", this));
         return param;
     }
-    else if ( parameterInfo.type == "" )
+    else
     {
         string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Paramètre"), "", this));
         return param;

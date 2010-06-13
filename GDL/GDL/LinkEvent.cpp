@@ -108,16 +108,8 @@ void LinkEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainE
 /**
  * Render the event in the bitmap
  */
-void LinkEvent::RenderInBitmap() const
+void LinkEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
-    //Get sizes and recreate the bitmap
-    unsigned int renderedHeight = CalculateNecessaryHeight();
-    renderedEventBitmap.Create(renderedWidth, renderedHeight, -1);
-
-    //Prepare DC and constants
-    wxMemoryDC dc;
-    dc.SelectObject(renderedEventBitmap);
-
     if ( !selected )
     {
         dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
@@ -129,34 +121,41 @@ void LinkEvent::RenderInBitmap() const
         dc.SetBrush(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)));
     }
 
-    dc.DrawRectangle(0, 0, renderedWidth, renderedHeight);
-    dc.DrawBitmap( wxBitmap( "res/link48.png", wxBITMAP_TYPE_ANY ), 4, 0 + 4, true);
+    dc.DrawRectangle(x, y, width, GetRenderedHeight(width));
+    dc.DrawBitmap( wxBitmap( "res/link48.png", wxBITMAP_TYPE_ANY ), x+4, y + 4, true);
 
     dc.SetTextForeground( wxColour( 0, 0, 0 ) );
     dc.SetTextBackground( wxColour( 255, 255, 255 ) );
     dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    dc.DrawText( _("Lien vers la scène ")+sceneLinked, 56, 0 + 16 );
+    dc.DrawText( _("Lien vers la scène ")+sceneLinked, x+56, y + 16 );
     wxRect lien = dc.GetTextExtent(_("Lien vers la scène ")+sceneLinked);
 
     dc.SetFont( wxFont( 10, wxDEFAULT, wxNORMAL, wxNORMAL ) );
     if ( start == -1 && end == -1 )
-        dc.DrawText( _("Inclure tous les évènements"), lien.GetWidth()+56+10, 0 + 18 );
+        dc.DrawText( _("Inclure tous les évènements"), x+lien.GetWidth()+56+10, y + 18 );
     else
-        dc.DrawText( "Inclure les évènements "+ToString(start)+" à "+ToString(end), lien.GetWidth()+56+10, 0 + 18 );
+        dc.DrawText( "Inclure les évènements "+ToString(start)+" à "+ToString(end), x+lien.GetWidth()+56+10, y + 18 );
 }
 
 /**
  * Precompute height for the link
  */
-unsigned int LinkEvent::CalculateNecessaryHeight() const
+unsigned int LinkEvent::GetRenderedHeight(unsigned int width) const
 {
-    wxMemoryDC dc;
-    dc.SelectObject(renderedEventBitmap);
+    if ( eventHeightNeedUpdate )
+    {
+        wxMemoryDC dc;
+        wxBitmap fakeBmp(1,1);
+        dc.SelectObject(fakeBmp);
 
-    dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    wxRect lien = dc.GetTextExtent(_("Lien vers la scène "));
+        dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
+        wxRect lien = dc.GetTextExtent(_("Lien vers la scène "));
 
-    return lien.GetHeight()+32;
+        renderedHeight = lien.GetHeight()+32;
+        eventHeightNeedUpdate = false;
+    }
+
+    return renderedHeight;
 }
 
 #endif

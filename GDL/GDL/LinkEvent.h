@@ -35,13 +35,17 @@ class LinkEvent : public BaseEvent
         int end;
 
 #if defined(GDE)
-        virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
-#endif
+        /**
+         * Called by event editor to draw the event.
+         */
+        virtual void Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const;
 
-    private:
-#ifdef GDE
-        virtual void RenderInBitmap() const;
-        unsigned int CalculateNecessaryHeight() const;
+        /**
+         * Must return the height of the event when rendered
+         */
+        virtual unsigned int GetRenderedHeight(unsigned int width) const;
+
+        virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
 #endif
 };
 

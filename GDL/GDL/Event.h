@@ -106,33 +106,14 @@ class GD_API BaseEvent
 
 #if defined(GDE)
         /**
-         * Called by event editor to draw the event. Call the internal RenderInBitmap() function
-         * if the event has to be redraw.
+         * Called by event editor to draw the event.
          */
-        void Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
-        {
-            if (eventRenderingNeedUpdate || width != renderedWidth)
-            {
-                renderedWidth = width;
-                RenderInBitmap();
-            }
-
-            if( renderedEventBitmap.IsOk() ) dc.DrawBitmap(renderedEventBitmap, x, y);
-        }
+        virtual void Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const {return;}
 
         /**
-         * Return the rendered event bitmap height.
+         * Must return the height of the event when rendered
          */
-        unsigned int GetRenderedHeight(unsigned int width) const
-        {
-            if (eventRenderingNeedUpdate || width != renderedWidth)
-            {
-                renderedWidth = width;
-                RenderInBitmap();
-            }
-
-            return renderedEventBitmap.IsOk() ? renderedEventBitmap.GetHeight() : 0;
-        };
+        virtual unsigned int GetRenderedHeight(unsigned int width) const {return 0;};
 
         /**
          * Called when user click on the event
@@ -146,18 +127,10 @@ class GD_API BaseEvent
         virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_) {};
 
         bool            selected;
-        mutable bool    eventRenderingNeedUpdate; ///<Automatically set to true/false by the events editor
-#endif
+        mutable bool    eventHeightNeedUpdate; ///<Automatically set to true/false by the events editor
 
     protected:
-#if defined(GDE)
-        /**
-         * Derived class have to redefine this function to draw themselves.
-         */
-        virtual void RenderInBitmap() const {};
-
-        mutable wxBitmap        renderedEventBitmap; ///<Event renders itself into this bitmap
-        mutable unsigned int    renderedWidth; ///<Automatically setted to a value before rendering
+        mutable unsigned int    renderedHeight;
 #endif
 
     private:

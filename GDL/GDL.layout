@@ -187,7 +187,7 @@
 	<File name="GDL\EditorImages.cpp" open="1" top="0" tabpos="1">
 		<Cursor position="10499" topLine="214" />
 	</File>
-	<File name="GDL\EditorImages.h" open="1" top="0" tabpos="3">
+	<File name="GDL\EditorImages.h" open="1" top="0" tabpos="2">
 		<Cursor position="1162" topLine="107" />
 	</File>
 	<File name="GDL\EditorObjet.cpp" open="0" top="0" tabpos="2">
@@ -208,8 +208,8 @@
 	<File name="GDL\Event.cpp" open="0" top="0" tabpos="18">
 		<Cursor position="662" topLine="0" />
 	</File>
-	<File name="GDL\Event.h" open="0" top="0" tabpos="2">
-		<Cursor position="2193" topLine="59" />
+	<File name="GDL\Event.h" open="1" top="0" tabpos="4">
+		<Cursor position="3779" topLine="107" />
 	</File>
 	<File name="GDL\EventsPreprocessor.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="3229" topLine="44" />
@@ -259,14 +259,14 @@
 	<File name="GDL\ForEachEvent.h" open="0" top="0" tabpos="16">
 		<Cursor position="3497" topLine="56" />
 	</File>
-	<File name="GDL\Force.cpp" open="0" top="0" tabpos="45">
-		<Cursor position="411" topLine="8" />
+	<File name="GDL\Force.cpp" open="1" top="0" tabpos="11">
+		<Cursor position="295" topLine="11" />
 	</File>
-	<File name="GDL\Force.h" open="0" top="0" tabpos="44">
-		<Cursor position="899" topLine="29" />
+	<File name="GDL\Force.h" open="1" top="1" tabpos="10">
+		<Cursor position="1496" topLine="50" />
 	</File>
-	<File name="GDL\GDExpression.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="19258" topLine="456" />
+	<File name="GDL\GDExpression.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="22317" topLine="362" />
 	</File>
 	<File name="GDL\GDExpression.h" open="0" top="0" tabpos="2">
 		<Cursor position="2494" topLine="61" />
@@ -877,8 +877,8 @@
 	<File name="GDL\sf_classes_5.pypp.cpp" open="0" top="0" tabpos="30">
 		<Cursor position="625" topLine="0" />
 	</File>
-	<File name="GDL\sf_classes_6.pypp.cpp" open="0" top="0" tabpos="31">
-		<Cursor position="18340" topLine="372" />
+	<File name="GDL\sf_classes_6.pypp.cpp" open="1" top="0" tabpos="13">
+		<Cursor position="5388" topLine="113" />
 	</File>
 	<File name="GDL\sf_classes_7.pypp.cpp" open="0" top="0" tabpos="22">
 		<Cursor position="2954" topLine="46" />

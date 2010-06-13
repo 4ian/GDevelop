@@ -61,6 +61,16 @@ class ForEachEvent : public BaseEvent
 
 #if defined(GDE)
         /**
+         * Called by event editor to draw the event.
+         */
+        virtual void Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const;
+
+        /**
+         * Must return the height of the event when rendered
+         */
+        virtual unsigned int GetRenderedHeight(unsigned int width) const;
+
+        /**
          * Called when user click on the event
          */
         virtual void OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
@@ -83,7 +93,6 @@ class ForEachEvent : public BaseEvent
         vector < BaseEventSPtr > events;
 
 #ifdef GDE
-        virtual void RenderInBitmap() const;
         bool objectsToPickSelected;
 #endif
 };

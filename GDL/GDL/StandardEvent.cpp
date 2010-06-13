@@ -128,25 +128,15 @@ void StandardEvent::LoadFromXml(const TiXmlElement * eventElem)
 /**
  * Render the event in the bitmap
  */
-void StandardEvent::RenderInBitmap() const
+void StandardEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
-
-    //Get sizes and recreate the bitmap
-    int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
-    int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, renderedWidth-renderingHelper->GetConditionsColumnWidth());
-    renderedEventBitmap.Create(renderedWidth, conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight, -1);
-
-    //Prepare renderers and constants
-    wxMemoryDC dc;
-    dc.SelectObject(renderedEventBitmap);
 
     //Draw event rectangle
     dc.SetPen(*wxTRANSPARENT_PEN);
     dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
-    dc.Clear();
     {
-        wxRect rect(0, 0, renderedWidth, renderedEventBitmap.GetHeight());
+        wxRect rect(x, y, width, GetRenderedHeight(width));
 
         if ( !selected )
             renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->eventGradient1, renderingHelper->eventGradient2, renderingHelper->eventGradient3,
@@ -156,10 +146,25 @@ void StandardEvent::RenderInBitmap() const
                                                 renderingHelper->selectionColor, renderingHelper->eventBorderColor);
     }
 
-    renderingHelper->DrawConditionsList(conditions, dc, 0, 0, renderingHelper->GetConditionsColumnWidth());
-    renderingHelper->DrawActionsList(actions, dc, renderingHelper->GetConditionsColumnWidth(), 0, renderedWidth-renderingHelper->GetConditionsColumnWidth());
+    renderingHelper->DrawConditionsList(conditions, dc, x, y, renderingHelper->GetConditionsColumnWidth());
+    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y, width-renderingHelper->GetConditionsColumnWidth());
+}
 
-    eventRenderingNeedUpdate = false;
+unsigned int StandardEvent::GetRenderedHeight(unsigned int width) const
+{
+    if ( eventHeightNeedUpdate )
+    {
+        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+
+        //Get maximum height needed
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth());
+
+        renderedHeight = (conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight);
+        eventHeightNeedUpdate = false;
+    }
+
+    return renderedHeight;
 }
 
 void StandardEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
@@ -180,7 +185,6 @@ void StandardEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
         {
             //Update event and conditions selection information
             if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
-            eventRenderingNeedUpdate = true;
 
             //Update editor selection information
             instructionsSelected = true;
@@ -191,9 +195,6 @@ void StandardEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
         }
         else if ( y <= 18 )
         {
-            //Update event selection information
-            eventRenderingNeedUpdate = true;
-
             //Update selection information
             instructionsSelected = true;
             boost::tuples::get<2>(eventsSelected.back()) = &conditions;
@@ -215,7 +216,6 @@ void StandardEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
         {
             //Update event and action selection information
             if ( actionIdInList < actionsListSelected->size() ) (*actionsListSelected)[actionIdInList].selected = true;
-            eventRenderingNeedUpdate = true;
 
             //Update selection information
             instructionsSelected = true;
@@ -224,9 +224,6 @@ void StandardEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
         }
         else
         {
-            //Update event selection information
-            eventRenderingNeedUpdate = true;
-
             //Update selection information
             instructionsSelected = true;
             boost::tuples::get<2>(eventsSelected.back()) = &actions;

@@ -183,7 +183,6 @@ void ForEachEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < B
         {
             //Update event and conditions selection information
             if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
-            eventRenderingNeedUpdate = true;
 
             //Update editor selection information
             instructionsSelected = true;
@@ -194,9 +193,6 @@ void ForEachEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < B
         }
         else if ( y <= 18 )
         {
-            //Update event selection information
-            eventRenderingNeedUpdate = true;
-
             //Update selection information
             instructionsSelected = true;
             boost::tuples::get<2>(eventsSelected.back()) = &conditions;
@@ -218,7 +214,6 @@ void ForEachEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < B
         {
             //Update event and action selection information
             if ( actionIdInList < actionsListSelected->size() ) (*actionsListSelected)[actionIdInList].selected = true;
-            eventRenderingNeedUpdate = true;
 
             //Update selection information
             instructionsSelected = true;
@@ -227,8 +222,6 @@ void ForEachEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < B
         }
         else
         {
-            //Update event selection information
-            eventRenderingNeedUpdate = true;
 
             //Update selection information
             instructionsSelected = true;
@@ -241,26 +234,16 @@ void ForEachEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < B
 /**
  * Render the event in the bitmap
  */
-void ForEachEvent::RenderInBitmap() const
+void ForEachEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
     const int forEachTextHeight = 20;
 
-    //Get sizes and recreate the bitmap
-    int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
-    int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, renderedWidth-renderingHelper->GetConditionsColumnWidth());
-    renderedEventBitmap.Create(renderedWidth, ( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + forEachTextHeight, -1);
-
-    //Prepare renderers and constants
-    wxMemoryDC dc;
-    dc.SelectObject(renderedEventBitmap);
-
     //Draw event rectangle
     dc.SetPen(*wxTRANSPARENT_PEN);
     dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
-    dc.Clear();
     {
-        wxRect rect(0, 0, renderedWidth, renderedEventBitmap.GetHeight());
+        wxRect rect(x, y, width, GetRenderedHeight(width));
 
         if ( !selected )
             renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->eventGradient1, renderingHelper->eventGradient2, renderingHelper->eventGradient3,
@@ -275,18 +258,34 @@ void ForEachEvent::RenderInBitmap() const
     {
         dc.SetBrush(renderingHelper->GetSelectedRectangleFillBrush());
         dc.SetPen(renderingHelper->GetSelectedRectangleOutlinePen());
-        dc.DrawRectangle(1, 1, renderedWidth-2, forEachTextHeight-2);
+        dc.DrawRectangle(x+1, y+1, width-2, forEachTextHeight-2);
     }
 
     //For Each text
     dc.SetFont( renderingHelper->GetBoldFont() );
-    dc.DrawText( _("Pour chaque objet") + " " + objectsToPick.GetPlainString() + _(", répéter :"), 0 + 2, 0 + 1 );
+    dc.DrawText( _("Pour chaque objet") + " " + objectsToPick.GetPlainString() + _(", répéter :"), x + 2, y + 1 );
 
     //Draw actions and conditions
-    renderingHelper->DrawConditionsList(conditions, dc, 0, forEachTextHeight, renderingHelper->GetConditionsColumnWidth());
-    renderingHelper->DrawActionsList(actions, dc, renderingHelper->GetConditionsColumnWidth(), forEachTextHeight, renderedWidth-renderingHelper->GetConditionsColumnWidth());
+    renderingHelper->DrawConditionsList(conditions, dc, x, y+forEachTextHeight, renderingHelper->GetConditionsColumnWidth());
+    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+forEachTextHeight, width-renderingHelper->GetConditionsColumnWidth());
+}
 
-    eventRenderingNeedUpdate = false;
+unsigned int ForEachEvent::GetRenderedHeight(unsigned int width) const
+{
+    if ( eventHeightNeedUpdate )
+    {
+        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+        const int forEachTextHeight = 20;
+
+        //Get maximum height needed
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth());
+
+        renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + forEachTextHeight);
+        eventHeightNeedUpdate = false;
+    }
+
+    return renderedHeight;
 }
 
 void ForEachEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)

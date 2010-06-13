@@ -10,9 +10,7 @@ vector <BaseEventSPtr> BaseEvent::badSubEvents;
 BaseEvent::BaseEvent()
 #ifdef GDE
 : selected(false),
-eventRenderingNeedUpdate(true),
-renderedEventBitmap(1,1,-1),
-renderedWidth(1)
+eventHeightNeedUpdate(true)
 #endif
 {
 }

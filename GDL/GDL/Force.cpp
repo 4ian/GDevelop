@@ -13,7 +13,7 @@
 #include "GDL/Force.h"
 
 const float Force::PI = 3.14159265;
-
+/*
 Force::Force() :
 X(0),
 Y(0),
@@ -23,8 +23,8 @@ clearing(0),
 ALneedUpdate(false),
 XYneedUpdate(false)
 {
-}
-
+}*/
+/*
 ////////////////////////////////////////////////////////////
 /// Calcul de X et Y en fonction de l'angle et la longueur de la force
 ////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ void Force::CalculAL()
     return;
 }
 
-float Force::GetX() const
+int Force::GetX() const
 {
     if ( XYneedUpdate )
     {
@@ -60,7 +60,7 @@ float Force::GetX() const
     return X;
 }
 
-float Force::GetY() const
+int Force::GetY() const
 {
     if ( XYneedUpdate )
     {
@@ -71,7 +71,7 @@ float Force::GetY() const
 
     return Y;
 }
-float Force::GetAngle() const
+int Force::GetAngle() const
 {
     if ( ALneedUpdate )
     {
@@ -82,7 +82,7 @@ float Force::GetAngle() const
 
     return angle;
 }
-float Force::GetLength() const
+int Force::GetLength() const
 {
     if ( ALneedUpdate )
     {
@@ -98,7 +98,7 @@ float Force::GetClearing() const
     return clearing;
 }
 
-void Force::SetX(float x_)
+void Force::SetX(int x_)
 {
     if ( X != x_ )
     {
@@ -106,7 +106,7 @@ void Force::SetX(float x_)
         X = x_;
     }
 }
-void Force::SetY(float y_)
+void Force::SetY(int y_)
 {
     if ( Y != y_ )
     {
@@ -114,7 +114,7 @@ void Force::SetY(float y_)
         Y = y_;
     }
 }
-void Force::SetAngle(float angle_)
+void Force::SetAngle(int angle_)
 {
     if ( angle != angle_ )
     {
@@ -122,7 +122,7 @@ void Force::SetAngle(float angle_)
         angle = angle_;
     }
 }
-void Force::SetLength(float length_)
+void Force::SetLength(int length_)
 {
     if ( length != length_ )
     {
@@ -133,4 +133,4 @@ void Force::SetLength(float length_)
 void Force::SetClearing(float clearing_)
 {
     clearing = clearing_;
-}
+}*/

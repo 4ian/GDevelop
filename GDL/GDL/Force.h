@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <complex>
 #include "GDL/Log.h"
 #include "GDL/Event.h"
 
@@ -20,33 +21,68 @@ class GD_API Force
 {
     public:
 
-    Force();
+    Force() : internalComplex(0.0f,0.0f), clearing(0) {}
 
-    float GetX() const;
-    float GetY() const;
-    float GetAngle() const;
-    float GetLength() const;
-    float GetClearing() const;
+    inline float GetX() const
+    {
+        return internalComplex.real();
+    }
 
-    void SetX(float x_);
-    void SetY(float y_);
-    void SetAngle(float angle_);
-    void SetLength(float length_);
-    void SetClearing(float clearing_);
+    inline float GetY() const
+    {
+        return internalComplex.imag();
+    }
+
+    inline float GetAngle() const
+    {
+        return -arg(internalComplex)*180/PI;
+    }
+
+    inline float GetLength() const
+    {
+        return abs(internalComplex);
+    }
+
+    inline float GetClearing() const
+    {
+        return clearing;
+    }
+
+    inline void SetX(float x_)
+    {
+        internalComplex = std::complex<float>(x_ , internalComplex.imag());
+    }
+
+    inline void SetY(float y_)
+    {
+        internalComplex = std::complex<float>(internalComplex.real() , y_);
+    }
+
+    inline void SetAngle(float angle_)
+    {
+        internalComplex = polar(abs(internalComplex) , angle_*PI/180);
+    }
+
+    inline void SetLength(float length_)
+    {
+        internalComplex = polar(length_, arg(internalComplex));
+    }
+
+    void SetClearing(float clearing_)
+    {
+        clearing = clearing_;
+    }
 
     private:
 
-    mutable float X;
-    mutable float Y;
-    mutable float angle;
-    mutable float length;
+    std::complex<float> internalComplex;
     float clearing;
 
-    mutable bool ALneedUpdate;
+    /*mutable bool ALneedUpdate;
     mutable bool XYneedUpdate;
 
     void CalculXY();
-    void CalculAL();
+    void CalculAL();*/
 
     static const float PI;
 

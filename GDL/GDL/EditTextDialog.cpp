@@ -245,6 +245,8 @@ mainObjectsName(mainObjectsName_)
     ValList->Expand(ValList->GetRootItem());
 
 	TexteEdit->SetValue(texte);
+	if ( texte.empty() )
+        TexteEdit->SetValue("\"\"");
 }
 
 EditTextDialog::~EditTextDialog()

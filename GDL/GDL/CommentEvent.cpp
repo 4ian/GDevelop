@@ -55,16 +55,10 @@ void CommentEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, Ma
 /**
  * Render the event in the bitmap
  */
-void CommentEvent::RenderInBitmap() const
+void CommentEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
 
-    //Get sizes and recreate the bitmap
-    renderedEventBitmap.Create(renderedWidth, CalculateNecessaryHeight(), -1);
-
-    //Prepare DC and constants
-    wxMemoryDC dc;
-    dc.SelectObject(renderedEventBitmap);
     const int sideSeparation = 3; //Espacement en pixel entre le texte et la bordure
     dc.SetFont( renderingHelper->GetFont() );
 
@@ -72,7 +66,9 @@ void CommentEvent::RenderInBitmap() const
     wxRect rectangle2 = wxRect(dc.GetMultiLineTextExtent(com2));
 
     //Setup the background
-    rectangle.SetWidth(renderedWidth);
+    rectangle.SetX(x);
+    rectangle.SetY(y);
+    rectangle.SetWidth(width);
     if ( rectangle.GetHeight() >= rectangle2.GetHeight() )
         rectangle.SetHeight(rectangle.GetHeight()+sideSeparation*2);
     else
@@ -101,29 +97,36 @@ void CommentEvent::RenderInBitmap() const
     //Optional text
     if ( com2 != "" )
     {
-        texteRect.SetX(texteRect.GetX()+renderedWidth/2);
+        texteRect.SetX(texteRect.GetX()+width/2);
         dc.DrawLabel( com2, texteRect );
     }
 }
 
-unsigned int CommentEvent::CalculateNecessaryHeight() const
+unsigned int CommentEvent::GetRenderedHeight(unsigned int width) const
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    if ( eventHeightNeedUpdate )
+    {
+        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
 
-    wxMemoryDC dc;
-    dc.SelectObject(renderedEventBitmap);
+        wxMemoryDC dc;
+        wxBitmap fakeBmp(1,1);
+        dc.SelectObject(fakeBmp);
 
-    dc.SetFont( renderingHelper->GetFont() );
-    const int sideSeparation = 3; //Espacement en pixel entre le texte et la bordure
+        dc.SetFont( renderingHelper->GetFont() );
+        const int sideSeparation = 3; //Espacement en pixel entre le texte et la bordure
 
-    wxRect rectangle = wxRect(dc.GetMultiLineTextExtent(com1));
-    wxRect rectangle2 = wxRect(dc.GetMultiLineTextExtent(com2));
+        wxRect rectangle = wxRect(dc.GetMultiLineTextExtent(com1));
+        wxRect rectangle2 = wxRect(dc.GetMultiLineTextExtent(com2));
 
-    if ( rectangle.GetHeight() >= rectangle2.GetHeight() )
-        rectangle.SetHeight(rectangle.GetHeight()+sideSeparation*2);
-    else
-        rectangle.SetHeight(rectangle2.GetHeight()+sideSeparation*2);
+        if ( rectangle.GetHeight() >= rectangle2.GetHeight() )
+            rectangle.SetHeight(rectangle.GetHeight()+sideSeparation*2);
+        else
+            rectangle.SetHeight(rectangle2.GetHeight()+sideSeparation*2);
 
-    return rectangle.GetHeight();
+        renderedHeight = rectangle.GetHeight();
+        eventHeightNeedUpdate = false;
+    }
+
+    return renderedHeight;
 }
 #endif

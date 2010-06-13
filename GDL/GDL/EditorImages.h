@@ -49,7 +49,7 @@ class GD_API EditorImages: public wxPanel
         /**
          * Can be called by parent so as to refresh ribbon for this editor.
          */
-        //void ForceRefreshRibbonAndConnect();
+        void ForceRefreshRibbonAndConnect();
 
 	protected:
 
@@ -126,6 +126,8 @@ class GD_API EditorImages: public wxPanel
         void OnMoreOptions( wxCommandEvent& event );
 
         void CreateToolbar();
+
+        void ConnectEvents();
 
 		MainEditorCommand mainEditorCommand;
 		bool useRibbon;

@@ -35,14 +35,17 @@ class CommentEvent : public BaseEvent
         string com2;
 
 #if defined(GDE)
+        /**
+         * Called by event editor to draw the event.
+         */
+        virtual void Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const;
+
+        /**
+         * Must return the height of the event when rendered
+         */
+        virtual unsigned int GetRenderedHeight(unsigned int width) const;
+
         virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
-#endif
-
-    private:
-
-#if defined(GDE)
-        virtual void RenderInBitmap() const;
-        unsigned int CalculateNecessaryHeight() const;
 #endif
 };
 

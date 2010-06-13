@@ -171,7 +171,6 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
         {
             //Update event and conditions selection information
             if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
-            eventRenderingNeedUpdate = true;
 
             //Update editor selection information
             instructionsSelected = true;
@@ -182,9 +181,6 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
         }
         else if ( y <= 18 )
         {
-            //Update event selection information
-            eventRenderingNeedUpdate = true;
-
             //Update selection information
             instructionsSelected = true;
             boost::tuples::get<2>(eventsSelected.back()) = &whileConditions;
@@ -210,7 +206,6 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
         {
             //Update event and conditions selection information
             if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
-            eventRenderingNeedUpdate = true;
 
             //Update editor selection information
             instructionsSelected = true;
@@ -221,9 +216,6 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
         }
         else if ( y <= 18 )
         {
-            //Update event selection information
-            eventRenderingNeedUpdate = true;
-
             //Update selection information
             instructionsSelected = true;
             boost::tuples::get<2>(eventsSelected.back()) = &conditions;
@@ -245,7 +237,6 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
         {
             //Update event and action selection information
             if ( actionIdInList < actionsListSelected->size() ) (*actionsListSelected)[actionIdInList].selected = true;
-            eventRenderingNeedUpdate = true;
 
             //Update selection information
             instructionsSelected = true;
@@ -254,9 +245,6 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
         }
         else
         {
-            //Update event selection information
-            eventRenderingNeedUpdate = true;
-
             //Update selection information
             instructionsSelected = true;
             boost::tuples::get<2>(eventsSelected.back()) = &actions;
@@ -268,26 +256,15 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
 /**
  * Render the event in the bitmap
  */
-void WhileEvent::RenderInBitmap() const
+void WhileEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
     const int repeatHeight = 20;
 
-    //Get sizes and recreate the bitmap
-    int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
-    int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, renderedWidth-renderingHelper->GetConditionsColumnWidth());
-    whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, renderedWidth-80);
-    renderedEventBitmap.Create(renderedWidth, ( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + whileConditionsHeight + repeatHeight +2, -1);
-
-    //Prepare renderers and constants
-    wxMemoryDC dc;
-    dc.SelectObject(renderedEventBitmap);
-
     //Draw event rectangle
     dc.SetPen(*wxTRANSPARENT_PEN);
     dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
-    dc.Clear();
-    wxRect rect(0, 0, renderedWidth, renderedEventBitmap.GetHeight());
+    wxRect rect(x, y, width, GetRenderedHeight(width));
 
     if ( !selected )
         renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->eventGradient1, renderingHelper->eventGradient2, renderingHelper->eventGradient3, renderingHelper->eventGradient4, renderingHelper->eventBorderColor);
@@ -296,19 +273,36 @@ void WhileEvent::RenderInBitmap() const
 
     //While text
     dc.SetFont( renderingHelper->GetBoldFont() );
-    dc.DrawText( _("Tant que :"), 2, 1 );
+    dc.DrawText( _("Tant que :"), x+2, y+1 );
 
     //Draw "while conditions"
     whileConditionsHeight = 2;
-    whileConditionsHeight += renderingHelper->DrawConditionsList(whileConditions, dc, 80, 2, renderedWidth-80);
+    whileConditionsHeight += renderingHelper->DrawConditionsList(whileConditions, dc, x+80, y+2, width-80);
 
     dc.SetFont( renderingHelper->GetBoldFont() );
     dc.DrawText( _("Répéter :"), 2, whileConditionsHeight);
 
-    renderingHelper->DrawConditionsList(conditions, dc, 0, whileConditionsHeight+repeatHeight, renderingHelper->GetConditionsColumnWidth());
-    renderingHelper->DrawActionsList(actions, dc, renderingHelper->GetConditionsColumnWidth(), whileConditionsHeight+repeatHeight, renderedWidth-renderingHelper->GetConditionsColumnWidth());
+    renderingHelper->DrawConditionsList(conditions, dc, x, y+whileConditionsHeight+repeatHeight, renderingHelper->GetConditionsColumnWidth());
+    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+whileConditionsHeight+repeatHeight, width-renderingHelper->GetConditionsColumnWidth());
+}
 
-    eventRenderingNeedUpdate = false;
+unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
+{
+    if ( eventHeightNeedUpdate )
+    {
+        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+        const int repeatHeight = 20;
+
+        //Get maximum height needed
+        whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80);
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth());
+
+        renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + whileConditionsHeight + repeatHeight);
+        eventHeightNeedUpdate = false;
+    }
+
+    return renderedHeight;
 }
 
 void WhileEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)

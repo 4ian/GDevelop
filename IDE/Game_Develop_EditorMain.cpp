@@ -133,7 +133,7 @@ ribbonSceneEditorButtonBar(NULL)
     SetClientSize(wxSize(850,700));
     {
     	wxIcon FrameIcon;
-    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/icon16.ico"))));
+    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/icon.ico"))));
     	SetIcon(FrameIcon);
     }
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -214,7 +214,6 @@ ribbonSceneEditorButtonBar(NULL)
     Connect( idRibbonWebSite, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuSiteSelected );
     Connect( idRibbonCredits, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnAbout );
     Connect( idRibbonStartPage, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonStartPageClicked );
-
 
     SetDropTarget(new DnDFileEditor(*this));
 
@@ -482,7 +481,7 @@ void Game_Develop_EditorFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
     EditorImages * imagesEditorPtr = dynamic_cast<EditorImages*>(editorsNotebook->GetPage(event.GetSelection()));
 
     if ( sceneEditorPtr != NULL ) sceneEditorPtr->ForceRefreshRibbonAndConnect();
-    //if ( imagesEditorPtr != NULL ) imagesEditorPtr->ForceRefreshRibbonAndConnect(); //TODO
+    if ( imagesEditorPtr != NULL ) imagesEditorPtr->ForceRefreshRibbonAndConnect();
 }
 
 void Game_Develop_EditorFrame::LoadSkin(wxRibbonBar * bar)

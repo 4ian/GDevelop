@@ -24,7 +24,6 @@ void EditorEvents::OnEditActionMenuSelected(wxCommandEvent& event)
         instr.SetParameters( dialog.Param );
         instr.SetLocal( dialog.Loc );
 
-        GetLastSelectedEvent()->eventRenderingNeedUpdate = true;
         ChangesMadeOnEvents();
     }
 }
@@ -43,7 +42,6 @@ void EditorEvents::OnAddActionMenuSelected(wxCommandEvent& event)
 
         GetLastSelectedListOfInstructions()->push_back(instruction);
 
-        GetLastSelectedEvent()->eventRenderingNeedUpdate = true;
         ChangesMadeOnEvents();
     }
 }
@@ -54,7 +52,6 @@ void EditorEvents::OnDelActionMenuSelected(wxCommandEvent& event)
 
     GetLastSelectedListOfInstructions()->erase( GetLastSelectedListOfInstructions()->begin() + boost::tuples::get<3>(eventsSelected[0]) );
 
-    GetLastSelectedEvent()->eventRenderingNeedUpdate = true;
     ChangesMadeOnEvents();
 }
 
@@ -79,7 +76,6 @@ void EditorEvents::OnCutActionMenuSelected(wxCommandEvent& event)
 
     GetLastSelectedListOfInstructions()->erase( GetLastSelectedListOfInstructions()->begin() + boost::tuples::get<3>(eventsSelected[0]) );
 
-    GetLastSelectedEvent()->eventRenderingNeedUpdate = true;
     ChangesMadeOnEvents();
 }
 
@@ -95,6 +91,5 @@ void EditorEvents::OnPasteActionMenuSelected(wxCommandEvent& event)
     else
         GetLastSelectedListOfInstructions()->insert(GetLastSelectedListOfInstructions()->begin()+boost::tuples::get<3>(eventsSelected[0]), clipboard->GetAction());
 
-    GetLastSelectedEvent()->eventRenderingNeedUpdate = true;
     ChangesMadeOnEvents();
 }

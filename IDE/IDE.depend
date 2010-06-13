@@ -4479,11 +4479,12 @@
 	<boost/detail/shared_count.hpp>
 	<boost/shared_ptr.hpp>
 
-1267736450 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
+1276375256 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
 	<iostream>
 	<vector>
 	<string>
 	<cmath>
+	<complex>
 	"GDL/Log.h"
 	"GDL/Event.h"
 
@@ -4491,7 +4492,7 @@
 	<string>
 	<vector>
 
-1273756713 d:\florian\programmation\gamedevelop\gdl\gdl\event.h
+1276431419 d:\florian\programmation\gamedevelop\gdl\gdl\event.h
 	<iostream>
 	<vector>
 	<string>
@@ -9535,7 +9536,7 @@
 	"wx/ribbon/control.h"
 	"wx/ribbon/art.h"
 
-1276291142 d:\florian\programmation\gamedevelop\gdl\gdl\editorimages.h
+1276455293 d:\florian\programmation\gamedevelop\gdl\gdl\editorimages.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/menu.h>
@@ -9954,7 +9955,7 @@
 	<wx/dialog.h>
 	"GDL/Scene.h"
 
-1275131173 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
+1276431418 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"EditorEvents.h"
@@ -10020,19 +10021,19 @@
 	<wx/html/htmprint.h>
 	<vector>
 
-1273756713 d:\florian\programmation\gamedevelop\gdl\gdl\standardevent.h
+1276419817 d:\florian\programmation\gamedevelop\gdl\gdl\standardevent.h
 	<wx/bitmap.h>
 	<wx/dcbuffer.h>
 	<wx/html/htmprint.h>
 	<boost/shared_ptr.hpp>
 	"Event.h"
 
-1271592333 source:d:\florian\programmation\gamedevelop\ide\editoreventsactions.cpp
+1276431949 source:d:\florian\programmation\gamedevelop\ide\editoreventsactions.cpp
 	"EditorEvents.h"
 	"ChoixAction.h"
 	"Clipboard.h"
 
-1271592333 source:d:\florian\programmation\gamedevelop\ide\editoreventsconditions.cpp
+1276431949 source:d:\florian\programmation\gamedevelop\ide\editoreventsconditions.cpp
 	"EditorEvents.h"
 	"ChoixCondition.h"
 	"Clipboard.h"
@@ -10190,7 +10191,7 @@
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
-1276288410 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
+1276455293 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
 	"EditorScene.h"
 	<wx/settings.h>
 	<wx/intl.h>
@@ -10455,7 +10456,7 @@
 
 1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\spriteextension.h
 
-1276291349 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
+1276454255 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
 	"debugMem.h"
 	"MemTrace.h"
 	"nommgr.h"
@@ -10848,7 +10849,7 @@
 	<wx/string.h>
 	"GDL/Layer.h"
 
-1275676869 source:d:\florian\programmation\gamedevelop\ide\playerunittests.cpp
+1276377754 source:d:\florian\programmation\gamedevelop\ide\playerunittests.cpp
 	"CppUnitLite/TestHarness.h"
 	"GDL/Object.h"
 	"GDL/aMove.h"
@@ -10944,6 +10945,29 @@
 	<string>
 	<vector>
 	<iostream>
+
+1276284089 source:d:\florian\programmation\gamedevelop\ide\projectmanager.cpp
+	"ProjectManager.h"
+	<wx/bitmap.h>
+	<wx/intl.h>
+	<wx/image.h>
+	<wx/string.h>
+	<wx/ribbon/bar.h>
+	<wx/ribbon/buttonbar.h>
+	<wx/ribbon/gallery.h>
+	<wx/ribbon/toolbar.h>
+	"Clipboard.h"
+	"Game_Develop_EditorMain.h"
+	"gdTreeItemGameData.h"
+	"GDL/ChercherScene.h"
+	"Extensions.h"
+	"EditPropJeu.h"
+	"InitialVariablesDialog.h"
+	"EditPropScene.h"
+
+1266534452 d:\florian\programmation\gamedevelop\ide\gdtreeitemgamedata.h
+	<string>
+	<wx/treectrl.h>
 
 1264364134 source:d:\florian\programmation\gamedevelop\ide\recentlist.cpp
 	"RecentList.h"
@@ -11060,7 +11084,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1276291350 d:\florian\programmation\gamedevelop\ide\version.h
+1276456000 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -11211,30 +11235,7 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1276280601 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
-
-1276284089 source:d:\florian\programmation\gamedevelop\ide\projectmanager.cpp
-	"ProjectManager.h"
-	<wx/bitmap.h>
-	<wx/intl.h>
-	<wx/image.h>
-	<wx/string.h>
-	<wx/ribbon/bar.h>
-	<wx/ribbon/buttonbar.h>
-	<wx/ribbon/gallery.h>
-	<wx/ribbon/toolbar.h>
-	"Clipboard.h"
-	"Game_Develop_EditorMain.h"
-	"gdTreeItemGameData.h"
-	"GDL/ChercherScene.h"
-	"Extensions.h"
-	"EditPropJeu.h"
-	"InitialVariablesDialog.h"
-	"EditPropScene.h"
-
-1266534452 d:\florian\programmation\gamedevelop\ide\gdtreeitemgamedata.h
-	<string>
-	<wx/treectrl.h>
+1276453963 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 
 1253308462 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 

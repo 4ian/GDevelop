@@ -118,14 +118,14 @@
 	<File name="EditOptionsPosition.h" open="0" top="0" tabpos="0">
 		<Cursor position="601" topLine="6" />
 	</File>
-	<File name="EditPropJeu.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="524" topLine="1" />
+	<File name="EditPropJeu.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="33599" topLine="646" />
 	</File>
 	<File name="EditPropScene.cpp" open="0" top="0" tabpos="19">
 		<Cursor position="7522" topLine="209" />
 	</File>
-	<File name="EditorEvents.cpp" open="1" top="1" tabpos="3">
-		<Cursor position="22235" topLine="333" />
+	<File name="EditorEvents.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="37894" topLine="654" />
 	</File>
 	<File name="EditorEvents.h" open="1" top="0" tabpos="4">
 		<Cursor position="1715" topLine="52" />
@@ -160,11 +160,11 @@
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="34951" topLine="712" />
+	<File name="EditorScene.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="32834" topLine="654" />
 	</File>
 	<File name="EditorScene.h" open="1" top="0" tabpos="1">
-		<Cursor position="1619" topLine="49" />
+		<Cursor position="5690" topLine="148" />
 	</File>
 	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="6625" topLine="126" />
@@ -229,8 +229,8 @@
 	<File name="ObjectTypeChoice.cpp" open="0" top="0" tabpos="26">
 		<Cursor position="9226" topLine="162" />
 	</File>
-	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="16">
-		<Cursor position="8188" topLine="205" />
+	<File name="PlayerUnitTests.cpp" open="1" top="1" tabpos="6">
+		<Cursor position="5272" topLine="112" />
 	</File>
 	<File name="Portable.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="8493" topLine="156" />
@@ -250,8 +250,8 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="22" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="16028" topLine="403" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="1767" topLine="34" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="1">
 		<Cursor position="1288" topLine="34" />

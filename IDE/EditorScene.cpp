@@ -669,6 +669,7 @@ void EditorScene::OnPlayWindowBtClick( wxCommandEvent & event )
     sceneCanvas->scene.editing = false;
 
     externalWindow.Show(true);
+    externalWindow.renderCanvas->SetFramerateLimit( game.maxFPS );
     externalWindow.SetSize(sceneCanvas->GetWidth(), sceneCanvas->GetHeight());
     sceneCanvas->scene.ChangeRenderWindow(externalWindow.renderCanvas);
 
@@ -726,17 +727,7 @@ void EditorScene::ForceRefreshRibbonAndConnect()
  */
 void EditorScene::OnnotebookPageChanged(wxAuiNotebookEvent& event)
 {
-    if ( notebook->GetPageText(notebook->GetSelection()) == _("Scène") )
-    {
-        CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->scene.editing);
-        mainEditorCommand.GetRibbon()->SetActivePage(3);
-        ConnectEvents();
-    }
-    else if ( notebook->GetPageText(notebook->GetSelection()) == _("Evènements") )
-    {
-        mainEditorCommand.GetRibbon()->SetActivePage(4);
-        eventsEditor->ConnectEvents();
-    }
+    ForceRefreshRibbonAndConnect();
 }
 
 void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)

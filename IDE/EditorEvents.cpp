@@ -504,7 +504,7 @@ void EditorEvents::SetEventsNeedUpdate(vector < BaseEventSPtr > & eventsToRefres
 
     for(;e != end;++e)
     {
-        (*e)->eventRenderingNeedUpdate = true;
+        (*e)->eventHeightNeedUpdate = true;
 
         if ( (*e)->CanHaveSubEvents() )
             SetEventsNeedUpdate((*e)->GetSubEvents());
@@ -666,7 +666,7 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
             eventsSelected.push_back(boost::make_tuple(&list, i,              //Useful part
                                                        (vector<Instruction>*)NULL, 0)); //Useless
             list[i]->selected = true;
-            list[i]->eventRenderingNeedUpdate = true;
+            list[i]->eventHeightNeedUpdate = true;
             list[i]->OnSingleClick(MouseX-initialXposition, MouseY-(Yposition+positionScrollbar), eventsSelected, conditionsSelected, instructionsSelected);
         }
 
@@ -1041,7 +1041,7 @@ void EditorEvents::OnEventsPanelLeftDClick( wxMouseEvent& event )
     else
         eventSelected->EditEvent(this, game, scene, mainEditorCommand);
 
-    eventSelected->eventRenderingNeedUpdate = true;
+    eventSelected->eventHeightNeedUpdate = true;
     ChangesMadeOnEvents();
 }
 
@@ -1218,7 +1218,7 @@ void EditorEvents::DeselectAllEvents(vector < BaseEventSPtr > & eventsToUnselect
         if ( eventsToUnselected[i]->selected )
         {
             eventsToUnselected[i]->selected = false;
-            eventsToUnselected[i]->eventRenderingNeedUpdate = true;
+            eventsToUnselected[i]->eventHeightNeedUpdate = true;
         }
 
     	if ( eventsToUnselected[i]->CanHaveSubEvents() )
@@ -1263,7 +1263,7 @@ void EditorEvents::DeselectAllInstructions(BaseEventSPtr parentEvent, vector<Ins
         if ( instrsToUnselected[j].selected )
         {
             instrsToUnselected[j].selected = false;
-            parentEvent->eventRenderingNeedUpdate = true;
+            parentEvent->eventHeightNeedUpdate = true;
         }
 
         DeselectAllInstructions(parentEvent, instrsToUnselected[j].GetSubInstructions());

@@ -154,6 +154,8 @@ class SpriteObject : public Object
         bool ActChangeScaleHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActCreateMaskFromColorOnActualImage( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActFlipX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActFlipY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         //Expressions
         double ExpGetObjectX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
@@ -183,6 +185,8 @@ class SpriteObject : public Object
 
         int opacity;
         sf::Blend::Mode blendMode;
+        bool isFlippedX;
+        bool isFlippedY;
 
         float scaleX;
         float scaleY;

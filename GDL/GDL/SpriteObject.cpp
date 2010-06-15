@@ -31,6 +31,8 @@ needUpdateCurrentSprite(true),
 cacheAnimationSizeNeedUpdate(true),
 opacity( 255 ),
 blendMode(sf::Blend::Alpha),
+isFlippedX(false),
+isFlippedY(false),
 scaleX( 1 ),
 scaleY( 1 ),
 colorR( 255 ),
@@ -534,10 +536,7 @@ void SpriteObject::UpdateCurrentSprite() const
 {
     //Mise à jour du pointeur vers le sprite SFML
     if ( m_animCourant >= GetAnimationsNumber() )
-    {
-        cout << "Impossible d'accéder à l'animation "<<m_animCourant;
         currentSprite = &badSpriteDatas;
-    }
     else
         currentSprite = &animations[m_animCourant].GetDirectionToModify( m_direcCourant ).ModSprite( m_spriteCourant );
 
@@ -545,6 +544,8 @@ void SpriteObject::UpdateCurrentSprite() const
     currentSprite->ModSprite().SetScale( scaleX, scaleY );
     currentSprite->ModSprite().SetColor( sf::Color( colorR, colorV, colorB, opacity ) );
     currentSprite->ModSprite().SetBlendMode( blendMode );
+    currentSprite->ModSprite().FlipX(isFlippedX);
+    currentSprite->ModSprite().FlipY(isFlippedY);
 
     if ( GetAnimation(m_animCourant).typeNormal )
     {

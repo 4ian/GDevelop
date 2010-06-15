@@ -40,6 +40,9 @@ public:
     //Compatibility code --- with Game Develop 1.3.9262 and inferior
     static void AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list, Game & game, Scene & scene);
     //End of Compatibility code --- with Game Develop 1.3.9262 and inferior
+    //Compatibility code --- with Game Develop 1.4.9552 and inferior
+    static void AdaptExpressionsFromGD149552(vector < BaseEventSPtr > & list, Game & game, Scene & scene);
+    //End of Compatibility code --- with Game Develop 1.4.9552 and inferior
 
 protected:
 private:

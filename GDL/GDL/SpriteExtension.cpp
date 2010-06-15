@@ -388,6 +388,36 @@ ExtensionSprite::ExtensionSprite()
 
         DECLARE_END_OBJECT_ACTION()
 
+        DECLARE_OBJECT_ACTION("FlipX",
+                       _("Inverser l'affichage horizontalement"),
+                       _("Inverse l'affichage de l'objet horizontalement"),
+                       _("Inverser l'affichage de _PARAM0_ horizontalement : _PARAM1_"),
+                       _("Effets"),
+                       "res/actions/color24.png",
+                       "res/actions/color.png",
+                       &SpriteObject::ActFlipX);
+
+            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("yesorno", _("Activer l'inversion"), false, "")
+            MAIN_OBJECTS_IN_PARAMETER(0)
+
+        DECLARE_END_OBJECT_ACTION()
+
+        DECLARE_OBJECT_ACTION("FlipY",
+                       _("Inverser l'affichage verticalement"),
+                       _("Inverse l'affichage de l'objet verticalement"),
+                       _("Inverser l'affichage de _PARAM0_ verticalement : _PARAM1_"),
+                       _("Effets"),
+                       "res/actions/color24.png",
+                       "res/actions/color.png",
+                       &SpriteObject::ActFlipY);
+
+            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("yesorno", _("Activer l'inversion"), false, "")
+            MAIN_OBJECTS_IN_PARAMETER(0)
+
+        DECLARE_END_OBJECT_ACTION()
+
         DECLARE_OBJECT_HIDDEN_EXPRESSION("X", _("Position X d'un point"), _("Position X d'un point"), _("Position"), "res/actions/position.png", &SpriteObject::ExpGetObjectX)
 
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")

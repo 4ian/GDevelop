@@ -254,6 +254,16 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     }
     //End of Compatibility code --- with Game Develop 1.3.9262 and inferior
 
+    //Compatibility code --- with Game Develop 1.4.9552 and inferior
+    if ( major <= 1 && minor <= 4 && build <= 9552 && revision <= 48094)
+    {
+        for (unsigned int i = 0;i<game.scenes.size();++i)
+        {
+            AdaptExpressionsFromGD149552(game.scenes[i]->events, game, *game.scenes[i]);
+        }
+    }
+    //End of Compatibility code --- with Game Develop 1.4.9552 and inferior
+
     if ( notBackwardCompatible )
     {
         MSG( _("Attention, si vous enregistrez votre jeu avec cette version de Game Develop, vous ne pourrez plus le réouvrir avec une version précédente.") );
@@ -1114,7 +1124,7 @@ void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list,
                 {
                     if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "expression" )
                         conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyMathExpression(conditionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
-                    if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color") )
+                    if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color"|| instructionInfos.parameters[p].type == "layer") )
                         conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(conditionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
                 }
         	}
@@ -1145,7 +1155,7 @@ void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list,
                 {
                     if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "expression" )
                         actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyMathExpression(actionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
-                    if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color") )
+                    if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color" || instructionInfos.parameters[p].type == "layer") )
                         actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(actionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
                 }
         	}
@@ -1156,6 +1166,75 @@ void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list,
     }
 }
 
+
+/**
+ * Adapt expressions that comes from Game Develop 1.3.9552 and inferior
+ * -> Transform legacy expression from parameters of type "layers".
+ */
+void OpenSaveGame::AdaptExpressionsFromGD149552(vector < BaseEventSPtr > & list, Game & game, Scene & scene)
+{
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+    for (unsigned int eId = 0;eId < list.size();++eId)
+    {
+        vector < GDExpression * > eventExpressions = list[eId]->GetAllExpressions();
+
+        //Adapt expression of events
+        for (unsigned int l = 0;l<eventExpressions.size();++l)
+            *eventExpressions[l] = GDExpression(AdaptLegacyMathExpression(eventExpressions[l]->GetPlainString(), game, scene));
+
+        vector < vector < Instruction > * > conditionsVectors = list[eId]->GetAllConditionsVectors();
+        vector < vector < Instruction > * > actionsVectors = list[eId]->GetAllActionsVectors();
+
+        //Adapt expression of conditions
+        for (unsigned int i = 0;i<conditionsVectors.size();++i)
+        {
+        	for (unsigned int j = 0;j<conditionsVectors[i]->size();++j)
+        	{
+        	    unsigned int paramNb = conditionsVectors[i]->at(j).GetParameters().size();
+                InstructionInfos instructionInfos = extensionsManager->GetConditionInfos(conditionsVectors[i]->at(j).GetType());
+
+                for (unsigned int p = 0;p<paramNb;++p)
+                {
+                    if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "layer")
+                        conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(conditionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
+                }
+        	}
+        }
+
+        //Adapt expression of actions
+        for (unsigned int i = 0;i<actionsVectors.size();++i)
+        {
+        	for (unsigned int j = 0;j<actionsVectors[i]->size();++j)
+        	{
+        	    unsigned int paramNb = actionsVectors[i]->at(j).GetParameters().size();
+                InstructionInfos instructionInfos = extensionsManager->GetActionInfos(actionsVectors[i]->at(j).GetType());
+
+                //Special adaptations for some actions
+                if ( actionsVectors[i]->at(j).GetType() == "Create" )
+                {
+                    if ( actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("CAL\"") != string::npos ||
+                         actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("OBJ(") != string::npos ||
+                         actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("GBL(") != string::npos ||
+                         actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("VAL(") != string::npos )
+                    {
+                        actionsVectors[i]->at(j).SetType("CreateByName");
+                        instructionInfos = extensionsManager->GetActionInfos(actionsVectors[i]->at(j).GetType());
+                    }
+                }
+
+                for (unsigned int p = 0;p<paramNb;++p)
+                {
+                    if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "layer")
+                        actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(actionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
+                }
+        	}
+        }
+
+        if ( list[eId]->CanHaveSubEvents() )
+            AdaptExpressionsFromGD149552(list[eId]->GetSubEvents(), game, scene);
+    }
+}
 
 
 void OpenSaveGame::OpenConditions(vector < Instruction > & conditions, const TiXmlElement * elem)

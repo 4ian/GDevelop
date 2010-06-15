@@ -33,6 +33,32 @@ bool SpriteObject::ActBlendMode( RuntimeScene & scene, ObjectsConcerned & object
 }
 
 /**
+ * Flip a sprite object on X axis
+ */
+bool SpriteObject::ActFlipX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 1 ).GetPlainString() == "yes" || action.GetParameter( 1 ).GetPlainString() == "oui")
+        isFlippedX = true;
+    else
+        isFlippedX = false;
+
+    return true;
+}
+
+/**
+ * Flip a sprite object on X axis
+ */
+bool SpriteObject::ActFlipY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 1 ).GetPlainString() == "yes" || action.GetParameter( 1 ).GetPlainString() == "oui")
+        isFlippedY = true;
+    else
+        isFlippedY = false;
+
+    return true;
+}
+
+/**
  * Copy the image of the current image of a Sprite object, and only this object.
  */
 bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )

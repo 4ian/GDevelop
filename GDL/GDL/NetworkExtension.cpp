@@ -18,7 +18,7 @@ NetworkExtension::NetworkExtension()
                    "res/actions/net.png",
                    &ActEnvoiDataNet);
 
-        DECLARE_PARAMETER("", _("Adresse de la page .php"), false, "")
+        DECLARE_PARAMETER("text", _("Adresse de la page .php ( N'oubliez pas le protocole http:// )"), false, "")
         DECLARE_PARAMETER("password", _("Mot de passe de sécurité"), false, "")
         DECLARE_PARAMETER("text", _("Donnée 1"), false, "")
         DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 2"), false, "")
@@ -38,7 +38,7 @@ NetworkExtension::NetworkExtension()
                    "res/actions/net.png",
                    &ActDownloadFile);
 
-        DECLARE_PARAMETER("text", _("Site web ( Par exemple : www.monsite.com )"), false, "")
+        DECLARE_PARAMETER("text", _("Site web ( Par exemple : http://www.monsite.com )"), false, "")
         DECLARE_PARAMETER("text", _("Chemin du fichier ( Par exemple : /dossier/fichier.txt )"), false, "")
         DECLARE_PARAMETER("text", _("Enregistrer le fichier sous le nom"), false, "")
 

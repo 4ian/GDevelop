@@ -21,19 +21,20 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#if defined(__GNUC__)
 #include <unistd.h>
+#endif
 
 #ifdef PYSUPPORT
 #include <boost/python.hpp>
 using namespace boost::python;
 #endif
 
-#include "GDL/algo.h"
+#include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/MemTrace.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ImageManager.h"
-#include "GDL/crypter.h"
 #include "GDL/RessourcesLoader.h"
 #include "GDL/FontManager.h"
 #include "GDL/OpenSaveLoadingScreen.h"
@@ -41,7 +42,6 @@ using namespace boost::python;
 #include "GDL/ExtensionsManager.h"
 #include "GDL/SpriteExtension.h"
 #include "GDL/ExtensionsLoader.h"
-#include "GDL/McbDES2.hpp"
 #include "GDL/Modules.h"
 #include "CompilationChecker.h"
 #include "GDL/AES.h"
@@ -50,12 +50,7 @@ using namespace boost::python;
 #include <stdlib.h>
 #include <stdio.h>
 
-//Cryptage
-#include "dlib/compress_stream.h"
-#include "dlib/base64.h"
-
 using namespace std;
-using namespace dlib;
 
 #ifndef RELEASE
 MemTrace MemTracer;
@@ -125,14 +120,14 @@ int main( int argc, char *p_argv[] )
     }
     if ( game.loadingScreen.texte )
     {
-        sf::Text Chargement( game.loadingScreen.texteChargement );
+        sf::Text Chargement( game.loadingScreen.texteChargement, *FontManager::getInstance()->GetFont("") );
         Chargement.SetPosition( game.loadingScreen.texteXPos, game.loadingScreen.texteYPos );
         loadingApp.Draw( Chargement );
     }
     loadingApp.Display();
 
     //Ouverture du jeu
-#ifndef RELEASE
+#ifdef RELEASE
 
     if ( srcString == "" )
     {
@@ -172,16 +167,20 @@ int main( int argc, char *p_argv[] )
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/Game Develop Player/BZmod.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/BenchC2.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Desktop/shoot.jgd" );
-    openGame.OpenFromFile("C:/Users/Florian/Programmation/SO4/SO4.jgd" );
+    //openGame.OpenFromFile("D:/Florian/Programmation/Jeux Game Develop/SA4/Game.gdg" );
+    openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/testCrashVariableString.gdg" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/Course/CourseTest.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/Game Develop Player/test2.txt" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/testCPPExtension2.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/testFont.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/3DEngine.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/Course3D/Course3D.jgd" );
+    //openGame.OpenFromFile("C:/Users/Florian/Programmation/Soldier/Soldier.jgd" );
+    //openGame.OpenFromFile("C:/Users/Florian/Desktop/Tank war II/TankWar.gdg" );
+
 #endif
 
-    if ( game.m_scenes.empty() )
+    if ( game.scenes.empty() )
         return EXIT_FAILURE;
 
     game.imageManager.LoadImagesFromFile( game );
@@ -192,7 +191,7 @@ int main( int argc, char *p_argv[] )
     window.UseVerticalSync( game.verticalSync );
 
     RuntimeScene scenePlayed(&window, &game);
-    if ( !scenePlayed.LoadFromScene( game.m_scenes.at( 0 ) ) )
+    if ( !scenePlayed.LoadFromScene( *game.scenes[0] ) )
         EcrireLog( "Chargement", "Erreur lors du chargement de la scène initiale" );
 
     loadingApp.Close();
@@ -222,7 +221,7 @@ int main( int argc, char *p_argv[] )
 
             RuntimeScene NewScenePlayed(&window, &game);
             scenePlayed = NewScenePlayed; //On vide la scène
-            if ( !scenePlayed.LoadFromScene( game.m_scenes.at( retour ) ) )
+            if ( !scenePlayed.LoadFromScene( *game.scenes.at( retour ) ) )
             {
                 EcrireLog( "Chargement", "Erreur lors du chargement" );
             }

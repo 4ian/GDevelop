@@ -5,7 +5,6 @@
 		<Option title="Runtime" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Versioning\;" />
 		<Build>
 			<Target title="Debug">
 				<Option output="bin\debug\PlayWin.exe" prefix_auto="0" extension_auto="0" />
@@ -18,6 +17,7 @@
 					<Add option="-Wall" />
 					<Add option="-pg" />
 					<Add option="-g" />
+					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -54,6 +54,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
@@ -91,6 +92,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -119,7 +121,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
-				<Option output="bin\release\PlayLinux" prefix_auto="1" extension_auto="1" />
+				<Option output="bin\release\ExeLinux" prefix_auto="0" extension_auto="0" />
 				<Option working_dir="bin\release" />
 				<Option object_output="obj\release\" />
 				<Option type="0" />
@@ -128,13 +130,11 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="\home\florian\Programmation\libs\dlib-17.12\" />
-					<Add directory="\home\florian\Programmation\libs\nwidgets\" />
-					<Add directory="\home\florian\Programmation\libs\fparser\" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
@@ -153,6 +153,7 @@
 					<Add option="-lXrandr" />
 					<Add option="-lXrender" />
 					<Add option="-lFLAC" />
+					<Add option="-lGLU" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="bin\release" />
@@ -164,10 +165,6 @@
 			<Add option="-fexceptions" />
 			<Add option="-DGDP" />
 			<Add directory="..\GDL" />
-			<Add directory="C:\Libs\dlib-17.12" />
-			<Add directory="C:\Users\Florian\Programmation\nwidgets" />
-			<Add directory="C:\Libs\muParser\ParserLib" />
-			<Add directory="C:\Libs\fparser" />
 			<Add directory="C:\Libs\boost_1_38_0" />
 			<Add directory="C:\Libs\SFML\include" />
 		</Compiler>
@@ -199,6 +196,7 @@
 				<Scheme minor_max="1" build_max="0" rev_max="0" rev_rand_max="9" build_times_to_increment_minor="100" />
 				<Settings autoincrement="0" date_declarations="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
 				<Changes_Log show_changes_editor="0" app_title="sortie de la version %M.%m.%b de %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>
 		</Extensions>
 	</Project>

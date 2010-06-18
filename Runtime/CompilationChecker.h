@@ -5,7 +5,7 @@
 class CompilationChecker
 {
     public:
-        static void EnsureCorrectGDLVersion();
+        static bool EnsureCorrectGDLVersion();
 };
 
 #endif // COMPILATIONCHECKER_H

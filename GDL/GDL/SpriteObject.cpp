@@ -1,6 +1,5 @@
 #include "GDL/SpriteObject.h"
 #include "GDL/Object.h"
-#include "GDL/Access.h"
 #include "GDL/ImageManager.h"
 #include "GDL/tinyxml.h"
 #include "GDL/Position.h"

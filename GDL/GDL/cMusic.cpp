@@ -8,7 +8,6 @@
 #include "GDL/Chercher.h"
 #include "GDL/CommonTools.h"
 #include <iostream>
-#include "GDL/Access.h"
 #include "GDL/SoundManager.h"
 #include "GDL/ObjectsConcerned.h"
 #include <SFML/Audio.hpp>

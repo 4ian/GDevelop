@@ -4,7 +4,6 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/Instruction.h"
-#include "GDL/Access.h"
 
 void ObjectWithOpacity::SetOpacity(int val)
 {

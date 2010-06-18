@@ -10,7 +10,6 @@
 #include "GDL/Event.h"
 #include "GDL/Chercher.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 
 bool ActShowLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

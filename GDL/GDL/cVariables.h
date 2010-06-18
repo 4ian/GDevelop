@@ -16,7 +16,7 @@
 #include "GDL/ListVariable.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/GDExpression.h"
-#include "GDL/Access.h"
+
 
 bool CondVarScene( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 bool CondVarSceneTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );

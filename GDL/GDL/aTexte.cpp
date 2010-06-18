@@ -12,7 +12,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
-#include "GDL/Access.h"
+
 #include "GDL/RuntimeScene.h"
 
 
@@ -51,7 +51,7 @@ bool ActEcrireTexte( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, 
 
     //Compatibilité Game Develop 1.0.4529
     if ( action.GetParameters().size() >= 7 )
-        texte.layer = action.GetParameter(6).GetPlainString();
+        texte.layer = action.GetParameter(6).GetAsTextExpressionResult(scene, objectsConcerned);
 
     scene.textes.push_back(texte);
 

@@ -7,7 +7,6 @@
 #include <sstream>
 #include <iostream>
 #include "GDL/CommonTools.h"
-#include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 
 bool ActGetJoystickAxis( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

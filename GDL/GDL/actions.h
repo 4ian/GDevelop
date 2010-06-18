@@ -23,7 +23,6 @@
 #include "GDL/aTexte.h"
 #include "GDL/aEffects.h"
 #include "GDL/aFichier.h"
-#include "GDL/aGUI.h"
 #include "GDL/aNet.h"
 #include "GDL/aAdvanced.h"
 #include "GDL/aJoystick.h"

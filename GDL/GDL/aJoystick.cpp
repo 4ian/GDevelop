@@ -12,7 +12,6 @@
 #include "GDL/Object.h"
 #include "GDL/Chercher.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
 

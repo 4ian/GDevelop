@@ -14,7 +14,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
-#include "GDL/Access.h"
+
 
 bool ActEcrireTexte( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 

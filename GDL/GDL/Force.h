@@ -81,11 +81,18 @@ class GD_API Force
     /*mutable bool ALneedUpdate;
     mutable bool XYneedUpdate;
 
+<<<<<<< .mine
+    static const float PI;
+=======
     void CalculXY();
     void CalculAL();*/
+>>>>>>> .r154
 
+<<<<<<< .mine
+=======
     static const float PI;
 
+>>>>>>> .r154
 };
 
 struct ForceNulle

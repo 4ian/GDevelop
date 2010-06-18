@@ -12,7 +12,6 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
-#include "GDL/Access.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
 

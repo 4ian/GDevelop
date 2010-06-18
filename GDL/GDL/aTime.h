@@ -12,7 +12,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
-#include "GDL/Access.h"
+
 #include "GDL/RuntimeScene.h"
 
 bool ActResetTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

@@ -17,7 +17,6 @@
 #include "GDL/ChercherScene.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Layer.h"
-#include "GDL/Access.h"
 #include "GDL/EventsPreprocessor.h"
 #include "GDL/profile.h"
 #include "GDL/ExtensionsManager.h"

@@ -10,7 +10,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Force.h"
 #include <iostream>
-#include "GDL/Access.h"
+
 #include <SFML/Graphics.hpp>
 #include "GDL/RuntimeScene.h"
 

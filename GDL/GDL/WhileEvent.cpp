@@ -2,7 +2,6 @@
 #include "tinyxml.h"
 #include "RuntimeScene.h"
 #include "ObjectsConcerned.h"
-#include "Access.h"
 #include "GDL/OpenSaveGame.h"
 
 #if defined(GDE)

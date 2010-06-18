@@ -1,6 +1,5 @@
 #include <vector>
 #include "GDL/RuntimeScene.h"
-#include "GDL/Access.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/md5.h"
 #include <SFML/Network.hpp>

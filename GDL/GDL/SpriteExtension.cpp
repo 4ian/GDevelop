@@ -5,7 +5,6 @@
 #include "GDL/Instruction.h"
 #include "GDL/SpriteExtension.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/Access.h"
 #include "GDL/Chercher.h"
 #include "GDL/Object.h"
 #include <iostream>
@@ -14,7 +13,6 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/Instruction.h"
-#include "GDL/Access.h"
 #include "GDL/Object.h"
 #include "GDL/SpriteObject.h"
 #include <iostream>

@@ -133,7 +133,7 @@ ribbonSceneEditorButtonBar(NULL)
     SetClientSize(wxSize(850,700));
     {
     	wxIcon FrameIcon;
-    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/icon.ico"))));
+    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/icon16.png"))));
     	SetIcon(FrameIcon);
     }
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);

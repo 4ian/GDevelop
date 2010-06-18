@@ -22,8 +22,8 @@ class Game_Develop_EditorApp : public wxApp
         virtual int     OnExit();
         #ifndef DEBUG
         virtual void    OnUnhandledException();
-        virtual bool    OnExceptionInMainLoop();
         #endif
+        virtual bool    OnExceptionInMainLoop();
 
         Game_Develop_EditorFrame * Frame;
         wxLogGui *log;

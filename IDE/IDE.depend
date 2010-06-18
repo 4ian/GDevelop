@@ -4479,12 +4479,11 @@
 	<boost/detail/shared_count.hpp>
 	<boost/shared_ptr.hpp>
 
-1276375256 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
+1276544988 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
 	<iostream>
 	<vector>
 	<string>
 	<cmath>
-	<complex>
 	"GDL/Log.h"
 	"GDL/Event.h"
 
@@ -8131,7 +8130,7 @@
 	<string>
 	<vector>
 
-1275849183 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
+1276630594 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
 	"ChoixAction.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -8698,7 +8697,7 @@
 	<vector>
 	<wx/msgdlg.h>
 
-1275849183 source:d:\florian\programmation\gamedevelop\ide\choixcondition.cpp
+1276630603 source:d:\florian\programmation\gamedevelop\ide\choixcondition.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"ChoixCondition.h"
@@ -8845,7 +8844,7 @@
 	<string>
 	<vector>
 
-1274712954 d:\florian\programmation\gamedevelop\gdl\gdl\opensavegame.h
+1276620796 d:\florian\programmation\gamedevelop\gdl\gdl\opensavegame.h
 	"GDL/Game.h"
 	<string>
 	"GDL/tinyxml.h"
@@ -9610,7 +9609,7 @@
 	"GDL/SpriteObject.h"
 	<cmath>
 
-1274717533 d:\florian\programmation\gamedevelop\gdl\gdl\spriteobject.h
+1276462185 d:\florian\programmation\gamedevelop\gdl\gdl\spriteobject.h
 	"GDL/Object.h"
 
 1275079510 d:\florian\programmation\gamedevelop\ide\edittimescene.h
@@ -10315,7 +10314,7 @@
 	<iostream>
 	<wx/dcbuffer.h>
 
-1274379168 source:d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
+1276457950 source:d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
 	"debugMem.h"
 	<wx/msw/winundef.h>
 	<wx/image.h>
@@ -10422,7 +10421,7 @@
 
 1253308453 c:\libs\wxwidgets\include\wx\palmos\stdpaths.h
 
-1268434396 d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.h
+1276457858 d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.h
 	<wx/app.h>
 	<wx/log.h>
 	"GDL/Game.h"
@@ -10456,7 +10455,7 @@
 
 1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\spriteextension.h
 
-1276454255 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
+1276630947 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
 	"debugMem.h"
 	"MemTrace.h"
 	"nommgr.h"
@@ -11084,7 +11083,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1276456000 d:\florian\programmation\gamedevelop\ide\version.h
+1276630947 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -11235,9 +11234,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1276453963 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
-
-1253308462 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
-
-1253437186 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\msw\rcdefs.h
+1276707806 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

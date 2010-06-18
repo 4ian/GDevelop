@@ -297,6 +297,7 @@ int Game_Develop_EditorApp::OnExit()
 
     return 0;
 }
+
 #ifndef DEBUG //So as to let the debugger catch exceptions in debug build
 void Game_Develop_EditorApp::OnUnhandledException()
 {
@@ -320,12 +321,13 @@ void Game_Develop_EditorApp::OnUnhandledException()
     {
         wxSafeShowMessage("Impossible de sauver le jeu","Le jeu n'a pas pu être sauvegardé !");
     }
-
     terminate();
 }
+    #endif
 
 bool Game_Develop_EditorApp::OnExceptionInMainLoop()
 {
+    #ifndef DEBUG //So as to let the debugger catch exceptions in debug build
     wxSafeShowMessage( "Erreur fatale", "Game Develop a rencontré une erreur fatale : (02) Segmentation fault.\nLe programme va devoir se fermer.\n\nAu prochain lancement, il vous sera proposé de charger la copie de sauvegarde de votre jeu, et de nous envoyer un rapport d'erreur." );
 
     wxFile dataErrorFile("errordata.txt", wxFile::write);
@@ -347,5 +349,8 @@ bool Game_Develop_EditorApp::OnExceptionInMainLoop()
     }
 
     terminate();
+    #else
+    throw;
+    return false;
+    #endif
 }
-#endif

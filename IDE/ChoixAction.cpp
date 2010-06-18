@@ -742,6 +742,7 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
                 ||(instructionInfos.parameters[i].type == "file" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
                 ||(instructionInfos.parameters[i].type == "color" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
                 ||(instructionInfos.parameters[i].type == "joyaxis" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
+                ||(instructionInfos.parameters[i].type == "layer" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
                 ||(instructionInfos.parameters[i].type == "expression" && !parameterExpression.PrepareForMathEvaluationOnly(game, scene)))
             {
                 if ( message == "" )

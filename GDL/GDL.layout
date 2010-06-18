@@ -67,8 +67,8 @@
 	<File name="GDL\ChoixDossier.h" open="0" top="0" tabpos="10">
 		<Cursor position="320" topLine="0" />
 	</File>
-	<File name="GDL\ChooseLayer.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="329" topLine="13" />
+	<File name="GDL\ChooseLayer.cpp" open="1" top="0" tabpos="13">
+		<Cursor position="4279" topLine="69" />
 	</File>
 	<File name="GDL\ChooseLayer.h" open="0" top="0" tabpos="0">
 		<Cursor position="378" topLine="5" />
@@ -415,8 +415,8 @@
 	<File name="GDL\ObjectsConcerned.h" open="0" top="0" tabpos="1">
 		<Cursor position="3422" topLine="81" />
 	</File>
-	<File name="GDL\OpenSaveGame.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="55732" topLine="1199" />
+	<File name="GDL\OpenSaveGame.cpp" open="1" top="1" tabpos="7">
+		<Cursor position="50892" topLine="1130" />
 	</File>
 	<File name="GDL\OpenSaveGame.h" open="1" top="0" tabpos="8">
 		<Cursor position="1712" topLine="27" />
@@ -541,8 +541,8 @@
 	<File name="GDL\Text.h" open="0" top="0" tabpos="22">
 		<Cursor position="332" topLine="0" />
 	</File>
-	<File name="GDL\TimeExtension.cpp" open="0" top="0" tabpos="16">
-		<Cursor position="5813" topLine="92" />
+	<File name="GDL\TimeExtension.cpp" open="1" top="0" tabpos="20">
+		<Cursor position="5931" topLine="92" />
 	</File>
 	<File name="GDL\TranslateAction.cpp" open="0" top="0" tabpos="18">
 		<Cursor position="4173" topLine="109" />
@@ -832,8 +832,8 @@
 	<File name="GDL\constantes.h" open="0" top="0" tabpos="75">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="GDL\eFreeFunctions.cpp" open="0" top="0" tabpos="14">
-		<Cursor position="6566" topLine="98" />
+	<File name="GDL\eFreeFunctions.cpp" open="1" top="0" tabpos="19">
+		<Cursor position="8008" topLine="131" />
 	</File>
 	<File name="GDL\eFreeFunctions.h" open="0" top="0" tabpos="20">
 		<Cursor position="3662" topLine="8" />

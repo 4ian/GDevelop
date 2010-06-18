@@ -144,7 +144,7 @@ void DrawerObject::SaveToXml(TiXmlElement * object)
 {
     TiXmlElement * fillOpacityElem = new TiXmlElement( "FillOpacity" );
     object->LinkEndChild( fillOpacityElem );
-    fillOpacityElem->SetAttribute("value", outlineOpacity);
+    fillOpacityElem->SetAttribute("value", fillOpacity);
 
     TiXmlElement * fillColorElem = new TiXmlElement( "FillColor" );
     object->LinkEndChild( fillColorElem );

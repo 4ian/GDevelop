@@ -168,7 +168,8 @@ int main( int argc, char *p_argv[] )
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/BenchC2.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Desktop/shoot.jgd" );
     //openGame.OpenFromFile("D:/Florian/Programmation/Jeux Game Develop/SA4/Game.gdg" );
-    openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/testCrashVariableString.gdg" );
+    openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/benchmarkForces.gdg" );
+    //openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/testCrashVariableString.gdg" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/Course/CourseTest.jgd" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/Game Develop Player/test2.txt" );
     //openGame.OpenFromFile("C:/Users/Florian/Programmation/testCPPExtension2.jgd" );

@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="Runtime"
 	ProjectGUID="{70DB1DF0-86EA-44E8-B216-F3159CB39BF5}"
+	RootNamespace="Runtime"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="0"
 	>
@@ -62,6 +63,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="sfml-window-d.lib sfml-system-d.lib sfml-audio-d.lib sfml-graphics-d.lib sfml-network-d.lib sfml-main.lib bin/VCdebug/GDL.lib opengl32.lib glu32.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="C:\Libs\SFML\lib\vc2008"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -133,6 +135,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="sfml-window.lib sfml-system.lib sfml-audio.lib sfml-graphics.lib sfml-network.lib sfml-main.lib bin/VCrelease/GDL.lib opengl32.lib glu32.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="C:\Libs\SFML\lib\vc2008"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

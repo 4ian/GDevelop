@@ -485,10 +485,9 @@ void RuntimeScene::GestionObjets()
     ObjList allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
     {
-    	if ( allObjects[id]->GetName() == "" )
-    	{
+    	if ( allObjects[id]->GetObjectIdentifier() == 0 ) //0 stand always for object without name, to delete.
             objectsInstances.RemoveObject(allObjects[id]); //Remove from objects Instances, not from the temporary list !
-    	}
+
     }
 
     allObjects = objectsInstances.GetAllObjects();

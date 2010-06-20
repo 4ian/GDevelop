@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\Users\Florian\Programmation\GameDevelop\GDL\GDL\nwidgets;&quot;C:\Users\Florian\Programmation\GameDevelop\GDL\GDL\dlib-17.12&quot;;C:\libs\boost_1_38_0;C:\Libs\SFML\include;C:\Users\Florian\Programmation\GameDevelop\GDL"
+				AdditionalIncludeDirectories="C:\libs\boost_1_38_0;C:\Libs\SFML\include;D:\Florian\Programmation\GameDevelop\GDL"
 				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS;WINDOWS;GDP;GD_API=__declspec(dllexport);SFML_DYNAMIC"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,6 +63,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="sfml-system-d.lib sfml-window-d.lib sfml-network-d.lib sfml-audio-d.lib sfml-graphics-d.lib opengl32.lib glu32.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="C:\Libs\SFML\lib\vc2008"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -114,13 +115,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				AdditionalIncludeDirectories="C:\libs\boost_1_38_0;C:\Libs\SFML\include;C:\Users\Florian\Programmation\GameDevelop\GDL;C:\Users\Florian\Programmation\GameDevelop\GDL\GDL\nwidgets;&quot;C:\Users\Florian\Programmation\GameDevelop\GDL\GDL\dlib-17.12&quot;"
+				AdditionalIncludeDirectories="C:\libs\boost_1_38_0;C:\Libs\SFML\include;D:\Florian\Programmation\GameDevelop\GDL;D:\Florian\Programmation\GameDevelop\GDL\GDL\nwidgets;&quot;D:\Florian\Programmation\GameDevelop\GDL\GDL\dlib-17.12&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;RELEASE;_WINDOWS;WINDOWS;GDP;GD_API=__declspec(dllexport);SFML_DYNAMIC"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
+				DebugInformationFormat="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -135,6 +136,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="sfml-system.lib sfml-window.lib sfml-graphics.lib sfml-audio.lib sfml-network.lib opengl32.lib glu32.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="C:\Libs\SFML\lib\vc2008"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -209,10 +211,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GDL\aGUI.h"
-				>
-			</File>
-			<File
 				RelativePath=".\GDL\AjoutPlusImage.h"
 				>
 			</File>
@@ -222,10 +220,6 @@
 			</File>
 			<File
 				RelativePath=".\GDL\aLayer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\GDL\algo.h"
 				>
 			</File>
 			<File
@@ -258,6 +252,10 @@
 			</File>
 			<File
 				RelativePath=".\GDL\AppelEvent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\Arial.hpp"
 				>
 			</File>
 			<File
@@ -345,6 +343,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\cEffects.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\cFichier.h"
 				>
 			</File>
@@ -358,6 +360,22 @@
 			</File>
 			<File
 				RelativePath=".\GDL\ChoixDossier.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\ChooseLayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\ChooseObject.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\ChooseObjectExpression.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\ChooseVariableDialog.h"
 				>
 			</File>
 			<File
@@ -385,6 +403,30 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\CommentEvent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\CommonConversions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\CommonConversionsExtension.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\CommonInstructions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\CommonInstructionsExtension.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\CommonTools.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\conditions.h"
 				>
 			</File>
@@ -398,10 +440,6 @@
 			</File>
 			<File
 				RelativePath=".\GDL\cPos.h"
-				>
-			</File>
-			<File
-				RelativePath=".\gdl\crypter.h"
 				>
 			</File>
 			<File
@@ -441,6 +479,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\EditComment.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\EditExpression.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\EditForEachEvent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\EditLink.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\EditorImages.h"
 				>
 			</File>
@@ -449,7 +503,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\EditRepeatEvent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\EditTextDialog.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\eFreeFunctions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\EmptyEvent.h"
 				>
 			</File>
 			<File
@@ -466,6 +532,10 @@
 			</File>
 			<File
 				RelativePath=".\GDL\EventsPreprocessor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\EventsRenderingHelper.h"
 				>
 			</File>
 			<File
@@ -497,11 +567,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\ForEachEvent.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\Game.h"
 				>
 			</File>
 			<File
 				RelativePath=".\GDL\GDExpression.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\GDMathParser.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\gdTreeItemStringData.h"
 				>
 			</File>
 			<File
@@ -529,10 +611,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GDL\InterfaceExtension.h"
-				>
-			</File>
-			<File
 				RelativePath=".\GDL\JoystickExtension.h"
 				>
 			</File>
@@ -542,6 +620,10 @@
 			</File>
 			<File
 				RelativePath=".\GDL\Layer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\LinkEvent.h"
 				>
 			</File>
 			<File
@@ -585,10 +667,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\needReload.h"
-				>
-			</File>
-			<File
 				RelativePath=".\GDL\NetworkExtension.h"
 				>
 			</File>
@@ -606,10 +684,6 @@
 			</File>
 			<File
 				RelativePath=".\GDL\ObjectsConcerned.h"
-				>
-			</File>
-			<File
-				RelativePath=".\gdl\ObjectStruct.h"
 				>
 			</File>
 			<File
@@ -646,6 +720,10 @@
 			</File>
 			<File
 				RelativePath=".\GDL\PropImage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\RepeatEvent.h"
 				>
 			</File>
 			<File
@@ -725,10 +803,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\SortByPlan.h"
-				>
-			</File>
-			<File
 				RelativePath=".\GDL\SortBySurface.h"
 				>
 			</File>
@@ -753,7 +827,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\StandardEvent.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\StdAlgo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\StrExpressionInstruction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\StringExpressions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\StringInstructionsExtension.h"
 				>
 			</File>
 			<File
@@ -773,6 +863,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\TranslateAction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\TranslateCondition.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\Variable.h"
 				>
 			</File>
@@ -785,11 +883,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\version.h"
+				RelativePath=".\GDL\VersionWrapper.h"
 				>
 			</File>
 			<File
-				RelativePath=".\GDL\VersionWrapper.h"
+				RelativePath=".\GDL\WhileEvent.h"
 				>
 			</File>
 			<File
@@ -821,10 +919,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GDL\Access.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\GDL\actions.cpp"
 				>
 			</File>
@@ -845,10 +939,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GDL\aGUI.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\GDL\AjoutPlusImage.cpp"
 				>
 			</File>
@@ -858,10 +948,6 @@
 			</File>
 			<File
 				RelativePath=".\GDL\aLayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\GDL\algo.cpp"
 				>
 			</File>
 			<File
@@ -890,10 +976,6 @@
 			</File>
 			<File
 				RelativePath=".\GDL\aPosition.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\GDL\AppelEvent.cpp"
 				>
 			</File>
 			<File
@@ -977,6 +1059,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\cEffects.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\cFichier.cpp"
 				>
 			</File>
@@ -990,6 +1076,22 @@
 			</File>
 			<File
 				RelativePath=".\GDL\ChoixDossier.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\ChooseLayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\ChooseObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\ChooseObjectExpression.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\ChooseVariableDialog.cpp"
 				>
 			</File>
 			<File
@@ -1017,6 +1119,30 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\CommentEvent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\CommonConversions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\CommonConversionsExtension.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\CommonInstructions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\CommonInstructionsExtension.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\CommonTools.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\conditions.cpp"
 				>
 			</File>
@@ -1026,10 +1152,6 @@
 			</File>
 			<File
 				RelativePath=".\GDL\cPos.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\gdl\crypter.cpp"
 				>
 			</File>
 			<File
@@ -1069,6 +1191,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\EditComment.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\EditExpression.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\EditForEachEvent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\EditLink.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\EditorImages.cpp"
 				>
 			</File>
@@ -1077,7 +1215,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\EditRepeatEvent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\EditTextDialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\eFreeFunctions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\EmptyEvent.cpp"
 				>
 			</File>
 			<File
@@ -1094,6 +1244,10 @@
 			</File>
 			<File
 				RelativePath=".\GDL\EventsPreprocessor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\EventsRenderingHelper.cpp"
 				>
 			</File>
 			<File
@@ -1125,11 +1279,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\ForEachEvent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\fparser\fparser.cc"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\Game.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\GDL\GDExpression.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\GDMathParser.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\gdTreeItemStringData.cpp"
 				>
 			</File>
 			<File
@@ -1153,10 +1323,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GDL\InterfaceExtension.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\GDL\JoystickExtension.cpp"
 				>
 			</File>
@@ -1166,6 +1332,10 @@
 			</File>
 			<File
 				RelativePath=".\GDL\Layer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\LinkEvent.cpp"
 				>
 			</File>
 			<File
@@ -1209,15 +1379,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\needReload.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\GDL\NetworkExtension.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\GDL\nwidgets\nsource.cpp"
 				>
 			</File>
 			<File
@@ -1270,6 +1432,10 @@
 			</File>
 			<File
 				RelativePath=".\GDL\PropImage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\RepeatEvent.cpp"
 				>
 			</File>
 			<File
@@ -1353,10 +1519,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GDL\dlib-17.12\dlib\all\source.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\GDL\Sprite.cpp"
 				>
 			</File>
@@ -1373,7 +1535,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GDL\StdAlgo.cpp"
+				RelativePath=".\GDL\StandardEvent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\StrExpressionInstruction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\StringExpressions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\StringInstructionsExtension.cpp"
 				>
 			</File>
 			<File
@@ -1401,6 +1575,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\TranslateAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\TranslateCondition.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\Variable.cpp"
 				>
 			</File>
@@ -1409,11 +1591,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gdl\Version.cpp"
+				RelativePath=".\GDL\VersionWrapper.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\GDL\VersionWrapper.cpp"
+				RelativePath=".\GDL\WhileEvent.cpp"
 				>
 			</File>
 			<File

@@ -411,6 +411,8 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
         return false;
     }
 
+    mathExpression.Optimize();
+
     isMathExpressionPreprocessed = true;
     return true;
 }

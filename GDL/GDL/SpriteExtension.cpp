@@ -391,8 +391,8 @@ ExtensionSprite::ExtensionSprite()
                        _("Inverse l'affichage de l'objet horizontalement"),
                        _("Inverser l'affichage de _PARAM0_ horizontalement : _PARAM1_"),
                        _("Effets"),
-                       "res/actions/color24.png",
-                       "res/actions/color.png",
+                       "res/actions/flipX24.png",
+                       "res/actions/flipX.png",
                        &SpriteObject::ActFlipX);
 
             DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
@@ -406,8 +406,8 @@ ExtensionSprite::ExtensionSprite()
                        _("Inverse l'affichage de l'objet verticalement"),
                        _("Inverser l'affichage de _PARAM0_ verticalement : _PARAM1_"),
                        _("Effets"),
-                       "res/actions/color24.png",
-                       "res/actions/color.png",
+                       "res/actions/flipY24.png",
+                       "res/actions/flipY.png",
                        &SpriteObject::ActFlipY);
 
             DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")

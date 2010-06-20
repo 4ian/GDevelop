@@ -142,6 +142,6 @@ class GD_API BaseEvent
 /**
  * Helper function for copying vector of shared_ptr of events
  */
-std::vector < BaseEventSPtr > CloneVectorOfEvents(const vector < BaseEventSPtr > & events);
+std::vector < BaseEventSPtr > GD_API CloneVectorOfEvents(const vector < BaseEventSPtr > & events);
 
 #endif // EVENT_H

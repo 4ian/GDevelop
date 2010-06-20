@@ -807,6 +807,18 @@
 		<Unit filename="GDL\fparser\fparser.cc">
 			<Option virtualFolder="Math parser\LIB fparser\" />
 		</Unit>
+		<Unit filename="GDL\fparser\fparser.hh">
+			<Option virtualFolder="Math parser\LIB fparser\" />
+		</Unit>
+		<Unit filename="GDL\fparser\fpconfig.hh">
+			<Option virtualFolder="Math parser\LIB fparser\" />
+		</Unit>
+		<Unit filename="GDL\fparser\fpoptimizer.cc">
+			<Option virtualFolder="Math parser\LIB fparser\" />
+		</Unit>
+		<Unit filename="GDL\fparser\fptypes.hh">
+			<Option virtualFolder="Math parser\LIB fparser\" />
+		</Unit>
 		<Unit filename="GDL\gdTreeItemStringData.cpp" />
 		<Unit filename="GDL\gdTreeItemStringData.h" />
 		<Unit filename="GDL\gpl.cpp" />

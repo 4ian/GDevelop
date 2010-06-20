@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release - Edittime" />
+	<ActiveTarget name="Development - Edittime" />
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="9408" topLine="106" />
 	</File>
@@ -19,13 +19,13 @@
 	<File name="ChoiceJoyAxis.h" open="0" top="0" tabpos="13">
 		<Cursor position="288" topLine="0" />
 	</File>
-	<File name="ChoixAction.cpp" open="1" top="1" tabpos="1">
+	<File name="ChoixAction.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="31702" topLine="724" />
 	</File>
 	<File name="ChoixAction.h" open="0" top="0" tabpos="0">
 		<Cursor position="0" topLine="27" />
 	</File>
-	<File name="ChoixCondition.cpp" open="1" top="0" tabpos="2">
+	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="33184" topLine="743" />
 	</File>
 	<File name="ChoixTemplateEvent.cpp" open="0" top="0" tabpos="2">
@@ -124,17 +124,17 @@
 	<File name="EditPropScene.cpp" open="0" top="0" tabpos="19">
 		<Cursor position="7522" topLine="209" />
 	</File>
-	<File name="EditorEvents.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="37894" topLine="654" />
+	<File name="EditorEvents.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="52403" topLine="1026" />
 	</File>
 	<File name="EditorEvents.h" open="0" top="0" tabpos="4">
 		<Cursor position="1715" topLine="52" />
 	</File>
-	<File name="EditorEventsActions.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="219" topLine="3" />
+	<File name="EditorEventsActions.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="3290" topLine="65" />
 	</File>
-	<File name="EditorEventsConditions.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="597" topLine="21" />
+	<File name="EditorEventsConditions.cpp" open="1" top="1" tabpos="3">
+		<Cursor position="599" topLine="0" />
 	</File>
 	<File name="EditorLayers.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="8679" topLine="173" />
@@ -193,7 +193,7 @@
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="3">
 		<Cursor position="724" topLine="0" />
 	</File>
-	<File name="Game_Develop_EditorMain.cpp" open="1" top="0" tabpos="3">
+	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="4208" topLine="107" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="7">
@@ -229,8 +229,8 @@
 	<File name="ObjectTypeChoice.cpp" open="0" top="0" tabpos="26">
 		<Cursor position="9226" topLine="162" />
 	</File>
-	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="5389" topLine="112" />
+	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="111" topLine="4" />
 	</File>
 	<File name="Portable.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="8493" topLine="156" />

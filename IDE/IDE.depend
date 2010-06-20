@@ -4479,7 +4479,7 @@
 	<boost/detail/shared_count.hpp>
 	<boost/shared_ptr.hpp>
 
-1276544988 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
+1276896994 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
 	<iostream>
 	<vector>
 	<string>
@@ -4491,7 +4491,7 @@
 	<string>
 	<vector>
 
-1276431419 d:\florian\programmation\gamedevelop\gdl\gdl\event.h
+1276981914 d:\florian\programmation\gamedevelop\gdl\gdl\event.h
 	<iostream>
 	<vector>
 	<string>
@@ -4525,7 +4525,7 @@
 	<string>
 	"gpl.h"
 
-1265744838 d:\florian\programmation\gamedevelop\gdl\gdl\fparser\fparser.hh
+1277059597 d:\florian\programmation\gamedevelop\gdl\gdl\fparser\fparser.hh
 	<string>
 	<vector>
 	<iostream>
@@ -7941,9 +7941,10 @@
 	<string>
 	"GDL/Variable.h"
 
-1270306992 d:\florian\programmation\gamedevelop\gdl\gdl\variable.h
+1276980967 d:\florian\programmation\gamedevelop\gdl\gdl\variable.h
 	<string>
 	<iostream>
+	<functional>
 
 1267821124 d:\florian\programmation\gamedevelop\gdl\gdl\animation.h
 	<iostream>
@@ -10027,12 +10028,12 @@
 	<boost/shared_ptr.hpp>
 	"Event.h"
 
-1276431949 source:d:\florian\programmation\gamedevelop\ide\editoreventsactions.cpp
+1277063194 source:d:\florian\programmation\gamedevelop\ide\editoreventsactions.cpp
 	"EditorEvents.h"
 	"ChoixAction.h"
 	"Clipboard.h"
 
-1276431949 source:d:\florian\programmation\gamedevelop\ide\editoreventsconditions.cpp
+1277063240 source:d:\florian\programmation\gamedevelop\ide\editoreventsconditions.cpp
 	"EditorEvents.h"
 	"ChoixCondition.h"
 	"Clipboard.h"
@@ -10848,12 +10849,11 @@
 	<wx/string.h>
 	"GDL/Layer.h"
 
-1276377754 source:d:\florian\programmation\gamedevelop\ide\playerunittests.cpp
+1276895850 source:d:\florian\programmation\gamedevelop\ide\playerunittests.cpp
 	"CppUnitLite/TestHarness.h"
 	"GDL/Object.h"
 	"GDL/aMove.h"
 	"GDL/cMove.h"
-	"GDL/Access.h"
 	"GDL/ObjectsConcerned.h"
 	<boost/shared_ptr.hpp>
 	<string>
@@ -10865,7 +10865,7 @@
 	"windows.h"
 	<wx/msw/winundef.h>
 
-1273765126 d:\florian\programmation\gamedevelop\gdl\gdl\amove.h
+1276895801 d:\florian\programmation\gamedevelop\gdl\gdl\amove.h
 	<vector>
 	<string>
 	"GDL/Object.h"
@@ -10877,14 +10877,9 @@
 	"GDL/CommonTools.h"
 	"GDL/Force.h"
 	<iostream>
-	"GDL/Access.h"
 	"GDL/RuntimeScene.h"
 
-1269379494 d:\florian\programmation\gamedevelop\gdl\gdl\access.h
-	"GDL/RuntimeScene.h"
-	"GDL/Game.h"
-
-1273765127 d:\florian\programmation\gamedevelop\gdl\gdl\cmove.h
+1276895850 d:\florian\programmation\gamedevelop\gdl\gdl\cmove.h
 	<vector>
 	<string>
 	"GDL/Object.h"
@@ -10896,7 +10891,6 @@
 	"GDL/CommonTools.h"
 	"GDL/Force.h"
 	<iostream>
-	"GDL/Access.h"
 	<SFML/Window.hpp>
 	"GDL/RuntimeScene.h"
 
@@ -11083,7 +11077,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1276630947 d:\florian\programmation\gamedevelop\ide\version.h
+1277063374 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -11234,5 +11228,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1276707806 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1277058954 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

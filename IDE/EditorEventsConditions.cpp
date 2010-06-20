@@ -26,6 +26,7 @@ void EditorEvents::OneEditConditionMenuSelected(wxCommandEvent& event)
         instr.SetLocal( dialog.Loc );
         instr.SetInversion( dialog.Contraire );
 
+        GetLastSelectedEvent()->eventHeightNeedUpdate = true;
         ChangesMadeOnEvents();
     }
 }
@@ -45,6 +46,7 @@ void EditorEvents::OnAddConditionMenuSelected(wxCommandEvent& event)
 
         GetLastSelectedListOfInstructions()->push_back(instruction);
 
+        GetLastSelectedEvent()->eventHeightNeedUpdate = true;
         ChangesMadeOnEvents();
     }
 }
@@ -55,6 +57,7 @@ void EditorEvents::OnDelConditionMenuSelected(wxCommandEvent& event)
 
     GetLastSelectedListOfInstructions()->erase( GetLastSelectedListOfInstructions()->begin() + boost::tuples::get<3>(eventsSelected[0]) );
 
+    GetLastSelectedEvent()->eventHeightNeedUpdate = true;
     ChangesMadeOnEvents();
 }
 
@@ -80,6 +83,7 @@ void EditorEvents::OnCutConditionMenuSelected(wxCommandEvent& event)
 
     GetLastSelectedListOfInstructions()->erase( GetLastSelectedListOfInstructions()->begin() + boost::tuples::get<3>(eventsSelected[0]) );
 
+    GetLastSelectedEvent()->eventHeightNeedUpdate = true;
     ChangesMadeOnEvents();
 }
 
@@ -95,5 +99,6 @@ void EditorEvents::OnPasteConditionMenuSelected(wxCommandEvent& event)
     else
         GetLastSelectedListOfInstructions()->insert(GetLastSelectedListOfInstructions()->begin()+boost::tuples::get<3>(eventsSelected[0]), clipboard->GetCondition());
 
+    GetLastSelectedEvent()->eventHeightNeedUpdate = true;
     ChangesMadeOnEvents();
 }

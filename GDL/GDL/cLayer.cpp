@@ -32,7 +32,7 @@ bool Object::CondLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
  */
 bool CondLayerVisible( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    string layer = condition.GetParameter(0).GetPlainString();
+    string layer = condition.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);;
     bool isTrue = false;
 
     if ( scene.GetLayer(layer).GetVisibility() )

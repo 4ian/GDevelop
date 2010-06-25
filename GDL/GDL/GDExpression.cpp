@@ -158,7 +158,7 @@ bool GDExpression::PrepareParameter(const Game & game, const Scene & scene, GDEx
             #endif
         }
     }
-    else if ( parametersInfo.type == "text" )
+    else if ( parametersInfo.type == "text" || parametersInfo.type == "layer" || parametersInfo.type == "color" || parametersInfo.type == "file" || parametersInfo.type == "joyaxis" )
     {
         if ( !parameter.PrepareForTextEvaluationOnly(game, scene) )
         {

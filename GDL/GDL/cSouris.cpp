@@ -31,7 +31,7 @@ bool CondSourisX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, con
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
     if ( condition.GetParameters().size() >= 3 )
-        layer = condition.GetParameter(2).GetPlainString();
+        layer = condition.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned);
 
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;
@@ -75,7 +75,7 @@ bool CondSourisY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, con
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
     if ( condition.GetParameters().size() >= 3 )
-        layer = condition.GetParameter(2).GetPlainString();
+        layer = condition.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned);
 
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;

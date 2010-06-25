@@ -91,8 +91,10 @@ ChooseLayer::~ChooseLayer()
 
 void ChooseLayer::OnokBtClick(wxCommandEvent& event)
 {
-    layerChosen = "\""+string(layersList->GetStringSelection().mb_str())+"\"";
-    if ( layerChosen == _("Calque de base") ) layerChosen = "\"\"";
+    layerChosen = string(layersList->GetStringSelection().mb_str());
+    if ( layerChosen == _("Calque de base") ) layerChosen = "";
+
+    layerChosen = "\""+layerChosen+"\"";
 
     EndModal(1);
 }

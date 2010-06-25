@@ -25,7 +25,7 @@ bool Object::ActChangeLayer( RuntimeScene & scene, ObjectsConcerned & objectsCon
  */
 bool ActShowLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    string layer = action.GetParameter(0).GetPlainString();
+    string layer = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
 
     scene.GetLayer(layer).SetVisibility(true);
 
@@ -37,7 +37,7 @@ bool ActShowLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
  */
 bool ActHideLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    string layer = action.GetParameter(0).GetPlainString();
+    string layer = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
 
     scene.GetLayer(layer).SetVisibility(false);
 

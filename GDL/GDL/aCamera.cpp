@@ -26,7 +26,7 @@
  */
 bool ActCameraViewport( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    std::string layer = action.GetParameter(0).GetPlainString();
+    std::string layer = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
     unsigned int cameraNb = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     RuntimeCamera & camera = scene.GetLayer(layer).GetCamera(cameraNb);
@@ -45,7 +45,7 @@ bool ActCameraViewport( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
  */
 bool ActCameraSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    std::string layer = action.GetParameter(0).GetPlainString();
+    std::string layer = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
     unsigned int cameraNb = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
     RuntimeCamera & camera = scene.GetLayer(layer).GetCamera(cameraNb);
@@ -62,7 +62,7 @@ bool ActCameraSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
  */
 bool ActAddCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    RuntimeLayer & layer = scene.GetLayer(action.GetParameter(0).GetPlainString());
+    RuntimeLayer & layer = scene.GetLayer(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
 
     Camera cameraInfo;
 
@@ -100,7 +100,7 @@ bool ActDeleteCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
 {
     unsigned int cameraNb = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    RuntimeLayer & layer = scene.GetLayer(action.GetParameter(0).GetPlainString());
+    RuntimeLayer & layer = scene.GetLayer(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
 
     layer.DeleteCamera(cameraNb);
 
@@ -127,7 +127,7 @@ bool ActFixCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
     if ( action.GetParameters().size() >= 7 )
-        layer = action.GetParameter(6).GetPlainString();
+        layer = action.GetParameter(6).GetAsTextExpressionResult(scene, objectsConcerned);
 
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;
@@ -202,7 +202,7 @@ bool ActCentreCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
     if ( action.GetParameters().size() >= 3 )
-        layer = action.GetParameter(2).GetPlainString();
+        layer = action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned);;
 
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;
@@ -241,7 +241,7 @@ bool ActZoomCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
     if ( action.GetParameters().size() >= 2 )
-        layer = action.GetParameter(1).GetPlainString();
+        layer = action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned);;
 
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int cameraNb = 0;
@@ -271,7 +271,7 @@ bool ActRotateCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     //Compatibilité Game Develop < 1.1.5429 :
     std::string layer = "";
     if ( action.GetParameters().size() >= 3 )
-        layer = action.GetParameter(2).GetPlainString();
+        layer = action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned);;
 
     //Compatibilité Game Develop < 1.2.8699 :
     unsigned int camera = 0;

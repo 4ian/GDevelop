@@ -255,7 +255,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     //End of Compatibility code --- with Game Develop 1.3.9262 and inferior
 
     //Compatibility code --- with Game Develop 1.4.9552 and inferior
-    if ( major <= 1 && minor <= 4 && build <= 9552 && revision <= 48094)
+    if ( major <= 1 && minor <= 4 && build <= 9552 && revision <= 48094 && !(major <= 1 && minor <= 3 && build <= 9262 && revision <= 46622))
     {
         for (unsigned int i = 0;i<game.scenes.size();++i)
         {
@@ -263,6 +263,16 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         }
     }
     //End of Compatibility code --- with Game Develop 1.4.9552 and inferior
+
+    //Compatibility code --- with Game Develop 1.4.9587 and inferior
+    if ( major <= 1 && minor <= 4 && build <= 9587 && revision <= 48275)
+    {
+        for (unsigned int i = 0;i<game.scenes.size();++i)
+        {
+            AdaptExpressionsFromGD149587(game.scenes[i]->events, game, *game.scenes[i]);
+        }
+    }
+    //End of Compatibility code --- with Game Develop 1.4.9587 and inferior
 
     if ( notBackwardCompatible )
     {
@@ -1233,6 +1243,152 @@ void OpenSaveGame::AdaptExpressionsFromGD149552(vector < BaseEventSPtr > & list,
 
         if ( list[eId]->CanHaveSubEvents() )
             AdaptExpressionsFromGD149552(list[eId]->GetSubEvents(), game, scene);
+    }
+}
+
+/**
+ * Adapt expressions that comes from Game Develop 1.3.9262 and inferior
+ * -> Transform legacy OBJ, VAL and GBL into C++ style function calls
+ */
+void OpenSaveGame::AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list, Game & game, Scene & scene)
+{
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+    for (unsigned int eId = 0;eId < list.size();++eId)
+    {
+        vector < GDExpression * > eventExpressions = list[eId]->GetAllExpressions();
+
+        //Adapt expression of events
+        for (unsigned int l = 0;l<eventExpressions.size();++l)
+            *eventExpressions[l] = GDExpression(AdaptLegacyMathExpression(eventExpressions[l]->GetPlainString(), game, scene));
+
+        vector < vector < Instruction > * > conditionsVectors = list[eId]->GetAllConditionsVectors();
+        vector < vector < Instruction > * > actionsVectors = list[eId]->GetAllActionsVectors();
+
+        //Adapt expression of conditions
+        for (unsigned int i = 0;i<conditionsVectors.size();++i)
+        {
+        	for (unsigned int j = 0;j<conditionsVectors[i]->size();++j)
+        	{
+        	    unsigned int paramNb = conditionsVectors[i]->at(j).GetParameters().size();
+                InstructionInfos instructionInfos = extensionsManager->GetConditionInfos(conditionsVectors[i]->at(j).GetType());
+
+                for (unsigned int p = 0;p<paramNb;++p)
+                {
+                    if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color"|| instructionInfos.parameters[p].type == "layer" || instructionInfos.parameters[p].type == "expression" ))
+                    {
+                        string parameter = conditionsVectors[i]->at(j).GetParameter(p).GetPlainString();
+                        size_t pos = 0;
+                        bool end = false;
+
+                        while (!end)
+                        {
+                            size_t first = parameter.find("MouseX", pos);
+                            if ( parameter.find("MouseY", pos) < first ) first = parameter.find("MouseY", pos);
+                            if ( parameter.find("CameraWidth", pos) < first ) first = parameter.find("CameraWidth", pos);
+                            if ( parameter.find("CameraHeight", pos) < first ) first = parameter.find("CameraHeight", pos);
+                            if ( parameter.find("CameraViewportLeft", pos) < first ) first = parameter.find("CameraViewportLeft", pos);
+                            if ( parameter.find("CameraViewportTop", pos) < first ) first = parameter.find("CameraViewportTop", pos);
+                            if ( parameter.find("CameraViewportRight", pos) < first ) first = parameter.find("CameraViewportRight", pos);
+                            if ( parameter.find("CameraViewportBottom", pos) < first ) first = parameter.find("CameraViewportBottom", pos);
+                            if ( parameter.find("CameraX", pos) < first ) first = parameter.find("CameraX", pos);
+                            if ( parameter.find("VueX", pos) < first ) first = parameter.find("VueX", pos);
+                            if ( parameter.find("CameraY", pos) < first ) first = parameter.find("CameraY", pos);
+                            if ( parameter.find("VueY", pos) < first ) first = parameter.find("VueY", pos);
+                            if ( parameter.find("CameraRotation", pos) < first ) first = parameter.find("CameraRotation", pos);
+                            if ( parameter.find("VueRotation", pos) < first ) first = parameter.find("VueRotation", pos);
+
+                            if ( first != string::npos )
+                            {
+                                size_t endFunction = parameter.find("(", first);
+                                if ( endFunction != string::npos )
+                                {
+                                    if ( parameter[endFunction+1] != ')')
+                                    {
+                                        pos = endFunction+1;
+                                        parameter.insert(endFunction+1, "\"");
+                                        while (pos<parameter.length() && parameter[pos] != ')' && parameter[pos] != ',')
+                                            pos++;
+
+                                        if (pos<parameter.length()) parameter.insert(pos, "\"");
+                                    }
+                                    else
+                                        pos = endFunction+1;
+                                }
+                            }
+                            else
+                                end = true;
+                        }
+
+                        conditionsVectors[i]->at(j).SetParameter(p, GDExpression(parameter));
+                    }
+                }
+        	}
+        }
+
+        //Adapt expression of actions
+        for (unsigned int i = 0;i<actionsVectors.size();++i)
+        {
+        	for (unsigned int j = 0;j<actionsVectors[i]->size();++j)
+        	{
+        	    unsigned int paramNb = actionsVectors[i]->at(j).GetParameters().size();
+                InstructionInfos instructionInfos = extensionsManager->GetActionInfos(actionsVectors[i]->at(j).GetType());
+
+                for (unsigned int p = 0;p<paramNb;++p)
+                {
+                    if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "expression" || instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color" || instructionInfos.parameters[p].type == "layer") )
+                    {
+                        string parameter = actionsVectors[i]->at(j).GetParameter(p).GetPlainString();
+                        size_t pos = 0;
+                        bool end = false;
+
+                        while (!end)
+                        {
+                            size_t first = parameter.find("MouseX", pos);
+                            if ( parameter.find("MouseY", pos) < first ) first = parameter.find("MouseY", pos);
+                            if ( parameter.find("CameraWidth", pos) < first ) first = parameter.find("CameraWidth", pos);
+                            if ( parameter.find("CameraHeight", pos) < first ) first = parameter.find("CameraHeight", pos);
+                            if ( parameter.find("CameraViewportLeft", pos) < first ) first = parameter.find("CameraViewportLeft", pos);
+                            if ( parameter.find("CameraViewportTop", pos) < first ) first = parameter.find("CameraViewportTop", pos);
+                            if ( parameter.find("CameraViewportRight", pos) < first ) first = parameter.find("CameraViewportRight", pos);
+                            if ( parameter.find("CameraViewportBottom", pos) < first ) first = parameter.find("CameraViewportBottom", pos);
+                            if ( parameter.find("CameraX", pos) < first ) first = parameter.find("CameraX", pos);
+                            if ( parameter.find("VueX", pos) < first ) first = parameter.find("VueX", pos);
+                            if ( parameter.find("CameraY", pos) < first ) first = parameter.find("CameraY", pos);
+                            if ( parameter.find("VueY", pos) < first ) first = parameter.find("VueY", pos);
+                            if ( parameter.find("CameraRotation", pos) < first ) first = parameter.find("CameraRotation", pos);
+                            if ( parameter.find("VueRotation", pos) < first ) first = parameter.find("VueRotation", pos);
+
+                            if ( first != string::npos )
+                            {
+                                size_t endFunction = parameter.find("(", first);
+                                if ( endFunction != string::npos )
+                                {
+                                    if ( parameter[endFunction+1] != ')')
+                                    {
+                                        pos = endFunction+1;
+                                        parameter.insert(endFunction+1, "\"");
+                                        while (pos<parameter.length() && parameter[pos] != ')' && parameter[pos] != ',')
+                                            pos++;
+
+                                        if (pos<parameter.length()) parameter.insert(pos, "\"");
+                                    }
+                                    else
+                                        pos = endFunction+1;
+                                }
+                            }
+                            else
+                                end = true;
+                        }
+
+                        actionsVectors[i]->at(j).SetParameter(p, GDExpression(parameter));
+                    }
+                }
+        	}
+        }
+
+        if ( list[eId]->CanHaveSubEvents() )
+            AdaptExpressionsFromGD139262(list[eId]->GetSubEvents(), game, scene);
     }
 }
 

@@ -199,6 +199,7 @@ void ChooseVariableDialog::OnDelVarSelected(wxCommandEvent& event)
     }
 
     variables.RemoveVariable(selectedVariable);
+    Refresh();
 }
 
 /**

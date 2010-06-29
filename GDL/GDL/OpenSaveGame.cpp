@@ -1278,6 +1278,7 @@ void OpenSaveGame::AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list,
                     if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color"|| instructionInfos.parameters[p].type == "layer" || instructionInfos.parameters[p].type == "expression" ))
                     {
                         string parameter = conditionsVectors[i]->at(j).GetParameter(p).GetPlainString();
+                        cout << parameter << endl;
                         size_t pos = 0;
                         bool end = false;
 
@@ -1315,6 +1316,8 @@ void OpenSaveGame::AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list,
                                     else
                                         pos = endFunction+1;
                                 }
+                                else
+                                    pos = first+1;
                             }
                             else
                                 end = true;
@@ -1339,6 +1342,7 @@ void OpenSaveGame::AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list,
                     if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "expression" || instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color" || instructionInfos.parameters[p].type == "layer") )
                     {
                         string parameter = actionsVectors[i]->at(j).GetParameter(p).GetPlainString();
+                        cout << parameter << endl;
                         size_t pos = 0;
                         bool end = false;
 
@@ -1376,6 +1380,8 @@ void OpenSaveGame::AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list,
                                     else
                                         pos = endFunction+1;
                                 }
+                                else
+                                    pos = first+1;
                             }
                             else
                                 end = true;

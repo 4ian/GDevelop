@@ -183,6 +183,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
 ////////////////////////////////////////////////////////////
 void RuntimeScene::ManageRenderTargetEvents()
 {
+
     sf::Event event;
     while ( renderWindow->GetEvent( event ) )
     {
@@ -193,6 +194,14 @@ void RuntimeScene::ManageRenderTargetEvents()
             #if defined(GDE)
             renderWindow->Close();
             #endif
+        }
+        else if (event.Type == sf::Event::KeyPressed)
+        {
+            inputKeyPressed = true;
+        }
+        else if (event.Type == sf::Event::KeyReleased )
+        {
+            inputKeyPressed = false;
         }
         else if (event.Type == sf::Event::Resized)
         {

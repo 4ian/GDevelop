@@ -70,6 +70,7 @@ class GD_API RuntimeScene : public Scene
         vector < Text >                         textes;
         vector < ManualTimer >                  timers;
         float                                   pauseTime;
+        bool                                    inputKeyPressed;    ///< Supplementary input : True if any key was pressed
         int                                     backgroundColorR;
         int                                     backgroundColorG;
         int                                     backgroundColorB;

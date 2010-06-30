@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
+	<ActiveTarget name="Release - Edittime" />
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="9408" topLine="106" />
 	</File>
@@ -124,17 +124,17 @@
 	<File name="EditPropScene.cpp" open="0" top="0" tabpos="19">
 		<Cursor position="7522" topLine="209" />
 	</File>
-	<File name="EditorEvents.cpp" open="1" top="0" tabpos="1">
+	<File name="EditorEvents.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="52403" topLine="1026" />
 	</File>
 	<File name="EditorEvents.h" open="0" top="0" tabpos="4">
 		<Cursor position="1715" topLine="52" />
 	</File>
-	<File name="EditorEventsActions.cpp" open="1" top="0" tabpos="2">
+	<File name="EditorEventsActions.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="3290" topLine="65" />
 	</File>
-	<File name="EditorEventsConditions.cpp" open="1" top="1" tabpos="3">
-		<Cursor position="599" topLine="0" />
+	<File name="EditorEventsConditions.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="564" topLine="0" />
 	</File>
 	<File name="EditorLayers.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="8679" topLine="173" />
@@ -290,7 +290,7 @@
 		<Cursor position="486" topLine="0" />
 	</File>
 	<File name="resource.rc" open="0" top="0" tabpos="0">
-		<Cursor position="714" topLine="15" />
+		<Cursor position="20" topLine="10" />
 	</File>
 	<File name="tinyxml.cpp" open="0" top="0" tabpos="28">
 		<Cursor position="3739" topLine="144" />

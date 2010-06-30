@@ -8845,7 +8845,7 @@
 	<string>
 	<vector>
 
-1276620796 d:\florian\programmation\gamedevelop\gdl\gdl\opensavegame.h
+1277406594 d:\florian\programmation\gamedevelop\gdl\gdl\opensavegame.h
 	"GDL/Game.h"
 	<string>
 	"GDL/tinyxml.h"
@@ -9121,7 +9121,7 @@
 	"GDL/BaseDebugger.h"
 	<wx/msw/winundef.h>
 
-1273765125 d:\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
+1277924612 d:\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
 	"GDL/MemTrace.h"
 	<iostream>
 	<sstream>
@@ -11077,7 +11077,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1277063374 d:\florian\programmation\gamedevelop\ide\version.h
+1277925330 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -11209,7 +11209,7 @@
 
 1259350652 c:\libs\sfml\include\sfml\network\selector.inl
 
-1273596141 source:d:\florian\programmation\gamedevelop\ide\credits.cpp
+1277470833 source:d:\florian\programmation\gamedevelop\ide\credits.cpp
 	"Credits.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -11228,5 +11228,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1277058954 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1277894970 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

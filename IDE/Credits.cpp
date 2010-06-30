@@ -92,7 +92,7 @@ Credits::Credits(wxWindow* parent)
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel1, _("Aide et support"));
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer5->AddGrowableCol(0);
-	StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, _("Support, aide, réponses aux suggestions sur notre site :"), wxDefaultPosition, wxSize(297,22), 0, _T("ID_STATICTEXT5"));
+	StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, _("Support, aide, réponses aux suggestions sur notre site :"), wxDefaultPosition, wxSize(310,22), 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer5->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
 	CompilGamesBt = new wxBitmapButton(Panel1, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/powered-cg.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));

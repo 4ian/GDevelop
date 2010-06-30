@@ -1394,7 +1394,7 @@ void OpenSaveGame::AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list,
         }
 
         if ( list[eId]->CanHaveSubEvents() )
-            AdaptExpressionsFromGD139262(list[eId]->GetSubEvents(), game, scene);
+            AdaptExpressionsFromGD149587(list[eId]->GetSubEvents(), game, scene);
     }
 }
 

@@ -279,7 +279,7 @@ void WhileEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width
     whileConditionsHeight += renderingHelper->DrawConditionsList(whileConditions, dc, x+80, y+2, width-80);
 
     dc.SetFont( renderingHelper->GetBoldFont() );
-    dc.DrawText( _("Répéter :"), 2, whileConditionsHeight);
+    dc.DrawText( _("Répéter :"), x+2, y+whileConditionsHeight);
 
     renderingHelper->DrawConditionsList(conditions, dc, x, y+whileConditionsHeight+repeatHeight, renderingHelper->GetConditionsColumnWidth());
     renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+whileConditionsHeight+repeatHeight, width-renderingHelper->GetConditionsColumnWidth());

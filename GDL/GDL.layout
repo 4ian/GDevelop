@@ -85,8 +85,8 @@
 	<File name="GDL\ChooseObjectExpression.h" open="0" top="0" tabpos="12">
 		<Cursor position="342" topLine="0" />
 	</File>
-	<File name="GDL\ChooseVariableDialog.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="10403" topLine="206" />
+	<File name="GDL\ChooseVariableDialog.cpp" open="1" top="0" tabpos="9">
+		<Cursor position="9394" topLine="165" />
 	</File>
 	<File name="GDL\ChooseVariableDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="2081" topLine="51" />
@@ -407,7 +407,7 @@
 		<Cursor position="153" topLine="0" />
 	</File>
 	<File name="GDL\ObjectWithOpacity.h" open="0" top="0" tabpos="0">
-		<Cursor position="869" topLine="0" />
+		<Cursor position="391" topLine="2" />
 	</File>
 	<File name="GDL\ObjectsConcerned.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="3005" topLine="49" />
@@ -496,8 +496,8 @@
 	<File name="GDL\Sprite.h" open="0" top="0" tabpos="4">
 		<Cursor position="618" topLine="9" />
 	</File>
-	<File name="GDL\SpriteExtension.cpp" open="0" top="0" tabpos="12">
-		<Cursor position="19745" topLine="383" />
+	<File name="GDL\SpriteExtension.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="24266" topLine="467" />
 	</File>
 	<File name="GDL\SpriteInitialPositionPanel.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="572" topLine="32" />
@@ -505,11 +505,11 @@
 	<File name="GDL\SpriteInitialPositionPanel.h" open="0" top="0" tabpos="0">
 		<Cursor position="636" topLine="8" />
 	</File>
-	<File name="GDL\SpriteObject.cpp" open="0" top="0" tabpos="13">
-		<Cursor position="19523" topLine="522" />
+	<File name="GDL\SpriteObject.cpp" open="1" top="0" tabpos="11">
+		<Cursor position="29682" topLine="870" />
 	</File>
-	<File name="GDL\SpriteObject.h" open="0" top="0" tabpos="3">
-		<Cursor position="7908" topLine="146" />
+	<File name="GDL\SpriteObject.h" open="1" top="1" tabpos="12">
+		<Cursor position="9876" topLine="155" />
 	</File>
 	<File name="GDL\StandardEvent.cpp" open="0" top="0" tabpos="18">
 		<Cursor position="142" topLine="0" />
@@ -697,8 +697,8 @@
 	<File name="GDL\aVariables.h" open="0" top="0" tabpos="46">
 		<Cursor position="185" topLine="0" />
 	</File>
-	<File name="GDL\aVisibilite.cpp" open="0" top="0" tabpos="59">
-		<Cursor position="338" topLine="13" />
+	<File name="GDL\aVisibilite.cpp" open="1" top="0" tabpos="10">
+		<Cursor position="672" topLine="13" />
 	</File>
 	<File name="GDL\aVisibilite.h" open="0" top="0" tabpos="60">
 		<Cursor position="345" topLine="0" />
@@ -736,8 +736,8 @@
 	<File name="GDL\cClavier.h" open="0" top="0" tabpos="68">
 		<Cursor position="339" topLine="0" />
 	</File>
-	<File name="GDL\cCollisions.cpp" open="0" top="0" tabpos="69">
-		<Cursor position="363" topLine="14" />
+	<File name="GDL\cCollisions.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="3265" topLine="71" />
 	</File>
 	<File name="GDL\cCollisions.h" open="0" top="0" tabpos="70">
 		<Cursor position="374" topLine="0" />
@@ -784,8 +784,8 @@
 	<File name="GDL\cPlans.h" open="0" top="0" tabpos="80">
 		<Cursor position="339" topLine="0" />
 	</File>
-	<File name="GDL\cPos.cpp" open="0" top="0" tabpos="81">
-		<Cursor position="356" topLine="14" />
+	<File name="GDL\cPos.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="1977" topLine="22" />
 	</File>
 	<File name="GDL\cPos.h" open="0" top="0" tabpos="82">
 		<Cursor position="282" topLine="0" />
@@ -802,8 +802,8 @@
 	<File name="GDL\cScene.h" open="0" top="0" tabpos="0">
 		<Cursor position="102" topLine="0" />
 	</File>
-	<File name="GDL\cSouris.cpp" open="0" top="0" tabpos="85">
-		<Cursor position="1100" topLine="18" />
+	<File name="GDL\cSouris.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="9712" topLine="168" />
 	</File>
 	<File name="GDL\cSouris.h" open="0" top="0" tabpos="0">
 		<Cursor position="259" topLine="0" />

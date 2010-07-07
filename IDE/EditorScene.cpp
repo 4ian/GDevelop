@@ -180,7 +180,7 @@ externalWindow(this)
 
     notebook->SetArtProvider(new GDAuiTabArt);
     notebook->SetPageBitmap(0, wxBitmap( "res/sceneeditor.png", wxBITMAP_TYPE_ANY ) );
-    notebook->SetPageBitmap(1, wxBitmap( "res/eventicon.png", wxBITMAP_TYPE_ANY ) );
+    notebook->SetPageBitmap(1, wxBitmap( "res/events16.png", wxBITMAP_TYPE_ANY ) );
 
     //notify wxAUI which frame to use
     m_mgr.SetManagedWindow( this );

@@ -20,6 +20,7 @@ objectCopied(boost::shared_ptr<Object>()),
 hasObject(false),
 eventCopied(boost::shared_ptr<BaseEvent>()),
 hasEvent(false),
+hasExternalEvents(false),
 hasAction(false),
 hasCondition(false),
 hasScene(false)
@@ -67,14 +68,6 @@ ObjSPtr Clipboard::GetObject()
     return objectCopied;
 }
 
-bool Clipboard::HasObject()
-{
-    if (hasObject)
-        return true;
-
-    return false;
-}
-
 void Clipboard::SetEvent( BaseEventSPtr event )
 {
     eventCopied = event->Clone();
@@ -84,14 +77,6 @@ void Clipboard::SetEvent( BaseEventSPtr event )
 BaseEventSPtr Clipboard::GetEvent()
 {
     return eventCopied->Clone();
-}
-
-bool Clipboard::HasEvent()
-{
-    if (hasEvent)
-        return true;
-
-    return false;
 }
 
 void Clipboard::SetScene( const Scene & scene )
@@ -105,12 +90,15 @@ Scene Clipboard::GetScene()
     return sceneCopied;
 }
 
-bool Clipboard::HasScene()
+void Clipboard::SetExternalEvents( const ExternalEvents & events )
 {
-    if (hasScene)
-        return true;
+    externalEventsCopied = events;
+    hasExternalEvents = true;
+}
 
-    return false;
+ExternalEvents Clipboard::GetExternalEvents()
+{
+    return externalEventsCopied;
 }
 
 void Clipboard::SetCondition( const Instruction & condition )
@@ -124,14 +112,6 @@ Instruction Clipboard::GetCondition()
     return conditionCopied;
 }
 
-bool Clipboard::HasCondition()
-{
-    if (hasCondition)
-        return true;
-
-    return false;
-}
-
 void Clipboard::SetAction( const Instruction & action )
 {
     actionCopied = action ;
@@ -141,14 +121,6 @@ void Clipboard::SetAction( const Instruction & action )
 Instruction Clipboard::GetAction()
 {
     return actionCopied;
-}
-
-bool Clipboard::HasAction()
-{
-    if (hasAction)
-        return true;
-
-    return false;
 }
 
 Clipboard * Clipboard::singleton = NULL;

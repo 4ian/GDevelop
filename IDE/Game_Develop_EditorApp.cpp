@@ -63,6 +63,16 @@
 #include "GDL/SpriteExtension.h"
 #include "GDL/ExtensionsLoader.h"
 
+// archives Boost
+#include <fstream>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
+#include "GDL/Event.h"
+#include "GDL/StandardEvent.h"
+#include "GDL/CommentEvent.h"
+#include <boost/archive/xml_iarchive.hpp>
+
 IMPLEMENT_APP( Game_Develop_EditorApp );
 
 MemTrace MemTracer;
@@ -267,9 +277,57 @@ bool Game_Develop_EditorApp::OnInit()
     //wxLogWarning("Cette version de Game Develop n'est utilisable qu'à des fins de tests. Merci d'utiliser la version disponible sur notre site pour toute autre utilisation.");
 
 #ifndef RELEASE
-    TestResult tr;
-    TestRegistry::runAllTests( tr );
+   /* TestResult tr;
+    TestRegistry::runAllTests( tr );*/
 #endif
+
+
+    //TEST
+    ExternalEvents externalEvent;
+    externalEvent.SetName("Monevent");
+
+    {
+        StandardEvent * event = new StandardEvent();
+        vector < Instruction > instructions;
+        Instruction instr;
+        instr.SetType("InstructionTestType");
+        vector < GDExpression > parameters;
+        parameters.push_back(GDExpression("Parameter1"));
+        parameters.push_back(GDExpression("Parameter12"));
+        instr.SetParameters(parameters);
+        instructions.push_back(instr);
+        event->SetConditions(instructions);
+        externalEvent.events.push_back(boost::shared_ptr<BaseEvent>(event));
+    }
+
+    {
+
+        CommentEvent * event = new CommentEvent();
+        event->r = 120;
+        event->v = 100;
+        event->b = 180;
+        event->com1 = "Commentaire1";
+        event->com2 = "Commentaire2 !! &&<><>\"\"\\<> !!";
+        externalEvent.events.push_back(boost::shared_ptr<BaseEvent>(event));
+    }/*
+    {
+        string eventType = "Function::Function";
+        gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+        BaseEventSPtr eventToAdd = extensionsManager->CreateEvent(eventType);
+        externalEvent.events.push_back(eventToAdd);
+    }*/
+
+    std::ofstream ofile("out.txt");
+	boost::archive::xml_oarchive ar(ofile);
+
+	ar.register_type(static_cast<StandardEvent *>(NULL));
+	boost::serialization::void_cast_register(static_cast<StandardEvent *>(NULL),static_cast<BaseEvent *>(NULL));
+
+	ar << BOOST_SERIALIZATION_NVP(externalEvent);
+	ofile.close();
+
+	//TEST END
 
     return wxsOK;
 

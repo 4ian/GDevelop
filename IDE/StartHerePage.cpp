@@ -50,7 +50,7 @@ mainEditor(mainEditor_)
 	wxGridSizer* GridSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxGridSizer* GridSizer2;
-
+	
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
 	SetBackgroundColour(wxColour(255,255,255));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -116,7 +116,7 @@ mainEditor(mainEditor_)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-
+	
 	Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&StartHerePage::OnguideBtClick);
 	Connect(ID_BUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&StartHerePage::OntutoBtClick);
 	Connect(ID_BUTTON12,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&StartHerePage::OnwikiBtClick);

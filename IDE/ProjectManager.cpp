@@ -14,11 +14,20 @@
 #include "Game_Develop_EditorMain.h"
 #include "gdTreeItemGameData.h"
 #include "GDL/ChercherScene.h"
+#include "GDL/ExternalEvents.h"
+#include "GDL/StandardEvent.h"
 
 #include "Extensions.h"
+#include "ExternalEventsEditor.h"
 #include "EditPropJeu.h"
 #include "InitialVariablesDialog.h"
 #include "EditPropScene.h"
+
+// archives Boost
+#include <fstream>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+
 
 //(*IdInit(ProjectManager)
 const long ProjectManager::ID_TREECTRL1 = wxNewId();
@@ -36,6 +45,14 @@ const long ProjectManager::ID_MENUITEM2 = wxNewId();
 const long ProjectManager::ID_MENUITEM3 = wxNewId();
 const long ProjectManager::ID_MENUITEM4 = wxNewId();
 const long ProjectManager::ID_MENUITEM5 = wxNewId();
+const long ProjectManager::ID_MENUITEM6 = wxNewId();
+const long ProjectManager::ID_MENUITEM7 = wxNewId();
+const long ProjectManager::ID_MENUITEM13 = wxNewId();
+const long ProjectManager::ID_MENUITEM8 = wxNewId();
+const long ProjectManager::ID_MENUITEM9 = wxNewId();
+const long ProjectManager::ID_MENUITEM10 = wxNewId();
+const long ProjectManager::ID_MENUITEM11 = wxNewId();
+const long ProjectManager::ID_MENUITEM12 = wxNewId();
 //*)
 const long ProjectManager::idRibbonNew = wxNewId();
 const long ProjectManager::idRibbonOpen = wxNewId();
@@ -46,6 +63,8 @@ const long ProjectManager::idRibbonExtensions = wxNewId();
 const long ProjectManager::idRibbonAddScene = wxNewId();
 const long ProjectManager::idRibbonEditImages = wxNewId();
 const long ProjectManager::idRibbonEditScene = wxNewId();
+const long ProjectManager::idRibbonAddExternalEvents = wxNewId();
+const long ProjectManager::idRibbonEditExternalEvents = wxNewId();
 
 BEGIN_EVENT_TABLE(ProjectManager,wxPanel)
 	//(*EventTable(ProjectManager)
@@ -120,6 +139,32 @@ mainEditor(mainEditor_)
 	gameContextMenu.AppendSeparator();
 	closeGameBt = new wxMenuItem((&gameContextMenu), ID_MENUITEM5, _("Fermer ce projet"), wxEmptyString, wxITEM_NORMAL);
 	gameContextMenu.Append(closeGameBt);
+	MenuItem2 = new wxMenuItem((&emptyExternalEventsContextMenu), ID_MENUITEM6, _("Ajouter des évènements externes"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/eventsadd16.png"))));
+	emptyExternalEventsContextMenu.Append(MenuItem2);
+	MenuItem3 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM7, _("Editer"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/eventsedit16.png"))));
+	externalEventsContextMenu.Append(MenuItem3);
+	MenuItem9 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM13, _("Renommer"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem9->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
+	externalEventsContextMenu.Append(MenuItem9);
+	externalEventsContextMenu.AppendSeparator();
+	MenuItem4 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM8, _("Ajouter des évènements externes"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/eventsadd16.png"))));
+	externalEventsContextMenu.Append(MenuItem4);
+	MenuItem5 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM9, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	externalEventsContextMenu.Append(MenuItem5);
+	externalEventsContextMenu.AppendSeparator();
+	MenuItem6 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM10, _("Copier"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
+	externalEventsContextMenu.Append(MenuItem6);
+	MenuItem7 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM11, _("Couper"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
+	externalEventsContextMenu.Append(MenuItem7);
+	MenuItem8 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM12, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem8->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+	externalEventsContextMenu.Append(MenuItem8);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
@@ -142,6 +187,14 @@ mainEditor(mainEditor_)
 	Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OneditGblVarMenuItemSelected);
 	Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OneditNameGameMenuItemSelected);
 	Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OncloseGameBtSelected);
+	Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnAddExternalEventsSelected);
+	Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnEditExternalEventsSelected);
+	Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnRenameExternalEventsSelected);
+	Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnAddExternalEventsSelected);
+	Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnDeleteExternalEventsSelected);
+	Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCopyExternalEventsSelected);
+	Connect(ID_MENUITEM11,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCutExternalEventsSelected);
+	Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnPasteExternalEventsSelected);
 	//*)
 
     wxImageList * imageList = new wxImageList(16,16);
@@ -149,6 +202,7 @@ mainEditor(mainEditor_)
     imageList->Add(wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY));
     imageList->Add(wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY));
     imageList->Add(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
+    imageList->Add(wxBitmap("res/events16.png", wxBITMAP_TYPE_ANY));
     projectsTree->SetImageList(imageList);
 
     Refresh();
@@ -159,7 +213,6 @@ ProjectManager::~ProjectManager()
 	//(*Destroy(ProjectManager)
 	//*)
 }
-
 
 /**
  * Static method for creating ribbon page for this kind of editor
@@ -188,8 +241,10 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : "", wxBitmap("res/imageicon24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Ajouter une scène") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Ajouter des évènements externes") : "", wxBitmap("res/eventsadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions") : "", wxBitmap("res/extension24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonEditScene, !hideLabels ? _("Editer la scène selectionnée") : "", wxBitmap("res/sceneedit24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonEditExternalEvents, !hideLabels ? _("Editer les évènements externes selectionnés") : "", wxBitmap("res/eventsedit24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -211,7 +266,9 @@ void ProjectManager::ConnectEvents()
     mainEditor.Connect( idRibbonExtensions, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonExtensionsSelected, NULL, this );
     mainEditor.Connect( idRibbonEditImages, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditImagesSelected, NULL, this );
     mainEditor.Connect( idRibbonAddScene, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonAddSceneSelected, NULL, this );
+    mainEditor.Connect( idRibbonAddExternalEvents, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonAddExternalEventsSelected, NULL, this );
     mainEditor.Connect( idRibbonEditScene, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditSceneSelected, NULL, this );
+    mainEditor.Connect( idRibbonEditExternalEvents, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditExternalEventsSelected, NULL, this );
 }
 
 void ProjectManager::Refresh()
@@ -242,6 +299,15 @@ void ProjectManager::Refresh()
             projectsTree->AppendItem(scenesItem, mainEditor.games[i]->scenes[j]->GetName(), 1 ,1, sceneItemData);
         }
 
+        //Evenements externes
+        gdTreeItemGameData * eventsItemData = new gdTreeItemGameData("ExternalEventsRoot", "", mainEditor.games[i].get());
+        wxTreeItemId eventsItem = projectsTree->AppendItem(projectItem, _("Evenements externes"), 4 ,4, eventsItemData);
+        for (unsigned int j = 0;j<mainEditor.games[i]->externalEvents.size();++j)
+        {
+            gdTreeItemGameData * eventsItemData = new gdTreeItemGameData("ExternalEvents", mainEditor.games[i]->externalEvents[j]->GetName(), mainEditor.games[i].get());
+            projectsTree->AppendItem(eventsItem, mainEditor.games[i]->externalEvents[j]->GetName(), 4 ,4, eventsItemData);
+        }
+
         //Extensions
         gdTreeItemGameData * extensionsItemData = new gdTreeItemGameData("Extensions", "", mainEditor.games[i].get());
         projectsTree->AppendItem(projectItem, _("Extensions") + " (" + ToString(mainEditor.games[i]->extensionsUsed.size()) + ")", 3 ,3, extensionsItemData);
@@ -250,6 +316,22 @@ void ProjectManager::Refresh()
     projectsTree->ExpandAll();
 }
 
+/**
+ * Complete the pointers with the game and the datas corresponding to the selected item.
+ * Return false if fail, in which case pointers are invalids.
+ */
+bool ProjectManager::GetGameOfSelectedItem(RuntimeGame *& game, gdTreeItemGameData *& data)
+{
+    data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
+    if ( data == NULL )
+        return false;
+
+    game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
+    if ( game == NULL )
+        return false;
+
+    return true;
+}
 
 /**
  * Double click on an item
@@ -258,13 +340,9 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
 {
     selectedItem = event.GetItem();
 
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     string prefix = "";
     if ( mainEditor.games.size() > 1 )
@@ -305,6 +383,11 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
         wxCommandEvent unusedEvent;
         OneditSceneMenuItemSelected(unusedEvent);
     }
+    else if ( data->GetString() == "ExternalEvents")
+    {
+        wxCommandEvent unusedEvent;
+        OnEditExternalEventsSelected(unusedEvent);
+    }
     else if ( data->GetString() == "Extensions")
     {
         EditExtensionsOfGame(game);
@@ -332,6 +415,14 @@ void ProjectManager::OnprojectsTreeItemRightClick(wxTreeEvent& event)
     {
         PopupMenu(&scenesContextMenu);
     }
+    else if ( data->GetString() == "ExternalEventsRoot")
+    {
+        PopupMenu(&emptyExternalEventsContextMenu);
+    }
+    else if ( data->GetString() == "ExternalEvents")
+    {
+        PopupMenu(&externalEventsContextMenu);
+    }
     else if ( data->GetString() == "Root")
     {
         PopupMenu(&gameContextMenu);
@@ -352,13 +443,9 @@ void ProjectManager::OnRibbonEditSceneSelected(wxRibbonButtonBarEvent& event)
  */
 void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
 {
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     MainEditorCommand mainEditorCommand;
     mainEditorCommand.SetMainEditor(&mainEditor);
@@ -408,18 +495,9 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
  */
 void ProjectManager::OneditScenePropMenuItemSelected(wxCommandEvent& event)
 {
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
-
-    MainEditorCommand mainEditorCommand;
-    mainEditorCommand.SetMainEditor(&mainEditor);
-    mainEditorCommand.SetRibbonSceneEditorButtonBar(mainEditor.GetRibbonSceneEditorButtonBar()); //Need link to the scene editor wxRibbonButtonBar
-    mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     vector< boost::shared_ptr<Scene> >::const_iterator scene =
         find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
@@ -441,13 +519,9 @@ void ProjectManager::OneditScenePropMenuItemSelected(wxCommandEvent& event)
  */
 void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
 {
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     MainEditorCommand mainEditorCommand;
     mainEditorCommand.SetMainEditor(&mainEditor);
@@ -488,15 +562,11 @@ void ProjectManager::OnprojectsTreeBeginLabelEdit(wxTreeEvent& event)
 
     itemTextBeforeEditing = projectsTree->GetItemText(event.GetItem());
 
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
-
-    if ( data->GetString() != "Scene" && data->GetString() != "Root")
+    if ( data->GetString() != "Scene" && data->GetString() != "Root" && data->GetString() != "ExternalEvents")
         projectsTree->EndEditLabel( selectedItem, true );
 }
 
@@ -510,13 +580,9 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
     selectedItem = event.GetItem();
     string newName = string(event.GetLabel().mb_str());
 
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     if ( data->GetString() == "Root")
     {
@@ -555,6 +621,39 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
     }
+    //Renaming external events
+    else if ( data->GetString() == "ExternalEvents")
+    {
+        vector< boost::shared_ptr<ExternalEvents> >::iterator events =
+            find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), itemTextBeforeEditing));
+
+        if ( events == game->externalEvents.end() )
+        {
+            wxLogWarning(_("Evenements introuvable."));
+            return;
+        }
+
+        if ( find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), newName)) != game->externalEvents.end() )
+        {
+            wxLogWarning( _( "Impossible de renommer : d'autres évènements externes portent déjà ce nom !" ) );
+            Refresh();
+            return;
+        }
+
+        projectsTree->SetItemData(selectedItem, new gdTreeItemGameData("ExternalEvents", newName, game));
+
+        (*events)->SetName(newName);
+
+        //Updating editors
+        for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+        {
+            ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+
+            //Si il s'agit d'un éditeur de scène avec ce nom, on le renomme
+            if ( editorPtr != NULL && &editorPtr->events == (*events).get())
+                mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
+        }
+    }
 }
 
 /**
@@ -574,13 +673,9 @@ void ProjectManager::OnRibbonAddSceneSelected(wxRibbonButtonBarEvent& event)
  */
 void ProjectManager::OnaddSceneMenuItemSelected(wxCommandEvent& event)
 {
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     AddSceneToGame(game);
 
@@ -594,7 +689,7 @@ void ProjectManager::AddSceneToGame(Game * game)
 {
     //Finding a new, unique name for the scene
     string newSceneName = string(_("Nouvelle scène"));
-    int i = 1;
+    int i = 2;
     while(find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), newSceneName)) != game->scenes.end())
     {
         newSceneName = _("Nouvelle scène") + " " + ToString(i);
@@ -657,13 +752,9 @@ void ProjectManager::EditImagesOfGame(Game * game)
  */
 void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
 {
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     vector< boost::shared_ptr<Scene> >::iterator scene =
         find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
@@ -699,13 +790,9 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
  */
 void ProjectManager::OncopySceneMenuItemSelected(wxCommandEvent& event)
 {
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     vector< boost::shared_ptr<Scene> >::const_iterator scene =
         find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
@@ -725,13 +812,9 @@ void ProjectManager::OncopySceneMenuItemSelected(wxCommandEvent& event)
  */
 void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
 {
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     vector< boost::shared_ptr<Scene> >::iterator scene =
         find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
@@ -767,13 +850,9 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
 
 void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
 {
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     vector< boost::shared_ptr<Scene> >::iterator scene =
         find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
@@ -785,11 +864,13 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     }
 
     Clipboard * clipboard = Clipboard::getInstance();
+    if (!clipboard->HasScene()) return;
+
     boost::shared_ptr<Scene> newScene = boost::shared_ptr<Scene>(new Scene(clipboard->GetScene()));
 
     //Finding a new, unique name for the scene
     string newSceneName = string(_("Copie de")) + " " + newScene->GetName();
-    int i = 1;
+    int i = 2;
     while(find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), newSceneName)) != game->scenes.end())
     {
         newSceneName = _("Copie de") + " " + newScene->GetName() + " " + ToString(i);
@@ -820,13 +901,9 @@ void ProjectManager::OneditNameGameMenuItemSelected(wxCommandEvent& event)
  */
 void ProjectManager::OneditGblVarMenuItemSelected(wxCommandEvent& event)
 {
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     InitialVariablesDialog dialog(this, game->variables);
     if ( dialog.ShowModal() == 1 )
@@ -842,13 +919,9 @@ void ProjectManager::OneditGblVarMenuItemSelected(wxCommandEvent& event)
  */
 void ProjectManager::OneditPropGameMenuItemSelected(wxCommandEvent& event)
 {
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     EditPropJeu Dialog( this, game );
     Dialog.ShowModal();
@@ -972,13 +1045,9 @@ void ProjectManager::OnRibbonCloseSelected(wxRibbonButtonBarEvent& event)
  */
 void ProjectManager::OncloseGameBtSelected(wxCommandEvent& event)
 {
-    gdTreeItemGameData * data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
-    if ( data == NULL)
-        return;
-
-    RuntimeGame * game = dynamic_cast<RuntimeGame*>(data->GetGamePointer());
-    if ( game == NULL)
-        return;
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
 
     if ( wxMessageBox( _( "Attention !\nToute modification non enregistrée sera perdue.\n\nFermer le projet actuel ?" ), _( "Confirmation" ), wxYES_NO, this ) == wxNO )
         return;
@@ -992,4 +1061,257 @@ void ProjectManager::OnprojectsTreeSelectionChanged(wxTreeEvent& event)
 {
     selectedItem = event.GetItem();
     mainEditor.GetRibbon()->SetActivePage(1);
+}
+
+/**
+ * Edit external events from ribbon button
+ */
+void ProjectManager::OnRibbonEditExternalEventsSelected(wxRibbonButtonBarEvent& event)
+{
+    wxCommandEvent unusedEvent;
+    OnEditExternalEventsSelected(unusedEvent);
+}
+
+/**
+ * Edit external events
+ */
+void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    MainEditorCommand mainEditorCommand;
+    mainEditorCommand.SetMainEditor(&mainEditor);
+    mainEditorCommand.SetRibbonSceneEditorButtonBar(mainEditor.GetRibbonSceneEditorButtonBar()); //Need link to the scene editor wxRibbonButtonBar
+    mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
+
+    vector< boost::shared_ptr<ExternalEvents> >::const_iterator events =
+        find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), data->GetSecondString()));
+
+    if ( events == game->externalEvents.end() )
+    {
+        wxLogWarning(_("Scène introuvable."));
+        return;
+    }
+
+    //Verify if the scene editor is not already opened
+    for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
+    {
+        ExternalEventsEditor * eventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
+
+        if ( eventsEditorPtr != NULL && &eventsEditorPtr->events == (*events).get() )
+        {
+            //Change notebook page to scene page
+            mainEditor.GetEditorsNotebook()->SetSelection(j);
+            return;
+        }
+    }
+
+    //Open a new editor if necessary
+    string prefix = "";
+    if ( mainEditor.games.size() > 1 )
+    {
+        prefix = "["+game->name+"] ";
+        if ( game->name.length() > gameMaxCharDisplayedInEditor )
+            prefix = "["+game->name.substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
+    }
+
+    ExternalEventsEditor * editor = new ExternalEventsEditor(mainEditor.GetEditorsNotebook(), *game, *(*events), mainEditorCommand);
+    if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, wxBitmap("res/events16.png", wxBITMAP_TYPE_ANY)) )
+    {
+        wxLogError(_("Impossible d'ajouter le nouvel onglet !"));
+    }
+}
+
+/**
+* Add external events from right click
+*/
+void ProjectManager::OnAddExternalEventsSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    AddExternalEventsToGame(game);
+
+    Refresh();
+}
+
+
+/**
+ * Add external events from ribbon button
+ */
+void ProjectManager::OnRibbonAddExternalEventsSelected(wxRibbonButtonBarEvent& event)
+{
+    if ( !mainEditor.CurrentGameIsValid() ) return;
+
+    AddExternalEventsToGame(mainEditor.GetCurrentGame().get());
+
+    Refresh();
+}
+
+/**
+ * Add external events to a game
+ */
+void ProjectManager::AddExternalEventsToGame(Game * game)
+{
+    //Finding a new, unique name for the scene
+    string newName = string(_("Evenements externes"));
+    int i = 2;
+    while(find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), newName)) != game->externalEvents.end())
+    {
+        newName = _("Evenements externes") + " " + ToString(i);
+        ++i;
+    }
+
+    boost::shared_ptr<ExternalEvents> externalEventsPtr = boost::shared_ptr<ExternalEvents>(new ExternalEvents());
+
+    std::ifstream ifile("out.txt");
+	boost::archive::xml_iarchive ar(ifile);
+
+    ExternalEvents & externalEvents = *externalEventsPtr;
+
+	ar.register_type(static_cast<StandardEvent *>(NULL));
+	boost::serialization::void_cast_register(static_cast<StandardEvent *>(NULL),static_cast<BaseEvent *>(NULL));
+
+	ar >> BOOST_SERIALIZATION_NVP(externalEvents);
+	ifile.close();
+
+    game->externalEvents.push_back(externalEventsPtr);
+}
+
+void ProjectManager::OnRenameExternalEventsSelected(wxCommandEvent& event)
+{
+    projectsTree->EditLabel( selectedItem );
+}
+
+void ProjectManager::OnDeleteExternalEventsSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    vector< boost::shared_ptr<ExternalEvents> >::iterator events =
+        find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), data->GetSecondString()));
+
+    if ( events == game->externalEvents.end() )
+    {
+        wxLogWarning(_("Evenements introuvable."));
+        return;
+    }
+
+    //Updating editors
+    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    {
+        ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+
+        if ( editorPtr != NULL && &editorPtr->events == (*events).get())
+        {
+            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
+                wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
+
+            k--;
+        }
+    }
+
+    //Updating tree
+    projectsTree->Delete(selectedItem);
+
+    game->externalEvents.erase(events);
+}
+
+void ProjectManager::OnCopyExternalEventsSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    vector< boost::shared_ptr<ExternalEvents> >::iterator events =
+        find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), data->GetSecondString()));
+
+    if ( events == game->externalEvents.end() )
+    {
+        wxLogWarning(_("Evenements introuvable."));
+        return;
+    }
+
+    Clipboard * clipboard = Clipboard::getInstance();
+    clipboard->SetExternalEvents(*(*events));
+}
+
+void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    vector< boost::shared_ptr<ExternalEvents> >::iterator events =
+        find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), data->GetSecondString()));
+
+    if ( events == game->externalEvents.end() )
+    {
+        wxLogWarning(_("Evenements introuvable."));
+        return;
+    }
+
+    Clipboard * clipboard = Clipboard::getInstance();
+    clipboard->SetExternalEvents(*(*events));
+
+    //Updating editors
+    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    {
+        ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+
+        if ( editorPtr != NULL && &editorPtr->events == (*events).get())
+        {
+            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
+                wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
+
+            k--;
+        }
+    }
+
+    //Updating tree
+    projectsTree->Delete(selectedItem);
+
+    game->externalEvents.erase(events);
+}
+
+void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    vector< boost::shared_ptr<ExternalEvents> >::iterator events =
+        find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), data->GetSecondString()));
+
+    if ( events == game->externalEvents.end() )
+    {
+        wxLogWarning(_("Evenements introuvable."));
+        return;
+    }
+
+    Clipboard * clipboard = Clipboard::getInstance();
+    boost::shared_ptr<ExternalEvents> newEvents = boost::shared_ptr<ExternalEvents>(new ExternalEvents(clipboard->GetExternalEvents()));
+
+    //Finding a new, unique name for the events
+    string newName = string(_("Copie de")) + " " + newEvents->GetName();
+    int i = 2;
+    while(find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), newName)) != game->externalEvents.end())
+    {
+        newName = _("Copie de") + " " + newEvents->GetName() + " " + ToString(i);
+        ++i;
+    }
+
+    newEvents->SetName(newName);
+    game->externalEvents.insert(events, newEvents);
+
+    //Insert in tree
+    gdTreeItemGameData * eventsItemData = new gdTreeItemGameData("ExternalEvents", newName, game);
+    if ( projectsTree->GetPrevSibling(selectedItem).IsOk() )
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), newName, 4, 4, eventsItemData);
+    else
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, newName, 4, 4, eventsItemData);
 }

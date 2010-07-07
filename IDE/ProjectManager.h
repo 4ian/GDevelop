@@ -14,6 +14,8 @@
 #include <wx/ribbon/toolbar.h>
 class Game_Develop_EditorFrame;
 class Game;
+class RuntimeGame;
+class gdTreeItemGameData;
 
 class ProjectManager: public wxPanel
 {
@@ -23,18 +25,28 @@ class ProjectManager: public wxPanel
 		virtual ~ProjectManager();
 
 		//(*Declarations(ProjectManager)
+		wxMenuItem* MenuItem8;
+		wxMenuItem* MenuItem7;
+		wxMenuItem* MenuItem5;
+		wxMenuItem* MenuItem2;
 		wxMenuItem* MenuItem1;
+		wxMenuItem* MenuItem4;
 		wxMenuItem* editNameGameMenuItem;
 		wxTreeCtrl* projectsTree;
 		wxMenuItem* cutSceneMenuItem;
 		wxMenuItem* modVarSceneMenuI;
+		wxMenu externalEventsContextMenu;
+		wxMenuItem* MenuItem3;
 		wxMenu scenesContextMenu;
 		wxMenuItem* copySceneMenuItem;
+		wxMenuItem* MenuItem6;
 		wxMenu gameContextMenu;
+		wxMenu emptyExternalEventsContextMenu;
 		wxMenu sceneContextMenu;
 		wxMenuItem* editPropGameMenuItem;
 		wxMenuItem* pasteSceneMenuItem;
 		wxMenuItem* editGblVarMenuItem;
+		wxMenuItem* MenuItem9;
 		wxMenuItem* closeGameBt;
 		wxMenuItem* editScenePropMenuItem;
 		//*)
@@ -63,6 +75,14 @@ class ProjectManager: public wxPanel
 		static const long ID_MENUITEM3;
 		static const long ID_MENUITEM4;
 		static const long ID_MENUITEM5;
+		static const long ID_MENUITEM6;
+		static const long ID_MENUITEM7;
+		static const long ID_MENUITEM13;
+		static const long ID_MENUITEM8;
+		static const long ID_MENUITEM9;
+		static const long ID_MENUITEM10;
+		static const long ID_MENUITEM11;
+		static const long ID_MENUITEM12;
 		//*)
         static const long idRibbonNew;
         static const long idRibbonOpen;
@@ -73,6 +93,8 @@ class ProjectManager: public wxPanel
         static const long idRibbonEditScene;
         static const long idRibbonEditImages;
         static const long idRibbonCompil;
+        static const long idRibbonAddExternalEvents;;
+        static const long idRibbonEditExternalEvents;
 
 	private:
 
@@ -95,7 +117,16 @@ class ProjectManager: public wxPanel
 		void OneditPropGameMenuItemSelected(wxCommandEvent& event);
 		void OncloseGameBtSelected(wxCommandEvent& event);
 		void OnprojectsTreeSelectionChanged(wxTreeEvent& event);
+		void OnEditExternalEventsSelected(wxCommandEvent& event);
+		void OnAddExternalEventsSelected(wxCommandEvent& event);
+		void OnRenameExternalEventsSelected(wxCommandEvent& event);
+		void OnDeleteExternalEventsSelected(wxCommandEvent& event);
+		void OnCopyExternalEventsSelected(wxCommandEvent& event);
+		void OnCutExternalEventsSelected(wxCommandEvent& event);
+		void OnPasteExternalEventsSelected(wxCommandEvent& event);
 		//*)
+
+		bool GetGameOfSelectedItem(RuntimeGame *& game, gdTreeItemGameData *& data);
 
 		void OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event);
 		void EditExtensionsOfGame(Game * game);
@@ -106,6 +137,9 @@ class ProjectManager: public wxPanel
 		void OnRibbonEditImagesSelected(wxRibbonButtonBarEvent& event);
 		void EditImagesOfGame(Game * game);
 		void OnRibbonEditSceneSelected(wxRibbonButtonBarEvent& event);
+		void OnRibbonAddExternalEventsSelected(wxRibbonButtonBarEvent& event);
+		void OnRibbonEditExternalEventsSelected(wxRibbonButtonBarEvent& event);
+		void AddExternalEventsToGame(Game * game);
 
         wxTreeItemId selectedItem;
         std::string itemTextBeforeEditing;

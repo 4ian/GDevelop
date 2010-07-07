@@ -84,6 +84,7 @@
 					<Add library="imm32" />
 					<Add library="Ws2_32" />
 					<Add library="winmm" />
+					<Add library="C:\Libs\boost_1_43_0\bin.v2\libs\serialization\build\gcc-mingw-4.3.2\release\threading-multi\libboost_serialization-mgw43-mt-1_43.dll.a" />
 					<Add directory="bin\debug" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
@@ -362,7 +363,7 @@
 			<Add directory="..\GDL" />
 			<Add directory="c:\Libs\SFML\include" />
 			<Add directory="C:\Libs\CppUnitLite" />
-			<Add directory="C:\Libs\boost_1_38_0" />
+			<Add directory="C:\Libs\boost_1_43_0" />
 			<Add directory="C:\Libs\wxspellchecker\include" />
 			<Add directory="C:\Libs\wxspellchecker\" />
 			<Add directory="CppUnitLite\" />
@@ -619,6 +620,8 @@
 		</Unit>
 		<Unit filename="Extensions.cpp" />
 		<Unit filename="Extensions.h" />
+		<Unit filename="ExternalEventsEditor.cpp" />
+		<Unit filename="ExternalEventsEditor.h" />
 		<Unit filename="Fusion.cpp">
 			<Option virtualFolder="Editeur principal\Fichier\" />
 		</Unit>
@@ -888,6 +891,7 @@
 					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="RenderDialog.cpp" hdr="RenderDialog.h" name="RenderDialog" language="CPP" />
 					<wxPanel wxs="wxsmith/ProjectManager.wxs" src="ProjectManager.cpp" hdr="ProjectManager.h" name="ProjectManager" language="CPP" />
 					<wxPanel wxs="wxsmith/StartHerePage.wxs" src="StartHerePage.cpp" hdr="StartHerePage.h" name="StartHerePage" language="CPP" />
+					<wxPanel wxs="wxsmith/ExternalEventsEditor.wxs" src="ExternalEventsEditor.cpp" hdr="ExternalEventsEditor.h" name="ExternalEventsEditor" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

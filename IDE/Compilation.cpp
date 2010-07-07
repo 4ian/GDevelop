@@ -29,12 +29,12 @@
 #include <iostream>
 #include <fstream>
 
-
 #include "GDL/AES.h"
 #include "GDL/Game.h"
 #include "GDL/DatFile.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/OpenSaveGame.h"
+#include "GDL/ResourcesMergingHelper.h"
 #include "GDL/ExtensionsManager.h"
 #include "Compilation.h"
 #include "ErrorCompilation.h"
@@ -287,40 +287,59 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     PrepareTempDir(report); //Préparation du répertoire
 
     //Copie du jeu
-    Game Jeu = *m_jeu;
+    Game game = *m_jeu;
 
     StaticText3->SetLabel( "Copie des images..." );
     //Image du chargement
-    if ( Jeu.loadingScreen.imageFichier != "" )
+    if ( game.loadingScreen.imageFichier != "" )
     {
         StaticText2->SetLabel( Jeu.loadingScreen.imageFichier );
-        Jeu.loadingScreen.imageFichier = CopyAndReduceFileName( Jeu.loadingScreen.imageFichier, report ); //Pour chaque image
+        game.loadingScreen.imageFichier = CopyAndReduceFileName( game.loadingScreen.imageFichier, report ); //Pour chaque image
     }
 
-    //Image d'erreur
-    if ( wxCopyFile( "vide.png", repTemp + "/vide.png", true ) == false )
-        report += _( "Impossible de copier vide.png dans le répertoire de compilation.\n" );
+    //Prepare resources to copy
+    ResourcesMergingHelper resourcesMergingHelper;
+    resourcesMergingHelper.GetNewFilename("vide.png");
 
-    //Images : copie et enlève le répertoire des chemins
-    for ( unsigned int i = 0;i < Jeu.images.size() ;i++ )
+    StaticText3->SetLabel( "Préparation des ressources..." );
+    for ( unsigned int i = 0;i < game.images.size() ;i++ ) //Add images
     {
-        StaticText2->SetLabel( Jeu.images.at( i ).nom );
-        Jeu.images.at( i ).fichier = CopyAndReduceFileName( Jeu.images.at( i ).fichier, report ); //Pour chaque image
-        AvancementGauge->SetValue( i / static_cast<float>(Jeu.images.size())*100.f / 3.f );
+        StaticText2->SetLabel( game.images[i].nom );
+        game.images[i].fichier = resourcesMergingHelper.GetNewFilename(game.images[i].fichier);
+    }
+
+    for ( unsigned int i = 0;i < game.scenes.size();i++ )
+    {
+        for (unsigned int j = 0;j<game.scenes[i].initialObjects.size();++j)
+        	game.scenes[i].initialObjects[j]->PrepareResourcesForMerging(resourcesMergingHelper);
+    }
+    for (unsigned int j = 0;j<game.globalObjects.size();++j)
+        game.globalObjects[j]->PrepareResourcesForMerging(resourcesMergingHelper);
+
+    //Copy ressources
+    StaticText3->SetLabel( "Copie des ressources..." );
+    map<string, string> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesNewFilename();
+    for(map<string, string>::const_iterator it = resourcesNewFilename.begin(), unsigned int i = 0; it != resourcesNewFilename.end(); ++it, ++i)
+    {
+        wxCopyFile( resourcesNewFilename->first, repTemp + "/" + resourcesNewFilename->second, true ) == false )
+            report += _( "Impossible de copier \""+resourcesNewFilename->first+"\" dans le répertoire de compilation.\n" );
+
+        AvancementGauge->SetValue( i / static_cast<float>(resourcesNewFilename.size())*100.f / 3.f );
         wxSafeYield();
     }
 
+    //Copy of sound and music of events
     StaticText3->SetLabel( "Copie des sons/musiques..." );
-    for ( unsigned int i = 0;i < Jeu.scenes.size();i++ )
+    for ( unsigned int i = 0;i < game.scenes.size();i++ )
     {
-        CopyEventsRes(Jeu, Jeu.scenes[i]->events, report);
-        AvancementGauge->SetValue( i / static_cast<float>(Jeu.scenes.size())*100.f / 3.f + 33 );
+        CopyEventsRes(game, game.scenes[i]->events, report);
+        AvancementGauge->SetValue( i / static_cast<float>(game.scenes.size())*100.f / 3.f + 33 );
     }
 
     wxSafeYield();
     StaticText3->SetLabel( "Compilation du jeu..." );
     StaticText2->SetLabel( "Etape 1 sur 3" );
-    OpenSaveGame saveGame( Jeu );
+    OpenSaveGame saveGame( game );
     saveGame.SaveToFile(static_cast<string>( repTemp + "/compil.gdg" ));
     AvancementGauge->SetValue(70);
 
@@ -363,16 +382,16 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     wxRemoveFile( repTemp + "/compil.gdg" );
     AvancementGauge->SetValue(80);
 
-    OpenSaveLoadingScreen saveLS(Jeu.loadingScreen);
+    OpenSaveLoadingScreen saveLS(game.loadingScreen);
     saveLS.SaveToFile(string(repTemp + "/loadingscreen"));
 
     //Création du fichier gam.egd
     StaticText2->SetLabel( "Etape 3 sur 3" );
     wxSafeYield();
 
-    vector < string > files;
 
     //On créé une liste avec tous les fichiers
+    vector < string > files;
     {
         wxString file = wxFindFirstFile( repTemp + "/*" );
         while ( !file.empty() )
@@ -411,22 +430,22 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 
     //Copy extensions
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-    for (unsigned int i = 0;i<Jeu.extensionsUsed.size();++i)
+    for (unsigned int i = 0;i<game.extensionsUsed.size();++i)
     {
         //Builtin extensions does not have a namespace.
-        boost::shared_ptr<ExtensionBase> extension = extensionsManager->GetExtension(Jeu.extensionsUsed[i]);
+        boost::shared_ptr<ExtensionBase> extension = extensionsManager->GetExtension(game.extensionsUsed[i]);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() &&
             ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" )
             && extension->GetName() != "BuiltinCommonInstructions" ) //Extension with a namespace but builtin
         {
             if ( WinCheck->GetValue() &&
-                wxCopyFile( "Extensions/"+Jeu.extensionsUsed[i]+".xgdw", repTemp + "/" + Jeu.extensionsUsed[i]+".xgdw", true ) == false )
-                report += _( "Impossible de copier l'extension \""+Jeu.extensionsUsed[i]+"\" pour Windows dans le répertoire de compilation.\n" );
+                wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdw", repTemp + "/" + game.extensionsUsed[i]+".xgdw", true ) == false )
+                report += _( "Impossible de copier l'extension \""+game.extensionsUsed[i]+"\" pour Windows dans le répertoire de compilation.\n" );
 
             if ( LinuxCheck->GetValue() &&
-                wxCopyFile( "Extensions/"+Jeu.extensionsUsed[i]+".xgdl", repTemp + "/"+Jeu.extensionsUsed[i]+".xgdl", true ) == false )
-                report += _( "Impossible de copier l'extension \""+Jeu.extensionsUsed[i]+"\" pour Linux dans le répertoire de compilation.\n" );
+                wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdl", repTemp + "/"+game.extensionsUsed[i]+".xgdl", true ) == false )
+                report += _( "Impossible de copier l'extension \""+game.extensionsUsed[i]+"\" pour Linux dans le répertoire de compilation.\n" );
         }
     }
 
@@ -558,9 +577,9 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 
             //Compression en un seul fichier
             StaticText3->SetLabel( "Exportation du jeu... ( Compression )" );
-            wxRemoveFile( "MonJeu.exe" );
+            wxRemoveFile( "Mongame.exe" );
             wxArrayString arrStdOut, arrStdErr;
-            wxExecute( _T( "7za.exe a -sfx7zS.sfx \""+ repTemp +"/MonJeu.exe\" \"" + repTemp + "/*\"" ), arrStdOut, arrStdErr, wxEXEC_SYNC | wxEXEC_NOHIDE );
+            wxExecute( _T( "7za.exe a -sfx7zS.sfx \""+ repTemp +"/Mongame.exe\" \"" + repTemp + "/*\"" ), arrStdOut, arrStdErr, wxEXEC_SYNC | wxEXEC_NOHIDE );
 
             for ( unsigned int i = 0;i < arrStdOut.GetCount() ;i++ )
             {
@@ -577,8 +596,8 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
             }
 
             //Copie du fichier
-            if ( !wxCopyFile(repTemp + "/MonJeu.exe", fileFinal) )
-                report += _( "Impossible de copier le fichier MonJeu.exe depuis le répertoire de compilation vers le répertoire final.\n" );
+            if ( !wxCopyFile(repTemp + "/Mongame.exe", fileFinal) )
+                report += _( "Impossible de copier le fichier Mongame.exe depuis le répertoire de compilation vers le répertoire final.\n" );
 
         }
         if ( LinuxCheck->GetValue() )
@@ -668,7 +687,7 @@ void Compilation::OnNext2Click(wxCommandEvent& event)
     Notebook1->SetSelection(2);
 }
 
-void Compilation::CopyEventsRes(const Game & Jeu, vector < BaseEventSPtr > & events, string & report)
+void Compilation::CopyEventsRes(const Game & game, vector < BaseEventSPtr > & events, string & report)
 {
     for ( unsigned int j = 0;j < events.size() ;j++ )
     {
@@ -703,7 +722,7 @@ void Compilation::CopyEventsRes(const Game & Jeu, vector < BaseEventSPtr > & eve
         }
 
         if ( events.at(j)->CanHaveSubEvents() )
-            CopyEventsRes(Jeu, events.at(j)->GetSubEvents(), report);
+            CopyEventsRes(game, events.at(j)->GetSubEvents(), report);
     }
     wxSafeYield();
 

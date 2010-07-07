@@ -69,7 +69,7 @@
 
 1253308487 c:\libs\wxwidgets\include\wx\osx\config_xcode.h
 
-1253308462 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+1253308462 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
 
 1253308518 c:\libs\wxwidgets\include\wx\setup_gccxml.h
 
@@ -11942,9 +11942,9 @@
 	"wx/msw/rcdefs.h"
 	"version.h"
 
-1253437186 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\msw\rcdefs.h
+1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1278342530 d:\florian\programmation\gamedevelop\ide\version.h
+1278523356 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -12095,5 +12095,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1278338194 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1278522221 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

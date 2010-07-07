@@ -14829,7 +14829,7 @@
 	<windows.h>
 	<dlfcn.h>
 
-1278534773 d:\florian\programmation\gamedevelop\gdl\\gdl\version.h
+1278535266 d:\florian\programmation\gamedevelop\gdl\\gdl\version.h
 
 1272055279 source:d:\florian\programmation\gamedevelop\gdl\gdl\log.cpp
 	<string>
@@ -14839,4 +14839,16 @@
 1264364232 source:d:\florian\programmation\gamedevelop\gdl\gdl\versionwrapper.cpp
 	"GDL/VersionWrapper.h"
 	"GDL/Version.h"
+
+1278527251 source:d:\florian\programmation\gamedevelop\gdl\gdl\gdexpression.cpp
+	"GDL/GDExpression.h"
+	"GDL/ExpressionInstruction.h"
+	"GDL/gpl.h"
+	"GDL/ObjectsConcerned.h"
+	"GDL/ExtensionsManager.h"
+	"GDL/RuntimeScene.h"
+	"GDL/eFreeFunctions.h"
+	"GDL/ObjectIdentifiersManager.h"
+	<string>
+	<wx/wx.h>
 

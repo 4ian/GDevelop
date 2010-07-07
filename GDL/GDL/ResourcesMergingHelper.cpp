@@ -4,7 +4,7 @@
 #include <wx/filename.h>
 #include <string>
 
-std::string GetNewFilename(std::string resourceFilename)
+std::string ResourcesMergingHelper::GetNewFilename(std::string resourceFilename)
 {
     if ( resourcesNewFilename.find(resourceFilename) != resourcesNewFilename.end() )
         return resourcesNewFilename[resourceFilename];

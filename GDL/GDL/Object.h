@@ -36,6 +36,7 @@ class Game;
 class Scene;
 class wxWindow;
 class MainEditorCommand;
+class ResourcesMergingHelper;
 #include <wx/wx.h>
 #endif
 
@@ -67,25 +68,12 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
          */
         virtual bool Draw(sf::RenderWindow& main_window) {return true;};
 
-        #ifdef GDE
-        /**
-         * Draw the object at edittime ( on a scene editor )
-         */
-        virtual bool DrawEdittime(sf::RenderWindow& main_window) {return true;};
-
-        virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail) {return false;};
-        virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ ) {};
-        virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position ) {return new wxPanel(parent);};
-        virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position) {};
-
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, string & name, string & value) const;
-        virtual bool ChangeProperty(unsigned int propertyNb, string newValue);
-        virtual unsigned int GetNumberOfProperties() const;
-        #endif
-
         virtual void LoadFromXml(const TiXmlElement * elemScene) {};
         virtual void SaveToXml(TiXmlElement * elemScene) {};
 
+        /**
+         * Called at each frame so as to update internal object's things using time ( Such as animation for a sprite ).
+         */
         virtual void UpdateTime(float timeElapsed) {};
 
         /**
@@ -176,6 +164,10 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         //Forces
         Force Force5;
         vector < Force > Forces;
+
+        /**
+         * Automatically called at each frame so as to update forces applied on the object.
+         */
         bool UpdateForce(float ElapsedTime);
         float TotalForceX() const;
         float TotalForceY() const;
@@ -183,15 +175,23 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         float TotalForceLength() const;
         bool ClearForce();
 
+        /**
+         * Change name ( and object identifier )
+         */
         void SetName(string name_);
         inline string GetName() { return name; }
+
+        /**
+         * Get object identifier ( number representing the object name )
+         */
         inline unsigned int GetObjectIdentifier() {return objectId;};
 
         /** Return the type indentifier of the object.
          */
         inline unsigned int GetTypeId() const { return typeId; }
 
-        /** Set the type indentifier of the object.
+        /**
+         * Set the type indentifier of the object.
          */
         inline void SetTypeId(unsigned int typeId_) { typeId = typeId_; }
 
@@ -208,8 +208,54 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         //Variables
         ListVariable variablesObjet;
 
-        //Pointeur pour l'ajout de messages d'erreurs.
-        ErrorReport * errors;
+        ErrorReport * errors; ///<Pointer to a legacy object meant to report errors
+
+        #ifdef GDE
+        /**
+         * Draw the object at edittime ( on a scene editor )
+         */
+        virtual bool DrawEdittime(sf::RenderWindow& main_window) {return true;};
+
+        /**
+         * Called ( e.g. during compilation ) so as to inventory internal resources and update their filename
+         */
+        virtual void PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper) {return;};
+
+        /**
+         * Generate thumbnail for editor
+         */
+        virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail) {return false;};
+
+        /**
+         * Called when user wants to edit the object.
+         */
+        virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ ) {};
+
+        /**
+         * Called when user edit an object on scene.
+         */
+        virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position ) {return new wxPanel(parent);};
+
+        /**
+         * Called so as to update InitialPosition values with values of panel.
+         */
+        virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position) {};
+
+        /**
+         * Called by the debugger so as to get a property value and name
+         */
+        virtual void GetPropertyForDebugger (unsigned int propertyNb, string & name, string & value) const;
+
+        /**
+         * Called by the debugger so as to update a property
+         */
+        virtual bool ChangeProperty(unsigned int propertyNb, string newValue);
+
+        /**
+         * Must return the number of available properties for the debugger
+         */
+        virtual unsigned int GetNumberOfProperties() const;
+        #endif
 
         //Actions
         bool ActMettreX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
@@ -267,7 +313,6 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
         float X;
         float Y;
-
         int zOrder;
         bool hidden;
         string layer;

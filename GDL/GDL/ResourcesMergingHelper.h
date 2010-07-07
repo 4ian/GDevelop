@@ -9,7 +9,7 @@
 /**
  * ResourcesMergingHelper is used during compilation
  */
-class ResourcesMergingHelper
+class GD_API ResourcesMergingHelper
 {
     public:
         ResourcesMergingHelper() {};

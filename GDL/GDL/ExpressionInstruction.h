@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/nvp.hpp>
 class GDExpression;
 class ExpressionInstruction;
 class Object;
@@ -29,7 +31,17 @@ class GD_API ExpressionInstruction
         PtrObjectFunction           objectFunction;
         std::vector<GDExpression>   parameters;
 
-    protected:
+        friend class boost::serialization::access;
+        /**
+         * Serialize
+         */
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int version){
+            ar /*& BOOST_SERIALIZATION_NVP(function)
+               & BOOST_SERIALIZATION_NVP(objectFunction)*/
+               & BOOST_SERIALIZATION_NVP(parameters);
+        }
+
     private:
 };
 

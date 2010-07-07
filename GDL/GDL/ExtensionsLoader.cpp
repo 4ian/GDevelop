@@ -198,7 +198,7 @@ void ExtensionsLoader::LoadExtensionInManager(std::string fullpath)
                 error += "Not the same SFML version.\n";
 
             if ( extensionPtr->compilationInfo.boostVersion != BOOST_VERSION )
-                error += "Not the same Boost version.\n";
+                error += "Not the same Boost version.";
 
             if ( extensionPtr->compilationInfo.gdlVersion != RC_FILEVERSION_STRING)
                 error += "Not the same GDL version.\n";

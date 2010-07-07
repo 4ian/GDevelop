@@ -6,6 +6,9 @@
 #ifndef FOREACHEVENT_H
 #define FOREACHEVENT_H
 #include <boost/shared_ptr.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/nvp.hpp>
 #include "Event.h"
 class RuntimeScene;
 class ObjectsConcerned;
@@ -95,6 +98,23 @@ class ForEachEvent : public BaseEvent
 #ifdef GDE
         bool objectsToPickSelected;
 #endif
+
+        friend class boost::serialization::access;
+
+        /**
+         * Serialize
+         */
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int version){
+            ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(BaseEvent)
+                & BOOST_SERIALIZATION_NVP(conditions)
+                & BOOST_SERIALIZATION_NVP(actions)
+                & BOOST_SERIALIZATION_NVP(events)
+                & BOOST_SERIALIZATION_NVP(objectsToPick);
+        }
 };
+
+BOOST_SERIALIZATION_SHARED_PTR(ForEachEvent)
+BOOST_CLASS_EXPORT_KEY(ForEachEvent)
 
 #endif // FOREACHEVENT_H

@@ -14,6 +14,7 @@
 #include <vector>
 #include "GDL/Image.h"
 #include "GDL/LoadingScreen.h"
+class ExternalEvents;
 
 using namespace std;
 
@@ -50,9 +51,10 @@ class GD_API Game
         vector < Image >    images;
         vector < Dossier >  dossierImages;
 
-        vector < boost::shared_ptr<Scene> >     scenes;
-        vector < boost::shared_ptr<Object> >    globalObjects;
-        vector < ObjectGroup >                  objectGroups;
+        vector < boost::shared_ptr<Scene> >             scenes;
+        vector < boost::shared_ptr<ExternalEvents> >    externalEvents;
+        vector < boost::shared_ptr<Object> >            globalObjects;
+        vector < ObjectGroup >                          objectGroups;
 
         //Initial
         ListVariable variables;

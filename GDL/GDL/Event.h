@@ -12,6 +12,10 @@
 #include <cmath>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/export.hpp>
 #include "GDL/Log.h"
 #include "GDL/Instruction.h"
 class RuntimeScene;
@@ -137,7 +141,20 @@ class GD_API BaseEvent
         string type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
 
         static vector <BaseEventSPtr> badSubEvents;
+
+        friend class boost::serialization::access;
+
+        /**
+         * Serialize
+         */
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int version){
+            ar & BOOST_SERIALIZATION_NVP(type);
+        }
 };
+
+BOOST_SERIALIZATION_SHARED_PTR(BaseEvent)
+BOOST_CLASS_EXPORT_KEY(BaseEvent)
 
 /**
  * Helper function for copying vector of shared_ptr of events

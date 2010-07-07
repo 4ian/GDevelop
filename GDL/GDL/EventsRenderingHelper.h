@@ -24,6 +24,7 @@ class GD_API EventsRenderingHelper
         unsigned int GetRenderedConditionsListHeight(const std::vector < Instruction > & conditions, int width);
         unsigned int GetRenderedActionsListHeight(const std::vector < Instruction > & actions, int width);
 
+
         /**
          * Get a condition under a point in a list.
          * Return true if a condition was found, in which case conditionList and conditionIdInList are completed
@@ -35,6 +36,8 @@ class GD_API EventsRenderingHelper
          * Return true if an action was found, in which case actionList and actionIdInList are completed
          */
         bool GetActionAt(std::vector < Instruction > & actions, int x, int y, std::vector < Instruction > *& actionList, unsigned int & actionIdInList);
+
+        unsigned int GetRenderedInstructionAndSubInstructionsHeight(const Instruction & instr);
 
         inline unsigned int GetConditionsColumnWidth() const {return conditionsColumnWidth;};
         inline void SetConditionsColumnWidth(unsigned int conditionsColumnWidth_) { conditionsColumnWidth = conditionsColumnWidth_; };

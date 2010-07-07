@@ -16,6 +16,10 @@
 
 using namespace std;
 
+GDExpression::GDExpression() : oIDcomputed(false), isMathExpressionPreprocessed(false)
+{
+}
+
 GDExpression::GDExpression(std::string plainString_) : plainString(plainString_), oIDcomputed(false), isMathExpressionPreprocessed(false)
 {
     if (plainString == "=" ) compOperator = Equal;
@@ -356,6 +360,18 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
                         isMathExpressionPreprocessed = true;
                         return false;
                     }
+                }
+                else
+                {
+                    #if defined(GDE)
+                    firstErrorPos = functionNameEnd;
+                    firstErrorStr = _("Parenthèses des paramètres manquantes");
+                    #endif
+                    mathExpressionFunctions.clear();
+                    mathExpression.Parse("0", "");
+
+                    isMathExpressionPreprocessed = true;
+                    return false;
                 }
 
                 instruction.parameters = (parameters);

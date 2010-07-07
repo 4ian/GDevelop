@@ -528,6 +528,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     elapsedTime = 0;
     realElapsedTime = 0;
     pauseTime = 0;
+    timeScale = 1;
     timeFromStart = 0;
     specialAction = -1;
 

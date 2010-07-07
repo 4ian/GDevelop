@@ -4,8 +4,10 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "GDL/GDMathParser.h"
 #include <boost/shared_ptr.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/nvp.hpp>
+#include "GDL/GDMathParser.h"
 #include "GDL/ExpressionInstruction.h"
 #include "GDL/StrExpressionInstruction.h"
 #include "GDL/ObjectIdentifiersManager.h"
@@ -27,6 +29,7 @@ typedef boost::shared_ptr<Object> ObjSPtr;
 class GD_API GDExpression
 {
     public:
+        GDExpression();
         GDExpression(std::string plainString_);
         virtual ~GDExpression();
 
@@ -121,6 +124,24 @@ class GD_API GDExpression
         {
             Set, Add, Substract, Multiply, Divide, UndefinedModification
         };
+
+
+        friend class boost::serialization::access;
+        /**
+         * Serialize
+         */
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int version){
+            ar & BOOST_SERIALIZATION_NVP(plainString)
+               & BOOST_SERIALIZATION_NVP(compOperator)
+               & BOOST_SERIALIZATION_NVP(modOperator)
+               & BOOST_SERIALIZATION_NVP(oID)
+               & BOOST_SERIALIZATION_NVP(oIDcomputed)
+               & BOOST_SERIALIZATION_NVP(mathExpressionFunctions)
+               & BOOST_SERIALIZATION_NVP(isMathExpressionPreprocessed)
+               & BOOST_SERIALIZATION_NVP(textExpressionFunctions)
+               & BOOST_SERIALIZATION_NVP(isTextExpressionPreprocessed);
+        }
 
     private:
 

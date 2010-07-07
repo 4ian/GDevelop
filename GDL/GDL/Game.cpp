@@ -1,6 +1,7 @@
 #include "GDL/Game.h"
 #include "GDL/MemTrace.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/ExternalEvents.h"
 
 #if defined(GDE)
 #include <wx/wx.h>
@@ -46,8 +47,6 @@ fullscreen(false)
 
 void Game::Init(const Game & game)
 {
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
-
     //Some properties
     name = game.name;
     author = game.author;
@@ -75,6 +74,10 @@ void Game::Init(const Game & game)
     scenes.clear();
     for (unsigned int i =0;i<game.scenes.size();++i)
     	scenes.push_back( boost::shared_ptr<Scene>(new Scene(*game.scenes[i])) );
+
+    externalEvents.clear();
+    for (unsigned int i =0;i<game.externalEvents.size();++i)
+    	externalEvents.push_back( boost::shared_ptr<ExternalEvents>(new ExternalEvents(*game.externalEvents[i])) );
 
     variables = game.variables;
     objectGroups = game.objectGroups;

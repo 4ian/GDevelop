@@ -115,6 +115,7 @@
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add library="C:\Libs\boost_1_43_0\bin.v2\libs\serialization\build\gcc-mingw-4.3.2\release\threading-multi\libboost_serialization-mgw43-mt-1_43.dll.a" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
 				</Linker>
@@ -263,6 +264,7 @@
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add library="C:\Libs\boost_1_43_0\bin.v2\libs\serialization\build\gcc-mingw-4.3.2\release\threading-multi\libboost_serialization-mgw43-mt-1_43.dll.a" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
@@ -470,7 +472,7 @@
 		<Compiler>
 			<Add directory="..\GDL\" />
 			<Add directory="..\GDL\GDL\fparser" />
-			<Add directory="C:\Libs\boost_1_38_0" />
+			<Add directory="C:\Libs\boost_1_43_0" />
 			<Add directory="C:\Python26\include" />
 			<Add directory="C:\Libs\SFML\include" />
 		</Compiler>
@@ -574,6 +576,8 @@
 		<Unit filename="GDL\ExtensionsLoader.h" />
 		<Unit filename="GDL\ExtensionsManager.cpp" />
 		<Unit filename="GDL\ExtensionsManager.h" />
+		<Unit filename="GDL\ExternalEvents.cpp" />
+		<Unit filename="GDL\ExternalEvents.h" />
 		<Unit filename="GDL\FileExtension.cpp" />
 		<Unit filename="GDL\FileExtension.h" />
 		<Unit filename="GDL\FontManager.cpp" />

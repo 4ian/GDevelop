@@ -358,7 +358,7 @@ bool EventsRenderingHelper::GetConditionAt(vector < Instruction > & conditions, 
 
             //Add subconditions height
             for (unsigned int sc = 0;sc<conditions[c].GetSubInstructions().size();++sc)
-                conditionsY += conditions[c].GetSubInstructions()[sc].renderedHeight+2;
+                conditionsY += conditions[c].GetSubInstructions()[sc].renderedHeight+2; //TODO : Fail with Sub sub conditions
             conditionsY += 3;
         }
         else if ( instructionInfos.canHaveSubInstructions )
@@ -373,6 +373,11 @@ bool EventsRenderingHelper::GetConditionAt(vector < Instruction > & conditions, 
         }
     }
     return false;
+}
+
+unsigned int EventsRenderingHelper::GetRenderedInstructionAndSubInstructionsHeight(const Instruction & instr)
+{
+    return 0; //TODO
 }
 
 bool EventsRenderingHelper::GetActionAt(vector < Instruction > & actions, int x, int y, vector < Instruction > *& actionList, unsigned int & actionIdInList)

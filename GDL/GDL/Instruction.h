@@ -123,6 +123,19 @@ class GD_API Instruction
         mutable bool selected; ///<True if selected in an event editor
         #endif
 
+        /**
+         * Serialize
+         */
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int version){
+            ar  & BOOST_SERIALIZATION_NVP(type)
+                & BOOST_SERIALIZATION_NVP(objectFunctionType)
+                & BOOST_SERIALIZATION_NVP(isLocal)
+                & BOOST_SERIALIZATION_NVP(inverted)
+                & BOOST_SERIALIZATION_NVP(parameters)
+                & BOOST_SERIALIZATION_NVP(subInstructions);
+        }
+
     private:
         string type;
         string objectFunctionType;

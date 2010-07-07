@@ -11,6 +11,10 @@
 #include <wx/html/htmprint.h>
 #endif
 #include <boost/shared_ptr.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/nvp.hpp>
 #include "Event.h"
 class RuntimeScene;
 class ObjectsConcerned;
@@ -18,7 +22,7 @@ class Instruction;
 class Evaluateur;
 class TiXmlElement;
 
-class StandardEvent : public BaseEvent
+class GD_API StandardEvent : public BaseEvent
 {
     public:
         StandardEvent();
@@ -75,6 +79,18 @@ class StandardEvent : public BaseEvent
         vector < Instruction > conditions;
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
+
+        friend class boost::serialization::access;
+
+        /**
+         * Serialize
+         */
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int version);
 };
+
+BOOST_CLASS_EXPORT_KEY(StandardEvent)
+BOOST_SERIALIZATION_SHARED_PTR(StandardEvent)
+
 
 #endif // STANDARDEVENT_H

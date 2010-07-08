@@ -1,25 +1,10 @@
-/***************************************************************
- * Name:      Game_Develop_EditorMain.cpp
- * Purpose:   Code for Application Frame
- * Author:    Florian "4ian" Rival ()
- * Created:   2008-03-01
- * Copyright: Florian "4ian" Rival ()
- * License:
- **************************************************************/
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
 
-
-#ifndef RELEASE
-#define _MEMORY_TRACKER
-#include "debugMem.h" //suivi mémoire
-#endif
 #include "MemTrace.h"
 extern MemTrace MemTracer;
-
-#ifdef DEBUG
-#include "nommgr.h"
-#endif
-
-#include <SFML/Graphics.hpp>
 
 //(*InternalHeaders(Game_Develop_EditorFrame)
 #include <wx/bitmap.h>
@@ -49,7 +34,6 @@ extern MemTrace MemTracer;
 #include <string>
 #include <list>
 #include <sstream>
-#include "wxSFMLCanvas.hpp"
 #include "GDAuiTabArt.h"
 
 #ifdef __WXMSW__
@@ -110,9 +94,9 @@ BEGIN_EVENT_TABLE( Game_Develop_EditorFrame, wxFrame )
 END_EVENT_TABLE()
 
 
-////////////////////////////////////////////////////////////
-/// Constructeur
-////////////////////////////////////////////////////////////
+/**
+ * Constructor : Create window
+ */
 Game_Develop_EditorFrame::Game_Develop_EditorFrame( wxWindow* parent, string FileToOpen) :
 gameCurrentlyEdited(0),
 m_ribbon(NULL),
@@ -369,9 +353,9 @@ ribbonSceneEditorButtonBar(NULL)
         Open(FileToOpen);
 }
 
-////////////////////////////////////////////////////////////
-/// Destructeur
-////////////////////////////////////////////////////////////
+/**
+ * Destructor : Uninit
+ */
 Game_Develop_EditorFrame::~Game_Develop_EditorFrame()
 {
     //(*Destroy(Game_Develop_EditorFrame)

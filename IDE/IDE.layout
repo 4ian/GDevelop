@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug - Edittime" />
+	<ActiveTarget name="Development - Edittime" />
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="9408" topLine="106" />
 	</File>
@@ -40,8 +40,8 @@
 	<File name="Clipboard.h" open="0" top="0" tabpos="9">
 		<Cursor position="245" topLine="0" />
 	</File>
-	<File name="Compilation.cpp" open="0" top="0" tabpos="11">
-		<Cursor position="33126" topLine="629" />
+	<File name="Compilation.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="18612" topLine="307" />
 	</File>
 	<File name="Compilation.h" open="0" top="0" tabpos="0">
 		<Cursor position="3151" topLine="104" />
@@ -193,8 +193,8 @@
 	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2790" topLine="90" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="1" top="1" tabpos="2">
-		<Cursor position="9607" topLine="275" />
+	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="9605" topLine="281" />
 	</File>
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="3">
 		<Cursor position="724" topLine="0" />

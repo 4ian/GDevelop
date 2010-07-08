@@ -37,9 +37,9 @@ class BugReport: public wxDialog
 		wxButton* Button2;
 		wxPanel* Panel3;
 		wxStaticText* StaticText5;
+		wxStaticText* StaticText7;
 		wxStaticLine* StaticLine1;
 		wxPanel* Panel2;
-		wxStaticText* StaticText4;
 		wxStaticBitmap* StaticBitmap3;
 		wxButton* CloseBt;
 		//*)
@@ -61,7 +61,7 @@ class BugReport: public wxDialog
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON5;
 		static const long ID_PANEL3;
-		static const long ID_STATICTEXT4;
+		static const long ID_STATICTEXT7;
 		static const long ID_STATICBITMAP2;
 		static const long ID_STATICTEXT5;
 		static const long ID_BUTTON2;

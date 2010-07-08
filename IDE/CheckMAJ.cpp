@@ -60,12 +60,6 @@ CheckMAJ::CheckMAJ()
 
 }
 
-CheckMAJ::~CheckMAJ()
-{
-    //dtor
-}
-
-
 ////////////////////////////////////////////////////////////
 /// Controle de la version
 ///

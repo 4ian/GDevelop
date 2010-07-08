@@ -293,7 +293,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     //Image du chargement
     if ( game.loadingScreen.imageFichier != "" )
     {
-        StaticText2->SetLabel( Jeu.loadingScreen.imageFichier );
+        StaticText2->SetLabel( game.loadingScreen.imageFichier );
         game.loadingScreen.imageFichier = CopyAndReduceFileName( game.loadingScreen.imageFichier, report ); //Pour chaque image
     }
 
@@ -310,8 +310,8 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 
     for ( unsigned int i = 0;i < game.scenes.size();i++ )
     {
-        for (unsigned int j = 0;j<game.scenes[i].initialObjects.size();++j)
-        	game.scenes[i].initialObjects[j]->PrepareResourcesForMerging(resourcesMergingHelper);
+        for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j)
+        	game.scenes[i]->initialObjects[j]->PrepareResourcesForMerging(resourcesMergingHelper);
     }
     for (unsigned int j = 0;j<game.globalObjects.size();++j)
         game.globalObjects[j]->PrepareResourcesForMerging(resourcesMergingHelper);
@@ -319,11 +319,13 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     //Copy ressources
     StaticText3->SetLabel( "Copie des ressources..." );
     map<string, string> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesNewFilename();
-    for(map<string, string>::const_iterator it = resourcesNewFilename.begin(), unsigned int i = 0; it != resourcesNewFilename.end(); ++it, ++i)
+    unsigned int i = 0;
+    for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
     {
-        wxCopyFile( resourcesNewFilename->first, repTemp + "/" + resourcesNewFilename->second, true ) == false )
-            report += _( "Impossible de copier \""+resourcesNewFilename->first+"\" dans le répertoire de compilation.\n" );
+        if ( wxCopyFile( it->first, repTemp + "/" + it->second, true ) == false )
+            report += _( "Impossible de copier \""+it->first+"\" dans le répertoire de compilation.\n" );
 
+        ++i;
         AvancementGauge->SetValue( i / static_cast<float>(resourcesNewFilename.size())*100.f / 3.f );
         wxSafeYield();
     }

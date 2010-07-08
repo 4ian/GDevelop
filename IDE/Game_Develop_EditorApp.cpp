@@ -130,10 +130,7 @@ bool Game_Develop_EditorApp::OnInit()
     chdir( exeDirectory.c_str() );
 #endif
 
-    //(*AppInitialize
-    bool wxsOK = true;
     wxInitAllImageHandlers();
-    //*)
 
     //Load configuration
     wxString ConfigPath = wxFileName::GetHomeDir() + "/.Game Develop/";
@@ -189,11 +186,11 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Test si le programme n'aurait pas planté la dernière fois
     //En vérifiant si un fichier existe toujours
+    bool openRecupFiles = false;
     if ( wxFileExists("errordetect.dat") )
     {
         BugReport dialog(NULL);
-        if ( dialog.ShowModal() == 1 && wxFileExists("recup1.gdg"))
-            fileToOpen = "recup1.gdg";
+        if ( dialog.ShowModal() == 1 ) openRecupFiles = true;
     }
 
     //Creating the console Manager
@@ -251,11 +248,19 @@ bool Game_Develop_EditorApp::OnInit()
     }
 
 
-    //Création de la fenêtre
-    if ( wxsOK )
+    //Creating main window
+    mainEditor = new Game_Develop_EditorFrame( 0, fileToOpen );
+    SetTopWindow( mainEditor );
+
+    //Open dumped files
+    if ( openRecupFiles )
     {
-        Frame = new Game_Develop_EditorFrame( 0, fileToOpen );
-        SetTopWindow( Frame );
+        unsigned int i = 0;
+        while( wxFileExists("gameDump"+ToString(i)+".gdg") )
+        {
+            mainEditor->Open("gameDump"+ToString(i)+".gdg");
+            ++i;
+        }
     }
 
     //Checking for updates
@@ -271,8 +276,7 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Fin du splash screen, affichage de la fenêtre
     splash->Destroy();
-    Frame->Show();
-
+    mainEditor->Show();
 
     //wxLogWarning("Cette version de Game Develop n'est utilisable qu'à des fins de tests. Merci d'utiliser la version disponible sur notre site pour toute autre utilisation.");
 
@@ -329,7 +333,7 @@ bool Game_Develop_EditorApp::OnInit()
 
 	//TEST END
 
-    return wxsOK;
+    return true;
 
 }
 
@@ -364,24 +368,23 @@ void Game_Develop_EditorApp::OnUnhandledException()
     wxFile dataErrorFile("errordata.txt", wxFile::write);
     dataErrorFile.Write("Game Develop - Trace de l'erreur.\n");
     dataErrorFile.Write("\n");
-    dataErrorFile.Write("Code erreur GD : (02) Segmentation Fault\n");
+    dataErrorFile.Write("GD Error code : (01) Fatal error\n");
 
     try
     {
-        for (unsigned int i = 0;i<Frame->games.size();++i)
+        for (unsigned int i = 0;i<mainEditor->games.size();++i)
         {
-            OpenSaveGame save(*Frame->games[i]);
-            save.SaveToFile("recup"+ToString(i)+".gdg");
+            OpenSaveGame save(*mainEditor->games[i]);
+            save.SaveToFile("gameDump"+ToString(i)+".gdg");
         }
-
     }
     catch(...)
     {
-        wxSafeShowMessage("Impossible de sauver le jeu","Le jeu n'a pas pu être sauvegardé !");
+        wxSafeShowMessage("Unable to save game", "A game could not be saved");
     }
     terminate();
 }
-    #endif
+#endif
 
 bool Game_Develop_EditorApp::OnExceptionInMainLoop()
 {
@@ -391,19 +394,19 @@ bool Game_Develop_EditorApp::OnExceptionInMainLoop()
     wxFile dataErrorFile("errordata.txt", wxFile::write);
     dataErrorFile.Write("Game Develop - Trace de l'erreur.\n");
     dataErrorFile.Write("\n");
-    dataErrorFile.Write("Code erreur GD : (02) Segmentation Fault\n");
+    dataErrorFile.Write("GD Error code : (02) Segmentation Fault\n");
 
     try
     {
-        for (unsigned int i = 0;i<Frame->games.size();++i)
+        for (unsigned int i = 0;i<mainEditor->games.size();++i)
         {
-            OpenSaveGame save(*Frame->games[i]);
-            save.SaveToFile("recup"+ToString(i)+".gdg");
+            OpenSaveGame save(*mainEditor->games[i]);
+            save.SaveToFile("gameDump"+ToString(i)+".gdg");
         }
     }
     catch(...)
     {
-        wxSafeShowMessage("Impossible de sauver le jeu","Le jeu n'a pas pu être sauvegardé !");
+        wxSafeShowMessage("Unable to save game", "A game could not be saved");
     }
 
     terminate();

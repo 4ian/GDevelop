@@ -1,13 +1,14 @@
 #ifndef CHECKMAJ_H
 #define CHECKMAJ_H
 
+/**
+ * Check for update
+ */
 class CheckMAJ
 {
     public:
-        /** Default constructor */
         CheckMAJ();
-        /** Default destructor */
-        virtual ~CheckMAJ();
+        virtual ~CheckMAJ() {};
         void Check();
     protected:
     private:

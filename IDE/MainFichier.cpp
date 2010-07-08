@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include <boost/shared_ptr.hpp>
 #include "GDL/OpenSaveGame.h"
 #include "GDL/ExtensionsManager.h"

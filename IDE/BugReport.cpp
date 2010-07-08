@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "BugReport.h"
 
 //(*InternalHeaders(BugReport)
@@ -34,7 +39,7 @@ const long BugReport::ID_STATICTEXT6 = wxNewId();
 const long BugReport::ID_BUTTON1 = wxNewId();
 const long BugReport::ID_BUTTON5 = wxNewId();
 const long BugReport::ID_PANEL3 = wxNewId();
-const long BugReport::ID_STATICTEXT4 = wxNewId();
+const long BugReport::ID_STATICTEXT7 = wxNewId();
 const long BugReport::ID_STATICBITMAP2 = wxNewId();
 const long BugReport::ID_STATICTEXT5 = wxNewId();
 const long BugReport::ID_BUTTON2 = wxNewId();
@@ -52,6 +57,7 @@ BugReport::BugReport( wxWindow* parent )
 {
     //(*Initialize(BugReport)
     wxFlexGridSizer* FlexGridSizer4;
+    wxFlexGridSizer* FlexGridSizer10;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
     wxFlexGridSizer* FlexGridSizer9;
@@ -86,9 +92,9 @@ BugReport::BugReport( wxWindow* parent )
     FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBitmap3 = new wxStaticBitmap(Panel2, ID_STATICBITMAP3, wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_INFORMATION")),wxART_OTHER), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP3"));
     FlexGridSizer9->Add(StaticBitmap3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText2 = new wxStaticText(Panel2, ID_STATICTEXT2, _("Il semble que Game Develop s\'est fermé brusquement suite à une\nerreur. Si ceci s\'avère vrai, nous nous excusons pour le dérangement\nencouru. Il ne s\'agit pas de votre faute, Game Develop ne devrait pas \nen effet se fermer brusquement même si vous effectuez une fausse\nmanipulation.\nVous pouvez néanmoins nous aider à corriger le problème en\ncomplétant le rapport d\'erreur."), wxDefaultPosition, wxSize(358,117), 0, _T("ID_STATICTEXT2"));
+    StaticText2 = new wxStaticText(Panel2, ID_STATICTEXT2, _("Il semble que Game Develop se soit fermé brusquement suite à une\nerreur. Si ceci s\'avère vrai, nous nous excusons pour le dérangement\nencouru. Il ne s\'agit pas de votre faute, mais d\'un problème interne\nau programme.\nVous pouvez néanmoins nous aider à corriger le problème en\ncomplétant le rapport d\'erreur."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     FlexGridSizer9->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer3->Add(FlexGridSizer9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer3->Add(FlexGridSizer9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     Button1 = new wxButton(Panel2, ID_BUTTON4, _("Suivant"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
     FlexGridSizer3->Add(Button1, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
     Panel2->SetSizer(FlexGridSizer3);
@@ -97,7 +103,8 @@ BugReport::BugReport( wxWindow* parent )
     Panel3 = new wxPanel(Notebook1, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
     FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer4->AddGrowableCol(0);
-    StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("Afin de nous aider à résoudre le problème, essayez de décrire comment est survenue\nl\'erreur. Indiquez, dans la mesure du possible :\n-Comment le bug s\'est déclenché ( clic sur un bouton... )\n-Où s\'est il déclenché ( éditeur de scènes, choix actions... )"), wxDefaultPosition, wxSize(427,59), 0, _T("ID_STATICTEXT3"));
+    FlexGridSizer4->AddGrowableRow(3);
+    StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("Afin de nous aider à résoudre le problème, essayez de décrire comment est survenue\nl\'erreur. Indiquez, dans la mesure du possible :\n-Comment le bug s\'est déclenché ( clic sur un bouton... )\n-Où s\'est il déclenché ( éditeur de scènes, choix actions... )"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     FlexGridSizer4->Add(StaticText3, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     UserReportEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(408,71), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     FlexGridSizer4->Add(UserReportEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -118,20 +125,26 @@ BugReport::BugReport( wxWindow* parent )
     FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer5->AddGrowableCol(0);
     FlexGridSizer5->AddGrowableRow(1);
-    StaticText4 = new wxStaticText(Panel4, ID_STATICTEXT4, _("Votre jeu a peut être pu être sauvegardé par Game Develop  ( sous le nom de Recup.jgd\ndans le dossier du logiciel ).\n\nGame Develop va le rouvrir quand vous aurez fermé cette fenêtre."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
-    FlexGridSizer5->Add(StaticText4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer10 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer10->AddGrowableCol(0);
+    FlexGridSizer10->AddGrowableRow(0);
+    StaticText7 = new wxStaticText(Panel4, ID_STATICTEXT7, _("Les jeux en cours d\'édition on peut être pû etre sauvegardés, sous le nom de gameDumpX.gdg ( où X représente un numéro ).\n\nGame Develop peut les réouvrir automatiquement une fois la fenêtre fermée."), wxDefaultPosition, wxSize(407,117), 0, _T("ID_STATICTEXT7"));
+    FlexGridSizer10->Add(StaticText7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer5->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer6->AddGrowableCol(1);
+    FlexGridSizer6->AddGrowableRow(0);
     StaticBitmap2 = new wxStaticBitmap(Panel4, ID_STATICBITMAP2, wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_WARNING")),wxART_OTHER), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP2"));
     FlexGridSizer6->Add(StaticBitmap2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText5 = new wxStaticText(Panel4, ID_STATICTEXT5, _("Vérifiez bien qu\'il s\'agit de votre jeu, et qu\'il soit au complet.\nIl n\'est pas garanti que le jeu ait été enregistré complètement,\net il est possible qu\'il s\'agisse d\'une sauvegarde ayant eu\nlieu lors d\'une ancienne erreur.\n\nSi il s\'agit bien de votre jeu au complet, vous pourrez le\nré-enregistrer normalement."), wxDefaultPosition, wxSize(355,117), 0, _T("ID_STATICTEXT5"));
+    StaticText5 = new wxStaticText(Panel4, ID_STATICTEXT5, _("Vérifiez bien qu\'il s\'agit du jeu souhaité, et qu\'il soit au complet. \nIl n\'est pas garanti  que le jeu ait été enregistré complètement,\net il est possible qu\'il s\'agisse d\'une sauvegarde ayant eu lieu\nlors d\'une ancienne erreur.\n\nSi il s\'agit bien de votre jeu au complet, vous pourrez le\nré-enregistrer normalement."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
     wxFont StaticText5Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText5->SetFont(StaticText5Font);
     FlexGridSizer6->Add(StaticText5, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
-    CloseBt = new wxButton(Panel4, ID_BUTTON2, _("Fermer et ouvrir le jeu"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+    CloseBt = new wxButton(Panel4, ID_BUTTON2, _("Fermer et ouvrir le(s) jeu(x)"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     FlexGridSizer8->Add(CloseBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    CloseNoOpenBt = new wxButton(Panel4, ID_BUTTON3, _("Fermer sans ouvrir le jeu"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+    CloseNoOpenBt = new wxButton(Panel4, ID_BUTTON3, _("Fermer sans ouvrir le(s) jeu(x)"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
     FlexGridSizer8->Add(CloseNoOpenBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer8, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 0);
     Panel4->SetSizer(FlexGridSizer5);

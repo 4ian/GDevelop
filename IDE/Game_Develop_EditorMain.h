@@ -1,11 +1,7 @@
-/***************************************************************
- * Name:      Game_Develop_EditorMain.h
- * Purpose:   Defines Application Frame
- * Author:    Florian "4ian" Rival ()
- * Created:   2008-03-01
- * Copyright: Florian "4ian" Rival ()
- * License:
- **************************************************************/
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
 
 #ifndef GAME_DEVELOP_EDITORMAIN_H
 #define GAME_DEVELOP_EDITORMAIN_H
@@ -50,9 +46,11 @@ class RuntimeGame;
 class ProjectManager;
 class StartHerePage;
 
-
 using namespace std;
 
+/**
+ * Class representing the main editor
+ */
 class Game_Develop_EditorFrame: public wxFrame
 {
     friend class EditorImages;
@@ -61,7 +59,12 @@ class Game_Develop_EditorFrame: public wxFrame
         Game_Develop_EditorFrame(wxWindow* parent, string FileToOpen);
         virtual ~Game_Develop_EditorFrame();
 
-        vector < boost::shared_ptr<RuntimeGame> > games;
+        vector < boost::shared_ptr<RuntimeGame> > games; ///< All games opened
+        unsigned int gameCurrentlyEdited; ///< Index of the current game ( "Current" means choosen in the project manager )
+
+        /**
+         * Get a shared pointer to the current game ( "Current" means choosen in the project manager )
+         */
         inline boost::shared_ptr<RuntimeGame> GetCurrentGame()
         {
             if ( gameCurrentlyEdited >= games.size()) return boost::shared_ptr<RuntimeGame> ();
@@ -69,6 +72,9 @@ class Game_Develop_EditorFrame: public wxFrame
             return games[gameCurrentlyEdited];
         }
 
+        /**
+         * True if a game is currently edited
+         */
         inline bool CurrentGameIsValid()
         {
             if ( gameCurrentlyEdited >= games.size()) return false;
@@ -76,21 +82,35 @@ class Game_Develop_EditorFrame: public wxFrame
             return true;
         }
 
+        /**
+         * Change the current game
+         */
         void SetCurrentGame(unsigned int i);
 
-        unsigned int gameCurrentlyEdited;
-
+        /**
+         * Open a game from its filename
+         */
         void Open(string FichierJeu);
 
         static void LoadSkin(wxRibbonBar * bar);
         static void LoadSkin(wxAuiManager * auiManager);
 
-        inline wxAuiNotebook * GetEditorsNotebook() { return editorsNotebook; };
+        /**
+         * Get a pointer to notebook containing editors
+         */
         inline const wxAuiNotebook * GetEditorsNotebook() const { return editorsNotebook; };
-        inline wxRibbonBar * GetRibbon() { return m_ribbon; };
+        inline wxAuiNotebook * GetEditorsNotebook() { return editorsNotebook; };
+
+        /**
+         * Get a pointer to the ribbon
+         */
         inline const wxRibbonBar * GetRibbon() const { return m_ribbon; };
+        inline wxRibbonBar * GetRibbon() { return m_ribbon; };
+
+        /**
+         * Get a pointer to ribbon bar which can be changed by scene editors
+         */
         inline wxRibbonButtonBar * GetRibbonSceneEditorButtonBar() const { return ribbonSceneEditorButtonBar; };
-        inline wxRibbonButtonBar * GetRibbonSceneEditorButtonBar() { return ribbonSceneEditorButtonBar; };
 
 
         //(*Handlers(Game_Develop_EditorFrame)
@@ -230,31 +250,14 @@ class Game_Develop_EditorFrame: public wxFrame
         wxMenuItem* MenuItem43;
         wxMenu saveContextMenu;
         //*)
-        wxRibbonBar * m_ribbon;
-        wxRibbonButtonBar * ribbonSceneEditorButtonBar;
+        wxAuiManager m_mgr;
+        wxRibbonBar * m_ribbon; ///< Pointer to the ribbon
+        wxRibbonButtonBar * ribbonSceneEditorButtonBar; ///Pointer to the ribbon bar which can be changed by scene editors
 
         StartHerePage * startPage;
         ProjectManager * projectManager;
-        vector < EditorScene* > EditorsScene;
 
-        void CloseScene(int nb);
-        void UpdateEditorsSceneID();
-
-        //Images pour la liste des scènes
-        wxImageList * imageListScene;
-
-        //RecentList
-        RecentList m_recentlist;
-
-        //Liste des scènes
-        wxTreeItemId item;
-        string ancienNom;
-
-        //Relatif au jeu geré
-
-        wxFileConfig* m_config;
-
-        wxAuiManager m_mgr;
+        RecentList m_recentlist; ///<Inventory and manage recent files
 
         DECLARE_EVENT_TABLE()
 };

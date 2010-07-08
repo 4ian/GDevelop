@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <cstring>
 #include "GDL/Music.h"
 #undef LoadImage //Undef a macro from windows.h
 
@@ -45,7 +46,11 @@ sf::Font * RessourcesLoader::LoadFont(const string & filename)
         if (buffer==NULL)
             cout << "Erreur lors de la récupération interne de la police " << filename << endl;
 
-        if (!font->LoadFromMemory(buffer, ExeGD.GetFileSize(filename)))
+        //TODO : Manage this
+        char * fontBuffer = new char[ExeGD.GetFileSize(filename)];
+        memcpy(fontBuffer, buffer, ExeGD.GetFileSize(filename));
+
+        if (!font->LoadFromMemory(fontBuffer, ExeGD.GetFileSize(filename)))
             cout << "Erreur lors du chargement interne de la police" << filename << endl;
     }
     else if (!font->LoadFromFile(filename)) //Chargement depuis un fichier externe

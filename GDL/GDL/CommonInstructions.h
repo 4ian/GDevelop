@@ -20,6 +20,7 @@ bool ActionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcer
 bool ConditionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 bool ConditionOr( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool ConditionAnd( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 bool ConditionNot( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
 #endif // COMMONINSTRUCTIONS_H

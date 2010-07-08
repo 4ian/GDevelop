@@ -28,9 +28,22 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                    _("Renvoie vraie si une seule des sous conditions est vraie"),
                    _("Si une de ces condition est vraie :"),
                    _("Avancé"),
-                   "res/conditions/toujours24.png",
-                   "res/conditions/toujours.png",
+                   "res/conditions/or24.png",
+                   "res/conditions/or.png",
                    &ConditionOr);
+
+        DECLARE_CAN_HAVE_SUB_CONDITION();
+
+    DECLARE_END_CONDITION()
+
+    DECLARE_CONDITION("And",
+                   _("Et"),
+                   _("Renvoie vraie si toutes les sous conditions sont vraies"),
+                   _("Si toutes ces conditions sont vraies :"),
+                   _("Avancé"),
+                   "res/conditions/and24.png",
+                   "res/conditions/and.png",
+                   &ConditionAnd);
 
         DECLARE_CAN_HAVE_SUB_CONDITION();
 
@@ -41,8 +54,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                    _("Renvoie l'inverse du résultat des sous conditions"),
                    _("Inverser le résultat logique de ces conditions :"),
                    _("Avancé"),
-                   "res/conditions/toujours24.png",
-                   "res/conditions/toujours.png",
+                   "res/conditions/not24.png",
+                   "res/conditions/not.png",
                    &ConditionNot);
 
         DECLARE_CAN_HAVE_SUB_CONDITION();

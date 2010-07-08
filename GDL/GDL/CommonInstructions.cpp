@@ -77,6 +77,21 @@ bool ConditionOr( RuntimeScene & scene, ObjectsConcerned & finalObjectsConcerned
 }
 
 /**
+ * Common instruction testing if all sub conditions are true
+ */
+bool ConditionAnd( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    for ( unsigned int k = 0; k < condition.GetSubInstructions().size(); ++k )
+    {
+        if ( condition.GetSubInstructions()[k].function != NULL &&
+             !condition.GetSubInstructions()[k].function( scene, objectsConcerned, condition.GetSubInstructions()[k]) )
+            return false; //Return false as soon as a condition is false
+    }
+
+    return true;
+}
+
+/**
  * Common instruction testing sub conditions, inversing the result
  */
 bool ConditionNot( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )

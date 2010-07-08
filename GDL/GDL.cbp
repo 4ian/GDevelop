@@ -45,6 +45,7 @@
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add library="C:\Libs\boost_1_43_0\bin.v2\libs\serialization\build\gcc-mingw-4.3.2\release\threading-multi\libboost_serialization-mgw43-mt-1_43.dll.a" />
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
@@ -334,6 +335,7 @@
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add library="C:\Libs\boost_1_43_0\bin.v2\libs\serialization\build\gcc-mingw-4.3.2\release\threading-multi\libboost_serialization-mgw43-mt-1_43.dll.a" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
 				</Linker>
@@ -661,6 +663,8 @@
 		<Unit filename="GDL\PropImage.h" />
 		<Unit filename="GDL\RepeatEvent.cpp" />
 		<Unit filename="GDL\RepeatEvent.h" />
+		<Unit filename="GDL\ResourcesMergingHelper.cpp" />
+		<Unit filename="GDL\ResourcesMergingHelper.h" />
 		<Unit filename="GDL\RessourcesLoader.cpp" />
 		<Unit filename="GDL\RessourcesLoader.h" />
 		<Unit filename="GDL\RuntimeCamera.cpp" />

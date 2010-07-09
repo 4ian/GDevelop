@@ -29,6 +29,7 @@ class ExternalEventsEditor: public wxPanel
 		//*)
 
 		ExternalEvents & events;
+		Game & game;
 
 	protected:
 
@@ -46,7 +47,6 @@ class ExternalEventsEditor: public wxPanel
 		//*)
 		void OnparentSceneComboBoxDropDown(wxCommandEvent& event);
 
-		Game & game;
         Scene emptyScene;
 		MainEditorCommand mainEditorCommand;
 

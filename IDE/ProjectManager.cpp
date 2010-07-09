@@ -16,6 +16,7 @@
 #include "GDL/ChercherScene.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/StandardEvent.h"
+#include "GDL/CommentEvent.h"
 
 #include "Extensions.h"
 #include "ExternalEventsEditor.h"
@@ -958,6 +959,7 @@ void ProjectManager::CloseGame(Game * game)
     {
     cout << "Start For" << endl;
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+        ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
         EditorImages * imagesEditorPtr = dynamic_cast<EditorImages*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
         cout << "sceneEditorPtr " << sceneEditorPtr << endl;
@@ -1002,6 +1004,17 @@ void ProjectManager::CloseGame(Game * game)
             if ( &imagesEditorPtr->game == game)
             {
     cout << "DeleteImageEditor" << endl;
+                if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
+                    wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
+    cout << "ENDDelete" << endl;
+                k--;
+            }
+        }
+        else if ( externalEventsEditorPtr != NULL )
+        {
+            if ( &externalEventsEditorPtr->game == game)
+            {
+    cout << "DeleteExternalEventsEditor" << endl;
                 if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                     wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
     cout << "ENDDelete" << endl;
@@ -1166,17 +1179,29 @@ void ProjectManager::AddExternalEventsToGame(Game * game)
     }
 
     boost::shared_ptr<ExternalEvents> externalEventsPtr = boost::shared_ptr<ExternalEvents>(new ExternalEvents());
+    externalEventsPtr->SetName(newName);
 
-    std::ifstream ifile("out.txt");
-	boost::archive::xml_iarchive ar(ifile);
+    /*try
+    {
+        std::ifstream ifile("out.txt");
+        boost::archive::xml_iarchive ar(ifile);
 
-    ExternalEvents & externalEvents = *externalEventsPtr;
+        ExternalEvents & externalEvents = *externalEventsPtr;
 
-	ar.register_type(static_cast<StandardEvent *>(NULL));
-	boost::serialization::void_cast_register(static_cast<StandardEvent *>(NULL),static_cast<BaseEvent *>(NULL));
+        ar.register_type(static_cast<BaseEvent *>(NULL));
+        ar.register_type(static_cast<StandardEvent *>(NULL));
+        ar.register_type(static_cast<CommentEvent *>(NULL));
+        boost::serialization::void_cast_register(static_cast<StandardEvent *>(NULL),static_cast<BaseEvent *>(NULL));
+        boost::serialization::void_cast_register(static_cast<CommentEvent *>(NULL),static_cast<BaseEvent *>(NULL));
 
-	ar >> BOOST_SERIALIZATION_NVP(externalEvents);
-	ifile.close();
+        ar >> BOOST_SERIALIZATION_NVP(externalEvents);
+        ifile.close();
+    }
+    catch(boost::archive::archive_exception & e)
+    {
+        std::cout << e.what();
+    }*/
+
 
     game->externalEvents.push_back(externalEventsPtr);
 }

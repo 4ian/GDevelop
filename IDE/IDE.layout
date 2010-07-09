@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
+	<ActiveTarget name="Debug - Edittime" />
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27">
-		<Cursor position="9408" topLine="106" />
+		<Cursor position="83" topLine="0" />
 	</File>
 	<File name="CheckMAJ.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="2739" topLine="75" />
+		<Cursor position="1681" topLine="40" />
+	</File>
+	<File name="CheckMAJ.h" open="0" top="0" tabpos="0">
+		<Cursor position="60" topLine="0" />
 	</File>
 	<File name="ChoiceFile.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="3855" topLine="52" />
@@ -40,7 +43,7 @@
 	<File name="Clipboard.h" open="0" top="0" tabpos="9">
 		<Cursor position="245" topLine="0" />
 	</File>
-	<File name="Compilation.cpp" open="1" top="0" tabpos="4">
+	<File name="Compilation.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="18612" topLine="307" />
 	</File>
 	<File name="Compilation.h" open="0" top="0" tabpos="0">
@@ -143,7 +146,7 @@
 		<Cursor position="2112" topLine="61" />
 	</File>
 	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="27081" topLine="479" />
+		<Cursor position="24625" topLine="516" />
 	</File>
 	<File name="EditorObjectList.h" open="0" top="0" tabpos="3">
 		<Cursor position="981" topLine="24" />
@@ -193,17 +196,17 @@
 	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2790" topLine="90" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="9605" topLine="281" />
+	<File name="Game_Develop_EditorApp.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="10090" topLine="300" />
 	</File>
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="3">
-		<Cursor position="724" topLine="0" />
+		<Cursor position="491" topLine="0" />
 	</File>
 	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="20125" topLine="325" />
+		<Cursor position="229" topLine="0" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="7">
-		<Cursor position="5881" topLine="134" />
+		<Cursor position="10297" topLine="230" />
 	</File>
 	<File name="GeneratePassword.cpp" open="0" top="0" tabpos="22">
 		<Cursor position="6280" topLine="95" />
@@ -224,7 +227,7 @@
 		<Cursor position="283" topLine="1" />
 	</File>
 	<File name="MainFichier.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="6062" topLine="163" />
+		<Cursor position="81" topLine="249" />
 	</File>
 	<File name="MainOptions.cpp" open="0" top="0" tabpos="15">
 		<Cursor position="688" topLine="26" />
@@ -245,7 +248,7 @@
 		<Cursor position="41395" topLine="794" />
 	</File>
 	<File name="ProjectManager.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="49601" topLine="1147" />
+		<Cursor position="50059" topLine="1159" />
 	</File>
 	<File name="ProjectManager.h" open="0" top="0" tabpos="8">
 		<Cursor position="411" topLine="80" />
@@ -288,9 +291,6 @@
 	</File>
 	<File name="debugMem.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="1504" topLine="69" />
-	</File>
-	<File name="debugMem.h" open="0" top="0" tabpos="0">
-		<Cursor position="0" topLine="29" />
 	</File>
 	<File name="gdTreeItemGameData.h" open="0" top="0" tabpos="0">
 		<Cursor position="486" topLine="0" />

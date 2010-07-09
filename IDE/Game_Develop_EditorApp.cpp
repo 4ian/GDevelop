@@ -287,7 +287,7 @@ bool Game_Develop_EditorApp::OnInit()
 
 
     //TEST
-    ExternalEvents externalEvent;
+    /*ExternalEvents externalEvent;
     externalEvent.SetName("Monevent");
 
     {
@@ -313,23 +313,26 @@ bool Game_Develop_EditorApp::OnInit()
         event->com1 = "Commentaire1";
         event->com2 = "Commentaire2 !! &&<><>\"\"\\<> !!";
         externalEvent.events.push_back(boost::shared_ptr<BaseEvent>(event));
-    }/*
+    }
     {
         string eventType = "Function::Function";
         gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
 
         BaseEventSPtr eventToAdd = extensionsManager->CreateEvent(eventType);
         externalEvent.events.push_back(eventToAdd);
-    }*/
+    }
 
     std::ofstream ofile("out.txt");
 	boost::archive::xml_oarchive ar(ofile);
 
+	ar.register_type(static_cast<BaseEvent *>(NULL));
 	ar.register_type(static_cast<StandardEvent *>(NULL));
+	ar.register_type(static_cast<CommentEvent *>(NULL));
 	boost::serialization::void_cast_register(static_cast<StandardEvent *>(NULL),static_cast<BaseEvent *>(NULL));
+	boost::serialization::void_cast_register(static_cast<CommentEvent *>(NULL),static_cast<BaseEvent *>(NULL));
 
 	ar << BOOST_SERIALIZATION_NVP(externalEvent);
-	ofile.close();
+	ofile.close();*/
 
 	//TEST END
 

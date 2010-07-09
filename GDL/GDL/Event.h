@@ -12,10 +12,10 @@
 #include <cmath>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include <boost/serialization/vector.hpp>
+/*#include <boost/serialization/vector.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/nvp.hpp>
-#include <boost/serialization/export.hpp>
+#include <boost/serialization/export.hpp>*/
 #include "GDL/Log.h"
 #include "GDL/Instruction.h"
 class RuntimeScene;
@@ -153,8 +153,8 @@ class GD_API BaseEvent
         }
 };
 
-BOOST_SERIALIZATION_SHARED_PTR(BaseEvent)
-BOOST_CLASS_EXPORT_KEY(BaseEvent)
+/*BOOST_SERIALIZATION_SHARED_PTR(BaseEvent)
+BOOST_CLASS_EXPORT_KEY(BaseEvent)*/
 
 /**
  * Helper function for copying vector of shared_ptr of events

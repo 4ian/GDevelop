@@ -12,9 +12,7 @@
 #include "EventsRenderingHelper.h"
 #endif
 
-/**
- * Serialize
- */
+/*
 template<class Archive>
 void StandardEvent::serialize(Archive& ar, const unsigned int version){
     ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(BaseEvent)
@@ -38,7 +36,7 @@ template void StandardEvent::serialize(
 //This is used to make the serialization library aware that code should be instantiated for serialization
 //of a given class even though the class hasn't been otherwise referred to by the program.
 #include <boost/serialization/export.hpp>
-BOOST_CLASS_EXPORT_IMPLEMENT(StandardEvent)
+BOOST_CLASS_EXPORT_IMPLEMENT(StandardEvent)*/
 
 StandardEvent::StandardEvent() :
 BaseEvent()

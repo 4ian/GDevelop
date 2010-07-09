@@ -6,10 +6,10 @@
 #ifndef COMMENTEVENT_H
 #define COMMENTEVENT_H
 
-#include <boost/shared_ptr.hpp>
+/*#include <boost/shared_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/nvp.hpp>*/
 #include "Event.h"
 class TiXmlElement;
 
@@ -66,7 +66,7 @@ class GD_API CommentEvent : public BaseEvent
                 & BOOST_SERIALIZATION_NVP(com2);
         }
 };
-BOOST_SERIALIZATION_SHARED_PTR(CommentEvent)
-BOOST_CLASS_EXPORT_KEY(CommentEvent)
+/*BOOST_SERIALIZATION_SHARED_PTR(CommentEvent)
+BOOST_CLASS_EXPORT_KEY(CommentEvent)*/
 
 #endif // COMMENTEVENT_H

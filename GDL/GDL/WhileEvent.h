@@ -1,10 +1,10 @@
 #ifndef WHILEEVENT_H
 #define WHILEEVENT_H
 
-#include <boost/shared_ptr.hpp>
+/*#include <boost/shared_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/nvp.hpp>*/
 #include "Event.h"
 class RuntimeScene;
 class ObjectsConcerned;
@@ -108,7 +108,7 @@ class WhileEvent : public BaseEvent
         }
 };
 
-BOOST_SERIALIZATION_SHARED_PTR(WhileEvent)
-BOOST_CLASS_EXPORT_KEY(WhileEvent)
+/*BOOST_SERIALIZATION_SHARED_PTR(WhileEvent)
+BOOST_CLASS_EXPORT_KEY(WhileEvent)*/
 
 #endif // WHILEEVENT_H

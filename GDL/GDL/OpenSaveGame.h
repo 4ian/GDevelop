@@ -59,12 +59,14 @@ private:
     void OpenPositions( vector < InitialPosition > & list, TiXmlElement * elem );
     void OpenGroupesObjets( vector < ObjectGroup > & list, TiXmlElement * elem );
     void OpenLayers( vector < Layer > & list, TiXmlElement * elem );
+    void OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * elem );
     static void OpenVariablesList(ListVariable & list, const TiXmlElement * elem);
 
     void SavePositions( const vector < InitialPosition > & list, TiXmlElement * positions );
     void SaveObjects( const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects );
     void SaveGroupesObjets( const vector < ObjectGroup > & list, TiXmlElement * grpsobjets );
     void SaveLayers( const vector < Layer > & list, TiXmlElement * layers );
+    void SaveExternalEvents( const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * layers );
     static void SaveVariablesList(const ListVariable & list, TiXmlElement * elem);
 };
 

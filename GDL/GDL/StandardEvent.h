@@ -10,11 +10,11 @@
 #include <wx/dcbuffer.h>
 #include <wx/html/htmprint.h>
 #endif
-#include <boost/shared_ptr.hpp>
+/*#include <boost/shared_ptr.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/nvp.hpp>*/
 #include "Event.h"
 class RuntimeScene;
 class ObjectsConcerned;
@@ -89,8 +89,8 @@ class GD_API StandardEvent : public BaseEvent
         void serialize(Archive& ar, const unsigned int version);
 };
 
-BOOST_CLASS_EXPORT_KEY(StandardEvent)
-BOOST_SERIALIZATION_SHARED_PTR(StandardEvent)
+/*BOOST_SERIALIZATION_SHARED_PTR(StandardEvent)
+BOOST_CLASS_EXPORT_KEY(StandardEvent)*/
 
 
 #endif // STANDARDEVENT_H

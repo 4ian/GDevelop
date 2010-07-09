@@ -5,10 +5,10 @@
 
 #ifndef REPEATEVENT_H
 #define REPEATEVENT_H
-#include <boost/shared_ptr.hpp>
+/*#include <boost/shared_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/nvp.hpp>*/
 #include "Event.h"
 class RuntimeScene;
 class ObjectsConcerned;
@@ -107,8 +107,8 @@ class RepeatEvent : public BaseEvent
                 & BOOST_SERIALIZATION_NVP(repeatNumberExpression);
         }
 };
-
+/*
 BOOST_SERIALIZATION_SHARED_PTR(RepeatEvent)
-BOOST_CLASS_EXPORT_KEY(RepeatEvent)
+BOOST_CLASS_EXPORT_KEY(RepeatEvent)*/
 
 #endif // REPEATEVENT_H

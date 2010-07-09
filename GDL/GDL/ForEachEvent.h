@@ -5,10 +5,10 @@
 
 #ifndef FOREACHEVENT_H
 #define FOREACHEVENT_H
-#include <boost/shared_ptr.hpp>
+/*#include <boost/shared_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/nvp.hpp>*/
 #include "Event.h"
 class RuntimeScene;
 class ObjectsConcerned;
@@ -114,7 +114,7 @@ class ForEachEvent : public BaseEvent
         }
 };
 
-BOOST_SERIALIZATION_SHARED_PTR(ForEachEvent)
-BOOST_CLASS_EXPORT_KEY(ForEachEvent)
+/*BOOST_SERIALIZATION_SHARED_PTR(ForEachEvent)
+BOOST_CLASS_EXPORT_KEY(ForEachEvent)*/
 
 #endif // FOREACHEVENT_H

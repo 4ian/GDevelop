@@ -9,7 +9,7 @@
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/EditForEachEvent.h"
 #endif
-
+/*
 //Declaration of serialization for xml archives
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
@@ -26,7 +26,7 @@ template void ForEachEvent::serialize(
 //This is used to make the serialization library aware that code should be instantiated for serialization
 //of a given class even though the class hasn't been otherwise referred to by the program.
 #include <boost/serialization/export.hpp>
-BOOST_CLASS_EXPORT_IMPLEMENT(ForEachEvent)
+BOOST_CLASS_EXPORT_IMPLEMENT(ForEachEvent)*/
 
 ForEachEvent::ForEachEvent() :
 BaseEvent(),

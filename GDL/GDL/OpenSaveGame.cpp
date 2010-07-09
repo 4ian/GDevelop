@@ -41,6 +41,7 @@
 #include "GDL/EmptyEvent.h"
 #include "GDL/ForEachEvent.h"
 #include "GDL/WhileEvent.h"
+#include "GDL/ExternalEvents.h"
 #include "GDL/StandardEvent.h"
 #include "GDL/RepeatEvent.h"
 #include <boost/shared_ptr.hpp>
@@ -198,7 +199,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     if ( elem )
         OpenVariablesList(game.variables, elem);
 
-    //Scenes du jeu
+    //Scenes
     elem = hdl.FirstChildElement().FirstChildElement( "Scenes" ).Element();
     if ( elem == NULL ) { MSG( "Les informations concernant les scenes manquent" ); }
     game.scenes.clear();
@@ -243,6 +244,11 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 
         elem = elem->NextSiblingElement();
     }
+
+    //External events
+    elem = hdl.FirstChildElement().FirstChildElement( "ExternalEvents" ).Element();
+    if ( elem )
+        OpenExternalEvents(game.externalEvents, elem);
 
     //Compatibility code --- with Game Develop 1.3.9262 and inferior
     if ( major <= 1 && minor <= 3 && build <= 9262 && revision <= 46622)
@@ -961,8 +967,6 @@ std::string AddBackSlashBeforeQuotes(std::string text)
 
 std::string AdaptLegacyTextExpression(std::string expression, Game & game, Scene & scene)
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-
     string newExpression;
     bool firstToken = true;
     size_t lastPos = 0;
@@ -1538,6 +1542,27 @@ void OpenSaveGame::OpenLayers(vector < Layer > & list, TiXmlElement * elem)
     }
 }
 
+
+void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * elem )
+{
+    list.clear();
+    TiXmlElement * elemScene = elem->FirstChildElement();
+
+    while ( elemScene )
+    {
+        boost::shared_ptr<ExternalEvents> externalEvents = boost::shared_ptr<ExternalEvents>(new ExternalEvents);
+
+        string name = elemScene->Attribute( "Name" ) != NULL ? elemScene->Attribute( "Name" ) : "";
+        externalEvents->SetName(name);
+
+        if ( elemScene->FirstChildElement("Events") != NULL )
+            OpenEvents(externalEvents->events, elemScene->FirstChildElement("Events"));
+
+        list.push_back(externalEvents);
+        elemScene = elemScene->NextSiblingElement();
+    }
+}
+
 void OpenSaveGame::OpenVariablesList(ListVariable & list, const TiXmlElement * elem)
 {
     list.Clear();
@@ -1693,7 +1718,7 @@ bool OpenSaveGame::SaveToFile(string file)
     root->LinkEndChild( variables );
     SaveVariablesList(game.variables, variables);
 
-    //Les scènes
+    //Scenes
     TiXmlElement * scenes = new TiXmlElement( "Scenes" );
     root->LinkEndChild( scenes );
     TiXmlElement * scene;
@@ -1745,6 +1770,11 @@ bool OpenSaveGame::SaveToFile(string file)
 
         }
     }
+
+    //External events
+    TiXmlElement * externalEvents = new TiXmlElement( "ExternalEvents" );
+    root->LinkEndChild( externalEvents );
+    SaveExternalEvents(game.externalEvents, externalEvents);
 
     //Sauvegarde le tout
     if ( !doc.SaveFile( file.c_str() ) )
@@ -1989,6 +2019,20 @@ void OpenSaveGame::SaveVariablesList(const ListVariable & list, TiXmlElement * e
     }
 }
 
+void OpenSaveGame::SaveExternalEvents(const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * elem)
+{
+    for ( unsigned int j = 0;j < list.size();j++ )
+    {
+        TiXmlElement * externalEvents = new TiXmlElement( "ExternalEvents" );
+        elem->LinkEndChild( externalEvents );
+
+        externalEvents->SetAttribute("Name", list[j]->GetName().c_str());
+
+        TiXmlElement * events = new TiXmlElement( "Events" );
+        externalEvents->LinkEndChild( events );
+        SaveEvents(list[j]->events, events);
+    }
+}
 
 ////////////////////////////////////////////////////////////
 /// Recréer les chemins

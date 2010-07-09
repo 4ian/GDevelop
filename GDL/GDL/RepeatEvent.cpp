@@ -6,13 +6,12 @@
 #include "RuntimeScene.h"
 #include "ObjectsConcerned.h"
 #include "GDL/OpenSaveGame.h"
-#include <boost/serialization/export.hpp>
 
 #if defined(GDE)
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/EditRepeatEvent.h"
 #endif
-
+/*
 //Declaration of serialization for xml archives
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
@@ -28,7 +27,8 @@ template void RepeatEvent::serialize(
 
 //This is used to make the serialization library aware that code should be instantiated for serialization
 //of a given class even though the class hasn't been otherwise referred to by the program.
-BOOST_CLASS_EXPORT_IMPLEMENT(RepeatEvent)
+#include <boost/serialization/export.hpp>
+BOOST_CLASS_EXPORT_IMPLEMENT(RepeatEvent)*/
 
 RepeatEvent::RepeatEvent() :
 BaseEvent(),

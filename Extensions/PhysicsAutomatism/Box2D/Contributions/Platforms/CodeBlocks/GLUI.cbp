@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="GLUI" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\..\Library\libGLUI" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj\Debug\" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="..\..\Library\libGLUI" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj\Release\" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add option="-DFREEGLUT_STATIC" />
+			<Add directory="..\..\include" />
+			<Add directory="..\..\Contrib" />
+			<Add directory="..\..\Contrib\freeglut" />
+		</Compiler>
+		<Linker>
+			<Add library="..\..\Library\libBox2D.a" />
+			<Add library="GLU32" />
+			<Add library="OpenGL32" />
+			<Add library="WinMM" />
+			<Add library="GDI32" />
+		</Linker>
+		<Unit filename="..\..\Contrib\glui\GL\glui.h" />
+		<Unit filename="..\..\Contrib\glui\algebra3.cpp" />
+		<Unit filename="..\..\Contrib\glui\algebra3.h" />
+		<Unit filename="..\..\Contrib\glui\arcball.cpp" />
+		<Unit filename="..\..\Contrib\glui\arcball.h" />
+		<Unit filename="..\..\Contrib\glui\glui.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_add_controls.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_bitmap_img_data.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_bitmaps.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_button.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_checkbox.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_column.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_commandline.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_control.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_edittext.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_filebrowser.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_internal.h" />
+		<Unit filename="..\..\Contrib\glui\glui_internal_control.h" />
+		<Unit filename="..\..\Contrib\glui\glui_list.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_listbox.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_mouse_iaction.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_node.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_panel.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_radio.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_rollout.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_rotation.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_scrollbar.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_separator.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_spinner.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_statictext.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_string.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_textbox.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_translation.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_tree.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_treepanel.cpp" />
+		<Unit filename="..\..\Contrib\glui\glui_window.cpp" />
+		<Unit filename="..\..\Contrib\glui\quaternion.cpp" />
+		<Unit filename="..\..\Contrib\glui\quaternion.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="FreeGlut" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\..\Library\libFreeGLUT" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj\Debug\" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="..\..\Library\libFreeGLUT" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj\Release\" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add option="-DFREEGLUT_STATIC" />
+			<Add directory="..\..\include" />
+			<Add directory="..\..\Contrib" />
+			<Add directory="..\..\Contrib\freeglut" />
+		</Compiler>
+		<Linker>
+			<Add library="..\..\Library\libBox2D.a" />
+			<Add library="GLU32" />
+			<Add library="OpenGL32" />
+			<Add library="WinMM" />
+			<Add library="GDI32" />
+		</Linker>
+		<Unit filename="..\..\Contrib\freeglut\GL\freeglut.h" />
+		<Unit filename="..\..\Contrib\freeglut\GL\freeglut_ext.h" />
+		<Unit filename="..\..\Contrib\freeglut\GL\freeglut_std.h" />
+		<Unit filename="..\..\Contrib\freeglut\GL\glut.h" />
+		<Unit filename="..\..\Contrib\freeglut\freeglut_callbacks.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_cursor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_display.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_ext.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_font.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_font_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_gamemode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_geometry.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_glutfont_definitions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_init.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_internal.h" />
+		<Unit filename="..\..\Contrib\freeglut\freeglut_joystick.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_misc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_overlay.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_state.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_stroke_mono_roman.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_stroke_roman.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_structure.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_teapot.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_teapot_data.h" />
+		<Unit filename="..\..\Contrib\freeglut\freeglut_videoresize.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\Contrib\freeglut\freeglut_window.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

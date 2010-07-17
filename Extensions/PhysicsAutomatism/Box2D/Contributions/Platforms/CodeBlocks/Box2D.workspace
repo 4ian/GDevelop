@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="Engine.cbp" />
+		<Project filename="HelloWorld.cbp">
+			<Depends filename="Engine.cbp" />
+		</Project>
+		<Project filename="TestBed.cbp" active="1">
+			<Depends filename="Engine.cbp" />
+			<Depends filename="FreeGLUT.cbp" />
+			<Depends filename="GLUI.cbp" />
+		</Project>
+		<Project filename="FreeGLUT.cbp" />
+		<Project filename="GLUI.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>

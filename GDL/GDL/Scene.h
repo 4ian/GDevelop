@@ -70,4 +70,11 @@ struct SceneHasName : public std::binary_function<boost::shared_ptr<Scene>, stri
  */
 unsigned int GD_API GetTypeIdOfObject(const Game & game, const Scene & scene, std::string objectName, bool searchInGroups = true);
 
+/**
+ * Get automatisms of an object/group
+ * @return vector containing names of automatisms
+ */
+vector < unsigned int > GD_API GetAutomatismsOfObject(const Game & game, const Scene & scene, std::string objectName, bool searchInGroups = true);
+
+
 #endif // SCENE_H

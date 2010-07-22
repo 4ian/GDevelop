@@ -16,6 +16,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "GDL/ObjectIdentifiersManager.h"
+#include "GDL/ExtensionsManager.h"
 #include "GDL/Log.h"
 #include "GDL/Force.h"
 #include "GDL/constantes.h"
@@ -25,6 +26,8 @@
 #include "GDL/MemTrace.h"
 #include "GDL/ErrorReport.h"
 #include "GDL/CommonTools.h"
+#include "GDL/Automatism.h"
+#include <typeinfo>
 
 #ifdef GDE
 #include "GDL/CommonTools.h"
@@ -46,11 +49,41 @@ Object::Object(string name_) :
     objectId = objectIdentifiersManager->GetOIDfromName(name_);
 
     this->ClearForce();
+
+    //TEST
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+    if ( extensionsManager->HasAutomatism("PhysicsAutomatism::PhysicsAutomatism") ) cout << "ok, y a phys" << endl;
+
+    boost::shared_ptr<Automatism> automatism = extensionsManager->CreateAutomatism("PhysicsAutomatism::PhysicsAutomatism");
+
+    automatisms[automatism->GetTypeId()] = automatism;
+    automatisms[automatism->GetTypeId()]->SetOwner(this);
 }
 
-Object::~Object()
+void Object::Init(const Object & object)
 {
-    //dtor
+    Forces = object.Forces;
+    Force5 = object.Force5;
+    variablesObjet = object.variablesObjet;
+    errors = object.errors;
+
+    name = object.name;
+    objectId = object.objectId;
+    typeId = object.typeId;
+
+    X = object.X;
+    Y = object.Y;
+    zOrder = object.zOrder;
+    hidden = object.hidden;
+    layer = object.layer;
+
+    automatisms.clear();
+    for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
+    {
+    	automatisms[it->first] = it->second->Clone();
+    	automatisms[it->first]->SetOwner(this);
+    }
 }
 
 /**
@@ -157,6 +190,54 @@ float Object::TotalForceLength() const
     return ForceMoyenne.GetLength();
 }
 
+void Object::DoAutomatismsPreEvents(RuntimeScene & scene)
+{
+    for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+        it->second->StepPreEvents(scene);
+}
+
+void Object::DoAutomatismsPostEvents(RuntimeScene & scene)
+{
+    for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+        it->second->StepPostEvents(scene);
+}
+
+void Object::CallAutomatismsSharedInitialization(RuntimeScene & scene, vector<const std::type_info*> & alreadyCalled)
+{
+    for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    {
+        //Shared initialization function must be called once only for each automatism type.
+        if ( find(alreadyCalled.begin(), alreadyCalled.end(), &typeid(*it->second)) == alreadyCalled.end())
+        {
+            it->second->InitializeSharedDatas(scene);
+            alreadyCalled.push_back(&typeid(*it->second));
+        }
+    }
+}
+
+void Object::CallAutomatismsSharedUnInitialization(RuntimeScene & scene, vector<const std::type_info*> & alreadyCalled)
+{
+    for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    {
+        //Shared initialization function must be called once only for each automatism type.
+        if ( find(alreadyCalled.begin(), alreadyCalled.end(), &typeid(*it->second)) == alreadyCalled.end())
+        {
+            it->second->UnInitializeSharedDatas(scene);
+            alreadyCalled.push_back(&typeid(*it->second));
+        }
+    }
+}
+
+vector < unsigned int > Object::GetAllAutomatismsTypes()
+{
+    vector < unsigned int > allTypes;
+
+    for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    	allTypes.push_back(it->first);
+
+    return allTypes;
+}
+
 #if GDE
 void Object::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
@@ -213,13 +294,10 @@ unsigned int Object::GetNumberOfProperties() const
 }
 #endif
 
-////////////////////////////////////////////////////////////
-/// Test si l'objet doit
-/// être supprimé
-////////////////////////////////////////////////////////////
-bool MustBeDeleted( boost::shared_ptr<Object> object )
+
+bool GD_API MustBeDeleted ( boost::shared_ptr<Object> object )
 {
-    return object->GetName() == "";
+    return object->GetName().empty();
 }
 
 void DestroyBaseObject(Object * object)

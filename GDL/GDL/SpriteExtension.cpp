@@ -50,7 +50,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/opacity.png",
                        &SpriteObject::ActOpacity);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Valeur"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -66,7 +66,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/animation.png",
                        &SpriteObject::ActChangeAnimation);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Valeur"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -82,7 +82,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/direction.png",
                        &SpriteObject::ActChangeDirection);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Valeur"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -98,7 +98,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/sprite.png",
                        &SpriteObject::ActChangeSprite);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Valeur"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -114,7 +114,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/animation.png",
                        &SpriteObject::ActPauseAnimation);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_ACTION()
@@ -128,7 +128,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/animation.png",
                        &SpriteObject::ActPlayAnimation);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_ACTION()
@@ -142,7 +142,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/direction.png",
                        &SpriteObject::ActTourneVersPos);
 
-            DECLARE_PARAMETER("objet", _("Objet à tourner"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet à tourner"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Position X"), false, "")
             DECLARE_PARAMETER("expression", _("Position Y"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -158,7 +158,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/scale.png",
                        &SpriteObject::ActChangeScale);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Valeur"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -174,7 +174,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/scale.png",
                        &SpriteObject::ActChangeScaleWidth);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Valeur"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -190,7 +190,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/scale.png",
                        &SpriteObject::ActChangeScaleHeight);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Valeur"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -206,7 +206,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/conditions/animation.png",
                        &SpriteObject::CondAnim);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Numéro de l'animation à tester"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -222,7 +222,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/conditions/direction.png",
                        &SpriteObject::CondDirection);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Numéro de la direction à tester"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -238,7 +238,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/conditions/sprite.png",
                        &SpriteObject::CondSprite);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Numéro de l'image à tester"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -254,7 +254,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/conditions/animation.png",
                        &SpriteObject::CondAnimStopped);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_CONDITION()
@@ -268,7 +268,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/conditions/scaleWidth.png",
                        &SpriteObject::CondScaleWidth);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -284,7 +284,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/conditions/scaleHeight.png",
                        &SpriteObject::CondScaleHeight);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -300,7 +300,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/conditions/opacity.png",
                        &SpriteObject::CondOpacityObjet);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -316,7 +316,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/conditions/opacity.png",
                        &SpriteObject::CondBlendMode);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Valeur à tester ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -332,7 +332,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/copy.png",
                        &SpriteObject::ActCopyImageOnImageOfSprite);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("text", _("Nom de l'image source"), false, "")
             DECLARE_PARAMETER("expression", _("Position X"), false, "")
             DECLARE_PARAMETER("expression", _("Position Y"), false, "")
@@ -350,7 +350,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/opacity.png",
                        &SpriteObject::ActCreateMaskFromColorOnActualImage);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("color", _("Couleur à rendre transparente"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -365,7 +365,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/color.png",
                        &SpriteObject::ActChangeColor);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("color", _("Couleur"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -380,7 +380,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/color.png",
                        &SpriteObject::ActBlendMode);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("expression", _("Mode ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -395,7 +395,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/flipX.png",
                        &SpriteObject::ActFlipX);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("yesorno", _("Activer l'inversion"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -410,7 +410,7 @@ ExtensionSprite::ExtensionSprite()
                        "res/actions/flipY.png",
                        &SpriteObject::ActFlipY);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+            DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
             DECLARE_PARAMETER("yesorno", _("Activer l'inversion"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -484,7 +484,7 @@ ExtensionSprite::ExtensionSprite()
                    "res/conditions/surObjet.png",
                    &CondSourisSurObjet);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "Sprite")
+        DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
         DECLARE_PARAMETER_OPTIONAL("yesorno", _("Test précis ? ( oui par défaut )"), false, "")
 
     DECLARE_END_CONDITION()
@@ -498,8 +498,8 @@ ExtensionSprite::ExtensionSprite()
                       "res/conditions/estTourne.png",
                       &CondEstTourne);
 
-        DECLARE_PARAMETER("objet", _("Nom de l'objet"), true, "Sprite")
-        DECLARE_PARAMETER("objet", _("Nom du second objet"), true, "")
+        DECLARE_PARAMETER("object", _("Nom de l'objet"), true, "Sprite")
+        DECLARE_PARAMETER("object", _("Nom du second objet"), true, "")
         DECLARE_PARAMETER("expression", _("Angle de tolérance ( 0 : tolérance minimale )"), false, "")
         MAIN_OBJECTS_IN_PARAMETERS(0,1)
 
@@ -513,8 +513,8 @@ ExtensionSprite::ExtensionSprite()
                       "res/conditions/collision.png",
                       &CondCollision);
 
-        DECLARE_PARAMETER("objet", _("Objet 1"), true, "Sprite")
-        DECLARE_PARAMETER("objet", _("Objet 2"), true, "Sprite")
+        DECLARE_PARAMETER("object", _("Objet 1"), true, "Sprite")
+        DECLARE_PARAMETER("object", _("Objet 2"), true, "Sprite")
 
     DECLARE_END_CONDITION()
     DECLARE_CONDITION("CollisionNP",
@@ -526,8 +526,8 @@ ExtensionSprite::ExtensionSprite()
                       "res/conditions/collision.png",
                       &CondCollisionNP);
 
-        DECLARE_PARAMETER("objet", _("Objet 1"), true, "Sprite")
-        DECLARE_PARAMETER("objet", _("Objet 2"), true, "Sprite")
+        DECLARE_PARAMETER("object", _("Objet 1"), true, "Sprite")
+        DECLARE_PARAMETER("object", _("Objet 2"), true, "Sprite")
 
     DECLARE_END_CONDITION()
 
@@ -540,8 +540,8 @@ ExtensionSprite::ExtensionSprite()
                    "res/actions/direction.png",
                    &ActTourneVers);
 
-        DECLARE_PARAMETER("objet", _("Objet à tourner"), true, "Sprite")
-        DECLARE_PARAMETER("objet", _("Objet vers lequel se tourner"), true, "")
+        DECLARE_PARAMETER("object", _("Objet à tourner"), true, "Sprite")
+        DECLARE_PARAMETER("object", _("Objet vers lequel se tourner"), true, "")
 
     DECLARE_END_ACTION()
 }

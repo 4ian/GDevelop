@@ -13,7 +13,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/create.png",
                    &ActCreate);
 
-        DECLARE_PARAMETER("objet", _("Objet à créer"), true, "")
+        DECLARE_PARAMETER("object", _("Objet à créer"), true, "")
         DECLARE_PARAMETER("expression", _("Position X"), false, "")
         DECLARE_PARAMETER("expression", _("Position Y"), false, "")
         DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( calque de base si vide )"), false, "")
@@ -45,7 +45,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/add.png",
                    &ActAjoutObjConcern);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
 
     DECLARE_END_ACTION()
 
@@ -58,7 +58,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/ajouthasard.png",
                    &ActAjoutHasard);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
 
     DECLARE_END_ACTION()
 
@@ -71,8 +71,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/ecarter.png",
                    &ActRebondir);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
-        DECLARE_PARAMETER("objet", _("Objet 2 ( Ne bougera pas )"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet 2 ( Ne bougera pas )"), true, "")
 
     DECLARE_END_ACTION()
 
@@ -85,8 +85,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/ecarter.png",
                    &ActEcarter);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
-        DECLARE_PARAMETER("objet", _("Objet 2 ( Ne bougera pas )"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet 2 ( Ne bougera pas )"), true, "")
 
     DECLARE_END_ACTION()
 
@@ -99,8 +99,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/forceVers.png",
                    &ActAddForceVers);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
-        DECLARE_PARAMETER("objet", _("Objet vers lequel se diriger"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet vers lequel se diriger"), true, "")
         DECLARE_PARAMETER("expression", _("Longueur en pixel"), false, "")
         DECLARE_PARAMETER("expression", _("Dissipation ( 0 par défaut )"), false, "")
         MAIN_OBJECTS_IN_PARAMETERS(0,1)
@@ -116,8 +116,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/forceTourne.png",
                    &ActAddForceTourne);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
-        DECLARE_PARAMETER("objet", _("Objet autour duquel tourner"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet autour duquel tourner"), true, "")
         DECLARE_PARAMETER("expression", _("Vitesse ( Degrés par secondes )"), false, "")
         DECLARE_PARAMETER("expression", _("Distance ( en pixel )"), false, "")
         DECLARE_PARAMETER("expression", _("Dissipation ( 0 par défaut )"), false, "")
@@ -134,8 +134,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/positionAutour.png",
                    &ActMettreAutour);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
-        DECLARE_PARAMETER("objet", _("Objet autour duquel positionner le premier"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet autour duquel positionner le premier"), true, "")
         DECLARE_PARAMETER("expression", _("Distance"), false, "")
         DECLARE_PARAMETER("expression", _("Angle en degré"), false, "")
         MAIN_OBJECTS_IN_PARAMETERS(0,1)
@@ -162,8 +162,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/conditions/sedirige.png",
                    &CondSeDirige);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
-        DECLARE_PARAMETER("objet", _("Objet 2"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet 2"), true, "")
         DECLARE_PARAMETER("expression", _("Angle de tolérance"), false, "")
         MAIN_OBJECTS_IN_PARAMETERS(0,1)
 
@@ -178,8 +178,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/conditions/distance.png",
                    &CondDistance);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
-        DECLARE_PARAMETER("objet", _("Objet 2"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet 2"), true, "")
         DECLARE_PARAMETER("expression", _("Distance"), false, "")
         DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
         MAIN_OBJECTS_IN_PARAMETERS(0,1)
@@ -195,7 +195,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/conditions/add.png",
                    &CondAjoutObjConcern);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
 
     DECLARE_END_CONDITION()
 
@@ -208,7 +208,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/conditions/ajouthasard.png",
                    &CondAjoutHasard);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
 
     DECLARE_END_CONDITION()
 
@@ -221,7 +221,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/conditions/nbObjet.png",
                    &CondNbObjet);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
         DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
         MAIN_OBJECTS_IN_PARAMETER(0)

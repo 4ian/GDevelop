@@ -10,6 +10,46 @@
 /**
  * Common instruction for executing instruction on each object "Foo".
  */
+bool AutomatismActionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
+
+	ObjList::iterator obj = list.begin();
+	ObjList::const_iterator obj_end = list.end();
+    for ( ; obj != obj_end; ++obj )
+        ((*obj)->GetAutomatism(action.automatismTypeId).get()->*action.automatismFunction)(scene, objectsConcerned, action);
+
+    return true;
+}
+
+/**
+ * Common instruction for testing instruction on each object "Foo".
+ */
+bool AutomatismConditionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    //Need to copy the old objectsConcerned object to evaluate properly the arguments
+    ObjectsConcerned objectsConcernedForExpressions = objectsConcerned;
+
+    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
+    bool isTrue = false;
+
+	ObjList::iterator obj = list.begin();
+	ObjList::const_iterator obj_end = list.end();
+    for ( ; obj != obj_end; ++obj )
+    {
+        if ( ((*obj)->GetAutomatism(condition.automatismTypeId).get()->*condition.automatismFunction)(scene, objectsConcernedForExpressions, condition) ^ condition.IsInverted())
+        {
+            isTrue = true;
+            objectsConcerned.objectsPicked.AddObject( *obj );
+        }
+    }
+
+    return isTrue;
+}
+
+/**
+ * Common instruction for executing instruction on each object "Foo".
+ */
 bool ActionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());

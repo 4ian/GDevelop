@@ -30,6 +30,7 @@ class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
 class TiXmlElement;
+class Automatism;
 #ifdef GDE
 class wxBitmap;
 class Game;
@@ -37,6 +38,7 @@ class Scene;
 class wxWindow;
 class MainEditorCommand;
 class ResourcesMergingHelper;
+class type_info;
 #include <wx/wx.h>
 #endif
 
@@ -50,7 +52,9 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
     public:
 
         Object(string name);
-        virtual ~Object();
+        Object(const Object & object) { Init(object); };
+        Object& operator=(const Object & object) {if( (this) != &object ) Init(object); return *this; }
+        virtual ~Object() {};
         virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new Object(*this));}
 
         /**
@@ -205,6 +209,36 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         inline void SetLayer(string layer_) { layer = layer_;}
         inline string GetLayer() const { return layer; }
 
+        /**
+         * Call each automatism before events
+         */
+        void DoAutomatismsPreEvents(RuntimeScene & scene);
+
+        /**
+         * Call each automatism after events
+         */
+        void DoAutomatismsPostEvents(RuntimeScene & scene);
+
+        /**
+         * Call initialisation routine of each automatism type
+         */
+        void CallAutomatismsSharedInitialization(RuntimeScene & scene, vector<const std::type_info*> & alreadyCalled);
+
+        /**
+         * Call uninitialisation routine of each automatism type
+         */
+        void CallAutomatismsSharedUnInitialization(RuntimeScene & scene, vector<const std::type_info*> & alreadyCalled);
+
+        /**
+         * Get automatism from type
+         */
+        inline boost::shared_ptr<Automatism> & GetAutomatism(unsigned int type) { return automatisms[type]; }
+
+        /**
+         * Get all types of automatisms used by the object
+         */
+        vector < unsigned int > GetAllAutomatismsTypes();
+
         //Variables
         ListVariable variablesObjet;
 
@@ -309,13 +343,20 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
         string name;
         unsigned int objectId; ///< The ObjectId, associated with the name, is used ( instead of the name ) by the runtime to identify objects.
-        unsigned int typeId; ///< The TypeId indicate of which type is the object. ( To test if we can do something reserved to some objects with it )*/
+        unsigned int typeId; ///< The TypeId indicate of which type is the object. ( To test if we can do something reserved to some objects with it )
 
         float X;
         float Y;
         int zOrder;
         bool hidden;
         string layer;
+        std::map<unsigned int, boost::shared_ptr<Automatism> > automatisms;
+
+        /**
+         * Initialize from another object. Used by copy-ctor and assign-op.
+         * Don't forget to update me if members were changed !
+         */
+        void Init(const Object & object);
 };
 
 //Actions

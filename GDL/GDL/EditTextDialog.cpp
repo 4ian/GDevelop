@@ -179,7 +179,7 @@ mainObjectsName(mainObjectsName_)
 	    {
             wxTreeItemId objectTypeItem =   objectsTypes[j] == "" ?
                                             ObjList->AppendItem(extensionItem, _("Tous les objets"), 0) :
-                                            ObjList->AppendItem(extensionItem, _("Objet") + wxString(" ") + extensions[i]->GetExtensionObjectName(objectsTypes[j]),0) ;
+                                            ObjList->AppendItem(extensionItem, _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectsTypes[j]).fullname,0) ;
 
             //Add each object expression
             std::map<string, StrExpressionInfos > allObjExpr = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);

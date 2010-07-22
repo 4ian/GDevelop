@@ -36,6 +36,20 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
                                                                                                     conditions[cId].GetType());
         }
 
+        //Affection to an automatism member function if found
+        vector < unsigned int > automatisms = GetAutomatismsOfObject(*scene.game, scene, objectName);
+        for (unsigned int i = 0;i<automatisms.size();++i)
+        {
+            if ( extensionsManager->HasAutomatismCondition(automatisms[i],
+                                                    conditions[cId].GetType()))
+            {
+                conditions[cId].function = &AutomatismConditionForEachObject;
+                conditions[cId].automatismTypeId = automatisms[i];
+                conditions[cId].automatismFunction = extensionsManager->GetAutomatismConditionFunctionPtr(automatisms[i],
+                                                                                                        conditions[cId].GetType());
+            }
+        }
+
         //Verify that there are not mismatch between object type in parameters
         InstructionInfos instrInfos = extensionsManager->GetConditionInfos(conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
@@ -94,6 +108,20 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
             actions[aId].function = &ActionForEachObject;
             actions[aId].objectFunction = extensionsManager->GetObjectActionFunctionPtr(objectTypeId,
                                                                                                     actions[aId].GetType());
+        }
+
+        //Affection to an automatism member function if found
+        vector < unsigned int > automatisms = GetAutomatismsOfObject(*scene.game, scene, objectName);
+        for (unsigned int i = 0;i<automatisms.size();++i)
+        {
+            if ( extensionsManager->HasAutomatismAction(automatisms[i],
+                                                    actions[aId].GetType()))
+            {
+                actions[aId].function = &AutomatismActionForEachObject;
+                actions[aId].automatismTypeId = automatisms[i];
+                actions[aId].automatismFunction = extensionsManager->GetAutomatismActionFunctionPtr(automatisms[i],
+                                                                                                        actions[aId].GetType());
+            }
         }
 
         //Verify that there are not mismatch between object type in parameters

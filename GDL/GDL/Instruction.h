@@ -12,6 +12,7 @@ class RuntimeScene;
 class Evaluateur;
 class ObjectsConcerned;
 class Object;
+class Automatism;
 #include "GDL/GDExpression.h"
 
 using namespace std;
@@ -24,10 +25,8 @@ class GD_API Instruction
 {
     public:
 
-        Instruction(string type_);
-        Instruction(string type_, const vector <GDExpression> & parameters_, bool isLocal);
-        Instruction(string type_, const vector <GDExpression> & parameters_, bool isLocal, bool pContraire);
-        Instruction();
+        Instruction(string type_ = "");
+        Instruction(string type_, const vector <GDExpression> & parameters_, bool isLocal = true , bool pContraire = false);
         virtual ~Instruction();
 
         typedef bool (*ptrFunction)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction );
@@ -35,6 +34,10 @@ class GD_API Instruction
 
         typedef bool (Object::*ptrObjectFunction)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction );
         ptrObjectFunction objectFunction; ///<Function to call on each object, if the instruction need one.
+
+        unsigned int automatismTypeId; ///<Automatism type to call, if the instruction need one
+        typedef bool (Automatism::*ptrAutomatismFunction)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction );
+        ptrAutomatismFunction automatismFunction; ///<Function to call on each object automatism, if the instruction need one.
 
         /** Access type
          * \return The type of the instruction

@@ -77,7 +77,7 @@ string TranslateAction::LabelFromType(string type)
         return "";
     else if ( type == "expression" )
         return static_cast<string>(_("Expression"));
-    else if ( type == "objet" )
+    else if ( type == "object" )
         return static_cast<string>(_("Choisir l'objet"));
     else if ( type == "signe" )
         return static_cast<string>(_("Choisir le signe"));
@@ -123,7 +123,7 @@ wxBitmap TranslateAction::BitmapFromType(string type)
         return bitmapGUIManager->unknownBt;
     else if ( type == "expression" )
         return bitmapGUIManager->expressionBt;
-    else if ( type == "objet" )
+    else if ( type == "object" )
         return bitmapGUIManager->objetBt;
     else if ( type == "signe" )
         return bitmapGUIManager->signeBt;
@@ -165,7 +165,7 @@ string TranslateAction::AddHTMLToParameter(string & parameter, string type)
 {
     if ( type == "expression" )
         parameter = "<i>"+parameter+"</i>";
-    else if ( type == "objet" )
+    else if ( type == "object" )
         parameter = "<b>"+parameter+"</b>";
     else if ( type == "signe" )
         parameter = "<b>"+parameter+"</b>";

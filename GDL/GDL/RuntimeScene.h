@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 #include "GDL/Scene.h"
 #include "GDL/RuntimeGame.h"
@@ -79,10 +80,11 @@ class GD_API RuntimeScene : public Scene
         //Fonctions supplémentaires pour une RuntimeScene
         //-> Chargement à partir d'une scène
         bool LoadFromScene( const Scene & scene );
-        void PreprocessScene( const Game & Jeu );
         void PreprocessEventList( const Game & Jeu, vector < BaseEventSPtr > & listEvent );
 
         void ChangeRenderWindow(sf::RenderWindow * window);
+        bool RenderWindowIsFullScreen() { return isFullScreen; }
+        void SetRenderWindowIsFullScreen(bool yes = true) { isFullScreen = yes; }
         void GotoSceneWhenEventsAreFinished(int scene);
 
         //-> Gestion de la boucle de jeu
@@ -100,7 +102,6 @@ class GD_API RuntimeScene : public Scene
         inline float GetTimeFromStart() const { return timeFromStart; };
         inline bool IsFirstLoop() const { return firstLoop; };
 
-
         bool StopMusic();
 
     protected:
@@ -112,18 +113,18 @@ class GD_API RuntimeScene : public Scene
         void Render();
         bool DisplayLegacyTexts(string layer = "");
         bool OrderObjectsByZOrder( ObjList & objList );
-        void GestionObjets();
+        void ManageObjectsBeforeEvents();
+        void ManageObjectsAfterEvents();
         void ManageRenderTargetEvents();
-        bool UpdateMousePos();
         bool UpdateTime();
-        void GestionMusique();
+        void ManageSounds();
         #ifndef RELEASE
         void DisplayProfile(CProfileIterator * iter, int x, int & y);
         #endif
 
         //Données supplémentaires pour une RuntimeScene
         bool firstLoop;
-        bool isFullScreen;
+        bool isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
         float realElapsedTime;
         float elapsedTime;
         float timeScale;

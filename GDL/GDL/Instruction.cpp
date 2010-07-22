@@ -12,6 +12,8 @@ GDExpression Instruction::badExpression("");
 Instruction::Instruction(string type_) :
 function(NULL),
 objectFunction(NULL),
+automatismTypeId(0),
+automatismFunction(NULL),
 type(type_),
 isLocal(true),
 inverted(false)
@@ -25,25 +27,11 @@ selected(false)
     parameters.reserve(8);
 }
 
-Instruction::Instruction(string type_, const vector <GDExpression> & parameters_, bool isLocal_) :
-function(NULL),
-objectFunction(NULL),
-type(type_),
-isLocal(isLocal_),
-inverted(false),
-parameters(parameters_)
-#if defined(GDE)
-,renderedHeightNeedUpdate(true),
-renderedHeight(0),
-selected(false)
-#endif
-{
-    parameters.reserve(8);
-}
-
 Instruction::Instruction(string type_, const vector <GDExpression> & parameters_, bool isLocal_, bool inverted_) :
 function(NULL),
 objectFunction(NULL),
+automatismTypeId(0),
+automatismFunction(NULL),
 type(type_),
 isLocal(isLocal_),
 inverted(inverted_),
@@ -54,21 +42,6 @@ renderedHeight(0),
 selected(false)
 #endif
 {
-    parameters.reserve(8);
-}
-
-Instruction::Instruction() :
-function(NULL),
-objectFunction(NULL),
-isLocal(true),
-#if defined(GDE)
-renderedHeightNeedUpdate(true),
-renderedHeight(0),
-selected(false),
-#endif
-inverted(false)
-{
-    //ctor
     parameters.reserve(8);
 }
 

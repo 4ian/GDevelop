@@ -33,7 +33,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/position.png",
                        &Object::CondPosX);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Position X"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -49,7 +49,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/position.png",
                        &Object::CondPosY);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Position Y"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -65,7 +65,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/position.png",
                        &Object::ActMettreX);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Valeur"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -81,7 +81,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/position.png",
                        &Object::ActMettreY);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Valeur"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -97,7 +97,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/position.png",
                        &Object::ActMettreXY);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Position X"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
             DECLARE_PARAMETER("expression", _("Position Y"), false, "")
@@ -115,7 +115,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/positionAutour.png",
                        &Object::ActMettreAutourPos);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Position X"), false, "")
             DECLARE_PARAMETER("expression", _("Position Y"), false, "")
             DECLARE_PARAMETER("expression", _("Distance"), false, "")
@@ -133,7 +133,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/force.png",
                        &Object::ActAddForceXY);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Déplacement en X"), false, "")
             DECLARE_PARAMETER("expression", _("Déplacement en Y"), false, "")
             DECLARE_PARAMETER("expression", _("Dissipation ( 0 par défaut )"), false, "")
@@ -144,13 +144,13 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         DECLARE_OBJECT_ACTION("AddForceAL",
                        _("Ajouter une force ( Par angle )"),
                        _("Ajouter une force à un objet. L'objet bougera ensuite en fonction de\ntoutes les forces qui s'exercent sur lui. Cette action créé la force en utilisant l'angle et la longueur indiquée."),
-                       _("Ajouter à _PARAM0_ une force d'angle _PARAM1_° et de longeur _PARAM2_ pixels"),
+                       _("Ajouter à _PARAM0_ une force d'angle _PARAM1_° et de longueur _PARAM2_ pixels"),
                        _("Déplacement"),
                        "res/actions/force24.png",
                        "res/actions/force.png",
                        &Object::ActAddForceAL);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Angle"), false, "")
             DECLARE_PARAMETER("expression", _("Longueur ( en pixels )"), false, "")
             DECLARE_PARAMETER("expression", _("Dissipation ( 0 par défaut )"), false, "")
@@ -167,7 +167,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/force.png",
                        &Object::ActAddForceVersPos);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Position X"), false, "")
             DECLARE_PARAMETER("expression", _("Position Y"), false, "")
             DECLARE_PARAMETER("expression", _("Longueur ( en pixels )"), false, "")
@@ -185,7 +185,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/forceTourne.png",
                        &Object::ActAddForceTournePos);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Position X du point autour duquel tourner"), false, "")
             DECLARE_PARAMETER("expression", _("Position Y du point autour duquel tourner"), false, "")
             DECLARE_PARAMETER("expression", _("Vitesse ( en Degrés par secondes )"), false, "")
@@ -204,7 +204,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/arreter.png",
                        &Object::ActArreter);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_ACTION()
@@ -218,7 +218,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/delete.png",
                        &Object::ActDelete);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_ACTION()
@@ -232,7 +232,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/duplicate.png",
                        &Object::ActDuplicate);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_ACTION()
@@ -246,7 +246,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/planicon.png",
                        &Object::ActChangeZOrder);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Valeur"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -262,7 +262,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/layer.png",
                        &Object::ActChangeLayer);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("layer", _("Mettre sur le calque ( calque de base si vide )"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -277,7 +277,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/var.png",
                        &Object::ActModVarObjet);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("objectvar", _("Nom de la variable"), false, "")
             DECLARE_PARAMETER("expression", _("Valeur"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
@@ -294,7 +294,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/var.png",
                        &Object::ActModVarObjetTxt);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("objectvar", _("Nom de la variable"), false, "")
             DECLARE_PARAMETER("text", _("Texte"), false, "")
             DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
@@ -311,7 +311,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/visibilite.png",
                        &Object::ActCacheObjet);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_ACTION()
@@ -325,7 +325,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/visibilite.png",
                        &Object::ActMontreObjet);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_ACTION()
@@ -339,7 +339,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/planicon.png",
                        &Object::CondZOrder);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Plan"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -355,7 +355,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/layer.png",
                        &Object::CondLayer);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("layer", _("Calque"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -370,7 +370,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/visibilite.png",
                        &Object::CondVisibleObjet);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_CONDITION()
@@ -384,7 +384,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/visibilite.png",
                        &Object::CondInvisibleObjet);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_CONDITION()
@@ -398,7 +398,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/arret.png",
                        &Object::CondArret);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_CONDITION()
@@ -412,7 +412,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/vitesse.png",
                        &Object::CondVitesse);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Vitesse"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -428,7 +428,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/vitesse.png",
                        &Object::CondAngleOfDisplacement);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Angle ( en degrés )"), false, "")
             DECLARE_PARAMETER("expression", _("Tolérance"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
@@ -444,7 +444,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/var.png",
                        &Object::CondVarObjet);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("objectvar", _("Nom de la variable"), false, "")
             DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
@@ -461,7 +461,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/var.png",
                        &Object::CondVarObjetTxt);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("objectvar", _("Nom de la variable"), false, "")
             DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
@@ -478,7 +478,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/var.png",
                        &Object::CondVarObjetDef);
 
-            DECLARE_PARAMETER("objet", _("Objet"), true, "")
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("objectvar", _("Nom de la variable"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 

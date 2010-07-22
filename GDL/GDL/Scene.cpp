@@ -100,3 +100,61 @@ unsigned int GD_API GetTypeIdOfObject(const Game & game, const Scene & scene, st
 
     return objectTypeId;
 }
+
+vector < unsigned int > GD_API GetAutomatismsOfObject(const Game & game, const Scene & scene, std::string name, bool searchInGroups)
+{
+    bool typesAlreadyInserted = false;
+    vector < unsigned int > automatims;
+
+    //Search in objects
+    int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, name );
+    int IDglobalObject = Picker::PickOneObject( &game.globalObjects, name );
+
+    if ( IDsceneObject != -1 )
+    {
+        vector < unsigned int > objectAutomatisms = scene.initialObjects[IDsceneObject]->GetAllAutomatismsTypes();
+        copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatims));
+        typesAlreadyInserted = true;
+    }
+    else if ( IDglobalObject != -1 )
+    {
+        vector < unsigned int > objectAutomatisms = game.globalObjects[IDglobalObject]->GetAllAutomatismsTypes();
+        copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatims));
+        typesAlreadyInserted = true;
+    }
+
+    //Search in groups
+    if ( searchInGroups )
+    {
+        for (unsigned int i = 0;i<scene.objectGroups.size();++i)
+        {
+            if ( scene.objectGroups[i].GetName() == name )
+            {
+                //A group has the name searched
+                //Verifying now that all objects have common automatisms.
+
+                vector < string > groupsObjects = scene.objectGroups[i].GetAllObjectsNames();
+                for (unsigned int j = 0;j<groupsObjects.size();++j)
+                {
+                    //Get automatisms of the object of the group and delete automatism which are not in commons.
+                	vector < unsigned int > objectAutomatisms = GetAutomatismsOfObject(game, scene, groupsObjects[j], false);
+                	if (!typesAlreadyInserted)
+                	    automatims = objectAutomatisms;
+                	else
+                	{
+                        for (unsigned int a = 0 ;a<automatims.size();++a)
+                        {
+                            if ( find(objectAutomatisms.begin(), objectAutomatisms.end(), automatims[a]) == objectAutomatisms.end() )
+                            {
+                                automatims.erase(automatims.begin() + a);
+                                --a;
+                            }
+                        }
+                	}
+                }
+            }
+        }
+    }
+
+    return automatims;
+}

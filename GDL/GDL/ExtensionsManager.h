@@ -70,16 +70,28 @@ class GD_API ExtensionsManager
         InstructionFunPtr GetConditionFunctionPtr(string name) const;
 
         /**
-         * Verifying if a ( object ) action exists
-         * @return true if the ( object ) action exists
+         * Verifying if a ( object ) condition exists
+         * @return true if the ( object ) condition exists
          */
         bool HasObjectCondition(unsigned int objectTypeId, string name) const;
 
         /**
-         * Get a pointer to a ( object ) action
-         * @return Pointer to the action, NULL if this latter does not exist.
+         * Get a pointer to a ( object ) condition
+         * @return Pointer to the condition, NULL if this latter does not exist.
          */
         InstructionObjectFunPtr GetObjectConditionFunctionPtr(unsigned int objectTypeId, string name) const;
+
+        /**
+         * Verifying if a ( automatism ) condition exists
+         * @return true if the ( automatism ) condition exists
+         */
+        bool HasAutomatismCondition(unsigned int automatismTypeId, string name) const;
+
+        /**
+         * Get a pointer to a ( automatism ) condition
+         * @return Pointer to the condition, NULL if this latter does not exist.
+         */
+        InstructionAutomatismFunPtr GetAutomatismConditionFunctionPtr(unsigned int automatismTypeId, string name) const;
 
         /**
          * Verifying if a ( static ) action exists
@@ -89,13 +101,13 @@ class GD_API ExtensionsManager
 
         /**
          * Get information about an action from its type
-         * Works for object and static actions.
+         * Works for object, automatisms and static actions.
          */
         const InstructionInfos & GetActionInfos(string actionType) const;
 
         /**
          * Get information about a condition from its type
-         * Works for object and static conditions.
+         * Works for object, automatisms and static conditions.
          */
         const InstructionInfos & GetConditionInfos(string conditionType) const;
 
@@ -112,6 +124,12 @@ class GD_API ExtensionsManager
         const ExpressionInfos & GetObjectExpressionInfos(string objectType, string exprType) const;
 
         /**
+         * Get information about an expression from its type
+         * Works for automatism expressions.
+         */
+        const ExpressionInfos & GetAutomatismExpressionInfos(string autoType, string exprType) const;
+
+        /**
          * Get information about a string expression from its type
          * Works for static expressions.
          */
@@ -122,6 +140,12 @@ class GD_API ExtensionsManager
          * Works for object expressions.
          */
         const StrExpressionInfos & GetObjectStrExpressionInfos(string objectType, string exprType) const;
+
+        /**
+         * Get information about a string expression from its type
+         * Works for automatism expressions.
+         */
+        const StrExpressionInfos & GetAutomatismStrExpressionInfos(string autoType, string exprType) const;
 
         /**
          * Get a pointer to a ( static ) action
@@ -140,6 +164,18 @@ class GD_API ExtensionsManager
          * @return Pointer to the action, NULL if this latter does not exist.
          */
         InstructionObjectFunPtr GetObjectActionFunctionPtr(unsigned int objectTypeId, string name) const;
+
+        /**
+         * Verifying if a ( Automatism ) action exists
+         * @return true if the ( Automatism ) action exists
+         */
+        bool HasAutomatismAction(unsigned int automatismTypeId, string name) const;
+
+        /**
+         * Get a pointer to a ( Automatism ) action
+         * @return Pointer to the action, NULL if this latter does not exist.
+         */
+        InstructionAutomatismFunPtr GetAutomatismActionFunctionPtr(unsigned int automatismTypeId, string name) const;
 
         /**
          * Verifying if a ( static ) expression exists
@@ -164,6 +200,19 @@ class GD_API ExtensionsManager
          * @return Pointer to the expression, NULL if this latter does not exist.
          */
         ExpressionObjectFunPtr GetObjectExpressionFunctionPtr(unsigned int objectTypeId, string name) const;
+
+        /**
+         * Verifying if a ( automatism ) expression exists
+         * @return true if the ( automatism ) expression exists
+         */
+        bool HasAutomatismExpression(unsigned int automatismTypeId, string name) const;
+
+        /**
+         * Get a pointer to a ( automatism ) expression
+         * @return Pointer to the expression, NULL if this latter does not exist.
+         */
+        ExpressionAutomatismFunPtr GetAutomatismExpressionFunctionPtr(unsigned int automatismTypeId, string name) const;
+
         /**
          * Verifying if a ( static ) string expression exists
          * @return true if the ( static ) string expression exists
@@ -189,6 +238,18 @@ class GD_API ExtensionsManager
         StrExpressionObjectFunPtr GetObjectStrExpressionFunctionPtr(unsigned int objectTypeId, string name) const;
 
         /**
+         * Verifying if a ( object ) string expression exists
+         * @return true if the ( object ) string expression exists
+         */
+        bool HasAutomatismStrExpression(unsigned int automatismTypeId, string name) const;
+
+        /**
+         * Get a pointer to a ( automatism ) string expression
+         * @return Pointer to the string expression, NULL if this latter does not exist.
+         */
+        StrExpressionAutomatismFunPtr GetAutomatismStrExpressionFunctionPtr(unsigned int automatismTypeId, string name) const;
+
+        /**
          * Return a shared_ptr to a new object.
          */
         boost::shared_ptr<Object> CreateObject(unsigned int typeId, std::string name);
@@ -202,6 +263,16 @@ class GD_API ExtensionsManager
          * Create a new event of given type
          */
         boost::shared_ptr<BaseEvent> CreateEvent(std::string eventType) const;
+
+        /**
+         * Check if an automatism type is available
+         */
+        bool HasAutomatism(std::string automatism) const;
+
+        /**
+         * Create a new automatism of given type
+         */
+        boost::shared_ptr<Automatism> CreateAutomatism(std::string automatismType) const;
 
         /**
          * Get the typeId associated with a name

@@ -198,7 +198,7 @@ CameraExtension::CameraExtension()
                    "res/actions/camera.png",
                    &ActFixCamera);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_PARAMETER("expression", _("Coté haut gauche de la limite : Position X"), false, "")
         DECLARE_PARAMETER("expression", _("Coté haut gauche de la limite : Position Y"), false, "")
         DECLARE_PARAMETER("expression", _("Coté bas droit de la limite : Position X"), false, "")
@@ -219,7 +219,7 @@ CameraExtension::CameraExtension()
                    "res/actions/camera.png",
                    &ActCentreCamera);
 
-        DECLARE_PARAMETER("objet", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_PARAMETER_OPTIONAL("yesorno", _("Anticiper le déplacement de l'objet ( oui par défaut )"), false, "")
         DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( Calque de base si vide )"), false, "")
         DECLARE_PARAMETER_OPTIONAL("expression", _("Numéro de la caméra ( 0 par défaut )"), false, "")

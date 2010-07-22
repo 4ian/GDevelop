@@ -42,6 +42,7 @@ backgroundColorR(125),
 backgroundColorG(125),
 backgroundColorB(125),
 firstLoop(true),
+isFullScreen(false),
 realElapsedTime(0),
 elapsedTime(0),
 timeScale(1),
@@ -64,7 +65,11 @@ specialAction(-1)
 
 RuntimeScene::~RuntimeScene()
 {
-    //dtor
+    //Call uninitialization routine of each automatism type
+    vector < const std::type_info* > alreadyCalled;
+    for (unsigned int id = 0;id<initialObjects.size();++id)
+        initialObjects[id]->CallAutomatismsSharedUnInitialization(*this, alreadyCalled);
+
 }
 
 void RuntimeScene::Init(const RuntimeScene & scene)
@@ -149,7 +154,8 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         //Gestion pré-évènements
         ManageRenderTargetEvents();
         UpdateTime();
-        GestionMusique();
+        ManageObjectsBeforeEvents();
+        ManageSounds();
 
         //Gestions des évènements
         ObjectsConcerned objectsConcerned(&objectsInstances, &objectGroups);
@@ -162,7 +168,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         }
 
         //Gestions post-évènements
-        GestionObjets();
+        ManageObjectsAfterEvents();
 
         #ifdef GDE
         if( debugger )
@@ -463,7 +469,7 @@ bool RuntimeScene::StopMusic()
 ////////////////////////////////////////////////////////////
 /// Efface les musiques et sons terminés
 ////////////////////////////////////////////////////////////
-void RuntimeScene::GestionMusique()
+void RuntimeScene::ManageSounds()
 {
     //Bruitages sans canaux. On les détruits si besoin est.
     for ( int i = soundManager->sounds.size() - 1;i >= 0;i-- )
@@ -487,9 +493,9 @@ void RuntimeScene::GestionMusique()
 }
 
 /**
- * Delete objects, updates forces and time
+ * Delete objects, updates time and launch automatisms
  */
-void RuntimeScene::GestionObjets()
+void RuntimeScene::ManageObjectsAfterEvents()
 {
     ObjList allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
@@ -506,7 +512,19 @@ void RuntimeScene::GestionObjets()
         allObjects[id]->SetY( allObjects[id]->GetY() + ( allObjects[id]->TotalForceY() * GetElapsedTime() ));
         allObjects[id]->UpdateTime( GetElapsedTime() );
         allObjects[id]->UpdateForce( GetElapsedTime() );
+        allObjects[id]->DoAutomatismsPostEvents(*this);
     }
+}
+
+/**
+ * Manage objects before launching events
+ */
+void RuntimeScene::ManageObjectsBeforeEvents()
+{
+    ObjList allObjects = objectsInstances.GetAllObjects();
+    for (unsigned int id = 0;id<allObjects.size();++id)
+        allObjects[id]->DoAutomatismsPreEvents(*this);
+
 }
 
 void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
@@ -616,31 +634,23 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     }
 
     //Preprocess events
-    PreprocessScene( *game );
+    PreprocessEventList( *game, events );
+    EventsPreprocessor::DeleteUselessEvents(events);
+    EventsPreprocessor::PreprocessEvents(*this, events);
+
+    //Call initialization routine of each automatism type
+    vector < const std::type_info* > alreadyCalled;
+    for (unsigned int id = 0;id<initialObjects.size();++id)
+        initialObjects[id]->CallAutomatismsSharedInitialization(*this, alreadyCalled);
 
     MessageLoading( "Loading finished", 100 );
 
     return true;
 }
 
-////////////////////////////////////////////////////////////
-/// Opération sur les évènements pendant le chargement de la scène
-////////////////////////////////////////////////////////////
-void RuntimeScene::PreprocessScene( const Game & Jeu )
-{
-    //Inclusion des liens
-    PreprocessEventList( Jeu, events );
-
-    EventsPreprocessor::DeleteUselessEvents(events);
-
-    //Optimisation des appels aux fonctions des évènements
-    EventsPreprocessor::PreprocessEvents(*this, events);
-
-}
-
-////////////////////////////////////////////////////////////
-/// Insertion des liens
-////////////////////////////////////////////////////////////
+/**
+ * Call preprocession method of each event
+ */
 void RuntimeScene::PreprocessEventList( const Game & game, vector < BaseEventSPtr > & listEvent )
 {
     for ( unsigned int i = 0;i < listEvent.size();i++ )

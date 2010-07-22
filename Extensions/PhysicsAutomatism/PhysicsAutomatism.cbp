@@ -116,6 +116,7 @@
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -147,6 +148,7 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\include" />
 				</Compiler>
@@ -210,6 +212,7 @@
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -241,6 +244,7 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\include" />
 				</Compiler>
@@ -305,6 +309,7 @@
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
@@ -346,6 +351,7 @@
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
@@ -416,23 +422,95 @@
 			<Add directory="..\..\GDL" />
 			<Add directory="C:\Libs\SFML\include" />
 			<Add directory="C:\Libs\boost_1_43_0" />
+			<Add directory="Box2D\Box2D" />
 		</Compiler>
 		<Linker>
 			<Add directory="C:\Libs\SFML\lib\mingw" />
 		</Linker>
-		<Unit filename="PhysicsAutomatismActions.cpp" />
-		<Unit filename="PhysicsAutomatismActions.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Box2D.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\Shapes\b2CircleShape.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\Shapes\b2CircleShape.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\Shapes\b2Shape.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\b2BroadPhase.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\b2BroadPhase.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\b2CollideCircle.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\b2CollidePolygon.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\b2Collision.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\b2Collision.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\b2Distance.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\b2Distance.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\b2DynamicTree.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\b2DynamicTree.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\b2TimeOfImpact.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Collision\b2TimeOfImpact.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Common\b2BlockAllocator.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Common\b2BlockAllocator.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Common\b2Math.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Common\b2Math.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Common\b2Settings.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Common\b2Settings.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Common\b2StackAllocator.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Common\b2StackAllocator.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Contacts\b2CircleContact.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Contacts\b2CircleContact.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Contacts\b2Contact.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Contacts\b2Contact.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Contacts\b2ContactSolver.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Contacts\b2ContactSolver.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Contacts\b2PolygonAndCircleContact.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Contacts\b2PolygonAndCircleContact.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Contacts\b2PolygonContact.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Contacts\b2PolygonContact.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2DistanceJoint.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2DistanceJoint.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2FrictionJoint.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2FrictionJoint.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2GearJoint.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2GearJoint.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2Joint.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2Joint.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2LineJoint.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2LineJoint.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2MouseJoint.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2MouseJoint.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2PrismaticJoint.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2PrismaticJoint.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2PulleyJoint.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2PulleyJoint.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2RevoluteJoint.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2RevoluteJoint.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2WeldJoint.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\Joints\b2WeldJoint.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2Body.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2Body.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2ContactManager.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2ContactManager.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2Fixture.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2Fixture.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2Island.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2Island.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2TimeStep.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2World.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2World.h" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2WorldCallbacks.cpp" />
+		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2WorldCallbacks.h" />
 		<Unit filename="Extension.cpp" />
+		<Unit filename="PhysicsAutomatism.cpp" />
+		<Unit filename="PhysicsAutomatism.h" />
+		<Unit filename="PhysicsAutomatismActions.cpp" />
+		<Unit filename="ScenePhysicsDatas.cpp" />
+		<Unit filename="ScenePhysicsDatas.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
 			<debugger />
 			<lib_finder disable_auto="1" />
 			<wxsmith version="1">
-				<resources>
-					<wxDialog wxs="wxsmith/Box3DObjectEditor.wxs" src="Box3DObjectEditor.cpp" hdr="Box3DObjectEditor.h" name="Box3DObjectEditor" language="CPP" />
-					<wxPanel wxs="wxsmith/Box3DInitialPositionPanel.wxs" src="Box3DInitialPositionPanel.cpp" hdr="Box3DInitialPositionPanel.h" name="Box3DInitialPositionPanel" language="CPP" />
-				</resources>
+				<gui name="wxWidgets" src="" main="" init_handlers="necessary" language="CPP" />
 			</wxsmith>
 		</Extensions>
 	</Project>

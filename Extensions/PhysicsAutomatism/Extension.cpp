@@ -1,6 +1,6 @@
 /**
 
-Game Develop - AES Extension
+Game Develop - Physic Automatism Extension
 Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -47,11 +47,165 @@ class Extension : public ExtensionBase
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
+                DECLARE_AUTOMATISM("PhysicsAutomatism",
+                          _("Automatisme Moteur physique"),
+                          _("Automatisme permettant de déplacer les objets comme si ils étaient soumis aux lois de la physique."),
+                          "",
+                          "res/function.png",
+                          PhysicsAutomatism)
+
+                    DECLARE_AUTOMATISM_ACTION("SetStatic",
+                                   _("Rendre l'objet statique"),
+                                   _("Rend l'objet statique physiquement"),
+                                   _("Rendre _PARAM0_ statique"),
+                                   _("Mouvement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActSetStatic);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetDynamic",
+                                   _("Rendre l'objet dynamique"),
+                                   _("Rend l'objet dynamique ( affecté par les forces et les autres objets )."),
+                                   _("Rendre _PARAM0_ dynamique"),
+                                   _("Mouvement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActSetDynamic);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_CONDITION("IsDynamic",
+                                   _("L'objet est dynamique"),
+                                   _("Teste si l'objet est dynamique ( affecté par les forces et les autres objets )."),
+                                   _("_PARAM0_ est dynamique"),
+                                   _("Mouvement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::CondIsDynamic);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetFixedRotation",
+                                   _("Fixer la rotation"),
+                                   _("Empêche l'objet de tourner."),
+                                   _("Fixer la rotation de _PARAM0_"),
+                                   _("Rotation"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActSetFixedRotation);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetFreeRotation",
+                                   _("Rendre la rotation libre"),
+                                   _("Permet à l'objet de tourner."),
+                                   _("Permettre à _PARAM0_ de tourner"),
+                                   _("Rotation"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActSetFreeRotation);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_CONDITION("IsFixedRotation",
+                                   _("Rotation fixée"),
+                                   _("Teste si l'objet a sa rotation fixée."),
+                                   _("_PARAM0_ a sa rotation fixée"),
+                                   _("Rotation"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::CondIsFixedRotation);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetAsBullet",
+                                   _("Considérer comme un projectile"),
+                                   _("Considérer l'objet comme un projectile, afin de garantir une meilleure gestion des collisions."),
+                                   _("Considérer _PARAM0_ comme un projectile"),
+                                   _("Autre"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActSetAsBullet);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("DontSetAsBullet",
+                                   _("Ne pas considérer comme un projectile"),
+                                   _("Ne pas considérer l'objet comme un projectile, afin d'utiliser une gestion standard des collisions."),
+                                   _("Ne pas considérer _PARAM0_ comme un projectile"),
+                                   _("Autre"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActDontSetAsBullet);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_CONDITION("IsBullet",
+                                   _("L'objet est considérée comme un projectile"),
+                                   _("Teste si l'objet est considéré comme un projectile."),
+                                   _("_PARAM0_ est considéré comme un projectile"),
+                                   _("Autre"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::CondIsBullet);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_ACTION("ApplyForce",
+                                   _("Appliquer une force"),
+                                   _("Applique une force à l'objet."),
+                                   _("Appliquer à _PARAM0_ une force _PARAM1_;_PARAM2_"),
+                                   _("Mouvement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActApplyForce);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("expression", _("Composante X"), false, "")
+                        DECLARE_PARAMETER("expression", _("Composante Y"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("ApplyTorque",
+                                   _("Appliquer un moment (rotation)"),
+                                   _("Applique un moment (rotation) à l'objet."),
+                                   _("Appliquer à _PARAM0_ un moment de valeur _PARAM1_"),
+                                   _("Mouvement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActApplyTorque);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("expression", _("Valeur du moment"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                DECLARE_END_AUTOMATISM();
+
             CompleteCompilationInformation();
         };
         virtual ~Extension() {};
 
-    protected:
     private:
 
         /**

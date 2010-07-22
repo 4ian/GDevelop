@@ -1,13 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Linux - Debug - Edittime" />
-	<File name="AESActions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="992" topLine="27" />
+	<ActiveTarget name="Development - Edittime" />
+	<File name="Box2D\Box2D\Box2D\Box2D.h" open="0" top="0" tabpos="0">
+		<Cursor position="902" topLine="27" />
 	</File>
-	<File name="AESActions.h" open="0" top="0" tabpos="0">
-		<Cursor position="1340" topLine="0" />
+	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2CircleShape.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="596" topLine="0" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="3175" topLine="60" />
+	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.h" open="0" top="0" tabpos="0">
+		<Cursor position="1165" topLine="8" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Common\b2Settings.h" open="0" top="0" tabpos="0">
+		<Cursor position="1340" topLine="20" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="3522" topLine="115" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.h" open="0" top="0" tabpos="0">
+		<Cursor position="3843" topLine="92" />
+	</File>
+	<File name="Extension.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="9291" topLine="175" />
+	</File>
+	<File name="PhysicsAutomatism.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="3570" topLine="110" />
+	</File>
+	<File name="PhysicsAutomatism.h" open="1" top="0" tabpos="3">
+		<Cursor position="3302" topLine="54" />
+	</File>
+	<File name="PhysicsAutomatismActions.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="2433" topLine="65" />
+	</File>
+	<File name="ScenePhysicsDatas.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="984" topLine="0" />
+	</File>
+	<File name="ScenePhysicsDatas.h" open="1" top="0" tabpos="4">
+		<Cursor position="1197" topLine="14" />
 	</File>
 </CodeBlocks_layout_file>

@@ -40,6 +40,7 @@ ExtensionsManager *ExtensionsManager::_singleton = NULL;
 InstructionInfos ExtensionsManager::badInstructionInfos;
 ExpressionInfos ExtensionsManager::badExpressionInfos;
 StrExpressionInfos ExtensionsManager::badStrExpressionInfos;
+AutomatismInfo ExtensionsManager::badAutomatismInfo;
 
 /**
  * Initializing Extension Manager
@@ -168,6 +169,17 @@ boost::shared_ptr<Automatism> ExtensionsManager::CreateAutomatism(std::string au
     }
 
     return boost::shared_ptr<Automatism>();
+}
+
+const AutomatismInfo& ExtensionsManager::GetAutomatismInfo(std::string automatism) const
+{
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        if ( find(extensionsLoaded[i]->GetAutomatismsTypes().begin(), extensionsLoaded[i]->GetAutomatismsTypes().end(), automatism) != extensionsLoaded[i]->GetAutomatismsTypes().end())
+            return extensionsLoaded[i]->GetAutomatismInfo(automatism);
+    }
+
+    return badAutomatismInfo;
 }
 
 const InstructionInfos & ExtensionsManager::GetActionInfos(string actionType) const

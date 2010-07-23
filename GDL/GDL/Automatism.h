@@ -7,6 +7,11 @@ class Object;
 class RuntimeScene;
 typedef boost::shared_ptr<Object> ObjSPtr;
 class TiXmlElement;
+#if defined(GDE)
+class wxWindow;
+class Game;
+class MainEditorCommand;
+#endif
 
 /**
  * Automatism are linked to objects and provided automatic behaviours to these latters.
@@ -48,6 +53,13 @@ class GD_API Automatism
          * Load Automatism from XML
          */
         virtual void LoadFromXml(const TiXmlElement * eventElem) {}
+
+        #ifdef GDE
+        /**
+         * Called when user wants to edit the automatism.
+         */
+        virtual void EditAutomatism( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ ) {};
+        #endif
 
     protected:
 

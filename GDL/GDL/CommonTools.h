@@ -39,7 +39,7 @@ int ToInt( const T & value )
 }
 
 template<typename T>
-int ToFloat( const T & value )
+float ToFloat( const T & value )
 {
     float f;
     std::istringstream oss(value);
@@ -48,7 +48,7 @@ int ToFloat( const T & value )
 }
 
 template<typename T>
-int ToDouble( const T & value )
+double ToDouble( const T & value )
 {
     double d;
     std::istringstream oss(value);

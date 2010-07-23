@@ -270,6 +270,11 @@ class GD_API ExtensionsManager
         bool HasAutomatism(std::string automatism) const;
 
         /**
+         * Get information about an automatism
+         */
+        const AutomatismInfo & GetAutomatismInfo(std::string automatismType) const;
+
+        /**
          * Create a new automatism of given type
          */
         boost::shared_ptr<Automatism> CreateAutomatism(std::string automatismType) const;
@@ -331,6 +336,7 @@ class GD_API ExtensionsManager
         static InstructionInfos badInstructionInfos;
         static ExpressionInfos badExpressionInfos;
         static StrExpressionInfos badStrExpressionInfos;
+        static AutomatismInfo badAutomatismInfo;
 
         static ExtensionsManager *_singleton;
 };

@@ -90,6 +90,8 @@ bool PhysicsAutomatism::ActApplyForce( RuntimeScene & scene, ObjectsConcerned & 
     if ( !body ) CreateBody(scene);
     body->ApplyForce(b2Vec2(action.GetParameter(1).GetAsMathExpressionResult(scene, objectsConcerned), action.GetParameter(2).GetAsMathExpressionResult(scene, objectsConcerned)),
                      body->GetPosition());
+
+    return true;
 }
 
 /**
@@ -99,4 +101,6 @@ bool PhysicsAutomatism::ActApplyTorque( RuntimeScene & scene, ObjectsConcerned &
 {
     if ( !body ) CreateBody(scene);
     body->ApplyTorque(action.GetParameter(1).GetAsMathExpressionResult(scene, objectsConcerned));
+
+    return true;
 }

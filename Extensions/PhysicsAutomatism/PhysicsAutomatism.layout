@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
+	<ActiveTarget name="Debug - Edittime" />
 	<File name="Box2D\Box2D\Box2D\Box2D.h" open="0" top="0" tabpos="0">
 		<Cursor position="902" topLine="27" />
 	</File>
@@ -19,22 +19,28 @@
 	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.h" open="0" top="0" tabpos="0">
 		<Cursor position="3843" topLine="92" />
 	</File>
-	<File name="Extension.cpp" open="1" top="1" tabpos="2">
+	<File name="Extension.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="9291" topLine="175" />
 	</File>
 	<File name="PhysicsAutomatism.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="3570" topLine="110" />
+		<Cursor position="2576" topLine="41" />
 	</File>
-	<File name="PhysicsAutomatism.h" open="1" top="0" tabpos="3">
-		<Cursor position="3302" topLine="54" />
+	<File name="PhysicsAutomatism.h" open="1" top="0" tabpos="2">
+		<Cursor position="3973" topLine="76" />
 	</File>
 	<File name="PhysicsAutomatismActions.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="2433" topLine="65" />
+		<Cursor position="1982" topLine="69" />
 	</File>
-	<File name="ScenePhysicsDatas.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="984" topLine="0" />
+	<File name="PhysicsAutomatismEditor.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="6858" topLine="86" />
 	</File>
-	<File name="ScenePhysicsDatas.h" open="1" top="0" tabpos="4">
-		<Cursor position="1197" topLine="14" />
+	<File name="PhysicsAutomatismEditor.h" open="1" top="0" tabpos="3">
+		<Cursor position="86" topLine="3" />
+	</File>
+	<File name="ScenePhysicsDatas.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="755" topLine="5" />
+	</File>
+	<File name="ScenePhysicsDatas.h" open="1" top="0" tabpos="6">
+		<Cursor position="1560" topLine="21" />
 	</File>
 </CodeBlocks_layout_file>

@@ -32,18 +32,25 @@ freely, subject to the following restrictions:
 class ScenePhysicsDatas
 {
     public:
-        ScenePhysicsDatas() : world(new b2World(b2Vec2(0.0f, -1.0f), false)), scaleX(100), scaleY(100), stepped(false)
+        ScenePhysicsDatas() : gravityX(0), gravityY(0), scaleX(100), scaleY(100), world(NULL), stepped(false)
         {
 
         };
-        virtual ~ScenePhysicsDatas();
+        /*ScenePhysicsDatas(const ScenePhysicsDatas & other) : world(b2World(b2Vec2(0.0f, 0.0f), false)) { Init(other); }
+        ScenePhysicsDatas& operator=(const ScenePhysicsDatas & other) { if(&other != this) Init(other); return *this; }*/
+        virtual ~ScenePhysicsDatas() {};
 
-        b2World * world;
+        float gravityX;
+        float gravityY;
         float scaleX;
         float scaleY;
+
+        //Runtime only :
+        b2World * world;
         bool stepped; ///< Used to be sure that Step is called only once at each frame.
 
     private:
+        //void Init(const ScenePhysicsDatas & other);
 };
 
 #endif // SCENEPHYSICSDATAS_H

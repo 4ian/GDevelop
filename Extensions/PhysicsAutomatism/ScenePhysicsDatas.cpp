@@ -25,8 +25,16 @@ freely, subject to the following restrictions:
 */
 
 #include "ScenePhysicsDatas.h"
-
-ScenePhysicsDatas::~ScenePhysicsDatas()
+#include <iostream>
+/*
+void ScenePhysicsDatas::Init(const ScenePhysicsDatas & other)
 {
-    //dtor
-}
+    std::cout << "called" << other.scaleX << std::endl;
+    scaleX = other.scaleX;
+    scaleY = other.scaleY;
+    stepped = other.stepped;
+
+    //b2World copy does not seems to work correctly
+    world = b2World(other.world.GetGravity(), false);
+    std::cout << "ENDcalled" << scaleX << std::endl;
+}*/

@@ -36,9 +36,13 @@ freely, subject to the following restrictions:
 #include <map>
 #include "GDL/RuntimeScene.h"
 class TiXmlElement;
+class Scene;
+class PhysicsAutomatismEditor;
 
 class PhysicsAutomatism : public Automatism
 {
+    friend class PhysicsAutomatismEditor;
+
     public:
         PhysicsAutomatism(std::string automatismTypeName);
         virtual ~PhysicsAutomatism();
@@ -47,7 +51,7 @@ class PhysicsAutomatism : public Automatism
         /**
          * Called -- one time -- when scene is loading
          */
-        virtual void InitializeSharedDatas(RuntimeScene & scene);
+        virtual void InitializeSharedDatas(RuntimeScene & scene, const Scene & loadedScene);
 
         /**
          * Called -- one time -- as a scene is closed
@@ -64,6 +68,13 @@ class PhysicsAutomatism : public Automatism
          */
         virtual void LoadFromXml(const TiXmlElement * eventElem) {}
 
+        #if defined(GDE)
+        /**
+         * Called when user wants to edit the automatism.
+         */
+        virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ );
+        #endif
+
         bool ActSetStatic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActSetDynamic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool CondIsDynamic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action ) { return dynamic; };
@@ -76,6 +87,7 @@ class PhysicsAutomatism : public Automatism
         bool ActApplyForce( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActApplyTorque( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
+        static std::map < const Scene* , ScenePhysicsDatas > scenesPhysicsDatas; ///< Static map associating scene to datas
     private:
 
         virtual void DoStepPreEvents(RuntimeScene & scene);
@@ -89,9 +101,11 @@ class PhysicsAutomatism : public Automatism
         float massDensity;
         float averageFriction;
 
+
         b2Body * body; ///< Box2D body, representing the object in the Box2D world
-        ScenePhysicsDatas * scenePhysicsDatasPtr; ///<Pointer ( valid when body is valid ) to the datas shared by all objects with physics on the scene
-        static std::map < const RuntimeScene* , ScenePhysicsDatas* > scenesPhysicsDatas; ///< Static map associating scene to datas
+        bool iteratorRuntimeScenesPhysicsDatasValid;
+        std::map < const RuntimeScene* , ScenePhysicsDatas >::iterator runtimeScenePhysicsDatasPtr; ///<Pointer ( valid when body is valid ) to the datas shared by all objects with physics on the scene
+        static std::map < const RuntimeScene* , ScenePhysicsDatas > runtimeScenesPhysicsDatas; ///< Static map associating Runtime scene to datas
 };
 
 #endif // PHYSICAUTOMATISM_H

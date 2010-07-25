@@ -502,6 +502,8 @@
 		<Unit filename="PhysicsAutomatism.cpp" />
 		<Unit filename="PhysicsAutomatism.h" />
 		<Unit filename="PhysicsAutomatismActions.cpp" />
+		<Unit filename="PhysicsAutomatismEditor.cpp" />
+		<Unit filename="PhysicsAutomatismEditor.h" />
 		<Unit filename="ScenePhysicsDatas.cpp" />
 		<Unit filename="ScenePhysicsDatas.h" />
 		<Extensions>
@@ -511,6 +513,9 @@
 			<lib_finder disable_auto="1" />
 			<wxsmith version="1">
 				<gui name="wxWidgets" src="" main="" init_handlers="necessary" language="CPP" />
+				<resources>
+					<wxDialog wxs="wxsmith/PhysicsAutomatismEditor.wxs" src="PhysicsAutomatismEditor.cpp" hdr="PhysicsAutomatismEditor.h" name="PhysicsAutomatismEditor" language="CPP" />
+				</resources>
 			</wxsmith>
 		</Extensions>
 	</Project>

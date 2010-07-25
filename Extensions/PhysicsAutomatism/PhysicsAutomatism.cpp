@@ -26,8 +26,11 @@ freely, subject to the following restrictions:
 
 #include "PhysicsAutomatism.h"
 #include "Box2D/Box2D.h"
+#include "PhysicsAutomatismEditor.h"
+#include "GDL/Scene.h"
 
-std::map < const RuntimeScene* , ScenePhysicsDatas*  > PhysicsAutomatism::scenesPhysicsDatas;
+std::map < const RuntimeScene* , ScenePhysicsDatas  > PhysicsAutomatism::runtimeScenesPhysicsDatas;
+std::map < const Scene* , ScenePhysicsDatas > PhysicsAutomatism::scenesPhysicsDatas;
 
 PhysicsAutomatism::PhysicsAutomatism(std::string automatismTypeName) :
 Automatism(automatismTypeName),
@@ -38,25 +41,35 @@ isBullet(false),
 massDensity(1),
 averageFriction(0.8),
 body(NULL),
-scenePhysicsDatasPtr(NULL)
+iteratorRuntimeScenesPhysicsDatasValid(false)
 {
 }
 
 PhysicsAutomatism::~PhysicsAutomatism()
 {
-    if ( scenePhysicsDatasPtr && body)
-        scenePhysicsDatasPtr->world->DestroyBody(body);
+    if ( iteratorRuntimeScenesPhysicsDatasValid && body)
+        runtimeScenePhysicsDatasPtr->second.world->DestroyBody(body);
 }
 
-void PhysicsAutomatism::InitializeSharedDatas(RuntimeScene & scene)
+void PhysicsAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ )
 {
-    scenesPhysicsDatas[&scene] = new ScenePhysicsDatas;
+    PhysicsAutomatismEditor editor(parent, game_, scene, *this, mainEditorCommand_);
+    editor.ShowModal();
+}
+
+void PhysicsAutomatism::InitializeSharedDatas(RuntimeScene & scene, const Scene & loadedScene)
+{
+    runtimeScenesPhysicsDatas[&scene] = scenesPhysicsDatas[&loadedScene];
+
+    //Initialization of runtime datas
+    runtimeScenesPhysicsDatas[&scene].world = new b2World(b2Vec2( runtimeScenesPhysicsDatas[&scene].gravityX,
+                                                                 -runtimeScenesPhysicsDatas[&scene].gravityY), false); //Y axis is inverted
 }
 
 void PhysicsAutomatism::UnInitializeSharedDatas(RuntimeScene & scene)
 {
-    delete scenesPhysicsDatas[&scene];
-    scenesPhysicsDatas[&scene] = NULL;
+    //UnInitialization of runtime datas
+    delete runtimeScenesPhysicsDatas[&scene].world;
 }
 
 /**
@@ -67,18 +80,18 @@ void PhysicsAutomatism::DoStepPreEvents(RuntimeScene & scene)
 {
     if ( !body ) CreateBody(scene);
 
-    if ( !scenePhysicsDatasPtr->stepped ) //Simulate the world, once at each frame
+    if ( !runtimeScenePhysicsDatasPtr->second.stepped ) //Simulate the world, once at each frame
     {
-        scenePhysicsDatasPtr->world->Step(scene.GetElapsedTime(), 6, 10);
-        scenePhysicsDatasPtr->world->ClearForces();
+        runtimeScenePhysicsDatasPtr->second.world->Step(scene.GetElapsedTime(), 6, 10);
+        runtimeScenePhysicsDatasPtr->second.world->ClearForces();
 
-        scenePhysicsDatasPtr->stepped = true;
+        runtimeScenePhysicsDatasPtr->second.stepped = true;
     }
 
     //Update object position according to Box2D body
     b2Vec2 position = body->GetPosition();
-    object->SetX(position.x*scenePhysicsDatasPtr->scaleX);
-    object->SetY(-position.y*scenePhysicsDatasPtr->scaleY); //Y axis is inverted
+    object->SetX(position.x*runtimeScenePhysicsDatasPtr->second.scaleX);
+    object->SetY(-position.y*runtimeScenePhysicsDatasPtr->second.scaleY); //Y axis is inverted
     object->SetAngle(-body->GetAngle()*360.0f/b2_pi); //Angles are inverted
 };
 
@@ -90,31 +103,35 @@ void PhysicsAutomatism::DoStepPostEvents(RuntimeScene & scene)
 {
     if ( !body ) CreateBody(scene);
 
-    scenePhysicsDatasPtr->stepped = false; //Prepare for a new simulation
+    runtimeScenePhysicsDatasPtr->second.stepped = false; //Prepare for a new simulation
 
     //Update Box2D position to object
     b2Vec2 oldPos;
-    oldPos.x = object->GetX()/scenePhysicsDatasPtr->scaleX;
-    oldPos.y = -object->GetY()/scenePhysicsDatasPtr->scaleY; //Y axis is inverted
+    oldPos.x = object->GetX()/runtimeScenePhysicsDatasPtr->second.scaleX;
+    oldPos.y = -object->GetY()/runtimeScenePhysicsDatasPtr->second.scaleY; //Y axis is inverted
     body->SetTransform(oldPos, -object->GetAngle()*b2_pi/360.0f); //Angles are inverted
 };
 
 /**
- * Prepare Box2D body, and set up also scenePhysicsDatasPtr.
+ * Prepare Box2D body, and set up also runtimeScenePhysicsDatasPtr.
  */
 void PhysicsAutomatism::CreateBody(RuntimeScene & scene)
 {
-    if ( !scenePhysicsDatasPtr )
+    cout << "CreateBody";
+    if ( !iteratorRuntimeScenesPhysicsDatasValid )
     {
-        if ( !scenesPhysicsDatas[&scene] ) scenesPhysicsDatas[&scene] = new ScenePhysicsDatas;
-        scenePhysicsDatasPtr = scenesPhysicsDatas[&scene];
+        cout << "GetIterator";
+        runtimeScenePhysicsDatasPtr = runtimeScenesPhysicsDatas.find(&scene);
+        if (runtimeScenePhysicsDatasPtr == runtimeScenesPhysicsDatas.end() ) cout << "Invalid";
+        iteratorRuntimeScenesPhysicsDatasValid = true;
     }
+    cout << "Next";
 
     //Create body from object
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(object->GetX()/scenePhysicsDatasPtr->scaleX, -object->GetY()/scenePhysicsDatasPtr->scaleY);
-    body = scenePhysicsDatasPtr->world->CreateBody(&bodyDef);
+    bodyDef.position.Set(object->GetX()/runtimeScenePhysicsDatasPtr->second.scaleX, -object->GetY()/runtimeScenePhysicsDatasPtr->second.scaleY);
+    body = runtimeScenePhysicsDatasPtr->second.world->CreateBody(&bodyDef);
 
     //Setup body
 
@@ -135,7 +152,7 @@ void PhysicsAutomatism::CreateBody(RuntimeScene & scene)
         b2FixtureDef fixtureDef;
 
         b2PolygonShape dynamicBox;
-        dynamicBox.SetAsBox(object->GetWidth()/(scenePhysicsDatasPtr->scaleX*2), object->GetHeight()/(scenePhysicsDatasPtr->scaleY*2));
+        dynamicBox.SetAsBox(object->GetWidth()/(runtimeScenePhysicsDatasPtr->second.scaleX*2), object->GetHeight()/(runtimeScenePhysicsDatasPtr->second.scaleY*2));
         fixtureDef.shape = &dynamicBox;
         fixtureDef.density = massDensity;
         fixtureDef.friction = averageFriction;

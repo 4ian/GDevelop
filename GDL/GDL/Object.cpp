@@ -53,8 +53,6 @@ Object::Object(string name_) :
     //TEST
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
 
-    if ( extensionsManager->HasAutomatism("PhysicsAutomatism::PhysicsAutomatism") ) cout << "ok, y a phys" << endl;
-
     boost::shared_ptr<Automatism> automatism = extensionsManager->CreateAutomatism("PhysicsAutomatism::PhysicsAutomatism");
 
     automatisms[automatism->GetTypeId()] = automatism;
@@ -202,14 +200,14 @@ void Object::DoAutomatismsPostEvents(RuntimeScene & scene)
         it->second->StepPostEvents(scene);
 }
 
-void Object::CallAutomatismsSharedInitialization(RuntimeScene & scene, vector<const std::type_info*> & alreadyCalled)
+void Object::CallAutomatismsSharedInitialization(RuntimeScene & scene, const Scene & loadedScene, vector<const std::type_info*> & alreadyCalled)
 {
     for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
     {
         //Shared initialization function must be called once only for each automatism type.
         if ( find(alreadyCalled.begin(), alreadyCalled.end(), &typeid(*it->second)) == alreadyCalled.end())
         {
-            it->second->InitializeSharedDatas(scene);
+            it->second->InitializeSharedDatas(scene, loadedScene);
             alreadyCalled.push_back(&typeid(*it->second));
         }
     }

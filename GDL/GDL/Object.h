@@ -222,7 +222,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Call initialisation routine of each automatism type
          */
-        void CallAutomatismsSharedInitialization(RuntimeScene & scene, vector<const std::type_info*> & alreadyCalled);
+        void CallAutomatismsSharedInitialization(RuntimeScene & scene, const Scene & loadedScene, vector<const std::type_info*> & alreadyCalled);
 
         /**
          * Call uninitialisation routine of each automatism type

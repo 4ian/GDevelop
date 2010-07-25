@@ -641,7 +641,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     //Call initialization routine of each automatism type
     vector < const std::type_info* > alreadyCalled;
     for (unsigned int id = 0;id<initialObjects.size();++id)
-        initialObjects[id]->CallAutomatismsSharedInitialization(*this, alreadyCalled);
+        initialObjects[id]->CallAutomatismsSharedInitialization(*this, scene, alreadyCalled);
 
     MessageLoading( "Loading finished", 100 );
 

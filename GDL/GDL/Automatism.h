@@ -5,6 +5,7 @@
 #include <string>
 class Object;
 class RuntimeScene;
+class Scene;
 typedef boost::shared_ptr<Object> ObjSPtr;
 class TiXmlElement;
 #if defined(GDE)
@@ -29,7 +30,7 @@ class GD_API Automatism
         /**
          * Called -- one time -- when scene is loading
          */
-        virtual void InitializeSharedDatas(RuntimeScene & scene) {}
+        virtual void InitializeSharedDatas(RuntimeScene & scene, const Scene & loadedScene) {}
 
         /**
          * Called -- one time -- as a scene is closed
@@ -58,7 +59,7 @@ class GD_API Automatism
         /**
          * Called when user wants to edit the automatism.
          */
-        virtual void EditAutomatism( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ ) {};
+        virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ ) {};
         #endif
 
     protected:

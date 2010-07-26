@@ -118,7 +118,7 @@ vector < GDExpression* > ForEachEvent::GetAllExpressions()
 
     return allExpressions;
 }
-
+#if defined(GDE)
 void ForEachEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * objectElem = new TiXmlElement( "Object" );
@@ -145,6 +145,7 @@ void ForEachEvent::SaveToXml(TiXmlElement * eventElem) const
         OpenSaveGame::SaveEvents(events, subeventsElem);
     }
 }
+#endif
 
 void ForEachEvent::LoadFromXml(const TiXmlElement * eventElem)
 {

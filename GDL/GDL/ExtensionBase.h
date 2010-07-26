@@ -647,10 +647,11 @@ typedef Object * (*CreateFunPtr)(std::string name);
             eventInfo.instance = boost::shared_ptr<BaseEvent>(new className_); \
             eventInfo.instance->SetType(GetNameSpace()+currentEventDeclarationName);
 
-#define DECLARE_AUTOMATISM(name_, fullname_, description_, group_, smallicon_, className_) { \
+#define DECLARE_AUTOMATISM(name_, fullname_, description_, group_, smallicon_, className_, sharedDatasClassName_) { \
             AutomatismInfo automatismInfo; \
             std::string currentAutomatismDeclarationName = name_;\
-            automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName));
+            automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName)); \
+            automatismInfo.sharedDatasInstance = boost::shared_ptr<AutomatismsSharedDatas>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
 
 #define DECLARE_PARAMETER(type_, desc, useObj, objType) { \
                 ParameterInfo parameter; \
@@ -1053,8 +1054,8 @@ class GD_API ExtensionBase
 
     #if defined(GDE)
     const ExtensionObjectInfos & GetObjectInfo(std::string objectType) const;
-    const AutomatismInfo & GetAutomatismInfo(std::string objectType) const;
     #endif
+    const AutomatismInfo & GetAutomatismInfo(std::string objectType) const;
 
     /**
      * Return a function to create the object if the type is handled by the extension

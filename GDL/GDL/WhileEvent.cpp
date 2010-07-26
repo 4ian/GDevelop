@@ -115,7 +115,7 @@ vector < vector<Instruction>* > WhileEvent::GetAllActionsVectors()
 
     return allActions;
 }
-
+#if defined(GDE)
 void WhileEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     //Save "While conditions"
@@ -143,6 +143,7 @@ void WhileEvent::SaveToXml(TiXmlElement * eventElem) const
         OpenSaveGame::SaveEvents(events, subeventsElem);
     }
 }
+#endif
 
 void WhileEvent::LoadFromXml(const TiXmlElement * eventElem)
 {

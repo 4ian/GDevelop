@@ -31,10 +31,12 @@ class GD_API AutomatismsSharedDatas
             return boost::shared_ptr<AutomatismsRuntimeSharedDatas>();
         }
 
+        #if defined(GDE)
         /**
          * Save AutomatismsSharedDatas to XML
          */
         virtual void SaveToXml(TiXmlElement * eventElem) const {}
+        #endif
 
         /**
          * Load AutomatismsSharedDatas from XML

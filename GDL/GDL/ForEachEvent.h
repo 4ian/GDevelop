@@ -59,7 +59,9 @@ class ForEachEvent : public BaseEvent
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
         virtual vector < GDExpression* > GetAllExpressions();
 
+#if defined(GDE)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
+#endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
 #if defined(GDE)
@@ -95,7 +97,7 @@ class ForEachEvent : public BaseEvent
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
 
-#ifdef GDE
+#if defined(GDE)
         bool objectsToPickSelected;
 #endif
 

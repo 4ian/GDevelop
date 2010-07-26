@@ -90,10 +90,12 @@ class GD_API BaseEvent
          */
         virtual vector < GDExpression* > GetAllExpressions() { vector < GDExpression* > noExpr; return noExpr;};
 
+        #if defined(GDE)
         /**
          * Save event to XML
          */
         virtual void SaveToXml(TiXmlElement * eventElem) const {}
+        #endif
 
         /**
          * Load event from XML

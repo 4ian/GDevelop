@@ -53,7 +53,9 @@ class RepeatEvent : public BaseEvent
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
         virtual vector < GDExpression* > GetAllExpressions();
 
+        #if defined(GDE)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
+        #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
 #if defined(GDE)

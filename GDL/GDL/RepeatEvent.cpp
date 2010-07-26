@@ -119,6 +119,7 @@ vector < GDExpression* > RepeatEvent::GetAllExpressions()
     return allExpressions;
 }
 
+#if defined(GDE)
 void RepeatEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * repeatElem = new TiXmlElement( "RepeatExpression" );
@@ -145,6 +146,7 @@ void RepeatEvent::SaveToXml(TiXmlElement * eventElem) const
         OpenSaveGame::SaveEvents(events, subeventsElem);
     }
 }
+#endif
 
 void RepeatEvent::LoadFromXml(const TiXmlElement * eventElem)
 {

@@ -28,7 +28,9 @@ class LinkEvent : public BaseEvent
         virtual ~LinkEvent() {};
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new LinkEvent(*this));}
 
+        #if defined(GDE)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
+        #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
         virtual void Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);

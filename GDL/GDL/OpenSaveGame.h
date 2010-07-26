@@ -24,15 +24,17 @@ public:
 
     bool OpenFromFile(string file);
     void OpenFromString(string text);
-    bool SaveToFile(string file);
     void RecreatePaths(string file);
-
     static void OpenEvents( vector < BaseEventSPtr > & list, const TiXmlElement * elem );
+    static void OpenConditions(vector < Instruction > & list, const TiXmlElement * elem);
+    static void OpenActions(vector < Instruction > & list, const TiXmlElement * elem);
+
+    #if defined(GDE)
+    bool SaveToFile(string file);
     static void SaveEvents( const vector < BaseEventSPtr > & list, TiXmlElement * events );
     static void SaveConditions(const vector < Instruction > & list, TiXmlElement * elem);
     static void SaveActions(const vector < Instruction > & list, TiXmlElement * elem);
-    static void OpenConditions(vector < Instruction > & list, const TiXmlElement * elem);
-    static void OpenActions(vector < Instruction > & list, const TiXmlElement * elem);
+    #endif
 
     //Compatibility code --- with Game Develop 1.3.8892 and inferior
     static void AdaptEventsFromGD138892(vector < BaseEventSPtr > & list);
@@ -62,12 +64,14 @@ private:
     void OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * elem );
     static void OpenVariablesList(ListVariable & list, const TiXmlElement * elem);
 
+    #if defined(GDE)
     void SavePositions( const vector < InitialPosition > & list, TiXmlElement * positions );
     void SaveObjects( const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects );
     void SaveGroupesObjets( const vector < ObjectGroup > & list, TiXmlElement * grpsobjets );
     void SaveLayers( const vector < Layer > & list, TiXmlElement * layers );
     void SaveExternalEvents( const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * layers );
     static void SaveVariablesList(const ListVariable & list, TiXmlElement * elem);
+    #endif
 };
 
 #endif // OPENSAVEGAME_H

@@ -106,7 +106,7 @@ vector < vector<Instruction>* > StandardEvent::GetAllActionsVectors()
 
     return allActions;
 }
-
+#if defined(GDE)
 void StandardEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     //Les conditions
@@ -129,6 +129,7 @@ void StandardEvent::SaveToXml(TiXmlElement * eventElem) const
         OpenSaveGame::SaveEvents(events, subeventsElem);
     }
 }
+#endif
 
 void StandardEvent::LoadFromXml(const TiXmlElement * eventElem)
 {

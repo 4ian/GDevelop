@@ -48,7 +48,9 @@ class WhileEvent : public BaseEvent
         virtual vector < vector<Instruction>* > GetAllConditionsVectors();
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
 
+        #if defined(GDE)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
+        #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
 #if defined(GDE)

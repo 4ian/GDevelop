@@ -34,6 +34,7 @@
 #include "GDL/Event.h"
 #include "GDL/Instruction.h"
 #include "GDL/Automatism.h"
+#include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/VersionWrapper.h"
 #include "GDL/ExtensionsLoader.h"
 #include "GDL/Layer.h"
@@ -108,6 +109,8 @@ void OpenSaveGame::OpenFromString(string text)
 ////////////////////////////////////////////////////////////
 void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 {
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
     bool notBackwardCompatible = false;
 
     TiXmlHandle hdl( &doc );
@@ -240,6 +243,24 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 
         if ( elem->FirstChildElement( "Variables" ) != NULL )
             OpenVariablesList(newScene->variables, elem->FirstChildElement( "Variables" ));
+
+        if ( elem->FirstChildElement( "AutomatismsSharedDatas" ) != NULL )
+        {
+            TiXmlElement * elemSharedDatas = elem->FirstChildElement( "AutomatismsSharedDatas" )->FirstChildElement( "AutomatismSharedDatas" );
+            while ( elemSharedDatas != NULL )
+            {
+                std::string type = elemSharedDatas->Attribute("Type") ? elemSharedDatas->Attribute("Type") : "";
+                boost::shared_ptr<AutomatismsSharedDatas> sharedDatas = extensionsManager->CreateAutomatismSharedDatas(type);
+
+                if ( sharedDatas != boost::shared_ptr<AutomatismsSharedDatas>() )
+                {
+                    sharedDatas->LoadFromXml(elemSharedDatas);
+                    newScene->automatismsInitialSharedDatas[sharedDatas->GetTypeId()] = sharedDatas;
+                }
+
+                elemSharedDatas = elemSharedDatas->NextSiblingElement("AutomatismSharedDatas");
+            }
+        }
 
         game.scenes.push_back( newScene );
 
@@ -411,7 +432,6 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, T
     TiXmlElement * elemScene = elem->FirstChildElement("Objet");
 
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-
 
     //Passage en revue des objets
     while ( elemScene )
@@ -1601,6 +1621,7 @@ void OpenSaveGame::OpenVariablesList(ListVariable & list, const TiXmlElement * e
     }
 }
 
+#if defined(GDE)
 ////////////////////////////////////////////////////////////
 /// Sauvegarde le jeu dans le fichier indiqué
 ////////////////////////////////////////////////////////////
@@ -1770,6 +1791,18 @@ bool OpenSaveGame::SaveToFile(string file)
             TiXmlElement * variables = new TiXmlElement( "Variables" );
             scene->LinkEndChild( variables );
             SaveVariablesList(game.scenes[i]->variables, variables);
+
+            TiXmlElement * autosSharedDatas = new TiXmlElement( "AutomatismsSharedDatas" );
+            scene->LinkEndChild( autosSharedDatas );
+            for (std::map<unsigned int, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = game.scenes[i]->automatismsInitialSharedDatas.begin();
+                 it != game.scenes[i]->automatismsInitialSharedDatas.end();++it)
+            {
+                TiXmlElement * autoSharedDatas = new TiXmlElement( "AutomatismSharedDatas" );
+                autosSharedDatas->LinkEndChild( autoSharedDatas );
+
+                autoSharedDatas->SetAttribute("Type", it->second->GetTypeName().c_str());
+                it->second->SaveToXml(autoSharedDatas);
+            }
 
             if ( !game.scenes[i]->initialObjectsPositions.empty() )
             {
@@ -2063,6 +2096,8 @@ void OpenSaveGame::SaveExternalEvents(const vector < boost::shared_ptr<ExternalE
         SaveEvents(list[j]->events, events);
     }
 }
+
+#endif
 
 ////////////////////////////////////////////////////////////
 /// Recréer les chemins

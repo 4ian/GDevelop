@@ -47,7 +47,9 @@ class SpriteObject : public Object
         #endif
 
         virtual void LoadFromXml(const TiXmlElement * elemScene);
+        #if defined(GDE)
         virtual void SaveToXml(TiXmlElement * elemScene);
+        #endif
 
         virtual void UpdateTime(float timeElapsed);
 

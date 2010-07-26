@@ -73,7 +73,9 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         virtual bool Draw(sf::RenderWindow& main_window) {return true;};
 
         virtual void LoadFromXml(const TiXmlElement * elemScene) {};
+        #if defined(GDE)
         virtual void SaveToXml(TiXmlElement * elemScene) {};
+        #endif
 
         /**
          * Called at each frame so as to update internal object's things using time ( Such as animation for a sprite ).

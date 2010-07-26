@@ -283,6 +283,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\Automatism.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\AutomatismsRuntimeSharedDatas.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\AutomatismsSharedDatas.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\aVariables.h"
 				>
 			</File>
@@ -300,10 +312,6 @@
 			</File>
 			<File
 				RelativePath=".\GDL\BaseObjectExtension.h"
-				>
-			</File>
-			<File
-				RelativePath=".\GDL\BBDConditions.h"
 				>
 			</File>
 			<File
@@ -352,10 +360,6 @@
 			</File>
 			<File
 				RelativePath=".\GDL\Chercher.h"
-				>
-			</File>
-			<File
-				RelativePath=".\GDL\ChercherScene.h"
 				>
 			</File>
 			<File
@@ -555,6 +559,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\ExternalEvents.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\FileExtension.h"
 				>
 			</File>
@@ -691,10 +699,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GDL\ObjectWithOpacity.h"
-				>
-			</File>
-			<File
 				RelativePath=".\GDL\ObjInstancesHolder.h"
 				>
 			</File>
@@ -724,6 +728,10 @@
 			</File>
 			<File
 				RelativePath=".\GDL\RepeatEvent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\ResourcesMergingHelper.h"
 				>
 			</File>
 			<File
@@ -894,6 +902,10 @@
 				RelativePath=".\GDL\WindowExtension.h"
 				>
 			</File>
+			<File
+				RelativePath=".\GDL\XmlMacros.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -1003,6 +1015,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\Automatism.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\AutomatismsRuntimeSharedDatas.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\AutomatismsSharedDatas.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\aVariables.cpp"
 				>
 			</File>
@@ -1024,10 +1048,6 @@
 			</File>
 			<File
 				RelativePath=".\GDL\BaseObjectExtension2.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\GDL\BBDConditions.cpp"
 				>
 			</File>
 			<File
@@ -1068,10 +1088,6 @@
 			</File>
 			<File
 				RelativePath=".\GDL\Chercher.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\GDL\ChercherScene.cpp"
 				>
 			</File>
 			<File
@@ -1267,6 +1283,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\ExternalEvents.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\FileExtension.cpp"
 				>
 			</File>
@@ -1403,10 +1423,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GDL\ObjectWithOpacity.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\GDL\ObjInstancesHolder.cpp"
 				>
 			</File>
@@ -1436,6 +1452,10 @@
 			</File>
 			<File
 				RelativePath=".\GDL\RepeatEvent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GDL\ResourcesMergingHelper.cpp"
 				>
 			</File>
 			<File

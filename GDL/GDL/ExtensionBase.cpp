@@ -222,13 +222,13 @@ const ExtensionObjectInfos & ExtensionBase::GetObjectInfo(std::string objectType
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second;
 }
+#endif
 
 const AutomatismInfo & ExtensionBase::GetAutomatismInfo(std::string objectType) const
 {
     if ( automatismsInfo.find(objectType) != automatismsInfo.end())
         return automatismsInfo.find(objectType)->second;
 }
-#endif
 
 InstructionFunPtr       ExtensionBase::GetConditionFunctionPtr(std::string conditionName) const
 {

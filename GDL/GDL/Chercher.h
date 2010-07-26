@@ -22,9 +22,6 @@
 
 using namespace std;
 
-int ChercherImage(const vector < string > *nomImages, const string nom);
-int ChercherImage(const vector < Image > & images, const string nom);
-
 /**
  * Deprecated. Do not use it anymore.
  * Old class to pick objects
@@ -32,20 +29,7 @@ int ChercherImage(const vector < Image > & images, const string nom);
 class GD_API Picker
 {
     public :
-    static int PickOneObject(const vector < boost::shared_ptr<Object> > *objets, const string nom, const vector < int > *ObjConcern);
     static int PickOneObject(const vector < boost::shared_ptr<Object> > *objets, const string nom);
-
-    static vector < int > PickAndRemove(const vector < boost::shared_ptr<Object> > *objets, const vector < ObjectGroup > *groups, const string nom);
-    static vector < int > PickAndRemove(const vector < boost::shared_ptr<Object> > *objets, const vector < ObjectGroup > *groups, const string nom, vector < int > *ObjConcern);
-    static vector < int > Pick(const vector < boost::shared_ptr<Object> > *objets, const vector < ObjectGroup > *groups, const string nom);
-    static vector < int > Pick(const vector < boost::shared_ptr<Object> > *objets, const vector < ObjectGroup > *groups, const string nom, const vector < int > *ObjConcern);
-
-    private:
-    static vector < int > PickObjects(const vector < boost::shared_ptr<Object> > *objets, const string nom);
-    static vector < int > PickObjects(const vector < boost::shared_ptr<Object> > *objets, const string nom, const vector < int > *ObjConcern);
-
-    static vector < int > PickGroups(const vector < boost::shared_ptr<Object> > *objets, const vector < ObjectGroup > *groups, const string nom);
-    static vector < int > PickGroups(const vector < boost::shared_ptr<Object> > *objets, const vector < ObjectGroup > *groups, const string nom, const vector < int > *ObjConcern);
 };
 
 #endif // CHERCHER_H_INCLUDED

@@ -27,7 +27,9 @@ class GD_API CommentEvent : public BaseEvent
         virtual ~CommentEvent() {};
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new CommentEvent(*this));}
 
+        #if defined(GDE)
         void SaveToXml(TiXmlElement * eventElem) const;
+        #endif
         void LoadFromXml(const TiXmlElement * eventElem);
 
         int r;

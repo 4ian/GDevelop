@@ -30,6 +30,7 @@ template void CommentEvent::serialize(
 #include <boost/serialization/export.hpp>
 BOOST_CLASS_EXPORT_IMPLEMENT(CommentEvent)*/
 
+#if defined(GDE)
 void CommentEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * color;
@@ -48,6 +49,7 @@ void CommentEvent::SaveToXml(TiXmlElement * eventElem) const
     eventElem->LinkEndChild( com2Elem );
     com2Elem->SetAttribute( "value", com2.c_str() );
 }
+#endif
 
 void CommentEvent::LoadFromXml(const TiXmlElement * eventElem)
 {

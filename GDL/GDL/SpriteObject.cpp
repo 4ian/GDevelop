@@ -235,7 +235,7 @@ void SaveSpritesDirection(const vector < Sprite > & sprites, TiXmlElement * elem
             pointCentre->SetAttribute("automatic", "false");
     }
 }
-
+#if defined(GDE)
 void SpriteObject::SaveToXml(TiXmlElement * objet)
 {
     //Animations
@@ -281,6 +281,7 @@ void SpriteObject::SaveToXml(TiXmlElement * objet)
         }
     }
 }
+#endif
 
 bool SpriteObject::LoadResources(const ImageManager & imageMgr )
 {

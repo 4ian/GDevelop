@@ -38,6 +38,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(LinkEvent)*/
 
 using namespace std;
 
+#if defined(GDE)
 void LinkEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * type = new TiXmlElement( "Type" );
@@ -56,6 +57,7 @@ void LinkEvent::SaveToXml(TiXmlElement * eventElem) const
     eventElem->LinkEndChild( com1 );
     com1->SetAttribute( "value", sceneLinked.c_str() );
 }
+#endif
 
 void LinkEvent::LoadFromXml(const TiXmlElement * eventElem)
 {

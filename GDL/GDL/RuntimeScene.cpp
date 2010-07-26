@@ -14,7 +14,6 @@
 #include "GDL/Game.h"
 #include "GDL/ImageManager.h"
 #include "GDL/Chercher.h"
-#include "GDL/ChercherScene.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Layer.h"
 #include "GDL/EventsPreprocessor.h"

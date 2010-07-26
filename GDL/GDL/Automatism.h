@@ -45,17 +45,19 @@ class GD_API Automatism
         inline void StepPreEvents(RuntimeScene & scene) { if (activated) DoStepPreEvents(scene); };
         inline void StepPostEvents(RuntimeScene & scene) { if (activated) DoStepPostEvents(scene); };
 
+        #if defined(GDE)
         /**
          * Save Automatism to XML
          */
         virtual void SaveToXml(TiXmlElement * eventElem) const {}
+        #endif
 
         /**
          * Load Automatism from XML
          */
         virtual void LoadFromXml(const TiXmlElement * eventElem) {}
 
-        #ifdef GDE
+        #if defined(GDE)
         /**
          * Called when user wants to edit the automatism.
          */

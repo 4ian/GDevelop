@@ -18,21 +18,26 @@
 
 #include "GDL/Object.h"
 #include "GDL/Game.h"
+#include "GDL/Scene.h"
 #include "GDL/MainEditorCommand.h"
 
 class EditorObjectList: public wxPanel
 {
 	public:
 
-		EditorObjectList(wxWindow* parent, Game & game_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand, bool * wasModifiedCallback_);
+		EditorObjectList(wxWindow* parent, Game & game_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand, Scene * scene_);
 		virtual ~EditorObjectList();
 
 		//(*Declarations(EditorObjectList)
+		wxMenuItem* addAutomatismItem;
 		wxPanel* toolbarPanel;
+		wxMenu* automatismsMenu;
 		wxTreeCtrl* objectsList;
+		wxMenuItem* deleteAutomatismItem;
 		wxMenuItem* copyMenuI;
 		wxMenu ContextMenu;
 		wxMenuItem* moveUpMenuI;
+		wxMenu rootContextMenu;
 		wxMenuItem* moveDownMenuI;
 		wxMenuItem* cutMenuI;
 		wxMenuItem* pasteMenuI;
@@ -52,6 +57,9 @@ class EditorObjectList: public wxPanel
 		static const long ID_TREECTRL1;
 		static const long idMenuModObj;
 		static const long idMenuModVar;
+		static const long ID_MENUITEM2;
+		static const long ID_MENUITEM3;
+		static const long ID_MENUITEM1;
 		static const long idMenuModName;
 		static const long idMenuAddObj;
 		static const long idMenuDelObj;
@@ -60,6 +68,8 @@ class EditorObjectList: public wxPanel
 		static const long idMenuCopy;
 		static const long idMenuCut;
 		static const long idMenuPaste;
+		static const long ID_MENUITEM4;
+		static const long ID_MENUITEM6;
 		//*)
 		static const long ID_BITMAPBUTTON1;
 		static const long ID_BITMAPBUTTON2;
@@ -101,7 +111,10 @@ class EditorObjectList: public wxPanel
 		void OnobjectsListBeginDrag(wxTreeEvent& event);
 		void OneditVarMenuISelected(wxCommandEvent& event);
 		void OnobjectsListItemRightClick(wxTreeEvent& event);
+		void OnaddAutomatismItemSelected(wxCommandEvent& event);
+		void OndeleteAutomatismItemSelected(wxCommandEvent& event);
 		//*)
+		void OnAutomatismSelected(wxCommandEvent & event);
 		void OnRefreshBtClick(wxCommandEvent& event);
 		void OnChercherBtClick(wxCommandEvent& event);
 		void OnAideBtClick(wxCommandEvent& event);
@@ -109,18 +122,21 @@ class EditorObjectList: public wxPanel
 		void DisableAll();
 		void EnableAll();
 		void CreateToolbar();
+		void RemoveSharedDatasIfNecessary(unsigned int automatismType);
+		void CreateSharedDatasIfNecessary(unsigned int automatismType, std::string automatismTypeName);
 
 		wxImageList* imageList;
 		wxImageList* objectsImagesList;
         wxToolBar * toolbar;
 
 		Game & game;
+		Scene * scene; ///< Scene edited. Can be NULL
 
 		MainEditorCommand & mainEditorCommand;
-		bool * wasModifiedCallback; ///< Set this to true when objects are modified. Can be NULL
 
-        //Item sélectionné
-        wxTreeItemId item;
+        vector < std::pair<long, unsigned int> > idForAutomatism;
+
+        wxTreeItemId item; ///< Selected item in the list
         string ancienNom;
 
 		DECLARE_EVENT_TABLE()

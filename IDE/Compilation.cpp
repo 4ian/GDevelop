@@ -322,7 +322,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     unsigned int i = 0;
     for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
     {
-        if ( wxCopyFile( it->first, repTemp + "/" + it->second, true ) == false )
+        if ( it->first != "" && wxCopyFile( it->first, repTemp + "/" + it->second, true ) == false )
             report += _( "Impossible de copier \""+it->first+"\" dans le répertoire de compilation.\n" );
 
         ++i;
@@ -579,9 +579,9 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 
             //Compression en un seul fichier
             StaticText3->SetLabel( "Exportation du jeu... ( Compression )" );
-            wxRemoveFile( "Mongame.exe" );
+            wxRemoveFile( "MonJeu.exe" );
             wxArrayString arrStdOut, arrStdErr;
-            wxExecute( _T( "7za.exe a -sfx7zS.sfx \""+ repTemp +"/Mongame.exe\" \"" + repTemp + "/*\"" ), arrStdOut, arrStdErr, wxEXEC_SYNC | wxEXEC_NOHIDE );
+            wxExecute( _T( "7za.exe a -sfx7zS.sfx \""+ repTemp +"/MonJeu.exe\" \"" + repTemp + "/*\"" ), arrStdOut, arrStdErr, wxEXEC_SYNC | wxEXEC_NOHIDE );
 
             for ( unsigned int i = 0;i < arrStdOut.GetCount() ;i++ )
             {
@@ -598,8 +598,8 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
             }
 
             //Copie du fichier
-            if ( !wxCopyFile(repTemp + "/Mongame.exe", fileFinal) )
-                report += _( "Impossible de copier le fichier Mongame.exe depuis le répertoire de compilation vers le répertoire final.\n" );
+            if ( !wxCopyFile(repTemp + "/MonJeu.exe", fileFinal) )
+                report += _( "Impossible de copier le fichier MonJeu.exe depuis le répertoire de compilation vers le répertoire final.\n" );
 
         }
         if ( LinuxCheck->GetValue() )

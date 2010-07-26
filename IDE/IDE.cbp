@@ -84,7 +84,6 @@
 					<Add library="imm32" />
 					<Add library="Ws2_32" />
 					<Add library="winmm" />
-					<Add library="C:\Libs\boost_1_43_0\bin.v2\libs\serialization\build\gcc-mingw-4.3.2\release\threading-multi\libboost_serialization-mgw43-mt-1_43.dll.a" />
 					<Add directory="bin\debug" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
@@ -119,6 +118,7 @@
 					<Add option="-DNDEBUG" />
 					<Add option="-DwxDEBUG_LEVEL=0" />
 					<Add option="-DWXUSINGDLL" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\libs\wxwidgets\include" />
 				</Compiler>
@@ -203,6 +203,7 @@
 					<Add option="-DNDEBUG" />
 					<Add option="-DwxDEBUG_LEVEL=0" />
 					<Add option="-DWXUSINGDLL" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\libs\wxwidgets\include" />
 				</Compiler>
@@ -253,7 +254,6 @@
 					<Add library="imm32" />
 					<Add library="Ws2_32" />
 					<Add library="winmm" />
-					<Add library="C:\Libs\boost_1_43_0\bin.v2\libs\serialization\build\gcc-mingw-4.3.2\release\threading-multi\libboost_serialization-mgw43-mt-1_43.dll.a" />
 					<Add directory="bin\dev" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll" />
@@ -286,6 +286,7 @@
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>

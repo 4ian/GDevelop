@@ -331,9 +331,11 @@ void ChoixCondition::RefreshList()
             continue;
 
 	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+
 
         wxTreeItemId extensionItem = ConditionsTree->GetRootItem();
-        if ( !objectsTypes.empty() )//Display the extension name only if it contains objects
+        if ( !objectsTypes.empty() || !automatismsTypes.empty() )//Display the extension name only if it contains objects
         {
             if ( extensions[i]->GetName() == "BuiltinObject" )
                 extensionItem = ConditionsTree->AppendItem(ConditionsTree->GetRootItem(), _("Tous les objets"), 0);
@@ -345,7 +347,7 @@ void ChoixCondition::RefreshList()
 	    {
             wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                         ConditionsTree->AppendItem(extensionItem,
-                                                                _("Objet") + wxString(" ") + extensions[i]->GetExtensionObjectName(objectsTypes[j]),
+                                                                _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectsTypes[j]).fullname,
                                                                 0) :
                                         extensionItem;
             //Add each object conditions
@@ -374,7 +376,40 @@ void ChoixCondition::RefreshList()
             }
 	    }
 
-        //Add each conditions
+	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
+	    {
+            wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
+                                        ConditionsTree->AppendItem(extensionItem,
+                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismsTypes[j]).fullname,
+                                                                0) :
+                                        extensionItem;
+            //Add each automatism conditions
+            std::map<string, InstructionInfos > allConditions = extensions[i]->GetAllConditionsForAutomatism(automatismsTypes[j]);
+            for(std::map<string, InstructionInfos>::const_iterator it = allConditions.begin(); it != allConditions.end(); ++it)
+            {
+                //Search and/or add group item
+                wxTreeItemIdValue cookie;
+                wxTreeItemId groupItem = ConditionsTree->GetFirstChild(automatismTypeItem, cookie);
+                while ( groupItem.IsOk() && ConditionsTree->GetItemText(groupItem) != it->second.group )
+                {
+                    groupItem = ConditionsTree->GetNextSibling(groupItem);
+                }
+                if ( !groupItem.IsOk() ) groupItem = ConditionsTree->AppendItem(automatismTypeItem, it->second.group, 0);
+
+                //Add condition item
+                int IDimage = 0;
+                if ( it->second.smallicon.IsOk() )
+                {
+                    imageList->Add(it->second.smallicon);
+                    IDimage = imageList->GetImageCount()-1;
+                }
+
+                gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+                ConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+            }
+	    }
+
+        //Add each (free) conditions
         std::map<string, InstructionInfos > allConditions = extensions[i]->GetAllConditions();
         for(std::map<string, InstructionInfos>::const_iterator it = allConditions.begin(); it != allConditions.end(); ++it)
         {
@@ -559,7 +594,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
 
     if ( i < MaxPara && i < instructionInfos.parameters.size())
     {
-        if ( instructionInfos.parameters[i].type == "objet" )
+        if ( instructionInfos.parameters[i].type == "object" )
         {
             ChooseObject dialog(this, game, scene, true, instructionInfos.parameters[i].objectType);
             if ( dialog.ShowModal() == 1 )

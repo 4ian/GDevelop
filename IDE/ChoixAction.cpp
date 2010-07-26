@@ -289,9 +289,10 @@ void ChoixAction::RefreshList()
             continue;
 
 	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
 
         wxTreeItemId extensionItem = ActionsTree->GetRootItem();
-        if ( !objectsTypes.empty() )//Display the extension name only if it contains objects
+        if ( !objectsTypes.empty() || !automatismsTypes.empty() )//Display the extension name only if it contains objects/automatisms
         {
             if ( extensions[i]->GetName() == "BuiltinObject" )
                 extensionItem = ActionsTree->AppendItem(ActionsTree->GetRootItem(), _("Tous les objets"), 0);
@@ -303,7 +304,7 @@ void ChoixAction::RefreshList()
 	    {
             wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                         ActionsTree->AppendItem(extensionItem,
-                                                                _("Objet") + wxString(" ") + extensions[i]->GetExtensionObjectName(objectsTypes[j]),
+                                                                _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectsTypes[j]).fullname,
                                                                 0) :
                                         extensionItem;
             //Add each object actions
@@ -332,7 +333,40 @@ void ChoixAction::RefreshList()
             }
 	    }
 
-        //Add each actions
+	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
+	    {
+            wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
+                                        ActionsTree->AppendItem(extensionItem,
+                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismsTypes[j]).fullname,
+                                                                0) :
+                                        extensionItem;
+            //Add each automatism actions
+            std::map<string, InstructionInfos > allAutoActions = extensions[i]->GetAllActionsForAutomatism(automatismsTypes[j]);
+            for(std::map<string, InstructionInfos>::const_iterator it = allAutoActions.begin(); it != allAutoActions.end(); ++it)
+            {
+                //Search and/or add group item
+                wxTreeItemIdValue cookie;
+                wxTreeItemId groupItem = ActionsTree->GetFirstChild(automatismTypeItem, cookie);
+                while ( groupItem.IsOk() && ActionsTree->GetItemText(groupItem) != it->second.group )
+                {
+                    groupItem = ActionsTree->GetNextSibling(groupItem);
+                }
+                if ( !groupItem.IsOk() ) groupItem = ActionsTree->AppendItem(automatismTypeItem, it->second.group, 0);
+
+                //Add action item
+                int IDimage = 0;
+                if ( it->second.smallicon.IsOk() )
+                {
+                    imageList->Add(it->second.smallicon);
+                    IDimage = imageList->GetImageCount()-1;
+                }
+
+                gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+                ActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+            }
+	    }
+
+        //Add each (free) actions
         std::map<string, InstructionInfos > allActions = extensions[i]->GetAllActions();
         for(std::map<string, InstructionInfos>::const_iterator it = allActions.begin(); it != allActions.end(); ++it)
         {
@@ -487,7 +521,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
     if ( i < MaxPara && i < instructionInfos.parameters.size())
     {
-        if ( instructionInfos.parameters[i].type == "objet" )
+        if ( instructionInfos.parameters[i].type == "object" )
         {
             ChooseObject Dialog(this, game, scene, true, instructionInfos.parameters[i].objectType);
             if ( Dialog.ShowModal() == 1 )

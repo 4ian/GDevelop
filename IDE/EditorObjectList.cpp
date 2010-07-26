@@ -16,6 +16,7 @@
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
 #include <wx/textdlg.h>
+#include <wx/choicdlg.h>
 
 #include <string>
 #include <vector>
@@ -33,11 +34,13 @@
 #include <numeric>
 #include "EditorObjetsGroups.h"
 #include "GDL/BitmapGUIManager.h"
+#include "GDL/Automatism.h"
 #include "GDL/CommonTools.h"
 #include "DndTextObjectsEditor.h"
 #include "ObjectTypeChoice.h"
 #include "InitialVariablesDialog.h"
 #include "GDL/HelpFileAccess.h"
+#include "AutomatismTypeChoice.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -52,6 +55,9 @@ const long EditorObjectList::ID_PANEL4 = wxNewId();
 const long EditorObjectList::ID_TREECTRL1 = wxNewId();
 const long EditorObjectList::idMenuModObj = wxNewId();
 const long EditorObjectList::idMenuModVar = wxNewId();
+const long EditorObjectList::ID_MENUITEM2 = wxNewId();
+const long EditorObjectList::ID_MENUITEM3 = wxNewId();
+const long EditorObjectList::ID_MENUITEM1 = wxNewId();
 const long EditorObjectList::idMenuModName = wxNewId();
 const long EditorObjectList::idMenuAddObj = wxNewId();
 const long EditorObjectList::idMenuDelObj = wxNewId();
@@ -60,6 +66,8 @@ const long EditorObjectList::idMoveDown = wxNewId();
 const long EditorObjectList::idMenuCopy = wxNewId();
 const long EditorObjectList::idMenuCut = wxNewId();
 const long EditorObjectList::idMenuPaste = wxNewId();
+const long EditorObjectList::ID_MENUITEM4 = wxNewId();
+const long EditorObjectList::ID_MENUITEM6 = wxNewId();
 //*)
 const long EditorObjectList::ID_BITMAPBUTTON1 = wxNewId();
 const long EditorObjectList::ID_BITMAPBUTTON2 = wxNewId();
@@ -84,15 +92,17 @@ BEGIN_EVENT_TABLE(EditorObjectList,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorObjectList::EditorObjectList(wxWindow* parent, Game & game_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand_, bool * wasModifiedCallback_) :
+EditorObjectList::EditorObjectList(wxWindow* parent, Game & game_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand_, Scene * scene_) :
 objects(objects_),
 game(game_),
-mainEditorCommand(mainEditorCommand_),
-wasModifiedCallback(wasModifiedCallback_)
+scene(scene_),
+mainEditorCommand(mainEditorCommand_)
 {
 	//(*Initialize(EditorObjectList)
 	wxMenuItem* delObjMenuI;
 	wxMenuItem* editNameMenuI;
+	wxMenuItem* MenuItem1;
+	wxMenuItem* MenuItem3;
 	wxMenuItem* editVarMenuI;
 	wxMenuItem* editMenuI;
 	wxFlexGridSizer* FlexGridSizer1;
@@ -119,6 +129,13 @@ wasModifiedCallback(wasModifiedCallback_)
 	editVarMenuI = new wxMenuItem((&ContextMenu), idMenuModVar, _("Modifier les variables initiales"), wxEmptyString, wxITEM_NORMAL);
 	editVarMenuI->SetBitmap(wxBitmap(wxImage(_T("res/var.png"))));
 	ContextMenu.Append(editVarMenuI);
+	automatismsMenu = new wxMenu();
+	automatismsMenu->AppendSeparator();
+	addAutomatismItem = new wxMenuItem(automatismsMenu, ID_MENUITEM2, _("Ajouter un automatisme"), wxEmptyString, wxITEM_NORMAL);
+	automatismsMenu->Append(addAutomatismItem);
+	deleteAutomatismItem = new wxMenuItem(automatismsMenu, ID_MENUITEM3, _("Supprimer un automatisme"), wxEmptyString, wxITEM_NORMAL);
+	automatismsMenu->Append(deleteAutomatismItem);
+	ContextMenu.Append(ID_MENUITEM1, _("Modifier les automatismes"), automatismsMenu, wxEmptyString);
 	editNameMenuI = new wxMenuItem((&ContextMenu), idMenuModName, _("Modifier le nom de l\'objet"), wxEmptyString, wxITEM_NORMAL);
 	editNameMenuI->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	ContextMenu.Append(editNameMenuI);
@@ -146,6 +163,13 @@ wasModifiedCallback(wasModifiedCallback_)
 	pasteMenuI = new wxMenuItem((&ContextMenu), idMenuPaste, _("Coller"), wxEmptyString, wxITEM_NORMAL);
 	pasteMenuI->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	ContextMenu.Append(pasteMenuI);
+	MenuItem1 = new wxMenuItem((&rootContextMenu), ID_MENUITEM4, _("Ajouter un objet"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
+	rootContextMenu.Append(MenuItem1);
+	rootContextMenu.AppendSeparator();
+	MenuItem3 = new wxMenuItem((&rootContextMenu), ID_MENUITEM6, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+	rootContextMenu.Append(MenuItem3);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
@@ -159,6 +183,8 @@ wasModifiedCallback(wasModifiedCallback_)
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_MENU,(wxObjectEventFunction)&EditorObjectList::OnobjectsListItemMenu);
 	Connect(idMenuModObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OneditMenuISelected);
 	Connect(idMenuModVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OneditVarMenuISelected);
+	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnaddAutomatismItemSelected);
+	Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OndeleteAutomatismItemSelected);
 	Connect(idMenuModName,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OneditNameMenuISelected);
 	Connect(idMenuAddObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnaddObjMenuISelected);
 	Connect(idMenuDelObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OndelObjMenuISelected);
@@ -167,6 +193,8 @@ wasModifiedCallback(wasModifiedCallback_)
 	Connect(idMenuCopy,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnCopySelected);
 	Connect(idMenuCut,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnCutSelected);
 	Connect(idMenuPaste,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnPasteSelected);
+	Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnaddObjMenuISelected);
+	Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnPasteSelected);
 	Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorObjectList::OnSetFocus);
 	//*)
 
@@ -328,6 +356,9 @@ void EditorObjectList::OnMoreOptions( wxCommandEvent& event )
     PopupMenu( &ContextMenu );
 }
 
+/**
+ * Popup context menu
+ */
 void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
 {
     wxFocusEvent unusedEvent;
@@ -335,7 +366,44 @@ void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
 
     item = event.GetItem();
 
-    PopupMenu( &ContextMenu );
+    if ( item == objectsList->GetRootItem())
+        PopupMenu( &rootContextMenu );
+    else
+    {
+        gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+        //Find object so as to update automatisms list
+        string name = static_cast<string>(objectsList->GetItemText( item ));
+        int i = Picker::PickOneObject( objects, name );
+        if ( i == -1 ) return;
+
+        //Remove already present automatisms from menu
+        for (vector < std::pair<long, unsigned int> >::iterator idIter = idForAutomatism.begin();
+             idIter != idForAutomatism.end();
+             ++idIter)
+        {
+            automatismsMenu->Destroy(idIter->first);
+        }
+        idForAutomatism.clear();
+
+        //Add each automatism of the object
+        vector < unsigned int > allObjectAutomatismsTypes = objects->at(i)->GetAllAutomatismsTypes();
+        for(unsigned int j = 0;j<allObjectAutomatismsTypes.size();++j)
+        {
+            //Find an identifier for the menu item
+            long id = wxNewId();
+
+            idForAutomatism.push_back(std::make_pair(id, allObjectAutomatismsTypes[j]));
+            wxMenuItem * menuItem = new wxMenuItem(automatismsMenu, id, //Quite long, but automatism will be perhaps able one day to have a personnalized name, in which case it will be shorter :
+                                                   extensionsManager->GetAutomatismInfo(objects->at(i)->GetAutomatism(allObjectAutomatismsTypes[j])->GetTypeName()).fullname);
+            automatismsMenu->Insert(0, menuItem);
+            Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnAutomatismSelected);
+        }
+
+
+        //Popup menu
+        PopupMenu( &ContextMenu );
+    }
 }
 
 void EditorObjectList::OnobjectsListItemRightClick(wxTreeEvent& event)
@@ -394,6 +462,24 @@ void EditorObjectList::OnRefreshBtClick( wxCommandEvent& event )
     Refresh();
 }
 
+
+void EditorObjectList::OnAutomatismSelected(wxCommandEvent & event)
+{
+    string name = static_cast<string>(objectsList->GetItemText( item ));
+    int i = Picker::PickOneObject( objects, name );
+    if ( i == -1 ) return;
+
+    unsigned int autoType = 0;
+    for (unsigned int i = 0;i<idForAutomatism.size();++i)
+    {
+    	if ( idForAutomatism[i].first == event.GetId() )
+            autoType = idForAutomatism[i].second;
+    }
+
+    objects->at(i)->GetAutomatism(autoType)->EditAutomatism(this, game, scene, mainEditorCommand);
+    if ( scene ) scene->wasModified = true;
+}
+
 ////////////////////////////////////////////////////////////
 /// Editer un objet
 ////////////////////////////////////////////////////////////
@@ -404,7 +490,7 @@ void EditorObjectList::OneditMenuISelected(wxCommandEvent& event)
     if ( i != -1 )
     {
         objects->at(i)->EditObject(this, game, mainEditorCommand);
-        if ( wasModifiedCallback ) *wasModifiedCallback = true;
+        if ( scene ) scene->wasModified = true;
 
         //Reload thumbnail
         int thumbnailID = -1;
@@ -499,7 +585,7 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
 
     objectsList->SetItemImage( itemAdded, thumbnailID );
 
-    if ( wasModifiedCallback ) *wasModifiedCallback = true;
+   if ( scene ) scene->wasModified = true;
     wxLogStatus( _( "L'objet a été correctement ajouté" ) );
 }
 
@@ -508,14 +594,22 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
 {
-    wxTreeItemId ItemNul = NULL;
-    if ( item != ItemNul && objectsList->GetItemText( item ) != _( "Tous les objets" ) )
+    if ( item.IsOk() && objectsList->GetRootItem() != item )
     {
-        int i = Picker::PickOneObject( objects, ( string ) objectsList->GetItemText( item ) );
-        if ( i != -1 )
-            objects->erase( objects->begin() + i );
+        int id = Picker::PickOneObject( objects, ( string ) objectsList->GetItemText( item ) );
+        if ( id != -1 )
+        {
+            vector <unsigned int> automatismsTypes = objects->at(id)->GetAllAutomatismsTypes();
 
-        if ( wasModifiedCallback ) *wasModifiedCallback = true;
+            //Remove objects
+            objects->erase( objects->begin() + id );
+
+            //Remove automatisms shared datas if necessary
+            for (unsigned int i = 0;i<automatismsTypes.size();++i)
+                RemoveSharedDatasIfNecessary(automatismsTypes[i]);
+        }
+
+        if ( scene ) scene->wasModified = true;
         objectsList->Delete( item );
         return;
 
@@ -611,7 +705,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
             {
                 objects->at( i )->SetName( newName );
 
-                if ( wasModifiedCallback ) *wasModifiedCallback = true;
+                if ( scene ) scene->wasModified = true;
                 objectsList->SetItemText( event.GetItem(), event.GetLabel() );
                 return;
             }
@@ -690,10 +784,18 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
     }
 
     objectsList->Delete( item );
-    if ( wasModifiedCallback ) *wasModifiedCallback = true;
+    if ( scene ) scene->wasModified = true;
 
     clipboard->SetObject(objects->at(i));
+
+    //Remove automatisms shared datas if necessary
+    vector <unsigned int> automatismsTypes = objects->at(i)->GetAllAutomatismsTypes();
+
+    //Remove object
     objects->erase(objects->begin() + i);
+
+    for (unsigned int j = 0;j<automatismsTypes.size();++j)
+        RemoveSharedDatasIfNecessary(automatismsTypes[j]);
 }
 
 ////////////////////////////////////////////////////////////
@@ -733,7 +835,12 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     objects->push_back( object );
     objectsList->AppendItem( objectsList->GetRootItem(), name );
 
-    if ( wasModifiedCallback ) *wasModifiedCallback = true;
+    //Add object's automatism's shared datas to scene if necessary
+    vector <unsigned int> automatismsTypes = object->GetAllAutomatismsTypes();
+    for (unsigned int j = 0;j<automatismsTypes.size();++j)
+        CreateSharedDatasIfNecessary(automatismsTypes[j], object->GetAutomatism(automatismsTypes[j])->GetTypeName());
+
+    if ( scene ) scene->wasModified = true;
     wxLogStatus( _( "L'objet a été correctement ajouté" ) );
 }
 
@@ -758,7 +865,7 @@ void EditorObjectList::OnMoveUpSelected(wxCommandEvent& event)
         objects->insert(objects->begin()+i-1, object);
 
         Refresh();
-        if ( wasModifiedCallback ) *wasModifiedCallback = true;
+        if ( scene ) scene->wasModified = true;
 
         //On la reselectionne
         wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
@@ -796,7 +903,7 @@ void EditorObjectList::OnMoveDownSelected(wxCommandEvent& event)
         objects->insert(objects->begin()+i+1, object);
 
         Refresh();
-        if ( wasModifiedCallback ) *wasModifiedCallback = true;
+        if ( scene ) scene->wasModified = true;
 
         //On la reselectionne
         wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
@@ -836,6 +943,9 @@ void EditorObjectList::OnSetFocus(wxFocusEvent& event)
     ConnectEvents();
 }
 
+/**
+ * Editing initial variables
+ */
 void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
 {
     string name = static_cast< string > ( objectsList->GetItemText( item ));
@@ -850,6 +960,106 @@ void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
     if ( dialog.ShowModal() == 1 )
     {
         objects->at(i)->variablesObjet = dialog.variables;
-        if ( wasModifiedCallback ) *wasModifiedCallback = true;
+        if ( scene ) scene->wasModified = true;
     }
+}
+
+/**
+ * Add an automatism to the object
+ */
+void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
+{
+    string name = static_cast< string > ( objectsList->GetItemText( item ));
+    int i = Picker::PickOneObject( objects, name );
+    if ( i == -1 )
+    {
+        wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
+        return;
+    }
+
+    AutomatismTypeChoice dialog(this, game);
+    if ( dialog.ShowModal() == 1)
+    {
+        gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+        boost::shared_ptr<Automatism> automatism = extensionManager->CreateAutomatism(dialog.selectedAutomatismType);
+
+        if (automatism == boost::shared_ptr<Automatism>())
+        {
+            wxLogError( _( "Impossible de créer l'automatisme." ) );
+            return;
+        }
+
+        //Add automatism to object
+        objects->at(i)->AddAutomatism(automatism);
+
+        //Add shared datas to scene if necessary
+        CreateSharedDatasIfNecessary(automatism->GetTypeId(), automatism->GetTypeName());
+
+        if ( scene ) scene->wasModified = true;
+    }
+}
+
+void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
+{
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+    string name = static_cast< string > ( objectsList->GetItemText( item ));
+    int id = Picker::PickOneObject( objects, name );
+    if ( id == -1 )
+    {
+        wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
+        return;
+    }
+
+    //Create automatism array
+    wxArrayString automatisms;
+
+    //Fill array
+    vector <unsigned int> automatismsTypes = objects->at(id)->GetAllAutomatismsTypes();
+    for (unsigned int i = 0;i<automatismsTypes.size();++i)
+        automatisms.Add(extensionsManager->GetAutomatismInfo(objects->at(id)->GetAutomatism(automatismsTypes[i])->GetTypeName()).fullname);
+
+    int selection = wxGetSingleChoiceIndex(_("Choisissez l'automatisme à supprimer"), _("Choisir l'automatisme à supprimer"), automatisms);
+    if ( selection == -1 ) return;
+
+    objects->at(id)->RemoveAutomatism(automatismsTypes[selection]);
+
+    //Remove shared datas if necessary
+    RemoveSharedDatasIfNecessary(automatismsTypes[selection]);
+
+    if ( scene ) scene->wasModified = true;
+}
+
+/**
+ * Remove shared datas of an automatism if this automatism is not used anymore
+ */
+void EditorObjectList::RemoveSharedDatasIfNecessary(unsigned int automatismType)
+{
+    if ( scene != NULL && scene->automatismsInitialSharedDatas.find(automatismType) != scene->automatismsInitialSharedDatas.end() )
+    {
+        //Check no object use this automatism anymore
+        for (unsigned int i = 0;i<scene->initialObjects.size();++i)
+        {
+        	if (scene->initialObjects[i]->HasAutomatism(automatismType))
+                return;
+        }
+        for (unsigned int i = 0;i<game.globalObjects.size();++i)
+        {
+        	if (game.globalObjects[i]->HasAutomatism(automatismType))
+                return;
+        }
+
+        scene->automatismsInitialSharedDatas.erase(automatismType);
+    }
+}
+
+/**
+ * Create datas shared by an automatism type if these data don't yet exist.
+ */
+void EditorObjectList::CreateSharedDatasIfNecessary(unsigned int automatismType, std::string automatismTypeName)
+{
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+    if ( scene != NULL && scene->automatismsInitialSharedDatas.find(automatismType) == scene->automatismsInitialSharedDatas.end() )
+        scene->automatismsInitialSharedDatas[automatismType] = extensionsManager->CreateAutomatismSharedDatas(automatismTypeName);
 }

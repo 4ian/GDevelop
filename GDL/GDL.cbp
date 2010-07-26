@@ -729,6 +729,7 @@
 		<Unit filename="GDL\WhileEvent.h" />
 		<Unit filename="GDL\WindowExtension.cpp" />
 		<Unit filename="GDL\WindowExtension.h" />
+		<Unit filename="GDL\XmlMacros.h" />
 		<Unit filename="GDL\aADS.cpp" />
 		<Unit filename="GDL\aADS.h" />
 		<Unit filename="GDL\aAdvanced.cpp" />

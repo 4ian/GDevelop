@@ -3,10 +3,6 @@
  *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
-
-////////////////////////////////////////////////////////////
-// Headers
-////////////////////////////////////////////////////////////
 #include "GDL/Object.h"
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
@@ -16,7 +12,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "GDL/ObjectIdentifiersManager.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/Log.h"
 #include "GDL/Force.h"
 #include "GDL/constantes.h"
@@ -28,10 +23,6 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Automatism.h"
 #include <typeinfo>
-
-#ifdef GDE
-#include "GDL/CommonTools.h"
-#endif
 
 using namespace std;
 
@@ -49,14 +40,6 @@ Object::Object(string name_) :
     objectId = objectIdentifiersManager->GetOIDfromName(name_);
 
     this->ClearForce();
-
-    //TEST
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-
-    boost::shared_ptr<Automatism> automatism = extensionsManager->CreateAutomatism("PhysicsAutomatism::PhysicsAutomatism");
-
-    automatisms[automatism->GetTypeId()] = automatism;
-    automatisms[automatism->GetTypeId()]->SetOwner(this);
 }
 
 void Object::Init(const Object & object)
@@ -200,32 +183,6 @@ void Object::DoAutomatismsPostEvents(RuntimeScene & scene)
         it->second->StepPostEvents(scene);
 }
 
-void Object::CallAutomatismsSharedInitialization(RuntimeScene & scene, const Scene & loadedScene, vector<const std::type_info*> & alreadyCalled)
-{
-    for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
-    {
-        //Shared initialization function must be called once only for each automatism type.
-        if ( find(alreadyCalled.begin(), alreadyCalled.end(), &typeid(*it->second)) == alreadyCalled.end())
-        {
-            it->second->InitializeSharedDatas(scene, loadedScene);
-            alreadyCalled.push_back(&typeid(*it->second));
-        }
-    }
-}
-
-void Object::CallAutomatismsSharedUnInitialization(RuntimeScene & scene, vector<const std::type_info*> & alreadyCalled)
-{
-    for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
-    {
-        //Shared initialization function must be called once only for each automatism type.
-        if ( find(alreadyCalled.begin(), alreadyCalled.end(), &typeid(*it->second)) == alreadyCalled.end())
-        {
-            it->second->UnInitializeSharedDatas(scene);
-            alreadyCalled.push_back(&typeid(*it->second));
-        }
-    }
-}
-
 vector < unsigned int > Object::GetAllAutomatismsTypes()
 {
     vector < unsigned int > allTypes;
@@ -235,6 +192,18 @@ vector < unsigned int > Object::GetAllAutomatismsTypes()
 
     return allTypes;
 }
+
+void Object::AddAutomatism(boost::shared_ptr<Automatism> automatism)
+{
+    automatisms[automatism->GetTypeId()] = automatism;
+    automatisms[automatism->GetTypeId()]->SetOwner(this);
+}
+#ifdef GDE
+void Object::RemoveAutomatism(unsigned int type)
+{
+    automatisms.erase(type);
+}
+#endif
 
 #if GDE
 void Object::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const

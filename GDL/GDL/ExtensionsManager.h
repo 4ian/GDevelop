@@ -280,6 +280,11 @@ class GD_API ExtensionsManager
         boost::shared_ptr<Automatism> CreateAutomatism(std::string automatismType) const;
 
         /**
+         * Create shared datas of the automatism of given type
+         */
+        boost::shared_ptr<AutomatismsSharedDatas> CreateAutomatismSharedDatas(std::string automatismType) const;
+
+        /**
          * Get the typeId associated with a name
          * @return typeId ( 0 if not found )
          */

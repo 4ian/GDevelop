@@ -33,6 +33,7 @@
 #include "GDL/Position.h"
 #include "GDL/Event.h"
 #include "GDL/Instruction.h"
+#include "GDL/Automatism.h"
 #include "GDL/VersionWrapper.h"
 #include "GDL/ExtensionsLoader.h"
 #include "GDL/Layer.h"
@@ -431,6 +432,25 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, T
 
         //Spécifique à l'objet
         newObject->LoadFromXml(elemScene);
+
+        if ( elemScene->FirstChildElement( "Automatism" ) != NULL )
+        {
+            TiXmlElement * elemAutomatism = elemScene->FirstChildElement( "Automatism" );
+            while ( elemAutomatism )
+            {
+                boost::shared_ptr<Automatism> newAutomatism = extensionsManager->CreateAutomatism(elemAutomatism->Attribute("type") != NULL ? elemAutomatism->Attribute("type") : "");
+                if ( newAutomatism != boost::shared_ptr<Automatism>() )
+                {
+                    newAutomatism->LoadFromXml(elemAutomatism);
+
+                    newObject->AddAutomatism(newAutomatism);
+                }
+                else
+                    cout << "Unknown automatism" << elemAutomatism->Attribute("type") << endl;
+
+                elemAutomatism = elemAutomatism->NextSiblingElement("Automatism");
+            }
+        }
 
         //Ajout de l'objet
         objects.push_back( newObject );
@@ -1803,6 +1823,16 @@ void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<Object> > & list
         TiXmlElement * variables = new TiXmlElement( "Variables" );
         objet->LinkEndChild( variables );
         SaveVariablesList(list.at( j )->variablesObjet, variables);
+
+        vector <unsigned int > allAutomatisms = list[j]->GetAllAutomatismsTypes();
+        for (unsigned int i = 0;i<allAutomatisms.size();++i)
+        {
+            TiXmlElement * automatism = new TiXmlElement( "Automatism" );
+            objet->LinkEndChild( automatism );
+            automatism->SetAttribute( "type", list[j]->GetAutomatism(allAutomatisms[i])->GetTypeName().c_str() );
+
+            list[j]->GetAutomatism(allAutomatisms[i])->SaveToXml(automatism);
+        }
 
         list[j]->SaveToXml(objet);
     }

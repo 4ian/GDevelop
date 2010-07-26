@@ -171,6 +171,18 @@ boost::shared_ptr<Automatism> ExtensionsManager::CreateAutomatism(std::string au
     return boost::shared_ptr<Automatism>();
 }
 
+boost::shared_ptr<AutomatismsSharedDatas> ExtensionsManager::CreateAutomatismSharedDatas(std::string automatismType) const
+{
+    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    {
+        boost::shared_ptr<AutomatismsSharedDatas> automatism = extensionsLoaded[i]->CreateAutomatismSharedDatas(automatismType);
+        if ( automatism != boost::shared_ptr<AutomatismsSharedDatas>() )
+            return automatism;
+    }
+
+    return boost::shared_ptr<AutomatismsSharedDatas>();
+}
+
 const AutomatismInfo& ExtensionsManager::GetAutomatismInfo(std::string automatism) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)

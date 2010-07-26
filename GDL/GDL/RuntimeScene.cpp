@@ -23,6 +23,7 @@
 #include "GDL/Position.h"
 #include "GDL/FontManager.h"
 #include "GDL/ObjectsConcerned.h"
+#include "GDL/AutomatismsSharedDatas.h"
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
@@ -65,11 +66,6 @@ specialAction(-1)
 
 RuntimeScene::~RuntimeScene()
 {
-    //Call uninitialization routine of each automatism type
-    vector < const std::type_info* > alreadyCalled;
-    for (unsigned int id = 0;id<initialObjects.size();++id)
-        initialObjects[id]->CallAutomatismsSharedUnInitialization(*this, alreadyCalled);
-
 }
 
 void RuntimeScene::Init(const RuntimeScene & scene)
@@ -101,6 +97,13 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     timeScale = scene.timeScale;
     timeFromStart = scene.timeFromStart;
     specialAction = scene.specialAction;
+
+    automatismsSharedDatas.clear();
+    for (std::map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> >::const_iterator it = scene.automatismsSharedDatas.begin();
+         it != scene.automatismsSharedDatas.end();++it)
+    {
+    	automatismsSharedDatas[it->first] = it->second->Clone();
+    }
 }
 
 RuntimeScene::RuntimeScene(const RuntimeScene & scene) : Scene(scene)
@@ -638,10 +641,14 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     EventsPreprocessor::DeleteUselessEvents(events);
     EventsPreprocessor::PreprocessEvents(*this, events);
 
-    //Call initialization routine of each automatism type
-    vector < const std::type_info* > alreadyCalled;
-    for (unsigned int id = 0;id<initialObjects.size();++id)
-        initialObjects[id]->CallAutomatismsSharedInitialization(*this, scene, alreadyCalled);
+    //Automatisms datas
+    automatismsSharedDatas.clear();
+    for(std::map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
+        it != scene.automatismsInitialSharedDatas.end();
+        ++it)
+    {
+        automatismsSharedDatas[it->first] = it->second->CreateRuntimeSharedDatas();
+    }
 
     MessageLoading( "Loading finished", 100 );
 

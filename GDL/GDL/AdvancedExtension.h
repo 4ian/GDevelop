@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef ADVANCEDEXTENSION_H
 #define ADVANCEDEXTENSION_H
 

@@ -12,6 +12,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <map>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
@@ -30,6 +31,7 @@
 #include "GDL/Layer.h"
 #include "GDL/ManualTimer.h"
 #include "GDL/ObjInstancesHolder.h"
+class AutomatismsRuntimeSharedDatas;
 
 #ifdef GDE
 #include "GDL/BaseDebugger.h"
@@ -76,6 +78,7 @@ class GD_API RuntimeScene : public Scene
         int                                     backgroundColorG;
         int                                     backgroundColorB;
         ErrorReport                             errors;
+        std::map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas;
 
         //Fonctions supplémentaires pour une RuntimeScene
         //-> Chargement à partir d'une scène

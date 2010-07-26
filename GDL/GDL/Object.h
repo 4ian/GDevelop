@@ -220,24 +220,53 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         void DoAutomatismsPostEvents(RuntimeScene & scene);
 
         /**
-         * Call initialisation routine of each automatism type
-         */
-        void CallAutomatismsSharedInitialization(RuntimeScene & scene, const Scene & loadedScene, vector<const std::type_info*> & alreadyCalled);
-
-        /**
-         * Call uninitialisation routine of each automatism type
-         */
-        void CallAutomatismsSharedUnInitialization(RuntimeScene & scene, vector<const std::type_info*> & alreadyCalled);
-
-        /**
          * Get automatism from type
          */
         inline boost::shared_ptr<Automatism> & GetAutomatism(unsigned int type) { return automatisms[type]; }
 
         /**
+         * Get (const) automatism from type
+         */
+        inline const boost::shared_ptr<Automatism> & GetAutomatism(unsigned int type) const { return automatisms.find(type)->second; }
+
+        /**
+         * Add an automatism
+         */
+        void AddAutomatism(boost::shared_ptr<Automatism> automatism);
+
+        /**
          * Get all types of automatisms used by the object
          */
         vector < unsigned int > GetAllAutomatismsTypes();
+
+        #ifdef GDE
+        /**
+         * Remove an automatism
+         */
+        void RemoveAutomatism(unsigned int type);
+
+        /**
+         * Test if object has an automaism
+         */
+        bool HasAutomatism(unsigned int type) { return automatisms.find(type) != automatisms.end(); };
+        #endif
+
+        /**
+         * Get a shared pointer for the object
+         */
+        inline boost::shared_ptr<Object> Shared_ptrFromObject()
+        {
+            return shared_from_this();
+        }
+
+        /**
+         * Get a shared pointer for the object
+         */
+        inline boost::shared_ptr<const Object> Shared_ptrFromObject() const
+        {
+            return shared_from_this();
+        }
+
 
         //Variables
         ListVariable variablesObjet;

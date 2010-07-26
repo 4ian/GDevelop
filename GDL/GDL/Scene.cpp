@@ -4,6 +4,8 @@
 #include "GDL/Chercher.h"
 #include "GDL/Game.h"
 #include "GDL/Position.h"
+#include "GDL/AutomatismsSharedDatas.h"
+#include <iostream>
 
 Scene::Scene() :
 backgroundColorR(125),
@@ -18,6 +20,12 @@ standardSortMethod(true)
     Layer layer;
     layer.SetCamerasNumber(1);
     initialLayers.push_back(layer);
+
+    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+
+    boost::shared_ptr<AutomatismsSharedDatas> automatism = extensionsManager->CreateAutomatismSharedDatas("PhysicsAutomatism::PhysicsAutomatism");
+    automatismsInitialSharedDatas[automatism->GetTypeId()] = automatism;
+    std::cout << "Scene created with automatism shared datas of name" << automatismsInitialSharedDatas[automatism->GetTypeId()]->GetTypeName() << std::endl;
 }
 
 void Scene::Init(const Scene & scene)
@@ -42,6 +50,13 @@ void Scene::Init(const Scene & scene)
     initialObjectsPositions = scene.initialObjectsPositions;
     initialLayers = scene.initialLayers;
     variables = scene.variables;
+
+    automatismsInitialSharedDatas.clear();
+    for (std::map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
+         it != scene.automatismsInitialSharedDatas.end();++it)
+    {
+    	automatismsInitialSharedDatas[it->first] = it->second->Clone();
+    }
 }
 
 Scene::Scene(const Scene & scene)

@@ -2,6 +2,7 @@
 #define SCENE_H
 
 #include <vector>
+#include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
 
@@ -11,6 +12,7 @@ class Game;
 #include "GDL/ObjectGroup.h"
 #include "GDL/Position.h"
 #include "GDL/Layer.h"
+class AutomatismsSharedDatas;
 
 /**
  * A scene is an important part of a game.
@@ -40,6 +42,7 @@ class GD_API Scene
         vector < InitialPosition >              initialObjectsPositions;
         vector < Layer >                        initialLayers;
         ListVariable                            variables;
+        std::map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas;
 
         #if defined(GDE)
         bool wasModified;

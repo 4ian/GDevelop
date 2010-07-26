@@ -6,6 +6,7 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/Event.h"
 #include "GDL/Automatism.h"
+#include "GDL/AutomatismsSharedDatas.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -379,4 +380,13 @@ boost::shared_ptr<Automatism> ExtensionBase::CreateAutomatism(std::string type) 
         return automatismsInfo.find(type)->second.instance->Clone();
 
     return boost::shared_ptr<Automatism>();
+}
+
+
+boost::shared_ptr<AutomatismsSharedDatas> ExtensionBase::CreateAutomatismSharedDatas(std::string type) const
+{
+    if ( automatismsInfo.find(type) != automatismsInfo.end())
+        return automatismsInfo.find(type)->second.sharedDatasInstance->Clone();
+
+    return boost::shared_ptr<AutomatismsSharedDatas>();
 }

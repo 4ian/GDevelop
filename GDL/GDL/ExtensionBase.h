@@ -21,6 +21,7 @@ class ExtensionBase;
 class ExpressionInstruction;
 class StrExpressionInstruction;
 class BaseEvent;
+class AutomatismsSharedDatas;
 
 #if defined(GDE)
 class Game;
@@ -520,7 +521,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename of a small icon
  * @param class representing the automatism
  */
-#define DECLARE_AUTOMATISM(name_, fullname_, description_, group_, icon24x24_, className_) { \
+#define DECLARE_AUTOMATISM(name_, fullname_, description_, group_, icon24x24_, className_, sharedDatasClassName_) { \
             AutomatismInfo automatismInfo; \
             std::string currentAutomatismDeclarationName = name_;\
             automatismInfo.fullname = fullname_; \
@@ -530,7 +531,8 @@ typedef Object * (*CreateFunPtr)(std::string name);
             {\
                 automatismInfo.icon = wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY); \
             } else { automatismInfo.icon = wxBitmap(24,24);} \
-            automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName));
+            automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName));\
+            automatismInfo.sharedDatasInstance = boost::shared_ptr<AutomatismsSharedDatas>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
 
 #define MAIN_OBJECTS_IN_PARAMETER(x) instrInfo.mainObjects.push_back(x);
 #define MAIN_OBJECTS_IN_PARAMETERS(x, y) instrInfo.mainObjects.push_back(x); instrInfo.mainObjects.push_back(y);
@@ -915,6 +917,7 @@ class GD_API AutomatismInfo
     std::map<std::string, StrExpressionInfos > strExpressionsInfos;
 
     boost::shared_ptr<Automatism> instance;
+    boost::shared_ptr<AutomatismsSharedDatas> sharedDatasInstance;
 };
 
 /**
@@ -1074,6 +1077,12 @@ class GD_API ExtensionBase
      * Return NULL if automatismType is not provided by the extension.
      */
     boost::shared_ptr<Automatism> CreateAutomatism(std::string automatismType) const;
+
+    /**
+     * Create shared datas of an automatism
+     * Return NULL if automatismType is not provided by the extension.
+     */
+    boost::shared_ptr<AutomatismsSharedDatas> CreateAutomatismSharedDatas(std::string automatismType) const;
 
     inline std::string GetNameSpace() { return nameSpace; };
 

@@ -88,7 +88,7 @@ bool PhysicsAutomatism::ActDontSetAsBullet( RuntimeScene & scene, ObjectsConcern
 bool PhysicsAutomatism::ActApplyForce( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( !body ) CreateBody(scene);
-    body->ApplyForce(b2Vec2(action.GetParameter(1).GetAsMathExpressionResult(scene, objectsConcerned), action.GetParameter(2).GetAsMathExpressionResult(scene, objectsConcerned)),
+    body->ApplyForce(b2Vec2(action.GetParameter(1).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()), action.GetParameter(2).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject())),
                      body->GetPosition());
 
     return true;
@@ -100,7 +100,7 @@ bool PhysicsAutomatism::ActApplyForce( RuntimeScene & scene, ObjectsConcerned & 
 bool PhysicsAutomatism::ActApplyTorque( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( !body ) CreateBody(scene);
-    body->ApplyTorque(action.GetParameter(1).GetAsMathExpressionResult(scene, objectsConcerned));
+    body->ApplyTorque(action.GetParameter(1).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()));
 
     return true;
 }

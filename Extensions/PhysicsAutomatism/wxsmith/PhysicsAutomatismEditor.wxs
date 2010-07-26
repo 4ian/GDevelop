@@ -10,38 +10,165 @@
 					<label>Paramètres initiaux</label>
 					<object class="sizeritem">
 						<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
-							<cols>2</cols>
-							<growablecols>1</growablecols>
+							<cols>1</cols>
+							<growablecols>0</growablecols>
 							<object class="sizeritem">
-								<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-									<label>Densité de masse :</label>
-								</object>
-								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-								<border>5</border>
-								<option>1</option>
-							</object>
-							<object class="sizeritem">
-								<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="massDensityEdit" member="yes">
-									<value>1</value>
+								<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
+									<cols>3</cols>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT11" variable="StaticText11" member="yes">
+											<label>Forme du masque de collision :</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="rectCheck" member="yes">
+											<label>Rectangle</label>
+											<selected>1</selected>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxRadioButton" name="ID_RADIOBUTTON2" variable="circleCheck" member="yes">
+											<label>Cercle</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
 								</object>
 								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-								<border>5</border>
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
-								<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-									<label>Friction :</label>
-								</object>
-								<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
-								<border>5</border>
-								<option>1</option>
-							</object>
-							<object class="sizeritem">
-								<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="frictionEdit" member="yes">
-									<value>0.8</value>
+								<object class="wxFlexGridSizer" variable="FlexGridSizer11" member="no">
+									<cols>3</cols>
+									<object class="sizeritem">
+										<object class="wxCheckBox" name="ID_CHECKBOX1" variable="staticCheck" member="yes">
+											<label>Objet statique</label>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxCheckBox" name="ID_CHECKBOX3" variable="fixedRotationCheck" member="yes">
+											<label>Empecher la rotation</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
 								</object>
 								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxCheckBox" name="ID_CHECKBOX2" variable="bulletCheck" member="yes">
+									<label>Assimilable à un projectile ( meilleure gestion de la collision, mais plus lent )</label>
+								</object>
+								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
+									<cols>3</cols>
+									<growablecols>1</growablecols>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+											<label>Densité de masse :</label>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="massDensityEdit" member="yes">
+											<value>1</value>
+										</object>
+										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
+									<cols>3</cols>
+									<growablecols>1</growablecols>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+											<label>Friction :</label>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="frictionEdit" member="yes">
+											<value>0.8</value>
+										</object>
+										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer9" member="no">
+									<cols>3</cols>
+									<growablecols>1</growablecols>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT9" variable="StaticText9" member="yes">
+											<label>Amortissement linéaire :</label>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxTextCtrl" name="ID_TEXTCTRL7" variable="linearDampingEdit" member="yes">
+											<value>0.1</value>
+										</object>
+										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer10" member="no">
+									<cols>3</cols>
+									<growablecols>1</growablecols>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT10" variable="StaticText10" member="yes">
+											<label>Amortissement angulaire :</label>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxTextCtrl" name="ID_TEXTCTRL8" variable="angularDampingEdit" member="yes">
+											<value>0.1</value>
+										</object>
+										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<option>1</option>
 							</object>
 						</object>
@@ -59,6 +186,7 @@
 					<object class="sizeritem">
 						<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
 							<cols>1</cols>
+							<growablecols>0</growablecols>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
 									<label>Coordonnées du vecteur de gravité :</label>
@@ -68,13 +196,12 @@
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
-								<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
-									<cols>3</cols>
+								<object class="wxBoxSizer" variable="BoxSizer1" member="no">
 									<object class="sizeritem">
 										<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="gravityXEdit" member="yes">
 											<value>0</value>
 										</object>
-										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
 										<option>1</option>
 									</object>
@@ -84,7 +211,6 @@
 										</object>
 										<flag>wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
-										<option>1</option>
 									</object>
 									<object class="sizeritem">
 										<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="gravityYEdit" member="yes">
@@ -98,9 +224,63 @@
 								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<option>1</option>
 							</object>
+							<object class="sizeritem">
+								<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
+									<label>Echelle de taille de la répresentation :</label>
+								</object>
+								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+									<cols>5</cols>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
+											<label>1m =</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="scaleXEdit" member="yes">
+											<value>0</value>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
+											<label>en X;</label>
+										</object>
+										<flag>wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxTextCtrl" name="ID_TEXTCTRL6" variable="scaleYEdit" member="yes">
+											<value>0</value>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
+											<label>en Y</label>
+										</object>
+										<flag>wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-						<border>5</border>
 						<option>1</option>
 					</object>
 				</object>

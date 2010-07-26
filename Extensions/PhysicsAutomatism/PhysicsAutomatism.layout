@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug - Edittime" />
+	<ActiveTarget name="Development - Edittime" />
 	<File name="Box2D\Box2D\Box2D\Box2D.h" open="0" top="0" tabpos="0">
 		<Cursor position="902" topLine="27" />
 	</File>
@@ -20,27 +20,39 @@
 		<Cursor position="3843" topLine="92" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="9291" topLine="175" />
+		<Cursor position="2187" topLine="22" />
 	</File>
-	<File name="PhysicsAutomatism.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="2576" topLine="41" />
+	<File name="PhysicsAutomatism.cpp" open="1" top="1" tabpos="0">
+		<Cursor position="1122" topLine="13" />
 	</File>
-	<File name="PhysicsAutomatism.h" open="1" top="0" tabpos="2">
-		<Cursor position="3973" topLine="76" />
+	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="2">
+		<Cursor position="4268" topLine="53" />
 	</File>
-	<File name="PhysicsAutomatismActions.cpp" open="1" top="0" tabpos="5">
+	<File name="PhysicsAutomatismActions.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="1982" topLine="69" />
 	</File>
-	<File name="PhysicsAutomatismEditor.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="6858" topLine="86" />
+	<File name="PhysicsAutomatismEditor.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="15461" topLine="236" />
 	</File>
-	<File name="PhysicsAutomatismEditor.h" open="1" top="0" tabpos="3">
-		<Cursor position="86" topLine="3" />
+	<File name="PhysicsAutomatismEditor.h" open="0" top="0" tabpos="3">
+		<Cursor position="3329" topLine="42" />
 	</File>
-	<File name="ScenePhysicsDatas.cpp" open="1" top="0" tabpos="7">
+	<File name="RuntimeScenePhysicsDatas.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="1210" topLine="9" />
+	</File>
+	<File name="RuntimeScenePhysicsDatas.h" open="0" top="0" tabpos="0">
+		<Cursor position="1617" topLine="15" />
+	</File>
+	<File name="ScenePhysicsDatas.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="755" topLine="5" />
 	</File>
-	<File name="ScenePhysicsDatas.h" open="1" top="0" tabpos="6">
-		<Cursor position="1560" topLine="21" />
+	<File name="ScenePhysicsDatas.h" open="0" top="0" tabpos="6">
+		<Cursor position="1150" topLine="24" />
+	</File>
+	<File name="..\..\GDL\GDL\tinystr.h" open="0" top="0" tabpos="0">
+		<Cursor position="7349" topLine="69" />
+	</File>
+	<File name="..\..\GDL\GDL\tinyxml.h" open="0" top="0" tabpos="0">
+		<Cursor position="743" topLine="87" />
 	</File>
 </CodeBlocks_layout_file>

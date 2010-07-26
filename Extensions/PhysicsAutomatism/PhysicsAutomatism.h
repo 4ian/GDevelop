@@ -49,24 +49,14 @@ class PhysicsAutomatism : public Automatism
         virtual boost::shared_ptr<Automatism> Clone() { return boost::shared_ptr<Automatism>(new PhysicsAutomatism(*this));}
 
         /**
-         * Called -- one time -- when scene is loading
-         */
-        virtual void InitializeSharedDatas(RuntimeScene & scene, const Scene & loadedScene);
-
-        /**
-         * Called -- one time -- as a scene is closed
-         */
-        virtual void UnInitializeSharedDatas(RuntimeScene & scene);
-
-        /**
          * Save Automatism to XML
          */
-        virtual void SaveToXml(TiXmlElement * eventElem) const {}
+        virtual void SaveToXml(TiXmlElement * elem) const;
 
         /**
          * Load Automatism from XML
          */
-        virtual void LoadFromXml(const TiXmlElement * eventElem) {}
+        virtual void LoadFromXml(const TiXmlElement * elem);
 
         #if defined(GDE)
         /**
@@ -100,12 +90,11 @@ class PhysicsAutomatism : public Automatism
         bool isBullet; ///< True if the object as to be considered as a bullet ( for better collision handling )
         float massDensity;
         float averageFriction;
-
+        float linearDamping;
+        float angularDamping;
 
         b2Body * body; ///< Box2D body, representing the object in the Box2D world
-        bool iteratorRuntimeScenesPhysicsDatasValid;
-        std::map < const RuntimeScene* , ScenePhysicsDatas >::iterator runtimeScenePhysicsDatasPtr; ///<Pointer ( valid when body is valid ) to the datas shared by all objects with physics on the scene
-        static std::map < const RuntimeScene* , ScenePhysicsDatas > runtimeScenesPhysicsDatas; ///< Static map associating Runtime scene to datas
+        boost::shared_ptr<RuntimeScenePhysicsDatas> runtimeScenesPhysicsDatas;
 };
 
 #endif // PHYSICAUTOMATISM_H

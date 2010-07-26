@@ -51,8 +51,9 @@ class Extension : public ExtensionBase
                           _("Automatisme Moteur physique"),
                           _("Automatisme permettant de déplacer les objets comme si ils étaient soumis aux lois de la physique."),
                           "",
-                          "res/function.png",
-                          PhysicsAutomatism)
+                          "res/physics32.png",
+                          PhysicsAutomatism,
+                          ScenePhysicsDatas)
 
                     DECLARE_AUTOMATISM_ACTION("SetStatic",
                                    _("Rendre l'objet statique"),

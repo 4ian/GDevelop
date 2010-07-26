@@ -28,29 +28,37 @@ freely, subject to the following restrictions:
 #define SCENEPHYSICSDATAS_H
 
 #include "Box2D/Box2D.h"
+#include "GDL/AutomatismsSharedDatas.h"
+#include "RuntimeScenePhysicsDatas.h"
+#include <iostream>
 
-class ScenePhysicsDatas
+/**
+ * Datas shared by Physics Automatism
+ */
+class ScenePhysicsDatas : public AutomatismsSharedDatas
 {
     public:
-        ScenePhysicsDatas() : gravityX(0), gravityY(0), scaleX(100), scaleY(100), world(NULL), stepped(false)
+        ScenePhysicsDatas(std::string typeName) : AutomatismsSharedDatas(typeName), gravityX(0), gravityY(0), scaleX(100), scaleY(100)
         {
-
         };
-        /*ScenePhysicsDatas(const ScenePhysicsDatas & other) : world(b2World(b2Vec2(0.0f, 0.0f), false)) { Init(other); }
-        ScenePhysicsDatas& operator=(const ScenePhysicsDatas & other) { if(&other != this) Init(other); return *this; }*/
         virtual ~ScenePhysicsDatas() {};
+        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() { return boost::shared_ptr<AutomatismsSharedDatas>(new ScenePhysicsDatas(*this));}
 
         float gravityX;
         float gravityY;
         float scaleX;
         float scaleY;
 
-        //Runtime only :
-        b2World * world;
-        bool stepped; ///< Used to be sure that Step is called only once at each frame.
+        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> CreateRuntimeSharedDatas()
+        {
+            return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeScenePhysicsDatas(*this));
+        }
+
+        virtual void SaveToXml(TiXmlElement * eventElem) const;
+
+        virtual void LoadFromXml(const TiXmlElement * eventElem);
 
     private:
-        //void Init(const ScenePhysicsDatas & other);
 };
 
 #endif // SCENEPHYSICSDATAS_H

@@ -24,22 +24,21 @@ freely, subject to the following restrictions:
 
 */
 
+#include "RuntimeScenePhysicsDatas.h"
 #include "ScenePhysicsDatas.h"
-#include "GDL/XmlMacros.h"
 #include <iostream>
 
-void ScenePhysicsDatas::SaveToXml(TiXmlElement * elem) const
+RuntimeScenePhysicsDatas::RuntimeScenePhysicsDatas(const ScenePhysicsDatas & automatismSharedDatas) :
+world(new b2World(b2Vec2(automatismSharedDatas.gravityX, -automatismSharedDatas.gravityY), false)),
+stepped(false),
+scaleX(automatismSharedDatas.scaleX),
+scaleY(automatismSharedDatas.scaleY)
 {
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("gravityX", gravityX);
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("gravityY", gravityY);
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("scaleX", scaleX);
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("scaleY", scaleY);
+    std::cout << "Initialize RuntimeScenePhysicsDatas" << std::endl;
 }
 
-void ScenePhysicsDatas::LoadFromXml(const TiXmlElement * elem)
+RuntimeScenePhysicsDatas::~RuntimeScenePhysicsDatas()
 {
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("gravityX", gravityX);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("gravityY", gravityY);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("scaleX", scaleX);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("scaleY", scaleY);
+    std::cout << "Destructing RuntimeScenePhysicsDatas" << std::endl;
+    delete world;
 }

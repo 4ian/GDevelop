@@ -24,22 +24,30 @@ freely, subject to the following restrictions:
 
 */
 
-#include "ScenePhysicsDatas.h"
-#include "GDL/XmlMacros.h"
+#ifndef RUNTIMESCENEPHYSICSDATAS_H
+#define RUNTIMESCENEPHYSICSDATAS_H
+
+#include "Box2D/Box2D.h"
 #include <iostream>
+#include "GDL/AutomatismsRuntimeSharedDatas.h"
+class ScenePhysicsDatas;
 
-void ScenePhysicsDatas::SaveToXml(TiXmlElement * elem) const
+/**
+ * Datas shared by Physics Automatism at runtime
+ */
+class RuntimeScenePhysicsDatas : public AutomatismsRuntimeSharedDatas
 {
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("gravityX", gravityX);
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("gravityY", gravityY);
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("scaleX", scaleX);
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("scaleY", scaleY);
-}
+    public:
+        RuntimeScenePhysicsDatas(const ScenePhysicsDatas & automatismSharedDatas);
+        virtual ~RuntimeScenePhysicsDatas();
+        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeScenePhysicsDatas(*this));}
 
-void ScenePhysicsDatas::LoadFromXml(const TiXmlElement * elem)
-{
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("gravityX", gravityX);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("gravityY", gravityY);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("scaleX", scaleX);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("scaleY", scaleY);
-}
+        b2World * world;
+        bool stepped; ///< Used to be sure that Step is called only once at each frame.
+        float scaleX;
+        float scaleY;
+
+    private:
+};
+
+#endif // RUNTIMESCENEPHYSICSDATAS_H

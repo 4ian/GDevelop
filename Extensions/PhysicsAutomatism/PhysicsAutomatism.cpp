@@ -28,9 +28,8 @@ freely, subject to the following restrictions:
 #include "Box2D/Box2D.h"
 #include "PhysicsAutomatismEditor.h"
 #include "GDL/Scene.h"
-
-std::map < const RuntimeScene* , ScenePhysicsDatas  > PhysicsAutomatism::runtimeScenesPhysicsDatas;
-std::map < const Scene* , ScenePhysicsDatas > PhysicsAutomatism::scenesPhysicsDatas;
+#include "GDL/tinyxml.h"
+#include "GDL/XmlMacros.h"
 
 PhysicsAutomatism::PhysicsAutomatism(std::string automatismTypeName) :
 Automatism(automatismTypeName),
@@ -40,36 +39,22 @@ fixedRotation(false),
 isBullet(false),
 massDensity(1),
 averageFriction(0.8),
-body(NULL),
-iteratorRuntimeScenesPhysicsDatasValid(false)
+linearDamping(0.1),
+angularDamping(0.1),
+body(NULL)
 {
 }
 
 PhysicsAutomatism::~PhysicsAutomatism()
 {
-    if ( iteratorRuntimeScenesPhysicsDatasValid && body)
-        runtimeScenePhysicsDatasPtr->second.world->DestroyBody(body);
+    if ( runtimeScenesPhysicsDatas != boost::shared_ptr<RuntimeScenePhysicsDatas>() && body)
+        runtimeScenesPhysicsDatas->world->DestroyBody(body);
 }
 
 void PhysicsAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ )
 {
     PhysicsAutomatismEditor editor(parent, game_, scene, *this, mainEditorCommand_);
     editor.ShowModal();
-}
-
-void PhysicsAutomatism::InitializeSharedDatas(RuntimeScene & scene, const Scene & loadedScene)
-{
-    runtimeScenesPhysicsDatas[&scene] = scenesPhysicsDatas[&loadedScene];
-
-    //Initialization of runtime datas
-    runtimeScenesPhysicsDatas[&scene].world = new b2World(b2Vec2( runtimeScenesPhysicsDatas[&scene].gravityX,
-                                                                 -runtimeScenesPhysicsDatas[&scene].gravityY), false); //Y axis is inverted
-}
-
-void PhysicsAutomatism::UnInitializeSharedDatas(RuntimeScene & scene)
-{
-    //UnInitialization of runtime datas
-    delete runtimeScenesPhysicsDatas[&scene].world;
 }
 
 /**
@@ -80,18 +65,18 @@ void PhysicsAutomatism::DoStepPreEvents(RuntimeScene & scene)
 {
     if ( !body ) CreateBody(scene);
 
-    if ( !runtimeScenePhysicsDatasPtr->second.stepped ) //Simulate the world, once at each frame
+    if ( !runtimeScenesPhysicsDatas->stepped ) //Simulate the world, once at each frame
     {
-        runtimeScenePhysicsDatasPtr->second.world->Step(scene.GetElapsedTime(), 6, 10);
-        runtimeScenePhysicsDatasPtr->second.world->ClearForces();
+        runtimeScenesPhysicsDatas->world->Step(scene.GetElapsedTime(), 6, 10);
+        runtimeScenesPhysicsDatas->world->ClearForces();
 
-        runtimeScenePhysicsDatasPtr->second.stepped = true;
+        runtimeScenesPhysicsDatas->stepped = true;
     }
 
     //Update object position according to Box2D body
     b2Vec2 position = body->GetPosition();
-    object->SetX(position.x*runtimeScenePhysicsDatasPtr->second.scaleX);
-    object->SetY(-position.y*runtimeScenePhysicsDatasPtr->second.scaleY); //Y axis is inverted
+    object->SetX(position.x*runtimeScenesPhysicsDatas->scaleX-object->GetCenterX());
+    object->SetY(-position.y*runtimeScenesPhysicsDatas->scaleY-object->GetCenterY()); //Y axis is inverted
     object->SetAngle(-body->GetAngle()*360.0f/b2_pi); //Angles are inverted
 };
 
@@ -103,44 +88,38 @@ void PhysicsAutomatism::DoStepPostEvents(RuntimeScene & scene)
 {
     if ( !body ) CreateBody(scene);
 
-    runtimeScenePhysicsDatasPtr->second.stepped = false; //Prepare for a new simulation
+    runtimeScenesPhysicsDatas->stepped = false; //Prepare for a new simulation
 
     //Update Box2D position to object
     b2Vec2 oldPos;
-    oldPos.x = object->GetX()/runtimeScenePhysicsDatasPtr->second.scaleX;
-    oldPos.y = -object->GetY()/runtimeScenePhysicsDatasPtr->second.scaleY; //Y axis is inverted
+    oldPos.x = (object->GetX()+object->GetCenterX())/runtimeScenesPhysicsDatas->scaleX;
+    oldPos.y = -(object->GetY()+object->GetCenterY())/runtimeScenesPhysicsDatas->scaleY; //Y axis is inverted
     body->SetTransform(oldPos, -object->GetAngle()*b2_pi/360.0f); //Angles are inverted
-};
+}
 
 /**
  * Prepare Box2D body, and set up also runtimeScenePhysicsDatasPtr.
  */
 void PhysicsAutomatism::CreateBody(RuntimeScene & scene)
 {
-    cout << "CreateBody";
-    if ( !iteratorRuntimeScenesPhysicsDatasValid )
-    {
-        cout << "GetIterator";
-        runtimeScenePhysicsDatasPtr = runtimeScenesPhysicsDatas.find(&scene);
-        if (runtimeScenePhysicsDatasPtr == runtimeScenesPhysicsDatas.end() ) cout << "Invalid";
-        iteratorRuntimeScenesPhysicsDatasValid = true;
-    }
-    cout << "Next";
+    //TODO : Bad position when origin is not 0;0
+    if ( runtimeScenesPhysicsDatas == boost::shared_ptr<RuntimeScenePhysicsDatas>() )
+        runtimeScenesPhysicsDatas = boost::static_pointer_cast<RuntimeScenePhysicsDatas>(scene.automatismsSharedDatas[typeId]);
 
     //Create body from object
     b2BodyDef bodyDef;
-    bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(object->GetX()/runtimeScenePhysicsDatasPtr->second.scaleX, -object->GetY()/runtimeScenePhysicsDatasPtr->second.scaleY);
-    body = runtimeScenePhysicsDatasPtr->second.world->CreateBody(&bodyDef);
+    bodyDef.type = dynamic ? b2_dynamicBody : b2_staticBody;
+    bodyDef.position.Set((object->GetX()+object->GetCenterX())/runtimeScenesPhysicsDatas->scaleX, -(object->GetY()+object->GetCenterY())/runtimeScenesPhysicsDatas->scaleY);
+    body = runtimeScenesPhysicsDatas->world->CreateBody(&bodyDef);
 
     //Setup body
-
     if ( shapeType == Circle)
     {
         b2FixtureDef fixtureDef;
 
         b2CircleShape circle;
-        circle.m_radius = (object->GetWidth()+object->GetHeight())/4; //Radius is based on the average of height and width
+        circle.m_radius = (object->GetWidth()/runtimeScenesPhysicsDatas->scaleX+
+                           object->GetHeight()/runtimeScenesPhysicsDatas->scaleY)/4; //Radius is based on the average of height and width
         fixtureDef.shape = &circle;
         fixtureDef.density = massDensity;
         fixtureDef.friction = averageFriction;
@@ -152,7 +131,7 @@ void PhysicsAutomatism::CreateBody(RuntimeScene & scene)
         b2FixtureDef fixtureDef;
 
         b2PolygonShape dynamicBox;
-        dynamicBox.SetAsBox(object->GetWidth()/(runtimeScenePhysicsDatasPtr->second.scaleX*2), object->GetHeight()/(runtimeScenePhysicsDatasPtr->second.scaleY*2));
+        dynamicBox.SetAsBox(object->GetWidth()/(runtimeScenesPhysicsDatas->scaleX*2), object->GetHeight()/(runtimeScenesPhysicsDatas->scaleY*2));
         fixtureDef.shape = &dynamicBox;
         fixtureDef.density = massDensity;
         fixtureDef.friction = averageFriction;
@@ -162,4 +141,38 @@ void PhysicsAutomatism::CreateBody(RuntimeScene & scene)
 
     body->SetFixedRotation(fixedRotation);
     body->SetBullet(isBullet);
+    body->SetLinearDamping(linearDamping);
+    body->SetAngularDamping(angularDamping);
+}
+
+void PhysicsAutomatism::SaveToXml(TiXmlElement * elem) const
+{
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("dynamic", dynamic);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("fixedRotation", fixedRotation);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("isBullet", isBullet);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("massDensity", massDensity);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("averageFriction", averageFriction);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("linearDamping", linearDamping);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("angularDamping", angularDamping);
+    if ( shapeType == Circle)
+        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "Circle");
+    else
+        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "Box");
+}
+
+void PhysicsAutomatism::LoadFromXml(const TiXmlElement * elem)
+{
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("dynamic", dynamic);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("fixedRotation", fixedRotation);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("isBullet", isBullet);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("massDensity", massDensity);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("averageFriction", averageFriction);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("linearDamping", linearDamping);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("angularDamping", angularDamping);
+    std::string shape;
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("shapeType", shape);
+    if ( shape == "Circle" )
+        shapeType = Circle;
+    else
+        shapeType = Box;
 }

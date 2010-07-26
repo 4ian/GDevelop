@@ -504,8 +504,16 @@
 		<Unit filename="PhysicsAutomatismActions.cpp" />
 		<Unit filename="PhysicsAutomatismEditor.cpp" />
 		<Unit filename="PhysicsAutomatismEditor.h" />
+		<Unit filename="RuntimeScenePhysicsDatas.cpp" />
+		<Unit filename="RuntimeScenePhysicsDatas.h" />
 		<Unit filename="ScenePhysicsDatas.cpp" />
 		<Unit filename="ScenePhysicsDatas.h" />
+		<Unit filename="..\..\GDL\GDL\tinystr.cpp" />
+		<Unit filename="..\..\GDL\GDL\tinystr.h" />
+		<Unit filename="..\..\GDL\GDL\tinyxml.cpp" />
+		<Unit filename="..\..\GDL\GDL\tinyxml.h" />
+		<Unit filename="..\..\GDL\GDL\tinyxmlerror.cpp" />
+		<Unit filename="..\..\GDL\GDL\tinyxmlparser.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development" />
-	<File name="CommonDialogsActions.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="3984" topLine="111" />
+	<ActiveTarget name="Release - Edittime" />
+	<File name="CommonDialogsActions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="1157" topLine="9" />
 	</File>
 	<File name="CommonDialogsActions.h" open="0" top="0" tabpos="3">
 		<Cursor position="705" topLine="5" />

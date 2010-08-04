@@ -72,6 +72,7 @@ class Extension : public ExtensionBase
 
                 DECLARE_PARAMETER("scenevar", _("Variable de la scène où enregistrer le résultat"), false, "")
                 DECLARE_PARAMETER("text", _("Titre"), false, "")
+                DECLARE_PARAMETER("text", _("Filtres ( Forme : \"TypeDeFichier|*.ext;*.ext2|TypeDeFichier2|*.ext3\" ) ( Windows seulement ) "), false, "")
 
             DECLARE_END_ACTION()
 

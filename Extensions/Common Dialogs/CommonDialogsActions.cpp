@@ -24,7 +24,6 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/aGUI.h"
 #include <vector>
 #include <string>
 #include "GDL/Object.h"
@@ -32,11 +31,12 @@ freely, subject to the following restrictions:
 #include <iostream>
 #include <sstream>
 #include "GDL/Chercher.h"
-#include "GDL/Access.h"
+
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
 #include <string>
 #include <vector>
+#include <algorithm>
 
 //Windows build uses native windows-dialogs
 #if defined(WINDOWS)
@@ -86,6 +86,10 @@ bool ActShowOpenFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
 
     //Display the dialog
     #if defined(WINDOWS)
+    //Process filters to match windows dialogs filters style.
+    std::string filters = action.GetParameter( 2 ).GetAsTextExpressionResult(scene, objectsConcerned)+'\0';
+    std::replace(filters.begin(), filters.end(), '|', '\0');
+
     OPENFILENAME toGetFileName; //Struct for the dialog
     char filePath[MAX_PATH] = "";
 
@@ -94,7 +98,7 @@ bool ActShowOpenFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     toGetFileName.hwndOwner = NULL;
     toGetFileName.lpstrFile = filePath;
     toGetFileName.nMaxFile = MAX_PATH;
-    toGetFileName.lpstrFilter = NULL;
+    toGetFileName.lpstrFilter = filters == '\0' ? NULL : filters.c_str();
     toGetFileName.nFilterIndex = 1;
     toGetFileName.Flags = OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;;
 
@@ -102,7 +106,7 @@ bool ActShowOpenFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
         result = filePath;
     #endif
     #if defined(LINUX)
-    nw::OpenFile * dialog = new nw::OpenFile(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), true, result);
+    nw::OpenFile * dialog = new nw::OpenFile(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned), true, result);
     dialog->wait_until_closed();
     #endif
 

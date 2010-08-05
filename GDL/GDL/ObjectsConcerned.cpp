@@ -85,9 +85,7 @@ ObjList ObjectsConcerned::PickOnlyObjects(unsigned int oId, bool onlyAlreadyConc
     ObjList objectsToTest;
 
     //L'objet a il déjà été selectionné auparavant ?
-    if (( onlyAlreadyConcerned || find(alreadyConcernedObjects.begin(),
-                                        alreadyConcernedObjects.end(),
-                                        oId) != alreadyConcernedObjects.end() )
+    if (( onlyAlreadyConcerned || alreadyConcernedObjects.find(oId) != alreadyConcernedObjects.end() )
         && !forceGlobal )
     {
         objectsToTest = objectsPicked.GetObjects(oId);

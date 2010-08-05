@@ -429,7 +429,7 @@ bool SpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
     if ( propertyNb == 0 ) { return SetAnim(ToInt(newValue)); }
     else if ( propertyNb == 1 ) {return SetDirec(ToInt(newValue)); }
     else if ( propertyNb == 2 ) { return SetSprite(ToInt(newValue)); }
-    else if ( propertyNb == 3 ) { SetOpacity(ToInt(newValue)); }
+    else if ( propertyNb == 3 ) { SetOpacity(ToFloat(newValue)); }
     else if ( propertyNb == 4 )
     {
         int blendModeRequested = ToInt(newValue);
@@ -886,7 +886,7 @@ unsigned int SpriteObject::GetAnimationsNumber() const
 /**
  * Change the opacity of the object
  */
-void SpriteObject::SetOpacity( int val )
+void SpriteObject::SetOpacity( float val )
 {
     if ( val > 255 )
         val = 255;

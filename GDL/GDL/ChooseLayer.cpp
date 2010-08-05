@@ -25,7 +25,8 @@ BEGIN_EVENT_TABLE(ChooseLayer,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChooseLayer::ChooseLayer(wxWindow* parent, vector < Layer > & layers)
+ChooseLayer::ChooseLayer(wxWindow* parent, vector < Layer > & layers, bool addQuotes_) :
+addQuotes(addQuotes_)
 {
 	//(*Initialize(ChooseLayer)
 	wxFlexGridSizer* FlexGridSizer3;
@@ -94,7 +95,7 @@ void ChooseLayer::OnokBtClick(wxCommandEvent& event)
     layerChosen = string(layersList->GetStringSelection().mb_str());
     if ( layerChosen == _("Calque de base") ) layerChosen = "";
 
-    layerChosen = "\""+layerChosen+"\"";
+    if ( addQuotes ) layerChosen = "\""+layerChosen+"\"";
 
     EndModal(1);
 }

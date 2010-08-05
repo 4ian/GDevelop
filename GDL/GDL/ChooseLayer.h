@@ -22,7 +22,7 @@ class GD_API ChooseLayer: public wxDialog
 {
 	public:
 
-		ChooseLayer(wxWindow* parent, vector < Layer > & layers);
+		ChooseLayer(wxWindow* parent, vector < Layer > & layers, bool addQuotes_ = true);
 		virtual ~ChooseLayer();
 
 		//(*Declarations(ChooseLayer)
@@ -57,6 +57,7 @@ class GD_API ChooseLayer: public wxDialog
 		void OnokBtClick(wxCommandEvent& event);
 		void OncancelBtClick(wxCommandEvent& event);
 		//*)
+        bool addQuotes;
 
 		DECLARE_EVENT_TABLE()
 };

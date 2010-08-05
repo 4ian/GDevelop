@@ -1307,6 +1307,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GDL\fparser\fpoptimizer.cc"
+				>
+			</File>
+			<File
 				RelativePath=".\GDL\Game.cpp"
 				>
 			</File>

@@ -503,8 +503,6 @@
 		<Unit filename="GDL\AutomatismsRuntimeSharedDatas.h" />
 		<Unit filename="GDL\AutomatismsSharedDatas.cpp" />
 		<Unit filename="GDL\AutomatismsSharedDatas.h" />
-		<Unit filename="GDL\BBDConditions.cpp" />
-		<Unit filename="GDL\BBDConditions.h" />
 		<Unit filename="GDL\BaseDebugger.cpp" />
 		<Unit filename="GDL\BaseDebugger.h" />
 		<Unit filename="GDL\BaseObjectExtension.cpp" />
@@ -518,8 +516,6 @@
 		<Unit filename="GDL\CameraExtension.h" />
 		<Unit filename="GDL\Chercher.cpp" />
 		<Unit filename="GDL\Chercher.h" />
-		<Unit filename="GDL\ChercherScene.cpp" />
-		<Unit filename="GDL\ChercherScene.h" />
 		<Unit filename="GDL\ChoixDossier.cpp" />
 		<Unit filename="GDL\ChoixDossier.h" />
 		<Unit filename="GDL\ChooseLayer.cpp" />
@@ -612,7 +608,6 @@
 		<Unit filename="GDL\Image.h" />
 		<Unit filename="GDL\ImageManager.cpp" />
 		<Unit filename="GDL\ImageManager.h" />
-		<Unit filename="GDL\ImageStruct.h" />
 		<Unit filename="GDL\Instruction.cpp" />
 		<Unit filename="GDL\Instruction.h" />
 		<Unit filename="GDL\JoystickExtension.cpp" />
@@ -655,8 +650,6 @@
 		<Unit filename="GDL\ObjectIdentifiersManager.h" />
 		<Unit filename="GDL\ObjectType.cpp" />
 		<Unit filename="GDL\ObjectType.h" />
-		<Unit filename="GDL\ObjectWithOpacity.cpp" />
-		<Unit filename="GDL\ObjectWithOpacity.h" />
 		<Unit filename="GDL\ObjectsConcerned.cpp" />
 		<Unit filename="GDL\ObjectsConcerned.h" />
 		<Unit filename="GDL\OpenSaveGame.cpp" />

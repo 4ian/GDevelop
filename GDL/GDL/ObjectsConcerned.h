@@ -11,6 +11,7 @@
 #include "GDL/ObjectType.h"
 #include "GDL/ObjInstancesHolder.h"
 #include <boost/shared_ptr.hpp>
+#include <boost/interprocess/containers/flat_set.hpp>
 #include <string>
 #include <vector>
 
@@ -87,10 +88,10 @@ class GD_API ObjectsConcerned
         }
 
         /**
-         * Return a set with the identifier of the objects already concerned.
+         * Return a (boost flat_)set with the identifier of the objects already concerned.
          * Used by Merge function.
          */
-        inline set < unsigned int > & GetAlreadyConcernedObjects()
+        inline boost::interprocess::flat_set < unsigned int > & GetAlreadyConcernedObjects()
         {
             return alreadyConcernedObjects;
         }
@@ -130,7 +131,7 @@ class GD_API ObjectsConcerned
         If an object is not in this list, pickers functions will
         use all objects List. If an object is in the list, they will
         use already picked list*/
-        set < unsigned int > alreadyConcernedObjects;
+        boost::interprocess::flat_set < unsigned int > alreadyConcernedObjects;
 
         /**
         * Pick only object. Called by generals picking functions.

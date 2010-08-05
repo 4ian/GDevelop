@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/interprocess/containers/flat_map.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
 #include "GDL/Force.h"
@@ -38,7 +39,6 @@ class Scene;
 class wxWindow;
 class MainEditorCommand;
 class ResourcesMergingHelper;
-class type_info;
 #include <wx/wx.h>
 #endif
 
@@ -224,7 +224,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Get automatism from type
          */
-        inline boost::shared_ptr<Automatism> & GetAutomatism(unsigned int type) { return automatisms[type]; }
+        inline boost::shared_ptr<Automatism> & GetAutomatism(unsigned int type) { return automatisms.find(type)->second; }
 
         /**
          * Get (const) automatism from type
@@ -381,7 +381,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         int zOrder;
         bool hidden;
         string layer;
-        std::map<unsigned int, boost::shared_ptr<Automatism> > automatisms;
+        boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> > automatisms; ///<Containing all automatisms of the object. Note the use of flat_map for better performance.
 
         /**
          * Initialize from another object. Used by copy-ctor and assign-op.

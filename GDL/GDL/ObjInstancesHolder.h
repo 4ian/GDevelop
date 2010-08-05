@@ -36,7 +36,7 @@ public:
     /**
      * Get all objects with the same identifier
      */
-    inline ObjList GetObjects(unsigned int oId)
+    inline const ObjList & GetObjects(unsigned int oId)
     {
         return objectsInstances[oId];
     }

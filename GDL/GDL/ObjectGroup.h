@@ -11,6 +11,7 @@
 #include <utility>
 #include "GDL/ObjectType.h"
 #include "GDL/ObjectIdentifiersManager.h"
+#include <boost/interprocess/containers/flat_set.hpp>
 
 using namespace std;
 
@@ -53,7 +54,7 @@ class GD_API ObjectGroup
             id = objectIdentifiersManager->GetOIDfromName(name_);
         };
 
-        bool HasAnIdenticalValue( const set < unsigned int > & list );
+        bool HasAnIdenticalValue( const boost::interprocess::flat_set < unsigned int > & list );
 
     private:
         vector < std::pair<string, unsigned int> > memberObjects; ///<For performance, objects are associated with their objects Id

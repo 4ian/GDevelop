@@ -57,11 +57,11 @@ void ObjectGroup::RemoveObject(string name)
     }
 }
 
-bool ObjectGroup::HasAnIdenticalValue( const set < unsigned int > & list)
+bool ObjectGroup::HasAnIdenticalValue( const boost::interprocess::flat_set < unsigned int > & list)
 {
     for (unsigned int j = 0;j < memberObjects.size();++j)
     {
-        if ( find(list.begin(), list.end(), memberObjects[j].second) != list.end())
+        if ( list.find(memberObjects[j].second) != list.end())
             return true;
     }
     return false;

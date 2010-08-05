@@ -115,8 +115,8 @@ class SpriteObject : public Object
         bool SetSprite(int nb);
         inline unsigned int GetSpriteNb() const { return m_spriteCourant; }
 
-        void SetOpacity(int val);
-        inline int GetOpacity() const {return opacity;};
+        void SetOpacity(float val);
+        inline float GetOpacity() const {return opacity;};
 
         inline void SetBlendMode(const sf::Blend::Mode & val) { blendMode = val; };
         inline sf::Blend::Mode GetBlendMode() const {return blendMode;};
@@ -185,7 +185,7 @@ class SpriteObject : public Object
         mutable unsigned int cacheAnimationsSize;
         mutable bool cacheAnimationSizeNeedUpdate;
 
-        int opacity;
+        float opacity;
         sf::Blend::Mode blendMode;
         bool isFlippedX;
         bool isFlippedY;

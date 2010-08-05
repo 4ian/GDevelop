@@ -60,7 +60,7 @@ void Object::Init(const Object & object)
     layer = object.layer;
 
     automatisms.clear();
-    for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
+    for (boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
     {
     	automatisms[it->first] = it->second->Clone();
     	automatisms[it->first]->SetOwner(this);
@@ -173,13 +173,13 @@ float Object::TotalForceLength() const
 
 void Object::DoAutomatismsPreEvents(RuntimeScene & scene)
 {
-    for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
         it->second->StepPreEvents(scene);
 }
 
 void Object::DoAutomatismsPostEvents(RuntimeScene & scene)
 {
-    for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
         it->second->StepPostEvents(scene);
 }
 
@@ -187,7 +187,7 @@ vector < unsigned int > Object::GetAllAutomatismsTypes()
 {
     vector < unsigned int > allTypes;
 
-    for (map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
     	allTypes.push_back(it->first);
 
     return allTypes;

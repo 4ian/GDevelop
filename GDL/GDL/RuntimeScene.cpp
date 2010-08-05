@@ -561,7 +561,6 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     events.clear();
     for (unsigned int i =0;i<scene.events.size();++i)
     	events.push_back( scene.events[i]->Clone() );
-    cout << events.size();
 
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;
@@ -623,13 +622,13 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
             newObject->SetLayer( scene.initialObjectsPositions[i].layer );
             newObject->SetAngle( scene.initialObjectsPositions[i].angle );
 
+            newObject->InitializeFromInitialPosition(scene.initialObjectsPositions[i]);
+
             if ( scene.initialObjectsPositions[i].personalizedSize )
             {
                 newObject->SetWidth(scene.initialObjectsPositions[i].width);
                 newObject->SetHeight(scene.initialObjectsPositions[i].height);
             }
-
-            newObject->InitializeFromInitialPosition(scene.initialObjectsPositions[i]);
 
             objectsInstances.AddObject(newObject);
         }

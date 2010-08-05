@@ -64,7 +64,7 @@ class Extension : public ExtensionBase
                                "res/actions/rectangle.png",
                                &DrawerObject::ActRectangle);
 
-                    DECLARE_PARAMETER("objet", _("Objet dessinateur"), true, "Drawer")
+                    DECLARE_PARAMETER("object", _("Objet dessinateur"), true, "Drawer")
                     DECLARE_PARAMETER("expression", _("Position X du point haut gauche"), false, "")
                     DECLARE_PARAMETER("expression", _("Position Y du point haut gauche"), false, "")
                     DECLARE_PARAMETER("expression", _("Position X du point bas droit"), false, "")
@@ -82,9 +82,9 @@ class Extension : public ExtensionBase
                                "res/actions/circle.png",
                                &DrawerObject::ActCircle);
 
-                    DECLARE_PARAMETER("objet", _("Objet dessinateur"), true, "Drawer")
-                    DECLARE_PARAMETER("expression", _("Position X du point haut gauche"), false, "")
-                    DECLARE_PARAMETER("expression", _("Position Y du point haut gauche"), false, "")
+                    DECLARE_PARAMETER("object", _("Objet dessinateur"), true, "Drawer")
+                    DECLARE_PARAMETER("expression", _("Position X du centre"), false, "")
+                    DECLARE_PARAMETER("expression", _("Position Y du centre"), false, "")
                     DECLARE_PARAMETER("expression", _("Rayon en pixels"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -99,7 +99,7 @@ class Extension : public ExtensionBase
                                "res/actions/line.png",
                                &DrawerObject::ActLine);
 
-                    DECLARE_PARAMETER("objet", _("Objet dessinateur"), true, "Drawer")
+                    DECLARE_PARAMETER("object", _("Objet dessinateur"), true, "Drawer")
                     DECLARE_PARAMETER("expression", _("Position X du point de départ"), false, "")
                     DECLARE_PARAMETER("expression", _("Position Y du point de départ"), false, "")
                     DECLARE_PARAMETER("expression", _("Position X du point d'arrivée"), false, "")
@@ -112,13 +112,13 @@ class Extension : public ExtensionBase
                 DECLARE_OBJECT_ACTION("FillColor",
                                _("Couleur de remplissage"),
                                _("Change la couleur de remplissage pour le dessin."),
-                               _("Changer la couleur de remplissage de _PARAM0_ en _PARAM1_ ( opacité : _PARAM2_ )"),
+                               _("Changer la couleur de remplissage de _PARAM0_ en _PARAM1_"),
                                _("Paramétrage"),
                                "res/actions/text24.png",
                                "res/actions/text.png",
                                &DrawerObject::ActFillColor);
 
-                    DECLARE_PARAMETER("objet", _("Objet dessinateur"), true, "Drawer")
+                    DECLARE_PARAMETER("object", _("Objet dessinateur"), true, "Drawer")
                     DECLARE_PARAMETER("color", _("Couleur de remplissage"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -133,7 +133,7 @@ class Extension : public ExtensionBase
                                "res/actions/color.png",
                                &DrawerObject::ActOutlineColor);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Drawer")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
                     DECLARE_PARAMETER("color", _("Couleur"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -148,7 +148,7 @@ class Extension : public ExtensionBase
                                "res/actions/outlineSize.png",
                                &DrawerObject::ActOutlineSize);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Drawer")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
                     DECLARE_PARAMETER("expression", _("Taille en pixels"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -164,7 +164,7 @@ class Extension : public ExtensionBase
                                "res/conditions/outlineSize.png",
                                &DrawerObject::CondOutlineSize);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Drawer")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
                     DECLARE_PARAMETER("expression", _("Taille à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -180,7 +180,7 @@ class Extension : public ExtensionBase
                                "res/actions/opacity.png",
                                &DrawerObject::ActFillOpacity);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Drawer")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
                     DECLARE_PARAMETER("expression", _("Valeur"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -196,7 +196,7 @@ class Extension : public ExtensionBase
                                "res/conditions/opacity.png",
                                &DrawerObject::CondFillOpacity);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Drawer")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
                     DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -212,7 +212,7 @@ class Extension : public ExtensionBase
                                "res/actions/opacity.png",
                                &DrawerObject::ActOutlineOpacity);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Drawer")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
                     DECLARE_PARAMETER("expression", _("Valeur"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -228,7 +228,7 @@ class Extension : public ExtensionBase
                                "res/conditions/opacity.png",
                                &DrawerObject::CondOutlineOpacity);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Drawer")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
                     DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)

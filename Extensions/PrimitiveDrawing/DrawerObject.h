@@ -74,7 +74,9 @@ class DrawerObject : public Object
         #endif
 
         virtual void LoadFromXml(const TiXmlElement * elemScene);
+        #if defined(GDE)
         virtual void SaveToXml(TiXmlElement * elemScene);
+        #endif
 
         virtual void UpdateTime(float timeElapsed);
 
@@ -98,16 +100,16 @@ class DrawerObject : public Object
         inline void SetOutlineSize(float size) { outlineSize = size; };
         inline float GetOutlineSize() const { return outlineSize; };
 
-        void SetOutlineOpacity(int val);
-        inline int GetOutlineOpacity() const {return outlineOpacity;};
+        void SetOutlineOpacity(float val);
+        inline float GetOutlineOpacity() const {return outlineOpacity;};
 
         void SetOutlineColor(unsigned int r,unsigned int v,unsigned int b);
         inline unsigned int GetOutlineColorR() const { return outlineColorR; };
         inline unsigned int GetOutlineColorG() const { return outlineColorG; };
         inline unsigned int GetOutlineColorB() const { return outlineColorB; };
 
-        void SetFillOpacity(int val);
-        inline int GetFillOpacity() const {return fillOpacity;};
+        void SetFillOpacity(float val);
+        inline float GetFillOpacity() const {return fillOpacity;};
 
         void SetFillColor(unsigned int r,unsigned int v,unsigned int b);
         inline unsigned int GetFillColorR() const { return fillColorR; };
@@ -144,14 +146,14 @@ class DrawerObject : public Object
         unsigned int fillColorR;
         unsigned int fillColorG;
         unsigned int fillColorB;
-        int fillOpacity;
+        float fillOpacity;
 
         //Outline
         int outlineSize;
         unsigned int outlineColorR;
         unsigned int outlineColorG;
         unsigned int outlineColorB;
-        int outlineOpacity;
+        float outlineOpacity;
 
         bool absoluteCoordinates;
 

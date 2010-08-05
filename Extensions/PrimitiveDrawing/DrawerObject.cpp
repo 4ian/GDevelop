@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #include "DrawerObject.h"
 #include <SFML/Graphics.hpp>
 #include "GDL/Object.h"
-#include "GDL/Access.h"
+
 #include "GDL/ImageManager.h"
 #include "GDL/tinyxml.h"
 #include "GDL/FontManager.h"
@@ -139,7 +139,7 @@ void DrawerObject::LoadFromXml(const TiXmlElement * object)
             absoluteCoordinates = false;
     }
 }
-
+#if defined(GDE)
 void DrawerObject::SaveToXml(TiXmlElement * object)
 {
     TiXmlElement * fillOpacityElem = new TiXmlElement( "FillOpacity" );
@@ -173,6 +173,7 @@ void DrawerObject::SaveToXml(TiXmlElement * object)
     else
         absoluteCoordinatesElem->SetAttribute("value", "false");
 }
+#endif
 
 bool DrawerObject::LoadResources(const ImageManager & imageMgr )
 {
@@ -283,7 +284,7 @@ bool DrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
 
         SetFillColor(ToInt(r), ToInt(g), ToInt(b));
     }
-    else if ( propertyNb == 1 ) { SetFillOpacity(ToInt(newValue)); }
+    else if ( propertyNb == 1 ) { SetFillOpacity(ToFloat(newValue)); }
     else if ( propertyNb == 2 ) { SetOutlineSize(ToInt(newValue)); }
     else if ( propertyNb == 3 )
     {
@@ -310,7 +311,7 @@ bool DrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
 
         SetOutlineColor(ToInt(r), ToInt(g), ToInt(b));
     }
-    else if ( propertyNb == 4 ) { SetOutlineOpacity(ToInt(newValue)); }
+    else if ( propertyNb == 4 ) { SetOutlineOpacity(ToFloat(newValue)); }
 
     return true;
 }
@@ -386,7 +387,7 @@ void DrawerObject::SetFillColor( unsigned int r, unsigned int g, unsigned int b 
     fillColorB = b;
 }
 
-void DrawerObject::SetFillOpacity(int val)
+void DrawerObject::SetFillOpacity(float val)
 {
     if ( val > 255 )
         val = 255;
@@ -406,7 +407,7 @@ void DrawerObject::SetOutlineColor( unsigned int r, unsigned int g, unsigned int
     outlineColorB = b;
 }
 
-void DrawerObject::SetOutlineOpacity(int val)
+void DrawerObject::SetOutlineOpacity(float val)
 {
     if ( val > 255 )
         val = 255;

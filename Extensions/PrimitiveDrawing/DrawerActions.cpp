@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/Access.h"
+
 #include "GDL/Instruction.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/RuntimeScene.h"
@@ -53,15 +53,15 @@ bool DrawerObject::ActOutlineSize( RuntimeScene & scene, ObjectsConcerned & obje
 bool DrawerObject::ActFillOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetFillOpacity( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetFillOpacity( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetFillOpacity( GetFillOpacity() + static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetFillOpacity( GetFillOpacity() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetFillOpacity( GetFillOpacity() - static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetFillOpacity( GetFillOpacity() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetFillOpacity( GetFillOpacity() * static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetFillOpacity( GetFillOpacity() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetFillOpacity( GetFillOpacity() / static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetFillOpacity( GetFillOpacity() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
 
     return true;
 }
@@ -72,15 +72,15 @@ bool DrawerObject::ActFillOpacity( RuntimeScene & scene, ObjectsConcerned & obje
 bool DrawerObject::ActOutlineOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetOutlineOpacity( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetOutlineOpacity( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetOutlineOpacity( GetOutlineOpacity() + static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetOutlineOpacity( GetOutlineOpacity() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetOutlineOpacity( GetOutlineOpacity() - static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetOutlineOpacity( GetOutlineOpacity() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetOutlineOpacity( GetOutlineOpacity() * static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetOutlineOpacity( GetOutlineOpacity() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetOutlineOpacity( GetOutlineOpacity() / static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetOutlineOpacity( GetOutlineOpacity() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
 
     return true;
 }

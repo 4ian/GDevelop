@@ -28,7 +28,6 @@ freely, subject to the following restrictions:
 #define TEXTOBJECT_H
 
 #include "GDL/Object.h"
-#include "GDL/ObjectWithOpacity.h"
 #include <SFML/Graphics.hpp>
 class Evaluateur;
 class ImageManager;
@@ -43,6 +42,7 @@ class wxBitmap;
 class Game;
 class wxWindow;
 class MainEditorCommand;
+class ResourcesMergingHelper;
 #endif
 
 /**
@@ -63,6 +63,7 @@ class TextObject : public Object
 
         #ifdef GDE
         virtual bool DrawEdittime(sf::RenderWindow& main_window);
+        virtual void PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper);
         virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
 
         virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
@@ -75,7 +76,9 @@ class TextObject : public Object
         #endif
 
         virtual void LoadFromXml(const TiXmlElement * elemScene);
+        #if defined(GDE)
         virtual void SaveToXml(TiXmlElement * elemScene);
+        #endif
 
         virtual void UpdateTime(float timeElapsed);
 
@@ -104,8 +107,8 @@ class TextObject : public Object
         void SetFont(std::string fontName_);
         inline std::string GetFont() {return fontName;};
 
-        void SetOpacity(int val);
-        inline int GetOpacity() const {return opacity;};
+        void SetOpacity(float val);
+        inline float GetOpacity() const {return opacity;};
 
         void SetColor(unsigned int r,unsigned int v,unsigned int b);
         inline unsigned int GetColorR() const { return colorR; };
@@ -141,7 +144,7 @@ class TextObject : public Object
         std::string fontName;
 
         //Opacity
-        int opacity;
+        float opacity;
 
         //Color
         unsigned int colorR;

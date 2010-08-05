@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug" />
-	<File name="Extension.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="6648" topLine="129" />
+	<ActiveTarget name="Debug - Edittime" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="9089" topLine="174" />
 	</File>
-	<File name="TextActions.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="4761" topLine="77" />
+	<File name="TextActions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="1003" topLine="27" />
 	</File>
-	<File name="TextConditions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="1686" topLine="22" />
+	<File name="TextConditions.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="1003" topLine="22" />
 	</File>
 	<File name="TextExpressions.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="863" topLine="7" />
 	</File>
-	<File name="TextObject.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="9783" topLine="319" />
+	<File name="TextObject.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="4190" topLine="107" />
 	</File>
-	<File name="TextObject.h" open="0" top="0" tabpos="12">
-		<Cursor position="1633" topLine="49" />
+	<File name="TextObject.h" open="0" top="0" tabpos="3">
+		<Cursor position="1047" topLine="13" />
 	</File>
 	<File name="TextObjectEditor.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="6625" topLine="106" />
 	</File>
-	<File name="TextObjectEditor.h" open="0" top="0" tabpos="0">
-		<Cursor position="749" topLine="27" />
+	<File name="TextObjectEditor.h" open="0" top="0" tabpos="1">
+		<Cursor position="2482" topLine="63" />
 	</File>
 </CodeBlocks_layout_file>

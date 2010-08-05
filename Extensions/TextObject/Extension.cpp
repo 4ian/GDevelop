@@ -64,7 +64,7 @@ class Extension : public ExtensionBase
                                "res/actions/text.png",
                                &TextObject::ActString);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
                     DECLARE_PARAMETER("text", _("Texte"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -80,7 +80,7 @@ class Extension : public ExtensionBase
                                "res/conditions/text.png",
                                &TextObject::CondString);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
                     DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -96,7 +96,7 @@ class Extension : public ExtensionBase
                                "res/actions/font.png",
                                &TextObject::ActFont);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
                     DECLARE_PARAMETER("police", _("Valeur"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -111,7 +111,7 @@ class Extension : public ExtensionBase
                                "res/actions/characterSize.png",
                                &TextObject::ActSize);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
                     DECLARE_PARAMETER("expression", _("Valeur"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -127,7 +127,7 @@ class Extension : public ExtensionBase
                                "res/conditions/characterSize.png",
                                &TextObject::CondSize);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
                     DECLARE_PARAMETER("expression", _("Taille à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -143,7 +143,7 @@ class Extension : public ExtensionBase
                                "res/actions/color.png",
                                &TextObject::ActChangeColor);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
                     DECLARE_PARAMETER("color", _("Couleur"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
 
@@ -158,7 +158,7 @@ class Extension : public ExtensionBase
                                "res/actions/opacity.png",
                                &TextObject::ActOpacity);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
                     DECLARE_PARAMETER("expression", _("Valeur"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -174,7 +174,7 @@ class Extension : public ExtensionBase
                                "res/conditions/opacity.png",
                                &TextObject::CondOpacity);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
                     DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -191,7 +191,7 @@ class Extension : public ExtensionBase
                                "res/actions/rotate.png",
                                &TextObject::ActAngle);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
                     DECLARE_PARAMETER("expression", _("Valeur"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -207,7 +207,7 @@ class Extension : public ExtensionBase
                                "res/conditions/rotate.png",
                                &TextObject::CondAngle);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Text")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
                     DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)

@@ -26,7 +26,7 @@ freely, subject to the following restrictions:
 
 #include <SFML/Graphics.hpp>
 #include "GDL/Object.h"
-#include "GDL/Access.h"
+
 #include "GDL/ImageManager.h"
 #include "GDL/tinyxml.h"
 #include "GDL/FontManager.h"
@@ -36,6 +36,7 @@ freely, subject to the following restrictions:
 #ifdef GDE
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
+#include "GDL/ResourcesMergingHelper.h"
 #include "GDL/MainEditorCommand.h"
 #include "TextObjectEditor.h"
 #endif
@@ -106,6 +107,7 @@ void TextObject::LoadFromXml(const TiXmlElement * object)
     }
 }
 
+#if defined(GDE)
 void TextObject::SaveToXml(TiXmlElement * object)
 {
     TiXmlElement * str = new TiXmlElement( "String" );
@@ -126,6 +128,7 @@ void TextObject::SaveToXml(TiXmlElement * object)
     color->SetAttribute("g", colorG);
     color->SetAttribute("b", colorB);
 }
+#endif
 
 bool TextObject::LoadResources(const ImageManager & imageMgr )
 {
@@ -176,6 +179,11 @@ bool TextObject::DrawEdittime(sf::RenderWindow& renderWindow)
     renderWindow.Draw( text );
 
     return true;
+}
+
+void TextObject::PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper)
+{
+    fontName = resourcesMergingHelper.GetNewFilename(fontName);
 }
 
 bool TextObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
@@ -239,7 +247,7 @@ bool TextObject::ChangeProperty(unsigned int propertyNb, string newValue)
 
         SetColor(ToInt(r), ToInt(g), ToInt(b));
     }
-    else if ( propertyNb == 4 ) { SetOpacity(ToInt(newValue)); }
+    else if ( propertyNb == 4 ) { SetOpacity(ToFloat(newValue)); }
 
     return true;
 }
@@ -315,7 +323,7 @@ void TextObject::SetColor( unsigned int r, unsigned int g, unsigned int b )
     colorB = b;
 }
 
-void TextObject::SetOpacity(int val)
+void TextObject::SetOpacity(float val)
 {
     if ( val > 255 )
         val = 255;

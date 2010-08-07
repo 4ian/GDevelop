@@ -77,7 +77,7 @@ game(game_)
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
-	moreAutomatismsBt = new wxButton(this, ID_BUTTON3, _("Plus d\'automatismes"), wxDefaultPosition, wxSize(113,23), 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	moreAutomatismsBt = new wxButton(this, ID_BUTTON3, _("Plus d\'automatismes"), wxDefaultPosition, wxSize(148,23), 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer2->Add(moreAutomatismsBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	okBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(okBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);

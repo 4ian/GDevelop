@@ -13,7 +13,6 @@
 #include "Clipboard.h"
 #include "Game_Develop_EditorMain.h"
 #include "gdTreeItemGameData.h"
-#include "GDL/ChercherScene.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/StandardEvent.h"
 #include "GDL/CommentEvent.h"

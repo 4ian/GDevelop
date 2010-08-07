@@ -54,6 +54,9 @@ class EditorObjetsGroups: public wxPanel
 		static const long idModName;
 		static const long idAddGroup;
 		static const long idDelGroup;
+		static const long ID_MENUITEM1;
+		static const long ID_MENUITEM2;
+		static const long ID_MENUITEM3;
 		//*)
 		static const long ID_Refresh;
 		static const long ID_AddGroup;
@@ -82,6 +85,9 @@ class EditorObjetsGroups: public wxPanel
 		void OnModNameSelected(wxCommandEvent& event);
 		void OnObjetsGroupsListItemDoubleClicked(wxTreeEvent& event);
 		void OnSetFocus(wxFocusEvent& event);
+		void OnCopyGroupSelected(wxCommandEvent& event);
+		void OnCutGroupSelected(wxCommandEvent& event);
+		void OnPasteGroupSelected(wxCommandEvent& event);
 		//*)
 		void OnHelp(wxCommandEvent& event);
 		void OnMoveUpSelected(wxCommandEvent& event);

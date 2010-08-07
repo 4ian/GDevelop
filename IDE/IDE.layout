@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug - Edittime" />
+	<ActiveTarget name="Development - Edittime" />
+	<File name="AutomatismTypeChoice.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="6812" topLine="8" />
+	</File>
+	<File name="AutomatismTypeChoice.h" open="0" top="0" tabpos="0">
+		<Cursor position="847" topLine="17" />
+	</File>
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="83" topLine="0" />
 	</File>
@@ -22,14 +28,14 @@
 	<File name="ChoiceJoyAxis.h" open="0" top="0" tabpos="13">
 		<Cursor position="288" topLine="0" />
 	</File>
-	<File name="ChoixAction.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="16107" topLine="307" />
+	<File name="ChoixAction.cpp" open="1" top="0" tabpos="9">
+		<Cursor position="28402" topLine="624" />
 	</File>
 	<File name="ChoixAction.h" open="0" top="0" tabpos="0">
 		<Cursor position="0" topLine="27" />
 	</File>
-	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="18814" topLine="356" />
+	<File name="ChoixCondition.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="31148" topLine="671" />
 	</File>
 	<File name="ChoixTemplateEvent.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="18697" topLine="354" />
@@ -37,11 +43,11 @@
 	<File name="ChoixTemplateEvent.h" open="0" top="0" tabpos="3">
 		<Cursor position="2460" topLine="77" />
 	</File>
-	<File name="Clipboard.cpp" open="0" top="0" tabpos="10">
-		<Cursor position="570" topLine="8" />
+	<File name="Clipboard.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="2280" topLine="103" />
 	</File>
-	<File name="Clipboard.h" open="0" top="0" tabpos="9">
-		<Cursor position="245" topLine="0" />
+	<File name="Clipboard.h" open="1" top="0" tabpos="3">
+		<Cursor position="1254" topLine="31" />
 	</File>
 	<File name="Compilation.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="18055" topLine="302" />
@@ -88,8 +94,8 @@
 	<File name="Credits.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="2181" topLine="40" />
 	</File>
-	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="11881" topLine="244" />
+	<File name="DebuggerGUI.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="28225" topLine="645" />
 	</File>
 	<File name="DebuggerGUI.h" open="0" top="0" tabpos="0">
 		<Cursor position="2773" topLine="93" />
@@ -146,10 +152,10 @@
 		<Cursor position="2112" topLine="61" />
 	</File>
 	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="23100" topLine="468" />
+		<Cursor position="20806" topLine="380" />
 	</File>
 	<File name="EditorObjectList.h" open="0" top="0" tabpos="3">
-		<Cursor position="3940" topLine="103" />
+		<Cursor position="4211" topLine="106" />
 	</File>
 	<File name="EditorObjets.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="1838" topLine="53" />
@@ -157,14 +163,14 @@
 	<File name="EditorObjets.h" open="0" top="0" tabpos="18">
 		<Cursor position="1496" topLine="38" />
 	</File>
-	<File name="EditorObjetsGroups.cpp" open="0" top="0" tabpos="14">
-		<Cursor position="16597" topLine="344" />
+	<File name="EditorObjetsGroups.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="25291" topLine="560" />
 	</File>
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="9806" topLine="165" />
+	<File name="EditorScene.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="773" topLine="7" />
 	</File>
 	<File name="EditorScene.h" open="0" top="0" tabpos="5">
 		<Cursor position="5690" topLine="158" />
@@ -187,8 +193,8 @@
 	<File name="ExternalEventsEditor.h" open="0" top="0" tabpos="4">
 		<Cursor position="790" topLine="11" />
 	</File>
-	<File name="Fusion.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="6230" topLine="99" />
+	<File name="Fusion.cpp" open="0" top="0" tabpos="15">
+		<Cursor position="422" topLine="5" />
 	</File>
 	<File name="Fusion.h" open="0" top="0" tabpos="0">
 		<Cursor position="441" topLine="3" />
@@ -196,14 +202,14 @@
 	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2790" topLine="90" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="9139" topLine="282" />
+	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="8406" topLine="244" />
 	</File>
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="3">
 		<Cursor position="491" topLine="0" />
 	</File>
-	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="229" topLine="0" />
+	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="16">
+		<Cursor position="939" topLine="27" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="7">
 		<Cursor position="10297" topLine="230" />
@@ -235,11 +241,14 @@
 	<File name="MainOutils.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="2374" topLine="40" />
 	</File>
-	<File name="ObjectTypeChoice.cpp" open="0" top="0" tabpos="26">
-		<Cursor position="9282" topLine="163" />
+	<File name="ObjectTypeChoice.cpp" open="1" top="0" tabpos="11">
+		<Cursor position="9959" topLine="184" />
 	</File>
-	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="111" topLine="4" />
+	<File name="ObjectTypeChoice.h" open="0" top="0" tabpos="0">
+		<Cursor position="802" topLine="10" />
+	</File>
+	<File name="PlayerUnitTests.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="2342" topLine="55" />
 	</File>
 	<File name="Portable.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="8493" topLine="156" />
@@ -248,13 +257,13 @@
 		<Cursor position="41395" topLine="794" />
 	</File>
 	<File name="ProjectManager.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="49947" topLine="1165" />
+		<Cursor position="1204" topLine="9" />
 	</File>
 	<File name="ProjectManager.h" open="0" top="0" tabpos="8">
 		<Cursor position="411" topLine="80" />
 	</File>
-	<File name="RenderDialog.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="1171" topLine="15" />
+	<File name="RenderDialog.cpp" open="1" top="0" tabpos="10">
+		<Cursor position="1022" topLine="15" />
 	</File>
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="22" topLine="0" />

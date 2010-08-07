@@ -670,7 +670,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     newObject->SetX( x );
     newObject->SetY( y );
 
-    ChooseLayer layerDialog(this, scene.initialLayers);
+    ChooseLayer layerDialog(this, scene.initialLayers, false);
     layerDialog.ShowModal();
     newObject->SetLayer( layerDialog.layerChosen );
 

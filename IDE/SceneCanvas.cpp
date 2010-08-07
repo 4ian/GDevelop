@@ -164,14 +164,14 @@ void SceneCanvas::Refresh()
     //On vérifie qu'on ne doit pas mettre à jour la scène
     if ( !scene.running || scene.editing )
     {
-        if ( gameEdited.imagesWereModified )
+        /*if ( gameEdited.imagesWereModified )
         {
             gameEdited.imageManager.LoadImagesFromFile( gameEdited );
             gameEdited.imagesWereModified = false;
 
             Reload();
         }
-        else if ( sceneEdited.wasModified )
+        else */if ( sceneEdited.wasModified )
             Reload();
     }
 

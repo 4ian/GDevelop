@@ -23,7 +23,8 @@ hasEvent(false),
 hasExternalEvents(false),
 hasAction(false),
 hasCondition(false),
-hasScene(false)
+hasScene(false),
+hasObjectGroup(false)
 {
 #ifndef RELEASE
     MemTracer.AddObj( "Clipboard", ( long )this );
@@ -121,6 +122,17 @@ void Clipboard::SetAction( const Instruction & action )
 Instruction Clipboard::GetAction()
 {
     return actionCopied;
+}
+
+void Clipboard::SetObjectGroup( const ObjectGroup & group )
+{
+    objectGroupCopied = group;
+    hasObjectGroup = true;
+}
+
+ObjectGroup Clipboard::GetObjectGroup()
+{
+    return objectGroupCopied;
 }
 
 Clipboard * Clipboard::singleton = NULL;

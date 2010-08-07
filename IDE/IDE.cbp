@@ -370,6 +370,8 @@
 			<Add directory="C:\Libs\wxspellchecker\" />
 			<Add directory="CppUnitLite\" />
 		</Compiler>
+		<Unit filename="AutomatismTypeChoice.cpp" />
+		<Unit filename="AutomatismTypeChoice.h" />
 		<Unit filename="BugReport.cpp">
 			<Option weight="60" />
 			<Option virtualFolder="Racine\" />
@@ -894,6 +896,7 @@
 					<wxPanel wxs="wxsmith/ProjectManager.wxs" src="ProjectManager.cpp" hdr="ProjectManager.h" name="ProjectManager" language="CPP" />
 					<wxPanel wxs="wxsmith/StartHerePage.wxs" src="StartHerePage.cpp" hdr="StartHerePage.h" name="StartHerePage" language="CPP" />
 					<wxPanel wxs="wxsmith/ExternalEventsEditor.wxs" src="ExternalEventsEditor.cpp" hdr="ExternalEventsEditor.h" name="ExternalEventsEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/AutomatismTypeChoice.wxs" src="AutomatismTypeChoice.cpp" hdr="AutomatismTypeChoice.h" name="AutomatismTypeChoice" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

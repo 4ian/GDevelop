@@ -57,60 +57,31 @@ TEST( Runtime, ObjectsConcerned )
     groupsList[4].SetName("Other");
     groupsList[4].AddObject("blueAutre");
 
-    ObjectsConcerned objectsConcerned(&objectsList, &groupsList);
+    cout << "Starting bench..." << endl;
 
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+    LARGE_INTEGER start;
+    QueryPerformanceCounter(&start);
 
+    for (unsigned int c = 0;c<10000;++c)
     {
+        ObjectsConcerned objectsConcerned(&objectsList, &groupsList);
+
+        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+
         vector < boost::shared_ptr<Object> > picked;
 
         picked = objectsConcerned.Pick(objectIdentifiersManager->GetOIDfromName("Reds"));
-        CHECK_EQUAL(3L, (long)picked.size()); // Les 3 rouges
-        CHECK_EQUAL(3L, (long)objectsConcerned.objectsPicked.GetAllObjects().size()); // Les 3 rouges
-        for (unsigned int i = 0;i<picked.size();++i)
-            cout << "object concerned : " << picked[i]->GetName() << endl;
-        cout << endl;
-        for (unsigned int i = 0;i<objectsConcerned.objectsPicked.GetAllObjects().size();++i)
-            cout << "object Picked : " << objectsConcerned.objectsPicked.GetAllObjects()[i]->GetName() << endl;
-        cout << endl;
-        cout << "------------------" <<endl;
-        cout << endl;
-
-        picked = objectsConcerned.Pick(objectIdentifiersManager->GetOIDfromName("Squares"));
-        CHECK_EQUAL(2L, (long)picked.size());// Les deux carrés rouge
-        CHECK_EQUAL(3L, (long)objectsConcerned.objectsPicked.GetAllObjects().size()); // Les 3 rouges
-        for (unsigned int i = 0;i<picked.size();++i)
-            cout << "object concerned : " << picked[i]->GetName() << endl;
-        cout << endl;
-        for (unsigned int i = 0;i<objectsConcerned.objectsPicked.GetAllObjects().size();++i)
-            cout << "object Picked : " << objectsConcerned.objectsPicked.GetAllObjects()[i]->GetName() << endl;
-        cout << endl;
-        cout << "------------------" <<endl;
-
-        picked = objectsConcerned.Pick(objectIdentifiersManager->GetOIDfromName("Other"));
-        CHECK_EQUAL(1L, (long)picked.size()); //L'autre
-        CHECK_EQUAL(4L, (long)objectsConcerned.objectsPicked.GetAllObjects().size()); // Les 3 rouges et l'autre
-        for (unsigned int i = 0;i<picked.size();++i)
-            cout << "object concerned : " << picked[i]->GetName() << endl;
-        cout << endl;
-        for (unsigned int i = 0;i<objectsConcerned.objectsPicked.GetAllObjects().size();++i)
-            cout << "object Picked : " << objectsConcerned.objectsPicked.GetAllObjects()[i]->GetName() << endl;
-        cout << endl;
-        cout << "------------------" <<endl;
-
         picked = objectsConcerned.PickAndRemove(objectIdentifiersManager->GetOIDfromName("Reds"));
-        CHECK_EQUAL(3L, (long)picked.size()); // Les 3 rouges
-        CHECK_EQUAL(1L, (long)objectsConcerned.objectsPicked.GetAllObjects().size()); // L'autre
-        cout << endl;
+        picked = objectsConcerned.Pick(objectIdentifiersManager->GetOIDfromName("Squares"));
+        picked = objectsConcerned.Pick(objectIdentifiersManager->GetOIDfromName("Other"));
+        picked = objectsConcerned.PickAndRemove(objectIdentifiersManager->GetOIDfromName("Squares"));
+        picked = objectsConcerned.PickAndRemove(objectIdentifiersManager->GetOIDfromName("Squares"));
 
-        //Print concerned and picked objects
-        for (unsigned int i = 0;i<picked.size();++i)
-            cout << "object concerned : " << picked[i]->GetName() << endl;
-        cout << endl;
-        for (unsigned int i = 0;i<objectsConcerned.objectsPicked.GetAllObjects().size();++i)
-            cout << "object Picked : " << objectsConcerned.objectsPicked.GetAllObjects()[i]->GetName() << endl;
-        cout << endl;
     }
+    LARGE_INTEGER end;
+    QueryPerformanceCounter(&end);
+
+    cout << "Result : " << end.QuadPart-start.QuadPart << endl;
 
 }
 

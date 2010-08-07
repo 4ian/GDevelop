@@ -281,8 +281,8 @@ bool Game_Develop_EditorApp::OnInit()
     //wxLogWarning("Cette version de Game Develop n'est utilisable qu'à des fins de tests. Merci d'utiliser la version disponible sur notre site pour toute autre utilisation.");
 
 #ifndef RELEASE
-   /* TestResult tr;
-    TestRegistry::runAllTests( tr );*/
+    TestResult tr;
+    TestRegistry::runAllTests( tr );
 #endif
 
 

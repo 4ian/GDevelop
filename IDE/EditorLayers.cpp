@@ -218,6 +218,7 @@ void EditorLayers::OnAddSelected(wxCommandEvent& event)
 
     Layer layer;
     layer.SetName(static_cast<string>(name));
+    layer.SetCamerasNumber(1);
     layers->push_back(layer);
 
     Refresh();

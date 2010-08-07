@@ -40,6 +40,10 @@ public:
     Instruction GetCondition();
     bool HasCondition() { return hasCondition; };
 
+    void SetObjectGroup( const ObjectGroup & group );
+    ObjectGroup GetObjectGroup();
+    bool HasObjectGroup() { return hasObjectGroup; };
+
 private:
     Clipboard();
     virtual ~Clipboard();
@@ -61,6 +65,9 @@ private:
 
     Scene sceneCopied;
     bool hasScene;
+
+    ObjectGroup objectGroupCopied;
+    bool hasObjectGroup;
 
     static Clipboard *singleton;
 };

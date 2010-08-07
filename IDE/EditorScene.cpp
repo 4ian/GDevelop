@@ -14,7 +14,6 @@
 
 #include "GDL/Game.h"
 #include "GDL/RuntimeGame.h"
-#include "GDL/ImageManager.h"
 #include "Game_Develop_EditorMain.h"
 #include "GDL/MainEditorCommand.h"
 #include "SceneCanvas.h"
@@ -589,7 +588,7 @@ void EditorScene::OnChoisirObjetBtClick( wxCommandEvent & event )
 ////////////////////////////////////////////////////////////
 void EditorScene::OnChoisirLayerBtClick( wxCommandEvent & event )
 {
-    ChooseLayer Dialog( this, scene.initialLayers );
+    ChooseLayer Dialog( this, scene.initialLayers, false );
     if ( Dialog.ShowModal() == 1 )
     {
         sceneCanvas->scene.addOnLayer = Dialog.layerChosen;

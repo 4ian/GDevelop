@@ -21,7 +21,7 @@ bool DndTextObjectsEditor::OnDropText(wxCoord x, wxCoord y, const wxString& text
                                                                                 string(text.mb_str())));
 
     Sprite sprite;
-    sprite.SetImage(string(text.mb_str()));
+    sprite.SetImageName(string(text.mb_str()));
 
     Animation animation;
     animation.SetDirectionsNumber(8);

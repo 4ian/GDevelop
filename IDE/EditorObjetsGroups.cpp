@@ -20,6 +20,7 @@
 #include "Game_Develop_EditorMain.h"
 #include "GDL/CommonTools.h"
 #include "EditObjectGroup.h"
+#include "Clipboard.h"
 #include "GDL/HelpFileAccess.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -39,6 +40,9 @@ const long EditorObjetsGroups::IdGroupEdit = wxNewId();
 const long EditorObjetsGroups::idModName = wxNewId();
 const long EditorObjetsGroups::idAddGroup = wxNewId();
 const long EditorObjetsGroups::idDelGroup = wxNewId();
+const long EditorObjetsGroups::ID_MENUITEM1 = wxNewId();
+const long EditorObjetsGroups::ID_MENUITEM2 = wxNewId();
+const long EditorObjetsGroups::ID_MENUITEM3 = wxNewId();
 //*)
 const long EditorObjetsGroups::ID_Refresh = wxNewId();
 const long EditorObjetsGroups::ID_Help = wxNewId();
@@ -62,6 +66,9 @@ objectsGroups(objectsGroups_),
 mainEditorCommand(mainEditorCommand_)
 {
 	//(*Initialize(EditorObjetsGroups)
+	wxMenuItem* MenuItem5;
+	wxMenuItem* MenuItem1;
+	wxMenuItem* MenuItem6;
 	wxMenuItem* editMenuItem;
 	wxFlexGridSizer* FlexGridSizer1;
 
@@ -93,6 +100,16 @@ mainEditorCommand(mainEditorCommand_)
 	MenuItem3 = new wxMenuItem((&ContextMenu), idDelGroup, _("Supprimer le groupe"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	ContextMenu.Append(MenuItem3);
+	ContextMenu.AppendSeparator();
+	MenuItem1 = new wxMenuItem((&ContextMenu), ID_MENUITEM1, _("Copier"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
+	ContextMenu.Append(MenuItem1);
+	MenuItem5 = new wxMenuItem((&ContextMenu), ID_MENUITEM2, _("Couper"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
+	ContextMenu.Append(MenuItem5);
+	MenuItem6 = new wxMenuItem((&ContextMenu), ID_MENUITEM3, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+	ContextMenu.Append(MenuItem6);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
@@ -106,6 +123,9 @@ mainEditorCommand(mainEditorCommand_)
 	Connect(idModName,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjetsGroups::OnModNameSelected);
 	Connect(idAddGroup,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjetsGroups::OnAddGroupSelected);
 	Connect(idDelGroup,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjetsGroups::OnDelGroupSelected);
+	Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjetsGroups::OnCopyGroupSelected);
+	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjetsGroups::OnCutGroupSelected);
+	Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjetsGroups::OnPasteGroupSelected);
 	Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorObjetsGroups::OnSetFocus);
 	//*)
 
@@ -514,4 +534,62 @@ void EditorObjetsGroups::OnSetFocus(wxFocusEvent& event)
 {
     mainEditorCommand.GetRibbon()->SetActivePage(6);
     ConnectEvents();
+}
+
+void EditorObjetsGroups::OnCopyGroupSelected(wxCommandEvent& event)
+{
+    Clipboard * clipboard = Clipboard::getInstance();
+
+    if ( itemSelected == ObjetsGroupsList->GetRootItem() ) return;
+
+    vector<ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
+                                                    objectsGroups->end(),
+                                                    std::bind2nd(HasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
+    if ( i == objectsGroups->end() ) return;
+
+    clipboard->SetObjectGroup(*i);
+}
+
+void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
+{
+    Clipboard * clipboard = Clipboard::getInstance();
+
+    if ( itemSelected == ObjetsGroupsList->GetRootItem() ) return;
+
+    vector<ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
+                                                    objectsGroups->end(),
+                                                    std::bind2nd(HasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
+    if ( i == objectsGroups->end() ) return;
+
+    clipboard->SetObjectGroup(*i);
+    objectsGroups->erase( i );
+
+    scene.wasModified = true;
+    ObjetsGroupsList->Delete( itemSelected );
+}
+
+void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
+{
+    Clipboard * clipboard = Clipboard::getInstance();
+    if ( !clipboard->HasObjectGroup() ) return;
+    ObjectGroup groupPasted = clipboard->GetObjectGroup();
+
+    wxTreeItemId rootId = ObjetsGroupsList->GetRootItem();
+
+    groupPasted.SetName(string(_( "Copie de" )+" "+groupPasted.GetName()));
+
+    //Tant qu'un objet avec le même nom existe, on ajoute un chiffre
+    unsigned int i = 1;
+    while ( std::find_if( objectsGroups->begin(), objectsGroups->end(), std::bind2nd(HasTheSameName(), groupPasted.GetName()))
+            != objectsGroups->end() )
+    {
+        ++i;
+        groupPasted.SetName(string(_( "Copie de" )+" "+groupPasted.GetName()+" "+ToString(i)));
+    }
+
+    //On l'ajoute
+    objectsGroups->push_back( groupPasted );
+    ObjetsGroupsList->AppendItem( rootId, groupPasted.GetName());
+
+    scene.wasModified = true;
 }

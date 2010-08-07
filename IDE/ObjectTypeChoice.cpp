@@ -46,7 +46,7 @@ game(game_)
 	wxFlexGridSizer* FlexGridSizer2;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
-	
+
 	Create(parent, wxID_ANY, _("Choisir un type d\'objet"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	SetClientSize(wxSize(249,163));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -93,7 +93,7 @@ game(game_)
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&ObjectTypeChoice::OnobjectsListItemSelect);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&ObjectTypeChoice::OnobjectsListItemActivated);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ObjectTypeChoice::OnmoreObjectsBtClick);
@@ -202,7 +202,7 @@ void ObjectTypeChoice::OncancelBtClick(wxCommandEvent& event)
 
 void ObjectTypeChoice::OnokBtClick(wxCommandEvent& event)
 {
-    EndModal(1);
+    if ( selectedObjectType != "" ) EndModal(1);
 }
 
 void ObjectTypeChoice::OnClose(wxCloseEvent& event)

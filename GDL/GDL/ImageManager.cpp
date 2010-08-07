@@ -13,68 +13,59 @@ void MessageLoading( string message, float avancement )
     cout << "Chargement :" << message << endl; //TODO : Must change that
 } //Prototype de la fonction pour renvoyer un message
 
-ImageManager::ImageManager()
-{
-    //ctor
-}
-
-ImageManager::~ImageManager()
-{
-    //dtor
-}
-
-////////////////////////////////////////////////////////////
-/// Chargement des images
-///
-/// Charge les images pour les utiliser pendant le jeu
-////////////////////////////////////////////////////////////
-bool ImageManager::LoadImagesFromFile(Game & Jeu)
+ImageManager::ImageManager() :
+game(NULL)
 {
     RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
-    imageVide = ressourcesLoader->LoadImage("vide.png");
-    images.clear();
-
-    for ( unsigned int i = 0;i<Jeu.images.size();++i)
-    {
-        //Ajout de l'image
-        images[Jeu.images.at(i).nom] = imageVide;
-
-        //Chargement de l'image
-        MessageLoading( "Chargement des images : " + Jeu.images.at(i).nom, static_cast<int>((i/static_cast<float>(Jeu.images.size()))*100));
-        //images.at(i) = ressourcesLoader->LoadImage( Jeu.images.at( i ).fichier );
-        images[Jeu.images.at(i).nom] = ressourcesLoader->LoadImage( Jeu.images.at( i ).fichier );
-
-        //Lissage ou pas
-        images[Jeu.images.at(i).nom].SetSmooth(true);
-        if ( !Jeu.images.at(i).smooth )
-            images[Jeu.images.at(i).nom].SetSmooth(false);
-    }
-
-    MessageLoading( "Chargement terminé.", 100);
-    return true;
+    badImage = ressourcesLoader->LoadImage("vide.png");
 }
 
-bool ImageManager::LoadImage(Game & Jeu, string imageName)
+sf::Image & ImageManager::GetImage(std::string name) const
 {
-    /*RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
-
-    for ( unsigned int i = 0;i<Jeu.images.size();++i)
+    if ( !game )
     {
-        //L'image existe déjà
-        if ( Jeu.images.at(i).nom == imageName)
-        {
-            MessageLoading( "Chargement de l'image : " + Jeu.images.at(i).nom, 0);
-            images.at(i) = ressourcesLoader->LoadImage( Jeu.images.at( i ).fichier );
-
-            //Lissage ou pas
-            images.at( i ).SetSmooth(true);
-            if ( !Jeu.images.at( i ).smooth )
-                images.at( i ).SetSmooth(false);
-
-            return true;
-        }
+        cout << "Image manager has no game associated with.";
+        return badImage;
     }
-    return false;*/
+
+    if ( images.find(name) != images.end() )
+        return images.find(name)->second;
+
+    cout << "Load " << name << endl;
+
+    //Load only an image when necessary
+    RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
+    for (unsigned int i = 0;i<game->images.size();++i)
+    {
+    	if ( game->images[i].nom == name )
+    	{
+            images[name] = ressourcesLoader->LoadImage( game->images[i].fichier );
+            images[name].SetSmooth(game->images[i].smooth);
+
+            return images[name];
+    	}
+    }
+
+    return badImage;
+}
+
+bool ImageManager::HasImage(std::string name) const
+{
+    if ( !game )
+    {
+        cout << "Image manager has no game associated with.";
+        return false;
+    }
+
+
+    if ( images.find(name) != images.end() )
+        return true;
+
+    for (unsigned int i = 0;i<game->images.size();++i)
+    {
+    	if ( game->images[i].nom == name )
+            return true;
+    }
 
     return false;
 }

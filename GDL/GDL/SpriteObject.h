@@ -68,8 +68,6 @@ class SpriteObject : public Object
         virtual float GetCenterY() const;
 
         void UpdateCurrentSprite() const;
-        bool AddSprite(const sf::Sprite & sprite);
-        bool AddSprite(const sf::Sprite & sprite, int animation, int direction);
         const sf::Sprite & GetCurrentSprite() const;
         bool IsValid(int anim, int direc, int sprite) const;
         const Sprite & GetCurrentSpriteDatas() const;

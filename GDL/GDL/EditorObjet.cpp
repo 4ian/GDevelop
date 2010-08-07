@@ -938,7 +938,7 @@ void EditorObjet::OnAjoutPlusBtClick(wxCommandEvent& event)
             for (unsigned int i = 0;i<dialog.ImagesToAdd.size();++i)
             {
                 Sprite sprite;
-                sprite.SetImage(dialog.ImagesToAdd.at(i));
+                sprite.SetImageName(dialog.ImagesToAdd.at(i));
             	object.GetAnimation( animation ).GetDirectionToModify( direction ).AddSprite(sprite);
             }
         }
@@ -1024,7 +1024,7 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
         dc.DrawRectangle(wxRect(2+i*48+i*3-decalage,2,50,50));
 
         //On cherche l'ID de l'image à afficher
-        int j = FindImage( game.images, directionToDisplay.GetSprite(i).GetImage() );
+        int j = FindImage( game.images, directionToDisplay.GetSprite(i).GetImageName() );
         if ( j != -1 )
         {
             wxBitmap bmp( game.images.at( j ).fichier, wxBITMAP_TYPE_ANY);
@@ -1110,7 +1110,7 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
     if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirection( direction ).GetSpritesNumber() )
     {
         const Sprite & sprite = object.GetAnimation( animation ).GetDirection( direction ).GetSprite(selectedImage);
-        int j = FindImage( game.images, sprite.GetImage() );
+        int j = FindImage( game.images, sprite.GetImageName() );
         if ( j != -1 )
         {
             //Chargement de l'image
@@ -1185,7 +1185,7 @@ void EditorObjet::OnAddImageEndSelected(wxCommandEvent& event)
     if ( nom != "" )
     {
         Sprite sprite;
-        sprite.SetImage(nom);
+        sprite.SetImageName(nom);
         object.GetAnimation( animation ).GetDirectionToModify( direction ).AddSprite(sprite);
     }
 
@@ -1205,7 +1205,7 @@ void EditorObjet::OnAddImageAfterSelected(wxCommandEvent& event)
     if ( nom != "" )
     {
         Sprite sprite;
-        sprite.SetImage(nom);
+        sprite.SetImageName(nom);
         vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
 
         if ( static_cast<unsigned>(selectedImage)+1 < sprites.size() )
@@ -1230,7 +1230,7 @@ void EditorObjet::OnAddImageBeforeSelected(wxCommandEvent& event)
     if ( nom != "" )
     {
         Sprite sprite;
-        sprite.SetImage(nom);
+        sprite.SetImageName(nom);
         vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
 
         if ( static_cast<unsigned>(selectedImage) < sprites.size() )
@@ -1259,7 +1259,7 @@ void EditorObjet::OnAddMoreEndSelected(wxCommandEvent& event)
     for (unsigned int i = 0;i<dialog.ImagesToAdd.size();++i)
     {
         Sprite sprite;
-        sprite.SetImage(dialog.ImagesToAdd.at(i));
+        sprite.SetImageName(dialog.ImagesToAdd.at(i));
         object.GetAnimation( animation ).GetDirectionToModify( direction ).AddSprite(sprite);
     }
 
@@ -1285,7 +1285,7 @@ void EditorObjet::OnAddMoreAfterSelected(wxCommandEvent& event)
     for (unsigned int i = 0;i<dialog.ImagesToAdd.size();++i)
     {
         Sprite sprite;
-        sprite.SetImage(dialog.ImagesToAdd.at(i));
+        sprite.SetImageName(dialog.ImagesToAdd.at(i));
 
         if ( static_cast<unsigned>(selectedImage)+1+i < sprites.size() )
             sprites.insert(sprites.begin() + selectedImage + 1 + i, sprite);
@@ -1315,7 +1315,7 @@ void EditorObjet::OnAddMoreBeforeSelected(wxCommandEvent& event)
     for (unsigned int i = 0;i<dialog.ImagesToAdd.size();++i)
     {
         Sprite sprite;
-        sprite.SetImage(dialog.ImagesToAdd.at(i));
+        sprite.SetImageName(dialog.ImagesToAdd.at(i));
 
         if ( static_cast<unsigned>(selectedImage)+i < sprites.size() )
             sprites.insert(sprites.begin() + selectedImage+i, sprite);
@@ -1345,7 +1345,7 @@ void EditorObjet::OnAddFromEndSelected(wxCommandEvent& event)
     if ( nom == _("Toutes les images") || nom == "" ) return;
 
     Sprite sprite;
-    sprite.SetImage(nom);
+    sprite.SetImageName(nom);
     object.GetAnimation( animation ).GetDirectionToModify( direction ).AddSprite(sprite);
 
     thumbsPanel->Refresh();
@@ -1364,7 +1364,7 @@ void EditorObjet::OnAddFromAfterSelected(wxCommandEvent& event)
     if ( nom == _("Toutes les images") || nom == "" ) return;
 
     Sprite sprite;
-    sprite.SetImage(nom);
+    sprite.SetImageName(nom);
 
     vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
 
@@ -1393,7 +1393,7 @@ void EditorObjet::OnAddFromBeforeSelected(wxCommandEvent& event)
     if ( nom == _("Toutes les images") || nom == "" ) return;
 
     Sprite sprite;
-    sprite.SetImage(nom);
+    sprite.SetImageName(nom);
 
     vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
 
@@ -1484,7 +1484,7 @@ void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
     {
         Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).ModSprite(selectedImage);
 
-        int j = FindImage( game.images, sprite.GetImage() );
+        int j = FindImage( game.images, sprite.GetImageName() );
         if ( j == -1 ) return;
 
         //Tailles nécessaire pour placer le point

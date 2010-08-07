@@ -3,10 +3,28 @@
 RuntimeGame::RuntimeGame() :
 Game()
 {
-    //ctor
+    imageManager.SetGame(this);
 }
 
-RuntimeGame::~RuntimeGame()
+RuntimeGame::RuntimeGame(const RuntimeGame & runtimeGame) :
+Game(runtimeGame)
 {
-    //dtor
+    Init(runtimeGame);
+}
+
+RuntimeGame& RuntimeGame::operator=(const RuntimeGame & runtimeGame)
+{
+    if( (this) != &runtimeGame )
+    {
+        Game::operator=(runtimeGame);
+        Init(runtimeGame);
+    }
+
+    return *this;
+}
+
+void RuntimeGame::Init(const RuntimeGame & runtimeGame)
+{
+    imageManager = runtimeGame.imageManager;
+    imageManager.SetGame(this);
 }

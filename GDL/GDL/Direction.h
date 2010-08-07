@@ -27,7 +27,6 @@ class GD_API Direction
         inline unsigned int GetSpritesNumber() const { return sprites.size(); }
         inline void RemoveAllSprites() { sprites.clear(); }
 
-        void AddSprite( const sf::Sprite & sprite );
         void AddSprite( const Sprite & sprite );
 
         //Accès direct au vector de Sprites.

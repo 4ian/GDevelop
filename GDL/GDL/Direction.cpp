@@ -30,13 +30,6 @@ void  Direction::SetTimeBetweenFrames( float time )
     timeBetweenFrame = time;
 }
 
-void Direction::AddSprite( const sf::Sprite & sprite_ )
-{
-    Sprite sprite;
-    sprite.SetSprite(sprite_);
-    sprites.push_back(sprite);
-}
-
 void Direction::AddSprite( const Sprite & sprite )
 {
     sprites.push_back(sprite);

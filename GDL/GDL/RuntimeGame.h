@@ -15,12 +15,15 @@ class GD_API RuntimeGame : public Game
 {
     public:
         RuntimeGame();
-        virtual ~RuntimeGame();
+        RuntimeGame(const RuntimeGame&);
+        virtual ~RuntimeGame() {};
+
+        RuntimeGame& operator=(const RuntimeGame & rhs);
 
         ImageManager imageManager;
 
-    protected:
     private:
+        void Init(const RuntimeGame & runtimeGame);
 };
 
 #endif // RUNTIMEGAME_H

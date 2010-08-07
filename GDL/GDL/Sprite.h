@@ -21,12 +21,10 @@ public:
     Sprite();
     virtual ~Sprite();
 
-    //Accès au sprite
     inline const sf::Sprite & GetSprite() const { return sfmlSprite; }
     inline sf::Sprite & ModSprite() { return sfmlSprite; }
     void SetSprite(const sf::Sprite & sprite_);
 
-    //Les points
     inline vector < Point > & ModNonDefaultPoints() { return points; }
     inline const vector < Point > & GetNonDefaultPoints() const { return points; }
 
@@ -44,8 +42,8 @@ public:
     inline bool IsCentreAutomatic() const { return automaticCentre; }
     bool SetCentreAutomatic(bool enabled);
 
-    inline void SetImage(const string & image_) { image = image_; }
-    inline const string & GetImage() const { return image; }
+    inline void SetImageName(const string & image_) { image = image_; }
+    inline const string & GetImageName() const { return image; }
 
     /**
      * Make the sprite, if it uses an image from ImageManager,

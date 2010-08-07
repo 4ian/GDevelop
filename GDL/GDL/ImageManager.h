@@ -16,16 +16,17 @@ class GD_API ImageManager
 {
     public:
         ImageManager();
-        virtual ~ImageManager();
-        //vector < sf::Image >    images;
-        map < string, sf::Image>    images;
-        sf::Image                   imageVide;
+        virtual ~ImageManager() {};
+        void SetGame(Game * game_) { game = game_; }
 
-        bool LoadImagesFromFile( Game & Jeu );
-        bool LoadImage( Game & Jeu, string imageName);
+        sf::Image & GetImage(std::string name) const;
+        bool HasImage(std::string name) const;
 
-    protected:
     private:
+        mutable map < string, sf::Image > images;
+        mutable sf::Image badImage;
+
+        Game * game;
 };
 
 #endif // ImageManager_H

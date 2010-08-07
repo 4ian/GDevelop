@@ -73,7 +73,7 @@ void OpenSpritesDirection(vector < Sprite > & sprites, const TiXmlElement * elem
     while ( elemSprite )
     {
         Sprite sprite;
-        if ( elemSprite->Attribute( "image" ) != NULL ) { sprite.SetImage(elemSprite->Attribute( "image" ));}
+        if ( elemSprite->Attribute( "image" ) != NULL ) { sprite.SetImageName(elemSprite->Attribute( "image" ));}
         else { cout <<( "Les informations concernant l'image d'un sprite manquent." ); }
 
         const TiXmlElement * elemPoints = elemSprite->FirstChildElement("Points");
@@ -153,7 +153,7 @@ void SpriteObject::LoadFromXml(const TiXmlElement * elemScene)
                     for (unsigned int spriteID = 0;spriteID < imgs.size() ;++spriteID)
                     {
                         Sprite sprite;
-                        sprite.SetImage(imgs.at(spriteID));
+                        sprite.SetImageName(imgs.at(spriteID));
                         direction.AddSprite(sprite);
                     }
                 }
@@ -216,7 +216,7 @@ void SaveSpritesDirection(const vector < Sprite > & sprites, TiXmlElement * elem
         TiXmlElement * sprite = new TiXmlElement( "Sprite" );
         elemSprites->LinkEndChild( sprite );
 
-        sprite->SetAttribute("image", sprites.at(i).GetImage().c_str());
+        sprite->SetAttribute("image", sprites.at(i).GetImageName().c_str());
 
         TiXmlElement * points = new TiXmlElement( "Points" );
         sprite->LinkEndChild( points );
@@ -293,13 +293,7 @@ bool SpriteObject::LoadResources(const ImageManager & imageMgr )
             {
                 Sprite & sprite = GetAnimation( j ).GetDirectionToModify(k).ModSprite(l);
 
-                if ( imageMgr.images.find(sprite.GetImage()) != imageMgr.images.end() )
-                    sprite.SetSprite(sf::Sprite(imageMgr.images.find(sprite.GetImage())->second));
-                else
-                {
-                    cout << "L'image \"" + sprite.GetImage() +  "\" pour l'objet nommé \"" + GetName() + "\" n'a pas pu être trouvée.";
-                    sprite.SetSprite(sf::Sprite(imageMgr.imageVide));
-                }
+                sprite.SetSprite(sf::Sprite(imageMgr.GetImage(sprite.GetImageName())));
             }
         }
     }
@@ -363,7 +357,7 @@ bool SpriteObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
     //Generate a thumbnail from the first animation
     if ( IsValid(0,0,0) )
     {
-        int idImage = FindImage(game.images, GetAnimation(0).GetDirection(0).GetSprite(0).GetImage());
+        int idImage = FindImage(game.images, GetAnimation(0).GetDirection(0).GetSprite(0).GetImageName());
         if ( idImage != -1 )
         {
             if ( !wxFileExists(game.images.at( idImage ).fichier) ) return false;
@@ -599,15 +593,6 @@ void SpriteObject::UpdateTime(float elapsedTime)
     }
 
     needUpdateCurrentSprite = true;
-}
-
-
-/**
- * Add a sprite to an animation
- */
-bool SpriteObject::AddSprite( const sf::Sprite & sprite, int animation, int direction )
-{
-    return GetAnimation( animation ).AddSpriteToDirection( sprite, direction );
 }
 
 /**
@@ -857,10 +842,7 @@ void SpriteObject::AddAnimation(const Animation & animation)
 bool SpriteObject::RemoveAnimation(unsigned int nb)
 {
     if ( nb >= GetAnimationsNumber() )
-    {
-        cout << "Impossible de suppriemr l'animation "<<nb;
         return false;
-    }
 
     cacheAnimationSizeNeedUpdate = true;
     needUpdateCurrentSprite = true;

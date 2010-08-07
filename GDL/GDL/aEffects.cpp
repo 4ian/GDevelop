@@ -68,9 +68,6 @@ bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsCon
     currentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
     sf::Image & dest = currentSprite->GetSpriteOwnImage();
 
-    std::map < string, sf::Image >::const_iterator src = scene.game->imageManager.images.find(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()));
-    if ( src == scene.game->imageManager.images.end() ) return false;
-
     //Make sure the coordinates are correct.
     int destX = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
     if ( destX < 0 || static_cast<unsigned>(destX) >= dest.GetWidth()) return false;
@@ -85,7 +82,8 @@ bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsCon
             applyAlpha = true;
     }
 
-    dest.Copy(src->second, destX, destY, sf::IntRect(0, 0, 0, 0), applyAlpha);
+    dest.Copy(scene.game->imageManager.GetImage(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this())),
+              destX, destY, sf::IntRect(0, 0, 0, 0), applyAlpha);
 
     return true;
 }

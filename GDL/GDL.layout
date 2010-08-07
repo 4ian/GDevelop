@@ -88,7 +88,7 @@
 	<File name="GDL\ChooseLayer.cpp" open="0" top="0" tabpos="13">
 		<Cursor position="4735" topLine="72" />
 	</File>
-	<File name="GDL\ChooseLayer.h" open="1" top="0" tabpos="37">
+	<File name="GDL\ChooseLayer.h" open="1" top="0" tabpos="13">
 		<Cursor position="1284" topLine="30" />
 	</File>
 	<File name="GDL\ChooseObject.cpp" open="0" top="0" tabpos="10">
@@ -175,7 +175,7 @@
 	<File name="GDL\EditComment.h" open="0" top="0" tabpos="0">
 		<Cursor position="449" topLine="4" />
 	</File>
-	<File name="GDL\EditExpression.cpp" open="1" top="0" tabpos="34">
+	<File name="GDL\EditExpression.cpp" open="1" top="0" tabpos="11">
 		<Cursor position="29279" topLine="521" />
 	</File>
 	<File name="GDL\EditExpression.h" open="0" top="0" tabpos="15">
@@ -199,7 +199,7 @@
 	<File name="GDL\EditRepeatEvent.h" open="0" top="0" tabpos="6">
 		<Cursor position="1624" topLine="29" />
 	</File>
-	<File name="GDL\EditTextDialog.cpp" open="1" top="0" tabpos="35">
+	<File name="GDL\EditTextDialog.cpp" open="1" top="0" tabpos="12">
 		<Cursor position="15319" topLine="284" />
 	</File>
 	<File name="GDL\EditTextDialog.h" open="0" top="0" tabpos="6">
@@ -535,8 +535,8 @@
 	<File name="GDL\Sprite.h" open="0" top="0" tabpos="4">
 		<Cursor position="618" topLine="9" />
 	</File>
-	<File name="GDL\SpriteExtension.cpp" open="0" top="0" tabpos="20">
-		<Cursor position="23692" topLine="449" />
+	<File name="GDL\SpriteExtension.cpp" open="1" top="0" tabpos="17">
+		<Cursor position="1800" topLine="33" />
 	</File>
 	<File name="GDL\SpriteInitialPositionPanel.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="572" topLine="32" />
@@ -544,11 +544,11 @@
 	<File name="GDL\SpriteInitialPositionPanel.h" open="0" top="0" tabpos="0">
 		<Cursor position="636" topLine="8" />
 	</File>
-	<File name="GDL\SpriteObject.cpp" open="0" top="0" tabpos="29">
-		<Cursor position="11384" topLine="304" />
+	<File name="GDL\SpriteObject.cpp" open="1" top="1" tabpos="16">
+		<Cursor position="5512" topLine="136" />
 	</File>
-	<File name="GDL\SpriteObject.h" open="0" top="0" tabpos="30">
-		<Cursor position="1861" topLine="32" />
+	<File name="GDL\SpriteObject.h" open="1" top="0" tabpos="14">
+		<Cursor position="6116" topLine="127" />
 	</File>
 	<File name="GDL\StandardEvent.cpp" open="0" top="0" tabpos="31">
 		<Cursor position="3779" topLine="110" />
@@ -643,8 +643,8 @@
 	<File name="GDL\aCamera.h" open="0" top="0" tabpos="25">
 		<Cursor position="306" topLine="0" />
 	</File>
-	<File name="GDL\aEffects.cpp" open="0" top="0" tabpos="11">
-		<Cursor position="1340" topLine="20" />
+	<File name="GDL\aEffects.cpp" open="1" top="0" tabpos="15">
+		<Cursor position="1256" topLine="0" />
 	</File>
 	<File name="GDL\aEffects.h" open="0" top="0" tabpos="26">
 		<Cursor position="294" topLine="0" />
@@ -740,7 +740,7 @@
 		<Cursor position="185" topLine="0" />
 	</File>
 	<File name="GDL\aVisibilite.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="672" topLine="13" />
+		<Cursor position="1649" topLine="23" />
 	</File>
 	<File name="GDL\aVisibilite.h" open="0" top="0" tabpos="60">
 		<Cursor position="345" topLine="0" />

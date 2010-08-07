@@ -66,23 +66,3 @@ void Animation::SetDirection(const Direction & direction, unsigned int nb)
 
     return;
 }
-
-bool Animation::AddSpriteToDirection( const sf::Sprite & sprite, unsigned int nb)
-{
-    if ( !typeNormal )
-        nb = 0; //En mode rotation automatique, on est toujours à la direction 0
-
-    if ( nb < directionsNumber )
-    {
-        directions[nb].AddSprite(sprite);
-        return true;
-    }
-
-    cout << "Impossible d'ajouter le sprite à la direction " << nb << endl;
-    return false;
-}
-
-Animation::~Animation()
-{
-    //dtor
-}

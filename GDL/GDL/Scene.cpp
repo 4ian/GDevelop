@@ -20,12 +20,6 @@ standardSortMethod(true)
     Layer layer;
     layer.SetCamerasNumber(1);
     initialLayers.push_back(layer);
-
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-
-    boost::shared_ptr<AutomatismsSharedDatas> automatism = extensionsManager->CreateAutomatismSharedDatas("PhysicsAutomatism::PhysicsAutomatism");
-    automatismsInitialSharedDatas[automatism->GetTypeId()] = automatism;
-    std::cout << "Scene created with automatism shared datas of name" << automatismsInitialSharedDatas[automatism->GetTypeId()]->GetTypeName() << std::endl;
 }
 
 void Scene::Init(const Scene & scene)

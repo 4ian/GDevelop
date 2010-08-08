@@ -24,6 +24,10 @@ class GD_API Automatism
         virtual ~Automatism() {};
         virtual boost::shared_ptr<Automatism> Clone() { return boost::shared_ptr<Automatism>(new Automatism(*this));}
 
+        void SetName(std::string name_);
+        std::string GetName() { return name; }
+        unsigned int GetAutomatismId() { return automatismId; }
+
         std::string GetTypeName() { return type; }
         unsigned int GetTypeId() { return typeId; }
 
@@ -83,6 +87,9 @@ class GD_API Automatism
 
         Object* object; ///< Object owning the automatism
         bool activated;
+
+        std::string name;
+        unsigned int automatismId;
 
         std::string type; ///< The type indicate of which type is the automatism. ( To test if we can do something, like actions, reserved to specific automatism with it )
         unsigned int typeId; /// The typeId is the "unsigned-int-equivalent" of the type.

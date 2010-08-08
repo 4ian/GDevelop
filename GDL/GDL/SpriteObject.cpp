@@ -243,41 +243,38 @@ void SpriteObject::SaveToXml(TiXmlElement * objet)
     objet->LinkEndChild( animations );
     TiXmlElement * animation;
 
-    if ( !HasNoAnimations() )
+    for ( unsigned int k = 0;k < GetAnimationsNumber();k++ )
     {
-        for ( unsigned int k = 0;k < GetAnimationsNumber();k++ )
+        animation = new TiXmlElement( "Animation" );
+        animations->LinkEndChild( animation );
+
+
+        if ( GetAnimation( k ).typeNormal )
         {
-            animation = new TiXmlElement( "Animation" );
-            animations->LinkEndChild( animation );
+            animation->SetAttribute( "typeNormal", "true" );
+        }
+        else { animation->SetAttribute( "typeNormal", "false" ); }
 
+        TiXmlElement * direction;
+        for ( unsigned int l = 0;l < GetAnimation( k ).GetDirectionsNumber();l++ )
+        {
+            direction = new TiXmlElement( "Direction" );
+            animation->LinkEndChild( direction );
 
-            if ( GetAnimation( k ).typeNormal )
+            //Paramètres de la direction
+            if ( GetAnimation( k ).GetDirection( l ).IsLooping() )
             {
-                animation->SetAttribute( "typeNormal", "true" );
+                direction->SetAttribute( "boucle", "true" );
             }
-            else { animation->SetAttribute( "typeNormal", "false" ); }
+            else { direction->SetAttribute( "boucle", "false" ); }
 
-            TiXmlElement * direction;
-            for ( unsigned int l = 0;l < GetAnimation( k ).GetDirectionsNumber();l++ )
-            {
-                direction = new TiXmlElement( "Direction" );
-                animation->LinkEndChild( direction );
+            direction->SetDoubleAttribute( "tempsEntre", GetAnimation( k ).GetDirection( l ).GetTimeBetweenFrames() );
 
-                //Paramètres de la direction
-                if ( GetAnimation( k ).GetDirection( l ).IsLooping() )
-                {
-                    direction->SetAttribute( "boucle", "true" );
-                }
-                else { direction->SetAttribute( "boucle", "false" ); }
+            //Sprites de la direction
+            TiXmlElement* sprites = new TiXmlElement( "Sprites" );
+            direction->LinkEndChild( sprites );
+            SaveSpritesDirection(GetAnimation( k ).GetDirection( l ).GetSprites(),sprites);
 
-                direction->SetDoubleAttribute( "tempsEntre", GetAnimation( k ).GetDirection( l ).GetTimeBetweenFrames() );
-
-                //Sprites de la direction
-                TiXmlElement* sprites = new TiXmlElement( "Sprites" );
-                direction->LinkEndChild( sprites );
-                SaveSpritesDirection(GetAnimation( k ).GetDirection( l ).GetSprites(),sprites);
-
-            }
         }
     }
 }

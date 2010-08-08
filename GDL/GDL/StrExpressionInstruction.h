@@ -9,6 +9,7 @@
 class GDExpression;
 class ExpressionInstruction;
 class Object;
+class Automatism;
 class ObjectsConcerned;
 class RuntimeScene;
 
@@ -22,6 +23,7 @@ class GD_API StrExpressionInstruction
 {
     typedef std::string (*PtrFunction)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction);
     typedef std::string (Object::*PtrObjectFunction)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction);
+    typedef std::string (Automatism::*PtrAutomatismFunction)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction);
 
     public:
         StrExpressionInstruction();
@@ -29,6 +31,9 @@ class GD_API StrExpressionInstruction
 
         PtrFunction                 function;
         PtrObjectFunction           objectFunction;
+        PtrAutomatismFunction       automatismFunction;
+        unsigned int                automatismTypeId;
+
         std::vector<GDExpression>   parameters;
 
     private:

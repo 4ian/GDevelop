@@ -338,6 +338,7 @@ void EditExpression::RefreshLists()
             continue;
 
 	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
 
         wxTreeItemId extensionItem = ObjList->GetRootItem();
 
@@ -371,6 +372,41 @@ void EditExpression::RefreshLists()
                     }
 
                     gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first, objectsTypes[j]);
+                    ObjList->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+                }
+            }
+	    }
+
+	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
+	    {
+            wxTreeItemId automatismTypeItem =   automatismsTypes[j] == "" ?
+                                            ObjList->AppendItem(extensionItem, _("Tous les objets"), 0) :
+                                            ObjList->AppendItem(extensionItem, _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismsTypes[j]).fullname,0) ;
+
+            //Add each automatism expression
+            std::map<string, ExpressionInfos > allAutoExpr = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<string, ExpressionInfos>::const_iterator it = allAutoExpr.begin(); it != allAutoExpr.end(); ++it)
+            {
+                if ( it->second.shown )
+                {
+                    //Search and/or add group item
+                    wxTreeItemIdValue cookie;
+                    wxTreeItemId groupItem = ObjList->GetFirstChild(automatismTypeItem, cookie);
+                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != it->second.group )
+                    {
+                        groupItem = ObjList->GetNextSibling(groupItem);
+                    }
+                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(automatismTypeItem, it->second.group, 0);
+
+                    //Add expression item
+                    int IDimage = 0;
+                    if ( it->second.smallicon.IsOk() )
+                    {
+                        imageListObj->Add(it->second.smallicon);
+                        IDimage = imageListObj->GetImageCount()-1;
+                    }
+
+                    gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first, automatismsTypes[j]);
                     ObjList->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
                 }
             }

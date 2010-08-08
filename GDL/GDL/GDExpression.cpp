@@ -87,6 +87,39 @@ double ExpObjectFunction( const RuntimeScene & scene, ObjectsConcerned & objects
 /**
  * Expression function needed for calling objects expressions functions
  */
+double ExpAutomatismFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction)
+{
+    //We need an object to pass to the function
+    ObjSPtr object = boost::shared_ptr<Object>();
+    ObjList list = objectsConcerned.Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() );
+
+    if ( !list.empty() )
+    {
+        object = list[0]; //On prend le premier objet de la liste par défaut
+
+        //Si l'objet principal de la  est dedans, on le prend
+        ObjList::iterator iter = find(list.begin(), list.end(), obj1);
+        if ( iter != list.end() )
+            object = *iter;
+        else
+        {
+            //Si l'objet secondaire de la  est dedans, on le prend
+            iter = find(list.begin(), list.end(), obj2);
+            if ( iter != list.end() )
+                object = *iter;
+        }
+    }
+
+    //Verify that we have a valid object
+    if ( object != boost::shared_ptr<Object>() )
+        return (object->GetAutomatism(exprInstruction.automatismTypeId).get()->*exprInstruction.automatismFunction)(scene, objectsConcerned, obj1, obj2, exprInstruction);
+    else
+        return 0;
+}
+
+/**
+ * Expression function needed for calling objects expressions functions
+ */
 std::string ExpObjectStrFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction)
 {
     //We need an object to pass to the function
@@ -267,16 +300,40 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
         if ( functionName.substr(0, functionName.length()-1).find_first_of(possibleSeparator) == string::npos )
         {
             bool isMathFunction = find(mathFunctions.begin(), mathFunctions.end(), functionName) != mathFunctions.end();
-            if ( !isMathFunction && nameIsFunction && extensionsManager->HasExpression(functionName) )
+            if ( !isMathFunction )
             {
-                instruction.function = (extensionsManager->GetExpressionFunctionPtr(functionName));
-                instructionInfos = extensionsManager->GetExpressionInfos(functionName);
-            }
-            else if ( !isMathFunction && !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
-            {
-                instruction.function = &ExpObjectFunction;
-                instruction.objectFunction = extensionsManager->GetObjectExpressionFunctionPtr(GetTypeIdOfObject(game, scene, objectName), functionName);
-                instructionInfos = extensionsManager->GetObjectExpressionInfos(extensionsManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, objectName)), functionName);
+                if ( nameIsFunction && extensionsManager->HasExpression(functionName) )
+                {
+                    instruction.function = (extensionsManager->GetExpressionFunctionPtr(functionName));
+                    instructionInfos = extensionsManager->GetExpressionInfos(functionName);
+                }
+                else if ( !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
+                {
+                    instruction.function = &ExpObjectFunction;
+                    instruction.objectFunction = extensionsManager->GetObjectExpressionFunctionPtr(GetTypeIdOfObject(game, scene, objectName), functionName);
+                    instructionInfos = extensionsManager->GetObjectExpressionInfos(extensionsManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, objectName)), functionName);
+                }
+                else if ( !nameIsFunction )
+                {
+                    size_t firstDoublePoints = functionName.find("::");
+                    if ( firstDoublePoints != string::npos )
+                    {
+                        std::string autoName = functionName.substr(0, firstDoublePoints);
+                        if ( firstDoublePoints+2 < functionName.length() )
+                            functionName = functionName.substr(firstDoublePoints+2, functionName.length());
+                        else
+                            functionName = "";
+                        cout << "FOUND " << autoName << " & " << functionName << endl;
+
+                        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+                        unsigned int automatismTypeId = objectIdentifiersManager->GetOIDfromName(autoName);
+
+                        instruction.function = &ExpAutomatismFunction;
+                        instruction.automatismTypeId = automatismTypeId;
+                        instruction.automatismFunction = extensionsManager->GetAutomatismExpressionFunctionPtr(automatismTypeId, functionName);
+                        instructionInfos = extensionsManager->GetAutomatismExpressionInfos(autoName, functionName);
+                    }
+                }
             }
 
             if( !isMathFunction && instruction.function != NULL ) //Add the function

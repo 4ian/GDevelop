@@ -12,32 +12,6 @@
 #include "EventsRenderingHelper.h"
 #endif
 
-/*
-template<class Archive>
-void StandardEvent::serialize(Archive& ar, const unsigned int version){
-    ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(BaseEvent)
-        & BOOST_SERIALIZATION_NVP(conditions)
-        & BOOST_SERIALIZATION_NVP(actions)
-        & BOOST_SERIALIZATION_NVP(events);
-}
-
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-
-template void StandardEvent::serialize(
-    boost::archive::xml_oarchive & ar,
-    const unsigned int version
-);
-template void StandardEvent::serialize(
-    boost::archive::xml_iarchive & ar,
-    const unsigned int version
-);
-
-//This is used to make the serialization library aware that code should be instantiated for serialization
-//of a given class even though the class hasn't been otherwise referred to by the program.
-#include <boost/serialization/export.hpp>
-BOOST_CLASS_EXPORT_IMPLEMENT(StandardEvent)*/
-
 StandardEvent::StandardEvent() :
 BaseEvent()
 {

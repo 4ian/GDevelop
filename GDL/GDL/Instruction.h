@@ -35,7 +35,6 @@ class GD_API Instruction
         typedef bool (Object::*ptrObjectFunction)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction );
         ptrObjectFunction objectFunction; ///<Function to call on each object, if the instruction need one.
 
-        unsigned int automatismTypeId; ///<Automatism type to call, if the instruction need one
         typedef bool (Automatism::*ptrAutomatismFunction)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction );
         ptrAutomatismFunction automatismFunction; ///<Function to call on each object automatism, if the instruction need one.
 
@@ -48,16 +47,6 @@ class GD_API Instruction
          * \param val New value to set
          */
         void SetType(string val) { type = val; }
-
-        /** Access objectFunctionType
-         * \return The objectFunctionType of the instruction
-         */
-        inline string GetObjectFunctionType() const { return objectFunctionType; }
-
-        /** Set objectFunctionType
-         * \param val New value to set
-         */
-        inline void SetObjectFunctionType(string val) { objectFunctionType = val; }
 
         /** Is the instruction local ( default ) ?
          * \return true if instruction is local
@@ -126,22 +115,8 @@ class GD_API Instruction
         mutable bool selected; ///<True if selected in an event editor
         #endif
 
-        /**
-         * Serialize
-         */
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int version){
-            ar  & BOOST_SERIALIZATION_NVP(type)
-                & BOOST_SERIALIZATION_NVP(objectFunctionType)
-                & BOOST_SERIALIZATION_NVP(isLocal)
-                & BOOST_SERIALIZATION_NVP(inverted)
-                & BOOST_SERIALIZATION_NVP(parameters)
-                & BOOST_SERIALIZATION_NVP(subInstructions);
-        }
-
     private:
         string type;
-        string objectFunctionType;
         bool isLocal;
         bool inverted;
         mutable vector < GDExpression > parameters;

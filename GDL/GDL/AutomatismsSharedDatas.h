@@ -18,6 +18,10 @@ class GD_API AutomatismsSharedDatas
         virtual ~AutomatismsSharedDatas() {};
         virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() { return boost::shared_ptr<AutomatismsSharedDatas>(new AutomatismsSharedDatas(*this));}
 
+        void SetName(std::string name_);
+        std::string GetName() { return name; }
+        unsigned int GetAutomatismId() { return automatismId; }
+
         std::string GetTypeName() { return type; }
         unsigned int GetTypeId() { return typeId; }
 
@@ -44,6 +48,9 @@ class GD_API AutomatismsSharedDatas
         virtual void LoadFromXml(const TiXmlElement * eventElem) {}
 
     private:
+        std::string name;
+        unsigned int automatismId;
+
         std::string type; ///< The type indicate of which type is the automatism.
         unsigned int typeId; /// The typeId is the "unsigned-int-equivalent" of the type.
 };

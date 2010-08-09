@@ -52,21 +52,6 @@ class LinkEvent : public BaseEvent
 
         virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
 #endif
-
-        friend class boost::serialization::access;
-
-        /**
-         * Serialize
-         */
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int version){
-            ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(BaseEvent)
-                & BOOST_SERIALIZATION_NVP(sceneLinked)
-                & BOOST_SERIALIZATION_NVP(start)
-                & BOOST_SERIALIZATION_NVP(end);
-        }
 };
-/*BOOST_SERIALIZATION_SHARED_PTR(LinkEvent)
-BOOST_CLASS_EXPORT_KEY(LinkEvent)*/
 
 #endif // LINKCOMMENT_H

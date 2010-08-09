@@ -98,7 +98,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     specialAction = scene.specialAction;
 
     automatismsSharedDatas.clear();
-    for (std::map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> >::const_iterator it = scene.automatismsSharedDatas.begin();
+    for (boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> >::const_iterator it = scene.automatismsSharedDatas.begin();
          it != scene.automatismsSharedDatas.end();++it)
     {
     	automatismsSharedDatas[it->first] = it->second->Clone();
@@ -641,7 +641,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
     //Automatisms datas
     automatismsSharedDatas.clear();
-    for(std::map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
+    for(boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
         it != scene.automatismsInitialSharedDatas.end();
         ++it)
     {

@@ -32,22 +32,10 @@ class GD_API StrExpressionInstruction
         PtrFunction                 function;
         PtrObjectFunction           objectFunction;
         PtrAutomatismFunction       automatismFunction;
-        unsigned int                automatismTypeId;
 
         std::vector<GDExpression>   parameters;
 
     private:
-
-        friend class boost::serialization::access;
-        /**
-         * Serialize
-         */
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int version){
-            ar /*& BOOST_SERIALIZATION_NVP(function)
-               & BOOST_SERIALIZATION_NVP(objectFunction)*/
-               & BOOST_SERIALIZATION_NVP(parameters);
-        }
 };
 
 #endif // STREXPRESSIONINSTRUCTION_H

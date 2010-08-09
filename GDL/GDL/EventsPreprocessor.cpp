@@ -9,6 +9,8 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/CommonInstructions.h"
+#include "GDL/CommonTools.h"
+#include "GDL/ObjectIdentifiersManager.h"
 
 /**
  * Link each condition to its function.
@@ -37,16 +39,22 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
         }
 
         //Affection to an automatism member function if found
-        vector < unsigned int > automatisms = GetAutomatismsOfObject(*scene.game, scene, objectName);
-        for (unsigned int i = 0;i<automatisms.size();++i)
+        unsigned int automatismTypeId = GetTypeIdOfAutomatism(*scene.game, scene, conditions[cId].GetParameter(1).GetPlainString());
+
+        if (extensionsManager->HasAutomatismCondition(automatismTypeId,
+                                                   conditions[cId].GetType()))
         {
-            if ( extensionsManager->HasAutomatismCondition(automatisms[i],
-                                                    conditions[cId].GetType()))
+            conditions[cId].function = &AutomatismConditionForEachObject;
+            conditions[cId].automatismFunction = extensionsManager->GetAutomatismConditionFunctionPtr(automatismTypeId,
+                                                                                                    conditions[cId].GetType());
+
+            //Verify that object has automatism.
+            unsigned int automatismNameId = conditions[cId].GetParameter(1).GetAsObjectIdentifier();
+            vector < unsigned int > automatisms = GetAutomatismsOfObject(*scene.game, scene, objectName);
+            if ( find(automatisms.begin(), automatisms.end(), automatismNameId) == automatisms.end() )
             {
-                conditions[cId].function = &AutomatismConditionForEachObject;
-                conditions[cId].automatismTypeId = automatisms[i];
-                conditions[cId].automatismFunction = extensionsManager->GetAutomatismConditionFunctionPtr(automatisms[i],
-                                                                                                        conditions[cId].GetType());
+                cout << "Bad automatism requested" << endl;
+                conditions[cId].SetType("");
             }
         }
 
@@ -111,18 +119,25 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
         }
 
         //Affection to an automatism member function if found
-        vector < unsigned int > automatisms = GetAutomatismsOfObject(*scene.game, scene, objectName);
-        for (unsigned int i = 0;i<automatisms.size();++i)
+        unsigned int automatismTypeId = GetTypeIdOfAutomatism(*scene.game, scene, actions[aId].GetParameter(1).GetPlainString());
+
+        if (extensionsManager->HasAutomatismAction(automatismTypeId,
+                                                   actions[aId].GetType()))
         {
-            if ( extensionsManager->HasAutomatismAction(automatisms[i],
-                                                    actions[aId].GetType()))
+            actions[aId].function = &AutomatismActionForEachObject;
+            actions[aId].automatismFunction = extensionsManager->GetAutomatismActionFunctionPtr(automatismTypeId,
+                                                                                                    actions[aId].GetType());
+
+            //Verify that object has automatism.
+            unsigned int automatismNameId = actions[aId].GetParameter(1).GetAsObjectIdentifier();
+            vector < unsigned int > automatisms = GetAutomatismsOfObject(*scene.game, scene, objectName);
+            if ( find(automatisms.begin(), automatisms.end(), automatismNameId) == automatisms.end() )
             {
-                actions[aId].function = &AutomatismActionForEachObject;
-                actions[aId].automatismTypeId = automatisms[i];
-                actions[aId].automatismFunction = extensionsManager->GetAutomatismActionFunctionPtr(automatisms[i],
-                                                                                                        actions[aId].GetType());
+                cout << "Bad automatism requested" << endl;
+                actions[aId].SetType("");
             }
         }
+
 
         //Verify that there are not mismatch between object type in parameters
         InstructionInfos instrInfos = extensionsManager->GetActionInfos(actions[aId].GetType());
@@ -134,7 +149,7 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
                 if (GetTypeIdOfObject(*scene.game, scene, objectInParameter) !=
                     extensionsManager->GetTypeIdFromString(instrInfos.parameters[pNb].objectType) )
                 {
-                    cout << "Bad object type in a parameter of an action " << actions[aId].GetType() << endl;
+                    cout << "Bad object type in parameter "+ToString(pNb)+" of an action " << actions[aId].GetType() << endl;
                     cout << "Action wanted " << instrInfos.parameters[pNb].objectType << " of typeId " << extensionsManager->GetTypeIdFromString(instrInfos.parameters[pNb].objectType) << endl;
                     cout << "Action has received " << objectInParameter << " of typeId " << GetTypeIdOfObject(*scene.game, scene, objectInParameter) << endl;
 

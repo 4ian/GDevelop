@@ -100,23 +100,7 @@ class ForEachEvent : public BaseEvent
 #if defined(GDE)
         bool objectsToPickSelected;
 #endif
-
-        friend class boost::serialization::access;
-
-        /**
-         * Serialize
-         */
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int version){
-            ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(BaseEvent)
-                & BOOST_SERIALIZATION_NVP(conditions)
-                & BOOST_SERIALIZATION_NVP(actions)
-                & BOOST_SERIALIZATION_NVP(events)
-                & BOOST_SERIALIZATION_NVP(objectsToPick);
-        }
 };
 
-/*BOOST_SERIALIZATION_SHARED_PTR(ForEachEvent)
-BOOST_CLASS_EXPORT_KEY(ForEachEvent)*/
 
 #endif // FOREACHEVENT_H

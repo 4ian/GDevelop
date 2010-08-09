@@ -516,16 +516,18 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Declare an automatism
  * @param name
  * @param fullname displayed in editor
+ * @param default name of an instance of the automatism
  * @param description displayed in editor
  * @param group
  * @param filename of a small icon
  * @param class representing the automatism
  */
-#define DECLARE_AUTOMATISM(name_, fullname_, description_, group_, icon24x24_, className_, sharedDatasClassName_) { \
+#define DECLARE_AUTOMATISM(name_, fullname_, defaultName_, description_, group_, icon24x24_, className_, sharedDatasClassName_) { \
             AutomatismInfo automatismInfo; \
             std::string currentAutomatismDeclarationName = name_;\
             automatismInfo.fullname = fullname_; \
             automatismInfo.description = description_; \
+            automatismInfo.defaultName = defaultName_;\
             automatismInfo.group = group_; \
             if ( wxFile::Exists(icon24x24_) )\
             {\
@@ -647,7 +649,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
             eventInfo.instance = boost::shared_ptr<BaseEvent>(new className_); \
             eventInfo.instance->SetType(GetNameSpace()+currentEventDeclarationName);
 
-#define DECLARE_AUTOMATISM(name_, fullname_, description_, group_, smallicon_, className_, sharedDatasClassName_) { \
+#define DECLARE_AUTOMATISM(name_, fullname_, defaultName_, description_, group_, smallicon_, className_, sharedDatasClassName_) { \
             AutomatismInfo automatismInfo; \
             std::string currentAutomatismDeclarationName = name_;\
             automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName)); \
@@ -658,7 +660,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
                 parameter.type = type_; \
                 parameter.useObject = useObj; \
                 parameter.optional = false; \
-                parameter.objectType = GetNameSpace()+objType; \
+                if ( !std::string(objType).empty() ) parameter.objectType = GetNameSpace()+objType; \
                 instrInfo.parameters.push_back(parameter); \
                 }
 
@@ -667,7 +669,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
                 parameter.type = type_; \
                 parameter.useObject = useObj; \
                 parameter.optional = true; \
-                parameter.objectType = GetNameSpace()+objType; \
+                 if ( !std::string(objType).empty() ) parameter.objectType = GetNameSpace()+objType; \
                 instrInfo.parameters.push_back(parameter); \
                 }
 
@@ -907,6 +909,7 @@ class GD_API AutomatismInfo
 
 #if defined(GDE)
     std::string fullname;
+    std::string defaultName;
     std::string description;
     std::string group;
     wxBitmap icon;

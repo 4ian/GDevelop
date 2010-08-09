@@ -12,7 +12,6 @@ GDExpression Instruction::badExpression("");
 Instruction::Instruction(string type_) :
 function(NULL),
 objectFunction(NULL),
-automatismTypeId(0),
 automatismFunction(NULL),
 type(type_),
 isLocal(true),
@@ -30,7 +29,6 @@ selected(false)
 Instruction::Instruction(string type_, const vector <GDExpression> & parameters_, bool isLocal_, bool inverted_) :
 function(NULL),
 objectFunction(NULL),
-automatismTypeId(0),
 automatismFunction(NULL),
 type(type_),
 isLocal(isLocal_),

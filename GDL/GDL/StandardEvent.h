@@ -81,18 +81,7 @@ class GD_API StandardEvent : public BaseEvent
         vector < Instruction > conditions;
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
-
-        friend class boost::serialization::access;
-
-        /**
-         * Serialize
-         */
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int version);
 };
-
-/*BOOST_SERIALIZATION_SHARED_PTR(StandardEvent)
-BOOST_CLASS_EXPORT_KEY(StandardEvent)*/
 
 
 #endif // STANDARDEVENT_H

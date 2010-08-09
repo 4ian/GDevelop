@@ -3,13 +3,14 @@
 
 Automatism::Automatism(std::string automatismTypeName) :
 activated(true),
-type(automatismTypeName)
+type(automatismTypeName),
+automatismId(0)
 {
     ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
     typeId = objectIdentifiersManager->GetOIDfromName(automatismTypeName);
 }
 
-void SetName(std::string name_)
+void Automatism::SetName(std::string name_)
 {
     name = name_;
 

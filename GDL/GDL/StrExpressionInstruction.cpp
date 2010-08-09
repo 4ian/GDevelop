@@ -4,8 +4,7 @@
 StrExpressionInstruction::StrExpressionInstruction() :
 function(NULL),
 objectFunction(NULL),
-automatismFunction(NULL),
-automatismTypeId(0)
+automatismFunction(NULL)
 {
     //ctor
 }

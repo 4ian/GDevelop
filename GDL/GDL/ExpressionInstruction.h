@@ -32,20 +32,8 @@ class GD_API ExpressionInstruction
         PtrFunction                 function;
         PtrObjectFunction           objectFunction;
         PtrAutomatismFunction       automatismFunction;
-        unsigned int automatismTypeId; ///<Automatism type to call, if the instruction need one
 
         std::vector<GDExpression>   parameters;
-
-        friend class boost::serialization::access;
-        /**
-         * Serialize
-         */
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int version){
-            ar /*& BOOST_SERIALIZATION_NVP(function)
-               & BOOST_SERIALIZATION_NVP(objectFunction)*/
-               & BOOST_SERIALIZATION_NVP(parameters);
-        }
 
     private:
 };

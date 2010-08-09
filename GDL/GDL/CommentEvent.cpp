@@ -12,24 +12,6 @@
 #include "GDL/EditComment.h"
 #endif
 
-/*//Declaration of serialization for xml archives
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-
-template void CommentEvent::serialize(
-    boost::archive::xml_oarchive & ar,
-    const unsigned int version
-);
-template void CommentEvent::serialize(
-    boost::archive::xml_iarchive & ar,
-    const unsigned int version
-);
-
-//This is used to make the serialization library aware that code should be instantiated for serialization
-//of a given class even though the class hasn't been otherwise referred to by the program.
-#include <boost/serialization/export.hpp>
-BOOST_CLASS_EXPORT_IMPLEMENT(CommentEvent)*/
-
 #if defined(GDE)
 void CommentEvent::SaveToXml(TiXmlElement * eventElem) const
 {

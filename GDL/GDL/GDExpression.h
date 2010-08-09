@@ -10,7 +10,6 @@
 #include "GDL/GDMathParser.h"
 #include "GDL/ExpressionInstruction.h"
 #include "GDL/StrExpressionInstruction.h"
-#include "GDL/ObjectIdentifiersManager.h"
 class Object;
 class RuntimeScene;
 class ObjectsConcerned;
@@ -31,7 +30,7 @@ class GD_API GDExpression
     public:
         GDExpression();
         GDExpression(std::string plainString_);
-        virtual ~GDExpression();
+        virtual ~GDExpression() {};
 
         /**
          * Get the plain string representing the expression
@@ -51,17 +50,7 @@ class GD_API GDExpression
         /**
          * Get the object identifier representing the object
          */
-        inline unsigned int GetAsObjectIdentifier() const
-        {
-            if ( !oIDcomputed )
-            {
-                ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
-                oID = objectIdentifiersManager->GetOIDfromName(plainString);
-                oIDcomputed = true;
-            }
-
-            return oID;
-        }
+        inline unsigned int GetAsObjectIdentifier() const { return oID; }
 
         /**
          * Evaluate as a math expression and return the result
@@ -87,7 +76,15 @@ class GD_API GDExpression
         std::string GetAsTextExpressionResult(const RuntimeScene & scene,
                                               ObjectsConcerned & objectsConcerned,
                                               ObjSPtr obj1 = boost::shared_ptr<Object>( ),
-                                              ObjSPtr obj2 = boost::shared_ptr<Object>( )) const;
+                                              ObjSPtr obj2 = boost::shared_ptr<Object>( )) const
+        {
+
+            std::string result;
+            for (unsigned int i = 0;i<textExpressionFunctions.size();++i)
+                result += (textExpressionFunctions[i].function)(scene, objectsConcerned, obj1, obj2, textExpressionFunctions[i]);
+
+            return result;
+        }
 
         /**
          * Preprocess expressions in order to allow evaluation as text or math expression.
@@ -125,24 +122,6 @@ class GD_API GDExpression
             Set, Add, Substract, Multiply, Divide, UndefinedModification
         };
 
-
-        friend class boost::serialization::access;
-        /**
-         * Serialize
-         */
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int version){
-            ar & BOOST_SERIALIZATION_NVP(plainString)
-               & BOOST_SERIALIZATION_NVP(compOperator)
-               & BOOST_SERIALIZATION_NVP(modOperator)
-               & BOOST_SERIALIZATION_NVP(oID)
-               & BOOST_SERIALIZATION_NVP(oIDcomputed)
-               & BOOST_SERIALIZATION_NVP(mathExpressionFunctions)
-               & BOOST_SERIALIZATION_NVP(isMathExpressionPreprocessed)
-               & BOOST_SERIALIZATION_NVP(textExpressionFunctions)
-               & BOOST_SERIALIZATION_NVP(isTextExpressionPreprocessed);
-        }
-
     private:
 
         /**
@@ -158,8 +137,7 @@ class GD_API GDExpression
         std::string     plainString; ///<The plain expression
         char            compOperator; ///<Char representing a comparison operator. Computed at creation.
         char            modOperator; ///<Char representing a modification operator. Computed at creation.
-        mutable unsigned int    oID; ///< Object identifier, if expression contains an object name. Automatically computed when needed.
-        mutable bool    oIDcomputed;
+        unsigned int    oID; ///< Object identifier, if expression contains an object name. Computed at creation..
 
         mutable GDMathParser  mathExpression; ///<Object representing the mathemathic expression to parse and evaluate.
         std::vector < ExpressionInstruction > mathExpressionFunctions; ///< The functions to call to generate the values of the parameters to pass to the mathematic expression when evaluating.

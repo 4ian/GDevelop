@@ -21,6 +21,9 @@
 
 #include <string>
 #include <cctype>
+#include <boost/shared_ptr.hpp>
+#include <boost/interprocess/containers/flat_map.hpp>
+
 #include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml.h"
 
@@ -46,7 +49,6 @@
 #include "GDL/ExternalEvents.h"
 #include "GDL/StandardEvent.h"
 #include "GDL/RepeatEvent.h"
-#include <boost/shared_ptr.hpp>
 
 using namespace std;
 
@@ -254,8 +256,9 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 
                 if ( sharedDatas != boost::shared_ptr<AutomatismsSharedDatas>() )
                 {
+                    sharedDatas->SetName( elemSharedDatas->Attribute("Name") ? elemSharedDatas->Attribute("Name") : "" );
                     sharedDatas->LoadFromXml(elemSharedDatas);
-                    newScene->automatismsInitialSharedDatas[sharedDatas->GetTypeId()] = sharedDatas;
+                    newScene->automatismsInitialSharedDatas[sharedDatas->GetAutomatismId()] = sharedDatas;
                 }
 
                 elemSharedDatas = elemSharedDatas->NextSiblingElement("AutomatismSharedDatas");
@@ -458,15 +461,16 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, T
             TiXmlElement * elemAutomatism = elemScene->FirstChildElement( "Automatism" );
             while ( elemAutomatism )
             {
-                boost::shared_ptr<Automatism> newAutomatism = extensionsManager->CreateAutomatism(elemAutomatism->Attribute("type") != NULL ? elemAutomatism->Attribute("type") : "");
+                boost::shared_ptr<Automatism> newAutomatism = extensionsManager->CreateAutomatism(elemAutomatism->Attribute("Type") != NULL ? elemAutomatism->Attribute("Type") : "");
                 if ( newAutomatism != boost::shared_ptr<Automatism>() )
                 {
+                    newAutomatism->SetName(elemAutomatism->Attribute("Name") != NULL ? elemAutomatism->Attribute("Name") : "");
                     newAutomatism->LoadFromXml(elemAutomatism);
 
                     newObject->AddAutomatism(newAutomatism);
                 }
                 else
-                    cout << "Unknown automatism" << elemAutomatism->Attribute("type") << endl;
+                    cout << "Unknown automatism" << elemAutomatism->Attribute("Type") << endl;
 
                 elemAutomatism = elemAutomatism->NextSiblingElement("Automatism");
             }
@@ -1794,13 +1798,14 @@ bool OpenSaveGame::SaveToFile(string file)
 
             TiXmlElement * autosSharedDatas = new TiXmlElement( "AutomatismsSharedDatas" );
             scene->LinkEndChild( autosSharedDatas );
-            for (std::map<unsigned int, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = game.scenes[i]->automatismsInitialSharedDatas.begin();
+            for (boost::interprocess::flat_map<unsigned int, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = game.scenes[i]->automatismsInitialSharedDatas.begin();
                  it != game.scenes[i]->automatismsInitialSharedDatas.end();++it)
             {
                 TiXmlElement * autoSharedDatas = new TiXmlElement( "AutomatismSharedDatas" );
                 autosSharedDatas->LinkEndChild( autoSharedDatas );
 
                 autoSharedDatas->SetAttribute("Type", it->second->GetTypeName().c_str());
+                autoSharedDatas->SetAttribute("Name", it->second->GetName().c_str());
                 it->second->SaveToXml(autoSharedDatas);
             }
 
@@ -1857,12 +1862,13 @@ void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<Object> > & list
         objet->LinkEndChild( variables );
         SaveVariablesList(list.at( j )->variablesObjet, variables);
 
-        vector <unsigned int > allAutomatisms = list[j]->GetAllAutomatismsTypes();
+        vector <unsigned int > allAutomatisms = list[j]->GetAllAutomatismsNameIdentifiers();
         for (unsigned int i = 0;i<allAutomatisms.size();++i)
         {
             TiXmlElement * automatism = new TiXmlElement( "Automatism" );
             objet->LinkEndChild( automatism );
-            automatism->SetAttribute( "type", list[j]->GetAutomatism(allAutomatisms[i])->GetTypeName().c_str() );
+            automatism->SetAttribute( "Type", list[j]->GetAutomatism(allAutomatisms[i])->GetTypeName().c_str() );
+            automatism->SetAttribute( "Name", list[j]->GetAutomatism(allAutomatisms[i])->GetName().c_str() );
 
             list[j]->GetAutomatism(allAutomatisms[i])->SaveToXml(automatism);
         }

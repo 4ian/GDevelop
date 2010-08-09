@@ -183,20 +183,20 @@ void Object::DoAutomatismsPostEvents(RuntimeScene & scene)
         it->second->StepPostEvents(scene);
 }
 
-vector < unsigned int > Object::GetAllAutomatismsTypes()
+vector < unsigned int > Object::GetAllAutomatismsNameIdentifiers()
 {
-    vector < unsigned int > allTypes;
+    vector < unsigned int > allNameIdentifiers;
 
     for (boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
-    	allTypes.push_back(it->first);
+    	allNameIdentifiers.push_back(it->first);
 
-    return allTypes;
+    return allNameIdentifiers;
 }
 
 void Object::AddAutomatism(boost::shared_ptr<Automatism> automatism)
 {
-    automatisms[automatism->GetTypeId()] = automatism;
-    automatisms[automatism->GetTypeId()]->SetOwner(this);
+    automatisms[automatism->GetAutomatismId()] = automatism;
+    automatisms[automatism->GetAutomatismId()]->SetOwner(this);
 }
 #ifdef GDE
 void Object::RemoveAutomatism(unsigned int type)

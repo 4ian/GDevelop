@@ -17,7 +17,7 @@ bool AutomatismActionForEachObject( RuntimeScene & scene, ObjectsConcerned & obj
 	ObjList::iterator obj = list.begin();
 	ObjList::const_iterator obj_end = list.end();
     for ( ; obj != obj_end; ++obj )
-        ((*obj)->GetAutomatism(action.automatismTypeId).get()->*action.automatismFunction)(scene, objectsConcerned, action);
+        ((*obj)->GetAutomatism(action.GetParameter( 1 ).GetAsObjectIdentifier()).get()->*action.automatismFunction)(scene, objectsConcerned, action);
 
     return true;
 }
@@ -37,7 +37,7 @@ bool AutomatismConditionForEachObject( RuntimeScene & scene, ObjectsConcerned & 
 	ObjList::const_iterator obj_end = list.end();
     for ( ; obj != obj_end; ++obj )
     {
-        if ( ((*obj)->GetAutomatism(condition.automatismTypeId).get()->*condition.automatismFunction)(scene, objectsConcernedForExpressions, condition) ^ condition.IsInverted())
+        if ( ((*obj)->GetAutomatism(condition.GetParameter( 1 ).GetAsObjectIdentifier()).get()->*condition.automatismFunction)(scene, objectsConcernedForExpressions, condition) ^ condition.IsInverted())
         {
             isTrue = true;
             objectsConcerned.objectsPicked.AddObject( *obj );
@@ -144,4 +144,145 @@ bool ConditionNot( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
     }
 
     return false; //Return false ( We are in a NOT condition )
+}
+
+
+/**
+ * Expression function needed for adding a constant text to a text expression
+ */
+string ExpConstantText(const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction)
+{
+    return exprInstruction.parameters[0].GetPlainString();
+}
+
+/**
+ * Expression function needed for calling objects expressions functions
+ */
+double ExpObjectFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction)
+{
+    //We need an object to pass to the function
+    ObjSPtr object;
+    ObjList list = objectsConcerned.Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() );
+
+    if ( !list.empty() )
+    {
+        object = list[0]; //On prend le premier objet de la liste par défaut
+
+        //Si l'objet principal de la  est dedans, on le prend
+        ObjList::iterator iter = find(list.begin(), list.end(), obj1);
+        if ( iter != list.end() )
+            object = *iter;
+        else
+        {
+            //Si l'objet secondaire de la  est dedans, on le prend
+            iter = find(list.begin(), list.end(), obj2);
+            if ( iter != list.end() )
+                object = *iter;
+        }
+    }
+
+    //Verify that we have a valid object
+    if ( object != boost::shared_ptr<Object>() )
+        return (object.get()->*exprInstruction.objectFunction)(scene, objectsConcerned, obj1, obj2, exprInstruction);
+    else
+        return 0;
+}
+
+/**
+ * Expression function needed for calling objects expressions functions
+ */
+double ExpAutomatismFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction)
+{
+    //We need an object to pass to the function
+    ObjSPtr object;
+    ObjList list = objectsConcerned.Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() );
+
+    if ( !list.empty() )
+    {
+        object = list[0]; //On prend le premier objet de la liste par défaut
+
+        //Si l'objet principal de la  est dedans, on le prend
+        ObjList::iterator iter = find(list.begin(), list.end(), obj1);
+        if ( iter != list.end() )
+            object = *iter;
+        else
+        {
+            //Si l'objet secondaire de la  est dedans, on le prend
+            iter = find(list.begin(), list.end(), obj2);
+            if ( iter != list.end() )
+                object = *iter;
+        }
+    }
+
+    //Verify that we have a valid object
+    if ( object != boost::shared_ptr<Object>() )
+        return (object->GetAutomatism(exprInstruction.parameters[1].GetAsObjectIdentifier()).get()->*exprInstruction.automatismFunction)(scene, objectsConcerned, obj1, obj2, exprInstruction);
+    else
+        return 0;
+}
+
+/**
+ * Expression function needed for calling objects expressions functions
+ */
+std::string ExpObjectStrFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction)
+{
+    //We need an object to pass to the function
+    ObjSPtr object;
+    ObjList list = objectsConcerned.Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() );
+
+    if ( !list.empty() )
+    {
+        object = list[0]; //On prend le premier objet de la liste par défaut
+
+        //Si l'objet principal de la  est dedans, on le prend
+        ObjList::iterator iter = find(list.begin(), list.end(), obj1);
+        if ( iter != list.end() )
+            object = *iter;
+        else
+        {
+            //Si l'objet secondaire de la  est dedans, on le prend
+            iter = find(list.begin(), list.end(), obj2);
+            if ( iter != list.end() )
+                object = *iter;
+        }
+    }
+
+    //Verify that we have a valid object
+    if ( object != boost::shared_ptr<Object>() )
+        return (object.get()->*exprInstruction.objectFunction)(scene, objectsConcerned, obj1, obj2, exprInstruction);
+    else
+        return "";
+}
+
+/**
+ * Expression function needed for calling objects expressions functions
+ */
+std::string ExpAutomatismStrFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction)
+{
+    //We need an object to pass to the function
+    ObjSPtr object;
+    ObjList list = objectsConcerned.Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() );
+
+    if ( !list.empty() )
+    {
+        object = list[0]; //On prend le premier objet de la liste par défaut
+
+        //Si l'objet principal de la  est dedans, on le prend
+        ObjList::iterator iter = find(list.begin(), list.end(), obj1);
+        if ( iter != list.end() )
+            object = *iter;
+        else
+        {
+            //Si l'objet secondaire de la  est dedans, on le prend
+            iter = find(list.begin(), list.end(), obj2);
+            if ( iter != list.end() )
+                object = *iter;
+        }
+    }
+
+    //Verify that we have a valid object
+    if ( object != boost::shared_ptr<Object>() )
+        return (object->GetAutomatism(exprInstruction.parameters[1].GetAsObjectIdentifier()).get()->*exprInstruction.automatismFunction)(scene, objectsConcerned, obj1, obj2, exprInstruction);
+    else
+        return "";
 }

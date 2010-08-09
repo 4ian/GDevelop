@@ -239,7 +239,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Get all types of automatisms used by the object
          */
-        vector < unsigned int > GetAllAutomatismsTypes();
+        vector < unsigned int > GetAllAutomatismsNameIdentifiers();
 
         #ifdef GDE
         /**

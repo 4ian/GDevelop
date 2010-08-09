@@ -15,6 +15,7 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+#include <boost/interprocess/containers/flat_map.hpp>
 
 #include "GDL/Scene.h"
 #include "GDL/RuntimeGame.h"
@@ -78,7 +79,7 @@ class GD_API RuntimeScene : public Scene
         int                                     backgroundColorG;
         int                                     backgroundColorB;
         ErrorReport                             errors;
-        std::map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas;
+        boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas;
 
         //Fonctions supplémentaires pour une RuntimeScene
         //-> Chargement à partir d'une scène

@@ -94,23 +94,6 @@ class WhileEvent : public BaseEvent
         int GetActionsHeight() const;
         int GetWhileConditionsHeight() const;
 #endif
-
-        friend class boost::serialization::access;
-
-        /**
-         * Serialize
-         */
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int version){
-            ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(BaseEvent)
-                & BOOST_SERIALIZATION_NVP(conditions)
-                & BOOST_SERIALIZATION_NVP(actions)
-                & BOOST_SERIALIZATION_NVP(events)
-                & BOOST_SERIALIZATION_NVP(whileConditions);
-        }
 };
-
-/*BOOST_SERIALIZATION_SHARED_PTR(WhileEvent)
-BOOST_CLASS_EXPORT_KEY(WhileEvent)*/
 
 #endif // WHILEEVENT_H

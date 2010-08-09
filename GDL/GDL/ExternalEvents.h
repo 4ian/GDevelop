@@ -26,14 +26,6 @@ class GD_API ExternalEvents
          * Don't forget to update me if members were changed !
          */
         void Init(const ExternalEvents & externalEvents);
-
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int version){
-            ar  & BOOST_SERIALIZATION_NVP(name)
-                & BOOST_SERIALIZATION_NVP(events);
-        }
 };
 
 //"Tool" Functions

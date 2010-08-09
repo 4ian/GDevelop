@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include <boost/interprocess/containers/flat_map.hpp>
 
 class Game;
 #include "GDL/Event.h"
@@ -42,7 +43,7 @@ class GD_API Scene
         vector < InitialPosition >              initialObjectsPositions;
         vector < Layer >                        initialLayers;
         ListVariable                            variables;
-        std::map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas;
+        boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas;
 
         #if defined(GDE)
         bool wasModified;
@@ -72,6 +73,12 @@ struct SceneHasName : public std::binary_function<boost::shared_ptr<Scene>, stri
  * @return typeId ( or 0 ).
  */
 unsigned int GD_API GetTypeIdOfObject(const Game & game, const Scene & scene, std::string objectName, bool searchInGroups = true);
+
+/**
+ * Get a type id from an automatism name
+ * @return typeId ( or 0 ).
+ */
+unsigned int GD_API GetTypeIdOfAutomatism(const Game & game, const Scene & scene, std::string automatismName, bool searchInGroups = true);
 
 /**
  * Get automatisms of an object/group

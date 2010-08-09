@@ -94,23 +94,6 @@ class RepeatEvent : public BaseEvent
 #ifdef GDE
         bool repeatNumberExpressionSelected;
 #endif
-
-        friend class boost::serialization::access;
-
-        /**
-         * Serialize
-         */
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int version){
-            ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(BaseEvent)
-                & BOOST_SERIALIZATION_NVP(conditions)
-                & BOOST_SERIALIZATION_NVP(actions)
-                & BOOST_SERIALIZATION_NVP(events)
-                & BOOST_SERIALIZATION_NVP(repeatNumberExpression);
-        }
 };
-/*
-BOOST_SERIALIZATION_SHARED_PTR(RepeatEvent)
-BOOST_CLASS_EXPORT_KEY(RepeatEvent)*/
 
 #endif // REPEATEVENT_H

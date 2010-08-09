@@ -6,6 +6,7 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/eFreeFunctions.h"
 #include "GDL/ObjectIdentifiersManager.h"
+#include "GDL/CommonInstructions.h"
 #include <string>
 
 #if defined(GDE)
@@ -16,11 +17,11 @@
 
 using namespace std;
 
-GDExpression::GDExpression() : oIDcomputed(false), isMathExpressionPreprocessed(false)
+GDExpression::GDExpression() : isMathExpressionPreprocessed(false), isTextExpressionPreprocessed(false)
 {
 }
 
-GDExpression::GDExpression(std::string plainString_) : plainString(plainString_), oIDcomputed(false), isMathExpressionPreprocessed(false)
+GDExpression::GDExpression(std::string plainString_) : plainString(plainString_), isMathExpressionPreprocessed(false), isTextExpressionPreprocessed(false)
 {
     if (plainString == "=" ) compOperator = Equal;
     else if (plainString == "<" ) compOperator = Inferior;
@@ -37,126 +38,8 @@ GDExpression::GDExpression(std::string plainString_) : plainString(plainString_)
     else if (plainString == "/" ) modOperator = Divide;
     else modOperator = UndefinedModification;
 
-}
-
-GDExpression::~GDExpression()
-{
-}
-
-/**
- * Expression function needed for adding a constant text to a text expression
- */
-string ExpConstantText(const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction)
-{
-    return exprInstruction.parameters[0].GetPlainString();
-}
-
-/**
- * Expression function needed for calling objects expressions functions
- */
-double ExpObjectFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction)
-{
-    //We need an object to pass to the function
-    ObjSPtr object = boost::shared_ptr<Object>();
-    ObjList list = objectsConcerned.Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() );
-
-    if ( !list.empty() )
-    {
-        object = list[0]; //On prend le premier objet de la liste par défaut
-
-        //Si l'objet principal de la  est dedans, on le prend
-        ObjList::iterator iter = find(list.begin(), list.end(), obj1);
-        if ( iter != list.end() )
-            object = *iter;
-        else
-        {
-            //Si l'objet secondaire de la  est dedans, on le prend
-            iter = find(list.begin(), list.end(), obj2);
-            if ( iter != list.end() )
-                object = *iter;
-        }
-    }
-
-    //Verify that we have a valid object
-    if ( object != boost::shared_ptr<Object>() )
-        return (object.get()->*exprInstruction.objectFunction)(scene, objectsConcerned, obj1, obj2, exprInstruction);
-    else
-        return 0;
-}
-
-/**
- * Expression function needed for calling objects expressions functions
- */
-double ExpAutomatismFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction)
-{
-    //We need an object to pass to the function
-    ObjSPtr object = boost::shared_ptr<Object>();
-    ObjList list = objectsConcerned.Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() );
-
-    if ( !list.empty() )
-    {
-        object = list[0]; //On prend le premier objet de la liste par défaut
-
-        //Si l'objet principal de la  est dedans, on le prend
-        ObjList::iterator iter = find(list.begin(), list.end(), obj1);
-        if ( iter != list.end() )
-            object = *iter;
-        else
-        {
-            //Si l'objet secondaire de la  est dedans, on le prend
-            iter = find(list.begin(), list.end(), obj2);
-            if ( iter != list.end() )
-                object = *iter;
-        }
-    }
-
-    //Verify that we have a valid object
-    if ( object != boost::shared_ptr<Object>() )
-        return (object->GetAutomatism(exprInstruction.automatismTypeId).get()->*exprInstruction.automatismFunction)(scene, objectsConcerned, obj1, obj2, exprInstruction);
-    else
-        return 0;
-}
-
-/**
- * Expression function needed for calling objects expressions functions
- */
-std::string ExpObjectStrFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction)
-{
-    //We need an object to pass to the function
-    ObjSPtr object = boost::shared_ptr<Object>();
-    ObjList list = objectsConcerned.Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() );
-
-    if ( !list.empty() )
-    {
-        object = list[0]; //On prend le premier objet de la liste par défaut
-
-        //Si l'objet principal de la  est dedans, on le prend
-        ObjList::iterator iter = find(list.begin(), list.end(), obj1);
-        if ( iter != list.end() )
-            object = *iter;
-        else
-        {
-            //Si l'objet secondaire de la  est dedans, on le prend
-            iter = find(list.begin(), list.end(), obj2);
-            if ( iter != list.end() )
-                object = *iter;
-        }
-    }
-
-    //Verify that we have a valid object
-    if ( object != boost::shared_ptr<Object>() )
-        return (object.get()->*exprInstruction.objectFunction)(scene, objectsConcerned, obj1, obj2, exprInstruction);
-    else
-        return "";
-}
-
-std::string GDExpression::GetAsTextExpressionResult(const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2) const
-{
-    string result;
-    for (unsigned int i = 0;i<textExpressionFunctions.size();++i)
-    	result += (textExpressionFunctions[i].function)(scene, objectsConcerned, obj1, obj2, textExpressionFunctions[i]);
-
-    return result;
+    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+    oID = objectIdentifiersManager->GetOIDfromName(plainString);
 }
 
 bool GDExpression::AddParameterToList(const Game & game, const Scene & scene, std::vector < GDExpression > & parameters, string parameterStr, std::vector < ParameterInfo > parametersInfos, const size_t positionInExpression)
@@ -302,17 +185,20 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
             bool isMathFunction = find(mathFunctions.begin(), mathFunctions.end(), functionName) != mathFunctions.end();
             if ( !isMathFunction )
             {
+                //First try to bind to a static expression
                 if ( nameIsFunction && extensionsManager->HasExpression(functionName) )
                 {
                     instruction.function = (extensionsManager->GetExpressionFunctionPtr(functionName));
                     instructionInfos = extensionsManager->GetExpressionInfos(functionName);
                 }
+                //Then search in object expression
                 else if ( !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
                 {
                     instruction.function = &ExpObjectFunction;
                     instruction.objectFunction = extensionsManager->GetObjectExpressionFunctionPtr(GetTypeIdOfObject(game, scene, objectName), functionName);
                     instructionInfos = extensionsManager->GetObjectExpressionInfos(extensionsManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, objectName)), functionName);
                 }
+                //And in automatisms expressions
                 else if ( !nameIsFunction )
                 {
                     size_t firstDoublePoints = functionName.find("::");
@@ -323,15 +209,25 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
                             functionName = functionName.substr(firstDoublePoints+2, functionName.length());
                         else
                             functionName = "";
-                        cout << "FOUND " << autoName << " & " << functionName << endl;
 
-                        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
-                        unsigned int automatismTypeId = objectIdentifiersManager->GetOIDfromName(autoName);
+                        if ( extensionsManager->HasAutomatismExpression(GetTypeIdOfAutomatism(game, scene, autoName), functionName) )
+                        {
+                            parameters.push_back(GDExpression(autoName));
+                            instruction.function = &ExpAutomatismFunction;
+                            instruction.automatismFunction = extensionsManager->GetAutomatismExpressionFunctionPtr(GetTypeIdOfAutomatism(game, scene, autoName), functionName);
 
-                        instruction.function = &ExpAutomatismFunction;
-                        instruction.automatismTypeId = automatismTypeId;
-                        instruction.automatismFunction = extensionsManager->GetAutomatismExpressionFunctionPtr(automatismTypeId, functionName);
-                        instructionInfos = extensionsManager->GetAutomatismExpressionInfos(autoName, functionName);
+                            ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+                            instructionInfos = extensionsManager->GetAutomatismExpressionInfos(objectIdentifiersManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, autoName)), functionName);
+
+                            //Verify that object has automatism.
+                            unsigned int automatismNameId = objectIdentifiersManager->GetOIDfromName(autoName);
+                            vector < unsigned int > automatisms = GetAutomatismsOfObject(game, scene, objectName);
+                            if ( find(automatisms.begin(), automatisms.end(), automatismNameId) == automatisms.end() )
+                            {
+                                cout << "Bad automatism requested" << endl;
+                                instruction.function = NULL;
+                            }
+                        }
                     }
                 }
             }
@@ -628,9 +524,9 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
             GDExpression lastParameter(currentParameterStr);
             parameters.push_back(lastParameter);
 
-            //Add instruction to the list of instructions to call to generate parameters
-            bool isMathFunction = find(mathFunctions.begin(), mathFunctions.end(), functionName) != mathFunctions.end();
             StrExpressionInstruction instruction;
+
+            //First try to bind to a static str expression
             if ( nameIsFunction && extensionsManager->HasStrExpression(functionName) )
             {
                 instruction.function = (extensionsManager->GetStrExpressionFunctionPtr(functionName));
@@ -663,6 +559,7 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
 
                 instruction.parameters = (parameters);
             }
+            //Then an object member expression
             else if ( !nameIsFunction && extensionsManager->HasObjectStrExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
             {
                 instruction.function = &ExpObjectStrFunction;
@@ -696,16 +593,78 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
 
                 instruction.parameters = (parameters);
             }
-            //Support for implicit conversion from math result to string
-            else if ( isMathFunction || extensionsManager->HasExpression(functionName) || extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
+            //And search automatisms expressions
+            else
             {
-                vector < GDExpression > implicitConversionParameters;
-                GDExpression implicitMathExpression(expression.substr(nameStart, parametersEnd+1-nameStart));
-                implicitMathExpression.PrepareForMathEvaluationOnly(game, scene);
-                implicitConversionParameters.push_back(implicitMathExpression);
+                size_t firstDoublePoints = functionName.find("::");
+                if ( firstDoublePoints != string::npos )
+                {
+                    std::string autoName = functionName.substr(0, firstDoublePoints);
+                    if ( firstDoublePoints+2 < functionName.length() )
+                        functionName = functionName.substr(firstDoublePoints+2, functionName.length());
+                    else
+                        functionName = "";
 
-                instruction.function = &ExpToStr;
-                instruction.parameters = (implicitConversionParameters);
+                    if ( extensionsManager->HasAutomatismStrExpression(GetTypeIdOfAutomatism(game, scene, autoName), functionName) )
+                    {
+                        parameters.push_back(GDExpression(autoName));
+                        instruction.function = &ExpAutomatismStrFunction;
+                        instruction.automatismFunction = extensionsManager->GetAutomatismStrExpressionFunctionPtr(GetTypeIdOfAutomatism(game, scene, autoName), functionName);
+
+                        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+                        vector < ParameterInfo > parametersInfos = extensionsManager->GetAutomatismStrExpressionInfos(objectIdentifiersManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, autoName)), functionName).parameters;
+
+                        //Verify that object has automatism.
+                        unsigned int automatismNameId = objectIdentifiersManager->GetOIDfromName(autoName);
+                        vector < unsigned int > automatisms = GetAutomatismsOfObject(game, scene, objectName);
+                        if ( find(automatisms.begin(), automatisms.end(), automatismNameId) == automatisms.end() )
+                        {
+                            cout << "Bad automatism requested" << endl;
+                            instruction.function = NULL;
+                        }
+                        else
+                        {
+                            //Testing the number of parameters
+                            if ( parametersInfos.size() > parameters.size() || parameters.size() < GetMinimalParametersNumber(parametersInfos))
+                            {
+                                #if defined(GDE)
+                                firstErrorPos = functionNameEnd;
+                                firstErrorStr = _("Nombre de paramètres incorrect.");
+                                #endif
+                                textExpressionFunctions.clear();
+
+                                isTextExpressionPreprocessed = true;
+                                return false;
+                            }
+
+                            //Preparing parameters
+                            for (unsigned int i = 0;i<parameters.size() && i<parametersInfos.size();++i)
+                            {
+                                if ( !PrepareParameter(game, scene, parameters[i], parametersInfos[i], functionNameEnd) )
+                                {
+                                    textExpressionFunctions.clear();
+
+                                    isTextExpressionPreprocessed = true;
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            //Support for implicit conversion from math result to string
+            if ( instruction.function == NULL )
+            {
+                GDExpression implicitMathExpression(expression.substr(nameStart, parametersEnd+1-nameStart));
+                if ( implicitMathExpression.PrepareForMathEvaluationOnly(game, scene) )
+                {
+                    vector < GDExpression > implicitConversionParameters;
+                    implicitConversionParameters.push_back(implicitMathExpression);
+
+                    instruction.function = &ExpToStr;
+                    instruction.parameters = (implicitConversionParameters);
+                }
             }
 
             if ( instruction.function == NULL ) //Function was not found
@@ -739,23 +698,23 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
 
             if (nextTokenPos < firstPlusPos)
             {
-                    #if defined(GDE)
-                    firstErrorPos = nextTokenPos;
-                    firstErrorStr = _("+ manquant entre deux chaines.");
-                    #endif
-                    textExpressionFunctions.clear();
-                    isTextExpressionPreprocessed = true;
-                    return false;
+                #if defined(GDE)
+                firstErrorPos = nextTokenPos;
+                firstErrorStr = _("+ manquant entre deux chaines.");
+                #endif
+                textExpressionFunctions.clear();
+                isTextExpressionPreprocessed = true;
+                return false;
             }
             else if ( expression.find("+", firstPlusPos+1) < nextTokenPos )
             {
-                    #if defined(GDE)
-                    firstErrorPos = firstPlusPos;
-                    firstErrorStr = _("Symbole manquant entre deux +.");
-                    #endif
-                    textExpressionFunctions.clear();
-                    isTextExpressionPreprocessed = true;
-                    return false;
+                #if defined(GDE)
+                firstErrorPos = firstPlusPos;
+                firstErrorStr = _("Symbole manquant entre deux +.");
+                #endif
+                textExpressionFunctions.clear();
+                isTextExpressionPreprocessed = true;
+                return false;
             }
         }
     }

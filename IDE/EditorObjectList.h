@@ -32,11 +32,13 @@ class EditorObjectList: public wxPanel
 		wxMenuItem* addAutomatismItem;
 		wxPanel* toolbarPanel;
 		wxMenu* automatismsMenu;
+		wxMenuItem* MenuItem1;
 		wxTreeCtrl* objectsList;
 		wxMenuItem* deleteAutomatismItem;
 		wxMenuItem* copyMenuI;
 		wxMenu ContextMenu;
 		wxMenuItem* moveUpMenuI;
+		wxMenuItem* MenuItem3;
 		wxMenu rootContextMenu;
 		wxMenuItem* moveDownMenuI;
 		wxMenuItem* cutMenuI;
@@ -58,6 +60,7 @@ class EditorObjectList: public wxPanel
 		static const long idMenuModObj;
 		static const long idMenuModVar;
 		static const long ID_MENUITEM2;
+		static const long ID_MENUITEM5;
 		static const long ID_MENUITEM3;
 		static const long ID_MENUITEM1;
 		static const long idMenuModName;
@@ -113,6 +116,7 @@ class EditorObjectList: public wxPanel
 		void OnobjectsListItemRightClick(wxTreeEvent& event);
 		void OnaddAutomatismItemSelected(wxCommandEvent& event);
 		void OndeleteAutomatismItemSelected(wxCommandEvent& event);
+		void OnrenameAutomatismSelected(wxCommandEvent& event);
 		//*)
 		void OnAutomatismSelected(wxCommandEvent & event);
 		void OnRefreshBtClick(wxCommandEvent& event);
@@ -123,7 +127,7 @@ class EditorObjectList: public wxPanel
 		void EnableAll();
 		void CreateToolbar();
 		void RemoveSharedDatasIfNecessary(unsigned int automatismType);
-		void CreateSharedDatasIfNecessary(unsigned int automatismType, std::string automatismTypeName);
+		void CreateSharedDatasIfNecessary(boost::shared_ptr<Automatism> automatism);
 
 		wxImageList* imageList;
 		wxImageList* objectsImagesList;

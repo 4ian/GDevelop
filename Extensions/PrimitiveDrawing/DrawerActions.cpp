@@ -170,20 +170,21 @@ bool DrawerObject::ActCircle( RuntimeScene & scene, ObjectsConcerned & objectsCo
 
 bool ActCopyImageOnAnother( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    std::map < string, sf::Image >::iterator dest = scene.game->imageManager.images.find(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
-    if ( dest == scene.game->imageManager.images.end() ) return false;
+    std::string destName = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
+    if ( !scene.game->imageManager.HasImage(destName) ) return false;
+    sf::Image & dest = scene.game->imageManager.GetImage(destName);
 
-    std::map < string, sf::Image >::const_iterator src = scene.game->imageManager.images.find(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned));
-    if ( src == scene.game->imageManager.images.end() ) return false;
+    std::string srcName = action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned);
+    if ( !scene.game->imageManager.HasImage(srcName) ) return false;
 
     //Make sure the coordinates are correct.
     int destX = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned);
-    if ( destX < 0 || static_cast<unsigned>(destX) >= dest->second.GetWidth()) return false;
+    if ( destX < 0 || static_cast<unsigned>(destX) >= dest.GetWidth()) return false;
 
     int destY = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
-    if ( destY < 0 || static_cast<unsigned>(destY) >= dest->second.GetWidth()) return false;
+    if ( destY < 0 || static_cast<unsigned>(destY) >= dest.GetWidth()) return false;
 
-    dest->second.Copy(src->second, destX, destY);
+    dest.Copy(scene.game->imageManager.GetImage(srcName), destX, destY);
 
     return true;
 }

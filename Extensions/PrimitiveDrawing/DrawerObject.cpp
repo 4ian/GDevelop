@@ -83,7 +83,7 @@ void DrawerObject::LoadFromXml(const TiXmlElement * object)
     }
     else
     {
-        object->FirstChildElement("FillOpacity")->QueryIntAttribute("value", &fillOpacity);
+        object->FirstChildElement("FillOpacity")->QueryFloatAttribute("value", &fillOpacity);
     }
 
 
@@ -113,7 +113,7 @@ void DrawerObject::LoadFromXml(const TiXmlElement * object)
     }
     else
     {
-        object->FirstChildElement("OutlineOpacity")->QueryIntAttribute("value", &outlineOpacity);
+        object->FirstChildElement("OutlineOpacity")->QueryFloatAttribute("value", &outlineOpacity);
     }
 
     if ( object->FirstChildElement( "OutlineSize" ) == NULL ||
@@ -144,7 +144,7 @@ void DrawerObject::SaveToXml(TiXmlElement * object)
 {
     TiXmlElement * fillOpacityElem = new TiXmlElement( "FillOpacity" );
     object->LinkEndChild( fillOpacityElem );
-    fillOpacityElem->SetAttribute("value", fillOpacity);
+    fillOpacityElem->SetDoubleAttribute("value", fillOpacity);
 
     TiXmlElement * fillColorElem = new TiXmlElement( "FillColor" );
     object->LinkEndChild( fillColorElem );
@@ -158,7 +158,7 @@ void DrawerObject::SaveToXml(TiXmlElement * object)
 
     TiXmlElement * outlineOpacityElem = new TiXmlElement( "OutlineOpacity" );
     object->LinkEndChild( outlineOpacityElem );
-    outlineOpacityElem->SetAttribute("value", outlineOpacity);
+    outlineOpacityElem->SetDoubleAttribute("value", outlineOpacity);
 
     TiXmlElement * outlineColorElem = new TiXmlElement( "OutlineColor" );
     object->LinkEndChild( outlineColorElem );

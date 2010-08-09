@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -214,13 +214,13 @@ mainEditorCommand(mainEditorCommand_)
 	angularDampingEdit->SetValue(ToString(automatism.angularDamping));
 
     //Setup shared datas
-	if ( !scene || scene->automatismsInitialSharedDatas.find(automatism.GetTypeId()) == scene->automatismsInitialSharedDatas.end())
+	if ( !scene || scene->automatismsInitialSharedDatas.find(automatism.GetAutomatismId()) == scene->automatismsInitialSharedDatas.end())
 	{
 	    wxLogError(_("Impossible d'accéder aux données partagées."));
 	    return;
 	}
 
-	sharedDatas = boost::dynamic_pointer_cast<ScenePhysicsDatas>(scene->automatismsInitialSharedDatas[automatism.GetTypeId()]);
+	sharedDatas = boost::dynamic_pointer_cast<ScenePhysicsDatas>(scene->automatismsInitialSharedDatas[automatism.GetAutomatismId()]);
 
     if ( sharedDatas == boost::shared_ptr<ScenePhysicsDatas>() )
     {

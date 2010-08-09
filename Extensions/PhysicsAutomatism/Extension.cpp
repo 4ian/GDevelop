@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -48,7 +48,8 @@ class Extension : public ExtensionBase
                                   "zlib/libpng License ( Open Source )")
 
                 DECLARE_AUTOMATISM("PhysicsAutomatism",
-                          _("Automatisme Moteur physique"),
+                          _("Moteur physique"),
+                          _("Physics"),
                           _("Automatisme permettant de déplacer les objets comme si ils étaient soumis aux lois de la physique."),
                           "",
                           "res/physics32.png",
@@ -65,6 +66,7 @@ class Extension : public ExtensionBase
                                    &PhysicsAutomatism::ActSetStatic);
 
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -78,6 +80,7 @@ class Extension : public ExtensionBase
                                    &PhysicsAutomatism::ActSetDynamic);
 
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -91,6 +94,7 @@ class Extension : public ExtensionBase
                                    &PhysicsAutomatism::CondIsDynamic);
 
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -104,6 +108,7 @@ class Extension : public ExtensionBase
                                    &PhysicsAutomatism::ActSetFixedRotation);
 
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -117,6 +122,7 @@ class Extension : public ExtensionBase
                                    &PhysicsAutomatism::ActSetFreeRotation);
 
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -130,6 +136,7 @@ class Extension : public ExtensionBase
                                    &PhysicsAutomatism::CondIsFixedRotation);
 
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -143,6 +150,7 @@ class Extension : public ExtensionBase
                                    &PhysicsAutomatism::ActSetAsBullet);
 
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -156,6 +164,7 @@ class Extension : public ExtensionBase
                                    &PhysicsAutomatism::ActDontSetAsBullet);
 
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -169,6 +178,7 @@ class Extension : public ExtensionBase
                                    &PhysicsAutomatism::CondIsBullet);
 
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -176,12 +186,13 @@ class Extension : public ExtensionBase
                                    _("Appliquer une force"),
                                    _("Applique une force à l'objet."),
                                    _("Appliquer à _PARAM0_ une force _PARAM1_;_PARAM2_"),
-                                   _("Mouvement"),
+                                   _("Déplacement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
                                    &PhysicsAutomatism::ActApplyForce);
 
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
                         DECLARE_PARAMETER("expression", _("Composante X"), false, "")
                         DECLARE_PARAMETER("expression", _("Composante Y"), false, "")
 
@@ -191,15 +202,182 @@ class Extension : public ExtensionBase
                                    _("Appliquer un moment (rotation)"),
                                    _("Applique un moment (rotation) à l'objet."),
                                    _("Appliquer à _PARAM0_ un moment de valeur _PARAM1_"),
-                                   _("Mouvement"),
+                                   _("Rotation"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
                                    &PhysicsAutomatism::ActApplyTorque);
 
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
                         DECLARE_PARAMETER("expression", _("Valeur du moment"), false, "")
 
                     DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetLinearVelocity",
+                                   _("Vitesse linéaire"),
+                                   _("Modifie la vitesse de l'objet."),
+                                   _("Mettre la vitesse linéaire de _PARAM0_ à _PARAM1_;_PARAM2_"),
+                                   _("Déplacement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActLinearVelocity);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                        DECLARE_PARAMETER("expression", _("Coordonnée X"), false, "")
+                        DECLARE_PARAMETER("expression", _("Coordonnée Y"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_CONDITION("LinearVelocityX",
+                                   _("Vitesse linéaire en X"),
+                                   _("Teste la vitesse linéaire en X de l'objet."),
+                                   _("La vitesse linéaire en X de _PARAM0_ est _PARAM2__PARAM1_"),
+                                   _("Déplacement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::CondLinearVelocityX);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe de la comparaison"), false, "")
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_CONDITION("LinearVelocityY",
+                                   _("Vitesse linéaire en Y"),
+                                   _("Teste la vitesse linéaire en Y de l'objet."),
+                                   _("La vitesse linéaire en Y de _PARAM0_ est _PARAM2__PARAM1_"),
+                                   _("Déplacement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::CondLinearVelocityY);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe de la comparaison"), false, "")
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetAngularVelocity",
+                                   _("Vitesse angulaire ( de rotation )"),
+                                   _("Modifie la vitesse angulaire de l'objet."),
+                                   _("Faire _PARAM2__PARAM1_ à la vitesse angulaire de _PARAM0_"),
+                                   _("Rotation"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActAngularVelocity);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                        DECLARE_PARAMETER("expression", _("Nouvelle valeur"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_CONDITION("AngularVelocity",
+                                   _("Vitesse angulaire ( de rotation )"),
+                                   _("Teste la vitesse angulaire ( Vitesse de rotation ) de l'objet."),
+                                   _("La vitesse angulaire de _PARAM0_ est _PARAM2__PARAM1_"),
+                                   _("Rotation"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::CondAngularVelocity);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe de la comparaison"), false, "")
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_CONDITION("LinearDamping",
+                                   _("Amortissement linéaire"),
+                                   _("Teste l'amortissement linéaire de l'objet."),
+                                   _("L'amortissement linéaire de _PARAM0_ est _PARAM2__PARAM1_"),
+                                   _("Déplacement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::CondLinearDamping);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe de la comparaison"), false, "")
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetLinearDamping",
+                                   _("Amortissement linéaire"),
+                                   _("Modifie l'amortissement linéaire de l'objet."),
+                                   _("Mettre l'amortissement linéaire de _PARAM0_ à _PARAM1_"),
+                                   _("Déplacement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActLinearDamping);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_CONDITION("AngularDamping",
+                                   _("Amortissement angulaire"),
+                                   _("Teste l'amortissement angulaire de l'objet."),
+                                   _("L'amortissement angulaire de _PARAM0_ est _PARAM2__PARAM1_"),
+                                   _("Déplacement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::CondAngularDamping);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe de la comparaison"), false, "")
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetAngularDamping",
+                                   _("Amortissement angulaire"),
+                                   _("Modifie l'amortissement angulaire de l'objet."),
+                                   _("Mettre l'amortissement angulaire de _PARAM0_ à _PARAM1_"),
+                                   _("Déplacement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActAngularDamping);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_EXPRESSION("LinearVelocityX", _("Vitesse linéaire en X"), _("Vitesse linéaire en X"), _("Déplacement"), "res/actions/scaleHeight.png", &PhysicsAutomatism::ExpLinearVelocityX)
+                        DECLARE_PARAMETER("object", _("Objet"), false, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                    DECLARE_END_AUTOMATISM_EXPRESSION()
+
+                    DECLARE_AUTOMATISM_EXPRESSION("LinearVelocityY", _("Vitesse linéaire en Y"), _("Vitesse linéaire en Y"), _("Déplacement"), "res/actions/scaleHeight.png", &PhysicsAutomatism::ExpLinearVelocityY)
+                        DECLARE_PARAMETER("object", _("Objet"), false, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                    DECLARE_END_AUTOMATISM_EXPRESSION()
+
+                    DECLARE_AUTOMATISM_EXPRESSION("AngularVelocity", _("Vitesse angulaire"), _("Vitesse angulaire ( de rotation )"), _("Rotation"), "res/actions/scaleHeight.png", &PhysicsAutomatism::ExpAngularVelocity)
+                        DECLARE_PARAMETER("object", _("Objet"), false, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                    DECLARE_END_AUTOMATISM_EXPRESSION()
+
+                    DECLARE_AUTOMATISM_EXPRESSION("LinearDamping", _("Amortissement linéaire"), _("Amortissement linéaire"), _("Déplacement"), "res/actions/scaleHeight.png", &PhysicsAutomatism::ExpLinearDamping)
+                        DECLARE_PARAMETER("object", _("Objet"), false, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                    DECLARE_END_AUTOMATISM_EXPRESSION()
+
+                    DECLARE_AUTOMATISM_EXPRESSION("LinearDamping", _("Amortissement angulaire"), _("Amortissement angulaire"), _("Rotation"), "res/actions/scaleHeight.png", &PhysicsAutomatism::ExpAngularDamping)
+                        DECLARE_PARAMETER("object", _("Objet"), false, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+                    DECLARE_END_AUTOMATISM_EXPRESSION()
 
                 DECLARE_END_AUTOMATISM();
 

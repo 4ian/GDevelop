@@ -502,8 +502,10 @@
 		<Unit filename="PhysicsAutomatism.cpp" />
 		<Unit filename="PhysicsAutomatism.h" />
 		<Unit filename="PhysicsAutomatismActions.cpp" />
+		<Unit filename="PhysicsAutomatismConditions.cpp" />
 		<Unit filename="PhysicsAutomatismEditor.cpp" />
 		<Unit filename="PhysicsAutomatismEditor.h" />
+		<Unit filename="PhysicsAutomatismExpressions.cpp" />
 		<Unit filename="RuntimeScenePhysicsDatas.cpp" />
 		<Unit filename="RuntimeScenePhysicsDatas.h" />
 		<Unit filename="ScenePhysicsDatas.cpp" />

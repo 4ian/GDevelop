@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -48,10 +48,12 @@ class PhysicsAutomatism : public Automatism
         virtual ~PhysicsAutomatism();
         virtual boost::shared_ptr<Automatism> Clone() { return boost::shared_ptr<Automatism>(new PhysicsAutomatism(*this));}
 
+        #if defined(GDE)
         /**
          * Save Automatism to XML
          */
         virtual void SaveToXml(TiXmlElement * elem) const;
+        #endif
 
         /**
          * Load Automatism from XML
@@ -76,13 +78,29 @@ class PhysicsAutomatism : public Automatism
         bool CondIsBullet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action ) { return isBullet; };
         bool ActApplyForce( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActApplyTorque( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActAngularDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActLinearDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActAngularVelocity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActLinearVelocity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+
+        bool CondAngularDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondLinearDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondAngularVelocity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondLinearVelocityY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondLinearVelocityX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+
+        double ExpLinearVelocityX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpLinearVelocityY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpAngularVelocity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpLinearDamping( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpAngularDamping( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 
         static std::map < const Scene* , ScenePhysicsDatas > scenesPhysicsDatas; ///< Static map associating scene to datas
     private:
 
         virtual void DoStepPreEvents(RuntimeScene & scene);
         virtual void DoStepPostEvents(RuntimeScene & scene);
-        void CreateBody(RuntimeScene & scene);
+        void CreateBody(const RuntimeScene & scene);
 
         enum ShapeType {Box, Circle} shapeType;
         bool dynamic; ///< Is the object static or dynamic

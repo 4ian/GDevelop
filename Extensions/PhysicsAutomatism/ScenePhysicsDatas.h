@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -54,7 +54,9 @@ class ScenePhysicsDatas : public AutomatismsSharedDatas
             return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeScenePhysicsDatas(*this));
         }
 
+        #if defined(GDE)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
+        #endif
 
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 

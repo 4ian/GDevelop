@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -25,9 +25,11 @@ freely, subject to the following restrictions:
 */
 
 #include "ScenePhysicsDatas.h"
+#include "GDL/tinyxml.h"
 #include "GDL/XmlMacros.h"
 #include <iostream>
 
+#if defined(GDE)
 void ScenePhysicsDatas::SaveToXml(TiXmlElement * elem) const
 {
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("gravityX", gravityX);
@@ -35,6 +37,7 @@ void ScenePhysicsDatas::SaveToXml(TiXmlElement * elem) const
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("scaleX", scaleX);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("scaleY", scaleY);
 }
+#endif
 
 void ScenePhysicsDatas::LoadFromXml(const TiXmlElement * elem)
 {

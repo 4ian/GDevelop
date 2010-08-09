@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -51,11 +51,13 @@ PhysicsAutomatism::~PhysicsAutomatism()
         runtimeScenesPhysicsDatas->world->DestroyBody(body);
 }
 
+#if defined(GDE)
 void PhysicsAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ )
 {
     PhysicsAutomatismEditor editor(parent, game_, scene, *this, mainEditorCommand_);
     editor.ShowModal();
 }
+#endif
 
 /**
  * Called at each frame before events :
@@ -75,8 +77,8 @@ void PhysicsAutomatism::DoStepPreEvents(RuntimeScene & scene)
 
     //Update object position according to Box2D body
     b2Vec2 position = body->GetPosition();
-    object->SetX(position.x*runtimeScenesPhysicsDatas->scaleX-object->GetCenterX());
-    object->SetY(-position.y*runtimeScenesPhysicsDatas->scaleY-object->GetCenterY()); //Y axis is inverted
+    object->SetX(position.x*runtimeScenesPhysicsDatas->scaleX-object->GetWidth()/2+object->GetX()-object->GetDrawableX());
+    object->SetY(-position.y*runtimeScenesPhysicsDatas->scaleY-object->GetHeight()/2+object->GetY()-object->GetDrawableY()); //Y axis is inverted
     object->SetAngle(-body->GetAngle()*360.0f/b2_pi); //Angles are inverted
 };
 
@@ -92,24 +94,24 @@ void PhysicsAutomatism::DoStepPostEvents(RuntimeScene & scene)
 
     //Update Box2D position to object
     b2Vec2 oldPos;
-    oldPos.x = (object->GetX()+object->GetCenterX())/runtimeScenesPhysicsDatas->scaleX;
-    oldPos.y = -(object->GetY()+object->GetCenterY())/runtimeScenesPhysicsDatas->scaleY; //Y axis is inverted
+    oldPos.x = (object->GetDrawableX()+object->GetWidth()/2)/runtimeScenesPhysicsDatas->scaleX;
+    oldPos.y = -(object->GetDrawableY()+object->GetHeight()/2)/runtimeScenesPhysicsDatas->scaleY; //Y axis is inverted
     body->SetTransform(oldPos, -object->GetAngle()*b2_pi/360.0f); //Angles are inverted
 }
 
 /**
  * Prepare Box2D body, and set up also runtimeScenePhysicsDatasPtr.
  */
-void PhysicsAutomatism::CreateBody(RuntimeScene & scene)
+void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
 {
     //TODO : Bad position when origin is not 0;0
     if ( runtimeScenesPhysicsDatas == boost::shared_ptr<RuntimeScenePhysicsDatas>() )
-        runtimeScenesPhysicsDatas = boost::static_pointer_cast<RuntimeScenePhysicsDatas>(scene.automatismsSharedDatas[typeId]);
+        runtimeScenesPhysicsDatas = boost::static_pointer_cast<RuntimeScenePhysicsDatas>(scene.automatismsSharedDatas.find(automatismId)->second);
 
     //Create body from object
     b2BodyDef bodyDef;
     bodyDef.type = dynamic ? b2_dynamicBody : b2_staticBody;
-    bodyDef.position.Set((object->GetX()+object->GetCenterX())/runtimeScenesPhysicsDatas->scaleX, -(object->GetY()+object->GetCenterY())/runtimeScenesPhysicsDatas->scaleY);
+    bodyDef.position.Set((object->GetDrawableX()+object->GetWidth()/2)/runtimeScenesPhysicsDatas->scaleX, -(object->GetDrawableY()+object->GetHeight()/2)/runtimeScenesPhysicsDatas->scaleY);
     body = runtimeScenesPhysicsDatas->world->CreateBody(&bodyDef);
 
     //Setup body
@@ -144,7 +146,7 @@ void PhysicsAutomatism::CreateBody(RuntimeScene & scene)
     body->SetLinearDamping(linearDamping);
     body->SetAngularDamping(angularDamping);
 }
-
+#if defined(GDE)
 void PhysicsAutomatism::SaveToXml(TiXmlElement * elem) const
 {
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("dynamic", dynamic);
@@ -155,10 +157,11 @@ void PhysicsAutomatism::SaveToXml(TiXmlElement * elem) const
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("linearDamping", linearDamping);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("angularDamping", angularDamping);
     if ( shapeType == Circle)
-        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "Circle");
+        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "Circle")
     else
-        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "Box");
+        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "Box")
 }
+#endif
 
 void PhysicsAutomatism::LoadFromXml(const TiXmlElement * elem)
 {

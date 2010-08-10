@@ -1,14 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- * Permet de choisir une action
- *
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "ChoixAction.h"
@@ -50,10 +42,21 @@
 #include "ChoiceJoyAxis.h"
 #include "ChoiceFile.h"
 #include "GDL/ChooseVariableDialog.h"
+#include "GDL/ObjectListDialogsHelper.h"
 
 
 //(*IdInit(ChoixAction)
 const long ChoixAction::ID_TREECTRL1 = wxNewId();
+const long ChoixAction::ID_TREECTRL2 = wxNewId();
+const long ChoixAction::ID_TREECTRL3 = wxNewId();
+const long ChoixAction::ID_TREECTRL4 = wxNewId();
+const long ChoixAction::ID_TREECTRL5 = wxNewId();
+const long ChoixAction::ID_NOTEBOOK2 = wxNewId();
+const long ChoixAction::ID_TEXTCTRL2 = wxNewId();
+const long ChoixAction::ID_TREECTRL6 = wxNewId();
+const long ChoixAction::ID_PANEL1 = wxNewId();
+const long ChoixAction::ID_NOTEBOOK1 = wxNewId();
+const long ChoixAction::ID_TEXTCTRL1 = wxNewId();
 const long ChoixAction::ID_STATICBITMAP1 = wxNewId();
 const long ChoixAction::ID_STATICTEXT1 = wxNewId();
 const long ChoixAction::ID_STATICTEXT2 = wxNewId();
@@ -86,6 +89,7 @@ scene(scene_)
 	wxBoxSizer* BoxSizer6;
 	wxFlexGridSizer* FlexGridSizer4;
 	wxBoxSizer* BoxSizer5;
+	wxBoxSizer* BoxSizer10;
 	wxBoxSizer* BoxSizer7;
 	wxBoxSizer* BoxSizer8;
 	wxFlexGridSizer* FlexGridSizer3;
@@ -93,20 +97,58 @@ scene(scene_)
 	wxFlexGridSizer* FlexGridSizer2;
 	wxBoxSizer* BoxSizer2;
 	wxBoxSizer* BoxSizer1;
+	wxBoxSizer* BoxSizer9;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
+	wxFlexGridSizer* FlexGridSizer1;
 	wxBoxSizer* BoxSizer3;
 
 	Create(parent, wxID_ANY, _("Editer l\'action"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
+	SetClientSize(wxSize(717,396));
 	SetMinSize(wxSize(640,480));
 	wxIcon FrameIcon;
 	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/actionicon.png"))));
 	SetIcon(FrameIcon);
 	BoxSizer6 = new wxBoxSizer(wxVERTICAL);
 	BoxSizer7 = new wxBoxSizer(wxHORIZONTAL);
-	ActionsTree = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxSize(285,270), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
+	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer1->AddGrowableCol(0);
+	FlexGridSizer1->AddGrowableRow(0);
+	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(270,500), 0, _T("ID_NOTEBOOK1"));
+	ActionsTree = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxDefaultPosition, wxSize(300,350), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
 	ActionsTree->SetToolTip(_("Choisissez une action à paramétrer."));
-	BoxSizer7->Add(ActionsTree, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	Panel1 = new wxPanel(Notebook1, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+	BoxSizer9 = new wxBoxSizer(wxVERTICAL);
+	BoxSizer10 = new wxBoxSizer(wxVERTICAL);
+	objectsListsNotebook = new wxNotebook(Panel1, ID_NOTEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK2"));
+	ObjetsList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL2, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL2"));
+	ObjetsList->SetToolTip(_("Choisissez un objet dans la liste"));
+	GroupesList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL3, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL3"));
+	GroupesList->SetToolTip(_("Choisissez un objet dans la liste"));
+	globalObjectsList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL4, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL4"));
+	globalObjectsList->SetToolTip(_("Choisissez un objet dans la liste"));
+	globalObjectGroups = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL5, wxPoint(-71,-11), wxSize(281,190), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL5"));
+	globalObjectGroups->SetToolTip(_("Choisissez un objet dans la liste"));
+	objectsListsNotebook->AddPage(ObjetsList, _("Objets"), false);
+	objectsListsNotebook->AddPage(GroupesList, _("Groupes d\'objets"), false);
+	objectsListsNotebook->AddPage(globalObjectsList, _("Objets globaux"), false);
+	objectsListsNotebook->AddPage(globalObjectGroups, _("Groupes globaux"), false);
+	BoxSizer10->Add(objectsListsNotebook, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	objectsSearchCtrl = new wxSearchCtrl(Panel1, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(10,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+	BoxSizer10->Add(objectsSearchCtrl, 0, wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BoxSizer9->Add(BoxSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	objectActionsTree = new wxTreeCtrl(Panel1, ID_TREECTRL6, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL6"));
+	objectActionsTree->SetToolTip(_("Choisissez une action à paramétrer."));
+	BoxSizer9->Add(objectActionsTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Panel1->SetSizer(BoxSizer9);
+	BoxSizer9->Fit(Panel1);
+	BoxSizer9->SetSizeHints(Panel1);
+	Notebook1->AddPage(ActionsTree, _("Toutes les actions"), false);
+	Notebook1->AddPage(Panel1, _("Par objet"), false);
+	FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	FlexGridSizer1->Add(searchCtrl, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BoxSizer7->Add(FlexGridSizer1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer8 = new wxBoxSizer(wxVERTICAL);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
 	ActionImg = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/unknown24.png")).Rescale(wxSize(24,24).GetWidth(),wxSize(24,24).GetHeight())), wxDefaultPosition, wxSize(24,24), 0, _T("ID_STATICBITMAP1"));
@@ -124,7 +166,7 @@ scene(scene_)
 	BoxSizer3->Add(ActionTextTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer8->Add(BoxSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
-	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
+	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(400,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	BoxSizer1->Add(StaticLine1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer8->Add(BoxSizer1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	GridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -149,7 +191,7 @@ scene(scene_)
 	BoxSizer6->Add(BoxSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
-	BoxSizer2->Add(StaticLine2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	BoxSizer2->Add(StaticLine2, 1, wxTOP|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
 	BoxSizer6->Add(BoxSizer2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
@@ -170,11 +212,17 @@ scene(scene_)
 	FlexGridSizer2->Add(BoxSizer5, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer6->Add(FlexGridSizer2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(BoxSizer6);
-	BoxSizer6->Fit(this);
 	BoxSizer6->SetSizeHints(this);
 	Center();
 
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnActionsTreeSelectionChanged);
+	Connect(ID_TREECTRL2,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnObjetsListSelectionChanged);
+	Connect(ID_TREECTRL3,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnObjetsListSelectionChanged);
+	Connect(ID_TREECTRL4,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnObjetsListSelectionChanged);
+	Connect(ID_TREECTRL5,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnObjetsListSelectionChanged);
+	Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ChoixAction::OnobjectsSearchCtrlText);
+	Connect(ID_TREECTRL6,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnobjectActionsTreeSelectionChanged);
+	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ChoixAction::OnsearchCtrlText);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixAction::OnmoreBtClick);
 	Connect(ID_CHECKBOX2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&ChoixAction::OnobjSortCheckClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixAction::OnOkBtClick);
@@ -205,8 +253,6 @@ scene(scene_)
 
         Connect( id, wxEVT_COMMAND_BUTTON_CLICKED,
                  wxCommandEventHandler( ChoixAction::OnABtClick ) );
-        Connect( ID_EDITARRAY, wxEVT_COMMAND_TEXT_UPDATED,
-                 wxCommandEventHandler( ChoixAction::OnParamEdit ) );
         Connect( ID_CHECKARRAY, wxEVT_COMMAND_CHECKBOX_CLICKED,
                  wxCommandEventHandler( ChoixAction::OnFacClicked ) );
 
@@ -229,6 +275,7 @@ scene(scene_)
     imageList = new wxImageList( 16, 16 );
     imageList->Add(( wxBitmap( "res/actions/uneaction.png", wxBITMAP_TYPE_ANY ) ) );
     ActionsTree->AssignImageList( imageList );
+    objectActionsTree->SetImageList( imageList );
 
     Type = "";
     Loc = true;
@@ -246,12 +293,8 @@ scene(scene_)
     }
 
 
-    RefreshList();
+    RefreshAllLists();
     Center();
-}
-
-void ChoixAction::OnButtonEraseBackground()
-{
 }
 
 ChoixAction::~ChoixAction()
@@ -267,6 +310,13 @@ ChoixAction::~ChoixAction()
 	//*)
 }
 
+void ChoixAction::RefreshAllLists()
+{
+    RefreshObjectsLists();
+    RefreshObjectActionsList();
+    RefreshList();
+}
+
 
 /**
  * Create the list of actions
@@ -275,6 +325,9 @@ void ChoixAction::RefreshList()
 {
     ActionsTree->DeleteAllItems();
     ActionsTree->AddRoot( _( "Toutes les actions" ),0);
+
+    std::string search = searchCtrl->GetValue().mb_str();
+    bool searching = search.empty() ? false : true;
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
@@ -311,6 +364,10 @@ void ChoixAction::RefreshList()
             std::map<string, InstructionInfos > allObjActions = extensions[i]->GetAllActionsForObject(objectsTypes[j]);
             for(std::map<string, InstructionInfos>::const_iterator it = allObjActions.begin(); it != allObjActions.end(); ++it)
             {
+                //Verify if the action match the search
+                if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                    continue;
+
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = ActionsTree->GetFirstChild(objectTypeItem, cookie);
@@ -331,6 +388,8 @@ void ChoixAction::RefreshList()
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
                 ActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
             }
+
+            if ( !ActionsTree->HasChildren(objectTypeItem) ) ActionsTree->Delete(objectTypeItem);
 	    }
 
 	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
@@ -344,6 +403,10 @@ void ChoixAction::RefreshList()
             std::map<string, InstructionInfos > allAutoActions = extensions[i]->GetAllActionsForAutomatism(automatismsTypes[j]);
             for(std::map<string, InstructionInfos>::const_iterator it = allAutoActions.begin(); it != allAutoActions.end(); ++it)
             {
+                //Verify if the action match the search
+                if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                    continue;
+
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = ActionsTree->GetFirstChild(automatismTypeItem, cookie);
@@ -364,12 +427,18 @@ void ChoixAction::RefreshList()
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
                 ActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
             }
+
+            if ( !ActionsTree->HasChildren(automatismTypeItem) ) ActionsTree->Delete(automatismTypeItem);
 	    }
 
         //Add each (free) actions
         std::map<string, InstructionInfos > allActions = extensions[i]->GetAllActions();
         for(std::map<string, InstructionInfos>::const_iterator it = allActions.begin(); it != allActions.end(); ++it)
         {
+            //Verify if the action match the search
+            if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                continue;
+
             //Search and/or add group item
             wxTreeItemIdValue cookie;
             wxTreeItemId groupItem = ActionsTree->GetFirstChild(extensionItem, cookie);
@@ -395,21 +464,163 @@ void ChoixAction::RefreshList()
     ActionsTree->Expand(ActionsTree->GetRootItem());
 }
 
-////////////////////////////////////////////////////////////
-/// Choix dans la liste
-///
-/// On déduit le type d'après le texte choisi
-////////////////////////////////////////////////////////////
+void ChoixAction::RefreshObjectsLists()
+{
+    ObjectListDialogsHelper objectListsHelper(game, scene);
+    objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups, "", objectsSearchCtrl->GetValue().mb_str());
+}
+
+void ChoixAction::RefreshObjectActionsList()
+{
+    objectActionsTree->DeleteAllItems();
+    objectActionsTree->AddRoot( _( "Toutes les actions" ),0);
+
+    std::string search = searchCtrl->GetValue().mb_str();
+    bool searching = search.empty() ? false : true;
+
+    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
+    std::string selectedObjectType = extensionManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, selectedObject));
+
+    //Insert extension objects actions
+	for (unsigned int i = 0;i<extensions.size();++i)
+	{
+	    //Verify if that extension is enabled
+	    if ( find(game.extensionsUsed.begin(),
+                  game.extensionsUsed.end(),
+                  extensions[i]->GetName()) == game.extensionsUsed.end() )
+            continue;
+
+	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+
+        wxTreeItemId extensionItem = objectActionsTree->GetRootItem();
+        std::string objectType = selectedObjectType;
+        if ( extensions[i]->GetName() == "BuiltinObject" )
+        {
+            objectType = "";
+            extensionItem = objectActionsTree->AppendItem(objectActionsTree->GetRootItem(), _("Tous les objets"), 0);
+        }
+        else
+            extensionItem = objectActionsTree->AppendItem(objectActionsTree->GetRootItem(), extensions[i]->GetFullName(), 0);
+
+        wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
+                                    objectActionsTree->AppendItem(extensionItem,
+                                                            _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectType).fullname,
+                                                            0) :
+                                    extensionItem;
+
+        //Add each object actions
+        std::map<string, InstructionInfos > allObjActions = extensions[i]->GetAllActionsForObject(objectType);
+        for(std::map<string, InstructionInfos>::const_iterator it = allObjActions.begin(); it != allObjActions.end(); ++it)
+        {
+            //Verify if the action match the search
+            if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                continue;
+
+            //Search and/or add group item
+            wxTreeItemIdValue cookie;
+            wxTreeItemId groupItem = objectActionsTree->GetFirstChild(objectTypeItem, cookie);
+            while ( groupItem.IsOk() && objectActionsTree->GetItemText(groupItem) != it->second.group )
+            {
+                groupItem = objectActionsTree->GetNextSibling(groupItem);
+            }
+            if ( !groupItem.IsOk() ) groupItem = objectActionsTree->AppendItem(objectTypeItem, it->second.group, 0);
+
+            //Add action item
+            int IDimage = 0;
+            if ( it->second.smallicon.IsOk() )
+            {
+                imageList->Add(it->second.smallicon);
+                IDimage = imageList->GetImageCount()-1;
+            }
+
+            gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+            objectActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+        }
+
+	    vector<unsigned int> objectAutomatisms = GetAutomatismsOfObject(game, scene, selectedObject);
+
+	    for(unsigned int j = 0;j<objectAutomatisms.size();++j)
+	    {
+	        ObjectIdentifiersManager * objectIdentifierManager = ObjectIdentifiersManager::getInstance();
+	        std::string automatismType = objectIdentifierManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, objectIdentifierManager->GetNamefromOID(objectAutomatisms[j])));
+
+	        cout << "Autotype of object " << automatismType << endl;
+
+	        if ( find(automatismsTypes.begin(), automatismsTypes.end(), automatismType) == automatismsTypes.end() )
+                continue;
+
+            cout << "ok" << endl;
+
+            wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
+                                        objectActionsTree->AppendItem(extensionItem,
+                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismType).fullname,
+                                                                0) :
+                                        extensionItem;
+            //Add each automatism actions
+            std::map<string, InstructionInfos > allAutoActions = extensions[i]->GetAllActionsForAutomatism(automatismType);
+            for(std::map<string, InstructionInfos>::const_iterator it = allAutoActions.begin(); it != allAutoActions.end(); ++it)
+            {
+                //Verify if the action match the search
+                if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                    continue;
+
+                //Search and/or add group item
+                wxTreeItemIdValue cookie;
+                wxTreeItemId groupItem = objectActionsTree->GetFirstChild(automatismTypeItem, cookie);
+                while ( groupItem.IsOk() && objectActionsTree->GetItemText(groupItem) != it->second.group )
+                {
+                    groupItem = objectActionsTree->GetNextSibling(groupItem);
+                }
+                if ( !groupItem.IsOk() ) groupItem = objectActionsTree->AppendItem(automatismTypeItem, it->second.group, 0);
+
+                //Add action item
+                int IDimage = 0;
+                if ( it->second.smallicon.IsOk() )
+                {
+                    imageList->Add(it->second.smallicon);
+                    IDimage = imageList->GetImageCount()-1;
+                }
+
+                gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+                objectActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+            }
+	    }
+
+	    if ( !objectActionsTree->HasChildren(extensionItem) ) objectActionsTree->Delete(extensionItem);
+	}
+
+    objectActionsTree->Expand(objectActionsTree->GetRootItem());
+}
+
+/**
+ * Action chosen in all actions list.
+ */
 void ChoixAction::OnActionsTreeSelectionChanged(wxTreeEvent& event)
 {
-    wxTreeItemId item = event.GetItem();
-
-    gdTreeItemStringData * associatedData = dynamic_cast<gdTreeItemStringData*>(ActionsTree->GetItemData(item));
+    gdTreeItemStringData * associatedData = dynamic_cast<gdTreeItemStringData*>(ActionsTree->GetItemData(event.GetItem()));
     if ( associatedData != NULL )
     {
         Type = associatedData->GetString();
 
         RefreshFromAction();
+        return;
+    }
+}
+
+/**
+ * Action chosen in object actions list.
+ */
+void ChoixAction::OnobjectActionsTreeSelectionChanged(wxTreeEvent& event)
+{
+    gdTreeItemStringData * associatedData = dynamic_cast<gdTreeItemStringData*>(objectActionsTree->GetItemData(event.GetItem()));
+    if ( associatedData != NULL )
+    {
+        Type = associatedData->GetString();
+
+        RefreshFromAction();
+        if ( !ParaEdit.empty() ) ParaEdit[0]->SetValue(selectedObject);
         return;
     }
 }
@@ -421,7 +632,7 @@ void ChoixAction::OnActionsTreeSelectionChanged(wxTreeEvent& event)
 ////////////////////////////////////////////////////////////
 void ChoixAction::RefreshFromAction()
 {
-    if ( Type == "" )
+    if ( Type.empty() )
         return;
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
@@ -510,7 +721,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
     // On déduit le numéro du paramètre à partir du nom du bouton
     // ( Son nom, pas son label )
     string num = ( string ) wxWindow::FindFocus()->GetName();
-    unsigned int i = atoi( num.c_str() );
+    unsigned int i = ToInt(num);
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(Type);
@@ -719,8 +930,8 @@ void ChoixAction::OnFacClicked(wxCommandEvent& event)
 {
     // On déduit le numéro du paramètre à partir du nom du bouton
     // ( Son nom, pas son label )
-    string num = ( string ) wxWindow::FindFocus()->GetName();
-    unsigned int i = atoi( num.c_str() );
+    string num = wxWindow::FindFocus()->GetName().mb_str();
+    unsigned int i = ToInt(num);
 
     if ( ParaFac.at(i)->GetValue() )
     {
@@ -734,17 +945,6 @@ void ChoixAction::OnFacClicked(wxCommandEvent& event)
         ParaText.at(i)->Enable(false);
         ParaEdit.at(i)->Enable(false);
     }
-}
-
-
-////////////////////////////////////////////////////////////
-/// Modification paramètres
-///
-/// Mise à jour automatique global/local
-////////////////////////////////////////////////////////////
-void ChoixAction::OnParamEdit( wxCommandEvent& event )
-{
-    //Plus besoin !
 }
 
 void ChoixAction::OnOkBtClick(wxCommandEvent& event)
@@ -847,4 +1047,31 @@ void ChoixAction::OnmoreBtClick(wxCommandEvent& event)
     dialog.ShowModal();
 
     RefreshList();
+}
+
+void ChoixAction::OnObjetsListSelectionChanged(wxTreeEvent& event)
+{
+    if ( objectsListsNotebook->GetSelection() == 0 && ObjetsList->GetRootItem() != ObjetsList->GetFocusedItem() )
+        selectedObject = ObjetsList->GetItemText( ObjetsList->GetFocusedItem() ).mb_str();
+    else if ( objectsListsNotebook->GetSelection() == 1 && GroupesList->GetRootItem() != GroupesList->GetFocusedItem() )
+        selectedObject = GroupesList->GetItemText( GroupesList->GetFocusedItem() ).mb_str();
+    else if ( objectsListsNotebook->GetSelection() == 2 && globalObjectsList->GetRootItem() != globalObjectsList->GetFocusedItem() )
+        selectedObject = globalObjectsList->GetItemText( globalObjectsList->GetFocusedItem() ).mb_str();
+    else if ( objectsListsNotebook->GetSelection() == 3 && globalObjectGroups->GetRootItem() != globalObjectGroups->GetFocusedItem() )
+        selectedObject = globalObjectGroups->GetItemText( globalObjectGroups->GetFocusedItem() ).mb_str();
+
+    RefreshObjectActionsList();
+}
+
+void ChoixAction::OnobjectsSearchCtrlText(wxCommandEvent& event)
+{
+    RefreshObjectsLists();
+    objectsSearchCtrl->SetFocus();
+}
+
+void ChoixAction::OnsearchCtrlText(wxCommandEvent& event)
+{
+    RefreshList();
+    RefreshObjectActionsList();
+    searchCtrl->SetFocus();
 }

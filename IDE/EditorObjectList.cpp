@@ -377,8 +377,6 @@ void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
         PopupMenu( &rootContextMenu );
     else
     {
-        gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-
         //Find object so as to update automatisms list
         string name = static_cast<string>(objectsList->GetItemText( item ));
         int i = Picker::PickOneObject( objects, name );
@@ -1046,7 +1044,7 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
  */
 void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
 {
-    string name = static_cast< string > ( objectsList->GetItemText( item ));
+    string name = objectsList->GetItemText( item ).mb_str();
     int id = Picker::PickOneObject( objects, name );
     if ( id == -1 )
     {

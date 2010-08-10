@@ -1,14 +1,6 @@
 /**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- * Permet de choisir une action
- *
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef CHOIXACTION_H
@@ -16,15 +8,19 @@
 
 //(*Headers(ChoixAction)
 #include <wx/treectrl.h>
+#include <wx/notebook.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/statline.h>
 #include <wx/radiobut.h>
+#include <wx/panel.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
+#include <wx/srchctrl.h>
 #include <wx/checkbox.h>
 #include <wx/imaglist.h>
 #include <wx/bmpbuttn.h>
@@ -56,15 +52,25 @@ class ChoixAction: public wxDialog
 
 		//(*Declarations(ChoixAction)
 		wxButton* OkBt;
+		wxSearchCtrl* searchCtrl;
 		wxStaticBitmap* ActionImg;
+		wxNotebook* Notebook1;
 		wxStaticText* NomActionTxt;
+		wxTreeCtrl* globalObjectGroups;
 		wxFlexGridSizer* GridSizer1;
+		wxPanel* Panel1;
 		wxRadioButton* LocaliseCheck;
+		wxTreeCtrl* ObjetsList;
 		wxStaticLine* StaticLine2;
+		wxTreeCtrl* objectActionsTree;
 		wxButton* moreBt;
 		wxButton* CancelBt;
 		wxStaticLine* StaticLine1;
+		wxTreeCtrl* globalObjectsList;
+		wxNotebook* objectsListsNotebook;
+		wxSearchCtrl* objectsSearchCtrl;
 		wxStaticText* ActionTextTxt;
+		wxTreeCtrl* GroupesList;
 		wxCheckBox* objSortCheck;
 		wxRadioButton* GlobalCheck;
 		wxButton* AideBt;
@@ -75,6 +81,16 @@ class ChoixAction: public wxDialog
 
 		//(*Identifiers(ChoixAction)
 		static const long ID_TREECTRL1;
+		static const long ID_TREECTRL2;
+		static const long ID_TREECTRL3;
+		static const long ID_TREECTRL4;
+		static const long ID_TREECTRL5;
+		static const long ID_NOTEBOOK2;
+		static const long ID_TEXTCTRL2;
+		static const long ID_TREECTRL6;
+		static const long ID_PANEL1;
+		static const long ID_NOTEBOOK1;
+		static const long ID_TEXTCTRL1;
 		static const long ID_STATICBITMAP1;
 		static const long ID_STATICTEXT1;
 		static const long ID_STATICTEXT2;
@@ -108,13 +124,19 @@ class ChoixAction: public wxDialog
 		void OnextSortCheckClick(wxCommandEvent& event);
 		void OnobjSortCheckClick(wxCommandEvent& event);
 		void OnmoreBtClick(wxCommandEvent& event);
+		void OnObjetsListSelectionChanged(wxTreeEvent& event);
+		void OnobjectActionsTreeSelectionChanged(wxTreeEvent& event);
+		void OnobjectsSearchCtrlText(wxCommandEvent& event);
+		void OnsearchCtrlText(wxCommandEvent& event);
 		//*)
+		void RefreshAllLists();
+		void RefreshObjectsLists();
+		void RefreshObjectActionsList();
 		void OnABtClick(wxCommandEvent& event);
-        void OnParamEdit(wxCommandEvent& event);
         void OnFacClicked(wxCommandEvent& event);
-        void OnButtonEraseBackground();
 
 		wxImageList * imageList;
+		std::string selectedObject;
 
 		DECLARE_EVENT_TABLE()
 };

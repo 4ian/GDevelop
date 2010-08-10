@@ -8606,7 +8606,7 @@
 	<string>
 	<vector>
 
-1279819855 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
+1281474739 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
 	"ChoixAction.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -8642,17 +8642,22 @@
 	"ChoiceJoyAxis.h"
 	"ChoiceFile.h"
 	"GDL/ChooseVariableDialog.h"
+	"GDL/ObjectListDialogsHelper.h"
 
-1264364132 d:\florian\programmation\gamedevelop\ide\choixaction.h
+1281464695 d:\florian\programmation\gamedevelop\ide\choixaction.h
 	<wx/treectrl.h>
+	<wx/notebook.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
+	<wx/textctrl.h>
 	<wx/checkbox.h>
 	<wx/statline.h>
 	<wx/radiobut.h>
+	<wx/panel.h>
 	<wx/statbmp.h>
 	<wx/button.h>
 	<wx/dialog.h>
+	<wx/srchctrl.h>
 	<wx/checkbox.h>
 	<wx/imaglist.h>
 	<wx/bmpbuttn.h>
@@ -8660,6 +8665,71 @@
 	"GDL/Game.h"
 	<string>
 	<vector>
+
+1253308520 c:\libs\wxwidgets\include\wx\notebook.h
+	"wx/defs.h"
+	"wx/bookctrl.h"
+	"wx/univ/notebook.h"
+	"wx/msw/notebook.h"
+	"wx/generic/notebook.h"
+	"wx/gtk/notebook.h"
+	"wx/gtk1/notebook.h"
+	"wx/osx/notebook.h"
+	"wx/cocoa/notebook.h"
+	"wx/os2/notebook.h"
+
+1253308527 c:\libs\wxwidgets\include\wx\bookctrl.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/dynarray.h"
+	"wx/notebook.h"
+	"wx/choicebk.h"
+
+1253308518 c:\libs\wxwidgets\include\wx\choicebk.h
+	"wx/defs.h"
+	"wx/bookctrl.h"
+	"wx/choice.h"
+
+1253308438 c:\libs\wxwidgets\include\wx\univ\notebook.h
+	"wx/arrstr.h"
+
+1253308465 c:\libs\wxwidgets\include\wx\msw\notebook.h
+	"wx/control.h"
+
+1253308506 c:\libs\wxwidgets\include\wx\generic\notebook.h
+	"wx/event.h"
+	"wx/control.h"
+
+1253308495 c:\libs\wxwidgets\include\wx\gtk\notebook.h
+	"wx/list.h"
+
+1253308447 c:\libs\wxwidgets\include\wx\gtk1\notebook.h
+	"wx/list.h"
+
+1253308488 c:\libs\wxwidgets\include\wx\osx\notebook.h
+	"wx/event.h"
+
+1253308511 c:\libs\wxwidgets\include\wx\cocoa\notebook.h
+	"wx/cocoa/NSTabView.h"
+
+1253308510 c:\libs\wxwidgets\include\wx\cocoa\nstabview.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+	"wx/cocoa/ObjcRef.h"
+
+1253308476 c:\libs\wxwidgets\include\wx\os2\notebook.h
+	"wx/control.h"
+
+1253308523 c:\libs\wxwidgets\include\wx\srchctrl.h
+	"wx/defs.h"
+	"wx/textctrl.h"
+	"wx/osx/srchctrl.h"
+	"wx/generic/srchctlg.h"
+
+1253308488 c:\libs\wxwidgets\include\wx\osx\srchctrl.h
+
+1253308506 c:\libs\wxwidgets\include\wx\generic\srchctlg.h
+	"wx/bitmap.h"
 
 1253308522 c:\libs\wxwidgets\include\wx\colordlg.h
 	"wx/defs.h"
@@ -8820,60 +8890,6 @@
 1253308506 c:\libs\wxwidgets\include\wx\generic\splitter.h
 	"wx/window.h"
 	"wx/containr.h"
-
-1253308520 c:\libs\wxwidgets\include\wx\notebook.h
-	"wx/defs.h"
-	"wx/bookctrl.h"
-	"wx/univ/notebook.h"
-	"wx/msw/notebook.h"
-	"wx/generic/notebook.h"
-	"wx/gtk/notebook.h"
-	"wx/gtk1/notebook.h"
-	"wx/osx/notebook.h"
-	"wx/cocoa/notebook.h"
-	"wx/os2/notebook.h"
-
-1253308527 c:\libs\wxwidgets\include\wx\bookctrl.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/dynarray.h"
-	"wx/notebook.h"
-	"wx/choicebk.h"
-
-1253308518 c:\libs\wxwidgets\include\wx\choicebk.h
-	"wx/defs.h"
-	"wx/bookctrl.h"
-	"wx/choice.h"
-
-1253308438 c:\libs\wxwidgets\include\wx\univ\notebook.h
-	"wx/arrstr.h"
-
-1253308465 c:\libs\wxwidgets\include\wx\msw\notebook.h
-	"wx/control.h"
-
-1253308506 c:\libs\wxwidgets\include\wx\generic\notebook.h
-	"wx/event.h"
-	"wx/control.h"
-
-1253308495 c:\libs\wxwidgets\include\wx\gtk\notebook.h
-	"wx/list.h"
-
-1253308447 c:\libs\wxwidgets\include\wx\gtk1\notebook.h
-	"wx/list.h"
-
-1253308488 c:\libs\wxwidgets\include\wx\osx\notebook.h
-	"wx/event.h"
-
-1253308511 c:\libs\wxwidgets\include\wx\cocoa\notebook.h
-	"wx/cocoa/NSTabView.h"
-
-1253308510 c:\libs\wxwidgets\include\wx\cocoa\nstabview.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-	"wx/cocoa/ObjcRef.h"
-
-1253308476 c:\libs\wxwidgets\include\wx\os2\notebook.h
-	"wx/control.h"
 
 1253308480 c:\libs\wxwidgets\include\wx\html\htmlwin.h
 	"wx/defs.h"
@@ -9060,18 +9076,20 @@
 	<assert.h>
 	<string.h>
 
-1271885024 d:\florian\programmation\gamedevelop\gdl\gdl\chooseobject.h
+1281449439 d:\florian\programmation\gamedevelop\gdl\gdl\chooseobject.h
 	<wx/treectrl.h>
 	<wx/notebook.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/menu.h>
+	<wx/textctrl.h>
 	<wx/statline.h>
 	<wx/panel.h>
 	<wx/statbmp.h>
 	<wx/button.h>
 	<wx/dialog.h>
 	<wx/imaglist.h>
+	<wx/srchctrl.h>
 	"GDL/Scene.h"
 	"GDL/Game.h"
 	<string>
@@ -9147,6 +9165,10 @@
 	<string>
 	"GDL/ListVariable.h"
 	<wx/msw/winundef.h>
+
+1281460594 d:\florian\programmation\gamedevelop\gdl\gdl\objectlistdialogshelper.h
+	<wx/treectrl.h>
+	<string>
 
 1264364130 source:d:\florian\programmation\gamedevelop\ide\choixbouton.cpp
 	"ChoixBouton.h"
@@ -10647,7 +10669,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1281373191 source:d:\florian\programmation\gamedevelop\ide\editorobjectlist.cpp
+1281379827 source:d:\florian\programmation\gamedevelop\ide\editorobjectlist.cpp
 	"EditorObjectList.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -11942,6 +11964,14 @@
 	"green.xpm"
 	"red.xpm"
 
+1281454535 source:d:\florian\programmation\gamedevelop\ide\objectlistpanel.cpp
+	"ObjectListPanel.h"
+	<wx/intl.h>
+	<wx/string.h>
+
+1281454534 d:\florian\programmation\gamedevelop\ide\objectlistpanel.h
+	<wx/panel.h>
+
 1281120412 source:d:\florian\programmation\gamedevelop\ide\objecttypechoice.cpp
 	"ObjectTypeChoice.h"
 	<wx/bitmap.h>
@@ -12200,7 +12230,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1281373193 d:\florian\programmation\gamedevelop\ide\version.h
+1281474743 d:\florian\programmation\gamedevelop\ide\version.h
 
 1272727521 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -12358,5 +12388,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1281366546 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1281460594 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

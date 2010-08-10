@@ -9,6 +9,7 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/menu.h>
+#include <wx/textctrl.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
 #include <wx/statbmp.h>
@@ -16,6 +17,7 @@
 #include <wx/dialog.h>
 //*)
 #include <wx/imaglist.h>
+#include <wx/srchctrl.h>
 
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
@@ -34,6 +36,7 @@ class GD_API ChooseObject: public wxDialog
 		//(*Declarations(ChooseObject)
 		wxMenu Menu2;
 		wxMenu Menu1;
+		wxSearchCtrl* searchCtrl;
 		wxNotebook* Notebook1;
 		wxTreeCtrl* globalObjectGroups;
 		wxMenuItem* MenuItem1;
@@ -77,6 +80,7 @@ class GD_API ChooseObject: public wxDialog
 		static const long ID_TREECTRL3;
 		static const long ID_TREECTRL4;
 		static const long ID_NOTEBOOK1;
+		static const long ID_TEXTCTRL1;
 		static const long ID_STATICLINE1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
@@ -105,6 +109,8 @@ class GD_API ChooseObject: public wxDialog
 		void OnglobalObjectGroupsItemActivated(wxTreeEvent& event);
 		void OnglobalObjectGroupsSelectionChanged(wxTreeEvent& event);
 		void OnglobalObjectGroupsItemRightClick(wxTreeEvent& event);
+		void OnsearchCtrlText(wxCommandEvent& event);
+		void OnsearchCtrlTextEnter(wxCommandEvent& event);
 		//*)
 
 		wxImageList * imageList;

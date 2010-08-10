@@ -648,6 +648,8 @@
 		<Unit filename="GDL\ObjectGroup.h" />
 		<Unit filename="GDL\ObjectIdentifiersManager.cpp" />
 		<Unit filename="GDL\ObjectIdentifiersManager.h" />
+		<Unit filename="GDL\ObjectListDialogsHelper.cpp" />
+		<Unit filename="GDL\ObjectListDialogsHelper.h" />
 		<Unit filename="GDL\ObjectType.cpp" />
 		<Unit filename="GDL\ObjectType.h" />
 		<Unit filename="GDL\ObjectsConcerned.cpp" />

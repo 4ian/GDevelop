@@ -18,6 +18,7 @@
 #include "GDL/Scene.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ObjectGroup.h"
+#include "GDL/ObjectListDialogsHelper.h"
 
 //(*IdInit(ChooseObject)
 const long ChooseObject::ID_STATICBITMAP3 = wxNewId();
@@ -29,6 +30,7 @@ const long ChooseObject::ID_TREECTRL2 = wxNewId();
 const long ChooseObject::ID_TREECTRL3 = wxNewId();
 const long ChooseObject::ID_TREECTRL4 = wxNewId();
 const long ChooseObject::ID_NOTEBOOK1 = wxNewId();
+const long ChooseObject::ID_TEXTCTRL1 = wxNewId();
 const long ChooseObject::ID_STATICLINE1 = wxNewId();
 const long ChooseObject::ID_BUTTON1 = wxNewId();
 const long ChooseObject::ID_BUTTON2 = wxNewId();
@@ -54,7 +56,7 @@ onlyObjectOfType(onlyObjectOfType_)
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
-	
+
 	Create(parent, wxID_ANY, _("Choisir un objet"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX, _T("wxID_ANY"));
 	wxIcon FrameIcon;
 	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/objeticon.png"))));
@@ -78,19 +80,21 @@ onlyObjectOfType(onlyObjectOfType_)
 	FlexGridSizer17->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(413,227), 0, _T("ID_NOTEBOOK1"));
-	ObjetsList = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxPoint(-71,-11), wxSize(179,170), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
+	ObjetsList = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
 	ObjetsList->SetToolTip(_("Choisissez un objet dans la liste"));
-	GroupesList = new wxTreeCtrl(Notebook1, ID_TREECTRL2, wxPoint(-71,-11), wxSize(179,170), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL2"));
+	GroupesList = new wxTreeCtrl(Notebook1, ID_TREECTRL2, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL2"));
 	GroupesList->SetToolTip(_("Choisissez un objet dans la liste"));
-	globalObjectsList = new wxTreeCtrl(Notebook1, ID_TREECTRL3, wxPoint(-71,-11), wxSize(179,170), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL3"));
+	globalObjectsList = new wxTreeCtrl(Notebook1, ID_TREECTRL3, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL3"));
 	globalObjectsList->SetToolTip(_("Choisissez un objet dans la liste"));
-	globalObjectGroups = new wxTreeCtrl(Notebook1, ID_TREECTRL4, wxPoint(-71,-11), wxSize(281,190), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL4"));
+	globalObjectGroups = new wxTreeCtrl(Notebook1, ID_TREECTRL4, wxPoint(-71,-11), wxSize(281,190), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL4"));
 	globalObjectGroups->SetToolTip(_("Choisissez un objet dans la liste"));
 	Notebook1->AddPage(ObjetsList, _("Objets"), false);
 	Notebook1->AddPage(GroupesList, _("Groupes d\'objets"), false);
 	Notebook1->AddPage(globalObjectsList, _("Objets globaux"), false);
 	Notebook1->AddPage(globalObjectGroups, _("Groupes globaux"), false);
 	FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	FlexGridSizer1->Add(searchCtrl, 1, wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -126,7 +130,7 @@ onlyObjectOfType(onlyObjectOfType_)
 	Menu2.Append(MenuItem4);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&ChooseObject::OnObjetsListItemActivated);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&ChooseObject::OnObjetsListItemRightClick);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChooseObject::OnObjetsListSelectionChanged);
@@ -139,6 +143,8 @@ onlyObjectOfType(onlyObjectOfType_)
 	Connect(ID_TREECTRL4,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&ChooseObject::OnglobalObjectGroupsItemActivated);
 	Connect(ID_TREECTRL4,wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&ChooseObject::OnglobalObjectGroupsItemRightClick);
 	Connect(ID_TREECTRL4,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChooseObject::OnglobalObjectGroupsSelectionChanged);
+	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ChooseObject::OnsearchCtrlText);
+	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&ChooseObject::OnsearchCtrlTextEnter);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseObject::OnChoisirBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseObject::OnAnnulerBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseObject::OnAucunBtClick);
@@ -187,87 +193,30 @@ ChooseObject::~ChooseObject()
  */
 void ChooseObject::Refresh()
 {
-    ObjetsList->DeleteAllItems();
-    ObjetsList->AddRoot( _( "Tous les objets de la scène" ) );
-
-    //Search the typeId we are allowed to pick
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-    unsigned int typeIdAllowed = extensionsManager->GetTypeIdFromString(onlyObjectOfType);
-
-    for ( unsigned int i = 0;i < scene.initialObjects.size();i++ )
-    {
-        //Only add the object if it has the correct typeId
-        if ( typeIdAllowed == 0 || scene.initialObjects[i]->GetTypeId() == typeIdAllowed )
-        {
-            ObjetsList->AppendItem( ObjetsList->GetRootItem(), scene.initialObjects[i]->GetName() );
-        }
-    }
-
-    ObjetsList->ExpandAll();
-
-    GroupesList->DeleteAllItems();
-    GroupesList->AddRoot( _( "Tous les groupes de la scène" ) );
-
-    for ( unsigned int i = 0;i < scene.objectGroups.size();i++ )
-    {
-        //Only add the group if it has all objects of the correct typeId
-        if ( typeIdAllowed == 0 || GetTypeIdOfObject(game, scene, scene.objectGroups.at( i ).GetName()) == typeIdAllowed )
-        {
-            GroupesList->AppendItem( GroupesList->GetRootItem(), scene.objectGroups.at( i ).GetName() );
-        }
-    }
-
-    GroupesList->ExpandAll();
-
-    globalObjectsList->DeleteAllItems();
-    globalObjectsList->AddRoot( _( "Tous les objets globaux" ) );
-
-    for ( unsigned int i = 0;i < game.globalObjects.size();i++ )
-    {
-        //Only add the object if it has the correct typeId
-        if ( typeIdAllowed == 0 || game.globalObjects[i]->GetTypeId() == typeIdAllowed )
-        {
-            globalObjectsList->AppendItem( globalObjectsList->GetRootItem(), game.globalObjects[i]->GetName() );
-        }
-    }
-
-    globalObjectsList->ExpandAll();
-
-    globalObjectGroups->DeleteAllItems();
-    globalObjectGroups->AddRoot( _( "Tous les groupes globaux" ) );
-
-    for ( unsigned int i = 0;i < game.objectGroups.size();i++ )
-    {
-        //Only add the group if it has all objects of the correct typeId
-        if ( typeIdAllowed == 0 || GetTypeIdOfObject(game, scene, game.objectGroups.at( i ).GetName()) == typeIdAllowed )
-        {
-            globalObjectGroups->AppendItem( globalObjectGroups->GetRootItem(), game.objectGroups.at( i ).GetName() );
-        }
-    }
-
-    globalObjectGroups->ExpandAll();
+    ObjectListDialogsHelper objectListsHelper(game, scene);
+    objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups, onlyObjectOfType, searchCtrl->GetValue().mb_str());
 }
 
 void ChooseObject::OnChoisirBtClick(wxCommandEvent& event)
 {
-    if ( Notebook1->GetSelection() == 0 && item.IsOk() && ObjetsList->GetItemText( item ) != _( "Tous les objets de la scène" ) )
+    if ( Notebook1->GetSelection() == 0 && item.IsOk() && ObjetsList->GetRootItem() != item )
     {
-        objectChosen = static_cast<string>(ObjetsList->GetItemText( item ));
+        objectChosen = ObjetsList->GetItemText( item ).mb_str();
         EndModal(1);
     }
-    else if ( GroupesList->IsEnabled() && itemGroups.IsOk() && Notebook1->GetSelection() == 1 && GroupesList->GetItemText( itemGroups ) != _( "Tous les groupes de la scène" ) )
+    else if ( GroupesList->IsEnabled() && itemGroups.IsOk() && Notebook1->GetSelection() == 1 && GroupesList->GetRootItem() != itemGroups )
     {
-        objectChosen = static_cast<string>(GroupesList->GetItemText( itemGroups ));
+        objectChosen = GroupesList->GetItemText( itemGroups ).mb_str();
         EndModal(1);
     }
-    else if ( Notebook1->GetSelection() == 2 && itemGlobal.IsOk() && GroupesList->GetItemText( itemGlobal ) != _( "Tous les objets globaux" ) )
+    else if ( Notebook1->GetSelection() == 2 && itemGlobal.IsOk() && globalObjectsList->GetRootItem() != itemGlobal )
     {
-        objectChosen = static_cast<string>(GroupesList->GetItemText( itemGlobal ));
+        objectChosen = globalObjectsList->GetItemText( itemGlobal ).mb_str();
         EndModal(1);
     }
-    else if ( Notebook1->GetSelection() == 3 && itemGlobalGroups.IsOk() && globalObjectGroups->GetItemText( itemGlobalGroups ) != _( "Tous les groupes globaux" ) )
+    else if ( Notebook1->GetSelection() == 3 && itemGlobalGroups.IsOk() && globalObjectGroups->GetRootItem() != itemGlobalGroups )
     {
-        objectChosen = static_cast<string>(globalObjectGroups->GetItemText( itemGlobalGroups ));
+        objectChosen = globalObjectGroups->GetItemText( itemGlobalGroups ).mb_str();
         EndModal(1);
     }
 }
@@ -355,3 +304,12 @@ void ChooseObject::OnglobalObjectGroupsItemRightClick(wxTreeEvent& event)
 }
 
 #endif
+
+void ChooseObject::OnsearchCtrlText(wxCommandEvent& event)
+{
+    Refresh();
+}
+
+void ChooseObject::OnsearchCtrlTextEnter(wxCommandEvent& event)
+{
+}

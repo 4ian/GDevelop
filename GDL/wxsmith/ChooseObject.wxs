@@ -60,6 +60,7 @@
 							<pos>-71,-11</pos>
 							<size>179,170</size>
 							<tooltip>Choisissez un objet dans la liste</tooltip>
+							<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 							<handler function="OnObjetsListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
 							<handler function="OnObjetsListItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
 							<handler function="OnObjetsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
@@ -71,6 +72,7 @@
 							<pos>-71,-11</pos>
 							<size>179,170</size>
 							<tooltip>Choisissez un objet dans la liste</tooltip>
+							<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 							<handler function="OnGroupesListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
 							<handler function="OnGroupesListItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
 							<handler function="OnGroupesListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
@@ -82,6 +84,7 @@
 							<pos>-71,-11</pos>
 							<size>179,170</size>
 							<tooltip>Choisissez un objet dans la liste</tooltip>
+							<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 							<handler function="OnglobalObjectsListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
 							<handler function="OnglobalObjectsListItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
 							<handler function="OnglobalObjectsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
@@ -93,6 +96,7 @@
 							<pos>-71,-11</pos>
 							<size>281,190</size>
 							<tooltip>Choisissez un objet dans la liste</tooltip>
+							<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 							<handler function="OnglobalObjectGroupsItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
 							<handler function="OnglobalObjectGroupsItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
 							<handler function="OnglobalObjectGroupsSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
@@ -101,6 +105,15 @@
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxTextCtrl" name="ID_TEXTCTRL1" subclass="wxSearchCtrl" variable="searchCtrl" member="yes">
+					<handler function="OnsearchCtrlText" entry="EVT_TEXT" />
+					<handler function="OnsearchCtrlTextEnter" entry="EVT_TEXT_ENTER" />
+				</object>
+				<flag>wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<border>5</border>
 				<option>1</option>
 			</object>
 			<object class="sizeritem">

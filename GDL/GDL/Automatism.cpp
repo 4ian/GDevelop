@@ -3,8 +3,8 @@
 
 Automatism::Automatism(std::string automatismTypeName) :
 activated(true),
-type(automatismTypeName),
-automatismId(0)
+automatismId(0),
+type(automatismTypeName)
 {
     ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
     typeId = objectIdentifiersManager->GetOIDfromName(automatismTypeName);

@@ -7,7 +7,6 @@
 #include "GDL/Object.h"
 #include "GDL/SpriteObject.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/gpl.h"
 #include "GDL/ObjectsConcerned.h"
 #include <SFML/System.hpp>
 #include <vector>
@@ -127,7 +126,7 @@ string Object::ExpGetObjectVariableString( const RuntimeScene & scene, ObjectsCo
 
 double Object::ExpGetDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    ObjSPtr object2 = boost::shared_ptr<Object>( );
+    ObjSPtr object2;
     ObjList list2 = objectsConcerned.Pick( exprInstruction.parameters[1].GetAsObjectIdentifier() );
 
     if ( !list2.empty() )
@@ -152,14 +151,14 @@ double Object::ExpGetDistanceBetweenObjects( const RuntimeScene & scene, Objects
         float X = GetDrawableX()+GetCenterX() - (object2->GetDrawableX()+object2->GetCenterX());
         float Y = GetDrawableY()+GetCenterY() - (object2->GetDrawableY()+object2->GetCenterY());
 
-        return gpl::sqrt(X*X+Y*Y); // Pythagore
+        return sqrt(X*X+Y*Y);
     }
     return 0;
 }
 
 double Object::ExpGetSqDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    ObjSPtr object2 = boost::shared_ptr<Object>( );
+    ObjSPtr object2;
     ObjList list2 = objectsConcerned.Pick( exprInstruction.parameters[1].GetAsObjectIdentifier() );
 
     if ( !list2.empty() )

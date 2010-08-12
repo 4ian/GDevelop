@@ -23,7 +23,7 @@ using namespace std;
 class GD_API TranslateCondition
 {
     public:
-        static string Translate(const Instruction & condition, const InstructionInfos & infos, bool afficherPlus, bool useHTML = false);
+        static string Translate(const Instruction & condition, const InstructionInfos & infos);
         static string AddHTMLToParameter(string & parameter, string type);
         static void RemoveHTMLTags(string & str);
 

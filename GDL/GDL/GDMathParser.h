@@ -5,7 +5,6 @@
 #include <cmath>
 #include <vector>
 #include <string>
-#include "gpl.h"
 
 double DistanceMathFunction(const double* p);
 double AngleMathFunction(const double* p);

@@ -1,6 +1,5 @@
 #include "GDL/GDExpression.h"
 #include "GDL/ExpressionInstruction.h"
-#include "GDL/gpl.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/RuntimeScene.h"

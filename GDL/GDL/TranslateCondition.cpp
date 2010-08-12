@@ -27,15 +27,10 @@ using namespace std;
 ///
 /// Traduction en une phrase complète d'une condition et ses paramètres
 ////////////////////////////////////////////////////////////
-string TranslateCondition::Translate(const Instruction & condition, const InstructionInfos & infos, bool afficherPlus, bool useHTML)
+string TranslateCondition::Translate(const Instruction & condition, const InstructionInfos & infos)
 {
-    string trad = "";
-    //Dois t on tout afficher ?
-    if ( afficherPlus && !condition.IsLocal() ) trad += "(Global) ";
-    if ( afficherPlus && condition.IsInverted() ) trad += " (Contraire) ";
-
-    trad += infos.sentence;
-    if ( useHTML ) RemoveHTMLTags(trad);
+    string trad = infos.sentence;
+    RemoveHTMLTags(trad);
 
     //Remplacement des _PARAMx_ par la valeur des paramètres
     for (unsigned int i =0;i<infos.parameters.size();++i)
@@ -43,8 +38,8 @@ string TranslateCondition::Translate(const Instruction & condition, const Instru
         while ( trad.find( "_PARAM"+ToString(i)+"_" ) != string::npos )
         {
             string parameter = condition.GetParameter( i ).GetPlainString();
-            if ( useHTML ) RemoveHTMLTags(parameter);
-            if ( useHTML ) AddHTMLToParameter(parameter, infos.parameters[i].type); //Mise en forme du paramètre
+            RemoveHTMLTags(parameter);
+            AddHTMLToParameter(parameter, infos.parameters[i].type); //Mise en forme du paramètre
 
             trad.replace(   trad.find( "_PARAM"+ToString(i)+"_" ), //Chaine à remplacer
                             string("_PARAM"+ToString(i)+"_").length(), //Longueur de la chaine
@@ -83,6 +78,8 @@ string TranslateCondition::LabelFromType( string type )
         return static_cast<string>(_( "Expression" ));
     else if ( type == "object" )
         return static_cast<string>(_( "Choisir l'objet" ));
+    else if ( type == "automatisme" )
+        return static_cast<string>(_( "Choisir l'automatisme" ));
     else if ( type == "signe" )
         return static_cast<string>(_( "Choisir le signe" ));
     else if ( type == "file" )
@@ -126,7 +123,9 @@ wxBitmap TranslateCondition::BitmapFromType( string type )
     else if ( type == "expression" )
         return bitmapGUIManager->expressionBt;
     else if ( type == "object" )
-        return bitmapGUIManager->objetBt;
+        return bitmapGUIManager->objectBt;
+    else if ( type == "automatism" )
+        return bitmapGUIManager->automatismBt;
     else if ( type == "signe" )
         return bitmapGUIManager->signeBt;
     else if ( type == "file" )
@@ -171,10 +170,6 @@ string TranslateCondition::AddHTMLToParameter(string & parameter, string type)
         parameter = "<b>"+parameter+"</b>";
     else if ( type == "file" )
         parameter = "<i>"+parameter+"</i>";
-    /*else if ( type == "color" )
-        parameter = parameter;
-    else if ( type == "text" )
-        return bitmapGUIManager->texteBt;*/
     else if ( type == "key" )
         parameter = "<b>"+parameter+"</b>";
     else if ( type == "mouse" )

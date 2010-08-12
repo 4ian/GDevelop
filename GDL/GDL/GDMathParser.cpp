@@ -6,7 +6,7 @@
  */
 double DistanceMathFunction(const double* p)
 {
-    return gpl::sqrt((p[0]-p[2])*(p[0]-p[2])+(p[1]-p[3])*(p[1]-p[3]));
+    return sqrt((p[0]-p[2])*(p[0]-p[2])+(p[1]-p[3])*(p[1]-p[3]));
 }
 
 /**

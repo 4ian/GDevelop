@@ -158,7 +158,7 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
     const int repeatHeight = 20;
 
-    if ( y <= whileConditionsHeight)
+    if ( y>0 && static_cast<unsigned int>(y) <= whileConditionsHeight)
     {
         conditionsSelected = true;
 
@@ -193,7 +193,7 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
     y -= whileConditionsHeight+repeatHeight; //Substract the height of the "For Each object ..." text so as to simplify the tests
     if ( y < 0 ) return;
 
-    if ( x <= renderingHelper->GetConditionsColumnWidth())
+    if ( x < 0 || static_cast<unsigned int>(x) <= renderingHelper->GetConditionsColumnWidth())
     {
         conditionsSelected = true;
 

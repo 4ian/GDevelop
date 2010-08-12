@@ -18,7 +18,6 @@
 #include <iostream>
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
-#include "GDL/gpl.h"
 
 
 ////////////////////////////////////////////////////////////

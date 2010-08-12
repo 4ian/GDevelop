@@ -18,7 +18,6 @@
 
 #include <SFML/Window.hpp>
 #include "GDL/RuntimeScene.h"
-#include "GDL/gpl.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/Instruction.h"
 
@@ -96,12 +95,12 @@ bool CondDistance( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
                 float Y = (*obj)->GetDrawableY()+(*obj)->GetCenterY() - ((*obj2)->GetDrawableY()+(*obj2)->GetCenterY());
 
                 //optimisation : le test de signe en premier
-                if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && gpl::sqrt(X*X+Y*Y) == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
-                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && gpl::sqrt(X*X+Y*Y) < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
-                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && gpl::sqrt(X*X+Y*Y) > condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
-                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && gpl::sqrt(X*X+Y*Y) <= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
-                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && gpl::sqrt(X*X+Y*Y) >= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
-                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && gpl::sqrt(X*X+Y*Y) != condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) )
+                if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && sqrt(X*X+Y*Y) == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
+                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && sqrt(X*X+Y*Y) < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
+                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && sqrt(X*X+Y*Y) > condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
+                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && sqrt(X*X+Y*Y) <= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
+                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && sqrt(X*X+Y*Y) >= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
+                        ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && sqrt(X*X+Y*Y) != condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) )
                    )
                 {
                     if ( !condition.IsInverted() )

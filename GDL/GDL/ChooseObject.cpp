@@ -92,9 +92,9 @@ onlyObjectOfType(onlyObjectOfType_)
 	Notebook1->AddPage(GroupesList, _("Groupes d\'objets"), false);
 	Notebook1->AddPage(globalObjectsList, _("Objets globaux"), false);
 	Notebook1->AddPage(globalObjectGroups, _("Groupes globaux"), false);
-	FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-	FlexGridSizer1->Add(searchCtrl, 1, wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer1->Add(searchCtrl, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -303,8 +303,6 @@ void ChooseObject::OnglobalObjectGroupsItemRightClick(wxTreeEvent& event)
     PopupMenu(&Menu2);
 }
 
-#endif
-
 void ChooseObject::OnsearchCtrlText(wxCommandEvent& event)
 {
     Refresh();
@@ -313,3 +311,6 @@ void ChooseObject::OnsearchCtrlText(wxCommandEvent& event)
 void ChooseObject::OnsearchCtrlTextEnter(wxCommandEvent& event)
 {
 }
+
+
+#endif

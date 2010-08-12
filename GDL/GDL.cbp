@@ -518,6 +518,8 @@
 		<Unit filename="GDL\Chercher.h" />
 		<Unit filename="GDL\ChoixDossier.cpp" />
 		<Unit filename="GDL\ChoixDossier.h" />
+		<Unit filename="GDL\ChooseAutomatismDlg.cpp" />
+		<Unit filename="GDL\ChooseAutomatismDlg.h" />
 		<Unit filename="GDL\ChooseLayer.cpp" />
 		<Unit filename="GDL\ChooseLayer.h" />
 		<Unit filename="GDL\ChooseObject.cpp" />
@@ -833,8 +835,6 @@
 		</Unit>
 		<Unit filename="GDL\gdTreeItemStringData.cpp" />
 		<Unit filename="GDL\gdTreeItemStringData.h" />
-		<Unit filename="GDL\gpl.cpp" />
-		<Unit filename="GDL\gpl.h" />
 		<Unit filename="GDL\md5.cpp">
 			<Option virtualFolder="md5\" />
 		</Unit>
@@ -894,6 +894,7 @@
 					<wxDialog wxs="wxsmith/EditExpression.wxs" src="GDL/EditExpression.cpp" hdr="GDL/EditExpression.h" name="EditExpression" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseVariableDialog.wxs" src="GDL/ChooseVariableDialog.cpp" hdr="GDL/ChooseVariableDialog.h" name="ChooseVariableDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/EditTextDialog.wxs" src="GDL/EditTextDialog.cpp" hdr="GDL/EditTextDialog.h" name="EditTextDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseAutomatismDlg.wxs" src="GDL/ChooseAutomatismDlg.cpp" hdr="GDL/ChooseAutomatismDlg.h" name="ChooseAutomatismDlg" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

@@ -20,7 +20,8 @@ class GD_API BitmapGUIManager
 public:
 
     wxBitmap expressionBt;
-    wxBitmap objetBt;
+    wxBitmap objectBt;
+    wxBitmap automatismBt;
     wxBitmap signeBt;
     wxBitmap fileBt;
     wxBitmap yesnoBt;

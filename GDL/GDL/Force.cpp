@@ -9,7 +9,6 @@
 #include <cmath>
 #include "GDL/Log.h"
 #include "GDL/Event.h"
-#include "GDL/gpl.h"
 #include "GDL/Force.h"
 
 float const Force::PI = 3.14159265;
@@ -53,7 +52,7 @@ float Force::GetAngle() const
     if ( ALneedUpdate )
     {
         angle = atan2(Y,X)*180/PI;
-        length = gpl::sqrt( X*X + Y*Y );
+        length = sqrt( X*X + Y*Y );
         ALneedUpdate = false;
     }
 
@@ -64,7 +63,7 @@ float Force::GetLength() const
     if ( ALneedUpdate )
     {
         angle = atan2(Y,X)*180/PI;
-        length = gpl::sqrt( X*X + Y*Y );
+        length = sqrt( X*X + Y*Y );
         ALneedUpdate = false;
     }
 

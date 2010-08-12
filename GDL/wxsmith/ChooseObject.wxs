@@ -105,6 +105,7 @@
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<border>5</border>
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
@@ -112,7 +113,7 @@
 					<handler function="OnsearchCtrlText" entry="EVT_TEXT" />
 					<handler function="OnsearchCtrlTextEnter" entry="EVT_TEXT_ENTER" />
 				</object>
-				<flag>wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>
 				<option>1</option>
 			</object>

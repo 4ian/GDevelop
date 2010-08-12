@@ -141,7 +141,7 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
         dc.DrawBitmap( instructionInfos.smallicon, x + sideSeparation + leftIconsWidth, yCondition, true );
 
         //Draw the condition text
-        string TexteFinal = TranslateCondition::Translate(conditions[j], instructionInfos,  false, true);
+        string TexteFinal = TranslateCondition::Translate(conditions[j], instructionInfos);
         GetHTMLRenderer().SetHtmlText(TexteFinal);
         wxArrayInt neededArray;
         GetHTMLRenderer().Render(x + sideSeparation + leftIconsWidth + iconWidth, yCondition, neededArray);
@@ -216,7 +216,7 @@ int EventsRenderingHelper::DrawActionsList(const vector < Instruction > & action
         dc.DrawBitmap( instructionInfos.smallicon, x + sideSeparation + leftIconsWidth, yAction, true );
 
         //Draw the action text
-        GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( actions[j], instructionInfos, false, true ));
+        GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( actions[j], instructionInfos ));
         wxArrayInt neededArray;
         GetHTMLRenderer().Render(x + leftIconsWidth + iconWidth + sideSeparation, yAction, neededArray);
 
@@ -267,7 +267,7 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
         yCondition += separation;
 
         //Calcul de la hauteur prise par le texte
-        GetHTMLRenderer().SetHtmlText(TranslateCondition::Translate(conditions[j], instructionInfos, false, true));
+        GetHTMLRenderer().SetHtmlText(TranslateCondition::Translate(conditions[j], instructionInfos));
         yCondition += GetHTMLRenderer().GetTotalHeight()+separation+1;
 
         conditions[j].renderedHeight = GetHTMLRenderer().GetTotalHeight();
@@ -320,7 +320,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
         yAction += separation;
 
         //Calcul de la hauteur prise par le texte
-        GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( actions[j], instructionInfos, false, true ));
+        GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( actions[j], instructionInfos ));
         yAction += GetHTMLRenderer().GetTotalHeight()+separation+1;
 
         actions[j].renderedHeight = GetHTMLRenderer().GetTotalHeight();
@@ -335,7 +335,7 @@ bool EventsRenderingHelper::GetConditionAt(vector < Instruction > & conditions, 
 {
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
 
-    unsigned int conditionsY = 1;
+    int conditionsY = 1;
     for (unsigned int c = 0;c<conditions.size();++c)
     {
         const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(conditions[c].GetType());
@@ -382,7 +382,7 @@ unsigned int EventsRenderingHelper::GetRenderedInstructionAndSubInstructionsHeig
 
 bool EventsRenderingHelper::GetActionAt(vector < Instruction > & actions, int x, int y, vector < Instruction > *& actionList, unsigned int & actionIdInList)
 {
-    unsigned int actionsY = 1;
+    int actionsY = 1;
     for (unsigned int a = 0;a<actions.size();++a)
     {
         actionsY += 1;

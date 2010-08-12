@@ -18,7 +18,8 @@ BitmapGUIManager::BitmapGUIManager()
 {
     //ctor
     expressionBt.LoadFile("res/expressionicon.png", wxBITMAP_TYPE_ANY);
-    objetBt.LoadFile("res/objeticon.png", wxBITMAP_TYPE_ANY);
+    objectBt.LoadFile("res/objeticon.png", wxBITMAP_TYPE_ANY);
+    automatismBt.LoadFile("res/automatism16.png", wxBITMAP_TYPE_ANY);
     signeBt.LoadFile("res/signeicon.png", wxBITMAP_TYPE_ANY);
     fileBt.LoadFile("res/fileicon.png", wxBITMAP_TYPE_ANY);
     yesnoBt.LoadFile("res/yesnoicon.png", wxBITMAP_TYPE_ANY);

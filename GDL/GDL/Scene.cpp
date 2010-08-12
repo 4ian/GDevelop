@@ -138,7 +138,7 @@ unsigned int GD_API GetTypeIdOfAutomatism(const Game & game, const Scene & scene
 
 vector < unsigned int > GD_API GetAutomatismsOfObject(const Game & game, const Scene & scene, std::string name, bool searchInGroups)
 {
-    bool typesAlreadyInserted = false;
+    bool automatismsAlreadyInserted = false;
     vector < unsigned int > automatims;
 
     //Search in objects
@@ -149,13 +149,13 @@ vector < unsigned int > GD_API GetAutomatismsOfObject(const Game & game, const S
     {
         vector < unsigned int > objectAutomatisms = scene.initialObjects[IDsceneObject]->GetAllAutomatismsNameIdentifiers();
         copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatims));
-        typesAlreadyInserted = true;
+        automatismsAlreadyInserted = true;
     }
     else if ( IDglobalObject != -1 )
     {
         vector < unsigned int > objectAutomatisms = game.globalObjects[IDglobalObject]->GetAllAutomatismsNameIdentifiers();
         copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatims));
-        typesAlreadyInserted = true;
+        automatismsAlreadyInserted = true;
     }
 
     //Search in groups
@@ -173,8 +173,11 @@ vector < unsigned int > GD_API GetAutomatismsOfObject(const Game & game, const S
                 {
                     //Get automatisms of the object of the group and delete automatism which are not in commons.
                 	vector < unsigned int > objectAutomatisms = GetAutomatismsOfObject(game, scene, groupsObjects[j], false);
-                	if (!typesAlreadyInserted)
+                	if (!automatismsAlreadyInserted)
+                	{
+                	    automatismsAlreadyInserted = true;
                 	    automatims = objectAutomatisms;
+                	}
                 	else
                 	{
                         for (unsigned int a = 0 ;a<automatims.size();++a)

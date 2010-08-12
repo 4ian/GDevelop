@@ -24,8 +24,9 @@
 #include <wx/checkbox.h>
 #include <wx/imaglist.h>
 #include <wx/bmpbuttn.h>
-#include "GDL/Scene.h"
-#include "GDL/Game.h"
+#include "GDL/GDExpression.h"
+class Scene;
+class Game;
 
 #include <string>
 #include <vector>

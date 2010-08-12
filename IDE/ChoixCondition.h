@@ -21,19 +21,23 @@
 
 //(*Headers(ChoixCondition)
 #include <wx/treectrl.h>
+#include <wx/notebook.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/statline.h>
 #include <wx/radiobut.h>
+#include <wx/panel.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
+#include <wx/srchctrl.h>
 #include <wx/bmpbuttn.h>
-#include "GDL/Scene.h"
-#include "GDL/Event.h"
-#include "GDL/Game.h"
+#include "GDL/GDExpression.h"
+class Scene;
+class Game;
 
 #include <string>
 #include <vector>
@@ -63,17 +67,28 @@ class ChoixCondition: public wxDialog
 		wxTreeCtrl* ConditionsTree;
 		wxButton* OkBt;
 		wxStaticBitmap* ConditionImg;
+		wxSearchCtrl* searchCtrl;
+		wxNotebook* Notebook1;
 		wxStaticText* NomConditionTxt;
 		wxCheckBox* ContraireCheck;
+		wxTreeCtrl* globalObjectGroups;
 		wxFlexGridSizer* GridSizer1;
+		wxPanel* Panel1;
+		wxTreeCtrl* objectConditionsTree;
 		wxRadioButton* LocaliseCheck;
+		wxTreeCtrl* ObjetsList;
 		wxStaticLine* StaticLine2;
 		wxStaticText* ConditionTextTxt;
 		wxButton* moreBt;
 		wxButton* CancelBt;
 		wxStaticLine* StaticLine1;
+		wxTreeCtrl* globalObjectsList;
+		wxNotebook* objectsListsNotebook;
+		wxSearchCtrl* objectsSearchCtrl;
+		wxTreeCtrl* GroupesList;
 		wxCheckBox* objSortCheck;
 		wxRadioButton* GlobalCheck;
+		wxBoxSizer* conditionSizer;
 		wxButton* AideBt;
 		//*)
 		vector < wxCheckBox * > ParaFac;
@@ -86,6 +101,16 @@ class ChoixCondition: public wxDialog
 
 		//(*Identifiers(ChoixCondition)
 		static const long ID_TREECTRL1;
+		static const long ID_TREECTRL2;
+		static const long ID_TREECTRL3;
+		static const long ID_TREECTRL4;
+		static const long ID_TREECTRL5;
+		static const long ID_NOTEBOOK2;
+		static const long ID_TEXTCTRL2;
+		static const long ID_TREECTRL6;
+		static const long ID_PANEL1;
+		static const long ID_NOTEBOOK1;
+		static const long ID_TEXTCTRL1;
 		static const long ID_STATICBITMAP1;
 		static const long ID_STATICTEXT1;
 		static const long ID_STATICTEXT2;
@@ -117,12 +142,19 @@ class ChoixCondition: public wxDialog
 		void OnobjSortCheckClick(wxCommandEvent& event);
 		void OnmoreBtClick(wxCommandEvent& event);
 		void OnGlobalCheckSelect(wxCommandEvent& event);
+		void OnsearchCtrlText(wxCommandEvent& event);
+		void OnobjectsSearchCtrlText(wxCommandEvent& event);
+		void OnObjetsListSelectionChanged(wxTreeEvent& event);
+		void OnobjectConditionsTreeSelectionChanged(wxTreeEvent& event);
 		//*)
+		void RefreshAllLists();
+		void RefreshObjectsLists();
+		void RefreshObjectConditionsList();
         void OnABtClick(wxCommandEvent& event);
-        void OnParamEdit(wxCommandEvent& event);
         void OnFacClicked(wxCommandEvent& event);
 
 		wxImageList * imageList;
+		std::string selectedObject;
 
 		DECLARE_EVENT_TABLE()
 };

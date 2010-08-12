@@ -48,6 +48,7 @@
 #include "ChoiceJoyAxis.h"
 #include "ChoiceFile.h"
 #include "GDL/ChooseVariableDialog.h"
+#include "GDL/ObjectListDialogsHelper.h"
 #include "Extensions.h"
 
 #include <string>
@@ -56,9 +57,9 @@
 #include "MemTrace.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
-#include "GDL/Event.h"
 #include "GDL/Chercher.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/ChooseAutomatismDlg.h"
 #include <wx/help.h>
 #include "SigneTest.h"
 
@@ -68,6 +69,16 @@ using namespace std;
 
 //(*IdInit(ChoixCondition)
 const long ChoixCondition::ID_TREECTRL1 = wxNewId();
+const long ChoixCondition::ID_TREECTRL2 = wxNewId();
+const long ChoixCondition::ID_TREECTRL3 = wxNewId();
+const long ChoixCondition::ID_TREECTRL4 = wxNewId();
+const long ChoixCondition::ID_TREECTRL5 = wxNewId();
+const long ChoixCondition::ID_NOTEBOOK2 = wxNewId();
+const long ChoixCondition::ID_TEXTCTRL2 = wxNewId();
+const long ChoixCondition::ID_TREECTRL6 = wxNewId();
+const long ChoixCondition::ID_PANEL1 = wxNewId();
+const long ChoixCondition::ID_NOTEBOOK1 = wxNewId();
+const long ChoixCondition::ID_TEXTCTRL1 = wxNewId();
 const long ChoixCondition::ID_STATICBITMAP1 = wxNewId();
 const long ChoixCondition::ID_STATICTEXT1 = wxNewId();
 const long ChoixCondition::ID_STATICTEXT2 = wxNewId();
@@ -108,13 +119,15 @@ scene(scene_)
     wxBoxSizer* BoxSizer4;
     wxStaticBoxSizer* StaticBoxSizer2;
     wxBoxSizer* BoxSizer6;
+    wxFlexGridSizer* FlexGridSizer4;
     wxBoxSizer* BoxSizer5;
+    wxBoxSizer* BoxSizer10;
     wxBoxSizer* BoxSizer7;
-    wxBoxSizer* BoxSizer8;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
     wxFlexGridSizer* FlexGridSizer2;
     wxBoxSizer* BoxSizer2;
+    wxBoxSizer* BoxSizer11;
     wxFlexGridSizer* FlexGridSizer7;
     wxBoxSizer* BoxSizer1;
     wxBoxSizer* BoxSizer9;
@@ -131,10 +144,45 @@ scene(scene_)
     SetIcon(FrameIcon);
     BoxSizer6 = new wxBoxSizer(wxVERTICAL);
     BoxSizer7 = new wxBoxSizer(wxHORIZONTAL);
-    ConditionsTree = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxSize(285,270), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
+    FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer4->AddGrowableCol(0);
+    FlexGridSizer4->AddGrowableRow(0);
+    Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(270,500), 0, _T("ID_NOTEBOOK1"));
+    ConditionsTree = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxDefaultPosition, wxSize(300,350), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
     ConditionsTree->SetToolTip(_("Choisissez une condition à paramétrer."));
-    BoxSizer7->Add(ConditionsTree, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    BoxSizer8 = new wxBoxSizer(wxVERTICAL);
+    Panel1 = new wxPanel(Notebook1, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+    BoxSizer10 = new wxBoxSizer(wxVERTICAL);
+    BoxSizer11 = new wxBoxSizer(wxVERTICAL);
+    objectsListsNotebook = new wxNotebook(Panel1, ID_NOTEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK2"));
+    ObjetsList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL2, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL2"));
+    ObjetsList->SetToolTip(_("Choisissez un objet dans la liste"));
+    GroupesList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL3, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL3"));
+    GroupesList->SetToolTip(_("Choisissez un objet dans la liste"));
+    globalObjectsList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL4, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL4"));
+    globalObjectsList->SetToolTip(_("Choisissez un objet dans la liste"));
+    globalObjectGroups = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL5, wxPoint(-71,-11), wxSize(281,190), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL5"));
+    globalObjectGroups->SetToolTip(_("Choisissez un objet dans la liste"));
+    objectsListsNotebook->AddPage(ObjetsList, _("Objets"), false);
+    objectsListsNotebook->AddPage(GroupesList, _("Groupes d\'objets"), false);
+    objectsListsNotebook->AddPage(globalObjectsList, _("Objets globaux"), false);
+    objectsListsNotebook->AddPage(globalObjectGroups, _("Groupes globaux"), false);
+    BoxSizer11->Add(objectsListsNotebook, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    objectsSearchCtrl = new wxSearchCtrl(Panel1, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(10,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+    BoxSizer11->Add(objectsSearchCtrl, 0, wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer10->Add(BoxSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    objectConditionsTree = new wxTreeCtrl(Panel1, ID_TREECTRL6, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL6"));
+    objectConditionsTree->SetToolTip(_("Choisissez une action à paramétrer."));
+    BoxSizer10->Add(objectConditionsTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    Panel1->SetSizer(BoxSizer10);
+    BoxSizer10->Fit(Panel1);
+    BoxSizer10->SetSizeHints(Panel1);
+    Notebook1->AddPage(ConditionsTree, _("Toutes les conditions"), false);
+    Notebook1->AddPage(Panel1, _("Par objet"), false);
+    FlexGridSizer4->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    FlexGridSizer4->Add(searchCtrl, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    BoxSizer7->Add(FlexGridSizer4, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    conditionSizer = new wxBoxSizer(wxVERTICAL);
     FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer3->AddGrowableCol(2);
     FlexGridSizer3->AddGrowableRow(0);
@@ -146,25 +194,24 @@ scene(scene_)
     NomConditionTxt->SetFont(NomConditionTxtFont);
     BoxSizer4->Add(NomConditionTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer3->Add(BoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    BoxSizer8->Add(FlexGridSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    conditionSizer->Add(FlexGridSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
     ConditionTextTxt = new wxStaticText(this, ID_STATICTEXT2, _("Choisissez une condition dans le menu de gauche"), wxDefaultPosition, wxSize(100,13), 0, _T("ID_STATICTEXT2"));
     ConditionTextTxt->SetToolTip(_("Pour plus d\'informations sur la condition, consultez l\'aide."));
     BoxSizer3->Add(ConditionTextTxt, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    BoxSizer8->Add(BoxSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    conditionSizer->Add(BoxSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
-    StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
+    StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(400,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
     BoxSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    BoxSizer8->Add(BoxSizer1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    conditionSizer->Add(BoxSizer1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     GridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
     GridSizer1->AddGrowableCol(1);
-    BoxSizer8->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    conditionSizer->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer9 = new wxBoxSizer(wxHORIZONTAL);
     StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Sélection des objets"));
     FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer5->AddGrowableCol(0);
     FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
-    FlexGridSizer6->AddGrowableCol(0);
     LocaliseCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("Par défaut"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
     LocaliseCheck->SetValue(true);
     LocaliseCheck->SetToolTip(_("Ne seront pris en compte que les objets concernés par les autres conditions de l\'évènement."));
@@ -174,7 +221,7 @@ scene(scene_)
     FlexGridSizer6->Add(GlobalCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     StaticBoxSizer1->Add(FlexGridSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    BoxSizer9->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 0);
+    BoxSizer9->Add(StaticBoxSizer1, 1, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 0);
     StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Inversion"));
     FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer7->AddGrowableCol(1);
@@ -185,8 +232,8 @@ scene(scene_)
     FlexGridSizer7->Add(ContraireCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer2->Add(FlexGridSizer7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer9->Add(StaticBoxSizer2, 0, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 0);
-    BoxSizer8->Add(BoxSizer9, 0, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_BOTTOM, 5);
-    BoxSizer7->Add(BoxSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    conditionSizer->Add(BoxSizer9, 0, wxALL|wxALIGN_LEFT|wxALIGN_BOTTOM, 5);
+    BoxSizer7->Add(conditionSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer6->Add(BoxSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
     StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
@@ -215,6 +262,13 @@ scene(scene_)
     Center();
 
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixCondition::OnConditionsTreeSelectionChanged);
+    Connect(ID_TREECTRL2,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixCondition::OnObjetsListSelectionChanged);
+    Connect(ID_TREECTRL3,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixCondition::OnObjetsListSelectionChanged);
+    Connect(ID_TREECTRL4,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixCondition::OnObjetsListSelectionChanged);
+    Connect(ID_TREECTRL5,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixCondition::OnObjetsListSelectionChanged);
+    Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ChoixCondition::OnobjectsSearchCtrlText);
+    Connect(ID_TREECTRL6,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixCondition::OnobjectConditionsTreeSelectionChanged);
+    Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ChoixCondition::OnsearchCtrlText);
     Connect(ID_RADIOBUTTON2,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&ChoixCondition::OnGlobalCheckSelect);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnmoreBtClick);
     Connect(ID_CHECKBOX3,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnobjSortCheckClick);
@@ -240,7 +294,7 @@ scene(scene_)
         ParaText.push_back(new wxStaticText( this, ID_TEXTARRAY, _( "Paramètre :" ), wxDefaultPosition, wxDefaultSize, 0, _T( "TxtPara" + num ) ));
 
         //Une zone à éditer
-        ParaEdit.push_back( new wxTextCtrl( this, ID_EDITARRAY,  "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, /*_T(*/ num /*)*/ ));
+        ParaEdit.push_back( new wxTextCtrl( this, ID_EDITARRAY,  "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator,  num  ));
 
         //Un bitmap bouton
         const long id = wxNewId();
@@ -250,8 +304,6 @@ scene(scene_)
                  wxCommandEventHandler( ChoixCondition::OnABtClick ) );
         Connect( ID_BUTTONARRAY, wxEVT_COMMAND_BUTTON_CLICKED,
                  wxCommandEventHandler( ChoixCondition::OnABtClick ) );
-        Connect( ID_EDITARRAY, wxEVT_COMMAND_TEXT_UPDATED,
-                 wxCommandEventHandler( ChoixCondition::OnParamEdit ) );
         Connect( ID_CHECKARRAY, wxEVT_COMMAND_CHECKBOX_CLICKED,
                  wxCommandEventHandler( ChoixCondition::OnFacClicked ) );
 
@@ -274,6 +326,7 @@ scene(scene_)
     imageList = new wxImageList( 16, 16 );
     imageList->Add(( wxBitmap( "res/conditions/unecond.png", wxBITMAP_TYPE_ANY ) ) );
     ConditionsTree->AssignImageList( imageList );
+    objectConditionsTree->SetImageList( imageList );
 
     Type = "";
     Loc = true;
@@ -292,7 +345,7 @@ scene(scene_)
         ContraireCheck->Enable(false);
     }
 
-    RefreshList();
+    RefreshAllLists();
     Center();
 }
 
@@ -310,6 +363,13 @@ ChoixCondition::~ChoixCondition()
     //*)
 }
 
+void ChoixCondition::RefreshAllLists()
+{
+    RefreshObjectsLists();
+    RefreshObjectConditionsList();
+    RefreshList();
+}
+
 /**
  * Create the list of conditions
  */
@@ -317,6 +377,9 @@ void ChoixCondition::RefreshList()
 {
     ConditionsTree->DeleteAllItems();
     ConditionsTree->AddRoot( _( "Toutes les conditions" ), 0 );
+
+    std::string search = searchCtrl->GetValue().mb_str();
+    bool searching = search.empty() ? false : true;
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
@@ -345,6 +408,7 @@ void ChoixCondition::RefreshList()
 
 	    for(unsigned int j = 0;j<objectsTypes.size();++j)
 	    {
+
             wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                         ConditionsTree->AppendItem(extensionItem,
                                                                 _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectsTypes[j]).fullname,
@@ -354,6 +418,10 @@ void ChoixCondition::RefreshList()
             std::map<string, InstructionInfos > allConditions = extensions[i]->GetAllConditionsForObject(objectsTypes[j]);
             for(std::map<string, InstructionInfos>::const_iterator it = allConditions.begin(); it != allConditions.end(); ++it)
             {
+                //Verify if the condition match the search
+                if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                    continue;
+
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = ConditionsTree->GetFirstChild(objectTypeItem, cookie);
@@ -387,6 +455,10 @@ void ChoixCondition::RefreshList()
             std::map<string, InstructionInfos > allConditions = extensions[i]->GetAllConditionsForAutomatism(automatismsTypes[j]);
             for(std::map<string, InstructionInfos>::const_iterator it = allConditions.begin(); it != allConditions.end(); ++it)
             {
+                //Verify if the condition match the search
+                if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                    continue;
+
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = ConditionsTree->GetFirstChild(automatismTypeItem, cookie);
@@ -413,6 +485,10 @@ void ChoixCondition::RefreshList()
         std::map<string, InstructionInfos > allConditions = extensions[i]->GetAllConditions();
         for(std::map<string, InstructionInfos>::const_iterator it = allConditions.begin(); it != allConditions.end(); ++it)
         {
+            //Verify if the condition match the search
+            if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                continue;
+
             //Search and/or add group item
             wxTreeItemIdValue cookie;
             wxTreeItemId groupItem = ConditionsTree->GetFirstChild(extensionItem, cookie);
@@ -433,9 +509,135 @@ void ChoixCondition::RefreshList()
             gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
             ConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
         }
+
+	    if ( !ConditionsTree->HasChildren(extensionItem) ) ConditionsTree->Delete(extensionItem);
 	}
 
     ConditionsTree->Expand(ConditionsTree->GetRootItem());
+}
+
+void ChoixCondition::RefreshObjectsLists()
+{
+    ObjectListDialogsHelper objectListsHelper(game, scene);
+    objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups, "", objectsSearchCtrl->GetValue().mb_str());
+}
+
+void ChoixCondition::RefreshObjectConditionsList()
+{
+    objectConditionsTree->DeleteAllItems();
+    objectConditionsTree->AddRoot( _( "Toutes les conditions" ), 0 );
+
+    std::string search = searchCtrl->GetValue().mb_str();
+    bool searching = search.empty() ? false : true;
+
+    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
+    std::string selectedObjectType = extensionManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, selectedObject));
+
+    //Insert extension objects conditions
+	for (unsigned int i = 0;i<extensions.size();++i)
+	{
+	    //Verify if that extension is enabled
+	    if ( find(game.extensionsUsed.begin(),
+                  game.extensionsUsed.end(),
+                  extensions[i]->GetName()) == game.extensionsUsed.end() )
+            continue;
+
+        wxTreeItemId extensionItem = objectConditionsTree->GetRootItem();
+        std::string objectType = selectedObjectType;
+        if ( extensions[i]->GetName() == "BuiltinObject" )
+        {
+            objectType = "";
+            extensionItem = objectConditionsTree->AppendItem(objectConditionsTree->GetRootItem(), _("Tous les objets"), 0);
+        }
+        else
+            extensionItem = objectConditionsTree->AppendItem(objectConditionsTree->GetRootItem(), extensions[i]->GetFullName(), 0);
+
+        wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
+                                    objectConditionsTree->AppendItem(extensionItem,
+                                                            _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectType).fullname,
+                                                            0) :
+                                    extensionItem;
+
+        //Add each object conditions
+        std::map<string, InstructionInfos > allConditions = extensions[i]->GetAllConditionsForObject(objectType);
+        for(std::map<string, InstructionInfos>::const_iterator it = allConditions.begin(); it != allConditions.end(); ++it)
+        {
+            //Verify if the condition match the search
+            if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                continue;
+
+            //Search and/or add group item
+            wxTreeItemIdValue cookie;
+            wxTreeItemId groupItem = objectConditionsTree->GetFirstChild(objectTypeItem, cookie);
+            while ( groupItem.IsOk() && objectConditionsTree->GetItemText(groupItem) != it->second.group )
+            {
+                groupItem = objectConditionsTree->GetNextSibling(groupItem);
+            }
+            if ( !groupItem.IsOk() ) groupItem = objectConditionsTree->AppendItem(objectTypeItem, it->second.group, 0);
+
+            //Add condition item
+            int IDimage = 0;
+            if ( it->second.smallicon.IsOk() )
+            {
+                imageList->Add(it->second.smallicon);
+                IDimage = imageList->GetImageCount()-1;
+            }
+
+            gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+            objectConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+        }
+
+	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+	    vector<unsigned int> objectAutomatisms = GetAutomatismsOfObject(game, scene, selectedObject);
+
+	    for(unsigned int j = 0;j<objectAutomatisms.size();++j)
+	    {
+	        ObjectIdentifiersManager * objectIdentifierManager = ObjectIdentifiersManager::getInstance();
+	        std::string automatismType = objectIdentifierManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, objectIdentifierManager->GetNamefromOID(objectAutomatisms[j])));
+
+	        if ( find(automatismsTypes.begin(), automatismsTypes.end(), automatismType) == automatismsTypes.end() )
+                continue;
+
+            wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
+                                        objectConditionsTree->AppendItem(extensionItem,
+                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismType).fullname,
+                                                                0) :
+                                        extensionItem;
+            //Add each automatism conditions
+            std::map<string, InstructionInfos > allConditions = extensions[i]->GetAllConditionsForAutomatism(automatismType);
+            for(std::map<string, InstructionInfos>::const_iterator it = allConditions.begin(); it != allConditions.end(); ++it)
+            {
+                //Verify if the condition match the search
+                if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                    continue;
+
+                //Search and/or add group item
+                wxTreeItemIdValue cookie;
+                wxTreeItemId groupItem = objectConditionsTree->GetFirstChild(automatismTypeItem, cookie);
+                while ( groupItem.IsOk() && objectConditionsTree->GetItemText(groupItem) != it->second.group )
+                {
+                    groupItem = objectConditionsTree->GetNextSibling(groupItem);
+                }
+                if ( !groupItem.IsOk() ) groupItem = objectConditionsTree->AppendItem(automatismTypeItem, it->second.group, 0);
+
+                //Add condition item
+                int IDimage = 0;
+                if ( it->second.smallicon.IsOk() )
+                {
+                    imageList->Add(it->second.smallicon);
+                    IDimage = imageList->GetImageCount()-1;
+                }
+
+                gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+                objectConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+            }
+	    }
+
+	    if ( !objectConditionsTree->HasChildren(extensionItem) ) objectConditionsTree->Delete(extensionItem);
+	}
+
+    objectConditionsTree->Expand(objectConditionsTree->GetRootItem());
 }
 
 void ChoixCondition::OnConditionsTreeSelectionChanged( wxTreeEvent& event )
@@ -448,6 +650,21 @@ void ChoixCondition::OnConditionsTreeSelectionChanged( wxTreeEvent& event )
         Type = associatedData->GetString();
 
         RefreshFromCondition();
+        return;
+    }
+}
+
+void ChoixCondition::OnobjectConditionsTreeSelectionChanged(wxTreeEvent& event)
+{
+    wxTreeItemId item = event.GetItem();
+
+    gdTreeItemStringData * associatedData = dynamic_cast<gdTreeItemStringData*>(objectConditionsTree->GetItemData(item));
+    if ( associatedData != NULL )
+    {
+        Type = associatedData->GetString();
+
+        RefreshFromCondition();
+        if ( !ParaEdit.empty() ) ParaEdit[0]->SetValue(selectedObject);;
         return;
     }
 }
@@ -526,25 +743,10 @@ void ChoixCondition::RefreshFromCondition()
     for ( unsigned int i = 0;i < Param.size();i++ )
         ParaEdit.at(i)->ChangeValue( Param[i].GetPlainString() );
 
-    if ( Loc )
-    {
-        LocaliseCheck->SetValue(true);
-        GlobalCheck->SetValue(false);
-    }
-    else
-    {
-        LocaliseCheck->SetValue(false);
-        GlobalCheck->SetValue(true);
-    }
+    LocaliseCheck->SetValue(Loc);
+    GlobalCheck->SetValue(!Loc);
 
-    if ( Contraire )
-    {
-        ContraireCheck->SetValue(true);
-    }
-    else
-    {
-        ContraireCheck->SetValue(false);
-    }
+    ContraireCheck->SetValue(Contraire);
 
     Fit();
 }
@@ -601,6 +803,15 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             {
                 ParaEdit.at(i)->ChangeValue(dialog.objectChosen);
             }
+            return;
+        }
+        else if ( instructionInfos.parameters[i].type == "automatism" )
+        {
+            std::string object = ParaEdit.empty() ? "" : ParaEdit[0]->GetValue().mb_str();
+            ChooseAutomatismDlg dialog(this, game, scene, object, instructionInfos.parameters[i].objectType);
+            if ( dialog.ShowModal() == 1 )
+                ParaEdit.at(i)->ChangeValue(dialog.automatismChosen);
+
             return;
         }
         else if (  instructionInfos.parameters[i].type == "expression" )
@@ -751,16 +962,6 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Modification paramètres
-///
-/// Mise à jour automatique global/local
-////////////////////////////////////////////////////////////
-void ChoixCondition::OnParamEdit( wxCommandEvent& event )
-{
-    //Plus besoin !
-}
-
 void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
 {
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
@@ -869,4 +1070,31 @@ void ChoixCondition::OnmoreBtClick(wxCommandEvent& event)
 void ChoixCondition::OnGlobalCheckSelect(wxCommandEvent& event)
 {
     wxLogMessage(_("Attention. Cette option n'est présente que par compatibilité avec les anciennes versions de Game Develop.\nElle ne doit plus être utilisée dans les nouveaux jeux et pourrait être enlevée dans les prochaines versions."));
+}
+
+void ChoixCondition::OnsearchCtrlText(wxCommandEvent& event)
+{
+    RefreshList();
+    RefreshObjectConditionsList();
+    searchCtrl->SetFocus();
+}
+
+void ChoixCondition::OnobjectsSearchCtrlText(wxCommandEvent& event)
+{
+    RefreshObjectsLists();
+    objectsSearchCtrl->SetFocus();
+}
+
+void ChoixCondition::OnObjetsListSelectionChanged(wxTreeEvent& event)
+{
+    if ( objectsListsNotebook->GetSelection() == 0 && ObjetsList->GetRootItem() != ObjetsList->GetFocusedItem() )
+        selectedObject = ObjetsList->GetItemText( ObjetsList->GetFocusedItem() ).mb_str();
+    else if ( objectsListsNotebook->GetSelection() == 1 && GroupesList->GetRootItem() != GroupesList->GetFocusedItem() )
+        selectedObject = GroupesList->GetItemText( GroupesList->GetFocusedItem() ).mb_str();
+    else if ( objectsListsNotebook->GetSelection() == 2 && globalObjectsList->GetRootItem() != globalObjectsList->GetFocusedItem() )
+        selectedObject = globalObjectsList->GetItemText( globalObjectsList->GetFocusedItem() ).mb_str();
+    else if ( objectsListsNotebook->GetSelection() == 3 && globalObjectGroups->GetRootItem() != globalObjectGroups->GetFocusedItem() )
+        selectedObject = globalObjectGroups->GetItemText( globalObjectGroups->GetFocusedItem() ).mb_str();
+
+    RefreshObjectConditionsList();
 }

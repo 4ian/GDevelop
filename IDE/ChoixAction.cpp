@@ -42,6 +42,7 @@
 #include "ChoiceJoyAxis.h"
 #include "ChoiceFile.h"
 #include "GDL/ChooseVariableDialog.h"
+#include "GDL/ChooseAutomatismDlg.h"
 #include "GDL/ObjectListDialogsHelper.h"
 
 
@@ -491,9 +492,6 @@ void ChoixAction::RefreshObjectActionsList()
                   extensions[i]->GetName()) == game.extensionsUsed.end() )
             continue;
 
-	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
-	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
-
         wxTreeItemId extensionItem = objectActionsTree->GetRootItem();
         std::string objectType = selectedObjectType;
         if ( extensions[i]->GetName() == "BuiltinObject" )
@@ -539,6 +537,7 @@ void ChoixAction::RefreshObjectActionsList()
             objectActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
         }
 
+	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
 	    vector<unsigned int> objectAutomatisms = GetAutomatismsOfObject(game, scene, selectedObject);
 
 	    for(unsigned int j = 0;j<objectAutomatisms.size();++j)
@@ -546,12 +545,8 @@ void ChoixAction::RefreshObjectActionsList()
 	        ObjectIdentifiersManager * objectIdentifierManager = ObjectIdentifiersManager::getInstance();
 	        std::string automatismType = objectIdentifierManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, objectIdentifierManager->GetNamefromOID(objectAutomatisms[j])));
 
-	        cout << "Autotype of object " << automatismType << endl;
-
 	        if ( find(automatismsTypes.begin(), automatismsTypes.end(), automatismType) == automatismsTypes.end() )
                 continue;
-
-            cout << "ok" << endl;
 
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         objectActionsTree->AppendItem(extensionItem,
@@ -739,6 +734,15 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             {
                 ParaEdit.at(i)->ChangeValue(Dialog.objectChosen);
             }
+            return;
+        }
+        else if ( instructionInfos.parameters[i].type == "automatism" )
+        {
+            std::string object = ParaEdit.empty() ? "" : ParaEdit[0]->GetValue().mb_str();
+            ChooseAutomatismDlg dialog(this, game, scene, object, instructionInfos.parameters[i].objectType);
+            if ( dialog.ShowModal() == 1 )
+                ParaEdit.at(i)->ChangeValue(dialog.automatismChosen);
+
             return;
         }
         else if ( instructionInfos.parameters[i].type == "expression" )

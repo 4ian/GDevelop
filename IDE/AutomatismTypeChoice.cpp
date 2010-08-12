@@ -129,7 +129,7 @@ void AutomatismTypeChoice::RefreshList()
 	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
 	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
 	    {
-	        if ( automatismsTypes[j] != "" )
+	        if ( !automatismsTypes[j].empty() )
 	        {
                 imageList->Add(extensions[i]->GetAutomatismInfo(automatismsTypes[j]).icon);
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(automatismsTypes[j]);
@@ -155,7 +155,8 @@ void AutomatismTypeChoice::OnautomatismsListItemActivated(wxListEvent& event)
         selectedAutomatismType = associatedData->GetString();
     }
 
-    EndModal(1);
+    if (!selectedAutomatismType.empty())
+        EndModal(1);
 }
 
 void AutomatismTypeChoice::OnautomatismsListItemSelect(wxListEvent& event)
@@ -189,7 +190,8 @@ void AutomatismTypeChoice::OnautomatismsListItemSelect(wxListEvent& event)
 
 void AutomatismTypeChoice::OnokBtClick(wxCommandEvent& event)
 {
-    EndModal(1);
+    if (!selectedAutomatismType.empty())
+        EndModal(1);
 }
 
 void AutomatismTypeChoice::OncancelBtClick(wxCommandEvent& event)

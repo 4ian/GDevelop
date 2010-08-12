@@ -1575,8 +1575,12 @@ void OpenSaveGame::OpenLayers(vector < Layer > & list, TiXmlElement * elem)
 
             elemCamera->QueryFloatAttribute("ViewportLeft", &layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Left);
             elemCamera->QueryFloatAttribute("ViewportTop", &layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Top);
-            elemCamera->QueryFloatAttribute("ViewportRight", &layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Right);
-            elemCamera->QueryFloatAttribute("ViewportBottom", &layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Bottom);
+
+            float value;
+            elemCamera->QueryFloatAttribute("ViewportRight", &value); //sf::Rect used Right and Bottom instead of Width and Height before.
+            layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Width = value - layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Left;
+            elemCamera->QueryFloatAttribute("ViewportBottom", &value);
+            layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Height = value - layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Top;
 
             elemCamera = elemCamera->NextSiblingElement();
         }
@@ -2069,8 +2073,8 @@ void OpenSaveGame::SaveLayers(const vector < Layer > & list, TiXmlElement * laye
 
             camera->SetDoubleAttribute("ViewportLeft", list.at(j).GetCamera(c).viewport.Left);
             camera->SetDoubleAttribute("ViewportTop", list.at(j).GetCamera(c).viewport.Top);
-            camera->SetDoubleAttribute("ViewportRight", list.at(j).GetCamera(c).viewport.Right);
-            camera->SetDoubleAttribute("ViewportBottom", list.at(j).GetCamera(c).viewport.Bottom);
+            camera->SetDoubleAttribute("ViewportRight", list.at(j).GetCamera(c).viewport.Left+list.at(j).GetCamera(c).viewport.Width);
+            camera->SetDoubleAttribute("ViewportBottom", list.at(j).GetCamera(c).viewport.Top+list.at(j).GetCamera(c).viewport.Height);
         }
     }
 }

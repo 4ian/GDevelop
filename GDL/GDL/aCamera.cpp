@@ -34,8 +34,8 @@ bool ActCameraViewport( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
     camera.GetCameraInfo().defaultViewport = false;
     camera.GetCameraInfo().viewport.Left = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned);
     camera.GetCameraInfo().viewport.Top = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
-    camera.GetCameraInfo().viewport.Right = action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned);
-    camera.GetCameraInfo().viewport.Bottom = action.GetParameter( 5 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    camera.GetCameraInfo().viewport.Width = action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned) - camera.GetCameraInfo().viewport.Left;
+    camera.GetCameraInfo().viewport.Height = action.GetParameter( 5 ).GetAsMathExpressionResult(scene, objectsConcerned) - camera.GetCameraInfo().viewport.Top;
     camera.GetSFMLView().SetViewport(camera.GetCameraInfo().viewport);
     return true;
 }
@@ -80,8 +80,8 @@ bool ActAddCamera( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
 
     cameraInfo.viewport.Left = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
     cameraInfo.viewport.Top = action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned);
-    cameraInfo.viewport.Right = action.GetParameter( 5 ).GetAsMathExpressionResult(scene, objectsConcerned);
-    cameraInfo.viewport.Bottom = action.GetParameter( 6 ).GetAsMathExpressionResult(scene, objectsConcerned);
+    cameraInfo.viewport.Width = action.GetParameter( 5 ).GetAsMathExpressionResult(scene, objectsConcerned) - cameraInfo.viewport.Left;
+    cameraInfo.viewport.Height = action.GetParameter( 6 ).GetAsMathExpressionResult(scene, objectsConcerned) - cameraInfo.viewport.Top;
 
     //Create a runtime camera from the camera
     const sf::RenderWindow * window = scene.renderWindow;

@@ -843,26 +843,6 @@
 		</Unit>
 		<Unit filename="GDL\profile.cpp" />
 		<Unit filename="GDL\profile.h" />
-		<Unit filename="GDL\sf_classes_1.pypp.cpp" />
-		<Unit filename="GDL\sf_classes_1.pypp.hpp" />
-		<Unit filename="GDL\sf_classes_2.pypp.cpp" />
-		<Unit filename="GDL\sf_classes_2.pypp.hpp" />
-		<Unit filename="GDL\sf_classes_3.pypp.cpp" />
-		<Unit filename="GDL\sf_classes_3.pypp.hpp" />
-		<Unit filename="GDL\sf_classes_4.pypp.cpp" />
-		<Unit filename="GDL\sf_classes_4.pypp.hpp" />
-		<Unit filename="GDL\sf_classes_5.pypp.cpp" />
-		<Unit filename="GDL\sf_classes_5.pypp.hpp" />
-		<Unit filename="GDL\sf_classes_6.pypp.cpp" />
-		<Unit filename="GDL\sf_classes_6.pypp.hpp" />
-		<Unit filename="GDL\sf_classes_7.pypp.cpp" />
-		<Unit filename="GDL\sf_classes_7.pypp.hpp" />
-		<Unit filename="GDL\sf_enumerations.pypp.cpp" />
-		<Unit filename="GDL\sf_enumerations.pypp.hpp" />
-		<Unit filename="GDL\sf_free_functions.pypp.cpp" />
-		<Unit filename="GDL\sf_free_functions.pypp.hpp" />
-		<Unit filename="GDL\sf_global_variables.pypp.cpp" />
-		<Unit filename="GDL\sf_global_variables.pypp.hpp" />
 		<Unit filename="GDL\singleton.cpp" />
 		<Unit filename="GDL\singleton.h" />
 		<Unit filename="GDL\tinystr.cpp" />

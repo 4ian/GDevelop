@@ -79,7 +79,7 @@ bool ActDownloadFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     // Create request
     sf::Http::Request Request;
     Request.SetMethod(sf::Http::Request::Get);
-    Request.SetURI(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned));
+    Request.SetUri(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned));
 
     // Send request & Get response
     sf::Http::Response datas = Http.SendRequest(Request);

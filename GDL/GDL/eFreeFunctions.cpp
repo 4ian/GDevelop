@@ -92,19 +92,20 @@ double ExpCameraViewportTop( const RuntimeScene & scene, ObjectsConcerned & obje
 double ExpCameraViewportRight( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
+    const sf::FloatRect & sfmlViewport = scene.GetLayer( exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned)
+                                                    ).GetCamera(camera).GetCameraInfo().viewport;
 
-    return scene.GetLayer(
-                            exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned)
-                            ).GetCamera(camera).GetCameraInfo().viewport.Right;
+
+    return sfmlViewport.Left+sfmlViewport.Width;
 }
 
 double ExpCameraViewportBottom( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
+    const sf::FloatRect & sfmlViewport = scene.GetLayer( exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned)
+                                                    ).GetCamera(camera).GetCameraInfo().viewport;
 
-    return scene.GetLayer(
-                            exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned)
-                            ).GetCamera(camera).GetCameraInfo().viewport.Bottom;
+    return sfmlViewport.Top+sfmlViewport.Height;
 }
 
 double ExpCameraX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )

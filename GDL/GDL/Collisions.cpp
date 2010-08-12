@@ -68,8 +68,8 @@ sf::IntRect GetAABB( const sf::Sprite& Object )
     {
         return sf::IntRect( static_cast<int>( pos.x ),
                             static_cast<int>( pos.y ),
-                            static_cast<int>( pos.x + size.x ),
-                            static_cast<int>( pos.y + size.y ) );
+                            static_cast<int>( size.x ), //4ian : Rect now uses width/height.
+                            static_cast<int>( size.y ) );
     }
 
     //Calculate the other points as vectors from (0,0)
@@ -91,8 +91,7 @@ sf::IntRect GetAABB( const sf::Sprite& Object )
     int Bottom = static_cast<int>( MaxValue( 0.0f, B.y, C.y, D.y ) );
 
     //Create a Rect from out points and move it back to the correct position on the screen
-    sf::IntRect AABB = sf::IntRect( Left, Top, Right, Bottom );
-    AABB.Offset( static_cast<int>( pos.x ), static_cast<int>( pos.y ) );
+    sf::IntRect AABB = sf::IntRect( pos.x+Left, pos.y+Top, Right-Left, Bottom-Top ); //4ian : Rect now uses width/height.
     return AABB;
 }
 
@@ -122,15 +121,15 @@ bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf:
         sf::IntRect O1SubRect = Object1.GetSubRect();
         sf::IntRect O2SubRect = Object2.GetSubRect();
 
-        sf::Vector2i O1SubRectSize( O1SubRect.GetSize().x, O1SubRect.GetSize().y );
-        sf::Vector2i O2SubRectSize( O2SubRect.GetSize().x, O2SubRect.GetSize().y );
+        sf::Vector2i O1SubRectSize( O1SubRect.Width, O1SubRect.Height );
+        sf::Vector2i O2SubRectSize( O2SubRect.Width, O2SubRect.Height );
 
         sf::Vector2f o1v;
         sf::Vector2f o2v;
         //Loop through our pixels
-        for ( int i = Intersection.Left; i < Intersection.Right; i++ )
+        for ( int i = Intersection.Left; i < Intersection.Left+Intersection.Width; i++ ) //4ian : Rect now uses width/height.
         {
-            for ( int j = Intersection.Top; j < Intersection.Bottom; j++ )
+            for ( int j = Intersection.Top; j < Intersection.Top+Intersection.Height; j++ ) //4ian : Rect now uses width/height.
             {
 
                 o1v = Object1.TransformToLocal( sf::Vector2f( i, j ) ); //Creating Objects each loop :(

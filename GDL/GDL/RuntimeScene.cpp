@@ -309,9 +309,9 @@ void RuntimeScene::Render()
 
                 const sf::FloatRect & viewport = camera.GetSFMLView().GetViewport();
                 glViewport(viewport.Left*renderWindow->GetWidth(),
-                           renderWindow->GetHeight()-(viewport.Top+viewport.GetSize().y)*renderWindow->GetHeight(), //Y start from bottom
-                           viewport.GetSize().x*renderWindow->GetWidth(),
-                           viewport.GetSize().y*renderWindow->GetHeight());
+                           renderWindow->GetHeight()-(viewport.Top+viewport.Height)*renderWindow->GetHeight(), //Y start from bottom
+                           viewport.Width*renderWindow->GetWidth(),
+                           viewport.Height*renderWindow->GetHeight());
 
                 renderWindow->SaveGLStates();
 

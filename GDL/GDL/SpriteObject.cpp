@@ -449,7 +449,7 @@ float SpriteObject::GetDrawableX() const
     //FIXME (The not commented code is correct but not optimal)
     //Bad placement when origine of sf::Sprite is changed ( for automatic Rotation for example )
     //return GetCurrentSprite().GetPosition().x;
-    return X - GetCurrentSpriteDatas().GetOrigine().GetX() + (currentSprite->ModSprite().GetSubRect().GetSize().x)*(1-scaleX)/2;
+    return X - GetCurrentSpriteDatas().GetOrigine().GetX() + (currentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2;
 }
 
 /**
@@ -458,7 +458,7 @@ float SpriteObject::GetDrawableX() const
 float SpriteObject::GetDrawableY() const
 {
     //return GetCurrentSprite().GetPosition().y;
-    return Y - GetCurrentSpriteDatas().GetOrigine().GetY() + (currentSprite->ModSprite().GetSubRect().GetSize().y)*(1-scaleY)/2;
+    return Y - GetCurrentSpriteDatas().GetOrigine().GetY() + (currentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2;
 }
 
 /**
@@ -481,7 +481,7 @@ void SpriteObject::SetWidth(float newWidth)
 {
     if ( newWidth > 0 )
     {
-        scaleX = newWidth/(GetCurrentSprite().GetSubRect().GetSize().x);
+        scaleX = newWidth/(GetCurrentSprite().GetSubRect().Width);
         needUpdateCurrentSprite = true;
     }
 }
@@ -490,7 +490,7 @@ void SpriteObject::SetHeight(float newHeight)
 {
     if ( newHeight > 0 )
     {
-        scaleY = newHeight/(GetCurrentSprite().GetSubRect().GetSize().y);
+        scaleY = newHeight/(GetCurrentSprite().GetSubRect().Height);
         needUpdateCurrentSprite = true;
     }
 }
@@ -540,15 +540,15 @@ void SpriteObject::UpdateCurrentSprite() const
 
     if ( GetAnimation(m_animCourant).typeNormal )
     {
-        currentSprite->ModSprite().SetX( X - currentSprite->GetOrigine().GetX() + (currentSprite->ModSprite().GetSubRect().GetSize().x)*(1-scaleX)/2 );
-        currentSprite->ModSprite().SetY( Y - currentSprite->GetOrigine().GetY() + (currentSprite->ModSprite().GetSubRect().GetSize().y)*(1-scaleY)/2 );
+        currentSprite->ModSprite().SetX( X - currentSprite->GetOrigine().GetX() + (currentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2 );
+        currentSprite->ModSprite().SetY( Y - currentSprite->GetOrigine().GetY() + (currentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2 );
     }
     else
     {
         currentSprite->ModSprite().SetX( X  + currentSprite->GetCentre().GetX()*scaleX - currentSprite->GetOrigine().GetX()
-                                            + (currentSprite->ModSprite().GetSubRect().GetSize().x)*(1-scaleX)/2);
+                                            + (currentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2);
         currentSprite->ModSprite().SetY( Y  + currentSprite->GetCentre().GetY()*scaleY - currentSprite->GetOrigine().GetY()
-                                            + (currentSprite->ModSprite().GetSubRect().GetSize().y)*(1-scaleY)/2);
+                                            + (currentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2);
 
         currentSprite->ModSprite().SetOrigin(   currentSprite->GetCentre().GetX(),
                                                 currentSprite->GetCentre().GetY() );

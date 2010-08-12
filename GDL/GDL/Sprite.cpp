@@ -84,7 +84,7 @@ void Sprite::SetSprite(const sf::Sprite & sprite_)
     hasItsOwnImage = false;
 
     if ( automaticCentre )
-        centre.SetXY(sfmlSprite.GetSubRect().GetSize().x/2, sfmlSprite.GetSubRect().GetSize().y/2);
+        centre.SetXY(sfmlSprite.GetSubRect().Width/2, sfmlSprite.GetSubRect().Height/2);
 }
 
 bool Sprite::SetCentreAutomatic(bool enabled)
@@ -92,7 +92,7 @@ bool Sprite::SetCentreAutomatic(bool enabled)
     automaticCentre = enabled;
 
     if ( automaticCentre )
-        centre.SetXY(sfmlSprite.GetSubRect().GetSize().x/2, sfmlSprite.GetSubRect().GetSize().y/2);
+        centre.SetXY(sfmlSprite.GetSubRect().Width/2, sfmlSprite.GetSubRect().Height/2);
 
     return true;
 }

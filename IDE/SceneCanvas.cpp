@@ -441,7 +441,7 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnMotion( wxMouseEvent &event )
 {
-    //Milles merci laurent.
+    //Mille mercis Laurent.
     int mouseXInScene = 0;
     int mouseYInScene = 0;
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="AutomatismTypeChoice.cpp" open="1" top="0" tabpos="8">
+	<File name="AutomatismTypeChoice.cpp" open="1" top="0" tabpos="5">
 		<Cursor position="10050" topLine="174" />
 	</File>
 	<File name="AutomatismTypeChoice.h" open="0" top="0" tabpos="0">
@@ -28,13 +28,13 @@
 	<File name="ChoiceJoyAxis.h" open="0" top="0" tabpos="13">
 		<Cursor position="288" topLine="0" />
 	</File>
-	<File name="ChoixAction.cpp" open="1" top="0" tabpos="2">
+	<File name="ChoixAction.cpp" open="1" top="0" tabpos="1">
 		<Cursor position="31341" topLine="558" />
 	</File>
 	<File name="ChoixAction.h" open="0" top="0" tabpos="4">
 		<Cursor position="596" topLine="6" />
 	</File>
-	<File name="ChoixCondition.cpp" open="1" top="1" tabpos="4">
+	<File name="ChoixCondition.cpp" open="1" top="0" tabpos="2">
 		<Cursor position="33869" topLine="613" />
 	</File>
 	<File name="ChoixCondition.h" open="0" top="0" tabpos="0">
@@ -205,7 +205,7 @@
 	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2790" topLine="90" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="5">
+	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="3">
 		<Cursor position="8504" topLine="187" />
 	</File>
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="3">
@@ -250,7 +250,7 @@
 	<File name="ObjectTypeChoice.h" open="0" top="0" tabpos="0">
 		<Cursor position="802" topLine="10" />
 	</File>
-	<File name="PlayerUnitTests.cpp" open="1" top="0" tabpos="6">
+	<File name="PlayerUnitTests.cpp" open="1" top="0" tabpos="4">
 		<Cursor position="3614" topLine="95" />
 	</File>
 	<File name="Portable.cpp" open="0" top="0" tabpos="7">

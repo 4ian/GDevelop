@@ -266,8 +266,8 @@ void EditLayer::RefreshCameraSettings()
 
         viewportX1Edit->ChangeValue(ToString(camera.viewport.Left));
         viewportY1Edit->ChangeValue(ToString(camera.viewport.Top));
-        viewportX2Edit->ChangeValue(ToString(camera.viewport.Right));
-        viewportY2Edit->ChangeValue(ToString(camera.viewport.Bottom));
+        viewportX2Edit->ChangeValue(ToString(camera.viewport.Left+camera.viewport.Width));
+        viewportY2Edit->ChangeValue(ToString(camera.viewport.Top+camera.viewport.Height));
     }
 }
 
@@ -322,7 +322,7 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
     Camera & camera = tempLayer.GetCamera(selection);
 
     {
-        float newValue = atof(viewportX1Edit->GetValue().c_str());
+        float newValue = ToFloat(viewportX1Edit->GetValue().mb_str());
         if ( newValue >= 0 && newValue <= 1)
         {
             camera.viewport.Left = newValue;
@@ -333,7 +333,7 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
     }
 
     {
-        float newValue = atof(viewportY1Edit->GetValue().c_str());
+        float newValue = ToFloat(viewportY1Edit->GetValue().mb_str());
         if ( newValue >= 0 && newValue <= 1)
         {
             camera.viewport.Top = newValue;
@@ -344,10 +344,10 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
     }
 
     {
-        float newValue = atof(viewportX2Edit->GetValue().c_str());
+        float newValue = ToFloat(viewportX2Edit->GetValue().mb_str());
         if ( newValue >= 0 && newValue <= 1)
         {
-            camera.viewport.Right = newValue;
+            camera.viewport.Width = newValue-camera.viewport.Left;
             viewportX2Edit->SetBackgroundColour(wxColour(255,255,255));
         }
         else
@@ -355,10 +355,10 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
     }
 
     {
-        float newValue = atof(viewportY2Edit->GetValue().c_str());
+        float newValue = ToFloat(viewportY2Edit->GetValue().mb_str());
         if ( newValue >= 0 && newValue <= 1)
         {
-            camera.viewport.Bottom = newValue;
+            camera.viewport.Height = newValue-camera.viewport.Top;
             viewportY2Edit->SetBackgroundColour(wxColour(255,255,255));
         }
         else

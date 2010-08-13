@@ -122,10 +122,13 @@ bool DrawerObject::ActRectangle( RuntimeScene & scene, ObjectsConcerned & object
     float Xgap = absoluteCoordinates ? 0 : GetX();
     float Ygap = absoluteCoordinates ? 0 : GetY();
 
-    shapesToDraw.push_back(sf::Shape::Rectangle(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Xgap,
-                                                action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Ygap,
-                                                action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Xgap,
-                                                action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())+Ygap,
+    float x = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
+    float y = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
+
+    shapesToDraw.push_back(sf::Shape::Rectangle(x+Xgap,
+                                                y+Ygap,
+                                                action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())-x+Xgap,
+                                                action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())-y+Ygap,
                                                 sf::Color(fillColorR, fillColorG, fillColorB, fillOpacity),
                                                 outlineSize,
                                                 sf::Color(outlineColorR, outlineColorG, outlineColorB, outlineOpacity)

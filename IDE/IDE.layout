@@ -115,8 +115,8 @@
 	<File name="DndTextSceneEditor.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="239" topLine="0" />
 	</File>
-	<File name="EditLayer.cpp" open="0" top="0" tabpos="14">
-		<Cursor position="12665" topLine="186" />
+	<File name="EditLayer.cpp" open="1" top="0" tabpos="13">
+		<Cursor position="17740" topLine="340" />
 	</File>
 	<File name="EditLayer.h" open="0" top="0" tabpos="6">
 		<Cursor position="2582" topLine="62" />
@@ -271,8 +271,8 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="22" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="12">
-		<Cursor position="30793" topLine="816" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="12">
+		<Cursor position="16549" topLine="426" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="6">
 		<Cursor position="1216" topLine="34" />

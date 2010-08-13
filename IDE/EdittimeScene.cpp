@@ -148,7 +148,7 @@ void EdittimeScene::RenderEdittimeScene()
     if ( isSelecting )
     {
         sf::Shape selection = sf::Shape::Rectangle(xRectangleSelection, yRectangleSelection,
-                                                   xEndRectangleSelection, yEndRectangleSelection,
+                                                   xEndRectangleSelection-xRectangleSelection, yEndRectangleSelection-yRectangleSelection,
                                                    sf::Color( 0, 0, 200, 40 ), 1, sf::Color( 0, 0, 255, 128 ) );
         renderWindow->Draw(selection);
     }

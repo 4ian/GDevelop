@@ -30,10 +30,10 @@ double SpriteObject::ExpGetObjectX( const RuntimeScene & scene, ObjectsConcerned
     {
         std::ostringstream renvoinum;
 
-        return GetCurrentSprite().TransformToGlobal(
+        return GetCurrentSFMLSprite().TransformToGlobal(
                     sf::Vector2f(
-                        GetCurrentSpriteDatas().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetX(),
-                        GetCurrentSpriteDatas().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetY()
+                        GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetX(),
+                        GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetY()
                     )).x;
     }
 
@@ -44,10 +44,10 @@ double SpriteObject::ExpGetObjectY( const RuntimeScene & scene, ObjectsConcerned
 {
     if ( exprInstruction.parameters.size() > 1 )
     {
-        return GetCurrentSprite().TransformToGlobal(
+        return GetCurrentSFMLSprite().TransformToGlobal(
                     sf::Vector2f(
-                        GetCurrentSpriteDatas().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetX(),
-                        GetCurrentSpriteDatas().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetY()
+                        GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetX(),
+                        GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetY()
                     )).y;
     }
 
@@ -56,7 +56,7 @@ double SpriteObject::ExpGetObjectY( const RuntimeScene & scene, ObjectsConcerned
 
 double SpriteObject::ExpGetObjectDirection( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    return GetDirectionNb();
+    return GetCurrentDirection();
 }
 
 double SpriteObject::ExpGetObjectSpriteNb( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
@@ -66,7 +66,7 @@ double SpriteObject::ExpGetObjectSpriteNb( const RuntimeScene & scene, ObjectsCo
 
 double SpriteObject::ExpGetObjectAnimationNb( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    return GetAnimationNb();
+    return GetCurrentAnimation();
 }
 
 double Object::ExpGetObjectTotalForceX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )

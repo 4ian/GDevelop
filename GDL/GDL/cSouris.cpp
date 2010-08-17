@@ -143,9 +143,8 @@ bool CondSourisSurObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcern
 
     //Précision
     bool accurate = true;
-    if ( condition.GetParameters().size() > 1 &&
-         (condition.GetParameter( 1 ).GetPlainString() == "no" || condition.GetParameter( 1 ).GetPlainString() == "non") )
-        accurate = false;
+    if ( condition.GetParameters().size() > 1 && !condition.GetParameter( 1 ).GetPlainString().empty())
+        accurate = condition.GetParameter( 1 ).GetAsBool();
 
     //Pour chaque objet concerné
     for (unsigned int layerIndex = 0;layerIndex < scene.layers.size();++layerIndex)
@@ -169,7 +168,7 @@ bool CondSourisSurObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcern
                         int ClicX = static_cast<int>( mouseXInTheLayer - (*obj)->GetDrawableX() );
                         int ClicY = static_cast<int>( mouseYInTheLayer - (*obj)->GetDrawableY() );
 
-                        if ( !accurate || (  boost::static_pointer_cast<SpriteObject>(*obj)->GetCurrentSprite().GetPixel( ClicX , ClicY ).a != 0 ) )
+                        if ( !accurate || (  boost::static_pointer_cast<SpriteObject>(*obj)->GetCurrentSFMLSprite().GetPixel( ClicX , ClicY ).a != 0 ) )
                         {
                             if ( !condition.IsInverted() )
                             {

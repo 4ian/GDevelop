@@ -37,10 +37,7 @@ bool SpriteObject::ActBlendMode( RuntimeScene & scene, ObjectsConcerned & object
  */
 bool SpriteObject::ActFlipX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    if ( action.GetParameter( 1 ).GetPlainString() == "yes" || action.GetParameter( 1 ).GetPlainString() == "oui")
-        isFlippedX = true;
-    else
-        isFlippedX = false;
+    isFlippedX = action.GetParameter( 1 ).GetAsBool();
 
     return true;
 }
@@ -50,10 +47,7 @@ bool SpriteObject::ActFlipX( RuntimeScene & scene, ObjectsConcerned & objectsCon
  */
 bool SpriteObject::ActFlipY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    if ( action.GetParameter( 1 ).GetPlainString() == "yes" || action.GetParameter( 1 ).GetPlainString() == "oui")
-        isFlippedY = true;
-    else
-        isFlippedY = false;
+    isFlippedY = action.GetParameter( 1 ).GetAsBool();
 
     return true;
 }
@@ -65,8 +59,8 @@ bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsCon
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
-    currentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
-    sf::Image & dest = currentSprite->GetSpriteOwnImage();
+    ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
+    sf::Image & dest = ptrToCurrentSprite->GetSpriteOwnImage();
 
     //Make sure the coordinates are correct.
     int destX = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
@@ -78,8 +72,7 @@ bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsCon
     bool applyAlpha = false;
     if ( action.GetParameters().size() > 4 )
     {
-        if ( action.GetParameter(4).GetPlainString() == "yes" || action.GetParameter(4).GetPlainString() == "oui" )
-            applyAlpha = true;
+        applyAlpha = action.GetParameter(4).GetAsBool();
     }
 
     dest.Copy(scene.game->imageManager.GetImage(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this())),
@@ -92,8 +85,8 @@ bool SpriteObject::ActCreateMaskFromColorOnActualImage( RuntimeScene & scene, Ob
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
-    currentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
-    sf::Image & dest = currentSprite->GetSpriteOwnImage();
+    ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
+    sf::Image & dest = ptrToCurrentSprite->GetSpriteOwnImage();
 
     vector < string > colors = SpliterStringToVector <string> (action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), ';');
 

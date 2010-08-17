@@ -48,6 +48,11 @@ class GD_API GDExpression
         inline short int GetAsModOperator() const { return modOperator; };
 
         /**
+         * Get the expression as a boolean
+         */
+        inline bool GetAsBool() const { return boolEquivalent; };
+
+        /**
          * Get the object identifier representing the object
          */
         inline unsigned int GetAsObjectIdentifier() const { return oID; }
@@ -138,6 +143,7 @@ class GD_API GDExpression
         char            compOperator; ///<Char representing a comparison operator. Computed at creation.
         char            modOperator; ///<Char representing a modification operator. Computed at creation.
         unsigned int    oID; ///< Object identifier, if expression contains an object name. Computed at creation..
+        bool            boolEquivalent;
 
         mutable GDMathParser  mathExpression; ///<Object representing the mathemathic expression to parse and evaluate.
         std::vector < ExpressionInstruction > mathExpressionFunctions; ///< The functions to call to generate the values of the parameters to pass to the mathematic expression when evaluating.

@@ -161,8 +161,8 @@ bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf:
 bool GD_API CheckCollisionNP( const boost::shared_ptr<const SpriteObject> objet1, const boost::shared_ptr<const SpriteObject> objet2 )
 {
     //Get AABBs of the two sprites
-    sf::IntRect Object1AABB = GetAABB( objet1->GetCurrentSprite() );
-    sf::IntRect Object2AABB = GetAABB( objet2->GetCurrentSprite() );
+    sf::IntRect Object1AABB = GetAABB( objet1->GetCurrentSFMLSprite() );
+    sf::IntRect Object2AABB = GetAABB( objet2->GetCurrentSFMLSprite() );
 
     sf::IntRect Intersection;
 
@@ -177,5 +177,5 @@ bool GD_API CheckCollisionNP( const boost::shared_ptr<const SpriteObject> objet1
  */
 bool GD_API CheckCollision( const boost::shared_ptr<const SpriteObject> objet1, const boost::shared_ptr<const SpriteObject> objet2)
 {
-    return PixelPerfectTest( objet1->GetCurrentSprite(), objet2->GetCurrentSprite(), 1 );
+    return PixelPerfectTest( objet1->GetCurrentSFMLSprite(), objet2->GetCurrentSFMLSprite(), 1 );
 }

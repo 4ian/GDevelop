@@ -209,14 +209,15 @@ void Object::RemoveAutomatism(unsigned int type)
 void Object::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Position");      value = ToString(GetX())+";"+ToString(GetY());}
-    else if ( propertyNb == 1 ) {name = _("Taille");        value = ToString(GetWidth())+";"+ToString(GetHeight());}
-    else if ( propertyNb == 2 ) {name = _("Visibilité");    value = hidden ? _("Masqué") : _("Affiché");}
-    else if ( propertyNb == 3 ) {name = _("Calque");        value = layer;}
-    else if ( propertyNb == 4 ) {name = _("Plan");          value = ToString(zOrder);}
-    else if ( propertyNb == 5 ) {name = _("Vitesse");       value = ToString(TotalForceLength());}
-    else if ( propertyNb == 6 ) {name = _("Angle de déplacement"); value = ToString(TotalForceAngle());}
-    else if ( propertyNb == 7 ) {name = _("Déplacement en X");     value = ToString(TotalForceX());}
-    else if ( propertyNb == 8 ) {name = _("Déplacement en Y"); value = ToString(TotalForceY());}
+    else if ( propertyNb == 1 ) {name = _("Angle");         value = ToString(GetAngle())+"°";}
+    else if ( propertyNb == 2 ) {name = _("Taille");        value = ToString(GetWidth())+";"+ToString(GetHeight());}
+    else if ( propertyNb == 3 ) {name = _("Visibilité");    value = hidden ? _("Masqué") : _("Affiché");}
+    else if ( propertyNb == 4 ) {name = _("Calque");        value = layer;}
+    else if ( propertyNb == 5 ) {name = _("Plan");          value = ToString(zOrder);}
+    else if ( propertyNb == 6 ) {name = _("Vitesse");       value = ToString(TotalForceLength());}
+    else if ( propertyNb == 7 ) {name = _("Angle de déplacement"); value = ToString(TotalForceAngle());}
+    else if ( propertyNb == 8 ) {name = _("Déplacement en X");     value = ToString(TotalForceX());}
+    else if ( propertyNb == 9 ) {name = _("Déplacement en Y"); value = ToString(TotalForceY());}
 }
 
 bool Object::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -234,8 +235,9 @@ bool Object::ChangeProperty(unsigned int propertyNb, string newValue)
         SetX(ToInt(xValue));
         SetY(ToInt(yValue));
     }
-    else if ( propertyNb == 1 ) {return false;}
-    else if ( propertyNb == 2 )
+    else if ( propertyNb == 1 ) {return SetAngle(ToFloat(newValue));}
+    else if ( propertyNb == 2 ) {return false;}
+    else if ( propertyNb == 3 )
     {
         if ( newValue == _("Masqué") )
         {
@@ -244,20 +246,20 @@ bool Object::ChangeProperty(unsigned int propertyNb, string newValue)
         else
             SetHidden(false);
     }
-    else if ( propertyNb == 3 ) { layer = newValue; }
-    else if ( propertyNb == 4 ) {SetZOrder(ToInt(newValue));}
-    else if ( propertyNb == 5 ) {return false;}
+    else if ( propertyNb == 4 ) { layer = newValue; }
+    else if ( propertyNb == 5 ) {SetZOrder(ToInt(newValue));}
     else if ( propertyNb == 6 ) {return false;}
     else if ( propertyNb == 7 ) {return false;}
     else if ( propertyNb == 8 ) {return false;}
+    else if ( propertyNb == 9 ) {return false;}
 
     return true;
 }
 
 unsigned int Object::GetNumberOfProperties() const
 {
-    //Be careful, property start at 0.
-    return 9;
+    //Be careful, properties start at 0.
+    return 10;
 }
 #endif
 

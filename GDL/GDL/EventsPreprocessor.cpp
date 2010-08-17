@@ -27,7 +27,7 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
             conditions[cId].function = extensionsManager->GetConditionFunctionPtr(conditions[cId].GetType());
 
         //Affection à une fonction membre d'un objet si trouvé
-        string objectName = conditions[cId].GetParameter(0).GetPlainString();
+        string objectName = conditions[cId].GetParameters().empty() ? "" : conditions[cId].GetParameter(0).GetPlainString();
         unsigned int objectTypeId = GetTypeIdOfObject(*scene.game, scene, objectName);
 
         if ( extensionsManager->HasObjectCondition(objectTypeId,
@@ -39,7 +39,8 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
         }
 
         //Affection to an automatism member function if found
-        unsigned int automatismTypeId = GetTypeIdOfAutomatism(*scene.game, scene, conditions[cId].GetParameter(1).GetPlainString());
+        unsigned int automatismTypeId = GetTypeIdOfAutomatism(*scene.game, scene,
+                                                              conditions[cId].GetParameters().size() < 2 ? "" : conditions[cId].GetParameter(1).GetPlainString());
 
         if (extensionsManager->HasAutomatismCondition(automatismTypeId,
                                                    conditions[cId].GetType()))
@@ -58,8 +59,16 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
             }
         }
 
-        //Verify that there are not mismatch between object type in parameters
+        //Be sure there is no lack of parameter.
         InstructionInfos instrInfos = extensionsManager->GetConditionInfos(conditions[cId].GetType());
+        while(conditions[cId].GetParameters().size() < instrInfos.parameters.size())
+        {
+            vector < GDExpression > parameters = conditions[cId].GetParameters();
+            parameters.push_back(GDExpression(""));
+            conditions[cId].SetParameters(parameters);
+        }
+
+        //Verify that there are not mismatch between object type in parameters
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             if ( instrInfos.parameters[pNb].useObject && instrInfos.parameters[pNb].objectType != "" )
@@ -78,6 +87,7 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
                 }
             }
         }
+
 
         //Preprocessing expressions
         for( unsigned int instrId=0;instrId<conditions[cId].GetParameters().size();++instrId)
@@ -107,7 +117,7 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
             actions[aId].function = extensionsManager->GetActionFunctionPtr(actions[aId].GetType());
 
         //Affection à une fonction membre d'un objet si trouvé
-        string objectName = actions[aId].GetParameter(0).GetPlainString();
+        string objectName = actions[aId].GetParameters().empty() ? "" : actions[aId].GetParameter(0).GetPlainString();
         unsigned int objectTypeId = GetTypeIdOfObject(*scene.game, scene, objectName);
 
         if ( extensionsManager->HasObjectAction(objectTypeId,
@@ -119,7 +129,8 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
         }
 
         //Affection to an automatism member function if found
-        unsigned int automatismTypeId = GetTypeIdOfAutomatism(*scene.game, scene, actions[aId].GetParameter(1).GetPlainString());
+        unsigned int automatismTypeId = GetTypeIdOfAutomatism(*scene.game, scene,
+                                                              actions[aId].GetParameters().size() < 2 ? "" : actions[aId].GetParameter(1).GetPlainString());
 
         if (extensionsManager->HasAutomatismAction(automatismTypeId,
                                                    actions[aId].GetType()))
@@ -138,9 +149,16 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
             }
         }
 
+        //Be sure there is no lack of parameter.
+        InstructionInfos instrInfos = extensionsManager->GetActionInfos(actions[aId].GetType());
+        while(actions[aId].GetParameters().size() < instrInfos.parameters.size())
+        {
+            vector < GDExpression > parameters = actions[aId].GetParameters();
+            parameters.push_back(GDExpression(""));
+            actions[aId].SetParameters(parameters);
+        }
 
         //Verify that there are not mismatch between object type in parameters
-        InstructionInfos instrInfos = extensionsManager->GetActionInfos(actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             if ( instrInfos.parameters[pNb].useObject && instrInfos.parameters[pNb].objectType != "" )

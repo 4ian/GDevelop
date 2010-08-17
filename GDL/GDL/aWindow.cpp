@@ -17,13 +17,13 @@ using namespace std;
 bool ActSetFullScreen( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     #ifdef GDP
-    if ( ( action.GetParameter(0).GetPlainString() == "yes" || action.GetParameter(0).GetPlainString() == "oui" ) && !scene.RenderWindowIsFullScreen() )
+    if ( action.GetParameter(0).GetAsBool() && !scene.RenderWindowIsFullScreen() )
     {
         scene.SetRenderWindowIsFullScreen();
         scene.renderWindow->Create( sf::VideoMode( scene.game->windowWidth, scene.game->windowHeight, 32 ), scene.title, sf::Style::Close | sf::Style::Fullscreen );
         scene.ChangeRenderWindow(scene.renderWindow);
     }
-    else if ( ( action.GetParameter(0).GetPlainString() == "no" || action.GetParameter(0).GetPlainString() == "non" ) && scene.RenderWindowIsFullScreen() )
+    else if ( !action.GetParameter(0).GetAsBool() && scene.RenderWindowIsFullScreen() )
     {
         scene.SetRenderWindowIsFullScreen(false);
         scene.renderWindow->Create( sf::VideoMode( scene.game->windowWidth, scene.game->windowHeight, 32 ), scene.title, sf::Style::Close );

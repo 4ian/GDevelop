@@ -28,7 +28,8 @@ class GD_API Animation
         void SetDirection(const Direction & direction, unsigned int nb);
 
         void SetDirectionsNumber(unsigned int nb);
-        unsigned int GetDirectionsNumber() const;
+        unsigned int GetDirectionsNumber() const { return directionsNumber; };
+        inline bool HasNoDirections() const { return directions.empty(); };
 
         bool typeNormal;
 

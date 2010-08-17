@@ -20,12 +20,12 @@ Sprite SpriteObject::badSpriteDatas;
 
 SpriteObject::SpriteObject(std::string name_) :
 Object(name_),
-m_animCourant( 0 ),
-m_direcCourant( 0 ),
-m_spriteCourant( 0 ),
+currentAnimation( 0 ),
+currentDirection( 0 ),
+currentSprite( 0 ),
 animationStopped(false),
 timeElapsedOnCurrentSprite(0),
-currentSprite( NULL ),
+ptrToCurrentSprite( NULL ),
 needUpdateCurrentSprite(true),
 cacheAnimationSizeNeedUpdate(true),
 opacity( 255 ),
@@ -304,7 +304,7 @@ bool SpriteObject::LoadResources(const ImageManager & imageMgr )
 bool SpriteObject::InitializeFromInitialPosition(const InitialPosition & position)
 {
     if ( position.floatInfos.find("animation") != position.floatInfos.end() )
-        SetAnim(position.floatInfos.find("animation")->second);
+        SetAnimation(position.floatInfos.find("animation")->second);
 
     //Compatibility with Game Develop 1.2.8522 and inferior
     if ( position.floatInfos.find("direction") != position.floatInfos.end() )
@@ -333,7 +333,7 @@ bool SpriteObject::Draw( sf::RenderWindow& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    window.Draw( GetCurrentSprite() );
+    window.Draw( GetCurrentSFMLSprite() );
 
     return true;
 }
@@ -344,7 +344,7 @@ bool SpriteObject::Draw( sf::RenderWindow& window )
  */
 bool SpriteObject::DrawEdittime(sf::RenderWindow& renderWindow)
 {
-    renderWindow.Draw( GetCurrentSprite() );
+    renderWindow.Draw( GetCurrentSFMLSprite() );
 
     return true;
 }
@@ -352,7 +352,7 @@ bool SpriteObject::DrawEdittime(sf::RenderWindow& renderWindow)
 bool SpriteObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
 {
     //Generate a thumbnail from the first animation
-    if ( IsValid(0,0,0) )
+    if ( !HasNoAnimations() && !GetAnimation(0).HasNoDirections() && !GetAnimation(0).GetDirection(0).HasNoSprites() )
     {
         int idImage = FindImage(game.images, GetAnimation(0).GetDirection(0).GetSprite(0).GetImageName());
         if ( idImage != -1 )
@@ -403,8 +403,8 @@ void SpriteObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositi
 
 void SpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Animation");     value = ToString(GetAnimationNb());}
-    else if ( propertyNb == 1 ) {name = _("Direction");     value = ToString(GetDirectionNb());}
+    if      ( propertyNb == 0 ) {name = _("Animation");     value = ToString(GetCurrentAnimation());}
+    else if ( propertyNb == 1 ) {name = _("Direction");     value = ToString(GetCurrentDirection());}
     else if ( propertyNb == 2 ) {name = _("Image");         value = ToString(GetSpriteNb());}
     else if ( propertyNb == 3 ) {name = _("Opacité");       value = ToString(GetOpacity());}
     else if ( propertyNb == 4 ) {name = _("Méthode d'affichage");   if ( blendMode == 0) value = "0 (Alpha)";
@@ -417,8 +417,8 @@ void SpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name
 
 bool SpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
-    if ( propertyNb == 0 ) { return SetAnim(ToInt(newValue)); }
-    else if ( propertyNb == 1 ) {return SetDirec(ToInt(newValue)); }
+    if ( propertyNb == 0 ) { return SetAnimation(ToInt(newValue)); }
+    else if ( propertyNb == 1 ) {return GetAnimation( currentAnimation ).typeNormal ? SetDirection(ToInt(newValue)) : SetAngle(ToFloat(newValue)); }
     else if ( propertyNb == 2 ) { return SetSprite(ToInt(newValue)); }
     else if ( propertyNb == 3 ) { SetOpacity(ToFloat(newValue)); }
     else if ( propertyNb == 4 )
@@ -448,8 +448,8 @@ float SpriteObject::GetDrawableX() const
 {
     //FIXME (The not commented code is correct but not optimal)
     //Bad placement when origine of sf::Sprite is changed ( for automatic Rotation for example )
-    //return GetCurrentSprite().GetPosition().x;
-    return X - GetCurrentSpriteDatas().GetOrigine().GetX() + (currentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2;
+    //return GetCurrentSFMLSprite().GetPosition().x;
+    return X - GetCurrentSprite().GetOrigine().GetX() + (GetCurrentSFMLSprite().GetSubRect().Width)*(1-scaleX)/2;
 }
 
 /**
@@ -457,8 +457,8 @@ float SpriteObject::GetDrawableX() const
  */
 float SpriteObject::GetDrawableY() const
 {
-    //return GetCurrentSprite().GetPosition().y;
-    return Y - GetCurrentSpriteDatas().GetOrigine().GetY() + (currentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2;
+    //return GetCurrentSFMLSprite().GetPosition().y;
+    return Y - GetCurrentSprite().GetOrigine().GetY() + (GetCurrentSFMLSprite().GetSubRect().Height)*(1-scaleY)/2;
 }
 
 /**
@@ -466,7 +466,7 @@ float SpriteObject::GetDrawableY() const
  */
 float SpriteObject::GetWidth() const
 {
-    return GetCurrentSprite().GetSize().x;
+    return GetCurrentSFMLSprite().GetSize().x;
 }
 
 /**
@@ -474,14 +474,14 @@ float SpriteObject::GetWidth() const
  */
 float SpriteObject::GetHeight() const
 {
-    return GetCurrentSprite().GetSize().y;
+    return GetCurrentSFMLSprite().GetSize().y;
 }
 
 void SpriteObject::SetWidth(float newWidth)
 {
     if ( newWidth > 0 )
     {
-        scaleX = newWidth/(GetCurrentSprite().GetSubRect().Width);
+        scaleX = newWidth/(GetCurrentSFMLSprite().GetSubRect().Width);
         needUpdateCurrentSprite = true;
     }
 }
@@ -490,7 +490,7 @@ void SpriteObject::SetHeight(float newHeight)
 {
     if ( newHeight > 0 )
     {
-        scaleY = newHeight/(GetCurrentSprite().GetSubRect().Height);
+        scaleY = newHeight/(GetCurrentSFMLSprite().GetSubRect().Height);
         needUpdateCurrentSprite = true;
     }
 }
@@ -508,7 +508,7 @@ void SpriteObject::SetOriginalSize()
 float SpriteObject::GetCenterX() const
 {
     //Just need to multiply by the scale as it is the center
-    return GetCurrentSpriteDatas().GetCentre().GetX()*scaleX;
+    return GetCurrentSprite().GetCentre().GetX()*scaleX;
 }
 
 /**
@@ -517,7 +517,7 @@ float SpriteObject::GetCenterX() const
 float SpriteObject::GetCenterY() const
 {
     //Just need to multiply by the scale as it is the center
-    return GetCurrentSpriteDatas().GetCentre().GetY()*scaleY;
+    return GetCurrentSprite().GetCentre().GetY()*scaleY;
 }
 
 /**
@@ -525,35 +525,43 @@ float SpriteObject::GetCenterY() const
  */
 void SpriteObject::UpdateCurrentSprite() const
 {
-    //Mise à jour du pointeur vers le sprite SFML
-    if ( m_animCourant >= GetAnimationsNumber() )
-        currentSprite = &badSpriteDatas;
-    else
-        currentSprite = &animations[m_animCourant].GetDirectionToModify( m_direcCourant ).ModSprite( m_spriteCourant );
+    if ( currentAnimation >= GetAnimationsNumber() )
+        ptrToCurrentSprite = &badSpriteDatas;
 
-    //Mise à jour du sprite SFML avec les propriétés de l'objet
-    currentSprite->ModSprite().SetScale( scaleX, scaleY );
-    currentSprite->ModSprite().SetColor( sf::Color( colorR, colorV, colorB, opacity ) );
-    currentSprite->ModSprite().SetBlendMode( blendMode );
-    currentSprite->ModSprite().FlipX(isFlippedX);
-    currentSprite->ModSprite().FlipY(isFlippedY);
-
-    if ( GetAnimation(m_animCourant).typeNormal )
+    if ( animations[currentAnimation].typeNormal )
     {
-        currentSprite->ModSprite().SetX( X - currentSprite->GetOrigine().GetX() + (currentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2 );
-        currentSprite->ModSprite().SetY( Y - currentSprite->GetOrigine().GetY() + (currentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2 );
+        //Update sprite pointer
+        if ( currentDirection >= animations[currentAnimation].GetDirectionsNumber() || currentSprite >= animations[currentAnimation].GetDirection(currentDirection).GetSpritesNumber() )
+            ptrToCurrentSprite = &badSpriteDatas;
+        else
+            ptrToCurrentSprite = &animations[currentAnimation].GetDirectionToModify( currentDirection ).ModSprite( currentSprite );
+
+        ptrToCurrentSprite->ModSprite().SetX( X - ptrToCurrentSprite->GetOrigine().GetX() + (ptrToCurrentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2 );
+        ptrToCurrentSprite->ModSprite().SetY( Y - ptrToCurrentSprite->GetOrigine().GetY() + (ptrToCurrentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2 );
     }
     else
     {
-        currentSprite->ModSprite().SetX( X  + currentSprite->GetCentre().GetX()*scaleX - currentSprite->GetOrigine().GetX()
-                                            + (currentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2);
-        currentSprite->ModSprite().SetY( Y  + currentSprite->GetCentre().GetY()*scaleY - currentSprite->GetOrigine().GetY()
-                                            + (currentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2);
+        //Update sprite pointer
+        if ( animations[currentAnimation].HasNoDirections() || currentSprite >= animations[currentAnimation].GetDirection(0).GetSpritesNumber() )
+            ptrToCurrentSprite = &badSpriteDatas;
+        else
+            ptrToCurrentSprite = &animations[currentAnimation].GetDirectionToModify(0).ModSprite( currentSprite );
 
-        currentSprite->ModSprite().SetOrigin(   currentSprite->GetCentre().GetX(),
-                                                currentSprite->GetCentre().GetY() );
-        currentSprite->ModSprite().SetRotation( -m_direcCourant );
+        ptrToCurrentSprite->ModSprite().SetX( X  + ptrToCurrentSprite->GetCentre().GetX()*scaleX - ptrToCurrentSprite->GetOrigine().GetX()
+                                            + (ptrToCurrentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2);
+        ptrToCurrentSprite->ModSprite().SetY( Y  + ptrToCurrentSprite->GetCentre().GetY()*scaleY - ptrToCurrentSprite->GetOrigine().GetY()
+                                            + (ptrToCurrentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2);
+
+        ptrToCurrentSprite->ModSprite().SetOrigin(   ptrToCurrentSprite->GetCentre().GetX(),
+                                                ptrToCurrentSprite->GetCentre().GetY() );
+        ptrToCurrentSprite->ModSprite().SetRotation( -currentAngle );
     }
+
+    ptrToCurrentSprite->ModSprite().SetScale( scaleX, scaleY );
+    ptrToCurrentSprite->ModSprite().SetColor( sf::Color( colorR, colorV, colorB, opacity ) );
+    ptrToCurrentSprite->ModSprite().SetBlendMode( blendMode );
+    ptrToCurrentSprite->ModSprite().FlipX(isFlippedX);
+    ptrToCurrentSprite->ModSprite().FlipY(isFlippedY);
 
     needUpdateCurrentSprite = false;
 }
@@ -567,7 +575,7 @@ void SpriteObject::UpdateTime(float elapsedTime)
     if ( animationStopped ) return;
 
     timeElapsedOnCurrentSprite += elapsedTime;
-    float delay = GetAnimation(m_animCourant).GetDirection( m_direcCourant ).GetTimeBetweenFrames();
+    float delay = GetAnimation(currentAnimation).GetDirection( currentDirection ).GetTimeBetweenFrames();
 
     //On gère l'avancement du sprite actuel suivant le temps entre chaque sprite
     if ( timeElapsedOnCurrentSprite > delay )
@@ -575,242 +583,104 @@ void SpriteObject::UpdateTime(float elapsedTime)
         if ( delay != 0 )
         {
             unsigned int frameCount = static_cast<unsigned int>( timeElapsedOnCurrentSprite / delay );
-            m_spriteCourant += frameCount;
+            currentSprite += frameCount;
         }
-        else m_spriteCourant++;
+        else currentSprite++;
 
         timeElapsedOnCurrentSprite = 0;
     }
-    if ( m_spriteCourant >= GetAnimation(m_animCourant).GetDirection( m_direcCourant ).GetSpritesNumber() )
+    if ( currentSprite >= GetAnimation(currentAnimation).GetDirection( currentDirection ).GetSpritesNumber() )
     {
-        if ( GetAnimation(m_animCourant).GetDirection( m_direcCourant ).IsLooping() )
-            m_spriteCourant = 0;
+        if ( GetAnimation(currentAnimation).GetDirection( currentDirection ).IsLooping() )
+            currentSprite = 0;
         else
-            m_spriteCourant = GetAnimation(m_animCourant).GetDirection( m_direcCourant ).GetSpritesNumber() - 1;
+            currentSprite = GetAnimation(currentAnimation).GetDirection( currentDirection ).GetSpritesNumber() - 1;
     }
 
     needUpdateCurrentSprite = true;
 }
 
 /**
- * Test if an animation/direction/sprite number is valid
- */
-bool SpriteObject::IsValid( int anim, int direc, int sprite ) const
-{
-    if ( anim != -1 )
-    {
-        //Vérification de l'animation
-        if ( anim < 0 )
-        {
-            std::ostringstream renvoinum;
-            renvoinum << anim;
-            std::string renvoistr = renvoinum.str();
-
-
-            if ( errors != NULL )
-                errors->Add( "L'animation n°" + renvoistr + " pour l'objet nommé " + name + " est invalide ( Inférieur à 0 )", "", name, -1, 1 );
-
-            return false;
-        }
-        if ( static_cast<unsigned>( anim ) >= GetAnimationsNumber() )
-        {
-            std::ostringstream renvoinum;
-            renvoinum << anim;
-            std::string renvoistr = renvoinum.str();
-
-            if ( errors != NULL )
-                errors->Add( "L'animation n°" + renvoistr + " pour l'objet nommé " + name + " est invalide ( ce numéro n'existe pas pour cet objet )", "", name, -1, 1 );
-
-            return false;
-        }
-    }
-
-    if ( direc != -1 )
-    {
-        //Vérification des directions ( uniquement pour les animations à 8 directions )
-        if ( animations[anim].typeNormal && static_cast<unsigned>( direc ) >= GetAnimation( anim ).GetDirectionsNumber() )
-        {
-            std::ostringstream renvoinum;
-            renvoinum << direc;
-            std::string renvoistr = renvoinum.str();
-
-
-            if ( errors != NULL )
-                errors->Add( "La direction n°" + renvoistr + " pour l'objet nommé " + name + " est invalide ( Supérieur au nombre de directions autorisées )", "", name, -1, 1 );
-
-            return false;
-        }
-        if ( animations[anim].typeNormal &&  direc < 0 )
-        {
-            std::ostringstream renvoinum;
-            renvoinum << direc;
-            std::string renvoistr = renvoinum.str();
-
-
-            if ( errors != NULL )
-                errors->Add( "La direction n°" + renvoistr + " pour l'objet nommé " + name + " est invalide ( Inférieure à 0 )", "", name, -1, 1 );
-
-            return false;
-        }
-        if ( animations[anim].GetDirection( direc ).HasNoSprites() )
-        {
-            std::ostringstream renvoinum;
-            renvoinum << direc;
-            std::string renvoistr = renvoinum.str();
-
-            if ( errors != NULL )
-                errors->Add( "La direction n°" + renvoistr + " pour l'objet nommé " + name + " ne contient pas d'images", "", name, -1, 1 );
-
-            return false;
-        }
-    }
-
-    if ( sprite != -1 )
-    {
-        int direction = direc;
-        if ( ! animations[anim].typeNormal )
-            direction = 0;
-
-        //Vérifications des images
-        if ( static_cast<unsigned>( sprite ) >= animations[anim].GetDirection( direction ).GetSpritesNumber() )
-        {
-            std::ostringstream renvoinum;
-            renvoinum << sprite;
-            std::string renvoistr = renvoinum.str();
-
-
-            if ( errors != NULL )
-                errors->Add( "L'image n°" + renvoistr + " pour l'objet nommé " + name + " est invalide ( Supérieur au nombres d'image que contient la direction )", "", name, -1, 1 );
-
-            return false;
-        }
-        if ( sprite < 0 )
-        {
-            std::ostringstream renvoinum;
-            renvoinum << sprite;
-            std::string renvoistr = renvoinum.str();
-
-
-            if ( errors != NULL )
-                errors->Add( "L'image n°" + renvoistr + " pour l'objet nommé " + name + " est invalide ( Inférieure à 0 )", "", name, -1, 1 );
-
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/**
  * Get the SFML sprite
  */
-const sf::Sprite & SpriteObject::GetCurrentSprite() const
+const sf::Sprite & SpriteObject::GetCurrentSFMLSprite() const
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
-    return currentSprite->ModSprite();
+    return ptrToCurrentSprite->ModSprite();
 }
 
 /**
  * Get the ( Game Develop ) sprite
  */
-const Sprite & SpriteObject::GetCurrentSpriteDatas() const
+const Sprite & SpriteObject::GetCurrentSprite() const
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
-    return *currentSprite;
+    return *ptrToCurrentSprite;
 }
 
 /**
  * Change the number of the current sprite
  */
-bool SpriteObject::SetSprite( int nb )
+bool SpriteObject::SetSprite( unsigned int nb )
 {
-    if ( nb < 0 ) return false;
+    if ( nb >= GetAnimation( currentAnimation ).GetDirection( currentDirection ).GetSpritesNumber() ) return false;
 
-    if ( IsValid( m_animCourant, m_direcCourant, nb ) )
-    {
-        m_spriteCourant = nb;
-        needUpdateCurrentSprite = true;
-        timeElapsedOnCurrentSprite = 0;
-        return true;
-    }
-    return false;
+    currentSprite = nb;
+    timeElapsedOnCurrentSprite = 0;
+
+    needUpdateCurrentSprite = true;
+    return true;
 }
 
 /**
  * Change the number of the current animation
  */
-bool SpriteObject::SetAnim( int nb )
+bool SpriteObject::SetAnimation( unsigned int nb )
 {
-    if ( nb < 0 ) return false;
+    if ( nb < 0 || nb >= GetAnimationsNumber() ) return false;
 
-    if ( static_cast<unsigned>( nb ) == m_animCourant )
-    {
-        if ( IsValid( nb, -1, -1 ) )
-            return true;
+    currentAnimation = nb;
+    currentSprite = 0;
+    timeElapsedOnCurrentSprite = 0;
 
-        return false;
-    }
-
-    int direc = m_direcCourant;
-    if ( IsValid( nb, -1, -1 ) && !GetAnimation( nb ).typeNormal )
-    {
-        direc = 0; //Rotation automatique, direction 0;
-    }
-
-    //Peut on changer l'animation ?
-    if ( IsValid( nb, direc, 0 ) )
-    {
-        m_animCourant = nb;
-        m_spriteCourant = 0;
-        timeElapsedOnCurrentSprite = 0;
-        needUpdateCurrentSprite = true;
-        return true;
-    }
-
-    return false;
+    needUpdateCurrentSprite = true;
+    return true;
 }
 
 /**
  * Change the value of the current direction
  */
-bool SpriteObject::SetDirec( int nb )
+bool SpriteObject::SetDirection( unsigned int nb )
 {
-    if ( nb < 0 && GetAnimation( m_animCourant ).typeNormal ) return false;
+    if ( nb >= GetAnimation( currentAnimation ).GetDirectionsNumber() ) return false;
 
-    if ( m_direcCourant == nb )
-        return true;
+    currentDirection = nb;
+    currentSprite = 0;
+    timeElapsedOnCurrentSprite = 0;
 
-    //Si on les directions sont des rotations automatiques
-    if ( IsValid( m_animCourant, -1, -1 ) && !GetAnimation( m_animCourant ).typeNormal )
-    {
-        m_direcCourant = nb;
-        needUpdateCurrentSprite = true;
-        //Pas de remise à zéro du sprite car c'est la rotation automatique
-        return true;
-    }
-
-    //Peut on changer la direction
-    if ( IsValid( m_animCourant, nb, 0 ) )
-    {
-        m_direcCourant = nb;
-        m_spriteCourant = 0;
-        needUpdateCurrentSprite = true;
-    }
-
+    needUpdateCurrentSprite = true;
     return true;
 }
 
 /**
  * Set the angle of a sprite object, which corresponds to its direction.
  */
-void SpriteObject::SetAngle(float newAngle)
+bool SpriteObject::SetAngle(float newAngle)
 {
-    if ( !GetAnimation( m_animCourant ).typeNormal )
-        SetDirec(newAngle);
+    if ( currentAnimation >= GetAnimationsNumber() ) return false;
+
+    if ( !GetAnimation( currentAnimation ).typeNormal )
+    {
+        currentAngle = newAngle;
+
+        needUpdateCurrentSprite = true;
+    }
     else
-        SetDirec(static_cast<int>(GDRound((static_cast<int>(newAngle)%360)/45.f))%8);
+        return SetDirection(static_cast<int>(GDRound((static_cast<int>(newAngle)%360)/45.f))%8);
+
+    return true;
 }
 
 /**
@@ -818,10 +688,10 @@ void SpriteObject::SetAngle(float newAngle)
  */
 float SpriteObject::GetAngle() const
 {
-    if ( !GetAnimation( m_animCourant ).typeNormal )
-        return m_direcCourant;
+    if ( !GetAnimation( currentAnimation ).typeNormal )
+        return currentAngle;
     else
-        return m_direcCourant*45;
+        return currentDirection*45;
 }
 
 /**

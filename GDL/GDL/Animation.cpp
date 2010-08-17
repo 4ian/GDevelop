@@ -31,11 +31,6 @@ void Animation::SetDirectionsNumber(unsigned int nb)
     //TODO : erase
 }
 
-unsigned int Animation::GetDirectionsNumber() const
-{
-    return directionsNumber;
-}
-
 const Direction & Animation::GetDirection(unsigned int nb) const
 {
     if ( !typeNormal )

@@ -20,7 +20,7 @@ GDExpression::GDExpression() : isMathExpressionPreprocessed(false), isTextExpres
 {
 }
 
-GDExpression::GDExpression(std::string plainString_) : plainString(plainString_), isMathExpressionPreprocessed(false), isTextExpressionPreprocessed(false)
+GDExpression::GDExpression(std::string plainString_) : plainString(plainString_), boolEquivalent(false), isMathExpressionPreprocessed(false), isTextExpressionPreprocessed(false)
 {
     if (plainString == "=" ) compOperator = Equal;
     else if (plainString == "<" ) compOperator = Inferior;
@@ -36,6 +36,8 @@ GDExpression::GDExpression(std::string plainString_) : plainString(plainString_)
     else if (plainString == "*" ) modOperator = Multiply;
     else if (plainString == "/" ) modOperator = Divide;
     else modOperator = UndefinedModification;
+
+    if (plainString == "yes" || plainString == "oui") boolEquivalent = true;
 
     ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
     oID = objectIdentifiersManager->GetOIDfromName(plainString);

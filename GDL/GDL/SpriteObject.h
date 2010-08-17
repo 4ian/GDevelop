@@ -68,16 +68,16 @@ class SpriteObject : public Object
         virtual float GetCenterY() const;
 
         void UpdateCurrentSprite() const;
-        const sf::Sprite & GetCurrentSprite() const;
+        const sf::Sprite & GetCurrentSFMLSprite() const;
         bool IsValid(int anim, int direc, int sprite) const;
-        const Sprite & GetCurrentSpriteDatas() const;
+        const Sprite & GetCurrentSprite() const;
 
         void StopAnimation() { animationStopped = true; };
         void PlayAnimation() { animationStopped = false; };
         bool IsAnimationStopped() const { return animationStopped; }
 
-        inline unsigned int GetAnimationNb() const { return m_animCourant; }
-        bool SetAnim(int nb);
+        inline unsigned int GetCurrentAnimation() const { return currentAnimation; }
+        bool SetAnimation(unsigned int nb);
         inline const Animation & GetAnimation(unsigned int nb) const
         {
             if ( nb >= GetAnimationsNumber() )
@@ -104,14 +104,14 @@ class SpriteObject : public Object
         inline void RemoveAllAnimation() { animations.clear(); cacheAnimationSizeNeedUpdate = true;}
         inline bool HasNoAnimations() { return animations.empty(); }
 
-        virtual void SetAngle(float newAngle);
+        virtual bool SetAngle(float newAngle);
         virtual float GetAngle() const;
 
-        bool SetDirec(int nb);
-        inline int GetDirectionNb() const { return m_direcCourant; }
+        bool SetDirection(unsigned int nb);
+        inline unsigned int GetCurrentDirection() const { return currentDirection; }
 
-        bool SetSprite(int nb);
-        inline unsigned int GetSpriteNb() const { return m_spriteCourant; }
+        bool SetSprite(unsigned int nb);
+        inline unsigned int GetSpriteNb() const { return currentSprite; }
 
         void SetOpacity(float val);
         inline float GetOpacity() const {return opacity;};
@@ -169,13 +169,14 @@ class SpriteObject : public Object
     private:
 
         //Animations, Directions et numéro de sprite actuel
-        unsigned int m_animCourant;
-        int m_direcCourant;
-        unsigned int m_spriteCourant;
+        unsigned int currentAnimation;
+        unsigned int currentDirection;
+        float currentAngle;
+        unsigned int currentSprite;
         bool animationStopped;
         float timeElapsedOnCurrentSprite;
 
-        mutable Sprite * currentSprite; //Ptr to the current sprite
+        mutable Sprite * ptrToCurrentSprite; //Ptr to the current sprite
         mutable bool needUpdateCurrentSprite;
 
         //Animations de l'objets

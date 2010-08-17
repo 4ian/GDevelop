@@ -17,6 +17,8 @@ std::map<std::string, InstructionInfos > ExtensionBase::badConditionsInfos;
 std::map<std::string, InstructionInfos > ExtensionBase::badActionsInfos;
 std::map<std::string, ExpressionInfos > ExtensionBase::badExpressionsInfos;
 std::map<std::string, StrExpressionInfos > ExtensionBase::badStrExpressionsInfos;
+std::map<std::string, AutomatismInfo > ExtensionBase::badAutomatismsInfo;
+
 
 
 ExtensionObjectInfos::ExtensionObjectInfos() :
@@ -228,6 +230,8 @@ const AutomatismInfo & ExtensionBase::GetAutomatismInfo(std::string objectType) 
 {
     if ( automatismsInfo.find(objectType) != automatismsInfo.end())
         return automatismsInfo.find(objectType)->second;
+
+    return badAutomatismsInfo[""];
 }
 
 InstructionFunPtr       ExtensionBase::GetConditionFunctionPtr(std::string conditionName) const

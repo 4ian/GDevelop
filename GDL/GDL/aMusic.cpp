@@ -52,10 +52,7 @@ bool ActPlaySound( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
     //On verifie si l'argument 2 ( Bouclage ) existe
     if ( action.GetParameters().size() > 1 )
     {
-        if ( action.GetParameter(1).GetPlainString() == "oui" || action.GetParameter(1).GetPlainString() == "yes" )
-        {
-            soundManager->sounds.back()->sound.SetLoop(true);
-        }
+        soundManager->sounds.back()->sound.SetLoop(action.GetParameter(1).GetAsBool());
     }
 
     //Compatibilité avec Game Develop 1.1.5429 et inférieur
@@ -107,10 +104,7 @@ bool ActPlaySoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
     //On verifie si l'argument 3 ( Bouclage ) existe
     if ( action.GetParameters().size() > 2 )
     {
-        if ( action.GetParameter(2).GetPlainString() == "oui" || action.GetParameter(2).GetPlainString() == "yes" )
-        {
-            soundManager->GetSoundOnChannel(canal)->sound.SetLoop(true);
-        }
+        soundManager->GetSoundOnChannel(canal)->sound.SetLoop(action.GetParameter(2).GetAsBool());
     }
 
     //Compatibilité avec Game Develop 1.1.5429 et inférieur
@@ -224,10 +218,7 @@ bool ActPlayMusic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
     //On verifie si l'argument 2 ( Bouclage ) existe
     if ( action.GetParameters().size() > 1 )
     {
-        if ( action.GetParameter(1).GetPlainString() == "oui" || action.GetParameter(1).GetPlainString() == "yes" )
-        {
-            music->SetLoop(true);
-        }
+        music->SetLoop(action.GetParameter(1).GetAsBool());
     }
 
     //Compatibilité avec Game Develop 1.1.5429 et inférieur
@@ -275,10 +266,7 @@ bool ActPlayMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
     //On verifie si l'argument 3 ( Bouclage ) existe
     if ( action.GetParameters().size() > 2 )
     {
-        if ( action.GetParameter(2).GetPlainString() == "oui" || action.GetParameter(2).GetPlainString() == "yes" )
-        {
-            music->SetLoop(true);
-        }
+        music->SetLoop(action.GetParameter(2).GetAsBool());
     }
 
     //Compatibilité avec Game Develop 1.1.5429 et inférieur

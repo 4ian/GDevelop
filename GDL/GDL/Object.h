@@ -108,7 +108,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
          * Set the new angle of the object.
          * The angle can be not changed if the object doesn't want/is not designed to.
          */
-        virtual void SetAngle(float ) {};
+        virtual bool SetAngle(float ) {return false;};
 
         /**
          * Get the angle of the object

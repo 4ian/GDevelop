@@ -28,12 +28,12 @@
 bool SpriteObject::CondAnim( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetAnimationNb() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetAnimationNb() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetAnimationNb() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetAnimationNb() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetAnimationNb() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetAnimationNb() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetCurrentAnimation() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetCurrentAnimation() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetCurrentAnimation() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetCurrentAnimation() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetCurrentAnimation() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetCurrentAnimation() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -76,12 +76,12 @@ bool SpriteObject::CondSprite( RuntimeScene & scene, ObjectsConcerned & objectsC
 bool SpriteObject::CondDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetDirectionNb() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetDirectionNb() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetDirectionNb() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetDirectionNb() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetDirectionNb() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetDirectionNb() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetCurrentDirection() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetCurrentDirection() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetCurrentDirection() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetCurrentDirection() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetCurrentDirection() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetCurrentDirection() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
@@ -121,14 +121,7 @@ bool CondEstTourne( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
 
                 int angle = static_cast<int>(force.GetAngle()); //On récupère l'angle entre les deux objets
 
-                int angleObjet = 0;
-
-                //On récupère l'angle de l'objet
-                if (  boost::static_pointer_cast<SpriteObject>(*obj)->GetAnimation(  boost::static_pointer_cast<SpriteObject>(*obj)->GetAnimationNb() ).typeNormal )
-                {
-                    angleObjet = boost::static_pointer_cast<SpriteObject>(*obj)->GetDirectionNb() * 45;
-                }
-                else { angleObjet =  boost::static_pointer_cast<SpriteObject>(*obj)->GetDirectionNb(); }
+                int angleObjet = boost::static_pointer_cast<SpriteObject>(*obj)->GetAngle();
 
                 angle = fmodf(angle, 360);
                 if ( angle < 0 )

@@ -46,15 +46,15 @@ bool SpriteObject::ActPlayAnimation( RuntimeScene & scene, ObjectsConcerned & ob
 bool SpriteObject::ActChangeAnimation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetAnim(static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetAnimation(static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetAnim(static_cast<int>(GetAnimationNb() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetAnimation(static_cast<int>(GetCurrentAnimation() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetAnim(static_cast<int>(GetAnimationNb() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetAnimation(static_cast<int>(GetCurrentAnimation() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetAnim(static_cast<int>(GetAnimationNb() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetAnimation(static_cast<int>(GetCurrentAnimation() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetAnim(static_cast<int>(GetAnimationNb() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        SetAnimation(static_cast<int>(GetCurrentAnimation() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
 
     return true;
 }
@@ -65,16 +65,34 @@ bool SpriteObject::ActChangeAnimation( RuntimeScene & scene, ObjectsConcerned & 
  */
 bool SpriteObject::ActChangeDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetDirec(GDRound((action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
-    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetDirec(GDRound((GetDirectionNb() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
-    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetDirec(GDRound((GetDirectionNb() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
-    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetDirec(GDRound((GetDirectionNb() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
-    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetDirec(GDRound((GetDirectionNb() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
+    if ( currentAnimation >= GetAnimationsNumber() ) return false;
+
+    if ( GetAnimation( currentAnimation ).typeNormal )
+    {
+        if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
+            SetDirection(GDRound((action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
+        else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
+            SetDirection(GDRound((GetCurrentDirection() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
+        else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
+            SetDirection(GDRound((GetCurrentDirection() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
+        else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
+            SetDirection(GDRound((GetCurrentDirection() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
+        else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
+            SetDirection(GDRound((GetCurrentDirection() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()))));
+    }
+    else
+    {
+        if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
+            SetAngle((action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
+            SetAngle((GetAngle() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
+            SetAngle((GetAngle() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
+            SetAngle((GetAngle() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+        else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
+            SetAngle((GetAngle() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+    }
 
     return true;
 }
@@ -95,40 +113,12 @@ bool ActTourneVers( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
     for ( ; obj != obj_end; ++obj )
     {
         //On se dirige vers le centre
-        int angle = atan2(
+        float angle = atan2(
         (obj2->GetDrawableY() + obj2->GetCenterY()) - ((*obj)->GetDrawableY()+(*obj)->GetCenterY()),
         (obj2->GetDrawableX() + obj2->GetCenterX()) - ((*obj)->GetDrawableX()+(*obj)->GetCenterX())
         ) * 180 / 3.14;
 
-        if (  boost::static_pointer_cast<SpriteObject>(*obj)->GetAnimation(
-                                                                           boost::static_pointer_cast<SpriteObject>(*obj)->GetAnimationNb()
-                                                                           ).typeNormal )
-        {
-            if ( angle < 0 )
-                angle += 360;
-
-            //TODO : Refactor
-            if ( angle >= 337.5 || angle < 22.5 )
-                boost::static_pointer_cast<SpriteObject>(*obj)->SetDirec(0);
-            else if ( angle >= 22.5 && angle < 67.5 )
-                boost::static_pointer_cast<SpriteObject>(*obj)->SetDirec(1);
-            else if ( angle >= 67.5 && angle < 112.5 )
-                boost::static_pointer_cast<SpriteObject>(*obj)->SetDirec(2);
-            else if ( angle >= 112.5 && angle < 157.5 )
-                boost::static_pointer_cast<SpriteObject>(*obj)->SetDirec(3);
-            else if ( angle >= 157.5 && angle < 202.5 )
-                boost::static_pointer_cast<SpriteObject>(*obj)->SetDirec(4);
-            else if ( angle >= 202.5 && angle < 247.5 )
-                boost::static_pointer_cast<SpriteObject>(*obj)->SetDirec(5);
-            else if ( angle >= 247.5 && angle < 292.5 )
-                boost::static_pointer_cast<SpriteObject>(*obj)->SetDirec(6);
-            else if ( angle >= 292.5 && angle < 337.5 )
-                boost::static_pointer_cast<SpriteObject>(*obj)->SetDirec(7);
-        }
-        else
-        {
-            boost::static_pointer_cast<SpriteObject>(*obj)->SetDirec(angle);
-        }
+        boost::static_pointer_cast<SpriteObject>(*obj)->SetAngle(angle);
     }
     return true;
 }
@@ -142,35 +132,9 @@ bool SpriteObject::ActTourneVersPos( RuntimeScene & scene, ObjectsConcerned & ob
 	//Work around for a Visual C++ internal compiler error (!)
 	double y = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()) - (GetDrawableY()+GetCenterY());
 	double x = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()) - (GetDrawableX()+GetCenterX());
-    int angle = atan2(y,x) * 180 / 3.14;
+    float angle = atan2(y,x) * 180 / 3.14;
 
-    if ( GetAnimation( GetAnimationNb() ).typeNormal )
-    {
-        //TODO : Refactor this
-        if ( angle < 0 )
-            angle += 360;
-
-        if ( angle >= 337.5 || angle < 22.5 )
-            SetDirec(0);
-        else if ( angle >= 22.5 && angle < 67.5 )
-            SetDirec(1);
-        else if ( angle >= 67.5 && angle < 112.5 )
-            SetDirec(2);
-        else if ( angle >= 112.5 && angle < 157.5 )
-            SetDirec(3);
-        else if ( angle >= 157.5 && angle < 202.5 )
-            SetDirec(4);
-        else if ( angle >= 202.5 && angle < 247.5 )
-            SetDirec(5);
-        else if ( angle >= 247.5 && angle < 292.5 )
-            SetDirec(6);
-        else if ( angle >= 292.5 && angle < 337.5 )
-            SetDirec(7);
-    }
-    else
-    {
-        SetDirec(angle);
-    }
+    SetAngle(angle);
     return true;
 }
 

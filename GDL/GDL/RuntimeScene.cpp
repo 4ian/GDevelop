@@ -131,6 +131,7 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
 
     renderWindow = newWindow;
     input = &renderWindow->GetInput();
+    renderWindow->SetTitle(title);
 
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);

@@ -523,8 +523,7 @@ void EditorObjet::RefreshFromObjet()
     AnimationsBox->Clear();
     for ( unsigned int i = 0;i < object.GetAnimationsNumber();i++ )
     {
-        string num =ToString( i );
-        AnimationsBox->Append( num );
+        AnimationsBox->Append( ToString( i ) );
     }
     if ( !object.HasNoAnimations() )
     {
@@ -556,7 +555,6 @@ void EditorObjet::RefreshFromObjet()
 void EditorObjet::OnScrollBar1Scroll( wxScrollEvent& event )
 {
     position = event.GetPosition();
-    printf( "%i", position );
 
     RefreshImages();
 }
@@ -569,59 +567,43 @@ void EditorObjet::OnScrollBar1Scroll( wxScrollEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorObjet::RefreshImages()
 {
-    //La valeur des boutons par défaut
-    NormalCheck->SetValue( true );
-    RotationCheck->SetValue( false );
-    Bt0->Enable( true );
-    Bt1->Enable( true );
-    Bt2->Enable( true );
-    Bt3->Enable( true );
-    Bt4->Enable( true );
-    Bt5->Enable( true );
-    Bt6->Enable( true );
-    Bt7->Enable( true );
+    if ( animation >= object.GetAnimationsNumber() || direction >= object.GetAnimation( animation ).GetDirectionsNumber())
+        return;
 
-    if ( animation < object.GetAnimationsNumber() )
+    //Type de directions
+    if ( !object.GetAnimation( animation ).typeNormal )
     {
-        if ( direction < 0 ) return;
-
-        //On ajoute des directions à l'objet si besoin
-        if ( static_cast<unsigned>(direction) >= object.GetAnimation( animation ).GetDirectionsNumber() )
-            object.GetAnimation( animation ).SetDirectionsNumber(direction+1);
-
-        //Type de directions
-        if ( !object.GetAnimation( animation ).typeNormal )
-        {
-            RotationCheck->SetValue( true );
-            NormalCheck->SetValue( false );
-            Bt0->Enable( false );
-            Bt1->Enable( false );
-            Bt2->Enable( false );
-            Bt3->Enable( false );
-            Bt4->Enable( false );
-            Bt5->Enable( false );
-            Bt6->Enable( false );
-            Bt7->Enable( false );
-        }
-
-        if ( direction < object.GetAnimation( animation ).GetDirectionsNumber() )
-        {
-            //Temps
-            TempsEdit->ChangeValue( ToString( object.GetAnimation( animation ).GetDirection( direction ).GetTimeBetweenFrames() ) );
-
-            //Boucle
-            if ( object.GetAnimation( animation ).GetDirection( direction ).IsLooping() )
-            {
-                BoucleOuiCheck->SetValue( true );
-                BoucleNonCheck->SetValue( false );
-            }
-            else
-            {
-                BoucleOuiCheck->SetValue( false );
-                BoucleNonCheck->SetValue( true );
-            }
-        }
+        RotationCheck->SetValue( true );
+        NormalCheck->SetValue( false );
+        Bt0->Enable( false );
+        Bt1->Enable( false );
+        Bt2->Enable( false );
+        Bt3->Enable( false );
+        Bt4->Enable( false );
+        Bt5->Enable( false );
+        Bt6->Enable( false );
+        Bt7->Enable( false );
     }
+    else
+    {
+        NormalCheck->SetValue( true );
+        RotationCheck->SetValue( false );
+        Bt0->Enable( true );
+        Bt1->Enable( true );
+        Bt2->Enable( true );
+        Bt3->Enable( true );
+        Bt4->Enable( true );
+        Bt5->Enable( true );
+        Bt6->Enable( true );
+        Bt7->Enable( true );
+    }
+
+    //Temps
+    TempsEdit->ChangeValue( ToString( object.GetAnimation( animation ).GetDirection( direction ).GetTimeBetweenFrames() ) );
+
+    //Boucle
+    BoucleOuiCheck->SetValue( object.GetAnimation( animation ).GetDirection( direction ).IsLooping() );
+    BoucleNonCheck->SetValue( !object.GetAnimation( animation ).GetDirection( direction ).IsLooping() );
 
     //Rafraichissement du reste
     thumbsPanel->Refresh();
@@ -738,12 +720,11 @@ void EditorObjet::OnBt7Toggle( wxCommandEvent& event )
 
 void EditorObjet::OnAddAnimBtClick( wxCommandEvent& event )
 {
-    Animation AnimToadd;
-    object.AddAnimation( AnimToadd );
+    Animation newAnimation;
+    newAnimation.SetDirectionsNumber(8);
+    object.AddAnimation( newAnimation );
 
-    string num =ToString( object.GetAnimationsNumber() - 1 );
-
-    AnimationsBox->Append( num );
+    AnimationsBox->Append( ToString( object.GetAnimationsNumber() - 1 ) );
 
     RefreshFromObjet();
 }
@@ -751,10 +732,9 @@ void EditorObjet::OnAddAnimBtClick( wxCommandEvent& event )
 void EditorObjet::OnDelAnimBtClick( wxCommandEvent& event )
 {
     int animNb = AnimationsBox->GetSelection();
-    if ( animNb == wxNOT_FOUND )
-        return;
+    if ( animNb == wxNOT_FOUND ) return;
 
-    if ( static_cast<unsigned>(animNb) < object.GetAnimationsNumber() && animNb > -1 )
+    if ( animNb >= 0 && static_cast<unsigned>(animNb) < object.GetAnimationsNumber() )
         object.RemoveAnimation( animNb );
 
     animation--;
@@ -776,29 +756,8 @@ void EditorObjet::OnAnimationsBoxSelect( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnTempsEditText( wxCommandEvent& event )
 {
-
-    string num = ( string ) TempsEdit->GetValue();
-    std::istringstream iss( num );
-    float tmp;
-    // tenter la conversion et
-    // vérifier qu'il ne reste plus rien dans la chaîne
-    if (( iss >> tmp ) && ( iss.eof() ) )
-    {
-        if ( animation < object.GetAnimationsNumber() )
-        {
-            if ( direction < object.GetAnimation( animation ).GetDirectionsNumber() )
-            {
-                object.GetAnimation( animation ).GetDirectionToModify( direction ).SetTimeBetweenFrames( tmp );
-            }
-        }
-
-        CheckTempsEntreImg->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
-    }
-    else
-    {
-        CheckTempsEntreImg->SetBitmap( wxBitmap( "res/error.png", wxBITMAP_TYPE_ANY ) );
-    }
-
+    if ( animation < object.GetAnimationsNumber() && direction < object.GetAnimation( animation ).GetDirectionsNumber())
+        object.GetAnimation( animation ).GetDirectionToModify( direction ).SetTimeBetweenFrames( ToFloat(TempsEdit->GetValue().mb_str()) );
 }
 
 ////////////////////////////////////////////////////////////
@@ -808,13 +767,8 @@ void EditorObjet::OnTempsEditText( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnBoucleOuiCheckSelect( wxCommandEvent& event )
 {
-    if ( animation < object.GetAnimationsNumber() )
-    {
-        if ( direction < object.GetAnimation( animation ).GetDirectionsNumber() )
-        {
-            object.GetAnimation( animation ).GetDirectionToModify( direction ).SetLoop( true );
-        }
-    }
+    if ( animation < object.GetAnimationsNumber() && direction < object.GetAnimation( animation ).GetDirectionsNumber())
+        object.GetAnimation( animation ).GetDirectionToModify( direction ).SetLoop( true );
 }
 
 ////////////////////////////////////////////////////////////
@@ -824,13 +778,8 @@ void EditorObjet::OnBoucleOuiCheckSelect( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnBoucleNonCheckSelect( wxCommandEvent& event )
 {
-    if ( animation < object.GetAnimationsNumber() )
-    {
-        if ( direction < object.GetAnimation( animation ).GetDirectionsNumber() )
-        {
-            object.GetAnimation( animation ).GetDirectionToModify( direction ).SetLoop( false );
-        }
-    }
+    if ( animation < object.GetAnimationsNumber() && direction < object.GetAnimation( animation ).GetDirectionsNumber())
+        object.GetAnimation( animation ).GetDirectionToModify( direction ).SetLoop( false );
 }
 
 /**
@@ -856,9 +805,9 @@ void EditorObjet::OnRotationCheckSelect( wxCommandEvent& event )
     NormalCheck->SetValue( false );
 
     if ( animation < object.GetAnimationsNumber() )
-    {
         object.GetAnimation( animation ).typeNormal = false;
-    }
+
+    direction = 0;
     Bt0->Enable( false );
     Bt1->Enable( false );
     Bt2->Enable( false );
@@ -879,9 +828,9 @@ void EditorObjet::OnNormalCheckSelect( wxCommandEvent& event )
     RotationCheck->SetValue( false );
 
     if ( animation < object.GetAnimationsNumber() )
-    {
         object.GetAnimation( animation ).typeNormal = true;
-    }
+
+
     Bt0->Enable( true );
     Bt1->Enable( true );
     Bt2->Enable( true );
@@ -910,15 +859,12 @@ void EditorObjet::OnOkBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnDeleteAllBtClick(wxCommandEvent& event)
 {
+    if ( animation >= object.GetAnimationsNumber() || direction >= object.GetAnimation( animation ).GetDirectionsNumber())
+        return;
+
     if (wxMessageBox("Etes-vous sûr de vouloir supprimer toutes les images ?", "Êtes vous sur ?",wxYES_NO ) == wxYES)
     {
-        if ( animation < object.GetAnimationsNumber() )
-        {
-            if ( direction < object.GetAnimation( animation ).GetDirectionsNumber() )
-            {
-                object.GetAnimation( animation ).GetDirectionToModify( direction ).RemoveAllSprites();
-            }
-        }
+        object.GetAnimation( animation ).GetDirectionToModify( direction ).RemoveAllSprites();
     }
 
     RefreshImages();
@@ -929,20 +875,20 @@ void EditorObjet::OnDeleteAllBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnAjoutPlusBtClick(wxCommandEvent& event)
 {
+    if ( animation >= object.GetAnimationsNumber() || direction >= object.GetAnimation( animation ).GetDirectionsNumber())
+        return;
+
     AjoutPlusImage dialog(this);
-    if ( dialog.ShowModal() == 1 )
+    if ( dialog.ShowModal() == 0 ) return;
+
+    //Ajout des images
+    for (unsigned int i = 0;i<dialog.ImagesToAdd.size();++i)
     {
-        //Ajout des images
-        if ( animation < object.GetAnimationsNumber() && direction < object.GetAnimation( animation ).GetDirectionsNumber())
-        {
-            for (unsigned int i = 0;i<dialog.ImagesToAdd.size();++i)
-            {
-                Sprite sprite;
-                sprite.SetImageName(dialog.ImagesToAdd.at(i));
-            	object.GetAnimation( animation ).GetDirectionToModify( direction ).AddSprite(sprite);
-            }
-        }
+        Sprite sprite;
+        sprite.SetImageName(dialog.ImagesToAdd.at(i));
+        object.GetAnimation( animation ).GetDirectionToModify( direction ).AddSprite(sprite);
     }
+
     RefreshImages();
 }
 
@@ -951,26 +897,21 @@ void EditorObjet::OnAjoutPlusBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnCopyBtClick(wxCommandEvent& event)
 {
-
-    if (object.GetAnimationsNumber() == 0)
+    if ( animation >= object.GetAnimationsNumber() || direction >= object.GetAnimation( animation ).GetDirectionsNumber())
         return;
 
-    int anim = wxGetNumberFromUser( "Animation à copier", "", "Entrez le numéro de l'animation dans laquelle se trouve la direction à copier", 0, 0, object.GetAnimationsNumber()-1, this);
-    int direc = 0;
+    int animToCopy = wxGetNumberFromUser( "Animation à copier", "", "Entrez le numéro de l'animation dans laquelle se trouve la direction à copier", 0, 0, object.GetAnimationsNumber()-1, this);
+    if (animToCopy < 0 || static_cast<unsigned int>(animToCopy) >= object.GetAnimationsNumber()) return;
 
-    if (anim == -1)
-        return;
+    int directionToCopy = 0;
 
-    if (object.GetAnimation( anim ).typeNormal)
+    if (object.GetAnimation( animToCopy ).typeNormal)
     {
-        direc = wxGetNumberFromUser( "Direction à copier", "", "Entrez le numéro de la direction dans laquelle se trouve les images à copier", 0, 0, object.GetAnimation( anim ).GetDirectionsNumber()-1, this);
-        if (direc == -1)
-            return;
+        directionToCopy = wxGetNumberFromUser( "Direction à copier", "", "Entrez le numéro de la direction dans laquelle se trouve les images à copier", 0, 0, object.GetAnimation( animToCopy ).GetDirectionsNumber()-1, this);
+        if (directionToCopy < 0 || static_cast<unsigned int>(directionToCopy) >= object.GetAnimation( animToCopy ).GetDirectionsNumber() ) return;
     }
 
-    object.GetAnimation( animation ).GetDirectionToModify( direction ).SetSprites( object.GetAnimation(anim).GetDirection(direc).GetSprites() );
-    object.GetAnimation( animation ).GetDirectionToModify( direction ).SetLoop( object.GetAnimation(anim).GetDirection(direc).IsLooping() );
-    object.GetAnimation( animation ).GetDirectionToModify( direction ).SetTimeBetweenFrames( object.GetAnimation(anim).GetDirection(direc).GetTimeBetweenFrames() );
+    object.GetAnimation( animation ).SetDirection(object.GetAnimation(animToCopy).GetDirection(directionToCopy), direction);
 
     RefreshImages();
 }

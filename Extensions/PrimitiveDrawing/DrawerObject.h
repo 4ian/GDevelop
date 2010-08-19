@@ -91,7 +91,7 @@ class DrawerObject : public Object
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
 
-        virtual void SetAngle(float newAngle) {};
+        virtual bool SetAngle(float newAngle) {return false;};
         virtual float GetAngle() const {return 0;};
 
         virtual void SetWidth(float ) {};

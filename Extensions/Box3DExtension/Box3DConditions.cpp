@@ -25,7 +25,7 @@ freely, subject to the following restrictions:
 */
 
 #include "Box3DObject.h"
-#include "GDL/Access.h"
+
 #include "GDL/Instruction.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/RuntimeScene.h"

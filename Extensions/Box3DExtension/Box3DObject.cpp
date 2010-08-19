@@ -28,7 +28,7 @@ freely, subject to the following restrictions:
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include "GDL/Object.h"
-#include "GDL/Access.h"
+
 #include "GDL/ImageManager.h"
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
@@ -139,6 +139,7 @@ void Box3DObject::LoadFromXml(const TiXmlElement * object)
         object->FirstChildElement("depth")->QueryFloatAttribute("value", &depth);
 }
 
+#if defined(GDE)
 void Box3DObject::SaveToXml(TiXmlElement * object)
 {
     {
@@ -187,33 +188,16 @@ void Box3DObject::SaveToXml(TiXmlElement * object)
         elem->SetAttribute("value", depth);
     }
 }
+#endif
 
 bool Box3DObject::LoadResources(const ImageManager & imageMgr )
 {
-    //Load all images from image manager
-    frontTexture =  imageMgr.images.find(frontTextureName) != imageMgr.images.end() ?
-                    imageMgr.images.find(frontTextureName)->second :
-                    imageMgr.imageVide;
-
-    topTexture =    imageMgr.images.find(topTextureName) != imageMgr.images.end() ?
-                    imageMgr.images.find(topTextureName)->second :
-                    imageMgr.imageVide;
-
-    bottomTexture = imageMgr.images.find(bottomTextureName) != imageMgr.images.end() ?
-                    imageMgr.images.find(bottomTextureName)->second :
-                    imageMgr.imageVide;
-
-    leftTexture =   imageMgr.images.find(leftTextureName) != imageMgr.images.end() ?
-                    imageMgr.images.find(leftTextureName)->second :
-                    imageMgr.imageVide;
-
-    rightTexture =  imageMgr.images.find(rightTextureName) != imageMgr.images.end() ?
-                    imageMgr.images.find(rightTextureName)->second :
-                    imageMgr.imageVide;
-
-    backTexture =   imageMgr.images.find(backTextureName) != imageMgr.images.end() ?
-                    imageMgr.images.find(backTextureName)->second :
-                    imageMgr.imageVide;
+    frontTexture =  imageMgr.GetImage(frontTextureName);
+    topTexture =    imageMgr.GetImage(topTextureName);
+    bottomTexture = imageMgr.GetImage(bottomTextureName) ;
+    leftTexture =   imageMgr.GetImage(leftTextureName);
+    rightTexture =  imageMgr.GetImage(rightTextureName);
+    backTexture =   imageMgr.GetImage(backTextureName);
 
     return true;
 }

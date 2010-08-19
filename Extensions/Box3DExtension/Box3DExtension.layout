@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="Box3DActions.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="6364" topLine="93" />
+	<File name="Box3DActions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="999" topLine="27" />
 	</File>
-	<File name="Box3DConditions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="9871" topLine="93" />
+	<File name="Box3DConditions.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="999" topLine="27" />
 	</File>
 	<File name="Box3DExpressions.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="2030" topLine="21" />
@@ -17,10 +17,10 @@
 		<Cursor position="969" topLine="0" />
 	</File>
 	<File name="Box3DObject.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="17976" topLine="431" />
+		<Cursor position="1082" topLine="26" />
 	</File>
 	<File name="Box3DObject.h" open="0" top="0" tabpos="4">
-		<Cursor position="1394" topLine="34" />
+		<Cursor position="3486" topLine="80" />
 	</File>
 	<File name="Box3DObjectEditor.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="14441" topLine="170" />
@@ -28,7 +28,10 @@
 	<File name="Box3DObjectEditor.h" open="0" top="0" tabpos="2">
 		<Cursor position="3649" topLine="111" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="14213" topLine="271" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="12894" topLine="247" />
+	</File>
+	<File name="..\..\GDL\GDL\tinyxmlparser.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="9006" topLine="339" />
 	</File>
 </CodeBlocks_layout_file>

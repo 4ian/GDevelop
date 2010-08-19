@@ -63,7 +63,7 @@ class Extension : public ExtensionBase
                                "res/actions/scaleWidth.png",
                                &Box3DObject::ActWidth);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -79,7 +79,7 @@ class Extension : public ExtensionBase
                                "res/conditions/scaleWidth.png",
                                &Box3DObject::CondWidth);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -95,7 +95,7 @@ class Extension : public ExtensionBase
                                "res/actions/scaleHeight.png",
                                &Box3DObject::ActHeight);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -111,7 +111,7 @@ class Extension : public ExtensionBase
                                "res/conditions/scaleHeight.png",
                                &Box3DObject::CondHeight);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -127,7 +127,7 @@ class Extension : public ExtensionBase
                                "res/actions/depth.png",
                                &Box3DObject::ActDepth);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -143,7 +143,7 @@ class Extension : public ExtensionBase
                                "res/conditions/depth.png",
                                &Box3DObject::CondDepth);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -159,7 +159,7 @@ class Extension : public ExtensionBase
                                "res/actions/position.png",
                                &Box3DObject::ActZPosition);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -175,7 +175,7 @@ class Extension : public ExtensionBase
                                "res/conditions/position.png",
                                &Box3DObject::CondZPosition);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -191,7 +191,7 @@ class Extension : public ExtensionBase
                                "res/actions/rotate.png",
                                &Box3DObject::ActYaw);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -207,7 +207,7 @@ class Extension : public ExtensionBase
                                "res/conditions/rotate.png",
                                &Box3DObject::CondYaw);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -223,7 +223,7 @@ class Extension : public ExtensionBase
                                "res/actions/rotate.png",
                                &Box3DObject::ActPitch);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -239,7 +239,7 @@ class Extension : public ExtensionBase
                                "res/conditions/rotate.png",
                                &Box3DObject::CondPitch);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -255,7 +255,7 @@ class Extension : public ExtensionBase
                                "res/actions/rotate.png",
                                &Box3DObject::ActRoll);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)
@@ -271,7 +271,7 @@ class Extension : public ExtensionBase
                                "res/conditions/rotate.png",
                                &Box3DObject::CondRoll);
 
-                    DECLARE_PARAMETER("objet", _("Objet"), true, "Box3D")
+                    DECLARE_PARAMETER("object", _("Objet"), true, "Box3D")
                     DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
                     DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
                     MAIN_OBJECTS_IN_PARAMETER(0)

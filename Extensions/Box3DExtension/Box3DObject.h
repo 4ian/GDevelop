@@ -75,7 +75,9 @@ class Box3DObject : public Object
         #endif
 
         virtual void LoadFromXml(const TiXmlElement * elemScene);
+        #if defined(GDE)
         virtual void SaveToXml(TiXmlElement * elemScene);
+        #endif
 
         virtual void UpdateTime(float timeElapsed);
 
@@ -94,7 +96,7 @@ class Box3DObject : public Object
         inline void SetZPosition(float newZ) {zPosition = newZ;};
         inline float GetZPosition() const {return zPosition;};
 
-        virtual inline void SetAngle(float newAngle) { yaw = newAngle;};
+        virtual inline bool SetAngle(float newAngle) { yaw = newAngle; return true;};
         virtual inline float GetAngle() const {return yaw;};
 
         virtual inline void SetWidth(float newWidth) {width = newWidth;};

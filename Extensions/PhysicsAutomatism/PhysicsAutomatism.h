@@ -34,6 +34,7 @@ freely, subject to the following restrictions:
 #include <boost/weak_ptr.hpp>
 #include <iostream>
 #include <map>
+#include <set>
 #include "GDL/RuntimeScene.h"
 class TiXmlElement;
 class Scene;
@@ -67,6 +68,12 @@ class PhysicsAutomatism : public Automatism
         virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ );
         #endif
 
+        b2Body * GetBox2DBody(const RuntimeScene & scene) { if (!body) CreateBody(scene); return body; }
+        inline Object * GetObject() {return object;};
+        inline const Object * GetObject() const {return object;};
+
+        std::set<PhysicsAutomatism*> currentContacts; ///< List of other bodies that are in contact with this body.
+
         bool ActSetStatic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActSetDynamic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool CondIsDynamic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action ) { return dynamic; };
@@ -82,12 +89,14 @@ class PhysicsAutomatism : public Automatism
         bool ActLinearDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActAngularVelocity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActLinearVelocity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActAddJoint( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         bool CondAngularDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool CondLinearDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool CondAngularVelocity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool CondLinearVelocityY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool CondLinearVelocityX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondCollisionWith( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
         double ExpLinearVelocityX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
         double ExpLinearVelocityY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
@@ -110,6 +119,12 @@ class PhysicsAutomatism : public Automatism
         float averageFriction;
         float linearDamping;
         float angularDamping;
+
+        float objectOldX;
+        float objectOldY;
+        float objectOldAngle;
+        float objectOldWidth;
+        float objectOldHeight;
 
         b2Body * body; ///< Box2D body, representing the object in the Box2D world
         boost::shared_ptr<RuntimeScenePhysicsDatas> runtimeScenesPhysicsDatas;

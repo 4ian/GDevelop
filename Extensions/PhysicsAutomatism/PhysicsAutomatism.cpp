@@ -47,6 +47,11 @@ body(NULL)
 
 PhysicsAutomatism::~PhysicsAutomatism()
 {
+    if ( runtimeScenesPhysicsDatas == boost::shared_ptr<RuntimeScenePhysicsDatas>() )
+        cout << endl << "runtimeScenesPhysicsDatas NULL lors d'une destruction !" << endl;
+
+    if ( !body ) cout << endl << "body NULL lors d'une destruction !" << endl;
+
     if ( runtimeScenesPhysicsDatas != boost::shared_ptr<RuntimeScenePhysicsDatas>() && body)
         runtimeScenesPhysicsDatas->world->DestroyBody(body);
 }
@@ -79,7 +84,11 @@ void PhysicsAutomatism::DoStepPreEvents(RuntimeScene & scene)
     b2Vec2 position = body->GetPosition();
     object->SetX(position.x*runtimeScenesPhysicsDatas->scaleX-object->GetWidth()/2+object->GetX()-object->GetDrawableX());
     object->SetY(-position.y*runtimeScenesPhysicsDatas->scaleY-object->GetHeight()/2+object->GetY()-object->GetDrawableY()); //Y axis is inverted
-    object->SetAngle(-body->GetAngle()*360.0f/b2_pi); //Angles are inverted
+    object->SetAngle(-body->GetAngle()*180.0f/b2_pi); //Angles are inverted
+
+    objectOldX = object->GetX();
+    objectOldY = object->GetY();
+    objectOldAngle = object->GetAngle();
 };
 
 /**
@@ -89,14 +98,23 @@ void PhysicsAutomatism::DoStepPreEvents(RuntimeScene & scene)
 void PhysicsAutomatism::DoStepPostEvents(RuntimeScene & scene)
 {
     if ( !body ) CreateBody(scene);
+    if ( objectOldWidth != object->GetWidth() || objectOldHeight != object->GetHeight() )
+    {
+        runtimeScenesPhysicsDatas->world->DestroyBody(body);
+        CreateBody(scene);
+    }
 
     runtimeScenesPhysicsDatas->stepped = false; //Prepare for a new simulation
 
-    //Update Box2D position to object
+    //Update Box2D position if necessary
+    if ( objectOldX == object->GetX() && objectOldY == object->GetY() && objectOldAngle == object->GetAngle())
+        return;
+
     b2Vec2 oldPos;
     oldPos.x = (object->GetDrawableX()+object->GetWidth()/2)/runtimeScenesPhysicsDatas->scaleX;
     oldPos.y = -(object->GetDrawableY()+object->GetHeight()/2)/runtimeScenesPhysicsDatas->scaleY; //Y axis is inverted
-    body->SetTransform(oldPos, -object->GetAngle()*b2_pi/360.0f); //Angles are inverted
+    body->SetTransform(oldPos, -object->GetAngle()*b2_pi/180.0f); //Angles are inverted
+    body->SetAwake(true);
 }
 
 /**
@@ -104,7 +122,6 @@ void PhysicsAutomatism::DoStepPostEvents(RuntimeScene & scene)
  */
 void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
 {
-    //TODO : Bad position when origin is not 0;0
     if ( runtimeScenesPhysicsDatas == boost::shared_ptr<RuntimeScenePhysicsDatas>() )
         runtimeScenesPhysicsDatas = boost::static_pointer_cast<RuntimeScenePhysicsDatas>(scene.automatismsSharedDatas.find(automatismId)->second);
 
@@ -112,7 +129,13 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
     b2BodyDef bodyDef;
     bodyDef.type = dynamic ? b2_dynamicBody : b2_staticBody;
     bodyDef.position.Set((object->GetDrawableX()+object->GetWidth()/2)/runtimeScenesPhysicsDatas->scaleX, -(object->GetDrawableY()+object->GetHeight()/2)/runtimeScenesPhysicsDatas->scaleY);
+    bodyDef.angle = -object->GetAngle()*b2_pi/180.0f; //Angles are inverted
+    bodyDef.angularDamping = angularDamping;
+    bodyDef.linearDamping = linearDamping;
+    bodyDef.bullet = isBullet;
+    bodyDef.fixedRotation = fixedRotation;
     body = runtimeScenesPhysicsDatas->world->CreateBody(&bodyDef);
+    body->SetUserData(this);
 
     //Setup body
     if ( shapeType == Circle)
@@ -141,10 +164,8 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
         body->CreateFixture(&fixtureDef);
     }
 
-    body->SetFixedRotation(fixedRotation);
-    body->SetBullet(isBullet);
-    body->SetLinearDamping(linearDamping);
-    body->SetAngularDamping(angularDamping);
+    objectOldWidth = object->GetWidth();
+    objectOldHeight = object->GetHeight();
 }
 #if defined(GDE)
 void PhysicsAutomatism::SaveToXml(TiXmlElement * elem) const

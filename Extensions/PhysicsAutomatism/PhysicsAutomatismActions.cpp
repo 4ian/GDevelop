@@ -166,7 +166,6 @@ bool PhysicsAutomatism::ActLinearDamping( RuntimeScene & scene, ObjectsConcerned
     return true;
 }
 
-
 /**
  * Change angular damping
  */
@@ -174,6 +173,23 @@ bool PhysicsAutomatism::ActAngularDamping( RuntimeScene & scene, ObjectsConcerne
 {
     if ( !body ) CreateBody(scene);
     body->SetAngularDamping(action.GetParameter(2).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()));
+
+    return true;
+}
+
+/**
+ * Add a joint
+ */
+bool PhysicsAutomatism::ActAddJoint( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( !body ) CreateBody(scene);
+
+    ObjList other = objectsConcerned.Pick(action.GetParameter(2).GetAsObjectIdentifier(), action.IsGlobal());
+    if ( other.empty() || !other[0]->HasAutomatism(automatismId) ) return false;
+
+    b2RevoluteJointDef jointDef;
+    jointDef.Initialize(body, boost::static_pointer_cast<PhysicsAutomatism>(other[0]->GetAutomatism(automatismId))->GetBox2DBody(scene), body->GetWorldCenter());
+    runtimeScenesPhysicsDatas->world->CreateJoint(&jointDef);
 
     return true;
 }

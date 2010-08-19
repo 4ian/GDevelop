@@ -498,6 +498,8 @@
 		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2World.h" />
 		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2WorldCallbacks.cpp" />
 		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2WorldCallbacks.h" />
+		<Unit filename="ContactListener.cpp" />
+		<Unit filename="ContactListener.h" />
 		<Unit filename="Extension.cpp" />
 		<Unit filename="PhysicsAutomatism.cpp" />
 		<Unit filename="PhysicsAutomatism.h" />

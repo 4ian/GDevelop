@@ -114,7 +114,6 @@ bool PhysicsAutomatism::CondLinearDamping( RuntimeScene & scene, ObjectsConcerne
     return false;
 }
 
-
 /**
  * Test linear damping
  */
@@ -131,6 +130,26 @@ bool PhysicsAutomatism::CondAngularDamping( RuntimeScene & scene, ObjectsConcern
        )
     {
         return true;
+    }
+
+    return false;
+}
+
+/**
+ * Test if there is a contact with another object
+ */
+bool PhysicsAutomatism::CondCollisionWith( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    bool isTrue = false;
+    unsigned int otherObjectId = condition.GetParameter(2).GetAsObjectIdentifier();
+    if ( !body ) CreateBody(scene);
+
+    set<PhysicsAutomatism*>::const_iterator it = currentContacts.begin();
+    set<PhysicsAutomatism*>::const_iterator end = currentContacts.end();
+    for (;it != end;++it)
+    {
+    	if ( (*it)->GetObject()->GetObjectIdentifier() == otherObjectId )
+    	    return true;
     }
 
     return false;

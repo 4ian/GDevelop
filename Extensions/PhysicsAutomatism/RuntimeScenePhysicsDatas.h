@@ -31,6 +31,7 @@ freely, subject to the following restrictions:
 #include <iostream>
 #include "GDL/AutomatismsRuntimeSharedDatas.h"
 class ScenePhysicsDatas;
+class ContactListener;
 
 /**
  * Datas shared by Physics Automatism at runtime
@@ -43,6 +44,7 @@ class RuntimeScenePhysicsDatas : public AutomatismsRuntimeSharedDatas
         virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeScenePhysicsDatas(*this));}
 
         b2World * world;
+        ContactListener * contactListener;
         bool stepped; ///< Used to be sure that Step is called only once at each frame.
         float scaleX;
         float scaleY;

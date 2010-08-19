@@ -26,17 +26,21 @@ freely, subject to the following restrictions:
 
 #include "RuntimeScenePhysicsDatas.h"
 #include "ScenePhysicsDatas.h"
+#include "ContactListener.h"
 #include <iostream>
 
 RuntimeScenePhysicsDatas::RuntimeScenePhysicsDatas(const ScenePhysicsDatas & automatismSharedDatas) :
-world(new b2World(b2Vec2(automatismSharedDatas.gravityX, -automatismSharedDatas.gravityY), false)),
+world(new b2World(b2Vec2(automatismSharedDatas.gravityX, -automatismSharedDatas.gravityY), true)),
+contactListener(new ContactListener),
 stepped(false),
 scaleX(automatismSharedDatas.scaleX),
 scaleY(automatismSharedDatas.scaleY)
 {
+    world->SetContactListener(contactListener);
 }
 
 RuntimeScenePhysicsDatas::~RuntimeScenePhysicsDatas()
 {
     delete world;
+    delete contactListener;
 }

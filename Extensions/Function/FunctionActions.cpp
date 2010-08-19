@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/Access.h"
+
 #include "GDL/Instruction.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/RuntimeScene.h"
@@ -44,7 +44,34 @@ bool ActLaunchFunction( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
 
     //Find objects concerned to transfer
     ObjectsConcerned * functionObjectsConcerned = &objectsConcerned;
-    if ( (action.GetParameter(1).GetPlainString() == "no" || action.GetParameter(1).GetPlainString() == "non") )
+    if ( !action.GetParameter(1).GetAsBool() )
+    {
+        ObjectsConcerned newObjectsConcerned;
+        newObjectsConcerned.InheritsFrom(&objectsConcerned);
+        newObjectsConcerned.Reset();
+        functionObjectsConcerned = &newObjectsConcerned;
+    }
+
+    vector < string > params;
+
+    for (unsigned int i = 2;i<action.GetParameters().size();++i)
+    	params.push_back(action.GetParameters()[i].GetAsTextExpressionResult(scene, objectsConcerned));
+
+    eventPtr->Launch(scene, *functionObjectsConcerned, params);
+
+    return true;
+}
+
+
+bool ActLaunchFunctionFromExpression( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    //Find function
+    FunctionEvent * eventPtr = FunctionEvent::functionsList[&scene][action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)];
+    if ( eventPtr == NULL ) return false;
+
+    //Find objects concerned to transfer
+    ObjectsConcerned * functionObjectsConcerned = &objectsConcerned;
+    if ( !action.GetParameter(1).GetAsBool() )
     {
         ObjectsConcerned newObjectsConcerned;
         newObjectsConcerned.InheritsFrom(&objectsConcerned);

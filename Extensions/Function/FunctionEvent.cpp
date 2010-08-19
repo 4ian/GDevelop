@@ -114,7 +114,7 @@ vector < vector<Instruction>* > FunctionEvent::GetAllActionsVectors()
 
     return allActions;
 }
-
+#if defined(GDE)
 void FunctionEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * objectElem = new TiXmlElement( "Name" );
@@ -141,6 +141,7 @@ void FunctionEvent::SaveToXml(TiXmlElement * eventElem) const
         OpenSaveGame::SaveEvents(events, subeventsElem);
     }
 }
+#endif
 
 void FunctionEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
@@ -236,7 +237,6 @@ void FunctionEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
         {
             //Update event and conditions selection information
             if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
-            eventRenderingNeedUpdate = true;
 
             //Update editor selection information
             instructionsSelected = true;
@@ -247,9 +247,6 @@ void FunctionEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
         }
         else if ( y <= 18 )
         {
-            //Update event selection information
-            eventRenderingNeedUpdate = true;
-
             //Update selection information
             instructionsSelected = true;
             boost::tuples::get<2>(eventsSelected.back()) = &conditions;
@@ -271,7 +268,6 @@ void FunctionEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
         {
             //Update event and action selection information
             if ( actionIdInList < actionsListSelected->size() ) (*actionsListSelected)[actionIdInList].selected = true;
-            eventRenderingNeedUpdate = true;
 
             //Update selection information
             instructionsSelected = true;
@@ -280,9 +276,6 @@ void FunctionEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
         }
         else
         {
-            //Update event selection information
-            eventRenderingNeedUpdate = true;
-
             //Update selection information
             instructionsSelected = true;
             boost::tuples::get<2>(eventsSelected.back()) = &actions;
@@ -294,34 +287,22 @@ void FunctionEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
 /**
  * Render the event in the bitmap
  */
-void FunctionEvent::RenderInBitmap() const
+void FunctionEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
-    cout << "renderFunction";
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
-    const int forEachTextHeight = 20;
-
-    //Get sizes and recreate the bitmap
-    int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
-    int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, renderedWidth-renderingHelper->GetConditionsColumnWidth());
-    renderedEventBitmap.Create(renderedWidth, ( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + forEachTextHeight, -1);
-
-    //Prepare renderers and constants
-    wxMemoryDC dc;
-    dc.SelectObject(renderedEventBitmap);
+    const int functionTextHeight = 20;
 
     //Draw event rectangle
     dc.SetPen(*wxTRANSPARENT_PEN);
     dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
-    dc.Clear();
     {
-        wxRect rect(0, 0, renderedWidth, renderedEventBitmap.GetHeight());
+        wxRect rect(x, y, width, GetRenderedHeight(width));
+        wxColor color1 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient1);
+        wxColor color2 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient2;
+        wxColor color3 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient3;
+        wxColor color4 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient4);
 
-        if ( !selected )
-            renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->eventGradient1, renderingHelper->eventGradient2, renderingHelper->eventGradient3,
-                                                renderingHelper->eventGradient4, renderingHelper->eventBorderColor);
-        else
-            renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->selectionColor, renderingHelper->eventGradient2, renderingHelper->eventGradient3,
-                                                renderingHelper->selectionColor, renderingHelper->eventBorderColor);
+        renderingHelper->DrawNiceRectangle(dc, rect, color1, color2, color3, color4, renderingHelper->eventBorderColor);
     }
 
     //Name Selection
@@ -329,18 +310,34 @@ void FunctionEvent::RenderInBitmap() const
     {
         dc.SetBrush(renderingHelper->GetSelectedRectangleFillBrush());
         dc.SetPen(renderingHelper->GetSelectedRectangleOutlinePen());
-        dc.DrawRectangle(1, 1, renderedWidth-2, forEachTextHeight-2);
+        dc.DrawRectangle(x+1, y+1, width-2, functionTextHeight-2);
     }
 
     //Name
     dc.SetFont( renderingHelper->GetBoldFont() );
-    dc.DrawText( _("Fonction") + " " + name, 0 + 2, 0 + 1 );
+    dc.DrawText( _("Fonction") + " " + name, x + 2, y + 1 );
 
     //Draw actions and conditions
-    renderingHelper->DrawConditionsList(conditions, dc, 0, forEachTextHeight, renderingHelper->GetConditionsColumnWidth());
-    renderingHelper->DrawActionsList(actions, dc, renderingHelper->GetConditionsColumnWidth(), forEachTextHeight, renderedWidth-renderingHelper->GetConditionsColumnWidth());
+    renderingHelper->DrawConditionsList(conditions, dc, x, y+functionTextHeight, renderingHelper->GetConditionsColumnWidth(), IsDisabled());
+    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+functionTextHeight, width-renderingHelper->GetConditionsColumnWidth(), IsDisabled());
+}
 
-    eventRenderingNeedUpdate = false;
+unsigned int FunctionEvent::GetRenderedHeight(unsigned int width) const
+{
+    if ( eventHeightNeedUpdate )
+    {
+        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+        const int functionTextHeight = 20;
+
+        //Get maximum height needed
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth());
+
+        renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + functionTextHeight);
+        eventHeightNeedUpdate = false;
+    }
+
+    return renderedHeight;
 }
 
 void FunctionEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)

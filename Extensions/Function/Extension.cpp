@@ -69,9 +69,29 @@ class Extension : public ExtensionBase
 
             DECLARE_END_ACTION()
 
+            DECLARE_ACTION("LaunchFunctionFromExpression",
+                           _("Lancer une fonction grâce à une expression"),
+                           _("Lance une fonction en retrouvant son nom depuis l'expression."),
+                           _("Lancer la fonction correspondant à _PARAM0_"),
+                           _("Fonctions"),
+                           "res/actions/function24.png",
+                           "res/actions/function.png",
+                           &ActLaunchFunctionFromExpression);
+
+                DECLARE_PARAMETER("text", _("Expression donnant le nom de la fonction"), false, "")
+                DECLARE_PARAMETER("yesorno", _("Garder les objets concernés"), false, "")
+                DECLARE_PARAMETER_OPTIONAL("text", _("Paramètre 1"), false, "")
+                DECLARE_PARAMETER_OPTIONAL("text", _("Paramètre 2"), false, "")
+                DECLARE_PARAMETER_OPTIONAL("text", _("Paramètre 3"), false, "")
+                DECLARE_PARAMETER_OPTIONAL("text", _("Paramètre 4"), false, "")
+                DECLARE_PARAMETER_OPTIONAL("text", _("Paramètre 5"), false, "")
+                DECLARE_PARAMETER_OPTIONAL("text", _("Paramètre 6"), false, "")
+
+            DECLARE_END_ACTION()
+
             DECLARE_EVENT("Function",
                           _("Fonction"),
-                          "Évènement fonction : L'évènement lancé uniquement grâce à l'action \"Lancer une fonction\"",
+                          _("Évènement fonction : L'évènement lancé uniquement grâce à l'action \"Lancer une fonction\""),
                           "",
                           "res/function.png",
                           FunctionEvent)

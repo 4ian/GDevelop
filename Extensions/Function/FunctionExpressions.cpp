@@ -40,7 +40,7 @@ std::string ExpGetFunctionParameter( const RuntimeScene & scene, ObjectsConcerne
     if ( FunctionEvent::currentFunctionParameter[&scene] == NULL) return "";
 
     int id = exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned);
-    if ( id < 0 || id >= FunctionEvent::currentFunctionParameter[&scene]->size() ) return "";
+    if ( id < 0 || static_cast<unsigned>(id) >= FunctionEvent::currentFunctionParameter[&scene]->size() ) return "";
 
     return FunctionEvent::currentFunctionParameter[&scene]->at(id);
 }

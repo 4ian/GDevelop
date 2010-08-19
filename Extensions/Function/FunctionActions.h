@@ -33,5 +33,6 @@ class Instruction;
 class Evaluateur;
 
 bool ActLaunchFunction( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActLaunchFunctionFromExpression( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 #endif // AESACTIONS_H_INCLUDED

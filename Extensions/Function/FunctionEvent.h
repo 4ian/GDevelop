@@ -27,7 +27,10 @@ freely, subject to the following restrictions:
 #ifndef FUNCTIONEVENT_H
 #define FUNCTIONEVENT_H
 
-#include <boost/shared_ptr.hpp>
+/*#include <boost/shared_ptr.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/extended_type_info.hpp>
+#include <boost/serialization/export.hpp>*/
 #include "GDL/Event.h"
 class RuntimeScene;
 class ObjectsConcerned;
@@ -86,10 +89,22 @@ class FunctionEvent : public BaseEvent
         virtual vector < vector<Instruction>* > GetAllConditionsVectors();
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
 
+        #if defined(GDE)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
+        #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
 #if defined(GDE)
+        /**
+         * Called by event editor to draw the event.
+         */
+        virtual void Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const;
+
+        /**
+         * Must return the height of the event when rendered
+         */
+        virtual unsigned int GetRenderedHeight(unsigned int width) const;
+
         /**
          * Called when user click on the event
          */
@@ -113,7 +128,6 @@ class FunctionEvent : public BaseEvent
         vector < BaseEventSPtr > events;
 
 #ifdef GDE
-        virtual void RenderInBitmap() const;
         bool nameSelected;
 #endif
 };

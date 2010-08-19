@@ -95,7 +95,7 @@ class TextObject : public Object
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
 
-        virtual void SetAngle(float newAngle) { angle = newAngle;};
+        virtual bool SetAngle(float newAngle) { angle = newAngle; return true;};
         virtual float GetAngle() const {return angle;};
 
         inline void SetString(std::string str) { text.SetString(str); };

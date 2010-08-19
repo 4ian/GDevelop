@@ -153,10 +153,10 @@ bool TextObject::Draw( sf::RenderWindow& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    text.SetX( GetX()+text.GetRect().GetSize().x/2 );
-    text.SetY( GetY()+text.GetRect().GetSize().y/2 );
+    text.SetX( GetX()+text.GetRect().Width/2 );
+    text.SetY( GetY()+text.GetRect().Height/2 );
     text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
-    text.SetOrigin(text.GetRect().GetSize().x/2, text.GetRect().GetSize().y/2);
+    text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2);
     text.SetRotation(-angle);
 
     window.Draw( text );
@@ -170,10 +170,10 @@ bool TextObject::Draw( sf::RenderWindow& window )
  */
 bool TextObject::DrawEdittime(sf::RenderWindow& renderWindow)
 {
-    text.SetX( GetX()+text.GetRect().GetSize().x/2 );
-    text.SetY( GetY()+text.GetRect().GetSize().y/2 );
+    text.SetX( GetX()+text.GetRect().Width/2 );
+    text.SetY( GetY()+text.GetRect().Height/2 );
     text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
-    text.SetOrigin(text.GetRect().GetSize().x/2, text.GetRect().GetSize().y/2);
+    text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2);
     text.SetRotation(-angle);
 
     renderWindow.Draw( text );
@@ -279,7 +279,7 @@ float TextObject::GetDrawableY() const
  */
 float TextObject::GetWidth() const
 {
-    return text.GetRect().GetSize().x;
+    return text.GetRect().Width;
 }
 
 /**
@@ -287,7 +287,7 @@ float TextObject::GetWidth() const
  */
 float TextObject::GetHeight() const
 {
-    return text.GetRect().GetSize().y;
+    return text.GetRect().Height;
 }
 
 /**
@@ -295,7 +295,7 @@ float TextObject::GetHeight() const
  */
 float TextObject::GetCenterX() const
 {
-    return text.GetRect().GetSize().x/2;
+    return text.GetRect().Width/2;
 }
 
 /**
@@ -303,7 +303,7 @@ float TextObject::GetCenterX() const
  */
 float TextObject::GetCenterY() const
 {
-    return text.GetRect().GetSize().y/2;
+    return text.GetRect().Height/2;
 }
 
 /**

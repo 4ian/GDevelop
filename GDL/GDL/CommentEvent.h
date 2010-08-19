@@ -23,7 +23,7 @@ class wxWindow;
 class GD_API CommentEvent : public BaseEvent
 {
     public:
-        CommentEvent() : BaseEvent(), r(255), v(230), b(109) {};
+        CommentEvent() : BaseEvent(), r(255), v(230), b(109), textR(0), textG(0), textB(0) {};
         virtual ~CommentEvent() {};
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new CommentEvent(*this));}
 
@@ -35,6 +35,10 @@ class GD_API CommentEvent : public BaseEvent
         int r;
         int v;
         int b;
+
+        int textR;
+        int textG;
+        int textB;
 
         string com1;
         string com2;

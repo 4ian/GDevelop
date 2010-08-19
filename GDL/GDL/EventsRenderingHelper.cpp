@@ -19,6 +19,8 @@ eventConditionsGradient3(wxColour(237, 237, 255)),
 eventConditionsGradient4(wxColour(210, 210, 255)),
 eventConditionsBorderColor(wxColour(185, 185, 247)),
 selectionColor(wxColour(255,230,156)),
+disabledColor(wxColour(245,245,254)),
+disabledColor2(wxColour(245,245,245)),
 conditionsColumnWidth(200),
 rectangleOutline(wxPen(wxColour(242/2,242/2,242/2), 1)),
 rectangleFill(wxBrush(wxColour(242,242,242))),
@@ -65,7 +67,7 @@ void EventsRenderingHelper::DrawNiceRectangle(wxDC & dc, const wxRect & rect, co
     }
 }
 
-int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & conditions, wxDC & dc, const int x, const int y, const int width)
+int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & conditions, wxDC & dc, const int x, const int y, const int width, bool disabled)
 {
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
     const int iconWidth = 18;
@@ -73,29 +75,22 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
     const int sideSeparation = 1;
     const int conditionsHeight = GetRenderedConditionsListHeight(conditions, width);
 
+    const wxColor & color1 = disabled ? disabledColor2 : eventGradient1;
+    const wxColor & color2 = disabled ? disabledColor : eventGradient2;
+    const wxColor & color3 = disabled ? disabledColor : eventGradient3;
+    const wxColor & color4 = disabled ? disabledColor2 : eventGradient4;
+
+    //Draw Conditions rectangle
+    wxRect rect(x, y, width, conditions.empty() ? 18 : conditionsHeight);
+    DrawNiceRectangle(dc, rect, color1, color2, color3, color4, eventConditionsBorderColor);
+
     if ( conditions.empty() )
     {
-        //Pas de conditions, on affiche juste un petit message
-        wxRect rect(x, y, width, 18);
-        DrawNiceRectangle(dc, rect, eventConditionsGradient1,
-                                eventConditionsGradient2,
-                                eventConditionsGradient3,
-                                eventConditionsGradient4,
-                                eventConditionsBorderColor);
-
         dc.SetFont( GetItalicFont() );
         dc.DrawText( _("Pas de conditions"), x + 2, y + 1 );
 
         return 18;
     }
-
-    //Draw Conditions rectangle
-    wxRect rect(x, y, width, conditionsHeight);
-    DrawNiceRectangle(dc, rect, eventConditionsGradient1,
-                            eventConditionsGradient2,
-                            eventConditionsGradient3,
-                            eventConditionsGradient4,
-                            eventConditionsBorderColor);
 
     //Draw each conditions
     int yCondition = y + 1;
@@ -141,7 +136,9 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
         dc.DrawBitmap( instructionInfos.smallicon, x + sideSeparation + leftIconsWidth, yCondition, true );
 
         //Draw the condition text
-        string TexteFinal = TranslateCondition::Translate(conditions[j], instructionInfos);
+        std::string beginTag = disabled ? "<FONT color=#BDBDBD>" : "";
+        std::string endTag = disabled ? "</FONT>" : "";
+        string TexteFinal = beginTag+TranslateCondition::Translate(conditions[j], instructionInfos)+endTag;
         GetHTMLRenderer().SetHtmlText(TexteFinal);
         wxArrayInt neededArray;
         GetHTMLRenderer().Render(x + sideSeparation + leftIconsWidth + iconWidth, yCondition, neededArray);
@@ -150,7 +147,7 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
 
         //Draw sub conditions
         if ( !conditions[j].GetSubInstructions().empty() )
-            yCondition += DrawConditionsList(conditions[j].GetSubInstructions(), dc, x + sideSeparation + leftIconsWidth + iconWidth + 18, yCondition, width-(sideSeparation + leftIconsWidth + iconWidth + 18));
+            yCondition += DrawConditionsList(conditions[j].GetSubInstructions(), dc, x + sideSeparation + leftIconsWidth + iconWidth + 18, yCondition, width-(sideSeparation + leftIconsWidth + iconWidth + 18), disabled);
         else if ( instructionInfos.canHaveSubInstructions )
         {
             dc.SetFont( GetItalicFont() );
@@ -163,7 +160,7 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
     return yCondition-y;
 }
 
-int EventsRenderingHelper::DrawActionsList(const vector < Instruction > & actions, wxDC & dc, const int x, const int y, const int width)
+int EventsRenderingHelper::DrawActionsList(const vector < Instruction > & actions, wxDC & dc, const int x, const int y, const int width, bool disabled)
 {
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
     const int iconWidth = 18;
@@ -216,7 +213,9 @@ int EventsRenderingHelper::DrawActionsList(const vector < Instruction > & action
         dc.DrawBitmap( instructionInfos.smallicon, x + sideSeparation + leftIconsWidth, yAction, true );
 
         //Draw the action text
-        GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( actions[j], instructionInfos ));
+        std::string beginTag = disabled ? "<FONT color=#BDBDBD>" : "";
+        std::string endTag = disabled ? "</FONT>" : "";
+        GetHTMLRenderer().SetHtmlText(beginTag+TranslateAction::Translate( actions[j], instructionInfos )+endTag);
         wxArrayInt neededArray;
         GetHTMLRenderer().Render(x + leftIconsWidth + iconWidth + sideSeparation, yAction, neededArray);
 

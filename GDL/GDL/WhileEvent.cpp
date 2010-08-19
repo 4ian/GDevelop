@@ -265,11 +265,12 @@ void WhileEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width
     dc.SetPen(*wxTRANSPARENT_PEN);
     dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
     wxRect rect(x, y, width, GetRenderedHeight(width));
+    wxColor color1 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient1);
+    wxColor color2 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient2;
+    wxColor color3 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient3;
+    wxColor color4 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient4);
 
-    if ( !selected )
-        renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->eventGradient1, renderingHelper->eventGradient2, renderingHelper->eventGradient3, renderingHelper->eventGradient4, renderingHelper->eventBorderColor);
-    else
-        renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->selectionColor, renderingHelper->eventGradient2, renderingHelper->eventGradient3, renderingHelper->selectionColor, renderingHelper->eventBorderColor);
+    renderingHelper->DrawNiceRectangle(dc, rect, color1, color2, color3, color4, renderingHelper->eventBorderColor);
 
     //While text
     dc.SetFont( renderingHelper->GetBoldFont() );
@@ -277,13 +278,13 @@ void WhileEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width
 
     //Draw "while conditions"
     whileConditionsHeight = 2;
-    whileConditionsHeight += renderingHelper->DrawConditionsList(whileConditions, dc, x+80, y+2, width-80);
+    whileConditionsHeight += renderingHelper->DrawConditionsList(whileConditions, dc, x+80, y+2, width-80, IsDisabled());
 
     dc.SetFont( renderingHelper->GetBoldFont() );
     dc.DrawText( _("Répéter :"), x+2, y+whileConditionsHeight);
 
-    renderingHelper->DrawConditionsList(conditions, dc, x, y+whileConditionsHeight+repeatHeight, renderingHelper->GetConditionsColumnWidth());
-    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+whileConditionsHeight+repeatHeight, width-renderingHelper->GetConditionsColumnWidth());
+    renderingHelper->DrawConditionsList(conditions, dc, x, y+whileConditionsHeight+repeatHeight, renderingHelper->GetConditionsColumnWidth(), IsDisabled());
+    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+whileConditionsHeight+repeatHeight, width-renderingHelper->GetConditionsColumnWidth(), IsDisabled());
 }
 
 unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const

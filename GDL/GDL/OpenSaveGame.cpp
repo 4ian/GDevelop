@@ -227,6 +227,9 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         else { MSG( "Les informations concernant la couleur de fond de la scene manquent." ); }
         if ( elem->Attribute( "titre" ) != NULL ) { newScene->title = elem->Attribute( "titre" );}
         else { MSG( "Les informations concernant le titre de la fenêtre de la scene manquent." ); }
+        if ( elem->Attribute( "oglFOV" ) != NULL ) { elem->QueryFloatAttribute("oglFOV", &newScene->oglFOV); }
+        if ( elem->Attribute( "oglZNear" ) != NULL ) { elem->QueryFloatAttribute("oglZNear", &newScene->oglZNear); }
+        if ( elem->Attribute( "oglZFar" ) != NULL ) { elem->QueryFloatAttribute("oglZFar", &newScene->oglZFar); }
 
         if ( elem->FirstChildElement( "GroupesObjets" ) != NULL )
             OpenGroupesObjets(newScene->objectGroups, elem->FirstChildElement( "GroupesObjets" ));
@@ -626,6 +629,7 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
         //End of Compatibility code --- with Game Develop 1.3.8892 and inferior
 
         BaseEventSPtr event = extensionsManager->CreateEvent(type);
+        if ( elemScene->Attribute( "disabled" ) != NULL ) { if ( string(elemScene->Attribute( "disabled" )) == "true" ) event->SetDisabled(); }
 
         if ( event != boost::shared_ptr<BaseEvent>())
         {
@@ -705,7 +709,7 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                         subEvent->SetActions(*actionsVectors[0]);
 
                     subEvent->SetSubEvents(list[eId]->GetSubEvents());
-                    subEvent->SetRepeatExpression((*conditions)[c].GetParameter(0).GetPlainString());
+                    subEvent->SetRepeatExpression((*conditions)[c].GetParameterSafely(0).GetPlainString());
 
                     //Insert the new event and modify the current
                     BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
@@ -740,7 +744,7 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                         subEvent->SetActions(*actionsVectors[0]);
 
                     subEvent->SetSubEvents(list[eId]->GetSubEvents());
-                    subEvent->SetObjectToPick((*conditions)[c].GetParameter(0).GetPlainString());
+                    subEvent->SetObjectToPick((*conditions)[c].GetParameterSafely(0).GetPlainString());
 
                     //Insert the new event and modify the current
                     BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
@@ -769,7 +773,7 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                         copy(oldConditions.begin()+c+1, oldConditions.begin()+c+2, back_inserter(whileConditions));
 
                     //Inverting condition if while first parameter is false
-                    if ( (*conditions)[c].GetParameter(0).GetPlainString() == "Faux" || (*conditions)[c].GetParameter(0).GetPlainString() == "False" )
+                    if ( (*conditions)[c].GetParameterSafely(0).GetPlainString() == "Faux" || (*conditions)[c].GetParameterSafely(0).GetPlainString() == "False" )
                     {
                         Instruction notCondition("BuiltinCommonInstructions::Not");
                         notCondition.SetSubInstructions(whileConditions);
@@ -839,7 +843,7 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                     subEvent->SetType("BuiltinCommonInstructions::Repeat");
                     subEvent->SetActions(subEventActions);
                     subEvent->SetSubEvents(list[eId]->GetSubEvents());
-                    subEvent->SetRepeatExpression((*actions)[a].GetParameter(0).GetPlainString());
+                    subEvent->SetRepeatExpression((*actions)[a].GetParameterSafely(0).GetPlainString());
 
                     //Insert the new event and modify the current
                     BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
@@ -863,7 +867,7 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
                     subEvent->SetType("BuiltinCommonInstructions::ForEach");
                     subEvent->SetActions(subEventActions);
                     subEvent->SetSubEvents(list[eId]->GetSubEvents());
-                    subEvent->SetObjectToPick((*actions)[a].GetParameter(0).GetPlainString());
+                    subEvent->SetObjectToPick((*actions)[a].GetParameterSafely(0).GetPlainString());
 
                     //Insert the new event and modify the current
                     BaseEventSPtr subEventSPtr = boost::shared_ptr<BaseEvent>(subEvent);
@@ -1181,9 +1185,9 @@ void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list,
                 for (unsigned int p = 0;p<paramNb;++p)
                 {
                     if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "expression" )
-                        conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyMathExpression(conditionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
+                        conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyMathExpression(conditionsVectors[i]->at(j).GetParameterSafely(p).GetPlainString(), game, scene)));
                     if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color"|| instructionInfos.parameters[p].type == "layer") )
-                        conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(conditionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
+                        conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(conditionsVectors[i]->at(j).GetParameterSafely(p).GetPlainString(), game, scene)));
                 }
         	}
         }
@@ -1199,10 +1203,10 @@ void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list,
                 //Special adaptations for some actions
                 if ( actionsVectors[i]->at(j).GetType() == "Create" )
                 {
-                    if ( actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("CAL\"") != string::npos ||
-                         actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("OBJ(") != string::npos ||
-                         actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("GBL(") != string::npos ||
-                         actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("VAL(") != string::npos )
+                    if ( actionsVectors[i]->at(j).GetParameterSafely(0).GetPlainString().find("CAL\"") != string::npos ||
+                         actionsVectors[i]->at(j).GetParameterSafely(0).GetPlainString().find("OBJ(") != string::npos ||
+                         actionsVectors[i]->at(j).GetParameterSafely(0).GetPlainString().find("GBL(") != string::npos ||
+                         actionsVectors[i]->at(j).GetParameterSafely(0).GetPlainString().find("VAL(") != string::npos )
                     {
                         actionsVectors[i]->at(j).SetType("CreateByName");
                         instructionInfos = extensionsManager->GetActionInfos(actionsVectors[i]->at(j).GetType());
@@ -1212,9 +1216,9 @@ void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list,
                 for (unsigned int p = 0;p<paramNb;++p)
                 {
                     if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "expression" )
-                        actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyMathExpression(actionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
+                        actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyMathExpression(actionsVectors[i]->at(j).GetParameterSafely(p).GetPlainString(), game, scene)));
                     if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color" || instructionInfos.parameters[p].type == "layer") )
-                        actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(actionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
+                        actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(actionsVectors[i]->at(j).GetParameterSafely(p).GetPlainString(), game, scene)));
                 }
         	}
         }
@@ -1255,7 +1259,7 @@ void OpenSaveGame::AdaptExpressionsFromGD149552(vector < BaseEventSPtr > & list,
                 for (unsigned int p = 0;p<paramNb;++p)
                 {
                     if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "layer")
-                        conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(conditionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
+                        conditionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(conditionsVectors[i]->at(j).GetParameterSafely(p).GetPlainString(), game, scene)));
                 }
         	}
         }
@@ -1271,10 +1275,10 @@ void OpenSaveGame::AdaptExpressionsFromGD149552(vector < BaseEventSPtr > & list,
                 //Special adaptations for some actions
                 if ( actionsVectors[i]->at(j).GetType() == "Create" )
                 {
-                    if ( actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("CAL\"") != string::npos ||
-                         actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("OBJ(") != string::npos ||
-                         actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("GBL(") != string::npos ||
-                         actionsVectors[i]->at(j).GetParameter(0).GetPlainString().find("VAL(") != string::npos )
+                    if ( actionsVectors[i]->at(j).GetParameterSafely(0).GetPlainString().find("CAL\"") != string::npos ||
+                         actionsVectors[i]->at(j).GetParameterSafely(0).GetPlainString().find("OBJ(") != string::npos ||
+                         actionsVectors[i]->at(j).GetParameterSafely(0).GetPlainString().find("GBL(") != string::npos ||
+                         actionsVectors[i]->at(j).GetParameterSafely(0).GetPlainString().find("VAL(") != string::npos )
                     {
                         actionsVectors[i]->at(j).SetType("CreateByName");
                         instructionInfos = extensionsManager->GetActionInfos(actionsVectors[i]->at(j).GetType());
@@ -1284,7 +1288,7 @@ void OpenSaveGame::AdaptExpressionsFromGD149552(vector < BaseEventSPtr > & list,
                 for (unsigned int p = 0;p<paramNb;++p)
                 {
                     if ( p < instructionInfos.parameters.size() && instructionInfos.parameters[p].type == "layer")
-                        actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(actionsVectors[i]->at(j).GetParameter(p).GetPlainString(), game, scene)));
+                        actionsVectors[i]->at(j).SetParameter(p, GDExpression(AdaptLegacyTextExpression(actionsVectors[i]->at(j).GetParameterSafely(p).GetPlainString(), game, scene)));
                 }
         	}
         }
@@ -1325,7 +1329,7 @@ void OpenSaveGame::AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list,
                 {
                     if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color"|| instructionInfos.parameters[p].type == "layer" || instructionInfos.parameters[p].type == "expression" ))
                     {
-                        string parameter = conditionsVectors[i]->at(j).GetParameter(p).GetPlainString();
+                        string parameter = conditionsVectors[i]->at(j).GetParameterSafely(p).GetPlainString();
                         cout << parameter << endl;
                         size_t pos = 0;
                         bool end = false;
@@ -1389,7 +1393,7 @@ void OpenSaveGame::AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list,
                 {
                     if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "expression" || instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color" || instructionInfos.parameters[p].type == "layer") )
                     {
-                        string parameter = actionsVectors[i]->at(j).GetParameter(p).GetPlainString();
+                        string parameter = actionsVectors[i]->at(j).GetParameterSafely(p).GetPlainString();
                         cout << parameter << endl;
                         size_t pos = 0;
                         bool end = false;
@@ -1783,6 +1787,9 @@ bool OpenSaveGame::SaveToFile(string file)
             scene->SetDoubleAttribute( "v", game.scenes[i]->backgroundColorG );
             scene->SetDoubleAttribute( "b", game.scenes[i]->backgroundColorB );
             scene->SetAttribute( "titre", game.scenes[i]->title.c_str() );
+            scene->SetDoubleAttribute( "oglFOV", game.scenes[i]->oglFOV );
+            scene->SetDoubleAttribute( "oglZNear", game.scenes[i]->oglZNear );
+            scene->SetDoubleAttribute( "oglZFar", game.scenes[i]->oglZFar );
 
             TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
             scene->LinkEndChild( grpsobjets );
@@ -1955,6 +1962,7 @@ void OpenSaveGame::SaveEvents(const vector < BaseEventSPtr > & list, TiXmlElemen
         TiXmlElement * event;
 
         event = new TiXmlElement( "Event" );
+        event->SetAttribute( "disabled", list[j]->IsDisabled() ? "true" : "false" );
         events->LinkEndChild( event );
 
         TiXmlElement * type = new TiXmlElement( "Type" );
@@ -1990,7 +1998,7 @@ void OpenSaveGame::SaveActions(const vector < Instruction > & list, TiXmlElement
         {
             TiXmlElement * Parametre = new TiXmlElement( "Parametre" );
             action->LinkEndChild( Parametre );
-            Parametre->SetAttribute( "value", list[k].GetParameter( l ).GetPlainString().c_str() );
+            Parametre->SetAttribute( "value", list[k].GetParameterSafely( l ).GetPlainString().c_str() );
         }
 
         //Sub instructions
@@ -2026,7 +2034,7 @@ void OpenSaveGame::SaveConditions(const vector < Instruction > & list, TiXmlElem
         {
             TiXmlElement * Parametre = new TiXmlElement( "Parametre" );
             condition->LinkEndChild( Parametre );
-            Parametre->SetAttribute( "value", list[k].GetParameter( l ).GetPlainString().c_str() );
+            Parametre->SetAttribute( "value", list[k].GetParameterSafely( l ).GetPlainString().c_str() );
         }
 
         //Sub instructions
@@ -2146,19 +2154,19 @@ void OpenSaveGame::RecreatePaths(string file)
                     if ( allActionsVectors[i]->at(k).GetType() == "PlaySound" || allActionsVectors[i]->at(k).GetType() == "PlaySoundCanal" )
                     {
                         //Rajout répertoire
-                        allActionsVectors[i]->at(k).SetParameter(0, GDExpression(rep + allActionsVectors[i]->at(k).GetParameter(0).GetPlainString()));
+                        allActionsVectors[i]->at(k).SetParameter(0, GDExpression(rep + allActionsVectors[i]->at(k).GetParameterSafely(0).GetPlainString()));
                     }
                     if ( allActionsVectors[i]->at(k).GetType() == "PlayMusic" || allActionsVectors[i]->at(k).GetType() == "PlayMusicCanal" )
                     {
                         //Rajout répertoire
-                        allActionsVectors[i]->at(k).SetParameter(0, GDExpression(rep + allActionsVectors[i]->at(k).GetParameter(0).GetPlainString()));
+                        allActionsVectors[i]->at(k).SetParameter(0, GDExpression(rep + allActionsVectors[i]->at(k).GetParameterSafely(0).GetPlainString()));
                     }
                     if ( allActionsVectors[i]->at(k).GetType() == "EcrireTexte" )
                     {
-                        if ( allActionsVectors[i]->at(k).GetParameter(5).GetPlainString() != "" )
+                        if ( allActionsVectors[i]->at(k).GetParameterSafely(5).GetPlainString() != "" )
                         {
                             //Rajout répertoire
-                            allActionsVectors[i]->at(k).SetParameter(5, GDExpression(rep + allActionsVectors[i]->at(k).GetParameter(5).GetPlainString()));
+                            allActionsVectors[i]->at(k).SetParameter(5, GDExpression(rep + allActionsVectors[i]->at(k).GetParameterSafely(5).GetPlainString()));
                         }
                     }
                 }

@@ -23,6 +23,7 @@ class EditComment: public wxDialog
 		wxTextCtrl* Com1Edit;
 		wxTextCtrl* Com2Edit;
 		wxButton* AnnulerBt;
+		wxButton* txtColorBt;
 		wxButton* AideBt;
 		//*)
 
@@ -32,6 +33,7 @@ class EditComment: public wxDialog
 
 		//(*Identifiers(EditComment)
 		static const long ID_BUTTON1;
+		static const long ID_BUTTON5;
 		static const long ID_TEXTCTRL1;
 		static const long ID_TEXTCTRL2;
 		static const long ID_BUTTON2;
@@ -46,6 +48,7 @@ class EditComment: public wxDialog
 		void OnOkBtClick(wxCommandEvent& event);
 		void OnAnnulerBtClick(wxCommandEvent& event);
 		void OnAideBtClick(wxCommandEvent& event);
+		void OntxtColorBtClick(wxCommandEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

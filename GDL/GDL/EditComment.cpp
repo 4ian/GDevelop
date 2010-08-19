@@ -11,6 +11,7 @@
 
 //(*IdInit(EditComment)
 const long EditComment::ID_BUTTON1 = wxNewId();
+const long EditComment::ID_BUTTON5 = wxNewId();
 const long EditComment::ID_TEXTCTRL1 = wxNewId();
 const long EditComment::ID_TEXTCTRL2 = wxNewId();
 const long EditComment::ID_BUTTON2 = wxNewId();
@@ -29,6 +30,7 @@ commentEvent(event_)
 	//(*Initialize(EditComment)
 	wxStaticBoxSizer* StaticBoxSizer2;
 	wxFlexGridSizer* FlexGridSizer2;
+	wxGridSizer* GridSizer1;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
@@ -36,10 +38,14 @@ commentEvent(event_)
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(1);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Couleur du commentaire"));
-	ColorBt = new wxButton(this, ID_BUTTON1, _("Cliquez pour choisir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
-	StaticBoxSizer1->Add(ColorBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	GridSizer1 = new wxGridSizer(0, 1, 0, 0);
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, this, _("Couleur du commentaire"));
+	ColorBt = new wxButton(this, ID_BUTTON1, _("Arrière plan - Cliquez pour choisir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	StaticBoxSizer1->Add(ColorBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	txtColorBt = new wxButton(this, ID_BUTTON5, _("Texte - Cliquez pour choisir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
+	StaticBoxSizer1->Add(txtColorBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	GridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer1->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Textes du commentaire"));
 	Com1Edit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(180,120), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	StaticBoxSizer2->Add(Com1Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -61,6 +67,7 @@ commentEvent(event_)
 	Center();
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditComment::OnColorBtClick);
+	Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditComment::OntxtColorBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditComment::OnOkBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditComment::OnAnnulerBtClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditComment::OnAideBtClick);
@@ -70,6 +77,7 @@ commentEvent(event_)
 	Com2Edit->ChangeValue( commentEvent.com2 );
 
 	ColorBt->SetBackgroundColour(wxColour(commentEvent.r, commentEvent.v, commentEvent.b ));
+	txtColorBt->SetBackgroundColour(wxColour(commentEvent.textR, commentEvent.textG, commentEvent.textB ));
 }
 
 EditComment::~EditComment()
@@ -95,12 +103,16 @@ void EditComment::OnColorBtClick(wxCommandEvent& event)
 
 void EditComment::OnOkBtClick(wxCommandEvent& event)
 {
-    commentEvent.com1 = static_cast<string> ( Com1Edit->GetValue() );
-    commentEvent.com2 = static_cast<string> ( Com2Edit->GetValue() );
+    commentEvent.com1 = Com1Edit->GetValue().mb_str();
+    commentEvent.com2 = Com2Edit->GetValue().mb_str();
 
     commentEvent.r = ColorBt->GetBackgroundColour().Red();
     commentEvent.v = ColorBt->GetBackgroundColour().Green();
     commentEvent.b = ColorBt->GetBackgroundColour().Blue();
+
+    commentEvent.textR = txtColorBt->GetBackgroundColour().Red();
+    commentEvent.textG = txtColorBt->GetBackgroundColour().Green();
+    commentEvent.textB = txtColorBt->GetBackgroundColour().Blue();
 
     EndModal(1);
 }
@@ -115,4 +127,17 @@ void EditComment::OnAideBtClick(wxCommandEvent& event)
     HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
     helpFileAccess->DisplaySection(21);
 }
+void EditComment::OntxtColorBtClick(wxCommandEvent& event)
+{
+    wxColourData cData;
+    cData.SetColour(txtColorBt->GetBackgroundColour());
+    wxColourDialog Dialog(this, &cData);
+    if ( Dialog.ShowModal() == wxID_OK)
+    {
+        cData = Dialog.GetColourData();
+        txtColorBt->SetBackgroundColour(cData.GetColour());
+        txtColorBt->Refresh();
+    }
+}
+
 #endif

@@ -36,7 +36,7 @@ string TranslateAction::Translate(const Instruction & action, const InstructionI
     {
         while ( trad.find( "_PARAM"+ToString(i)+"_" ) != string::npos )
         {
-            string parameter = action.GetParameter( i ).GetPlainString();
+            string parameter = action.GetParameterSafely( i ).GetPlainString();
             RemoveHTMLTags(parameter);
             AddHTMLToParameter(parameter, infos.parameters[i].type);
 

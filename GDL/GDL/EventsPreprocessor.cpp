@@ -232,7 +232,7 @@ void EventsPreprocessor::DeleteUselessEvents(vector < BaseEventSPtr > & events)
         if ( events[eId]->CanHaveSubEvents() ) //Process sub events, if any
             DeleteUselessEvents(events[eId]->GetSubEvents());
 
-        if ( !events[eId]->IsExecutable() ) //Delete events that are not executable
+        if ( !events[eId]->IsExecutable() || events[eId]->IsDisabled() ) //Delete events that are not executable
             events.erase(events.begin() + eId);
     }
 }

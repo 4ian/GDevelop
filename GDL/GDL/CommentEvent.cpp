@@ -7,6 +7,7 @@
 #include "GDL/OpenSaveGame.h"
 #include "GDL/EventsRenderingHelper.h"
 #include "tinyxml.h"
+#include "GDL/XmlMacros.h"
 
 #if defined(GDE)
 #include "GDL/EditComment.h"
@@ -22,6 +23,9 @@ void CommentEvent::SaveToXml(TiXmlElement * eventElem) const
     color->SetDoubleAttribute( "r", r );
     color->SetDoubleAttribute( "v", v );
     color->SetDoubleAttribute( "b", b );
+    color->SetDoubleAttribute( "textR", textR );
+    color->SetDoubleAttribute( "textG", textG );
+    color->SetDoubleAttribute( "textB", textB );
 
     TiXmlElement * com1Elem = new TiXmlElement( "Com1" );
     eventElem->LinkEndChild( com1Elem );
@@ -45,6 +49,10 @@ void CommentEvent::LoadFromXml(const TiXmlElement * eventElem)
     else { cout <<"Les informations concernant le texte 1 d'un commentaire manquent." ; }
     if ( eventElem->FirstChildElement( "Com2" )->Attribute( "value" ) != NULL ) { com2 = eventElem->FirstChildElement( "Com2" )->Attribute( "value" );}
     else { cout <<"Les informations concernant le texte 2 d'un commentaire manquent." ; }
+
+    if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "textR" ) != NULL ) { eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "textR", &textR );}
+    if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "textG" ) != NULL ) { eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "textG", &textG );}
+    if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "textB" ) != NULL ) { eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "textB", &textB );}
 }
 
 #if defined(GDE)
@@ -91,6 +99,7 @@ void CommentEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int wid
     dc.DrawRectangle(rectangle);
 
     //Draw the text
+    dc.SetTextForeground(wxColour(textR, textG, textB));
     wxRect texteRect = rectangle;
     texteRect.SetY(texteRect.GetY()+sideSeparation);
     texteRect.SetX(texteRect.GetX()+sideSeparation);

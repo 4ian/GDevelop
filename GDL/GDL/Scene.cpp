@@ -12,7 +12,10 @@ Scene::Scene() :
 backgroundColorR(125),
 backgroundColorG(125),
 backgroundColorB(125),
-standardSortMethod(true)
+standardSortMethod(true),
+oglFOV(90.0f),
+oglZNear(1.0f),
+oglZFar(500.0f)
 #if defined(GDE)
 ,wasModified(false)
 #endif
@@ -32,6 +35,9 @@ void Scene::Init(const Scene & scene)
     backgroundColorB = scene.backgroundColorB;
     standardSortMethod = scene.standardSortMethod;
     title = scene.title;
+    oglFOV = scene.oglFOV;
+    oglZNear = scene.oglZNear;
+    oglZFar = scene.oglZFar;
 
     events.clear();
     for (unsigned int i =0;i<scene.events.size();++i)

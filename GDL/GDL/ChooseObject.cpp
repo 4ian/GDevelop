@@ -306,6 +306,7 @@ void ChooseObject::OnglobalObjectGroupsItemRightClick(wxTreeEvent& event)
 void ChooseObject::OnsearchCtrlText(wxCommandEvent& event)
 {
     Refresh();
+    searchCtrl->SetFocus();
 }
 
 void ChooseObject::OnsearchCtrlTextEnter(wxCommandEvent& event)

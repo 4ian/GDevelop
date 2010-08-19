@@ -81,7 +81,25 @@ class GD_API Instruction
         /** Access a parameter
          * \return The current value of the parameter
          */
-        inline GDExpression & GetParameter(unsigned int nb) const
+        inline const GDExpression & GetParameter(unsigned int nb) const { return parameters[nb]; }
+        inline GDExpression & GetParameter(unsigned int nb) { return parameters[nb]; }
+
+        /** Access a parameter. Return a bad expression if the parameter requested does not exists.
+         * \return The current value of the parameter
+         */
+        inline const GDExpression & GetParameterSafely(unsigned int nb) const
+        {
+            if ( nb >= parameters.size() )
+            {
+                #ifndef RELEASE
+                    std::cout << "Parameter that doesn't exist was requested.";
+                #endif
+                return badExpression;
+            }
+
+            return parameters[nb];
+        }
+        inline GDExpression & GetParameterSafely(unsigned int nb)
         {
             if ( nb >= parameters.size() )
             {

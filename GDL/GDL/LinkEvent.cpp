@@ -53,6 +53,8 @@ void LinkEvent::LoadFromXml(const TiXmlElement * eventElem)
 
 void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
 {
+    if ( IsDisabled() ) return;
+
     //Finding events to include
     vector< BaseEventSPtr > * eventsToInclude = NULL;
 
@@ -120,6 +122,8 @@ void LinkEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainE
  */
 void LinkEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+
     if ( !selected )
     {
         dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
@@ -131,7 +135,14 @@ void LinkEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width)
         dc.SetBrush(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)));
     }
 
-    dc.DrawRectangle(x, y, width, GetRenderedHeight(width));
+    wxRect rect(x, y, width, GetRenderedHeight(width));
+    wxColor color1 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient1);
+    wxColor color2 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient2;
+    wxColor color3 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient3;
+    wxColor color4 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient4);
+
+    renderingHelper->DrawNiceRectangle(dc, rect, color1, color2, color3, color4, renderingHelper->eventBorderColor);
+
     dc.DrawBitmap( wxBitmap( "res/link48.png", wxBITMAP_TYPE_ANY ), x+4, y + 4, true);
 
     dc.SetTextForeground( wxColour( 0, 0, 0 ) );

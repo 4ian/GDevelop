@@ -70,6 +70,16 @@ class GD_API BaseEvent
         virtual vector < BaseEventSPtr > & GetSubEvents() {return badSubEvents;};
 
         /**
+         * Set if the event if disabled or not
+         */
+        void SetDisabled(bool disable = true) { disabled = disable; }
+
+        /**
+         * True if event is disabled
+         */
+        bool IsDisabled() const { return disabled; }
+
+        /**
          * Event must be able to return all conditions vector they have.
          * Used to preprocess the conditions.
          */
@@ -137,6 +147,7 @@ class GD_API BaseEvent
 #endif
 
     private:
+        bool disabled; ///<True if the event is disabled and must not be executed
         string type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
 
         static vector <BaseEventSPtr> badSubEvents;

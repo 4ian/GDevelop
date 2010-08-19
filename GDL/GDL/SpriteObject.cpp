@@ -527,34 +527,36 @@ void SpriteObject::UpdateCurrentSprite() const
 {
     if ( currentAnimation >= GetAnimationsNumber() )
         ptrToCurrentSprite = &badSpriteDatas;
-
-    if ( animations[currentAnimation].typeNormal )
-    {
-        //Update sprite pointer
-        if ( currentDirection >= animations[currentAnimation].GetDirectionsNumber() || currentSprite >= animations[currentAnimation].GetDirection(currentDirection).GetSpritesNumber() )
-            ptrToCurrentSprite = &badSpriteDatas;
-        else
-            ptrToCurrentSprite = &animations[currentAnimation].GetDirectionToModify( currentDirection ).ModSprite( currentSprite );
-
-        ptrToCurrentSprite->ModSprite().SetX( X - ptrToCurrentSprite->GetOrigine().GetX() + (ptrToCurrentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2 );
-        ptrToCurrentSprite->ModSprite().SetY( Y - ptrToCurrentSprite->GetOrigine().GetY() + (ptrToCurrentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2 );
-    }
     else
     {
-        //Update sprite pointer
-        if ( animations[currentAnimation].HasNoDirections() || currentSprite >= animations[currentAnimation].GetDirection(0).GetSpritesNumber() )
-            ptrToCurrentSprite = &badSpriteDatas;
+        if ( animations[currentAnimation].typeNormal )
+        {
+            //Update sprite pointer
+            if ( currentDirection >= animations[currentAnimation].GetDirectionsNumber() || currentSprite >= animations[currentAnimation].GetDirection(currentDirection).GetSpritesNumber() )
+                ptrToCurrentSprite = &badSpriteDatas;
+            else
+                ptrToCurrentSprite = &animations[currentAnimation].GetDirectionToModify( currentDirection ).ModSprite( currentSprite );
+
+            ptrToCurrentSprite->ModSprite().SetX( X - ptrToCurrentSprite->GetOrigine().GetX() + (ptrToCurrentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2 );
+            ptrToCurrentSprite->ModSprite().SetY( Y - ptrToCurrentSprite->GetOrigine().GetY() + (ptrToCurrentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2 );
+        }
         else
-            ptrToCurrentSprite = &animations[currentAnimation].GetDirectionToModify(0).ModSprite( currentSprite );
+        {
+            //Update sprite pointer
+            if ( animations[currentAnimation].HasNoDirections() || currentSprite >= animations[currentAnimation].GetDirection(0).GetSpritesNumber() )
+                ptrToCurrentSprite = &badSpriteDatas;
+            else
+                ptrToCurrentSprite = &animations[currentAnimation].GetDirectionToModify(0).ModSprite( currentSprite );
 
-        ptrToCurrentSprite->ModSprite().SetX( X  + ptrToCurrentSprite->GetCentre().GetX()*scaleX - ptrToCurrentSprite->GetOrigine().GetX()
-                                            + (ptrToCurrentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2);
-        ptrToCurrentSprite->ModSprite().SetY( Y  + ptrToCurrentSprite->GetCentre().GetY()*scaleY - ptrToCurrentSprite->GetOrigine().GetY()
-                                            + (ptrToCurrentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2);
+            ptrToCurrentSprite->ModSprite().SetX( X  + ptrToCurrentSprite->GetCentre().GetX()*scaleX - ptrToCurrentSprite->GetOrigine().GetX()
+                                                + (ptrToCurrentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2);
+            ptrToCurrentSprite->ModSprite().SetY( Y  + ptrToCurrentSprite->GetCentre().GetY()*scaleY - ptrToCurrentSprite->GetOrigine().GetY()
+                                                + (ptrToCurrentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2);
 
-        ptrToCurrentSprite->ModSprite().SetOrigin(   ptrToCurrentSprite->GetCentre().GetX(),
-                                                ptrToCurrentSprite->GetCentre().GetY() );
-        ptrToCurrentSprite->ModSprite().SetRotation( -currentAngle );
+            ptrToCurrentSprite->ModSprite().SetOrigin(   ptrToCurrentSprite->GetCentre().GetX(),
+                                                    ptrToCurrentSprite->GetCentre().GetY() );
+            ptrToCurrentSprite->ModSprite().SetRotation( -currentAngle );
+        }
     }
 
     ptrToCurrentSprite->ModSprite().SetScale( scaleX, scaleY );
@@ -625,7 +627,9 @@ const Sprite & SpriteObject::GetCurrentSprite() const
  */
 bool SpriteObject::SetSprite( unsigned int nb )
 {
-    if ( nb >= GetAnimation( currentAnimation ).GetDirection( currentDirection ).GetSpritesNumber() ) return false;
+    if ( currentAnimation >= GetAnimationsNumber() ||
+        currentDirection >= GetAnimation( currentAnimation ).GetDirectionsNumber() ||
+        nb >= GetAnimation( currentAnimation ).GetDirection( currentDirection ).GetSpritesNumber() ) return false;
 
     currentSprite = nb;
     timeElapsedOnCurrentSprite = 0;
@@ -639,7 +643,7 @@ bool SpriteObject::SetSprite( unsigned int nb )
  */
 bool SpriteObject::SetAnimation( unsigned int nb )
 {
-    if ( nb < 0 || nb >= GetAnimationsNumber() ) return false;
+    if ( nb >= GetAnimationsNumber() ) return false;
 
     currentAnimation = nb;
     currentSprite = 0;
@@ -654,7 +658,9 @@ bool SpriteObject::SetAnimation( unsigned int nb )
  */
 bool SpriteObject::SetDirection( unsigned int nb )
 {
-    if ( nb >= GetAnimation( currentAnimation ).GetDirectionsNumber() ) return false;
+    if ( currentAnimation >= GetAnimationsNumber() ||
+        nb >= GetAnimation( currentAnimation ).GetDirectionsNumber() ||
+        GetAnimation( currentAnimation ).GetDirection( nb ).HasNoSprites() ) return false;
 
     currentDirection = nb;
     currentSprite = 0;

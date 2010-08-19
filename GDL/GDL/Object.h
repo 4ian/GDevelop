@@ -241,16 +241,16 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
          */
         vector < unsigned int > GetAllAutomatismsNameIdentifiers();
 
+        /**
+         * Test if object has an automaism
+         */
+        bool HasAutomatism(unsigned int type) { return automatisms.find(type) != automatisms.end(); };
+
         #ifdef GDE
         /**
          * Remove an automatism
          */
         void RemoveAutomatism(unsigned int type);
-
-        /**
-         * Test if object has an automaism
-         */
-        bool HasAutomatism(unsigned int type) { return automatisms.find(type) != automatisms.end(); };
         #endif
 
         /**

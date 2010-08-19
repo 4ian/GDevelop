@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxDialog" name="EditCommentaire">
+	<object class="wxDialog" name="EditComment">
 		<title>Editer le commentaire</title>
 		<centered>1</centered>
 		<id_arg>0</id_arg>
@@ -10,20 +10,37 @@
 			<growablecols>0</growablecols>
 			<growablerows>1</growablerows>
 			<object class="sizeritem">
-				<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
-					<label>Couleur du commentaire</label>
+				<object class="wxGridSizer" variable="GridSizer1" member="no">
+					<cols>1</cols>
 					<object class="sizeritem">
-						<object class="wxButton" name="ID_BUTTON1" variable="ColorBt" member="yes">
-							<label>Cliquez pour choisir</label>
-							<handler function="OnColorBtClick" entry="EVT_BUTTON" />
+						<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
+							<label>Couleur du commentaire</label>
+							<orient>wxVERTICAL</orient>
+							<object class="sizeritem">
+								<object class="wxButton" name="ID_BUTTON1" variable="ColorBt" member="yes">
+									<label>Arrière plan - Cliquez pour choisir</label>
+									<handler function="OnColorBtClick" entry="EVT_BUTTON" />
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxButton" name="ID_BUTTON5" variable="txtColorBt" member="yes">
+									<label>Texte - Cliquez pour choisir</label>
+									<handler function="OntxtColorBtClick" entry="EVT_BUTTON" />
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
 						</object>
-						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
 						<option>1</option>
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<border>5</border>
 				<option>1</option>
 			</object>
 			<object class="sizeritem">

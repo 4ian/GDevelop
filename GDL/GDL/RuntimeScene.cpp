@@ -142,7 +142,7 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
     glLoadIdentity();
 
     double windowRatio = static_cast<double>(renderWindow->GetWidth())/static_cast<double>(renderWindow->GetHeight());
-    gluPerspective(90.f, windowRatio, 1.f, 500.f);
+    gluPerspective(oglFOV, windowRatio, oglZNear, oglZFar);
 }
 
 ////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ void RuntimeScene::ManageRenderTargetEvents()
             glLoadIdentity();
 
             double windowRatio = static_cast<double>(event.Size.Width)/static_cast<double>(event.Size.Height);
-            gluPerspective(90.f, windowRatio, 1.f, 500.f);
+            gluPerspective(oglFOV, windowRatio, oglZNear, oglZFar);
         }
     }
 }
@@ -305,8 +305,8 @@ void RuntimeScene::Render()
 
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
-                gluPerspective(90.f, camera.GetSFMLView().GetSize().x
-                                    /camera.GetSFMLView().GetSize().y, 1.f, 500.f);
+                gluPerspective(oglFOV, camera.GetSFMLView().GetSize().x
+                                    /camera.GetSFMLView().GetSize().y, oglZNear, oglZFar);
 
                 const sf::FloatRect & viewport = camera.GetSFMLView().GetViewport();
                 glViewport(viewport.Left*renderWindow->GetWidth(),
@@ -568,6 +568,10 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     backgroundColorB = scene.backgroundColorB;
     title = scene.title;
     standardSortMethod = scene.standardSortMethod;
+    title = scene.title;
+    oglFOV = scene.oglFOV;
+    oglZNear = scene.oglZNear;
+    oglZFar = scene.oglZFar;
 
     //Add global object groups
     copy(game->objectGroups.begin(), game->objectGroups.end(), back_inserter(objectGroups));
@@ -621,9 +625,8 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
             newObject->SetY( scene.initialObjectsPositions[i].y );
             newObject->SetZOrder( scene.initialObjectsPositions[i].zOrder );
             newObject->SetLayer( scene.initialObjectsPositions[i].layer );
-            newObject->SetAngle( scene.initialObjectsPositions[i].angle );
-
             newObject->InitializeFromInitialPosition(scene.initialObjectsPositions[i]);
+            newObject->SetAngle( scene.initialObjectsPositions[i].angle );
 
             if ( scene.initialObjectsPositions[i].personalizedSize )
             {

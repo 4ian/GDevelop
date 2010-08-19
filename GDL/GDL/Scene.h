@@ -36,6 +36,9 @@ class GD_API Scene
         unsigned int backgroundColorB;
         bool standardSortMethod;
         string title; ///< Title displayed in the window
+        float oglFOV;
+        float oglZNear;
+        float oglZFar;
 
         vector < BaseEventSPtr >                events;
         vector < boost::shared_ptr<Object> >    initialObjects;

@@ -19,8 +19,8 @@ class GD_API EventsRenderingHelper
 
         void DrawNiceRectangle(wxDC & dc, const wxRect & rect, const wxColor & color1, const wxColor & color2,const wxColor & color3,const wxColor & color4,const wxColor & color5) const;
 
-        int DrawConditionsList(const std::vector < Instruction > & conditions, wxDC & dc, const int x, const int y, const int width);
-        int DrawActionsList(const std::vector < Instruction > & actions, wxDC & dc, int x, int y, int width);
+        int DrawConditionsList(const std::vector < Instruction > & conditions, wxDC & dc, const int x, const int y, const int width, bool disabled);
+        int DrawActionsList(const std::vector < Instruction > & actions, wxDC & dc, int x, int y, int width, bool disabled);
         unsigned int GetRenderedConditionsListHeight(const std::vector < Instruction > & conditions, int width);
         unsigned int GetRenderedActionsListHeight(const std::vector < Instruction > & actions, int width);
 
@@ -83,6 +83,8 @@ class GD_API EventsRenderingHelper
         wxColor eventConditionsGradient4;
         wxColor eventConditionsBorderColor;
         wxColor selectionColor;
+        wxColor disabledColor;
+        wxColor disabledColor2;
 
     protected:
     private:

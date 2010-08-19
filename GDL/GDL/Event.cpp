@@ -13,11 +13,12 @@ BOOST_CLASS_EXPORT_IMPLEMENT(BaseEvent)*/
 
 vector <BaseEventSPtr> BaseEvent::badSubEvents;
 
-BaseEvent::BaseEvent()
+BaseEvent::BaseEvent() :
 #ifdef GDE
-: selected(false),
-eventHeightNeedUpdate(true)
+selected(false),
+eventHeightNeedUpdate(true),
 #endif
+disabled(false)
 {
 }
 

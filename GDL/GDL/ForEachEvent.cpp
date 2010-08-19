@@ -243,13 +243,12 @@ void ForEachEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int wid
     dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
     {
         wxRect rect(x, y, width, GetRenderedHeight(width));
+        wxColor color1 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient1);
+        wxColor color2 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient2;
+        wxColor color3 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient3;
+        wxColor color4 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient4);
 
-        if ( !selected )
-            renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->eventGradient1, renderingHelper->eventGradient2, renderingHelper->eventGradient3,
-                                                renderingHelper->eventGradient4, renderingHelper->eventBorderColor);
-        else
-            renderingHelper->DrawNiceRectangle(dc, rect, renderingHelper->selectionColor, renderingHelper->eventGradient2, renderingHelper->eventGradient3,
-                                                renderingHelper->selectionColor, renderingHelper->eventBorderColor);
+        renderingHelper->DrawNiceRectangle(dc, rect, color1, color2, color3, color4, renderingHelper->eventBorderColor);
     }
 
     //"For Each" text selection
@@ -265,8 +264,8 @@ void ForEachEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int wid
     dc.DrawText( _("Pour chaque objet") + " " + objectsToPick.GetPlainString() + _(", répéter :"), x + 2, y + 1 );
 
     //Draw actions and conditions
-    renderingHelper->DrawConditionsList(conditions, dc, x, y+forEachTextHeight, renderingHelper->GetConditionsColumnWidth());
-    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+forEachTextHeight, width-renderingHelper->GetConditionsColumnWidth());
+    renderingHelper->DrawConditionsList(conditions, dc, x, y+forEachTextHeight, renderingHelper->GetConditionsColumnWidth(), IsDisabled());
+    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+forEachTextHeight, width-renderingHelper->GetConditionsColumnWidth(), IsDisabled());
 }
 
 unsigned int ForEachEvent::GetRenderedHeight(unsigned int width) const

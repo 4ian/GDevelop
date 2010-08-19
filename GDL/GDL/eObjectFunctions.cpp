@@ -56,7 +56,12 @@ double SpriteObject::ExpGetObjectY( const RuntimeScene & scene, ObjectsConcerned
 
 double SpriteObject::ExpGetObjectDirection( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    return GetCurrentDirection();
+    if ( currentAnimation >= GetAnimationsNumber() ) return false;
+
+    if ( GetAnimation( currentAnimation ).typeNormal )
+        return GetCurrentDirection();
+    else
+        return GetAngle();
 }
 
 double SpriteObject::ExpGetObjectSpriteNb( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )

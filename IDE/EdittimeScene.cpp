@@ -73,7 +73,7 @@ void EdittimeScene::RenderEdittimeScene()
 
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            gluPerspective(90.f, static_cast<double>(renderWindow->GetWidth())/static_cast<double>(renderWindow->GetHeight()), 1.f, 500.f);
+            gluPerspective(oglFOV, static_cast<double>(renderWindow->GetWidth())/static_cast<double>(renderWindow->GetHeight()), oglZNear, oglZFar);
 
             glViewport(0,0, renderWindow->GetWidth(), renderWindow->GetHeight());
 

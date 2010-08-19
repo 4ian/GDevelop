@@ -57,6 +57,7 @@ const long EditorEvents::idMenuCom = wxNewId();
 const long EditorEvents::idMenuSubEvent = wxNewId();
 const long EditorEvents::ID_MENUITEM1 = wxNewId();
 const long EditorEvents::idMenuEventDel = wxNewId();
+const long EditorEvents::ID_MENUITEM15 = wxNewId();
 const long EditorEvents::idMenuUndo = wxNewId();
 const long EditorEvents::idMenuRedo = wxNewId();
 const long EditorEvents::idMenuClearHistory = wxNewId();
@@ -139,6 +140,7 @@ isResizingColumns(false)
     wxMenuItem* MenuItem23;
     wxMenuItem* editMenuItem;
     wxMenu* MenuItem5;
+    wxMenuItem* MenuItem9;
     wxMenuItem* MenuItem19;
 
     Create(parent, wxID_ANY, wxDefaultPosition, wxSize(536,252), 0, _T("wxID_ANY"));
@@ -171,6 +173,8 @@ isResizingColumns(false)
     MenuItem1 = new wxMenuItem((&ContextMenu), idMenuEventDel, _("Supprimer cet évènement\tDEL"), _("Supprimer l\'évènement complet ( Action et Condition ) de la scène"), wxITEM_NORMAL);
     MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
     ContextMenu.Append(MenuItem1);
+    MenuItem9 = new wxMenuItem((&ContextMenu), ID_MENUITEM15, _("Dés/activer l\'évènement"), wxEmptyString, wxITEM_NORMAL);
+    ContextMenu.Append(MenuItem9);
     ContextMenu.AppendSeparator();
     MenuItem16 = new wxMenuItem((&ContextMenu), idMenuUndo, _("Annuler\tCtrl-Z"), _("Annuler les modifications précédentes"), wxITEM_NORMAL);
     MenuItem16->SetBitmap(wxBitmap(wxImage(_T("res/undo.png"))));
@@ -292,6 +296,7 @@ isResizingColumns(false)
     Connect(idMenuCom,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnMenuItem7Selected);
     Connect(idMenuSubEvent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnSubEventMenuItemSelected);
     Connect(idMenuEventDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelEventSelected);
+    Connect(ID_MENUITEM15,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnToggleEventSelected);
     Connect(idMenuUndo,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnUndoSelected);
     Connect(idMenuRedo,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnRedoSelected);
     Connect(idMenuClearHistory,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnClearHistorySelected);
@@ -980,6 +985,24 @@ void EditorEvents::OnDelSubEventsSelected(wxCommandEvent& event)
     ChangesMadeOnEvents();
 }
 
+/**
+ * De/activate an event
+ */
+void EditorEvents::OnToggleEventSelected(wxCommandEvent& event)
+{
+    if ( eventsSelected.empty() ) return;
+
+    bool newState = !GetLastSelectedEvent()->IsDisabled();
+    GetLastSelectedEvent()->SetDisabled(newState);
+    if ( GetLastSelectedEvent()->CanHaveSubEvents() )
+    {
+        for (unsigned int i = 0;i<GetLastSelectedEvent()->GetSubEvents().size();++i)
+        	GetLastSelectedEvent()->GetSubEvents()[i]->SetDisabled(newState);
+    }
+
+    ChangesMadeOnEvents();
+}
+
 
 void EditorEvents::OnAideBtClick( wxCommandEvent& event )
 {
@@ -1386,3 +1409,4 @@ void EditorEvents::OnEventsPanelSetFocus(wxFocusEvent& event)
 }
 
 //TODO : Selection de plusieurs events
+

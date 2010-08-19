@@ -16,6 +16,7 @@
 #include <wx/help.h>
 #include <wx/config.h>
 #include "GDL/HelpFileAccess.h"
+#include "GDL/CommonTools.h"
 
 #include "GDL/Scene.h"
 
@@ -29,6 +30,13 @@
 const long EditPropScene::ID_BUTTON1 = wxNewId();
 const long EditPropScene::ID_RADIOBOX1 = wxNewId();
 const long EditPropScene::ID_STATICTEXT3 = wxNewId();
+const long EditPropScene::ID_STATICTEXT4 = wxNewId();
+const long EditPropScene::ID_TEXTCTRL2 = wxNewId();
+const long EditPropScene::ID_STATICTEXT5 = wxNewId();
+const long EditPropScene::ID_STATICTEXT6 = wxNewId();
+const long EditPropScene::ID_TEXTCTRL3 = wxNewId();
+const long EditPropScene::ID_STATICTEXT7 = wxNewId();
+const long EditPropScene::ID_TEXTCTRL4 = wxNewId();
 const long EditPropScene::ID_STATICLINE2 = wxNewId();
 const long EditPropScene::ID_BUTTON2 = wxNewId();
 const long EditPropScene::ID_BUTTON3 = wxNewId();
@@ -47,8 +55,13 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
 	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer5;
+	wxFlexGridSizer* FlexGridSizer9;
 	wxFlexGridSizer* FlexGridSizer2;
+	wxFlexGridSizer* FlexGridSizer7;
+	wxStaticBoxSizer* StaticBoxSizer3;
 	wxGridSizer* GridSizer1;
+	wxFlexGridSizer* FlexGridSizer8;
+	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
@@ -103,6 +116,34 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
 	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
 	FlexGridSizer5->Add(StaticText2, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Avancé"));
+	FlexGridSizer6 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer6->AddGrowableCol(0);
+	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer7->AddGrowableCol(1);
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT4, _("Angle de champ :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	FlexGridSizer7->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	fovEdit = new wxTextCtrl(this, ID_TEXTCTRL2, _("90"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+	FlexGridSizer7->Add(fovEdit, 1, wxTOP|wxBOTTOM|wxLEFT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT5, _("°"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	FlexGridSizer7->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer6->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer8->AddGrowableCol(1);
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT6, _("Distance du premier plan de coupe :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	FlexGridSizer8->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	zNearEdit = new wxTextCtrl(this, ID_TEXTCTRL3, _("1"), wxDefaultPosition, wxSize(77,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
+	FlexGridSizer8->Add(zNearEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer6->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer9->AddGrowableCol(1);
+	StaticText6 = new wxStaticText(this, ID_STATICTEXT7, _("Distance du dernier plan de coupe :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+	FlexGridSizer9->Add(StaticText6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	zFarEdit = new wxTextCtrl(this, ID_TEXTCTRL4, _("500"), wxDefaultPosition, wxSize(77,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
+	FlexGridSizer9->Add(zFarEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer6->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticBoxSizer3->Add(FlexGridSizer6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer5->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -136,6 +177,9 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
     else
         TriBox->SetSelection(1);
 
+    fovEdit->SetValue(ToString(scene->oglFOV));
+    zNearEdit->SetValue(ToString(scene->oglZNear));
+    zFarEdit->SetValue(ToString(scene->oglZFar));
 
     //On vérifie si on est pas en mode simple.
     wxConfigBase * pConfig = wxConfigBase::Get();
@@ -157,13 +201,16 @@ EditPropScene::~EditPropScene()
 
 void EditPropScene::OnOkBtClick(wxCommandEvent& event)
 {
-    scene->title = static_cast<string> (CaptionEdit->GetValue());
+    scene->title = CaptionEdit->GetValue().mb_str();
 
     wxColourData cData;
     cData.SetColour(Panel1->GetBackgroundColour());
     scene->backgroundColorR = cData.GetColour().Red();
     scene->backgroundColorG = cData.GetColour().Green();
     scene->backgroundColorB = cData.GetColour().Blue();
+    scene->oglFOV = ToFloat(fovEdit->GetValue().mb_str());
+    scene->oglZNear = ToFloat(zNearEdit->GetValue().mb_str());
+    scene->oglZFar = ToFloat(zFarEdit->GetValue().mb_str());
 
     if ( TriBox->GetSelection() == 0 )
         scene->standardSortMethod = true;

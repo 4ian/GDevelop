@@ -700,24 +700,24 @@ void Compilation::CopyEventsRes(const Game & game, vector < BaseEventSPtr > & ev
             {
                 if ( allActionsVectors[i]->at( k ).GetType() == "PlaySound" || allActionsVectors[i]->at( k ).GetType() == "PlaySoundCanal" )
                 {
-                    StaticText2->SetLabel( allActionsVectors[i]->at( k ).GetParameter( 0 ).GetPlainString() );
+                    StaticText2->SetLabel( allActionsVectors[i]->at( k ).GetParameterSafely( 0 ).GetPlainString() );
                     //Copie et réduction du nom des sons
-                    allActionsVectors[i]->at( k ).SetParameter( 0, CopyAndReduceFileName( allActionsVectors[i]->at( k ).GetParameter( 0 ).GetPlainString(), report ));
+                    allActionsVectors[i]->at( k ).SetParameter( 0, CopyAndReduceFileName( allActionsVectors[i]->at( k ).GetParameterSafely( 0 ).GetPlainString(), report ));
                 }
                 if ( allActionsVectors[i]->at( k ).GetType() == "PlayMusic" || allActionsVectors[i]->at( k ).GetType() == "PlayMusicCanal" )
                 {
-                    StaticText2->SetLabel( allActionsVectors[i]->at( k ).GetParameter( 0 ).GetPlainString() );
+                    StaticText2->SetLabel( allActionsVectors[i]->at( k ).GetParameterSafely( 0 ).GetPlainString() );
                     //Copie et réduction du nom des musiques
-                    allActionsVectors[i]->at( k ).SetParameter( 0 , CopyAndReduceFileName( allActionsVectors[i]->at( k ).GetParameter( 0 ).GetPlainString(), report ));
+                    allActionsVectors[i]->at( k ).SetParameter( 0 , CopyAndReduceFileName( allActionsVectors[i]->at( k ).GetParameterSafely( 0 ).GetPlainString(), report ));
                 }
                 if ( allActionsVectors[i]->at( k ).GetType() == "EcrireTexte" )
                 {
-                    if ( allActionsVectors[i]->at( k ).GetParameter( 5 ).GetPlainString() != "" )
+                    if ( allActionsVectors[i]->at( k ).GetParameterSafely( 5 ).GetPlainString() != "" )
                     {
 
-                        StaticText2->SetLabel( allActionsVectors[i]->at( k ).GetParameter( 5 ).GetPlainString() );
+                        StaticText2->SetLabel( allActionsVectors[i]->at( k ).GetParameterSafely( 5 ).GetPlainString() );
                         //Copie et réduction du nom des musiques
-                        allActionsVectors[i]->at( k ).SetParameter( 5, CopyAndReduceFileName( allActionsVectors[i]->at( k ).GetParameter( 5 ).GetPlainString(), report ));
+                        allActionsVectors[i]->at( k ).SetParameter( 5, CopyAndReduceFileName( allActionsVectors[i]->at( k ).GetParameterSafely( 5 ).GetPlainString(), report ));
                     }
                 }
             }

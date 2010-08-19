@@ -24,16 +24,23 @@ class EditPropScene: public wxDialog
 
 		//(*Declarations(EditPropScene)
 		wxButton* OkBt;
+		wxTextCtrl* zFarEdit;
 		wxButton* ColorBt;
 		wxStaticText* StaticText2;
 		wxStaticText* NomSceneTxt;
 		wxTextCtrl* CaptionEdit;
+		wxStaticText* StaticText6;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
+		wxStaticText* StaticText3;
 		wxStaticLine* StaticLine2;
+		wxTextCtrl* zNearEdit;
+		wxStaticText* StaticText5;
+		wxTextCtrl* fovEdit;
 		wxStaticLine* StaticLine1;
 		wxButton* AnnulerBt;
 		wxPanel* Panel2;
+		wxStaticText* StaticText4;
 		wxRadioBox* TriBox;
 		wxButton* AideBt;
 		//*)
@@ -50,6 +57,13 @@ class EditPropScene: public wxDialog
 		static const long ID_BUTTON1;
 		static const long ID_RADIOBOX1;
 		static const long ID_STATICTEXT3;
+		static const long ID_STATICTEXT4;
+		static const long ID_TEXTCTRL2;
+		static const long ID_STATICTEXT5;
+		static const long ID_STATICTEXT6;
+		static const long ID_TEXTCTRL3;
+		static const long ID_STATICTEXT7;
+		static const long ID_TEXTCTRL4;
 		static const long ID_STATICLINE2;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON3;

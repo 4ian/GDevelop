@@ -84,6 +84,7 @@ class EditorEvents: public wxPanel
 		static const long idMenuSubEvent;
 		static const long ID_MENUITEM1;
 		static const long idMenuEventDel;
+		static const long ID_MENUITEM15;
 		static const long idMenuUndo;
 		static const long idMenuRedo;
 		static const long idMenuClearHistory;
@@ -186,6 +187,7 @@ class EditorEvents: public wxPanel
 		void OnPasteConditionMenuSelected(wxCommandEvent& event);
 		void OnEditLinkMenuSelected(wxCommandEvent& event);
 		void OnEditCommentMenuSelected(wxCommandEvent& event);
+		void OnToggleEventSelected(wxCommandEvent& event);
 		//*)
         void DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & maximalWidth, bool draw);
         void OnSearchBtClick(wxCommandEvent& event);

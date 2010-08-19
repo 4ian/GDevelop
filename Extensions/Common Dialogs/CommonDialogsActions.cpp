@@ -98,7 +98,7 @@ bool ActShowOpenFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     toGetFileName.hwndOwner = NULL;
     toGetFileName.lpstrFile = filePath;
     toGetFileName.nMaxFile = MAX_PATH;
-    toGetFileName.lpstrFilter = filters == '\0' ? NULL : filters.c_str();
+    toGetFileName.lpstrFilter = filters == "\0" ? NULL : filters.c_str();
     toGetFileName.nFilterIndex = 1;
     toGetFileName.Flags = OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;;
 

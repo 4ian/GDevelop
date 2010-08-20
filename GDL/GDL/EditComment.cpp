@@ -78,6 +78,7 @@ commentEvent(event_)
 
 	ColorBt->SetBackgroundColour(wxColour(commentEvent.r, commentEvent.v, commentEvent.b ));
 	txtColorBt->SetBackgroundColour(wxColour(commentEvent.textR, commentEvent.textG, commentEvent.textB ));
+	txtColorBt->SetForegroundColour(wxColour(255-commentEvent.textR, 255-commentEvent.textG, 255-commentEvent.textB ));
 }
 
 EditComment::~EditComment()
@@ -136,6 +137,7 @@ void EditComment::OntxtColorBtClick(wxCommandEvent& event)
     {
         cData = Dialog.GetColourData();
         txtColorBt->SetBackgroundColour(cData.GetColour());
+        txtColorBt->SetForegroundColour(wxColour(255-txtColorBt->GetBackgroundColour().Red(), 255-txtColorBt->GetBackgroundColour().Green(), 255-txtColorBt->GetBackgroundColour().Blue() ));
         txtColorBt->Refresh();
     }
 }

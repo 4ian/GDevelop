@@ -37,6 +37,32 @@ FileExtension::FileExtension()
 
     DECLARE_END_CONDITION()
 
+    DECLARE_ACTION("LoadFile",
+                   _("Charger un fichier en mémoire"),
+                   _("Cette action charge le fichier XML en mémoire, pour permettre de lire et écrire dedans.\nIl est possible de lire et d'écrire dans un fichier XML sans passer par cette action, mais les performances seront moindres."),
+                   _("Charger le fichier XML _PARAM0_ en mémoire"),
+                   _("Fichiers"),
+                   "res/actions/fichier24.png",
+                   "res/actions/fichier.png",
+                   &ActLoadFile);
+
+        DECLARE_PARAMETER("file", _("Fichier"), false, "");
+
+    DECLARE_END_ACTION()
+
+    DECLARE_ACTION("UnloadFile",
+                   _("Fermer un fichier chargé en mémoire"),
+                   _("Cette action ferme le fichier XML chargé précédemment en mémoire, en enregistrant les modifications apportées à celui ci."),
+                   _("Fermer le fichier XML _PARAM0_ chargé en mémoire"),
+                   _("Fichiers"),
+                   "res/actions/fichier24.png",
+                   "res/actions/fichier.png",
+                   &ActUnloadFile);
+
+        DECLARE_PARAMETER("file", _("Fichier"), false, "");
+
+    DECLARE_END_ACTION()
+
     DECLARE_ACTION("EcrireFichierExp",
                    _("Ecrire un nombre dans un fichier"),
                    _("Cette action écrit le résultat de l'expression dans le fichier, dans le groupe indiqué.\nIndiquez la structure du groupe en séparant les éléments par des /. (Exemple : Racine/MonPersonnage/X)\nAttention ! Les espaces sont interdits dans le nom des groupes."),

@@ -22,6 +22,7 @@ SpriteObject::SpriteObject(std::string name_) :
 Object(name_),
 currentAnimation( 0 ),
 currentDirection( 0 ),
+currentAngle( 0 ),
 currentSprite( 0 ),
 animationStopped(false),
 timeElapsedOnCurrentSprite(0),

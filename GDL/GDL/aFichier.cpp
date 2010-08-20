@@ -35,7 +35,7 @@ bool ActLaunchFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
 }
 
 /**
- * Execute a command
+ * Execute a system-specific command
  */
 bool ActExecuteCmd( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
@@ -44,15 +44,85 @@ bool ActExecuteCmd( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
     return true;
 }
 
-////////////////////////////////////////////////////////////
-/// Supprimer un fichier
-///
-/// Type : EcrireFichierExp
-/// Paramètre 1 : Nom du fichier
-////////////////////////////////////////////////////////////
+/**
+ * Delete a file
+ */
 bool ActDeleteFichier( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     remove(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str());
+
+    return true;
+}
+
+/**
+ * Helper class wrapping a tinyxml document in RAII fashion
+ */
+class XmlFile
+{
+    public :
+        XmlFile(std::string filename) : doc(filename.c_str()), modified(false) { doc.LoadFile(); };
+        ~XmlFile() { if (modified) doc.SaveFile(); }
+
+        void MarkAsModified() { modified = true; }
+        TiXmlDocument & GetTinyXmlDocument() { return doc; };
+        const TiXmlDocument & GetTinyXmlDocument() const { return doc; };
+
+    private :
+        TiXmlDocument doc;
+        bool modified;
+};
+
+/**
+ * Helper class for opening files.
+ */
+class XmlFilesManager
+{
+    static std::map<string, boost::shared_ptr<XmlFile> > openedFiles;
+
+    public:
+
+    /**
+     * Load a file
+     */
+    static void LoadFile(std::string filename)
+    {
+        if ( openedFiles.find(filename) == openedFiles.end() )
+            openedFiles[filename] = boost::shared_ptr<XmlFile>(new XmlFile(filename));
+    }
+
+    /**
+     * Unload a file
+     */
+    static void UnloadFile(std::string filename)
+    {
+        if ( openedFiles.find(filename) != openedFiles.end() )
+            openedFiles.erase(filename);
+    }
+
+    /**
+     * Get access to a file. If the file has not been loaded with LoadFile,
+     * it will be loaded now.
+     */
+    static boost::shared_ptr<XmlFile> GetFile(std::string filename, bool isGoingToModifyFile = true)
+    {
+        boost::shared_ptr<XmlFile> file = openedFiles.find(filename) != openedFiles.end() ? openedFiles[filename] : boost::shared_ptr<XmlFile>(new XmlFile(filename));
+        if ( isGoingToModifyFile ) file->MarkAsModified();
+
+        return file;
+    }
+};
+std::map<string, boost::shared_ptr<XmlFile> > XmlFilesManager::openedFiles;
+
+bool ActLoadFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    XmlFilesManager::LoadFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+
+    return true;
+}
+
+bool ActUnloadFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    XmlFilesManager::UnloadFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
 
     return true;
 }
@@ -66,10 +136,8 @@ bool ActDeleteFichier( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
 ////////////////////////////////////////////////////////////
 bool ActDeleteGroupFichier( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    TiXmlDocument doc(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str()); //On tente de charger le fichier, pour garder la structure.
-    doc.LoadFile(); //On ne se préoccupe pas du retour.
-
-    TiXmlHandle hdl( &doc );
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
     istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
@@ -106,11 +174,6 @@ bool ActDeleteGroupFichier( RuntimeScene & scene, ObjectsConcerned & objectsConc
         if ( i >= (groups.size()-1)-1 )
         {
             hdl.ToNode()->RemoveChild(hdl.FirstChildElement(groups.at(i).c_str()).ToNode());
-            if ( !doc.SaveFile( action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str() ) )
-            {
-                scene.errors.Add("Impossible d'enregistrer dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
-                return false;
-            }
             return true;
         }
 
@@ -131,10 +194,8 @@ bool ActDeleteGroupFichier( RuntimeScene & scene, ObjectsConcerned & objectsConc
 ////////////////////////////////////////////////////////////
 bool ActEcrireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    TiXmlDocument doc(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str()); //On tente de charger le fichier, pour garder la structure.
-    doc.LoadFile(); //On ne se préoccupe pas du retour.
-
-    TiXmlHandle hdl( &doc );
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
     istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
@@ -158,16 +219,16 @@ bool ActEcrireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcer
     {
         //Il y a déjà un noeud, on vérifie que c'est pas une déclaration
         if ( hdl.FirstChild().ToNode()->ToDeclaration() == NULL )
-            doc.InsertBeforeChild(hdl.FirstChildElement().Element(), decl);
+            file->GetTinyXmlDocument().InsertBeforeChild(hdl.FirstChildElement().Element(), decl);
     }
     else
-        doc.InsertEndChild(decl); //Il n'y a rien, on peut insérer notre déclaration
+        file->GetTinyXmlDocument().InsertEndChild(decl); //Il n'y a rien, on peut insérer notre déclaration
 
     //Création si besoin est de la racine
     if ( hdl.FirstChildElement(groups.at(0).c_str()).Element() == NULL )
     {
         TiXmlElement root(groups.at(0).c_str());
-        doc.InsertEndChild(root);
+        file->GetTinyXmlDocument().InsertEndChild(root);
     }
 
     //A chaque fois, on vérifie si le groupe voulu existe, si non on le créé,
@@ -190,12 +251,6 @@ bool ActEcrireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcer
     }
     else { scene.errors.Add("Erreur interne : Le groupe finale aurait dû être valide.", "", "", -1, 2); }
 
-    if ( !doc.SaveFile( action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str() ) )
-    {
-        scene.errors.Add("Impossible d'enregistrer dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
-        return false;
-    }
-
     return true;
 }
 
@@ -209,10 +264,8 @@ bool ActEcrireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcer
 ////////////////////////////////////////////////////////////
 bool ActEcrireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    TiXmlDocument doc(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str()); //On tente de charger le fichier, pour garder la structure.
-    doc.LoadFile(); //On ne se préoccupe pas du retour.
-
-    TiXmlHandle hdl( &doc );
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
     istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
@@ -236,16 +289,16 @@ bool ActEcrireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcer
     {
         //Il y a déjà un noeud, on vérifie que c'est pas une déclaration
         if ( hdl.FirstChild().ToNode()->ToDeclaration() == NULL )
-            doc.InsertBeforeChild(hdl.FirstChildElement().Element(), decl);
+            file->GetTinyXmlDocument().InsertBeforeChild(hdl.FirstChildElement().Element(), decl);
     }
     else
-        doc.InsertEndChild(decl); //Il n'y a rien, on peut insérer notre déclaration
+        file->GetTinyXmlDocument().InsertEndChild(decl); //Il n'y a rien, on peut insérer notre déclaration
 
     //Création si besoin est de la racine
     if ( hdl.FirstChildElement(groups.at(0).c_str()).Element() == NULL )
     {
         TiXmlElement root(groups.at(0).c_str());
-        doc.InsertEndChild(root);
+        file->GetTinyXmlDocument().InsertEndChild(root);
     }
 
     //A chaque fois, on vérifie si le groupe voulu existe, si non on le créé,
@@ -268,12 +321,6 @@ bool ActEcrireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcer
     }
     else { scene.errors.Add("Erreur interne : Le groupe final aurait dû être valide.", "", "", -1, 2); }
 
-    if ( !doc.SaveFile( action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str() ) )
-    {
-        scene.errors.Add("Impossible d'enregistrer dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
-        return false;
-    }
-
     return true;
 }
 
@@ -287,14 +334,8 @@ bool ActEcrireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcer
 ////////////////////////////////////////////////////////////
 bool ActLireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    TiXmlDocument doc;
-    if ( !doc.LoadFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str() ) && doc.ErrorId() == 2) //Tente de charger le fichier en tant que fichier xml pour préserver sa structure
-    {
-        scene.errors.Add("Impossible d'ouvrir le fichier "+action.GetParameter(0).GetPlainString()+" : "+string(doc.ErrorDesc()), "", "", -1, 2);
-        return false;
-    }
-
-    TiXmlHandle hdl( &doc );
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
     istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
@@ -339,14 +380,8 @@ bool ActLireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
 ////////////////////////////////////////////////////////////
 bool ActLireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    TiXmlDocument doc;
-    if ( !doc.LoadFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str() ) && doc.ErrorId() == 2) //Tente de charger le fichier en tant que fichier xml pour préserver sa structure
-    {
-        scene.errors.Add("Impossible d'ouvrir le fichier "+action.GetParameter(0).GetPlainString()+" : "+string(doc.ErrorDesc()), "", "", -1, 2);
-        return false;
-    }
-
-    TiXmlHandle hdl( &doc );
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
     istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );

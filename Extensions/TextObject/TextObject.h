@@ -82,7 +82,7 @@ class TextObject : public Object
 
         virtual void UpdateTime(float timeElapsed);
 
-        virtual void OnPositionChanged() {};
+        virtual void OnPositionChanged();
 
         virtual float GetWidth() const;
         virtual float GetHeight() const;
@@ -95,17 +95,17 @@ class TextObject : public Object
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
 
-        virtual bool SetAngle(float newAngle) { angle = newAngle; return true;};
+        virtual bool SetAngle(float newAngle) { angle = newAngle; text.SetRotation(-angle); return true;};
         virtual float GetAngle() const {return angle;};
 
-        inline void SetString(std::string str) { text.SetString(str); };
+        inline void SetString(std::string str) { text.SetString(str); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
         inline std::string GetString() const {return text.GetString();};
 
-        inline void SetCharacterSize(float size) { text.SetCharacterSize(size); };
+        inline void SetCharacterSize(float size) { text.SetCharacterSize(size); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
         inline float GetCharacterSize() const { return text.GetCharacterSize(); };
 
         void SetFont(std::string fontName_);
-        inline std::string GetFont() {return fontName;};
+        inline std::string GetFont() const {return fontName;};
 
         void SetOpacity(float val);
         inline float GetOpacity() const {return opacity;};

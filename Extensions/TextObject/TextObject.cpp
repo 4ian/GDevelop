@@ -61,7 +61,7 @@ void TextObject::LoadFromXml(const TiXmlElement * object)
     }
     else
     {
-        text.SetString(object->FirstChildElement("String")->Attribute("value"));
+        SetString(object->FirstChildElement("String")->Attribute("value"));
     }
 
     if ( object->FirstChildElement( "Font" ) == NULL ||
@@ -112,7 +112,7 @@ void TextObject::SaveToXml(TiXmlElement * object)
 {
     TiXmlElement * str = new TiXmlElement( "String" );
     object->LinkEndChild( str );
-    str->SetAttribute("value", string(text.GetString()).c_str());
+    str->SetAttribute("value", GetString().c_str());
 
     TiXmlElement * font = new TiXmlElement( "Font" );
     object->LinkEndChild( font );
@@ -124,9 +124,9 @@ void TextObject::SaveToXml(TiXmlElement * object)
 
     TiXmlElement * color = new TiXmlElement( "Color" );
     object->LinkEndChild( color );
-    color->SetAttribute("r", colorR);
-    color->SetAttribute("g", colorG);
-    color->SetAttribute("b", colorB);
+    color->SetAttribute("r", GetColorR());
+    color->SetAttribute("g", GetColorG());
+    color->SetAttribute("b", GetColorB());
 }
 #endif
 
@@ -153,12 +153,6 @@ bool TextObject::Draw( sf::RenderWindow& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    text.SetX( GetX()+text.GetRect().Width/2 );
-    text.SetY( GetY()+text.GetRect().Height/2 );
-    text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
-    text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2);
-    text.SetRotation(-angle);
-
     window.Draw( text );
 
     return true;
@@ -170,12 +164,6 @@ bool TextObject::Draw( sf::RenderWindow& window )
  */
 bool TextObject::DrawEdittime(sf::RenderWindow& renderWindow)
 {
-    text.SetX( GetX()+text.GetRect().Width/2 );
-    text.SetY( GetY()+text.GetRect().Height/2 );
-    text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
-    text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2);
-    text.SetRotation(-angle);
-
     renderWindow.Draw( text );
 
     return true;
@@ -210,16 +198,16 @@ void TextObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition
 
 void TextObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Texte");                     value = text.GetString();}
-    else if ( propertyNb == 1 ) {name = _("Police");                    value = fontName;}
+    if      ( propertyNb == 0 ) {name = _("Texte");                     value = GetString();}
+    else if ( propertyNb == 1 ) {name = _("Police");                    value = GetFont();}
     else if ( propertyNb == 2 ) {name = _("Taille de caractères");      value = ToString(GetCharacterSize());}
-    else if ( propertyNb == 3 ) {name = _("Couleur");       value = ToString(colorR)+";"+ToString(colorG)+";"+ToString(colorB);}
+    else if ( propertyNb == 3 ) {name = _("Couleur");       value = ToString(GetColorR())+";"+ToString(GetColorG())+";"+ToString(GetColorB());}
     else if ( propertyNb == 4 ) {name = _("Opacité");       value = ToString(GetOpacity());}
 }
 
 bool TextObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
-    if      ( propertyNb == 0 ) { text.SetString(newValue); return true; }
+    if      ( propertyNb == 0 ) { SetString(newValue); return true; }
     else if ( propertyNb == 1 ) { SetFont(newValue); }
     else if ( propertyNb == 2 ) { SetCharacterSize(ToInt(newValue)); }
     else if ( propertyNb == 3 )
@@ -257,6 +245,12 @@ unsigned int TextObject::GetNumberOfProperties() const
     return 5;
 }
 #endif
+
+void TextObject::OnPositionChanged()
+{
+    text.SetX( GetX()+text.GetRect().Width/2 );
+    text.SetY( GetY()+text.GetRect().Height/2 );
+}
 
 /**
  * Get the real X position of the sprite
@@ -321,6 +315,7 @@ void TextObject::SetColor( unsigned int r, unsigned int g, unsigned int b )
     colorR = r;
     colorG = g;
     colorB = b;
+    text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
 }
 
 void TextObject::SetOpacity(float val)
@@ -339,6 +334,7 @@ void TextObject::SetFont(string fontName_)
 
     FontManager * fontManager = FontManager::getInstance();
     text.SetFont(*fontManager->GetFont(fontName));
+    text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2);
 }
 
 /**

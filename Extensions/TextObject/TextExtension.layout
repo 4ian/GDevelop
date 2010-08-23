@@ -13,14 +13,14 @@
 	<File name="TextExpressions.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="863" topLine="7" />
 	</File>
-	<File name="TextObject.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="8862" topLine="327" />
+	<File name="TextObject.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="4622" topLine="167" />
 	</File>
-	<File name="TextObject.h" open="0" top="0" tabpos="1">
-		<Cursor position="3450" topLine="80" />
+	<File name="TextObject.h" open="0" top="0" tabpos="2">
+		<Cursor position="3670" topLine="80" />
 	</File>
-	<File name="TextObjectEditor.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="6625" topLine="106" />
+	<File name="TextObjectEditor.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="7072" topLine="128" />
 	</File>
 	<File name="TextObjectEditor.h" open="0" top="0" tabpos="1">
 		<Cursor position="2482" topLine="63" />

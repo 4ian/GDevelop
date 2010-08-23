@@ -38,9 +38,9 @@ freely, subject to the following restrictions:
 bool TextObject::ActString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter(2).GetAsModOperator() == GDExpression::Set )
-        text.SetString( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()) );
+        SetString( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()) );
     else if ( action.GetParameter(2).GetAsModOperator() == GDExpression::Add )
-        text.SetString( string(text.GetString()) + action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()) );
+        SetString( GetString() + action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()) );
 
     return true;
 }
@@ -98,9 +98,7 @@ bool TextObject::ActChangeColor( RuntimeScene & scene, ObjectsConcerned & object
 
     if ( colors.size() < 3 ) return false; //La couleur est incorrecte
 
-    colorR = ToInt(colors[0]);
-    colorG = ToInt(colors[1]);
-    colorB = ToInt(colors[2]);
+    SetColor(ToInt(colors[0]),ToInt(colors[1]),ToInt(colors[2]));
 
     return true;
 }

@@ -47,11 +47,6 @@ body(NULL)
 
 PhysicsAutomatism::~PhysicsAutomatism()
 {
-    if ( runtimeScenesPhysicsDatas == boost::shared_ptr<RuntimeScenePhysicsDatas>() )
-        cout << endl << "runtimeScenesPhysicsDatas NULL lors d'une destruction !" << endl;
-
-    if ( !body ) cout << endl << "body NULL lors d'une destruction !" << endl;
-
     if ( runtimeScenesPhysicsDatas != boost::shared_ptr<RuntimeScenePhysicsDatas>() && body)
         runtimeScenesPhysicsDatas->world->DestroyBody(body);
 }
@@ -82,8 +77,8 @@ void PhysicsAutomatism::DoStepPreEvents(RuntimeScene & scene)
 
     //Update object position according to Box2D body
     b2Vec2 position = body->GetPosition();
-    object->SetX(position.x*runtimeScenesPhysicsDatas->scaleX-object->GetWidth()/2+object->GetX()-object->GetDrawableX());
-    object->SetY(-position.y*runtimeScenesPhysicsDatas->scaleY-object->GetHeight()/2+object->GetY()-object->GetDrawableY()); //Y axis is inverted
+    object->SetX(position.x*runtimeScenesPhysicsDatas->GetScaleX()-object->GetWidth()/2+object->GetX()-object->GetDrawableX());
+    object->SetY(-position.y*runtimeScenesPhysicsDatas->GetScaleY()-object->GetHeight()/2+object->GetY()-object->GetDrawableY()); //Y axis is inverted
     object->SetAngle(-body->GetAngle()*180.0f/b2_pi); //Angles are inverted
 
     objectOldX = object->GetX();
@@ -111,8 +106,8 @@ void PhysicsAutomatism::DoStepPostEvents(RuntimeScene & scene)
         return;
 
     b2Vec2 oldPos;
-    oldPos.x = (object->GetDrawableX()+object->GetWidth()/2)/runtimeScenesPhysicsDatas->scaleX;
-    oldPos.y = -(object->GetDrawableY()+object->GetHeight()/2)/runtimeScenesPhysicsDatas->scaleY; //Y axis is inverted
+    oldPos.x = (object->GetDrawableX()+object->GetWidth()/2)*runtimeScenesPhysicsDatas->GetInvScaleX();
+    oldPos.y = -(object->GetDrawableY()+object->GetHeight()/2)*runtimeScenesPhysicsDatas->GetInvScaleY(); //Y axis is inverted
     body->SetTransform(oldPos, -object->GetAngle()*b2_pi/180.0f); //Angles are inverted
     body->SetAwake(true);
 }
@@ -128,7 +123,7 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
     //Create body from object
     b2BodyDef bodyDef;
     bodyDef.type = dynamic ? b2_dynamicBody : b2_staticBody;
-    bodyDef.position.Set((object->GetDrawableX()+object->GetWidth()/2)/runtimeScenesPhysicsDatas->scaleX, -(object->GetDrawableY()+object->GetHeight()/2)/runtimeScenesPhysicsDatas->scaleY);
+    bodyDef.position.Set((object->GetDrawableX()+object->GetWidth()/2)*runtimeScenesPhysicsDatas->GetInvScaleX(), -(object->GetDrawableY()+object->GetHeight()/2)*runtimeScenesPhysicsDatas->GetInvScaleY());
     bodyDef.angle = -object->GetAngle()*b2_pi/180.0f; //Angles are inverted
     bodyDef.angularDamping = angularDamping;
     bodyDef.linearDamping = linearDamping;
@@ -143,8 +138,8 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
         b2FixtureDef fixtureDef;
 
         b2CircleShape circle;
-        circle.m_radius = (object->GetWidth()/runtimeScenesPhysicsDatas->scaleX+
-                           object->GetHeight()/runtimeScenesPhysicsDatas->scaleY)/4; //Radius is based on the average of height and width
+        circle.m_radius = (object->GetWidth()*runtimeScenesPhysicsDatas->GetInvScaleX()+
+                           object->GetHeight()*runtimeScenesPhysicsDatas->GetInvScaleY())/4; //Radius is based on the average of height and width
         fixtureDef.shape = &circle;
         fixtureDef.density = massDensity;
         fixtureDef.friction = averageFriction;
@@ -156,7 +151,7 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
         b2FixtureDef fixtureDef;
 
         b2PolygonShape dynamicBox;
-        dynamicBox.SetAsBox(object->GetWidth()/(runtimeScenesPhysicsDatas->scaleX*2), object->GetHeight()/(runtimeScenesPhysicsDatas->scaleY*2));
+        dynamicBox.SetAsBox(object->GetWidth()*runtimeScenesPhysicsDatas->GetInvScaleX()/2, object->GetHeight()*runtimeScenesPhysicsDatas->GetInvScaleY()/2);
         fixtureDef.shape = &dynamicBox;
         fixtureDef.density = massDensity;
         fixtureDef.friction = averageFriction;

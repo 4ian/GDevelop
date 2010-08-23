@@ -32,11 +32,17 @@ freely, subject to the following restrictions:
 RuntimeScenePhysicsDatas::RuntimeScenePhysicsDatas(const ScenePhysicsDatas & automatismSharedDatas) :
 world(new b2World(b2Vec2(automatismSharedDatas.gravityX, -automatismSharedDatas.gravityY), true)),
 contactListener(new ContactListener),
+staticBody(NULL),
 stepped(false),
 scaleX(automatismSharedDatas.scaleX),
-scaleY(automatismSharedDatas.scaleY)
+scaleY(automatismSharedDatas.scaleY),
+invScaleX(1/scaleX),
+invScaleY(1/scaleY)
 {
     world->SetContactListener(contactListener);
+
+    b2BodyDef bodyWithoutFixture;
+    staticBody = world->CreateBody(&bodyWithoutFixture);
 }
 
 RuntimeScenePhysicsDatas::~RuntimeScenePhysicsDatas()

@@ -45,11 +45,34 @@ class RuntimeScenePhysicsDatas : public AutomatismsRuntimeSharedDatas
 
         b2World * world;
         ContactListener * contactListener;
+        b2Body * staticBody; ///< A simple static body with no fixture. Used for joints.
         bool stepped; ///< Used to be sure that Step is called only once at each frame.
-        float scaleX;
-        float scaleY;
+
+        /**
+         * Get the scale between world coordinates and scene pixels in x axis
+         */
+        inline float GetScaleX() const { return scaleX; }
+
+        /**
+         * Get the scale between world coordinates and scene pixels in y axis
+         */
+        inline float GetScaleY() const { return scaleY; }
+
+        /**
+         * Get inverse of scale X
+         */
+        inline float GetInvScaleX() const { return invScaleX; }
+
+        /**
+         * Get inverse of scale Y
+         */
+        inline float GetInvScaleY() const { return invScaleY; }
 
     private:
+        float scaleX;
+        float scaleY;
+        float invScaleX;
+        float invScaleY;
 };
 
 #endif // RUNTIMESCENEPHYSICSDATAS_H

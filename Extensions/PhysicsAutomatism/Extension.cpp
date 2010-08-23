@@ -112,14 +112,30 @@ class Extension : public ExtensionBase
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
-                    DECLARE_AUTOMATISM_ACTION("AddJoint",
-                                   _("Ajouter un joint"),
-                                   _("Ajoute un joint."),
-                                   _("Ajouter un joint entre _PARAM0_ et _PARAM2_"),
-                                   _("Joint"),
+                    DECLARE_AUTOMATISM_ACTION("AddRevoluteJoint",
+                                   _("Ajouter une charnière"),
+                                   _("Ajoute une charnière autour de laquelle l'objet va tourner.\nLa distance entre la charnière et l'objet restera identique à quand l'action sera appelée."),
+                                   _("Ajouter une charnière à _PARAM0_ à la position _PARAM2_;_PARAM3_"),
+                                   _("Joints"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
-                                   &PhysicsAutomatism::ActAddJoint);
+                                   &PhysicsAutomatism::ActAddRevoluteJoint);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        DECLARE_PARAMETER("expression", _("Position X de la charnière"), false, "")
+                        DECLARE_PARAMETER("expression", _("Position Y de la charnière"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("AddRevoluteJointBetweenObjects",
+                                   _("Ajouter une charnière entre deux objets"),
+                                   _("Ajoute une charnière autour de laquelle l'objet va tourner. "),
+                                   _("Ajouter une charnière entre _PARAM0_ et _PARAM2_"),
+                                   _("Joints"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActAddRevoluteJointBetweenObjects);
 
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
                         DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")

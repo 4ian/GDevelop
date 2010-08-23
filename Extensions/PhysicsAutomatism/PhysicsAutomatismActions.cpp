@@ -178,17 +178,36 @@ bool PhysicsAutomatism::ActAngularDamping( RuntimeScene & scene, ObjectsConcerne
 }
 
 /**
- * Add a joint
+ * Add an hinge between two objects
  */
-bool PhysicsAutomatism::ActAddJoint( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+bool PhysicsAutomatism::ActAddRevoluteJointBetweenObjects( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( !body ) CreateBody(scene);
 
     ObjList other = objectsConcerned.Pick(action.GetParameter(2).GetAsObjectIdentifier(), action.IsGlobal());
     if ( other.empty() || !other[0]->HasAutomatism(automatismId) ) return false;
+    b2Body * otherBody = boost::static_pointer_cast<PhysicsAutomatism>(other[0]->GetAutomatism(automatismId))->GetBox2DBody(scene);
 
     b2RevoluteJointDef jointDef;
-    jointDef.Initialize(body, boost::static_pointer_cast<PhysicsAutomatism>(other[0]->GetAutomatism(automatismId))->GetBox2DBody(scene), body->GetWorldCenter());
+    jointDef.Initialize(otherBody, body, otherBody->GetWorldCenter());
+    runtimeScenesPhysicsDatas->world->CreateJoint(&jointDef);
+
+    return true;
+}
+
+
+/**
+ * Add an hinge to an object
+ */
+bool PhysicsAutomatism::ActAddRevoluteJoint( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( !body ) CreateBody(scene);
+
+    b2RevoluteJointDef jointDef;
+    jointDef.Initialize(body, runtimeScenesPhysicsDatas->staticBody,
+                        b2Vec2( action.GetParameter(2).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject())*runtimeScenesPhysicsDatas->GetInvScaleX(),
+                               -action.GetParameter(3).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject())*runtimeScenesPhysicsDatas->GetInvScaleY()));
+
     runtimeScenesPhysicsDatas->world->CreateJoint(&jointDef);
 
     return true;

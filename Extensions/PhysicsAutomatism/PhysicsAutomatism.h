@@ -89,7 +89,8 @@ class PhysicsAutomatism : public Automatism
         bool ActLinearDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActAngularVelocity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActLinearVelocity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActAddJoint( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActAddRevoluteJointBetweenObjects( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActAddRevoluteJoint( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         bool CondAngularDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool CondLinearDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

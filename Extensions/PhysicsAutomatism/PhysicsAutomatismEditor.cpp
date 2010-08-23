@@ -93,7 +93,7 @@ mainEditorCommand(mainEditorCommand_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
-	
+
 	Create(parent, wxID_ANY, _("Editer l\'automatisme"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Paramètres initiaux"));
@@ -162,7 +162,7 @@ mainEditorCommand(mainEditorCommand_)
 	gravityYEdit = new wxTextCtrl(this, ID_TEXTCTRL4, _("0"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
 	BoxSizer1->Add(gravityYEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4->Add(BoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Echelle de taille de la répresentation :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Echelle de taille de la représentation :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer4->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 5, 0, 0);
 	StaticText7 = new wxStaticText(this, ID_STATICTEXT7, _("1m ="), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
@@ -189,7 +189,7 @@ mainEditorCommand(mainEditorCommand_)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PhysicsAutomatismEditor::OnokBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PhysicsAutomatismEditor::OncancelBtClick);
 	//*)

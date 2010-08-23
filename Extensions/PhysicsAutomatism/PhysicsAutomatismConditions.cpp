@@ -140,7 +140,6 @@ bool PhysicsAutomatism::CondAngularDamping( RuntimeScene & scene, ObjectsConcern
  */
 bool PhysicsAutomatism::CondCollisionWith( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    bool isTrue = false;
     unsigned int otherObjectId = condition.GetParameter(2).GetAsObjectIdentifier();
     if ( !body ) CreateBody(scene);
 

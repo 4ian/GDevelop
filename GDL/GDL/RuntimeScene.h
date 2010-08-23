@@ -19,7 +19,6 @@
 
 #include "GDL/Scene.h"
 #include "GDL/RuntimeGame.h"
-#include "GDL/ImageManager.h"
 #include "GDL/Object.h"
 #include "GDL/Event.h"
 #include "GDL/CommonTools.h"

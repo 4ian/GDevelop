@@ -437,8 +437,7 @@ bool RuntimeScene::DisplayLegacyTexts(string layer)
 ////////////////////////////////////////////////////////////
 bool RuntimeScene::StopMusic()
 {
-    SoundManager * soundManager;
-    soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::getInstance();
 
     //Arrêt des musiques : simples musiques
     for ( unsigned int i = 0;i < soundManager->musics.size();i++ )
@@ -587,7 +586,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     for (unsigned int i = 0; i < scene.initialObjects.size();++i)
     {
         MessageLoading( "Loading object resources : " + scene.initialObjects.at( i )->GetName(), i + 1 / scene.initialObjects.size()*100 / 3 + 33 );
-        scene.initialObjects[i]->LoadResources(game->imageManager);
+        scene.initialObjects[i]->LoadResources(*game->imageManager);
     }
 
     //Load resources of global objects
@@ -595,7 +594,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     for (unsigned int i = 0; i < game->globalObjects.size();++i)
     {
         MessageLoading( "Loading object resources : " + game->globalObjects[i]->GetName(), i + 1 /  game->globalObjects.size()*100 / 3 + 33 );
-        game->globalObjects[i]->LoadResources(game->imageManager);
+        game->globalObjects[i]->LoadResources(*game->imageManager);
     }
 
     //Create object instances which are originally positionned on scene

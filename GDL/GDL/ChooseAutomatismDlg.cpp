@@ -8,6 +8,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <boost/algorithm/string.hpp>
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 
@@ -100,7 +101,7 @@ void ChooseAutomatismDlg::RefreshList()
 	    std::string automatismName = objectIdentifiersManager->GetNamefromOID(automatisms[i]);
 
 		if ( (automatismTypeAllowed.empty() || automatismTypeAllowed == objectIdentifiersManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, automatismName))) &&
-             (!searching || (searching && automatismName.find(search) != std::string::npos) ))
+             (!searching || (searching && boost::to_upper_copy(automatismName).find(boost::to_upper_copy(search)) != std::string::npos) ))
             automatismsList->Append(automatismName);
 	}
 }

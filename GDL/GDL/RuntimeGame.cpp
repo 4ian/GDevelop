@@ -1,9 +1,10 @@
 #include "GDL/RuntimeGame.h"
 
 RuntimeGame::RuntimeGame() :
-Game()
+Game(),
+imageManager(boost::shared_ptr<ImageManager>(new ImageManager))
 {
-    imageManager.SetGame(this);
+    imageManager->SetGame(this);
 }
 
 RuntimeGame::RuntimeGame(const RuntimeGame & runtimeGame) :
@@ -25,6 +26,6 @@ RuntimeGame& RuntimeGame::operator=(const RuntimeGame & runtimeGame)
 
 void RuntimeGame::Init(const RuntimeGame & runtimeGame)
 {
-    imageManager = runtimeGame.imageManager;
-    imageManager.SetGame(this);
+    imageManager = boost::shared_ptr<ImageManager>(new ImageManager(*runtimeGame.imageManager));
+    imageManager->SetGame(this);
 }

@@ -24,7 +24,7 @@ FileExtension::FileExtension()
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("GroupExists",
-                   _("Existance d'un groupe"),
+                   _("Existence d'un groupe"),
                    _("Teste si le groupe ( de la forme /Racine/Exemple/1 ) existe dans le fichier.\nAttention ! Les espaces sont interdits dans le nom des groupes."),
                    _("Le groupe _PARAM1_ existe dans le fichier _PARAM0_"),
                    _("Fichiers XML"),

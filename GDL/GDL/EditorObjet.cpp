@@ -79,18 +79,14 @@ const long EditorObjet::ID_BUTTON3 = wxNewId();
 const long EditorObjet::ID_BUTTON5 = wxNewId();
 const long EditorObjet::ID_BUTTON4 = wxNewId();
 const long EditorObjet::ID_PANEL1 = wxNewId();
-const long EditorObjet::idMenuAddEnd = wxNewId();
-const long EditorObjet::idMenuAddAfter = wxNewId();
-const long EditorObjet::idMenuAddBefore = wxNewId();
-const long EditorObjet::idMenuAdd = wxNewId();
-const long EditorObjet::idMenuAddMoreEnd = wxNewId();
-const long EditorObjet::idMenuAddMoreAfter = wxNewId();
-const long EditorObjet::idMenuAddMoreBefore = wxNewId();
-const long EditorObjet::idMenuAddMulti = wxNewId();
 const long EditorObjet::idMenuAddFromEnd = wxNewId();
 const long EditorObjet::idMenuAddFromAfter = wxNewId();
 const long EditorObjet::idMenuAddFromBefore = wxNewId();
 const long EditorObjet::ID_MENUITEM1 = wxNewId();
+const long EditorObjet::idMenuAddMoreEnd = wxNewId();
+const long EditorObjet::idMenuAddMoreAfter = wxNewId();
+const long EditorObjet::idMenuAddMoreBefore = wxNewId();
+const long EditorObjet::idMenuAddMulti = wxNewId();
 const long EditorObjet::idMenuDel = wxNewId();
 const long EditorObjet::idMenuDelAll = wxNewId();
 const long EditorObjet::idMenuCopyFrom = wxNewId();
@@ -324,28 +320,6 @@ placingPoint(false)
     FlexGridSizer2->SetSizeHints(Core);
     FlexGridSizer1->Add(Core, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer1);
-    MenuItem1 = new wxMenu();
-    MenuItem2 = new wxMenuItem(MenuItem1, idMenuAddEnd, _("...à la fin"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/2rightarrow.png"))));
-    MenuItem1->Append(MenuItem2);
-    MenuItem3 = new wxMenuItem(MenuItem1, idMenuAddAfter, _("...après celle-ci"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/1rightarrow.png"))));
-    MenuItem1->Append(MenuItem3);
-    MenuItem4 = new wxMenuItem(MenuItem1, idMenuAddBefore, _("...avant celle-ci"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/1leftarrow.png"))));
-    MenuItem1->Append(MenuItem4);
-    contextMenu.Append(idMenuAdd, _("Ajouter une image..."), MenuItem1, wxEmptyString);
-    MenuItem5 = new wxMenu();
-    MenuItem8 = new wxMenuItem(MenuItem5, idMenuAddMoreEnd, _("...à la fin"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem8->SetBitmap(wxBitmap(wxImage(_T("res/2rightarrow.png"))));
-    MenuItem5->Append(MenuItem8);
-    MenuItem9 = new wxMenuItem(MenuItem5, idMenuAddMoreAfter, _("...après celle-ci"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem9->SetBitmap(wxBitmap(wxImage(_T("res/1rightarrow.png"))));
-    MenuItem5->Append(MenuItem9);
-    MenuItem10 = new wxMenuItem(MenuItem5, idMenuAddMoreBefore, _("...avant celle-ci"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/1leftarrow.png"))));
-    MenuItem5->Append(MenuItem10);
-    contextMenu.Append(idMenuAddMulti, _("Ajouter plusieurs images"), MenuItem5, wxEmptyString);
     MenuItem6 = new wxMenu();
     MenuItem11 = new wxMenuItem(MenuItem6, idMenuAddFromEnd, _("...à la fin"), wxEmptyString, wxITEM_NORMAL);
     MenuItem11->SetBitmap(wxBitmap(wxImage(_T("res/2rightarrow.png"))));
@@ -357,6 +331,17 @@ placingPoint(false)
     MenuItem13->SetBitmap(wxBitmap(wxImage(_T("res/1leftarrow.png"))));
     MenuItem6->Append(MenuItem13);
     contextMenu.Append(ID_MENUITEM1, _("Ajouter l\'image selectionnée dans la banque d\'image"), MenuItem6, wxEmptyString);
+    MenuItem5 = new wxMenu();
+    MenuItem8 = new wxMenuItem(MenuItem5, idMenuAddMoreEnd, _("...à la fin"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem8->SetBitmap(wxBitmap(wxImage(_T("res/2rightarrow.png"))));
+    MenuItem5->Append(MenuItem8);
+    MenuItem9 = new wxMenuItem(MenuItem5, idMenuAddMoreAfter, _("...après celle-ci"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem9->SetBitmap(wxBitmap(wxImage(_T("res/1rightarrow.png"))));
+    MenuItem5->Append(MenuItem9);
+    MenuItem10 = new wxMenuItem(MenuItem5, idMenuAddMoreBefore, _("...avant celle-ci"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/1leftarrow.png"))));
+    MenuItem5->Append(MenuItem10);
+    contextMenu.Append(idMenuAddMulti, _("Ajouter plusieurs images"), MenuItem5, wxEmptyString);
     contextMenu.AppendSeparator();
     MenuItem7 = new wxMenuItem((&contextMenu), idMenuDel, _("Supprimer l\'image"), wxEmptyString, wxITEM_NORMAL);
     MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
@@ -421,15 +406,12 @@ placingPoint(false)
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnButton1Click);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnOkBtClick);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnAideBtClick);
-    Connect(idMenuAddEnd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddImageEndSelected);
-    Connect(idMenuAddAfter,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddImageAfterSelected);
-    Connect(idMenuAddBefore,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddImageBeforeSelected);
-    Connect(idMenuAddMoreEnd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddMoreEndSelected);
-    Connect(idMenuAddMoreAfter,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddMoreAfterSelected);
-    Connect(idMenuAddMoreBefore,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddMoreBeforeSelected);
     Connect(idMenuAddFromEnd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddFromEndSelected);
     Connect(idMenuAddFromAfter,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddFromAfterSelected);
     Connect(idMenuAddFromBefore,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddFromBeforeSelected);
+    Connect(idMenuAddMoreEnd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddMoreEndSelected);
+    Connect(idMenuAddMoreAfter,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddMoreAfterSelected);
+    Connect(idMenuAddMoreBefore,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddMoreBeforeSelected);
     Connect(idMenuDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDeleteSelected);
     Connect(idMenuDelAll,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDeleteAllBtClick);
     Connect(idMenuCopyFrom,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnCopyBtClick);
@@ -444,8 +426,7 @@ placingPoint(false)
 
     toolbar->ClearTools();
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( idMenuAddEnd, wxT( "Ajouter une image à la fin" ), wxBitmap( wxImage( "res/addicon.png" ) ), _( "Ajouter une image à la fin" ) );
-    toolbar->AddTool( idMenuAddFromEnd, wxT( "Ajouter une image à la fin depuis la banque d'image" ), wxBitmap( wxImage( "res/addfromimagebanque.png" ) ), _( "Ajouter une image à la fin depuis la banque d'image" ) );
+    toolbar->AddTool( idMenuAddFromEnd, wxT( "Ajouter l'image à la fin" ), wxBitmap( wxImage( "res/addfromimagebanque.png" ) ), _( "Ajouter une image à la fin depuis la banque d'image" ) );
     toolbar->AddTool( idMenuDel, wxT( "Supprimer l'image selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _( "Supprimer l'image selectionnée" ) );
     toolbar->AddSeparator();
     toolbar->AddTool( idMenuCopyFrom, wxT( "Copier les images depuis une animation/direction" ), wxBitmap( wxImage( "res/copyicon.png" ) ), _( "Copier les images depuis une animation/direction" ) );
@@ -492,7 +473,7 @@ placingPoint(false)
     editorImagesPnl->Refresh();
 
     m_mgr.AddPane( Core, wxAuiPaneInfo().Name( wxT( "Core" ) ).Center().CaptionVisible(false) );
-    m_mgr.AddPane( editorImagesPnl, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(150, 100) );
+    m_mgr.AddPane( editorImagesPnl, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).MinSize(150, 100) );
 
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );
@@ -501,7 +482,7 @@ placingPoint(false)
 
     RefreshFromObjet();
     Core->Layout();
-    Center();
+    SetSize(GetSize().GetWidth()+150, GetSize().GetHeight());
 }
 
 EditorObjet::~EditorObjet()
@@ -968,7 +949,7 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
         int j = FindImage( game.images, directionToDisplay.GetSprite(i).GetImageName() );
         if ( j != -1 )
         {
-            wxBitmap bmp( game.images.at( j ).fichier, wxBITMAP_TYPE_ANY);
+            wxBitmap bmp( game.images.at( j ).file, wxBITMAP_TYPE_ANY);
             if ( bmp.GetWidth() != 48 || bmp.GetHeight() != 48 )
             {
                 wxImage image = bmp.ConvertToImage();
@@ -1055,7 +1036,7 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
         if ( j != -1 )
         {
             //Chargement de l'image
-            wxBitmap bmp( game.images.at( j ).fichier, wxBITMAP_TYPE_ANY);
+            wxBitmap bmp( game.images.at( j ).file, wxBITMAP_TYPE_ANY);
             wxBitmap point( bitmapGUIManager->point );
 
             scrollWidth->SetScrollbar(scrollWidth->GetThumbPosition(),
@@ -1282,11 +1263,14 @@ void EditorObjet::OnAddFromEndSelected(wxCommandEvent& event)
         return;
     }
 
-    string nom = static_cast<string>(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
-    if ( nom == _("Toutes les images") || nom == "" ) return;
+    if ( !editorImagesPnl->m_itemSelected.IsOk() || editorImagesPnl->m_itemSelected == editorImagesPnl->BanqueImageList->GetRootItem())
+    {
+        wxLogMessage(_("Choisissez une image dans la banque d'image."));
+        return;
+    }
 
     Sprite sprite;
-    sprite.SetImageName(nom);
+    sprite.SetImageName(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected).mb_str());
     object.GetAnimation( animation ).GetDirectionToModify( direction ).AddSprite(sprite);
 
     thumbsPanel->Refresh();
@@ -1301,11 +1285,20 @@ void EditorObjet::OnAddFromAfterSelected(wxCommandEvent& event)
     if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
         return;
 
-    string nom = static_cast<string>(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
-    if ( nom == _("Toutes les images") || nom == "" ) return;
+    if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
+    {
+        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        return;
+    }
+
+    if ( !editorImagesPnl->m_itemSelected.IsOk() || editorImagesPnl->m_itemSelected == editorImagesPnl->BanqueImageList->GetRootItem())
+    {
+        wxLogMessage(_("Choisissez une image dans la banque d'image."));
+        return;
+    }
 
     Sprite sprite;
-    sprite.SetImageName(nom);
+    sprite.SetImageName(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected).mb_str());
 
     vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
 
@@ -1330,11 +1323,20 @@ void EditorObjet::OnAddFromBeforeSelected(wxCommandEvent& event)
     if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
         return;
 
-    string nom = static_cast<string>(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
-    if ( nom == _("Toutes les images") || nom == "" ) return;
+    if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
+    {
+        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        return;
+    }
+
+    if ( !editorImagesPnl->m_itemSelected.IsOk() || editorImagesPnl->m_itemSelected == editorImagesPnl->BanqueImageList->GetRootItem())
+    {
+        wxLogMessage(_("Choisissez une image dans la banque d'image."));
+        return;
+    }
 
     Sprite sprite;
-    sprite.SetImageName(nom);
+    sprite.SetImageName(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected).mb_str());
 
     vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
 
@@ -1423,14 +1425,14 @@ void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
 
     if ( placingPoint && selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size())
     {
-        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).ModSprite(selectedImage);
+        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
 
         int j = FindImage( game.images, sprite.GetImageName() );
         if ( j == -1 ) return;
 
         //Tailles nécessaire pour placer le point
         wxSize size = imagePanel->GetSize();
-        wxBitmap bmp( game.images.at( j ).fichier, wxBITMAP_TYPE_ANY);
+        wxBitmap bmp( game.images.at( j ).file, wxBITMAP_TYPE_ANY);
 
         int SpritePosX = (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2;
         int SpritePosY = (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2;
@@ -1442,7 +1444,7 @@ void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
         {
             for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesNumber();++i)
             {
-                MovePoint(object.GetAnimation( animation ).GetDirectionToModify( direction ).ModSprite(i),
+                MovePoint(object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i),
                           selectedPoint, event.GetX() - SpritePosX, event.GetY() - SpritePosY);
             }
         }
@@ -1465,13 +1467,13 @@ void EditorObjet::OnModPointSelected(wxCommandEvent& event)
 
     if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size() )
     {
-        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).ModSprite(selectedImage);
+        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
 
         wxArrayString points;
         points.Add("Origin");
         points.Add("Centre");
-        for (unsigned int i =0;i<sprite.GetNonDefaultPoints().size();++i)
-        	points.Add(sprite.GetNonDefaultPoints().at(i).GetName());
+        for (unsigned int i =0;i<sprite.GetAllNonDefaultPoints().size();++i)
+        	points.Add(sprite.GetAllNonDefaultPoints().at(i).GetName());
 
         string name = static_cast<string>(wxGetSingleChoice(_("Choisissez le point à éditer.\nVous pourrez ensuite le placer en faisant un clic gauche sur l'image."), _("Choisir le point à positionner"), points));
         if ( name == "" ) return;
@@ -1511,14 +1513,14 @@ void EditorObjet::OnModPointPrecisSelected(wxCommandEvent& event)
 
     if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size() )
     {
-        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).ModSprite(selectedImage);
+        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
 
         //Choix du point
         wxArrayString points;
         points.Add("Origin");
         points.Add("Centre");
-        for (unsigned int i =0;i<sprite.GetNonDefaultPoints().size();++i)
-        	points.Add(sprite.GetNonDefaultPoints().at(i).GetName());
+        for (unsigned int i =0;i<sprite.GetAllNonDefaultPoints().size();++i)
+        	points.Add(sprite.GetAllNonDefaultPoints().at(i).GetName());
 
         string name = static_cast<string>(wxGetSingleChoice(_("Choisissez le point à éditer.\nVous pourrez ensuite le placer en faisant un clic gauche sur l'image."), _("Choisir le point à positionner"), points));
         if ( name == "" ) return;
@@ -1549,7 +1551,7 @@ void EditorObjet::OnModPointPrecisSelected(wxCommandEvent& event)
         {
             for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesNumber();++i)
             {
-                MovePoint(object.GetAnimation( animation ).GetDirectionToModify( direction ).ModSprite(i),
+                MovePoint(object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i),
                           name, ToInt(x_str), ToInt(y_str));
             }
         }
@@ -1565,12 +1567,11 @@ void EditorObjet::MovePoint(Sprite & sprite, string pointName, int X, int Y)
     if ( !sprite.HasPoint(pointName) )
         sprite.AddPoint(pointName);
 
-    Point & point = sprite.ModPoint(pointName);
+    Point & point = sprite.GetPoint(pointName);
 
     point.SetX(X);
     point.SetY(Y);
 }
-
 
 ////////////////////////////////////////////////////////////
 /// Ajouter un point
@@ -1585,7 +1586,7 @@ void EditorObjet::OnAddPointSelected(wxCommandEvent& event)
 
     if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size() )
     {
-        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).ModSprite(selectedImage);
+        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
 
         string name = static_cast<string>(wxGetTextFromUser(_("Entrez le nom du nouveau point"), _("Création d'un point")));
         if ( name == "" ) return;
@@ -1601,7 +1602,7 @@ void EditorObjet::OnAddPointSelected(wxCommandEvent& event)
         {
             for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
             {
-            	object.GetAnimation( animation ).GetDirectionToModify( direction ).ModSprite(i).AddPoint(name);
+            	object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).AddPoint(name);
             }
         }
 
@@ -1621,11 +1622,11 @@ void EditorObjet::OnDelPointSelected(wxCommandEvent& event)
 
     if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size() )
     {
-        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).ModSprite(selectedImage);
+        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
 
         wxArrayString points;
-        for (unsigned int i =0;i<sprite.GetNonDefaultPoints().size();++i)
-        	points.Add(sprite.GetNonDefaultPoints().at(i).GetName());
+        for (unsigned int i =0;i<sprite.GetAllNonDefaultPoints().size();++i)
+        	points.Add(sprite.GetAllNonDefaultPoints().at(i).GetName());
 
         if ( points.IsEmpty() )
         {
@@ -1643,7 +1644,7 @@ void EditorObjet::OnDelPointSelected(wxCommandEvent& event)
         {
             for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
             {
-            	object.GetAnimation( animation ).GetDirectionToModify( direction ).ModSprite(i).DelPoint(name);
+            	object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).DelPoint(name);
             }
         }
     }

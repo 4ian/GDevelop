@@ -397,7 +397,7 @@ void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
                 //On ajoute l'image
                 Image image;
 
-                image.fichier = ( string ) Fichiers[i];
+                image.file = ( string ) Fichiers[i];
                 image.nom = ( string ) Noms[i];
 
                 game.images.push_back(image);
@@ -516,7 +516,7 @@ void EditorImages::OnBanqueImageListSelectionChanged( wxTreeEvent& event )
         int i = FindImage( game.images, nom );
         if ( i != -1 )
         {
-            fileImageSelected = game.images.at( i ).fichier;
+            fileImageSelected = game.images.at( i ).file;
             apercuPanel->Refresh();
             apercuPanel->Update();
         }
@@ -634,7 +634,7 @@ void EditorImages::OnModFileImage( wxCommandEvent& event )
         string Fichier;
         Fichier = ( string ) FileDialog.GetPath();
 
-        game.images.at( i ).fichier = Fichier;
+        game.images.at( i ).file = Fichier;
         //Ne concerne pas les dossiers
 
         game.imagesWereModified = true;
@@ -813,7 +813,7 @@ void EditorImages::OnOpenPaintProgramClick(wxCommandEvent& event)
             return;
         }
 
-        wxExecute(result+" \""+game.images.at(i).fichier+"\"");
+        wxExecute(result+" \""+game.images.at(i).file+"\"");
     }
 }
 

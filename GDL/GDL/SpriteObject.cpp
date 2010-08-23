@@ -79,20 +79,20 @@ void OpenSpritesDirection(vector < Sprite > & sprites, const TiXmlElement * elem
 
         const TiXmlElement * elemPoints = elemSprite->FirstChildElement("Points");
         if ( elemPoints != NULL )
-            OpenPointsSprites(sprite.ModNonDefaultPoints(), elemPoints);
+            OpenPointsSprites(sprite.GetAllNonDefaultPoints(), elemPoints);
         else
             cout <<( "Les points d'un sprite manquent." );
 
         const TiXmlElement * elemPointOrigine = elemSprite->FirstChildElement("PointOrigine");
         if ( elemPointOrigine != NULL )
-            OpenPoint(sprite.ModOrigine(), elemPointOrigine);
+            OpenPoint(sprite.GetOrigine(), elemPointOrigine);
         else
             cout <<( "Le point origine d'un sprite manquent." );
 
         const TiXmlElement * elemPointCentre = elemSprite->FirstChildElement("PointCentre");
         if ( elemPointCentre != NULL )
         {
-            OpenPoint(sprite.ModCentre(), elemPointCentre);
+            OpenPoint(sprite.GetCentre(), elemPointCentre);
 
             if (    elemPointCentre->Attribute( "automatic" ) != NULL &&
                     string (elemPointCentre->Attribute( "automatic" )) == "false" )
@@ -221,7 +221,7 @@ void SaveSpritesDirection(const vector < Sprite > & sprites, TiXmlElement * elem
 
         TiXmlElement * points = new TiXmlElement( "Points" );
         sprite->LinkEndChild( points );
-        SavePointsSprites(sprites.at(i).GetNonDefaultPoints(), points);
+        SavePointsSprites(sprites.at(i).GetAllNonDefaultPoints(), points);
 
         TiXmlElement * pointOrigine = new TiXmlElement( "PointOrigine" );
         sprite->LinkEndChild( pointOrigine );
@@ -289,9 +289,9 @@ bool SpriteObject::LoadResources(const ImageManager & imageMgr )
         {
             for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpritesNumber();l++ )
             {
-                Sprite & sprite = GetAnimation( j ).GetDirectionToModify(k).ModSprite(l);
+                Sprite & sprite = GetAnimation( j ).GetDirectionToModify(k).GetSprite(l);
 
-                sprite.SetSprite(sf::Sprite(imageMgr.GetImage(sprite.GetImageName())));
+                sprite.LoadImage(imageMgr.GetImage(sprite.GetImageName()));
             }
         }
     }
@@ -358,9 +358,9 @@ bool SpriteObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
         int idImage = FindImage(game.images, GetAnimation(0).GetDirection(0).GetSprite(0).GetImageName());
         if ( idImage != -1 )
         {
-            if ( !wxFileExists(game.images.at( idImage ).fichier) ) return false;
+            if ( !wxFileExists(game.images.at( idImage ).file) ) return false;
 
-            thumbnail = wxBitmap( game.images.at( idImage ).fichier, wxBITMAP_TYPE_ANY);
+            thumbnail = wxBitmap( game.images.at( idImage ).file, wxBITMAP_TYPE_ANY);
 
             wxImage image = thumbnail.ConvertToImage();
             thumbnail = wxBitmap(image.Scale(24, 24));
@@ -536,10 +536,10 @@ void SpriteObject::UpdateCurrentSprite() const
             if ( currentDirection >= animations[currentAnimation].GetDirectionsNumber() || currentSprite >= animations[currentAnimation].GetDirection(currentDirection).GetSpritesNumber() )
                 ptrToCurrentSprite = &badSpriteDatas;
             else
-                ptrToCurrentSprite = &animations[currentAnimation].GetDirectionToModify( currentDirection ).ModSprite( currentSprite );
+                ptrToCurrentSprite = &animations[currentAnimation].GetDirectionToModify( currentDirection ).GetSprite( currentSprite );
 
-            ptrToCurrentSprite->ModSprite().SetX( X - ptrToCurrentSprite->GetOrigine().GetX() + (ptrToCurrentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2 );
-            ptrToCurrentSprite->ModSprite().SetY( Y - ptrToCurrentSprite->GetOrigine().GetY() + (ptrToCurrentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2 );
+            ptrToCurrentSprite->GetSFMLSprite().SetX( X - ptrToCurrentSprite->GetOrigine().GetX() + (ptrToCurrentSprite->GetSFMLSprite().GetSubRect().Width)*(1-scaleX)/2 );
+            ptrToCurrentSprite->GetSFMLSprite().SetY( Y - ptrToCurrentSprite->GetOrigine().GetY() + (ptrToCurrentSprite->GetSFMLSprite().GetSubRect().Height)*(1-scaleY)/2 );
         }
         else
         {
@@ -547,24 +547,24 @@ void SpriteObject::UpdateCurrentSprite() const
             if ( animations[currentAnimation].HasNoDirections() || currentSprite >= animations[currentAnimation].GetDirection(0).GetSpritesNumber() )
                 ptrToCurrentSprite = &badSpriteDatas;
             else
-                ptrToCurrentSprite = &animations[currentAnimation].GetDirectionToModify(0).ModSprite( currentSprite );
+                ptrToCurrentSprite = &animations[currentAnimation].GetDirectionToModify(0).GetSprite( currentSprite );
 
-            ptrToCurrentSprite->ModSprite().SetX( X  + ptrToCurrentSprite->GetCentre().GetX()*scaleX - ptrToCurrentSprite->GetOrigine().GetX()
-                                                + (ptrToCurrentSprite->ModSprite().GetSubRect().Width)*(1-scaleX)/2);
-            ptrToCurrentSprite->ModSprite().SetY( Y  + ptrToCurrentSprite->GetCentre().GetY()*scaleY - ptrToCurrentSprite->GetOrigine().GetY()
-                                                + (ptrToCurrentSprite->ModSprite().GetSubRect().Height)*(1-scaleY)/2);
+            ptrToCurrentSprite->GetSFMLSprite().SetX( X  + ptrToCurrentSprite->GetCentre().GetX()*scaleX - ptrToCurrentSprite->GetOrigine().GetX()
+                                                + (ptrToCurrentSprite->GetSFMLSprite().GetSubRect().Width)*(1-scaleX)/2);
+            ptrToCurrentSprite->GetSFMLSprite().SetY( Y  + ptrToCurrentSprite->GetCentre().GetY()*scaleY - ptrToCurrentSprite->GetOrigine().GetY()
+                                                + (ptrToCurrentSprite->GetSFMLSprite().GetSubRect().Height)*(1-scaleY)/2);
 
-            ptrToCurrentSprite->ModSprite().SetOrigin(   ptrToCurrentSprite->GetCentre().GetX(),
+            ptrToCurrentSprite->GetSFMLSprite().SetOrigin(   ptrToCurrentSprite->GetCentre().GetX(),
                                                     ptrToCurrentSprite->GetCentre().GetY() );
-            ptrToCurrentSprite->ModSprite().SetRotation( -currentAngle );
+            ptrToCurrentSprite->GetSFMLSprite().SetRotation( -currentAngle );
         }
     }
 
-    ptrToCurrentSprite->ModSprite().SetScale( scaleX, scaleY );
-    ptrToCurrentSprite->ModSprite().SetColor( sf::Color( colorR, colorV, colorB, opacity ) );
-    ptrToCurrentSprite->ModSprite().SetBlendMode( blendMode );
-    ptrToCurrentSprite->ModSprite().FlipX(isFlippedX);
-    ptrToCurrentSprite->ModSprite().FlipY(isFlippedY);
+    ptrToCurrentSprite->GetSFMLSprite().SetScale( scaleX, scaleY );
+    ptrToCurrentSprite->GetSFMLSprite().SetColor( sf::Color( colorR, colorV, colorB, opacity ) );
+    ptrToCurrentSprite->GetSFMLSprite().SetBlendMode( blendMode );
+    ptrToCurrentSprite->GetSFMLSprite().FlipX(isFlippedX);
+    ptrToCurrentSprite->GetSFMLSprite().FlipY(isFlippedY);
 
     needUpdateCurrentSprite = false;
 }
@@ -610,7 +610,7 @@ const sf::Sprite & SpriteObject::GetCurrentSFMLSprite() const
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
-    return ptrToCurrentSprite->ModSprite();
+    return ptrToCurrentSprite->GetSFMLSprite();
 }
 
 /**

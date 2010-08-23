@@ -17,12 +17,13 @@ using namespace std;
 class GD_API Image
 {
     public:
-        Image() : smooth(true) {};
+        Image() : smooth(true), alwaysLoaded(false) {};
         ~Image() {};
 
-        string fichier; ///<File to load
+        string file; ///<File to load
         string nom; ///<Name of the image
         bool smooth; ///< True if smoothing filter is applied
+        bool alwaysLoaded; ///< True if the image must always be loaded in memory.
 };
 
 #endif // IMAGE_H

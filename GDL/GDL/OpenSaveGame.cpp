@@ -378,7 +378,7 @@ void OpenSaveGame::OpenImages(const TiXmlElement * imagesElem, TiXmlElement * do
 
         if ( imagesElem->Attribute( "nom" ) != NULL ) { imageToAdd.nom = imagesElem->Attribute( "nom" ); }
         else { MSG( "Les informations concernant le nom de l'image manquent." ); }
-        if ( imagesElem->Attribute( "fichier" ) != NULL ) {imageToAdd.fichier = imagesElem->Attribute( "fichier" ); }
+        if ( imagesElem->Attribute( "fichier" ) != NULL ) {imageToAdd.file = imagesElem->Attribute( "fichier" ); }
         else { MSG( "Les informations concernant le fichier de l'image manquent." ); }
 
         imageToAdd.smooth = true;
@@ -1719,7 +1719,7 @@ bool OpenSaveGame::SaveToFile(string file)
             image = new TiXmlElement( "Image" );
             images->LinkEndChild( image );
             image->SetAttribute( "nom", game.images.at( i ).nom.c_str() );
-            image->SetAttribute( "fichier", game.images.at( i ).fichier.c_str() );
+            image->SetAttribute( "fichier", game.images.at( i ).file.c_str() );
 
             if ( !game.images.at( i ).smooth )
             {
@@ -2138,7 +2138,7 @@ void OpenSaveGame::RecreatePaths(string file)
     //Images : copie et enlève le répertoire des chemins
     for ( unsigned int i = 0;i < game.images.size() ;i++ )
     {
-        game.images.at( i ).fichier = rep + game.images.at( i ).fichier;
+        game.images.at( i ).file = rep + game.images.at( i ).file;
         wxSafeYield();
     }
 

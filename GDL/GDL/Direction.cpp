@@ -44,7 +44,7 @@ const Sprite & Direction::GetSprite(unsigned int nb) const
     return badSprite;
 }
 
-Sprite & Direction::ModSprite(unsigned int nb)
+Sprite & Direction::GetSprite(unsigned int nb)
 {
     if ( nb < sprites.size() )
         return sprites[nb];

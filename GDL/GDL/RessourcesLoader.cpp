@@ -17,9 +17,9 @@ void RessourcesLoader::SetExeGD(const string & filename)
     ExeGD.Read(filename);
 }
 
-sf::Image RessourcesLoader::LoadImage(const string & filename)
+sf::Image * RessourcesLoader::LoadImage(const string & filename)
 {
-    sf::Image image;
+    sf::Image * image = new sf::Image();
 
     if ( ExeGD.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
     {
@@ -27,10 +27,10 @@ sf::Image RessourcesLoader::LoadImage(const string & filename)
         if (buffer==NULL)
             cout << "Erreur lors de la récupération interne de l'image " << filename << endl;
 
-        if (!image.LoadFromMemory(buffer, ExeGD.GetFileSize(filename)))
+        if (!image->LoadFromMemory(buffer, ExeGD.GetFileSize(filename)))
             cout << "Erreur lors du chargement interne de l'image" << filename << endl;
     }
-    else if (!image.LoadFromFile(filename)) //Chargement depuis un fichier externe
+    else if (!image->LoadFromFile(filename)) //Chargement depuis un fichier externe
         cout << "Erreur lors du chargement externe de l'image " << filename << endl;
 
     return image;

@@ -24,7 +24,7 @@ public:
     /**
      * Load a SFML image
      */
-    sf::Image LoadImage( const string & filename );
+    sf::Image * LoadImage( const string & filename );
 
     /**
      * Load a SFML Font

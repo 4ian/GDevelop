@@ -21,7 +21,7 @@ class GD_API Direction
 
         //Accès sécurisé aux sprites
         const Sprite & GetSprite(unsigned int nb) const;
-        Sprite & ModSprite(unsigned int nb);
+        Sprite & GetSprite(unsigned int nb);
 
         inline bool HasNoSprites() const { return sprites.empty(); }
         inline unsigned int GetSpritesNumber() const { return sprites.size(); }

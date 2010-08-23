@@ -6,6 +6,7 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 #include <SFML/Graphics.hpp>
+#include <boost/shared_ptr.hpp>
 #include "GDL/Point.h"
 #include <string>
 
@@ -21,29 +22,32 @@ public:
     Sprite();
     virtual ~Sprite();
 
-    inline const sf::Sprite & GetSprite() const { return sfmlSprite; }
-    inline sf::Sprite & ModSprite() { return sfmlSprite; }
-    void SetSprite(const sf::Sprite & sprite_);
+    inline const sf::Sprite & GetSFMLSprite() const { return sfmlSprite; }
+    inline sf::Sprite & GetSFMLSprite() { return sfmlSprite; }
 
-    inline vector < Point > & ModNonDefaultPoints() { return points; }
-    inline const vector < Point > & GetNonDefaultPoints() const { return points; }
+    void LoadImage(boost::shared_ptr<sf::Image> image);
+    boost::shared_ptr<sf::Image> GetSFMLImage() { return sfmlImage; };
+    const boost::shared_ptr<sf::Image> GetSFMLImage() const { return sfmlImage; };
+
+    inline void SetImageName(const string & image_) { image = image_; }
+    inline const string & GetImageName() const { return image; }
+
+    inline vector < Point > & GetAllNonDefaultPoints() { return points; }
+    inline const vector < Point > & GetAllNonDefaultPoints() const { return points; }
 
     void AddPoint( const Point & point );
     void DelPoint( const string & name );
     const Point & GetPoint( const string & name) const;
-    Point & ModPoint(const string & name);
+    Point & GetPoint(const string & name);
     bool HasPoint( const string & name ) const;
 
     inline const Point & GetOrigine() const { return origine; }
-    inline Point & ModOrigine() { return origine; }
+    inline Point & GetOrigine() { return origine; }
 
     inline const Point & GetCentre() const { return centre; }
-    inline Point & ModCentre() { automaticCentre = false; return centre; }
+    inline Point & GetCentre() { automaticCentre = false; return centre; }
     inline bool IsCentreAutomatic() const { return automaticCentre; }
     bool SetCentreAutomatic(bool enabled);
-
-    inline void SetImageName(const string & image_) { image = image_; }
-    inline const string & GetImageName() const { return image; }
 
     /**
      * Make the sprite, if it uses an image from ImageManager,
@@ -51,30 +55,12 @@ public:
      */
     void MakeSpriteOwnsItsImage();
 
-    /**
-     * Get the unique image the sprite own.
-     * Make sure that the sprite own its personal image before calling this function.
-     */
-    inline sf::Image & GetSpriteOwnImage() {return uniqueImage;};
-
-protected:
 private:
 
-    /**
-     * SFML Sprite
-     */
-    sf::Sprite sfmlSprite;
-
-    /**
-     * Name of the image to be loaded in ImageManager
-     */
-    string image;
-
-    /**
-     * Can also hold its own image
-     */
-    sf::Image uniqueImage;
-    bool hasItsOwnImage;
+    sf::Sprite sfmlSprite; ///< Displayed SFML sprite
+    boost::shared_ptr<sf::Image> sfmlImage; ///< Pointer to the image displayed by the sprite.
+    bool hasItsOwnImage; ///< True if sfmlImage is only owned by this Sprite.
+    string image; ///< Name of the image to be loaded in Image Manager.
 
     vector < Point > points;
     Point origine;

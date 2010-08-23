@@ -872,9 +872,11 @@
 					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDL/EditForEachEvent.cpp" hdr="GDL/EditForEachEvent.h" name="EditForEachEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDL/EditRepeatEvent.cpp" hdr="GDL/EditRepeatEvent.h" name="EditRepeatEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditExpression.wxs" src="GDL/EditExpression.cpp" hdr="GDL/EditExpression.h" name="EditExpression" language="CPP" />
+					<wxDialog wxs="wxsmith/EditorObjet.wxs" src="GDL/EditorObjet.cpp" hdr="GDL/EditorObjet.h" name="EditorObjet" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseVariableDialog.wxs" src="GDL/ChooseVariableDialog.cpp" hdr="GDL/ChooseVariableDialog.h" name="ChooseVariableDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/EditTextDialog.wxs" src="GDL/EditTextDialog.cpp" hdr="GDL/EditTextDialog.h" name="EditTextDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseAutomatismDlg.wxs" src="GDL/ChooseAutomatismDlg.cpp" hdr="GDL/ChooseAutomatismDlg.h" name="ChooseAutomatismDlg" language="CPP" />
+					<wxDialog wxs="wxsmith/PropImage.wxs" src="GDL/PropImage.cpp" hdr="GDL/PropImage.h" name="PropImage" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

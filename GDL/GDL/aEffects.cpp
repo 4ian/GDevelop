@@ -60,14 +60,14 @@ bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsCon
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
     ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
-    sf::Image & dest = ptrToCurrentSprite->GetSpriteOwnImage();
+    boost::shared_ptr<sf::Image> dest = ptrToCurrentSprite->GetSFMLImage();
 
     //Make sure the coordinates are correct.
     int destX = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
-    if ( destX < 0 || static_cast<unsigned>(destX) >= dest.GetWidth()) return false;
+    if ( destX < 0 || static_cast<unsigned>(destX) >= dest->GetWidth()) return false;
 
     int destY = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this());
-    if ( destY < 0 || static_cast<unsigned>(destY) >= dest.GetWidth()) return false;
+    if ( destY < 0 || static_cast<unsigned>(destY) >= dest->GetWidth()) return false;
 
     bool applyAlpha = false;
     if ( action.GetParameters().size() > 4 )
@@ -75,7 +75,7 @@ bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsCon
         applyAlpha = action.GetParameter(4).GetAsBool();
     }
 
-    dest.Copy(scene.game->imageManager.GetImage(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this())),
+    dest->Copy(*scene.game->imageManager->GetImage(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this())),
               destX, destY, sf::IntRect(0, 0, 0, 0), applyAlpha);
 
     return true;
@@ -86,13 +86,13 @@ bool SpriteObject::ActCreateMaskFromColorOnActualImage( RuntimeScene & scene, Ob
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
     ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
-    sf::Image & dest = ptrToCurrentSprite->GetSpriteOwnImage();
+    boost::shared_ptr<sf::Image> dest = ptrToCurrentSprite->GetSFMLImage();
 
     vector < string > colors = SpliterStringToVector <string> (action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), ';');
 
     if ( colors.size() < 3 ) return false; //La couleur est incorrecte
 
-    dest.CreateMaskFromColor(  sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2])));
+    dest->CreateMaskFromColor(  sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2])));
 
     return true;
 }

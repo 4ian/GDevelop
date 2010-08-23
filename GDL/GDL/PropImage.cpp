@@ -22,6 +22,7 @@ const long PropImage::ID_STATICTEXT2 = wxNewId();
 const long PropImage::ID_TEXTCTRL2 = wxNewId();
 const long PropImage::ID_BUTTON3 = wxNewId();
 const long PropImage::ID_CHECKBOX1 = wxNewId();
+const long PropImage::ID_CHECKBOX2 = wxNewId();
 const long PropImage::ID_STATICTEXT4 = wxNewId();
 const long PropImage::ID_STATICTEXT6 = wxNewId();
 const long PropImage::ID_STATICTEXT5 = wxNewId();
@@ -73,11 +74,16 @@ image(pImage)
 	BrowseBt = new wxButton(this, ID_BUTTON3, _("Parcourir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer7->Add(BrowseBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer3->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer3->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	LissageCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Lisser l\'image"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	LissageCheck->SetValue(false);
 	LissageCheck->SetToolTip(_("Activé par défaut, permet de \"lisser\" l\'image, de façon à moins voir les pixels."));
 	FlexGridSizer3->Add(LissageCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer3->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	alwaysLoadedCheck = new wxCheckBox(this, ID_CHECKBOX2, _("Toujours conserver l\'image en mémoire"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+	alwaysLoadedCheck->SetValue(false);
+	alwaysLoadedCheck->SetToolTip(_("Activé par défaut, permet de \"lisser\" l\'image, de façon à moins voir les pixels."));
+	FlexGridSizer3->Add(alwaysLoadedCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4->Add(StaticBoxSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2 = new wxStaticBoxSizer(wxVERTICAL, this, _("Informations sur l\'image"));
@@ -120,7 +126,6 @@ image(pImage)
 	FlexGridSizer1->SetSizeHints(this);
 
 	Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&PropImage::OnFichierEditText);
-	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PropImage::OnBrowseBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PropImage::OnOkBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PropImage::OnAnnulerBtClick);
 	apercuPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&PropImage::OnapercuPanelPaint,0,this);
@@ -132,8 +137,8 @@ image(pImage)
 
     LissageCheck->SetValue(image.smooth);
     NomEdit->ChangeValue(image.nom);
-    FichierEdit->ChangeValue(image.fichier);
-
+    FichierEdit->ChangeValue(image.file);
+    alwaysLoadedCheck->SetValue(image.alwaysLoaded);
 }
 
 PropImage::~PropImage()
@@ -147,7 +152,8 @@ void PropImage::OnOkBtClick(wxCommandEvent& event)
 {
     image.smooth = LissageCheck->GetValue();
     image.nom = NomEdit->GetValue();
-    image.fichier = FichierEdit->GetValue();
+    image.file = FichierEdit->GetValue();
+    image.alwaysLoaded = alwaysLoadedCheck->GetValue();
 
     EndModal(1);
 }

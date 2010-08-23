@@ -7,7 +7,6 @@ using namespace std;
 Point Sprite::badPoint("");
 
 Sprite::Sprite() :
-uniqueImage(),
 hasItsOwnImage(false),
 origine("origine"),
 automaticCentre(true),
@@ -64,7 +63,7 @@ const Point & Sprite::GetPoint( const string & name) const
     return badPoint;
 }
 
-Point & Sprite::ModPoint(const string & name)
+Point & Sprite::GetPoint(const string & name)
 {
     if ( name == "Origin") return origine;
     if ( name == "Centre") return centre;
@@ -78,9 +77,10 @@ Point & Sprite::ModPoint(const string & name)
     return badPoint;
 }
 
-void Sprite::SetSprite(const sf::Sprite & sprite_)
+void Sprite::LoadImage(boost::shared_ptr<sf::Image> image_)
 {
-    sfmlSprite = sprite_;
+    sfmlImage = image_;
+    sfmlSprite.SetImage(*sfmlImage);
     hasItsOwnImage = false;
 
     if ( automaticCentre )
@@ -99,14 +99,10 @@ bool Sprite::SetCentreAutomatic(bool enabled)
 
 void Sprite::MakeSpriteOwnsItsImage()
 {
-    if ( !hasItsOwnImage )
+    if ( !hasItsOwnImage || sfmlImage == boost::shared_ptr<sf::Image>() )
     {
-        const sf::Image * sfmlImage = sfmlSprite.GetImage();
-        if ( sfmlImage == NULL) return;
-
-        uniqueImage = *sfmlImage;
-        sfmlSprite.SetImage(uniqueImage);
-
+        sfmlImage = boost::shared_ptr<sf::Image>(new sf::Image(*sfmlImage)); //Copy the image.
+        sfmlSprite.SetImage(*sfmlImage);
         hasItsOwnImage = true;
     }
 }

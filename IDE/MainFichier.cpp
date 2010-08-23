@@ -30,7 +30,7 @@ void Game_Develop_EditorFrame::OnQuit( wxCommandEvent& event )
 void Game_Develop_EditorFrame::OnMenuNewSelected( wxCommandEvent& event )
 {
     games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
-    wxString GD = _( "Game Develop - Nouveau jeu" );
+    wxString GD = "Game Develop - "+_( "Nouveau jeu" );
     SetTitle( GD );
 
     gameCurrentlyEdited = games.size()-1;

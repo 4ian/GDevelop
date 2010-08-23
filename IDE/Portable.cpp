@@ -125,7 +125,7 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     //Images : copie et enlève le répertoire des chemins
     for ( unsigned int i = 0;i < Jeu.images.size() ;i++ )
     {
-        Jeu.images.at( i ).fichier = CopyAndReduceFileName(Jeu.images.at( i ).fichier, rep); //Pour chaque image
+        Jeu.images.at( i ).file = CopyAndReduceFileName(Jeu.images.at( i ).file, rep); //Pour chaque image
         AvancementGauge->SetValue(i/Jeu.images.size()*100/3);
         wxSafeYield();
     }

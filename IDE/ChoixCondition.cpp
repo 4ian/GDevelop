@@ -62,6 +62,7 @@
 #include "GDL/ChooseAutomatismDlg.h"
 #include <wx/help.h>
 #include "SigneTest.h"
+#include <boost/algorithm/string.hpp>
 
 extern MemTrace MemTracer;
 
@@ -378,7 +379,7 @@ void ChoixCondition::RefreshList()
     ConditionsTree->DeleteAllItems();
     ConditionsTree->AddRoot( _( "Toutes les conditions" ), 0 );
 
-    std::string search = searchCtrl->GetValue().mb_str();
+    std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
@@ -419,7 +420,9 @@ void ChoixCondition::RefreshList()
             for(std::map<string, InstructionInfos>::const_iterator it = allConditions.begin(); it != allConditions.end(); ++it)
             {
                 //Verify if the condition match the search
-                if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                if ( searching &&
+                    boost::to_upper_copy(it->second.group).find(search) == string::npos &&
+                    boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
                     continue;
 
                 //Search and/or add group item
@@ -456,7 +459,9 @@ void ChoixCondition::RefreshList()
             for(std::map<string, InstructionInfos>::const_iterator it = allConditions.begin(); it != allConditions.end(); ++it)
             {
                 //Verify if the condition match the search
-                if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                if ( searching &&
+                    boost::to_upper_copy(it->second.group).find(search) == string::npos &&
+                    boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
                     continue;
 
                 //Search and/or add group item
@@ -486,7 +491,9 @@ void ChoixCondition::RefreshList()
         for(std::map<string, InstructionInfos>::const_iterator it = allConditions.begin(); it != allConditions.end(); ++it)
         {
             //Verify if the condition match the search
-            if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+            if ( searching &&
+                boost::to_upper_copy(it->second.group).find(search) == string::npos &&
+                boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
                 continue;
 
             //Search and/or add group item
@@ -527,7 +534,7 @@ void ChoixCondition::RefreshObjectConditionsList()
     objectConditionsTree->DeleteAllItems();
     objectConditionsTree->AddRoot( _( "Toutes les conditions" ), 0 );
 
-    std::string search = searchCtrl->GetValue().mb_str();
+    std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
     gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
@@ -564,7 +571,9 @@ void ChoixCondition::RefreshObjectConditionsList()
         for(std::map<string, InstructionInfos>::const_iterator it = allConditions.begin(); it != allConditions.end(); ++it)
         {
             //Verify if the condition match the search
-            if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+            if ( searching &&
+                boost::to_upper_copy(it->second.group).find(search) == string::npos &&
+                boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
                 continue;
 
             //Search and/or add group item
@@ -609,7 +618,9 @@ void ChoixCondition::RefreshObjectConditionsList()
             for(std::map<string, InstructionInfos>::const_iterator it = allConditions.begin(); it != allConditions.end(); ++it)
             {
                 //Verify if the condition match the search
-                if ( searching && it->second.group.find(search) == string::npos && it->second.fullname.find(search) == string::npos)
+                if ( searching &&
+                    boost::to_upper_copy(it->second.group).find(search) == string::npos &&
+                    boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
                     continue;
 
                 //Search and/or add group item

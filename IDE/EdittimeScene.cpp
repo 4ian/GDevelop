@@ -154,7 +154,7 @@ void EdittimeScene::RenderEdittimeScene()
     }
 
     //Affichage de l'objet à insérer en semi transparent
-    if ( objectToAdd != "" )
+    if ( !objectToAdd.empty() )
     {
         try
         {
@@ -257,8 +257,6 @@ ObjSPtr EdittimeScene::FindSmallestObject()
     int x = renderWindow->ConvertCoords(input->GetMouseX(), 0).x;
     int y = renderWindow->ConvertCoords(0, input->GetMouseY()).y;
 
-    unsigned int boucleTest = 0;
-
     ObjList allObjects = objectsInstances.GetAllObjects();
 
     for (unsigned int id = 0;id < allObjects.size();++id)
@@ -271,8 +269,6 @@ ObjSPtr EdittimeScene::FindSmallestObject()
         {
             potentialObjects.push_back( allObjects[id] );
         }
-
-        boucleTest++;
     }
     if ( potentialObjects.empty() ) return boost::shared_ptr<Object> (); //Aucun objet trouvé
 

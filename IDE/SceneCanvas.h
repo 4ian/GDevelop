@@ -20,7 +20,6 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/ImageManager.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/MainEditorCommand.h"
 #include "MemTrace.h"

@@ -305,7 +305,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     for ( unsigned int i = 0;i < game.images.size() ;i++ ) //Add images
     {
         StaticText2->SetLabel( game.images[i].nom );
-        game.images[i].fichier = resourcesMergingHelper.GetNewFilename(game.images[i].fichier);
+        game.images[i].file = resourcesMergingHelper.GetNewFilename(game.images[i].file);
     }
 
     for ( unsigned int i = 0;i < game.scenes.size();i++ )

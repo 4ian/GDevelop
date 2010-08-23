@@ -38,7 +38,7 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
         wxSFMLCanvas( Parent, Id, Position, Size, Style ),
         gameEdited(game_),
         sceneEdited(scene_),
-        game(game_),
+        game(gameEdited),
         scene(this, &game),
         mainEditorCommand( mainEditorCommand_ ),
         hasJustRightClicked(false),
@@ -164,14 +164,12 @@ void SceneCanvas::Refresh()
     //On vérifie qu'on ne doit pas mettre à jour la scène
     if ( !scene.running || scene.editing )
     {
-        /*if ( gameEdited.imagesWereModified )
+        if ( gameEdited.imagesWereModified )
         {
-            gameEdited.imageManager.LoadImagesFromFile( gameEdited );
+            gameEdited.imageManager->LoadPermanentImages();
             gameEdited.imagesWereModified = false;
-
-            Reload();
         }
-        else */if ( sceneEdited.wasModified )
+        else if ( sceneEdited.wasModified )
             Reload();
     }
 
@@ -641,7 +639,7 @@ void SceneCanvas::AddObjetSelected(float x, float y)
 
     scene.objectsInstances.AddObject(newObject);
 
-    newObject->LoadResources(game.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
+    newObject->LoadResources(*game.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
 
     ChangesMade();
 }
@@ -844,11 +842,13 @@ void SceneCanvas::OnMiddleUp( wxMouseEvent &event )
 void SceneCanvas::Reload()
 {
     game = gameEdited;
+    game.imageManager = gameEdited.imageManager; //Use same image manager.
 
     scene.StopMusic();
     scene.LoadFromScene( sceneEdited );
 
     sceneEdited.wasModified = false;
+
     UpdateScrollbars();
 }
 

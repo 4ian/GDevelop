@@ -143,7 +143,7 @@ void ConvertJRC::OnConvertirBtClick(wxCommandEvent& event)
                 if (i == 3)
                 {
                     Image image;
-                    image.fichier = elem->Attribute("value");
+                    image.file = elem->Attribute("value");
                     image.nom = "MMButton";
 
                     jeu->images.push_back(image);
@@ -151,7 +151,7 @@ void ConvertJRC::OnConvertirBtClick(wxCommandEvent& event)
                 if (i == 4)
                 {
                     Image image;
-                    image.fichier = elem->Attribute("value");
+                    image.file = elem->Attribute("value");
                     image.nom = "Button";
 
                     jeu->images.push_back(image);
@@ -159,7 +159,7 @@ void ConvertJRC::OnConvertirBtClick(wxCommandEvent& event)
                 if (i == 5)
                 {
                     Image image;
-                    image.fichier = elem->Attribute("value");
+                    image.file = elem->Attribute("value");
                     image.nom = "Box";
 
                     jeu->images.push_back(image);
@@ -167,7 +167,7 @@ void ConvertJRC::OnConvertirBtClick(wxCommandEvent& event)
                 if (i == 6)
                 {
                     Image image;
-                    image.fichier = elem->Attribute("value");
+                    image.file = elem->Attribute("value");
                     image.nom = "ButtonSave";
 
                     jeu->images.push_back(image);
@@ -278,7 +278,7 @@ void ConvertJRC::OnConvertirBtClick(wxCommandEvent& event)
                 if (i == 5)
                 {
                     Image image;
-                    image.fichier = elem->Attribute("value");
+                    image.file = elem->Attribute("value");
                     image.nom = "FondMM";
 
                     jeu->images.push_back(image);

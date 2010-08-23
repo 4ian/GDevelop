@@ -16,11 +16,11 @@
 	<File name="Box3DInitialPositionPanel.h" open="0" top="0" tabpos="0">
 		<Cursor position="969" topLine="0" />
 	</File>
-	<File name="Box3DObject.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="1082" topLine="26" />
+	<File name="Box3DObject.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="13862" topLine="354" />
 	</File>
-	<File name="Box3DObject.h" open="0" top="0" tabpos="4">
-		<Cursor position="3486" topLine="80" />
+	<File name="Box3DObject.h" open="0" top="0" tabpos="1">
+		<Cursor position="6882" topLine="125" />
 	</File>
 	<File name="Box3DObjectEditor.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="14441" topLine="170" />

@@ -145,12 +145,12 @@ class Box3DObject : public Object
         float pitch;
         float roll;
 
-        sf::Image frontTexture;
-        sf::Image topTexture;
-        sf::Image bottomTexture;
-        sf::Image leftTexture;
-        sf::Image rightTexture;
-        sf::Image backTexture;
+        boost::shared_ptr<sf::Image> frontTexture;
+        boost::shared_ptr<sf::Image> topTexture;
+        boost::shared_ptr<sf::Image> bottomTexture;
+        boost::shared_ptr<sf::Image> leftTexture;
+        boost::shared_ptr<sf::Image> rightTexture;
+        boost::shared_ptr<sf::Image> backTexture;
 };
 
 void DestroyBox3DObject(Object * object);

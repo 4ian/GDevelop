@@ -18,12 +18,13 @@
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/gdTreeItemStringData.h"
+#include "GDL/TreeItemExpressionInfoData.h"
 
 #include "GDL/ChooseObject.h"
 #include "GDL/ChooseLayer.h"
 #include "GDL/ChooseObjectExpression.h"
 #include "GDL/ChooseVariableDialog.h"
+#include "GDL/ChooseAutomatismDlg.h"
 
 #include <string>
 #include <vector>
@@ -371,7 +372,7 @@ void EditExpression::RefreshLists()
                         IDimage = imageListObj->GetImageCount()-1;
                     }
 
-                    gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first, objectsTypes[j]);
+                    TreeItemExpressionInfoData * associatedData = new TreeItemExpressionInfoData(it->first, it->second);
                     ObjList->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
                 }
             }
@@ -406,7 +407,7 @@ void EditExpression::RefreshLists()
                         IDimage = imageListObj->GetImageCount()-1;
                     }
 
-                    gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first, automatismsTypes[j]);
+                    TreeItemExpressionInfoData * associatedData = new TreeItemExpressionInfoData(it->first, it->second);
                     ObjList->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
                 }
             }
@@ -437,7 +438,7 @@ void EditExpression::RefreshLists()
                     IDimage = imageListVal->GetImageCount()-1;
                 }
 
-                gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+                TreeItemExpressionInfoData * associatedData = new TreeItemExpressionInfoData(it->first, it->second);
                 ValList->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
             }
         }
@@ -609,25 +610,31 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
 {
     if ( !itemObj.IsOk() ) return;
 
-    gdTreeItemStringData * associatedData = dynamic_cast<gdTreeItemStringData*>(ObjList->GetItemData(itemObj));
-    if ( associatedData != NULL )
+    TreeItemExpressionInfoData * infos = dynamic_cast<TreeItemExpressionInfoData *>(ObjList->GetItemData(itemObj));
+    if ( infos != NULL )
     {
-        gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+        if ( infos->GetExpressionInfos().parameters.empty() ) return; //Not even a parameter for the object ?
 
-        ExpressionInfos infos = extensionsManager->GetObjectExpressionInfos(associatedData->GetSecondString(), associatedData->GetString());
+        string object = ShowParameterDialog(infos->GetExpressionInfos().parameters[0]);
 
-        if ( infos.parameters.empty() ) return; //Not even a parameter for the object ?
-
-        string object = ShowParameterDialog(infos.parameters[0]);
-
-        string parametersStr;
-        for (unsigned int i = 1;i<infos.parameters.size();++i)
+        //Add parameters
+        string parametersStr, automatismStr;
+        for (unsigned int i = 1;i<infos->GetExpressionInfos().parameters.size();++i)
         {
-            if ( i != 1 ) parametersStr += ",";
-            parametersStr += ShowParameterDialog(infos.parameters[i]);
+            if ( i == 1 && infos->GetExpressionInfos().parameters[i].type == "automatism" )
+            {
+                ChooseAutomatismDlg dialog(this, game, scene, object, infos->GetExpressionInfos().parameters[i].objectType);
+                if ( dialog.ShowModal() == 1 )
+                    automatismStr = dialog.automatismChosen+"::";
+            }
+            else
+            {
+                if ( i != 1 ) parametersStr += ",";
+                parametersStr += ShowParameterDialog(infos->GetExpressionInfos().parameters[i]);
+            }
         }
 
-        expression += ReplaceSpacesByTildes(object)+"."+associatedData->GetString()+"("+parametersStr+")";
+        expression += ReplaceSpacesByTildes(object)+"."+automatismStr+infos->GetName()+"("+parametersStr+")";
 
         ExpressionEdit->ChangeValue(expression);
         RefreshExpressionEdit();
@@ -639,21 +646,17 @@ void EditExpression::OnAddValBtClick(wxCommandEvent& event)
 {
     if ( !itemVal.IsOk() ) return;
 
-    gdTreeItemStringData * associatedData = dynamic_cast<gdTreeItemStringData*>(ValList->GetItemData(itemVal));
-    if ( associatedData != NULL )
+    TreeItemExpressionInfoData * infos = dynamic_cast<TreeItemExpressionInfoData *>(ValList->GetItemData(itemVal));
+    if ( infos != NULL )
     {
-        gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-
-        ExpressionInfos infos = extensionsManager->GetExpressionInfos(associatedData->GetString());
-
         string parametersStr;
-        for (unsigned int i = 0;i<infos.parameters.size();++i)
+        for (unsigned int i = 0;i<infos->GetExpressionInfos().parameters.size();++i)
         {
             if ( i != 0 ) parametersStr += ",";
-            parametersStr += ShowParameterDialog(infos.parameters[i]);
+            parametersStr += ShowParameterDialog(infos->GetExpressionInfos().parameters[i]);
         }
 
-        expression += associatedData->GetString()+"("+parametersStr+")";
+        expression += infos->GetName()+"("+parametersStr+")";
 
         ExpressionEdit->ChangeValue(expression);
         RefreshExpressionEdit();

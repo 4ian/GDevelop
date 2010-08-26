@@ -85,7 +85,7 @@
 									<object class="sizeritem">
 										<object class="wxCheckBox" name="ID_CHECKBOX2" variable="alwaysLoadedCheck" member="yes">
 											<label>Toujours conserver l&apos;image en mémoire</label>
-											<tooltip>Activé par défaut, permet de &quot;lisser&quot; l&apos;image, de façon à moins voir les pixels.</tooltip>
+											<tooltip>Laisser l&apos;image en mémoire, afin d&apos;éviter par exemple de la recharger si elle n&apos;est pas utilisé continuellement par un objet, mais utilisée dans des actions de dessin.</tooltip>
 										</object>
 										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>

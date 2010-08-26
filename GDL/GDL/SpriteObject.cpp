@@ -646,6 +646,8 @@ bool SpriteObject::SetAnimation( unsigned int nb )
 {
     if ( nb >= GetAnimationsNumber() ) return false;
 
+    if ( nb == currentAnimation ) return true;
+
     currentAnimation = nb;
     currentSprite = 0;
     timeElapsedOnCurrentSprite = 0;
@@ -662,6 +664,8 @@ bool SpriteObject::SetDirection( unsigned int nb )
     if ( currentAnimation >= GetAnimationsNumber() ||
         nb >= GetAnimation( currentAnimation ).GetDirectionsNumber() ||
         GetAnimation( currentAnimation ).GetDirection( nb ).HasNoSprites() ) return false;
+
+    if ( nb == currentDirection ) return true;
 
     currentDirection = nb;
     currentSprite = 0;

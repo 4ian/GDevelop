@@ -382,11 +382,12 @@ void OpenSaveGame::OpenImages(const TiXmlElement * imagesElem, TiXmlElement * do
         else { MSG( "Les informations concernant le fichier de l'image manquent." ); }
 
         imageToAdd.smooth = true;
-        if ( imagesElem->Attribute( "lissage" ) != NULL )
-        {
-            if ( strcmp(imagesElem->Attribute( "lissage" ), "false") == 0 )
+        if ( imagesElem->Attribute( "lissage" ) != NULL && string(imagesElem->Attribute( "lissage" )) == "false")
                 imageToAdd.smooth = false;
-        }
+
+        imageToAdd.alwaysLoaded = false;
+        if ( imagesElem->Attribute( "alwaysLoaded" ) != NULL && string(imagesElem->Attribute( "alwaysLoaded" )) == "true")
+                imageToAdd.smooth = true;
 
         game.images.push_back(imageToAdd);
         imagesElem = imagesElem->NextSiblingElement();
@@ -1330,7 +1331,6 @@ void OpenSaveGame::AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list,
                     if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color"|| instructionInfos.parameters[p].type == "layer" || instructionInfos.parameters[p].type == "expression" ))
                     {
                         string parameter = conditionsVectors[i]->at(j).GetParameterSafely(p).GetPlainString();
-                        cout << parameter << endl;
                         size_t pos = 0;
                         bool end = false;
 
@@ -1394,7 +1394,6 @@ void OpenSaveGame::AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list,
                     if ( p < instructionInfos.parameters.size() && (instructionInfos.parameters[p].type == "expression" || instructionInfos.parameters[p].type == "text" || instructionInfos.parameters[p].type == "file" || instructionInfos.parameters[p].type == "joyaxis" || instructionInfos.parameters[p].type == "color" || instructionInfos.parameters[p].type == "layer") )
                     {
                         string parameter = actionsVectors[i]->at(j).GetParameterSafely(p).GetPlainString();
-                        cout << parameter << endl;
                         size_t pos = 0;
                         bool end = false;
 
@@ -1722,13 +1721,13 @@ bool OpenSaveGame::SaveToFile(string file)
             image->SetAttribute( "fichier", game.images.at( i ).file.c_str() );
 
             if ( !game.images.at( i ).smooth )
-            {
                 image->SetAttribute( "lissage", "false" );
-            }
             else
-            {
                 image->SetAttribute( "lissage", "true" );
-            }
+
+            image->SetAttribute( "alwaysLoaded", "false" );
+            if ( game.images.at( i ).alwaysLoaded )
+                image->SetAttribute( "alwaysLoaded", "true" );
 
         }
     }

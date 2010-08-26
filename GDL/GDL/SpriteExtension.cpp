@@ -325,7 +325,7 @@ ExtensionSprite::ExtensionSprite()
 
         DECLARE_OBJECT_ACTION("CopyImageOnImageOfSprite",
                        _("Copier une image sur celle d'un objet"),
-                       _("Copie une image sur celle d'un objet."),
+                       _("Copie une image sur celle d'un objet.\nNotez qu'il est préférable que l'image source reste chargée en mémoire."),
                        _("Copier l'image _PARAM1_ sur celle de _PARAM0_ à l'emplacement _PARAM2_;_PARAM3_"),
                        _("Effets"),
                        "res/actions/copy24.png",

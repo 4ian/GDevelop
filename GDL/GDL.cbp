@@ -359,16 +359,16 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lsfml-audio" />
-					<Add option="-lsfml-graphics" />
-					<Add option="-lsfml-window" />
-					<Add option="-lsfml-network" />
-					<Add option="-lsfml-system" />
+					<Add option="-lsfml2-audio" />
+					<Add option="-lsfml2-graphics" />
+					<Add option="-lsfml2-window" />
+					<Add option="-lsfml2-network" />
+					<Add option="-lsfml2-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -404,17 +404,17 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="`wx-config --libs all`" />
-					<Add option="-lsfml-audio" />
-					<Add option="-lsfml-graphics" />
-					<Add option="-lsfml-window" />
-					<Add option="-lsfml-network" />
-					<Add option="-lsfml-system" />
+					<Add option="-lsfml2-audio" />
+					<Add option="-lsfml2-graphics" />
+					<Add option="-lsfml2-window" />
+					<Add option="-lsfml2-network" />
+					<Add option="-lsfml2-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -449,16 +449,16 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs all`" />
-					<Add option="-lsfml-audio" />
-					<Add option="-lsfml-graphics" />
-					<Add option="-lsfml-window" />
-					<Add option="-lsfml-network" />
-					<Add option="-lsfml-system" />
+					<Add option="-lsfml2-audio" />
+					<Add option="-lsfml2-graphics" />
+					<Add option="-lsfml2-window" />
+					<Add option="-lsfml2-network" />
+					<Add option="-lsfml2-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -713,6 +713,10 @@
 		<Unit filename="GDL\TranslateAction.h" />
 		<Unit filename="GDL\TranslateCondition.cpp" />
 		<Unit filename="GDL\TranslateCondition.h" />
+		<Unit filename="GDL\TreeItemExpressionInfoData.cpp" />
+		<Unit filename="GDL\TreeItemExpressionInfoData.h" />
+		<Unit filename="GDL\TreeItemStrExpressionInfoData.cpp" />
+		<Unit filename="GDL\TreeItemStrExpressionInfoData.h" />
 		<Unit filename="GDL\Variable.cpp" />
 		<Unit filename="GDL\Variable.h" />
 		<Unit filename="GDL\VariablesExtension.cpp" />

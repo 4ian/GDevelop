@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Development" />
+	<File name="Extension.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="64" topLine="3" />
+	</File>
+	<File name="VideoActions.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="64" topLine="0" />
+	</File>
+	<File name="VideoConditions.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="64" topLine="0" />
+	</File>
+	<File name="VideoExpressions.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="64" topLine="0" />
+	</File>
+	<File name="VideoObject.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="591" topLine="3" />
+	</File>
+	<File name="VideoObject.h" open="1" top="0" tabpos="7">
+		<Cursor position="1092" topLine="16" />
+	</File>
+	<File name="VideoObjectEditor.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="64" topLine="3" />
+	</File>
+	<File name="VideoObjectEditor.h" open="1" top="1" tabpos="1">
+		<Cursor position="1019" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>

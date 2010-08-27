@@ -326,6 +326,7 @@ void TextObject::SetOpacity(float val)
         val = 0;
 
     opacity = val;
+    text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
 }
 
 void TextObject::SetFont(string fontName_)

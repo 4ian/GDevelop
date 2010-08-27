@@ -4,8 +4,8 @@
 	<File name="Extension.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="9089" topLine="174" />
 	</File>
-	<File name="TextActions.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="3397" topLine="61" />
+	<File name="TextActions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="1165" topLine="29" />
 	</File>
 	<File name="TextConditions.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="3554" topLine="61" />
@@ -13,11 +13,11 @@
 	<File name="TextExpressions.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="863" topLine="7" />
 	</File>
-	<File name="TextObject.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="4622" topLine="167" />
+	<File name="TextObject.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="7803" topLine="235" />
 	</File>
-	<File name="TextObject.h" open="0" top="0" tabpos="2">
-		<Cursor position="3670" topLine="80" />
+	<File name="TextObject.h" open="1" top="1" tabpos="1">
+		<Cursor position="6336" topLine="122" />
 	</File>
 	<File name="TextObjectEditor.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="7072" topLine="128" />

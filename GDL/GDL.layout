@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release - Edittime" />
+	<ActiveTarget name="Release" />
 	<File name="GDL\AES.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="18568" topLine="654" />
 	</File>
@@ -19,8 +19,8 @@
 	<File name="GDL\AjoutPlusImage.h" open="0" top="0" tabpos="49">
 		<Cursor position="81" topLine="0" />
 	</File>
-	<File name="GDL\Animation.cpp" open="0" top="0" tabpos="34">
-		<Cursor position="367" topLine="0" />
+	<File name="GDL\Animation.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="1180" topLine="28" />
 	</File>
 	<File name="GDL\Animation.h" open="0" top="0" tabpos="33">
 		<Cursor position="765" topLine="9" />
@@ -454,8 +454,8 @@
 	<File name="GDL\ObjectsConcerned.h" open="0" top="0" tabpos="12">
 		<Cursor position="1486" topLine="45" />
 	</File>
-	<File name="GDL\OpenSaveGame.cpp" open="0" top="0" tabpos="10">
-		<Cursor position="16605" topLine="358" />
+	<File name="GDL\OpenSaveGame.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="20382" topLine="459" />
 	</File>
 	<File name="GDL\OpenSaveGame.h" open="0" top="0" tabpos="11">
 		<Cursor position="2154" topLine="23" />
@@ -547,8 +547,8 @@
 	<File name="GDL\Sprite.h" open="0" top="0" tabpos="23">
 		<Cursor position="802" topLine="6" />
 	</File>
-	<File name="GDL\SpriteExtension.cpp" open="0" top="0" tabpos="16">
-		<Cursor position="1800" topLine="33" />
+	<File name="GDL\SpriteExtension.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="15722" topLine="308" />
 	</File>
 	<File name="GDL\SpriteInitialPositionPanel.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="572" topLine="32" />
@@ -556,8 +556,8 @@
 	<File name="GDL\SpriteInitialPositionPanel.h" open="0" top="0" tabpos="0">
 		<Cursor position="636" topLine="8" />
 	</File>
-	<File name="GDL\SpriteObject.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="12215" topLine="320" />
+	<File name="GDL\SpriteObject.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="1065" topLine="32" />
 	</File>
 	<File name="GDL\SpriteObject.h" open="0" top="0" tabpos="4">
 		<Cursor position="2221" topLine="75" />
@@ -595,14 +595,14 @@
 	<File name="GDL\TimeExtension.cpp" open="0" top="0" tabpos="23">
 		<Cursor position="5179" topLine="92" />
 	</File>
-	<File name="GDL\TranslateAction.cpp" open="0" top="0" tabpos="14">
-		<Cursor position="1101" topLine="21" />
+	<File name="GDL\TranslateAction.cpp" open="1" top="0" tabpos="22">
+		<Cursor position="1605" topLine="35" />
 	</File>
 	<File name="GDL\TranslateAction.h" open="0" top="0" tabpos="13">
 		<Cursor position="473" topLine="7" />
 	</File>
-	<File name="GDL\TranslateCondition.cpp" open="0" top="0" tabpos="20">
-		<Cursor position="1127" topLine="22" />
+	<File name="GDL\TranslateCondition.cpp" open="1" top="0" tabpos="23">
+		<Cursor position="2258" topLine="55" />
 	</File>
 	<File name="GDL\TranslateCondition.h" open="0" top="0" tabpos="15">
 		<Cursor position="548" topLine="7" />
@@ -640,8 +640,8 @@
 	<File name="GDL\XmlMacros.h" open="0" top="0" tabpos="2">
 		<Cursor position="317" topLine="0" />
 	</File>
-	<File name="GDL\aADS.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="3025" topLine="57" />
+	<File name="GDL\aADS.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="6722" topLine="106" />
 	</File>
 	<File name="GDL\aADS.h" open="0" top="0" tabpos="21">
 		<Cursor position="298" topLine="0" />

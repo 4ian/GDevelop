@@ -689,7 +689,12 @@ bool SpriteObject::SetAngle(float newAngle)
         needUpdateCurrentSprite = true;
     }
     else
-        return SetDirection(static_cast<int>(GDRound((static_cast<int>(newAngle)%360)/45.f))%8);
+    {
+        newAngle = static_cast<int>(newAngle)%360;
+        if ( newAngle < 0 ) newAngle += 360;
+
+        return SetDirection(static_cast<int>(GDRound(newAngle/45.f))%8);
+    }
 
     return true;
 }

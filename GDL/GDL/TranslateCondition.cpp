@@ -78,7 +78,7 @@ string TranslateCondition::LabelFromType( string type )
         return static_cast<string>(_( "Expression" ));
     else if ( type == "object" )
         return static_cast<string>(_( "Choisir l'objet" ));
-    else if ( type == "automatisme" )
+    else if ( type == "automatism" )
         return static_cast<string>(_( "Choisir l'automatisme" ));
     else if ( type == "signe" )
         return static_cast<string>(_( "Choisir le signe" ));

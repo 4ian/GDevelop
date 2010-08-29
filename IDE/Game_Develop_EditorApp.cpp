@@ -285,57 +285,6 @@ bool Game_Develop_EditorApp::OnInit()
     TestRegistry::runAllTests( tr );
 #endif
 
-
-    //TEST
-    /*ExternalEvents externalEvent;
-    externalEvent.SetName("Monevent");
-
-    {
-        StandardEvent * event = new StandardEvent();
-        vector < Instruction > instructions;
-        Instruction instr;
-        instr.SetType("InstructionTestType");
-        vector < GDExpression > parameters;
-        parameters.push_back(GDExpression("Parameter1"));
-        parameters.push_back(GDExpression("Parameter12"));
-        instr.SetParameters(parameters);
-        instructions.push_back(instr);
-        event->SetConditions(instructions);
-        externalEvent.events.push_back(boost::shared_ptr<BaseEvent>(event));
-    }
-
-    {
-
-        CommentEvent * event = new CommentEvent();
-        event->r = 120;
-        event->v = 100;
-        event->b = 180;
-        event->com1 = "Commentaire1";
-        event->com2 = "Commentaire2 !! &&<><>\"\"\\<> !!";
-        externalEvent.events.push_back(boost::shared_ptr<BaseEvent>(event));
-    }
-    {
-        string eventType = "Function::Function";
-        gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
-
-        BaseEventSPtr eventToAdd = extensionsManager->CreateEvent(eventType);
-        externalEvent.events.push_back(eventToAdd);
-    }
-
-    std::ofstream ofile("out.txt");
-	boost::archive::xml_oarchive ar(ofile);
-
-	ar.register_type(static_cast<BaseEvent *>(NULL));
-	ar.register_type(static_cast<StandardEvent *>(NULL));
-	ar.register_type(static_cast<CommentEvent *>(NULL));
-	boost::serialization::void_cast_register(static_cast<StandardEvent *>(NULL),static_cast<BaseEvent *>(NULL));
-	boost::serialization::void_cast_register(static_cast<CommentEvent *>(NULL),static_cast<BaseEvent *>(NULL));
-
-	ar << BOOST_SERIALIZATION_NVP(externalEvent);
-	ofile.close();*/
-
-	//TEST END
-
     return true;
 
 }

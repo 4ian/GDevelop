@@ -468,8 +468,6 @@ void ChoixAction::RefreshList()
             ActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
         }
 	}
-
-    ActionsTree->Expand(ActionsTree->GetRootItem());
 }
 
 void ChoixAction::RefreshObjectsLists()
@@ -596,8 +594,6 @@ void ChoixAction::RefreshObjectActionsList()
 
 	    if ( !objectActionsTree->HasChildren(extensionItem) ) objectActionsTree->Delete(extensionItem);
 	}
-
-    objectActionsTree->Expand(objectActionsTree->GetRootItem());
 }
 
 /**

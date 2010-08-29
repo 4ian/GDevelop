@@ -533,6 +533,9 @@ void EditorScene::OnObjectsEditor( wxCommandEvent & event )
 
 void EditorScene::OnRefreshBtClick( wxCommandEvent & event )
 {
+    sceneCanvas->scene.editing = false;
+    sceneCanvas->scene.running = false;
+
     sceneCanvas->Reload();
 }
 

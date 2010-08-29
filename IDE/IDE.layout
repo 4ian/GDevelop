@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
-	<File name="AutomatismTypeChoice.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="10050" topLine="174" />
+	<ActiveTarget name="Release - Edittime" />
+	<File name="AutomatismTypeChoice.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="1129" topLine="18" />
 	</File>
-	<File name="AutomatismTypeChoice.h" open="0" top="0" tabpos="0">
+	<File name="AutomatismTypeChoice.h" open="1" top="0" tabpos="3">
 		<Cursor position="847" topLine="17" />
 	</File>
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27">
@@ -29,13 +29,13 @@
 		<Cursor position="288" topLine="0" />
 	</File>
 	<File name="ChoixAction.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="25893" topLine="468" />
+		<Cursor position="31904" topLine="580" />
 	</File>
 	<File name="ChoixAction.h" open="0" top="0" tabpos="4">
 		<Cursor position="596" topLine="6" />
 	</File>
 	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="29213" topLine="520" />
+		<Cursor position="34882" topLine="631" />
 	</File>
 	<File name="ChoixCondition.h" open="0" top="0" tabpos="0">
 		<Cursor position="692" topLine="17" />
@@ -52,8 +52,8 @@
 	<File name="Clipboard.h" open="0" top="0" tabpos="3">
 		<Cursor position="1254" topLine="31" />
 	</File>
-	<File name="Compilation.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="17851" topLine="307" />
+	<File name="Compilation.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="28784" topLine="502" />
 	</File>
 	<File name="Compilation.h" open="0" top="0" tabpos="0">
 		<Cursor position="3151" topLine="104" />
@@ -98,7 +98,7 @@
 		<Cursor position="2181" topLine="40" />
 	</File>
 	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="28225" topLine="645" />
+		<Cursor position="16281" topLine="335" />
 	</File>
 	<File name="DebuggerGUI.h" open="0" top="0" tabpos="0">
 		<Cursor position="2773" topLine="93" />
@@ -136,11 +136,11 @@
 	<File name="EditPropScene.cpp" open="0" top="0" tabpos="19">
 		<Cursor position="393" topLine="6" />
 	</File>
-	<File name="EditorEvents.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="51037" topLine="972" />
+	<File name="EditorEvents.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="50195" topLine="969" />
 	</File>
 	<File name="EditorEvents.h" open="0" top="0" tabpos="4">
-		<Cursor position="1550" topLine="67" />
+		<Cursor position="8746" topLine="214" />
 	</File>
 	<File name="EditorEventsActions.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="3290" topLine="65" />
@@ -172,13 +172,13 @@
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="3230" topLine="78" />
+	<File name="EditorScene.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="27928" topLine="510" />
 	</File>
-	<File name="EditorScene.h" open="1" top="0" tabpos="5">
+	<File name="EditorScene.h" open="0" top="0" tabpos="4">
 		<Cursor position="5773" topLine="158" />
 	</File>
-	<File name="EdittimeScene.cpp" open="1" top="0" tabpos="2">
+	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="9443" topLine="180" />
 	</File>
 	<File name="EdittimeScene.h" open="0" top="0" tabpos="2">
@@ -205,16 +205,16 @@
 	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2790" topLine="90" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="8504" topLine="187" />
+	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="8113" topLine="241" />
 	</File>
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="3">
 		<Cursor position="491" topLine="0" />
 	</File>
-	<File name="Game_Develop_EditorMain.cpp" open="1" top="0" tabpos="6">
+	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="17697" topLine="269" />
 	</File>
-	<File name="Game_Develop_EditorMain.h" open="1" top="0" tabpos="7">
+	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="6">
 		<Cursor position="1750" topLine="52" />
 	</File>
 	<File name="GeneratePassword.cpp" open="0" top="0" tabpos="22">
@@ -235,7 +235,7 @@
 	<File name="MainAide.cpp" open="0" top="0" tabpos="19">
 		<Cursor position="283" topLine="1" />
 	</File>
-	<File name="MainFichier.cpp" open="1" top="0" tabpos="10">
+	<File name="MainFichier.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="1113" topLine="29" />
 	</File>
 	<File name="MainOptions.cpp" open="0" top="0" tabpos="15">
@@ -250,7 +250,7 @@
 	<File name="ObjectTypeChoice.h" open="0" top="0" tabpos="0">
 		<Cursor position="802" topLine="10" />
 	</File>
-	<File name="PlayerUnitTests.cpp" open="1" top="0" tabpos="8">
+	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="4501" topLine="134" />
 	</File>
 	<File name="Portable.cpp" open="0" top="0" tabpos="5">
@@ -259,8 +259,8 @@
 	<File name="Preferences.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="41395" topLine="794" />
 	</File>
-	<File name="ProjectManager.cpp" open="1" top="0" tabpos="9">
-		<Cursor position="22023" topLine="311" />
+	<File name="ProjectManager.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="22110" topLine="287" />
 	</File>
 	<File name="ProjectManager.h" open="0" top="0" tabpos="8">
 		<Cursor position="411" topLine="80" />
@@ -271,10 +271,10 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="22" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="994" topLine="23" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="31517" topLine="824" />
 	</File>
-	<File name="SceneCanvas.h" open="1" top="0" tabpos="3">
+	<File name="SceneCanvas.h" open="0" top="0" tabpos="3">
 		<Cursor position="1237" topLine="25" />
 	</File>
 	<File name="SearchEvents.cpp" open="0" top="0" tabpos="10">

@@ -6,6 +6,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <wx/imaglist.h>
 #include "GDL/Game.h"
 #include "GDL/Automatism.h"
 #include "GDL/ExtensionsManager.h"

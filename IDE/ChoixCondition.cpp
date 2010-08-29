@@ -519,8 +519,6 @@ void ChoixCondition::RefreshList()
 
 	    if ( !ConditionsTree->HasChildren(extensionItem) ) ConditionsTree->Delete(extensionItem);
 	}
-
-    ConditionsTree->Expand(ConditionsTree->GetRootItem());
 }
 
 void ChoixCondition::RefreshObjectsLists()
@@ -647,8 +645,6 @@ void ChoixCondition::RefreshObjectConditionsList()
 
 	    if ( !objectConditionsTree->HasChildren(extensionItem) ) objectConditionsTree->Delete(extensionItem);
 	}
-
-    objectConditionsTree->Expand(objectConditionsTree->GetRootItem());
 }
 
 void ChoixCondition::OnConditionsTreeSelectionChanged( wxTreeEvent& event )

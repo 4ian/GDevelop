@@ -509,26 +509,29 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
             if ( wxCopyFile( "Runtime/libopenal.so.0", repTemp + "/libopenal.so.0", true ) == false )
                 report += _( "Impossible de créer libopenal.so.0 dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "Runtime/libsfml-audio.so.2.0", repTemp + "/libsfml-audio.so.2.0", true ) == false )
-                report += _( "Impossible de créer libsfml-audio.so.2.0 dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "Runtime/libsfml2-audio.so", repTemp + "/libsfml2-audio.so", true ) == false )
+                report += _( "Impossible de créer libsfml2-audio.so dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "Runtime/libsfml-graphics.so.2.0", repTemp + "/libsfml-graphics.so.2.0", true ) == false )
-                report += _( "Impossible de créer libsfml-graphics.so.2.0 dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "Runtime/libsfml2-graphics.so", repTemp + "/libsfml2-graphics.so", true ) == false )
+                report += _( "Impossible de créer libsfml2-graphics.so dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "Runtime/libsfml-network.so.2.0", repTemp + "/libsfml-network.so.2.0", true ) == false )
-                report += _( "Impossible de créer libsfml-network.so.2.0 dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "Runtime/libsfml2-network.so", repTemp + "/libsfml2-network.so", true ) == false )
+                report += _( "Impossible de créer libsfml2-network.so dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "Runtime/libsfml-system.so.2.0", repTemp + "/libsfml-system.so.2.0", true ) == false )
-                report += _( "Impossible de créer libsfml-system.so.2.0 dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "Runtime/libsfml2-system.so", repTemp + "/libsfml2-system.so", true ) == false )
+                report += _( "Impossible de créer libsfml2-system.so dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "Runtime/libsfml-system.so.2.0", repTemp + "/libsfml-system.so.2.0", true ) == false )
-                report += _( "Impossible de créer libsfml-system.so.2.0 dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "Runtime/libsfml2-system.so", repTemp + "/libsfml2-system.so", true ) == false )
+                report += _( "Impossible de créer libsfml2-system.so dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "Runtime/libsfml-window.so.2.0", repTemp + "/libsfml-window.so.2.0", true ) == false )
-                report += _( "Impossible de créer libsfml-window.so.2.0 dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "Runtime/libsfml2-window.so", repTemp + "/libsfml2-window.so", true ) == false )
+                report += _( "Impossible de créer libsfml2-window.so dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libsndfile.so.1", repTemp + "/libsndfile.so.1", true ) == false )
                 report += _( "Impossible de créer libsndfile.so.1 dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "Runtime/libGLEW.so.1.3", repTemp + "/libGLEW.so.1.3", true ) == false )
+                report += _( "Impossible de créer libGLEW.so.1.3 dans le répertoire de compilation.\n" );
         }
 
         //Copie du tout dans le répertoire final

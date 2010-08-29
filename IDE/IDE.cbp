@@ -287,18 +287,18 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
-					<Add option="-lsfml-audio" />
-					<Add option="-lsfml-graphics" />
-					<Add option="-lsfml-window" />
-					<Add option="-lsfml-network" />
-					<Add option="-lsfml-system" />
+					<Add option="-lsfml2-audio" />
+					<Add option="-lsfml2-graphics" />
+					<Add option="-lsfml2-window" />
+					<Add option="-lsfml2-network" />
+					<Add option="-lsfml2-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -334,17 +334,17 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
-					<Add option="-lsfml-audio" />
-					<Add option="-lsfml-graphics" />
-					<Add option="-lsfml-window" />
-					<Add option="-lsfml-network" />
-					<Add option="-lsfml-system" />
+					<Add option="-lsfml2-audio" />
+					<Add option="-lsfml2-graphics" />
+					<Add option="-lsfml2-window" />
+					<Add option="-lsfml2-network" />
+					<Add option="-lsfml2-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -859,7 +859,6 @@
 					<wxDialog wxs="wxsmith/Portable.wxs" src="Portable.cpp" hdr="Portable.h" name="Portable" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixClavier.wxs" src="ChoixClavier.cpp" hdr="ChoixClavier.h" name="ChoixClavier" language="CPP" />
 					<wxDialog wxs="wxsmith/mp3ogg.wxs" src="mp3ogg.cpp" hdr="mp3ogg.h" name="mp3ogg" language="CPP" />
-					<wxDialog wxs="wxsmith/PropImage.wxs" src="PropImage.cpp" hdr="PropImage.h" name="PropImage" language="CPP" />
 					<wxDialog wxs="wxsmith/SigneModification.wxs" src="SigneModification.cpp" hdr="SigneModification.h" name="SigneModification" language="CPP" />
 					<wxDialog wxs="wxsmith/SigneTest.wxs" src="SigneTest.cpp" hdr="SigneTest.h" name="SigneTest" language="CPP" />
 					<wxDialog wxs="wxsmith/BugReport.wxs" src="BugReport.cpp" hdr="BugReport.h" name="BugReport" language="CPP" />

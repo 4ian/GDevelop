@@ -452,11 +452,11 @@ ExtensionSprite::ExtensionSprite()
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_HIDDEN_EXPRESSION("Anim", _("Animation"), _("Animation de l'objet"), _("Animation et images"), "res/actions/animation.png", &SpriteObject::ExpGetObjectAnimationNb)
+        DECLARE_OBJECT_HIDDEN_EXPRESSION("Anim", _("Animation"), _("Animation de l'objet"), _("Animations et images"), "res/actions/animation.png", &SpriteObject::ExpGetObjectAnimationNb)
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
         DECLARE_END_OBJECT_EXPRESSION()
 
-        DECLARE_OBJECT_EXPRESSION("Animation", _("Animation"), _("Animation de l'objet"), _("Animation et images"), "res/actions/animation.png", &SpriteObject::ExpGetObjectAnimationNb)
+        DECLARE_OBJECT_EXPRESSION("Animation", _("Animation"), _("Animation de l'objet"), _("Animations et images"), "res/actions/animation.png", &SpriteObject::ExpGetObjectAnimationNb)
             DECLARE_PARAMETER("object", _("Objet"), true, "Sprite")
         DECLARE_END_OBJECT_EXPRESSION()
 

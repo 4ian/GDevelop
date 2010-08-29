@@ -112,6 +112,29 @@ unsigned int GD_API GetTypeIdOfObject(const Game & game, const Scene & scene, st
                 objectTypeId = previousTypeId;
             }
         }
+        for (unsigned int i = 0;i<game.objectGroups.size();++i)
+        {
+            if ( game.objectGroups[i].GetName() == name )
+            {
+                //A group has the name searched
+                //Verifying now that all objects have the same typeId.
+
+                vector < string > groupsObjects = game.objectGroups[i].GetAllObjectsNames();
+                unsigned int previousTypeId = groupsObjects.empty() ? 0 : GetTypeIdOfObject(game, scene, groupsObjects[0], false);
+
+                for (unsigned int j = 0;j<groupsObjects.size();++j)
+                {
+                    if ( GetTypeIdOfObject(game, scene, groupsObjects[j], false) != previousTypeId )
+                        return 0; //The group has more than one type.
+
+                }
+
+                if ( objectTypeId != 0 && previousTypeId != objectTypeId )
+                    return 0; //The group has not the same type has an object
+
+                objectTypeId = previousTypeId;
+            }
+        }
     }
 
     return objectTypeId;
@@ -175,6 +198,37 @@ vector < unsigned int > GD_API GetAutomatismsOfObject(const Game & game, const S
                 //Verifying now that all objects have common automatisms.
 
                 vector < string > groupsObjects = scene.objectGroups[i].GetAllObjectsNames();
+                for (unsigned int j = 0;j<groupsObjects.size();++j)
+                {
+                    //Get automatisms of the object of the group and delete automatism which are not in commons.
+                	vector < unsigned int > objectAutomatisms = GetAutomatismsOfObject(game, scene, groupsObjects[j], false);
+                	if (!automatismsAlreadyInserted)
+                	{
+                	    automatismsAlreadyInserted = true;
+                	    automatims = objectAutomatisms;
+                	}
+                	else
+                	{
+                        for (unsigned int a = 0 ;a<automatims.size();++a)
+                        {
+                            if ( find(objectAutomatisms.begin(), objectAutomatisms.end(), automatims[a]) == objectAutomatisms.end() )
+                            {
+                                automatims.erase(automatims.begin() + a);
+                                --a;
+                            }
+                        }
+                	}
+                }
+            }
+        }
+        for (unsigned int i = 0;i<game.objectGroups.size();++i)
+        {
+            if ( game.objectGroups[i].GetName() == name )
+            {
+                //A group has the name searched
+                //Verifying now that all objects have common automatisms.
+
+                vector < string > groupsObjects = game.objectGroups[i].GetAllObjectsNames();
                 for (unsigned int j = 0;j<groupsObjects.size();++j)
                 {
                     //Get automatisms of the object of the group and delete automatism which are not in commons.

@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include "GDL/CommonTools.h"
+#include "GDL/XmlFilesHelper.h"
 #include <stdio.h>
 
 using namespace std;
@@ -55,64 +56,8 @@ bool ActDeleteFichier( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
 }
 
 /**
- * Helper class wrapping a tinyxml document in RAII fashion
+ * Load a file in memory
  */
-class XmlFile
-{
-    public :
-        XmlFile(std::string filename) : doc(filename.c_str()), modified(false) { doc.LoadFile(); };
-        ~XmlFile() { if (modified) doc.SaveFile(); }
-
-        void MarkAsModified() { modified = true; }
-        TiXmlDocument & GetTinyXmlDocument() { return doc; };
-        const TiXmlDocument & GetTinyXmlDocument() const { return doc; };
-
-    private :
-        TiXmlDocument doc;
-        bool modified;
-};
-
-/**
- * Helper class for opening files.
- */
-class XmlFilesManager
-{
-    static std::map<string, boost::shared_ptr<XmlFile> > openedFiles;
-
-    public:
-
-    /**
-     * Load a file
-     */
-    static void LoadFile(std::string filename)
-    {
-        if ( openedFiles.find(filename) == openedFiles.end() )
-            openedFiles[filename] = boost::shared_ptr<XmlFile>(new XmlFile(filename));
-    }
-
-    /**
-     * Unload a file
-     */
-    static void UnloadFile(std::string filename)
-    {
-        if ( openedFiles.find(filename) != openedFiles.end() )
-            openedFiles.erase(filename);
-    }
-
-    /**
-     * Get access to a file. If the file has not been loaded with LoadFile,
-     * it will be loaded now.
-     */
-    static boost::shared_ptr<XmlFile> GetFile(std::string filename, bool isGoingToModifyFile = true)
-    {
-        boost::shared_ptr<XmlFile> file = openedFiles.find(filename) != openedFiles.end() ? openedFiles[filename] : boost::shared_ptr<XmlFile>(new XmlFile(filename));
-        if ( isGoingToModifyFile ) file->MarkAsModified();
-
-        return file;
-    }
-};
-std::map<string, boost::shared_ptr<XmlFile> > XmlFilesManager::openedFiles;
-
 bool ActLoadFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     XmlFilesManager::LoadFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
@@ -120,6 +65,9 @@ bool ActLoadFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, con
     return true;
 }
 
+/**
+ * Unload a file from memory
+ */
 bool ActUnloadFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     XmlFilesManager::UnloadFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));

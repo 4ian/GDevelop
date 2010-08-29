@@ -2,7 +2,7 @@
 #include "GDL/tinyxml.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/Instruction.h"
-
+#include "GDL/XmlFilesHelper.h"
 #include "GDL/CommonTools.h"
 #include <vector>
 #include <string>
@@ -18,14 +18,10 @@ bool CondFileExists( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, 
     TiXmlDocument doc;
     if ( !doc.LoadFile(condition.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str()) && doc.ErrorId() == 2)
     {
-        if ( condition.IsInverted() )
-            return true;
-        return false;
+        return (false ^ condition.IsInverted());
     }
 
-    if ( condition.IsInverted() )
-        return false;
-    return true;
+    return (true ^ condition.IsInverted());
 }
 
 ////////////////////////////////////////////////////////////
@@ -37,17 +33,8 @@ bool CondFileExists( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, 
 ////////////////////////////////////////////////////////////
 bool CondGroupExists( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    TiXmlDocument doc;
-    if ( !doc.LoadFile(condition.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str() ) && doc.ErrorId() == 2)
-    {
-        scene.errors.Add("Impossible d'ouvrir le fichier "+condition.GetParameter(0).GetPlainString()+" : "+string(doc.ErrorDesc()), "", "", -1, 2);
-
-        if ( condition.IsInverted() )
-            return true;
-        return false;
-    }
-
-    TiXmlHandle hdl( &doc );
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(condition.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
     istringstream groupsStr( condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
@@ -63,15 +50,11 @@ bool CondGroupExists( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
         {
-            if ( condition.IsInverted() )
-                return true;
-            return false;
+            return (false ^ condition.IsInverted());
         }
 
         hdl = hdl.FirstChildElement(groups.at(i).c_str());
     }
 
-    if ( condition.IsInverted() )
-        return false;
-    return true;
+    return (true ^ condition.IsInverted());
 }

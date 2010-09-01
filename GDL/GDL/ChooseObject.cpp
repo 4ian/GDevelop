@@ -194,7 +194,7 @@ ChooseObject::~ChooseObject()
 void ChooseObject::Refresh()
 {
     ObjectListDialogsHelper objectListsHelper(game, scene);
-    objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups, onlyObjectOfType, searchCtrl->GetValue().mb_str());
+    objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups, onlyObjectOfType, string(searchCtrl->GetValue().mb_str()));
 }
 
 void ChooseObject::OnChoisirBtClick(wxCommandEvent& event)

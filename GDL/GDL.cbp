@@ -596,6 +596,8 @@
 		<Unit filename="GDL\Force.h" />
 		<Unit filename="GDL\GDExpression.cpp" />
 		<Unit filename="GDL\GDExpression.h" />
+		<Unit filename="GDL\GDExpressionParser.cpp" />
+		<Unit filename="GDL\GDExpressionParser.h" />
 		<Unit filename="GDL\GDMathParser.cpp">
 			<Option virtualFolder="Math parser\" />
 		</Unit>
@@ -885,6 +887,15 @@
 					<wxDialog wxs="wxsmith/PropImage.wxs" src="GDL/PropImage.cpp" hdr="GDL/PropImage.h" name="PropImage" language="CPP" />
 				</resources>
 			</wxsmith>
+			<DoxyBlocks>
+				<comment_style block="0" line="2" />
+				<doxyfile_project project_number="1.5.9911" use_auto_version="1" />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output html_help="1" />
+				<doxyfile_dot class_diagrams="1" have_dot="1" />
+				<general />
+			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

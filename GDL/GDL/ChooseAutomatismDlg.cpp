@@ -89,7 +89,7 @@ ChooseAutomatismDlg::~ChooseAutomatismDlg()
 
 void ChooseAutomatismDlg::RefreshList()
 {
-    std::string search = searchCtrl->GetValue().mb_str();
+    std::string search = string(searchCtrl->GetValue().mb_str());
     bool searching = search.empty() ? false : true;
 
 	vector <unsigned int> automatisms = GetAutomatismsOfObject(game, scene, parentObject);

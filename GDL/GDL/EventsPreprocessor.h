@@ -17,7 +17,6 @@ class GD_API EventsPreprocessor
 
         static void DeleteUselessEvents(vector < BaseEventSPtr > & events);
 
-    protected:
     private:
         EventsPreprocessor() {};
         virtual ~EventsPreprocessor() {};

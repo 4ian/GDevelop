@@ -208,7 +208,7 @@ placingPoint(false)
     GridSizer3->Add(Bt7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Bt4 = new wxToggleButton(Core, ID_TOGGLEBUTTON5, _("4"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON5"));
     GridSizer3->Add(Bt4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    StaticBitmap1 = new wxStaticBitmap(Core, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/direction.png")).Rescale(wxSize(25,25).GetWidth(),wxSize(25,25).GetHeight())), wxDefaultPosition, wxSize(25,25), 0, _T("ID_STATICBITMAP2"));
+    StaticBitmap1 = new wxStaticBitmap(Core, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/direction.png")).Rescale(wxSize(25,25).GetWidth(),wxSize(25,25).GetHeight())), wxDefaultPosition, wxSize(25,25), wxSIMPLE_BORDER, _T("ID_STATICBITMAP2"));
     GridSizer3->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     Bt0 = new wxToggleButton(Core, ID_TOGGLEBUTTON1, _("0"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON1"));
     Bt0->SetValue(true);
@@ -275,7 +275,7 @@ placingPoint(false)
     FlexGridSizer7->Add(thumbsSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer9 = new wxFlexGridSizer(0, 4, 0, 0);
-    CheckTempsEntreImg = new wxStaticBitmap(Core, ID_STATICBITMAP1, wxNullBitmap, wxDefaultPosition, wxSize(16,16), 0, _T("ID_STATICBITMAP1"));
+    CheckTempsEntreImg = new wxStaticBitmap(Core, ID_STATICBITMAP1, wxNullBitmap, wxDefaultPosition, wxSize(16,16), wxSIMPLE_BORDER, _T("ID_STATICBITMAP1"));
     FlexGridSizer9->Add(CheckTempsEntreImg, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText2 = new wxStaticText(Core, ID_STATICTEXT2, _("Temps entre chaque image :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     FlexGridSizer9->Add(StaticText2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
@@ -738,7 +738,7 @@ void EditorObjet::OnAnimationsBoxSelect( wxCommandEvent& event )
 void EditorObjet::OnTempsEditText( wxCommandEvent& event )
 {
     if ( animation < object.GetAnimationsNumber() && direction < object.GetAnimation( animation ).GetDirectionsNumber())
-        object.GetAnimation( animation ).GetDirectionToModify( direction ).SetTimeBetweenFrames( ToFloat(TempsEdit->GetValue().mb_str()) );
+        object.GetAnimation( animation ).GetDirectionToModify( direction ).SetTimeBetweenFrames( ToFloat(string(TempsEdit->GetValue().mb_str())) );
 }
 
 ////////////////////////////////////////////////////////////
@@ -1270,7 +1270,7 @@ void EditorObjet::OnAddFromEndSelected(wxCommandEvent& event)
     }
 
     Sprite sprite;
-    sprite.SetImageName(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected).mb_str());
+    sprite.SetImageName(string(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected).mb_str()));
     object.GetAnimation( animation ).GetDirectionToModify( direction ).AddSprite(sprite);
 
     thumbsPanel->Refresh();
@@ -1298,7 +1298,7 @@ void EditorObjet::OnAddFromAfterSelected(wxCommandEvent& event)
     }
 
     Sprite sprite;
-    sprite.SetImageName(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected).mb_str());
+    sprite.SetImageName(string(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected).mb_str()));
 
     vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
 
@@ -1336,7 +1336,7 @@ void EditorObjet::OnAddFromBeforeSelected(wxCommandEvent& event)
     }
 
     Sprite sprite;
-    sprite.SetImageName(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected).mb_str());
+    sprite.SetImageName(string(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected).mb_str()));
 
     vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
 

@@ -524,7 +524,7 @@ void ChoixCondition::RefreshList()
 void ChoixCondition::RefreshObjectsLists()
 {
     ObjectListDialogsHelper objectListsHelper(game, scene);
-    objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups, "", objectsSearchCtrl->GetValue().mb_str());
+    objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups, "", string(objectsSearchCtrl->GetValue().mb_str()));
 }
 
 void ChoixCondition::RefreshObjectConditionsList()
@@ -766,7 +766,7 @@ void ChoixCondition::OnFacClicked(wxCommandEvent& event)
 {
     // On déduit le numéro du paramètre à partir du nom du bouton
     // ( Son nom, pas son label )
-    string num = ( string ) wxWindow::FindFocus()->GetName();
+    string num = string(wxWindow::FindFocus()->GetName().mb_str());
     unsigned int i = atoi( num.c_str() );
 
     if ( ParaFac.at(i)->GetValue() )

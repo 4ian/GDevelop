@@ -109,7 +109,7 @@ bool Game_Develop_EditorApp::OnInit()
 
 #ifdef LINUX
     string tmp; //Make sure current working directory is executable directory.
-    if ( *argv[0] != '/' )
+    if ( string(argv[0]) != "/" )
     {
         char buffer[1024];
         tmp += ( getcwd( buffer, 1024 ) );

@@ -208,9 +208,9 @@ void EditPropScene::OnOkBtClick(wxCommandEvent& event)
     scene->backgroundColorR = cData.GetColour().Red();
     scene->backgroundColorG = cData.GetColour().Green();
     scene->backgroundColorB = cData.GetColour().Blue();
-    scene->oglFOV = ToFloat(fovEdit->GetValue().mb_str());
-    scene->oglZNear = ToFloat(zNearEdit->GetValue().mb_str());
-    scene->oglZFar = ToFloat(zFarEdit->GetValue().mb_str());
+    scene->oglFOV = ToFloat(string(fovEdit->GetValue().mb_str()));
+    scene->oglZNear = ToFloat(string(zNearEdit->GetValue().mb_str()));
+    scene->oglZFar = ToFloat(string(zFarEdit->GetValue().mb_str()));
 
     if ( TriBox->GetSelection() == 0 )
         scene->standardSortMethod = true;

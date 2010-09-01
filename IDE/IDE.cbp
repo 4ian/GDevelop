@@ -622,6 +622,8 @@
 		<Unit filename="ErrorCompilation.h">
 			<Option virtualFolder="Editeur principal\Fichier\" />
 		</Unit>
+		<Unit filename="EventsRefactorer.cpp" />
+		<Unit filename="EventsRefactorer.h" />
 		<Unit filename="Extensions.cpp" />
 		<Unit filename="Extensions.h" />
 		<Unit filename="ExternalEventsEditor.cpp" />
@@ -907,6 +909,15 @@
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
 				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

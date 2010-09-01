@@ -473,7 +473,7 @@ void ChoixAction::RefreshList()
 void ChoixAction::RefreshObjectsLists()
 {
     ObjectListDialogsHelper objectListsHelper(game, scene);
-    objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups, "", objectsSearchCtrl->GetValue().mb_str());
+    objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups, "", string(objectsSearchCtrl->GetValue().mb_str()));
 }
 
 void ChoixAction::RefreshObjectActionsList()
@@ -941,7 +941,7 @@ void ChoixAction::OnFacClicked(wxCommandEvent& event)
 {
     // On déduit le numéro du paramètre à partir du nom du bouton
     // ( Son nom, pas son label )
-    string num = wxWindow::FindFocus()->GetName().mb_str();
+    string num = string(wxWindow::FindFocus()->GetName().mb_str());
     unsigned int i = ToInt(num);
 
     if ( ParaFac.at(i)->GetValue() )

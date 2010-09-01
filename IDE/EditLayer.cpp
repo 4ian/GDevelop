@@ -322,7 +322,7 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
     Camera & camera = tempLayer.GetCamera(selection);
 
     {
-        float newValue = ToFloat(viewportX1Edit->GetValue().mb_str());
+        float newValue = ToFloat(string(viewportX1Edit->GetValue().mb_str()));
         if ( newValue >= 0 && newValue <= 1)
         {
             camera.viewport.Left = newValue;
@@ -333,7 +333,7 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
     }
 
     {
-        float newValue = ToFloat(viewportY1Edit->GetValue().mb_str());
+        float newValue = ToFloat(string(viewportY1Edit->GetValue().mb_str()));
         if ( newValue >= 0 && newValue <= 1)
         {
             camera.viewport.Top = newValue;
@@ -344,7 +344,7 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
     }
 
     {
-        float newValue = ToFloat(viewportX2Edit->GetValue().mb_str());
+        float newValue = ToFloat(string(viewportX2Edit->GetValue().mb_str()));
         if ( newValue >= 0 && newValue <= 1)
         {
             camera.viewport.Width = newValue-camera.viewport.Left;
@@ -355,7 +355,7 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
     }
 
     {
-        float newValue = ToFloat(viewportY2Edit->GetValue().mb_str());
+        float newValue = ToFloat(string(viewportY2Edit->GetValue().mb_str()));
         if ( newValue >= 0 && newValue <= 1)
         {
             camera.viewport.Height = newValue-camera.viewport.Top;

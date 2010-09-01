@@ -42,6 +42,7 @@
 #include "GDL/HelpFileAccess.h"
 #include "GDL/AutomatismsSharedDatas.h"
 #include "AutomatismTypeChoice.h"
+#include "EventsRefactorer.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -631,91 +632,87 @@ void EditorObjectList::OnobjectsListBeginLabelEdit(wxTreeEvent& event)
     if ( objectsList->GetItemText( event.GetItem() ) != _( "Tous les objets" ) )
     {
         ancienNom = objectsList->GetItemText( event.GetItem() );
+        return;
     }
-    else
-    {
-        //On ne touche pas au dossier "Tous les objets"
-        objectsList->EndEditLabel( event.GetItem(), true );
-    }
+
+    //On ne touche pas au dossier "Tous les objets"
+    objectsList->EndEditLabel( event.GetItem(), true );
 }
 
 void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
 {
+    if ( event.IsEditCancelled() ) return;
+
+    string newName = string(event.GetLabel().mb_str());
+
+    //Be sure there is not already another object with this name
+    if ( Picker::PickOneObject( objects, newName ) != -1 )
+    {
+        wxLogWarning( _( "Impossible de renommer l'objet : un autre objet porte déjà ce nom." ) );
+        Refresh();
+        return;
+    }
+
+    //Be sure the name is valid
+    if ( !CheckObjectName(newName) )
+    {
+        wxMessageBox(_("Le nom de l'objet contient des espaces, des caractères non autorisés ou représente un nom d'une expression. Utilisez uniquement des lettres, chiffres et underscores ( _ )."), _("Attention"), wxICON_EXCLAMATION, this);
+
+        Refresh();
+        return;
+    }
+
+    int i = Picker::PickOneObject( objects, ancienNom );
+    if ( i != -1 )
+    {
+        objects->at( i )->SetName( newName );
+
+        if ( scene )
+        {
+            EventsRefactorer::RenameObjectInEvents(game, *scene, scene->events, ancienNom, newName);
+            scene->wasModified = true;
+        }
+        objectsList->SetItemText( event.GetItem(), event.GetLabel() );
+        return;
+    }
+}
+
+/**
+ * Check if an object name is valid
+ */
+bool EditorObjectList::CheckObjectName(std::string name)
+{
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionsManager->GetExtensions();
 
-    if ( !event.IsEditCancelled() )
+    string allowedCharacter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+
+    //Check for invalid names
+    bool nameUsedByExpression = extensionsManager->HasExpression(name) || extensionsManager->HasStrExpression(name);
+    for (unsigned int i = 0;i<extensions.size();++i)
     {
-        string newName = string(event.GetLabel().mb_str());
+        //Verify if that extension is enabled
+        if ( find(game.extensionsUsed.begin(),
+                  game.extensionsUsed.end(),
+                  extensions[i]->GetName()) == game.extensionsUsed.end() )
+            continue;
 
-        //Si le nom n'existe pas
-        if ( Picker::PickOneObject( objects, newName ) != -1 )
+        vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+
+        for(unsigned int j = 0;j<objectsTypes.size();++j)
         {
-            wxLogWarning( _( "Impossible de renommer l'objet : un autre objet porte déjà ce nom." ) );
-            Refresh();
-            return;
-        }
-        else
-        {
-            string allowedCharacter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-
-            //Check for invalid names
-            bool nameUsedByExpression = extensionsManager->HasExpression(newName) || extensionsManager->HasStrExpression(newName);
-            for (unsigned int i = 0;i<extensions.size();++i)
+            //Add each object expression
+            std::map<string, ExpressionInfos > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
+            for(std::map<string, ExpressionInfos>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
             {
-                //Verify if that extension is enabled
-                if ( find(game.extensionsUsed.begin(),
-                          game.extensionsUsed.end(),
-                          extensions[i]->GetName()) == game.extensionsUsed.end() )
-                    continue;
-
-                vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
-
-                for(unsigned int j = 0;j<objectsTypes.size();++j)
-                {
-                    //Add each object expression
-                    std::map<string, ExpressionInfos > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
-                    for(std::map<string, ExpressionInfos>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
-                    {
-                        if ( newName == it->first )
-                            nameUsedByExpression = true;
-                    }
-                }
-            }
-
-            //Display warning or errors for invalid names
-            if ( newName.find_first_not_of(allowedCharacter) != string::npos || nameUsedByExpression )
-            {
-                //Allow changing a "invalid" name to a new "invalid" name, but display a warning
-                if (ancienNom.find_first_not_of(allowedCharacter) != string::npos)
-                {
-                    if ( wxMessageBox(_("Le nom de l'objet contient des espaces ou des caractères susceptibles de ne pas être interprétés correctement dans les expressions.\nÊtes vous sur de vouloir conserver le nouveau nom ?"), _("Attention"), wxICON_EXCLAMATION | wxYES_NO, this )
-                        == wxNO )
-                    {
-                        Refresh();
-                        return;
-                    }
-                }
-                else
-                {
-                    wxMessageBox(_("Le nom de l'objet contient des espaces, des caractères non autorisés ou représente un nom d'une expression. Utilisez uniquement des lettres, chiffres et underscores ( _ )."), _("Attention"), wxICON_EXCLAMATION, this);
-
-                    Refresh();
-                    return;
-                }
-            }
-
-            int i = Picker::PickOneObject( objects, ancienNom );
-            if ( i != -1 )
-            {
-                objects->at( i )->SetName( newName );
-
-                if ( scene ) scene->wasModified = true;
-                objectsList->SetItemText( event.GetItem(), event.GetLabel() );
-                return;
+                if ( name == it->first )
+                    nameUsedByExpression = true;
             }
         }
     }
+
+    //Display warning or errors for invalid names
+    return !(name.find_first_not_of(allowedCharacter) != string::npos || nameUsedByExpression);
 }
 
 ////////////////////////////////////////////////////////////
@@ -1044,7 +1041,7 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
  */
 void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
 {
-    string name = objectsList->GetItemText( item ).mb_str();
+    string name = string(objectsList->GetItemText( item ).mb_str());
     int id = Picker::PickOneObject( objects, name );
     if ( id == -1 )
     {
@@ -1065,7 +1062,7 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
 
     boost::shared_ptr<Automatism> automatism = objects->at(id)->GetAutomatism(automatisms[selection]);
 
-    std::string newName = wxGetTextFromUser("Entrez le nouveau nom de l'automatisme", "Renommer un automatisme", automatism->GetName()).mb_str();
+    std::string newName = string(wxGetTextFromUser("Entrez le nouveau nom de l'automatisme", "Renommer un automatisme", automatism->GetName()).mb_str());
     if ( newName == automatism->GetName() || newName.empty() ) return;
 
     //Remove shared datas if necessary

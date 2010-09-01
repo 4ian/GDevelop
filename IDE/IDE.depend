@@ -8605,7 +8605,7 @@
 	<string>
 	<vector>
 
-1282769603 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
+1283343467 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
 	"ChoixAction.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -10890,7 +10890,7 @@
 	<wx/msw/winundef.h>
 	"EditorObjetsGroups.h"
 
-1281372811 d:\florian\programmation\gamedevelop\ide\editorobjectlist.h
+1283278931 d:\florian\programmation\gamedevelop\ide\editorobjectlist.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/menu.h>
@@ -11415,7 +11415,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1281379827 source:d:\florian\programmation\gamedevelop\ide\editorobjectlist.cpp
+1283282198 source:d:\florian\programmation\gamedevelop\ide\editorobjectlist.cpp
 	"EditorObjectList.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -11455,6 +11455,7 @@
 	"GDL/HelpFileAccess.h"
 	"GDL/AutomatismsSharedDatas.h"
 	"AutomatismTypeChoice.h"
+	"EventsRefactorer.h"
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
@@ -11490,6 +11491,11 @@
 	<string>
 
 1280078541 d:\florian\programmation\gamedevelop\gdl\gdl\automatismsruntimeshareddatas.h
+	<boost/shared_ptr.hpp>
+
+1283286767 d:\florian\programmation\gamedevelop\ide\eventsrefactorer.h
+	<vector>
+	<string>
 	<boost/shared_ptr.hpp>
 
 1279900965 source:d:\florian\programmation\gamedevelop\ide\editorobjets.cpp
@@ -11604,6 +11610,17 @@
 1264364136 source:d:\florian\programmation\gamedevelop\ide\errorcompilation.cpp
 	"ErrorCompilation.h"
 	"nommgr.h"
+
+1283289276 source:d:\florian\programmation\gamedevelop\ide\eventsrefactorer.cpp
+	"EventsRefactorer.h"
+	"GDL/Event.h"
+	"GDL/GDExpressionParser.h"
+	"GDL/ExtensionBase.h"
+	"GDL/ExtensionsManager.h"
+
+1283282351 d:\florian\programmation\gamedevelop\gdl\gdl\gdexpressionparser.h
+	<string>
+	<vector>
 
 1276279209 source:d:\florian\programmation\gamedevelop\ide\extensions.cpp
 	"Extensions.h"
@@ -12976,7 +12993,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1282945628 d:\florian\programmation\gamedevelop\ide\version.h
+1283344076 d:\florian\programmation\gamedevelop\ide\version.h
 
 1272727521 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -13117,5 +13134,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1283018620 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1283282351 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

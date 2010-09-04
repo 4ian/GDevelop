@@ -32,6 +32,8 @@ const long InitialVariablesDialog::ID_BUTTON2 = wxNewId();
 const long InitialVariablesDialog::idAddVar = wxNewId();
 const long InitialVariablesDialog::idEditVar = wxNewId();
 const long InitialVariablesDialog::idDelVar = wxNewId();
+const long InitialVariablesDialog::idMoveUpVar = wxNewId();
+const long InitialVariablesDialog::idMoveDownVar = wxNewId();
 const long InitialVariablesDialog::ID_Help = wxNewId();
 
 BEGIN_EVENT_TABLE(InitialVariablesDialog,wxDialog)
@@ -98,6 +100,8 @@ variables(variables_)
 	Connect(idAddVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnAddVarSelected);
 	Connect(idDelVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnDelVarSelected);
 	Connect(idEditVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnEditVarSelected);
+	Connect(idMoveUpVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnMoveUpVarSelected);
+	Connect(idMoveDownVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnMoveDownVarSelected);
 	Connect(ID_Help,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnhelpBtClick);
 
 	variablesList->InsertColumn(0, _("Variable"));
@@ -112,6 +116,9 @@ variables(variables_)
     toolbar->AddTool( idAddVar, wxT( "Ajouter une variable" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter une variable") );
     toolbar->AddTool( idEditVar, wxT( "Editer la valeur initiale de la variable" ), wxBitmap( wxImage( "res/editicon.png" ) ), _("Editer la valeur initiale de la variable") );
     toolbar->AddTool( idDelVar, wxT( "Supprimer la variable selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer la variable selectionnée") );
+    toolbar->AddSeparator();
+    toolbar->AddTool( idMoveUpVar, wxT( "Déplacer vers le haut" ), wxBitmap( wxImage( "res/up.png" ) ), _("Déplacer vers le haut") );
+    toolbar->AddTool( idMoveDownVar, wxT( "Déplacer vers le bas" ), wxBitmap( wxImage( "res/down.png" ) ), _("Déplacer vers le bas") );
     toolbar->AddSeparator();
     toolbar->AddTool( ID_Help, wxT( "Aide sur les variables initiales" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide sur les variables initiales") );
     toolbar->Realize();
@@ -197,6 +204,44 @@ void InitialVariablesDialog::OnDelVarSelected(wxCommandEvent& event)
 
     variables.RemoveVariable(selectedVariable);
     Refresh();
+}
+
+/**
+ * Move up a variable
+ */
+void InitialVariablesDialog::OnMoveUpVarSelected(wxCommandEvent& event)
+{
+    vector < Variable > & variablesVector = variables.GetVariablesVector();
+
+    for (unsigned int i = 0;i<variablesVector.size();++i)
+    {
+        if ( variablesVector[i].GetName() == selectedVariable)
+        {
+            variablesVector.insert(variablesVector.begin()+i, variablesVector[i]);
+            variablesVector.erase(variablesVector.begin()+i+1);
+            Refresh();
+            return;
+        }
+    }
+}
+
+/**
+ * Move down a variable
+ */
+void InitialVariablesDialog::OnMoveDownVarSelected(wxCommandEvent& event)
+{
+    vector < Variable > & variablesVector = variables.GetVariablesVector();
+
+    for (unsigned int i = 0;i<variablesVector.size()-1;++i)
+    {
+        if ( variablesVector[i].GetName() == selectedVariable)
+        {
+            variablesVector.insert(variablesVector.begin()+i+1, variablesVector[i]);
+            variablesVector.erase(variablesVector.begin()+i);
+            Refresh();
+            return;
+        }
+    }
 }
 
 /**

@@ -191,6 +191,9 @@ TEST( Runtime, Expressions )
 
     {
         GDExpression expression("cos(3.5)+Random(5)");
+        expression.PrepareForMathEvaluationOnly(game, scene);
+        cout << expression.GetFirstErrorDuringPreprocessingText();
+
         CHECK_EQUAL(true, expression.PrepareForMathEvaluationOnly(game, scene));
     }
     {

@@ -57,6 +57,8 @@ class InitialVariablesDialog: public wxDialog
 		static const long idAddVar;
 		static const long idEditVar;
 		static const long idDelVar;
+		static const long idMoveUpVar;
+		static const long idMoveDownVar;
 		static const long ID_Help;
 
 	private:
@@ -72,6 +74,8 @@ class InitialVariablesDialog: public wxDialog
 		void OnAddVarSelected(wxCommandEvent& event);
 		void OnDelVarSelected(wxCommandEvent& event);
 		void OnEditVarSelected(wxCommandEvent& event);
+		void OnMoveUpVarSelected(wxCommandEvent& event);
+		void OnMoveDownVarSelected(wxCommandEvent& event);
 		void Refresh();
 
         wxToolBar * toolbar;

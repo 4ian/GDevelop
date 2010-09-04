@@ -667,9 +667,14 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     {
         objects->at( i )->SetName( newName );
 
-        if ( scene )
+        if ( scene ) //Change the object name in the scene.
         {
             EventsRefactorer::RenameObjectInEvents(game, *scene, scene->events, ancienNom, newName);
+            for (unsigned int p = 0;p<scene.initialObjectsPositions.size();++p)
+            {
+                if ( initialObjectsPositions[p].objectName == ancienNom ) initialObjectsPositions[p].objectName = newName;
+            }
+
             scene->wasModified = true;
         }
         objectsList->SetItemText( event.GetItem(), event.GetLabel() );

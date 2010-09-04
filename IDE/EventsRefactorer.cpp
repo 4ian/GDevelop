@@ -4,34 +4,23 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
 
-class MathExpressionConstantTokenRenamer : public ConstantTokenFunctor
+class CallbacksForRenamingObject : public ParserCallbacks
 {
     public:
 
-    MathExpressionConstantTokenRenamer(std::string & mathPlainExpression_) :
-    mathPlainExpression(mathPlainExpression_)
+    CallbacksForRenamingObject(std::string & plainExpression_, std::string oldName_, std::string newName_) :
+    plainExpression(plainExpression_),
+    newName(newName_),
+    oldName(oldName_)
     {};
-    virtual ~MathExpressionConstantTokenRenamer() {};
+    virtual ~CallbacksForRenamingObject() {};
 
-    virtual void operator()(std::string text)
+    virtual void OnConstantToken(std::string text)
     {
-        mathPlainExpression += text;
+        plainExpression += text;
     };
 
-    private :
-        std::string & mathPlainExpression;
-};
-
-class MathExpressionStaticFunctionRenamer : public StaticFunctionFunctor
-{
-    public:
-
-    MathExpressionStaticFunctionRenamer(std::string & mathPlainExpression_) :
-    mathPlainExpression(mathPlainExpression_)
-    {};
-    virtual ~MathExpressionStaticFunctionRenamer() {};
-
-    virtual void operator()(std::string functionName, const ExpressionInstruction & instruction)
+    virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction)
     {
         std::string parametersStr;
         for (unsigned int i = 0;i<instruction.parameters.size();++i)
@@ -39,25 +28,30 @@ class MathExpressionStaticFunctionRenamer : public StaticFunctionFunctor
             if ( i != 0 ) parametersStr += ", ";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
-        mathPlainExpression += functionName+"("+parametersStr+")";
+        plainExpression += functionName+"("+parametersStr+")";
     };
 
-    private :
-        std::string & mathPlainExpression;
-};
+    virtual void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction)
+    {
+        //Special case : Function without name is a litteral string.
+        if ( functionName.empty() )
+        {
+            if ( instruction.parameters.empty() ) return;
+            plainExpression += "\""+instruction.parameters[0].GetPlainString()+"\"";
 
-class MathExpressionObjectFunctionRenamer : public ObjectFunctionFunctor
-{
-    public:
+            return;
+        }
 
-    MathExpressionObjectFunctionRenamer(std::string & mathPlainExpression_, std::string oldName_, std::string newName_) :
-    mathPlainExpression(mathPlainExpression_),
-    newName(newName_),
-    oldName(oldName_)
-    {};
-    virtual ~MathExpressionObjectFunctionRenamer() {};
+        std::string parametersStr;
+        for (unsigned int i = 0;i<instruction.parameters.size();++i)
+        {
+            if ( i != 0 ) parametersStr += ", ";
+            parametersStr += instruction.parameters[i].GetPlainString();
+        }
+        plainExpression += functionName+"("+parametersStr+")";
+    };
 
-    virtual void operator()(std::string functionName, const ExpressionInstruction & instruction)
+    virtual void OnObjectFunction(std::string functionName, const ExpressionInstruction & instruction)
     {
         if ( instruction.parameters.empty() ) return;
 
@@ -67,28 +61,25 @@ class MathExpressionObjectFunctionRenamer : public ObjectFunctionFunctor
             if ( i != 1 ) parametersStr += ", ";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
-        mathPlainExpression += (instruction.parameters[0].GetPlainString() == oldName ? newName : instruction.parameters[0].GetPlainString())
+        plainExpression += (instruction.parameters[0].GetPlainString() == oldName ? newName : instruction.parameters[0].GetPlainString())
                                +"."+functionName+"("+parametersStr+")";
     };
 
-    private :
-        std::string & mathPlainExpression;
-        std::string newName;
-        std::string oldName;
-};
+    virtual void OnObjectFunction(std::string functionName, const StrExpressionInstruction & instruction)
+    {
+        if ( instruction.parameters.empty() ) return;
 
-class MathExpressionAutomatismFunctionRenamer : public AutomatismFunctionFunctor
-{
-    public:
+        std::string parametersStr;
+        for (unsigned int i = 1;i<instruction.parameters.size();++i)
+        {
+            if ( i != 1 ) parametersStr += ", ";
+            parametersStr += instruction.parameters[i].GetPlainString();
+        }
+        plainExpression += (instruction.parameters[0].GetPlainString() == oldName ? newName : instruction.parameters[0].GetPlainString())
+                               +"."+functionName+"("+parametersStr+")";
+    };
 
-    MathExpressionAutomatismFunctionRenamer(std::string & mathPlainExpression_, std::string oldName_, std::string newName_) :
-    mathPlainExpression(mathPlainExpression_),
-    newName(newName_),
-    oldName(oldName_)
-    {};
-    virtual ~MathExpressionAutomatismFunctionRenamer() {};
-
-    virtual void operator()(std::string functionName, const ExpressionInstruction & instruction)
+    virtual void OnObjectAutomatismFunction(std::string functionName, const ExpressionInstruction & instruction)
     {
         if ( instruction.parameters.size() < 2 ) return;
 
@@ -98,12 +89,55 @@ class MathExpressionAutomatismFunctionRenamer : public AutomatismFunctionFunctor
             if ( i != 2 ) parametersStr += ", ";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
-        mathPlainExpression += (instruction.parameters[0].GetPlainString() == oldName ? newName : instruction.parameters[0].GetPlainString())
+        plainExpression += (instruction.parameters[0].GetPlainString() == oldName ? newName : instruction.parameters[0].GetPlainString())
                                +"."+instruction.parameters[1].GetPlainString()+"::"+functionName+"("+parametersStr+")";
     };
 
+    virtual void OnObjectAutomatismFunction(std::string functionName, const StrExpressionInstruction & instruction)
+    {
+        if ( instruction.parameters.size() < 2 ) return;
+
+        std::string parametersStr;
+        for (unsigned int i = 2;i<instruction.parameters.size();++i)
+        {
+            if ( i != 2 ) parametersStr += ", ";
+            parametersStr += instruction.parameters[i].GetPlainString();
+        }
+        plainExpression += (instruction.parameters[0].GetPlainString() == oldName ? newName : instruction.parameters[0].GetPlainString())
+                               +"."+instruction.parameters[1].GetPlainString()+"::"+functionName+"("+parametersStr+")";
+    };
+
+    virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression)
+    {
+        std::string newExpression;
+
+        CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
+
+        GDExpressionParser parser(expression.GetPlainString());
+        if ( !parser.ParseMathExpression(game, scene, callbacks) )
+            return false;
+
+        expression = GDExpression(newExpression);
+        return true;
+    }
+
+    virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression)
+    {
+        std::string newExpression;
+
+        CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
+
+        GDExpressionParser parser(expression.GetPlainString());
+        if ( !parser.ParseTextExpression(game, scene, callbacks) )
+            return false;
+
+        expression = GDExpression(newExpression);
+        return true;
+    }
+
+
     private :
-        std::string & mathPlainExpression;
+        std::string & plainExpression;
         std::string newName;
         std::string oldName;
 };
@@ -115,21 +149,30 @@ void EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
         InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetActionInfos(actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
+            //Replace object's name in parameters
             if ( instrInfos.parameters[pNb].type == "object" && actions[aId].GetParameterSafely(pNb).GetPlainString() == oldName )
                 actions[aId].SetParameter(pNb, GDExpression(newName));
+            //Replace object's name in expressions
             else if (instrInfos.parameters[pNb].type == "expression")
             {
                 std::string newExpression;
 
-                MathExpressionConstantTokenRenamer constantTokenRenamer(newExpression);
-                MathExpressionStaticFunctionRenamer staticFunctionRenamer(newExpression);
-                MathExpressionObjectFunctionRenamer objectFunctionRenamer(newExpression, oldName, newName);
-                MathExpressionAutomatismFunctionRenamer automatismFunctionRenamer(newExpression, oldName, newName);
+                CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
                 GDExpressionParser parser(actions[aId].GetParameterSafely(pNb).GetPlainString());
-                parser.ParseMathExpression(game, scene, constantTokenRenamer, staticFunctionRenamer, objectFunctionRenamer, automatismFunctionRenamer);
+                if ( parser.ParseMathExpression(game, scene, callbacks) )
+                    actions[aId].SetParameter(pNb, GDExpression(newExpression));
+            }
+            //Replace object's name in text expressions
+            else if (instrInfos.parameters[pNb].type == "text")
+            {
+                std::string newExpression;
 
-                actions[aId].SetParameter(pNb, GDExpression(newExpression));
+                CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
+
+                GDExpressionParser parser(actions[aId].GetParameterSafely(pNb).GetPlainString());
+                if ( parser.ParseTextExpression(game, scene, callbacks))
+                    actions[aId].SetParameter(pNb, GDExpression(newExpression));
             }
         }
 
@@ -139,30 +182,39 @@ void EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
 
 void EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string oldName, std::string newName)
 {
-    for (unsigned int aId = 0;aId < conditions.size();++aId)
+    for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
-        InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetConditionInfos(conditions[aId].GetType());
+        InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetConditionInfos(conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
-            if ( instrInfos.parameters[pNb].type == "object" && conditions[aId].GetParameterSafely(pNb).GetPlainString() == oldName )
-                conditions[aId].SetParameter(pNb, GDExpression(newName));
+            //Replace object's name in parameters
+            if ( instrInfos.parameters[pNb].type == "object" && conditions[cId].GetParameterSafely(pNb).GetPlainString() == oldName )
+                conditions[cId].SetParameter(pNb, GDExpression(newName));
+            //Replace object's name in expressions
             else if (instrInfos.parameters[pNb].type == "expression")
             {
                 std::string newExpression;
 
-                MathExpressionConstantTokenRenamer constantTokenRenamer(newExpression);
-                MathExpressionStaticFunctionRenamer staticFunctionRenamer(newExpression);
-                MathExpressionObjectFunctionRenamer objectFunctionRenamer(newExpression, oldName, newName);
-                MathExpressionAutomatismFunctionRenamer automatismFunctionRenamer(newExpression, oldName, newName);
+                CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
-                GDExpressionParser parser(conditions[aId].GetParameterSafely(pNb).GetPlainString());
-                parser.ParseMathExpression(game, scene, constantTokenRenamer, staticFunctionRenamer, objectFunctionRenamer, automatismFunctionRenamer);
+                GDExpressionParser parser(conditions[cId].GetParameterSafely(pNb).GetPlainString());
+                if ( parser.ParseMathExpression(game, scene, callbacks) )
+                    conditions[cId].SetParameter(pNb, GDExpression(newExpression));
+            }
+            //Replace object's name in text expressions
+            else if (instrInfos.parameters[pNb].type == "text")
+            {
+                std::string newExpression;
 
-                conditions[aId].SetParameter(pNb, GDExpression(newExpression));
+                CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
+
+                GDExpressionParser parser(conditions[cId].GetParameterSafely(pNb).GetPlainString());
+                if ( parser.ParseMathExpression(game, scene, callbacks) )
+                    conditions[cId].SetParameter(pNb, GDExpression(newExpression));
             }
         }
 
-        if ( !conditions[aId].GetSubInstructions().empty() ) RenameObjectInConditions(game, scene, conditions[aId].GetSubInstructions(), oldName, newName);
+        if ( !conditions[cId].GetSubInstructions().empty() ) RenameObjectInConditions(game, scene, conditions[cId].GetSubInstructions(), oldName, newName);
     }
 }
 

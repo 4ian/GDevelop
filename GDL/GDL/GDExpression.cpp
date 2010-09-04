@@ -55,81 +55,55 @@ bool GDExpression::PrepareForEvaluation(const Game & game, const Scene & scene)
     return ok;
 }
 
-class MathExpressionConstantTokenFunctor : public ConstantTokenFunctor
+/**
+ * Callbacks for parser, designed to prepare an expression for mathematical evaluations
+ */
+class CallbacksForPreparingMathEvaluation : public ParserCallbacks
 {
     public:
 
-    MathExpressionConstantTokenFunctor(std::string & mathPlainExpression_) :
-    mathPlainExpression(mathPlainExpression_)
+    CallbacksForPreparingMathEvaluation(std::string & mathPlainExpression_, std::vector < ExpressionInstruction > & mathExpressionFunctions_) :
+    mathPlainExpression(mathPlainExpression_),
+    mathExpressionFunctions(mathExpressionFunctions_)
     {};
-    virtual ~MathExpressionConstantTokenFunctor() {};
+    virtual ~CallbacksForPreparingMathEvaluation() {};
 
-    virtual void operator()(std::string text)
+    virtual void OnConstantToken(std::string text)
     {
         mathPlainExpression += text;
     };
 
-    private :
-        std::string & mathPlainExpression;
-};
-
-class MathExpressionStaticFunctionFunctor : public StaticFunctionFunctor
-{
-    public:
-
-    MathExpressionStaticFunctionFunctor(std::string & mathPlainExpression_, std::vector < ExpressionInstruction > & mathExpressionFunctions_) :
-    mathPlainExpression(mathPlainExpression_),
-    mathExpressionFunctions(mathExpressionFunctions_)
-    {};
-    virtual ~MathExpressionStaticFunctionFunctor() {};
-
-    virtual void operator()(std::string functionName, const ExpressionInstruction & instruction)
+    virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction)
     {
         mathExpressionFunctions.push_back(instruction);
         mathPlainExpression += "x"+ToString(mathExpressionFunctions.size());
     };
 
-    private :
-        std::string & mathPlainExpression;
-        std::vector < ExpressionInstruction > & mathExpressionFunctions;
-};
-
-class MathExpressionObjectFunctionFunctor : public ObjectFunctionFunctor
-{
-    public:
-
-    MathExpressionObjectFunctionFunctor(std::string & mathPlainExpression_, std::vector < ExpressionInstruction > & mathExpressionFunctions_) :
-    mathPlainExpression(mathPlainExpression_),
-    mathExpressionFunctions(mathExpressionFunctions_)
-    {};
-    virtual ~MathExpressionObjectFunctionFunctor() {};
-
-    virtual void operator()(std::string functionName, const ExpressionInstruction & instruction)
+    virtual void OnObjectFunction(std::string functionName, const ExpressionInstruction & instruction)
     {
         mathExpressionFunctions.push_back(instruction);
         mathPlainExpression += "x"+ToString(mathExpressionFunctions.size());
     };
 
-    private :
-        std::string & mathPlainExpression;
-        std::vector < ExpressionInstruction > & mathExpressionFunctions;
-};
-
-class MathExpressionAutomatismFunctionFunctor : public AutomatismFunctionFunctor
-{
-    public:
-
-    MathExpressionAutomatismFunctionFunctor(std::string & mathPlainExpression_, std::vector < ExpressionInstruction > & mathExpressionFunctions_) :
-    mathPlainExpression(mathPlainExpression_),
-    mathExpressionFunctions(mathExpressionFunctions_)
-    {};
-    virtual ~MathExpressionAutomatismFunctionFunctor() {};
-
-    virtual void operator()(std::string functionName, const ExpressionInstruction & instruction)
+    virtual void OnObjectAutomatismFunction(std::string functionName, const ExpressionInstruction & instruction)
     {
         mathExpressionFunctions.push_back(instruction);
         mathPlainExpression += "x"+ToString(mathExpressionFunctions.size());
     };
+
+    virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression)
+    {
+        return expression.PrepareForMathEvaluationOnly(game, scene);
+    }
+
+    virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression)
+    {
+        return expression.PrepareForTextEvaluationOnly(game, scene);
+    }
+
+    virtual void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction){};
+    virtual void OnObjectFunction(std::string functionName, const StrExpressionInstruction & instruction){};
+    virtual void OnObjectAutomatismFunction(std::string functionName, const StrExpressionInstruction & instruction){};
 
     private :
         std::string & mathPlainExpression;
@@ -144,13 +118,10 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
     mathExpressionFunctions.clear();
 
     //Prepare functors
-    MathExpressionConstantTokenFunctor constantTokenFunctor(mathPlainExpression);
-    MathExpressionStaticFunctionFunctor staticFunctionFunctor(mathPlainExpression, mathExpressionFunctions);
-    MathExpressionObjectFunctionFunctor objectFunctionFunctor(mathPlainExpression, mathExpressionFunctions);
-    MathExpressionAutomatismFunctionFunctor automatismFunctionFunctor(mathPlainExpression, mathExpressionFunctions);
+    CallbacksForPreparingMathEvaluation callbacks(mathPlainExpression, mathExpressionFunctions);
 
     //Call parser
-    if ( !expressionParser.ParseMathExpression(game, scene, constantTokenFunctor, staticFunctionFunctor, objectFunctionFunctor, automatismFunctionFunctor) )
+    if ( !expressionParser.ParseMathExpression(game, scene, callbacks) )
     {
         //Parsing failed
         #if defined(GDE)
@@ -188,66 +159,47 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
     return true;
 }
 
-
-class TextExpressionConstantTokenFunctor : public ConstantTokenFunctor
+/**
+ * Callbacks for parser, designed to prepare an expression for text evaluation
+ */
+class CallbacksForPreparingTextEvaluation : public ParserCallbacks
 {
     public:
 
-    TextExpressionConstantTokenFunctor() {};
-    virtual ~TextExpressionConstantTokenFunctor() {};
-
-    private :
-};
-
-class TextExpressionStaticFunctionFunctor : public StaticFunctionFunctor
-{
-    public:
-
-    TextExpressionStaticFunctionFunctor(std::vector < StrExpressionInstruction > & textExpressionFunctions_) :
+    CallbacksForPreparingTextEvaluation(std::vector < StrExpressionInstruction > & textExpressionFunctions_) :
     textExpressionFunctions(textExpressionFunctions_)
     {};
-    virtual ~TextExpressionStaticFunctionFunctor() {};
+    virtual ~CallbacksForPreparingTextEvaluation() {};
 
-    virtual void operator()(std::string functionName, const StrExpressionInstruction & instruction)
+    virtual void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction)
     {
         textExpressionFunctions.push_back(instruction);
     };
 
-    private :
-        std::vector < StrExpressionInstruction > & textExpressionFunctions;
-};
-
-class TextExpressionObjectFunctionFunctor : public ObjectFunctionFunctor
-{
-    public:
-
-    TextExpressionObjectFunctionFunctor(std::vector < StrExpressionInstruction > & textExpressionFunctions_) :
-    textExpressionFunctions(textExpressionFunctions_)
-    {};
-    virtual ~TextExpressionObjectFunctionFunctor() {};
-
-    virtual void operator()(std::string functionName, const StrExpressionInstruction & instruction)
+    virtual void OnObjectFunction(std::string functionName, const StrExpressionInstruction & instruction)
     {
         textExpressionFunctions.push_back(instruction);
     };
 
-    private :
-        std::vector < StrExpressionInstruction > & textExpressionFunctions;
-};
-
-class TextExpressionAutomatismFunctionFunctor : public AutomatismFunctionFunctor
-{
-    public:
-
-    TextExpressionAutomatismFunctionFunctor(std::vector < StrExpressionInstruction > & textExpressionFunctions_) :
-    textExpressionFunctions(textExpressionFunctions_)
-    {};
-    virtual ~TextExpressionAutomatismFunctionFunctor() {};
-
-    virtual void operator()(std::string functionName, const StrExpressionInstruction & instruction)
+    virtual void OnObjectAutomatismFunction(std::string functionName, const StrExpressionInstruction & instruction)
     {
         textExpressionFunctions.push_back(instruction);
     };
+
+    virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression)
+    {
+        return expression.PrepareForMathEvaluationOnly(game, scene);
+    }
+
+    virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression)
+    {
+        return expression.PrepareForTextEvaluationOnly(game, scene);
+    }
+
+    virtual void OnConstantToken(std::string text){};
+    virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction){};
+    virtual void OnObjectFunction(std::string functionName, const ExpressionInstruction & instruction){};
+    virtual void OnObjectAutomatismFunction(std::string functionName, const ExpressionInstruction & instruction){};
 
     private :
         std::vector < StrExpressionInstruction > & textExpressionFunctions;
@@ -259,13 +211,10 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
     textExpressionFunctions.clear();
 
     //Prepare functors
-    TextExpressionConstantTokenFunctor constantTokenFunctor;
-    TextExpressionStaticFunctionFunctor staticFunctionFunctor(textExpressionFunctions);
-    TextExpressionObjectFunctionFunctor objectFunctionFunctor(textExpressionFunctions);
-    TextExpressionAutomatismFunctionFunctor automatismFunctionFunctor(textExpressionFunctions);
+    CallbacksForPreparingTextEvaluation callbacks(textExpressionFunctions);
 
     //Call parser
-    if ( !expressionParser.ParseTextExpression(game, scene, constantTokenFunctor, staticFunctionFunctor, objectFunctionFunctor, automatismFunctionFunctor) )
+    if ( !expressionParser.ParseTextExpression(game, scene, callbacks) )
     {
         //Parsing failed
         #if defined(GDE)

@@ -116,6 +116,14 @@ class GD_API ListVariable
             return variables;
         }
 
+        /**
+         * Return the internal vector containing the variables.
+         */
+        inline vector<Variable> & GetVariablesVector()
+        {
+            return variables;
+        }
+
     private:
         vector < Variable > variables;
 };

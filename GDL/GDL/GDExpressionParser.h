@@ -4,10 +4,7 @@
 #include <string>
 #include <vector>
 class GDExpression;
-class ConstantTokenFunctor;
-class StaticFunctionFunctor;
-class ObjectFunctionFunctor;
-class AutomatismFunctionFunctor;
+class ParserCallbacks;
 class Game;
 class Scene;
 class ParameterInfo;
@@ -29,21 +26,13 @@ class GD_API GDExpressionParser
          * Parse the expression, calling each functor when necessary
          * \return True if expression was correctly parsed.
          */
-        bool ParseMathExpression(const Game & game, const Scene & scene,
-                                 ConstantTokenFunctor & constantTokenFunctor,
-                                 StaticFunctionFunctor & staticFunctionFunctor,
-                                 ObjectFunctionFunctor & objectFunctionFunctor,
-                                 AutomatismFunctionFunctor & automatismFunctionFunctor);
+        bool ParseMathExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks);
 
         /**
          * Parse the expression, calling each functor when necessary
          * \return True if expression was correctly parsed.
          */
-        bool ParseTextExpression(const Game & game, const Scene & scene,
-                                 ConstantTokenFunctor & constantTokenFunctor,
-                                 StaticFunctionFunctor & staticFunctionFunctor,
-                                 ObjectFunctionFunctor & objectFunctionFunctor,
-                                 AutomatismFunctionFunctor & automatismFunctionFunctor);
+        bool ParseTextExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks);
 
 
         #if defined(GDE)
@@ -56,57 +45,40 @@ class GD_API GDExpressionParser
         /**
          * Tool function to add a parameter
          */
-        bool AddParameterToList(const Game & game, const Scene & scene, std::vector < GDExpression > & parameters, std::string parameterStr, std::vector < ParameterInfo > parametersInfos, const size_t positionInExpression);
+        bool AddParameterToList(const Game & game, const Scene & scene, ParserCallbacks &, std::vector < GDExpression > & parameters, std::string parameterStr, std::vector < ParameterInfo > parametersInfos, const size_t positionInExpression);
 
         /**
          * Tool function to prepare a parameter
          */
-        bool PrepareParameter(const Game & game, const Scene & scene, GDExpression & parameter, const ParameterInfo & parametersInfo, const size_t positionInExpression);
+        bool PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks &, GDExpression & parameter, const ParameterInfo & parametersInfo, const size_t positionInExpression);
 
         std::string expressionPlainString;
 };
 
-class ConstantTokenFunctor
+/** \brief Callbacks called by parser during parsing
+ *
+ * Parser will call the appropriate functions during parsing, allowing to do special works.
+ */
+class ParserCallbacks
 {
     public:
 
-    ConstantTokenFunctor() {};
-    virtual ~ConstantTokenFunctor() {};
+    ParserCallbacks() {};
+    virtual ~ParserCallbacks() {};
 
-    virtual void operator()(std::string text){};
-};
+    virtual void OnConstantToken(std::string text) = 0;
 
-class StaticFunctionFunctor
-{
-    public:
+    virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction) = 0;
+    virtual void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction) = 0;
 
-    StaticFunctionFunctor() {};
-    virtual ~StaticFunctionFunctor() {};
+    virtual void OnObjectFunction(std::string functionName, const ExpressionInstruction & instruction) = 0;
+    virtual void OnObjectFunction(std::string functionName, const StrExpressionInstruction & instruction) = 0;
 
-    virtual void operator()(std::string functionName, const ExpressionInstruction & instruction){};
-    virtual void operator()(std::string functionName, const StrExpressionInstruction & instruction){};
-};
+    virtual void OnObjectAutomatismFunction(std::string functionName, const ExpressionInstruction & instruction) = 0;
+    virtual void OnObjectAutomatismFunction(std::string functionName, const StrExpressionInstruction & instruction) = 0;
 
-class ObjectFunctionFunctor
-{
-    public:
-
-    ObjectFunctionFunctor() {};
-    virtual ~ObjectFunctionFunctor() {};
-
-    virtual void operator()(std::string functionName, const ExpressionInstruction & instruction){};
-    virtual void operator()(std::string functionName, const StrExpressionInstruction & instruction){};
-};
-
-class AutomatismFunctionFunctor
-{
-    public:
-
-    AutomatismFunctionFunctor() {};
-    virtual ~AutomatismFunctionFunctor() {};
-
-    virtual void operator()(std::string functionName, const ExpressionInstruction & instruction){};
-    virtual void operator()(std::string functionName, const StrExpressionInstruction & instruction){};
+    virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression) = 0;
+    virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression) = 0;
 };
 
 #endif // GDEXPRESSIONPARSER_H

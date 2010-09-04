@@ -31,11 +31,7 @@ std::string ReplaceTildesBySpaces(std::string text)
     return text;
 }
 
-bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & scene,
-                                             ConstantTokenFunctor & constantTokenFunctor,
-                                             StaticFunctionFunctor & staticFunctionFunctor,
-                                             ObjectFunctionFunctor & objectFunctionFunctor,
-                                             AutomatismFunctionFunctor & automatismFunctionFunctor)
+bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks)
 {
 
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
@@ -159,7 +155,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                         //Add the character to the current parameter or terminate the latter
                         if ( (expression[parametersEnd] == ',' && level == 0) && takeSymbolsInAccount )
                         {
-                            if ( !AddParameterToList(game, scene, parameters, currentParameterStr, instructionInfos.parameters, parametersEnd) )
+                            if ( !AddParameterToList(game, scene, callbacks, parameters, currentParameterStr, instructionInfos.parameters, parametersEnd) )
                                 return false;
 
                             currentParameterStr.clear();
@@ -171,7 +167,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                     }
                     if ( currentParameterStr.find_first_not_of(" ") != string::npos ) //Add last parameter if needed
                     {
-                        if ( !AddParameterToList(game, scene, parameters, currentParameterStr, instructionInfos.parameters, parametersEnd) )
+                        if ( !AddParameterToList(game, scene, callbacks, parameters, currentParameterStr, instructionInfos.parameters, parametersEnd) )
                             return false;
                     }
 
@@ -209,10 +205,10 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
 
                 instruction.parameters = parameters;
 
-                constantTokenFunctor(expression.substr(parsePosition, nameStart-parsePosition));
-                if      ( instruction.objectFunction ) objectFunctionFunctor(functionName, instruction);
-                else if ( instruction.automatismFunction ) automatismFunctionFunctor(functionName, instruction);
-                else if ( instruction.function ) staticFunctionFunctor(functionName, instruction);
+                callbacks.OnConstantToken(expression.substr(parsePosition, nameStart-parsePosition));
+                if      ( instruction.objectFunction ) callbacks.OnObjectFunction(functionName, instruction);
+                else if ( instruction.automatismFunction ) callbacks.OnObjectAutomatismFunction(functionName, instruction);
+                else if ( instruction.function ) callbacks.OnStaticFunction(functionName, instruction);
 
                 parsePosition = parametersEnd+1;
                 firstPointPos = expression.find(".", parametersEnd+1);
@@ -220,7 +216,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
             }
             else //Math function or math constant : Pass it.
             {
-                constantTokenFunctor(expression.substr(parsePosition, functionNameEnd+1-parsePosition));
+                callbacks.OnConstantToken(expression.substr(parsePosition, functionNameEnd+1-parsePosition));
                 parsePosition = functionNameEnd+1;
                 firstPointPos = expression.find(".", functionNameEnd+1);
                 firstParPos = expression.find("(", functionNameEnd+1);
@@ -228,7 +224,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
         }
         else //Not a function call : Pass it
         {
-            constantTokenFunctor(expression.substr(parsePosition, nameEnd+1-parsePosition));
+            callbacks.OnConstantToken(expression.substr(parsePosition, nameEnd+1-parsePosition));
             parsePosition = nameEnd+1;
             firstPointPos = expression.find(".", nameEnd+1);
             firstParPos = expression.find("(", nameEnd+1);
@@ -236,17 +232,13 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
     }
 
     if ( parsePosition < expression.length() )
-        constantTokenFunctor(expression.substr(parsePosition, expression.length()));
+        callbacks.OnConstantToken(expression.substr(parsePosition, expression.length()));
 
     return true;
 }
 
 
-bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & scene,
-                                             ConstantTokenFunctor & constantTokenFunctor,
-                                             StaticFunctionFunctor & staticFunctionFunctor,
-                                             ObjectFunctionFunctor & objectFunctionFunctor,
-                                             AutomatismFunctionFunctor & automatismFunctionFunctor)
+bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks)
 {
     gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
     string expression = expressionPlainString;
@@ -275,6 +267,8 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
     {
         if ( firstQuotePos < firstPointPos && firstQuotePos < firstParPos ) //Adding a constant text
         {
+            callbacks.OnConstantToken(expression.substr(parsePosition, firstQuotePos-parsePosition));
+
             //Finding start and end of quotes
             size_t finalQuotePosition = expression.find("\"", firstQuotePos+1);
             while ( finalQuotePosition == expression.find("\\\"", finalQuotePosition-1)+1)
@@ -307,7 +301,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             parameters.push_back(finalText);
             instruction.parameters = parameters;
 
-            staticFunctionFunctor("", instruction);
+            callbacks.OnStaticFunction("", instruction);
 
             parsePosition = finalQuotePosition+1;
         }
@@ -317,6 +311,8 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             size_t nameEnd = firstPointPos < firstParPos ? firstPointPos : firstParPos;
             size_t nameStart = expression.find_last_of(possibleSeparator, nameEnd-1);
             nameStart++;
+
+            callbacks.OnConstantToken(expression.substr(parsePosition, nameStart-parsePosition));
 
             string nameBefore = expression.substr(nameStart, nameEnd-nameStart);
             string objectName = ReplaceTildesBySpaces(nameBefore);
@@ -396,12 +392,12 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 //Preparing parameters
                 for (unsigned int i = 0;i<parameters.size() && i<parametersInfos.size();++i)
                 {
-                    if ( !PrepareParameter(game, scene, parameters[i], parametersInfos[i], functionNameEnd) )
+                    if ( !PrepareParameter(game, scene, callbacks, parameters[i], parametersInfos[i], functionNameEnd) )
                         return false;
                 }
 
                 instruction.parameters = parameters;
-                staticFunctionFunctor(functionName, instruction);
+                callbacks.OnStaticFunction(functionName, instruction);
             }
             //Then an object member expression
             else if ( !nameIsFunction && extensionsManager->HasObjectStrExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
@@ -423,12 +419,12 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 //Preparing parameters
                 for (unsigned int i = 0;i<parameters.size() && i<parametersInfos.size();++i)
                 {
-                    if ( !PrepareParameter(game, scene, parameters[i], parametersInfos[i], functionNameEnd) )
+                    if ( !PrepareParameter(game, scene, callbacks, parameters[i], parametersInfos[i], functionNameEnd) )
                         return false;
                 }
 
                 instruction.parameters = parameters;
-                objectFunctionFunctor(functionName, instruction);
+                callbacks.OnObjectFunction(functionName, instruction);
             }
             //And search automatisms expressions
             else
@@ -474,12 +470,12 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                             //Preparing parameters
                             for (unsigned int i = 0;i<parameters.size() && i<parametersInfos.size();++i)
                             {
-                                if ( !PrepareParameter(game, scene, parameters[i], parametersInfos[i], functionNameEnd) )
+                                if ( !PrepareParameter(game, scene, callbacks, parameters[i], parametersInfos[i], functionNameEnd) )
                                     return false;
                             }
 
                             instruction.parameters = parameters;
-                            automatismFunctionFunctor(functionName, instruction);
+                            callbacks.OnObjectAutomatismFunction(functionName, instruction);
                         }
                     }
                 }
@@ -496,7 +492,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
                     instruction.function = &ExpToStr;
                     instruction.parameters = (implicitConversionParameters);
-                    staticFunctionFunctor(functionName, instruction);
+                    callbacks.OnStaticFunction(functionName, instruction);
                 }
             }
 
@@ -547,7 +543,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
     return true;
 }
 
-bool GDExpressionParser::AddParameterToList(const Game & game, const Scene & scene, std::vector < GDExpression > & parameters, string parameterStr, std::vector < ParameterInfo > parametersInfos, const size_t positionInExpression)
+bool GDExpressionParser::AddParameterToList(const Game & game, const Scene & scene, ParserCallbacks & callbacks, std::vector < GDExpression > & parameters, string parameterStr, std::vector < ParameterInfo > parametersInfos, const size_t positionInExpression)
 {
     parameters.push_back(GDExpression(parameterStr));
     if ( parameters.size()-1 >= parametersInfos.size() )
@@ -560,42 +556,26 @@ bool GDExpressionParser::AddParameterToList(const Game & game, const Scene & sce
         #endif
     }
 
-    if ( !PrepareParameter(game, scene, parameters.back(), parametersInfos[parameters.size()-1], positionInExpression) )
+    if ( !PrepareParameter(game, scene, callbacks, parameters.back(), parametersInfos[parameters.size()-1], positionInExpression) )
         return false;
 
     return true;
 }
 
-bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene, GDExpression & parameter, const ParameterInfo & parametersInfo, const size_t positionInExpression)
+bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks & callbacks, GDExpression & parameter, const ParameterInfo & parametersInfo, const size_t positionInExpression)
 {
     if ( parametersInfo.type == "expression" )
     {
-        if ( !parameter.PrepareForMathEvaluationOnly(game, scene) )
+        if ( !callbacks.OnSubMathExpression(game, scene, parameter) )
         {
-            #if defined(GDE)
-            firstErrorStr = parameter.GetFirstErrorDuringPreprocessingText();
-            if ( parameter.GetFirstErrorDuringPreprocessingPosition() != string::npos )
-                firstErrorPos = positionInExpression+parameter.GetFirstErrorDuringPreprocessingPosition();
-            else
-                firstErrorPos = string::npos;
-
             return false;
-            #endif
         }
     }
     else if ( parametersInfo.type == "text" || parametersInfo.type == "layer" || parametersInfo.type == "color" || parametersInfo.type == "file" || parametersInfo.type == "joyaxis" )
     {
-        if ( !parameter.PrepareForTextEvaluationOnly(game, scene) )
+        if ( !callbacks.OnSubTextExpression(game, scene, parameter) )
         {
-            #if defined(GDE)
-            firstErrorStr = parameter.GetFirstErrorDuringPreprocessingText();
-            if ( parameter.GetFirstErrorDuringPreprocessingPosition() != string::npos )
-                firstErrorPos = positionInExpression+parameter.GetFirstErrorDuringPreprocessingPosition();
-            else
-                firstErrorPos = string::npos;
-
             return false;
-            #endif
         }
     }
 

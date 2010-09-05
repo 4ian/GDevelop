@@ -8576,16 +8576,78 @@
 	<string>
 	<vector>
 
-1275845862 d:\florian\programmation\gamedevelop\gdl\gdl\edittextdialog.h
+1283712124 d:\florian\programmation\gamedevelop\gdl\gdl\edittextdialog.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
-	<wx/textctrl.h>
 	<wx/statline.h>
 	<wx/button.h>
 	<wx/dialog.h>
+	<wx/stc/stc.h>
 	<string>
 	<vector>
+
+1253308449 c:\libs\wxwidgets\include\wx\stc\stc.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/dnd.h"
+	"wx/stopwatch.h"
+	"wx/textentry.h"
+	"wx/textctrl.h"
+
+1253308527 c:\libs\wxwidgets\include\wx\dnd.h
+	"wx/defs.h"
+	"wx/dataobj.h"
+	"wx/cursor.h"
+	"wx/msw/ole/dropsrc.h"
+	"wx/msw/ole/droptgt.h"
+	"wx/motif/dnd.h"
+	"wx/x11/dnd.h"
+	"wx/gtk/dnd.h"
+	"wx/gtk1/dnd.h"
+	"wx/osx/dnd.h"
+	"wx/os2/dnd.h"
+
+1253308459 c:\libs\wxwidgets\include\wx\msw\ole\dropsrc.h
+
+1253308459 c:\libs\wxwidgets\include\wx\msw\ole\droptgt.h
+
+1253308443 c:\libs\wxwidgets\include\wx\motif\dnd.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/dataobj.h"
+	"wx/cursor.h"
+
+1253308467 c:\libs\wxwidgets\include\wx\x11\dnd.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/dataobj.h"
+	"wx/cursor.h"
+
+1253308494 c:\libs\wxwidgets\include\wx\gtk\dnd.h
+	"wx/icon.h"
+
+1253308446 c:\libs\wxwidgets\include\wx\gtk1\dnd.h
+	"wx/object.h"
+	"wx/string.h"
+	"wx/dataobj.h"
+	"wx/cursor.h"
+	"wx/icon.h"
+	"wx/gdicmn.h"
+
+1253308488 c:\libs\wxwidgets\include\wx\osx\dnd.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/string.h"
+	"wx/dataobj.h"
+	"wx/cursor.h"
+
+1253308475 c:\libs\wxwidgets\include\wx\os2\dnd.h
+	<os2.h>
+	<pmstddlg.h>
 
 1275849132 source:d:\florian\programmation\gamedevelop\ide\choicejoyaxis.cpp
 	"ChoiceJoyAxis.h"
@@ -9095,14 +9157,14 @@
 	<string>
 	<vector>
 
-1274814375 d:\florian\programmation\gamedevelop\gdl\gdl\editexpression.h
+1283713353 d:\florian\programmation\gamedevelop\gdl\gdl\editexpression.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
-	<wx/textctrl.h>
 	<wx/bmpbuttn.h>
 	<wx/button.h>
 	<wx/dialog.h>
+	<wx/stc/stc.h>
 	<wx/imaglist.h>
 	"GDL/Game.h"
 	"GDL/Scene.h"
@@ -10578,60 +10640,6 @@
 	<wx/dnd.h>
 	<wx/log.h>
 
-1253308527 c:\libs\wxwidgets\include\wx\dnd.h
-	"wx/defs.h"
-	"wx/dataobj.h"
-	"wx/cursor.h"
-	"wx/msw/ole/dropsrc.h"
-	"wx/msw/ole/droptgt.h"
-	"wx/motif/dnd.h"
-	"wx/x11/dnd.h"
-	"wx/gtk/dnd.h"
-	"wx/gtk1/dnd.h"
-	"wx/osx/dnd.h"
-	"wx/os2/dnd.h"
-
-1253308459 c:\libs\wxwidgets\include\wx\msw\ole\dropsrc.h
-
-1253308459 c:\libs\wxwidgets\include\wx\msw\ole\droptgt.h
-
-1253308443 c:\libs\wxwidgets\include\wx\motif\dnd.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/string.h"
-	"wx/dataobj.h"
-	"wx/cursor.h"
-
-1253308467 c:\libs\wxwidgets\include\wx\x11\dnd.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/string.h"
-	"wx/dataobj.h"
-	"wx/cursor.h"
-
-1253308494 c:\libs\wxwidgets\include\wx\gtk\dnd.h
-	"wx/icon.h"
-
-1253308446 c:\libs\wxwidgets\include\wx\gtk1\dnd.h
-	"wx/object.h"
-	"wx/string.h"
-	"wx/dataobj.h"
-	"wx/cursor.h"
-	"wx/icon.h"
-	"wx/gdicmn.h"
-
-1253308488 c:\libs\wxwidgets\include\wx\osx\dnd.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/string.h"
-	"wx/string.h"
-	"wx/dataobj.h"
-	"wx/cursor.h"
-
-1253308475 c:\libs\wxwidgets\include\wx\os2\dnd.h
-	<os2.h>
-	<pmstddlg.h>
-
 1278598250 d:\florian\programmation\gamedevelop\ide\game_develop_editormain.h
 	<wx/sizer.h>
 	<wx/menu.h>
@@ -11415,7 +11423,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1283344302 source:d:\florian\programmation\gamedevelop\ide\editorobjectlist.cpp
+1283677439 source:d:\florian\programmation\gamedevelop\ide\editorobjectlist.cpp
 	"EditorObjectList.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -13134,5 +13142,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1283282351 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1283702689 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

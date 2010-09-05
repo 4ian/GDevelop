@@ -29,7 +29,7 @@
 		<Cursor position="288" topLine="0" />
 	</File>
 	<File name="ChoixAction.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="44839" topLine="926" />
+		<Cursor position="18125" topLine="328" />
 	</File>
 	<File name="ChoixAction.h" open="0" top="0" tabpos="4">
 		<Cursor position="596" topLine="6" />
@@ -154,8 +154,8 @@
 	<File name="EditorLayers.h" open="0" top="0" tabpos="10">
 		<Cursor position="2112" topLine="61" />
 	</File>
-	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="43878" topLine="1047" />
+	<File name="EditorObjectList.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="30446" topLine="655" />
 	</File>
 	<File name="EditorObjectList.h" open="0" top="0" tabpos="2">
 		<Cursor position="4246" topLine="114" />
@@ -184,11 +184,11 @@
 	<File name="EdittimeScene.h" open="0" top="0" tabpos="2">
 		<Cursor position="1631" topLine="58" />
 	</File>
-	<File name="EventsRefactorer.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="294" topLine="2" />
+	<File name="EventsRefactorer.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="526" topLine="0" />
 	</File>
-	<File name="EventsRefactorer.h" open="1" top="1" tabpos="4">
-		<Cursor position="677" topLine="6" />
+	<File name="EventsRefactorer.h" open="1" top="0" tabpos="3">
+		<Cursor position="172" topLine="3" />
 	</File>
 	<File name="Extensions.cpp" open="0" top="0" tabpos="21">
 		<Cursor position="11989" topLine="318" />
@@ -232,10 +232,10 @@
 	<File name="ImportImage.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="29134" topLine="422" />
 	</File>
-	<File name="InitialVariablesDialog.cpp" open="1" top="0" tabpos="3">
+	<File name="InitialVariablesDialog.cpp" open="1" top="0" tabpos="2">
 		<Cursor position="11122" topLine="213" />
 	</File>
-	<File name="InitialVariablesDialog.h" open="1" top="0" tabpos="1">
+	<File name="InitialVariablesDialog.h" open="1" top="1" tabpos="1">
 		<Cursor position="1480" topLine="48" />
 	</File>
 	<File name="MAJ.cpp" open="0" top="0" tabpos="13">
@@ -259,8 +259,8 @@
 	<File name="ObjectTypeChoice.h" open="0" top="0" tabpos="0">
 		<Cursor position="802" topLine="10" />
 	</File>
-	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="4501" topLine="134" />
+	<File name="PlayerUnitTests.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="5683" topLine="177" />
 	</File>
 	<File name="Portable.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="5778" topLine="127" />

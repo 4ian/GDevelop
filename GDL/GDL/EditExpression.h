@@ -7,12 +7,13 @@
 #include <wx/treectrl.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
-#include <wx/textctrl.h>
 #include <wx/bmpbuttn.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
+#include <wx/stc/stc.h>
 //*)
 #include <wx/imaglist.h>
+
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 class ParameterInfo;
@@ -54,9 +55,9 @@ class GD_API EditExpression: public wxDialog
 		wxButton* AddPropBt;
 		wxButton* intBt;
 		wxButton* PlusBt;
+		wxStyledTextCtrl* ExpressionEdit;
 		wxButton* MinusBt;
 		wxButton* MultBt;
-		wxTextCtrl* ExpressionEdit;
 		wxStaticText* StaticText4;
 		wxButton* PFBt;
 		wxButton* Button8;
@@ -64,7 +65,6 @@ class GD_API EditExpression: public wxDialog
 		//*)
 
 		string expression;
-		void RefreshExpressionEdit();
 		void RefreshLists();
 
 		//Item sélectionné dans la liste
@@ -74,7 +74,7 @@ class GD_API EditExpression: public wxDialog
 	protected:
 
 		//(*Identifiers(EditExpression)
-		static const long ID_TEXTCTRL1;
+		static const long ID_CUSTOM1;
 		static const long ID_BUTTON1;
 		static const long ID_STATICTEXT5;
 		static const long ID_STATICTEXT1;
@@ -111,7 +111,6 @@ class GD_API EditExpression: public wxDialog
 
 		//(*Handlers(EditExpression)
 		void OnOkBtClick(wxCommandEvent& event);
-		void OnExpressionEditText(wxCommandEvent& event);
 		void OnPlusBtClick(wxCommandEvent& event);
 		void OnMinusBtClick(wxCommandEvent& event);
 		void OnMultBtClick(wxCommandEvent& event);
@@ -138,7 +137,10 @@ class GD_API EditExpression: public wxDialog
 		void OnintBtClick(wxCommandEvent& event);
 		void OnObjListItemDoubleClicked(wxTreeEvent& event);
 		void OnValListItemDoubleClicked(wxTreeEvent& event);
+		void OnCustom1Paint(wxPaintEvent& event);
 		//*)
+		void TextModified(wxStyledTextEvent& event);
+		void UpdateTextCtrl(wxStyledTextEvent& event);
 		std::string ShowParameterDialog(const ParameterInfo & parameter);
 
 		wxImageList * imageListObj;

@@ -16,10 +16,10 @@
 					<growablecols>0</growablecols>
 					<growablerows>0</growablerows>
 					<object class="sizeritem">
-						<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="ExpressionEdit" member="yes">
-							<size>428,23</size>
-							<style>wxTE_MULTILINE|wxTE_RICH</style>
-							<handler function="OnExpressionEditText" entry="EVT_TEXT" />
+						<object class="Custom" name="ID_CUSTOM1" subclass="wxStyledTextCtrl" variable="ExpressionEdit" member="yes">
+							<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),$(STYLE),$(NAME));</creating_code>
+							<include_file>wx/stc/stc.h</include_file>
+							<size>460,40</size>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>

@@ -84,6 +84,7 @@
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
 					<Add option="-lwxmsw29d_xrc" />
+					<Add option="-lwxmsw29d_stc" />
 					<Add option="-lwxmsw29d_richtext" />
 					<Add option="-lwxmsw29d_ribbon" />
 					<Add option="-lwxmsw29d_aui" />
@@ -194,6 +195,7 @@
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
 					<Add option="-lwxmsw29_xrc" />
+					<Add option="-lwxmsw29_stc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
 					<Add option="-lwxmsw29_aui" />
@@ -305,6 +307,7 @@
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
 					<Add option="-lwxmsw29_xrc" />
+					<Add option="-lwxmsw29_stc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
 					<Add option="-lwxmsw29_aui" />

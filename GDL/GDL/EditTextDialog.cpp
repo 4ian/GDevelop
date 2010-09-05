@@ -5,6 +5,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
+#include <wx/stc/stc.h>
 #include "GDL/EditExpression.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ChooseObject.h"
@@ -22,7 +23,7 @@
 #include "GDL/ChooseAutomatismDlg.h"
 
 //(*IdInit(EditTextDialog)
-const long EditTextDialog::ID_TEXTCTRL1 = wxNewId();
+const long EditTextDialog::ID_CUSTOM1 = wxNewId();
 const long EditTextDialog::ID_STATICTEXT5 = wxNewId();
 const long EditTextDialog::ID_BUTTON2 = wxNewId();
 const long EditTextDialog::ID_BUTTON1 = wxNewId();
@@ -74,7 +75,7 @@ mainObjectsName(mainObjectsName_)
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
 	FlexGridSizer3->AddGrowableRow(0);
-	TexteEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(478,110), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	TexteEdit = new wxStyledTextCtrl(this,ID_CUSTOM1,wxDefaultPosition,wxSize(460,110),0,_T("ID_CUSTOM1"));
 	FlexGridSizer3->Add(TexteEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	errorTxt = new wxStaticText(this, ID_STATICTEXT5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	errorTxt->SetForegroundColour(wxColour(120,0,0));
@@ -133,7 +134,6 @@ mainObjectsName(mainObjectsName_)
 	FlexGridSizer1->SetSizeHints(this);
 	Center();
 
-	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditTextDialog::OnTexteEditText);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnOkBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnAnnulerBtClick);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&EditTextDialog::OnObjListItemActivated);
@@ -144,6 +144,8 @@ mainObjectsName(mainObjectsName_)
 	Connect(ID_BUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnAddFunctionBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnInsertBtClick);
 	//*)
+	Connect(ID_CUSTOM1, wxEVT_STC_MODIFIED, (wxObjectEventFunction)&EditTextDialog::TextModified);
+	Connect(ID_CUSTOM1, wxEVT_STC_UPDATEUI, (wxObjectEventFunction)&EditTextDialog::UpdateTextCtrl);
 
     //Prepare image lists
     imageListObj = new wxImageList( 16, 16 );
@@ -282,9 +284,65 @@ mainObjectsName(mainObjectsName_)
     ObjList->Expand(ObjList->GetRootItem());
     ValList->Expand(ValList->GetRootItem());
 
-	TexteEdit->SetValue(texte);
-	if ( texte.empty() )
-        TexteEdit->SetValue("\"\"");
+	TexteEdit->SetLexer(wxSTC_LEX_CPP);
+	TexteEdit->StyleSetForeground(4, *wxBLACK); //Numbers
+	TexteEdit->StyleSetForeground(10, *wxRED); //Operators
+	TexteEdit->StyleSetForeground(6, *wxBLUE); //String
+	TexteEdit->StyleSetForeground(5, wxColour(0,28,158)); //(Key)Word
+	TexteEdit->StyleSetBackground(34, wxColour(119, 255, 119)); //Brace
+	TexteEdit->StyleSetBackground(35, wxColour(255, 119, 119)); //Brace
+
+    //Prepare keyword highlighting
+    std::string keywords;
+	for (unsigned int i = 0;i<extensions.size();++i)
+	{
+	    //Verify if that extension is enabled
+	    if ( find(game.extensionsUsed.begin(),
+                  game.extensionsUsed.end(),
+                  extensions[i]->GetName()) == game.extensionsUsed.end() )
+            continue;
+
+        //Add keywords of static expressions
+	    const std::map<std::string, ExpressionInfos > & allExprs = extensions[i]->GetAllExpressions();
+        for(std::map<std::string, ExpressionInfos >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+	        keywords += " "+it->first;
+
+	    const std::map<std::string, StrExpressionInfos > & allStrExprs = extensions[i]->GetAllStrExpressions();
+        for(std::map<std::string, StrExpressionInfos >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+	        keywords += " "+it->first;
+
+        //Add keywords of objects expressions
+	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+        for (unsigned int j = 0;j<objectsTypes.size();++j)
+        {
+            const std::map<std::string, ExpressionInfos > & allExprs = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
+            for(std::map<std::string, ExpressionInfos >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+                keywords += " "+it->first;
+
+            const std::map<std::string, StrExpressionInfos > & allStrExprs = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
+            for(std::map<std::string, StrExpressionInfos >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+                keywords += " "+it->first;
+        }
+
+        //Add keywords of automatisms expressions
+	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+        for (unsigned int j = 0;j<automatismsTypes.size();++j)
+        {
+            const std::map<std::string, ExpressionInfos > & allExprs = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<std::string, ExpressionInfos >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+                keywords += " "+it->first;
+
+            const std::map<std::string, StrExpressionInfos > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<std::string, StrExpressionInfos >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+                keywords += " "+it->first;
+        }
+	}
+	TexteEdit->SetKeyWords(0, keywords);
+    TexteEdit->SetWrapMode(wxSTC_WRAP_WORD);
+    TexteEdit->SetMarginLeft(1);
+
+	TexteEdit->SetText(texte);
+	if ( texte.empty() ) TexteEdit->SetText("\"\"");
 }
 
 EditTextDialog::~EditTextDialog()
@@ -293,6 +351,25 @@ EditTextDialog::~EditTextDialog()
 	//*)
 }
 
+/**
+ * Syntax highlighting
+ */
+void EditTextDialog::UpdateTextCtrl(wxStyledTextEvent& event)
+{
+    char currentChar = TexteEdit->GetCharAt(TexteEdit->GetCurrentPos());
+    if ( currentChar != '(' && currentChar != ')')
+    {
+        TexteEdit->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
+        return;
+    }
+
+    int otherBrace = TexteEdit->BraceMatch(TexteEdit->GetCurrentPos());
+
+    if ( otherBrace != wxSTC_INVALID_POSITION)
+        TexteEdit->BraceHighlight(TexteEdit->GetCurrentPos(), otherBrace);
+    else
+        TexteEdit->BraceBadLight(TexteEdit->GetCurrentPos());
+}
 
 void EditTextDialog::OnAnnulerBtClick(wxCommandEvent& event)
 {
@@ -409,24 +486,20 @@ void EditTextDialog::OnInsertBtClick(wxCommandEvent& event)
     EditExpression dialog(this, "", game, scene, true, mainObjectsName);
     dialog.ShowModal();
 
-    TexteEdit->WriteText("ToString("+dialog.expression+")");
+    TexteEdit->AddText("ToString("+dialog.expression+")");
 }
 
 /**
  * Real time expression checking
  */
-void EditTextDialog::OnTexteEditText(wxCommandEvent& event)
+void EditTextDialog::TextModified(wxStyledTextEvent& event)
 {
     string text = string(TexteEdit->GetValue().mb_str());
-
-    TexteEdit->SetStyle(0, text.length()-1, wxColour(0,0,0) );
 
     GDExpression expressionTest(text);
     if ( !expressionTest.PrepareForTextEvaluationOnly(game, scene) )
     {
         errorTxt->SetLabel(expressionTest.GetFirstErrorDuringPreprocessingText());
-        if ( expressionTest.GetFirstErrorDuringPreprocessingPosition() != string::npos )
-            TexteEdit->SetStyle(expressionTest.GetFirstErrorDuringPreprocessingPosition(), expressionTest.GetFirstErrorDuringPreprocessingPosition()+1, wxColour(120,0,0) );
     }
     else
     {
@@ -461,7 +534,7 @@ void EditTextDialog::OnAddPropBtClick(wxCommandEvent& event)
             }
         }
 
-        TexteEdit->WriteText(ReplaceSpacesByTildes(object)+"."+automatismStr+infos->GetName()+"("+parametersStr+")");
+        TexteEdit->AddText(ReplaceSpacesByTildes(object)+"."+automatismStr+infos->GetName()+"("+parametersStr+")");
         return;
     }
 }
@@ -493,7 +566,7 @@ void EditTextDialog::OnAddFunctionBtClick(wxCommandEvent& event)
             parametersStr += ShowParameterDialog(infos->GetStrExpressionInfos().parameters[i]);
         }
 
-        TexteEdit->WriteText(infos->GetName()+"("+parametersStr+")");
+        TexteEdit->AddText(infos->GetName()+"("+parametersStr+")");
         return;
     }
 }

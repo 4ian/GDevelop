@@ -32,7 +32,7 @@
 using namespace std;
 
 //(*IdInit(EditExpression)
-const long EditExpression::ID_TEXTCTRL1 = wxNewId();
+const long EditExpression::ID_CUSTOM1 = wxNewId();
 const long EditExpression::ID_BUTTON1 = wxNewId();
 const long EditExpression::ID_STATICTEXT5 = wxNewId();
 const long EditExpression::ID_STATICTEXT1 = wxNewId();
@@ -100,7 +100,7 @@ mainObjectsName(mainObjectsName_)
 	FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
 	FlexGridSizer2->AddGrowableRow(0);
-	ExpressionEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(428,23), wxTE_MULTILINE|wxTE_RICH, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	ExpressionEdit = new wxStyledTextCtrl(this,ID_CUSTOM1,wxDefaultPosition,wxSize(460,40),0,_T("ID_CUSTOM1"));
 	FlexGridSizer2->Add(ExpressionEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(OkBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -202,7 +202,6 @@ mainObjectsName(mainObjectsName_)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->SetSizeHints(this);
 
-	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditExpression::OnExpressionEditText);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnOkBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnPlusBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnMinusBtClick);
@@ -231,6 +230,8 @@ mainObjectsName(mainObjectsName_)
 	Connect(ID_TREECTRL2,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&EditExpression::OnValListItemActivated);
 	Connect(ID_BUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnAddValBtClick);
 	//*)
+	Connect(ID_CUSTOM1, wxEVT_STC_MODIFIED, (wxObjectEventFunction)&EditExpression::TextModified);
+	Connect(ID_CUSTOM1, wxEVT_STC_UPDATEUI, (wxObjectEventFunction)&EditExpression::UpdateTextCtrl);
 
 	expression = pExpression;
 
@@ -275,7 +276,65 @@ mainObjectsName(mainObjectsName_)
     imageListVal->Add(( wxBitmap( "res/actions/net.png", wxBITMAP_TYPE_ANY ) ) );
     ValList->AssignImageList( imageListVal );
 
-	ExpressionEdit->SetValue(expression);
+	ExpressionEdit->SetText(expression);
+	ExpressionEdit->SetLexer(wxSTC_LEX_CPP);
+	ExpressionEdit->StyleSetForeground(4, *wxBLACK); //Numbers
+	ExpressionEdit->StyleSetForeground(10, *wxRED); //Operators
+	ExpressionEdit->StyleSetForeground(6, *wxBLUE); //String
+	ExpressionEdit->StyleSetForeground(5, wxColour(0,28,158)); //(Key)Word
+	ExpressionEdit->StyleSetBackground(34, wxColour(119, 255, 119)); //Brace
+	ExpressionEdit->StyleSetBackground(35, wxColour(255, 119, 119)); //Brace
+
+    //Prepare keyword highlighting
+    std::string keywords;
+    const vector < boost::shared_ptr<ExtensionBase> > extensions = gdp::ExtensionsManager::getInstance()->GetExtensions();
+	for (unsigned int i = 0;i<extensions.size();++i)
+	{
+	    //Verify if that extension is enabled
+	    if ( find(game.extensionsUsed.begin(),
+                  game.extensionsUsed.end(),
+                  extensions[i]->GetName()) == game.extensionsUsed.end() )
+            continue;
+
+        //Add keywords of static expressions
+	    const std::map<std::string, ExpressionInfos > & allExprs = extensions[i]->GetAllExpressions();
+        for(std::map<std::string, ExpressionInfos >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+	        keywords += " "+it->first;
+
+	    const std::map<std::string, StrExpressionInfos > & allStrExprs = extensions[i]->GetAllStrExpressions();
+        for(std::map<std::string, StrExpressionInfos >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+	        keywords += " "+it->first;
+
+        //Add keywords of objects expressions
+	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+        for (unsigned int j = 0;j<objectsTypes.size();++j)
+        {
+            const std::map<std::string, ExpressionInfos > & allExprs = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
+            for(std::map<std::string, ExpressionInfos >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+                keywords += " "+it->first;
+
+            const std::map<std::string, StrExpressionInfos > & allStrExprs = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
+            for(std::map<std::string, StrExpressionInfos >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+                keywords += " "+it->first;
+        }
+
+        //Add keywords of automatisms expressions
+	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+        for (unsigned int j = 0;j<automatismsTypes.size();++j)
+        {
+            const std::map<std::string, ExpressionInfos > & allExprs = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<std::string, ExpressionInfos >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+                keywords += " "+it->first;
+
+            const std::map<std::string, StrExpressionInfos > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<std::string, StrExpressionInfos >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+                keywords += " "+it->first;
+        }
+	}
+	ExpressionEdit->SetKeyWords(0, keywords);
+    ExpressionEdit->SetWrapMode(wxSTC_WRAP_WORD);
+    ExpressionEdit->SetMarginLeft(1);
+
 	RefreshLists();
 }
 
@@ -285,6 +344,42 @@ EditExpression::~EditExpression()
 	//*)
 }
 
+/**
+ * Syntax highlighting
+ */
+void EditExpression::UpdateTextCtrl(wxStyledTextEvent& event)
+{
+    char currentChar = ExpressionEdit->GetCharAt(ExpressionEdit->GetCurrentPos());
+    if ( currentChar != '(' && currentChar != ')')
+    {
+        ExpressionEdit->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
+        return;
+    }
+
+    int otherBrace = ExpressionEdit->BraceMatch(ExpressionEdit->GetCurrentPos());
+
+    if ( otherBrace != wxSTC_INVALID_POSITION)
+        ExpressionEdit->BraceHighlight(ExpressionEdit->GetCurrentPos(), otherBrace);
+    else
+        ExpressionEdit->BraceBadLight(ExpressionEdit->GetCurrentPos());
+}
+
+/**
+ * Realtime expression checking
+ */
+void EditExpression::TextModified(wxStyledTextEvent& event)
+{
+    //Syntax checking
+    expression = string( ExpressionEdit->GetText().mb_str() );
+
+    GDExpression expressionTest(expression);
+    if ( !expressionTest.PrepareForMathEvaluationOnly(game, scene) )
+    {
+        errorTxt->SetLabel(expressionTest.GetFirstErrorDuringPreprocessingText());
+    }
+    else
+        errorTxt->SetLabel("");
+}
 
 void EditExpression::OnOkBtClick(wxCommandEvent& event)
 {
@@ -296,26 +391,6 @@ void EditExpression::OnOkBtClick(wxCommandEvent& event)
     }
 
     EndModal(1);
-}
-
-void EditExpression::OnExpressionEditText(wxCommandEvent& event)
-{
-    expression = static_cast<string>( ExpressionEdit->GetValue() );
-    RefreshExpressionEdit();
-
-    GDExpression expressionTest(expression);
-    if ( !expressionTest.PrepareForMathEvaluationOnly(game, scene) )
-    {
-        errorTxt->SetLabel(expressionTest.GetFirstErrorDuringPreprocessingText());
-        if ( expressionTest.GetFirstErrorDuringPreprocessingPosition() != string::npos )
-        {
-            ExpressionEdit->SetStyle(expressionTest.GetFirstErrorDuringPreprocessingPosition(), expressionTest.GetFirstErrorDuringPreprocessingPosition()+1, wxColour(120,0,0) );
-        }
-    }
-    else
-    {
-        errorTxt->SetLabel("");
-    }
 }
 
 void EditExpression::RefreshLists()
@@ -448,105 +523,44 @@ void EditExpression::RefreshLists()
     ValList->Expand(ValList->GetRootItem());
 }
 
-void EditExpression::RefreshExpressionEdit()
-{
-    size_t found = expression.find("VAL");
-    ExpressionEdit->SetStyle(0, expression.length(), wxTextAttr( wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)));
-
-    while (found!=string::npos)
-    {
-        ExpressionEdit->SetStyle(found, found+3, wxTextAttr( wxColour(0 , 148, 255) ) );
-        //On remet en normal après
-        ExpressionEdit->SetStyle(found+3, found+4, wxTextAttr( wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT) ) );
-        found = expression.find("VAL", found+3);
-    }
-
-    found = expression.find("OBJ");
-
-    while (found!=string::npos)
-    {
-        ExpressionEdit->SetStyle(found, found+3, wxTextAttr( wxColour(0 , 148, 255) ) );
-        //On remet en normal après
-        ExpressionEdit->SetStyle(found+3, found+4, wxTextAttr( wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT) ) );
-        found = expression.find("OBJ", found+3);
-    }
-
-    found = expression.find("(");
-
-    while (found!=string::npos)
-    {
-        ExpressionEdit->SetStyle(found, found+1, wxTextAttr( wxColour(0 , 148, 255) ) );
-        //On remet en normal après
-        ExpressionEdit->SetStyle(found+1, found+2, wxTextAttr( wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT) ) );
-        found = expression.find("(", found+1);
-    }
-
-    found = expression.find(")");
-
-    while (found!=string::npos)
-    {
-        ExpressionEdit->SetStyle(found, found+1, wxTextAttr( wxColour(0 , 148, 255) ) );
-        //On remet en normal après
-        ExpressionEdit->SetStyle(found+1, found+2, wxTextAttr( wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT) ) );
-        found = expression.find(")", found+1);
-    }
-
-}
-
 void EditExpression::OnPlusBtClick(wxCommandEvent& event)
 {
-    expression += "+";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("+");
 }
 
 void EditExpression::OnMinusBtClick(wxCommandEvent& event)
 {
-    expression += "-";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("-");
 }
 
 void EditExpression::OnMultBtClick(wxCommandEvent& event)
 {
-    expression += "*";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("*");
 }
 
 void EditExpression::OnDivBtClick(wxCommandEvent& event)
 {
-    expression += "/";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("/");
 }
 
 void EditExpression::OnPOBtClick(wxCommandEvent& event)
 {
-    expression += "(";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("(");
 }
 
 void EditExpression::OnPFBtClick(wxCommandEvent& event)
 {
-    expression += ")";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText(")");
 }
 
 void EditExpression::OnCosBtClick(wxCommandEvent& event)
 {
-    expression += "cos";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("cos(");
 }
 
 void EditExpression::OnSinBtClick(wxCommandEvent& event)
 {
-    expression += "sin";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("sin(");
 }
 
 /**
@@ -634,10 +648,7 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
             }
         }
 
-        expression += ReplaceSpacesByTildes(object)+"."+automatismStr+infos->GetName()+"("+parametersStr+")";
-
-        ExpressionEdit->ChangeValue(expression);
-        RefreshExpressionEdit();
+        ExpressionEdit->AddText(ReplaceSpacesByTildes(object)+"."+automatismStr+infos->GetName()+"("+parametersStr+")");
         return;
     }
 }
@@ -656,10 +667,7 @@ void EditExpression::OnAddValBtClick(wxCommandEvent& event)
             parametersStr += ShowParameterDialog(infos->GetExpressionInfos().parameters[i]);
         }
 
-        expression += infos->GetName()+"("+parametersStr+")";
-
-        ExpressionEdit->ChangeValue(expression);
-        RefreshExpressionEdit();
+        ExpressionEdit->AddText(infos->GetName()+"("+parametersStr+")");
         return;
     }
 }
@@ -691,85 +699,61 @@ void EditExpression::OnValListItemDoubleClicked(wxTreeEvent& event)
 
 void EditExpression::OnButton2Click(wxCommandEvent& event)
 {
-    expression += "^";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("^");
 }
 
 void EditExpression::OnButton3Click(wxCommandEvent& event)
 {
-    expression += "E";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("E");
 }
 
 void EditExpression::OnBitmapButton2Click(wxCommandEvent& event)
 {
-    expression += "sqrt(";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("sqrt(");
 }
 
 void EditExpression::OnBitmapButton1Click(wxCommandEvent& event)
 {
-    expression += "nthroot(x,n)";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("nthroot(x,n)");
 }
 
 void EditExpression::OnButton4Click(wxCommandEvent& event)
 {
-    expression += "exp(";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("exp(");
 }
 
 void EditExpression::OnButton1Click(wxCommandEvent& event)
 {
-    expression += "log(";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("log(");
 }
 
 void EditExpression::OnButton5Click(wxCommandEvent& event)
 {
-    expression += "tan";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("tan(");
 }
 
 void EditExpression::OnButton6Click(wxCommandEvent& event)
 {
-    expression += "abs";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("abs(");
 }
 
 void EditExpression::OnButton7Click(wxCommandEvent& event)
 {
-    expression += "acos";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("acos(");
 }
 
 void EditExpression::OnButton8Click(wxCommandEvent& event)
 {
-    expression += "asin";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("asin(");
 }
 
 void EditExpression::OnButton9Click(wxCommandEvent& event)
 {
-    expression += "atan";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("atan(");
 }
 
 void EditExpression::OnintBtClick(wxCommandEvent& event)
 {
-    expression += "int(";
-	ExpressionEdit->ChangeValue(expression);
-    RefreshExpressionEdit();
+	ExpressionEdit->AddText("int(");
 }
 #endif

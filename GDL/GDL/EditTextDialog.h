@@ -7,10 +7,10 @@
 #include <wx/treectrl.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
-#include <wx/textctrl.h>
 #include <wx/statline.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
+#include <wx/stc/stc.h>
 //*)
 #include <string>
 #include <vector>
@@ -32,9 +32,9 @@ class GD_API EditTextDialog: public wxDialog
 		wxButton* AddFunctionBt;
 		wxStaticText* StaticText2;
 		wxTreeCtrl* ValList;
+		wxStyledTextCtrl* TexteEdit;
 		wxStaticText* StaticText1;
 		wxTreeCtrl* ObjList;
-		wxTextCtrl* TexteEdit;
 		wxStaticLine* StaticLine2;
 		wxButton* AddPropBt;
 		wxButton* InsertBt;
@@ -47,7 +47,7 @@ class GD_API EditTextDialog: public wxDialog
 	protected:
 
 		//(*Identifiers(EditTextDialog)
-		static const long ID_TEXTCTRL1;
+		static const long ID_CUSTOM1;
 		static const long ID_STATICTEXT5;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON1;
@@ -79,6 +79,8 @@ class GD_API EditTextDialog: public wxDialog
 		void OnObjListSelectionChanged(wxTreeEvent& event);
 		void OnTreeCtrl1SelectionChanged(wxTreeEvent& event);
 		//*)
+		void TextModified(wxStyledTextEvent& event);
+		void UpdateTextCtrl(wxStyledTextEvent& event);
 
 		string ShowParameterDialog(const ParameterInfo & parameterInfo, std::string object = "");
 

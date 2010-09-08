@@ -124,6 +124,30 @@
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer12" member="no">
+									<cols>3</cols>
+									<growablecols>1</growablecols>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT12" variable="StaticText12" member="yes">
+											<label>Restitution ( Elasticité ) :</label>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxTextCtrl" name="ID_TEXTCTRL9" variable="restitutionEdit" member="yes">
+											<value>0</value>
+										</object>
+										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
 								<object class="wxFlexGridSizer" variable="FlexGridSizer9" member="no">
 									<cols>3</cols>
 									<growablecols>1</growablecols>

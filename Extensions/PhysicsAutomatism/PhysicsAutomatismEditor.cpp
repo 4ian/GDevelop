@@ -48,6 +48,8 @@ const long PhysicsAutomatismEditor::ID_STATICTEXT1 = wxNewId();
 const long PhysicsAutomatismEditor::ID_TEXTCTRL1 = wxNewId();
 const long PhysicsAutomatismEditor::ID_STATICTEXT2 = wxNewId();
 const long PhysicsAutomatismEditor::ID_TEXTCTRL2 = wxNewId();
+const long PhysicsAutomatismEditor::ID_STATICTEXT12 = wxNewId();
+const long PhysicsAutomatismEditor::ID_TEXTCTRL9 = wxNewId();
 const long PhysicsAutomatismEditor::ID_STATICTEXT9 = wxNewId();
 const long PhysicsAutomatismEditor::ID_TEXTCTRL7 = wxNewId();
 const long PhysicsAutomatismEditor::ID_STATICTEXT10 = wxNewId();
@@ -89,6 +91,7 @@ mainEditorCommand(mainEditorCommand_)
 	wxFlexGridSizer* FlexGridSizer7;
 	wxFlexGridSizer* FlexGridSizer8;
 	wxBoxSizer* BoxSizer1;
+	wxFlexGridSizer* FlexGridSizer12;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
@@ -133,6 +136,13 @@ mainEditorCommand(mainEditorCommand_)
 	frictionEdit = new wxTextCtrl(this, ID_TEXTCTRL2, _("0.8"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	FlexGridSizer8->Add(frictionEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer12->AddGrowableCol(1);
+	StaticText12 = new wxStaticText(this, ID_STATICTEXT12, _("Restitution ( Elasticité ) :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT12"));
+	FlexGridSizer12->Add(StaticText12, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	restitutionEdit = new wxTextCtrl(this, ID_TEXTCTRL9, _("0"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL9"));
+	FlexGridSizer12->Add(restitutionEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer9->AddGrowableCol(1);
 	StaticText9 = new wxStaticText(this, ID_STATICTEXT9, _("Amortissement linéaire :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
@@ -210,6 +220,7 @@ mainEditorCommand(mainEditorCommand_)
 	massDensityEdit->SetValue(ToString(automatism.massDensity));
 	bulletCheck->SetValue(automatism.isBullet);
 	frictionEdit->SetValue(ToString(automatism.averageFriction));
+	restitutionEdit->SetValue(ToString(automatism.averageRestitution));
 	linearDampingEdit->SetValue(ToString(automatism.linearDamping));
 	angularDampingEdit->SetValue(ToString(automatism.angularDamping));
 
@@ -256,15 +267,16 @@ void PhysicsAutomatismEditor::OnokBtClick(wxCommandEvent& event)
     automatism.dynamic = !staticCheck->GetValue();
     automatism.fixedRotation = fixedRotationCheck->GetValue();
     automatism.isBullet = bulletCheck->GetValue();
-    automatism.massDensity = ToFloat(massDensityEdit->GetValue().mb_str());
-    automatism.averageFriction = ToFloat(frictionEdit->GetValue().mb_str());
-    automatism.linearDamping = ToFloat(linearDampingEdit->GetValue().mb_str());
-    automatism.angularDamping = ToFloat(angularDampingEdit->GetValue().mb_str());
+    automatism.massDensity = ToFloat(string(massDensityEdit->GetValue().mb_str()));
+    automatism.averageFriction = ToFloat(string(frictionEdit->GetValue().mb_str()));
+    automatism.averageRestitution = ToFloat(string(restitutionEdit->GetValue().mb_str()));
+    automatism.linearDamping = ToFloat(string(linearDampingEdit->GetValue().mb_str()));
+    automatism.angularDamping = ToFloat(string(angularDampingEdit->GetValue().mb_str()));
 
-    sharedDatas->gravityX = ToFloat(gravityXEdit->GetValue().mb_str());
-    sharedDatas->gravityY = ToFloat(gravityYEdit->GetValue().mb_str());
-    sharedDatas->scaleX = ToFloat(scaleXEdit->GetValue().mb_str());
-    sharedDatas->scaleY = ToFloat(scaleYEdit->GetValue().mb_str());
+    sharedDatas->gravityX = ToFloat(string(gravityXEdit->GetValue().mb_str()));
+    sharedDatas->gravityY = ToFloat(string(gravityYEdit->GetValue().mb_str()));
+    sharedDatas->scaleX = ToFloat(string(scaleXEdit->GetValue().mb_str()));
+    sharedDatas->scaleY = ToFloat(string(scaleYEdit->GetValue().mb_str()));
 
     EndModal(1);
 }

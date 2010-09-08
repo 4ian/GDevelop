@@ -16,11 +16,17 @@
 	<File name="Box2D\Box2D\Box2D\Common\b2Settings.h" open="0" top="0" tabpos="0">
 		<Cursor position="1383" topLine="80" />
 	</File>
+	<File name="Box2D\Box2D\Box2D\Dynamics\Joints\b2Joint.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="4351" topLine="151" />
+	</File>
 	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="1207" topLine="5" />
+		<Cursor position="1444" topLine="8" />
 	</File>
 	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.h" open="0" top="0" tabpos="6">
 		<Cursor position="4015" topLine="104" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Dynamics\b2Fixture.h" open="0" top="0" tabpos="0">
+		<Cursor position="1081" topLine="39" />
 	</File>
 	<File name="Box2D\Box2D\Box2D\Dynamics\b2World.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="2802" topLine="73" />
@@ -31,29 +37,29 @@
 	<File name="ContactListener.h" open="0" top="0" tabpos="4">
 		<Cursor position="238" topLine="0" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="6097" topLine="113" />
+	<File name="Extension.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="8095" topLine="132" />
 	</File>
-	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="1453" topLine="31" />
+	<File name="PhysicsAutomatism.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="5210" topLine="116" />
 	</File>
-	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="3">
-		<Cursor position="4603" topLine="86" />
+	<File name="PhysicsAutomatism.h" open="1" top="0" tabpos="3">
+		<Cursor position="4992" topLine="79" />
 	</File>
-	<File name="PhysicsAutomatismActions.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="6483" topLine="178" />
+	<File name="PhysicsAutomatismActions.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="9557" topLine="247" />
 	</File>
 	<File name="PhysicsAutomatismConditions.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="9963" topLine="120" />
 	</File>
 	<File name="PhysicsAutomatismEditor.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="3478" topLine="33" />
+		<Cursor position="16275" topLine="239" />
 	</File>
 	<File name="PhysicsAutomatismEditor.h" open="0" top="0" tabpos="7">
 		<Cursor position="69" topLine="3" />
 	</File>
-	<File name="PhysicsAutomatismExpressions.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="1347" topLine="28" />
+	<File name="PhysicsAutomatismExpressions.cpp" open="0" top="0" tabpos="17">
+		<Cursor position="1988" topLine="19" />
 	</File>
 	<File name="RuntimeScenePhysicsDatas.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="1379" topLine="17" />

@@ -143,6 +143,21 @@ class Extension : public ExtensionBase
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
+                    DECLARE_AUTOMATISM_ACTION("ActAddGearJointBetweenObjects",
+                                   _("Ajouter une liaison engrenage entre deux objets"),
+                                   _("Ajoute une liaison engrenage autour de laquelle l'objet va tourner. "),
+                                   _("Ajouter une liaison engrenage entre _PARAM0_ et _PARAM2_"),
+                                   _("Joints"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActAddGearJointBetweenObjects);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
                     DECLARE_AUTOMATISM_ACTION("SetFreeRotation",
                                    _("Rendre la rotation libre"),
                                    _("Permet à l'objet de tourner."),
@@ -216,7 +231,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_ACTION("ApplyForce",
                                    _("Appliquer une force"),
                                    _("Applique une force à l'objet."),
-                                   _("Appliquer à _PARAM0_ une force _PARAM1_;_PARAM2_"),
+                                   _("Appliquer à _PARAM0_ une force _PARAM2_;_PARAM3_"),
                                    _("Déplacement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
@@ -229,10 +244,27 @@ class Extension : public ExtensionBase
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
+                    DECLARE_AUTOMATISM_ACTION("ApplyForceTowardPosition",
+                                   _("Appliquer une force vers une position"),
+                                   _("Applique une force, dirigée vers une position, à l'objet."),
+                                   _("Appliquer à _PARAM0_ une force vers la position _PARAM2_;_PARAM3_ de longeur _PARAM4_"),
+                                   _("Déplacement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActApplyForceTowardPosition);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        DECLARE_PARAMETER("expression", _("Position X"), false, "")
+                        DECLARE_PARAMETER("expression", _("Position Y"), false, "")
+                        DECLARE_PARAMETER("expression", _("Longueur de la force"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
                     DECLARE_AUTOMATISM_ACTION("ApplyTorque",
                                    _("Appliquer un moment (rotation)"),
                                    _("Applique un moment (rotation) à l'objet."),
-                                   _("Appliquer à _PARAM0_ un moment de valeur _PARAM1_"),
+                                   _("Appliquer à _PARAM0_ un moment de valeur _PARAM2_"),
                                    _("Rotation"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
@@ -247,7 +279,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_ACTION("SetLinearVelocity",
                                    _("Vitesse linéaire"),
                                    _("Modifie la vitesse de l'objet."),
-                                   _("Mettre la vitesse linéaire de _PARAM0_ à _PARAM1_;_PARAM2_"),
+                                   _("Mettre la vitesse linéaire de _PARAM0_ à _PARAM2_;_PARAM3_"),
                                    _("Déplacement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
@@ -263,7 +295,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_CONDITION("LinearVelocityX",
                                    _("Vitesse linéaire en X"),
                                    _("Teste la vitesse linéaire en X de l'objet."),
-                                   _("La vitesse linéaire en X de _PARAM0_ est _PARAM2__PARAM1_"),
+                                   _("La vitesse linéaire en X de _PARAM0_ est _PARAM3_ à _PARAM2_"),
                                    _("Déplacement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
@@ -279,7 +311,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_CONDITION("LinearVelocityY",
                                    _("Vitesse linéaire en Y"),
                                    _("Teste la vitesse linéaire en Y de l'objet."),
-                                   _("La vitesse linéaire en Y de _PARAM0_ est _PARAM2__PARAM1_"),
+                                   _("La vitesse linéaire en Y de _PARAM0_ est _PARAM3_ à _PARAM2_"),
                                    _("Déplacement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
@@ -295,7 +327,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_ACTION("SetAngularVelocity",
                                    _("Vitesse angulaire ( de rotation )"),
                                    _("Modifie la vitesse angulaire de l'objet."),
-                                   _("Faire _PARAM2__PARAM1_ à la vitesse angulaire de _PARAM0_"),
+                                   _("Mettre la vitesse angulaire de _PARAM0_ à _PARAM2_"),
                                    _("Rotation"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
@@ -310,7 +342,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_CONDITION("AngularVelocity",
                                    _("Vitesse angulaire ( de rotation )"),
                                    _("Teste la vitesse angulaire ( Vitesse de rotation ) de l'objet."),
-                                   _("La vitesse angulaire de _PARAM0_ est _PARAM2__PARAM1_"),
+                                   _("La vitesse angulaire de _PARAM0_ est _PARAM3_ à _PARAM2_"),
                                    _("Rotation"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
@@ -326,7 +358,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_CONDITION("LinearDamping",
                                    _("Amortissement linéaire"),
                                    _("Teste l'amortissement linéaire de l'objet."),
-                                   _("L'amortissement linéaire de _PARAM0_ est _PARAM2__PARAM1_"),
+                                   _("L'amortissement linéaire de _PARAM0_ est _PARAM3_ à _PARAM2_"),
                                    _("Déplacement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
@@ -357,7 +389,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_ACTION("SetLinearDamping",
                                    _("Amortissement linéaire"),
                                    _("Modifie l'amortissement linéaire de l'objet."),
-                                   _("Mettre l'amortissement linéaire de _PARAM0_ à _PARAM1_"),
+                                   _("Mettre l'amortissement linéaire de _PARAM0_ à _PARAM2_"),
                                    _("Déplacement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
@@ -372,7 +404,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_CONDITION("AngularDamping",
                                    _("Amortissement angulaire"),
                                    _("Teste l'amortissement angulaire de l'objet."),
-                                   _("L'amortissement angulaire de _PARAM0_ est _PARAM2__PARAM1_"),
+                                   _("L'amortissement angulaire de _PARAM0_ est _PARAM3_ à _PARAM2_"),
                                    _("Déplacement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
@@ -388,7 +420,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_ACTION("SetAngularDamping",
                                    _("Amortissement angulaire"),
                                    _("Modifie l'amortissement angulaire de l'objet."),
-                                   _("Mettre l'amortissement angulaire de _PARAM0_ à _PARAM1_"),
+                                   _("Mettre l'amortissement angulaire de _PARAM0_ à _PARAM2_"),
                                    _("Déplacement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png",
@@ -397,6 +429,22 @@ class Extension : public ExtensionBase
                         DECLARE_PARAMETER("object", _("Objet"), true, "")
                         DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
                         DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetGravity",
+                                   _("Gravité"),
+                                   _("Modifie la force de gravité"),
+                                   _("Mettre la force de gravité à _PARAM2_;_PARAM3_"),
+                                   _("Options globales"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActSetGravity);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        DECLARE_PARAMETER("expression", _("Coordonnée X"), false, "")
+                        DECLARE_PARAMETER("expression", _("Coordonnée Y"), false, "")
 
                     DECLARE_END_AUTOMATISM_ACTION()
 

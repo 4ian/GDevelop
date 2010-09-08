@@ -91,6 +91,9 @@ class PhysicsAutomatism : public Automatism
         bool ActLinearVelocity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActAddRevoluteJointBetweenObjects( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActAddRevoluteJoint( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActSetGravity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActApplyForceTowardPosition( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActAddGearJointBetweenObjects( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         bool CondAngularDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool CondLinearDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
@@ -118,6 +121,7 @@ class PhysicsAutomatism : public Automatism
         bool isBullet; ///< True if the object as to be considered as a bullet ( for better collision handling )
         float massDensity;
         float averageFriction;
+        float averageRestitution;
         float linearDamping;
         float angularDamping;
 

@@ -39,6 +39,7 @@ fixedRotation(false),
 isBullet(false),
 massDensity(1),
 averageFriction(0.8),
+averageRestitution(0),
 linearDamping(0.1),
 angularDamping(0.1),
 body(NULL)
@@ -125,8 +126,8 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
     bodyDef.type = dynamic ? b2_dynamicBody : b2_staticBody;
     bodyDef.position.Set((object->GetDrawableX()+object->GetWidth()/2)*runtimeScenesPhysicsDatas->GetInvScaleX(), -(object->GetDrawableY()+object->GetHeight()/2)*runtimeScenesPhysicsDatas->GetInvScaleY());
     bodyDef.angle = -object->GetAngle()*b2_pi/180.0f; //Angles are inverted
-    bodyDef.angularDamping = angularDamping;
-    bodyDef.linearDamping = linearDamping;
+    bodyDef.angularDamping = angularDamping > 0.0f ? angularDamping : 0.0f;
+    bodyDef.linearDamping = linearDamping > 0.0f ? linearDamping : 0.0f;
     bodyDef.bullet = isBullet;
     bodyDef.fixedRotation = fixedRotation;
     body = runtimeScenesPhysicsDatas->world->CreateBody(&bodyDef);
@@ -143,6 +144,7 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
         fixtureDef.shape = &circle;
         fixtureDef.density = massDensity;
         fixtureDef.friction = averageFriction;
+        fixtureDef.restitution = averageRestitution;
 
         body->CreateFixture(&fixtureDef);
     }
@@ -155,6 +157,7 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
         fixtureDef.shape = &dynamicBox;
         fixtureDef.density = massDensity;
         fixtureDef.friction = averageFriction;
+        fixtureDef.restitution = averageRestitution;
 
         body->CreateFixture(&fixtureDef);
     }
@@ -176,6 +179,7 @@ void PhysicsAutomatism::SaveToXml(TiXmlElement * elem) const
         GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "Circle")
     else
         GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "Box")
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("averageRestitution", averageRestitution);
 }
 #endif
 
@@ -194,4 +198,5 @@ void PhysicsAutomatism::LoadFromXml(const TiXmlElement * elem)
         shapeType = Circle;
     else
         shapeType = Box;
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("averageRestitution", averageRestitution);
 }

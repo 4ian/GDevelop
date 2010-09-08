@@ -60,6 +60,7 @@ class PhysicsAutomatismEditor: public wxDialog
 		wxCheckBox* fixedRotationCheck;
 		wxTextCtrl* frictionEdit;
 		wxStaticText* StaticText2;
+		wxTextCtrl* restitutionEdit;
 		wxStaticText* StaticText6;
 		wxStaticText* StaticText8;
 		wxStaticText* StaticText11;
@@ -75,6 +76,7 @@ class PhysicsAutomatismEditor: public wxDialog
 		wxStaticLine* StaticLine1;
 		wxTextCtrl* massDensityEdit;
 		wxRadioButton* rectCheck;
+		wxStaticText* StaticText12;
 		wxCheckBox* bulletCheck;
 		wxStaticText* StaticText4;
 		wxRadioButton* circleCheck;
@@ -97,6 +99,8 @@ class PhysicsAutomatismEditor: public wxDialog
 		static const long ID_TEXTCTRL1;
 		static const long ID_STATICTEXT2;
 		static const long ID_TEXTCTRL2;
+		static const long ID_STATICTEXT12;
+		static const long ID_TEXTCTRL9;
 		static const long ID_STATICTEXT9;
 		static const long ID_TEXTCTRL7;
 		static const long ID_STATICTEXT10;

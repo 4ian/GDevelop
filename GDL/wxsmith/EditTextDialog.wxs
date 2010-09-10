@@ -31,11 +31,13 @@
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
-								<object class="wxStaticText" name="ID_STATICTEXT5" variable="errorTxt" member="yes">
-									<label></label>
-									<fg>#780000</fg>
+								<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="errorTxt" member="yes">
+									<label>Pas d&apos;erreurs.</label>
+									<tooltip>Cliquer pour positionner le curseur sur l&apos;erreur.</tooltip>
+									<style>wxHL_ALIGN_LEFT|wxNO_BORDER</style>
+									<handler function="OnerrorTxtClick" entry="EVT_HYPERLINK" />
 								</object>
-								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
 								<option>1</option>
 							</object>

@@ -79,6 +79,11 @@ class ParserCallbacks
 
     virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression) = 0;
     virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression) = 0;
+
+    #if defined(GDE)
+    std::string firstErrorStr;
+    size_t firstErrorPos;
+    #endif
 };
 
 #endif // GDEXPRESSIONPARSER_H

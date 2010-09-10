@@ -540,6 +540,15 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
         }
     }
 
+    if ( expression.substr(parsePosition, expression.length()).find_first_not_of(" \n") != std::string::npos )
+    {
+        #if defined(GDE)
+        firstErrorPos = parsePosition;
+        firstErrorStr = _("Symbole erroné en fin d'expression.");
+        #endif
+        return false;
+    }
+
     return true;
 }
 
@@ -568,6 +577,10 @@ bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene
     {
         if ( !callbacks.OnSubMathExpression(game, scene, parameter) )
         {
+            #if defined(GDE)
+            firstErrorStr = callbacks.firstErrorStr;
+            firstErrorPos = callbacks.firstErrorPos;
+            #endif
             return false;
         }
     }
@@ -575,6 +588,10 @@ bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene
     {
         if ( !callbacks.OnSubTextExpression(game, scene, parameter) )
         {
+            #if defined(GDE)
+            firstErrorStr = callbacks.firstErrorStr;
+            firstErrorPos = callbacks.firstErrorPos;
+            #endif
             return false;
         }
     }

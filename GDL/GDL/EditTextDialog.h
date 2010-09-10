@@ -8,6 +8,7 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/statline.h>
+#include <wx/hyperlink.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 #include <wx/stc/stc.h>
@@ -32,6 +33,7 @@ class GD_API EditTextDialog: public wxDialog
 		wxButton* AddFunctionBt;
 		wxStaticText* StaticText2;
 		wxTreeCtrl* ValList;
+		wxHyperlinkCtrl* errorTxt;
 		wxStyledTextCtrl* TexteEdit;
 		wxStaticText* StaticText1;
 		wxTreeCtrl* ObjList;
@@ -40,7 +42,6 @@ class GD_API EditTextDialog: public wxDialog
 		wxButton* InsertBt;
 		wxButton* AnnulerBt;
 		wxStaticText* StaticText4;
-		wxStaticText* errorTxt;
 		//*)
 		string returnedText;
 
@@ -48,7 +49,7 @@ class GD_API EditTextDialog: public wxDialog
 
 		//(*Identifiers(EditTextDialog)
 		static const long ID_CUSTOM1;
-		static const long ID_STATICTEXT5;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON1;
 		static const long ID_STATICTEXT1;
@@ -78,6 +79,7 @@ class GD_API EditTextDialog: public wxDialog
 		void OnObjListItemActivated(wxTreeEvent& event);
 		void OnObjListSelectionChanged(wxTreeEvent& event);
 		void OnTreeCtrl1SelectionChanged(wxTreeEvent& event);
+		void OnerrorTxtClick(wxCommandEvent& event);
 		//*)
 		void TextModified(wxStyledTextEvent& event);
 		void UpdateTextCtrl(wxStyledTextEvent& event);
@@ -97,6 +99,8 @@ class GD_API EditTextDialog: public wxDialog
 		Scene & scene;
 		bool canSelectGroup;
 		const vector < string > & mainObjectsName;
+
+		size_t lastErrorPos;
 
 		DECLARE_EVENT_TABLE()
 };

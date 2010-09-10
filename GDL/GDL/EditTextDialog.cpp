@@ -24,7 +24,7 @@
 
 //(*IdInit(EditTextDialog)
 const long EditTextDialog::ID_CUSTOM1 = wxNewId();
-const long EditTextDialog::ID_STATICTEXT5 = wxNewId();
+const long EditTextDialog::ID_HYPERLINKCTRL1 = wxNewId();
 const long EditTextDialog::ID_BUTTON2 = wxNewId();
 const long EditTextDialog::ID_BUTTON1 = wxNewId();
 const long EditTextDialog::ID_STATICTEXT1 = wxNewId();
@@ -47,7 +47,8 @@ EditTextDialog::EditTextDialog(wxWindow* parent, string texte, Game & game_, Sce
 game(game_),
 scene(scene_),
 canSelectGroup(canSelectGroup_),
-mainObjectsName(mainObjectsName_)
+mainObjectsName(mainObjectsName_),
+lastErrorPos(std::string::npos)
 {
 	//(*Initialize(EditTextDialog)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -77,9 +78,9 @@ mainObjectsName(mainObjectsName_)
 	FlexGridSizer3->AddGrowableRow(0);
 	TexteEdit = new wxStyledTextCtrl(this,ID_CUSTOM1,wxDefaultPosition,wxSize(460,110),0,_T("ID_CUSTOM1"));
 	FlexGridSizer3->Add(TexteEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	errorTxt = new wxStaticText(this, ID_STATICTEXT5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
-	errorTxt->SetForegroundColour(wxColour(120,0,0));
-	FlexGridSizer3->Add(errorTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	errorTxt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Pas d\'erreurs."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	errorTxt->SetToolTip(_("Cliquer pour positionner le curseur sur l\'erreur."));
+	FlexGridSizer3->Add(errorTxt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer8->AddGrowableCol(0);
@@ -134,6 +135,7 @@ mainObjectsName(mainObjectsName_)
 	FlexGridSizer1->SetSizeHints(this);
 	Center();
 
+	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EditTextDialog::OnerrorTxtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnOkBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnAnnulerBtClick);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&EditTextDialog::OnObjListItemActivated);
@@ -500,11 +502,14 @@ void EditTextDialog::TextModified(wxStyledTextEvent& event)
     if ( !expressionTest.PrepareForTextEvaluationOnly(game, scene) )
     {
         errorTxt->SetLabel(expressionTest.GetFirstErrorDuringPreprocessingText());
+        lastErrorPos = expressionTest.GetFirstErrorDuringPreprocessingPosition();
     }
     else
     {
-        errorTxt->SetLabel("");
+        errorTxt->SetLabel("Pas d'erreurs.");
+        lastErrorPos = std::string::npos;
     }
+    errorTxt->Refresh(); //Need to call manually update.
 }
 
 void EditTextDialog::OnAddPropBtClick(wxCommandEvent& event)
@@ -582,4 +587,11 @@ void EditTextDialog::OnTreeCtrl1SelectionChanged(wxTreeEvent& event)
 {
     itemVal = event.GetItem();
 }
+
+void EditTextDialog::OnerrorTxtClick(wxCommandEvent& event)
+{
+    if ( lastErrorPos != std::string::npos )
+        TexteEdit->GotoPos(lastErrorPos);
+}
+
 #endif

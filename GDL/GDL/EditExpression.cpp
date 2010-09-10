@@ -34,7 +34,7 @@ using namespace std;
 //(*IdInit(EditExpression)
 const long EditExpression::ID_CUSTOM1 = wxNewId();
 const long EditExpression::ID_BUTTON1 = wxNewId();
-const long EditExpression::ID_STATICTEXT5 = wxNewId();
+const long EditExpression::ID_HYPERLINKCTRL1 = wxNewId();
 const long EditExpression::ID_STATICTEXT1 = wxNewId();
 const long EditExpression::ID_BUTTON2 = wxNewId();
 const long EditExpression::ID_BUTTON3 = wxNewId();
@@ -74,7 +74,8 @@ EditExpression::EditExpression(wxWindow* parent, string pExpression, Game & game
 game(game_),
 scene(scene_),
 canSelectGroup(canSelectGroup_),
-mainObjectsName(mainObjectsName_)
+mainObjectsName(mainObjectsName_),
+lastErrorPos(std::string::npos)
 {
 	//(*Initialize(EditExpression)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -105,9 +106,11 @@ mainObjectsName(mainObjectsName_)
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(OkBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
-	errorTxt = new wxStaticText(this, ID_STATICTEXT5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
-	errorTxt->SetForegroundColour(wxColour(120,0,0));
-	FlexGridSizer7->Add(errorTxt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer7->AddGrowableCol(0);
+	FlexGridSizer7->AddGrowableRow(0);
+	errorTxt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Pas d\'erreurs."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	errorTxt->SetToolTip(_("Cliquer pour positionner le curseur sur l\'erreur."));
+	FlexGridSizer7->Add(errorTxt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Editer l\'expression"));
@@ -203,6 +206,7 @@ mainObjectsName(mainObjectsName_)
 	FlexGridSizer1->SetSizeHints(this);
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnOkBtClick);
+	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EditExpression::OnerrorTxtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnPlusBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnMinusBtClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnMultBtClick);
@@ -237,43 +241,10 @@ mainObjectsName(mainObjectsName_)
 
     imageListObj = new wxImageList( 16, 16 );
     imageListObj->Add(( wxBitmap( "res/actions/uneaction.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/position.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/force.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/direction.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/animation.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/var.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/planicon.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/visibilite.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/create.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/timer.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/camera.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/mouse.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/music.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/texte.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/scene.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/fichier.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/net.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListObj->Add(( wxBitmap( "res/actions/scale.png", wxBITMAP_TYPE_ANY ) ) );
     ObjList->AssignImageList( imageListObj );
 
     imageListVal = new wxImageList( 16, 16 );
     imageListVal->Add(( wxBitmap( "res/actions/uneaction.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/position.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/force.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/direction.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/animation.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/var.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/planicon.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/visibilite.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/create.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/timer.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/camera.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/mouse.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/music.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/texte.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/scene.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/fichier.png", wxBITMAP_TYPE_ANY ) ) );
-    imageListVal->Add(( wxBitmap( "res/actions/net.png", wxBITMAP_TYPE_ANY ) ) );
     ValList->AssignImageList( imageListVal );
 
 	ExpressionEdit->SetText(expression);
@@ -376,9 +347,15 @@ void EditExpression::TextModified(wxStyledTextEvent& event)
     if ( !expressionTest.PrepareForMathEvaluationOnly(game, scene) )
     {
         errorTxt->SetLabel(expressionTest.GetFirstErrorDuringPreprocessingText());
+        lastErrorPos = expressionTest.GetFirstErrorDuringPreprocessingPosition();
     }
     else
-        errorTxt->SetLabel("");
+    {
+        errorTxt->SetLabel("Pas d'erreurs.");
+        lastErrorPos = std::string::npos;
+    }
+
+    errorTxt->Refresh(); //Need to call manually update.
 }
 
 void EditExpression::OnOkBtClick(wxCommandEvent& event)
@@ -755,5 +732,11 @@ void EditExpression::OnButton9Click(wxCommandEvent& event)
 void EditExpression::OnintBtClick(wxCommandEvent& event)
 {
 	ExpressionEdit->AddText("int(");
+}
+
+void EditExpression::OnerrorTxtClick(wxCommandEvent& event)
+{
+    if ( lastErrorPos != std::string::npos )
+        ExpressionEdit->GotoPos(lastErrorPos);
 }
 #endif

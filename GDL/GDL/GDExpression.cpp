@@ -93,12 +93,30 @@ class CallbacksForPreparingMathEvaluation : public ParserCallbacks
 
     virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression)
     {
-        return expression.PrepareForMathEvaluationOnly(game, scene);
+        if ( !expression.PrepareForMathEvaluationOnly(game, scene) )
+        {
+            #if defined(GDE)
+            firstErrorStr = expression.GetFirstErrorDuringPreprocessingText();
+            firstErrorPos = expression.GetFirstErrorDuringPreprocessingPosition();
+            #endif
+            return false;
+        }
+
+        return true;
     }
 
     virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression)
     {
-        return expression.PrepareForTextEvaluationOnly(game, scene);
+        if ( !expression.PrepareForTextEvaluationOnly(game, scene) )
+        {
+            #if defined(GDE)
+            firstErrorStr = expression.GetFirstErrorDuringPreprocessingText();
+            firstErrorPos = expression.GetFirstErrorDuringPreprocessingPosition();
+            #endif
+            return false;
+        }
+
+        return true;
     }
 
     virtual void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction){};
@@ -132,6 +150,7 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
         mathExpression.Parse("0", "");
 
         isMathExpressionPreprocessed = true;
+        return false;
     }
 
     //Parsing successed, prepare math parsing
@@ -188,12 +207,30 @@ class CallbacksForPreparingTextEvaluation : public ParserCallbacks
 
     virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression)
     {
-        return expression.PrepareForMathEvaluationOnly(game, scene);
+        if ( !expression.PrepareForMathEvaluationOnly(game, scene) )
+        {
+            #if defined(GDE)
+            firstErrorStr = expression.GetFirstErrorDuringPreprocessingText();
+            firstErrorPos = expression.GetFirstErrorDuringPreprocessingPosition();
+            #endif
+            return false;
+        }
+
+        return true;
     }
 
     virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression)
     {
-        return expression.PrepareForTextEvaluationOnly(game, scene);
+        if ( !expression.PrepareForTextEvaluationOnly(game, scene) )
+        {
+            #if defined(GDE)
+            firstErrorStr = expression.GetFirstErrorDuringPreprocessingText();
+            firstErrorPos = expression.GetFirstErrorDuringPreprocessingPosition();
+            #endif
+            return false;
+        }
+
+        return true;
     }
 
     virtual void OnConstantToken(std::string text){};
@@ -222,6 +259,8 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
         firstErrorPos = expressionParser.firstErrorPos;
         #endif
         textExpressionFunctions.clear();
+
+        return false;
     }
 
     isTextExpressionPreprocessed = true;

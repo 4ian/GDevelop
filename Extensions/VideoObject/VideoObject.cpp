@@ -50,14 +50,18 @@ extern "C"
 
 VideoObject::VideoObject(std::string name_) :
     Object(name_),
-    pCodec(NULL),
-    pFormatCtx(NULL),
-    pCodecCtx(NULL),
-    pFrame(NULL),
-    pFrameRGB(NULL),
+    Data(NULL),
+    Frame(NULL),
+    FrameRGB(NULL),
+    FormatCtx(NULL),
+    videoCodecCtx(NULL),audioCodecCtx(NULL),dataCodecCtx(NULL),
+    videoCodec   (NULL),audioCodec   (NULL),dataCodec(NULL),
     buffer(NULL),
+    Sound(false),
+    Play(true),
+    Replay(false),
+    writeConsol(true),
     img_convert_ctx(NULL),
-    packetValid(false),
     opacity( 255 ),
     colorR( 255 ),
     colorG( 255 ),
@@ -68,29 +72,11 @@ VideoObject::VideoObject(std::string name_) :
 
 VideoObject::~VideoObject()
 {
-    if (pFrameRGB) av_free(pFrameRGB); //Safe to destroy
-    if (pFrame) av_free(pFrame); //Safe to destroy
-    if (buffer) av_free(buffer);
-
-    if(!packetValid) return;
-
-    cout << "Destr1";
-    // Libérer le packet alloué par av_read_frame
-    if(packetValid)av_free_packet(&packet);
-    // Libérer l'image RGB
-    cout << "Destr1.1";
-
-    cout << "Destr1.2";
-    cout << "Destr2";
-    // Libérer l'image YUV
-    cout << "Destr4";
-    // Fermer le codec
-    if (pCodecCtx) avcodec_close(pCodecCtx); // Not safe to destroy
-    cout << "Destr5";
-    // Fermer le  fichier video
-    if (packetValid && pFormatCtx) av_close_input_file(pFormatCtx);
-    cout << "Destr3";
-
+        if(buffer        != NULL) av_free(buffer);
+        if(FrameRGB      != NULL) av_free(FrameRGB);
+        if(Frame         != NULL) av_free(Frame);
+        if(videoCodecCtx != NULL) avcodec_close(videoCodecCtx);
+        //if(FormatCtx     != NULL) av_close_input_file(FormatCtx);
 }
 
 void VideoObject::LoadFromXml(const TiXmlElement * object)
@@ -105,67 +91,76 @@ void VideoObject::SaveToXml(TiXmlElement * object)
 
 bool VideoObject::LoadResources(const ImageManager & imageMgr )
 {
-    std::string filename = "D:/Florian/Videos/LegoStarWars.avi";
+    std::string file = "D:/Florian/Videos/LegoStarWars.avi";
 
     av_register_all();
 
-    if(av_open_input_file(&pFormatCtx, filename.c_str(), NULL, 0, NULL)!=0)
-    {
-        cout << "Unexisting file!\n";
-    }
-
-    if(av_find_stream_info(pFormatCtx)<0)
-    {
-        cout << "Couldn't find stream information!\n";
-    }
-
-    dump_format(pFormatCtx, 0, filename.c_str(), 0);
-    videoStream=-1;
-    for(int i=0; i<pFormatCtx->nb_streams; i++)
-    {
-        if(pFormatCtx->streams[i]->codec->codec_type==CODEC_TYPE_VIDEO)
+        Sound = false;
+        if(av_open_input_file(&FormatCtx, file.c_str(), NULL, 0, NULL)!=0)
         {
-            videoStream=i;
-            break;
+          Play = false;
+          return true;
         }
-    }
-    if(videoStream==-1)
-        cout << endl << "videoStream == -1" << endl;
+        if(av_find_stream_info(FormatCtx)<0)
+        {
+          Play = false;
+          return true;
+        }
 
-    pCodecCtx=pFormatCtx->streams[videoStream]->codec;
-    pCodec=avcodec_find_decoder(pCodecCtx->codec_id);
-    if(pCodec==NULL)
-    {
-        cout << endl << "Unsupported codec!\n"<< endl;
-    }
+        dump_format(FormatCtx, 0, file.c_str(), 0);
 
-    if(avcodec_open(pCodecCtx, pCodec)<0)
-        cout << endl << "avcodec_open(pCodecCtx, pCodec)<0"<< endl;
-    iFrameSize = pCodecCtx->width * pCodecCtx->height * 3;
-    cout << "FrameSize" << iFrameSize;
-    pFrame=avcodec_alloc_frame();
+        videoStream=-1;
+        audioStream=-1;
+        dataStream=-1;
+        for(nFrm=0; nFrm<FormatCtx->nb_streams; nFrm++)
+        {
+          if(FormatCtx->streams[nFrm]->codec->codec_type == CODEC_TYPE_VIDEO)
+          {
+             videoStream = nFrm;
+          }
+          if(FormatCtx->streams[nFrm]->codec->codec_type == CODEC_TYPE_AUDIO)
+          {
+             audioStream = nFrm;
+          }
+          if(FormatCtx->streams[nFrm]->codec->codec_type == CODEC_TYPE_DATA)
+          {
+             dataStream = nFrm;
+          }
+        }
+        if(dataStream > -1)
+            dataCodecCtx = FormatCtx->streams[dataStream]->codec;
+        if(audioStream > -1 && Sound)
+        {
+            audioCodecCtx = FormatCtx->streams[audioStream]->codec;
+            audioCodec = avcodec_find_decoder(audioCodecCtx->codec_id);
+            avcodec_open(audioCodecCtx, audioCodec);
+        }
+        if(videoStream > -1)
+        {
+            videoCodecCtx = FormatCtx->streams[videoStream]->codec;
+            videoCodec = avcodec_find_decoder(videoCodecCtx->codec_id);
+            avcodec_open(videoCodecCtx, videoCodec);
+            videoFPS = (double)FormatCtx->streams[videoStream]->r_frame_rate.den / FormatCtx->streams[videoStream]->r_frame_rate.num;
+            Frame = avcodec_alloc_frame();
+            FrameRGB = avcodec_alloc_frame();
+        }
+        numBytes = avpicture_get_size(PIX_FMT_RGB24, videoCodecCtx->width,videoCodecCtx->height);
+        buffer = (uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
+        avpicture_fill((AVPicture *)FrameRGB, buffer, PIX_FMT_RGB24, videoCodecCtx->width, videoCodecCtx->height);
+        nFrm = 0;
 
-    pFrameRGB=avcodec_alloc_frame();
-    if(pFrameRGB==NULL)
-        cout << "Unable to alloc_frame RGB";
+    iFrameSize = videoCodecCtx->width * videoCodecCtx->height * 3;
+    Data = new sf::Uint8[videoCodecCtx->width * videoCodecCtx->height * 4];
 
-    int numBytes=avpicture_get_size(PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
-    buffer=(uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
-
-    avpicture_fill((AVPicture *)pFrameRGB, buffer, PIX_FMT_RGB24,
-                   pCodecCtx->width, pCodecCtx->height);
-
-    Data = new sf::Uint8[pCodecCtx->width * pCodecCtx->height * 4];
-
-    im_video.Create(pCodecCtx->width, pCodecCtx->height, sf::Color(100,255,255,255));
+    im_video.Create(videoCodecCtx->width, videoCodecCtx->height, sf::Color(100,255,255,255));
     im_video.SetSmooth(false);
     sp_video.SetImage(im_video);
     sp_video.SetOrigin(sp_video.GetSize().x/2,sp_video.GetSize().y/2);
 
     //Initialize image converter
-    img_convert_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height,
-                                     pCodecCtx->pix_fmt, //Source format
-                                     pCodecCtx->width, pCodecCtx->height,
+    img_convert_ctx = sws_getContext(videoCodecCtx->width, videoCodecCtx->height,
+                                     videoCodecCtx->pix_fmt, //Source format
+                                     videoCodecCtx->width, videoCodecCtx->height,
                                      PIX_FMT_RGB24, //Destination format, compatible with SFML
                                      SWS_BICUBIC, NULL, NULL, NULL);
     if(img_convert_ctx == NULL)
@@ -173,7 +168,7 @@ bool VideoObject::LoadResources(const ImageManager & imageMgr )
         cout << "Cannot initialize the conversion context!\n";
     }
 
-    return true;
+        return true;
 }
 
 /**
@@ -192,40 +187,56 @@ bool VideoObject::Draw( sf::RenderWindow& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    if ( !packetValid ) return true;
-
-    if(packet.stream_index==videoStream)
+    if(Play)
     {
-        //Get frame
-        int frameFinished;
-        if ( avcodec_decode_video(pCodecCtx, pFrame, &frameFinished,
-                             packet.data, packet.size) <0) cout << "error" << endl;
-
-        if(frameFinished) //Changing frame ? Prepare so the new frame
+        AVPacket packet;
+        if(av_read_frame(FormatCtx, &packet) >= 0)
         {
-            sws_scale(img_convert_ctx, pFrame->data,
-                      pFrame->linesize, 0,
-                      pCodecCtx->height,
-                      pFrameRGB->data, pFrameRGB->linesize);
+            if(packet.stream_index == videoStream)
+            {
+                avcodec_decode_video(videoCodecCtx, Frame, &frame, packet.data, packet.size);
+                if(frame)
+                {
+                    sws_scale(img_convert_ctx, Frame->data,
+                              Frame->linesize, 0,
+                              videoCodecCtx->height,
+                              FrameRGB->data, FrameRGB->linesize);
+
+                    nFrm++;
+                    av_free_packet(&packet);
+                }
+            }
+            else if(packet.stream_index == audioStream);
+            else av_free_packet(&packet);
+        }
+        else
+        {
+            if(Replay == true) ; //TODO
+            else
+            {
+                if(writeConsol) printf("\n> END <\n\n");
+                ;//TODO Play(false)
+                return false;
+            }
         }
 
-        //Adapt frame to SFML image format.
-        int j = 0;
-        for(int i = 0 ; i < (iFrameSize) ; i+=3)
-        {
-            Data[j] = pFrameRGB->data[0][i];
-            Data[j+1] = pFrameRGB->data[0][i+1];
-            Data[j+2] = pFrameRGB->data[0][i+2];
-            Data[j+3] = 255;
-            j+=4;
-        }
 
-        im_video.LoadFromPixels(pCodecCtx->width, pCodecCtx->height, Data);
-        sp_video.SetImage(im_video);
+    //Adapt frame to SFML image format.
+    int j = 0;
+    for(int i = 0 ; i < (iFrameSize) ; i+=3)
+    {
+        Data[j] = FrameRGB->data[0][i];
+        Data[j+1] = FrameRGB->data[0][i+1];
+        Data[j+2] = FrameRGB->data[0][i+2];
+        Data[j+3] = 255;
+        j+=4;
     }
 
+    im_video.LoadFromPixels(videoCodecCtx->width, videoCodecCtx->height, Data);
+    sp_video.SetImage(im_video);
     window.Draw( sp_video );
 
+    }
     return true;
 }
 
@@ -342,11 +353,6 @@ float VideoObject::GetCenterY() const
  */
 void VideoObject::UpdateTime(float)
 {
-    if (av_read_frame(pFormatCtx, &packet) < 0) //Changed to av_read_frame
-    {
-        //Video ended.
-    }
-    packetValid = true;
 }
 
 /**

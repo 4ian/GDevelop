@@ -117,20 +117,23 @@ class VideoObject : public Object
         sf::Image im_video;
         sf::Sprite sp_video;
         sf::Uint8 *Data;
+        int iFrameSize;
 
-        AVCodec   *pCodec; ///< Video stuff
+        std::string file;
 
-        AVFormatContext *pFormatCtx; ///< Video stuff
-        int             videoStream; ///< Video stuff
-        int             iFrameSize; ///< Video stuff
-        AVCodecContext  *pCodecCtx; ///< Video stuff
-        AVFrame         *pFrame; ///< Video stuff
-        AVFrame         *pFrameRGB; ///< Video stuff
-        uint8_t         *buffer; ///< Video stuff
-        AVPacket        packet; ///< Video stuff
+        AVFrame *Frame,*FrameRGB;
+        AVFormatContext *FormatCtx;
+        AVCodecContext  *videoCodecCtx ,*audioCodecCtx ,*dataCodecCtx;
+        AVCodec         *videoCodec    ,*audioCodec    ,*dataCodec;
+
+        uint8_t *buffer;
+
+            double videoFPS;
+            int  nFrm, frame, numBytes, windowFPS;
+            int  videoStream, audioStream, dataStream;
+            bool drawFrame, Sound, Play, Replay, writeConsol;
+
         SwsContext *img_convert_ctx; //Video stuff : Image converter
-
-        bool packetValid;
 
         //Opacity
         float opacity;

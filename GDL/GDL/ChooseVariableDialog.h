@@ -61,6 +61,9 @@ class GD_API ChooseVariableDialog: public wxDialog
 		static const long idAddVar;
 		static const long idEditVar;
 		static const long idDelVar;
+		static const long idMoveUpVar;
+		static const long idRenameVar;
+		static const long idMoveDownVar;
 		static const long ID_Help;
 
 	private:
@@ -72,10 +75,14 @@ class GD_API ChooseVariableDialog: public wxDialog
 		void OntoolbarPanelResize(wxSizeEvent& event);
 		void OnvariablesListItemActivated(wxListEvent& event);
 		void OnvariablesListItemSelect(wxListEvent& event);
+		void OnvariablesListKeyDown(wxListEvent& event);
 		//*)
 		void OnAddVarSelected(wxCommandEvent& event);
 		void OnDelVarSelected(wxCommandEvent& event);
 		void OnEditVarSelected(wxCommandEvent& event);
+		void OnRenameVarSelected(wxCommandEvent& event);
+		void OnMoveUpVarSelected(wxCommandEvent& event);
+		void OnMoveDownVarSelected(wxCommandEvent& event);
 		void Refresh();
 
         wxToolBar * toolbar;

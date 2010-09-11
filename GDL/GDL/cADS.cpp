@@ -75,16 +75,35 @@ bool SpriteObject::CondSprite( RuntimeScene & scene, ObjectsConcerned & objectsC
  */
 bool SpriteObject::CondDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetCurrentDirection() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetCurrentDirection() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetCurrentDirection() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetCurrentDirection() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetCurrentDirection() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetCurrentDirection() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
-       )
+    if ( currentAnimation >= GetAnimationsNumber() ) return false;
+
+    if ( GetAnimation( currentAnimation ).typeNormal )
     {
-        return true;
+        //optimisation : le test de signe en premier
+        if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetCurrentDirection() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+                ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetCurrentDirection() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+                ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetCurrentDirection() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+                ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetCurrentDirection() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+                ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetCurrentDirection() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+                ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetCurrentDirection() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
+           )
+        {
+            return true;
+        }
+    }
+    else
+    {
+        //optimisation : le test de signe en premier
+        if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetAngle() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+                ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetAngle() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+                ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetAngle() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+                ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetAngle() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+                ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetAngle() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+                ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetAngle() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
+           )
+        {
+            return true;
+        }
     }
 
     return false;

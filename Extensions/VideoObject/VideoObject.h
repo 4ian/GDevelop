@@ -28,13 +28,8 @@ freely, subject to the following restrictions:
 #define VIDEOOBJECT_H
 
 #include "GDL/Object.h"
+#include <TheoraPlayer.h>
 #include <SFML/Graphics.hpp>
-extern "C"
-{
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
-}
 class Evaluateur;
 class ImageManager;
 class RuntimeScene;
@@ -101,7 +96,7 @@ class VideoObject : public Object
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
 
-        virtual bool SetAngle(float newAngle) { angle = newAngle; sp_video.SetRotation(-angle); return true;};
+        virtual bool SetAngle(float newAngle) { angle = newAngle; video.SetRotation(-angle); return true;};
         virtual float GetAngle() const {return angle;};
 
         void SetOpacity(float val);
@@ -114,26 +109,13 @@ class VideoObject : public Object
 
     private:
 
-        sf::Image im_video;
-        sf::Sprite sp_video;
-        sf::Uint8 *Data;
-        int iFrameSize;
+        TheoraVideoManager* mgr;
+        TheoraVideoClip* clip;
 
-        std::string file;
+        sf::Image frameImage;
+        sf::Sprite video;
 
-        AVFrame *Frame,*FrameRGB;
-        AVFormatContext *FormatCtx;
-        AVCodecContext  *videoCodecCtx ,*audioCodecCtx ,*dataCodecCtx;
-        AVCodec         *videoCodec    ,*audioCodec    ,*dataCodec;
-
-        uint8_t *buffer;
-
-            double videoFPS;
-            int  nFrm, frame, numBytes, windowFPS;
-            int  videoStream, audioStream, dataStream;
-            bool drawFrame, Sound, Play, Replay, writeConsol;
-
-        SwsContext *img_convert_ctx; //Video stuff : Image converter
+        bool started;
 
         //Opacity
         float opacity;

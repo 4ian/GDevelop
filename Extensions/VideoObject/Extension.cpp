@@ -24,6 +24,23 @@ freely, subject to the following restrictions:
 
 */
 
+/*
+Note : How to compile dependancies ?
+
+Download libogg, libvorbis, libtheora and libtheoraplayer.
+
+Mingw :
+-Using MSYS, go to libogg directory, type "./configure --prefix=c:/mingw" and press Enter.
+-Type "make" and "make install" to build and install libogg
+-go to libvorbis directory, type "./configure --prefix=c:/mingw" and press Enter.
+-Type "make" and "make install" to build and install libvorbis
+-go to libtheora directory, type "./configure --prefix=c:/mingw" and press Enter.
+-Type "make" and "make install" to build and install libtheora
+-Build libtheoraplayer using Code::Blocks projects. Define DTHEORAVIDEO_STATIC if necessary.
+
+
+*/
+
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
 #include "VideoObject.h"

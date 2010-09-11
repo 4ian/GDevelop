@@ -16,8 +16,8 @@
 	<File name="VideoObject.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="4489" topLine="172" />
 	</File>
-	<File name="VideoObject.h" open="0" top="0" tabpos="2">
-		<Cursor position="1234" topLine="117" />
+	<File name="VideoObject.h" open="1" top="1" tabpos="0">
+		<Cursor position="4184" topLine="103" />
 	</File>
 	<File name="VideoObjectEditor.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="64" topLine="3" />

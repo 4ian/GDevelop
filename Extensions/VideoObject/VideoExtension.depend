@@ -32,7 +32,7 @@
 	"GDL/tinyxml.h"
 	<windows.h>
 
-1282938703 source:d:\florian\programmation\gamedevelop\extensions\videoobject\extension.cpp
+1284234246 source:d:\florian\programmation\gamedevelop\extensions\videoobject\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"VideoObject.h"
@@ -7693,12 +7693,10 @@
 
 1283976199 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 
-1282939260 d:\florian\programmation\gamedevelop\extensions\videoobject\videoobject.h
+1284236578 d:\florian\programmation\gamedevelop\extensions\videoobject\videoobject.h
 	"GDL/Object.h"
+	<TheoraPlayer.h>
 	<SFML/Graphics.hpp>
-	<libavcodec/avcodec.h>
-	<libavformat/avformat.h>
-	<libswscale/swscale.h>
 
 1282075489 d:\florian\programmation\gamedevelop\gdl\gdl\object.h
 	<SFML/System.hpp>
@@ -8754,7 +8752,7 @@
 	"GDL/ObjectsConcerned.h"
 	"VideoObject.h"
 
-1282945427 source:d:\florian\programmation\gamedevelop\extensions\videoobject\videoobject.cpp
+1284233773 source:d:\florian\programmation\gamedevelop\extensions\videoobject\videoobject.cpp
 	<SFML/Graphics.hpp>
 	"GDL/Object.h"
 	"GDL/ImageManager.h"
@@ -8762,9 +8760,6 @@
 	"GDL/FontManager.h"
 	"GDL/Position.h"
 	"VideoObject.h"
-	<libavcodec/avcodec.h>
-	<libavformat/avformat.h>
-	<libswscale/swscale.h>
 	<wx/wx.h>
 	"GDL/CommonTools.h"
 	"GDL/ResourcesMergingHelper.h"
@@ -8970,4 +8965,24 @@
 	"wx/cmndata.h"
 
 1253308462 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
+
+1284229476 c:\libs\libtheoraplayer\trunk\include\theoraplayer.h
+	"TheoraVideoManager.h"
+	"TheoraVideoClip.h"
+	"TheoraVideoFrame.h"
+
+1284229476 c:\libs\libtheoraplayer\trunk\include\theoravideomanager.h
+	<vector>
+	<string>
+	"TheoraExport.h"
+	"TheoraVideoClip.h"
+
+1284229476 c:\libs\libtheoraplayer\trunk\include\theoraexport.h
+
+1284229476 c:\libs\libtheoraplayer\trunk\include\theoravideoclip.h
+	<string>
+	"TheoraExport.h"
+
+1284229476 c:\libs\libtheoraplayer\trunk\include\theoravideoframe.h
+	<TheoraExport.h>
 

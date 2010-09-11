@@ -255,7 +255,6 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\include" />
-					<Add directory="C:\Libs\mingw_dgn_media\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -298,13 +297,7 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libswscale.dll.a" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libavutil.dll.a" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libavformat.dll.a" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libavfilter.dll.a" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libavdevice.dll.a" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libavcore.dll.a" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libavcodec.dll.a" />
+					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Release" />
 					<Add directory="..\..\IDE\bin\dev" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />

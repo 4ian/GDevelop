@@ -29,9 +29,11 @@ class EditorObjectList: public wxPanel
 		virtual ~EditorObjectList();
 
 		//(*Declarations(EditorObjectList)
+		wxMenuItem* renameAutomatism;
 		wxMenuItem* addAutomatismItem;
 		wxPanel* toolbarPanel;
 		wxMenu* automatismsMenu;
+		wxMenuItem* MenuItem2;
 		wxMenuItem* MenuItem1;
 		wxTreeCtrl* objectsList;
 		wxMenuItem* deleteAutomatismItem;
@@ -42,6 +44,7 @@ class EditorObjectList: public wxPanel
 		wxMenu rootContextMenu;
 		wxMenuItem* moveDownMenuI;
 		wxMenuItem* cutMenuI;
+		wxMenu multipleContextMenu;
 		wxMenuItem* pasteMenuI;
 		//*)
 
@@ -73,6 +76,7 @@ class EditorObjectList: public wxPanel
 		static const long idMenuPaste;
 		static const long ID_MENUITEM4;
 		static const long ID_MENUITEM6;
+		static const long ID_MENUITEM7;
 		//*)
 		static const long ID_BITMAPBUTTON1;
 		static const long ID_BITMAPBUTTON2;
@@ -117,6 +121,7 @@ class EditorObjectList: public wxPanel
 		void OnaddAutomatismItemSelected(wxCommandEvent& event);
 		void OndeleteAutomatismItemSelected(wxCommandEvent& event);
 		void OnrenameAutomatismSelected(wxCommandEvent& event);
+		void OnobjectsListKeyDown(wxTreeEvent& event);
 		//*)
 		void OnAutomatismSelected(wxCommandEvent & event);
 		void OnRefreshBtClick(wxCommandEvent& event);

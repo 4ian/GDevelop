@@ -24,6 +24,11 @@ class EventsRefactorer
          */
         static void RenameObjectInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events, std::string oldName, std::string newName);
 
+        /**
+         * Remove all actions or conditions using an object
+         */
+        static void RemoveObjectInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events, std::string name);
+
     private:
         /**
          * Replace all occurences of an object name by another name in an action
@@ -36,6 +41,16 @@ class EventsRefactorer
          * ( include : objects in parameters and in math/text expressions ).
          */
         static void RenameObjectInConditions(Game & game, Scene & scene, std::vector < Instruction > & instructions, std::string oldName, std::string newName);
+
+        /**
+         * Remove all conditions of the list using an object
+         */
+        static void RemoveObjectInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string name);
+
+        /**
+         * Remove all actions of the list using an object
+         */
+        static void RemoveObjectInActions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string name);
 
         EventsRefactorer() {};
         virtual ~EventsRefactorer() {};

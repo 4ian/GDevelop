@@ -71,6 +71,7 @@ const long EditorObjectList::idMenuCut = wxNewId();
 const long EditorObjectList::idMenuPaste = wxNewId();
 const long EditorObjectList::ID_MENUITEM4 = wxNewId();
 const long EditorObjectList::ID_MENUITEM6 = wxNewId();
+const long EditorObjectList::ID_MENUITEM7 = wxNewId();
 //*)
 const long EditorObjectList::ID_BITMAPBUTTON1 = wxNewId();
 const long EditorObjectList::ID_BITMAPBUTTON2 = wxNewId();
@@ -103,7 +104,6 @@ mainEditorCommand(mainEditorCommand_)
 {
 	//(*Initialize(EditorObjectList)
 	wxMenuItem* delObjMenuI;
-	wxMenuItem* renameAutomatism;
 	wxMenuItem* editNameMenuI;
 	wxMenuItem* editVarMenuI;
 	wxMenuItem* editMenuI;
@@ -116,7 +116,7 @@ mainEditorCommand(mainEditorCommand_)
 	FlexGridSizer1->AddGrowableRow(1);
 	toolbarPanel = new wxPanel(this, ID_PANEL4, wxDefaultPosition, wxSize(-1,0), wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer1->Add(toolbarPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	objectsList = new wxTreeCtrl(this, ID_TREECTRL1, wxPoint(-72,-72), wxSize(179,170), wxTR_EDIT_LABELS|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
+	objectsList = new wxTreeCtrl(this, ID_TREECTRL1, wxPoint(-72,-72), wxSize(179,170), wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer1->Add(objectsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	editMenuI = new wxMenuItem((&ContextMenu), idMenuModObj, _("Modifier les propriétés de l\'objet"), wxEmptyString, wxITEM_NORMAL);
@@ -150,33 +150,36 @@ mainEditorCommand(mainEditorCommand_)
 	addObjMenuI = new wxMenuItem((&ContextMenu), idMenuAddObj, _("Ajouter un objet"), wxEmptyString, wxITEM_NORMAL);
 	addObjMenuI->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	ContextMenu.Append(addObjMenuI);
-	delObjMenuI = new wxMenuItem((&ContextMenu), idMenuDelObj, _("Supprimer l\'objet"), wxEmptyString, wxITEM_NORMAL);
+	delObjMenuI = new wxMenuItem((&ContextMenu), idMenuDelObj, _("Supprimer l\'objet\tDel"), wxEmptyString, wxITEM_NORMAL);
 	delObjMenuI->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	ContextMenu.Append(delObjMenuI);
 	ContextMenu.AppendSeparator();
-	moveUpMenuI = new wxMenuItem((&ContextMenu), idMoveUp, _("Déplacer vers le haut"), wxEmptyString, wxITEM_NORMAL);
+	moveUpMenuI = new wxMenuItem((&ContextMenu), idMoveUp, _("Déplacer vers le haut\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
 	moveUpMenuI->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
 	ContextMenu.Append(moveUpMenuI);
-	moveDownMenuI = new wxMenuItem((&ContextMenu), idMoveDown, _("Déplacer vers le bas"), wxEmptyString, wxITEM_NORMAL);
+	moveDownMenuI = new wxMenuItem((&ContextMenu), idMoveDown, _("Déplacer vers le bas\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
 	moveDownMenuI->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
 	ContextMenu.Append(moveDownMenuI);
 	ContextMenu.AppendSeparator();
-	copyMenuI = new wxMenuItem((&ContextMenu), idMenuCopy, _("Copier"), wxEmptyString, wxITEM_NORMAL);
+	copyMenuI = new wxMenuItem((&ContextMenu), idMenuCopy, _("Copier\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
 	copyMenuI->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
 	ContextMenu.Append(copyMenuI);
-	cutMenuI = new wxMenuItem((&ContextMenu), idMenuCut, _("Couper"), wxEmptyString, wxITEM_NORMAL);
+	cutMenuI = new wxMenuItem((&ContextMenu), idMenuCut, _("Couper\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
 	cutMenuI->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
 	ContextMenu.Append(cutMenuI);
-	pasteMenuI = new wxMenuItem((&ContextMenu), idMenuPaste, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+	pasteMenuI = new wxMenuItem((&ContextMenu), idMenuPaste, _("Coller\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
 	pasteMenuI->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	ContextMenu.Append(pasteMenuI);
 	MenuItem1 = new wxMenuItem((&rootContextMenu), ID_MENUITEM4, _("Ajouter un objet"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	rootContextMenu.Append(MenuItem1);
 	rootContextMenu.AppendSeparator();
-	MenuItem3 = new wxMenuItem((&rootContextMenu), ID_MENUITEM6, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem3 = new wxMenuItem((&rootContextMenu), ID_MENUITEM6, _("Coller\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	rootContextMenu.Append(MenuItem3);
+	MenuItem2 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Supprimer les objets\tDEL"), _("Supprimer tous les objets selectionnés"), wxITEM_NORMAL);
+	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	multipleContextMenu.Append(MenuItem2);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
@@ -187,6 +190,7 @@ mainEditorCommand(mainEditorCommand_)
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&EditorObjectList::OnobjectsListItemActivated);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&EditorObjectList::OnobjectsListItemRightClick);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&EditorObjectList::OnobjectsListSelectionChanged);
+	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_KEY_DOWN,(wxObjectEventFunction)&EditorObjectList::OnobjectsListKeyDown);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_MENU,(wxObjectEventFunction)&EditorObjectList::OnobjectsListItemMenu);
 	Connect(idMenuModObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OneditMenuISelected);
 	Connect(idMenuModVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OneditVarMenuISelected);
@@ -203,6 +207,7 @@ mainEditorCommand(mainEditorCommand_)
 	Connect(idMenuPaste,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnPasteSelected);
 	Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnaddObjMenuISelected);
 	Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnPasteSelected);
+	Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OndelObjMenuISelected);
 	Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorObjectList::OnSetFocus);
 	//*)
 
@@ -373,9 +378,14 @@ void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
     OnSetFocus(unusedEvent);
 
     item = event.GetItem();
+    wxArrayTreeItemIds selection;
 
     if ( item == objectsList->GetRootItem())
         PopupMenu( &rootContextMenu );
+    else if ( objectsList->GetSelections(selection) > 1 )
+    {
+        PopupMenu( &multipleContextMenu );
+    }
     else
     {
         //Find object so as to update automatisms list
@@ -600,28 +610,74 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
 {
-    if ( item.IsOk() && objectsList->GetRootItem() != item )
+    wxArrayTreeItemIds selection;
+    objectsList->GetSelections(selection);
+    std::vector < string > objectsDeleted;
+
+    int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Supprimer également toutes les références à l'objet dans les groupes et les évènements ( Soit les actions et conditions utilisant l'objet ) ?") :
+                                                             wxString::Format(_("Supprimer également toutes les références aux %i objets dans les groupes et les évènements ( Soit les actions et conditions utilisant l'objet ) ?"), selection.GetCount()),
+                              _("Confirmation de la suppression"), wxYES_NO | wxCANCEL);
+
+    if ( answer == wxCANCEL ) return;
+
+    //Removing objects
+    for (unsigned int i = 0;i<selection.GetCount();++i)
     {
-        int id = Picker::PickOneObject( objects, ( string ) objectsList->GetItemText( item ) );
-        if ( id != -1 )
+        std::string objectName = string(objectsList->GetItemText( selection[i] ).mb_str());
+        objectsDeleted.push_back(objectName); //Generate also a list containing the names of the objects deleted.
+
+        if ( selection[i].IsOk() && objectsList->GetRootItem() != selection[i] )
         {
-            vector <unsigned int> automatisms = objects->at(id)->GetAllAutomatismsNameIdentifiers();
+            int id = Picker::PickOneObject( objects, objectName );
+            if ( id != -1 )
+            {
+                vector <unsigned int> automatisms = objects->at(id)->GetAllAutomatismsNameIdentifiers();
 
-            //Remove objects
-            objects->erase( objects->begin() + id );
+                //Remove objects
+                objects->erase( objects->begin() + id );
 
-            //Remove automatisms shared datas if necessary
-            for (unsigned int i = 0;i<automatisms.size();++i)
-                RemoveSharedDatasIfNecessary(automatisms[i]);
+                if ( scene )
+                {
+                    if ( answer == wxYES )
+                    {
+                        EventsRefactorer::RemoveObjectInEvents(game, *scene, scene->events, objectName);
+                        for (unsigned int g = 0;g<scene->objectGroups.size();++g)
+                        {
+                            if ( scene->objectGroups[g].Find(objectName)) scene->objectGroups[g].RemoveObject(objectName);
+                        }
+                    }
+                    for (unsigned int p = 0;p<scene->initialObjectsPositions.size();++p)
+                    {
+                        if ( scene->initialObjectsPositions[p].objectName == objectName )
+                        {
+                            scene->initialObjectsPositions.erase(scene->initialObjectsPositions.begin() + p);
+                            --p;
+                        }
+                    }
+                }
+
+                //Remove automatisms shared datas if necessary
+                for (unsigned int i = 0;i<automatisms.size();++i)
+                    RemoveSharedDatasIfNecessary(automatisms[i]);
+            }
+
+            if ( scene ) scene->wasModified = true;
         }
-
-        if ( scene ) scene->wasModified = true;
-        objectsList->Delete( item );
-        return;
-
     }
-    else
-        wxLogStatus( _( "Aucun objet sélectionnée" ) );
+
+    //Removing items
+    void * nothing;
+    wxTreeItemId item = objectsList->GetFirstChild( objectsList->GetRootItem(), nothing);
+    while( item.IsOk() )
+    {
+        if ( find(objectsDeleted.begin(), objectsDeleted.end(), string(objectsList->GetItemText( item ).mb_str())) != objectsDeleted.end() )
+        {
+            objectsList->Delete(item);
+            item = objectsList->GetFirstChild(objectsList->GetRootItem(), nothing);
+        }
+        else
+            item = objectsList->GetNextSibling(item);
+    }
 }
 
 ////////////////////////////////////////////////////////////
@@ -663,23 +719,30 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     }
 
     int i = Picker::PickOneObject( objects, ancienNom );
-    if ( i != -1 )
+    if ( i == -1 ) return;
+
+    objects->at( i )->SetName( newName );
+
+    if ( scene ) //Change the object name in the scene.
     {
-        objects->at( i )->SetName( newName );
-
-        if ( scene ) //Change the object name in the scene.
+        EventsRefactorer::RenameObjectInEvents(game, *scene, scene->events, ancienNom, newName);
+        for (unsigned int p = 0;p<scene->initialObjectsPositions.size();++p)
         {
-            EventsRefactorer::RenameObjectInEvents(game, *scene, scene->events, ancienNom, newName);
-            for (unsigned int p = 0;p<scene->initialObjectsPositions.size();++p)
-            {
-                if ( scene->initialObjectsPositions[p].objectName == ancienNom ) scene->initialObjectsPositions[p].objectName = newName;
-            }
-
-            scene->wasModified = true;
+            if ( scene->initialObjectsPositions[p].objectName == ancienNom ) scene->initialObjectsPositions[p].objectName = newName;
         }
-        objectsList->SetItemText( event.GetItem(), event.GetLabel() );
-        return;
+        for (unsigned int g = 0;g<scene->objectGroups.size();++g)
+        {
+            if ( scene->objectGroups[g].Find(ancienNom))
+            {
+                scene->objectGroups[g].RemoveObject(ancienNom);
+                scene->objectGroups[g].AddObject(newName);
+            }
+        }
+
+        scene->wasModified = true;
     }
+    objectsList->SetItemText( event.GetItem(), event.GetLabel() );
+    return;
 }
 
 /**
@@ -1115,5 +1178,55 @@ void EditorObjectList::CreateSharedDatasIfNecessary(boost::shared_ptr<Automatism
         boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = extensionsManager->CreateAutomatismSharedDatas(automatism->GetTypeName());
         automatismsSharedDatas->SetName(automatism->GetName());
         scene->automatismsInitialSharedDatas[automatismsSharedDatas->GetAutomatismId()] = automatismsSharedDatas;
+    }
+}
+
+/**
+ * Handle accelerators
+ */
+void EditorObjectList::OnobjectsListKeyDown(wxTreeEvent& event)
+{
+    if ( event.GetKeyCode() == WXK_DELETE )
+    {
+        wxCommandEvent unusedEvent;
+        OndelObjMenuISelected( unusedEvent );
+    }
+    else if (event.GetKeyEvent().GetModifiers() == wxMOD_CMD)
+    {
+        switch ( event.GetKeyCode() )
+        {
+            case 67: //Ctrl C
+            {
+                wxCommandEvent unusedEvent;
+                OnCopySelected( unusedEvent );
+                break;
+            }
+            case 86: //Ctrl-V
+            {
+                wxCommandEvent unusedEvent;
+                OnPasteSelected( unusedEvent );
+                break;
+            }
+            case 88: //Ctrl-X
+            {
+                wxCommandEvent unusedEvent;
+                OnCutSelected( unusedEvent );
+                break;
+            }
+            case WXK_UP:
+            {
+                wxCommandEvent unusedEvent;
+                OnMoveUpSelected( unusedEvent );
+                break;
+            }
+            case WXK_DOWN:
+            {
+                wxCommandEvent unusedEvent;
+                OnMoveDownSelected( unusedEvent );
+                break;
+            }
+            default:
+                break;
+        }
     }
 }

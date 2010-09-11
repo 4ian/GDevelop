@@ -12,6 +12,7 @@
 #include <wx/textdlg.h>
 #include <wx/log.h>
 #include "GDL/ListVariable.h"
+#include "GDL/HelpFileAccess.h"
 
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
@@ -34,6 +35,7 @@ const long InitialVariablesDialog::idEditVar = wxNewId();
 const long InitialVariablesDialog::idDelVar = wxNewId();
 const long InitialVariablesDialog::idMoveUpVar = wxNewId();
 const long InitialVariablesDialog::idMoveDownVar = wxNewId();
+const long InitialVariablesDialog::idRenameVar = wxNewId();
 const long InitialVariablesDialog::ID_Help = wxNewId();
 
 BEGIN_EVENT_TABLE(InitialVariablesDialog,wxDialog)
@@ -60,7 +62,7 @@ variables(variables_)
 	Panel2 = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
 	Panel2->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 	FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticBitmap1 = new wxStaticBitmap(Panel2, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/var64.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP1"));
+	StaticBitmap1 = new wxStaticBitmap(Panel2, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/var64.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	FlexGridSizer12->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText4 = new wxStaticText(Panel2, ID_STATICTEXT6, _("Modifiez ici les variables initiales.\nNotez qu\'il n\'est pas obligatoire de déclarer une variable\ndans le tableau pour l\'utiliser. Déclarer une variable dans\nle tableau permet de lui affecter une valeur initiale, et de\npouvoir la retrouver facilement."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT6"));
 	FlexGridSizer12->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -73,7 +75,7 @@ variables(variables_)
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	toolbarPanel = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(-1,26), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	FlexGridSizer1->Add(toolbarPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	variablesList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxSize(293,147), wxLC_REPORT|wxLC_EDIT_LABELS, wxDefaultValidator, _T("ID_LISTCTRL1"));
+	variablesList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxSize(374,149), wxLC_REPORT|wxLC_EDIT_LABELS|wxLC_SINGLE_SEL, wxDefaultValidator, _T("ID_LISTCTRL1"));
 	FlexGridSizer1->Add(variablesList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -93,6 +95,7 @@ variables(variables_)
 	toolbarPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&InitialVariablesDialog::OntoolbarPanelResize,0,this);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnvariablesListItemSelect);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&InitialVariablesDialog::OnvariablesListItemActivated);
+	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_KEY_DOWN,(wxObjectEventFunction)&InitialVariablesDialog::OnvariablesListKeyDown);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&InitialVariablesDialog::OnokBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&InitialVariablesDialog::OncancelBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&InitialVariablesDialog::OnhelpBtClick);
@@ -100,6 +103,7 @@ variables(variables_)
 	Connect(idAddVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnAddVarSelected);
 	Connect(idDelVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnDelVarSelected);
 	Connect(idEditVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnEditVarSelected);
+	Connect(idRenameVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnRenameVarSelected);
 	Connect(idMoveUpVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnMoveUpVarSelected);
 	Connect(idMoveDownVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnMoveDownVarSelected);
 	Connect(ID_Help,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnhelpBtClick);
@@ -115,6 +119,7 @@ variables(variables_)
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
     toolbar->AddTool( idAddVar, wxT( "Ajouter une variable" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter une variable") );
     toolbar->AddTool( idEditVar, wxT( "Editer la valeur initiale de la variable" ), wxBitmap( wxImage( "res/editicon.png" ) ), _("Editer la valeur initiale de la variable") );
+    toolbar->AddTool( idRenameVar, wxT( "Renommer la variable" ), wxBitmap( wxImage( "res/editnom.png" ) ), _("Renommer la variable") );
     toolbar->AddTool( idDelVar, wxT( "Supprimer la variable selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer la variable selectionnée") );
     toolbar->AddSeparator();
     toolbar->AddTool( idMoveUpVar, wxT( "Déplacer vers le haut" ), wxBitmap( wxImage( "res/up.png" ) ), _("Déplacer vers le haut") );
@@ -159,6 +164,16 @@ void InitialVariablesDialog::Refresh()
     	variablesList->InsertItem(i, variablesVector[i].GetName());
     	variablesList->SetItem(i, 1, variablesVector[i].Gettexte());
     }
+
+    //Resize columns with a little margin
+    variablesList->SetColumnWidth(0, variablesList->GetSize().GetWidth()/2-10);
+    variablesList->SetColumnWidth(1, variablesList->GetSize().GetWidth()/2-10);
+
+    int bestHeight = 200+variablesVector.size()*10;
+    bestHeight = (bestHeight < 200) ? 350 : bestHeight;
+    bestHeight = (bestHeight > 500) ? 500 : bestHeight;
+
+    SetSize(GetSize().GetWidth(), bestHeight);
 }
 
 void InitialVariablesDialog::OnokBtClick(wxCommandEvent& event)
@@ -187,8 +202,8 @@ void InitialVariablesDialog::OnAddVarSelected(wxCommandEvent& event)
         return;
     }
 
-    variables.ObtainVariable(variableName);
-    Refresh();
+    variables.ObtainVariable(variableName); //Automatically create variable
+    variablesList->InsertItem(variablesList->GetItemCount(), variableName);
 }
 
 /**
@@ -197,13 +212,30 @@ void InitialVariablesDialog::OnAddVarSelected(wxCommandEvent& event)
 void InitialVariablesDialog::OnDelVarSelected(wxCommandEvent& event)
 {
     if ( !variables.HasVariable(selectedVariable) )
+        return;
+
+    variablesList->DeleteItem(variablesList->FindItem(-1, selectedVariable));
+    variables.RemoveVariable(selectedVariable);
+}
+
+/**
+ * Rename an initial variable
+ */
+void InitialVariablesDialog::OnRenameVarSelected(wxCommandEvent& event)
+{
+    if ( !variables.HasVariable(selectedVariable) )
+        return;
+
+    string newName = string(wxGetTextFromUser("Entrez le nouveau nom de la variable", "Nom de la variable", variables.ObtainVariable(selectedVariable).GetName()).mb_str());
+
+    if ( variables.HasVariable(newName) )
     {
-        wxLogMessage(_("Impossible de trouver la variable à supprimer"));
+        wxLogMessage(_("Une variable porte déjà ce nom."));
         return;
     }
 
-    variables.RemoveVariable(selectedVariable);
-    Refresh();
+    variablesList->SetItem(variablesList->FindItem(-1, selectedVariable), 0, newName);
+    variables.ObtainVariable(selectedVariable).SetName(newName);
 }
 
 /**
@@ -213,13 +245,20 @@ void InitialVariablesDialog::OnMoveUpVarSelected(wxCommandEvent& event)
 {
     vector < Variable > & variablesVector = variables.GetVariablesVector();
 
-    for (unsigned int i = 0;i<variablesVector.size();++i)
+    for (unsigned int i = 1;i<variablesVector.size();++i)
     {
         if ( variablesVector[i].GetName() == selectedVariable)
         {
-            variablesVector.insert(variablesVector.begin()+i, variablesVector[i]);
-            variablesVector.erase(variablesVector.begin()+i+1);
-            Refresh();
+            Variable variable = variablesVector[i];
+
+            variablesVector.erase(variablesVector.begin()+i);
+            variablesVector.insert(variablesVector.begin()+i-1, variable);
+
+            long variableIdInList = variablesList->FindItem(-1, selectedVariable);
+            variablesList->DeleteItem(variableIdInList);
+            variablesList->InsertItem(variableIdInList-1, variable.GetName());
+            variablesList->SetItem(variableIdInList-1, 1, variable.Gettexte());
+
             return;
         }
     }
@@ -236,9 +275,16 @@ void InitialVariablesDialog::OnMoveDownVarSelected(wxCommandEvent& event)
     {
         if ( variablesVector[i].GetName() == selectedVariable)
         {
-            variablesVector.insert(variablesVector.begin()+i+1, variablesVector[i]);
+            Variable variable = variablesVector[i];
+
             variablesVector.erase(variablesVector.begin()+i);
-            Refresh();
+            variablesVector.insert(variablesVector.begin()+i+1, variable);
+
+            long variableIdInList = variablesList->FindItem(-1, selectedVariable);
+            variablesList->DeleteItem(variableIdInList);
+            variablesList->InsertItem(variableIdInList+1, variable.GetName());
+            variablesList->SetItem(variableIdInList+1, 1, variable.Gettexte());
+
             return;
         }
     }
@@ -250,16 +296,12 @@ void InitialVariablesDialog::OnMoveDownVarSelected(wxCommandEvent& event)
 void InitialVariablesDialog::OnEditVarSelected(wxCommandEvent& event)
 {
     if ( !variables.HasVariable(selectedVariable) )
-    {
-        wxLogMessage(_("Impossible de trouver la variable à éditer"));
         return;
-    }
 
-    string value = string(wxGetTextFromUser("Entrez la valeur initiale de la variable", "Valeur initiale").mb_str());
+    string value = string(wxGetTextFromUser("Entrez la valeur initiale de la variable", "Valeur initiale", variables.GetVariableText(selectedVariable)).mb_str());
+
     variables.ObtainVariable(selectedVariable).Settexte(value);
-
-    Refresh();
-    return;
+    variablesList->SetItem(variablesList->FindItem(-1, selectedVariable), 1, value);
 }
 
 /**
@@ -275,10 +317,28 @@ void InitialVariablesDialog::OnvariablesListItemActivated(wxListEvent& event)
 
 void InitialVariablesDialog::OnhelpBtClick(wxCommandEvent& event)
 {
+    HelpFileAccess::getInstance()->DisplaySection(242);
 }
 
 
 void InitialVariablesDialog::OnvariablesListItemSelect(wxListEvent& event)
 {
     selectedVariable = event.GetText();
+}
+
+/**
+ * Handles accelerators
+ */
+void InitialVariablesDialog::OnvariablesListKeyDown(wxListEvent& event)
+{
+    if ( event.GetKeyCode() == WXK_DELETE )
+    {
+        wxCommandEvent unusedEvent;
+        OnDelVarSelected( unusedEvent );
+    }
+    else if ( event.GetKeyCode() == WXK_INSERT )
+    {
+        wxCommandEvent unusedEvent;
+        OnAddVarSelected( unusedEvent );
+    }
 }

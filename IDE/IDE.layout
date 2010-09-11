@@ -136,8 +136,8 @@
 	<File name="EditPropScene.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="12120" topLine="333" />
 	</File>
-	<File name="EditorEvents.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="50195" topLine="969" />
+	<File name="EditorEvents.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="62265" topLine="1326" />
 	</File>
 	<File name="EditorEvents.h" open="0" top="0" tabpos="4">
 		<Cursor position="8746" topLine="214" />
@@ -154,8 +154,8 @@
 	<File name="EditorLayers.h" open="0" top="0" tabpos="10">
 		<Cursor position="2112" topLine="61" />
 	</File>
-	<File name="EditorObjectList.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="30446" topLine="655" />
+	<File name="EditorObjectList.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="47503" topLine="1145" />
 	</File>
 	<File name="EditorObjectList.h" open="0" top="0" tabpos="2">
 		<Cursor position="4246" topLine="114" />
@@ -173,7 +173,7 @@
 		<Cursor position="248" topLine="0" />
 	</File>
 	<File name="EditorScene.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="27928" topLine="510" />
+		<Cursor position="33975" topLine="696" />
 	</File>
 	<File name="EditorScene.h" open="0" top="0" tabpos="4">
 		<Cursor position="5773" topLine="158" />
@@ -184,11 +184,11 @@
 	<File name="EdittimeScene.h" open="0" top="0" tabpos="2">
 		<Cursor position="1631" topLine="58" />
 	</File>
-	<File name="EventsRefactorer.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="526" topLine="0" />
+	<File name="EventsRefactorer.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="16446" topLine="248" />
 	</File>
-	<File name="EventsRefactorer.h" open="1" top="0" tabpos="3">
-		<Cursor position="172" topLine="3" />
+	<File name="EventsRefactorer.h" open="0" top="0" tabpos="3">
+		<Cursor position="1911" topLine="24" />
 	</File>
 	<File name="Extensions.cpp" open="0" top="0" tabpos="21">
 		<Cursor position="11989" topLine="318" />
@@ -232,10 +232,10 @@
 	<File name="ImportImage.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="29134" topLine="422" />
 	</File>
-	<File name="InitialVariablesDialog.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="11122" topLine="213" />
+	<File name="InitialVariablesDialog.cpp" open="1" top="1" tabpos="3">
+		<Cursor position="12651" topLine="268" />
 	</File>
-	<File name="InitialVariablesDialog.h" open="1" top="1" tabpos="1">
+	<File name="InitialVariablesDialog.h" open="0" top="0" tabpos="1">
 		<Cursor position="1480" topLine="48" />
 	</File>
 	<File name="MAJ.cpp" open="0" top="0" tabpos="13">
@@ -259,7 +259,7 @@
 	<File name="ObjectTypeChoice.h" open="0" top="0" tabpos="0">
 		<Cursor position="802" topLine="10" />
 	</File>
-	<File name="PlayerUnitTests.cpp" open="1" top="0" tabpos="4">
+	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="5683" topLine="177" />
 	</File>
 	<File name="Portable.cpp" open="0" top="0" tabpos="5">

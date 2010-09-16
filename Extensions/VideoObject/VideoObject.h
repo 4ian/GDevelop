@@ -28,7 +28,7 @@ freely, subject to the following restrictions:
 #define VIDEOOBJECT_H
 
 #include "GDL/Object.h"
-#include <TheoraPlayer.h>
+#include "VideoWrapper.h"
 #include <SFML/Graphics.hpp>
 class Evaluateur;
 class ImageManager;
@@ -58,6 +58,7 @@ class VideoObject : public Object
         virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new VideoObject(*this));}
 
         virtual bool LoadResources(const ImageManager & imageMgr );
+        virtual bool LoadRuntimeResources(const ImageManager & imageMgr );
         virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
         virtual bool Draw(sf::RenderWindow& main_window);
@@ -96,7 +97,7 @@ class VideoObject : public Object
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
 
-        virtual bool SetAngle(float newAngle) { angle = newAngle; video.SetRotation(-angle); return true;};
+        virtual bool SetAngle(float newAngle) { angle = newAngle; renderSprite.SetRotation(-angle); return true;};
         virtual float GetAngle() const {return angle;};
 
         void SetOpacity(float val);
@@ -109,11 +110,9 @@ class VideoObject : public Object
 
     private:
 
-        TheoraVideoManager* mgr;
-        TheoraVideoClip* clip;
-
-        sf::Image frameImage;
-        sf::Sprite video;
+        std::string videoFile;
+        VideoWrapper video;
+        sf::Sprite renderSprite;
 
         bool started;
 

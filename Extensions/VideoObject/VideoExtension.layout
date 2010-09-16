@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug" />
+	<ActiveTarget name="Debug - Edittime" />
 	<File name="Extension.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="64" topLine="3" />
+		<Cursor position="1016" topLine="84" />
 	</File>
 	<File name="VideoActions.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="64" topLine="0" />
@@ -13,16 +13,22 @@
 	<File name="VideoExpressions.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="64" topLine="0" />
 	</File>
-	<File name="VideoObject.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="4489" topLine="172" />
+	<File name="VideoObject.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="1950" topLine="57" />
 	</File>
-	<File name="VideoObject.h" open="1" top="1" tabpos="0">
-		<Cursor position="4184" topLine="103" />
+	<File name="VideoObject.h" open="1" top="0" tabpos="1">
+		<Cursor position="1747" topLine="52" />
 	</File>
 	<File name="VideoObjectEditor.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="64" topLine="3" />
 	</File>
 	<File name="VideoObjectEditor.h" open="0" top="0" tabpos="1">
 		<Cursor position="1019" topLine="0" />
+	</File>
+	<File name="VideoWrapper.cpp" open="1" top="1" tabpos="4">
+		<Cursor position="1580" topLine="43" />
+	</File>
+	<File name="VideoWrapper.h" open="1" top="0" tabpos="3">
+		<Cursor position="1172" topLine="17" />
 	</File>
 </CodeBlocks_layout_file>

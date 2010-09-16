@@ -68,13 +68,15 @@ void VideoObject::SaveToXml(TiXmlElement * object)
 
 bool VideoObject::LoadResources(const ImageManager & imageMgr )
 {
-	mgr=new TheoraVideoManager();
-	clip=mgr->createVideoClip("C:/Libs/libtheoraplayer/trunk/demos/media/short.ogg",TH_RGBA);
-	clip->setAutoRestart(1);
+    renderSprite.SetImage(video.GetFrameImage(), true);
+    renderSprite.SetOrigin(renderSprite.GetSize().x/2, renderSprite.GetSize().y/2);
+}
 
-	frameImage.Create(clip->getWidth(), clip->getHeight(), sf::Color(0,0,0));
-    video.SetImage(frameImage);
-    video.SetOrigin(video.GetSize().x/2, video.GetSize().y/2);
+bool VideoObject::LoadRuntimeResources(const ImageManager & imageMgr )
+{
+    video.Load("C:/Libs/libtheoraplayer/trunk/demos/media/short.ogg");
+    renderSprite.SetImage(video.GetFrameImage(), true);
+    renderSprite.SetOrigin(renderSprite.GetSize().x/2, renderSprite.GetSize().y/2);
 }
 
 /**
@@ -93,16 +95,9 @@ bool VideoObject::Draw( sf::RenderWindow& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-	TheoraVideoFrame* f=clip->getNextFrame();
-	if (f)
-	{
-        frameImage.LoadFromPixels(clip->getWidth(), f->getHeight(), f->getBuffer());
-        video.SetImage(frameImage);
-
-		clip->popFrame();
-	}
-
-    window.Draw( video );
+	renderSprite.SetImage(video.GetNextFrameImage(), true);
+    renderSprite.SetOrigin(renderSprite.GetSize().x/2, renderSprite.GetSize().y/2);
+    window.Draw( renderSprite );
 
     return true;
 }
@@ -113,17 +108,8 @@ bool VideoObject::Draw( sf::RenderWindow& window )
  */
 bool VideoObject::DrawEdittime(sf::RenderWindow& renderWindow)
 {
-
-	TheoraVideoFrame* f=clip->getNextFrame();
-	if (f)
-	{
-        frameImage.LoadFromPixels(clip->getWidth(), f->getHeight(), f->getBuffer());
-        video.SetImage(frameImage);
-
-		clip->popFrame();
-	}
-
-    renderWindow.Draw( video );
+    renderWindow.Draw( renderSprite );
+    renderSprite.SetOrigin(renderSprite.GetSize().x/2, renderSprite.GetSize().y/2);
 
     return true;
 }
@@ -172,8 +158,8 @@ unsigned int VideoObject::GetNumberOfProperties() const
 
 void VideoObject::OnPositionChanged()
 {
-    video.SetX( GetX()+video.GetSize().x/2 );
-    video.SetY( GetY()+video.GetSize().y/2 );
+    renderSprite.SetX( GetX()+renderSprite.GetSize().x/2 );
+    renderSprite.SetY( GetY()+renderSprite.GetSize().y/2 );
 }
 
 /**
@@ -181,7 +167,7 @@ void VideoObject::OnPositionChanged()
  */
 float VideoObject::GetDrawableX() const
 {
-    return video.GetPosition().x-video.GetOrigin().x;
+    return renderSprite.GetPosition().x-renderSprite.GetOrigin().x;
 }
 
 /**
@@ -189,7 +175,7 @@ float VideoObject::GetDrawableX() const
  */
 float VideoObject::GetDrawableY() const
 {
-    return video.GetPosition().y-video.GetOrigin().y;
+    return renderSprite.GetPosition().y-renderSprite.GetOrigin().y;
 }
 
 /**
@@ -197,7 +183,7 @@ float VideoObject::GetDrawableY() const
  */
 float VideoObject::GetWidth() const
 {
-    return video.GetSize().x;
+    return renderSprite.GetSize().x;
 }
 
 /**
@@ -205,7 +191,7 @@ float VideoObject::GetWidth() const
  */
 float VideoObject::GetHeight() const
 {
-    return video.GetSize().y;
+    return renderSprite.GetSize().y;
 }
 
 /**
@@ -213,7 +199,7 @@ float VideoObject::GetHeight() const
  */
 float VideoObject::GetCenterX() const
 {
-    return video.GetSize().x/2;
+    return renderSprite.GetSize().x/2;
 }
 
 /**
@@ -221,7 +207,7 @@ float VideoObject::GetCenterX() const
  */
 float VideoObject::GetCenterY() const
 {
-    return video.GetSize().y/2;
+    return renderSprite.GetSize().y/2;
 }
 
 /**
@@ -229,14 +215,7 @@ float VideoObject::GetCenterY() const
  */
 void VideoObject::UpdateTime(float time_increase)
 {
-	if (started)
-	{
-		// let's wait until the system caches up a few frames on startup
-		if (clip->getNumReadyFrames() < clip->getNumPrecachedFrames()*0.5f)
-			return;
-		started=false;
-	}
-	mgr->update(time_increase);
+    video.UpdateTime(time_increase);
 }
 
 /**
@@ -247,7 +226,7 @@ void VideoObject::SetColor( unsigned int r, unsigned int g, unsigned int b )
     colorR = r;
     colorG = g;
     colorB = b;
-    video.SetColor(sf::Color(colorR, colorG, colorB, opacity));
+    renderSprite.SetColor(sf::Color(colorR, colorG, colorB, opacity));
 }
 
 void VideoObject::SetOpacity(float val)
@@ -258,7 +237,7 @@ void VideoObject::SetOpacity(float val)
         val = 0;
 
     opacity = val;
-    video.SetColor(sf::Color(colorR, colorG, colorB, opacity));
+    renderSprite.SetColor(sf::Color(colorR, colorG, colorB, opacity));
 }
 
 /**

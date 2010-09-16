@@ -32,6 +32,7 @@
 					<Add option="-lsfml-system-d.dll" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
+					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.dll.a" />
 					<Add directory="..\..\Runtime\bin\debug" />
 				</Linker>
 			</Target>
@@ -98,13 +99,7 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libswscale.dll.a" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libavutil.dll.a" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libavformat.dll.a" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libavfilter.dll.a" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libavdevice.dll.a" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libavcore.dll.a" />
-					<Add library="C:\Libs\mingw_dgn_media\lib\libavcodec.dll.a" />
+					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.dll.a" />
 					<Add directory="..\..\IDE\bin\debug" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
@@ -136,6 +131,7 @@
 					<Add option="-lsfml-system.dll" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
+					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
 					<Add directory="..\..\Runtime\bin\release" />
 				</Linker>
 			</Target>
@@ -201,6 +197,7 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
+					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
 					<Add directory="..\..\IDE\bin\release" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
@@ -232,6 +229,7 @@
 					<Add option="-lsfml-system.dll" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
+					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
 					<Add directory="..\..\Runtime\bin\dev" />
 				</Linker>
 			</Target>
@@ -297,7 +295,7 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Release" />
+					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
 					<Add directory="..\..\IDE\bin\dev" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
@@ -431,6 +429,7 @@
 			<Add directory="..\..\GDL" />
 			<Add directory="C:\Libs\SFML\include" />
 			<Add directory="C:\Libs\boost_1_43_0" />
+			<Add directory="C:\Libs\libtheoraplayer\trunk\include" />
 		</Compiler>
 		<Linker>
 			<Add directory="C:\Libs\SFML\lib\mingw" />
@@ -443,6 +442,8 @@
 		<Unit filename="VideoObject.h" />
 		<Unit filename="VideoObjectEditor.cpp" />
 		<Unit filename="VideoObjectEditor.h" />
+		<Unit filename="VideoWrapper.cpp" />
+		<Unit filename="VideoWrapper.h" />
 		<Unit filename="..\..\GDL\GDL\tinystr.cpp" />
 		<Unit filename="..\..\GDL\GDL\tinystr.h" />
 		<Unit filename="..\..\GDL\GDL\tinyxml.cpp" />

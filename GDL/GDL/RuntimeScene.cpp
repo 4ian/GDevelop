@@ -633,6 +633,8 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
                 newObject->SetHeight(scene.initialObjectsPositions[i].height);
             }
 
+            newObject->LoadRuntimeResources(*game->imageManager);
+
             objectsInstances.AddObject(newObject);
         }
     }

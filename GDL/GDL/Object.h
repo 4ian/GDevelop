@@ -58,9 +58,14 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new Object(*this));}
 
         /**
-         * Called by RuntimeScene at loading
+         * Called by RuntimeScene at loading. The object is not necessarily used on the scene.
          */
         virtual bool LoadResources(const ImageManager & imageMgr) {return true;};
+
+        /**
+         * Called by RuntimeScene when the object is going to be used on the scene.
+         */
+        virtual bool LoadRuntimeResources(const ImageManager & imageMgr) {return true;};
 
         /**
          * Called by RuntimeScene when placing an real object from a position

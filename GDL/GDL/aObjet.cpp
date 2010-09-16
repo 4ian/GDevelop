@@ -21,13 +21,11 @@
 #include <stdexcept>
 
 
-
 /**
  * Duplicate an object
  */
 bool Object::ActDuplicate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-
     ObjSPtr newObject = Clone();
 
     scene.objectsInstances.AddObject(newObject);
@@ -63,6 +61,7 @@ bool ActCreate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const
     newObject->errors = &scene.errors;
     newObject->SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) );
     newObject->SetY( action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) );
+    newObject->LoadRuntimeResources(*scene.game->imageManager);
 
     //Compatibilité avec les versions de Game Develop précédentes
     if ( action.GetParameters().size() > 3 )
@@ -104,6 +103,7 @@ bool ActCreateByName( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     newObject->errors = &scene.errors;
     newObject->SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) );
     newObject->SetY( action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) );
+    newObject->LoadRuntimeResources(*scene.game->imageManager);
 
     //Compatibilité avec les versions de Game Develop précédentes
     if ( action.GetParameters().size() > 3 )

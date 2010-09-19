@@ -40,3 +40,7 @@ double TextObject::ExpAngle( const RuntimeScene & scene, ObjectsConcerned & obje
     return angle;
 }
 
+std::string TextObject::ExpString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction )
+{
+    return text.GetString();
+}

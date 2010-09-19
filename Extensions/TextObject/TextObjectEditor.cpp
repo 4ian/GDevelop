@@ -135,7 +135,7 @@ TextObjectEditor::~TextObjectEditor()
 void TextObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
     object.SetString(string(textEdit->GetValue().mb_str()));
-    object.SetFont(fontEdit->GetValue().mb_str());
+    object.SetFont(string(fontEdit->GetValue().mb_str()));
 
     EndModal(1);
 }

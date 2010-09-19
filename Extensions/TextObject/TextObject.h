@@ -118,6 +118,7 @@ class TextObject : public Object
         //ACE for string
         bool CondString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool ActString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        std::string ExpString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction );
 
         //ACE for font and size
         bool ActFont( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

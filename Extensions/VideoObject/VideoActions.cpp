@@ -31,3 +31,108 @@ freely, subject to the following restrictions:
 #include "GDL/RuntimeScene.h"
 #include "GDL/CommonTools.h"
 
+
+/**
+ * Modify opacity
+ */
+bool VideoObject::ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
+        SetOpacity( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
+        SetOpacity( GetOpacity() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
+        SetOpacity( GetOpacity() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
+        SetOpacity( GetOpacity() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
+        SetOpacity( GetOpacity() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+
+    return true;
+}
+
+/**
+ * Change the color of the texte
+ */
+bool VideoObject::ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), ';');
+
+    if ( colors.size() < 3 ) return false; //La couleur est incorrecte
+
+    SetColor(ToInt(colors[0]),ToInt(colors[1]),ToInt(colors[2]));
+
+    return true;
+}
+
+
+/**
+ * Modify angle
+ */
+bool VideoObject::ActAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
+        SetAngle( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
+        SetAngle( GetAngle() + static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
+        SetAngle( GetAngle() - static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
+        SetAngle( GetAngle() * static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
+        SetAngle( GetAngle() / static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
+
+    return true;
+}
+
+/**
+ * Load a new video
+ */
+bool VideoObject::ActLoadVideo( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    SetVideoFile(action.GetParameter( 1 ).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()));
+    ReloadVideo();
+    video.SetPause(false);
+
+    return true;
+}
+
+/**
+ * Load a new video
+ */
+bool VideoObject::ActSetPause( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    video.SetPause(action.GetParameter( 1 ).GetAsBool());
+
+    return true;
+}
+
+/**
+ * Set looping
+ */
+bool VideoObject::ActSetLooping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    SetLooping(action.GetParameter( 1 ).GetAsBool());
+
+    return true;
+}
+
+/**
+ * Restart video
+ */
+bool VideoObject::ActRestart( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    video.Restart();
+
+    return true;
+}
+
+/**
+ * Set looping
+ */
+bool VideoObject::ActSeek( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    video.Seek(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+
+    return true;
+}

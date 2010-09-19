@@ -1,14 +1,14 @@
 #include "VideoWrapper.h"
+#include <TheoraException.h>
 #include <iostream>
 
 VideoWrapper::VideoWrapper() :
 clip(NULL),
-started(false)
+started(false),
+valid(false)
 {
     if ( TheoraVideoManager::getSingletonPtr() == NULL )
         new TheoraVideoManager;
-
-    currentFrameImage.Create(100,100, sf::Color(100,100,100));
 }
 
 VideoWrapper::~VideoWrapper()
@@ -30,18 +30,25 @@ bool VideoWrapper::Load(std::string filename)
 {
     //Destroy old clip if necessary
     if ( clip ) TheoraVideoManager::getSingletonPtr()->destroyVideoClip(clip);
+    clip = NULL;
+    valid = false;
+    started = false;
 
     //Load new clip
-    clip = TheoraVideoManager::getSingletonPtr()->createVideoClip(filename, TH_RGBA);
+    try
+    {
+        clip = TheoraVideoManager::getSingletonPtr()->createVideoClip(filename, TH_RGBA);
+    }
+    catch(...)
+    {
+        std::cout << "Error when opening video file " << filename << std::endl;
+    }
+
     if ( clip )
     {
         clip->setAutoRestart(1);
         currentFrameImage.Create(clip->getWidth(), clip->getHeight(), sf::Color(0,0,0));
-    }
-    else //Something failed
-    {
-        currentFrameImage.Create(50, 50, sf::Color(255,0,0));
-        return false;
+        valid = true;
     }
 
     return true;
@@ -75,4 +82,42 @@ const sf::Image & VideoWrapper::GetNextFrameImage()
     }
 
 	return currentFrameImage;
+}
+
+void VideoWrapper::SetLooping(bool loop)
+{
+    if ( clip != NULL ) clip->setAutoRestart(loop);
+}
+
+void VideoWrapper::Seek(float time)
+{
+    if ( clip != NULL ) clip->seek(time);
+}
+
+void VideoWrapper::SetPause(bool pause)
+{
+    if ( clip != NULL )
+    {
+        if ( pause ) clip->pause();
+        else clip->play();
+    }
+}
+
+void VideoWrapper::Restart()
+{
+    if ( clip != NULL ) return clip->restart();
+}
+
+float VideoWrapper::GetTimePosition() const
+{
+    if ( clip != NULL ) return clip->getTimePosition();
+
+    return 0;
+}
+
+float VideoWrapper::GetDuration() const
+{
+    if ( clip != NULL ) return clip->getDuration();
+
+    return 0;
 }

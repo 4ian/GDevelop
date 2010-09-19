@@ -57,7 +57,6 @@ class VideoObject : public Object
         virtual ~VideoObject();
         virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new VideoObject(*this));}
 
-        virtual bool LoadResources(const ImageManager & imageMgr );
         virtual bool LoadRuntimeResources(const ImageManager & imageMgr );
         virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
@@ -86,6 +85,31 @@ class VideoObject : public Object
 
         virtual void OnPositionChanged();
 
+        /**
+         * Change the video file loaded when a call is made to LoadRuntimeResources
+         */
+        void SetVideoFile(std::string file) { videoFile = file; }
+
+        /**
+         * Get video filename.
+         */
+        std::string GetVideoFile() const { return videoFile; }
+
+        /**
+         * Load and start video using the video Filename.
+         */
+        void ReloadVideo();
+
+        /**
+         * Set the looping of the video
+         */
+        void SetLooping(bool loop_) { looping = loop_; video.SetLooping(looping); }
+
+        /**
+         * Return true if looping is activated
+         */
+        bool GetLooping() const { return looping; }
+
         virtual float GetWidth() const;
         virtual float GetHeight() const;
         virtual void SetWidth(float ) {};
@@ -108,13 +132,42 @@ class VideoObject : public Object
         inline unsigned int GetColorG() const { return colorG; };
         inline unsigned int GetColorB() const { return colorB; };
 
+        //ACE for opacity
+        bool CondOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        double ExpOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+
+        //ACE for angle
+        bool CondAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        double ExpAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+
+        //Action for color
+        bool ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+
+        std::string ExpVideoFile( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction );
+
+        bool ActLoadVideo( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActSetPause( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActSetLooping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActRestart( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActSeek( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+
+        bool CondPaused( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondLooping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondTimePosition( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+
+        double ExpTimePosition( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double ExpDuration( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+
     private:
 
         std::string videoFile;
         VideoWrapper video;
         sf::Sprite renderSprite;
 
-        bool started;
+        bool looping;
+        bool paused;
 
         //Opacity
         float opacity;

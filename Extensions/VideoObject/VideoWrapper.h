@@ -31,22 +31,63 @@ class VideoWrapper
         }
 
         /**
-         * Load clip
+         * Load a new clip.
          */
         bool Load(std::string filename);
 
-        const sf::Image & GetNextFrameImage();
-        const sf::Image & GetFrameImage() const { return currentFrameImage; };
+        /**
+         * Return true if the current video clip is valid.
+         */
+        bool IsValid() const { return valid; };
 
+        /**
+         * Update current frame image and return it.
+         */
+        const sf::Image & GetNextFrameImage();
+
+        /**
+         * Update video clip time.
+         */
         void UpdateTime(float time);
+
+        /**
+         * Set the looping of the video
+         */
+        void SetLooping(bool loop_);
+
+        /**
+         * Go to a certain position in the video.
+         */
+        void Seek(float time);
+
+        /**
+         * Pause or unpause the video clip.
+         */
+        void SetPause(bool pause);
+
+        /**
+         * Restart video from beginning
+         */
+        void Restart();
+
+        /**
+         * Return current position in the video.
+         */
+        float GetTimePosition() const;
+
+        /**
+         * Return current position in the video.
+         */
+        float GetDuration() const;
 
     private:
 
         void Init(const VideoWrapper & other);
 
-        sf::Image currentFrameImage;
-        TheoraVideoClip * clip;
+        sf::Image currentFrameImage; ///<SFML Image to be displayed
+        TheoraVideoClip * clip; ///< Theora video clip.
         bool started;
+        bool valid; ///< True if the clip is valid
 };
 
 #endif // VIDEOWRAPPER_H

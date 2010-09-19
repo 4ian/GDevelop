@@ -33,7 +33,7 @@ freely, subject to the following restrictions:
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
-#include <wx/spinctrl.h>
+#include <wx/checkbox.h>
 #include <wx/statline.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -50,15 +50,13 @@ class VideoObjectEditor: public wxDialog
 		virtual ~VideoObjectEditor();
 
 		//(*Declarations(VideoObjectEditor)
-		wxSpinCtrl* sizeEdit;
-		wxStaticText* StaticText2;
-		wxTextCtrl* textEdit;
+		wxButton* converterBt;
+		wxTextCtrl* videoEdit;
+		wxCheckBox* loopCheck;
 		wxStaticText* StaticText1;
-		wxButton* fontBt;
-		wxButton* colorBt;
+		wxButton* cancelBt;
 		wxStaticLine* StaticLine1;
-		wxTextCtrl* fontEdit;
-		wxStaticText* StaticText4;
+		wxButton* browseBt;
 		wxButton* okBt;
 		//*)
 
@@ -66,15 +64,13 @@ class VideoObjectEditor: public wxDialog
 
 		//(*Identifiers(VideoObjectEditor)
 		static const long ID_TEXTCTRL1;
+		static const long ID_BUTTON2;
 		static const long ID_STATICTEXT1;
-		static const long ID_BUTTON3;
-		static const long ID_STATICTEXT2;
-		static const long ID_TEXTCTRL2;
 		static const long ID_BUTTON4;
-		static const long ID_STATICTEXT4;
-		static const long ID_SPINCTRL1;
+		static const long ID_CHECKBOX1;
 		static const long ID_STATICLINE1;
 		static const long ID_BUTTON1;
+		static const long ID_BUTTON3;
 		//*)
 
 	private:
@@ -85,6 +81,9 @@ class VideoObjectEditor: public wxDialog
 		void OnfontBtClick(wxCommandEvent& event);
 		void OnSizeEditChange(wxSpinEvent& event);
 		void OncancelBtClick(wxCommandEvent& event);
+		void OnbrowseBtClick(wxCommandEvent& event);
+		void OnloopCheckClick(wxCommandEvent& event);
+		void OnconverterBtClick(wxCommandEvent& event);
 		//*)
 
 		Game & game;

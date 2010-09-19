@@ -31,6 +31,7 @@ freely, subject to the following restrictions:
 #include "GDL/tinyxml.h"
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
+#include "GDL/XmlMacros.h"
 #include "VideoObject.h"
 
 #ifdef GDE
@@ -43,7 +44,8 @@ freely, subject to the following restrictions:
 
 VideoObject::VideoObject(std::string name_) :
     Object(name_),
-    started(true),
+    looping(true),
+    paused(false),
     opacity( 255 ),
     colorR( 255 ),
     colorG( 255 ),
@@ -56,26 +58,45 @@ VideoObject::~VideoObject()
 {
 }
 
-void VideoObject::LoadFromXml(const TiXmlElement * object)
+void VideoObject::LoadFromXml(const TiXmlElement * elem)
 {
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("videoFile", videoFile);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("looping", looping);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("opacity", opacity);
+
+    int r = 255;
+    int g = 255;
+    int b = 255;
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorR", r);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorG", g);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorB", b);
+    SetColor(r,g,b);
 }
 
 #if defined(GDE)
-void VideoObject::SaveToXml(TiXmlElement * object)
+void VideoObject::SaveToXml(TiXmlElement * elem)
 {
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("videoFile", videoFile);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("looping", looping);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("opacity", opacity);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorR", colorR);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorG", colorG);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorB", colorB);
 }
 #endif
 
-bool VideoObject::LoadResources(const ImageManager & imageMgr )
-{
-    renderSprite.SetImage(video.GetFrameImage(), true);
-    renderSprite.SetOrigin(renderSprite.GetSize().x/2, renderSprite.GetSize().y/2);
-}
-
 bool VideoObject::LoadRuntimeResources(const ImageManager & imageMgr )
 {
-    video.Load("C:/Libs/libtheoraplayer/trunk/demos/media/short.ogg");
-    renderSprite.SetImage(video.GetFrameImage(), true);
+    ReloadVideo();
+    return true;
+}
+
+void VideoObject::ReloadVideo()
+{
+    video.Load(videoFile);
+    video.SetLooping(looping);
+    video.SetPause(paused);
+    renderSprite.SetImage(video.GetNextFrameImage(), true);
     renderSprite.SetOrigin(renderSprite.GetSize().x/2, renderSprite.GetSize().y/2);
 }
 
@@ -96,7 +117,6 @@ bool VideoObject::Draw( sf::RenderWindow& window )
     if ( hidden ) return true;
 
 	renderSprite.SetImage(video.GetNextFrameImage(), true);
-    renderSprite.SetOrigin(renderSprite.GetSize().x/2, renderSprite.GetSize().y/2);
     window.Draw( renderSprite );
 
     return true;
@@ -108,8 +128,21 @@ bool VideoObject::Draw( sf::RenderWindow& window )
  */
 bool VideoObject::DrawEdittime(sf::RenderWindow& renderWindow)
 {
+    if ( !video.IsValid() )
+    {
+        static bool badImageLoaded = false;
+        static sf::Image badVideoIcon;
+        if ( !badImageLoaded )
+        {
+            badVideoIcon.LoadFromFile("Extensions/badVideo.png");
+            badImageLoaded = true;
+        }
+        renderSprite.SetImage(badVideoIcon, true);
+    }
+    else
+        renderSprite.SetImage(video.GetNextFrameImage(), true);
+
     renderWindow.Draw( renderSprite );
-    renderSprite.SetOrigin(renderSprite.GetSize().x/2, renderSprite.GetSize().y/2);
 
     return true;
 }
@@ -120,7 +153,7 @@ void VideoObject::PrepareResourcesForMerging(ResourcesMergingHelper & resourcesM
 
 bool VideoObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
 {
-    thumbnail = wxBitmap("Extensions/texticon.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("Extensions/videoicon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
@@ -142,24 +175,62 @@ void VideoObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
 
 void VideoObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
+    if      ( propertyNb == 0 ) {name = _("Fichier");                     value = GetVideoFile();}
+    else if ( propertyNb == 1 ) {name = _("Bouclage");                    value = looping ? _("Oui") : _("Non");}
+    else if ( propertyNb == 2 ) {name = _("Position dans la vidéo");      value = ToString(video.GetTimePosition())+"s";}
+    else if ( propertyNb == 3 ) {name = _("En pause");                    value = paused ? _("Oui") : _("Non");}
+    else if ( propertyNb == 4 ) {name = _("Durée");                       value = ToString(video.GetDuration())+"s";}
+    else if ( propertyNb == 5 ) {name = _("Couleur");                     value = ToString(colorR)+";"+ToString(colorG)+";"+ToString(colorB);}
+    else if ( propertyNb == 6 ) {name = _("Opacité");       value = ToString(GetOpacity());}
 }
 
 bool VideoObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
+    if      ( propertyNb == 0 ) { SetVideoFile(newValue); ReloadVideo(); }
+    else if ( propertyNb == 1 ) { looping = (newValue == _("Oui")); video.SetLooping(looping); }
+    else if ( propertyNb == 2 ) { video.Seek(ToFloat(newValue)); }
+    else if ( propertyNb == 3 ) { paused = (newValue == _("Oui")); video.SetPause(paused); }
+    else if ( propertyNb == 4 ) { return false; }
+    else if ( propertyNb == 5 )
+    {
+        string r, gb, g, b;
+        {
+            size_t separationPos = newValue.find(";");
+
+            if ( separationPos > newValue.length())
+                return false;
+
+            r = newValue.substr(0, separationPos);
+            gb = newValue.substr(separationPos+1, newValue.length());
+        }
+
+        {
+            size_t separationPos = gb.find(";");
+
+            if ( separationPos > gb.length())
+                return false;
+
+            g = gb.substr(0, separationPos);
+            b = gb.substr(separationPos+1, gb.length());
+        }
+
+        SetColor(ToInt(r), ToInt(g), ToInt(b));
+    }
+    else if ( propertyNb == 6 ) { SetOpacity(ToFloat(newValue)); }
 
     return true;
 }
 
 unsigned int VideoObject::GetNumberOfProperties() const
 {
-    return 0;
+    return 7;
 }
 #endif
 
 void VideoObject::OnPositionChanged()
 {
-    renderSprite.SetX( GetX()+renderSprite.GetSize().x/2 );
-    renderSprite.SetY( GetY()+renderSprite.GetSize().y/2 );
+    renderSprite.SetX( GetX() );
+    renderSprite.SetY( GetY() );
 }
 
 /**

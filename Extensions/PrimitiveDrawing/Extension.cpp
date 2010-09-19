@@ -239,7 +239,7 @@ class Extension : public ExtensionBase
 
             DECLARE_ACTION("CopyImageOnAnother",
                            _("Copier une image sur une autre"),
-                           _("Copie une image sur une autre."),
+                           _("Copie une image sur une autre.\nNotez qu'il est préférable que l'image source reste chargée en mémoire."),
                            _("Copier l'image _PARAM1_ sur _PARAM0_ à l'emplacement _PARAM2_;_PARAM3_"),
                            _("Images"),
                            "res/actions/copy24.png",

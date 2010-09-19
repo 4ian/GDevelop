@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="DrawerActions.cpp" open="1" top="1" tabpos="0">
-		<Cursor position="9954" topLine="158" />
+	<File name="DrawerActions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="9834" topLine="158" />
 	</File>
 	<File name="DrawerConditions.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="982" topLine="30" />
@@ -22,8 +22,8 @@
 	<File name="DrawerObjectEditor.h" open="0" top="0" tabpos="0">
 		<Cursor position="1372" topLine="36" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="11404" topLine="213" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="12506" topLine="38" />
 	</File>
 	<File name="..\..\GDL\GDL\tinystr.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="247" topLine="30" />

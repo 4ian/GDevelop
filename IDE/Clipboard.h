@@ -44,6 +44,10 @@ public:
     ObjectGroup GetObjectGroup();
     bool HasObjectGroup() { return hasObjectGroup; };
 
+    void SetPositionsSelection( vector < InitialPosition > positionsSelection_ );
+    vector < InitialPosition > GetPositionsSelection() { return positionsSelection; };
+    bool HasPositionsSelection() { return hasPositionsSelection; };
+
 private:
     Clipboard();
     virtual ~Clipboard();
@@ -68,6 +72,9 @@ private:
 
     ObjectGroup objectGroupCopied;
     bool hasObjectGroup;
+
+    vector < InitialPosition > positionsSelection;
+    bool hasPositionsSelection;
 
     static Clipboard *singleton;
 };

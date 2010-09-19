@@ -7,6 +7,7 @@
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/bmpbuttn.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
@@ -24,7 +25,6 @@ class Credits: public wxDialog
 		wxButton* OkBt;
 		wxNotebook* Notebook1;
 		wxBitmapButton* GccBt;
-		wxStaticText* StaticText2;
 		wxBitmapButton* CBBt;
 		wxStaticText* StaticText6;
 		wxStaticBitmap* StaticBitmap1;
@@ -33,7 +33,7 @@ class Credits: public wxDialog
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxBitmapButton* DonBt;
-		wxStaticText* StaticText3;
+		wxHyperlinkCtrl* florianRival;
 		wxPanel* Panel3;
 		wxStaticText* StaticText5;
 		wxStaticText* StaticText7;
@@ -51,8 +51,7 @@ class Credits: public wxDialog
 		static const long ID_STATICBITMAP1;
 		static const long ID_STATICTEXT1;
 		static const long ID_STATICTEXT4;
-		static const long ID_STATICTEXT2;
-		static const long ID_STATICTEXT3;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_STATICTEXT5;
 		static const long ID_BITMAPBUTTON1;
 		static const long ID_BITMAPBUTTON7;

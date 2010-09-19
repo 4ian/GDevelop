@@ -122,12 +122,6 @@ mainEditorCommand(mainEditorCommand_)
 	editMenuI = new wxMenuItem((&ContextMenu), idMenuModObj, _("Modifier les propriétés de l\'objet"), wxEmptyString, wxITEM_NORMAL);
 	editMenuI->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
 	ContextMenu.Append(editMenuI);
-	#ifdef __WXMSW__
-	    ContextMenu.Remove(editMenuI);
-	    wxFont boldFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
-	    editMenuI->SetFont(boldFont);
-	    ContextMenu.Append(editMenuI);
-	#endif
 	editVarMenuI = new wxMenuItem((&ContextMenu), idMenuModVar, _("Modifier les variables initiales"), wxEmptyString, wxITEM_NORMAL);
 	editVarMenuI->SetBitmap(wxBitmap(wxImage(_T("res/var.png"))));
 	ContextMenu.Append(editVarMenuI);

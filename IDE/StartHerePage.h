@@ -6,8 +6,8 @@
 #include <wx/stattext.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/statbmp.h>
-#include <wx/button.h>
 //*)
 class Game_Develop_EditorFrame;
 
@@ -19,25 +19,25 @@ class StartHerePage: public wxPanel
 		virtual ~StartHerePage();
 
 		//(*Declarations(StartHerePage)
-		wxButton* recent8Bt;
-		wxButton* recent5Bt;
-		wxButton* wikiBt;
+		wxHyperlinkCtrl* HyperlinkCtrl2;
+		wxHyperlinkCtrl* recent6Bt;
+		wxHyperlinkCtrl* recent3Bt;
+		wxHyperlinkCtrl* HyperlinkCtrl3;
 		wxStaticText* StaticText2;
+		wxHyperlinkCtrl* recent2Bt;
+		wxHyperlinkCtrl* recent1Bt;
 		wxStaticBitmap* StaticBitmap1;
-		wxButton* recent6Bt;
-		wxButton* recent3Bt;
+		wxHyperlinkCtrl* recent5Bt;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
-		wxButton* forumBt;
-		wxButton* guideBt;
-		wxButton* recent7Bt;
+		wxHyperlinkCtrl* HyperlinkCtrl1;
+		wxHyperlinkCtrl* recent8Bt;
+		wxHyperlinkCtrl* HyperlinkCtrl4;
 		wxStaticLine* StaticLine1;
-		wxButton* recent2Bt;
-		wxButton* recent4Bt;
-		wxButton* tutoBt;
+		wxHyperlinkCtrl* recent7Bt;
 		wxStaticText* StaticText4;
-		wxButton* recent9Bt;
-		wxButton* recent1Bt;
+		wxHyperlinkCtrl* recent9Bt;
+		wxHyperlinkCtrl* recent4Bt;
 		//*)
 
         void Refresh();
@@ -51,19 +51,19 @@ class StartHerePage: public wxPanel
 		static const long ID_STATICTEXT1;
 		static const long ID_STATICTEXT3;
 		static const long ID_STATICTEXT4;
-		static const long ID_BUTTON10;
-		static const long ID_BUTTON11;
-		static const long ID_BUTTON12;
-		static const long ID_BUTTON13;
-		static const long ID_BUTTON1;
-		static const long ID_BUTTON2;
-		static const long ID_BUTTON3;
-		static const long ID_BUTTON4;
-		static const long ID_BUTTON9;
-		static const long ID_BUTTON8;
-		static const long ID_BUTTON7;
-		static const long ID_BUTTON6;
-		static const long ID_BUTTON5;
+		static const long ID_HYPERLINKCTRL1;
+		static const long ID_HYPERLINKCTRL2;
+		static const long ID_HYPERLINKCTRL3;
+		static const long ID_HYPERLINKCTRL4;
+		static const long ID_HYPERLINKCTRL5;
+		static const long ID_HYPERLINKCTRL6;
+		static const long ID_HYPERLINKCTRL7;
+		static const long ID_HYPERLINKCTRL9;
+		static const long ID_HYPERLINKCTRL8;
+		static const long ID_HYPERLINKCTRL10;
+		static const long ID_HYPERLINKCTRL11;
+		static const long ID_HYPERLINKCTRL12;
+		static const long ID_HYPERLINKCTRL13;
 		//*)
 
 	private:

@@ -19,8 +19,7 @@ using namespace std;
 const long Credits::ID_STATICBITMAP1 = wxNewId();
 const long Credits::ID_STATICTEXT1 = wxNewId();
 const long Credits::ID_STATICTEXT4 = wxNewId();
-const long Credits::ID_STATICTEXT2 = wxNewId();
-const long Credits::ID_STATICTEXT3 = wxNewId();
+const long Credits::ID_HYPERLINKCTRL1 = wxNewId();
 const long Credits::ID_STATICTEXT5 = wxNewId();
 const long Credits::ID_BITMAPBUTTON1 = wxNewId();
 const long Credits::ID_BITMAPBUTTON7 = wxNewId();
@@ -60,7 +59,7 @@ Credits::Credits(wxWindow* parent)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
-	
+
 	Create(parent, wxID_ANY, _("A propos de Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxSize(271,351));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -81,19 +80,15 @@ Credits::Credits(wxWindow* parent)
 	StaticText4 = new wxStaticText(Panel1, ID_STATICTEXT4, _("a été créé par"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer3->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("Florian \"4ian\" Rival de"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	FlexGridSizer4->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Compil Games"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-	wxFont StaticText3Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
-	StaticText3->SetFont(StaticText3Font);
-	FlexGridSizer4->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 4);
+	florianRival = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL1, _("Florian \"4ian\" Rival"), _("http://www.florianrival.com"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	FlexGridSizer4->Add(florianRival, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(FlexGridSizer4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer10->Add(FlexGridSizer3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel1, _("Aide et support"));
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer5->AddGrowableCol(0);
-	StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, _("Support, aide, réponses aux suggestions sur notre site :"), wxDefaultPosition, wxSize(310,22), 0, _T("ID_STATICTEXT5"));
-	FlexGridSizer5->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, _("Support, aide, réponses aux suggestions sur notre site :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	FlexGridSizer5->Add(StaticText5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
 	CompilGamesBt = new wxBitmapButton(Panel1, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/powered-cg.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
 	FlexGridSizer9->Add(CompilGamesBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -158,7 +153,7 @@ Credits::Credits(wxWindow* parent)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->SetSizeHints(this);
 	Center();
-	
+
 	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCompilGamesBtClick);
 	Connect(ID_BITMAPBUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnDonBtClick);
 	Connect(ID_BITMAPBUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCppBtClick);
@@ -169,10 +164,15 @@ Credits::Credits(wxWindow* parent)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnOkBtClick);
 	//*)
 
+	//Be sure that my name has not been translated ;)
+	florianRival->SetLabel("Florian \"4ian\" Rival");
+
+    //Format Game Develop version
     string nbversion = GDLVersionWrapper::FullString();
     string status = GDLVersionWrapper::Status();
     string version ="Game Develop "+nbversion+" "+status+"";
 	StaticText1->SetLabel(version);
+
 	FlexGridSizer3->Layout();
 }
 

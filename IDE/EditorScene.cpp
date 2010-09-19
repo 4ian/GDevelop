@@ -42,6 +42,14 @@ const long EditorScene::ID_PANEL1 = wxNewId();
 const long EditorScene::ID_CUSTOM2 = wxNewId();
 const long EditorScene::ID_PANEL6 = wxNewId();
 const long EditorScene::ID_AUINOTEBOOK1 = wxNewId();
+const long EditorScene::ID_MENUITEM8 = wxNewId();
+const long EditorScene::ID_MENUITEM1 = wxNewId();
+const long EditorScene::ID_MENUITEM2 = wxNewId();
+const long EditorScene::ID_MENUITEM3 = wxNewId();
+const long EditorScene::ID_MENUITEM4 = wxNewId();
+const long EditorScene::ID_MENUITEM5 = wxNewId();
+const long EditorScene::ID_MENUITEM6 = wxNewId();
+const long EditorScene::ID_MENUITEM7 = wxNewId();
 //*)
 const long EditorScene::ID_REFRESHBUTTON = wxNewId();
 const long EditorScene::ID_PLAYBUTTON = wxNewId();
@@ -102,6 +110,7 @@ externalWindow(this)
 	//(*Initialize(EditorScene)
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer1;
+	wxMenuItem* zoom5;
 
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, _T("wxID_ANY"));
 	SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
@@ -135,6 +144,22 @@ externalWindow(this)
 	notebook->AddPage(Panel5, _("Evènements"));
 	FlexGridSizer1->Add(notebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
+	zoom5 = new wxMenuItem((&zoomMenu), ID_MENUITEM8, _("5%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom5);
+	zoom10 = new wxMenuItem((&zoomMenu), ID_MENUITEM1, _("10%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom10);
+	zoom25 = new wxMenuItem((&zoomMenu), ID_MENUITEM2, _("25%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom25);
+	zoom50 = new wxMenuItem((&zoomMenu), ID_MENUITEM3, _("50%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom50);
+	zoom100 = new wxMenuItem((&zoomMenu), ID_MENUITEM4, _("100%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom100);
+	zoom150 = new wxMenuItem((&zoomMenu), ID_MENUITEM5, _("150%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom150);
+	zoom200 = new wxMenuItem((&zoomMenu), ID_MENUITEM6, _("200%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom200);
+	zoom500 = new wxMenuItem((&zoomMenu), ID_MENUITEM7, _("500%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom500);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
@@ -150,6 +175,14 @@ externalWindow(this)
 	Core->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnCoreResize,0,this);
 	scenePanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnscenePanelResize,0,this);
 	Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&EditorScene::OnnotebookPageChanged);
+	Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom5Selected);
+	Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom10Selected);
+	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom25Selected);
+	Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom50Selected);
+	Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom100Selected);
+	Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom150Selected);
+	Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom200Selected);
+	Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom500Selected);
 	//*)
     Connect(ID_REFRESHBUTTON,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorScene::OnRefreshBtClick);
     Connect(ID_APERCUBUTTON,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorScene::OnPreviewBtClick);
@@ -248,7 +281,7 @@ void EditorScene::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
         bar->AddButton(idRibbonUndo, !hideLabels ? _("Annuler") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonRedo, !hideLabels ? _("Refaire") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonOrigine, !hideLabels ? _("Revenir à l'origine") : "", wxBitmap("res/center24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonOriginalZoom, !hideLabels ? _("Zoom initial") : "", wxBitmap("res/zoom24.png", wxBITMAP_TYPE_ANY));
+        bar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Zoom initial") : "", wxBitmap("res/zoom24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonGrid, !hideLabels ? _("Grille") : "", wxBitmap("res/grid24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonGridSetup, !hideLabels ? _("Editer la grille") : "", wxBitmap("res/gridedit24.png", wxBITMAP_TYPE_ANY));
     }
@@ -275,6 +308,7 @@ void EditorScene::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonChooseLayer, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnChoisirLayerBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonOrigine, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnOrigineBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonOriginalZoom, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnZoomInitBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonOriginalZoom, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&EditorScene::OnZoomMoreBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonGrid, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnGridBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonGridSetup, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnGridSetupBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&EditorScene::OnUndoBtClick, NULL, this);
@@ -285,6 +319,15 @@ void EditorScene::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonPlayWin, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnPlayWindowBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonPause, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnPauseBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonDebugger, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnDebugBtClick, NULL, this);
+
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom5Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom10Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom25Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom50Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom100Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom150Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom200Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom500Selected, NULL, this);
 }
 
 /**
@@ -599,14 +642,6 @@ void EditorScene::OnChoisirLayerBtClick( wxCommandEvent & event )
 }
 
 ////////////////////////////////////////////////////////////
-/// Retour au niveau de zoom 1:1
-////////////////////////////////////////////////////////////
-void EditorScene::OnZoomInitBtClick( wxCommandEvent & event )
-{
-    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth(), sceneCanvas->GetHeight());
-}
-
-////////////////////////////////////////////////////////////
 /// Activer/Desactiver la grille
 ////////////////////////////////////////////////////////////
 void EditorScene::OnGridBtClick( wxCommandEvent & event )
@@ -737,4 +772,58 @@ void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
     CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->scene.editing);
     mainEditorCommand.GetRibbon()->SetActivePage(3);
     ConnectEvents();
+}
+
+
+////////////////////////////////////////////////////////////
+/// Retour au niveau de zoom 1:1
+////////////////////////////////////////////////////////////
+void EditorScene::OnZoomInitBtClick( wxCommandEvent & event )
+{
+    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth(), sceneCanvas->GetHeight());
+}
+
+void EditorScene::OnZoomMoreBtClick(wxRibbonButtonBarEvent& evt)
+{
+    evt.PopupMenu(&zoomMenu);
+}
+
+void EditorScene::Onzoom5Selected(wxCommandEvent& event)
+{
+    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/0.05f, sceneCanvas->GetHeight()/0.05f);
+}
+
+void EditorScene::Onzoom10Selected(wxCommandEvent& event)
+{
+    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/0.1f, sceneCanvas->GetHeight()/0.1f);
+}
+
+void EditorScene::Onzoom25Selected(wxCommandEvent& event)
+{
+    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/0.25f, sceneCanvas->GetHeight()/0.25f);
+}
+
+void EditorScene::Onzoom50Selected(wxCommandEvent& event)
+{
+    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/0.5f, sceneCanvas->GetHeight()/0.5f);
+}
+
+void EditorScene::Onzoom100Selected(wxCommandEvent& event)
+{
+    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth(), sceneCanvas->GetHeight());
+}
+
+void EditorScene::Onzoom150Selected(wxCommandEvent& event)
+{
+    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/1.5f, sceneCanvas->GetHeight()/1.5f);
+}
+
+void EditorScene::Onzoom200Selected(wxCommandEvent& event)
+{
+    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/2.f, sceneCanvas->GetHeight()/2.f);
+}
+
+void EditorScene::Onzoom500Selected(wxCommandEvent& event)
+{
+    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/5.f, sceneCanvas->GetHeight()/5.f);
 }

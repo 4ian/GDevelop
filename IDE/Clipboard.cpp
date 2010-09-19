@@ -24,7 +24,8 @@ hasExternalEvents(false),
 hasAction(false),
 hasCondition(false),
 hasScene(false),
-hasObjectGroup(false)
+hasObjectGroup(false),
+hasPositionsSelection(false)
 {
 #ifndef RELEASE
     MemTracer.AddObj( "Clipboard", ( long )this );
@@ -133,6 +134,12 @@ void Clipboard::SetObjectGroup( const ObjectGroup & group )
 ObjectGroup Clipboard::GetObjectGroup()
 {
     return objectGroupCopied;
+}
+
+void Clipboard::SetPositionsSelection( vector < InitialPosition > positionsSelection_ )
+{
+    positionsSelection = positionsSelection_;
+    hasPositionsSelection = true;
 }
 
 Clipboard * Clipboard::singleton = NULL;

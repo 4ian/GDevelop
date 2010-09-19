@@ -87,6 +87,9 @@ private :
     void OnDelObjetSelected(wxCommandEvent & event);
     void OnLayerUpSelected(wxCommandEvent & event);
     void OnLayerDownSelected(wxCommandEvent & event);
+    void OnCopySelected(wxCommandEvent & event);
+    void OnCutSelected(wxCommandEvent & event);
+    void OnPasteSelected(wxCommandEvent & event);
 
     //Fonctions outils
     int GetInitialPositionFromObject(ObjSPtr object);
@@ -98,6 +101,9 @@ private :
     static const long ID_PROPMENU;
     static const long ID_LAYERUPMENU;
     static const long ID_LAYERDOWNMENU;
+    static const long ID_COPYMENU;
+    static const long ID_CUTMENU;
+    static const long ID_PASTEMENU;
 
     bool hasJustRightClicked;
 

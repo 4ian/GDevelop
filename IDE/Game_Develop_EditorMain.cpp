@@ -576,6 +576,7 @@ void Game_Develop_EditorFrame::LoadSkin(wxAuiManager * auiManager)
         dockArt->SetColour(8, wxColour(221,229,246));
         dockArt->SetColour(11, wxColour(104,114,138));
         dockArt->SetColour(12, wxColour(104,114,138));
+
     }
 
     auiManager->SetArtProvider(dockArt);

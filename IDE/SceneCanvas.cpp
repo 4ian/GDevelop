@@ -25,6 +25,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ImageManager.h"
 #include "GDL/RuntimeGame.h"
+#include "Clipboard.h"
 #include "DndTextSceneEditor.h"
 #include <wx/cursor.h>
 
@@ -33,6 +34,9 @@ const long SceneCanvas::ID_DELOBJMENU = wxNewId();
 const long SceneCanvas::ID_PROPMENU = wxNewId();
 const long SceneCanvas::ID_LAYERUPMENU = wxNewId();
 const long SceneCanvas::ID_LAYERDOWNMENU = wxNewId();
+const long SceneCanvas::ID_COPYMENU = wxNewId();
+const long SceneCanvas::ID_CUTMENU = wxNewId();
+const long SceneCanvas::ID_PASTEMENU = wxNewId();
 
 SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style ) :
         wxSFMLCanvas( Parent, Id, Position, Size, Style ),
@@ -58,19 +62,30 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
     Connect(ID_PROPMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnPropObjSelected);
     Connect(ID_LAYERUPMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnLayerUpSelected);
     Connect(ID_LAYERDOWNMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnLayerDownSelected);
+    Connect(ID_COPYMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnCopySelected);
+    Connect(ID_CUTMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnCutSelected);
+    Connect(ID_PASTEMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnPasteSelected);
+
+    wxMenuItem * layerUpItem = new wxMenuItem((&contextMenu), ID_LAYERUPMENU, _("Passer le(s) objet(s) sur le calque supérieur"), wxEmptyString, wxITEM_NORMAL);
+    layerUpItem->SetBitmap(wxImage( "res/up.png" ) );
+    wxMenuItem * layerDownItem = new wxMenuItem((&contextMenu), ID_LAYERDOWNMENU, _("Passer le(s) objet(s) sur le calque inférieur"), wxEmptyString, wxITEM_NORMAL);
+    layerDownItem->SetBitmap(wxImage( "res/down.png" ) );
+    wxMenuItem * deleteItem = new wxMenuItem((&contextMenu), ID_DELOBJMENU, _("Supprimer la sélection\tDEL"), wxEmptyString, wxITEM_NORMAL);
+    deleteItem->SetBitmap(wxImage( "res/deleteicon.png" ) );
+    wxMenuItem * addItem = new wxMenuItem((&contextMenu), ID_ADDOBJMENU, _("Ajouter un objet\tINSER"), wxEmptyString, wxITEM_NORMAL);
+    addItem->SetBitmap(wxImage( "res/addobjet.png" ) );
 
     contextMenu.Append(ID_PROPMENU, _("Propriétés"));
     contextMenu.AppendSeparator();
-    contextMenu.Append(ID_ADDOBJMENU, _("Ajouter un objet\tINSER"));
-    contextMenu.Append(ID_DELOBJMENU, _("Supprimer la sélection\tDEL"));
+    contextMenu.Append(addItem);
+    contextMenu.Append(deleteItem);
     contextMenu.AppendSeparator();
-    contextMenu.Append(ID_LAYERUPMENU, _("Passer le(s) objet(s) sur le calque supérieur"));
-    contextMenu.Append(ID_LAYERDOWNMENU, _("Passer le(s) objet(s) sur le calque inférieur"));
-
-    contextMenu.FindItem(ID_ADDOBJMENU)->SetBitmap(wxImage( "res/addobjet.png" ) );
-    contextMenu.FindItem(ID_DELOBJMENU)->SetBitmap(wxImage( "res/deleteicon.png" ) );
-    contextMenu.FindItem(ID_LAYERUPMENU)->SetBitmap(wxImage( "res/up.png" ) );
-    contextMenu.FindItem(ID_LAYERDOWNMENU)->SetBitmap(wxImage( "res/down.png" ) );
+    contextMenu.Append(layerUpItem);
+    contextMenu.Append(layerDownItem);
+    contextMenu.AppendSeparator();
+    contextMenu.Append(ID_COPYMENU, _("Copier"));
+    contextMenu.Append(ID_CUTMENU, _("Couper"));
+    contextMenu.Append(ID_PASTEMENU, _("Coller"));
 
     SetDropTarget(new DndTextSceneEditor(*this));
 }
@@ -636,6 +651,7 @@ void SceneCanvas::AddObjetSelected(float x, float y)
     newObject->SetLayer( pos.layer );
 
     newObject->InitializeFromInitialPosition(pos);
+    newObject->LoadRuntimeResources( *game.imageManager );
 
     scene.objectsInstances.AddObject(newObject);
 
@@ -706,6 +722,67 @@ void SceneCanvas::OnLayerUpSelected(wxCommandEvent & event)
     }
 
     ChangesMade();
+}
+
+void SceneCanvas::OnCopySelected(wxCommandEvent & event)
+{
+    vector < InitialPosition > copiedPositions;
+
+    for (unsigned int i =0;i<scene.objectsSelected.size();++i)
+    {
+        int posId = GetInitialPositionFromObject(scene.objectsSelected[i]);
+        if ( posId != -1 )
+        {
+            copiedPositions.push_back(sceneEdited.initialObjectsPositions.at(posId));
+            copiedPositions.back().x -= ConvertCoords(scene.input->GetMouseX(), 0).x;
+            copiedPositions.back().y -= ConvertCoords(0, scene.input->GetMouseY()).y;
+        }
+    }
+
+    Clipboard::getInstance()->SetPositionsSelection(copiedPositions);
+}
+
+void SceneCanvas::OnCutSelected(wxCommandEvent & event)
+{
+    vector < InitialPosition > copiedPositions;
+
+    for (unsigned int i =0;i<scene.objectsSelected.size();++i)
+    {
+        int posId = GetInitialPositionFromObject(scene.objectsSelected[i]);
+        if ( posId != -1 )
+        {
+            //Copy position
+            copiedPositions.push_back(sceneEdited.initialObjectsPositions.at(posId));
+            copiedPositions.back().x -= ConvertCoords(scene.input->GetMouseX(), 0).x;
+            copiedPositions.back().y -= ConvertCoords(0, scene.input->GetMouseY()).y;
+
+            //Remove objects
+            sceneEdited.initialObjectsPositions.erase(sceneEdited.initialObjectsPositions.begin() + posId);
+            scene.objectsInstances.RemoveObject(scene.objectsSelected[i]);
+        }
+    }
+
+    scene.objectsSelected.clear();
+    scene.xObjectsSelected.clear();
+    scene.yObjectsSelected.clear();
+
+    Clipboard::getInstance()->SetPositionsSelection(copiedPositions);
+}
+
+void SceneCanvas::OnPasteSelected(wxCommandEvent & event)
+{
+    if ( !Clipboard::getInstance()->HasPositionsSelection() ) return;
+
+    vector < InitialPosition > pastedPositions = Clipboard::getInstance()->GetPositionsSelection();
+
+    for (unsigned int i =0;i<pastedPositions.size();++i)
+    {
+        sceneEdited.initialObjectsPositions.push_back(pastedPositions[i]);
+        sceneEdited.initialObjectsPositions.back().x += ConvertCoords(scene.input->GetMouseX(), 0).x;
+        sceneEdited.initialObjectsPositions.back().y += ConvertCoords(0, scene.input->GetMouseY()).y;
+    }
+
+    Reload();
 }
 
 ////////////////////////////////////////////////////////////

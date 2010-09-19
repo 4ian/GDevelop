@@ -3,6 +3,7 @@
 
 //(*Headers(EditorScene)
 #include <wx/sizer.h>
+#include <wx/menu.h>
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
@@ -48,13 +49,21 @@ class EditorScene: public wxPanel
 		wxPanel* Core;
 		wxScrollBar* ScrollBar2;
 		wxPanel* Panel5;
+		wxMenuItem* zoom10;
+		wxMenuItem* zoom50;
 		wxPanel* Panel4;
+		wxMenu zoomMenu;
 		wxScrollBar* ScrollBar1;
 		SceneCanvas* sceneCanvas;
+		wxMenuItem* zoom200;
+		wxMenuItem* zoom25;
 		wxPanel* scenePanel;
 		EditorEvents* eventsEditor;
+		wxMenuItem* zoom100;
 		wxAuiNotebook* notebook;
 		wxPanel* Panel2;
+		wxMenuItem* zoom500;
+		wxMenuItem* zoom150;
 		//*)
 		EditorObjets *  objectsEditor;
 		EditorLayers *  layersEditor;
@@ -87,6 +96,14 @@ class EditorScene: public wxPanel
 		static const long ID_CUSTOM2;
 		static const long ID_PANEL6;
 		static const long ID_AUINOTEBOOK1;
+		static const long ID_MENUITEM8;
+		static const long ID_MENUITEM1;
+		static const long ID_MENUITEM2;
+		static const long ID_MENUITEM3;
+		static const long ID_MENUITEM4;
+		static const long ID_MENUITEM5;
+		static const long ID_MENUITEM6;
+		static const long ID_MENUITEM7;
 		//*)
 		static const long ID_EDITIONBUTTON;
 		static const long ID_APERCUBUTTON;
@@ -146,6 +163,15 @@ class EditorScene: public wxPanel
 		void OnscenePanelResize(wxSizeEvent& event);
 		void OnnotebookPageChanged(wxAuiNotebookEvent& event);
 		void OnsceneCanvasSetFocus(wxFocusEvent& event);
+		void Onzoom10Selected(wxCommandEvent& event);
+		void Onzoom25Selected(wxCommandEvent& event);
+		void Onzoom50Selected(wxCommandEvent& event);
+		void Onzoom100Selected(wxCommandEvent& event);
+		void Onzoom150Selected(wxCommandEvent& event);
+		void Onzoom200Selected(wxCommandEvent& event);
+		void Onzoom300Selected(wxCommandEvent& event);
+		void Onzoom500Selected(wxCommandEvent& event);
+		void Onzoom5Selected(wxCommandEvent& event);
 		//*)
         void UpdateSceneCanvasSize(int parentPanelWidht, int parentPanelHeight);
         void UpdateScenePanelSize(int parentPanelWidht, int parentPanelHeight);
@@ -161,6 +187,7 @@ class EditorScene: public wxPanel
         void OnChoisirObjetBtClick( wxCommandEvent & event );
         void OnChoisirLayerBtClick( wxCommandEvent & event );
         void OnZoomInitBtClick( wxCommandEvent & event );
+        void OnZoomMoreBtClick( wxRibbonButtonBarEvent & event );
         void OnGridBtClick( wxCommandEvent & event );
         void OnGridSetupBtClick( wxCommandEvent & event );
 

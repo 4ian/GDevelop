@@ -248,7 +248,7 @@ void EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
                     actions[aId].SetParameter(pNb, GDExpression(newExpression));
             }
             //Replace object's name in text expressions
-            else if (instrInfos.parameters[pNb].type == "text")
+            else if (instrInfos.parameters[pNb].type == "text"||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
                 std::string newExpression;
 
@@ -286,7 +286,7 @@ void EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vect
                     conditions[cId].SetParameter(pNb, GDExpression(newExpression));
             }
             //Replace object's name in text expressions
-            else if (instrInfos.parameters[pNb].type == "text")
+            else if (instrInfos.parameters[pNb].type == "text" ||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
                 std::string newExpression;
 
@@ -346,7 +346,7 @@ void EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector 
                 }
             }
             //Replace object's name in text expressions
-            else if (instrInfos.parameters[pNb].type == "text")
+            else if (instrInfos.parameters[pNb].type == "text"||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
                 CallbacksForRemovingObject callbacks(name);
 
@@ -396,7 +396,7 @@ void EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vect
                 }
             }
             //Replace object's name in text expressions
-            else if (instrInfos.parameters[pNb].type == "text")
+            else if (instrInfos.parameters[pNb].type == "text"||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
                 CallbacksForRemovingObject callbacks(name);
 

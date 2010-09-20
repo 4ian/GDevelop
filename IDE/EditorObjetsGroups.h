@@ -31,11 +31,16 @@ class EditorObjetsGroups: public wxPanel
 		virtual ~EditorObjetsGroups();
 
 		//(*Declarations(EditorObjetsGroups)
+		wxMenuItem* MenuItem7;
+		wxMenuItem* MenuItem5;
 		wxMenuItem* MenuItem2;
+		wxMenuItem* MenuItem1;
 		wxMenuItem* MenuItem4;
 		wxMenu ContextMenu;
 		wxPanel* Panel3;
 		wxMenuItem* MenuItem3;
+		wxMenuItem* MenuItem6;
+		wxMenu multipleContextMenu;
 		wxTreeCtrl* ObjetsGroupsList;
 		//*)
 		wxTreeItemId itemSelected;
@@ -57,6 +62,7 @@ class EditorObjetsGroups: public wxPanel
 		static const long ID_MENUITEM1;
 		static const long ID_MENUITEM2;
 		static const long ID_MENUITEM3;
+		static const long ID_MENUITEM4;
 		//*)
 		static const long ID_Refresh;
 		static const long ID_AddGroup;

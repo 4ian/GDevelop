@@ -22,6 +22,7 @@
 #include "EditObjectGroup.h"
 #include "Clipboard.h"
 #include "GDL/HelpFileAccess.h"
+#include "EventsRefactorer.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -43,6 +44,7 @@ const long EditorObjetsGroups::idDelGroup = wxNewId();
 const long EditorObjetsGroups::ID_MENUITEM1 = wxNewId();
 const long EditorObjetsGroups::ID_MENUITEM2 = wxNewId();
 const long EditorObjetsGroups::ID_MENUITEM3 = wxNewId();
+const long EditorObjetsGroups::ID_MENUITEM4 = wxNewId();
 //*)
 const long EditorObjetsGroups::ID_Refresh = wxNewId();
 const long EditorObjetsGroups::ID_Help = wxNewId();
@@ -66,9 +68,6 @@ objectsGroups(objectsGroups_),
 mainEditorCommand(mainEditorCommand_)
 {
 	//(*Initialize(EditorObjetsGroups)
-	wxMenuItem* MenuItem5;
-	wxMenuItem* MenuItem1;
-	wxMenuItem* MenuItem6;
 	wxMenuItem* editMenuItem;
 	wxFlexGridSizer* FlexGridSizer1;
 
@@ -78,7 +77,7 @@ mainEditorCommand(mainEditorCommand_)
 	FlexGridSizer1->AddGrowableRow(1);
 	Panel3 = new wxPanel(this, ID_PANEL4, wxDefaultPosition, wxSize(-1,0), wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer1->Add(Panel3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	ObjetsGroupsList = new wxTreeCtrl(this, ID_TREECTRL1, wxPoint(-72,-72), wxSize(179,170), wxTR_EDIT_LABELS|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
+	ObjetsGroupsList = new wxTreeCtrl(this, ID_TREECTRL1, wxPoint(-72,-72), wxSize(179,170), wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer1->Add(ObjetsGroupsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	editMenuItem = new wxMenuItem((&ContextMenu), IdGroupEdit, _("Editer le groupe"), wxEmptyString, wxITEM_NORMAL);
@@ -110,6 +109,8 @@ mainEditorCommand(mainEditorCommand_)
 	MenuItem6 = new wxMenuItem((&ContextMenu), ID_MENUITEM3, _("Coller"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	ContextMenu.Append(MenuItem6);
+	MenuItem7 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM4, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
+	multipleContextMenu.Append(MenuItem7);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
@@ -126,6 +127,7 @@ mainEditorCommand(mainEditorCommand_)
 	Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjetsGroups::OnCopyGroupSelected);
 	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjetsGroups::OnCutGroupSelected);
 	Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjetsGroups::OnPasteGroupSelected);
+	Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjetsGroups::OnDelGroupSelected);
 	Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorObjetsGroups::OnSetFocus);
 	//*)
 
@@ -331,16 +333,21 @@ void EditorObjetsGroups::OnPanel3Resize(wxSizeEvent& event)
     toolbar->SetSize(Panel3->GetSize().x, -1);
 }
 
-////////////////////////////////////////////////////////////
-/// Clic droit : menu contextuel
-////////////////////////////////////////////////////////////
+/**
+ * Display context menus
+ */
 void EditorObjetsGroups::OnTreeCtrl1ItemRightClick(wxTreeEvent& event)
 {
     wxFocusEvent unusedEvent;
     OnSetFocus(unusedEvent);
 
     itemSelected = event.GetItem();
-    PopupMenu( &ContextMenu );
+    wxArrayTreeItemIds selection;
+
+    if ( ObjetsGroupsList->GetSelections(selection) > 1 )
+        PopupMenu( &multipleContextMenu );
+    else
+        PopupMenu( &ContextMenu );
 }
 
 ////////////////////////////////////////////////////////////
@@ -396,23 +403,61 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
 {
-    if ( ObjetsGroupsList->GetItemText( itemSelected ) != _( "Tous les groupes d'objets de la scène" ) )
-    {
-        vector<ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
-                                                        objectsGroups->end(),
-                                                        std::bind2nd(HasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
-        if ( i != objectsGroups->end() )
-            objectsGroups->erase( i );
+    //Get selection
+    wxArrayTreeItemIds selection;
+    ObjetsGroupsList->GetSelections(selection);
+    std::vector < string > groupsDeleted;
 
-        scene.wasModified = true;
-        ObjetsGroupsList->Delete( itemSelected );
-        return;
+    int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Supprimer également toutes les références à l'objet dans les groupes et les évènements ( Soit les actions et conditions utilisant l'objet ) ?") :
+                                                             wxString::Format(_("Supprimer également toutes les références aux %i objets dans les groupes et les évènements ( Soit les actions et conditions utilisant l'objet ) ?"), selection.GetCount()),
+                              _("Confirmation de la suppression"), wxYES_NO | wxCANCEL);
 
-    }
-    else
+    if ( answer == wxCANCEL ) return;
+
+    if ( itemSelected == ObjetsGroupsList->GetRootItem() )
     {
         wxLogStatus( _( "Aucun groupe sélectionnée" ) );
+        return;
     }
+
+    for (unsigned int i = 0;i<selection.GetCount();++i)
+    {
+        std::string groupName = string(ObjetsGroupsList->GetItemText( selection[i] ).mb_str());
+        groupsDeleted.push_back(groupName); //Generate also a list containing the names of the objects deleted.
+
+        if ( selection[i].IsOk() && ObjetsGroupsList->GetRootItem() != selection[i] )
+        {
+            vector<ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
+                                                            objectsGroups->end(),
+                                                            std::bind2nd(HasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
+            if ( i != objectsGroups->end() )
+                objectsGroups->erase( i );
+
+            if ( answer == wxYES )
+            {
+                EventsRefactorer::RemoveObjectInEvents(game, scene, scene.events, groupName);
+            }
+
+            scene.wasModified = true;
+            ObjetsGroupsList->Delete( itemSelected );
+        }
+    }
+
+    //Removing items
+    void * nothing;
+    wxTreeItemId item = ObjetsGroupsList->GetFirstChild( ObjetsGroupsList->GetRootItem(), nothing);
+    while( item.IsOk() )
+    {
+        if ( find(groupsDeleted.begin(), groupsDeleted.end(), string(ObjetsGroupsList->GetItemText( item ).mb_str())) != groupsDeleted.end() )
+        {
+            ObjetsGroupsList->Delete(item);
+            item = ObjetsGroupsList->GetFirstChild(ObjetsGroupsList->GetRootItem(), nothing);
+        }
+        else
+            item = ObjetsGroupsList->GetNextSibling(item);
+    }
+
+    return;
 }
 
 ////////////////////////////////////////////////////////////
@@ -477,6 +522,7 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
     if ( event.IsEditCancelled() )
         return;
 
+    std::string newName = string(event.GetLabel().mb_str());
 
     //On vérifie que le nom n'existe pas déjà
     if ( std::find_if(  objectsGroups->begin(),
@@ -497,7 +543,9 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
 
         if ( i != objectsGroups->end() )
         {
-            i->SetName( static_cast<string>(event.GetLabel()) );
+            i->SetName( newName );
+
+            EventsRefactorer::RenameObjectInEvents(game, scene, scene.events, ancienNom, newName);
 
             scene.wasModified = true;
             return;

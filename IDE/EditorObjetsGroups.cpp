@@ -408,15 +408,15 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
     ObjetsGroupsList->GetSelections(selection);
     std::vector < string > groupsDeleted;
 
-    int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Supprimer également toutes les références à l'objet dans les groupes et les évènements ( Soit les actions et conditions utilisant l'objet ) ?") :
-                                                             wxString::Format(_("Supprimer également toutes les références aux %i objets dans les groupes et les évènements ( Soit les actions et conditions utilisant l'objet ) ?"), selection.GetCount()),
+    int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Supprimer également toutes les références au groupe dans les évènements ( Soit les actions et conditions utilisant le groupe ) ?") :
+                                                             wxString::Format(_("Supprimer également toutes les références aux %i groupes dans les évènements ( Soit les actions et conditions utilisant les groupes ) ?"), selection.GetCount()),
                               _("Confirmation de la suppression"), wxYES_NO | wxCANCEL);
 
     if ( answer == wxCANCEL ) return;
 
     if ( itemSelected == ObjetsGroupsList->GetRootItem() )
     {
-        wxLogStatus( _( "Aucun groupe sélectionnée" ) );
+        wxLogStatus( _( "Aucun groupe sélectionné" ) );
         return;
     }
 
@@ -469,9 +469,9 @@ void EditorObjetsGroups::OnObjetsGroupsListItemActivated(wxTreeEvent& event)
     OnSetFocus(unusedEvent);
 
     itemSelected = event.GetItem();
+    if ( itemSelected == ObjetsGroupsList->GetRootItem() ) return;
 
-    string nomItemSelected = static_cast<string>(ObjetsGroupsList->GetItemText( event.GetItem() ) );
-    if ( nomItemSelected == _( "Tous les groupes d'objets de la scène" )) return;
+    string nomItemSelected = string(ObjetsGroupsList->GetItemText( event.GetItem() ).mb_str());
 
     vector<ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
                                                     objectsGroups->end(),
@@ -503,7 +503,7 @@ void EditorObjetsGroups::OnObjetsGroupsListBeginLabelEdit(wxTreeEvent& event)
     wxFocusEvent unusedEvent;
     OnSetFocus(unusedEvent);
 
-    if ( ObjetsGroupsList->GetItemText( event.GetItem() ) != _( "Tous les groupes d'objets de la scène" ) )
+    if ( event.GetItem() != ObjetsGroupsList->GetRootItem() )
     {
         ancienNom = ObjetsGroupsList->GetItemText( event.GetItem() );
     }

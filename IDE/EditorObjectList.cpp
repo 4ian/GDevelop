@@ -840,7 +840,7 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
 
     Clipboard * clipboard = Clipboard::getInstance();
 
-    int i = Picker::PickOneObject( objects, static_cast<string>(objectsList->GetItemText( item )) );
+    int i = Picker::PickOneObject( objects, string(objectsList->GetItemText( item ).mb_str()) );
     if ( i == -1 )
     {
         wxLogWarning(_("Impossible de trouver l'objet à couper"));

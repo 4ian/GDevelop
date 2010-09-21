@@ -102,18 +102,17 @@ int main( int argc, char *p_argv[] )
     OpenSaveLoadingScreen openLS(game.loadingScreen);
     openLS.OpenFromString(exeGD->LoadPlainText( "loadingscreen" ));
 
-    // Fenêtre de chargement
+    // Display loading window
     unsigned long style = 0;
     if ( game.loadingScreen.border ) style |= sf::Style::Titlebar;
     sf::RenderWindow loadingApp( sf::VideoMode( game.loadingScreen.width, game.loadingScreen.height, 32 ), "Chargement en cours...", style );
-    if ( !game.loadingScreen.afficher ) loadingApp.Show(false);
+    loadingApp.Show(game.loadingScreen.afficher);
     loadingApp.Clear( sf::Color( 100, 100, 100 ) );
 
-    sf::Image image;
-    image = exeGD->LoadImage( game.loadingScreen.imageFichier );
-    if ( !game.loadingScreen.smooth ) image.SetSmooth(false);
+    boost::shared_ptr<sf::Image> image = boost::shared_ptr<sf::Image>(exeGD->LoadImage( game.loadingScreen.imageFichier ));
+    if ( !game.loadingScreen.smooth ) image->SetSmooth(false);
 
-    sf::Sprite sprite( image );
+    sf::Sprite sprite( *image );
     if ( game.loadingScreen.image )
     {
         loadingApp.Draw( sprite );
@@ -126,10 +125,10 @@ int main( int argc, char *p_argv[] )
     }
     loadingApp.Display();
 
-    //Ouverture du jeu
+    //Open game
 #ifdef RELEASE
 
-    if ( srcString == "" )
+    if ( srcString.empty() )
     {
         cout << endl << "N'a pas pu charger src. Fermeture." << endl;
         return EXIT_FAILURE;
@@ -162,29 +161,20 @@ int main( int argc, char *p_argv[] )
 
 #else
     OpenSaveGame openGame( game );
-    //openGame.OpenFromFile("C:/Program Files/Compil Games/Game Develop/Exemples/CourseAdvanced.jgd" );
-    //openGame.OpenFromFile("C:/Users/Florian/Programmation/Game Develop Player/test2.txt" );
-    //openGame.OpenFromFile("C:/Users/Florian/Programmation/Game Develop Player/BZmod.jgd" );
-    //openGame.OpenFromFile("C:/Users/Florian/Programmation/BenchC2.jgd" );
-    //openGame.OpenFromFile("C:/Users/Florian/Desktop/shoot.jgd" );
-    //openGame.OpenFromFile("D:/Florian/Programmation/Jeux Game Develop/SA4/Game.gdg" );
-    openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/benchmarkForces.gdg" );
+    openGame.OpenFromFile("D:/Florian/Programmation/Jeux Game Develop/SA4/Game.gdg" );
+    //openGame.OpenFromFile("D:/Florian/Programmation/Jeux Game Develop/Ecce Deus/EcceDeus.gdg" );
+    //openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/TestPhysicNew.gdg" );
+    //openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/testTextFont.gdg" );
     //openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/testCrashVariableString.gdg" );
-    //openGame.OpenFromFile("C:/Users/Florian/Programmation/Course/CourseTest.jgd" );
-    //openGame.OpenFromFile("C:/Users/Florian/Programmation/Game Develop Player/test2.txt" );
-    //openGame.OpenFromFile("C:/Users/Florian/Programmation/testCPPExtension2.jgd" );
-    //openGame.OpenFromFile("C:/Users/Florian/Programmation/testFont.jgd" );
-    //openGame.OpenFromFile("C:/Users/Florian/Programmation/3DEngine.jgd" );
-    //openGame.OpenFromFile("C:/Users/Florian/Programmation/Course3D/Course3D.jgd" );
-    //openGame.OpenFromFile("C:/Users/Florian/Programmation/Soldier/Soldier.jgd" );
-    //openGame.OpenFromFile("C:/Users/Florian/Desktop/Tank war II/TankWar.gdg" );
 
 #endif
 
     if ( game.scenes.empty() )
         return EXIT_FAILURE;
 
-    game.imageManager.LoadImagesFromFile( game );
+    //Initialize image manager and load always loaded images
+    game.imageManager->SetGame( &game );
+    game.imageManager->LoadPermanentImages();
 
     //Fenêtre de jeu
     sf::RenderWindow window;
@@ -207,7 +197,7 @@ int main( int argc, char *p_argv[] )
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     double windowRatio = static_cast<double>(window.GetWidth())/static_cast<double>(window.GetHeight());
-    gluPerspective(90.f, windowRatio, 1.f, 500.f);
+    gluPerspective(scenePlayed.oglFOV, windowRatio, scenePlayed.oglZNear, scenePlayed.oglZFar);
 
     //Boucle de jeu
     while ( scenePlayed.running )

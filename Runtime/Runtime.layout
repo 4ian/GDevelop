@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development" />
-	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="382" topLine="0" />
+	<ActiveTarget name="Release" />
+	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="472" topLine="0" />
 	</File>
 	<File name="CompilationChecker.h" open="0" top="0" tabpos="0">
 		<Cursor position="125" topLine="0" />
 	</File>
-	<File name="main.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="4369" topLine="144" />
+	<File name="main.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="3029" topLine="105" />
 	</File>
 </CodeBlocks_layout_file>

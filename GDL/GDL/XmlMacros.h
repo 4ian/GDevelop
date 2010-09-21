@@ -11,6 +11,7 @@
 #define GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING(name_, value_) elem->SetAttribute( name_, value_.c_str() );
 #define GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL(name_, value_) if ( value_ ) elem->SetAttribute( name_, "true" ); else elem->SetAttribute( name_, "false" )
 
+#define GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT(name_, variable_) if ( elem->Attribute( name_ )  != NULL ) elem->QueryIntAttribute( name_, &variable_ );
 #define GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT(name_, variable_) if ( elem->Attribute( name_ )  != NULL ) elem->QueryFloatAttribute( name_, &variable_ );
 #define GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_DOUBLE(name_, variable_) if ( elem->Attribute( name_ )  != NULL ) elem->QueryDoubleAttribute( name_, &variable_ );
 #define GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING(name_, variable_) if ( elem->Attribute( name_ )  != NULL ) variable_ = elem->Attribute( name_ );

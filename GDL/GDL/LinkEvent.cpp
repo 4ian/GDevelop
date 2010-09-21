@@ -68,10 +68,10 @@ void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector 
 
     if ( eventsToInclude == NULL ) return;
 
-    int firstEvent = start;
-    int lastEvent = end;
+    unsigned int firstEvent = start;
+    unsigned int lastEvent = end;
 
-    if ( firstEvent == -1 && lastEvent == -1 ) //Do we need to include all events ?
+    if ( firstEvent == std::string::npos && lastEvent == std::string::npos ) //Do we need to include all events ?
     {
         firstEvent = 0;
         lastEvent = eventsToInclude->size() - 1;
@@ -84,12 +84,12 @@ void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector 
 
 
     //On teste la validité de l'insertion
-    if ( firstEvent < 0 || static_cast<unsigned>(firstEvent) >= eventsToInclude->size() )
+    if ( firstEvent >= eventsToInclude->size() )
     {
         scene.errors.Add( "Impossible d'insérer les évènements du lien ( Début invalide )", "", "", indexOfTheEventInThisList, 2 );
         return;
     }
-    if ( lastEvent < 0 || static_cast<unsigned>(lastEvent) >= eventsToInclude->size() )
+    if ( lastEvent >= eventsToInclude->size() )
     {
         scene.errors.Add( "Impossible d'insérer les évènements du lien ( Fin invalide )", "", "", indexOfTheEventInThisList, 2 );
         return;
@@ -100,14 +100,11 @@ void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector 
         return;
     }
 
-    eventList.erase( eventList.begin() + indexOfTheEventInThisList ); //Suppression du lien
-    for ( int insertion = firstEvent ; insertion <= lastEvent ;insertion++ ) //Insertion des évènements du lien
+    for ( unsigned int insertion = 0;insertion <= static_cast<unsigned>(lastEvent-firstEvent);insertion++ ) //Insertion des évènements du lien
     {
-        if ( indexOfTheEventInThisList+insertion < eventList.size() )
-            eventList.insert( eventList.begin() + indexOfTheEventInThisList+insertion, eventsToInclude->at( insertion )->Clone() );
-        else
-            eventList.push_back( eventsToInclude->at( insertion )->Clone() );
+        eventList.insert( eventList.begin() + indexOfTheEventInThisList + insertion, eventsToInclude->at( firstEvent+insertion )->Clone() );
     }
+    eventList.erase( eventList.begin() + indexOfTheEventInThisList + static_cast<unsigned>(lastEvent-firstEvent)+1 ); //Suppression du lien
 }
 
 #if defined(GDE)

@@ -65,12 +65,12 @@ class EventsRefactorer
         /**
          * Replace all occurences of a string in conditions
          */
-        static void ReplaceStringInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string toReplace, std::string newString);
+        static void ReplaceStringInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase);
 
         /**
          * Replace all occurences of a string in actions
          */
-        static void ReplaceStringInActions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string toReplace, std::string newString);
+        static void ReplaceStringInActions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase);
 
         EventsRefactorer() {};
         virtual ~EventsRefactorer() {};

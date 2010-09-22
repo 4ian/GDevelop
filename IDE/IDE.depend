@@ -11515,7 +11515,7 @@
 1280078541 d:\florian\programmation\gamedevelop\gdl\gdl\automatismsruntimeshareddatas.h
 	<boost/shared_ptr.hpp>
 
-1285188661 d:\florian\programmation\gamedevelop\ide\eventsrefactorer.h
+1285188988 d:\florian\programmation\gamedevelop\ide\eventsrefactorer.h
 	<vector>
 	<string>
 	<boost/shared_ptr.hpp>
@@ -11634,12 +11634,13 @@
 	"ErrorCompilation.h"
 	"nommgr.h"
 
-1285186190 source:d:\florian\programmation\gamedevelop\ide\eventsrefactorer.cpp
+1285189055 source:d:\florian\programmation\gamedevelop\ide\eventsrefactorer.cpp
 	"EventsRefactorer.h"
 	"GDL/Event.h"
 	"GDL/GDExpressionParser.h"
 	"GDL/ExtensionBase.h"
 	"GDL/ExtensionsManager.h"
+	<boost/algorithm/string.hpp>
 
 1283961410 d:\florian\programmation\gamedevelop\gdl\gdl\gdexpressionparser.h
 	<string>
@@ -12942,7 +12943,7 @@
 	"DndTextSceneEditor.h"
 	<wx/cursor.h>
 
-1285186594 source:d:\florian\programmation\gamedevelop\ide\searchevents.cpp
+1285188555 source:d:\florian\programmation\gamedevelop\ide\searchevents.cpp
 	"SearchEvents.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -13022,7 +13023,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1285188896 d:\florian\programmation\gamedevelop\ide\version.h
+1285189055 d:\florian\programmation\gamedevelop\ide\version.h
 
 1272727521 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

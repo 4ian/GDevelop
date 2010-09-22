@@ -3,6 +3,7 @@
 #include "GDL/GDExpressionParser.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
+#include <boost/algorithm/string.hpp>
 
 class CallbacksForRenamingObject : public ParserCallbacks
 {

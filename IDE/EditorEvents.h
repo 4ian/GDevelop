@@ -215,16 +215,10 @@ class EditorEvents: public wxPanel
 
         SearchEvents * searchDialog;
 
-        /**
-         * Reference to game containing the datas to edit
-         */
 		Game & game;
-
-        /**
-         * Reference to the scene edited
-         */
 		Scene & scene;
         vector < BaseEventSPtr > * events; //Pointeur vers les évènements à modifier
+
 		MainEditorCommand & mainEditorCommand;
 
         //Annulation

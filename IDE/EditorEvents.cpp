@@ -394,7 +394,8 @@ isResizingColumns(false)
         }
 	}
 
-    searchDialog = new SearchEvents(this, unusedEventList);
+    searchDialog = new SearchEvents(this, game, scene, events);
+    searchDialog->Show();
 }
 
 /**

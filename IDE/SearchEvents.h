@@ -15,28 +15,36 @@
 #include <string>
 #include <vector>
 #include "GDL/Event.h"
-
-using namespace std;
+class Game;
+class Scene;
 
 class SearchEvents: public wxDialog
 {
 	public:
 
-		SearchEvents(wxWindow* parent, vector < BaseEventSPtr > events_);
+		SearchEvents(wxWindow* parent, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_);
 		virtual ~SearchEvents();
 
 		//(*Declarations(SearchEvents)
+		wxCheckBox* replaceCaseCheck;
 		wxCheckBox* actionsCheck;
 		wxListCtrl* ListCtrl1;
 		wxNotebook* Notebook1;
+		wxCheckBox* replaceActionsCheck;
+		wxStaticText* StaticText2;
 		wxButton* Button1;
 		wxCheckBox* CheckBox2;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
+		wxStaticText* StaticText3;
 		wxButton* Button2;
 		wxCheckBox* CheckBox1;
+		wxCheckBox* replaceConditionsCheck;
 		wxTextCtrl* searchEdit;
+		wxTextCtrl* replaceEdit;
 		wxCheckBox* conditionsCheck;
+		wxTextCtrl* searchToReplaceEdit;
+		wxButton* replaceBt;
 		wxPanel* Panel2;
 		wxCheckBox* commentsCheck;
 		wxCheckBox* linksCheck;
@@ -59,6 +67,14 @@ class SearchEvents: public wxDialog
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON3;
 		static const long ID_PANEL1;
+		static const long ID_STATICTEXT2;
+		static const long ID_TEXTCTRL2;
+		static const long ID_STATICTEXT3;
+		static const long ID_TEXTCTRL3;
+		static const long ID_CHECKBOX8;
+		static const long ID_CHECKBOX9;
+		static const long ID_CHECKBOX10;
+		static const long ID_BUTTON4;
 		static const long ID_PANEL2;
 		static const long ID_NOTEBOOK1;
 		//*)
@@ -66,9 +82,13 @@ class SearchEvents: public wxDialog
 	private:
 
 		//(*Handlers(SearchEvents)
+		void OnreplaceBtClick(wxCommandEvent& event);
 		//*)
 
-		vector < BaseEventSPtr > events;
+		Game & game;
+		Scene & scene;
+
+		std::vector < BaseEventSPtr > * events;
 
 		DECLARE_EVENT_TABLE()
 };

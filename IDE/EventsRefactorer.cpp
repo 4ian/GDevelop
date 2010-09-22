@@ -433,3 +433,84 @@ void EventsRefactorer::RemoveObjectInEvents(Game & game, Scene & scene, vector <
         if ( events[i]->CanHaveSubEvents() ) RemoveObjectInEvents(game, scene, events[i]->GetSubEvents(), name);
     }
 }
+
+void EventsRefactorer::ReplaceStringInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events,
+                                              std::string toReplace,
+                                              std::string newString,
+                                              bool matchCase,
+                                              bool inConditions,
+                                              bool inActions)
+{
+    for (unsigned int i = 0;i<events.size();++i)
+    {
+        if ( inConditions )
+        {
+            vector < vector<Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
+            for (unsigned int j = 0;j < conditionsVectors.size();++j)
+                ReplaceStringInConditions(game, scene, *conditionsVectors[j], toReplace, newString, matchCase);
+        }
+
+        if ( inActions )
+        {
+            vector < vector<Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
+            for (unsigned int j = 0;j < actionsVectors.size();++j)
+                ReplaceStringInActions(game, scene, *actionsVectors[j], toReplace, newString, matchCase);
+        }
+
+        if ( events[i]->CanHaveSubEvents() ) ReplaceStringInEvents(game, scene, events[i]->GetSubEvents(), toReplace, newString, matchCase, inConditions, inActions);
+    }
+}
+
+std::string ReplaceAllOccurences(string context, const string& from, const string& to)
+{
+    size_t lookHere = 0;
+    size_t foundHere;
+    while((foundHere = context.find(from, lookHere)) != string::npos)
+    {
+          context.replace(foundHere, from.size(), to);
+          lookHere = foundHere + to.size();
+    }
+
+    return context;
+}
+
+std::string ReplaceAllOccurencesCaseUnsensitive(string context, string from, const string& to)
+{
+    boost::to_upper(from);
+
+    size_t lookHere = 0;
+    size_t foundHere;
+    while((foundHere = boost::to_upper_copy(context).find(from, lookHere)) != string::npos)
+    {
+          context.replace(foundHere, from.size(), to);
+          lookHere = foundHere + to.size();
+    }
+
+    return context;
+}
+
+void EventsRefactorer::ReplaceStringInActions(Game & game, Scene & scene, vector < Instruction > & actions, std::string toReplace, std::string newString, bool matchCase)
+{
+    for (unsigned int aId = 0;aId < actions.size();++aId)
+    {
+        InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetActionInfos(actions[aId].GetType());
+        for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+            actions[aId].SetParameter(pNb, GDExpression(matchCase ? ReplaceAllOccurences(actions[aId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString)
+                                                                  : ReplaceAllOccurencesCaseUnsensitive(actions[aId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString)));
+
+        if ( !actions[aId].GetSubInstructions().empty() ) ReplaceStringInActions(game, scene, actions[aId].GetSubInstructions(), toReplace, newString, matchCase);
+    }
+}
+
+void EventsRefactorer::ReplaceStringInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase)
+{
+    for (unsigned int cId = 0;cId < conditions.size();++cId)
+    {
+        InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetConditionInfos(conditions[cId].GetType());
+        for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+            conditions[cId].SetParameter(pNb, GDExpression(matchCase ? ReplaceAllOccurences(conditions[cId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString)
+                                                                     : ReplaceAllOccurencesCaseUnsensitive(conditions[cId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString)));
+
+        if ( !conditions[cId].GetSubInstructions().empty() ) ReplaceStringInConditions(game, scene, conditions[cId].GetSubInstructions(), toReplace, newString, matchCase);
+    }
+}

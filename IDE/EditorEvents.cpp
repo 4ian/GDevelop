@@ -390,6 +390,7 @@ isResizingColumns(false)
             menuItem->SetBitmap(it->second.smallicon);
             eventTypesMenu->Append(menuItem);
             Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnInsertSomeEventSelected);
+            mainEditorCommand.GetMainEditor()->Connect(id, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&EditorEvents::OnInsertSomeEventSelected, NULL, this);
         }
 	}
 

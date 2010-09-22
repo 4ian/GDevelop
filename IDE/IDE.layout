@@ -166,8 +166,8 @@
 	<File name="EditorObjets.h" open="0" top="0" tabpos="18">
 		<Cursor position="1496" topLine="38" />
 	</File>
-	<File name="EditorObjetsGroups.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="27270" topLine="599" />
+	<File name="EditorObjetsGroups.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="26990" topLine="599" />
 	</File>
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
@@ -184,7 +184,7 @@
 	<File name="EdittimeScene.h" open="0" top="0" tabpos="2">
 		<Cursor position="1393" topLine="31" />
 	</File>
-	<File name="EventsRefactorer.cpp" open="1" top="0" tabpos="4">
+	<File name="EventsRefactorer.cpp" open="1" top="1" tabpos="3">
 		<Cursor position="17224" topLine="109" />
 	</File>
 	<File name="EventsRefactorer.h" open="0" top="0" tabpos="3">

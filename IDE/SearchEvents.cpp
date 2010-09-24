@@ -10,6 +10,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "EventsRefactorer.h"
+#include "EditorEvents.h"
 
 using namespace std;
 
@@ -32,6 +33,7 @@ const long SearchEvents::ID_TEXTCTRL2 = wxNewId();
 const long SearchEvents::ID_STATICTEXT3 = wxNewId();
 const long SearchEvents::ID_TEXTCTRL3 = wxNewId();
 const long SearchEvents::ID_CHECKBOX8 = wxNewId();
+const long SearchEvents::ID_CHECKBOX7 = wxNewId();
 const long SearchEvents::ID_CHECKBOX9 = wxNewId();
 const long SearchEvents::ID_CHECKBOX10 = wxNewId();
 const long SearchEvents::ID_BUTTON4 = wxNewId();
@@ -44,7 +46,8 @@ BEGIN_EVENT_TABLE(SearchEvents,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-SearchEvents::SearchEvents(wxWindow* parent, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_) :
+SearchEvents::SearchEvents(EditorEvents * parent_, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_) :
+parent(parent_),
 game(game_),
 scene(scene_),
 events(events_)
@@ -71,6 +74,7 @@ events(events_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
+	wxFlexGridSizer* FlexGridSizer17;
 
 	Create(parent, wxID_ANY, _("Chercher dans les évènements"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -165,13 +169,18 @@ events(events_)
 	StaticBoxSizer3->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Où"));
-	FlexGridSizer14 = new wxFlexGridSizer(0, 2, 0, 0);
+	FlexGridSizer14 = new wxFlexGridSizer(0, 1, 0, 0);
+	onlySelectedEventCheck = new wxCheckBox(Panel2, ID_CHECKBOX7, _("Seulement l\'évènement selectionné"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
+	onlySelectedEventCheck->SetValue(false);
+	FlexGridSizer14->Add(onlySelectedEventCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
 	replaceConditionsCheck = new wxCheckBox(Panel2, ID_CHECKBOX9, _("Les conditions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX9"));
 	replaceConditionsCheck->SetValue(true);
-	FlexGridSizer14->Add(replaceConditionsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer17->Add(replaceConditionsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	replaceActionsCheck = new wxCheckBox(Panel2, ID_CHECKBOX10, _("Les actions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX10"));
 	replaceActionsCheck->SetValue(true);
-	FlexGridSizer14->Add(replaceActionsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer17->Add(replaceActionsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer14->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer4->Add(FlexGridSizer14, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -203,15 +212,27 @@ SearchEvents::~SearchEvents()
 	//*)
 }
 
-
 void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
 {
-    if ( events == NULL ) return;
+    vector < BaseEventSPtr > eventsToInspect;
 
-    EventsRefactorer::ReplaceStringInEvents(game, scene, *events,
+    //Check events validity
+    if ( !onlySelectedEventCheck->GetValue() && events == NULL ) return;
+    if ( onlySelectedEventCheck->GetValue() )
+    {
+        if ( parent->GetLastSelectedEvent() == boost::shared_ptr<BaseEvent>() ) return;
+
+        eventsToInspect.push_back(parent->GetLastSelectedEvent()); //Use an intermediate vector for single events.
+    }
+
+    EventsRefactorer::ReplaceStringInEvents(game, scene,
+                                            onlySelectedEventCheck->GetValue() ? eventsToInspect : *events,
                                             string(searchToReplaceEdit->GetValue().mb_str()),
                                             string(replaceEdit->GetValue().mb_str()),
                                             replaceCaseCheck->GetValue(),
                                             replaceConditionsCheck->GetValue(),
                                             replaceActionsCheck->GetValue());
+
+    parent->ChangesMadeOnEvents();
+    parent->ForceRefresh();
 }

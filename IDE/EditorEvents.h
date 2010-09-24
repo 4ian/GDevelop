@@ -16,13 +16,10 @@
 #include <wx/dcbuffer.h>
 #include <wx/toolbar.h>
 #include <boost/tuple/tuple.hpp>
-#include <stack>
-
-#include "SearchEvents.h"
 #include "GDL/MainEditorCommand.h"
 #include "GDL/EventsRenderingHelper.h"
-
 #include "GDL/Game.h"
+class SearchEvents;
 
 class EditorEvents: public wxPanel
 {
@@ -35,6 +32,23 @@ class EditorEvents: public wxPanel
 
 		static void CreateRibbonPage(wxRibbonPage * page);
 		void ConnectEvents();
+
+		/**
+		 * Called (internally by EventsEditor or by modeless dialogs like Search/Replace dialog) when some changes
+		 * were made to events.
+		 */
+        void ChangesMadeOnEvents();
+
+        /**
+         * Called (internally or by modeless dialogs like Search/Replace dialog ) so as to force refresh of the events.
+         */
+        void ForceRefresh();
+
+        /**
+         * Return the selected event
+         */
+        BaseEventSPtr GetLastSelectedEvent();
+
 
 		//(*Declarations(EditorEvents)
 		wxMenuItem* MenuItem31;
@@ -135,6 +149,7 @@ class EditorEvents: public wxPanel
 		static const long idRibbonTemplate;
 		static const long idRibbonCreateTemplate;
 		static const long idRibbonHelp;
+		static const long idSearchReplace;
 		static vector < std::pair<long, std::string> > idForEventTypesMenu;
 
 	private:
@@ -193,8 +208,7 @@ class EditorEvents: public wxPanel
         void OnSearchBtClick(wxCommandEvent& event);
 		void OnInsertSomeEventSelected(wxCommandEvent& event);
 		void OnAddSomeEventSelected(wxRibbonButtonBarEvent& evt);
-        void ChangesMadeOnEvents();
-        void SetEventsNeedUpdate(vector < BaseEventSPtr > & eventsToReset);
+		void SetEventsNeedUpdate(vector < BaseEventSPtr > & eventsToRefresh);
 
         void DeselectAllEvents(vector < BaseEventSPtr > & eventsToUnselected);
         void DeselectAllActions(vector < BaseEventSPtr > & eventsToUnselected);
@@ -207,7 +221,6 @@ class EditorEvents: public wxPanel
         vector < Instruction > * GetSelectedListOfInstructions(unsigned int nb);
         vector < Instruction > * GetLastSelectedListOfInstructions();
 
-        BaseEventSPtr GetLastSelectedEvent();
         BaseEventSPtr GetSelectedEvent(unsigned int nb);
 
         vector < BaseEventSPtr > * GetSelectedListOfEvents(unsigned int nb);

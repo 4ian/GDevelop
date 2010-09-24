@@ -17,12 +17,17 @@
 #include "GDL/Event.h"
 class Game;
 class Scene;
+class EditorEvents;
 
+/**
+ * Search/Replace dialogs for events.
+ * Intented to be only used by EditorEvents
+ */
 class SearchEvents: public wxDialog
 {
 	public:
 
-		SearchEvents(wxWindow* parent, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_);
+		SearchEvents(EditorEvents * parent_, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_);
 		virtual ~SearchEvents();
 
 		//(*Declarations(SearchEvents)
@@ -42,6 +47,7 @@ class SearchEvents: public wxDialog
 		wxCheckBox* replaceConditionsCheck;
 		wxTextCtrl* searchEdit;
 		wxTextCtrl* replaceEdit;
+		wxCheckBox* onlySelectedEventCheck;
 		wxCheckBox* conditionsCheck;
 		wxTextCtrl* searchToReplaceEdit;
 		wxButton* replaceBt;
@@ -72,6 +78,7 @@ class SearchEvents: public wxDialog
 		static const long ID_STATICTEXT3;
 		static const long ID_TEXTCTRL3;
 		static const long ID_CHECKBOX8;
+		static const long ID_CHECKBOX7;
 		static const long ID_CHECKBOX9;
 		static const long ID_CHECKBOX10;
 		static const long ID_BUTTON4;
@@ -85,6 +92,7 @@ class SearchEvents: public wxDialog
 		void OnreplaceBtClick(wxCommandEvent& event);
 		//*)
 
+        EditorEvents * parent;
 		Game & game;
 		Scene & scene;
 

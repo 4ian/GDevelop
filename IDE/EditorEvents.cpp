@@ -33,6 +33,7 @@
 #include "GDL/StandardEvent.h"
 #include "GDL/CommonTools.h"
 #include "GDL/HelpFileAccess.h"
+#include "SearchEvents.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -108,6 +109,7 @@ const long EditorEvents::idRibbonPaste = wxNewId();
 const long EditorEvents::idRibbonTemplate = wxNewId();
 const long EditorEvents::idRibbonCreateTemplate = wxNewId();
 const long EditorEvents::idRibbonHelp = wxNewId();
+const long EditorEvents::idSearchReplace = wxNewId();
 
 vector < std::pair<long, std::string> > EditorEvents::idForEventTypesMenu;
 
@@ -395,7 +397,6 @@ isResizingColumns(false)
 	}
 
     searchDialog = new SearchEvents(this, game, scene, events);
-    searchDialog->Show();
 }
 
 /**
@@ -440,6 +441,11 @@ void EditorEvents::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonCreateTemplate, !hideLabels ? _("Créer") : "", wxBitmap("res/addtemplate24.png", wxBITMAP_TYPE_ANY));
     }
     {
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Recherche"), wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        ribbonBar->AddButton(idSearchReplace, !hideLabels ? _("Chercher / Remplacer") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
+    }
+    {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
@@ -460,12 +466,15 @@ void EditorEvents::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonPaste, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnMenuPasteSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnTemplateBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonCreateTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnCreateTemplateBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idSearchReplace, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnSearchBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnAideBtClick, NULL, this);
 }
 
 EditorEvents::~EditorEvents()
 {
     MemTracer.DelObj(( long )this );
+
+    delete searchDialog;
 
     //Be careful to remove ( not delete ) the common sub menu, so as to prevent its multiple deletion.
     actionsMenu.Remove(actionsMenu.FindItemByPosition(actionsMenu.GetMenuItemCount()-1));
@@ -476,18 +485,22 @@ EditorEvents::~EditorEvents()
     //*)
 }
 
+void EditorEvents::ForceRefresh()
+{
+    EventsPanel->Refresh();
+    EventsPanel->Update();
+}
+
 ////////////////////////////////////////////////////////////
 /// Rafraichissement à chaque changement de la scrollbar
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnScrollBar1ScrollChanged( wxScrollEvent& event )
 {
-    EventsPanel->Refresh();
-    EventsPanel->Update();
+    ForceRefresh();
 }
 void EditorEvents::OnhorizontalScrollbarScroll(wxScrollEvent& event)
 {
-    EventsPanel->Refresh();
-    EventsPanel->Update();
+    ForceRefresh();
 }
 
 ////////////////////////////////////////////////////////////
@@ -497,8 +510,7 @@ void EditorEvents::OnEventsPanelResize( wxSizeEvent& event )
 {
     SetEventsNeedUpdate(*events);
 
-    EventsPanel->Refresh();
-    EventsPanel->Update();
+    ForceRefresh();
 }
 
 /**
@@ -530,8 +542,7 @@ void EditorEvents::ChangesMadeOnEvents()
     scene.wasModified = true;
 
     //Rafraichissement
-    EventsPanel->Refresh();
-    EventsPanel->Update();
+    ForceRefresh();
 }
 
 Instruction & EditorEvents::GetLastSelectedInstruction()
@@ -1037,8 +1048,7 @@ void EditorEvents::OnEventsPanelLeftDClick( wxMouseEvent& event )
     MouseY = event.GetY()+ScrollBar1->GetThumbPosition();
 
     //Refresh, so as to display selection and refresh events selected
-    EventsPanel->Refresh();
-    EventsPanel->Update();
+    ForceRefresh();
 
     //Get the selection
     BaseEventSPtr eventSelected = GetLastSelectedEvent();
@@ -1099,8 +1109,7 @@ void EditorEvents::OnEventsPanelLeftUp(wxMouseEvent& event)
     }
 
     //Refresh the events
-    EventsPanel->Refresh();
-    EventsPanel->Update();
+    ForceRefresh();
 }
 
 ////////////////////////////////////////////////////////////
@@ -1124,8 +1133,7 @@ void EditorEvents::OnEventsPanelRightUp( wxMouseEvent& event )
     MouseY = event.GetY()+ScrollBar1->GetThumbPosition();
 
     //Refresh, so as to display selection and refresh events selected
-    EventsPanel->Refresh();
-    EventsPanel->Update();
+    ForceRefresh();
 
     //Get the selection
     BaseEventSPtr eventSelected = GetLastSelectedEvent();
@@ -1158,8 +1166,7 @@ void EditorEvents::OnEventsPanelRightUp( wxMouseEvent& event )
 void EditorEvents::OnEventsPanelMouseWheel(wxMouseEvent& event)
 {
     ScrollBar1->SetScrollbar(ScrollBar1->GetThumbPosition()-event.GetWheelRotation(), ScrollBar1->GetThumbSize(), ScrollBar1->GetRange(), ScrollBar1->GetPageSize());
-    EventsPanel->Refresh();
-    EventsPanel->Update();
+    ForceRefresh();
 }
 
 ////////////////////////////////////////////////////////////
@@ -1168,7 +1175,7 @@ void EditorEvents::OnEventsPanelMouseWheel(wxMouseEvent& event)
 void EditorEvents::OnSearchBtClick(wxCommandEvent& event)
 {
     if ( searchDialog )
-        searchDialog->ShowModal();
+        searchDialog->Show();
 }
 
 ////////////////////////////////////////////////////////////
@@ -1192,8 +1199,7 @@ void EditorEvents::OnUndoSelected(wxCommandEvent& event)
     *events = CloneVectorOfEvents(history.at( history.size() - 2 )); //-2 car le dernier élément est la liste d'évènement actuelle
     history.pop_back();
 
-    EventsPanel->Refresh();
-    EventsPanel->Update();
+    ForceRefresh();
 
     scene.wasModified = true;
 }
@@ -1210,8 +1216,7 @@ void EditorEvents::OnRedoSelected(wxCommandEvent& event)
     *events = CloneVectorOfEvents(redoHistory.back());
     redoHistory.pop_back();
 
-    EventsPanel->Refresh();
-    EventsPanel->Update();
+    ForceRefresh();
 
     scene.wasModified = true;
 }

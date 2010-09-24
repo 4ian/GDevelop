@@ -28,8 +28,8 @@
 	<File name="ChoiceJoyAxis.h" open="0" top="0" tabpos="13">
 		<Cursor position="288" topLine="0" />
 	</File>
-	<File name="ChoixAction.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="18125" topLine="328" />
+	<File name="ChoixAction.cpp" open="1" top="0" tabpos="9">
+		<Cursor position="1174" topLine="24" />
 	</File>
 	<File name="ChoixAction.h" open="0" top="0" tabpos="4">
 		<Cursor position="596" topLine="6" />
@@ -136,11 +136,11 @@
 	<File name="EditPropScene.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="12120" topLine="333" />
 	</File>
-	<File name="EditorEvents.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="61258" topLine="1272" />
+	<File name="EditorEvents.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="24383" topLine="378" />
 	</File>
-	<File name="EditorEvents.h" open="0" top="0" tabpos="4">
-		<Cursor position="8746" topLine="214" />
+	<File name="EditorEvents.h" open="1" top="0" tabpos="8">
+		<Cursor position="832" topLine="26" />
 	</File>
 	<File name="EditorEventsActions.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="3290" topLine="65" />
@@ -184,11 +184,11 @@
 	<File name="EdittimeScene.h" open="0" top="0" tabpos="2">
 		<Cursor position="1393" topLine="31" />
 	</File>
-	<File name="EventsRefactorer.cpp" open="1" top="1" tabpos="3">
-		<Cursor position="17224" topLine="109" />
+	<File name="EventsRefactorer.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="24464" topLine="281" />
 	</File>
-	<File name="EventsRefactorer.h" open="0" top="0" tabpos="3">
-		<Cursor position="1911" topLine="24" />
+	<File name="EventsRefactorer.h" open="1" top="0" tabpos="6">
+		<Cursor position="3454" topLine="52" />
 	</File>
 	<File name="Extensions.cpp" open="0" top="0" tabpos="21">
 		<Cursor position="11989" topLine="318" />
@@ -211,11 +211,11 @@
 	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2790" topLine="90" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="10">
-		<Cursor position="2994" topLine="103" />
+	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="11">
+		<Cursor position="2812" topLine="91" />
 	</File>
-	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="3">
-		<Cursor position="491" topLine="0" />
+	<File name="Game_Develop_EditorApp.h" open="1" top="0" tabpos="10">
+		<Cursor position="221" topLine="1" />
 	</File>
 	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="18336" topLine="285" />
@@ -286,11 +286,11 @@
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="21">
 		<Cursor position="883" topLine="35" />
 	</File>
-	<File name="SearchEvents.cpp" open="0" top="0" tabpos="10">
-		<Cursor position="1146" topLine="105" />
+	<File name="SearchEvents.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="13604" topLine="202" />
 	</File>
-	<File name="SearchEvents.h" open="0" top="0" tabpos="9">
-		<Cursor position="1562" topLine="48" />
+	<File name="SearchEvents.h" open="1" top="0" tabpos="7">
+		<Cursor position="2238" topLine="19" />
 	</File>
 	<File name="SplashScreen.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="1411" topLine="61" />

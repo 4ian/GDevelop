@@ -11237,7 +11237,7 @@
 	<wx/dialog.h>
 	"GDL/Scene.h"
 
-1285186347 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
+1285271279 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"EditorEvents.h"
@@ -11261,6 +11261,7 @@
 	"GDL/StandardEvent.h"
 	"GDL/CommonTools.h"
 	"GDL/HelpFileAccess.h"
+	"SearchEvents.h"
 	<wx/msw/winundef.h>
 	"Clipboard.h"
 	"ChoixTemplateEvent.h"
@@ -11269,7 +11270,7 @@
 	<time.h>
 	<gtk/gtk.h>
 
-1285185807 d:\florian\programmation\gamedevelop\ide\editorevents.h
+1285354473 d:\florian\programmation\gamedevelop\ide\editorevents.h
 	<wx/sizer.h>
 	<wx/menu.h>
 	<wx/panel.h>
@@ -11278,25 +11279,9 @@
 	<wx/dcbuffer.h>
 	<wx/toolbar.h>
 	<boost/tuple/tuple.hpp>
-	<stack>
-	"SearchEvents.h"
 	"GDL/MainEditorCommand.h"
 	"GDL/EventsRenderingHelper.h"
 	"GDL/Game.h"
-
-1285188555 d:\florian\programmation\gamedevelop\ide\searchevents.h
-	<wx/listctrl.h>
-	<wx/notebook.h>
-	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/textctrl.h>
-	<wx/checkbox.h>
-	<wx/panel.h>
-	<wx/button.h>
-	<wx/dialog.h>
-	<string>
-	<vector>
-	"GDL/Event.h"
 
 1282232794 d:\florian\programmation\gamedevelop\gdl\gdl\eventsrenderinghelper.h
 	<wx/dc.h>
@@ -11387,6 +11372,20 @@
 	<boost/serialization/nvp.hpp>
 	<boost/serialization/version.hpp>
 	<boost/serialization/tracking.hpp>
+
+1285353384 d:\florian\programmation\gamedevelop\ide\searchevents.h
+	<wx/listctrl.h>
+	<wx/notebook.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/checkbox.h>
+	<wx/panel.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<string>
+	<vector>
+	"GDL/Event.h"
 
 1277063194 source:d:\florian\programmation\gamedevelop\ide\editoreventsactions.cpp
 	"EditorEvents.h"
@@ -11515,7 +11514,7 @@
 1280078541 d:\florian\programmation\gamedevelop\gdl\gdl\automatismsruntimeshareddatas.h
 	<boost/shared_ptr.hpp>
 
-1285188988 d:\florian\programmation\gamedevelop\ide\eventsrefactorer.h
+1285271824 d:\florian\programmation\gamedevelop\ide\eventsrefactorer.h
 	<vector>
 	<string>
 	<boost/shared_ptr.hpp>
@@ -11634,7 +11633,7 @@
 	"ErrorCompilation.h"
 	"nommgr.h"
 
-1285189055 source:d:\florian\programmation\gamedevelop\ide\eventsrefactorer.cpp
+1285272578 source:d:\florian\programmation\gamedevelop\ide\eventsrefactorer.cpp
 	"EventsRefactorer.h"
 	"GDL/Event.h"
 	"GDL/GDExpressionParser.h"
@@ -11731,7 +11730,7 @@
 	<iostream>
 	<wx/dcbuffer.h>
 
-1283344302 source:d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
+1285269231 source:d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
 	"debugMem.h"
 	<wx/msw/winundef.h>
 	<wx/image.h>
@@ -11846,11 +11845,16 @@
 
 1253308453 c:\libs\wxwidgets\include\wx\palmos\stdpaths.h
 
-1278598074 d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.h
+1285267686 d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.h
 	<wx/app.h>
 	<wx/log.h>
+	<wx/snglinst.h>
 	"GDL/Game.h"
 	"Game_Develop_EditorMain.h"
+
+1253308521 c:\libs\wxwidgets\include\wx\snglinst.h
+	"wx/app.h"
+	"wx/utils.h"
 
 1264364136 d:\florian\programmation\gamedevelop\ide\log.h
 	<string>
@@ -12386,7 +12390,7 @@
 1236014536 c:\libs\boost_1_43_0\boost\detail\quick_allocator.hpp
 	<boost/smart_ptr/detail/quick_allocator.hpp>
 
-1284832880 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
+1285267450 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
 	"MemTrace.h"
 	<wx/bitmap.h>
 	<wx/icon.h>
@@ -12943,7 +12947,7 @@
 	"DndTextSceneEditor.h"
 	<wx/cursor.h>
 
-1285188555 source:d:\florian\programmation\gamedevelop\ide\searchevents.cpp
+1285271279 source:d:\florian\programmation\gamedevelop\ide\searchevents.cpp
 	"SearchEvents.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -12953,6 +12957,7 @@
 	"GDL/Game.h"
 	"GDL/Scene.h"
 	"EventsRefactorer.h"
+	"EditorEvents.h"
 
 1264364134 source:d:\florian\programmation\gamedevelop\ide\signemodification.cpp
 	"SigneModification.h"
@@ -13023,7 +13028,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1285189055 d:\florian\programmation\gamedevelop\ide\version.h
+1285354475 d:\florian\programmation\gamedevelop\ide\version.h
 
 1272727521 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

@@ -8,6 +8,7 @@
 
 #include <wx/app.h>
 #include <wx/log.h>
+#include <wx/snglinst.h>
 #include "GDL/Game.h"
 #include "Game_Develop_EditorMain.h"
 
@@ -25,6 +26,7 @@ class Game_Develop_EditorApp : public wxApp
         virtual bool    OnExceptionInMainLoop();
 
         Game_Develop_EditorFrame * mainEditor;
+        wxSingleInstanceChecker * singleInstanceChecker;
         wxLogGui *log;
         wxLogStderr *log_stderr_;
         wxLogChain *logChain;

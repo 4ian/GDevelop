@@ -43,34 +43,46 @@ class EventsRefactorer
         /**
          * Replace all occurences of an object name by another name in an action
          * ( include : objects in parameters and in math/text expressions ).
+         *
+         * \return true if something was modified.
          */
-        static void RenameObjectInActions(Game & game, Scene & scene, std::vector < Instruction > & instructions, std::string oldName, std::string newName);
+        static bool RenameObjectInActions(Game & game, Scene & scene, std::vector < Instruction > & instructions, std::string oldName, std::string newName);
 
         /**
          * Replace all occurences of an object name by another name in a condition
          * ( include : objects in parameters and in math/text expressions ).
+         *
+         * \return true if something was modified.
          */
-        static void RenameObjectInConditions(Game & game, Scene & scene, std::vector < Instruction > & instructions, std::string oldName, std::string newName);
+        static bool RenameObjectInConditions(Game & game, Scene & scene, std::vector < Instruction > & instructions, std::string oldName, std::string newName);
 
         /**
          * Remove all conditions of the list using an object
+         *
+         * \return true if something was modified.
          */
-        static void RemoveObjectInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string name);
+        static bool RemoveObjectInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string name);
 
         /**
          * Remove all actions of the list using an object
+         *
+         * \return true if something was modified.
          */
-        static void RemoveObjectInActions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string name);
+        static bool RemoveObjectInActions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string name);
 
         /**
          * Replace all occurences of a string in conditions
+         *
+         * \return true if something was modified.
          */
-        static void ReplaceStringInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase);
+        static bool ReplaceStringInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase);
 
         /**
          * Replace all occurences of a string in actions
+         *
+         * \return true if something was modified.
          */
-        static void ReplaceStringInActions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase);
+        static bool ReplaceStringInActions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase);
 
         EventsRefactorer() {};
         virtual ~EventsRefactorer() {};

@@ -227,8 +227,10 @@ class CallbacksForRemovingObject : public ParserCallbacks
         std::string name;
 };
 
-void EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector < Instruction > & actions, std::string oldName, std::string newName)
+bool EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector < Instruction > & actions, std::string oldName, std::string newName)
 {
+    bool somethingModified = false;
+
     for (unsigned int aId = 0;aId < actions.size();++aId)
     {
         InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetActionInfos(actions[aId].GetType());
@@ -241,32 +243,45 @@ void EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
             else if (instrInfos.parameters[pNb].type == "expression")
             {
                 std::string newExpression;
+                std::string oldExpression = actions[aId].GetParameterSafely(pNb).GetPlainString();
 
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
-                GDExpressionParser parser(actions[aId].GetParameterSafely(pNb).GetPlainString());
-                if ( parser.ParseMathExpression(game, scene, callbacks) )
+                GDExpressionParser parser(oldExpression);
+                if ( parser.ParseMathExpression(game, scene, callbacks) && newExpression != oldExpression )
+                {
+                    somethingModified = true;
                     actions[aId].SetParameter(pNb, GDExpression(newExpression));
+                }
             }
             //Replace object's name in text expressions
             else if (instrInfos.parameters[pNb].type == "text"||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
                 std::string newExpression;
+                std::string oldExpression = actions[aId].GetParameterSafely(pNb).GetPlainString();
 
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
-                GDExpressionParser parser(actions[aId].GetParameterSafely(pNb).GetPlainString());
-                if ( parser.ParseTextExpression(game, scene, callbacks))
+                GDExpressionParser parser(oldExpression);
+                if ( parser.ParseTextExpression(game, scene, callbacks) && newExpression != oldExpression )
+                {
+                    somethingModified = true;
                     actions[aId].SetParameter(pNb, GDExpression(newExpression));
+                }
             }
         }
 
-        if ( !actions[aId].GetSubInstructions().empty() ) RenameObjectInActions(game, scene, actions[aId].GetSubInstructions(), oldName, newName);
+        if ( !actions[aId].GetSubInstructions().empty() )
+            somethingModified = RenameObjectInActions(game, scene, actions[aId].GetSubInstructions(), oldName, newName) || somethingModified;
     }
+
+    return somethingModified;
 }
 
-void EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string oldName, std::string newName)
+bool EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string oldName, std::string newName)
 {
+    bool somethingModified = false;
+
     for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
         InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetConditionInfos(conditions[cId].GetType());
@@ -279,28 +294,39 @@ void EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vect
             else if (instrInfos.parameters[pNb].type == "expression")
             {
                 std::string newExpression;
+                std::string oldExpression = conditions[cId].GetParameterSafely(pNb).GetPlainString();
 
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
-                GDExpressionParser parser(conditions[cId].GetParameterSafely(pNb).GetPlainString());
+                GDExpressionParser parser(oldExpression);
                 if ( parser.ParseMathExpression(game, scene, callbacks) )
+                {
+                    somethingModified = true;
                     conditions[cId].SetParameter(pNb, GDExpression(newExpression));
+                }
             }
             //Replace object's name in text expressions
             else if (instrInfos.parameters[pNb].type == "text" ||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
                 std::string newExpression;
+                std::string oldExpression = conditions[cId].GetParameterSafely(pNb).GetPlainString();
 
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
-                GDExpressionParser parser(conditions[cId].GetParameterSafely(pNb).GetPlainString());
+                GDExpressionParser parser(oldExpression);
                 if ( parser.ParseMathExpression(game, scene, callbacks) )
+                {
+                    somethingModified = true;
                     conditions[cId].SetParameter(pNb, GDExpression(newExpression));
+                }
             }
         }
 
-        if ( !conditions[cId].GetSubInstructions().empty() ) RenameObjectInConditions(game, scene, conditions[cId].GetSubInstructions(), oldName, newName);
+        if ( !conditions[cId].GetSubInstructions().empty() )
+            somethingModified = RenameObjectInConditions(game, scene, conditions[cId].GetSubInstructions(), oldName, newName) || somethingModified;
     }
+
+    return somethingModified;
 }
 
 void EventsRefactorer::RenameObjectInEvents(Game & game, Scene & scene, vector < BaseEventSPtr > & events, std::string oldName, std::string newName)
@@ -309,18 +335,30 @@ void EventsRefactorer::RenameObjectInEvents(Game & game, Scene & scene, vector <
     {
         vector < vector<Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
-            RenameObjectInConditions(game, scene, *conditionsVectors[j], oldName, newName);
+        {
+            bool somethingModified = RenameObjectInConditions(game, scene, *conditionsVectors[j], oldName, newName);
+            #if defined(GDE)
+            if ( somethingModified )  events[i]->eventHeightNeedUpdate = true;
+            #endif
+        }
 
         vector < vector<Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
         for (unsigned int j = 0;j < actionsVectors.size();++j)
-            RenameObjectInActions(game, scene, *actionsVectors[j], oldName, newName);
+        {
+            bool somethingModified = RenameObjectInActions(game, scene, *actionsVectors[j], oldName, newName);
+            #if defined(GDE)
+            if ( somethingModified )  events[i]->eventHeightNeedUpdate = true;
+            #endif
+        }
 
         if ( events[i]->CanHaveSubEvents() ) RenameObjectInEvents(game, scene, events[i]->GetSubEvents(), oldName, newName);
     }
 }
 
-void EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector < Instruction > & actions, std::string name)
+bool EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector < Instruction > & actions, std::string name)
 {
+    bool somethingModified = false;
+
     for (unsigned int aId = 0;aId < actions.size();++aId)
     {
         bool deleteMe = false;
@@ -363,15 +401,20 @@ void EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector 
 
         if ( deleteMe )
         {
+            somethingModified = true;
             actions.erase(actions.begin()+aId);
             aId--;
         }
-        else if ( !actions[aId].GetSubInstructions().empty() ) RemoveObjectInActions(game, scene, actions[aId].GetSubInstructions(), name);
+        else if ( !actions[aId].GetSubInstructions().empty() ) somethingModified = RemoveObjectInActions(game, scene, actions[aId].GetSubInstructions(), name) || somethingModified;
     }
+
+    return somethingModified;
 }
 
-void EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string name)
+bool EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string name)
 {
+    bool somethingModified = false;
+
     for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
         bool deleteMe = false;
@@ -412,11 +455,14 @@ void EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vect
 
         if ( deleteMe )
         {
+            somethingModified = true;
             conditions.erase(conditions.begin()+cId);
             cId--;
         }
-        else if ( !conditions[cId].GetSubInstructions().empty() ) RemoveObjectInConditions(game, scene, conditions[cId].GetSubInstructions(), name);
+        else if ( !conditions[cId].GetSubInstructions().empty() ) somethingModified = RemoveObjectInConditions(game, scene, conditions[cId].GetSubInstructions(), name) || somethingModified;
     }
+
+    return somethingModified;
 }
 
 void EventsRefactorer::RemoveObjectInEvents(Game & game, Scene & scene, vector < BaseEventSPtr > & events, std::string name)
@@ -425,11 +471,21 @@ void EventsRefactorer::RemoveObjectInEvents(Game & game, Scene & scene, vector <
     {
         vector < vector<Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
-            RemoveObjectInConditions(game, scene, *conditionsVectors[j], name);
+        {
+            bool conditionsModified = RemoveObjectInConditions(game, scene, *conditionsVectors[j], name);
+            #if defined(GDE)
+            if ( conditionsModified ) events[i]->eventHeightNeedUpdate = true;
+            #endif
+        }
 
         vector < vector<Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
         for (unsigned int j = 0;j < actionsVectors.size();++j)
-            RemoveObjectInActions(game, scene, *actionsVectors[j], name);
+        {
+            bool actionsModified = RemoveObjectInActions(game, scene, *actionsVectors[j], name);
+            #if defined(GDE)
+            if ( actionsModified ) events[i]->eventHeightNeedUpdate = true;
+            #endif
+        }
 
         if ( events[i]->CanHaveSubEvents() ) RemoveObjectInEvents(game, scene, events[i]->GetSubEvents(), name);
     }
@@ -448,14 +504,24 @@ void EventsRefactorer::ReplaceStringInEvents(Game & game, Scene & scene, std::ve
         {
             vector < vector<Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
             for (unsigned int j = 0;j < conditionsVectors.size();++j)
-                ReplaceStringInConditions(game, scene, *conditionsVectors[j], toReplace, newString, matchCase);
+            {
+                bool conditionsModified = ReplaceStringInConditions(game, scene, *conditionsVectors[j], toReplace, newString, matchCase);
+                #if defined(GDE)
+                if ( conditionsModified ) events[i]->eventHeightNeedUpdate = true;
+                #endif
+            }
         }
 
         if ( inActions )
         {
             vector < vector<Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
             for (unsigned int j = 0;j < actionsVectors.size();++j)
-                ReplaceStringInActions(game, scene, *actionsVectors[j], toReplace, newString, matchCase);
+            {
+                bool actionsModified = ReplaceStringInActions(game, scene, *actionsVectors[j], toReplace, newString, matchCase);
+                #if defined(GDE)
+                if ( actionsModified ) events[i]->eventHeightNeedUpdate = true;
+                #endif
+            }
         }
 
         if ( events[i]->CanHaveSubEvents() ) ReplaceStringInEvents(game, scene, events[i]->GetSubEvents(), toReplace, newString, matchCase, inConditions, inActions);
@@ -490,28 +556,58 @@ std::string ReplaceAllOccurencesCaseUnsensitive(string context, string from, con
     return context;
 }
 
-void EventsRefactorer::ReplaceStringInActions(Game & game, Scene & scene, vector < Instruction > & actions, std::string toReplace, std::string newString, bool matchCase)
+bool EventsRefactorer::ReplaceStringInActions(Game & game, Scene & scene, vector < Instruction > & actions, std::string toReplace, std::string newString, bool matchCase)
 {
+    bool somethingModified = false;
+
     for (unsigned int aId = 0;aId < actions.size();++aId)
     {
         InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetActionInfos(actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
-            actions[aId].SetParameter(pNb, GDExpression(matchCase ? ReplaceAllOccurences(actions[aId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString)
-                                                                  : ReplaceAllOccurencesCaseUnsensitive(actions[aId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString)));
+        {
+            std::string newParameter = matchCase ? ReplaceAllOccurences(actions[aId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString)
+                                                 : ReplaceAllOccurencesCaseUnsensitive(actions[aId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString);
+
+            if ( newParameter != actions[aId].GetParameterSafely(pNb).GetPlainString())
+            {
+                actions[aId].SetParameter(pNb, GDExpression(newParameter));
+                somethingModified = true;
+                #if defined(GDE)
+                actions[aId].renderedHeightNeedUpdate = true;
+                #endif
+            }
+        }
 
         if ( !actions[aId].GetSubInstructions().empty() ) ReplaceStringInActions(game, scene, actions[aId].GetSubInstructions(), toReplace, newString, matchCase);
     }
+
+    return somethingModified;
 }
 
-void EventsRefactorer::ReplaceStringInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase)
+bool EventsRefactorer::ReplaceStringInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase)
 {
+    bool somethingModified = false;
+
     for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
         InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetConditionInfos(conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
-            conditions[cId].SetParameter(pNb, GDExpression(matchCase ? ReplaceAllOccurences(conditions[cId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString)
-                                                                     : ReplaceAllOccurencesCaseUnsensitive(conditions[cId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString)));
+        {
+            std::string newParameter = matchCase ? ReplaceAllOccurences(conditions[cId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString)
+                                                 : ReplaceAllOccurencesCaseUnsensitive(conditions[cId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString);
+
+            if ( newParameter != conditions[cId].GetParameterSafely(pNb).GetPlainString())
+            {
+                conditions[cId].SetParameter(pNb, GDExpression(newParameter));
+                somethingModified = true;
+                #if defined(GDE)
+                conditions[cId].renderedHeightNeedUpdate = true;
+                #endif
+            }
+        }
 
         if ( !conditions[cId].GetSubInstructions().empty() ) ReplaceStringInConditions(game, scene, conditions[cId].GetSubInstructions(), toReplace, newString, matchCase);
     }
+
+    return somethingModified;
 }

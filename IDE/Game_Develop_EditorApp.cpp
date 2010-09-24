@@ -97,6 +97,17 @@ void MessageLoading( string message, float avancement )
 ////////////////////////////////////////////////////////////
 bool Game_Develop_EditorApp::OnInit()
 {
+    singleInstanceChecker = new wxSingleInstanceChecker;
+    if ( singleInstanceChecker->IsAnotherRunning() )
+    {
+        wxLogMessage(_("Une autre instance de Game Develop est actuellement ouverte. Glissez-déposez dessus un fichier pour l'ouvrir."));
+
+        delete singleInstanceChecker; // OnExit() won't be called if we return false
+        singleInstanceChecker = NULL;
+
+        return false;
+    }
+
     //Get file to open from first argument.
     string fileToOpen;
     if ( wxApp::argc > 1 )

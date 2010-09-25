@@ -712,6 +712,61 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
         parentMaximalWidth = initialXposition + maximalWidth;
 }
 
+void EditorEvents::ScrollToEvent(BaseEventSPtr eventToScrollTo)
+{
+    wxClientDC dc( EventsPanel );
+    dc.SetFont( wxFont( 8, wxDEFAULT, wxNORMAL, wxNORMAL ) );
+
+    int YPosition = 0;
+    int initialXposition = 2 + dc.GetTextExtent(ToString(events->size())).GetWidth() + 2 - horizontalScrollbar->GetThumbPosition();
+
+    if ( ScrollToEvent(*events, eventToScrollTo, YPosition, initialXposition) )
+        ForceRefresh();
+}
+
+bool EditorEvents::ScrollToEvent(vector < BaseEventSPtr > & list, BaseEventSPtr eventToScrollTo, int & YPosition, int initialXposition)
+{
+    const int separation = 3;
+
+    for ( unsigned int i = 0;i < list.size();++i )
+    {
+        //If event is found, scroll and select it
+        if ( list[i] == eventToScrollTo )
+        {
+            DeselectAllEvents(*events);
+            DeselectAllActions(*events);
+            DeselectAllConditions(*events);
+
+            eventsSelected.push_back(boost::make_tuple(&list, i,              //Useful part
+                                                       (vector<Instruction>*)NULL, 0)); //Useless
+            list[i]->selected = true;
+            list[i]->eventHeightNeedUpdate = true;
+
+            ScrollBar1->SetThumbPosition(YPosition);
+
+            return true;
+        }
+
+        EventsRenderingHelper::getInstance()->SetConditionsColumnWidth(conditionsColumnWidth-initialXposition);
+
+        int width = EventsPanel->GetSize().x-initialXposition;
+        unsigned int renderedHeight = list[i]->GetRenderedHeight(width < 0 ? 0 : width);
+
+        YPosition += renderedHeight;
+
+        //Sub events
+        if ( list[i]->CanHaveSubEvents() )
+        {
+            YPosition += separation;
+            if ( ScrollToEvent(list[i]->GetSubEvents(), eventToScrollTo, YPosition, initialXposition+32) ) return true;
+        }
+
+        YPosition += separation;
+    }
+
+    return false;
+}
+
 ////////////////////////////////////////////////////////////
 /// Suppression de l'évènement entier
 ////////////////////////////////////////////////////////////

@@ -2,7 +2,6 @@
 #define SEARCHEVENTS_H
 
 //(*Headers(SearchEvents)
-#include <wx/listctrl.h>
 #include <wx/notebook.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
@@ -32,28 +31,25 @@ class SearchEvents: public wxDialog
 
 		//(*Declarations(SearchEvents)
 		wxCheckBox* replaceCaseCheck;
+		wxButton* previousBt;
 		wxCheckBox* actionsCheck;
-		wxListCtrl* ListCtrl1;
 		wxNotebook* Notebook1;
 		wxCheckBox* replaceActionsCheck;
+		wxCheckBox* caseCheck;
 		wxStaticText* StaticText2;
-		wxButton* Button1;
-		wxCheckBox* CheckBox2;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
-		wxButton* Button2;
-		wxCheckBox* CheckBox1;
 		wxCheckBox* replaceConditionsCheck;
 		wxTextCtrl* searchEdit;
 		wxTextCtrl* replaceEdit;
 		wxCheckBox* onlySelectedEventCheck;
 		wxCheckBox* conditionsCheck;
 		wxTextCtrl* searchToReplaceEdit;
+		wxStaticText* resultsCountTxt;
 		wxButton* replaceBt;
 		wxPanel* Panel2;
-		wxCheckBox* commentsCheck;
-		wxCheckBox* linksCheck;
+		wxButton* nextBt;
 		wxButton* searchBt;
 		//*)
 
@@ -62,13 +58,10 @@ class SearchEvents: public wxDialog
 		//(*Identifiers(SearchEvents)
 		static const long ID_STATICTEXT1;
 		static const long ID_TEXTCTRL1;
-		static const long ID_CHECKBOX5;
+		static const long ID_STATICTEXT4;
 		static const long ID_CHECKBOX6;
 		static const long ID_CHECKBOX1;
 		static const long ID_CHECKBOX2;
-		static const long ID_CHECKBOX3;
-		static const long ID_CHECKBOX4;
-		static const long ID_LISTCTRL1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON3;
@@ -90,6 +83,10 @@ class SearchEvents: public wxDialog
 
 		//(*Handlers(SearchEvents)
 		void OnreplaceBtClick(wxCommandEvent& event);
+		void OnsearchBtClick(wxCommandEvent& event);
+		void OnsearchEditText(wxCommandEvent& event);
+		void OnnextBtClick(wxCommandEvent& event);
+		void OnpreviousBtClick(wxCommandEvent& event);
 		//*)
 
         EditorEvents * parent;
@@ -97,6 +94,8 @@ class SearchEvents: public wxDialog
 		Scene & scene;
 
 		std::vector < BaseEventSPtr > * events;
+		std::vector < boost::weak_ptr<BaseEvent> > searchResults;
+		size_t currentResult;
 
 		DECLARE_EVENT_TABLE()
 };

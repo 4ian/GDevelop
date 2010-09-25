@@ -49,6 +49,10 @@ class EditorEvents: public wxPanel
          */
         BaseEventSPtr GetLastSelectedEvent();
 
+        /**
+         * Scroll view to reach an event.
+         */
+        void ScrollToEvent(BaseEventSPtr event);
 
 		//(*Declarations(EditorEvents)
 		wxMenuItem* MenuItem31;
@@ -205,6 +209,7 @@ class EditorEvents: public wxPanel
 		void OnToggleEventSelected(wxCommandEvent& event);
 		//*)
         void DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & maximalWidth, bool draw);
+
         void OnSearchBtClick(wxCommandEvent& event);
 		void OnInsertSomeEventSelected(wxCommandEvent& event);
 		void OnAddSomeEventSelected(wxRibbonButtonBarEvent& evt);
@@ -225,6 +230,11 @@ class EditorEvents: public wxPanel
 
         vector < BaseEventSPtr > * GetSelectedListOfEvents(unsigned int nb);
         vector < BaseEventSPtr > * GetLastSelectedListOfEvents();
+
+        /**
+         * Scroll view to reach an event. Return true if event has been reached
+         */
+        bool ScrollToEvent(vector < BaseEventSPtr > & list, BaseEventSPtr eventToScrollTo, int & Yposition, int initialXposition);
 
         SearchEvents * searchDialog;
 

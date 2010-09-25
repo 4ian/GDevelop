@@ -17,13 +17,10 @@ using namespace std;
 //(*IdInit(SearchEvents)
 const long SearchEvents::ID_STATICTEXT1 = wxNewId();
 const long SearchEvents::ID_TEXTCTRL1 = wxNewId();
-const long SearchEvents::ID_CHECKBOX5 = wxNewId();
+const long SearchEvents::ID_STATICTEXT4 = wxNewId();
 const long SearchEvents::ID_CHECKBOX6 = wxNewId();
 const long SearchEvents::ID_CHECKBOX1 = wxNewId();
 const long SearchEvents::ID_CHECKBOX2 = wxNewId();
-const long SearchEvents::ID_CHECKBOX3 = wxNewId();
-const long SearchEvents::ID_CHECKBOX4 = wxNewId();
-const long SearchEvents::ID_LISTCTRL1 = wxNewId();
 const long SearchEvents::ID_BUTTON1 = wxNewId();
 const long SearchEvents::ID_BUTTON2 = wxNewId();
 const long SearchEvents::ID_BUTTON3 = wxNewId();
@@ -64,7 +61,6 @@ events(events_)
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
 	wxStaticBoxSizer* StaticBoxSizer3;
-	wxFlexGridSizer* FlexGridSizer15;
 	wxFlexGridSizer* FlexGridSizer8;
 	wxFlexGridSizer* FlexGridSizer14;
 	wxBoxSizer* BoxSizer1;
@@ -80,7 +76,7 @@ events(events_)
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(491,326), 0, _T("ID_NOTEBOOK1"));
+	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK1"));
 	Panel1 = new wxPanel(Notebook1, ID_PANEL1, wxPoint(60,115), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
@@ -91,17 +87,20 @@ events(events_)
 	FlexGridSizer4->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	searchEdit = new wxTextCtrl(Panel1, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(178,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer4->Add(searchEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer9->AddGrowableCol(0);
+	FlexGridSizer9->AddGrowableRow(0);
+	resultsCountTxt = new wxStaticText(Panel1, ID_STATICTEXT4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	FlexGridSizer9->Add(resultsCountTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer6->AddGrowableCol(0);
 	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Options"));
 	FlexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
-	CheckBox1 = new wxCheckBox(Panel1, ID_CHECKBOX5, _("Chercher uniquement dans les paramètres"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
-	CheckBox1->SetValue(false);
-	FlexGridSizer7->Add(CheckBox1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	CheckBox2 = new wxCheckBox(Panel1, ID_CHECKBOX6, _("Prendre en compte la casse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
-	CheckBox2->SetValue(false);
-	FlexGridSizer7->Add(CheckBox2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	caseCheck = new wxCheckBox(Panel1, ID_CHECKBOX6, _("Prendre en compte la casse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
+	caseCheck->SetValue(false);
+	FlexGridSizer7->Add(caseCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Où"));
@@ -112,28 +111,18 @@ events(events_)
 	actionsCheck = new wxCheckBox(Panel1, ID_CHECKBOX2, _("Les actions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	actionsCheck->SetValue(true);
 	FlexGridSizer5->Add(actionsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	commentsCheck = new wxCheckBox(Panel1, ID_CHECKBOX3, _("Les commentaires"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
-	commentsCheck->SetValue(true);
-	FlexGridSizer5->Add(commentsCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	linksCheck = new wxCheckBox(Panel1, ID_CHECKBOX4, _("Les liens"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
-	linksCheck->SetValue(true);
-	FlexGridSizer5->Add(linksCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer9->AddGrowableCol(0);
-	FlexGridSizer9->AddGrowableRow(0);
-	ListCtrl1 = new wxListCtrl(Panel1, ID_LISTCTRL1, wxDefaultPosition, wxSize(455,125), wxLC_REPORT, wxDefaultValidator, _T("ID_LISTCTRL1"));
-	FlexGridSizer9->Add(ListCtrl1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
 	searchBt = new wxButton(Panel1, ID_BUTTON1, _("Chercher"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer8->Add(searchBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	Button1 = new wxButton(Panel1, ID_BUTTON2, _("Suivant"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
-	FlexGridSizer8->Add(Button1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	Button2 = new wxButton(Panel1, ID_BUTTON3, _("Précédent"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
-	FlexGridSizer8->Add(Button2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	nextBt = new wxButton(Panel1, ID_BUTTON2, _("Suivant"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	nextBt->Disable();
+	FlexGridSizer8->Add(nextBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	previousBt = new wxButton(Panel1, ID_BUTTON3, _("Précédent"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	previousBt->Disable();
+	FlexGridSizer8->Add(previousBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel1->SetSizer(FlexGridSizer2);
 	FlexGridSizer2->Fit(Panel1);
@@ -184,10 +173,6 @@ events(events_)
 	StaticBoxSizer4->Add(FlexGridSizer14, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer15 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer15->AddGrowableCol(0);
-	FlexGridSizer15->AddGrowableRow(0);
-	FlexGridSizer10->Add(FlexGridSizer15, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer16 = new wxFlexGridSizer(0, 3, 0, 0);
 	replaceBt = new wxButton(Panel2, ID_BUTTON4, _("Remplacer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer16->Add(replaceBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
@@ -202,6 +187,10 @@ events(events_)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
+	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&SearchEvents::OnsearchEditText);
+	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnsearchBtClick);
+	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnnextBtClick);
+	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnpreviousBtClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnreplaceBtClick);
 	//*)
 }
@@ -235,4 +224,57 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
 
     parent->ChangesMadeOnEvents();
     parent->ForceRefresh();
+}
+
+void SearchEvents::OnsearchBtClick(wxCommandEvent& event)
+{
+    if ( events == NULL ) return;
+
+    searchResults = EventsRefactorer::SearchInEvents(game, scene, *events,
+                                            string(searchEdit->GetValue().mb_str()),
+                                            caseCheck->GetValue(),
+                                            conditionsCheck->GetValue(),
+                                            actionsCheck->GetValue());
+
+    resultsCountTxt->SetLabel(wxString::Format(_("%i résultats."), searchResults.size()));
+    nextBt->Enable(true);
+    previousBt->Enable(true);
+    currentResult = 0;
+}
+
+void SearchEvents::OnsearchEditText(wxCommandEvent& event)
+{
+    resultsCountTxt->SetLabel("");
+    nextBt->Enable(false);
+    previousBt->Enable(false);
+}
+
+void SearchEvents::OnnextBtClick(wxCommandEvent&)
+{
+    if ( searchResults.empty() ) return;
+
+    //Iterate over results
+    currentResult++;
+    if ( currentResult >= searchResults.size()) currentResult = 0;
+
+    //Verify event still exists
+    BaseEventSPtr event = searchResults[currentResult].lock();
+    if ( event == boost::shared_ptr<BaseEvent>() ) return;
+
+    parent->ScrollToEvent(event);
+}
+
+void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
+{
+    if ( searchResults.empty() ) return;
+
+    //Iterate over results
+    currentResult--;
+    if ( currentResult >= searchResults.size()) currentResult = searchResults.size()-1;
+
+    //Verify event still exists
+    BaseEventSPtr event = searchResults[currentResult].lock();
+    if ( event == boost::shared_ptr<BaseEvent>() ) return;
+
+    parent->ScrollToEvent(event);
 }

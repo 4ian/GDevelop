@@ -4,6 +4,7 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
 #include <boost/algorithm/string.hpp>
+#include <boost/weak_ptr.hpp>
 
 class CallbacksForRenamingObject : public ParserCallbacks
 {
@@ -562,8 +563,7 @@ bool EventsRefactorer::ReplaceStringInActions(Game & game, Scene & scene, vector
 
     for (unsigned int aId = 0;aId < actions.size();++aId)
     {
-        InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetActionInfos(actions[aId].GetType());
-        for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+        for (unsigned int pNb = 0;pNb < actions[aId].GetParameters().size();++pNb)
         {
             std::string newParameter = matchCase ? ReplaceAllOccurences(actions[aId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString)
                                                  : ReplaceAllOccurencesCaseUnsensitive(actions[aId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString);
@@ -590,8 +590,7 @@ bool EventsRefactorer::ReplaceStringInConditions(Game & game, Scene & scene, vec
 
     for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
-        InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetConditionInfos(conditions[cId].GetType());
-        for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+        for (unsigned int pNb = 0;pNb < conditions[cId].GetParameters().size();++pNb)
         {
             std::string newParameter = matchCase ? ReplaceAllOccurences(conditions[cId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString)
                                                  : ReplaceAllOccurencesCaseUnsensitive(conditions[cId].GetParameterSafely(pNb).GetPlainString(), toReplace, newString);
@@ -610,4 +609,92 @@ bool EventsRefactorer::ReplaceStringInConditions(Game & game, Scene & scene, vec
     }
 
     return somethingModified;
+}
+
+vector < boost::weak_ptr<BaseEvent> > EventsRefactorer::SearchInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events,
+                                  std::string search,
+                                  bool matchCase,
+                                  bool inConditions,
+                                  bool inActions)
+{
+    vector < boost::weak_ptr<BaseEvent> > results;
+
+    for (unsigned int i = 0;i<events.size();++i)
+    {
+        bool eventAddedInResults = false;
+
+        if ( inConditions )
+        {
+            vector < vector<Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
+            for (unsigned int j = 0;j < conditionsVectors.size();++j)
+            {
+                if (!eventAddedInResults && SearchStringInConditions(game, scene, *conditionsVectors[j], search, matchCase))
+                {
+                    results.push_back(boost::weak_ptr<BaseEvent>(events[i]));
+                }
+            }
+        }
+
+        if ( inActions )
+        {
+            vector < vector<Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
+            for (unsigned int j = 0;j < actionsVectors.size();++j)
+            {
+                if (!eventAddedInResults && SearchStringInActions(game, scene, *actionsVectors[j], search, matchCase))
+                {
+                    results.push_back(boost::weak_ptr<BaseEvent>(events[i]));
+                }
+            }
+        }
+
+        if ( events[i]->CanHaveSubEvents() )
+        {
+            vector < boost::weak_ptr<BaseEvent> > subResults = SearchInEvents(game, scene, events[i]->GetSubEvents(), search, matchCase, inConditions, inActions);;
+            std::copy(subResults.begin(), subResults.end(), std::back_inserter(results));
+        }
+    }
+
+    return results;
+}
+
+bool EventsRefactorer::SearchStringInActions(Game & game, Scene & scene, vector < Instruction > & actions, std::string search, bool matchCase)
+{
+    if ( !matchCase ) boost::to_upper(search);
+
+    for (unsigned int aId = 0;aId < actions.size();++aId)
+    {
+        for (unsigned int pNb = 0;pNb < actions[aId].GetParameters().size();++pNb)
+        {
+            size_t foundPosition = matchCase ? actions[aId].GetParameterSafely(pNb).GetPlainString().find(search) :
+                                     boost::to_upper_copy(actions[aId].GetParameterSafely(pNb).GetPlainString()).find(search);
+
+            if ( foundPosition != std::string::npos ) return true;
+        }
+
+        if ( !actions[aId].GetSubInstructions().empty() && SearchStringInActions(game, scene, actions[aId].GetSubInstructions(), search, matchCase) )
+            return true;
+    }
+
+    return false;
+}
+
+bool EventsRefactorer::SearchStringInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string search, bool matchCase)
+{
+    if ( !matchCase ) boost::to_upper(search);
+
+    for (unsigned int cId = 0;cId < conditions.size();++cId)
+    {
+        for (unsigned int pNb = 0;pNb < conditions[cId].GetParameters().size();++pNb)
+        {
+            size_t foundPosition = matchCase ? conditions[cId].GetParameterSafely(pNb).GetPlainString().find(search) :
+                                     boost::to_upper_copy(conditions[cId].GetParameterSafely(pNb).GetPlainString()).find(search);
+
+            if ( foundPosition != std::string::npos ) return true;
+        }
+
+        if ( !conditions[cId].GetSubInstructions().empty() && SearchStringInConditions(game, scene, conditions[cId].GetSubInstructions(), search, matchCase) )
+            return true;
+    }
+
+    return false;
 }

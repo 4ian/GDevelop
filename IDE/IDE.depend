@@ -11237,7 +11237,7 @@
 	<wx/dialog.h>
 	"GDL/Scene.h"
 
-1285271279 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
+1285427949 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"EditorEvents.h"
@@ -11270,7 +11270,7 @@
 	<time.h>
 	<gtk/gtk.h>
 
-1285354473 d:\florian\programmation\gamedevelop\ide\editorevents.h
+1285426333 d:\florian\programmation\gamedevelop\ide\editorevents.h
 	<wx/sizer.h>
 	<wx/menu.h>
 	<wx/panel.h>
@@ -11373,8 +11373,7 @@
 	<boost/serialization/version.hpp>
 	<boost/serialization/tracking.hpp>
 
-1285353384 d:\florian\programmation\gamedevelop\ide\searchevents.h
-	<wx/listctrl.h>
+1285427011 d:\florian\programmation\gamedevelop\ide\searchevents.h
 	<wx/notebook.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -11514,7 +11513,7 @@
 1280078541 d:\florian\programmation\gamedevelop\gdl\gdl\automatismsruntimeshareddatas.h
 	<boost/shared_ptr.hpp>
 
-1285271824 d:\florian\programmation\gamedevelop\ide\eventsrefactorer.h
+1285420897 d:\florian\programmation\gamedevelop\ide\eventsrefactorer.h
 	<vector>
 	<string>
 	<boost/shared_ptr.hpp>
@@ -11633,13 +11632,14 @@
 	"ErrorCompilation.h"
 	"nommgr.h"
 
-1285272578 source:d:\florian\programmation\gamedevelop\ide\eventsrefactorer.cpp
+1285424721 source:d:\florian\programmation\gamedevelop\ide\eventsrefactorer.cpp
 	"EventsRefactorer.h"
 	"GDL/Event.h"
 	"GDL/GDExpressionParser.h"
 	"GDL/ExtensionBase.h"
 	"GDL/ExtensionsManager.h"
 	<boost/algorithm/string.hpp>
+	<boost/weak_ptr.hpp>
 
 1283961410 d:\florian\programmation\gamedevelop\gdl\gdl\gdexpressionparser.h
 	<string>
@@ -12947,7 +12947,7 @@
 	"DndTextSceneEditor.h"
 	<wx/cursor.h>
 
-1285271279 source:d:\florian\programmation\gamedevelop\ide\searchevents.cpp
+1285427151 source:d:\florian\programmation\gamedevelop\ide\searchevents.cpp
 	"SearchEvents.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -13028,7 +13028,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1285354475 d:\florian\programmation\gamedevelop\ide\version.h
+1285428729 d:\florian\programmation\gamedevelop\ide\version.h
 
 1272727521 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

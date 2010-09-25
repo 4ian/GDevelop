@@ -30,6 +30,15 @@ class EventsRefactorer
         static void RemoveObjectInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events, std::string name);
 
         /**
+         * Search for a string in events
+         */
+        static std::vector < boost::weak_ptr<BaseEvent> > SearchInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events,
+                                          std::string search,
+                                          bool matchCase,
+                                          bool inConditions,
+                                          bool inAction);
+
+        /**
          * Replace all occurences of a string in events
          */
         static void ReplaceStringInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events,
@@ -83,6 +92,9 @@ class EventsRefactorer
          * \return true if something was modified.
          */
         static bool ReplaceStringInActions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase);
+
+        static bool SearchStringInActions(Game & game, Scene & scene, std::vector < Instruction > & actions, std::string search, bool matchCase);
+        static bool SearchStringInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string search, bool matchCase);
 
         EventsRefactorer() {};
         virtual ~EventsRefactorer() {};

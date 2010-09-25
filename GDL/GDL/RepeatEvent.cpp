@@ -160,7 +160,7 @@ void RepeatEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Ba
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
 
     //Test selection for the "Repeat x times"
-    if ( y <= repeatTextHeight )
+    if ( y >= 0 && y <= repeatTextHeight )
     {
         repeatNumberExpressionSelected = true;
         return;
@@ -252,7 +252,7 @@ void RepeatEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int widt
     }
 
     //"Repeat" text selection
-    if ( repeatNumberExpressionSelected )
+    if ( selected && repeatNumberExpressionSelected )
     {
         dc.SetBrush(renderingHelper->GetSelectedRectangleFillBrush());
         dc.SetPen(renderingHelper->GetSelectedRectangleOutlinePen());

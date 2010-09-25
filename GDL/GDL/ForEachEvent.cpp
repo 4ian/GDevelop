@@ -160,7 +160,7 @@ void ForEachEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < B
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
 
     //Test selection for the "For Each object..."
-    if ( y <= forEachTextHeight )
+    if ( y >= 0 && y <= forEachTextHeight )
     {
         objectsToPickSelected = true;
         return;
@@ -252,7 +252,7 @@ void ForEachEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int wid
     }
 
     //"For Each" text selection
-    if ( objectsToPickSelected )
+    if ( selected && objectsToPickSelected )
     {
         dc.SetBrush(renderingHelper->GetSelectedRectangleFillBrush());
         dc.SetPen(renderingHelper->GetSelectedRectangleOutlinePen());

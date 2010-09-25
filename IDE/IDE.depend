@@ -10855,7 +10855,7 @@
 	<string>
 	<vector>
 
-1284224717 d:\florian\programmation\gamedevelop\ide\scenecanvas.h
+1285432773 d:\florian\programmation\gamedevelop\ide\scenecanvas.h
 	<SFML/Graphics.hpp>
 	<SFML/System.hpp>
 	"wxSFMLCanvas.hpp"
@@ -11373,7 +11373,7 @@
 	<boost/serialization/version.hpp>
 	<boost/serialization/tracking.hpp>
 
-1285427011 d:\florian\programmation\gamedevelop\ide\searchevents.h
+1285431639 d:\florian\programmation\gamedevelop\ide\searchevents.h
 	<wx/notebook.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -12917,7 +12917,7 @@
 	<wx/string.h>
 	<iostream>
 
-1284812414 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1285434008 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<SFML/System.hpp>
@@ -12947,7 +12947,7 @@
 	"DndTextSceneEditor.h"
 	<wx/cursor.h>
 
-1285427151 source:d:\florian\programmation\gamedevelop\ide\searchevents.cpp
+1285431693 source:d:\florian\programmation\gamedevelop\ide\searchevents.cpp
 	"SearchEvents.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -12958,6 +12958,7 @@
 	"GDL/Scene.h"
 	"EventsRefactorer.h"
 	"EditorEvents.h"
+	"GDL/HelpFileAccess.h"
 
 1264364134 source:d:\florian\programmation\gamedevelop\ide\signemodification.cpp
 	"SigneModification.h"
@@ -13028,7 +13029,7 @@
 
 1263937643 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1285428729 d:\florian\programmation\gamedevelop\ide\version.h
+1285439638 d:\florian\programmation\gamedevelop\ide\version.h
 
 1272727521 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -13169,5 +13170,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1285185896 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1285433270 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

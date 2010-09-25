@@ -51,7 +51,6 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
 {
     MemTracer.AddObj( "Editeur de scène", ( long )this );
 
-    //SetDropTarget(new wxTextDropTarget);
     SetView( scene.view );
     SetFramerateLimit( gameEdited.maxFPS );
     UseVerticalSync( gameEdited.verticalSync );
@@ -66,6 +65,7 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
     Connect(ID_CUTMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnCutSelected);
     Connect(ID_PASTEMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnPasteSelected);
 
+    //Generate context menu
     wxMenuItem * layerUpItem = new wxMenuItem((&contextMenu), ID_LAYERUPMENU, _("Passer le(s) objet(s) sur le calque supérieur"), wxEmptyString, wxITEM_NORMAL);
     layerUpItem->SetBitmap(wxImage( "res/up.png" ) );
     wxMenuItem * layerDownItem = new wxMenuItem((&contextMenu), ID_LAYERDOWNMENU, _("Passer le(s) objet(s) sur le calque inférieur"), wxEmptyString, wxITEM_NORMAL);
@@ -83,9 +83,28 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
     contextMenu.Append(layerUpItem);
     contextMenu.Append(layerDownItem);
     contextMenu.AppendSeparator();
-    contextMenu.Append(ID_COPYMENU, _("Copier"));
-    contextMenu.Append(ID_CUTMENU, _("Couper"));
-    contextMenu.Append(ID_PASTEMENU, _("Coller"));
+    {
+        wxMenuItem * copyItem = new wxMenuItem((&contextMenu), ID_COPYMENU, _("Copier"), wxEmptyString, wxITEM_NORMAL);
+        copyItem->SetBitmap(wxImage( "res/copyicon.png" ) );
+        contextMenu.Append(copyItem);
+        wxMenuItem * cutItem = new wxMenuItem((&contextMenu), ID_CUTMENU, _("Couper"), wxEmptyString, wxITEM_NORMAL);
+        cutItem->SetBitmap(wxImage( "res/cuticon.png" ) );
+        contextMenu.Append(cutItem);
+        wxMenuItem * pasteItem = new wxMenuItem((&contextMenu), ID_PASTEMENU, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+        pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
+        contextMenu.Append(pasteItem);
+    }
+
+    //Generate "no object" context menu
+    {
+        wxMenuItem * addItem = new wxMenuItem((&noObjectContextMenu), ID_ADDOBJMENU, _("Ajouter un objet\tINSER"), wxEmptyString, wxITEM_NORMAL);
+        addItem->SetBitmap(wxImage( "res/addobjet.png" ) );
+        noObjectContextMenu.Append(addItem);
+        noObjectContextMenu.AppendSeparator();
+        wxMenuItem * pasteItem = new wxMenuItem((&noObjectContextMenu), ID_PASTEMENU, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+        pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
+        noObjectContextMenu.Append(pasteItem);
+    }
 
     SetDropTarget(new DndTextSceneEditor(*this));
 }
@@ -670,9 +689,9 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
 
     ObjSPtr object = scene.FindSmallestObject();
 
-    //Suppression de la selection
-    if ( object == boost::shared_ptr<Object> () || /*Si clic n'importe où */
-        (( !scene.input->IsKeyDown(sf::Key::LShift) && !scene.input->IsKeyDown(sf::Key::RShift) ) && /*Ou si clic sur un objet sans Shift*/
+    //Suppress selection if
+    if ( object == boost::shared_ptr<Object> () || /*Not clicked on an object*/
+        (( !scene.input->IsKeyDown(sf::Key::LShift) && !scene.input->IsKeyDown(sf::Key::RShift) ) && /*Clicked without using shift*/
          find(scene.objectsSelected.begin(), scene.objectsSelected.end(), object) == scene.objectsSelected.end() ))
     {
         scene.objectsSelected.clear();
@@ -680,19 +699,23 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
         scene.yObjectsSelected.clear();
     }
 
-    //On ajoute l'objet surligné dans les objets à bouger
-    if ( object == boost::shared_ptr<Object> () ) return;
+    if ( object == boost::shared_ptr<Object> () ) //Popup "no object" context menu
+    {
+        PopupMenu(&noObjectContextMenu);
+        return;
+    }
 
+    //Add the object to selection
     if ( find(scene.objectsSelected.begin(), scene.objectsSelected.end(), object) == scene.objectsSelected.end() )
     {
         scene.objectsSelected.push_back(object);
 
-        //Et on renseigne sa position de départ :
+        //Must also register its position
         scene.xObjectsSelected.push_back(object->GetX());
         scene.yObjectsSelected.push_back(object->GetY());
     }
 
-    OnUpdate(); //Pour afficher le rectangle de selection
+    OnUpdate(); //So as to display selection rectangle for the newly selected object
     UpdateContextMenu();
     PopupMenu(&contextMenu);
 

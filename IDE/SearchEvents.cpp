@@ -11,6 +11,7 @@
 #include "GDL/Scene.h"
 #include "EventsRefactorer.h"
 #include "EditorEvents.h"
+#include "GDL/HelpFileAccess.h"
 
 using namespace std;
 
@@ -24,6 +25,7 @@ const long SearchEvents::ID_CHECKBOX2 = wxNewId();
 const long SearchEvents::ID_BUTTON1 = wxNewId();
 const long SearchEvents::ID_BUTTON2 = wxNewId();
 const long SearchEvents::ID_BUTTON3 = wxNewId();
+const long SearchEvents::ID_BUTTON5 = wxNewId();
 const long SearchEvents::ID_PANEL1 = wxNewId();
 const long SearchEvents::ID_STATICTEXT2 = wxNewId();
 const long SearchEvents::ID_TEXTCTRL2 = wxNewId();
@@ -34,6 +36,7 @@ const long SearchEvents::ID_CHECKBOX7 = wxNewId();
 const long SearchEvents::ID_CHECKBOX9 = wxNewId();
 const long SearchEvents::ID_CHECKBOX10 = wxNewId();
 const long SearchEvents::ID_BUTTON4 = wxNewId();
+const long SearchEvents::ID_BUTTON6 = wxNewId();
 const long SearchEvents::ID_PANEL2 = wxNewId();
 const long SearchEvents::ID_NOTEBOOK1 = wxNewId();
 //*)
@@ -61,6 +64,7 @@ events(events_)
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
 	wxStaticBoxSizer* StaticBoxSizer3;
+	wxFlexGridSizer* FlexGridSizer15;
 	wxFlexGridSizer* FlexGridSizer8;
 	wxFlexGridSizer* FlexGridSizer14;
 	wxBoxSizer* BoxSizer1;
@@ -114,6 +118,8 @@ events(events_)
 	StaticBoxSizer1->Add(FlexGridSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer15 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer15->AddGrowableCol(0);
 	FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
 	searchBt = new wxButton(Panel1, ID_BUTTON1, _("Chercher"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer8->Add(searchBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
@@ -123,7 +129,10 @@ events(events_)
 	previousBt = new wxButton(Panel1, ID_BUTTON3, _("Précédent"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	previousBt->Disable();
 	FlexGridSizer8->Add(previousBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(FlexGridSizer8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer15->Add(FlexGridSizer8, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
+	helpBt = new wxButton(Panel1, ID_BUTTON5, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
+	FlexGridSizer15->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer15, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel1->SetSizer(FlexGridSizer2);
 	FlexGridSizer2->Fit(Panel1);
 	FlexGridSizer2->SetSizeHints(Panel1);
@@ -174,9 +183,12 @@ events(events_)
 	FlexGridSizer12->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer16 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer16->AddGrowableCol(1);
 	replaceBt = new wxButton(Panel2, ID_BUTTON4, _("Remplacer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer16->Add(replaceBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer10->Add(FlexGridSizer16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	help2Bt = new wxButton(Panel2, ID_BUTTON6, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
+	FlexGridSizer16->Add(help2Bt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer10->Add(FlexGridSizer16, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel2->SetSizer(FlexGridSizer10);
 	FlexGridSizer10->Fit(Panel2);
 	FlexGridSizer10->SetSizeHints(Panel2);
@@ -191,7 +203,9 @@ events(events_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnsearchBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnnextBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnpreviousBtClick);
+	Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnhelpBtClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnreplaceBtClick);
+	Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnhelpBtClick);
 	//*)
 }
 
@@ -277,4 +291,9 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
     if ( event == boost::shared_ptr<BaseEvent>() ) return;
 
     parent->ScrollToEvent(event);
+}
+
+void SearchEvents::OnhelpBtClick(wxCommandEvent& event)
+{
+    HelpFileAccess::getInstance()->DisplaySection(58);
 }

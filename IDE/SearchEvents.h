@@ -31,6 +31,7 @@ class SearchEvents: public wxDialog
 
 		//(*Declarations(SearchEvents)
 		wxCheckBox* replaceCaseCheck;
+		wxButton* helpBt;
 		wxButton* previousBt;
 		wxCheckBox* actionsCheck;
 		wxNotebook* Notebook1;
@@ -51,6 +52,7 @@ class SearchEvents: public wxDialog
 		wxPanel* Panel2;
 		wxButton* nextBt;
 		wxButton* searchBt;
+		wxButton* help2Bt;
 		//*)
 
 	protected:
@@ -65,6 +67,7 @@ class SearchEvents: public wxDialog
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON3;
+		static const long ID_BUTTON5;
 		static const long ID_PANEL1;
 		static const long ID_STATICTEXT2;
 		static const long ID_TEXTCTRL2;
@@ -75,6 +78,7 @@ class SearchEvents: public wxDialog
 		static const long ID_CHECKBOX9;
 		static const long ID_CHECKBOX10;
 		static const long ID_BUTTON4;
+		static const long ID_BUTTON6;
 		static const long ID_PANEL2;
 		static const long ID_NOTEBOOK1;
 		//*)
@@ -87,6 +91,7 @@ class SearchEvents: public wxDialog
 		void OnsearchEditText(wxCommandEvent& event);
 		void OnnextBtClick(wxCommandEvent& event);
 		void OnpreviousBtClick(wxCommandEvent& event);
+		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 
         EditorEvents * parent;

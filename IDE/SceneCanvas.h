@@ -108,6 +108,7 @@ private :
     bool hasJustRightClicked;
 
     wxMenu contextMenu;
+    wxMenu noObjectContextMenu;
 
     //Pointeurs vers les barres de défilements
     wxScrollBar * scrollBar1;

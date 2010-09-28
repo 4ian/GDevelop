@@ -124,6 +124,20 @@ bool PhysicsAutomatism::ActApplyForce( RuntimeScene & scene, ObjectsConcerned & 
 /**
  * Apply a force
  */
+bool PhysicsAutomatism::ActApplyForceUsingPolarCoordinates( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    float angle = -action.GetParameter(2).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject())/180.0f*3.14f;
+    float length = action.GetParameter(3).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject());
+
+    if ( !body ) CreateBody(scene);
+    body->ApplyForce(b2Vec2(cos(angle)*length,-sin(angle)*length), body->GetPosition());
+
+    return true;
+}
+
+/**
+ * Apply a force
+ */
 bool PhysicsAutomatism::ActApplyForceTowardPosition( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( !body ) CreateBody(scene);

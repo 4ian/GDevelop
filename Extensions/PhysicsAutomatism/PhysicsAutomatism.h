@@ -94,6 +94,8 @@ class PhysicsAutomatism : public Automatism
         bool ActSetGravity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActApplyForceTowardPosition( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActAddGearJointBetweenObjects( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActApplyForceUsingPolarCoordinates( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+
 
         bool CondAngularDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool CondLinearDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

@@ -37,16 +37,16 @@
 	<File name="ContactListener.h" open="0" top="0" tabpos="4">
 		<Cursor position="238" topLine="0" />
 	</File>
-	<File name="Extension.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="8095" topLine="132" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="1863" topLine="34" />
 	</File>
-	<File name="PhysicsAutomatism.cpp" open="1" top="0" tabpos="5">
+	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="5210" topLine="116" />
 	</File>
-	<File name="PhysicsAutomatism.h" open="1" top="0" tabpos="3">
+	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="2">
 		<Cursor position="4992" topLine="79" />
 	</File>
-	<File name="PhysicsAutomatismActions.cpp" open="1" top="1" tabpos="2">
+	<File name="PhysicsAutomatismActions.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="9557" topLine="247" />
 	</File>
 	<File name="PhysicsAutomatismConditions.cpp" open="0" top="0" tabpos="6">

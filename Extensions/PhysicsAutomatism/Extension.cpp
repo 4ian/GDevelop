@@ -244,6 +244,22 @@ class Extension : public ExtensionBase
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
+                    DECLARE_AUTOMATISM_ACTION("ApplyForceUsingPolarCoordinates",
+                                   _("Appliquer une force ( angle )"),
+                                   _("Applique une force à l'objet, en utilisant un angle et une longueur comme coordonnées de cette force."),
+                                   _("Appliquer à _PARAM0_ une force d'angle _PARAM2_ et de longueur _PARAM3_"),
+                                   _("Déplacement"),
+                                   "res/actions/window24.png",
+                                   "res/actions/window.png",
+                                   &PhysicsAutomatism::ActApplyForceUsingPolarCoordinates);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        DECLARE_PARAMETER("expression", _("Angle"), false, "")
+                        DECLARE_PARAMETER("expression", _("Longueur"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
                     DECLARE_AUTOMATISM_ACTION("ApplyForceTowardPosition",
                                    _("Appliquer une force vers une position"),
                                    _("Applique une force, dirigée vers une position, à l'objet."),
@@ -373,7 +389,7 @@ class Extension : public ExtensionBase
 
                     DECLARE_AUTOMATISM_CONDITION("CollisionWith",
                                    _("Collision"),
-                                   _("Teste si deux objets sont en contact."),
+                                   _("Teste si deux objets sont en contact.\nAttention ! Seul les objets spécifiés en premier, si ils sont en collision avec un des autres objets, seront pris en compte pour les prochaines conditions et actions."),
                                    _("_PARAM0_ est en collision avec un _PARAM2_"),
                                    _("Collision"),
                                    "res/actions/window24.png",

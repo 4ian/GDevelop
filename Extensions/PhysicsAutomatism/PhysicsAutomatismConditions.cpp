@@ -140,15 +140,20 @@ bool PhysicsAutomatism::CondAngularDamping( RuntimeScene & scene, ObjectsConcern
  */
 bool PhysicsAutomatism::CondCollisionWith( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    unsigned int otherObjectId = condition.GetParameter(2).GetAsObjectIdentifier();
     if ( !body ) CreateBody(scene);
 
-    set<PhysicsAutomatism*>::const_iterator it = currentContacts.begin();
-    set<PhysicsAutomatism*>::const_iterator end = currentContacts.end();
-    for (;it != end;++it)
+    ObjList list = objectsConcerned.Pick(condition.GetParameter( 2 ).GetAsObjectIdentifier(), condition.IsGlobal());
+
+	ObjList::const_iterator obj_end = list.end();
+    for (ObjList::iterator obj = list.begin(); obj != obj_end; ++obj )
     {
-    	if ( (*it)->GetObject()->GetObjectIdentifier() == otherObjectId )
-    	    return true;
+        set<PhysicsAutomatism*>::const_iterator it = currentContacts.begin();
+        set<PhysicsAutomatism*>::const_iterator end = currentContacts.end();
+        for (;it != end;++it)
+        {
+            if ( (*it)->GetObject()->GetObjectIdentifier() == (*obj)->GetObjectIdentifier() )
+                return true;
+        }
     }
 
     return false;

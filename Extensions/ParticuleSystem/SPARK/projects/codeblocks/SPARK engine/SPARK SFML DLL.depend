@@ -1,0 +1,427 @@
+# depslib dependency file v1.0
+1257106996 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\src\spk_sfml_all.cpp
+	"RenderingAPIs/SFML/SPK_SFMLSystem.cpp"
+	"RenderingAPIs/SFML/SPK_SFMLRenderer.cpp"
+	"RenderingAPIs/SFML/SPK_SFMLQuadRenderer.cpp"
+	"RenderingAPIs/SFML/SPK_SFMLDrawableRenderer.cpp"
+	"RenderingAPIs/SFML/SPK_SFMLLineRenderer.cpp"
+	"RenderingAPIs/SFML/SPK_SFMLPointRenderer.cpp"
+
+1277479123 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\src\renderingapis\sfml\spk_sfmlsystem.cpp
+	"RenderingAPIs/SFML/SPK_SFML_GLOBAL.h"
+	"RenderingAPIs/SFML/SPK_SFMLSystem.h"
+	"RenderingAPIs/SFML/SPK_SFMLRenderer.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfml_global.h
+	"RenderingAPIs/SFML/SPK_SFML_DEF.h"
+	"Core/SPK_Vector3D.h"
+	"Core/SPK_System.h"
+	"Core/SPK_Transformable.h"
+	"RenderingAPIs/SFML/SPK_SFMLRenderer.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfml_def.h
+	"RenderingAPIs/OpenGL/SPK_GL_DEF.h"
+	<SFML/Window.hpp>
+	<SFML/Graphics.hpp>
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\opengl\spk_gl_def.h
+	<windows.h>
+	<OpenGL/gl.h>
+	<gl.h>
+	<GL/gl.h>
+	<GL/glx.h>
+
+1281608108 c:\libs\sfml\include\sfml\window.hpp
+	<SFML/System.hpp>
+	<SFML/Window/Context.hpp>
+	<SFML/Window/ContextSettings.hpp>
+	<SFML/Window/Event.hpp>
+	<SFML/Window/Input.hpp>
+	<SFML/Window/VideoMode.hpp>
+	<SFML/Window/Window.hpp>
+	<SFML/Window/WindowStyle.hpp>
+
+1281608108 c:\libs\sfml\include\sfml\system.hpp
+	<SFML/Config.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/System/Err.hpp>
+	<SFML/System/Lock.hpp>
+	<SFML/System/Mutex.hpp>
+	<SFML/System/Randomizer.hpp>
+	<SFML/System/Sleep.hpp>
+	<SFML/System/String.hpp>
+	<SFML/System/Thread.hpp>
+	<SFML/System/ThreadLocal.hpp>
+	<SFML/System/ThreadLocalPtr.hpp>
+	<SFML/System/Utf.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/Vector3.hpp>
+
+1256147690 c:\libs\sfml\include\sfml\config.hpp
+	<climits>
+
+1281608105 c:\libs\sfml\include\sfml\system\clock.hpp
+	<SFML/Config.hpp>
+
+1281608105 c:\libs\sfml\include\sfml\system\err.hpp
+	<SFML/Config.hpp>
+	<ostream>
+
+1281608105 c:\libs\sfml\include\sfml\system\lock.hpp
+	<SFML/System/NonCopyable.hpp>
+
+1281608105 c:\libs\sfml\include\sfml\system\noncopyable.hpp
+	<SFML/Config.hpp>
+
+1281608105 c:\libs\sfml\include\sfml\system\mutex.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+
+1281608105 c:\libs\sfml\include\sfml\system\randomizer.hpp
+	<SFML/Config.hpp>
+
+1281608105 c:\libs\sfml\include\sfml\system\sleep.hpp
+	<SFML/Config.hpp>
+
+1281608105 c:\libs\sfml\include\sfml\system\string.hpp
+	<SFML/Config.hpp>
+	<locale>
+	<string>
+
+1281608105 c:\libs\sfml\include\sfml\system\thread.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<cstdlib>
+
+1281608105 c:\libs\sfml\include\sfml\system\threadlocal.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<cstdlib>
+
+1281608105 c:\libs\sfml\include\sfml\system\threadlocalptr.hpp
+	<SFML/System/ThreadLocal.hpp>
+	<SFML/System/ThreadLocalPtr.inl>
+
+1256147689 c:\libs\sfml\include\sfml\system\threadlocalptr.inl
+
+1281608105 c:\libs\sfml\include\sfml\system\utf.hpp
+	<SFML/Config.hpp>
+	<algorithm>
+	<locale>
+	<string>
+	<cstdlib>
+	<SFML/System/Utf.inl>
+
+1259264900 c:\libs\sfml\include\sfml\system\utf.inl
+
+1281608105 c:\libs\sfml\include\sfml\system\vector2.hpp
+	<SFML/System/Vector2.inl>
+
+1256147689 c:\libs\sfml\include\sfml\system\vector2.inl
+
+1281608105 c:\libs\sfml\include\sfml\system\vector3.hpp
+	<SFML/System/Vector3.inl>
+
+1256147689 c:\libs\sfml\include\sfml\system\vector3.inl
+
+1281608107 c:\libs\sfml\include\sfml\window\context.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+
+1281608107 c:\libs\sfml\include\sfml\window\contextsettings.hpp
+
+1281608107 c:\libs\sfml\include\sfml\window\event.hpp
+	<SFML/Config.hpp>
+
+1281608107 c:\libs\sfml\include\sfml\window\input.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Window/Event.hpp>
+
+1281608107 c:\libs\sfml\include\sfml\window\videomode.hpp
+	<SFML/Config.hpp>
+	<vector>
+
+1281608107 c:\libs\sfml\include\sfml\window\window.hpp
+	<SFML/Window/ContextSettings.hpp>
+	<SFML/Window/Input.hpp>
+	<SFML/Window/VideoMode.hpp>
+	<SFML/Window/WindowHandle.hpp>
+	<SFML/Window/WindowStyle.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<string>
+
+1244728046 c:\libs\sfml\include\sfml\window\windowhandle.hpp
+	<SFML/Config.hpp>
+
+1281608107 c:\libs\sfml\include\sfml\window\windowstyle.hpp
+
+1281608108 c:\libs\sfml\include\sfml\graphics.hpp
+	<SFML/Window.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Font.hpp>
+	<SFML/Graphics/Glyph.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/Renderer.hpp>
+	<SFML/Graphics/RenderImage.hpp>
+	<SFML/Graphics/RenderWindow.hpp>
+	<SFML/Graphics/Shader.hpp>
+	<SFML/Graphics/Shape.hpp>
+	<SFML/Graphics/Sprite.hpp>
+	<SFML/Graphics/Text.hpp>
+	<SFML/Graphics/View.hpp>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\color.hpp
+	<SFML/Config.hpp>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\font.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/String.hpp>
+	<SFML/Graphics/Glyph.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<map>
+	<string>
+	<vector>
+
+1281608105 c:\libs\sfml\include\sfml\system\resource.hpp
+	<SFML/System/Lock.hpp>
+	<SFML/System/Mutex.hpp>
+	<set>
+	<SFML/System/Resource.inl>
+	<SFML/System/ResourcePtr.inl>
+
+1267184484 c:\libs\sfml\include\sfml\system\resource.inl
+
+1281608105 c:\libs\sfml\include\sfml\system\resourceptr.inl
+
+1281608104 c:\libs\sfml\include\sfml\graphics\glyph.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Rect.hpp>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\rect.hpp
+	<SFML/System/Vector2.hpp>
+	<algorithm>
+	<SFML/Graphics/Rect.inl>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\rect.inl
+
+1281608104 c:\libs\sfml\include\sfml\graphics\image.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<string>
+	<vector>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\renderer.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\drawable.hpp
+	<SFML/System/Vector2.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\matrix3.hpp
+	<SFML/Config.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<cmath>
+	<SFML/Graphics/Matrix3.inl>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\matrix3.inl
+
+1281608104 c:\libs\sfml\include\sfml\graphics\renderimage.hpp
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/RenderTarget.hpp>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\rendertarget.hpp
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<SFML/Graphics/Renderer.hpp>
+	<SFML/Graphics/View.hpp>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\view.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+	<SFML/System/Vector2.hpp>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\renderwindow.hpp
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/RenderTarget.hpp>
+	<SFML/Window/Window.hpp>
+	<string>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\shader.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/Vector3.hpp>
+	<map>
+	<string>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\shape.hpp
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/System/Vector2.hpp>
+	<vector>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\sprite.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Rect.hpp>
+
+1281608104 c:\libs\sfml\include\sfml\graphics\text.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/System/String.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Font.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<string>
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_vector3d.h
+	"Core/SPK_DEF.h"
+
+1262866786 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_def.h
+	<cstdlib>
+	<cmath>
+	<algorithm>
+	<deque>
+	<list>
+	<iostream>
+	<vector>
+	<limits>
+	<map>
+	<set>
+	<string>
+	<cstring>
+	<crtdbg.h>
+
+1265911696 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_system.h
+	"Core/SPK_DEF.h"
+	"Core/SPK_Registerable.h"
+	"Core/SPK_Transformable.h"
+	"Core/SPK_Vector3D.h"
+
+1259085360 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_registerable.h
+	"Core/SPK_DEF.h"
+	"Core/SPK_Vector3D.h"
+
+1266883320 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_transformable.h
+	"Core/SPK_Vector3D.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmlrenderer.h
+	"RenderingAPIs/SFML/SPK_SFML_DEF.h"
+	"Core/SPK_Renderer.h"
+	"RenderingAPIs/SFML/SPK_SFMLSystem.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_renderer.h
+	"Core/SPK_DEF.h"
+	"Core/SPK_Registerable.h"
+	"Core/SPK_BufferHandler.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_bufferhandler.h
+	"Core/SPK_DEF.h"
+
+1277479112 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmlsystem.h
+	"RenderingAPIs/SFML/SPK_SFML_DEF.h"
+	"Core/SPK_System.h"
+
+1277479164 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\src\renderingapis\sfml\spk_sfmlrenderer.cpp
+	"RenderingAPIs/SFML/SPK_SFMLRenderer.h"
+	"Core/SPK_Group.h"
+
+1259707870 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_group.h
+	"Core/SPK_DEF.h"
+	"Core/SPK_Registerable.h"
+	"Core/SPK_Transformable.h"
+	"Core/SPK_Vector3D.h"
+	"Core/SPK_Pool.h"
+	"Core/SPK_Particle.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_pool.h
+	"Core/SPK_DEF.h"
+
+1258828694 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_particle.h
+	"Core/SPK_DEF.h"
+	"Core/SPK_Vector3D.h"
+	"Core/SPK_Pool.h"
+	"Core/SPK_Model.h"
+
+1259352926 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_model.h
+	"Core/SPK_DEF.h"
+	"Core/SPK_Registerable.h"
+	"Core/SPK_Interpolator.h"
+
+1258851152 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_interpolator.h
+	"Core/SPK_DEF.h"
+
+1257106996 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\src\renderingapis\sfml\spk_sfmlquadrenderer.cpp
+	"RenderingAPIs/SFML/SPK_SFMLQuadRenderer.h"
+	"Core/SPK_Particle.h"
+	"Core/SPK_Group.h"
+	"Core/SPK_ArrayBuffer.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmlquadrenderer.h
+	"RenderingAPIs/SFML/SPK_SFMLRenderer.h"
+	"Extensions/Renderers/SPK_QuadRendererInterface.h"
+	"Extensions/Renderers/SPK_Oriented2DRendererInterface.h"
+
+1260804080 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_quadrendererinterface.h
+	"Core/SPK_DEF.h"
+	"Core/SPK_Particle.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_oriented2drendererinterface.h
+	"Core/SPK_Vector3D.h"
+	"Core/SPK_Group.h"
+
+1266883384 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_arraybuffer.h
+	"Core/SPK_Buffer.h"
+
+1266883384 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_buffer.h
+
+1257106996 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\src\renderingapis\sfml\spk_sfmldrawablerenderer.cpp
+	"RenderingAPIs/SFML/SPK_SFMLDrawableRenderer.h"
+	"Core/SPK_Particle.h"
+	"Core/SPK_Group.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmldrawablerenderer.h
+	"RenderingAPIs/SFML/SPK_SFMLRenderer.h"
+
+1257106996 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\src\renderingapis\sfml\spk_sfmllinerenderer.cpp
+	"RenderingAPIs/SFML/SPK_SFMLLineRenderer.h"
+	"Core/SPK_Particle.h"
+	"Core/SPK_Group.h"
+	"Core/SPK_ArrayBuffer.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmllinerenderer.h
+	"RenderingAPIs/SFML/SPK_SFMLRenderer.h"
+	"Extensions/Renderers/SPK_LineRendererInterface.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_linerendererinterface.h
+	"Core/SPK_DEF.h"
+
+1257106996 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\src\renderingapis\sfml\spk_sfmlpointrenderer.cpp
+	"RenderingAPIs/SFML/SPK_SFMLPointRenderer.h"
+	"Core/SPK_Particle.h"
+	"Core/SPK_Group.h"
+	"Core/SPK_ArrayBuffer.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmlpointrenderer.h
+	"RenderingAPIs/SFML/SPK_SFMLRenderer.h"
+	"RenderingAPIs/OpenGL/SPK_GLExtHandler.h"
+	"Extensions/Renderers/SPK_PointRendererInterface.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\opengl\spk_glexthandler.h
+	"Core/SPK_DEF.h"
+	"RenderingAPIs/OpenGL/SPK_GL_DEF.h"
+
+1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_pointrendererinterface.h
+	"Core/SPK_DEF.h"
+

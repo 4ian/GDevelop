@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug - Edittime" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="974" topLine="3" />
+	</File>
+	<File name="ParticuleEmitterActions.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="68" topLine="2" />
+	</File>
+	<File name="ParticuleEmitterConditions.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="68" topLine="2" />
+	</File>
+	<File name="ParticuleEmitterExpressions.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="68" topLine="2" />
+	</File>
+	<File name="ParticuleEmitterInitialPositionPanel.cpp" open="0" top="0" tabpos="10">
+		<Cursor position="5809" topLine="50" />
+	</File>
+	<File name="ParticuleEmitterInitialPositionPanel.h" open="0" top="0" tabpos="11">
+		<Cursor position="1432" topLine="15" />
+	</File>
+	<File name="ParticuleEmitterObject.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="7411" topLine="190" />
+	</File>
+	<File name="ParticuleEmitterObject.h" open="1" top="0" tabpos="2">
+		<Cursor position="6489" topLine="128" />
+	</File>
+	<File name="ParticuleEmitterObjectEditor.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="2630" topLine="50" />
+	</File>
+	<File name="ParticuleEmitterObjectEditor.h" open="0" top="0" tabpos="0">
+		<Cursor position="1809" topLine="51" />
+	</File>
+</CodeBlocks_layout_file>

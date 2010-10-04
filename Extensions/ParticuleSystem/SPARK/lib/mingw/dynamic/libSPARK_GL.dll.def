@@ -1,0 +1,139 @@
+EXPORTS
+    _ZN3SPK2GL10GLRenderer11setBlendingENS_12BlendingModeE @1
+    _ZN3SPK2GL10GLRenderer12saveGLStatesEv @2
+    _ZN3SPK2GL10GLRenderer14enableBlendingEb @3
+    _ZN3SPK2GL10GLRenderer15restoreGLStatesEv @4
+    _ZN3SPK2GL10GLRendererC1Ev @5
+    _ZN3SPK2GL10GLRendererC2Ev @6
+    _ZN3SPK2GL10GLRendererD0Ev @7
+    _ZN3SPK2GL10GLRendererD1Ev @8
+    _ZN3SPK2GL10GLRendererD2Ev @9
+    _ZN3SPK2GL12GLExtHandler11shaderGLExtE @10 DATA
+    _ZN3SPK2GL12GLExtHandler12glTexImage3DEjijiiiijjPKv @11
+    _ZN3SPK2GL12GLExtHandler12pixelPerUnitE @12 DATA
+    _ZN3SPK2GL12GLExtHandler14POINT_SIZE_MAXE @13 DATA
+    _ZN3SPK2GL12GLExtHandler14POINT_SIZE_MINE @14 DATA
+    _ZN3SPK2GL12GLExtHandler14getShaderGLExtEv @15
+    _ZN3SPK2GL12GLExtHandler14texture3DGLExtE @16 DATA
+    _ZN3SPK2GL12GLExtHandler15loadGLExtShaderEv @17
+    _ZN3SPK2GL12GLExtHandler15setPixelPerUnitEfi @18
+    _ZN3SPK2GL12GLExtHandler16QUADRATIC_SCREENE @19 DATA
+    _ZN3SPK2GL12GLExtHandler16SPK_glTexImage3DE @20 DATA
+    _ZN3SPK2GL12GLExtHandler16SPK_glUseProgramE @21 DATA
+    _ZN3SPK2GL12GLExtHandler16pointSpriteGLExtE @22 DATA
+    _ZN3SPK2GL12GLExtHandler17SPK_glLinkProgramE @23 DATA
+    _ZN3SPK2GL12GLExtHandler17getTexture3DGLExtEv @24
+    _ZN3SPK2GL12GLExtHandler18POINT_SIZE_CURRENTE @25 DATA
+    _ZN3SPK2GL12GLExtHandler18SPK_glAttachShaderE @26 DATA
+    _ZN3SPK2GL12GLExtHandler18SPK_glCreateShaderE @27 DATA
+    _ZN3SPK2GL12GLExtHandler18SPK_glDeleteShaderE @28 DATA
+    _ZN3SPK2GL12GLExtHandler18SPK_glDetachShaderE @29 DATA
+    _ZN3SPK2GL12GLExtHandler18SPK_glShaderSourceE @30 DATA
+    _ZN3SPK2GL12GLExtHandler18loadGLExtTexture3DEv @31
+    _ZN3SPK2GL12GLExtHandler19SPK_glCompileShaderE @32 DATA
+    _ZN3SPK2GL12GLExtHandler19SPK_glCreateProgramE @33 DATA
+    _ZN3SPK2GL12GLExtHandler19SPK_glDeleteProgramE @34 DATA
+    _ZN3SPK2GL12GLExtHandler19getPointSpriteGLExtEv @35
+    _ZN3SPK2GL12GLExtHandler19pointParameterGLExtE @36 DATA
+    _ZN3SPK2GL12GLExtHandler20loadGLExtPointSpriteEv @37
+    _ZN3SPK2GL12GLExtHandler21SPK_glPointParameterfE @38 DATA
+    _ZN3SPK2GL12GLExtHandler22SPK_glPointParameterfvE @39 DATA
+    _ZN3SPK2GL12GLExtHandler22getPointParameterGLExtEv @40
+    _ZN3SPK2GL12GLExtHandler23loadGLExtPointParameterEv @41
+    _ZN3SPK2GL12GLExtHandler25enablePointParameterGLExtEfb @42
+    _ZN3SPK2GL12GLExtHandler26disablePointParameterGLExtEv @43
+    _ZN3SPK2GL14GLLineRenderer11gpuIteratorE @44 DATA
+    _ZN3SPK2GL14GLLineRenderer12checkBuffersERKNS_5GroupE @45
+    _ZN3SPK2GL14GLLineRenderer13createBuffersERKNS_5GroupE @46
+    _ZN3SPK2GL14GLLineRenderer14destroyBuffersERKNS_5GroupE @47
+    _ZN3SPK2GL14GLLineRenderer15GPU_BUFFER_NAMEE @48 DATA
+    _ZN3SPK2GL14GLLineRenderer6renderERKNS_5GroupE @49
+    _ZN3SPK2GL14GLLineRenderer9gpuBufferE @50 DATA
+    _ZN3SPK2GL14GLLineRendererC1Eff @51
+    _ZN3SPK2GL14GLLineRendererC2Eff @52
+    _ZN3SPK2GL14GLQuadRenderer11gpuIteratorE @53 DATA
+    _ZN3SPK2GL14GLQuadRenderer12checkBuffersERKNS_5GroupE @54
+    _ZN3SPK2GL14GLQuadRenderer13createBuffersERKNS_5GroupE @55
+    _ZN3SPK2GL14GLQuadRenderer13textureBufferE @56 DATA
+    _ZN3SPK2GL14GLQuadRenderer14destroyBuffersERKNS_5GroupE @57
+    _ZN3SPK2GL14GLQuadRenderer14renderParticleE @58 DATA
+    _ZN3SPK2GL14GLQuadRenderer15GPU_BUFFER_NAMEE @59 DATA
+    _ZN3SPK2GL14GLQuadRenderer15textureIteratorE @60 DATA
+    _ZN3SPK2GL14GLQuadRenderer16setTexturingModeENS_13TexturingModeE @61
+    _ZN3SPK2GL14GLQuadRenderer19TEXTURE_BUFFER_NAMEE @62 DATA
+    _ZN3SPK2GL14GLQuadRenderer6renderERKNS_5GroupE @63
+    _ZN3SPK2GL14GLQuadRenderer9gpuBufferE @64 DATA
+    _ZN3SPK2GL14GLQuadRendererC1Eff @65
+    _ZN3SPK2GL14GLQuadRendererC2Eff @66
+    _ZN3SPK2GL15GLPointRenderer15enableWorldSizeEb @67
+    _ZN3SPK2GL15GLPointRenderer6renderERKNS_5GroupE @68
+    _ZN3SPK2GL15GLPointRenderer7setTypeENS_9PointTypeE @69
+    _ZN3SPK2GL15GLPointRendererC1Ef @70
+    _ZN3SPK2GL15GLPointRendererC2Ef @71
+    _ZN3SPK2GL19GLLineTrailRenderer11colorBufferE @72 DATA
+    _ZN3SPK2GL19GLLineTrailRenderer11valueBufferE @73 DATA
+    _ZN3SPK2GL19GLLineTrailRenderer12checkBuffersERKNS_5GroupE @74
+    _ZN3SPK2GL19GLLineTrailRenderer12vertexBufferE @75 DATA
+    _ZN3SPK2GL19GLLineTrailRenderer13colorIteratorE @76 DATA
+    _ZN3SPK2GL19GLLineTrailRenderer13createBuffersERKNS_5GroupE @77
+    _ZN3SPK2GL19GLLineTrailRenderer13valueIteratorE @78 DATA
+    _ZN3SPK2GL19GLLineTrailRenderer14destroyBuffersERKNS_5GroupE @79
+    _ZN3SPK2GL19GLLineTrailRenderer14enableBlendingEb @80
+    _ZN3SPK2GL19GLLineTrailRenderer14vertexIteratorE @81 DATA
+    _ZN3SPK2GL19GLLineTrailRenderer17COLOR_BUFFER_NAMEE @82 DATA
+    _ZN3SPK2GL19GLLineTrailRenderer17VALUE_BUFFER_NAMEE @83 DATA
+    _ZN3SPK2GL19GLLineTrailRenderer18VERTEX_BUFFER_NAMEE @84 DATA
+    _ZN3SPK2GL19GLLineTrailRenderer19setDegeneratedLinesEffff @85
+    _ZN3SPK2GL19GLLineTrailRenderer4initERKNS_5GroupE @86
+    _ZN3SPK2GL19GLLineTrailRenderer6renderERKNS_5GroupE @87
+    _ZN3SPK2GL19GLLineTrailRendererC1Ev @88
+    _ZN3SPK2GL19GLLineTrailRendererC2Ev @89
+    _ZNK3SPK2GL14GLLineRenderer12getClassNameEv @90
+    _ZNK3SPK2GL14GLLineRenderer5cloneEb @91
+    _ZNK3SPK2GL14GLQuadRenderer11render2DRotERKNS_8ParticleE @92
+    _ZNK3SPK2GL14GLQuadRenderer11render3DRotERKNS_8ParticleE @93
+    _ZNK3SPK2GL14GLQuadRenderer12getClassNameEv @94
+    _ZNK3SPK2GL14GLQuadRenderer13render2DAtlasERKNS_8ParticleE @95
+    _ZNK3SPK2GL14GLQuadRenderer16render2DAtlasRotERKNS_8ParticleE @96
+    _ZNK3SPK2GL14GLQuadRenderer19createTextureBufferERKNS_5GroupE @97
+    _ZNK3SPK2GL14GLQuadRenderer5cloneEb @98
+    _ZNK3SPK2GL14GLQuadRenderer8render2DERKNS_8ParticleE @99
+    _ZNK3SPK2GL14GLQuadRenderer8render3DERKNS_8ParticleE @100
+    _ZNK3SPK2GL15GLPointRenderer12getClassNameEv @101
+    _ZNK3SPK2GL15GLPointRenderer5cloneEb @102
+    _ZNK3SPK2GL19GLLineTrailRenderer12getClassNameEv @103
+    _ZNK3SPK2GL19GLLineTrailRenderer5cloneEb @104
+    _ZTVN3SPK2GL10GLRendererE @105 DATA
+    _ZTVN3SPK2GL14GLLineRendererE @106 DATA
+    _ZTVN3SPK2GL14GLQuadRendererE @107 DATA
+    _ZTVN3SPK2GL15GLPointRendererE @108 DATA
+    _ZTVN3SPK2GL19GLLineTrailRendererE @109 DATA
+    _ZThn100_N3SPK2GL14GLQuadRendererD0Ev @110
+    _ZThn100_N3SPK2GL14GLQuadRendererD1Ev @111
+    _ZThn20_N3SPK2GL10GLRendererD0Ev @112
+    _ZThn20_N3SPK2GL10GLRendererD1Ev @113
+    _ZThn20_N3SPK2GL14GLLineRenderer12checkBuffersERKNS_5GroupE @114
+    _ZThn20_N3SPK2GL14GLLineRenderer13createBuffersERKNS_5GroupE @115
+    _ZThn20_N3SPK2GL14GLLineRenderer14destroyBuffersERKNS_5GroupE @116
+    _ZThn20_N3SPK2GL14GLLineRendererD0Ev @117
+    _ZThn20_N3SPK2GL14GLLineRendererD1Ev @118
+    _ZThn20_N3SPK2GL14GLQuadRenderer12checkBuffersERKNS_5GroupE @119
+    _ZThn20_N3SPK2GL14GLQuadRenderer13createBuffersERKNS_5GroupE @120
+    _ZThn20_N3SPK2GL14GLQuadRenderer14destroyBuffersERKNS_5GroupE @121
+    _ZThn20_N3SPK2GL14GLQuadRendererD0Ev @122
+    _ZThn20_N3SPK2GL14GLQuadRendererD1Ev @123
+    _ZThn20_N3SPK2GL15GLPointRendererD0Ev @124
+    _ZThn20_N3SPK2GL15GLPointRendererD1Ev @125
+    _ZThn20_N3SPK2GL19GLLineTrailRenderer12checkBuffersERKNS_5GroupE @126
+    _ZThn20_N3SPK2GL19GLLineTrailRenderer13createBuffersERKNS_5GroupE @127
+    _ZThn20_N3SPK2GL19GLLineTrailRenderer14destroyBuffersERKNS_5GroupE @128
+    _ZThn20_N3SPK2GL19GLLineTrailRendererD0Ev @129
+    _ZThn20_N3SPK2GL19GLLineTrailRendererD1Ev @130
+    _ZThn52_N3SPK2GL14GLLineRendererD0Ev @131
+    _ZThn52_N3SPK2GL14GLLineRendererD1Ev @132
+    _ZThn52_N3SPK2GL14GLQuadRenderer16setTexturingModeENS_13TexturingModeE @133
+    _ZThn52_N3SPK2GL14GLQuadRendererD0Ev @134
+    _ZThn52_N3SPK2GL14GLQuadRendererD1Ev @135
+    _ZThn52_N3SPK2GL15GLPointRenderer7setTypeENS_9PointTypeE @136
+    _ZThn52_N3SPK2GL15GLPointRendererD0Ev @137
+    _ZThn52_N3SPK2GL15GLPointRendererD1Ev @138

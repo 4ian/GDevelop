@@ -133,65 +133,187 @@ void ParticuleEmitterObject::SaveToXml(TiXmlElement * object)
 }
 #endif
 
+float angleY = 0.0f;
+float camPosZ = 5.0f;
+
+int deltaTime = 0;
+
+int screenWidth;
+int screenHeight;
+int universeHeight;
+int universeWidth ;
+
+int drawText = 2;
+
+sf::Clock timer;
+
+sf::View hudView;
+sf::View worldView;
+
+deque<SPK::SFML::SFMLSystem*> collisionParticleSystems;
+
+SPK::SPK_ID BaseSparkSystemID = SPK::NO_ID;
+sf::Image textureGround;
+
+// Converts an int into a string
+string int2Str(int a)
+{
+    ostringstream stm;
+    stm << a;
+    return stm.str();
+}
+
+// Converts a HSV color to RGB
+// h E [0,360]
+// s E [0,1]
+// v E [0,1]
+SPK::Vector3D convertHSV2RGB(const SPK::Vector3D& hsv)
+{
+	float h = hsv.x;
+	float s = hsv.y;
+	float v = hsv.z;
+
+	int hi = static_cast<int>(h / 60.0f) % 6;
+	float f = h / 60.0f - hi;
+	float p = v * (1.0f - s);
+	float q = v * (1.0f - f * s);
+	float t = v * (1.0f - (1.0f - f) * s);
+
+	switch(hi)
+	{
+	case 0 : return SPK::Vector3D(v,t,p);
+	case 1 : return SPK::Vector3D(q,v,p);
+	case 2 : return SPK::Vector3D(p,v,t);
+	case 3 : return SPK::Vector3D(p,q,v);
+	case 4 : return SPK::Vector3D(t,p,v);
+	default : return SPK::Vector3D(v,p,q);
+	}
+}
+
+	sf::Image textureSmoke;
+	sf::Image textureParticle;
+// Renders the scene
+void render(sf::RenderWindow& window)
+{
+	window.Clear();
+	window.SetView(worldView);
+
+	// Draws ground
+	textureGround.Bind();
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+	glBegin(GL_QUADS);
+	glColor3f(1.0f,1.0f,1.0f);
+	glTexCoord2f(0.0f,0.0f);
+	glVertex2f(0.0f,0.0f);
+	glTexCoord2f(universeWidth / 128.0f,0.0f);
+	glVertex2f((float)universeWidth,0.0f);
+	glTexCoord2f(universeWidth / 128.0f,universeHeight / 128.0f);
+	glVertex2f((float)universeWidth,(float)universeHeight);
+	glTexCoord2f(0.0f,universeHeight / 128.0f);
+	glVertex2f(0.0f,(float)universeHeight);
+	glEnd();
+
+	// Draws particles
+	for (deque<SPK::SFML::SFMLSystem*>::const_iterator it = collisionParticleSystems.begin(); it != collisionParticleSystems.end(); ++it)
+	{
+		window.Draw(**it);
+	    cout << (*it)->getNbParticles ();
+	}
+
+//	glDisable(GL_ALPHA_TEST);
+
+	window.Display();
+}
+
+// creates and register the base system
+SPK::SPK_ID createParticleSystemBase(sf::Image* texture)
+{
+	// Creates the model
+	SPK::Model* sparkModel = SPK::Model::create(SPK::FLAG_RED | SPK::FLAG_GREEN | SPK::FLAG_BLUE | SPK::FLAG_ALPHA,
+		SPK::FLAG_ALPHA,
+		SPK::FLAG_GREEN | SPK::FLAG_BLUE);
+	sparkModel->setParam(SPK::PARAM_RED,1.0f);
+	sparkModel->setParam(SPK::PARAM_BLUE,0.0f,0.2f);
+	sparkModel->setParam(SPK::PARAM_GREEN,0.2f,1.0f);
+	sparkModel->setParam(SPK::PARAM_ALPHA,0.8f,0.0f);
+	sparkModel->setLifeTime(0.2f,0.6f);
+
+	// Creates the renderer
+	SPK::SFML::SFMLLineRenderer* sparkRenderer = SPK::SFML::SFMLLineRenderer::create(0.1f,1.0f);
+	sparkRenderer->setBlendMode(sf::Blend::Add);
+	sparkRenderer->setGroundCulling(true);
+
+	// Creates the zone
+	SPK::Sphere* sparkSource = SPK::Sphere::create(SPK::Vector3D(0.0f,0.0f,10.0f),5.0f);
+
+	// Creates the emitter
+	SPK::SphericEmitter* sparkEmitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,0.0f,1.0f),3.14159f / 4.0f,3.0f * 3.14159f / 4.0f);
+	sparkEmitter->setForce(50.0f,150.0f);
+	sparkEmitter->setZone(sparkSource);
+	sparkEmitter->setTank(25);
+	sparkEmitter->setFlow(-1);
+
+	// Creates the Group
+	SPK::Group* sparkGroup = SPK::Group::create(sparkModel,25);
+	sparkGroup->setRenderer(sparkRenderer);
+	sparkGroup->addEmitter(sparkEmitter);
+	sparkGroup->setGravity(SPK::Vector3D(0.0f,0.0f,-200.0f));
+	sparkGroup->setFriction(2.0f);
+
+	// Creates the System
+	SPK::SFML::SFMLSystem* sparkSystem = SPK::SFML::SFMLSystem::create();
+	sparkSystem->addGroup(sparkGroup);
+
+	// Defines which objects will be shared by all systems
+	sparkModel->setShared(true);
+	sparkRenderer->setShared(true);
+
+	// Creates the base and gets the ID
+	return sparkSystem->getID();
+}
+
+// creates a particle system from the base system
+SPK::SFML::SFMLSystem* createParticleSystem(const sf::Vector2f& pos)
+{
+	SPK::SFML::SFMLSystem* sparkSystem = SPK_Copy(SPK::SFML::SFMLSystem,BaseSparkSystemID);
+	sparkSystem->SetPosition(pos);
+
+	return sparkSystem;
+}
+
+// destroy a particle system
+void destroyParticleSystem(SPK::SFML::SFMLSystem*& system)
+{
+	SPK_Destroy(system);
+	system = NULL;
+}
+
 bool ParticuleEmitterObject::LoadRuntimeResources(const ImageManager & imageMgr )
 {
     cout << "called";
-    float universeHeight = 800;
+	// Loads earth texture
+	if (!textureGround.LoadFromFile("D:/Florian/Programmation/GameDevelop/Extensions/ParticuleSystem/SPARK/demos/bin/res/earth.png"))
+		cout << "loading error1";
 
-	// Creates the model
-	SPK::Model* smokeModel = SPK::Model::create(
-		SPK::FLAG_SIZE | SPK::FLAG_ALPHA | SPK::FLAG_TEXTURE_INDEX | SPK::FLAG_ANGLE,
-		SPK::FLAG_SIZE | SPK::FLAG_ALPHA,
-		SPK::FLAG_SIZE | SPK::FLAG_TEXTURE_INDEX | SPK::FLAG_ANGLE);
-	smokeModel->setParam(SPK::PARAM_SIZE,5.0f,10.0f,100.0f,200.0f);
-	smokeModel->setParam(SPK::PARAM_ALPHA,1.0f,0.0f);
-	smokeModel->setParam(SPK::PARAM_TEXTURE_INDEX,0.0f,0.0f);
-	smokeModel->setParam(SPK::PARAM_ANGLE,0.0f,3.14 * 2.0f);
-	smokeModel->setLifeTime(120.0f,155.0f);
+	// Loads particle texture
+	if (!textureParticle.LoadFromFile("D:/Florian/Programmation/GameDevelop/Extensions/ParticuleSystem/SPARK/demos/bin/res/flare.png"))
+		cout << "loading error2";
 
-	// Creates the renderer
-	SPK::SFML::SFMLPointRenderer* smokeRenderer = SPK::SFML::SFMLPointRenderer::create();
-	smokeRenderer->setBlendMode(sf::Blend::Alpha);
-	//smokeRenderer->setDrawable(&sprite);
-	//smokeRenderer->setAtlasDimensions(2,2);
-	//smokeRenderer->setScale(0.875f,0.875f); // optim
-	//smokeRenderer->setGroundCulling(true);
+	// Loads smoke texture
+	if (!textureSmoke.LoadFromFile("D:/Florian/Programmation/GameDevelop/Extensions/ParticuleSystem/SPARK/demos/bin/res/smoke2.png"))
+		cout << "loading error3";
 
-	// Creates the zones
-	SPK::Point* leftTire = SPK::Point::create(SPK::Vector3D(0.0f,0.0f));
-	SPK::Point* rightTire = SPK::Point::create(SPK::Vector3D(-50.0f,-30.0f));
+	// random seed
+	SPK::randomSeed = static_cast<unsigned int>(time(NULL));
 
-	// Creates the emitters
-	SPK::SphericEmitter* leftSmokeEmitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,0.0f,1.0f),0.0f,1.1f * 3.14);
-	leftSmokeEmitter->setZone(leftTire);
-	leftSmokeEmitter->setName("left wheel emitter");
+	// Sets the update step
+	SPK::System::setClampStep(true,0.1f);			// clamp the step to 100 ms
+	SPK::System::useAdaptiveStep(0.001f,0.01f);		// use an adaptive step from 1ms to 10ms (1000fps to 100fps)
 
-	SPK::SphericEmitter* rightSmokeEmitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,0.0f,1.0f),0.0f,1.1f * 3.14);
-	rightSmokeEmitter->setZone(rightTire);
-	rightSmokeEmitter->setName("right wheel emitter");
-
-	// Creates the Group
-	SPK::Group* smokeGroup = SPK::Group::create(smokeModel,500);
-	smokeGroup->setGravity(SPK::Vector3D(0.0f,0.0f,2.0f));
-	smokeGroup->setRenderer(smokeRenderer);
-	smokeGroup->addEmitter(leftSmokeEmitter);
-	smokeGroup->addEmitter(rightSmokeEmitter);
-	smokeGroup->enableSorting(true);
-
-	// Creates the System
-	SPK::SFML::SFMLSystem* system = SPK::SFML::SFMLSystem::create(true);
-	system->addGroup(smokeGroup);
-
-	// Defines which objects will be shared by all systems
-	smokeModel->setShared(true);
-	smokeRenderer->setShared(true);
-
-	// Creates the base and gets the ID
-	baseParticleSystemID = system->getID();
-
-	particleSystem = SPK_Copy(SPK::SFML::SFMLSystem,baseParticleSystemID);
-	particleSystem->SetPosition(100,100);
-	cout << particleSystem->getNbParticles();
+	SPK::SFML::SFMLRenderer::setZFactor(1.0f);
+	SPK::SFML::setCameraPosition(SPK::SFML::CAMERA_CENTER,SPK::SFML::CAMERA_BOTTOM,static_cast<float>(universeHeight),0.0f);
+	BaseSparkSystemID = createParticleSystemBase(&textureParticle);
 
     return true;
 }
@@ -214,10 +336,25 @@ bool ParticuleEmitterObject::Draw( sf::RenderWindow& window )
 
     window.RestoreGLStates();
 
+	screenWidth = window.GetWidth();
+	screenHeight = window.GetHeight();
+
+	universeWidth = 1440;
+	universeHeight = (1440 * screenHeight) / screenWidth;
+
+	// Views
+	worldView = window.GetDefaultView();
+	hudView = window.GetDefaultView();
+
+	worldView.SetSize(universeWidth ,universeHeight );
+	worldView.SetCenter(universeWidth / 2.0f,universeHeight / 2.0f);
+	window.SetView(worldView);
+
     cout << "drawn";
-	cout << particleSystem->getNbParticles();
-	particleSystem->SetPosition(GetX(), GetY());
-    window.Draw(*particleSystem);
+    collisionParticleSystems.push_back(createParticleSystem(sf::Vector2f(GetX(), GetY())));
+
+    // Renders scene
+    render(window);
 
     //TODO : Probleme : Rien ne s'affiche et les objets affichés après ne s'affichent pas non plus.
 
@@ -372,7 +509,7 @@ float ParticuleEmitterObject::GetCenterY() const
  */
 void ParticuleEmitterObject::UpdateTime(float deltaTime)
 {
-	float forceMin = 50 * 0.04f;
+	/*float forceMin = 50 * 0.04f;
 	float forceMax = 75 * 0.08f;
 	float flow = 55 * 0.20f;
 
@@ -381,9 +518,13 @@ void ParticuleEmitterObject::UpdateTime(float deltaTime)
 	leftWheelEmitter->setForce(forceMin,forceMax);
 	rightWheelEmitter->setForce(forceMin,forceMax);
 	leftWheelEmitter->setFlow(flow);
-	rightWheelEmitter->setFlow(flow);
+	rightWheelEmitter->setFlow(flow);*/
 
-	particleSystem->update(deltaTime);
+	for (deque<SPK::SFML::SFMLSystem*>::const_iterator it = collisionParticleSystems.begin(); it != collisionParticleSystems.end(); ++it)
+	{
+		(*it)->update (deltaTime);
+		cout << "updated";
+	}
 }
 
 /**

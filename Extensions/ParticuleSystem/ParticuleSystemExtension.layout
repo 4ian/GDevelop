@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug - Edittime" />
-	<File name="Extension.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="974" topLine="3" />
+	<ActiveTarget name="Development - Edittime" />
+	<File name="Extension.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="4568" topLine="68" />
 	</File>
 	<File name="ParticuleEmitterActions.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="68" topLine="2" />
@@ -19,11 +19,11 @@
 	<File name="ParticuleEmitterInitialPositionPanel.h" open="0" top="0" tabpos="11">
 		<Cursor position="1432" topLine="15" />
 	</File>
-	<File name="ParticuleEmitterObject.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="7411" topLine="190" />
+	<File name="ParticuleEmitterObject.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="10772" topLine="328" />
 	</File>
 	<File name="ParticuleEmitterObject.h" open="1" top="0" tabpos="2">
-		<Cursor position="6489" topLine="128" />
+		<Cursor position="6543" topLine="112" />
 	</File>
 	<File name="ParticuleEmitterObjectEditor.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="2630" topLine="50" />

@@ -32,7 +32,7 @@
 	"GDL/tinyxml.h"
 	<windows.h>
 
-1286220763 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\extension.cpp
+1286222130 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"ParticuleEmitterObject.h"
@@ -7693,7 +7693,7 @@
 
 1285433270 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 
-1286221473 d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterobject.h
+1286222130 d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterobject.h
 	"GDL/Object.h"
 	<SFML/Graphics.hpp>
 	<SPK.h>
@@ -8394,7 +8394,7 @@
 
 1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\objecttype.h
 
-1259352926 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\spk.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\spk.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Vector3D.h"
 	"Core/SPK_Buffer.h"
@@ -8437,7 +8437,7 @@
 	"Extensions/Renderers/SPK_LineRendererInterface.h"
 	"Extensions/Renderers/SPK_Oriented3DRendererInterface.h"
 
-1262866786 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_def.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_def.h
 	<cstdlib>
 	<cmath>
 	<algorithm>
@@ -8452,70 +8452,70 @@
 	<cstring>
 	<crtdbg.h>
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_vector3d.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_vector3d.h
 	"Core/SPK_DEF.h"
 
-1266883384 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_buffer.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_buffer.h
 
-1266883384 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_arraybuffer.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_arraybuffer.h
 	"Core/SPK_Buffer.h"
 
-1259085360 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_registerable.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_registerable.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Vector3D.h"
 
-1266883320 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_transformable.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_transformable.h
 	"Core/SPK_Vector3D.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_bufferhandler.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_bufferhandler.h
 	"Core/SPK_DEF.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_regwrapper.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_regwrapper.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Registerable.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_renderer.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_renderer.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Registerable.h"
 	"Core/SPK_BufferHandler.h"
 
-1265911696 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_system.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_system.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Registerable.h"
 	"Core/SPK_Transformable.h"
 	"Core/SPK_Vector3D.h"
 
-1258828694 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_particle.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_particle.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Vector3D.h"
 	"Core/SPK_Pool.h"
 	"Core/SPK_Model.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_pool.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_pool.h
 	"Core/SPK_DEF.h"
 
-1259352926 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_model.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_model.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Registerable.h"
 	"Core/SPK_Interpolator.h"
 
-1258851152 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_interpolator.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_interpolator.h
 	"Core/SPK_DEF.h"
 
-1265911696 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_zone.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_zone.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Registerable.h"
 	"Core/SPK_Transformable.h"
 	"Core/SPK_Vector3D.h"
 
-1265911696 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_emitter.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_emitter.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Registerable.h"
 	"Core/SPK_Transformable.h"
 	"Core/SPK_Zone.h"
 	"Core/SPK_Particle.h"
 
-1265911696 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_modifier.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_modifier.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Vector3D.h"
 	"Core/SPK_Registerable.h"
@@ -8523,7 +8523,7 @@
 	"Core/SPK_Zone.h"
 	"Core/SPK_Particle.h"
 
-1259707870 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_group.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_group.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Registerable.h"
 	"Core/SPK_Transformable.h"
@@ -8531,87 +8531,87 @@
 	"Core/SPK_Pool.h"
 	"Core/SPK_Particle.h"
 
-1261424346 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_factory.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\core\spk_factory.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Registerable.h"
 
-1260821742 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\zones\spk_aabox.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\zones\spk_aabox.h
 	"Core/SPK_Zone.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\zones\spk_point.h
-	"Core/SPK_Zone.h"
-	"Core/SPK_Particle.h"
-
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\zones\spk_sphere.h
-	"Core/SPK_Zone.h"
-
-1258831182 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\zones\spk_plane.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\zones\spk_point.h
 	"Core/SPK_Zone.h"
 	"Core/SPK_Particle.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\zones\spk_line.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\zones\spk_sphere.h
 	"Core/SPK_Zone.h"
 
-1258851232 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\zones\spk_ring.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\zones\spk_plane.h
+	"Core/SPK_Zone.h"
+	"Core/SPK_Particle.h"
+
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\zones\spk_line.h
 	"Core/SPK_Zone.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\emitters\spk_straightemitter.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\zones\spk_ring.h
+	"Core/SPK_Zone.h"
+
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\emitters\spk_straightemitter.h
 	"Core/SPK_Emitter.h"
 	"Core/SPK_Particle.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\emitters\spk_sphericemitter.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\emitters\spk_sphericemitter.h
 	"Core/SPK_Emitter.h"
 
-1257442774 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\emitters\spk_normalemitter.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\emitters\spk_normalemitter.h
 	"Core/SPK_Emitter.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\emitters\spk_randomemitter.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\emitters\spk_randomemitter.h
 	"Core/SPK_Emitter.h"
 
-1259998260 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\emitters\spk_staticemitter.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\emitters\spk_staticemitter.h
 	"Core/SPK_Emitter.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_obstacle.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_obstacle.h
 	"Core/SPK_Modifier.h"
 	"Core/SPK_Particle.h"
 	"Core/SPK_Zone.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_destroyer.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_destroyer.h
 	"Core/SPK_Modifier.h"
 
-1257737978 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_pointmass.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_pointmass.h
 	"Core/SPK_Modifier.h"
 
-1257442774 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_modifiergroup.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_modifiergroup.h
 	"Core/SPK_Modifier.h"
 	"Core/SPK_Particle.h"
 	"Core/SPK_Zone.h"
 
-1258831182 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_linearforce.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_linearforce.h
 	"Core/SPK_Modifier.h"
 	"Core/SPK_Model.h"
 
-1260212850 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_collision.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_collision.h
 	"Core/SPK_Modifier.h"
 	"Core/SPK_Particle.h"
 
-1258851232 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_vortex.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_vortex.h
 	"Core/SPK_Modifier.h"
 
-1259354554 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_rotator.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\modifiers\spk_rotator.h
 	"Core/SPK_Modifier.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_pointrendererinterface.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_pointrendererinterface.h
 	"Core/SPK_DEF.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_linerendererinterface.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_linerendererinterface.h
 	"Core/SPK_DEF.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_oriented3drendererinterface.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_oriented3drendererinterface.h
 	"Core/SPK_Vector3D.h"
 	"Core/SPK_Group.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\spk_sfml.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\spk_sfml.h
 	"RenderingAPIs/SFML/SPK_SFML_DEF.h"
 	"RenderingAPIs/SFML/SPK_SFML_GLOBAL.h"
 	"RenderingAPIs/SFML/SPK_SFMLSystem.h"
@@ -8621,66 +8621,66 @@
 	"RenderingAPIs/SFML/SPK_SFMLLineRenderer.h"
 	"RenderingAPIs/SFML/SPK_SFMLPointRenderer.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfml_def.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfml_def.h
 	"RenderingAPIs/OpenGL/SPK_GL_DEF.h"
 	<SFML/Window.hpp>
 	<SFML/Graphics.hpp>
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\opengl\spk_gl_def.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\opengl\spk_gl_def.h
 	<windows.h>
 	<OpenGL/gl.h>
 	<gl.h>
 	<GL/gl.h>
 	<GL/glx.h>
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfml_global.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfml_global.h
 	"RenderingAPIs/SFML/SPK_SFML_DEF.h"
 	"Core/SPK_Vector3D.h"
 	"Core/SPK_System.h"
 	"Core/SPK_Transformable.h"
 	"RenderingAPIs/SFML/SPK_SFMLRenderer.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmlrenderer.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmlrenderer.h
 	"RenderingAPIs/SFML/SPK_SFML_DEF.h"
 	"Core/SPK_Renderer.h"
 	"RenderingAPIs/SFML/SPK_SFMLSystem.h"
 
-1277479112 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmlsystem.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmlsystem.h
 	"RenderingAPIs/SFML/SPK_SFML_DEF.h"
 	"Core/SPK_System.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmlquadrenderer.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmlquadrenderer.h
 	"RenderingAPIs/SFML/SPK_SFMLRenderer.h"
 	"Extensions/Renderers/SPK_QuadRendererInterface.h"
 	"Extensions/Renderers/SPK_Oriented2DRendererInterface.h"
 
-1260804080 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_quadrendererinterface.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_quadrendererinterface.h
 	"Core/SPK_DEF.h"
 	"Core/SPK_Particle.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_oriented2drendererinterface.h
+1286222118 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\extensions\renderers\spk_oriented2drendererinterface.h
 	"Core/SPK_Vector3D.h"
 	"Core/SPK_Group.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmldrawablerenderer.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmldrawablerenderer.h
 	"RenderingAPIs/SFML/SPK_SFMLRenderer.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmllinerenderer.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmllinerenderer.h
 	"RenderingAPIs/SFML/SPK_SFMLRenderer.h"
 	"Extensions/Renderers/SPK_LineRendererInterface.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmlpointrenderer.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\sfml\spk_sfmlpointrenderer.h
 	"RenderingAPIs/SFML/SPK_SFMLRenderer.h"
 	"RenderingAPIs/OpenGL/SPK_GLExtHandler.h"
 	"Extensions/Renderers/SPK_PointRendererInterface.h"
 
-1257106638 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\opengl\spk_glexthandler.h
+1286222119 d:\florian\programmation\gamedevelop\extensions\particulesystem\spark\include\renderingapis\opengl\spk_glexthandler.h
 	"Core/SPK_DEF.h"
 	"RenderingAPIs/OpenGL/SPK_GL_DEF.h"
 
 1272745771 c:\libs\boost_1_43_0\boost\version.hpp
 
-1285961414 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitteractions.cpp
+1286222130 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitteractions.cpp
 	"ParticuleEmitterObject.h"
 	"GDL/Instruction.h"
 	"GDL/ObjectsConcerned.h"
@@ -8948,31 +8948,31 @@
 1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
 	"GDL/btScalar.h"
 
-1285961414 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterconditions.cpp
+1286222130 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterconditions.cpp
 	"ParticuleEmitterObject.h"
 	"GDL/Instruction.h"
 	"GDL/ObjectsConcerned.h"
 	"GDL/RuntimeScene.h"
 
-1285961414 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterexpressions.cpp
+1286222130 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterexpressions.cpp
 	"GDL/Object.h"
 	"GDL/ExpressionInstruction.h"
 	"GDL/RuntimeScene.h"
 	"GDL/ObjectsConcerned.h"
 	"ParticuleEmitterObject.h"
 
-1285962365 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterinitialpositionpanel.cpp
+1286222130 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterinitialpositionpanel.cpp
 	"ParticuleEmitterInitialPositionPanel.h"
 	<wx/intl.h>
 	<wx/string.h>
 
-1285962365 d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterinitialpositionpanel.h
+1286222130 d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterinitialpositionpanel.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
 	<wx/panel.h>
 
-1286113206 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterobject.cpp
+1286222958 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterobject.cpp
 	<SFML/Graphics.hpp>
 	"GDL/Object.h"
 	"GDL/ImageManager.h"
@@ -9035,7 +9035,7 @@
 	<wx/pen.h>
 	<wx/bitmap.h>
 
-1285961414 d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterobjecteditor.h
+1286222130 d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterobjecteditor.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
@@ -9141,7 +9141,7 @@
 
 1253308506 c:\libs\wxwidgets\include\wx\generic\statline.h
 
-1285961414 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterobjecteditor.cpp
+1286222130 source:d:\florian\programmation\gamedevelop\extensions\particulesystem\particuleemitterobjecteditor.cpp
 	"ParticuleEmitterObjectEditor.h"
 	<wx/intl.h>
 	<wx/string.h>

@@ -51,8 +51,6 @@ colorG( 255 ),
 colorB( 255 ),
 angle(0)
 {
-    smoke.LoadFromFile("D:/Florian/Programmation/GameDevelop/Extensions/ParticuleSystem/SPARK/demos/bin/res/grass.bmp");
-    sprite.SetImage(smoke);
 }
 
 void ParticuleEmitterObject::LoadFromXml(const TiXmlElement * object)
@@ -133,98 +131,7 @@ void ParticuleEmitterObject::SaveToXml(TiXmlElement * object)
 }
 #endif
 
-float angleY = 0.0f;
-float camPosZ = 5.0f;
-
-int deltaTime = 0;
-
-int screenWidth;
-int screenHeight;
-int universeHeight;
-int universeWidth ;
-
-int drawText = 2;
-
-sf::Clock timer;
-
-sf::View hudView;
-sf::View worldView;
-
-deque<SPK::SFML::SFMLSystem*> collisionParticleSystems;
-
 SPK::SPK_ID BaseSparkSystemID = SPK::NO_ID;
-sf::Image textureGround;
-
-// Converts an int into a string
-string int2Str(int a)
-{
-    ostringstream stm;
-    stm << a;
-    return stm.str();
-}
-
-// Converts a HSV color to RGB
-// h E [0,360]
-// s E [0,1]
-// v E [0,1]
-SPK::Vector3D convertHSV2RGB(const SPK::Vector3D& hsv)
-{
-	float h = hsv.x;
-	float s = hsv.y;
-	float v = hsv.z;
-
-	int hi = static_cast<int>(h / 60.0f) % 6;
-	float f = h / 60.0f - hi;
-	float p = v * (1.0f - s);
-	float q = v * (1.0f - f * s);
-	float t = v * (1.0f - (1.0f - f) * s);
-
-	switch(hi)
-	{
-	case 0 : return SPK::Vector3D(v,t,p);
-	case 1 : return SPK::Vector3D(q,v,p);
-	case 2 : return SPK::Vector3D(p,v,t);
-	case 3 : return SPK::Vector3D(p,q,v);
-	case 4 : return SPK::Vector3D(t,p,v);
-	default : return SPK::Vector3D(v,p,q);
-	}
-}
-
-	sf::Image textureSmoke;
-	sf::Image textureParticle;
-// Renders the scene
-void render(sf::RenderWindow& window)
-{
-	window.Clear();
-	window.SetView(worldView);
-
-	// Draws ground
-	textureGround.Bind();
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-	glBegin(GL_QUADS);
-	glColor3f(1.0f,1.0f,1.0f);
-	glTexCoord2f(0.0f,0.0f);
-	glVertex2f(0.0f,0.0f);
-	glTexCoord2f(universeWidth / 128.0f,0.0f);
-	glVertex2f((float)universeWidth,0.0f);
-	glTexCoord2f(universeWidth / 128.0f,universeHeight / 128.0f);
-	glVertex2f((float)universeWidth,(float)universeHeight);
-	glTexCoord2f(0.0f,universeHeight / 128.0f);
-	glVertex2f(0.0f,(float)universeHeight);
-	glEnd();
-
-	// Draws particles
-	for (deque<SPK::SFML::SFMLSystem*>::const_iterator it = collisionParticleSystems.begin(); it != collisionParticleSystems.end(); ++it)
-	{
-		window.Draw(**it);
-	    cout << (*it)->getNbParticles ();
-	}
-
-//	glDisable(GL_ALPHA_TEST);
-
-	window.Display();
-}
 
 // creates and register the base system
 SPK::SPK_ID createParticleSystemBase(sf::Image* texture)
@@ -292,17 +199,10 @@ void destroyParticleSystem(SPK::SFML::SFMLSystem*& system)
 bool ParticuleEmitterObject::LoadRuntimeResources(const ImageManager & imageMgr )
 {
     cout << "called";
-	// Loads earth texture
-	if (!textureGround.LoadFromFile("D:/Florian/Programmation/GameDevelop/Extensions/ParticuleSystem/SPARK/demos/bin/res/earth.png"))
-		cout << "loading error1";
 
 	// Loads particle texture
 	if (!textureParticle.LoadFromFile("D:/Florian/Programmation/GameDevelop/Extensions/ParticuleSystem/SPARK/demos/bin/res/flare.png"))
 		cout << "loading error2";
-
-	// Loads smoke texture
-	if (!textureSmoke.LoadFromFile("D:/Florian/Programmation/GameDevelop/Extensions/ParticuleSystem/SPARK/demos/bin/res/smoke2.png"))
-		cout << "loading error3";
 
 	// random seed
 	SPK::randomSeed = static_cast<unsigned int>(time(NULL));
@@ -312,8 +212,10 @@ bool ParticuleEmitterObject::LoadRuntimeResources(const ImageManager & imageMgr 
 	SPK::System::useAdaptiveStep(0.001f,0.01f);		// use an adaptive step from 1ms to 10ms (1000fps to 100fps)
 
 	SPK::SFML::SFMLRenderer::setZFactor(1.0f);
-	SPK::SFML::setCameraPosition(SPK::SFML::CAMERA_CENTER,SPK::SFML::CAMERA_BOTTOM,static_cast<float>(universeHeight),0.0f);
+	SPK::SFML::setCameraPosition(SPK::SFML::CAMERA_CENTER,SPK::SFML::CAMERA_BOTTOM,static_cast<float>(1440),0.0f);
 	BaseSparkSystemID = createParticleSystemBase(&textureParticle);
+
+    particleSystem = createParticleSystem(sf::Vector2f(GetX(), GetY()));
 
     return true;
 }
@@ -336,27 +238,7 @@ bool ParticuleEmitterObject::Draw( sf::RenderWindow& window )
 
     window.RestoreGLStates();
 
-	screenWidth = window.GetWidth();
-	screenHeight = window.GetHeight();
-
-	universeWidth = 1440;
-	universeHeight = (1440 * screenHeight) / screenWidth;
-
-	// Views
-	worldView = window.GetDefaultView();
-	hudView = window.GetDefaultView();
-
-	worldView.SetSize(universeWidth ,universeHeight );
-	worldView.SetCenter(universeWidth / 2.0f,universeHeight / 2.0f);
-	window.SetView(worldView);
-
-    cout << "drawn";
-    collisionParticleSystems.push_back(createParticleSystem(sf::Vector2f(GetX(), GetY())));
-
-    // Renders scene
-    render(window);
-
-    //TODO : Probleme : Rien ne s'affiche et les objets affichés après ne s'affichent pas non plus.
+    window.Draw(*particleSystem);
 
     window.SaveGLStates();
 
@@ -452,8 +334,8 @@ unsigned int ParticuleEmitterObject::GetNumberOfProperties() const
 
 void ParticuleEmitterObject::OnPositionChanged()
 {
-    text.SetX( GetX()+text.GetRect().Width/2 );
-    text.SetY( GetY()+text.GetRect().Height/2 );
+    if ( particleSystem )
+        particleSystem->SetPosition(GetX(), GetY());
 }
 
 /**
@@ -461,7 +343,7 @@ void ParticuleEmitterObject::OnPositionChanged()
  */
 float ParticuleEmitterObject::GetDrawableX() const
 {
-    return text.GetPosition().x-text.GetOrigin().x;
+    return GetX();
 }
 
 /**
@@ -469,7 +351,7 @@ float ParticuleEmitterObject::GetDrawableX() const
  */
 float ParticuleEmitterObject::GetDrawableY() const
 {
-    return text.GetPosition().y-text.GetOrigin().y;
+    return GetY();
 }
 
 /**
@@ -477,7 +359,7 @@ float ParticuleEmitterObject::GetDrawableY() const
  */
 float ParticuleEmitterObject::GetWidth() const
 {
-    return text.GetRect().Width;
+    return 0;
 }
 
 /**
@@ -485,7 +367,7 @@ float ParticuleEmitterObject::GetWidth() const
  */
 float ParticuleEmitterObject::GetHeight() const
 {
-    return text.GetRect().Height;
+    return 0;
 }
 
 /**
@@ -493,7 +375,7 @@ float ParticuleEmitterObject::GetHeight() const
  */
 float ParticuleEmitterObject::GetCenterX() const
 {
-    return text.GetRect().Width/2;
+    return 0;
 }
 
 /**
@@ -501,7 +383,7 @@ float ParticuleEmitterObject::GetCenterX() const
  */
 float ParticuleEmitterObject::GetCenterY() const
 {
-    return text.GetRect().Height/2;
+    return 0;
 }
 
 /**
@@ -509,22 +391,7 @@ float ParticuleEmitterObject::GetCenterY() const
  */
 void ParticuleEmitterObject::UpdateTime(float deltaTime)
 {
-	/*float forceMin = 50 * 0.04f;
-	float forceMax = 75 * 0.08f;
-	float flow = 55 * 0.20f;
-
-	SPK::Emitter* leftWheelEmitter = dynamic_cast<SPK::Emitter*>(particleSystem->findByName("left wheel emitter"));
-	SPK::Emitter* rightWheelEmitter = dynamic_cast<SPK::Emitter*>(particleSystem->findByName("right wheel emitter"));
-	leftWheelEmitter->setForce(forceMin,forceMax);
-	rightWheelEmitter->setForce(forceMin,forceMax);
-	leftWheelEmitter->setFlow(flow);
-	rightWheelEmitter->setFlow(flow);*/
-
-	for (deque<SPK::SFML::SFMLSystem*>::const_iterator it = collisionParticleSystems.begin(); it != collisionParticleSystems.end(); ++it)
-	{
-		(*it)->update (deltaTime);
-		cout << "updated";
-	}
+	particleSystem->update (deltaTime);
 }
 
 /**

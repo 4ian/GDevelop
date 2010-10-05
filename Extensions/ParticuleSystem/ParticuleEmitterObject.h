@@ -144,8 +144,7 @@ class ParticuleEmitterObject : public Object
 
         SPK::SPK_ID baseParticleSystemID;
         SPK::SFML::SFMLSystem* particleSystem;
-        sf::Image smoke;
-        sf::Sprite sprite;
+        sf::Image textureParticle;
 
         //The text to display
         sf::Text text;

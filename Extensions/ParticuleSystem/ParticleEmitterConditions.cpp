@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Particule System Extension
+Game Develop - Particle System Extension
 Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 
 */
 
-#include "ParticuleEmitterObject.h"
+#include "ParticleEmitterObject.h"
 
 #include "GDL/Instruction.h"
 #include "GDL/ObjectsConcerned.h"
@@ -32,41 +32,9 @@ freely, subject to the following restrictions:
 
 
 /**
- * Test the string
- */
-bool ParticuleEmitterObject::CondString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
-{
-    if (( condition.GetParameter(2).GetAsCompOperator() == GDExpression::Equal && string(text.GetString()) == condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()) ) ||
-        ( condition.GetParameter(2).GetAsCompOperator() == GDExpression::Different && string(text.GetString()) != condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()) )
-       )
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool ParticuleEmitterObject::CondSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
-{
-    //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetCharacterSize() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetCharacterSize() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetCharacterSize() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetCharacterSize() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetCharacterSize() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
-            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetCharacterSize() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
-       )
-    {
-       return true;
-    }
-
-    return false;
-}
-
-/**
  * Test the opacity
  */
-bool ParticuleEmitterObject::CondOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+bool ParticleEmitterObject::CondOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetOpacity() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -86,7 +54,7 @@ bool ParticuleEmitterObject::CondOpacity( RuntimeScene & scene, ObjectsConcerned
 /**
  * Test the angle
  */
-bool ParticuleEmitterObject::CondAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+bool ParticleEmitterObject::CondAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
     if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetAngle() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||

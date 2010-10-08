@@ -2,21 +2,21 @@
 #ifndef BOX3DINITIALPOSITIONPANEL_H
 #define BOX3DINITIALPOSITIONPANEL_H
 
-//(*Headers(ParticuleEmitterInitialPositionPanel)
+//(*Headers(ParticleEmitterInitialPositionPanel)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/panel.h>
 //*)
 
-class ParticuleEmitterInitialPositionPanel: public wxPanel
+class ParticleEmitterInitialPositionPanel: public wxPanel
 {
 	public:
 
-		ParticuleEmitterInitialPositionPanel(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
-		virtual ~ParticuleEmitterInitialPositionPanel();
+		ParticleEmitterInitialPositionPanel(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
+		virtual ~ParticleEmitterInitialPositionPanel();
 
-		//(*Declarations(ParticuleEmitterInitialPositionPanel)
+		//(*Declarations(ParticleEmitterInitialPositionPanel)
 		wxTextCtrl* rollEdit;
 		wxStaticText* StaticText2;
 		wxStaticText* StaticText6;
@@ -32,7 +32,7 @@ class ParticuleEmitterInitialPositionPanel: public wxPanel
 
 	protected:
 
-		//(*Identifiers(ParticuleEmitterInitialPositionPanel)
+		//(*Identifiers(ParticleEmitterInitialPositionPanel)
 		static const long ID_STATICTEXT4;
 		static const long ID_TEXTCTRL3;
 		static const long ID_STATICTEXT5;
@@ -48,7 +48,7 @@ class ParticuleEmitterInitialPositionPanel: public wxPanel
 
 	private:
 
-		//(*Handlers(ParticuleEmitterInitialPositionPanel)
+		//(*Handlers(ParticleEmitterInitialPositionPanel)
 		//*)
 
 		DECLARE_EVENT_TABLE()

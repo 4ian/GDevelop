@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Particule System Extension
+Game Develop - Particle System Extension
 Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -29,7 +29,7 @@ freely, subject to the following restrictions:
 #ifndef TEXTOBJECTEDITOR_H
 #define TEXTOBJECTEDITOR_H
 
-//(*Headers(ParticuleEmitterObjectEditor)
+//(*Headers(ParticleEmitterObjectEditor)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -39,17 +39,17 @@ freely, subject to the following restrictions:
 #include <wx/dialog.h>
 //*)
 class Game;
-class ParticuleEmitterObject;
+class ParticleEmitterObject;
 class MainEditorCommand;
 
-class ParticuleEmitterObjectEditor: public wxDialog
+class ParticleEmitterObjectEditor: public wxDialog
 {
 	public:
 
-		ParticuleEmitterObjectEditor( wxWindow* parent, Game & game_, ParticuleEmitterObject & object_, MainEditorCommand & mainEditorCommand_ );
-		virtual ~ParticuleEmitterObjectEditor();
+		ParticleEmitterObjectEditor( wxWindow* parent, Game & game_, ParticleEmitterObject & object_, MainEditorCommand & mainEditorCommand_ );
+		virtual ~ParticleEmitterObjectEditor();
 
-		//(*Declarations(ParticuleEmitterObjectEditor)
+		//(*Declarations(ParticleEmitterObjectEditor)
 		wxSpinCtrl* sizeEdit;
 		wxStaticText* StaticText2;
 		wxTextCtrl* textEdit;
@@ -64,7 +64,7 @@ class ParticuleEmitterObjectEditor: public wxDialog
 
 	protected:
 
-		//(*Identifiers(ParticuleEmitterObjectEditor)
+		//(*Identifiers(ParticleEmitterObjectEditor)
 		static const long ID_TEXTCTRL1;
 		static const long ID_STATICTEXT1;
 		static const long ID_BUTTON3;
@@ -79,7 +79,7 @@ class ParticuleEmitterObjectEditor: public wxDialog
 
 	private:
 
-		//(*Handlers(ParticuleEmitterObjectEditor)
+		//(*Handlers(ParticleEmitterObjectEditor)
 		void OnokBtClick(wxCommandEvent& event);
 		void OncolorBtClick(wxCommandEvent& event);
 		void OnfontBtClick(wxCommandEvent& event);
@@ -89,7 +89,7 @@ class ParticuleEmitterObjectEditor: public wxDialog
 
 		Game & game;
 		MainEditorCommand & mainEditorCommand;
-		ParticuleEmitterObject & object;
+		ParticleEmitterObject & object;
 
 		DECLARE_EVENT_TABLE()
 };

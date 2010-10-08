@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Particule System Extension
+Game Develop - Particle System Extension
 Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -50,15 +50,16 @@ class ResourcesMergingHelper;
 /**
  * Text Object
  */
-class ParticuleEmitterObject : public Object
+class ParticleEmitterObject : public Object
 {
     public :
 
-        ParticuleEmitterObject(std::string name_);
-        virtual ~ParticuleEmitterObject() {};
-        virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new ParticuleEmitterObject(*this));}
+        ParticleEmitterObject(std::string name_);
+        virtual ~ParticleEmitterObject();
+        virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new ParticleEmitterObject(*this));}
 
         virtual bool LoadRuntimeResources(const ImageManager & imageMgr );
+        virtual bool LoadResources(const ImageManager & imageMgr );
         virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
         virtual bool Draw(sf::RenderWindow& main_window);
@@ -97,17 +98,8 @@ class ParticuleEmitterObject : public Object
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
 
-        virtual bool SetAngle(float newAngle) { angle = newAngle; text.SetRotation(-angle); return true;};
+        virtual bool SetAngle(float newAngle) { angle = newAngle; if ( particleSystem ) particleSystem->SetRotation(-angle); return true;};
         virtual float GetAngle() const {return angle;};
-
-        inline void SetString(std::string str) { text.SetString(str); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
-        inline std::string GetString() const {return text.GetString();};
-
-        inline void SetCharacterSize(float size) { text.SetCharacterSize(size); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
-        inline float GetCharacterSize() const { return text.GetCharacterSize(); };
-
-        void SetFont(std::string fontName_);
-        inline std::string GetFont() const {return fontName;};
 
         void SetOpacity(float val);
         inline float GetOpacity() const {return opacity;};
@@ -142,13 +134,12 @@ class ParticuleEmitterObject : public Object
 
     private:
 
+        SPK::SPK_ID CreateBaseParticleSystem();
+
         SPK::SPK_ID baseParticleSystemID;
         SPK::SFML::SFMLSystem* particleSystem;
         sf::Image textureParticle;
-
-        //The text to display
-        sf::Text text;
-        std::string fontName;
+        enum RendererType {Point, Line, Quad} rendererType;
 
         //Opacity
         float opacity;
@@ -159,9 +150,16 @@ class ParticuleEmitterObject : public Object
         unsigned int colorB;
 
         float angle;
+
+        #if defined(GDE)
+        sf::Image edittimeIconImage;
+        sf::Sprite edittimeIcon;
+        #endif
+
+        static bool SPKinitialized;
 };
 
-void DestroyParticuleEmitterObject(Object * object);
-Object * CreateParticuleEmitterObject(std::string name);
+void DestroyParticleEmitterObject(Object * object);
+Object * CreateParticleEmitterObject(std::string name);
 
 #endif // TEXTOBJECT_H

@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Particule System Extension
+Game Develop - Particle System Extension
 Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -28,19 +28,14 @@ freely, subject to the following restrictions:
 #include "GDL/ExpressionInstruction.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
-#include "ParticuleEmitterObject.h"
+#include "ParticleEmitterObject.h"
 
-double ParticuleEmitterObject::ExpOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double ParticleEmitterObject::ExpOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return opacity;
 }
 
-double ParticuleEmitterObject::ExpAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+double ParticleEmitterObject::ExpAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return angle;
-}
-
-std::string ParticuleEmitterObject::ExpString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction )
-{
-    return text.GetString();
 }

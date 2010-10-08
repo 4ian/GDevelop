@@ -1,33 +1,33 @@
 #if defined(GDE)
-#include "ParticuleEmitterInitialPositionPanel.h"
+#include "ParticleEmitterInitialPositionPanel.h"
 
-//(*InternalHeaders(ParticuleEmitterInitialPositionPanel)
+//(*InternalHeaders(ParticleEmitterInitialPositionPanel)
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
 
-//(*IdInit(ParticuleEmitterInitialPositionPanel)
-const long ParticuleEmitterInitialPositionPanel::ID_STATICTEXT4 = wxNewId();
-const long ParticuleEmitterInitialPositionPanel::ID_TEXTCTRL3 = wxNewId();
-const long ParticuleEmitterInitialPositionPanel::ID_STATICTEXT5 = wxNewId();
-const long ParticuleEmitterInitialPositionPanel::ID_STATICTEXT2 = wxNewId();
-const long ParticuleEmitterInitialPositionPanel::ID_TEXTCTRL2 = wxNewId();
-const long ParticuleEmitterInitialPositionPanel::ID_STATICTEXT3 = wxNewId();
-const long ParticuleEmitterInitialPositionPanel::ID_STATICTEXT6 = wxNewId();
-const long ParticuleEmitterInitialPositionPanel::ID_TEXTCTRL4 = wxNewId();
-const long ParticuleEmitterInitialPositionPanel::ID_STATICTEXT7 = wxNewId();
-const long ParticuleEmitterInitialPositionPanel::ID_STATICTEXT1 = wxNewId();
-const long ParticuleEmitterInitialPositionPanel::ID_TEXTCTRL1 = wxNewId();
+//(*IdInit(ParticleEmitterInitialPositionPanel)
+const long ParticleEmitterInitialPositionPanel::ID_STATICTEXT4 = wxNewId();
+const long ParticleEmitterInitialPositionPanel::ID_TEXTCTRL3 = wxNewId();
+const long ParticleEmitterInitialPositionPanel::ID_STATICTEXT5 = wxNewId();
+const long ParticleEmitterInitialPositionPanel::ID_STATICTEXT2 = wxNewId();
+const long ParticleEmitterInitialPositionPanel::ID_TEXTCTRL2 = wxNewId();
+const long ParticleEmitterInitialPositionPanel::ID_STATICTEXT3 = wxNewId();
+const long ParticleEmitterInitialPositionPanel::ID_STATICTEXT6 = wxNewId();
+const long ParticleEmitterInitialPositionPanel::ID_TEXTCTRL4 = wxNewId();
+const long ParticleEmitterInitialPositionPanel::ID_STATICTEXT7 = wxNewId();
+const long ParticleEmitterInitialPositionPanel::ID_STATICTEXT1 = wxNewId();
+const long ParticleEmitterInitialPositionPanel::ID_TEXTCTRL1 = wxNewId();
 //*)
 
-BEGIN_EVENT_TABLE(ParticuleEmitterInitialPositionPanel,wxPanel)
-	//(*EventTable(ParticuleEmitterInitialPositionPanel)
+BEGIN_EVENT_TABLE(ParticleEmitterInitialPositionPanel,wxPanel)
+	//(*EventTable(ParticleEmitterInitialPositionPanel)
 	//*)
 END_EVENT_TABLE()
 
-ParticuleEmitterInitialPositionPanel::ParticuleEmitterInitialPositionPanel(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
+ParticleEmitterInitialPositionPanel::ParticleEmitterInitialPositionPanel(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
 {
-	//(*Initialize(ParticuleEmitterInitialPositionPanel)
+	//(*Initialize(ParticleEmitterInitialPositionPanel)
 	wxStaticBoxSizer* StaticBoxSizer2;
 	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer3;
@@ -81,9 +81,9 @@ ParticuleEmitterInitialPositionPanel::ParticuleEmitterInitialPositionPanel(wxWin
 	//*)
 }
 
-ParticuleEmitterInitialPositionPanel::~ParticuleEmitterInitialPositionPanel()
+ParticleEmitterInitialPositionPanel::~ParticleEmitterInitialPositionPanel()
 {
-	//(*Destroy(ParticuleEmitterInitialPositionPanel)
+	//(*Destroy(ParticleEmitterInitialPositionPanel)
 	//*)
 }
 

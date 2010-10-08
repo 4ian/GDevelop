@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Particule System Extension
+Game Develop - Particle System Extension
 Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 
 */
 
-#include "ParticuleEmitterObject.h"
+#include "ParticleEmitterObject.h"
 
 #include "GDL/Instruction.h"
 #include "GDL/ObjectsConcerned.h"
@@ -33,47 +33,9 @@ freely, subject to the following restrictions:
 
 
 /**
- * Change the string
- */
-bool ParticuleEmitterObject::ActString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
-{
-    if ( action.GetParameter(2).GetAsModOperator() == GDExpression::Set )
-        SetString( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()) );
-    else if ( action.GetParameter(2).GetAsModOperator() == GDExpression::Add )
-        SetString( GetString() + action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()) );
-
-    return true;
-}
-
-bool ParticuleEmitterObject::ActFont( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
-{
-    SetFont(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()));
-
-    return true;
-}
-
-
-bool ParticuleEmitterObject::ActSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
-{
-    if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
-        SetCharacterSize( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
-    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
-        SetCharacterSize( GetCharacterSize() + static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
-    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
-        SetCharacterSize( GetCharacterSize() - static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
-    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
-        SetCharacterSize( GetCharacterSize() * static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
-    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetCharacterSize( GetCharacterSize() / static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));
-
-    return true;
-}
-
-
-/**
  * Modify opacity
  */
-bool ParticuleEmitterObject::ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+bool ParticleEmitterObject::ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
         SetOpacity( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
@@ -92,7 +54,7 @@ bool ParticuleEmitterObject::ActOpacity( RuntimeScene & scene, ObjectsConcerned 
 /**
  * Change the color of the texte
  */
-bool ParticuleEmitterObject::ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+bool ParticleEmitterObject::ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     vector < string > colors = SpliterStringToVector <string> (action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), ';');
 
@@ -107,7 +69,7 @@ bool ParticuleEmitterObject::ActChangeColor( RuntimeScene & scene, ObjectsConcer
 /**
  * Modify angle
  */
-bool ParticuleEmitterObject::ActAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+bool ParticleEmitterObject::ActAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
         SetAngle( static_cast<int>(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this())));

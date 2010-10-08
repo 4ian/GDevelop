@@ -1,6 +1,6 @@
 /**
 
-Game Develop - Particule System Extension
+Game Develop - Particle System Extension
 Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
@@ -26,9 +26,9 @@ freely, subject to the following restrictions:
 
 #if defined(GDE)
 
-#include "ParticuleEmitterObjectEditor.h"
+#include "ParticleEmitterObjectEditor.h"
 
-//(*InternalHeaders(ParticuleEmitterObjectEditor)
+//(*InternalHeaders(ParticleEmitterObjectEditor)
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
@@ -36,33 +36,33 @@ freely, subject to the following restrictions:
 #include <wx/filedlg.h>
 
 #include "GDL/Game.h"
-#include "ParticuleEmitterObject.h"
+#include "ParticleEmitterObject.h"
 #include "GDL/MainEditorCommand.h"
 
-//(*IdInit(ParticuleEmitterObjectEditor)
-const long ParticuleEmitterObjectEditor::ID_TEXTCTRL1 = wxNewId();
-const long ParticuleEmitterObjectEditor::ID_STATICTEXT1 = wxNewId();
-const long ParticuleEmitterObjectEditor::ID_BUTTON3 = wxNewId();
-const long ParticuleEmitterObjectEditor::ID_STATICTEXT2 = wxNewId();
-const long ParticuleEmitterObjectEditor::ID_TEXTCTRL2 = wxNewId();
-const long ParticuleEmitterObjectEditor::ID_BUTTON4 = wxNewId();
-const long ParticuleEmitterObjectEditor::ID_STATICTEXT4 = wxNewId();
-const long ParticuleEmitterObjectEditor::ID_SPINCTRL1 = wxNewId();
-const long ParticuleEmitterObjectEditor::ID_STATICLINE1 = wxNewId();
-const long ParticuleEmitterObjectEditor::ID_BUTTON1 = wxNewId();
+//(*IdInit(ParticleEmitterObjectEditor)
+const long ParticleEmitterObjectEditor::ID_TEXTCTRL1 = wxNewId();
+const long ParticleEmitterObjectEditor::ID_STATICTEXT1 = wxNewId();
+const long ParticleEmitterObjectEditor::ID_BUTTON3 = wxNewId();
+const long ParticleEmitterObjectEditor::ID_STATICTEXT2 = wxNewId();
+const long ParticleEmitterObjectEditor::ID_TEXTCTRL2 = wxNewId();
+const long ParticleEmitterObjectEditor::ID_BUTTON4 = wxNewId();
+const long ParticleEmitterObjectEditor::ID_STATICTEXT4 = wxNewId();
+const long ParticleEmitterObjectEditor::ID_SPINCTRL1 = wxNewId();
+const long ParticleEmitterObjectEditor::ID_STATICLINE1 = wxNewId();
+const long ParticleEmitterObjectEditor::ID_BUTTON1 = wxNewId();
 //*)
 
-BEGIN_EVENT_TABLE(ParticuleEmitterObjectEditor,wxDialog)
-	//(*EventTable(ParticuleEmitterObjectEditor)
+BEGIN_EVENT_TABLE(ParticleEmitterObjectEditor,wxDialog)
+	//(*EventTable(ParticleEmitterObjectEditor)
 	//*)
 END_EVENT_TABLE()
 
-ParticuleEmitterObjectEditor::ParticuleEmitterObjectEditor( wxWindow* parent, Game & game_, ParticuleEmitterObject & object_, MainEditorCommand & mainEditorCommand_ ) :
+ParticleEmitterObjectEditor::ParticleEmitterObjectEditor( wxWindow* parent, Game & game_, ParticleEmitterObject & object_, MainEditorCommand & mainEditorCommand_ ) :
 game(game_),
 mainEditorCommand(mainEditorCommand_),
 object(object_)
 {
-	//(*Initialize(ParticuleEmitterObjectEditor)
+	//(*Initialize(ParticleEmitterObjectEditor)
 	wxStaticBoxSizer* StaticBoxSizer2;
 	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer3;
@@ -113,34 +113,28 @@ object(object_)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
-	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ParticuleEmitterObjectEditor::OncolorBtClick);
-	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ParticuleEmitterObjectEditor::OnfontBtClick);
-	Connect(ID_SPINCTRL1,wxEVT_COMMAND_SPINCTRL_UPDATED,(wxObjectEventFunction)&ParticuleEmitterObjectEditor::OnSizeEditChange);
-	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ParticuleEmitterObjectEditor::OnokBtClick);
+	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OncolorBtClick);
+	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnfontBtClick);
+	Connect(ID_SPINCTRL1,wxEVT_COMMAND_SPINCTRL_UPDATED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnSizeEditChange);
+	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnokBtClick);
 	//*)
 
-	textEdit->ChangeValue(object.GetString());
-	fontEdit->ChangeValue(object.GetFont());
-	sizeEdit->SetValue(object.GetCharacterSize());
 	colorBt->SetBackgroundColour(wxColour(object.GetColorR(), object.GetColorG(), object.GetColorB()));
 }
 
-ParticuleEmitterObjectEditor::~ParticuleEmitterObjectEditor()
+ParticleEmitterObjectEditor::~ParticleEmitterObjectEditor()
 {
-	//(*Destroy(ParticuleEmitterObjectEditor)
+	//(*Destroy(ParticleEmitterObjectEditor)
 	//*)
 }
 
 
-void ParticuleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
+void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-    object.SetString(string(textEdit->GetValue().mb_str()));
-    object.SetFont(string(fontEdit->GetValue().mb_str()));
-
     EndModal(1);
 }
 
-void ParticuleEmitterObjectEditor::OncolorBtClick(wxCommandEvent& event)
+void ParticleEmitterObjectEditor::OncolorBtClick(wxCommandEvent& event)
 {
     wxColour color = wxGetColourFromUser(this, colorBt->GetBackgroundColour());
     if ( color.IsOk() )
@@ -151,19 +145,11 @@ void ParticuleEmitterObjectEditor::OncolorBtClick(wxCommandEvent& event)
     return;
 }
 
-void ParticuleEmitterObjectEditor::OnfontBtClick(wxCommandEvent& event)
+void ParticleEmitterObjectEditor::OnfontBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Choisissez une police de caractère ( fichiers ttf, ttc )"), "", "", "Polices (*.ttf, *.ttc)|*.ttf;*.ttc");
-    dialog.ShowModal();
-
-    if ( dialog.GetPath() != "" )
-    {
-        fontEdit->ChangeValue(dialog.GetPath());
-    }
 }
 
-void ParticuleEmitterObjectEditor::OnSizeEditChange(wxSpinEvent& event)
+void ParticleEmitterObjectEditor::OnSizeEditChange(wxSpinEvent& event)
 {
-    object.SetCharacterSize(sizeEdit->GetValue());
 }
 #endif

@@ -132,14 +132,51 @@ class ParticleEmitterObject : public Object
         //Action for color
         bool ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
+        void SetRendererParam1(float newValue) { rendererParam1 = newValue; };
+        void SetRendererParam2(float newValue) { rendererParam2 = newValue; };
+        void SetTank(float newValue);
+        void SetFlow(float newValue);
+        void SetEmitterForceMin(float newValue);
+        void SetEmitterForceMax(float newValue);
+        void SetParticleGravityX(float newValue);
+        void SetParticleGravityY(float newValue);
+        void SetParticleGravityZ(float newValue);
+        void SetFriction(float newValue);
+
+        float GetRendererParam1() const { return rendererParam1; };
+        float GetRendererParam2() const { return rendererParam2; };
+        float GetTank() const { return tank; };
+        float GetFlow() const { return flow; };
+        float GetEmitterForceMin() const { return emitterForceMin; };
+        float GetEmitterForceMax() const { return emitterForceMax; };
+        float GetParticleGravityX() const { return particleGravityX; };
+        float GetParticleGravityY() const { return particleGravityY; };
+        float GetParticleGravityZ() const { return particleGravityZ; };
+        float GetFriction() const { return friction; };
+
+        enum RendererType {Point, Line, Quad};
+        void SetRendererType(RendererType type) { rendererType = type; };
+        RendererType GetRendererType() const { return rendererType; };
+
     private:
 
         SPK::SPK_ID CreateBaseParticleSystem();
 
         SPK::SPK_ID baseParticleSystemID;
-        SPK::SFML::SFMLSystem* particleSystem;
+        SPK::SFML::SFMLSystem * particleSystem;
+        SPK::Emitter * emitter;
+        SPK::Group * group;
+
         sf::Image textureParticle;
-        enum RendererType {Point, Line, Quad} rendererType;
+        RendererType rendererType;
+        float rendererParam1;
+        float rendererParam2;
+        float tank;
+        float flow;
+        float emitterForceMin;
+        float emitterForceMax;
+        float particleGravityX,particleGravityY,particleGravityZ;
+        float friction;
 
         //Opacity
         float opacity;

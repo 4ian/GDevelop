@@ -31,6 +31,7 @@ freely, subject to the following restrictions:
 #include "GDL/tinyxml.h"
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
+#include "GDL/XmlMacros.h"
 #include "ParticleEmitterObject.h"
 
 #ifdef GDE
@@ -47,7 +48,19 @@ ParticleEmitterObject::ParticleEmitterObject(std::string name_) :
 Object(name_),
 baseParticleSystemID(SPK::NO_ID),
 particleSystem(NULL),
+emitter(NULL),
+group(NULL),
 rendererType(Point),
+rendererParam1(1.0f),
+rendererParam2(1.0f),
+tank(-1),
+flow(300),
+emitterForceMin(70.0f),
+emitterForceMax(170.0f),
+particleGravityX(0.0f),
+particleGravityY(0.0f),
+particleGravityZ(100.0f),
+friction(2.0f),
 opacity( 255 ),
 colorR( 255 ),
 colorG( 255 ),
@@ -67,36 +80,39 @@ angle(0)
     }
 }
 
-void ParticleEmitterObject::LoadFromXml(const TiXmlElement * object)
+void ParticleEmitterObject::LoadFromXml(const TiXmlElement * elem)
 {
-    if ( object->FirstChildElement( "Color" ) == NULL ||
-         object->FirstChildElement( "Color" )->Attribute("r") == NULL ||
-         object->FirstChildElement( "Color" )->Attribute("g") == NULL ||
-         object->FirstChildElement( "Color" )->Attribute("b") == NULL )
-    {
-        cout << "Les informations concernant la couleur du texte d'un objet Text manquent.";
-    }
-    else
-    {
-        int r = 255;
-        int g = 255;
-        int b = 255;
-        object->FirstChildElement("Color")->QueryIntAttribute("r", &r);
-        object->FirstChildElement("Color")->QueryIntAttribute("g", &g);
-        object->FirstChildElement("Color")->QueryIntAttribute("b", &b);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("tank", tank);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("flow", flow);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("emitterForceMin", emitterForceMin);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("emitterForceMax", emitterForceMax);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleGravityX", particleGravityX);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleGravityY", particleGravityY);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleGravityZ", particleGravityZ);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("friction", friction);
 
-        SetColor(r,g,b);
-    }
+    int r,g,b;
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorR", r);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorG", g);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorB", b);
+    colorR = r; colorG = g; colorB = b;
 }
 
 #if defined(GDE)
-void ParticleEmitterObject::SaveToXml(TiXmlElement * object)
+void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
 {
-    TiXmlElement * color = new TiXmlElement( "Color" );
-    object->LinkEndChild( color );
-    color->SetAttribute("r", GetColorR());
-    color->SetAttribute("g", GetColorG());
-    color->SetAttribute("b", GetColorB());
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("tank", tank);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("flow", flow);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("emitterForceMin", emitterForceMin);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("emitterForceMax", emitterForceMax);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleGravityX", particleGravityX);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleGravityY", particleGravityY);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleGravityZ", particleGravityZ);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("friction", friction);
+
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorR", colorR);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorG", colorG);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorB", colorB);
 }
 #endif
 
@@ -117,35 +133,35 @@ SPK::SPK_ID ParticleEmitterObject::CreateBaseParticleSystem()
 	SPK::SFML::SFMLRenderer * renderer = NULL;
 	if ( rendererType == Line )
 	{
-	    renderer = SPK::SFML::SFMLLineRenderer::create(0.15f,2.0f);
+	    renderer = SPK::SFML::SFMLLineRenderer::create(rendererParam1,rendererParam2);
 	}
 	else
 	{
-	    renderer = SPK::SFML::SFMLPointRenderer::create(1.5f);
+	    renderer = SPK::SFML::SFMLPointRenderer::create(rendererParam1);
 	}
 	renderer->setGroundCulling(true);
 	renderer->setBlendMode(sf::Blend::Add);
 
 	// Creates the zone
-	SPK::Sphere* sparkSource = SPK::Sphere::create(SPK::Vector3D(0.0f,0.0f,10.0f),5.0f);
+	SPK::Sphere* sparkSource = SPK::Sphere::create(SPK::Vector3D(0.0f,0.0f,0.0f),5.0f);
 
 	// Creates the emitter
-	SPK::SphericEmitter* emitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,0.0f,1.0f),3.14159f / 4.0f,3.0f * 3.14159f / 4.0f);
-	emitter->setForce(70.0f,190.0f);
+	emitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,0.0f,1.0f),3.14159f / 4.0f,3.0f * 3.14159f / 4.0f);
+	emitter->setForce(emitterForceMin,emitterForceMax);
 	emitter->setZone(sparkSource);
-	emitter->setTank(-1);
-	emitter->setFlow(300);
+	emitter->setTank(tank);
+	emitter->setFlow(flow);
 
 	// Creates the Group
-	SPK::Group* sparkGroup = SPK::Group::create(sparkModel);
-	sparkGroup->setRenderer(renderer);
-	sparkGroup->addEmitter(emitter);
-	sparkGroup->setGravity(SPK::Vector3D(0.0f,0.0f,100.0f));
-	sparkGroup->setFriction(2.0f);
+	group = SPK::Group::create(sparkModel);
+	group->setRenderer(renderer);
+	group->addEmitter(emitter);
+	group->setGravity(SPK::Vector3D(particleGravityX,particleGravityY,particleGravityZ));
+	group->setFriction(friction);
 
 	// Creates the System
 	SPK::SFML::SFMLSystem* sparkSystem = SPK::SFML::SFMLSystem::create();
-	sparkSystem->addGroup(sparkGroup);
+	sparkSystem->addGroup(group);
 
 	// Defines which objects will be shared by all systems
 	sparkModel->setShared(true);
@@ -291,6 +307,47 @@ unsigned int ParticleEmitterObject::GetNumberOfProperties() const
     return 3;
 }
 #endif
+
+void ParticleEmitterObject::SetTank(float newValue)
+{
+    tank = newValue;
+    if ( emitter ) emitter->setFlow(tank);
+}
+void ParticleEmitterObject::SetFlow(float newValue)
+{
+    flow = newValue;
+    if ( emitter ) emitter->setFlow(flow);
+}
+void ParticleEmitterObject::SetEmitterForceMin(float newValue)
+{
+    emitterForceMin = newValue;
+    if ( emitter ) emitter->setForce(emitterForceMin, emitterForceMax);
+}
+void ParticleEmitterObject::SetEmitterForceMax(float newValue)
+{
+    emitterForceMax = newValue;
+    if ( emitter ) emitter->setForce(emitterForceMin, emitterForceMax);
+}
+void ParticleEmitterObject::SetParticleGravityX(float newValue)
+{
+    particleGravityX = newValue;
+    if ( group ) group->setGravity(SPK::Vector3D(particleGravityX,particleGravityY,particleGravityZ));
+}
+void ParticleEmitterObject::SetParticleGravityY(float newValue)
+{
+    particleGravityY = newValue;
+    if ( group ) group->setGravity(SPK::Vector3D(particleGravityX,particleGravityY,particleGravityZ));
+}
+void ParticleEmitterObject::SetParticleGravityZ(float newValue)
+{
+    particleGravityZ = newValue;
+    if ( group ) group->setGravity(SPK::Vector3D(particleGravityX,particleGravityY,particleGravityZ));
+}
+void ParticleEmitterObject::SetFriction(float newValue)
+{
+    friction = newValue;
+    if ( group ) group->setFriction(friction);
+}
 
 void ParticleEmitterObject::OnPositionChanged()
 {

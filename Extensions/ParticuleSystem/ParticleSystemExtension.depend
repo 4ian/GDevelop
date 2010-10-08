@@ -1,1 +1,34 @@
 # depslib dependency file v1.0
+1264364232 source:d:\florian\programmation\gamedevelop\gdl\gdl\tinystr.cpp
+	"GDL/tinystr.h"
+
+1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\tinystr.h
+	<assert.h>
+	<string.h>
+
+1264364232 source:d:\florian\programmation\gamedevelop\gdl\gdl\tinyxml.cpp
+	<ctype.h>
+	<sstream>
+	<iostream>
+	"GDL/tinyxml.h"
+
+1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\tinyxml.h
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<string>
+	<iostream>
+	<sstream>
+	"GDL/tinystr.h"
+
+1264364232 source:d:\florian\programmation\gamedevelop\gdl\gdl\tinyxmlerror.cpp
+	"GDL/tinyxml.h"
+
+1269379494 source:d:\florian\programmation\gamedevelop\gdl\gdl\tinyxmlparser.cpp
+	<ctype.h>
+	<stddef.h>
+	"GDL/tinyxml.h"
+	<windows.h>
+

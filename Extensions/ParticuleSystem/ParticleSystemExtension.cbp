@@ -2,12 +2,12 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="ParticuleSystem" />
+		<Option title="ParticleSystem" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="..\..\Runtime\bin\debug\ParticuleSystem.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\ParticleSystem.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -36,7 +36,7 @@
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\ParticuleSystem.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\Extensions\ParticleSystem.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -108,7 +108,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="..\..\Runtime\bin\release\ParticuleSystem.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\ParticleSystem.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -137,7 +137,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\ParticuleSystem.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\Extensions\ParticleSystem.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -204,7 +204,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development">
-				<Option output="..\..\Runtime\bin\dev\ParticuleSystem.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\dev\ParticleSystem.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -233,7 +233,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
-				<Option output="..\..\IDE\bin\dev\Extensions\ParticuleSystem.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\dev\Extensions\ParticleSystem.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -305,7 +305,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
-				<Option output="..\..\Runtime\bin\release\ParticuleSystem.xgdl" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\ParticleSystem.xgdl" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -344,7 +344,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\ParticuleSystem.xgdle" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\Extensions\ParticleSystem.xgdle" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -387,7 +387,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\ParticuleSystem.xgdle" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\Extensions\ParticleSystem.xgdle" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -437,15 +437,15 @@
 			<Add directory="C:\Libs\SFML\lib\mingw" />
 		</Linker>
 		<Unit filename="Extension.cpp" />
-		<Unit filename="ParticuleEmitterActions.cpp" />
-		<Unit filename="ParticuleEmitterConditions.cpp" />
-		<Unit filename="ParticuleEmitterExpressions.cpp" />
-		<Unit filename="ParticuleEmitterInitialPositionPanel.cpp" />
-		<Unit filename="ParticuleEmitterInitialPositionPanel.h" />
-		<Unit filename="ParticuleEmitterObject.cpp" />
-		<Unit filename="ParticuleEmitterObject.h" />
-		<Unit filename="ParticuleEmitterObjectEditor.cpp" />
-		<Unit filename="ParticuleEmitterObjectEditor.h" />
+		<Unit filename="ParticleEmitterActions.cpp" />
+		<Unit filename="ParticleEmitterConditions.cpp" />
+		<Unit filename="ParticleEmitterExpressions.cpp" />
+		<Unit filename="ParticleEmitterInitialPositionPanel.cpp" />
+		<Unit filename="ParticleEmitterInitialPositionPanel.h" />
+		<Unit filename="ParticleEmitterObject.cpp" />
+		<Unit filename="ParticleEmitterObject.h" />
+		<Unit filename="ParticleEmitterObjectEditor.cpp" />
+		<Unit filename="ParticleEmitterObjectEditor.h" />
 		<Unit filename="..\..\GDL\GDL\tinystr.cpp" />
 		<Unit filename="..\..\GDL\GDL\tinystr.h" />
 		<Unit filename="..\..\GDL\GDL\tinyxml.cpp" />
@@ -459,7 +459,7 @@
 			<lib_finder disable_auto="1" />
 			<wxsmith version="1">
 				<resources>
-					<wxDialog wxs="wxsmith/ParticuleEmitterObjectEditor.wxs" src="ParticuleEmitterObjectEditor.cpp" hdr="ParticuleEmitterObjectEditor.h" name="ParticuleEmitterObjectEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/ParticleEmitterObjectEditor.wxs" src="ParticleEmitterObjectEditor.cpp" hdr="ParticleEmitterObjectEditor.h" name="ParticleEmitterObjectEditor" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

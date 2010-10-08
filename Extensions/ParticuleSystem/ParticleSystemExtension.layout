@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="Extension.cpp" open="1" top="1" tabpos="6">
+	<File name="Extension.cpp" open="1" top="1" tabpos="4">
 		<Cursor position="1933" topLine="31" />
 	</File>
 	<File name="ParticuleEmitterActions.cpp" open="1" top="0" tabpos="7">

@@ -919,6 +919,8 @@ void SceneCanvas::OnDelObjetSelected(wxCommandEvent & event)
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnMiddleDown( wxMouseEvent &event )
 {
+    if ( !scene.editing ) return;
+
     if ( !scene.isMoving )
     {
         scene.isMoving = true;

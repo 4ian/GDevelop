@@ -115,7 +115,7 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
     Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
     FlexGridSizer18 = new wxFlexGridSizer(0, 3, 0, 0);
-    StaticBitmap5 = new wxStaticBitmap(Panel1, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/paraJeu.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP5"));
+    StaticBitmap5 = new wxStaticBitmap(Panel1, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/paraJeu.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
     FlexGridSizer18->Add(StaticBitmap5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText6 = new wxStaticText(Panel1, ID_STATICTEXT6, _("Vous pouvez régler les principaux paramètres de votre jeu,\nainsi que les écrans annexes, comme celui du chargement."), wxDefaultPosition, wxSize(371,32), 0, _T("ID_STATICTEXT6"));
     FlexGridSizer18->Add(StaticText6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -154,7 +154,7 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
     HeightEdit = new wxTextCtrl(Panel2, ID_TEXTCTRL4, wxEmptyString, wxDefaultPosition, wxSize(35,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
     HeightEdit->SetToolTip(_("Hauteur de la fenêtre de jeu.\nGénéralement, 480, 600 ( Défaut ) ou 768."));
     FlexGridSizer4->Add(HeightEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBitmap1 = new wxStaticBitmap(Panel2, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/ok.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP1"));
+    StaticBitmap1 = new wxStaticBitmap(Panel2, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/ok.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
     FlexGridSizer4->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer19 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -194,7 +194,7 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
     FlexGridSizer16->Add(StaticText11, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     heightECEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL12, wxEmptyString, wxDefaultPosition, wxSize(34,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL12"));
     FlexGridSizer16->Add(heightECEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBitmap2 = new wxStaticBitmap(Panel3, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/ok.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP2"));
+    StaticBitmap2 = new wxStaticBitmap(Panel3, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/ok.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
     FlexGridSizer16->Add(StaticBitmap2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer13->Add(FlexGridSizer16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer7->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -217,7 +217,7 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
     FlexGridSizer9->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     texteYPosEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL7, _("0"), wxDefaultPosition, wxSize(35,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
     FlexGridSizer9->Add(texteYPosEdit, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBitmap3 = new wxStaticBitmap(Panel3, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/ok.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP3"));
+    StaticBitmap3 = new wxStaticBitmap(Panel3, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/ok.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
     FlexGridSizer9->Add(StaticBitmap3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer10 = new wxFlexGridSizer(0, 7, 0, 0);
@@ -236,7 +236,7 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
     pourcentYPosEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL10, _("0"), wxDefaultPosition, wxSize(35,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL10"));
     pourcentYPosEdit->Disable();
     FlexGridSizer10->Add(pourcentYPosEdit, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBitmap4 = new wxStaticBitmap(Panel3, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/ok.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP4"));
+    StaticBitmap4 = new wxStaticBitmap(Panel3, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/ok.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP4"));
     FlexGridSizer10->Add(StaticBitmap4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);

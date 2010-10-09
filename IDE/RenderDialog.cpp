@@ -20,7 +20,7 @@ RenderDialog::RenderDialog(wxWindow* parent)
 {
 	//(*Initialize(RenderDialog)
 	wxFlexGridSizer* FlexGridSizer1;
-
+	
 	Create(parent, wxID_ANY, _("Aperçu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	renderCanvas = new wxSFMLCanvas(this,ID_CUSTOM1,wxDefaultPosition,wxSize(800,600),wxWANTS_CHARS | wxNO_BORDER);
@@ -28,7 +28,7 @@ RenderDialog::RenderDialog(wxWindow* parent)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-
+	
 	Connect(wxEVT_SIZE,(wxObjectEventFunction)&RenderDialog::OnResize);
 	//*)
 }

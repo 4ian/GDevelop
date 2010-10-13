@@ -143,6 +143,23 @@ class ParticleEmitterObject : public Object
         void SetParticleGravityZ(float newValue);
         void SetFriction(float newValue);
 
+        enum ParticleParameterType {Nothing, Enabled, Mutable, Random};
+        void SetRedParameterType(ParticleParameterType type) { redParam = type; };
+        void SetGreenParameterType(ParticleParameterType type) { greenParam = type; };
+        void SetBlueParameterType(ParticleParameterType type) { blueParam = type; };
+        void SetAlphaParameterType(ParticleParameterType type) { alphaParam = type; };
+
+        void SetParticleRed1(float newValue) { particleRed1= newValue; };
+        void SetParticleRed2(float newValue) { particleRed2= newValue; };
+        void SetParticleGreen1(float newValue) { particleGreen1= newValue; };
+        void SetParticleGreen2(float newValue) { particleGreen2= newValue; };
+        void SetParticleBlue1(float newValue) { particleBlue1= newValue; };
+        void SetParticleBlue2(float newValue) { particleBlue2= newValue; };
+        void SetParticleAlpha1(float newValue) { particleAlpha1= newValue; };
+        void SetParticleAlpha2(float newValue) { particleAlpha2= newValue; };
+        void SetParticleLifeTimeMin(float newValue) { particleLifeTimeMin= newValue; };
+        void SetParticleLifeTimeMax(float newValue) { particleLifeTimeMax= newValue; };
+
         float GetRendererParam1() const { return rendererParam1; };
         float GetRendererParam2() const { return rendererParam2; };
         float GetTank() const { return tank; };
@@ -153,10 +170,33 @@ class ParticleEmitterObject : public Object
         float GetParticleGravityY() const { return particleGravityY; };
         float GetParticleGravityZ() const { return particleGravityZ; };
         float GetFriction() const { return friction; };
+        float GetParticleLifeTimeMin() const { return particleLifeTimeMin; };
+        float GetParticleLifeTimeMax() const { return particleLifeTimeMax; };
+
+        ParticleParameterType GetRedParameterType() const { return redParam; };
+        ParticleParameterType GetGreenParameterType() const { return greenParam; };
+        ParticleParameterType GetBlueParameterType() const { return blueParam; };
+        ParticleParameterType GetAlphaParameterType() const { return alphaParam; };
+
+        float GetParticleRed1() const { return particleRed1; };
+        float GetParticleRed2() const { return particleRed2; };
+        float GetParticleGreen1() const { return particleGreen1; };
+        float GetParticleGreen2() const { return particleGreen2; };
+        float GetParticleBlue1() const { return particleBlue1; };
+        float GetParticleBlue2() const { return particleBlue2; };
+        float GetParticleAlpha1() const { return particleAlpha1; };
+        float GetParticleAlpha2() const { return particleAlpha2; };
 
         enum RendererType {Point, Line, Quad};
         void SetRendererType(RendererType type) { rendererType = type; };
         RendererType GetRendererType() const { return rendererType; };
+
+        bool IsRenderingAdditive() { return additive; };
+        void SetRenderingAdditive() { additive = true;};
+        void SetRenderingAlpha() { additive = false;};
+
+        void SetParticleTexture(std::string imageName) { textureParticleName = imageName; };
+        std::string GetParticleTexture() const { return textureParticleName; };
 
     private:
 
@@ -164,19 +204,25 @@ class ParticleEmitterObject : public Object
 
         SPK::SPK_ID baseParticleSystemID;
         SPK::SFML::SFMLSystem * particleSystem;
+        SPK::Model * particleModel;
         SPK::Emitter * emitter;
         SPK::Group * group;
 
-        sf::Image textureParticle;
+        std::string textureParticleName;
+        boost::shared_ptr<sf::Image> textureParticle;
         RendererType rendererType;
         float rendererParam1;
         float rendererParam2;
+        bool additive;
         float tank;
         float flow;
         float emitterForceMin;
         float emitterForceMax;
         float particleGravityX,particleGravityY,particleGravityZ;
         float friction;
+        float particleLifeTimeMin, particleLifeTimeMax;
+        ParticleParameterType redParam, greenParam, blueParam, alphaParam;
+        float particleRed1, particleRed2, particleGreen1, particleGreen2, particleBlue1, particleBlue2, particleAlpha1, particleAlpha2;
 
         //Opacity
         float opacity;

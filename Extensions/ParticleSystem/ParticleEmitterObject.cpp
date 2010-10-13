@@ -33,6 +33,7 @@ freely, subject to the following restrictions:
 #include "GDL/Position.h"
 #include "GDL/XmlMacros.h"
 #include "ParticleEmitterObject.h"
+#include <SPK_GL.h>
 
 #ifdef GDE
 #include <wx/wx.h>
@@ -48,11 +49,13 @@ ParticleEmitterObject::ParticleEmitterObject(std::string name_) :
 Object(name_),
 baseParticleSystemID(SPK::NO_ID),
 particleSystem(NULL),
+particleModel(NULL),
 emitter(NULL),
 group(NULL),
 rendererType(Point),
 rendererParam1(1.0f),
 rendererParam2(1.0f),
+additive(true),
 tank(-1),
 flow(300),
 emitterForceMin(70.0f),
@@ -61,6 +64,20 @@ particleGravityX(0.0f),
 particleGravityY(0.0f),
 particleGravityZ(100.0f),
 friction(2.0f),
+particleLifeTimeMin(0.5f),
+particleLifeTimeMax(2.5f),
+redParam(Enabled),
+greenParam(Random),
+blueParam(Random),
+alphaParam(Mutable),
+particleRed1(1.0f),
+particleRed2(1.0f),
+particleGreen1(0.2f),
+particleGreen2(0.8f),
+particleBlue1(0.2f),
+particleBlue2(0.0f),
+particleAlpha1(0.8f),
+particleAlpha2(0.0f),
 opacity( 255 ),
 colorR( 255 ),
 colorG( 255 ),
@@ -74,7 +91,7 @@ angle(0)
         SPK::System::useAdaptiveStep(0.001f,0.01f);		// use an adaptive step from 1ms to 10ms (1000fps to 100fps)
 
         SPK::SFML::SFMLRenderer::setZFactor(1.0f);
-        SPK::SFML::setCameraPosition(SPK::SFML::CAMERA_CENTER,SPK::SFML::CAMERA_BOTTOM,static_cast<float>(1440),0.0f);
+        SPK::SFML::setCameraPosition(SPK::SFML::CAMERA_CENTER,SPK::SFML::CAMERA_BOTTOM,static_cast<float>(800),0.0f);
 
         SPKinitialized = true;
     }
@@ -90,6 +107,54 @@ void ParticleEmitterObject::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleGravityY", particleGravityY);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleGravityZ", particleGravityZ);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("friction", friction);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleLifeTimeMin", particleLifeTimeMin);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleLifeTimeMax", particleLifeTimeMax);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleRed1", particleRed1);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleRed2", particleRed2);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleGreen1", particleGreen1);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleGreen2", particleGreen2);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleBlue1", particleBlue1);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleBlue2", particleBlue2);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleAlpha1", particleAlpha1);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleAlpha2", particleAlpha2);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("additive", additive);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("textureParticleName", textureParticleName);
+
+    {
+        std::string result;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("rendererType", result);
+        if ( result == "Line") rendererType = Line;
+        else if ( result == "Quad") rendererType = Quad;
+        else rendererType = Point;
+    }
+    {
+        std::string result;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("redParam", result);
+        if ( result == "Mutable") redParam = Mutable;
+        else if ( result == "Random") redParam = Random;
+        else redParam = Enabled;
+    }
+    {
+        std::string result;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("greenParam", result);
+        if ( result == "Mutable") greenParam = Mutable;
+        else if ( result == "Random") greenParam = Random;
+        else greenParam = Enabled;
+    }
+    {
+        std::string result;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("blueParam", result);
+        if ( result == "Mutable") blueParam = Mutable;
+        else if ( result == "Random") blueParam = Random;
+        else blueParam = Enabled;
+    }
+    {
+        std::string result;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("alphaParam", result);
+        if ( result == "Mutable") alphaParam = Mutable;
+        else if ( result == "Random") alphaParam = Random;
+        else alphaParam = Enabled;
+    }
 
     int r,g,b;
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorR", r);
@@ -109,6 +174,43 @@ void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleGravityY", particleGravityY);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleGravityZ", particleGravityZ);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("friction", friction);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleLifeTimeMin", particleLifeTimeMin);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleLifeTimeMax", particleLifeTimeMax);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleRed1", particleRed1);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleRed2", particleRed2);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleGreen1", particleGreen1);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleGreen2", particleGreen2);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleBlue1", particleBlue1);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleBlue2", particleBlue2);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleAlpha1", particleAlpha1);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleAlpha2", particleAlpha2);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("additive", additive);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("textureParticleName", textureParticleName);
+
+    std::string rendererTypeStr = "Point";
+    if ( rendererType == Line ) rendererTypeStr = "Line";
+    else if ( rendererType == Quad ) rendererTypeStr = "Quad";
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("rendererType", rendererTypeStr);
+
+    std::string redParamStr = "Enabled";
+    if ( redParam == Mutable ) redParamStr = "Mutable";
+    else if ( redParam == Random ) redParamStr = "Random";
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("redParam", redParamStr);
+
+    std::string greenParamStr = "Enabled";
+    if ( greenParam == Mutable ) greenParamStr = "Mutable";
+    else if ( greenParam == Random ) greenParamStr = "Random";
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("greenParam", greenParamStr);
+
+    std::string blueParamStr = "Enabled";
+    if ( blueParam == Mutable ) blueParamStr = "Mutable";
+    else if ( blueParam == Random ) blueParamStr = "Random";
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("blueParam", blueParamStr);
+
+    std::string alphaParamStr = "Enabled";
+    if ( alphaParam == Mutable ) alphaParamStr = "Mutable";
+    else if ( alphaParam == Random ) alphaParamStr = "Random";
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("alphaParam", alphaParamStr);
 
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorR", colorR);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorG", colorG);
@@ -119,28 +221,86 @@ void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
 // creates and register the base system
 SPK::SPK_ID ParticleEmitterObject::CreateBaseParticleSystem()
 {
+    int enabledFlag = 0;
+    int mutableFlag = 0;
+    int randomFlag = 0;
+
+    if ( redParam == Enabled ) enabledFlag |= SPK::FLAG_RED;
+    else if ( redParam == Mutable )
+    {
+        enabledFlag |= SPK::FLAG_RED; mutableFlag |= SPK::FLAG_RED;
+    }
+    else if ( redParam == Random )
+    {
+        enabledFlag |= SPK::FLAG_RED; randomFlag |= SPK::FLAG_RED;
+    }
+
+    if ( greenParam == Enabled ) enabledFlag |= SPK::FLAG_RED;
+    else if ( greenParam == Mutable )
+    {
+        enabledFlag |= SPK::FLAG_GREEN; mutableFlag |= SPK::FLAG_GREEN;
+    }
+    else if ( greenParam == Random )
+    {
+        enabledFlag |= SPK::FLAG_GREEN; randomFlag |= SPK::FLAG_GREEN;
+    }
+
+    if ( blueParam == Enabled ) enabledFlag |= SPK::FLAG_BLUE;
+    else if ( blueParam == Mutable )
+    {
+        enabledFlag |= SPK::FLAG_BLUE; mutableFlag |= SPK::FLAG_BLUE;
+    }
+    else if ( blueParam == Random )
+    {
+        enabledFlag |= SPK::FLAG_BLUE; randomFlag |= SPK::FLAG_BLUE;
+    }
+
+    if ( alphaParam == Enabled ) enabledFlag |= SPK::FLAG_ALPHA;
+    else if ( alphaParam == Mutable )
+    {
+        enabledFlag |= SPK::FLAG_ALPHA; mutableFlag |= SPK::FLAG_ALPHA;
+    }
+    else if ( alphaParam == Random )
+    {
+        enabledFlag |= SPK::FLAG_ALPHA; randomFlag |= SPK::FLAG_ALPHA;
+    }
+    if ( rendererType == Quad) enabledFlag |= SPK::PARAM_TEXTURE_INDEX;
+
 	// Creates the model
-	SPK::Model* sparkModel = SPK::Model::create(SPK::FLAG_RED | SPK::FLAG_GREEN | SPK::FLAG_BLUE | SPK::FLAG_ALPHA,
-		SPK::FLAG_ALPHA,
-		SPK::FLAG_GREEN | SPK::FLAG_BLUE);
-	sparkModel->setParam(SPK::PARAM_RED,1.0f);
-	sparkModel->setParam(SPK::PARAM_BLUE,0.0f,0.2f);
-	sparkModel->setParam(SPK::PARAM_GREEN,0.2f,1.0f);
-	sparkModel->setParam(SPK::PARAM_ALPHA,0.8f,0.0f);
-	sparkModel->setLifeTime(0.6f,3.6f);
+	particleModel = SPK::Model::create( enabledFlag, mutableFlag, randomFlag );
+	if ( redParam == Mutable || redParam == Random ) particleModel->setParam(SPK::PARAM_RED, particleRed1,particleRed2);
+	else particleModel->setParam(SPK::PARAM_RED, particleRed1);
+
+	if ( greenParam == Mutable || greenParam == Random ) particleModel->setParam(SPK::PARAM_GREEN, particleGreen1,particleGreen2);
+	else particleModel->setParam(SPK::PARAM_GREEN, particleGreen1);
+
+	if ( blueParam == Mutable || blueParam == Random ) particleModel->setParam(SPK::PARAM_BLUE, particleBlue1,particleBlue2);
+	else particleModel->setParam(SPK::PARAM_BLUE, particleBlue1);
+
+	if ( alphaParam == Mutable || alphaParam == Random ) particleModel->setParam(SPK::PARAM_ALPHA, particleAlpha1,particleAlpha2);
+	else particleModel->setParam(SPK::PARAM_ALPHA, particleAlpha1);
+
+	particleModel->setLifeTime(particleLifeTimeMin,particleLifeTimeMax);
+	particleModel->setParam(SPK::PARAM_TEXTURE_INDEX, 0.0f);
 
 	// Creates the renderer
 	SPK::SFML::SFMLRenderer * renderer = NULL;
 	if ( rendererType == Line )
-	{
 	    renderer = SPK::SFML::SFMLLineRenderer::create(rendererParam1,rendererParam2);
+	else if ( rendererType == Quad)
+	{
+	    cout << "Quad" << textureParticle.get();
+	    SPK::SFML::SFMLQuadRenderer * smokeRenderer = SPK::SFML::SFMLQuadRenderer::create(textureParticle.get(), rendererParam1,rendererParam2);
+        smokeRenderer->setScale(087.5f,087.5f); // optim
+
+        renderer = smokeRenderer;
 	}
 	else
 	{
 	    renderer = SPK::SFML::SFMLPointRenderer::create(rendererParam1);
 	}
 	renderer->setGroundCulling(true);
-	renderer->setBlendMode(sf::Blend::Add);
+	renderer->setBlendMode(additive ? sf::Blend::Add : sf::Blend::Alpha);
 
 	// Creates the zone
 	SPK::Sphere* sparkSource = SPK::Sphere::create(SPK::Vector3D(0.0f,0.0f,0.0f),5.0f);
@@ -153,18 +313,22 @@ SPK::SPK_ID ParticleEmitterObject::CreateBaseParticleSystem()
 	emitter->setFlow(flow);
 
 	// Creates the Group
-	group = SPK::Group::create(sparkModel);
+	group = SPK::Group::create(particleModel);
 	group->setRenderer(renderer);
 	group->addEmitter(emitter);
 	group->setGravity(SPK::Vector3D(particleGravityX,particleGravityY,particleGravityZ));
 	group->setFriction(friction);
+	if ( rendererType == Quad )
+	{
+        //group->enableSorting(true);
+	}
 
 	// Creates the System
 	SPK::SFML::SFMLSystem* sparkSystem = SPK::SFML::SFMLSystem::create();
 	sparkSystem->addGroup(group);
 
 	// Defines which objects will be shared by all systems
-	sparkModel->setShared(true);
+	particleModel->setShared(true);
 	renderer->setShared(true);
 
 	// Creates the base and gets the ID
@@ -174,8 +338,7 @@ SPK::SPK_ID ParticleEmitterObject::CreateBaseParticleSystem()
 bool ParticleEmitterObject::LoadRuntimeResources(const ImageManager & imageMgr )
 {
 	// Loads particle texture
-	if (!textureParticle.LoadFromFile("D:/Florian/Programmation/GameDevelop/Extensions/ParticleSystem/SPARK/demos/bin/res/flare.png"))
-		cout << "loading error2";
+	textureParticle = imageMgr.GetImage(textureParticleName);
 
 	baseParticleSystemID = CreateBaseParticleSystem();
     particleSystem = SPK_Copy(SPK::SFML::SFMLSystem, baseParticleSystemID);
@@ -215,9 +378,57 @@ bool ParticleEmitterObject::Draw( sf::RenderWindow& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
+    /*sf::View originalView = window.GetView();
     window.RestoreGLStates();
+    glLoadIdentity();
+    float windowRatio = static_cast<float>(window.GetView().GetSize().x)/static_cast<float>(window.GetView().GetSize().y);
+    float sizeRatio =   0.3330 //To make base have the same size as a rectangle drawn by SFML
+                        *1/window.GetView().GetSize().y*600.f; //To make size window's size independant
+
+    //Get the position of the box
+    float x = GetX();
+    float y = GetY();
+
+    glRotatef(-window.GetView().GetRotation(), 0, 0, 1);
+    glTranslatef(x, y, 0);*/
+
+    //Commenting these two lines make the first rendered emitter object not to be displayed :
+    /*{window.RestoreGLStates();
+    window.SaveGLStates();}*/
+
+    {window.RestoreGLStates();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    cout << "ParticleDrawing, center size : " << window.GetView().GetCenter().x << ";" << window.GetView().GetCenter().y << endl;
+    cout << "ParticleDrawing, position : " << GetX() << ";" << GetY() << endl;
+    cout << "ParticleDrawing, position2 : " << particleSystem->GetPosition().x << ";" << particleSystem->GetPosition().y << endl;
+
+    GLint values[5];glGetIntegerv(GL_VIEWPORT, values);
+    cout << "GL" << ";" << values[0] << ";" << values[1] << ";" << values[2] << ";" << values[3] << ";" << values[4];
+
+    float windowRatio = static_cast<float>(window.GetView().GetSize().x)/static_cast<float>(window.GetView().GetSize().y);
+    float sizeRatio =   0.3330 //To make base have the same size as a rectangle drawn by SFML
+                        *1/window.GetView().GetSize().y*600.f; //To make size window's size independant
+
+    //Get the position of the box
+    float x = ( (GetX()-window.GetView().GetCenter().x+window.GetView().GetSize().x/2) * 200.f / window.GetView().GetSize().x  - 100.f)*windowRatio;
+    float y = -(GetY()-window.GetView().GetCenter().y+window.GetView().GetSize().y/2) * 200.f / window.GetView().GetSize().y + 100.f;
+
+    cout << "x:" << x << " y:" << y <<endl;
+    cout << "--" << endl;
+
+    glTranslatef(x, y, 0);
+	particleSystem->SetPosition(window.ConvertCoords(GetX(), 0).x, window.ConvertCoords(0, GetY()).y);
     window.Draw(*particleSystem);
-    window.SaveGLStates();
+    particleSystem->SetRotation(0);
+	particleSystem->SetPosition(GetX(), GetY());
+    window.SaveGLStates();}
+    /*window.SaveGLStates();
+    window.SetView(originalView);*/
+
+    //PROBLEM : (One) problem : First rendered particle emitter is not displayed..
+    //Note : When doing twice the entire rendering the second rendering is displayed.
 
     return true;
 }

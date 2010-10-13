@@ -21,10 +21,14 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="SPARK\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-lgdl.dll" />
+					<Add option="-lSPARK_SFML_debug" />
+					<Add option="-lSPARK_GL_debug" />
+					<Add option="-lSPARK_debug" />
 					<Add option="-lsfml-audio-d.dll" />
 					<Add option="-lsfml-graphics-d.dll" />
 					<Add option="-lsfml-network-d.dll" />
@@ -33,6 +37,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\Runtime\bin\debug" />
+					<Add directory="SPARK\lib\mingw\static" />
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
@@ -122,10 +127,14 @@
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add directory="SPARK\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
+					<Add option="-lSPARK_SFML" />
+					<Add option="-lSPARK_GL" />
+					<Add option="-lSPARK" />
 					<Add option="-lsfml-audio.dll" />
 					<Add option="-lsfml-graphics.dll" />
 					<Add option="-lsfml-network.dll" />
@@ -134,6 +143,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\Runtime\bin\release" />
+					<Add directory="SPARK\lib\mingw\static" />
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
@@ -156,10 +166,14 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="SPARK\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
+					<Add option="-lSPARK_SFML" />
+					<Add option="-lSPARK_GL" />
+					<Add option="-lSPARK" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
@@ -201,6 +215,7 @@
 					<Add directory="..\..\IDE\bin\release" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="SPARK\lib\mingw\static" />
 				</Linker>
 			</Target>
 			<Target title="Development">
@@ -218,10 +233,14 @@
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add directory="SPARK\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
+					<Add option="-lSPARK_SFML" />
+					<Add option="-lSPARK_GL" />
+					<Add option="-lSPARK" />
 					<Add option="-lsfml-audio.dll" />
 					<Add option="-lsfml-graphics.dll" />
 					<Add option="-lsfml-network.dll" />
@@ -230,6 +249,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\Runtime\bin\dev" />
+					<Add directory="SPARK\lib\mingw\static" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">

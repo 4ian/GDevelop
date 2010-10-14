@@ -220,20 +220,71 @@ void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
 
 // creates and register the base system
 SPK::SPK_ID ParticleEmitterObject::CreateBaseParticleSystem()
-{
+{int enabledFlag = 0;
+    int mutableFlag = 0;
+    int randomFlag = 0;
+
+    if ( redParam == Enabled ) enabledFlag |= SPK::FLAG_RED;
+    else if ( redParam == Mutable )
+    {
+        enabledFlag |= SPK::FLAG_RED; mutableFlag |= SPK::FLAG_RED;
+    }
+    else if ( redParam == Random )
+    {
+        enabledFlag |= SPK::FLAG_RED; randomFlag |= SPK::FLAG_RED;
+    }
+
+    if ( greenParam == Enabled ) enabledFlag |= SPK::FLAG_RED;
+    else if ( greenParam == Mutable )
+    {
+        enabledFlag |= SPK::FLAG_GREEN; mutableFlag |= SPK::FLAG_GREEN;
+    }
+    else if ( greenParam == Random )
+    {
+        enabledFlag |= SPK::FLAG_GREEN; randomFlag |= SPK::FLAG_GREEN;
+    }
+
+    if ( blueParam == Enabled ) enabledFlag |= SPK::FLAG_BLUE;
+    else if ( blueParam == Mutable )
+    {
+        enabledFlag |= SPK::FLAG_BLUE; mutableFlag |= SPK::FLAG_BLUE;
+    }
+    else if ( blueParam == Random )
+    {
+        enabledFlag |= SPK::FLAG_BLUE; randomFlag |= SPK::FLAG_BLUE;
+    }
+
+    if ( alphaParam == Enabled ) enabledFlag |= SPK::FLAG_ALPHA;
+    else if ( alphaParam == Mutable )
+    {
+        enabledFlag |= SPK::FLAG_ALPHA; mutableFlag |= SPK::FLAG_ALPHA;
+    }
+    else if ( alphaParam == Random )
+    {
+        enabledFlag |= SPK::FLAG_ALPHA; randomFlag |= SPK::FLAG_ALPHA;
+    }
+    if ( rendererType == Quad) enabledFlag |= SPK::PARAM_TEXTURE_INDEX;
+
 	// Creates the model
-	particleModel = SPK::Model::create(SPK::FLAG_RED | SPK::FLAG_GREEN | SPK::FLAG_BLUE | SPK::FLAG_ALPHA,
-		SPK::FLAG_ALPHA,
-		SPK::FLAG_RED | SPK::FLAG_GREEN | SPK::FLAG_BLUE);
-	particleModel->setParam(SPK::PARAM_ALPHA,1.0f,0.0f); // This makes the particles fade out over time
-	particleModel->setParam(SPK::PARAM_BLUE,1.0f,0.0f); // NOTE : Modified
-	particleModel->setParam(SPK::PARAM_RED,0.0f,1.0f); // NOTE : Modified
-	particleModel->setLifeTime(1.0f,2.0f);
+	particleModel = SPK::Model::create( enabledFlag, mutableFlag, randomFlag );
+	if ( redParam == Mutable || redParam == Random ) particleModel->setParam(SPK::PARAM_RED, particleRed1,particleRed2);
+	else particleModel->setParam(SPK::PARAM_RED, particleRed1);
+
+	if ( greenParam == Mutable || greenParam == Random ) particleModel->setParam(SPK::PARAM_GREEN, particleGreen1,particleGreen2);
+	else particleModel->setParam(SPK::PARAM_GREEN, particleGreen1);
+
+	if ( blueParam == Mutable || blueParam == Random ) particleModel->setParam(SPK::PARAM_BLUE, particleBlue1,particleBlue2);
+	else particleModel->setParam(SPK::PARAM_BLUE, particleBlue1);
+
+	if ( alphaParam == Mutable || alphaParam == Random ) particleModel->setParam(SPK::PARAM_ALPHA, particleAlpha1,particleAlpha2);
+	else particleModel->setParam(SPK::PARAM_ALPHA, particleAlpha1);
+
+	particleModel->setLifeTime(particleLifeTimeMin,particleLifeTimeMax);
 
 	// Create the renderer
 	SPK::GL::GLRenderer* renderer = NULL;
 
-    SPK::GL::GLPointRenderer* pointRenderer = SPK::GL::GLPointRenderer::create();
+    SPK::GL::GLPointRenderer* pointRenderer = SPK::GL::GLPointRenderer::create();//TODO : Personalize this
     pointRenderer->setType(SPK::POINT_CIRCLE);
     pointRenderer->enableWorldSize(true);
     SPK::GL::GLPointRenderer::setPixelPerUnit(45.0f * 3.14159f / 180.f,600.0f); //!!NOTE : HARDCODED SIZE //Note : Fovy and screenheight
@@ -242,26 +293,25 @@ SPK::SPK_ID ParticleEmitterObject::CreateBaseParticleSystem()
     renderer = pointRenderer;
 
 	renderer->enableBlending(true);
-	renderer->setBlendingFunctions(GL_SRC_ALPHA,GL_ONE); // additive blending
+	renderer->setBlendingFunctions(GL_SRC_ALPHA,GL_ONE); // additive blending //TODO : Personalize this
 	renderer->setTextureBlending(GL_MODULATE); // the texture is modulated with the particle's color
 	renderer->enableRenderingHint(SPK::DEPTH_TEST,false); // the depth test is disabled
 
 	// Creates the zone
-	SPK::Point* source = SPK::Point::create();
+	SPK::Sphere* source = SPK::Sphere::create(SPK::Vector3D(0.0f, 0.0f, 0.0f), 5.0f);//TODO : Personalize this
 
 	// Creates the emitter
-	emitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,1.0f,0.0f),3.14159f / 4.0f,3.0f * 3.14159f / 4.0f);
-	//emitter = SPK::RandomEmitter::create();
-	emitter->setForce(100,320);
+	emitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,1.0f,0.0f),3.14159f / 4.0f, 3.14159f / 4.0f); //TODO : Personalize this
+	emitter->setForce(emitterForceMin,emitterForceMax);
 	emitter->setZone(source);
-	emitter->setTank(-1); // NOTE : Modified
-	emitter->setFlow(500); // Creates all the particles in the tank at the first frame // NOTE : Modified
+	emitter->setTank(tank);
+	emitter->setFlow(flow);
 
 	// Creates the Group
-	group = SPK::Group::create(particleModel,500); // 500 particles is the maximum capacity of the group
+	group = SPK::Group::create(particleModel,500); // 500 particles is the maximum capacity of the group //TODO : Personalize this
 	group->addEmitter(emitter);
-	group->setGravity(SPK::Vector3D(0.0f,-100.0f,0.0f));
-	group->setFriction(2.0f);
+	group->setGravity(SPK::Vector3D(particleGravityX,particleGravityY,particleGravityZ));
+	group->setFriction(friction);
 	group->setRenderer(renderer);
 
 	// Creates the System

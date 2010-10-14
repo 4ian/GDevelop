@@ -98,7 +98,7 @@ class ParticleEmitterObject : public Object
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
 
-        virtual bool SetAngle(float newAngle) { angle = newAngle; if ( particleSystem ) particleSystem->SetRotation(-angle); return true;};
+        virtual bool SetAngle(float newAngle) { angle = newAngle; return true;};
         virtual float GetAngle() const {return angle;};
 
         void SetOpacity(float val);
@@ -203,7 +203,7 @@ class ParticleEmitterObject : public Object
         SPK::SPK_ID CreateBaseParticleSystem();
 
         SPK::SPK_ID baseParticleSystemID;
-        SPK::SFML::SFMLSystem * particleSystem;
+        SPK::System * particleSystem;
         SPK::Model * particleModel;
         SPK::Emitter * emitter;
         SPK::Group * group;

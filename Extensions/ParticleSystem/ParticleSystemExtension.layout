@@ -5,10 +5,10 @@
 		<Cursor position="1928" topLine="31" />
 	</File>
 	<File name="ParticleEmitterObject.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="15159" topLine="386" />
+		<Cursor position="12350" topLine="302" />
 	</File>
-	<File name="ParticleEmitterObject.h" open="0" top="0" tabpos="4">
-		<Cursor position="10367" topLine="189" />
+	<File name="ParticleEmitterObject.h" open="1" top="0" tabpos="2">
+		<Cursor position="3745" topLine="80" />
 	</File>
 	<File name="ParticleEmitterObjectEditor.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="43198" topLine="566" />

@@ -221,118 +221,59 @@ void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
 // creates and register the base system
 SPK::SPK_ID ParticleEmitterObject::CreateBaseParticleSystem()
 {
-    int enabledFlag = 0;
-    int mutableFlag = 0;
-    int randomFlag = 0;
-
-    if ( redParam == Enabled ) enabledFlag |= SPK::FLAG_RED;
-    else if ( redParam == Mutable )
-    {
-        enabledFlag |= SPK::FLAG_RED; mutableFlag |= SPK::FLAG_RED;
-    }
-    else if ( redParam == Random )
-    {
-        enabledFlag |= SPK::FLAG_RED; randomFlag |= SPK::FLAG_RED;
-    }
-
-    if ( greenParam == Enabled ) enabledFlag |= SPK::FLAG_RED;
-    else if ( greenParam == Mutable )
-    {
-        enabledFlag |= SPK::FLAG_GREEN; mutableFlag |= SPK::FLAG_GREEN;
-    }
-    else if ( greenParam == Random )
-    {
-        enabledFlag |= SPK::FLAG_GREEN; randomFlag |= SPK::FLAG_GREEN;
-    }
-
-    if ( blueParam == Enabled ) enabledFlag |= SPK::FLAG_BLUE;
-    else if ( blueParam == Mutable )
-    {
-        enabledFlag |= SPK::FLAG_BLUE; mutableFlag |= SPK::FLAG_BLUE;
-    }
-    else if ( blueParam == Random )
-    {
-        enabledFlag |= SPK::FLAG_BLUE; randomFlag |= SPK::FLAG_BLUE;
-    }
-
-    if ( alphaParam == Enabled ) enabledFlag |= SPK::FLAG_ALPHA;
-    else if ( alphaParam == Mutable )
-    {
-        enabledFlag |= SPK::FLAG_ALPHA; mutableFlag |= SPK::FLAG_ALPHA;
-    }
-    else if ( alphaParam == Random )
-    {
-        enabledFlag |= SPK::FLAG_ALPHA; randomFlag |= SPK::FLAG_ALPHA;
-    }
-    if ( rendererType == Quad) enabledFlag |= SPK::PARAM_TEXTURE_INDEX;
-
 	// Creates the model
-	particleModel = SPK::Model::create( enabledFlag, mutableFlag, randomFlag );
-	if ( redParam == Mutable || redParam == Random ) particleModel->setParam(SPK::PARAM_RED, particleRed1,particleRed2);
-	else particleModel->setParam(SPK::PARAM_RED, particleRed1);
+	particleModel = SPK::Model::create(SPK::FLAG_RED | SPK::FLAG_GREEN | SPK::FLAG_BLUE | SPK::FLAG_ALPHA,
+		SPK::FLAG_ALPHA,
+		SPK::FLAG_RED | SPK::FLAG_GREEN | SPK::FLAG_BLUE);
+	particleModel->setParam(SPK::PARAM_ALPHA,1.0f,0.0f); // This makes the particles fade out over time
+	particleModel->setParam(SPK::PARAM_BLUE,1.0f,0.0f); // NOTE : Modified
+	particleModel->setParam(SPK::PARAM_RED,0.0f,1.0f); // NOTE : Modified
+	particleModel->setLifeTime(1.0f,2.0f);
 
-	if ( greenParam == Mutable || greenParam == Random ) particleModel->setParam(SPK::PARAM_GREEN, particleGreen1,particleGreen2);
-	else particleModel->setParam(SPK::PARAM_GREEN, particleGreen1);
+	// Create the renderer
+	SPK::GL::GLRenderer* renderer = NULL;
 
-	if ( blueParam == Mutable || blueParam == Random ) particleModel->setParam(SPK::PARAM_BLUE, particleBlue1,particleBlue2);
-	else particleModel->setParam(SPK::PARAM_BLUE, particleBlue1);
+    SPK::GL::GLPointRenderer* pointRenderer = SPK::GL::GLPointRenderer::create();
+    pointRenderer->setType(SPK::POINT_CIRCLE);
+    pointRenderer->enableWorldSize(true);
+    SPK::GL::GLPointRenderer::setPixelPerUnit(45.0f * 3.14159f / 180.f,600.0f); //!!NOTE : HARDCODED SIZE //Note : Fovy and screenheight
+    pointRenderer->setSize(1.0f);
+    //pointRenderer->setTexture(textureIndex); //!!NOTE : COMMENTED LINE
+    renderer = pointRenderer;
 
-	if ( alphaParam == Mutable || alphaParam == Random ) particleModel->setParam(SPK::PARAM_ALPHA, particleAlpha1,particleAlpha2);
-	else particleModel->setParam(SPK::PARAM_ALPHA, particleAlpha1);
-
-	particleModel->setLifeTime(particleLifeTimeMin,particleLifeTimeMax);
-	particleModel->setParam(SPK::PARAM_TEXTURE_INDEX, 0.0f);
-
-	// Creates the renderer
-	SPK::SFML::SFMLRenderer * renderer = NULL;
-	if ( rendererType == Line )
-	    renderer = SPK::SFML::SFMLLineRenderer::create(rendererParam1,rendererParam2);
-	else if ( rendererType == Quad)
-	{
-	    cout << "Quad" << textureParticle.get();
-	    SPK::SFML::SFMLQuadRenderer * smokeRenderer = SPK::SFML::SFMLQuadRenderer::create(textureParticle.get(), rendererParam1,rendererParam2);
-        smokeRenderer->setScale(087.5f,087.5f); // optim
-
-        renderer = smokeRenderer;
-	}
-	else
-	{
-	    renderer = SPK::SFML::SFMLPointRenderer::create(rendererParam1);
-	}
-	renderer->setGroundCulling(true);
-	renderer->setBlendMode(additive ? sf::Blend::Add : sf::Blend::Alpha);
+	renderer->enableBlending(true);
+	renderer->setBlendingFunctions(GL_SRC_ALPHA,GL_ONE); // additive blending
+	renderer->setTextureBlending(GL_MODULATE); // the texture is modulated with the particle's color
+	renderer->enableRenderingHint(SPK::DEPTH_TEST,false); // the depth test is disabled
 
 	// Creates the zone
-	SPK::Sphere* sparkSource = SPK::Sphere::create(SPK::Vector3D(0.0f,0.0f,0.0f),5.0f);
+	SPK::Point* source = SPK::Point::create();
 
 	// Creates the emitter
-	emitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,0.0f,1.0f),3.14159f / 4.0f,3.0f * 3.14159f / 4.0f);
-	emitter->setForce(emitterForceMin,emitterForceMax);
-	emitter->setZone(sparkSource);
-	emitter->setTank(tank);
-	emitter->setFlow(flow);
+	emitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,1.0f,0.0f),3.14159f / 4.0f,3.0f * 3.14159f / 4.0f);
+	//emitter = SPK::RandomEmitter::create();
+	emitter->setForce(100,320);
+	emitter->setZone(source);
+	emitter->setTank(-1); // NOTE : Modified
+	emitter->setFlow(500); // Creates all the particles in the tank at the first frame // NOTE : Modified
 
 	// Creates the Group
-	group = SPK::Group::create(particleModel);
-	group->setRenderer(renderer);
+	group = SPK::Group::create(particleModel,500); // 500 particles is the maximum capacity of the group
 	group->addEmitter(emitter);
-	group->setGravity(SPK::Vector3D(particleGravityX,particleGravityY,particleGravityZ));
-	group->setFriction(friction);
-	if ( rendererType == Quad )
-	{
-        //group->enableSorting(true);
-	}
+	group->setGravity(SPK::Vector3D(0.0f,-100.0f,0.0f));
+	group->setFriction(2.0f);
+	group->setRenderer(renderer);
 
 	// Creates the System
-	SPK::SFML::SFMLSystem* sparkSystem = SPK::SFML::SFMLSystem::create();
-	sparkSystem->addGroup(group);
+	SPK::System* system = SPK::System::create();
+	system->addGroup(group);
 
 	// Defines which objects will be shared by all systems
 	particleModel->setShared(true);
 	renderer->setShared(true);
 
-	// Creates the base and gets the ID
-	return sparkSystem->getID();
+	// Creates the base and gets a pointer to the base
+	return system->getSPKID();
 }
 
 bool ParticleEmitterObject::LoadRuntimeResources(const ImageManager & imageMgr )
@@ -341,8 +282,7 @@ bool ParticleEmitterObject::LoadRuntimeResources(const ImageManager & imageMgr )
 	textureParticle = imageMgr.GetImage(textureParticleName);
 
 	baseParticleSystemID = CreateBaseParticleSystem();
-    particleSystem = SPK_Copy(SPK::SFML::SFMLSystem, baseParticleSystemID);
-	particleSystem->SetPosition(GetX(), GetY());
+    particleSystem = SPK_Copy(SPK::System, baseParticleSystemID);
 
     return true;
 }
@@ -378,35 +318,7 @@ bool ParticleEmitterObject::Draw( sf::RenderWindow& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    /*sf::View originalView = window.GetView();
     window.RestoreGLStates();
-    glLoadIdentity();
-    float windowRatio = static_cast<float>(window.GetView().GetSize().x)/static_cast<float>(window.GetView().GetSize().y);
-    float sizeRatio =   0.3330 //To make base have the same size as a rectangle drawn by SFML
-                        *1/window.GetView().GetSize().y*600.f; //To make size window's size independant
-
-    //Get the position of the box
-    float x = GetX();
-    float y = GetY();
-
-    glRotatef(-window.GetView().GetRotation(), 0, 0, 1);
-    glTranslatef(x, y, 0);*/
-
-    //Commenting these two lines make the first rendered emitter object not to be displayed :
-    /*{window.RestoreGLStates();
-    window.SaveGLStates();}*/
-
-    {window.RestoreGLStates();
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    cout << "ParticleDrawing, center size : " << window.GetView().GetCenter().x << ";" << window.GetView().GetCenter().y << endl;
-    cout << "ParticleDrawing, position : " << GetX() << ";" << GetY() << endl;
-    cout << "ParticleDrawing, position2 : " << particleSystem->GetPosition().x << ";" << particleSystem->GetPosition().y << endl;
-
-    GLint values[5];glGetIntegerv(GL_VIEWPORT, values);
-    cout << "GL" << ";" << values[0] << ";" << values[1] << ";" << values[2] << ";" << values[3] << ";" << values[4];
-
     float windowRatio = static_cast<float>(window.GetView().GetSize().x)/static_cast<float>(window.GetView().GetSize().y);
     float sizeRatio =   0.3330 //To make base have the same size as a rectangle drawn by SFML
                         *1/window.GetView().GetSize().y*600.f; //To make size window's size independant
@@ -415,20 +327,17 @@ bool ParticleEmitterObject::Draw( sf::RenderWindow& window )
     float x = ( (GetX()-window.GetView().GetCenter().x+window.GetView().GetSize().x/2) * 200.f / window.GetView().GetSize().x  - 100.f)*windowRatio;
     float y = -(GetY()-window.GetView().GetCenter().y+window.GetView().GetSize().y/2) * 200.f / window.GetView().GetSize().y + 100.f;
 
-    cout << "x:" << x << " y:" << y <<endl;
-    cout << "--" << endl;
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
-    glTranslatef(x, y, 0);
-	particleSystem->SetPosition(window.ConvertCoords(GetX(), 0).x, window.ConvertCoords(0, GetY()).y);
-    window.Draw(*particleSystem);
-    particleSystem->SetRotation(0);
-	particleSystem->SetPosition(GetX(), GetY());
-    window.SaveGLStates();}
-    /*window.SaveGLStates();
-    window.SetView(originalView);*/
+    cout << "x:" << x << "y:" << y <<endl;
 
-    //PROBLEM : (One) problem : First rendered particle emitter is not displayed..
-    //Note : When doing twice the entire rendering the second rendering is displayed.
+    glRotatef(window.GetView().GetRotation(), 0, 0, 1);
+    glTranslatef(x, y, -100); //5 : Arbitrary
+
+	particleSystem->render();
+
+    window.SaveGLStates();
 
     return true;
 }
@@ -562,8 +471,8 @@ void ParticleEmitterObject::SetFriction(float newValue)
 
 void ParticleEmitterObject::OnPositionChanged()
 {
-    if ( particleSystem )
-        particleSystem->SetPosition(GetX(), GetY());
+    /*if ( particleSystem )
+        particleSystem->SetPosition(GetX(), GetY());*/
 }
 
 /**
@@ -630,7 +539,7 @@ void ParticleEmitterObject::SetColor( unsigned int r, unsigned int g, unsigned i
     colorR = r;
     colorG = g;
     colorB = b;
-    if ( particleSystem ) particleSystem->SetColor(sf::Color(colorR, colorG, colorB, opacity));
+    //if ( particleSystem ) particleSystem->SetColor(sf::Color(colorR, colorG, colorB, opacity));
 }
 
 void ParticleEmitterObject::SetOpacity(float val)
@@ -641,7 +550,7 @@ void ParticleEmitterObject::SetOpacity(float val)
         val = 0;
 
     opacity = val;
-    if ( particleSystem ) particleSystem->SetColor(sf::Color(colorR, colorG, colorB, opacity));
+    //if ( particleSystem ) particleSystem->SetColor(sf::Color(colorR, colorG, colorB, opacity));
 }
 
 /**

@@ -24,14 +24,34 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/Object.h"
-#include "GDL/ExpressionInstruction.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/ObjectsConcerned.h"
-#include "ParticleEmitterObject.h"
+#include "ParticleSystemWrapper.h"
 
-double ParticleEmitterObject::ExpNbParticles( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+bool ParticleSystemWrapper::SPKinitialized = false;
+
+ParticleSystemWrapper::ParticleSystemWrapper() :
+particleSystem(NULL),
+particleModel(NULL),
+emitter(NULL),
+zone(NULL),
+group(NULL),
+openGLTextureParticle(0)
 {
-    if ( particleSystem.group ) return particleSystem.group->getNbParticles();
-    return 0;
+    if ( !SPKinitialized )
+    {
+        SPK::randomSeed = static_cast<unsigned int>(time(NULL));
+        SPK::System::setClampStep(true,0.1f);			// clamp the step to 100 ms
+        SPK::System::useAdaptiveStep(0.001f,0.01f);		// use an adaptive step from 1ms to 10ms (1000fps to 100fps)
+
+        SPKinitialized = true;
+    }
+}
+
+ParticleSystemWrapper::~ParticleSystemWrapper()
+{
+    if ( particleSystem ) delete particleSystem;
+    if ( particleModel ) delete particleModel;
+    if ( emitter ) delete emitter;
+    if ( zone ) delete zone;
+    if ( group ) delete group;
+    if ( openGLTextureParticle != 0 ) glDeleteTextures(1, &openGLTextureParticle);
 }

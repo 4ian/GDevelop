@@ -27,168 +27,77 @@ freely, subject to the following restrictions:
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
 #include "ParticleEmitterObject.h"
+#include "ExtensionSubDeclaration1.h"
+#include "ExtensionSubDeclaration2.h"
+#include "ExtensionSubDeclaration3.h"
+#include "Extension.h"
 #include <boost/version.hpp>
 
 /**
- * This class declare information about the extension.
+ * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
  */
-class Extension : public ExtensionBase
+Extension::Extension()
 {
-    public:
+    DECLARE_THE_EXTENSION("ParticleEmitterObject",
+                          _("Système de particules"),
+                          _("Extension permettant d'afficher un grand nombre de petites particules."),
+                          "Compil Games",
+                          "zlib/libpng License ( Open Source )")
 
-        /**
-         * Constructor of an extension declares everything the extension contains : Objects, actions, conditions and expressions.
-         */
-        Extension()
-        {
-            DECLARE_THE_EXTENSION("ParticleEmitterObject",
-                                  _("Système de particules"),
-                                  _("Extension permettant d'afficher un grand nombre de petites particules."),
-                                  "Compil Games",
-                                  "zlib/libpng License ( Open Source )")
+    //Declaration of all objects available
+    DECLARE_OBJECT("ParticleEmitter",
+                   _("Emetteur de particules"),
+                   _("Objet affichant un texte"),
+                   "Extensions/particleSystemicon.png",
+                   &CreateParticleEmitterObject,
+                   &DestroyParticleEmitterObject);
 
-            //Declaration of all objects available
-            DECLARE_OBJECT("ParticleEmitter",
-                           _("Emetteur de particules"),
-                           _("Objet affichant un texte"),
-                           "Extensions/particleSystemicon.png",
-                           &CreateParticleEmitterObject,
-                           &DestroyParticleEmitterObject);
+        //Declaration is too big to be compiled by GCC in one file, unless you have 4GB+ ram. :/
+        ExtensionSubDeclaration2(objInfos);
+        ExtensionSubDeclaration1(objInfos);
+        ExtensionSubDeclaration3(objInfos);
 
-                DECLARE_OBJECT_ACTION("ChangeColor",
-                               _("Changer la couleur d'un objet texte"),
-                               _("Change la couleur du texte. Par défaut, la couleur est le blanc."),
-                               _("Changer la couleur de _PARAM0_ en _PARAM1_"),
-                               _("Effets"),
-                               "res/actions/color24.png",
-                               "res/actions/color.png",
-                               &ParticleEmitterObject::ActChangeColor);
+    DECLARE_END_OBJECT()
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-                    DECLARE_PARAMETER("color", _("Couleur"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_ACTION("Opacity",
-                               _("Régler l'opacité d'un objet"),
-                               _("Modifie la transparence d'un objet texte."),
-                               _("Faire _PARAM2__PARAM1_ à l'opacité de _PARAM0_"),
-                               _("Visibilité"),
-                               "res/actions/opacity24.png",
-                               "res/actions/opacity.png",
-                               &ParticleEmitterObject::ActOpacity);
-
-                    DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-                    DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_CONDITION("Opacity",
-                               _("Opacité d'un objet"),
-                               _("Teste la valeur de l'opacité ( transparence ) d'un objet texte."),
-                               _("L'opacité de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                               _("Visibilité"),
-                               "res/conditions/opacity24.png",
-                               "res/conditions/opacity.png",
-                               &ParticleEmitterObject::CondOpacity);
-
-                    DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-                    DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
-
-                DECLARE_END_OBJECT_CONDITION()
-
-
-                DECLARE_OBJECT_ACTION("Angle",
-                               _("Régler l'angle d'un objet texte"),
-                               _("Modifie l'angle d'un objet texte."),
-                               _("Faire _PARAM2__PARAM1_ à l'angle de _PARAM0_"),
-                               _("Rotation"),
-                               "res/actions/rotate24.png",
-                               "res/actions/rotate.png",
-                               &ParticleEmitterObject::ActAngle);
-
-                    DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-                    DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
-
-                DECLARE_END_OBJECT_ACTION()
-
-                DECLARE_OBJECT_CONDITION("Angle",
-                               _("Angle d'un objet texte"),
-                               _("Teste la valeur de l'angle d'un objet texte."),
-                               _("L'angle de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                               _("Rotation"),
-                               "res/conditions/rotate24.png",
-                               "res/conditions/rotate.png",
-                               &ParticleEmitterObject::CondAngle);
-
-                    DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-                    DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
-
-                DECLARE_END_OBJECT_CONDITION()
-
-                DECLARE_OBJECT_EXPRESSION("Opacity", _("Opacité"), _("Opacité"), _("Opacité"), "res/actions/opacity.png", &ParticleEmitterObject::ExpOpacity)
-                    DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-                DECLARE_END_OBJECT_EXPRESSION()
-
-                DECLARE_OBJECT_EXPRESSION("Angle", _("Angle"), _("Angle"), _("Rotation"), "res/actions/rotate.png", &ParticleEmitterObject::ExpAngle)
-                    DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-                DECLARE_END_OBJECT_EXPRESSION()
-
-            DECLARE_END_OBJECT()
-
-            CompleteCompilationInformation();
-        };
-        virtual ~Extension() {};
-
-    protected:
-    private:
-
-        /**
-         * This function is called by Game Develop so
-         * as to complete information about how the extension was compiled ( which libs... )
-         * -- Do not need to be modified. --
-         */
-        void CompleteCompilationInformation()
-        {
-            #if defined(GDE)
-            compilationInfo.runtimeOnly = false;
-            #else
-            compilationInfo.runtimeOnly = true;
-            #endif
-
-            #if defined(__GNUC__)
-            compilationInfo.gccMajorVersion = __GNUC__;
-            compilationInfo.gccMinorVersion = __GNUC_MINOR__;
-            compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__;
-            #endif
-
-            compilationInfo.boostVersion = BOOST_VERSION;
-
-            compilationInfo.sfmlMajorVersion = 2;
-            compilationInfo.sfmlMinorVersion = 0;
-
-            #if defined(GDE)
-            compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION;
-            compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION;
-            compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER;
-            compilationInfo.wxWidgetsSubReleaseNumber = wxSUBRELEASE_NUMBER;
-            #endif
-
-            compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
-            compilationInfo.sizeOfpInt = sizeof(int*);
-
-            compilationInfo.informationCompleted = true;
-        }
+    CompleteCompilationInformation();
 };
+
+/**
+ * This function is called by Game Develop so
+ * as to complete information about how the extension was compiled ( which libs... )
+ * -- Do not need to be modified. --
+ */
+void Extension::CompleteCompilationInformation()
+{
+    #if defined(GDE)
+    compilationInfo.runtimeOnly = false;
+    #else
+    compilationInfo.runtimeOnly = true;
+    #endif
+
+    #if defined(__GNUC__)
+    compilationInfo.gccMajorVersion = __GNUC__;
+    compilationInfo.gccMinorVersion = __GNUC_MINOR__;
+    compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__;
+    #endif
+
+    compilationInfo.boostVersion = BOOST_VERSION;
+
+    compilationInfo.sfmlMajorVersion = 2;
+    compilationInfo.sfmlMinorVersion = 0;
+
+    #if defined(GDE)
+    compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION;
+    compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION;
+    compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER;
+    compilationInfo.wxWidgetsSubReleaseNumber = wxSUBRELEASE_NUMBER;
+    #endif
+
+    compilationInfo.gdlVersion = RC_FILEVERSION_STRING;
+    compilationInfo.sizeOfpInt = sizeof(int*);
+
+    compilationInfo.informationCompleted = true;
+}
 
 /**
  * Used by Game Develop to create the extension class

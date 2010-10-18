@@ -29,8 +29,7 @@ freely, subject to the following restrictions:
 
 #include "GDL/Object.h"
 #include <SFML/Graphics.hpp>
-#include <SPK.h>
-#include <SPK_SFML.h>
+#include "ParticleSystemWrapper.h"
 class Evaluateur;
 class ImageManager;
 class RuntimeScene;
@@ -98,39 +97,105 @@ class ParticleEmitterObject : public Object
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
 
-        virtual bool SetAngle(float newAngle) { angle = newAngle; return true;};
-        virtual float GetAngle() const {return angle;};
+        void RecreateParticleSystem();
+        bool ActRecreateParticleSystem( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
-        void SetOpacity(float val);
-        inline float GetOpacity() const {return opacity;};
+        bool CondEmitterXDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActEmitterXDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondEmitterYDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActEmitterYDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondEmitterZDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActEmitterZDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondParticleGravityX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleGravityX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondParticleGravityY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleGravityY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondParticleGravityZ( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleGravityZ( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondEmitterForceMin( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActEmitterForceMin( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondEmitterForceMax( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActEmitterForceMax( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActRendererParam1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActRendererParam2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondRendererParam1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondRendererParam2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondTank( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondFlow( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActTank( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActFlow( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActEmitterAngleA( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondEmitterAngleA( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActEmitterAngleB( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondEmitterAngleB( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActFriction( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondFriction( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActZoneRadius( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondZoneRadius( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondParticleLifeTimeMin( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleLifeTimeMin( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleLifeTimeMax( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleLifeTimeMax( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
-        void SetColor(unsigned int r,unsigned int v,unsigned int b);
-        inline unsigned int GetColorR() const { return colorR; };
-        inline unsigned int GetColorG() const { return colorG; };
-        inline unsigned int GetColorB() const { return colorB; };
+        double ExpRendererParam1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return rendererParam1; };
+        double ExpRendererParam2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return rendererParam2; };
+        double ExpTank( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return tank; };
+        double ExpFlow( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return flow; };
+        double ExpEmitterForceMin( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return emitterForceMin; };
+        double ExpEmitterForceMax( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return emitterForceMax; };
+        double ExpEmitterXDirection( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return emitterXDirection; };
+        double ExpEmitterYDirection( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return emitterYDirection; };
+        double ExpEmitterZDirection( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return emitterZDirection; };
+        double ExpEmitterAngleA( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return emitterAngleA; };
+        double ExpEmitterAngleB( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return  emitterAngleB; };
+        double ExpZoneRadius( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return  zoneRadius; };
+        double ExpParticleGravityX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return particleGravityX; };
+        double ExpParticleGravityY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return particleGravityY; };
+        double ExpParticleGravityZ( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return particleGravityZ; };
+        double ExpFriction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return friction; };
+        double ExpParticleLifeTimeMin( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return particleLifeTimeMin; };
+        double ExpParticleLifeTimeMax( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return particleLifeTimeMax; };
 
-        //ACE for string
-        bool CondString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        std::string ExpString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction );
+        bool ActParticleRed1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleRed2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleGreen1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleGreen2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleBlue1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleBlue2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleAlpha1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleAlpha2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleSize1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleSize2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleAngle1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleAngle2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleRed1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleRed2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleGreen1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleGreen2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleBlue1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleBlue2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleAlpha1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleAlpha2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleSize1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleSize2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleAngle1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleAngle2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
-        //ACE for font and size
-        bool ActFont( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        double ExpParticleRed1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleRed1; };
+        double ExpParticleRed2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleRed2; };
+        double ExpParticleGreen1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleGreen1; };
+        double ExpParticleGreen2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleGreen2; };
+        double ExpParticleBlue1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleBlue1; };
+        double ExpParticleBlue2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleBlue2; };
+        double ExpParticleAlpha1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAlpha1; };
+        double ExpParticleAlpha2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAlpha2; };
+        double ExpParticleSize1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleSize1; };
+        double ExpParticleSize2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleSize2; };
+        double ExpParticleAngle1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAngle1; };
+        double ExpParticleAngle2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAngle2; };
 
-        //ACE for opacity
-        bool CondOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-
-        //ACE for angle
-        bool CondAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-
-        //Action for color
-        bool ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondNoMoreParticles( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        double ExpNbParticles( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 
         void SetRendererParam1(float newValue) { rendererParam1 = newValue; };
         void SetRendererParam2(float newValue) { rendererParam2 = newValue; };
@@ -138,6 +203,12 @@ class ParticleEmitterObject : public Object
         void SetFlow(float newValue);
         void SetEmitterForceMin(float newValue);
         void SetEmitterForceMax(float newValue);
+        void SetEmitterXDirection(float newValue);
+        void SetEmitterYDirection(float newValue);
+        void SetEmitterZDirection(float newValue);
+        void SetEmitterAngleA(float newValue);
+        void SetEmitterAngleB(float newValue);
+        void SetZoneRadius(float newValue);
         void SetParticleGravityX(float newValue);
         void SetParticleGravityY(float newValue);
         void SetParticleGravityZ(float newValue);
@@ -148,6 +219,8 @@ class ParticleEmitterObject : public Object
         void SetGreenParameterType(ParticleParameterType type) { greenParam = type; };
         void SetBlueParameterType(ParticleParameterType type) { blueParam = type; };
         void SetAlphaParameterType(ParticleParameterType type) { alphaParam = type; };
+        void SetSizeParameterType(ParticleParameterType type) { sizeParam = type; };
+        void SetAngleParameterType(ParticleParameterType type) { angleParam = type; };
 
         void SetParticleRed1(float newValue) { particleRed1= newValue; };
         void SetParticleRed2(float newValue) { particleRed2= newValue; };
@@ -157,6 +230,10 @@ class ParticleEmitterObject : public Object
         void SetParticleBlue2(float newValue) { particleBlue2= newValue; };
         void SetParticleAlpha1(float newValue) { particleAlpha1= newValue; };
         void SetParticleAlpha2(float newValue) { particleAlpha2= newValue; };
+        void SetParticleSize1(float newValue) { particleSize1= newValue; };
+        void SetParticleSize2(float newValue) { particleSize2= newValue; };
+        void SetParticleAngle1(float newValue) { particleAngle1= newValue; };
+        void SetParticleAngle2(float newValue) { particleAngle2= newValue; };
         void SetParticleLifeTimeMin(float newValue) { particleLifeTimeMin= newValue; };
         void SetParticleLifeTimeMax(float newValue) { particleLifeTimeMax= newValue; };
 
@@ -166,6 +243,12 @@ class ParticleEmitterObject : public Object
         float GetFlow() const { return flow; };
         float GetEmitterForceMin() const { return emitterForceMin; };
         float GetEmitterForceMax() const { return emitterForceMax; };
+        float GetEmitterXDirection() const { return emitterXDirection; };
+        float GetEmitterYDirection() const { return emitterYDirection; };
+        float GetEmitterZDirection() const { return emitterZDirection; };
+        float GetEmitterAngleA() const { return emitterAngleA; };
+        float GetEmitterAngleB() const { return  emitterAngleB; };
+        float GetZoneRadius() const { return  zoneRadius; };
         float GetParticleGravityX() const { return particleGravityX; };
         float GetParticleGravityY() const { return particleGravityY; };
         float GetParticleGravityZ() const { return particleGravityZ; };
@@ -177,6 +260,8 @@ class ParticleEmitterObject : public Object
         ParticleParameterType GetGreenParameterType() const { return greenParam; };
         ParticleParameterType GetBlueParameterType() const { return blueParam; };
         ParticleParameterType GetAlphaParameterType() const { return alphaParam; };
+        ParticleParameterType GetSizeParameterType() const { return sizeParam; };
+        ParticleParameterType GetAngleParameterType() const { return angleParam; };
 
         float GetParticleRed1() const { return particleRed1; };
         float GetParticleRed2() const { return particleRed2; };
@@ -186,6 +271,10 @@ class ParticleEmitterObject : public Object
         float GetParticleBlue2() const { return particleBlue2; };
         float GetParticleAlpha1() const { return particleAlpha1; };
         float GetParticleAlpha2() const { return particleAlpha2; };
+        float GetParticleSize1() const { return particleSize1; };
+        float GetParticleSize2() const { return particleSize2; };
+        float GetParticleAngle1() const { return particleAngle1; };
+        float GetParticleAngle2() const { return particleAngle2; };
 
         enum RendererType {Point, Line, Quad};
         void SetRendererType(RendererType type) { rendererType = type; };
@@ -200,13 +289,9 @@ class ParticleEmitterObject : public Object
 
     private:
 
-        SPK::SPK_ID CreateBaseParticleSystem();
+        void CreateParticleSystem();
 
-        SPK::SPK_ID baseParticleSystemID;
-        SPK::System * particleSystem;
-        SPK::Model * particleModel;
-        SPK::Emitter * emitter;
-        SPK::Group * group;
+        ParticleSystemWrapper particleSystem;
 
         std::string textureParticleName;
         boost::shared_ptr<sf::Image> textureParticle;
@@ -218,11 +303,20 @@ class ParticleEmitterObject : public Object
         float flow;
         float emitterForceMin;
         float emitterForceMax;
+        float emitterXDirection;
+        float emitterYDirection;
+        float emitterZDirection;
+        float emitterAngleA;
+        float emitterAngleB;
+        float zoneRadius;
         float particleGravityX,particleGravityY,particleGravityZ;
         float friction;
         float particleLifeTimeMin, particleLifeTimeMax;
-        ParticleParameterType redParam, greenParam, blueParam, alphaParam;
+        ParticleParameterType redParam, greenParam, blueParam, alphaParam, sizeParam, angleParam;
         float particleRed1, particleRed2, particleGreen1, particleGreen2, particleBlue1, particleBlue2, particleAlpha1, particleAlpha2;
+        float particleSize1, particleSize2, particleAngle1, particleAngle2;
+
+        bool hasSomeParticles;
 
         //Opacity
         float opacity;
@@ -238,8 +332,6 @@ class ParticleEmitterObject : public Object
         sf::Image edittimeIconImage;
         sf::Sprite edittimeIcon;
         #endif
-
-        static bool SPKinitialized;
 };
 
 void DestroyParticleEmitterObject(Object * object);

@@ -457,6 +457,10 @@
 			<Add directory="C:\Libs\SFML\lib\mingw" />
 		</Linker>
 		<Unit filename="Extension.cpp" />
+		<Unit filename="Extension.h" />
+		<Unit filename="ExtensionSubDeclaration1.cpp" />
+		<Unit filename="ExtensionSubDeclaration2.cpp" />
+		<Unit filename="ExtensionSubDeclaration3.cpp" />
 		<Unit filename="ParticleEmitterActions.cpp" />
 		<Unit filename="ParticleEmitterConditions.cpp" />
 		<Unit filename="ParticleEmitterExpressions.cpp" />

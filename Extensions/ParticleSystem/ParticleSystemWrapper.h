@@ -24,14 +24,31 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/Object.h"
-#include "GDL/ExpressionInstruction.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/ObjectsConcerned.h"
-#include "ParticleEmitterObject.h"
+#ifndef PARTICLESYSTEMWRAPPER_H
+#define PARTICLESYSTEMWRAPPER_H
 
-double ParticleEmitterObject::ExpNbParticles( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+#include <SPK.h>
+#include <SPK_SFML.h>
+
+/**
+ * Wrapper around Particle system
+ */
+class ParticleSystemWrapper
 {
-    if ( particleSystem.group ) return particleSystem.group->getNbParticles();
-    return 0;
-}
+    public:
+        ParticleSystemWrapper();
+        virtual ~ParticleSystemWrapper();
+
+        SPK::System * particleSystem;
+        SPK::Model * particleModel;
+        SPK::SphericEmitter * emitter;
+        SPK::Sphere * zone;
+        SPK::Group * group;
+        GLuint openGLTextureParticle;
+
+    private:
+
+        static bool SPKinitialized;
+};
+
+#endif // PARTICLESYSTEMWRAPPER_H

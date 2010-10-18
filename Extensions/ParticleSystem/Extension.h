@@ -24,14 +24,26 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/Object.h"
-#include "GDL/ExpressionInstruction.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/ObjectsConcerned.h"
-#include "ParticleEmitterObject.h"
+#ifndef EXTENSION_H_INCLUDED
+#define EXTENSION_H_INCLUDED
 
-double ParticleEmitterObject::ExpNbParticles( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+
+/**
+ * This class declare information about the extension.
+ */
+class Extension : public ExtensionBase
 {
-    if ( particleSystem.group ) return particleSystem.group->getNbParticles();
-    return 0;
-}
+    public:
+
+        Extension();
+        virtual ~Extension() {};
+
+    private:
+
+        void ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos);
+        void ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos);
+        void ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos);
+        void CompleteCompilationInformation();
+};
+
+#endif // EXTENSION_H_INCLUDED

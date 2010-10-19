@@ -26,7 +26,6 @@
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lSPARK_SFML_debug" />
 					<Add option="-lSPARK_GL_debug" />
 					<Add option="-lSPARK_debug" />
 					<Add option="-lsfml-audio-d.dll" />
@@ -80,7 +79,6 @@
 					<Add option="-lwxjpegd" />
 					<Add option="-lwxzlibd" />
 					<Add option="-lwxtiffd" />
-					<Add option="-lSPARK_SFML_debug" />
 					<Add option="-lSPARK_GL_debug" />
 					<Add option="-lSPARK_debug" />
 					<Add option="-lsfml-audio-d.dll" />
@@ -132,7 +130,6 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lSPARK_SFML" />
 					<Add option="-lSPARK_GL" />
 					<Add option="-lSPARK" />
 					<Add option="-lsfml-audio.dll" />
@@ -171,7 +168,6 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lSPARK_SFML" />
 					<Add option="-lSPARK_GL" />
 					<Add option="-lSPARK" />
 					<Add option="-lwxmsw29_xrc" />
@@ -238,7 +234,6 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lSPARK_SFML" />
 					<Add option="-lSPARK_GL" />
 					<Add option="-lSPARK" />
 					<Add option="-lsfml-audio.dll" />
@@ -292,7 +287,6 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add option="-lSPARK_SFML" />
 					<Add option="-lSPARK_GL" />
 					<Add option="-lSPARK" />
 					<Add option="-lsfml-audio.dll" />
@@ -470,6 +464,8 @@
 		<Unit filename="ParticleEmitterObject.h" />
 		<Unit filename="ParticleEmitterObjectEditor.cpp" />
 		<Unit filename="ParticleEmitterObjectEditor.h" />
+		<Unit filename="ParticleSystemWrapper.cpp" />
+		<Unit filename="ParticleSystemWrapper.h" />
 		<Unit filename="..\..\GDL\GDL\tinystr.cpp" />
 		<Unit filename="..\..\GDL\GDL\tinystr.h" />
 		<Unit filename="..\..\GDL\GDL\tinyxml.cpp" />

@@ -55,3 +55,32 @@ ParticleSystemWrapper::~ParticleSystemWrapper()
     if ( group ) delete group;
     if ( openGLTextureParticle != 0 ) glDeleteTextures(1, &openGLTextureParticle);
 }
+
+void ParticleSystemWrapper::Init(const ParticleSystemWrapper & other)
+{
+    if ( particleSystem ) delete particleSystem;
+    if ( particleModel ) delete particleModel;
+    if ( emitter ) delete emitter;
+    if ( zone ) delete zone;
+    if ( group ) delete group;
+    //! Note : Texture copy is not implemented
+    //if ( openGLTextureParticle != 0 ) glDeleteTextures(1, &openGLTextureParticle);
+
+    //Don't initialize members if the other object's member are NULL.
+    if ( other.particleModel == NULL ) return;
+
+    particleModel = new SPK::Model(*other.particleModel);
+
+    zone = new SPK::Sphere(*other.zone);
+    emitter = new SPK::SphericEmitter(*other.emitter);
+	emitter->setZone(zone);
+
+    group = new SPK::Group(*other.group);
+	group->setModel(particleModel);
+	group->removeEmitter(other.emitter);
+	group->addEmitter(emitter);
+
+    particleSystem = new SPK::System(*other.particleSystem);
+    particleSystem->removeGroup(other.group);
+    particleSystem->addGroup(group);
+}

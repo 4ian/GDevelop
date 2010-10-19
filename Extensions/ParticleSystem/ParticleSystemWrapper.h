@@ -31,13 +31,30 @@ freely, subject to the following restrictions:
 #include <SPK_SFML.h>
 
 /**
- * Wrapper around Particle system
+ * Wrapper around SPARK related stuff.
+ * This class gives direct access to these stuff,
+ * it only manages the destruction and automatize the copy behaviour.
  */
 class ParticleSystemWrapper
 {
     public:
         ParticleSystemWrapper();
         virtual ~ParticleSystemWrapper();
+        ParticleSystemWrapper(const ParticleSystemWrapper & other) //What a bad design
+        {
+             particleSystem = NULL;
+             particleModel = NULL;
+            emitter = NULL;
+            zone = NULL;
+            group = NULL;
+            Init(other);
+        };
+        ParticleSystemWrapper & operator=(const ParticleSystemWrapper & other)
+        {
+            if ( &other != this ) Init(other);
+
+            return *this;
+        }
 
         SPK::System * particleSystem;
         SPK::Model * particleModel;
@@ -47,6 +64,7 @@ class ParticleSystemWrapper
         GLuint openGLTextureParticle;
 
     private:
+        void Init(const ParticleSystemWrapper & other);
 
         static bool SPKinitialized;
 };

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxDialog" name="ChoixLayer">
+	<object class="wxDialog" name="ChooseLayer">
 		<title>Choisir un calque</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
@@ -18,6 +18,7 @@
 								<object class="sizeritem">
 									<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
 										<bitmap>res/layers64.png</bitmap>
+										<style>wxNO_BORDER</style>
 									</object>
 									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>

@@ -455,7 +455,7 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
         else if ( IDglobalObject != -1)
             object = game.globalObjects[IDglobalObject];
         else
-            return "";
+            return string(wxGetTextFromUser(parameterInfo.description, _("Variable"), "", this).mb_str());
 
         ChooseVariableDialog dialog(this, object->variablesObjet);
         if ( dialog.ShowModal() == 1 )

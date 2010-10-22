@@ -95,7 +95,7 @@
 		<Cursor position="3156" topLine="97" />
 	</File>
 	<File name="Credits.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="13192" topLine="212" />
+		<Cursor position="13665" topLine="212" />
 	</File>
 	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="27459" topLine="642" />
@@ -103,8 +103,11 @@
 	<File name="DebuggerGUI.h" open="0" top="0" tabpos="0">
 		<Cursor position="2773" topLine="93" />
 	</File>
-	<File name="Demarrage.cpp" open="0" top="0" tabpos="14">
-		<Cursor position="2801" topLine="461" />
+	<File name="Demarrage.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="16474" topLine="426" />
+	</File>
+	<File name="Demarrage.h" open="0" top="0" tabpos="8">
+		<Cursor position="2298" topLine="64" />
 	</File>
 	<File name="DnDFileEditor.cpp" open="0" top="0" tabpos="13">
 		<Cursor position="322" topLine="0" />
@@ -211,14 +214,14 @@
 	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2790" topLine="90" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="10">
-		<Cursor position="8142" topLine="238" />
+	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="4693" topLine="154" />
 	</File>
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="9">
-		<Cursor position="221" topLine="1" />
+		<Cursor position="912" topLine="1" />
 	</File>
-	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="18336" topLine="285" />
+	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="9">
+		<Cursor position="15512" topLine="233" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="6">
 		<Cursor position="1750" topLine="52" />
@@ -241,8 +244,8 @@
 	<File name="MAJ.cpp" open="0" top="0" tabpos="13">
 		<Cursor position="7719" topLine="108" />
 	</File>
-	<File name="MainAide.cpp" open="0" top="0" tabpos="19">
-		<Cursor position="283" topLine="1" />
+	<File name="MainAide.cpp" open="0" top="0" tabpos="10">
+		<Cursor position="3357" topLine="87" />
 	</File>
 	<File name="MainFichier.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="1113" topLine="29" />
@@ -259,14 +262,14 @@
 	<File name="ObjectTypeChoice.h" open="0" top="0" tabpos="0">
 		<Cursor position="802" topLine="10" />
 	</File>
-	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="5683" topLine="177" />
+	<File name="PlayerUnitTests.cpp" open="1" top="1" tabpos="11">
+		<Cursor position="217" topLine="0" />
 	</File>
 	<File name="Portable.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="5778" topLine="127" />
 	</File>
 	<File name="Preferences.cpp" open="0" top="0" tabpos="27">
-		<Cursor position="41395" topLine="794" />
+		<Cursor position="29992" topLine="457" />
 	</File>
 	<File name="ProjectManager.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="22110" topLine="287" />
@@ -281,7 +284,7 @@
 		<Cursor position="22" topLine="0" />
 	</File>
 	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="12">
-		<Cursor position="21023" topLine="527" />
+		<Cursor position="35718" topLine="921" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="13">
 		<Cursor position="3470" topLine="83" />
@@ -298,8 +301,8 @@
 	<File name="SplashScreen.h" open="0" top="0" tabpos="6">
 		<Cursor position="288" topLine="6" />
 	</File>
-	<File name="StartHerePage.cpp" open="0" top="0" tabpos="15">
-		<Cursor position="14531" topLine="244" />
+	<File name="StartHerePage.cpp" open="0" top="0" tabpos="11">
+		<Cursor position="16641" topLine="267" />
 	</File>
 	<File name="StartHerePage.h" open="0" top="0" tabpos="0">
 		<Cursor position="933" topLine="13" />

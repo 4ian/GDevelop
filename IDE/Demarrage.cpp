@@ -75,7 +75,7 @@ Demarrage::Demarrage(wxWindow* parent)
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
-	
+
 	Create(parent, wxID_ANY, _("Premier démarrage de Game Develop"), wxDefaultPosition, wxDefaultSize, wxCAPTION|wxSYSTEM_MENU, _T("wxID_ANY"));
 	SetClientSize(wxSize(662,325));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -193,7 +193,7 @@ Demarrage::Demarrage(wxWindow* parent)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->SetSizeHints(this);
 	Center();
-	
+
 	Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Demarrage::OnButton1Click);
 	Connect(ID_BUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Demarrage::OnButton2Click);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Demarrage::OnGuideBtClick);
@@ -277,7 +277,7 @@ void Demarrage::OnFermerBtClick(wxCommandEvent& event)
 
 void Demarrage::OnTutorielBtClick(wxCommandEvent& event)
 {
-    wxString link = wxGetCwd() + "\\Tutoriel\\Tutoriel.pdf";
+    wxString link = wxGetCwd() + "\\Tutorial\\"+_("Tutoriel.pdf");
     wxString mimetype = "application/pdf";
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
     if (filetype) {

@@ -102,7 +102,7 @@ void Game_Develop_EditorFrame::OnMenuItem36Selected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuTutoSelected(wxCommandEvent& event)
 {
-    wxString link = wxGetCwd() + "/Tutoriel/Tutoriel.pdf";
+    wxString link = wxGetCwd() + "/Tutorial/"+_("Tutoriel.pdf");
 
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType ("application/pdf");
     if (filetype) {

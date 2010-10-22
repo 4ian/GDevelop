@@ -59,6 +59,7 @@ extern MemTrace MemTracer;
 const long Game_Develop_EditorFrame::ID_PANEL3 = wxNewId();
 const long Game_Develop_EditorFrame::ID_AUINOTEBOOK1 = wxNewId();
 const long Game_Develop_EditorFrame::ID_PANEL1 = wxNewId();
+const long Game_Develop_EditorFrame::ID_MENUITEM1 = wxNewId();
 const long Game_Develop_EditorFrame::ID_MENUITEM8 = wxNewId();
 const long Game_Develop_EditorFrame::ID_MENUITEM2 = wxNewId();
 const long Game_Develop_EditorFrame::ID_MENUITEM3 = wxNewId();
@@ -103,6 +104,7 @@ ribbonSceneEditorButtonBar(NULL)
 {
 
     //(*Initialize(Game_Develop_EditorFrame)
+    wxMenuItem* MenuItem1;
     wxMenuItem* MenuItem11;
     wxFlexGridSizer* FlexGridSizer2;
     wxMenuItem* MenuItem42;
@@ -111,7 +113,7 @@ ribbonSceneEditorButtonBar(NULL)
     wxFlexGridSizer* FlexGridSizer1;
     wxMenuItem* MenuItem45;
     wxFlexGridSizer* ribbonSizer;
-    
+
     Create(parent, wxID_ANY, _("Game Develop - Nouveau jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(850,700));
     {
@@ -144,6 +146,8 @@ ribbonSceneEditorButtonBar(NULL)
     FlexGridSizer2->SetSizeHints(Panel1);
     FlexGridSizer1->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer1);
+    MenuItem1 = new wxMenuItem((&openContextMenu), ID_MENUITEM1, _("Ouvrir un exemple"), wxEmptyString, wxITEM_NORMAL);
+    openContextMenu.Append(MenuItem1);
     MenuItem45 = new wxMenuItem((&openContextMenu), ID_MENUITEM8, _("Importer un jeu"), wxEmptyString, wxITEM_NORMAL);
     MenuItem45->SetBitmap(wxBitmap(wxImage(_T("res/fusionicon.png"))));
     openContextMenu.Append(MenuItem45);
@@ -166,9 +170,10 @@ ribbonSceneEditorButtonBar(NULL)
     decomposerContextMenu.Append(MenuItem43);
     FlexGridSizer1->SetSizeHints(this);
     Center();
-    
+
     Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE,(wxObjectEventFunction)&Game_Develop_EditorFrame::OneditorsNotebookPageClose);
     Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnNotebook1PageChanged);
+    Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnOpenExampleSelected);
     Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuFusionSelected);
     Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuSaveAsSelected);
     Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuPortableSelected);

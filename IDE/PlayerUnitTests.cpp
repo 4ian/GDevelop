@@ -18,7 +18,7 @@
 #endif
 
 using namespace std;
-
+/*
 float SquareRootFloat(float number) {
     long *i;
     float x, y;
@@ -121,7 +121,7 @@ TEST(Runtime, SQRT)
         cout << "Result forces : " << end.QuadPart-start.QuadPart << endl;
     }
 }
-
+*/
 TEST( Runtime, Forces )
 {
     Force force;

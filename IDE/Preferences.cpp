@@ -112,7 +112,7 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer11;
     wxFlexGridSizer* FlexGridSizer17;
     wxStaticBoxSizer* StaticBoxSizer5;
-
+    
     Create(parent, wxID_ANY, _("Préférences de Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(467,330));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -123,7 +123,7 @@ changesNeedRestart(false)
     Panel1 = new wxPanel(this, ID_PANEL5, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL5"));
     Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
     FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
-    StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/preferencelogo.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP3"));
+    StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/preferencelogo.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP3"));
     FlexGridSizer12->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     StaticText7 = new wxStaticText(Panel1, ID_STATICTEXT7, _("La fenêtre des préférences vous permet de personnaliser\nGame Develop. Chaque utilisateur de l\'ordinateur possède\nses propres préférences."), wxDefaultPosition, wxSize(417,48), wxALIGN_LEFT, _T("ID_STATICTEXT7"));
     FlexGridSizer12->Add(StaticText7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -216,7 +216,7 @@ changesNeedRestart(false)
     FlexGridSizer16->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer3->AddGrowableCol(2);
-    wxString __wxRadioBoxChoices_1[2] =
+    wxString __wxRadioBoxChoices_1[2] = 
     {
     	_("Microsoft Office"),
     	_("wxAUI")
@@ -305,7 +305,7 @@ changesNeedRestart(false)
     SetSizer(FlexGridSizer1);
     FlexGridSizer1->SetSizeHints(this);
     Center();
-
+    
     Connect(ID_CHOICE2,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&Preferences::OnlangChoiceSelect);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnBrowseEditionImageClick);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnBrowseDossierTempBtClick);

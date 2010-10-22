@@ -42,7 +42,7 @@ ChoixBouton::ChoixBouton( wxWindow* parent, string pBouton ) :
     	_("Bouton spécial 1"),
     	_("Bouton spécial 2")
     };
-    RadioBox1 = new wxRadioBox(this, ID_RADIOBOX1, _("Choisissez le bouton :"), wxDefaultPosition, wxSize(136,127), 5, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
+    RadioBox1 = new wxRadioBox(this, ID_RADIOBOX1, _("Choisissez le bouton :"), wxDefaultPosition, wxDefaultSize, 5, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
     FlexGridSizer2->Add(RadioBox1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     TestPanel = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(123,117), wxRAISED_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     TestPanel->SetBackgroundColour(wxColour(128,128,128));

@@ -192,6 +192,7 @@ class Game_Develop_EditorFrame: public wxFrame
         void OnmodVarSceneMenuISelected(wxCommandEvent& event);
         void OnglobalVarBtClick(wxCommandEvent& event);
         void OneditorsNotebookPageClose(wxAuiNotebookEvent& event);
+        void OnOpenExampleSelected(wxCommandEvent& event);
         //*)
         void OnRibbonNewClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonOpenClicked(wxRibbonButtonBarEvent& evt);
@@ -212,6 +213,7 @@ class Game_Develop_EditorFrame: public wxFrame
         static const long ID_PANEL3;
         static const long ID_AUINOTEBOOK1;
         static const long ID_PANEL1;
+        static const long ID_MENUITEM1;
         static const long ID_MENUITEM8;
         static const long ID_MENUITEM2;
         static const long ID_MENUITEM3;

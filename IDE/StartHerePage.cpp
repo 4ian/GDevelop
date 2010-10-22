@@ -95,7 +95,7 @@ mainEditor(mainEditor_)
 	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Si vous débutez ou avez besoin d\'aide :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer4->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer7 = new wxFlexGridSizer(0, 2, 0, 0);
-	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/tutoicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/modesimpleicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	FlexGridSizer7->Add(StaticBitmap2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	HyperlinkCtrl1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Lire le guide de démarrage"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	FlexGridSizer7->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -282,7 +282,7 @@ void StartHerePage::OnguideBtClick(wxCommandEvent& event)
 
 void StartHerePage::OntutoBtClick(wxCommandEvent& event)
 {
-    wxString link = wxGetCwd() + "\\Tutoriel\\Tutoriel.pdf";
+    wxString link = wxGetCwd() + "\\Tutorial\\"+_("Tutoriel.pdf");
     wxString mimetype = "application/pdf";
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
     if (filetype) {
@@ -302,7 +302,7 @@ void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)
     wxFileDialog open( NULL, _( "Ouvrir un exemple" ), "Exemples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
     open.ShowModal();
 
-    mainEditor.Open(string(open.GetPath().mb_str()));
+    if ( !open.GetPath().empty() ) mainEditor.Open(string(open.GetPath().mb_str()));
 }
 
 void StartHerePage::OnresourcesLinkClick(wxCommandEvent& event)

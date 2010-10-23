@@ -188,6 +188,7 @@
 																					<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap1" member="yes">
 																						<bitmap>res/direction.png</bitmap>
 																						<size>25,25</size>
+																						<style>wxNO_BORDER</style>
 																					</object>
 																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																					<option>1</option>

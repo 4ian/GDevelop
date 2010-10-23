@@ -75,7 +75,7 @@ bool SpriteObject::ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsCon
         applyAlpha = action.GetParameter(4).GetAsBool();
     }
 
-    dest->Copy(*scene.game->imageManager->GetImage(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this())),
+    dest->Copy(*scene.game->imageManager->GetSFMLImage(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this())),
               destX, destY, sf::IntRect(0, 0, 0, 0), applyAlpha);
 
     return true;

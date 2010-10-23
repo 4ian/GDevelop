@@ -182,7 +182,7 @@
 		<Cursor position="449" topLine="4" />
 	</File>
 	<File name="GDL\EditExpression.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="30299" topLine="542" />
+		<Cursor position="25178" topLine="405" />
 	</File>
 	<File name="GDL\EditExpression.h" open="0" top="0" tabpos="6">
 		<Cursor position="4706" topLine="128" />
@@ -337,11 +337,11 @@
 	<File name="GDL\Image.h" open="0" top="0" tabpos="20">
 		<Cursor position="363" topLine="0" />
 	</File>
-	<File name="GDL\ImageManager.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="2196" topLine="56" />
+	<File name="GDL\ImageManager.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="2419" topLine="48" />
 	</File>
-	<File name="GDL\ImageManager.h" open="0" top="0" tabpos="21">
-		<Cursor position="743" topLine="4" />
+	<File name="GDL\ImageManager.h" open="1" top="0" tabpos="4">
+		<Cursor position="1500" topLine="26" />
 	</File>
 	<File name="GDL\Instruction.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="992" topLine="24" />
@@ -551,7 +551,7 @@
 		<Cursor position="604" topLine="36" />
 	</File>
 	<File name="GDL\Sprite.h" open="0" top="0" tabpos="23">
-		<Cursor position="802" topLine="6" />
+		<Cursor position="724" topLine="10" />
 	</File>
 	<File name="GDL\SpriteExtension.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="22595" topLine="431" />
@@ -563,7 +563,7 @@
 		<Cursor position="636" topLine="8" />
 	</File>
 	<File name="GDL\SpriteObject.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="12041" topLine="317" />
+		<Cursor position="10745" topLine="275" />
 	</File>
 	<File name="GDL\SpriteObject.h" open="0" top="0" tabpos="4">
 		<Cursor position="4109" topLine="141" />
@@ -671,7 +671,7 @@
 		<Cursor position="306" topLine="0" />
 	</File>
 	<File name="GDL\aEffects.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="2935" topLine="60" />
+		<Cursor position="2948" topLine="60" />
 	</File>
 	<File name="GDL\aEffects.h" open="0" top="0" tabpos="26">
 		<Cursor position="294" topLine="0" />

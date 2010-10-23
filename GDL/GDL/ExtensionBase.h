@@ -1012,6 +1012,7 @@ class GD_API ExtensionBase
     inline std::string GetAuthor() const { return author; }
     inline std::string GetLicense() const { return license; }
     inline std::string GetFullName() const { return fullname; }
+    const std::vector < std::pair<std::string, std::string> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
     #endif
 
     InstructionFunPtr       GetConditionFunctionPtr(std::string conditionName) const;
@@ -1104,6 +1105,7 @@ class GD_API ExtensionBase
     std::string informations;
     std::string author;
     std::string license;
+    std::vector < std::pair<std::string, std::string> > supplementaryRuntimeFiles; ///<Supplementary runtime files to copy on compilation
     #endif
 
     std::map<std::string, ExtensionObjectInfos > objectsInfos;

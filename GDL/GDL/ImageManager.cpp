@@ -20,7 +20,7 @@ game(NULL)
     badImage = boost::shared_ptr<sf::Image>(ressourcesLoader->LoadImage("vide.png"));
 }
 
-boost::shared_ptr<sf::Image> ImageManager::GetImage(std::string name) const
+boost::shared_ptr<sf::Image> ImageManager::GetSFMLImage(std::string name) const
 {
     if ( !game )
     {
@@ -48,6 +48,24 @@ boost::shared_ptr<sf::Image> ImageManager::GetImage(std::string name) const
     }
 
     return badImage;
+}
+
+boost::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(std::string name) const
+{
+    if ( !game )
+    {
+        cout << "Image manager has no game associated with.";
+        return badOpenGLTexture;
+    }
+
+    if ( alreadyLoadedOpenGLTextures.find(name) != alreadyLoadedOpenGLTextures.end() && !alreadyLoadedOpenGLTextures.find(name)->second.expired() )
+        return alreadyLoadedOpenGLTextures.find(name)->second.lock();
+
+    cout << "Load OpenGL Texture" << name << endl;
+
+    boost::shared_ptr<OpenGLTextureWrapper> texture = boost::shared_ptr<OpenGLTextureWrapper>(new OpenGLTextureWrapper(GetSFMLImage(name)));
+    alreadyLoadedOpenGLTextures[name] = texture;
+    return texture;
 }
 
 bool ImageManager::HasImage(std::string name) const
@@ -84,8 +102,18 @@ void ImageManager::LoadPermanentImages()
     for (unsigned int i = 0;i<game->images.size();++i)
     {
     	if ( game->images[i].alwaysLoaded )
-            newPermanentlyLoadedImages[game->images[i].nom] = GetImage(game->images[i].nom);
+            newPermanentlyLoadedImages[game->images[i].nom] = GetSFMLImage(game->images[i].nom);
     }
 
     permanentlyLoadedImages = newPermanentlyLoadedImages;
+}
+
+OpenGLTextureWrapper::OpenGLTextureWrapper(boost::shared_ptr<sf::Image> sfmlImage_)
+{
+    sfmlImage = sfmlImage_;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, sfmlImage->GetWidth(), sfmlImage->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, sfmlImage->GetPixelsPtr());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 }

@@ -291,7 +291,7 @@ bool SpriteObject::LoadResources(const ImageManager & imageMgr )
             {
                 Sprite & sprite = GetAnimation( j ).GetDirectionToModify(k).GetSprite(l);
 
-                sprite.LoadImage(imageMgr.GetImage(sprite.GetImageName()));
+                sprite.LoadImage(imageMgr.GetSFMLImage(sprite.GetImageName()));
             }
         }
     }

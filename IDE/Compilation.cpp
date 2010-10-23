@@ -102,7 +102,7 @@ Compilation::Compilation( wxWindow* parent, Game * jeu )
     wxStaticBoxSizer* StaticBoxSizer1;
     wxFlexGridSizer* FlexGridSizer1;
     wxFlexGridSizer* FlexGridSizer17;
-    
+
     Create(parent, wxID_ANY, _("Compilation du jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
     wxIcon FrameIcon;
     FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/compil.png"))));
@@ -132,7 +132,7 @@ Compilation::Compilation( wxWindow* parent, Game * jeu )
     FlexGridSizer7->AddGrowableRow(2);
     StaticText4 = new wxStaticText(Panel5, ID_STATICTEXT4, _("Game Develop vous propose deux types de compilation :\n\n-La compilation simple créé un dossier rassemblant les ressources \n( images, sons... ) du jeu et l\'executable.\n\n-La compilation en un fichier unique rassemble votre jeu en un fichier\nunique, qui contient l\'ensemble du jeu."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
     FlexGridSizer7->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    wxString __wxRadioBoxChoices_1[2] = 
+    wxString __wxRadioBoxChoices_1[2] =
     {
     	_("Simple ( dossier contenant jeu et ressources )"),
     	_("Fichier exécutable unique ( compressé )")
@@ -225,7 +225,7 @@ Compilation::Compilation( wxWindow* parent, Game * jeu )
     FlexGridSizer1->Fit(this);
     FlexGridSizer1->SetSizeHints(this);
     Center();
-    
+
     Connect(ID_RADIOBOX1,wxEVT_COMMAND_RADIOBOX_SELECTED,(wxObjectEventFunction)&Compilation::OnTypeBoxSelect);
     Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnNext1Click);
     Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnNext2Click);
@@ -441,13 +441,34 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
             ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" )
             && extension->GetName() != "BuiltinCommonInstructions" ) //Extension with a namespace but builtin
         {
-            if ( WinCheck->GetValue() &&
-                wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdw", repTemp + "/" + game.extensionsUsed[i]+".xgdw", true ) == false )
-                report += _( "Impossible de copier l'extension \""+game.extensionsUsed[i]+"\" pour Windows dans le répertoire de compilation.\n" );
+            if ( WinCheck->GetValue())
+            {
+                if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdw", repTemp + "/" + game.extensionsUsed[i]+".xgdw", true ) == false )
+                    report += _( "Impossible de copier l'extension \""+game.extensionsUsed[i]+"\" pour Windows dans le répertoire de compilation.\n" );
 
-            if ( LinuxCheck->GetValue() &&
-                wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdl", repTemp + "/"+game.extensionsUsed[i]+".xgdl", true ) == false )
-                report += _( "Impossible de copier l'extension \""+game.extensionsUsed[i]+"\" pour Linux dans le répertoire de compilation.\n" );
+                const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
+                for (unsigned int i = 0;i<supplementaryFiles.size();++i)
+                {
+                    if ( supplementaryFiles[i].first == "Windows"
+                         && wxCopyFile( supplementaryFiles[i].second, repTemp + "/" + supplementaryFiles[i].second, true ) == false )
+                        report += _( "Impossible de copier \""+supplementaryFiles[i].second+"\" pour Windows dans le répertoire de compilation.\n" );
+                }
+            }
+
+
+            if ( LinuxCheck->GetValue() )
+            {
+                if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdl", repTemp + "/"+game.extensionsUsed[i]+".xgdl", true ) == false )
+                    report += _( "Impossible de copier l'extension \""+game.extensionsUsed[i]+"\" pour Linux dans le répertoire de compilation.\n" );
+
+                const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
+                for (unsigned int i = 0;i<supplementaryFiles.size();++i)
+                {
+                    if ( supplementaryFiles[i].first == "Linux"
+                         && wxCopyFile( supplementaryFiles[i].second, repTemp + "/" + supplementaryFiles[i].second, true ) == false )
+                        report += _( "Impossible de copier \""+supplementaryFiles[i].second+"\" pour Linux dans le répertoire de compilation.\n" );
+                }
+            }
         }
     }
 
@@ -578,7 +599,6 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 
             if ( wxCopyFile( "mingwm10.dll", repTemp + "/mingwm10.dll", true ) == false )
                 report += _( "Impossible de copier mingwm10.dll dans le répertoire de compilation.\n" );
-
 
             //Compression en un seul fichier
             StaticText3->SetLabel( "Exportation du jeu... ( Compression )" );

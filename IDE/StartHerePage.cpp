@@ -23,6 +23,7 @@ const long StartHerePage::ID_STATICBITMAP2 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL1 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP3 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL2 = wxNewId();
+const long StartHerePage::ID_HYPERLINKCTRL17 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP4 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL14 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP5 = wxNewId();
@@ -59,6 +60,7 @@ mainEditor(mainEditor_)
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
 	wxGridSizer* GridSizer1;
+	wxFlexGridSizer* FlexGridSizer8;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxGridSizer* GridSizer2;
@@ -101,8 +103,12 @@ mainEditor(mainEditor_)
 	FlexGridSizer7->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap3 = new wxStaticBitmap(this, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/tutoicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
 	FlexGridSizer7->Add(StaticBitmap3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
 	HyperlinkCtrl2 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL2, _("Lire le tutoriel"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
-	FlexGridSizer7->Add(HyperlinkCtrl2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer8->Add(HyperlinkCtrl2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	secondTutoLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL17, _("(-Insert the name of the second tutorial or a blank text-)"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL17"));
+	FlexGridSizer8->Add(secondTutoLink, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer7->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBitmap4 = new wxStaticBitmap(this, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/openicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP4"));
 	FlexGridSizer7->Add(StaticBitmap4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	openExamplesLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL14, _("Ouvrir les exemples"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL14"));
@@ -157,6 +163,7 @@ mainEditor(mainEditor_)
 
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnguideBtClick);
 	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OntutoBtClick);
+	Connect(ID_HYPERLINKCTRL17,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnTutorial2BtClick);
 	Connect(ID_HYPERLINKCTRL14,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnopenExamplesLinkClick);
 	Connect(ID_HYPERLINKCTRL15,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnresourcesLinkClick);
 	Connect(ID_HYPERLINKCTRL5,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::Onrecent1BtClick);
@@ -169,6 +176,9 @@ mainEditor(mainEditor_)
 	Connect(ID_HYPERLINKCTRL12,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::Onrecent8BtClick);
 	Connect(ID_HYPERLINKCTRL13,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::Onrecent9BtClick);
 	//*)
+
+    if ( _("-Insert the name of the second tutorial or a blank text-") == "(-Insert the name of the second tutorial or a blank text-)" )
+        secondTutoLink->SetLabel("");
 
     Refresh();
 }
@@ -297,9 +307,28 @@ void StartHerePage::OntutoBtClick(wxCommandEvent& event)
         wxLogMessage(_("Impossible de lancer le tutoriel. Vous pouvez le consulter en allant dans le dossier Game Develop, puis dans le répertoire Tutoriel et en ouvrant le fichier Tutoriel.pdf"));
 }
 
+void StartHerePage::OnTutorial2BtClick(wxCommandEvent& event)
+{
+    if ( _("(-Insert filename of the second tutorial or a blank text if there is no second tutorial-)") == "" ) return;
+
+    wxString link = wxGetCwd() + "\\Tutorial\\"+_("(-Insert filename of the second tutorial or a blank text if there is no second tutorial-)");
+    wxString mimetype = "application/pdf";
+    wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
+    if (filetype) {
+        wxString cmd;
+        if (filetype->GetOpenCommand (&cmd, wxFileType::MessageParameters (link))) {
+            cmd.Replace(_T("file://"), wxEmptyString);
+            ::wxExecute(cmd);
+        }
+        delete filetype;
+    }
+    else
+        wxLogMessage(_("Impossible de lancer le tutoriel. Vous pouvez le consulter en allant dans le dossier Game Develop, puis dans le répertoire Tutoriel et en ouvrant le fichier Tutoriel.pdf"));
+}
+
 void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)
 {
-    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), "Exemples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Exemples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
     open.ShowModal();
 
     if ( !open.GetPath().empty() ) mainEditor.Open(string(open.GetPath().mb_str()));

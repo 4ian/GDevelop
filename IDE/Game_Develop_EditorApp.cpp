@@ -249,10 +249,10 @@ bool Game_Develop_EditorApp::OnInit()
             Demarrage bienvenue( NULL );
             if ( bienvenue.ShowModal() == 1 )
             {
-                wxFileDialog open( NULL, _( "Ouvrir un exemple" ), "Exemples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+                wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Exemples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
                 open.ShowModal();
 
-                fileToOpen = static_cast<string>( open.GetPath() );
+                if ( !open.GetPath().empty() ) fileToOpen = static_cast<string>( open.GetPath() );
             }
             Config->Write( "Démarrage/Guide", "false" );
         }

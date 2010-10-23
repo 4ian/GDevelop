@@ -113,7 +113,7 @@ ribbonSceneEditorButtonBar(NULL)
     wxFlexGridSizer* FlexGridSizer1;
     wxMenuItem* MenuItem45;
     wxFlexGridSizer* ribbonSizer;
-
+    
     Create(parent, wxID_ANY, _("Game Develop - Nouveau jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(850,700));
     {
@@ -170,7 +170,7 @@ ribbonSceneEditorButtonBar(NULL)
     decomposerContextMenu.Append(MenuItem43);
     FlexGridSizer1->SetSizeHints(this);
     Center();
-
+    
     Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE,(wxObjectEventFunction)&Game_Develop_EditorFrame::OneditorsNotebookPageClose);
     Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnNotebook1PageChanged);
     Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnOpenExampleSelected);

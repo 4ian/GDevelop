@@ -243,5 +243,5 @@ void Credits::OnCompilGamesBtClick(wxCommandEvent& event)
 
 void Credits::OnDonBtClick(wxCommandEvent& event)
 {
-    OpenLink("http://www.compilgames.net/don.php");
+    OpenLink(_("http://www.compilgames.net/\?file=kop8.php"));
 }

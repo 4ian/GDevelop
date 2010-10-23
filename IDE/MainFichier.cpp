@@ -68,7 +68,7 @@ void Game_Develop_EditorFrame::OnMenuOpenSelected( wxCommandEvent& event )
 }
 void Game_Develop_EditorFrame::OnOpenExampleSelected(wxCommandEvent& event)
 {
-    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), "Exemples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Exemples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
     open.ShowModal();
 
     if ( !open.GetPath().empty() ) Open(string(open.GetPath().mb_str()));

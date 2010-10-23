@@ -64,10 +64,11 @@ game(game_)
 	
 	Create(parent, wxID_ANY, _("Utiliser des modules d\'extensions de Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer1->AddGrowableCol(0);
 	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 	FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
-	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/extension64.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP3"));
+	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/extension64.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Game Develop peut utiliser des extensions pour augmenter\nou simplifier les possibilités de création.\nCochez extensions que vous souhaitez utiliser dans votre jeu."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
 	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -78,6 +79,8 @@ game(game_)
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Extensions disponibles :"));
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer2->AddGrowableCol(0);
+	FlexGridSizer2->AddGrowableRow(0);
 	ExtensionsList = new wxCheckListBox(this, ID_CHECKLISTBOX1, wxDefaultPosition, wxSize(370,322), 0, 0, 0, wxDefaultValidator, _T("ID_CHECKLISTBOX1"));
 	FlexGridSizer2->Add(ExtensionsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -93,6 +96,8 @@ game(game_)
 	FlexGridSizer7->Add(infoEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer8->AddGrowableCol(1);
+	FlexGridSizer8->AddGrowableRow(0);
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT5, _("Auteur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer8->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	authorTxt = new wxStaticText(this, ID_STATICTEXT3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
@@ -101,6 +106,8 @@ game(game_)
 	FlexGridSizer8->Add(authorTxt, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer5->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer9->AddGrowableCol(1);
+	FlexGridSizer9->AddGrowableRow(0);
 	StaticText4 = new wxStaticText(this, ID_STATICTEXT6, _("Licence d\'utilisation :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	FlexGridSizer9->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	licenseTxt = new wxStaticText(this, ID_STATICTEXT4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
@@ -109,11 +116,12 @@ game(game_)
 	FlexGridSizer9->Add(licenseTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer10 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer10->AddGrowableRow(0);
 	StaticText5 = new wxStaticText(this, ID_STATICTEXT7, _("Compatibilité :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
 	FlexGridSizer10->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	wincompatibleBmp = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/win-compatible.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP2"));
+	wincompatibleBmp = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/win-compatible.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	FlexGridSizer10->Add(wincompatibleBmp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	linuxcompatibleBmp = new wxStaticBitmap(this, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/linux-compatible.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP4"));
+	linuxcompatibleBmp = new wxStaticBitmap(this, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/linux-compatible.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP4"));
 	FlexGridSizer10->Add(linuxcompatibleBmp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer2->Add(FlexGridSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);

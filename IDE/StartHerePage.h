@@ -34,6 +34,7 @@ class StartHerePage: public wxPanel
 		wxHyperlinkCtrl* HyperlinkCtrl5;
 		wxStaticBitmap* StaticBitmap4;
 		wxHyperlinkCtrl* recent5Bt;
+		wxHyperlinkCtrl* secondTutoLink;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
 		wxHyperlinkCtrl* HyperlinkCtrl1;
@@ -65,6 +66,7 @@ class StartHerePage: public wxPanel
 		static const long ID_HYPERLINKCTRL1;
 		static const long ID_STATICBITMAP3;
 		static const long ID_HYPERLINKCTRL2;
+		static const long ID_HYPERLINKCTRL17;
 		static const long ID_STATICBITMAP4;
 		static const long ID_HYPERLINKCTRL14;
 		static const long ID_STATICBITMAP5;
@@ -104,6 +106,7 @@ class StartHerePage: public wxPanel
 		void OnforumBtClick(wxCommandEvent& event);
 		void OnopenExamplesLinkClick(wxCommandEvent& event);
 		void OnresourcesLinkClick(wxCommandEvent& event);
+		void OnTutorial2BtClick(wxCommandEvent& event);
 		//*)
 
 		Game_Develop_EditorFrame & mainEditor;

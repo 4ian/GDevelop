@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
+	<ActiveTarget name="Release - Edittime" />
 	<File name="AutomatismTypeChoice.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="1129" topLine="18" />
 	</File>
@@ -194,7 +194,7 @@
 		<Cursor position="1905" topLine="20" />
 	</File>
 	<File name="Extensions.cpp" open="0" top="0" tabpos="21">
-		<Cursor position="11989" topLine="318" />
+		<Cursor position="13457" topLine="235" />
 	</File>
 	<File name="Extensions.h" open="0" top="0" tabpos="2">
 		<Cursor position="1971" topLine="58" />
@@ -214,14 +214,14 @@
 	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2790" topLine="90" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="4693" topLine="154" />
+	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="11">
+		<Cursor position="8755" topLine="238" />
 	</File>
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="9">
 		<Cursor position="912" topLine="1" />
 	</File>
 	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="15512" topLine="233" />
+		<Cursor position="28226" topLine="557" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="6">
 		<Cursor position="1750" topLine="52" />
@@ -247,8 +247,8 @@
 	<File name="MainAide.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="3357" topLine="87" />
 	</File>
-	<File name="MainFichier.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="1113" topLine="29" />
+	<File name="MainFichier.cpp" open="1" top="0" tabpos="12">
+		<Cursor position="2002" topLine="52" />
 	</File>
 	<File name="MainOptions.cpp" open="0" top="0" tabpos="15">
 		<Cursor position="688" topLine="26" />
@@ -262,7 +262,7 @@
 	<File name="ObjectTypeChoice.h" open="0" top="0" tabpos="0">
 		<Cursor position="802" topLine="10" />
 	</File>
-	<File name="PlayerUnitTests.cpp" open="1" top="1" tabpos="11">
+	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="11">
 		<Cursor position="217" topLine="0" />
 	</File>
 	<File name="Portable.cpp" open="0" top="0" tabpos="5">
@@ -301,8 +301,8 @@
 	<File name="SplashScreen.h" open="0" top="0" tabpos="6">
 		<Cursor position="288" topLine="6" />
 	</File>
-	<File name="StartHerePage.cpp" open="0" top="0" tabpos="11">
-		<Cursor position="16641" topLine="267" />
+	<File name="StartHerePage.cpp" open="1" top="0" tabpos="10">
+		<Cursor position="19358" topLine="302" />
 	</File>
 	<File name="StartHerePage.h" open="0" top="0" tabpos="0">
 		<Cursor position="933" topLine="13" />

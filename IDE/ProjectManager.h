@@ -87,6 +87,7 @@ class ProjectManager: public wxPanel
         static const long idRibbonNew;
         static const long idRibbonOpen;
         static const long idRibbonSave;
+        static const long idRibbonSaveAll;
         static const long idRibbonClose;
         static const long idRibbonExtensions;
         static const long idRibbonAddScene;

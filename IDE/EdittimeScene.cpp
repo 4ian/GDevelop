@@ -116,9 +116,9 @@ void EdittimeScene::RenderEdittimeScene()
                                                allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2);
 
                             angleBt.SetPosition(    allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2-2
-                                                    +20*cos(allObjects[id]->GetAngle()/180.f*3.14),
+                                                    +20*cos(allObjects[id]->GetAngle()/180.f*3.14159),
                                                     allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2-2
-                                                    +20*sin(allObjects[id]->GetAngle()/180.f*3.14) );
+                                                    +20*sin(allObjects[id]->GetAngle()/180.f*3.14159) );
 
                             centerToAngle.Rotate(-allObjects[id]->GetAngle());
                             centerToAngle.SetPosition(  allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,

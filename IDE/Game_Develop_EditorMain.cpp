@@ -66,6 +66,7 @@ const long Game_Develop_EditorFrame::ID_MENUITEM3 = wxNewId();
 const long Game_Develop_EditorFrame::ID_MENUITEM4 = wxNewId();
 const long Game_Develop_EditorFrame::ID_MENUITEM5 = wxNewId();
 const long Game_Develop_EditorFrame::ID_MENUITEM6 = wxNewId();
+const long Game_Develop_EditorFrame::ID_TIMER1 = wxNewId();
 //*)
 const long Game_Develop_EditorFrame::IDM_RECENTS = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonNew = wxNewId();
@@ -73,6 +74,7 @@ const long Game_Develop_EditorFrame::idRibbonOpen = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonSave = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonProjectsManager = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonSaveAs = wxNewId();
+const long Game_Develop_EditorFrame::idRibbonSaveAll = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonPortable = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonCompil = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonSimpleMode = wxNewId();
@@ -113,7 +115,7 @@ ribbonSceneEditorButtonBar(NULL)
     wxFlexGridSizer* FlexGridSizer1;
     wxMenuItem* MenuItem45;
     wxFlexGridSizer* ribbonSizer;
-    
+
     Create(parent, wxID_ANY, _("Game Develop - Nouveau jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(850,700));
     {
@@ -168,9 +170,11 @@ ribbonSceneEditorButtonBar(NULL)
     MenuItem43 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM6, _("Décomposer une feuille de sprite"), wxEmptyString, wxITEM_NORMAL);
     MenuItem43->SetBitmap(wxBitmap(wxImage(_T("res/spritesheet16.png"))));
     decomposerContextMenu.Append(MenuItem43);
+    autoSaveTimer.SetOwner(this, ID_TIMER1);
+    autoSaveTimer.Start(180000, false);
     FlexGridSizer1->SetSizeHints(this);
     Center();
-    
+
     Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE,(wxObjectEventFunction)&Game_Develop_EditorFrame::OneditorsNotebookPageClose);
     Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnNotebook1PageChanged);
     Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnOpenExampleSelected);
@@ -180,6 +184,7 @@ ribbonSceneEditorButtonBar(NULL)
     Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnDecomposeGIFSelected);
     Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnDecomposeRPGSelected);
     Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnDecomposeSSSelected);
+    Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnautoSaveTimerTrigger);
     Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnClose);
     //*)
     Connect( wxID_FILE1, wxID_FILE9, wxEVT_COMMAND_MENU_SELECTED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRecentClicked );
@@ -188,6 +193,7 @@ ribbonSceneEditorButtonBar(NULL)
     Connect( idRibbonOpen, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonOpenDropDownClicked );
     Connect( idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuSaveSelected );
     Connect( idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonSaveDropDownClicked );
+    Connect( idRibbonSaveAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonSaveAllClicked );
     Connect( idRibbonCompil, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuCompilationSelected );
     Connect( idRibbonProjectsManager, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnProjectsManagerClicked );
     Connect( idRibbonEncoder, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuItem23Selected );
@@ -233,6 +239,7 @@ ribbonSceneEditorButtonBar(NULL)
         wxRibbonPanel *file2Panel = new wxRibbonPanel(home, wxID_ANY, _("Projet actuel"), wxBitmap("res/saveicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_EXT_BUTTON);
         wxRibbonButtonBar *file2_bar = new wxRibbonButtonBar(file2Panel, wxID_ANY);
         file2_bar->AddHybridButton(idRibbonSave, !hideLabels ? _("Enregistrer") : " ", wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY));
+        file2_bar->AddButton(idRibbonSaveAll, !hideLabels ? _("Enregistrer tout ") : " ", wxBitmap("res/save_all24.png", wxBITMAP_TYPE_ANY));
         file2_bar->AddButton(idRibbonCompil, !hideLabels ? _("Compilation") : "", wxBitmap("res/compilicon24.png", wxBITMAP_TYPE_ANY));
 
         wxRibbonPanel *affichagePanel = new wxRibbonPanel(home, wxID_ANY, _("Affichage"), wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -591,4 +598,9 @@ void Game_Develop_EditorFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& ev
 {
     if (  dynamic_cast<StartHerePage*>(editorsNotebook->GetPage(event.GetSelection())) != NULL )
         startPage = NULL;
+}
+
+void Game_Develop_EditorFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
+{
+    //TODO
 }

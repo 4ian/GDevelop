@@ -25,10 +25,10 @@ class Credits: public wxDialog
 		wxButton* OkBt;
 		wxNotebook* Notebook1;
 		wxBitmapButton* GccBt;
+		wxStaticText* StaticText2;
 		wxBitmapButton* CBBt;
 		wxStaticText* StaticText6;
 		wxStaticBitmap* StaticBitmap1;
-		wxStaticText* StaticText8;
 		wxBitmapButton* WxBt;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
@@ -65,7 +65,7 @@ class Credits: public wxDialog
 		static const long ID_STATICTEXT6;
 		static const long ID_BITMAPBUTTON5;
 		static const long ID_BITMAPBUTTON6;
-		static const long ID_STATICTEXT8;
+		static const long ID_STATICTEXT2;
 		static const long ID_PANEL3;
 		static const long ID_NOTEBOOK1;
 		static const long ID_BUTTON1;

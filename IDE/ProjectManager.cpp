@@ -57,6 +57,7 @@ const long ProjectManager::ID_MENUITEM12 = wxNewId();
 const long ProjectManager::idRibbonNew = wxNewId();
 const long ProjectManager::idRibbonOpen = wxNewId();
 const long ProjectManager::idRibbonSave = wxNewId();
+const long ProjectManager::idRibbonSaveAll = wxNewId();
 const long ProjectManager::idRibbonCompil = wxNewId();
 const long ProjectManager::idRibbonClose = wxNewId();
 const long ProjectManager::idRibbonExtensions = wxNewId();
@@ -233,6 +234,7 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         wxRibbonPanel *file2Panel = new wxRibbonPanel(page, wxID_ANY, _("Projet actuel"), wxBitmap("res/saveicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_EXT_BUTTON);
         wxRibbonButtonBar *file2_bar = new wxRibbonButtonBar(file2Panel, wxID_ANY);
         file2_bar->AddHybridButton(idRibbonSave, !hideLabels ? _("Enregistrer") : " ", wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY));
+        file2_bar->AddButton(idRibbonSaveAll, !hideLabels ? _("Enregistrer tout ") : " ", wxBitmap("res/save_all24.png", wxBITMAP_TYPE_ANY));
         file2_bar->AddButton(idRibbonClose, !hideLabels ? _("Fermer") : "", wxBitmap("res/close24.png", wxBITMAP_TYPE_ANY));
         file2_bar->AddButton(idRibbonCompil, !hideLabels ? _("Compilation") : "", wxBitmap("res/compilicon24.png", wxBITMAP_TYPE_ANY));
     }
@@ -258,6 +260,7 @@ void ProjectManager::ConnectEvents()
 {
     mainEditor.Connect( idRibbonNew, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuNewSelected, NULL, &mainEditor );
     mainEditor.Connect( idRibbonOpen, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuOpenSelected, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonSaveAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonSaveAllClicked, NULL, &mainEditor );
     mainEditor.Connect( idRibbonOpen, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonOpenDropDownClicked, NULL, &mainEditor );
     mainEditor.Connect( idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuSaveSelected, NULL, &mainEditor );
     mainEditor.Connect( idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonSaveDropDownClicked, NULL, &mainEditor );

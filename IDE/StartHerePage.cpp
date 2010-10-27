@@ -177,7 +177,7 @@ mainEditor(mainEditor_)
 	Connect(ID_HYPERLINKCTRL13,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::Onrecent9BtClick);
 	//*)
 
-    if ( _("-Insert the name of the second tutorial or a blank text-") == "(-Insert the name of the second tutorial or a blank text-)" )
+    if ( _("(-Insert the name of the second tutorial or a blank text-)") == "(-Insert the name of the second tutorial or a blank text-)" )
         secondTutoLink->SetLabel("");
 
     Refresh();

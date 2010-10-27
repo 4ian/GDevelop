@@ -168,6 +168,45 @@ void Game_Develop_EditorFrame::OnRibbonSaveDropDownClicked(wxRibbonButtonBarEven
     evt.PopupMenu(&saveContextMenu);
 }
 
+/**
+ * Save all
+ */
+void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
+{
+    for (unsigned int i = 0;i<games.size();++i)
+    {
+        if ( games[i]->gameFile == "" )
+        {
+            wxFileDialog FileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg", wxFD_SAVE );
+            FileDialog.ShowModal();
+
+            //A t on  un fichier à enregistrer ?
+            if ( FileDialog.GetPath() != "" )
+            {
+                //oui, donc on l'enregistre
+                games[i]->gameFile = FileDialog.GetPath();
+                OpenSaveGame saveGame( *games[i] );
+
+                if ( !saveGame.SaveToFile(games[i]->gameFile) ) {wxLogError( "L'enregistrement a échoué." );}
+
+                if ( games[i] == GetCurrentGame() )
+                {
+                    wxString GD = "Game Develop";
+                    wxString Fichier = GetCurrentGame()->gameFile;
+                    SetTitle( GD + " - " + Fichier );
+                }
+            }
+        }
+        else
+        {
+            OpenSaveGame saveGame( *games[i] );
+            if ( !saveGame.SaveToFile(games[i]->gameFile) ) {wxLogError( "L'enregistrement a échoué." );}
+        }
+    }
+
+    wxLogStatus(_("Enregistrements des fichiers terminés."));
+}
+
 ////////////////////////////////////////////////////////////
 /// Enregistrer sous
 ////////////////////////////////////////////////////////////
@@ -184,7 +223,7 @@ void Game_Develop_EditorFrame::SaveAs()
     if ( !CurrentGameIsValid() ) return;
 
     //Affichage de la boite de dialogue
-    wxFileDialog FileDialog( this, _( "Choisissez le nom et le répertoire du jeu à enregistrer" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg", wxFD_SAVE );
+    wxFileDialog FileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg", wxFD_SAVE );
     FileDialog.ShowModal();
 
     //A t on  un fichier à enregistrer ?

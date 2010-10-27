@@ -12,6 +12,7 @@
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/frame.h>
+#include <wx/timer.h>
 //*)
 #include "wx/aui/aui.h"
 #include <wx/textctrl.h>
@@ -193,11 +194,13 @@ class Game_Develop_EditorFrame: public wxFrame
         void OnglobalVarBtClick(wxCommandEvent& event);
         void OneditorsNotebookPageClose(wxAuiNotebookEvent& event);
         void OnOpenExampleSelected(wxCommandEvent& event);
+        void OnautoSaveTimerTrigger(wxTimerEvent& event);
         //*)
         void OnRibbonNewClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonOpenClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonOpenDropDownClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonSaveClicked(wxRibbonButtonBarEvent& evt);
+        void OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonSaveDropDownClicked(wxRibbonButtonBarEvent& evt);
         void OnProjectsManagerClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonDecomposerDropDownClicked(wxRibbonButtonBarEvent& evt);
@@ -220,11 +223,13 @@ class Game_Develop_EditorFrame: public wxFrame
         static const long ID_MENUITEM4;
         static const long ID_MENUITEM5;
         static const long ID_MENUITEM6;
+        static const long ID_TIMER1;
         //*)
         static const long IDM_RECENTS;
         static const long idRibbonNew;
         static const long idRibbonOpen;
         static const long idRibbonSave;
+        static const long idRibbonSaveAll;
         static const long idRibbonSaveAs;
         static const long idRibbonPortable;
         static const long idRibbonCompil;
@@ -243,6 +248,7 @@ class Game_Develop_EditorFrame: public wxFrame
         static const long idRibbonStartPage;
 
         //(*Declarations(Game_Develop_EditorFrame)
+        wxTimer autoSaveTimer;
         wxPanel* Panel1;
         wxAuiNotebook* editorsNotebook;
         wxMenu openContextMenu;

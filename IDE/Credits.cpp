@@ -33,7 +33,7 @@ const long Credits::ID_BITMAPBUTTON4 = wxNewId();
 const long Credits::ID_STATICTEXT6 = wxNewId();
 const long Credits::ID_BITMAPBUTTON5 = wxNewId();
 const long Credits::ID_BITMAPBUTTON6 = wxNewId();
-const long Credits::ID_STATICTEXT8 = wxNewId();
+const long Credits::ID_STATICTEXT2 = wxNewId();
 const long Credits::ID_PANEL3 = wxNewId();
 const long Credits::ID_NOTEBOOK1 = wxNewId();
 const long Credits::ID_BUTTON1 = wxNewId();
@@ -113,7 +113,6 @@ Credits::Credits(wxWindow* parent)
 	Panel3 = new wxPanel(Notebook1, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	FlexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer7->AddGrowableCol(0);
-	FlexGridSizer7->AddGrowableRow(4);
 	StaticText7 = new wxStaticText(Panel3, ID_STATICTEXT7, _("Programmé en C++, compilé avec GCC, avec l\'aide de Code::Blocks"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
 	FlexGridSizer7->Add(StaticText7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -138,8 +137,8 @@ Credits::Credits(wxWindow* parent)
 	WxBt->SetDefault();
 	FlexGridSizer8->Add(WxBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer7->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText8 = new wxStaticText(Panel3, ID_STATICTEXT8, _("Merci à toute la communauté et utilisateurs de Game Develop"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
-	FlexGridSizer7->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText2 = new wxStaticText(Panel3, ID_STATICTEXT2, _("Merci à toute la communauté et utilisateurs de Game Develop"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	FlexGridSizer7->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel3->SetSizer(FlexGridSizer7);
 	FlexGridSizer7->Fit(Panel3);
 	FlexGridSizer7->SetSizeHints(Panel3);

@@ -367,10 +367,10 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
         scene.isResizingY = true;
     }
     else if ( scene.objectsSelected.size() == 1 &&
-                mouseX > object->GetDrawableX()+object->GetWidth()/2+20*cos(object->GetAngle()/180.f*3.14)-3 &&
-                mouseX < object->GetDrawableX()+object->GetWidth()/2+20*cos(object->GetAngle()/180.f*3.14)+3 &&
-                mouseY > object->GetDrawableY()+object->GetHeight()/2+20*sin(object->GetAngle()/180.f*3.14)-3 &&
-                mouseY < object->GetDrawableY()+object->GetHeight()/2+20*sin(object->GetAngle()/180.f*3.14)+3 )
+                mouseX > object->GetDrawableX()+object->GetWidth()/2+20*cos(object->GetAngle()/180.f*3.14159)-3 &&
+                mouseX < object->GetDrawableX()+object->GetWidth()/2+20*cos(object->GetAngle()/180.f*3.14159)+3 &&
+                mouseY > object->GetDrawableY()+object->GetHeight()/2+20*sin(object->GetAngle()/180.f*3.14159)-3 &&
+                mouseY < object->GetDrawableY()+object->GetHeight()/2+20*sin(object->GetAngle()/180.f*3.14159)+3 )
     {
         scene.isRotatingObject = true;
         scene.isMovingObject = false;
@@ -547,7 +547,7 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
             ObjSPtr object = scene.objectsSelected.at(i);
             float x = mouseXInScene-(object->GetDrawableX()+object->GetWidth()/2);
             float y = mouseYInScene-(object->GetDrawableY()+object->GetHeight()/2);
-            float newAngle = atan2(y,x)*180/3.14;
+            float newAngle = atan2(y,x)*180/3.14159;
 
             object->SetAngle(newAngle);
 

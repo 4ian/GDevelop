@@ -26,10 +26,11 @@ freely, subject to the following restrictions:
 
 #if defined(GDE)
 
-#ifndef TEXTOBJECTEDITOR_H
-#define TEXTOBJECTEDITOR_H
+#ifndef PARTICLEEMITTEROBJECTEDITOR_H
+#define PARTICLEEMITTEROBJECTEDITOR_H
 
 //(*Headers(ParticleEmitterObjectEditor)
+#include <wx/notebook.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -37,12 +38,17 @@ freely, subject to the following restrictions:
 #include <wx/spinctrl.h>
 #include <wx/statline.h>
 #include <wx/radiobut.h>
+#include <wx/panel.h>
+#include <wx/bmpbuttn.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
+#include <wx/clrpicker.h>
 //*)
+#include <wx/aui/aui.h>
 class Game;
 class ParticleEmitterObject;
 class MainEditorCommand;
+class EditorImages;
 
 class ParticleEmitterObjectEditor: public wxDialog
 {
@@ -54,102 +60,155 @@ class ParticleEmitterObjectEditor: public wxDialog
 		//(*Declarations(ParticleEmitterObjectEditor)
 		wxStaticText* StaticText10;
 		wxTextCtrl* gravityXEdit;
+		wxRadioButton* simpleSizeRandomCheck;
 		wxStaticText* StaticText22;
+		wxRadioButton* simpleAngleRandomCheck;
+		wxPanel* Core;
 		wxStaticText* StaticText9;
+		wxStaticText* StaticText53;
 		wxStaticText* StaticText20;
 		wxStaticText* rendererParam1Txt;
+		wxStaticText* StaticText45;
+		wxSpinCtrlDouble* simpleSize1Edit;
 		wxRadioButton* angleMutableCheck;
+		wxColourPickerCtrl* simpleColor1Bt;
+		wxPanel* Panel5;
+		wxSpinCtrlDouble* simpleAngle2Edit;
 		wxSpinCtrlDouble* green2Edit;
 		wxStaticText* StaticText29;
 		wxSpinCtrlDouble* angle2Edit;
 		wxTextCtrl* frictionEdit;
+		wxSpinCtrlDouble* simpleSize2Edit;
 		wxCheckBox* infiniteTankCheck;
+		wxStaticText* StaticText37;
+		wxNotebook* emissionNotebook;
 		wxStaticText* StaticText33;
 		wxStaticText* StaticText13;
 		wxStaticText* StaticText2;
 		wxTextCtrl* tankEdit;
+		wxPanel* Panel4;
 		wxStaticText* StaticText30;
 		wxStaticText* StaticText14;
+		wxTextCtrl* simpleRadiusEdit;
 		wxRadioButton* blueFixedCheck;
+		wxTextCtrl* simpleFrictionEdit;
 		wxRadioButton* quadCheck;
+		wxRadioButton* simpleSizeMutableCheck;
 		wxRadioButton* additiveRenderingCheck;
 		wxStaticText* StaticText6;
 		wxStaticText* StaticText26;
 		wxSpinCtrlDouble* size1Edit;
+		wxTextCtrl* simpleGravityAngleEdit;
 		wxTextCtrl* emitterAngleAEdit;
+		wxStaticText* StaticText40;
 		wxSpinCtrlDouble* blue2Edit;
+		wxRadioButton* simpleAngleMutableCheck;
 		wxRadioButton* alphaRenderingCheck;
 		wxTextCtrl* emitterDirYEdit;
 		wxStaticText* StaticText32;
+		wxStaticText* StaticText42;
 		wxStaticText* StaticText19;
 		wxStaticText* StaticText8;
+		wxSpinCtrlDouble* simpleOpacity2Edit;
+		wxStaticText* StaticText38;
 		wxStaticText* StaticText11;
 		wxTextCtrl* lifeTimeMaxEdit;
 		wxStaticText* StaticText18;
+		wxStaticText* StaticText50;
 		wxStaticText* StaticText31;
+		wxPanel* Panel1;
 		wxRadioButton* pointCheck;
 		wxStaticText* StaticText1;
 		wxSpinCtrlDouble* red1Edit;
+		wxStaticText* StaticText58;
 		wxStaticText* StaticText27;
 		wxRadioButton* blueMutableCheck;
 		wxStaticText* StaticText3;
 		wxButton* cancelBt;
 		wxTextCtrl* textureEdit;
+		wxStaticText* StaticText54;
 		wxRadioButton* alphaMutableCheck;
+		wxPanel* Panel6;
+		wxStaticText* StaticText44;
+		wxPanel* Panel3;
 		wxStaticText* StaticText21;
+		wxStaticText* StaticText56;
+		wxStaticText* StaticText39;
 		wxTextCtrl* gravityZEdit;
+		wxButton* imageBankBt;
+		wxStaticText* StaticText55;
 		wxStaticText* StaticText23;
 		wxRadioButton* blueRandomCheck;
 		wxStaticText* StaticText24;
 		wxSpinCtrlDouble* blue1Edit;
 		wxRadioButton* redMutableCheck;
+		wxStaticText* StaticText49;
 		wxRadioButton* angleNothingCheck;
 		wxTextCtrl* emitterDirZEdit;
 		wxSpinCtrlDouble* alpha1Edit;
 		wxRadioButton* sizeMutableCheck;
-		wxStaticText* StaticText5;
 		wxStaticText* StaticText34;
+		wxStaticText* StaticText5;
 		wxRadioButton* alphaFixedCheck;
 		wxStaticText* StaticText7;
 		wxRadioButton* angleRandomCheck;
+		wxStaticText* StaticText57;
 		wxRadioButton* lineCheck;
 		wxRadioButton* redRandomCheck;
 		wxTextCtrl* gravityYEdit;
 		wxRadioButton* greenFixedCheck;
 		wxRadioButton* greenMutableCheck;
 		wxStaticLine* StaticLine1;
+		wxStaticText* StaticText47;
 		wxTextCtrl* lifeTimeMinEdit;
 		wxStaticText* rendererParam2Txt;
 		wxSpinCtrlDouble* alpha2Edit;
+		wxStaticText* StaticText52;
+		wxNotebook* particleNotebook;
 		wxTextCtrl* emitterDirXEdit;
 		wxSpinCtrlDouble* red2Edit;
 		wxRadioButton* redFixedCheck;
 		wxRadioButton* alphaRandomCheck;
 		wxStaticText* StaticText28;
+		wxStaticText* StaticText43;
+		wxStaticText* StaticText41;
 		wxStaticText* StaticText15;
 		wxStaticText* StaticText12;
+		wxTextCtrl* simpleConeAngleEdit;
 		wxStaticText* textureTxt;
 		wxTextCtrl* emitterAngleBEdit;
 		wxStaticText* StaticText35;
 		wxSpinCtrlDouble* angle1Edit;
+		wxBitmapButton* imageChooseBt;
 		wxTextCtrl* emitterForceMinEdit;
 		wxSpinCtrlDouble* green1Edit;
+		wxPanel* Panel2;
 		wxSpinCtrlDouble* size2Edit;
 		wxTextCtrl* rendererParam2Edit;
+		wxNotebook* gravityNotebook;
 		wxTextCtrl* flowEdit;
 		wxStaticText* StaticText25;
 		wxRadioButton* sizeRandomCheck;
+		wxSpinCtrlDouble* simpleOpacityEdit;
 		wxTextCtrl* zoneRadiusEdit;
-		wxStaticText* StaticText4;
 		wxStaticText* StaticText36;
+		wxStaticText* StaticText4;
 		wxStaticText* StaticText17;
+		wxStaticText* StaticText48;
+		wxTextCtrl* simpleAngleEdit;
 		wxButton* okBt;
 		wxRadioButton* sizeNothingCheck;
 		wxStaticText* StaticText16;
+		wxSpinCtrlDouble* simpleAngle1Edit;
 		wxTextCtrl* rendererParam1Edit;
+		wxTextCtrl* simpleGravityLengthEdit;
+		wxStaticText* StaticText46;
+		wxStaticText* StaticText51;
 		wxRadioButton* greenRandomCheck;
+		wxColourPickerCtrl* simpleColor2Bt;
 		wxTextCtrl* emitterForceMaxEdit;
 		//*)
+		EditorImages * editorImagesPnl;
 
 	protected:
 
@@ -164,6 +223,7 @@ class ParticleEmitterObjectEditor: public wxDialog
 		static const long ID_TEXTCTRL10;
 		static const long ID_STATICTEXT32;
 		static const long ID_TEXTCTRL13;
+		static const long ID_BITMAPBUTTON1;
 		static const long ID_RADIOBUTTON22;
 		static const long ID_RADIOBUTTON23;
 		static const long ID_STATICTEXT29;
@@ -171,6 +231,32 @@ class ParticleEmitterObjectEditor: public wxDialog
 		static const long ID_STATICTEXT30;
 		static const long ID_TEXTCTRL12;
 		static const long ID_STATICTEXT31;
+		static const long ID_STATICTEXT40;
+		static const long ID_COLOURPICKERCTRL1;
+		static const long ID_STATICTEXT41;
+		static const long ID_COLOURPICKERCTRL2;
+		static const long ID_STATICTEXT42;
+		static const long ID_CUSTOM12;
+		static const long ID_STATICTEXT61;
+		static const long ID_CUSTOM17;
+		static const long ID_RADIOBUTTON25;
+		static const long ID_RADIOBUTTON24;
+		static const long ID_STATICTEXT43;
+		static const long ID_CUSTOM13;
+		static const long ID_STATICTEXT56;
+		static const long ID_STATICTEXT55;
+		static const long ID_CUSTOM14;
+		static const long ID_STATICTEXT54;
+		static const long ID_STATICTEXT57;
+		static const long ID_RADIOBUTTON26;
+		static const long ID_RADIOBUTTON27;
+		static const long ID_STATICTEXT44;
+		static const long ID_CUSTOM15;
+		static const long ID_STATICTEXT58;
+		static const long ID_STATICTEXT59;
+		static const long ID_CUSTOM16;
+		static const long ID_STATICTEXT60;
+		static const long ID_PANEL3;
 		static const long ID_RADIOBUTTON6;
 		static const long ID_RADIOBUTTON5;
 		static const long ID_RADIOBUTTON4;
@@ -219,6 +305,22 @@ class ParticleEmitterObjectEditor: public wxDialog
 		static const long ID_CUSTOM8;
 		static const long ID_STATICTEXT25;
 		static const long ID_CUSTOM9;
+		static const long ID_PANEL2;
+		static const long ID_NOTEBOOK1;
+		static const long ID_STATICTEXT4;
+		static const long ID_STATICTEXT5;
+		static const long ID_TEXTCTRL6;
+		static const long ID_STATICTEXT6;
+		static const long ID_TEXTCTRL7;
+		static const long ID_STATICTEXT45;
+		static const long ID_TEXTCTRL17;
+		static const long ID_STATICTEXT46;
+		static const long ID_TEXTCTRL21;
+		static const long ID_STATICTEXT47;
+		static const long ID_STATICTEXT48;
+		static const long ID_TEXTCTRL22;
+		static const long ID_STATICTEXT49;
+		static const long ID_PANEL5;
 		static const long ID_STATICTEXT33;
 		static const long ID_TEXTCTRL14;
 		static const long ID_STATICTEXT34;
@@ -232,25 +334,34 @@ class ParticleEmitterObjectEditor: public wxDialog
 		static const long ID_STATICTEXT39;
 		static const long ID_TEXTCTRL16;
 		static const long ID_STATICTEXT37;
-		static const long ID_STATICTEXT4;
-		static const long ID_STATICTEXT5;
-		static const long ID_TEXTCTRL6;
-		static const long ID_STATICTEXT6;
-		static const long ID_TEXTCTRL7;
+		static const long ID_PANEL4;
+		static const long ID_NOTEBOOK2;
 		static const long ID_CHECKBOX1;
 		static const long ID_STATICTEXT3;
 		static const long ID_TEXTCTRL1;
 		static const long ID_STATICTEXT1;
 		static const long ID_TEXTCTRL2;
+		static const long ID_STATICTEXT50;
+		static const long ID_TEXTCTRL23;
+		static const long ID_STATICTEXT52;
+		static const long ID_TEXTCTRL25;
+		static const long ID_STATICTEXT53;
+		static const long ID_STATICTEXT51;
+		static const long ID_TEXTCTRL26;
+		static const long ID_PANEL7;
 		static const long ID_STATICTEXT2;
 		static const long ID_TEXTCTRL3;
 		static const long ID_TEXTCTRL4;
 		static const long ID_TEXTCTRL5;
 		static const long ID_STATICTEXT8;
 		static const long ID_TEXTCTRL8;
+		static const long ID_PANEL6;
+		static const long ID_NOTEBOOK3;
 		static const long ID_STATICLINE1;
+		static const long ID_BUTTON3;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
+		static const long ID_PANEL1;
 		//*)
 
 	private:
@@ -273,7 +384,26 @@ class ParticleEmitterObjectEditor: public wxDialog
 		void OnblueRandomCheckSelect(wxCommandEvent& event);
 		void OnalphaFixedCheckSelect(wxCommandEvent& event);
 		void OnalphaRandomCheckSelect(wxCommandEvent& event);
+		void OnsizeRandomCheckSelect(wxCommandEvent& event);
+		void OnsizeNothingCheckSelect(wxCommandEvent& event);
+		void OnangleNothingCheckSelect(wxCommandEvent& event);
+		void OnangleRandomCheckSelect(wxCommandEvent& event);
+		void OnimageChooseBtClick(wxCommandEvent& event);
+		void OnimageBankBtClick(wxCommandEvent& event);
+		void OnsimpleColor1BtColourChanged(wxColourPickerEvent& event);
+		void OnsimpleRadiusEditText(wxCommandEvent& event);
+		void OnsimpleAngleText(wxCommandEvent& event);
+		void OnsimpleConeAngleText(wxCommandEvent& event);
+		void OnsimpleGravityAngleText(wxCommandEvent& event);
+		void OnsimpleFrictionEditText(wxCommandEvent& event);
+		void OnsimpleSizeRandomCheckSelect(wxCommandEvent& event);
+		void OnsimpleSizeMutableCheckSelect(wxCommandEvent& event);
+		void OnsimpleAngleMutableCheckSelect(wxCommandEvent& event);
+		void OnsimpleAngleRandomCheckSelect(wxCommandEvent& event);
 		//*)
+		void OnsimpleOpacityEditChange(wxSpinDoubleEvent& event);
+		void OnsimpleSizeEditChange(wxSpinDoubleEvent& event);
+		void OnsimpleAngleEditChange(wxSpinDoubleEvent& event);
 		void PrepareControlsForPointRenderer();
 		void PrepareControlsForQuadRenderer();
 		void PrepareControlsForLineRenderer();
@@ -281,6 +411,8 @@ class ParticleEmitterObjectEditor: public wxDialog
 		Game & game;
 		MainEditorCommand & mainEditorCommand;
 		ParticleEmitterObject & object;
+
+		wxAuiManager m_mgr; ///< Used to display the image bank editor
 
 		DECLARE_EVENT_TABLE()
 };

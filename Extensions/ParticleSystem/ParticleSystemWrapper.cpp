@@ -25,6 +25,7 @@ freely, subject to the following restrictions:
 */
 
 #include "ParticleSystemWrapper.h"
+#include <ctime>
 
 bool ParticleSystemWrapper::SPKinitialized = false;
 
@@ -33,8 +34,7 @@ particleSystem(NULL),
 particleModel(NULL),
 emitter(NULL),
 zone(NULL),
-group(NULL),
-openGLTextureParticle(0)
+group(NULL)
 {
     if ( !SPKinitialized )
     {
@@ -53,7 +53,6 @@ ParticleSystemWrapper::~ParticleSystemWrapper()
     if ( emitter ) delete emitter;
     if ( zone ) delete zone;
     if ( group ) delete group;
-    if ( openGLTextureParticle != 0 ) glDeleteTextures(1, &openGLTextureParticle);
 }
 
 void ParticleSystemWrapper::Init(const ParticleSystemWrapper & other)
@@ -63,8 +62,6 @@ void ParticleSystemWrapper::Init(const ParticleSystemWrapper & other)
     if ( emitter ) delete emitter;
     if ( zone ) delete zone;
     if ( group ) delete group;
-    //! Note : Texture copy is not implemented
-    //if ( openGLTextureParticle != 0 ) glDeleteTextures(1, &openGLTextureParticle);
 
     //Don't initialize members if the other object's member are NULL.
     if ( other.particleModel == NULL ) return;

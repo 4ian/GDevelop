@@ -36,9 +36,9 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
 {
     DECLARE_OBJECT_ACTION("RecreateParticleSystem",
                    _("Recréer les particules"),
-                   _("Efface et recréé les particules"),
+                   _("Efface et recréé les particules, pour prendre en compte par exemple les changements au niveau du paramétrage."),
                    _("Recréer les particules de _PARAM0_"),
-                   _("Particules"),
+                   _("Paramétrage"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActRecreateParticleSystem);
@@ -87,7 +87,7 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("Paramétrage"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActRendererParam1);
+                   &ParticleEmitterObject::ActRendererParam2);
 
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
         DECLARE_PARAMETER("expression", _("Valeur"), false, "")
@@ -97,13 +97,13 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
     DECLARE_END_OBJECT_ACTION()
 
     DECLARE_OBJECT_CONDITION("RendererParam2",
-                   _("Direction de la gravité en Z"),
+                   _("Paramètre 2 du rendu"),
                    _("Teste la valeur du paramètre 2 de rendu ( Taille/Longueur )."),
                    _("Le 2nd paramètre du rendu de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Paramétrage"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondRendererParam1);
+                   &ParticleEmitterObject::CondRendererParam2);
 
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
         DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
@@ -114,9 +114,9 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("Tank",
                    _("Capacité"),
-                   _("Modifie la capacité de l'émetteur.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie la capacité de l'émetteur."),
                    _("Faire _PARAM2__PARAM1_ à la capacité de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActTank);
@@ -132,7 +132,7 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("Capacité"),
                    _("Teste la capacité de l'émetteur."),
                    _("La capacité de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondTank);
@@ -146,9 +146,9 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("Flow",
                    _("Flux"),
-                   _("Modifie le flux de l'émetteur.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le flux de l'émetteur."),
                    _("Faire _PARAM2__PARAM1_ au flux de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActFlow);
@@ -164,7 +164,7 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("Flux"),
                    _("Teste le flux de l'émetteur."),
                    _("Le flux de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondFlow);
@@ -176,7 +176,7 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
 
     DECLARE_END_OBJECT_CONDITION()
 
-    DECLARE_OBJECT_EXPRESSION("NbParticles", _("Nombre de particules"), _("Nombre de particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpNbParticles)
+    DECLARE_OBJECT_EXPRESSION("NbParticles", _("Nombre de particules"), _("Nombre de particules"), _("Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpNbParticles)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
 
@@ -188,38 +188,41 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("Tank", _("Capacité"), _("Capacité"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpTank)
+    DECLARE_OBJECT_EXPRESSION("Tank", _("Capacité"), _("Capacité"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpTank)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("Flow", _("Flux"), _("Flux"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpFlow)
+    DECLARE_OBJECT_EXPRESSION("Flow", _("Flux"), _("Flux"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpFlow)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("EmitterForceMin", _("Force minimale de l'émission"), _("Force minimale de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterForceMin)
+    DECLARE_OBJECT_EXPRESSION("EmitterForceMin", _("Force minimale de l'émission"), _("Force minimale de l'émission"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterForceMin)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("EmitterForceMax", _("Force maximale de l'émission"), _("Force maximale de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterForceMax)
+    DECLARE_OBJECT_EXPRESSION("EmitterForceMax", _("Force maximale de l'émission"), _("Force maximale de l'émission"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterForceMax)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("EmitterXDirection", _("Direction X de l'émission"), _("Direction X de de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterXDirection)
+    DECLARE_OBJECT_EXPRESSION("EmitterXDirection", _("Direction X de l'émission"), _("Direction X de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterXDirection)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("EmitterYDirection", _("Direction Y de l'émission"), _("Direction Y de de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterYDirection)
+    DECLARE_OBJECT_EXPRESSION("EmitterYDirection", _("Direction Y de l'émission"), _("Direction Y de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterYDirection)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("EmitterZDirection", _("Direction Z de l'émission"), _("Direction Z de de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterZDirection)
+    DECLARE_OBJECT_EXPRESSION("EmitterZDirection", _("Direction Z de l'émission"), _("Direction Z de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterZDirection)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("EmitterAngleA", _("Angle A de l'émission"), _("Angle A de de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterAngleA)
+    DECLARE_OBJECT_EXPRESSION("EmitterAngle", _("Angle de l'émission"), _("Angle de l'émission"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterAngle)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("EmitterAngleB", _("Angle B de l'émission"), _("Angle B de de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterAngleB)
+    DECLARE_OBJECT_EXPRESSION("EmitterAngleA", _("Angle A de l'émission"), _("Angle A de l'émission"), _("Avancé"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterAngleA)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ZoneRadius", _("Rayon de la zone d'émission"), _("Rayon de la zone d'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpZoneRadius)
+    DECLARE_OBJECT_EXPRESSION("EmitterAngleB", _("Angle B de l'émission"), _("Angle B de l'émission"), _("Avancé"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterAngleB)
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_END_OBJECT_EXPRESSION()
+    DECLARE_OBJECT_EXPRESSION("ZoneRadius", _("Rayon de la zone d'émission"), _("Rayon de la zone d'émission"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpZoneRadius)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
     DECLARE_OBJECT_EXPRESSION("ParticleGravityX", _("Gravité en X des particules"), _("Gravité en X des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGravityX)
@@ -231,49 +234,55 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
     DECLARE_OBJECT_EXPRESSION("ParticleGravityZ", _("Gravité en Z des particules"), _("Gravité en Z des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGravityZ)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("Friction", _("Friction des particules"), _("Friction des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpFriction)
+    DECLARE_OBJECT_EXPRESSION("ParticleGravityAngle", _("Angle de la gravité"), _("Angle de la gravité"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGravityAngle)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleLifeTimeMin", _("Temps de vie minimal particules"), _("Temps de vie minimal des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleLifeTimeMin)
+    DECLARE_OBJECT_EXPRESSION("ParticleGravityLength", _("Gravité"), _("Valeur de la gravité"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGravityLength)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleLifeTimeMax", _("Temps de vie maximal particules"), _("Temps de vie maximal des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleLifeTimeMax)
+    DECLARE_OBJECT_EXPRESSION("Friction", _("Friction des particules"), _("Friction des particules"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpFriction)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleRed1", _("Paramètre 1 de la couleur rouge"), _("Paramètre 1 de la couleur rouge"), _("Paramétrage : Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleRed1)
+    DECLARE_OBJECT_EXPRESSION("ParticleLifeTimeMin", _("Temps de vie minimal des particules"), _("Temps de vie minimal des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleLifeTimeMin)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleRed2", _("Paramètre 2 de la couleur rouge"), _("Paramètre 2 de la couleur rouge"), _("Paramétrage : Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleRed2)
+    DECLARE_OBJECT_EXPRESSION("ParticleLifeTimeMax", _("Temps de vie maximal des particules"), _("Temps de vie maximal des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleLifeTimeMax)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleBlue1", _("Paramètre 1 de la couleur bleue"), _("Paramètre 1 de la couleur bleue"), _("Paramétrage : Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleBlue1)
+    DECLARE_OBJECT_EXPRESSION("ParticleRed1", _("Paramètre 1 de la couleur rouge"), _("Paramètre 1 de la couleur rouge"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleRed1)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleBlue2", _("Paramètre 2 de la couleur bleue"), _("Paramètre 2 de la couleur bleue"), _("Paramétrage : Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleBlue2)
+    DECLARE_OBJECT_EXPRESSION("ParticleRed2", _("Paramètre 2 de la couleur rouge"), _("Paramètre 2 de la couleur rouge"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleRed2)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleGreen1", _("Paramètre 1 de la couleur vert"), _("Paramètre 1 de la couleur vert"), _("Paramétrage : Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGreen1)
+    DECLARE_OBJECT_EXPRESSION("ParticleBlue1", _("Paramètre 1 de la couleur bleue"), _("Paramètre 1 de la couleur bleue"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleBlue1)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleGreen2", _("Paramètre 2 de la couleur vert"), _("Paramètre 2 de la couleur vert"), _("Paramétrage : Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGreen2)
+    DECLARE_OBJECT_EXPRESSION("ParticleBlue2", _("Paramètre 2 de la couleur bleue"), _("Paramètre 2 de la couleur bleue"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleBlue2)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleAlpha1", _("Paramètre 1 de la transparence"), _("Paramètre 1 de la transparence"), _("Paramétrage : Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleAlpha1)
+    DECLARE_OBJECT_EXPRESSION("ParticleGreen1", _("Paramètre 1 de la couleur vert"), _("Paramètre 1 de la couleur vert"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGreen1)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleAlpha2", _("Paramètre 2 de la transparence"), _("Paramètre 2 de la transparence"), _("Paramétrage : Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleAlpha2)
+    DECLARE_OBJECT_EXPRESSION("ParticleGreen2", _("Paramètre 2 de la couleur vert"), _("Paramètre 2 de la couleur vert"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGreen2)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleSize1", _("Paramètre 1 de la taille"), _("Paramètre 1 de la taille"), _("Paramétrage : Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleSize1)
+    DECLARE_OBJECT_EXPRESSION("ParticleAlpha1", _("Paramètre 1 de la transparence"), _("Paramètre 1 de la transparence"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleAlpha1)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleSize2", _("Paramètre 2 de la taille"), _("Paramètre 2 de la taille"), _("Paramétrage : Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleSize2)
+    DECLARE_OBJECT_EXPRESSION("ParticleAlpha2", _("Paramètre 2 de la transparence"), _("Paramètre 2 de la transparence"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleAlpha2)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleAngle1", _("Paramètre 1 de l'angle"), _("Paramètre 1 de l'angle"), _("Paramétrage : Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleAngle1)
+    DECLARE_OBJECT_EXPRESSION("ParticleSize1", _("Paramètre 1 de la taille"), _("Paramètre 1 de la taille"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleSize1)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleAngle2", _("Paramètre 2 de l'angle"), _("Paramètre 2 de l'angle"), _("Paramétrage : Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleAngle2)
+    DECLARE_OBJECT_EXPRESSION("ParticleSize2", _("Paramètre 2 de la taille"), _("Paramètre 2 de la taille"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleSize2)
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_END_OBJECT_EXPRESSION()
+    DECLARE_OBJECT_EXPRESSION("ParticleAngle1", _("Paramètre 1 de l'angle"), _("Paramètre 1 de l'angle"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleAngle1)
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_END_OBJECT_EXPRESSION()
+    DECLARE_OBJECT_EXPRESSION("ParticleAngle2", _("Paramètre 2 de l'angle"), _("Paramètre 2 de l'angle"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleAngle2)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()
 }

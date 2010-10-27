@@ -48,22 +48,22 @@ freely, subject to the following restrictions:
 ParticleEmitterObject::ParticleEmitterObject(std::string name_) :
 Object(name_),
 rendererType(Point),
-rendererParam1(1.0f),
+rendererParam1(3.0f),
 rendererParam2(1.0f),
 additive(true),
 tank(-1),
 flow(300),
-emitterForceMin(70.0f),
-emitterForceMax(170.0f),
+emitterForceMin(25.0f),
+emitterForceMax(65.0f),
 emitterXDirection(0.0f),
 emitterYDirection(1.0f),
 emitterZDirection(0.0f),
-emitterAngleA(3.14f/4.0f),
-emitterAngleB(3.14f),
-zoneRadius(5.0f),
+emitterAngleA(3.14159f/4.0f),
+emitterAngleB(3.14159f),
+zoneRadius(3.0f),
 particleGravityX(0.0f),
-particleGravityY(0.0f),
-particleGravityZ(100.0f),
+particleGravityY(-100.0f),
+particleGravityZ(0.0f),
 friction(2.0f),
 particleLifeTimeMin(0.5f),
 particleLifeTimeMax(2.5f),
@@ -71,8 +71,8 @@ redParam(Enabled),
 greenParam(Random),
 blueParam(Random),
 alphaParam(Mutable),
-sizeParam(Nothing),
-angleParam(Nothing),
+sizeParam(Mutable),
+angleParam(Mutable),
 particleRed1(1.0f),
 particleRed2(1.0f),
 particleGreen1(0.2f),
@@ -81,8 +81,8 @@ particleBlue1(0.2f),
 particleBlue2(0.0f),
 particleAlpha1(0.8f),
 particleAlpha2(0.0f),
-particleSize1(0.0f),
-particleSize2(0.0f),
+particleSize1(1.0f),
+particleSize2(1.0f),
 particleAngle1(0.0f),
 particleAngle2(0.0f),
 hasSomeParticles(true),
@@ -91,6 +91,11 @@ colorR( 255 ),
 colorG( 255 ),
 colorB( 255 ),
 angle(0)
+#if defined(GDE)
+,particleEditionSimpleMode(true),
+emissionEditionSimpleMode(true),
+gravityEditionSimpleMode(true)
+#endif
 {
 }
 
@@ -184,6 +189,12 @@ void ParticleEmitterObject::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorG", g);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorB", b);
     colorR = r; colorG = g; colorB = b;
+
+    #if defined(GDE)
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("particleEditionSimpleMode", particleEditionSimpleMode);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("emissionEditionSimpleMode", emissionEditionSimpleMode);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("gravityEditionSimpleMode", gravityEditionSimpleMode);
+    #endif
 }
 
 #if defined(GDE)
@@ -260,11 +271,17 @@ void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorR", colorR);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorG", colorG);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorB", colorB);
+
+    #if defined(GDE)
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("particleEditionSimpleMode", particleEditionSimpleMode);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("emissionEditionSimpleMode", emissionEditionSimpleMode);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("gravityEditionSimpleMode", gravityEditionSimpleMode);
+    #endif
 }
 #endif
 
 /**
- *
+ * Create particle system from parameters
  */
 void ParticleEmitterObject::CreateParticleSystem()
 {
@@ -362,17 +379,10 @@ void ParticleEmitterObject::CreateParticleSystem()
 	{
 	    SPK::GL::GLQuadRenderer * quadRenderer = new SPK::GL::GLQuadRenderer(rendererParam1,rendererParam2);
 
-	    //Prepare texture from SFML Image
-        //We're going to use it directly with OpenGL
-        glGenTextures(1, &particleSystem.openGLTextureParticle);
-        glBindTexture(GL_TEXTURE_2D, particleSystem.openGLTextureParticle);
-        gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, textureParticle->GetWidth(), textureParticle->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, textureParticle->GetPixelsPtr());
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        if ( particleSystem.openGLTextureParticle != 0 )
+        if ( particleSystem.openGLTextureParticle->GetOpenGLTexture() != 0 )
         {
             quadRenderer->setTexturingMode(SPK::TEXTURE_2D);
-            quadRenderer->setTexture(particleSystem.openGLTextureParticle);
+            quadRenderer->setTexture(particleSystem.openGLTextureParticle->GetOpenGLTexture());
         }
 
         renderer = quadRenderer;
@@ -393,10 +403,10 @@ void ParticleEmitterObject::CreateParticleSystem()
 	renderer->enableRenderingHint(SPK::DEPTH_TEST,false); //No depth test for performance
 
 	// Create the zone
-	particleSystem.zone = SPK::Sphere::create(SPK::Vector3D(0.0f, 0.0f, 0.0f), zoneRadius);
+	particleSystem.zone = SPK::Sphere::create(SPK::Vector3D(GetX()*0.25f, -GetY()*0.25f, 0.0f), zoneRadius);
 
 	// Create the emitter
-	particleSystem.emitter = SPK::SphericEmitter::create(SPK::Vector3D(emitterXDirection,emitterYDirection,emitterZDirection), emitterAngleA, emitterAngleB); //TODO : Personalize this
+	particleSystem.emitter = SPK::SphericEmitter::create(SPK::Vector3D(emitterXDirection,-emitterYDirection,emitterZDirection), emitterAngleA, emitterAngleB); //TODO : Personalize this
 	particleSystem.emitter->setForce(emitterForceMin,emitterForceMax);
 	particleSystem.emitter->setZone(particleSystem.zone);
 	particleSystem.emitter->setTank(tank);
@@ -405,7 +415,7 @@ void ParticleEmitterObject::CreateParticleSystem()
 	// Create the Group
 	particleSystem.group = SPK::Group::create(particleSystem.particleModel);
 	particleSystem.group->addEmitter(particleSystem.emitter);
-	particleSystem.group->setGravity(SPK::Vector3D(particleGravityX,particleGravityY,particleGravityZ));
+	particleSystem.group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
 	particleSystem.group->setFriction(friction);
 	particleSystem.group->setRenderer(renderer);
 
@@ -417,7 +427,7 @@ void ParticleEmitterObject::CreateParticleSystem()
 bool ParticleEmitterObject::LoadRuntimeResources(const ImageManager & imageMgr )
 {
     //Get the texture if necessary
-    if ( rendererType == Quad ) textureParticle = imageMgr.GetImage(textureParticleName);
+    if ( rendererType == Quad ) particleSystem.openGLTextureParticle = imageMgr.GetOpenGLTexture(textureParticleName);
 
 	CreateParticleSystem();
 
@@ -463,14 +473,14 @@ bool ParticleEmitterObject::Draw( sf::RenderWindow& window )
 
     window.RestoreGLStates();
 
-    float x =  (200.0f*window.GetView().GetSize().x*(GetX()-window.GetView().GetCenter().x))/(window.GetView().GetSize().y*window.GetWidth());
-    float y = -(200.0f*window.GetView().GetSize().x*(GetY()-window.GetView().GetCenter().y))/(window.GetView().GetSize().y*window.GetWidth());
+    float xView =  window.GetView().GetCenter().x*0.25f;
+    float yView = -window.GetView().GetCenter().y*0.25f;
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     glRotatef(window.GetView().GetRotation(), 0, 0, 1);
-    glTranslatef(x, y, -100.0f/(window.GetWidth()/window.GetView().GetSize().x));
+    glTranslatef(-xView, -yView, -75.0f*(window.GetView().GetSize().y/600.0f));
 
 	SPK::GL::GLRenderer::saveGLStates();
 	particleSystem.particleSystem->render();
@@ -479,6 +489,12 @@ bool ParticleEmitterObject::Draw( sf::RenderWindow& window )
     window.SaveGLStates();
 
     return true;
+}
+
+void ParticleEmitterObject::OnPositionChanged()
+{
+    if ( particleSystem.zone )
+        particleSystem.zone->setPosition(SPK::Vector3D(GetX()*0.25f, -GetY()*0.25f, 0));
 }
 
 #ifdef GDE
@@ -562,17 +578,17 @@ void ParticleEmitterObject::SetEmitterForceMax(float newValue)
 void ParticleEmitterObject::SetParticleGravityX(float newValue)
 {
     particleGravityX = newValue;
-    if ( particleSystem.group ) particleSystem.group->setGravity(SPK::Vector3D(particleGravityX,particleGravityY,particleGravityZ));
+    if ( particleSystem.group ) particleSystem.group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
 }
 void ParticleEmitterObject::SetParticleGravityY(float newValue)
 {
     particleGravityY = newValue;
-    if ( particleSystem.group ) particleSystem.group->setGravity(SPK::Vector3D(particleGravityX,particleGravityY,particleGravityZ));
+    if ( particleSystem.group ) particleSystem.group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
 }
 void ParticleEmitterObject::SetParticleGravityZ(float newValue)
 {
     particleGravityZ = newValue;
-    if ( particleSystem.group ) particleSystem.group->setGravity(SPK::Vector3D(particleGravityX,particleGravityY,particleGravityZ));
+    if ( particleSystem.group ) particleSystem.group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
 }
 void ParticleEmitterObject::SetFriction(float newValue)
 {
@@ -582,17 +598,17 @@ void ParticleEmitterObject::SetFriction(float newValue)
 void ParticleEmitterObject::SetEmitterXDirection(float newValue)
 {
     emitterXDirection = newValue;
-    if ( particleSystem.emitter ) particleSystem.emitter->setDirection(SPK::Vector3D(emitterXDirection, emitterYDirection, emitterZDirection));
+    if ( particleSystem.emitter ) particleSystem.emitter->setDirection(SPK::Vector3D(emitterXDirection, -emitterYDirection, emitterZDirection));
 }
 void ParticleEmitterObject::SetEmitterYDirection(float newValue)
 {
     emitterYDirection = newValue;
-    if ( particleSystem.emitter ) particleSystem.emitter->setDirection(SPK::Vector3D(emitterXDirection, emitterYDirection, emitterZDirection));
+    if ( particleSystem.emitter ) particleSystem.emitter->setDirection(SPK::Vector3D(emitterXDirection, -emitterYDirection, emitterZDirection));
 }
 void ParticleEmitterObject::SetEmitterZDirection(float newValue)
 {
     emitterZDirection = newValue;
-    if ( particleSystem.emitter ) particleSystem.emitter->setDirection(SPK::Vector3D(emitterXDirection, emitterYDirection, emitterZDirection));
+    if ( particleSystem.emitter ) particleSystem.emitter->setDirection(SPK::Vector3D(emitterXDirection, -emitterYDirection, emitterZDirection));
 }
 void ParticleEmitterObject::SetEmitterAngleA(float newValue)
 {
@@ -610,14 +626,13 @@ void ParticleEmitterObject::SetZoneRadius(float newValue)
     if ( particleSystem.zone ) particleSystem.zone->setRadius(zoneRadius);
 }
 
-void ParticleEmitterObject::OnPositionChanged()
+void ParticleEmitterObject::UpdateTime(float deltaTime)
 {
-    /*if ( particleSystem )
-        particleSystem->SetPosition(GetX(), GetY());*/
+	hasSomeParticles = particleSystem.particleSystem->update (deltaTime);
 }
 
 /**
- * Get the real X position of the sprite
+ * Get the real X position of the object
  */
 float ParticleEmitterObject::GetDrawableX() const
 {
@@ -625,51 +640,31 @@ float ParticleEmitterObject::GetDrawableX() const
 }
 
 /**
- * Get the real Y position of the text
+ * Get the real Y position of the object
  */
 float ParticleEmitterObject::GetDrawableY() const
 {
     return GetY();
 }
 
-/**
- * Width is the width of the current sprite.
- */
 float ParticleEmitterObject::GetWidth() const
 {
     return 32;
 }
 
-/**
- * Height is the height of the current sprite.
- */
 float ParticleEmitterObject::GetHeight() const
 {
     return 32;
 }
 
-/**
- * X center is computed with text rectangle
- */
 float ParticleEmitterObject::GetCenterX() const
 {
     return 16;
 }
 
-/**
- * Y center is computed with text rectangle
- */
 float ParticleEmitterObject::GetCenterY() const
 {
     return 16;
-}
-
-/**
- * Nothing to do when updating time
- */
-void ParticleEmitterObject::UpdateTime(float deltaTime)
-{
-	hasSomeParticles = particleSystem.particleSystem->update (deltaTime);
 }
 
 /**

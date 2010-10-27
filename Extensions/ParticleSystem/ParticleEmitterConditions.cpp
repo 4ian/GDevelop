@@ -79,6 +79,24 @@ bool ParticleEmitterObject::CondEmitterZDirection( RuntimeScene & scene, Objects
 
     return false;
 }
+bool ParticleEmitterObject::CondEmitterAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    float angle = atan2(GetEmitterYDirection(), GetEmitterXDirection())*180.0f/3.14159f;
+
+    //optimisation : le test de signe en premier
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && angle == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && angle < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && angle > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && angle <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && angle >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && angle != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
+       )
+    {
+       return true;
+    }
+
+    return false;
+}
 bool ParticleEmitterObject::CondEmitterAngleA( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
@@ -104,6 +122,22 @@ bool ParticleEmitterObject::CondEmitterAngleB( RuntimeScene & scene, ObjectsConc
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetEmitterAngleB() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetEmitterAngleB() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetEmitterAngleB() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
+       )
+    {
+       return true;
+    }
+
+    return false;
+}
+bool ParticleEmitterObject::CondConeSprayAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    //optimisation : le test de signe en premier
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetEmitterAngleB()*180.0f/3.14159f == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetEmitterAngleB()*180.0f/3.14159f < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetEmitterAngleB()*180.0f/3.14159f > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetEmitterAngleB()*180.0f/3.14159f <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetEmitterAngleB()*180.0f/3.14159f >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetEmitterAngleB()*180.0f/3.14159f != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
        return true;
@@ -153,6 +187,42 @@ bool ParticleEmitterObject::CondParticleGravityZ( RuntimeScene & scene, ObjectsC
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetParticleGravityZ() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && GetParticleGravityZ() >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && GetParticleGravityZ() != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
+       )
+    {
+       return true;
+    }
+
+    return false;
+}
+bool ParticleEmitterObject::CondParticleGravityAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    float angle = atan2(GetParticleGravityY(), GetParticleGravityX())*180.0f/3.14159f;
+
+    //optimisation : le test de signe en premier
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && angle == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && angle < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && angle > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && angle <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && angle >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && angle != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
+       )
+    {
+       return true;
+    }
+
+    return false;
+}
+bool ParticleEmitterObject::CondParticleGravityLength( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    float length = sqrt(GetParticleGravityY()*GetParticleGravityY()+GetParticleGravityX()*GetParticleGravityX());
+
+    //optimisation : le test de signe en premier
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && length == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && length < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && length > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && length <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && length >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && length != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
        return true;

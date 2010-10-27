@@ -136,6 +136,14 @@ class ParticleEmitterObject : public Object
         bool ActParticleLifeTimeMin( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool CondParticleLifeTimeMax( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool ActParticleLifeTimeMax( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondConeSprayAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActConeSprayAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleGravityLength( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondParticleGravityAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActParticleGravityLength( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActParticleGravityAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondEmitterAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActEmitterAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         double ExpRendererParam1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return rendererParam1; };
         double ExpRendererParam2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return rendererParam2; };
@@ -155,6 +163,9 @@ class ParticleEmitterObject : public Object
         double ExpFriction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return friction; };
         double ExpParticleLifeTimeMin( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return particleLifeTimeMin; };
         double ExpParticleLifeTimeMax( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return particleLifeTimeMax; };
+        double ExpEmitterAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return atan2(GetEmitterYDirection(), GetEmitterXDirection())*180.0f/3.14159f; };
+        double ExpParticleGravityAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return atan2(GetParticleGravityY(), GetParticleGravityX())*180.0f/3.14159f; };
+        double ExpParticleGravityLength( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return sqrt(GetParticleGravityY()*GetParticleGravityY() + GetParticleGravityX()*GetParticleGravityX()); };
 
         bool ActParticleRed1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool ActParticleRed2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
@@ -286,6 +297,12 @@ class ParticleEmitterObject : public Object
 
         void SetParticleTexture(std::string imageName) { textureParticleName = imageName; };
         std::string GetParticleTexture() const { return textureParticleName; };
+
+        #if defined(GDE)
+        bool particleEditionSimpleMode; ///< User preference related to object's edition
+        bool emissionEditionSimpleMode; ///< User preference related to object's edition
+        bool gravityEditionSimpleMode; ///< User preference related to object's edition
+        #endif
 
     private:
 

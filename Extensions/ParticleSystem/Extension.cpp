@@ -38,7 +38,7 @@ freely, subject to the following restrictions:
  */
 Extension::Extension()
 {
-    DECLARE_THE_EXTENSION("ParticleEmitterObject",
+    DECLARE_THE_EXTENSION("ParticleSystem",
                           _("Système de particules"),
                           _("Extension permettant d'afficher un grand nombre de petites particules."),
                           "Compil Games",
@@ -47,7 +47,7 @@ Extension::Extension()
     //Declaration of all objects available
     DECLARE_OBJECT("ParticleEmitter",
                    _("Emetteur de particules"),
-                   _("Objet affichant un texte"),
+                   _("Objet affichant un grand nombre de petites particules"),
                    "Extensions/particleSystemicon.png",
                    &CreateParticleEmitterObject,
                    &DestroyParticleEmitterObject);

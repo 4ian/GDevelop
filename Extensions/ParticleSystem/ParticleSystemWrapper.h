@@ -27,8 +27,11 @@ freely, subject to the following restrictions:
 #ifndef PARTICLESYSTEMWRAPPER_H
 #define PARTICLESYSTEMWRAPPER_H
 
+#include <boost/shared_ptr.hpp>
 #include <SPK.h>
-#include <SPK_SFML.h>
+#include <SPK_GL.h>
+class OpenGLTextureWrapper;
+
 
 /**
  * Wrapper around SPARK related stuff.
@@ -42,8 +45,8 @@ class ParticleSystemWrapper
         virtual ~ParticleSystemWrapper();
         ParticleSystemWrapper(const ParticleSystemWrapper & other) //What a bad design
         {
-             particleSystem = NULL;
-             particleModel = NULL;
+            particleSystem = NULL;
+            particleModel = NULL;
             emitter = NULL;
             zone = NULL;
             group = NULL;
@@ -61,7 +64,7 @@ class ParticleSystemWrapper
         SPK::SphericEmitter * emitter;
         SPK::Sphere * zone;
         SPK::Group * group;
-        GLuint openGLTextureParticle;
+        boost::shared_ptr<OpenGLTextureWrapper> openGLTextureParticle;
 
     private:
         void Init(const ParticleSystemWrapper & other);

@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="Extension.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="0" topLine="0" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="1762" topLine="43" />
 	</File>
-	<File name="Extension.h" open="0" top="0" tabpos="0">
-		<Cursor position="977" topLine="0" />
+	<File name="Extension.h" open="0" top="0" tabpos="13">
+		<Cursor position="1105" topLine="0" />
 	</File>
-	<File name="ExtensionSubDeclaration1.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="977" topLine="0" />
+	<File name="ExtensionSubDeclaration1.cpp" open="0" top="0" tabpos="9">
+		<Cursor position="1033" topLine="384" />
 	</File>
-	<File name="ExtensionSubDeclaration2.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="977" topLine="0" />
+	<File name="ExtensionSubDeclaration2.cpp" open="0" top="0" tabpos="11">
+		<Cursor position="21454" topLine="397" />
 	</File>
-	<File name="ExtensionSubDeclaration3.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="977" topLine="0" />
+	<File name="ExtensionSubDeclaration3.cpp" open="0" top="0" tabpos="10">
+		<Cursor position="14629" topLine="17" />
 	</File>
 	<File name="ParticleEmitterActions.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="0" topLine="0" />
@@ -22,31 +22,31 @@
 	<File name="ParticleEmitterConditions.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="35919" topLine="0" />
 	</File>
-	<File name="ParticleEmitterExpressions.cpp" open="1" top="0" tabpos="5">
+	<File name="ParticleEmitterExpressions.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="1391" topLine="0" />
 	</File>
-	<File name="ParticleEmitterInitialPositionPanel.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="977" topLine="79" />
+	<File name="ParticleEmitterInitialPositionPanel.cpp" open="0" top="0" tabpos="12">
+		<Cursor position="2988" topLine="79" />
 	</File>
-	<File name="ParticleEmitterInitialPositionPanel.h" open="0" top="0" tabpos="0">
+	<File name="ParticleEmitterInitialPositionPanel.h" open="0" top="0" tabpos="14">
 		<Cursor position="395" topLine="33" />
 	</File>
 	<File name="ParticleEmitterObject.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="17923" topLine="392" />
+		<Cursor position="2175" topLine="58" />
 	</File>
-	<File name="ParticleEmitterObject.h" open="1" top="0" tabpos="2">
-		<Cursor position="1076" topLine="24" />
+	<File name="ParticleEmitterObject.h" open="0" top="0" tabpos="3">
+		<Cursor position="2629" topLine="303" />
 	</File>
-	<File name="ParticleEmitterObjectEditor.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="48924" topLine="595" />
+	<File name="ParticleEmitterObjectEditor.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="86901" topLine="1113" />
 	</File>
 	<File name="ParticleEmitterObjectEditor.h" open="0" top="0" tabpos="9">
-		<Cursor position="0" topLine="0" />
+		<Cursor position="1509" topLine="18" />
 	</File>
-	<File name="ParticleSystemWrapper.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="1626" topLine="28" />
+	<File name="ParticleSystemWrapper.cpp" open="0" top="0" tabpos="16">
+		<Cursor position="2272" topLine="28" />
 	</File>
-	<File name="ParticleSystemWrapper.h" open="1" top="1" tabpos="3">
-		<Cursor position="1424" topLine="30" />
+	<File name="ParticleSystemWrapper.h" open="0" top="0" tabpos="15">
+		<Cursor position="1558" topLine="28" />
 	</File>
 </CodeBlocks_layout_file>

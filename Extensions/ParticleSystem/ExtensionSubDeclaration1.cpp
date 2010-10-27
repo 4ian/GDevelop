@@ -37,9 +37,9 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
 {
     DECLARE_OBJECT_ACTION("EmitterXDirection",
                    _("Direction d'émission en X"),
-                   _("Modifie la direction d'émission des particules en X.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie la direction d'émission des particules en X."),
                    _("Faire _PARAM2__PARAM1_ à la direction d'émission des particules en X de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActEmitterXDirection);
@@ -55,7 +55,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Direction d'émission en X"),
                    _("Teste la direction d'émission des particules en X."),
                    _("La direction d'émission des particules en X de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondEmitterXDirection);
@@ -69,9 +69,9 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("EmitterYDirection",
                    _("Direction d'émission en Y"),
-                   _("Modifie la direction d'émission des particules en Y.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie la direction d'émission des particules en Y."),
                    _("Faire _PARAM2__PARAM1_ à la direction d'émission des particules en Y de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActEmitterYDirection);
@@ -87,7 +87,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Direction d'émission en Y"),
                    _("Teste la direction d'émission des particules en Y."),
                    _("La direction d'émission des particules en Y de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondEmitterYDirection);
@@ -101,9 +101,9 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("EmitterZDirection",
                    _("Direction d'émission en Z"),
-                   _("Modifie la direction d'émission des particules en Z.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie la direction d'émission des particules en Z."),
                    _("Faire _PARAM2__PARAM1_ à la direction d'émission des particules en Z de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActEmitterZDirection);
@@ -119,7 +119,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Direction d'émission en Z"),
                    _("Teste la direction d'émission des particules en Z."),
                    _("La direction d'émission des particules en Z de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondEmitterZDirection);
@@ -131,11 +131,43 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
 
     DECLARE_END_OBJECT_CONDITION()
 
+    DECLARE_OBJECT_ACTION("EmitterAngle",
+                   _("Angle d'émission"),
+                   _("Modifie l'angle d'émission."),
+                   _("Faire _PARAM2__PARAM1_ à l'angle d'émission de _PARAM0_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::ActEmitterAngle);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_ACTION()
+
+    DECLARE_OBJECT_CONDITION("EmitterAngle",
+                   _("Angle d'émission"),
+                   _("Teste la valeur de l'angle d'émission de l'émetteur."),
+                   _("L'angle d'émission de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::CondEmitterAngle);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_CONDITION()
+
     DECLARE_OBJECT_ACTION("EmitterAngleA",
                    _("Angle d'émission 1"),
-                   _("Modifie l'angle d'émission n°1.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie l'angle d'émission n°1."),
                    _("Faire _PARAM2__PARAM1_ à l'angle d'émission n°1 de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActEmitterAngleA);
@@ -151,7 +183,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Angle d'émission 1"),
                    _("Teste la valeur de l'angle d'émission n°1 de l'émetteur."),
                    _("L'angle d'émission n°1 de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondEmitterAngleA);
@@ -165,9 +197,9 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("EmitterAngleB",
                    _("Angle d'émission 2"),
-                   _("Modifie l'angle d'émission n°2.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie l'angle d'émission n°2."),
                    _("Faire _PARAM2__PARAM1_ à l'angle d'émission n°2 de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActEmitterAngleB);
@@ -183,10 +215,42 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Angle d'émission 2"),
                    _("Teste la valeur de l'angle d'émission n°2 de l'émetteur."),
                    _("L'angle d'émission n°2 de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondEmitterAngleB);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_CONDITION()
+
+    DECLARE_OBJECT_ACTION("ConeSprayAngle",
+                   _("Angle d'ouverture du cône d'émission"),
+                   _("Modifie l'angle d'ouverture du cône d'émission."),
+                   _("Faire _PARAM2__PARAM1_ à l'angle d'ouverture du cône d'émission de _PARAM0_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::ActConeSprayAngle);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_ACTION()
+
+    DECLARE_OBJECT_CONDITION("ConeSprayAngle",
+                   _("Angle d'ouverture du cône d'émission"),
+                   _("Teste l'angle d'ouverture du cône d'émission de l'émetteur."),
+                   _("L'angle d'ouverture du cône d'émission de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::CondConeSprayAngle);
 
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
         DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
@@ -199,7 +263,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Friction"),
                    _("Modifie la friction appliquée aux particules.\nNécessite de recréer les particules pour prendre en compte les changements."),
                    _("Faire _PARAM2__PARAM1_ à la friction des particules _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActFriction);
@@ -215,7 +279,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Friction"),
                    _("Teste la friction appliquée aux particules."),
                    _("La friction des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondFriction);
@@ -228,10 +292,10 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
     DECLARE_END_OBJECT_CONDITION()
 
     DECLARE_OBJECT_ACTION("ZoneRadius",
-                   _("ZoneRadius"),
+                   _("Rayon d'apparition"),
                    _("Modifie le rayon d'apparition des particules.\nNécessite de recréer les particules pour prendre en compte les changements."),
                    _("Faire _PARAM2__PARAM1_ au rayon d'apparition des particules de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActZoneRadius);
@@ -244,10 +308,10 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
     DECLARE_END_OBJECT_ACTION()
 
     DECLARE_OBJECT_CONDITION("ZoneRadius",
-                   _("ZoneRadius"),
+                   _("Rayon d'apparition"),
                    _("Teste le rayon d'apparition des particules."),
                    _("Le rayon d'apparition des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondZoneRadius);
@@ -325,9 +389,9 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleGravityX",
                    _("Gravité en X"),
-                   _("Modifie la direction de la gravité en X.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie la direction de la gravité en X."),
                    _("Faire _PARAM2__PARAM1_ à la direction de la gravité en X de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleGravityX);
@@ -343,7 +407,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Direction de la gravité en X"),
                    _("Teste la direction de la gravité en X."),
                    _("La direction de la gravité des particules en X de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleGravityX);
@@ -357,9 +421,9 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleGravityY",
                    _("Gravité en Y"),
-                   _("Modifie la direction de la gravité en Y.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie la direction de la gravité en Y."),
                    _("Faire _PARAM2__PARAM1_ à la direction de la gravité en Y de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleGravityY);
@@ -375,7 +439,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Direction de la gravité en Y"),
                    _("Teste la direction de la gravité en Y."),
                    _("La direction de la gravité des particules en Y de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleGravityY);
@@ -389,9 +453,9 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleGravityZ",
                    _("Gravité en Z"),
-                   _("Modifie la direction de la gravité en Z.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie la direction de la gravité en Z."),
                    _("Faire _PARAM2__PARAM1_ à la direction de la gravité en Z de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleGravityZ);
@@ -407,10 +471,74 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Direction de la gravité en Z"),
                    _("Teste la direction de la gravité en Z."),
                    _("La direction de la gravité des particules en Z de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleGravityZ);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_CONDITION()
+
+    DECLARE_OBJECT_ACTION("ParticleGravityAngle",
+                   _("Angle de la gravité"),
+                   _("Modifie l'angle de la gravité."),
+                   _("Faire _PARAM2__PARAM1_ à l'angle de la gravité de _PARAM0_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::ActParticleGravityAngle);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_ACTION()
+
+    DECLARE_OBJECT_CONDITION("ParticleGravityAngle",
+                   _("Angle de la gravité"),
+                   _("Teste la valeur de l'angle de la gravité de l'émetteur."),
+                   _("L'angle de la gravité de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::CondParticleGravityAngle);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_CONDITION()
+
+    DECLARE_OBJECT_ACTION("ParticleGravityLength",
+                   _("Gravité"),
+                   _("Modifie la gravité de l'émetteur."),
+                   _("Faire _PARAM2__PARAM1_ à la gravité de _PARAM0_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::ActParticleGravityLength);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_ACTION()
+
+    DECLARE_OBJECT_CONDITION("ParticleGravityLength",
+                   _("Gravité"),
+                   _("Teste la valeur de la gravité de l'émetteur."),
+                   _("La gravité de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::CondParticleGravityLength);
 
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
         DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")

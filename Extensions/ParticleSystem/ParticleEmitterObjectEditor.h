@@ -154,6 +154,7 @@ class ParticleEmitterObjectEditor: public wxDialog
 		wxRadioButton* angleRandomCheck;
 		wxStaticText* StaticText57;
 		wxRadioButton* lineCheck;
+		wxTextCtrl* maxParticleNbEdit;
 		wxRadioButton* redRandomCheck;
 		wxTextCtrl* gravityYEdit;
 		wxRadioButton* greenFixedCheck;
@@ -187,6 +188,7 @@ class ParticleEmitterObjectEditor: public wxDialog
 		wxTextCtrl* rendererParam2Edit;
 		wxNotebook* gravityNotebook;
 		wxTextCtrl* flowEdit;
+		wxStaticText* StaticText59;
 		wxStaticText* StaticText25;
 		wxRadioButton* sizeRandomCheck;
 		wxSpinCtrlDouble* simpleOpacityEdit;
@@ -257,6 +259,8 @@ class ParticleEmitterObjectEditor: public wxDialog
 		static const long ID_CUSTOM16;
 		static const long ID_STATICTEXT60;
 		static const long ID_PANEL3;
+		static const long ID_STATICTEXT62;
+		static const long ID_TEXTCTRL24;
 		static const long ID_RADIOBUTTON6;
 		static const long ID_RADIOBUTTON5;
 		static const long ID_RADIOBUTTON4;

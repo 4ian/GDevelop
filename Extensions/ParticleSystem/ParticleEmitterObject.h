@@ -247,6 +247,7 @@ class ParticleEmitterObject : public Object
         void SetParticleAngle2(float newValue) { particleAngle2= newValue; };
         void SetParticleLifeTimeMin(float newValue) { particleLifeTimeMin= newValue; };
         void SetParticleLifeTimeMax(float newValue) { particleLifeTimeMax= newValue; };
+        void SetMaxParticleNb(unsigned int newValue) { maxParticleNb = newValue; };
 
         float GetRendererParam1() const { return rendererParam1; };
         float GetRendererParam2() const { return rendererParam2; };
@@ -266,6 +267,7 @@ class ParticleEmitterObject : public Object
         float GetFriction() const { return friction; };
         float GetParticleLifeTimeMin() const { return particleLifeTimeMin; };
         float GetParticleLifeTimeMax() const { return particleLifeTimeMax; };
+        unsigned int GetMaxParticleNb() const { return maxParticleNb; };
 
         ParticleParameterType GetRedParameterType() const { return redParam; };
         ParticleParameterType GetGreenParameterType() const { return greenParam; };
@@ -332,6 +334,7 @@ class ParticleEmitterObject : public Object
         ParticleParameterType redParam, greenParam, blueParam, alphaParam, sizeParam, angleParam;
         float particleRed1, particleRed2, particleGreen1, particleGreen2, particleBlue1, particleBlue2, particleAlpha1, particleAlpha2;
         float particleSize1, particleSize2, particleAngle1, particleAngle2;
+        unsigned int maxParticleNb;
 
         bool hasSomeParticles;
 

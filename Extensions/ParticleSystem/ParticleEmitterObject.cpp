@@ -47,6 +47,11 @@ freely, subject to the following restrictions:
 
 ParticleEmitterObject::ParticleEmitterObject(std::string name_) :
 Object(name_),
+#if defined(GDE)
+particleEditionSimpleMode(true),
+emissionEditionSimpleMode(true),
+gravityEditionSimpleMode(true),
+#endif
 rendererType(Point),
 rendererParam1(3.0f),
 rendererParam2(1.0f),
@@ -85,17 +90,13 @@ particleSize1(1.0f),
 particleSize2(1.0f),
 particleAngle1(0.0f),
 particleAngle2(0.0f),
+maxParticleNb(5000),
 hasSomeParticles(true),
 opacity( 255 ),
 colorR( 255 ),
 colorG( 255 ),
 colorB( 255 ),
 angle(0)
-#if defined(GDE)
-,particleEditionSimpleMode(true),
-emissionEditionSimpleMode(true),
-gravityEditionSimpleMode(true)
-#endif
 {
 }
 
@@ -133,6 +134,12 @@ void ParticleEmitterObject::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleAngle2", particleAngle2);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("additive", additive);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("textureParticleName", textureParticleName);
+
+    {
+        int result = 5000;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("maxParticleNb", result);
+        maxParticleNb = result;
+    }
 
     {
         std::string result;
@@ -232,6 +239,7 @@ void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("rendererParam2", rendererParam2);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("additive", additive);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("textureParticleName", textureParticleName);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("maxParticleNb", maxParticleNb);
 
     std::string rendererTypeStr = "Point";
     if ( rendererType == Line ) rendererTypeStr = "Line";
@@ -413,7 +421,8 @@ void ParticleEmitterObject::CreateParticleSystem()
 	particleSystem.emitter->setFlow(flow);
 
 	// Create the Group
-	particleSystem.group = SPK::Group::create(particleSystem.particleModel);
+	cout << "Creating <ith" << maxParticleNb << endl;
+	particleSystem.group = SPK::Group::create(particleSystem.particleModel, maxParticleNb);
 	particleSystem.group->addEmitter(particleSystem.emitter);
 	particleSystem.group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
 	particleSystem.group->setFriction(friction);

@@ -88,6 +88,8 @@ const long ParticleEmitterObjectEditor::ID_STATICTEXT59 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_CUSTOM16 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_STATICTEXT60 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_PANEL3 = wxNewId();
+const long ParticleEmitterObjectEditor::ID_STATICTEXT62 = wxNewId();
+const long ParticleEmitterObjectEditor::ID_TEXTCTRL24 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_RADIOBUTTON6 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_RADIOBUTTON5 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_RADIOBUTTON4 = wxNewId();
@@ -210,6 +212,7 @@ object(object_)
 	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer45;
 	wxFlexGridSizer* FlexGridSizer47;
+	wxFlexGridSizer* FlexGridSizer59;
 	wxFlexGridSizer* FlexGridSizer54;
 	wxFlexGridSizer* FlexGridSizer16;
 	wxFlexGridSizer* FlexGridSizer24;
@@ -276,13 +279,14 @@ object(object_)
 	wxStaticBoxSizer* StaticBoxSizer5;
 	wxFlexGridSizer* FlexGridSizer32;
 	wxFlexGridSizer* FlexGridSizer42;
+	wxFlexGridSizer* FlexGridSizer58;
 	wxFlexGridSizer* FlexGridSizer31;
 	wxFlexGridSizer* FlexGridSizer40;
 	wxFlexGridSizer* FlexGridSizer39;
 	wxFlexGridSizer* FlexGridSizer28;
 	wxFlexGridSizer* FlexGridSizer26;
 	wxFlexGridSizer* FlexGridSizer30;
-	
+
 	Create(parent, wxID_ANY, _("Editer l\'émetteur de particules"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
@@ -334,7 +338,7 @@ object(object_)
 	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Core, _("Particules"));
 	FlexGridSizer30 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer30->AddGrowableCol(0);
-	FlexGridSizer31 = new wxFlexGridSizer(0, 5, 0, 0);
+	FlexGridSizer31 = new wxFlexGridSizer(0, 7, 0, 0);
 	StaticText27 = new wxStaticText(Core, ID_STATICTEXT29, _("Temps de vie : Entre"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT29"));
 	FlexGridSizer31->Add(StaticText27, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	lifeTimeMinEdit = new wxTextCtrl(Core, ID_TEXTCTRL11, wxEmptyString, wxDefaultPosition, wxSize(55,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL11"));
@@ -426,32 +430,41 @@ object(object_)
 	FlexGridSizer40->Fit(Panel2);
 	FlexGridSizer40->SetSizeHints(Panel2);
 	Panel1 = new wxPanel(particleNotebook, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
-	GridSizer1 = new wxGridSizer(0, 3, 0, 0);
-	StaticBoxSizer5 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Rouge"));
 	FlexGridSizer12 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer12->AddGrowableCol(0);
+	FlexGridSizer12->AddGrowableRow(1);
+	FlexGridSizer59 = new wxFlexGridSizer(0, 3, 0, 0);
+	StaticText59 = new wxStaticText(Panel1, ID_STATICTEXT62, _("Nombre maximum de particules :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT62"));
+	FlexGridSizer59->Add(StaticText59, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	maxParticleNbEdit = new wxTextCtrl(Panel1, ID_TEXTCTRL24, _("5000"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL24"));
+	FlexGridSizer59->Add(maxParticleNbEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer12->Add(FlexGridSizer59, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	GridSizer1 = new wxGridSizer(0, 3, 0, 0);
+	StaticBoxSizer5 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Rouge"));
+	FlexGridSizer13 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer13->AddGrowableCol(0);
 	FlexGridSizer14 = new wxFlexGridSizer(0, 3, 0, 0);
 	redFixedCheck = new wxRadioButton(Panel1, ID_RADIOBUTTON6, _("Fixé"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON6"));
 	redFixedCheck->SetValue(true);
 	FlexGridSizer14->Add(redFixedCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	redRandomCheck = new wxRadioButton(Panel1, ID_RADIOBUTTON5, _("Aléatoire"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON5"));
 	FlexGridSizer14->Add(redRandomCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer12->Add(FlexGridSizer14, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer13->Add(FlexGridSizer14, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	redMutableCheck = new wxRadioButton(Panel1, ID_RADIOBUTTON4, _("Changeant au cours du temps"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON4"));
-	FlexGridSizer12->Add(redMutableCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer13 = new wxFlexGridSizer(0, 5, 0, 0);
+	FlexGridSizer13->Add(redMutableCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer15 = new wxFlexGridSizer(0, 5, 0, 0);
 	StaticText9 = new wxStaticText(Panel1, ID_STATICTEXT11, _("Valeur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
-	FlexGridSizer13->Add(StaticText9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer15->Add(StaticText9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText11 = new wxStaticText(Panel1, ID_STATICTEXT13, _("De"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT13"));
-	FlexGridSizer13->Add(StaticText11, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer15->Add(StaticText11, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	red1Edit = new wxSpinCtrlDouble(Panel1,ID_SPINCTRL1,"",wxDefaultPosition,wxSize(55,21),0,0,1,0,0.1,_T("ID_SPINCTRL1"));
-	FlexGridSizer13->Add(red1Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer15->Add(red1Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText10 = new wxStaticText(Panel1, ID_STATICTEXT12, _("à"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT12"));
-	FlexGridSizer13->Add(StaticText10, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer15->Add(StaticText10, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	red2Edit = new wxSpinCtrlDouble(Panel1,ID_CUSTOM1,"",wxDefaultPosition,wxSize(55,21),0,0,1,0,0.1,_T("ID_CUSTOM1"));
-	FlexGridSizer13->Add(red2Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer12->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer5->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer15->Add(red2Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer13->Add(FlexGridSizer15, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticBoxSizer5->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	GridSizer1->Add(StaticBoxSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer7 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Vert"));
 	FlexGridSizer18 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -480,56 +493,56 @@ object(object_)
 	StaticBoxSizer7->Add(FlexGridSizer18, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	GridSizer1->Add(StaticBoxSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer6 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Bleu"));
-	FlexGridSizer15 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer15->AddGrowableCol(0);
-	FlexGridSizer16 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer16 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer16->AddGrowableCol(0);
+	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
 	blueFixedCheck = new wxRadioButton(Panel1, ID_RADIOBUTTON7, _("Fixé"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON7"));
 	blueFixedCheck->SetValue(true);
-	FlexGridSizer16->Add(blueFixedCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer17->Add(blueFixedCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	blueRandomCheck = new wxRadioButton(Panel1, ID_RADIOBUTTON8, _("Aléatoire"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON8"));
-	FlexGridSizer16->Add(blueRandomCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer15->Add(FlexGridSizer16, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer17->Add(blueRandomCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer16->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	blueMutableCheck = new wxRadioButton(Panel1, ID_RADIOBUTTON9, _("Changeant au cours du temps"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON9"));
-	FlexGridSizer15->Add(blueMutableCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer17 = new wxFlexGridSizer(0, 5, 0, 0);
+	FlexGridSizer16->Add(blueMutableCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer21 = new wxFlexGridSizer(0, 5, 0, 0);
 	StaticText12 = new wxStaticText(Panel1, ID_STATICTEXT14, _("Valeur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
-	FlexGridSizer17->Add(StaticText12, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer21->Add(StaticText12, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText13 = new wxStaticText(Panel1, ID_STATICTEXT15, _("De"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT15"));
-	FlexGridSizer17->Add(StaticText13, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer21->Add(StaticText13, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	blue1Edit = new wxSpinCtrlDouble(Panel1,ID_CUSTOM4,"",wxDefaultPosition,wxSize(55,21),0,0,1,0,0.1,_T("ID_CUSTOM4"));
-	FlexGridSizer17->Add(blue1Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer21->Add(blue1Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText14 = new wxStaticText(Panel1, ID_STATICTEXT16, _("à"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT16"));
-	FlexGridSizer17->Add(StaticText14, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer21->Add(StaticText14, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	blue2Edit = new wxSpinCtrlDouble(Panel1,ID_CUSTOM5,"",wxDefaultPosition,wxSize(55,21),0,0,1,0,0.1,_T("ID_CUSTOM5"));
-	FlexGridSizer17->Add(blue2Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer15->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer6->Add(FlexGridSizer15, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer21->Add(blue2Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer16->Add(FlexGridSizer21, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticBoxSizer6->Add(FlexGridSizer16, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	GridSizer1->Add(StaticBoxSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer8 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Transparence"));
-	FlexGridSizer21 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer21->AddGrowableCol(0);
-	FlexGridSizer22 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer22 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer22->AddGrowableCol(0);
+	FlexGridSizer23 = new wxFlexGridSizer(0, 3, 0, 0);
 	alphaFixedCheck = new wxRadioButton(Panel1, ID_RADIOBUTTON13, _("Fixé"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON13"));
 	alphaFixedCheck->SetValue(true);
-	FlexGridSizer22->Add(alphaFixedCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer23->Add(alphaFixedCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	alphaRandomCheck = new wxRadioButton(Panel1, ID_RADIOBUTTON14, _("Aléatoire"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON14"));
-	FlexGridSizer22->Add(alphaRandomCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer21->Add(FlexGridSizer22, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer23->Add(alphaRandomCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer22->Add(FlexGridSizer23, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	alphaMutableCheck = new wxRadioButton(Panel1, ID_RADIOBUTTON15, _("Changeant au cours du temps"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON15"));
-	FlexGridSizer21->Add(alphaMutableCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer23 = new wxFlexGridSizer(0, 5, 0, 0);
+	FlexGridSizer22->Add(alphaMutableCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer24 = new wxFlexGridSizer(0, 5, 0, 0);
 	StaticText18 = new wxStaticText(Panel1, ID_STATICTEXT20, _("Valeur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT20"));
-	FlexGridSizer23->Add(StaticText18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer24->Add(StaticText18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText19 = new wxStaticText(Panel1, ID_STATICTEXT21, _("De"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT21"));
-	FlexGridSizer23->Add(StaticText19, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer24->Add(StaticText19, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	alpha1Edit = new wxSpinCtrlDouble(Panel1,ID_CUSTOM6,"",wxDefaultPosition,wxSize(55,21),0,0,1,0,0.1,_T("ID_CUSTOM6"));
-	FlexGridSizer23->Add(alpha1Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer24->Add(alpha1Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText20 = new wxStaticText(Panel1, ID_STATICTEXT22, _("à"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT22"));
-	FlexGridSizer23->Add(StaticText20, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer24->Add(StaticText20, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	alpha2Edit = new wxSpinCtrlDouble(Panel1,ID_CUSTOM7,"",wxDefaultPosition,wxSize(55,21),0,0,1,0,0.1,_T("ID_CUSTOM7"));
-	FlexGridSizer23->Add(alpha2Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer21->Add(FlexGridSizer23, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer8->Add(FlexGridSizer21, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer24->Add(alpha2Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer22->Add(FlexGridSizer24, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticBoxSizer8->Add(FlexGridSizer22, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	GridSizer1->Add(StaticBoxSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer10 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Taille"));
 	FlexGridSizer27 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -558,34 +571,35 @@ object(object_)
 	StaticBoxSizer10->Add(FlexGridSizer27, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	GridSizer1->Add(StaticBoxSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer9 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Angle"));
-	FlexGridSizer24 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer24->AddGrowableCol(0);
-	FlexGridSizer25 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer25 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer25->AddGrowableCol(0);
+	FlexGridSizer26 = new wxFlexGridSizer(0, 3, 0, 0);
 	angleNothingCheck = new wxRadioButton(Panel1, ID_RADIOBUTTON16, _("Pas de changement"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON16"));
 	angleNothingCheck->SetValue(true);
-	FlexGridSizer25->Add(angleNothingCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer26->Add(angleNothingCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	angleRandomCheck = new wxRadioButton(Panel1, ID_RADIOBUTTON17, _("Aléatoire"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON17"));
-	FlexGridSizer25->Add(angleRandomCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer24->Add(FlexGridSizer25, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer26->Add(angleRandomCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer25->Add(FlexGridSizer26, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	angleMutableCheck = new wxRadioButton(Panel1, ID_RADIOBUTTON18, _("Changeant au cours du temps"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON18"));
-	FlexGridSizer24->Add(angleMutableCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer26 = new wxFlexGridSizer(0, 5, 0, 0);
+	FlexGridSizer25->Add(angleMutableCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer58 = new wxFlexGridSizer(0, 5, 0, 0);
 	StaticText21 = new wxStaticText(Panel1, ID_STATICTEXT23, _("Valeur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT23"));
-	FlexGridSizer26->Add(StaticText21, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer58->Add(StaticText21, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText22 = new wxStaticText(Panel1, ID_STATICTEXT24, _("De"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT24"));
-	FlexGridSizer26->Add(StaticText22, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer58->Add(StaticText22, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	angle1Edit = new wxSpinCtrlDouble(Panel1,ID_CUSTOM8,"",wxDefaultPosition,wxSize(55,21),0,0,6.28319,0,0.1,_T("ID_CUSTOM8"));
-	FlexGridSizer26->Add(angle1Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer58->Add(angle1Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText23 = new wxStaticText(Panel1, ID_STATICTEXT25, _("à"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT25"));
-	FlexGridSizer26->Add(StaticText23, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer58->Add(StaticText23, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	angle2Edit = new wxSpinCtrlDouble(Panel1,ID_CUSTOM9,"",wxDefaultPosition,wxSize(55,21),0,0,6.28319,0,0.1,_T("ID_CUSTOM9"));
-	FlexGridSizer26->Add(angle2Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer24->Add(FlexGridSizer26, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer9->Add(FlexGridSizer24, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer58->Add(angle2Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer25->Add(FlexGridSizer58, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticBoxSizer9->Add(FlexGridSizer25, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	GridSizer1->Add(StaticBoxSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	Panel1->SetSizer(GridSizer1);
-	GridSizer1->Fit(Panel1);
-	GridSizer1->SetSizeHints(Panel1);
+	FlexGridSizer12->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Panel1->SetSizer(FlexGridSizer12);
+	FlexGridSizer12->Fit(Panel1);
+	FlexGridSizer12->SetSizeHints(Panel1);
 	particleNotebook->AddPage(Panel2, _("Configuration simple"), false);
 	particleNotebook->AddPage(Panel1, _("Configuration avancée"), false);
 	FlexGridSizer30->Add(particleNotebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -808,7 +822,7 @@ object(object_)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 	Center();
-	
+
 	Connect(ID_RADIOBUTTON2,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnpointCheckSelect);
 	Connect(ID_RADIOBUTTON1,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnLineCheckSelect);
 	Connect(ID_RADIOBUTTON3,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnQuadCheckSelect);
@@ -896,6 +910,7 @@ object(object_)
     lifeTimeMinEdit->SetValue(ToString(object.GetParticleLifeTimeMin()));
     lifeTimeMaxEdit->SetValue(ToString(object.GetParticleLifeTimeMax()));
     zoneRadiusEdit->SetValue(ToString(object.GetZoneRadius()));
+    maxParticleNbEdit->SetValue(ToString(object.GetMaxParticleNb()));
 
     red1Edit->SetValue(ToString(object.GetParticleRed1()));
     red2Edit->SetValue(ToString(object.GetParticleRed2()));
@@ -1060,6 +1075,7 @@ void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
     object.SetParticleLifeTimeMax(ToFloat(string(lifeTimeMaxEdit->GetValue().mb_str())));
     object.SetZoneRadius(ToFloat(string(zoneRadiusEdit->GetValue().mb_str())));
     object.SetFriction(ToFloat(string(frictionEdit->GetValue().mb_str())));
+    object.SetMaxParticleNb(ToFloat(string(maxParticleNbEdit->GetValue().mb_str())) > 0 ? ToFloat(string(maxParticleNbEdit->GetValue().mb_str())) : 0);
 
     object.SetParticleRed1(red1Edit->GetValue());
     object.SetParticleRed2(red2Edit->GetValue());
@@ -1283,7 +1299,8 @@ void ParticleEmitterObjectEditor::OnsimpleOpacityEditChange(wxSpinDoubleEvent& e
 
 void ParticleEmitterObjectEditor::OnsimpleSizeEditChange(wxSpinDoubleEvent& event)
 {
-    sizeRandomCheck->SetValue(true);
+    sizeRandomCheck->SetValue(simpleSizeRandomCheck->GetValue());
+    sizeMutableCheck->SetValue(simpleSizeMutableCheck->GetValue());
     size2Edit->Enable(true);
     size1Edit->SetValue(simpleSize1Edit->GetValue()/100.0f);
     size2Edit->SetValue(simpleSize2Edit->GetValue()/100.0f);
@@ -1291,7 +1308,8 @@ void ParticleEmitterObjectEditor::OnsimpleSizeEditChange(wxSpinDoubleEvent& even
 
 void ParticleEmitterObjectEditor::OnsimpleAngleEditChange(wxSpinDoubleEvent& event)
 {
-    angleRandomCheck->SetValue(true);
+    angleRandomCheck->SetValue(simpleAngleRandomCheck->GetValue());
+    angleMutableCheck->SetValue(simpleAngleMutableCheck->GetValue());
     angle2Edit->Enable(true);
     angle1Edit->SetValue(simpleAngle1Edit->GetValue()/180.0f*3.14159f);
     angle2Edit->SetValue(simpleAngle2Edit->GetValue()/180.0f*3.14159f);
@@ -1301,8 +1319,6 @@ void ParticleEmitterObjectEditor::OnsimpleRadiusEditText(wxCommandEvent& event)
 {
     zoneRadiusEdit->SetValue(simpleRadiusEdit->GetValue());
 }
-
-#endif
 
 void ParticleEmitterObjectEditor::OnsimpleAngleText(wxCommandEvent& event)
 {
@@ -1351,3 +1367,6 @@ void ParticleEmitterObjectEditor::OnsimpleAngleRandomCheckSelect(wxCommandEvent&
 {
     angleRandomCheck->SetValue(true);
 }
+
+
+#endif

@@ -839,68 +839,68 @@
 			<wxsmith version="1">
 				<gui name="wxWidgets" src="Game_Develop_EditorApp.cpp" main="-- None --" init_handlers="necessary" language="CPP" />
 				<resources>
-					<wxFrame wxs="wxsmith/Game_Develop_Editorframe.wxs" src="Game_Develop_EditorMain.cpp" hdr="Game_Develop_EditorMain.h" name="Game_Develop_EditorFrame" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorObjets.wxs" src="EditorObjets.cpp" hdr="EditorObjets.h" name="EditorObjets" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorEvents.wxs" src="EditorEvents.cpp" hdr="EditorEvents.h" name="EditorEvents" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoixCondition.wxs" src="ChoixCondition.cpp" hdr="ChoixCondition.h" name="ChoixCondition" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoixAction.wxs" src="ChoixAction.cpp" hdr="ChoixAction.h" name="ChoixAction" language="CPP" />
-					<wxDialog wxs="wxsmith/EditorObjet.wxs" src="EditorObjet.cpp" hdr="EditorObjet.h" name="EditorObjet" language="CPP" />
-					<wxDialog wxs="wxsmith/EditOptionsPosition.wxs" src="EditOptionsPosition.cpp" hdr="EditOptionsPosition.h" name="EditOptionsPosition" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoixBouton.wxs" src="ChoixBouton.cpp" hdr="ChoixBouton.h" name="ChoixBouton" language="CPP" />
-					<wxDialog wxs="wxsmith/EditPropScene.wxs" src="EditPropScene.cpp" hdr="EditPropScene.h" name="EditPropScene" language="CPP" />
-					<wxDialog wxs="wxsmith/EditPropJeu.wxs" src="EditPropJeu.cpp" hdr="EditPropJeu.h" name="EditPropJeu" language="CPP" />
-					<wxDialog wxs="wxsmith/Preferences.wxs" src="Preferences.cpp" hdr="Preferences.h" name="Preferences" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoixTemplateEvent.wxs" src="ChoixTemplateEvent.cpp" hdr="ChoixTemplateEvent.h" name="ChoixTemplateEvent" language="CPP" />
-					<wxDialog wxs="wxsmith/Credits.wxs" src="Credits.cpp" hdr="Credits.h" name="Credits" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoixDossier.wxs" src="ChoixDossier.cpp" hdr="ChoixDossier.h" name="ChoixDossier" language="CPP" />
-					<wxDialog wxs="wxsmith/EditDossier.wxs" src="EditDossier.cpp" hdr="EditDossier.h" name="EditDossier" language="CPP" />
-					<wxDialog wxs="wxsmith/MessagePlus.wxs" src="MessagePlus.cpp" hdr="MessagePlus.h" name="MessagePlus" language="CPP" />
-					<wxDialog wxs="wxsmith/Compilation.wxs" src="Compilation.cpp" hdr="Compilation.h" name="Compilation" language="CPP" />
-					<wxDialog wxs="wxsmith/Demarrage.wxs" src="Demarrage.cpp" hdr="Demarrage.h" name="Demarrage" language="CPP" />
-					<wxDialog wxs="wxsmith/ConvertJRC.wxs" src="ConvertJRC.cpp" hdr="ConvertJRC.h" name="ConvertJRC" language="CPP" />
-					<wxDialog wxs="wxsmith/Portable.wxs" src="Portable.cpp" hdr="Portable.h" name="Portable" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoixClavier.wxs" src="ChoixClavier.cpp" hdr="ChoixClavier.h" name="ChoixClavier" language="CPP" />
-					<wxDialog wxs="wxsmith/mp3ogg.wxs" src="mp3ogg.cpp" hdr="mp3ogg.h" name="mp3ogg" language="CPP" />
-					<wxDialog wxs="wxsmith/SigneModification.wxs" src="SigneModification.cpp" hdr="SigneModification.h" name="SigneModification" language="CPP" />
-					<wxDialog wxs="wxsmith/SigneTest.wxs" src="SigneTest.cpp" hdr="SigneTest.h" name="SigneTest" language="CPP" />
-					<wxDialog wxs="wxsmith/BugReport.wxs" src="BugReport.cpp" hdr="BugReport.h" name="BugReport" language="CPP" />
-					<wxDialog wxs="wxsmith/Fusion.wxs" src="Fusion.cpp" hdr="Fusion.h" name="Fusion" language="CPP" />
-					<wxDialog wxs="wxsmith/MAJ.wxs" src="MAJ.cpp" hdr="MAJ.h" name="MAJ" language="CPP" />
-					<wxDialog wxs="wxsmith/AjoutPlusImage.wxs" src="AjoutPlusImage.cpp" hdr="AjoutPlusImage.h" name="AjoutPlusImage" language="CPP" />
-					<wxDialog wxs="wxsmith/CreateTemplate.wxs" src="CreateTemplate.cpp" hdr="CreateTemplate.h" name="CreateTemplate" language="CPP" />
-					<wxDialog wxs="wxsmith/ErrorCompilation.wxs" src="ErrorCompilation.cpp" hdr="ErrorCompilation.h" name="ErrorCompilation" language="CPP" />
-					<wxDialog wxs="wxsmith/GeneratePassword.wxs" src="GeneratePassword.cpp" hdr="GeneratePassword.h" name="GeneratePassword" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorScene.wxs" src="EditorScene.cpp" hdr="EditorScene.h" name="EditorScene" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorJeu.wxs" src="EditorJeu.cpp" hdr="EditorJeu.h" name="EditorJeu" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorObjetsGroups.wxs" src="EditorObjetsGroups.cpp" hdr="EditorObjetsGroups.h" name="EditorObjetsGroups" language="CPP" />
-					<wxDialog wxs="wxsmith/EditObjectGroup.wxs" src="EditObjectGroup.cpp" hdr="EditObjectGroup.h" name="EditObjectGroup" language="CPP" />
-					<wxDialog wxs="wxsmith/ModeSimple.wxs" src="ModeSimple.cpp" hdr="ModeSimple.h" name="ModeSimple" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoixObjetExpression.wxs" src="ChoixObjetExpression.cpp" hdr="ChoixObjetExpression.h" name="ChoixObjetExpression" language="CPP" />
-					<wxDialog wxs="wxsmith/ImportImage.wxs" src="ImportImage.cpp" hdr="ImportImage.h" name="ImportImage" language="CPP" />
-					<wxFrame wxs="wxsmith/ImageEditor.wxs" src="ImageEditor.cpp" hdr="ImageEditor.h" name="ImageEditor" language="CPP" />
-					<wxDialog wxs="wxsmith/TrueOrFalse.wxs" src="TrueOrFalse.cpp" hdr="TrueOrFalse.h" name="TrueOrFalse" language="CPP" />
-					<wxDialog wxs="wxsmith/SearchEvents.wxs" src="SearchEvents.cpp" hdr="SearchEvents.h" name="SearchEvents" language="CPP" />
-					<wxDialog wxs="wxsmith/Extensions.wxs" src="Extensions.cpp" hdr="Extensions.h" name="Extensions" language="CPP" />
-					<wxDialog wxs="wxsmith/GridSetup.wxs" src="GridSetup.cpp" hdr="GridSetup.h" name="GridSetup" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorLayers.wxs" src="EditorLayers.cpp" hdr="EditorLayers.h" name="EditorLayers" language="CPP" />
-					<wxDialog wxs="wxsmith/EditLayer.wxs" src="EditLayer.cpp" hdr="EditLayer.h" name="EditLayer" language="CPP" />
-					<wxDialog wxs="wxsmith/ObjectsOnBadLayerBox.wxs" src="ObjectsOnBadLayerBox.cpp" hdr="ObjectsOnBadLayerBox.h" name="ObjectsOnBadLayerBox" language="CPP" />
-					<wxPanel wxs="wxsmith/DebuggerGUI.wxs" src="DebuggerGUI.cpp" hdr="DebuggerGUI.h" name="DebuggerGUI" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoiceJoyAxis.wxs" src="ChoiceJoyAxis.cpp" hdr="ChoiceJoyAxis.h" name="ChoiceJoyAxis" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoiceFile.wxs" src="ChoiceFile.cpp" hdr="ChoiceFile.h" name="ChoiceFile" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorObjectList.wxs" src="EditorObjectList.cpp" hdr="EditorObjectList.h" name="EditorObjectList" language="CPP" />
-					<wxFrame wxs="wxsmith/ConsoleFrame.wxs" src="ConsoleFrame.cpp" hdr="ConsoleFrame.h" name="ConsoleFrame" language="CPP" />
-					<wxDialog wxs="wxsmith/ObjectTypeChoice.wxs" src="ObjectTypeChoice.cpp" hdr="ObjectTypeChoice.h" name="ObjectTypeChoice" language="CPP" />
-					<wxPanel wxs="wxsmith/SpriteInitialPositionPanel.wxs" src="SpriteInitialPositionPanel.cpp" hdr="SpriteInitialPositionPanel.h" name="SpriteInitialPositionPanel" language="CPP" />
-					<wxDialog wxs="wxsmith/InitialVariablesDialog.wxs" src="InitialVariablesDialog.cpp" hdr="InitialVariablesDialog.h" name="InitialVariablesDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/TextObjectEditor.wxs" src="TextObjectEditor.cpp" hdr="TextObjectEditor.h" name="TextObjectEditor" language="CPP" />
-					<wxDialog wxs="wxsmith/DrawerObjectEditor.wxs" src="DrawerObjectEditor.cpp" hdr="DrawerObjectEditor.h" name="DrawerObjectEditor" language="CPP" />
-					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="RenderDialog.cpp" hdr="RenderDialog.h" name="RenderDialog" language="CPP" />
-					<wxPanel wxs="wxsmith/ProjectManager.wxs" src="ProjectManager.cpp" hdr="ProjectManager.h" name="ProjectManager" language="CPP" />
-					<wxPanel wxs="wxsmith/StartHerePage.wxs" src="StartHerePage.cpp" hdr="StartHerePage.h" name="StartHerePage" language="CPP" />
-					<wxPanel wxs="wxsmith/ExternalEventsEditor.wxs" src="ExternalEventsEditor.cpp" hdr="ExternalEventsEditor.h" name="ExternalEventsEditor" language="CPP" />
-					<wxDialog wxs="wxsmith/AutomatismTypeChoice.wxs" src="AutomatismTypeChoice.cpp" hdr="AutomatismTypeChoice.h" name="AutomatismTypeChoice" language="CPP" />
-					<wxPanel wxs="wxsmith/ObjectListPanel.wxs" src="ObjectListPanel.cpp" hdr="ObjectListPanel.h" name="ObjectListPanel" language="CPP" />
+					<wxFrame wxs="wxsmith/Game_Develop_Editorframe.wxs" src="Game_Develop_EditorMain.cpp" hdr="Game_Develop_EditorMain.h" fwddecl="0" i18n="1" name="Game_Develop_EditorFrame" language="CPP" />
+					<wxPanel wxs="wxsmith/EditorObjets.wxs" src="EditorObjets.cpp" hdr="EditorObjets.h" fwddecl="0" i18n="1" name="EditorObjets" language="CPP" />
+					<wxPanel wxs="wxsmith/EditorEvents.wxs" src="EditorEvents.cpp" hdr="EditorEvents.h" fwddecl="0" i18n="1" name="EditorEvents" language="CPP" />
+					<wxDialog wxs="wxsmith/ChoixCondition.wxs" src="ChoixCondition.cpp" hdr="ChoixCondition.h" fwddecl="0" i18n="1" name="ChoixCondition" language="CPP" />
+					<wxDialog wxs="wxsmith/ChoixAction.wxs" src="ChoixAction.cpp" hdr="ChoixAction.h" fwddecl="0" i18n="1" name="ChoixAction" language="CPP" />
+					<wxDialog wxs="wxsmith/EditorObjet.wxs" src="EditorObjet.cpp" hdr="EditorObjet.h" fwddecl="0" i18n="1" name="EditorObjet" language="CPP" />
+					<wxDialog wxs="wxsmith/EditOptionsPosition.wxs" src="EditOptionsPosition.cpp" hdr="EditOptionsPosition.h" fwddecl="0" i18n="1" name="EditOptionsPosition" language="CPP" />
+					<wxDialog wxs="wxsmith/ChoixBouton.wxs" src="ChoixBouton.cpp" hdr="ChoixBouton.h" fwddecl="0" i18n="1" name="ChoixBouton" language="CPP" />
+					<wxDialog wxs="wxsmith/EditPropScene.wxs" src="EditPropScene.cpp" hdr="EditPropScene.h" fwddecl="0" i18n="1" name="EditPropScene" language="CPP" />
+					<wxDialog wxs="wxsmith/EditPropJeu.wxs" src="EditPropJeu.cpp" hdr="EditPropJeu.h" fwddecl="0" i18n="1" name="EditPropJeu" language="CPP" />
+					<wxDialog wxs="wxsmith/Preferences.wxs" src="Preferences.cpp" hdr="Preferences.h" fwddecl="0" i18n="1" name="Preferences" language="CPP" />
+					<wxDialog wxs="wxsmith/ChoixTemplateEvent.wxs" src="ChoixTemplateEvent.cpp" hdr="ChoixTemplateEvent.h" fwddecl="0" i18n="1" name="ChoixTemplateEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/Credits.wxs" src="Credits.cpp" hdr="Credits.h" fwddecl="0" i18n="1" name="Credits" language="CPP" />
+					<wxDialog wxs="wxsmith/ChoixDossier.wxs" src="ChoixDossier.cpp" hdr="ChoixDossier.h" fwddecl="0" i18n="1" name="ChoixDossier" language="CPP" />
+					<wxDialog wxs="wxsmith/EditDossier.wxs" src="EditDossier.cpp" hdr="EditDossier.h" fwddecl="0" i18n="1" name="EditDossier" language="CPP" />
+					<wxDialog wxs="wxsmith/MessagePlus.wxs" src="MessagePlus.cpp" hdr="MessagePlus.h" fwddecl="0" i18n="1" name="MessagePlus" language="CPP" />
+					<wxDialog wxs="wxsmith/Compilation.wxs" src="Compilation.cpp" hdr="Compilation.h" fwddecl="0" i18n="1" name="Compilation" language="CPP" />
+					<wxDialog wxs="wxsmith/Demarrage.wxs" src="Demarrage.cpp" hdr="Demarrage.h" fwddecl="0" i18n="1" name="Demarrage" language="CPP" />
+					<wxDialog wxs="wxsmith/ConvertJRC.wxs" src="ConvertJRC.cpp" hdr="ConvertJRC.h" fwddecl="0" i18n="1" name="ConvertJRC" language="CPP" />
+					<wxDialog wxs="wxsmith/Portable.wxs" src="Portable.cpp" hdr="Portable.h" fwddecl="0" i18n="1" name="Portable" language="CPP" />
+					<wxDialog wxs="wxsmith/ChoixClavier.wxs" src="ChoixClavier.cpp" hdr="ChoixClavier.h" fwddecl="0" i18n="1" name="ChoixClavier" language="CPP" />
+					<wxDialog wxs="wxsmith/mp3ogg.wxs" src="mp3ogg.cpp" hdr="mp3ogg.h" fwddecl="0" i18n="1" name="mp3ogg" language="CPP" />
+					<wxDialog wxs="wxsmith/SigneModification.wxs" src="SigneModification.cpp" hdr="SigneModification.h" fwddecl="0" i18n="1" name="SigneModification" language="CPP" />
+					<wxDialog wxs="wxsmith/SigneTest.wxs" src="SigneTest.cpp" hdr="SigneTest.h" fwddecl="0" i18n="1" name="SigneTest" language="CPP" />
+					<wxDialog wxs="wxsmith/BugReport.wxs" src="BugReport.cpp" hdr="BugReport.h" fwddecl="0" i18n="1" name="BugReport" language="CPP" />
+					<wxDialog wxs="wxsmith/Fusion.wxs" src="Fusion.cpp" hdr="Fusion.h" fwddecl="0" i18n="1" name="Fusion" language="CPP" />
+					<wxDialog wxs="wxsmith/MAJ.wxs" src="MAJ.cpp" hdr="MAJ.h" fwddecl="0" i18n="1" name="MAJ" language="CPP" />
+					<wxDialog wxs="wxsmith/AjoutPlusImage.wxs" src="AjoutPlusImage.cpp" hdr="AjoutPlusImage.h" fwddecl="0" i18n="1" name="AjoutPlusImage" language="CPP" />
+					<wxDialog wxs="wxsmith/CreateTemplate.wxs" src="CreateTemplate.cpp" hdr="CreateTemplate.h" fwddecl="0" i18n="1" name="CreateTemplate" language="CPP" />
+					<wxDialog wxs="wxsmith/ErrorCompilation.wxs" src="ErrorCompilation.cpp" hdr="ErrorCompilation.h" fwddecl="0" i18n="1" name="ErrorCompilation" language="CPP" />
+					<wxDialog wxs="wxsmith/GeneratePassword.wxs" src="GeneratePassword.cpp" hdr="GeneratePassword.h" fwddecl="0" i18n="1" name="GeneratePassword" language="CPP" />
+					<wxPanel wxs="wxsmith/EditorScene.wxs" src="EditorScene.cpp" hdr="EditorScene.h" fwddecl="0" i18n="1" name="EditorScene" language="CPP" />
+					<wxPanel wxs="wxsmith/EditorJeu.wxs" src="EditorJeu.cpp" hdr="EditorJeu.h" fwddecl="0" i18n="1" name="EditorJeu" language="CPP" />
+					<wxPanel wxs="wxsmith/EditorObjetsGroups.wxs" src="EditorObjetsGroups.cpp" hdr="EditorObjetsGroups.h" fwddecl="0" i18n="1" name="EditorObjetsGroups" language="CPP" />
+					<wxDialog wxs="wxsmith/EditObjectGroup.wxs" src="EditObjectGroup.cpp" hdr="EditObjectGroup.h" fwddecl="0" i18n="1" name="EditObjectGroup" language="CPP" />
+					<wxDialog wxs="wxsmith/ModeSimple.wxs" src="ModeSimple.cpp" hdr="ModeSimple.h" fwddecl="0" i18n="1" name="ModeSimple" language="CPP" />
+					<wxDialog wxs="wxsmith/ChoixObjetExpression.wxs" src="ChoixObjetExpression.cpp" hdr="ChoixObjetExpression.h" fwddecl="0" i18n="1" name="ChoixObjetExpression" language="CPP" />
+					<wxDialog wxs="wxsmith/ImportImage.wxs" src="ImportImage.cpp" hdr="ImportImage.h" fwddecl="0" i18n="1" name="ImportImage" language="CPP" />
+					<wxFrame wxs="wxsmith/ImageEditor.wxs" src="ImageEditor.cpp" hdr="ImageEditor.h" fwddecl="0" i18n="1" name="ImageEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/TrueOrFalse.wxs" src="TrueOrFalse.cpp" hdr="TrueOrFalse.h" fwddecl="0" i18n="1" name="TrueOrFalse" language="CPP" />
+					<wxDialog wxs="wxsmith/SearchEvents.wxs" src="SearchEvents.cpp" hdr="SearchEvents.h" fwddecl="0" i18n="1" name="SearchEvents" language="CPP" />
+					<wxDialog wxs="wxsmith/Extensions.wxs" src="Extensions.cpp" hdr="Extensions.h" fwddecl="0" i18n="1" name="Extensions" language="CPP" />
+					<wxDialog wxs="wxsmith/GridSetup.wxs" src="GridSetup.cpp" hdr="GridSetup.h" fwddecl="0" i18n="1" name="GridSetup" language="CPP" />
+					<wxPanel wxs="wxsmith/EditorLayers.wxs" src="EditorLayers.cpp" hdr="EditorLayers.h" fwddecl="0" i18n="1" name="EditorLayers" language="CPP" />
+					<wxDialog wxs="wxsmith/EditLayer.wxs" src="EditLayer.cpp" hdr="EditLayer.h" fwddecl="0" i18n="1" name="EditLayer" language="CPP" />
+					<wxDialog wxs="wxsmith/ObjectsOnBadLayerBox.wxs" src="ObjectsOnBadLayerBox.cpp" hdr="ObjectsOnBadLayerBox.h" fwddecl="0" i18n="1" name="ObjectsOnBadLayerBox" language="CPP" />
+					<wxPanel wxs="wxsmith/DebuggerGUI.wxs" src="DebuggerGUI.cpp" hdr="DebuggerGUI.h" fwddecl="0" i18n="1" name="DebuggerGUI" language="CPP" />
+					<wxDialog wxs="wxsmith/ChoiceJoyAxis.wxs" src="ChoiceJoyAxis.cpp" hdr="ChoiceJoyAxis.h" fwddecl="0" i18n="1" name="ChoiceJoyAxis" language="CPP" />
+					<wxDialog wxs="wxsmith/ChoiceFile.wxs" src="ChoiceFile.cpp" hdr="ChoiceFile.h" fwddecl="0" i18n="1" name="ChoiceFile" language="CPP" />
+					<wxPanel wxs="wxsmith/EditorObjectList.wxs" src="EditorObjectList.cpp" hdr="EditorObjectList.h" fwddecl="0" i18n="1" name="EditorObjectList" language="CPP" />
+					<wxFrame wxs="wxsmith/ConsoleFrame.wxs" src="ConsoleFrame.cpp" hdr="ConsoleFrame.h" fwddecl="0" i18n="1" name="ConsoleFrame" language="CPP" />
+					<wxDialog wxs="wxsmith/ObjectTypeChoice.wxs" src="ObjectTypeChoice.cpp" hdr="ObjectTypeChoice.h" fwddecl="0" i18n="1" name="ObjectTypeChoice" language="CPP" />
+					<wxPanel wxs="wxsmith/SpriteInitialPositionPanel.wxs" src="SpriteInitialPositionPanel.cpp" hdr="SpriteInitialPositionPanel.h" fwddecl="0" i18n="1" name="SpriteInitialPositionPanel" language="CPP" />
+					<wxDialog wxs="wxsmith/InitialVariablesDialog.wxs" src="InitialVariablesDialog.cpp" hdr="InitialVariablesDialog.h" fwddecl="0" i18n="1" name="InitialVariablesDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/TextObjectEditor.wxs" src="TextObjectEditor.cpp" hdr="TextObjectEditor.h" fwddecl="0" i18n="1" name="TextObjectEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/DrawerObjectEditor.wxs" src="DrawerObjectEditor.cpp" hdr="DrawerObjectEditor.h" fwddecl="0" i18n="1" name="DrawerObjectEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="RenderDialog.cpp" hdr="RenderDialog.h" fwddecl="0" i18n="1" name="RenderDialog" language="CPP" />
+					<wxPanel wxs="wxsmith/ProjectManager.wxs" src="ProjectManager.cpp" hdr="ProjectManager.h" fwddecl="0" i18n="1" name="ProjectManager" language="CPP" />
+					<wxPanel wxs="wxsmith/StartHerePage.wxs" src="StartHerePage.cpp" hdr="StartHerePage.h" fwddecl="0" i18n="1" name="StartHerePage" language="CPP" />
+					<wxPanel wxs="wxsmith/ExternalEventsEditor.wxs" src="ExternalEventsEditor.cpp" hdr="ExternalEventsEditor.h" fwddecl="0" i18n="1" name="ExternalEventsEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/AutomatismTypeChoice.wxs" src="AutomatismTypeChoice.cpp" hdr="AutomatismTypeChoice.h" fwddecl="0" i18n="1" name="AutomatismTypeChoice" language="CPP" />
+					<wxPanel wxs="wxsmith/ObjectListPanel.wxs" src="ObjectListPanel.cpp" hdr="ObjectListPanel.h" fwddecl="0" i18n="1" name="ObjectListPanel" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

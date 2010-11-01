@@ -217,10 +217,20 @@ ribbonSceneEditorButtonBar(NULL)
     //Deactivate menu
     SetMenuBar(NULL);
 
+    //Prepare autosave
+    PrepareAutosave();
+
+    //Prepare recent list
     m_recentlist.SetMaxEntries( 9 );
     m_recentlist.SetAssociatedMenu( contextMenuRecents );
+    for ( int i = 0;i < 9;i++ )
+    {
+        wxString result;
+        pConfig->Read( wxString::Format( _T( "/Recent/%d" ), i ), &result );
+        m_recentlist.Append( result );
+    }
 
-    //Status bar
+    //Create status bar
     MyStatusBar * myStatusBar = new MyStatusBar(this);
 
     //Ribbon setup
@@ -239,7 +249,7 @@ ribbonSceneEditorButtonBar(NULL)
         wxRibbonPanel *file2Panel = new wxRibbonPanel(home, wxID_ANY, _("Projet actuel"), wxBitmap("res/saveicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_EXT_BUTTON);
         wxRibbonButtonBar *file2_bar = new wxRibbonButtonBar(file2Panel, wxID_ANY);
         file2_bar->AddHybridButton(idRibbonSave, !hideLabels ? _("Enregistrer") : " ", wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY));
-        file2_bar->AddButton(idRibbonSaveAll, !hideLabels ? _("Enregistrer tout ") : " ", wxBitmap("res/save_all24.png", wxBITMAP_TYPE_ANY));
+        file2_bar->AddButton(idRibbonSaveAll, !hideLabels ? _("Tout enregistrer") : " ", wxBitmap("res/save_all24.png", wxBITMAP_TYPE_ANY));
         file2_bar->AddButton(idRibbonCompil, !hideLabels ? _("Compilation") : "", wxBitmap("res/compilicon24.png", wxBITMAP_TYPE_ANY));
 
         wxRibbonPanel *affichagePanel = new wxRibbonPanel(home, wxID_ANY, _("Affichage"), wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -296,9 +306,7 @@ ribbonSceneEditorButtonBar(NULL)
     }
     ribbonSizer->Add(m_ribbon, 0, wxEXPAND);
 
-    games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
-
-    //notify wxAUI which frame to use
+    //Load wxAUI
     m_mgr.SetManagedWindow( this );
 
     LoadSkin(&m_mgr);
@@ -324,6 +332,11 @@ ribbonSceneEditorButtonBar(NULL)
     startPage = new StartHerePage(editorsNotebook, *this);
     editorsNotebook->AddPage(startPage, _("Page de démarrage"));
 
+    if ( !FileToOpen.empty() )
+        Open(FileToOpen);
+    else
+        games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
+
     projectManager = new ProjectManager(this, *this);
     projectManager->ConnectEvents();
 
@@ -341,13 +354,6 @@ ribbonSceneEditorButtonBar(NULL)
     else
         m_mgr.GetPane(ribbonPanel).MinSize(1, 100);
 
-    for ( int i = 0;i < 9;i++ )
-    {
-        result = "";
-        pConfig->Read( wxString::Format( _T( "/Recent/%d" ), i ), &result );
-        m_recentlist.Append( result );
-    }
-
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );
 
@@ -357,11 +363,7 @@ ribbonSceneEditorButtonBar(NULL)
 
     SetSize(900,740);
     Center();
-
     Maximize(true);
-
-    if ( FileToOpen != "" )
-        Open(FileToOpen);
 }
 
 /**
@@ -372,7 +374,7 @@ Game_Develop_EditorFrame::~Game_Develop_EditorFrame()
     //(*Destroy(Game_Develop_EditorFrame)
     //*)
 
-    // deinitialize the frame manager
+    //Deinitialize the frame manager
     m_mgr.UnInit();
 }
 
@@ -397,13 +399,7 @@ void Game_Develop_EditorFrame::SetCurrentGame(unsigned int i)
 
 void Game_Develop_EditorFrame::UpdateNotebook()
 {
-    wxConfigBase *pConfig = wxConfigBase::Get();
-    wxString result;
-    if ( pConfig->Exists( "/Onglets" ) )
-    {
-        editorsNotebook->SetWindowStyleFlag(wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS | wxNO_BORDER );
-    }
-
+    editorsNotebook->SetWindowStyleFlag(wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS | wxNO_BORDER );
 }
 
 /**
@@ -441,9 +437,7 @@ void Game_Develop_EditorFrame::OnClose( wxCloseEvent& event )
     if (wxMessageBox(_("Etes-vous sûr de vouloir quitter Game Develop ?"), _("Quitter Game Develop"), wxYES_NO ) == wxNO)
         return;
 
-    wxConfigBase *pConfig = wxConfigBase::Get();
-
-    pConfig->Write( _T( "/Workspace/Actuel" ), m_mgr.SavePerspective() );
+    wxConfigBase::Get()->Write( _T( "/Workspace/Actuel" ), m_mgr.SavePerspective() );
 
     //Close the editor close the program.
     //We have to destroy the other frames.
@@ -600,7 +594,36 @@ void Game_Develop_EditorFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& ev
         startPage = NULL;
 }
 
+/**
+ * Configure autosaving according to preferences
+ */
+void Game_Develop_EditorFrame::PrepareAutosave()
+{
+    bool activated = true;
+    wxConfigBase::Get()->Read( "/Autosave/Activated", &activated );
+
+    if ( activated )
+    {
+        int time = 180000;
+        wxConfigBase::Get()->Read( "/Autosave/Time", &time );
+        autoSaveTimer.Start(time, false);
+    }
+    else autoSaveTimer.Stop();
+}
+
+/**
+ * Autosave projects
+ */
 void Game_Develop_EditorFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
 {
-    //TODO
+    for (unsigned int i = 0;i<games.size();++i)
+    {
+        if ( !games[i]->gameFile.empty() )
+        {
+            wxString filename = wxFileName(games[i]->gameFile).GetPath()+"/"+wxFileName(games[i]->gameFile).GetName()+".autosave.gdg";
+
+            OpenSaveGame saveGame( *games[i] );
+            if ( !saveGame.SaveToFile(string(filename.mb_str())) ) {wxLogStatus( "L'enregistrement automatique a échoué." );}
+        }
+    }
 }

@@ -7,6 +7,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <wx/imaglist.h>
 #include <wx/fileconf.h>
 #include <wx/filename.h>
 #include <wx/config.h>
@@ -17,6 +18,7 @@
 #include <wx/dirdlg.h>
 #include <wx/log.h>
 #include "GDL/HelpFileAccess.h"
+#include "GDL/CommonTools.h"
 
 #include <string>
 #include <vector>
@@ -31,8 +33,10 @@ const long Preferences::ID_PANEL5 = wxNewId();
 const long Preferences::ID_STATICLINE2 = wxNewId();
 const long Preferences::ID_CHECKBOX1 = wxNewId();
 const long Preferences::ID_CHECKBOX4 = wxNewId();
+const long Preferences::ID_CHECKBOX3 = wxNewId();
+const long Preferences::ID_TEXTCTRL1 = wxNewId();
 const long Preferences::ID_STATICTEXT5 = wxNewId();
-const long Preferences::ID_CHOICE1 = wxNewId();
+const long Preferences::ID_STATICTEXT14 = wxNewId();
 const long Preferences::ID_PANEL6 = wxNewId();
 const long Preferences::ID_STATICTEXT13 = wxNewId();
 const long Preferences::ID_CHOICE2 = wxNewId();
@@ -87,6 +91,7 @@ changesNeedRestart(false)
     wxStaticBoxSizer* StaticBoxSizer2;
     wxFlexGridSizer* FlexGridSizer4;
     wxFlexGridSizer* FlexGridSizer16;
+    wxFlexGridSizer* FlexGridSizer19;
     wxStaticBoxSizer* StaticBoxSizer4;
     wxFlexGridSizer* FlexGridSizer10;
     wxFlexGridSizer* FlexGridSizer3;
@@ -112,7 +117,7 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer11;
     wxFlexGridSizer* FlexGridSizer17;
     wxStaticBoxSizer* StaticBoxSizer5;
-    
+
     Create(parent, wxID_ANY, _("Préférences de Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(467,330));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -145,16 +150,19 @@ changesNeedRestart(false)
     MAJCheck->SetValue(false);
     StaticBoxSizer1->Add(MAJCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer14->Add(StaticBoxSizer1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Réponses automatiques"));
-    FlexGridSizer10 = new wxFlexGridSizer(0, 2, 0, 0);
-    StaticText5 = new wxStaticText(Panel2, ID_STATICTEXT5, _("Redimensionner l\'éditeur de scène à la taille \nde la fenêtre du jeu"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
-    FlexGridSizer10->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    TailleEditeurScene = new wxChoice(Panel2, ID_CHOICE1, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
-    TailleEditeurScene->SetSelection( TailleEditeurScene->Append(_("Demander")) );
-    TailleEditeurScene->Append(_("Oui"));
-    TailleEditeurScene->Append(_("Non"));
-    TailleEditeurScene->SetToolTip(_("Choisir une réponse automatique, ou laisser sur \"Demander\" pour que Game Develop vous pose la question au moment voulu."));
-    FlexGridSizer10->Add(TailleEditeurScene, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Autosauvegarde"));
+    FlexGridSizer10 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer19 = new wxFlexGridSizer(0, 3, 0, 0);
+    autosaveActivatedCheck = new wxCheckBox(Panel2, ID_CHECKBOX3, _("Faire une copie de sauvegarde des projets ouverts toutes les"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
+    autosaveActivatedCheck->SetValue(false);
+    FlexGridSizer19->Add(autosaveActivatedCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    autosaveTimeEdit = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("3"), wxDefaultPosition, wxSize(44,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    FlexGridSizer19->Add(autosaveTimeEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText5 = new wxStaticText(Panel2, ID_STATICTEXT5, _("minutes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+    FlexGridSizer19->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer10->Add(FlexGridSizer19, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    StaticText14 = new wxStaticText(Panel2, ID_STATICTEXT14, _("Les fichiers seront sauvegardés en ajoutant .autosave.gdg à leur nom"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
+    FlexGridSizer10->Add(StaticText14, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer4->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer14->Add(StaticBoxSizer4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel2->SetSizer(FlexGridSizer14);
@@ -216,7 +224,7 @@ changesNeedRestart(false)
     FlexGridSizer16->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer3->AddGrowableCol(2);
-    wxString __wxRadioBoxChoices_1[2] = 
+    wxString __wxRadioBoxChoices_1[2] =
     {
     	_("Microsoft Office"),
     	_("wxAUI")
@@ -305,7 +313,7 @@ changesNeedRestart(false)
     SetSizer(FlexGridSizer1);
     FlexGridSizer1->SetSizeHints(this);
     Center();
-    
+
     Connect(ID_CHOICE2,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&Preferences::OnlangChoiceSelect);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnBrowseEditionImageClick);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnBrowseDossierTempBtClick);
@@ -327,6 +335,12 @@ changesNeedRestart(false)
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnAnnulerBtClick);
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnAideBtClick);
     //*)
+
+
+    wxImageList * imageList = new wxImageList( 16, 16 );
+    imageList->Add(( wxBitmap( "res/objeticon.png", wxBITMAP_TYPE_ANY ) ) );
+    imageList->Add(( wxBitmap( "res/groupeobjeticon.png", wxBITMAP_TYPE_ANY ) ) );
+    Listbook1->AssignImageList(imageList);
 
     wxConfigBase *pConfig = wxConfigBase::Get();
 
@@ -350,17 +364,6 @@ changesNeedRestart(false)
             MAJCheck->SetValue( false );
         }
         else { MAJCheck->SetValue( true ); }
-    }
-
-    {
-        wxString result;
-        pConfig->Read( _T( "/Auto/TailleEditeurScene" ), result );
-        if ( result == "" )
-            TailleEditeurScene->SetSelection( 0 );
-        else if ( result == "Y" )
-            TailleEditeurScene->SetSelection( 1 );
-        else if ( result == "N" )
-            TailleEditeurScene->SetSelection( 2 );
     }
 
     {
@@ -477,6 +480,17 @@ changesNeedRestart(false)
                 langChoice->SetSelection(1);
         }
     }
+
+    {
+        int time = 180000;
+        bool activated = true;
+
+        pConfig->Read( _T( "/Autosave/Time" ), &time );
+        pConfig->Read( _T( "/Autosave/Activated" ), &activated );
+
+        autosaveTimeEdit->ChangeValue( ToString(static_cast<float>(time)/60.0f/1000.0f) );
+        autosaveActivatedCheck->SetValue(activated);
+    }
 }
 
 Preferences::~Preferences()
@@ -575,13 +589,6 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     pConfig->Write( _T( "/Skin/ITextG" ), cData.GetColour().Green() );
     pConfig->Write( _T( "/Skin/ITextB" ), cData.GetColour().Blue() );
 
-    if ( TailleEditeurScene->GetSelection() == 0 )
-        pConfig->Write( _T( "/Auto/TailleEditeurScene" ), "" );
-    if ( TailleEditeurScene->GetSelection() == 1 )
-        pConfig->Write( _T( "/Auto/TailleEditeurScene" ), "Y" );
-    if ( TailleEditeurScene->GetSelection() == 2 )
-        pConfig->Write( _T( "/Auto/TailleEditeurScene" ), "N" );
-
     pConfig->Write( _T( "/Skin/HideLabels"), hideLabelsCheck->GetValue() );
 
     pConfig->Write( _T( "/EditeursExternes/Image" ), EditeurImageEdit->GetValue() );
@@ -596,6 +603,9 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     {
         wxLogMessage(_("Certains changements nécessitent de redémarrer Game Develop pour prendre effet."));
     }
+
+    pConfig->Write( "/Autosave/Activated", autosaveActivatedCheck->GetValue());
+    pConfig->Write( "/Autosave/Time", ToFloat(string(autosaveTimeEdit->GetValue().mb_str()))*60*1000);
 
     EndModal( 1 );
 }

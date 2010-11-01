@@ -29,7 +29,6 @@ class Preferences: public wxDialog
 		wxPanel* InactifColorPnl;
 		wxButton* OkBt;
 		wxStaticText* StaticText9;
-		wxChoice* TailleEditeurScene;
 		wxPanel* backColorPnl;
 		wxPanel* Panel5;
 		wxCheckBox* hideLabelsCheck;
@@ -42,10 +41,12 @@ class Preferences: public wxDialog
 		wxPanel* ActifColor2Pnl;
 		wxStaticText* StaticText2;
 		wxPanel* Panel4;
+		wxStaticText* StaticText14;
 		wxStaticText* StaticText6;
 		wxPanel* borderColorPnl;
 		wxStaticText* StaticText8;
 		wxStaticText* StaticText11;
+		wxTextCtrl* autosaveTimeEdit;
 		wxPanel* Panel1;
 		wxPanel* activeTextColorPnl;
 		wxStaticText* StaticText1;
@@ -60,6 +61,7 @@ class Preferences: public wxDialog
 		wxListbook* Listbook1;
 		wxStaticText* StaticText5;
 		wxStaticText* StaticText7;
+		wxCheckBox* autosaveActivatedCheck;
 		wxStaticLine* StaticLine1;
 		wxButton* BrowseEditionImage;
 		wxStaticText* StaticText12;
@@ -84,8 +86,10 @@ class Preferences: public wxDialog
 		static const long ID_STATICLINE2;
 		static const long ID_CHECKBOX1;
 		static const long ID_CHECKBOX4;
+		static const long ID_CHECKBOX3;
+		static const long ID_TEXTCTRL1;
 		static const long ID_STATICTEXT5;
-		static const long ID_CHOICE1;
+		static const long ID_STATICTEXT14;
 		static const long ID_PANEL6;
 		static const long ID_STATICTEXT13;
 		static const long ID_CHOICE2;

@@ -175,7 +175,7 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
 {
     for (unsigned int i = 0;i<games.size();++i)
     {
-        if ( games[i]->gameFile == "" )
+        if ( games[i]->gameFile.empty() )
         {
             wxFileDialog FileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg", wxFD_SAVE );
             FileDialog.ShowModal();

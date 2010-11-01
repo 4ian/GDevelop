@@ -209,6 +209,7 @@ class Game_Develop_EditorFrame: public wxFrame
         void OnRecentClicked(wxCommandEvent& event );
         void UpdateNotebook();
         void MakeImagesEditorRibbon();
+        void PrepareAutosave();
 
     private:
 

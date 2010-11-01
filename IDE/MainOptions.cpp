@@ -21,34 +21,9 @@ void Game_Develop_EditorFrame::OnMenuPrefSelected( wxCommandEvent& event )
     LoadSkin(&m_mgr);
     LoadSkin(m_ribbon);
 
+    PrepareAutosave();
+
     UpdateNotebook();
     m_ribbon->Realize();
     m_mgr.Update();
-}
-
-////////////////////////////////////////////////////////////
-/// Sauver l'espace de travail actuel
-////////////////////////////////////////////////////////////
-void Game_Develop_EditorFrame::OnMenuSaveWSSelected( wxCommandEvent& event )
-{
-}
-
-////////////////////////////////////////////////////////////
-/// Espaces de travail pré-conçu
-////////////////////////////////////////////////////////////
-void Game_Develop_EditorFrame::OnWSDefautSelected(wxCommandEvent& event)
-{
-
-}
-
-void Game_Develop_EditorFrame::OnWSDetacheSelected(wxCommandEvent& event)
-{
-}
-
-void Game_Develop_EditorFrame::OnWSSimpleSelected1(wxCommandEvent& event)
-{
-}
-
-void Game_Develop_EditorFrame::OnWSChronoSelected(wxCommandEvent& event)
-{
 }

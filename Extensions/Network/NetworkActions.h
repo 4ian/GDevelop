@@ -33,6 +33,7 @@ class Instruction;
 class Evaluateur;
 
 bool ActDoServer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActAcceptNewClients( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActServerReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActServerSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActDoClient( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

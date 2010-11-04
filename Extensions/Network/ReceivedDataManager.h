@@ -3,6 +3,9 @@
 #include <map>
 #include <string>
 
+/**
+ * Singleton where is stocked receveid data from other peers.
+ */
 class ReceivedDataManager
 {
     public:
@@ -27,6 +30,7 @@ class ReceivedDataManager
     }
 
     std::map<std::string, double> values;
+    std::map<std::string, std::string> strings;
 
     protected:
     private:

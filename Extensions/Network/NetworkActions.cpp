@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/RuntimeScene.h"
 #include "ReceivedDataManager.h"
+#include "ErrorManager.h"
 #include <SFML/Network.hpp>
 #include <iostream>
 #include <fstream>
@@ -44,10 +45,9 @@ bool ActDoServer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, con
 {
     if (!serverListener.Listen(Port) == sf::Socket::Done)
     {
-        cout << "Server unable to listen to port " << Port << endl;
+        ErrorManager::getInstance()->SetLastError("Server unable to listen to port "+ToString(Port)+"\n");
         return false;
     }
-    std::cout << "Listening to port " << Port << ", waiting for connections..." << std::endl;
 
     // Create a Selector for handling several sockets (the listener + the socket associated to each client)
     sf::SocketSelector newSelector;
@@ -60,18 +60,14 @@ bool ActDoServer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, con
     return true;
 }
 
-bool ActServerReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+bool ActAcceptNewClients( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     // Get the sockets ready for reading
-    unsigned int NbSockets = serverSelector.Wait(0.1);
-    cout << NbSockets;
+    unsigned int NbSockets = serverSelector.Wait(0.001);
 
     // We can read from each returned socket
     for (unsigned int i = 0; i < NbSockets; ++i)
     {
-        // Get the current socket
-        sf::TcpSocket Socket;
-
         if (serverSelector.IsReady(serverListener))
         {
             sf::TcpSocket* client = new sf::TcpSocket;
@@ -80,12 +76,27 @@ bool ActServerReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsCo
                  // Add the new client to the clients list
                  serverClients.push_back(client);
 
-                std::cout << "Client connected (" << client->GetRemoteAddress() << ")" << std::endl;
-
                  // Add the new client to the Selector so that we will
                  // be notified when he sends something
                  serverSelector.Add(*client);
              }
+        }
+    }
+
+    return true;
+}
+
+bool ActServerReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    // Get the sockets ready for reading
+    unsigned int NbSockets = serverSelector.Wait(0.001);
+
+    // We can read from each returned socket
+    for (unsigned int i = 0; i < NbSockets; ++i)
+    {
+        if (serverSelector.IsReady(serverListener))
+        {
+            //Pass, connection of new clients are handled in another action.
         }
         else
         {
@@ -107,13 +118,13 @@ bool ActServerReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsCo
                             {
                                 std::string title; packet >> title;
                                 double number; packet >> number;
-                                cout << "Received " << title << ";"<<number;
 
                                 ReceivedDataManager::getInstance()->values[title] = number;
                                 break;
                             }
                             default:
-                                cout << "Received unknown data ( Type " << type << " )" << endl;
+                                ErrorManager::getInstance()->SetLastError("Received unknown data ( Type "+ToString(type)+" )\n");
+                                break;
                         }
                      }
                  }
@@ -136,7 +147,7 @@ bool ActServerSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcern
         sf::TcpSocket& client = **it;
 
         if (!client.Send(packet) == sf::Socket::Done)
-            cout << "Failed to send packet to a client" << endl;
+            ErrorManager::getInstance()->SetLastError("Failed to send packet to a client\n");
     }
 
     return true;
@@ -151,14 +162,14 @@ bool ActDoClient( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, con
     sf::IpAddress ServerAddress = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
     if (ServerAddress == sf::IpAddress::None)
     {
-        cout << "Bad IP Adress";
+        ErrorManager::getInstance()->SetLastError("IP Adress malformated\n");
         return false;
     }
 
     // Connect to the server
     if (clientSocket.Connect(ServerAddress, Port) != sf::Socket::Done)
     {
-        cout << "Unable to connect to server.";
+        ErrorManager::getInstance()->SetLastError("Unable to connect to server.\n");
         connected = false;
         return false;
     }
@@ -170,7 +181,7 @@ bool ActClientSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcern
 {
     if ( !connected )
     {
-        cout << "ClientSendValue: Client not connected to server" << endl;
+        ErrorManager::getInstance()->SetLastError("Unable to send data : Client not connected to a server.\n");
         return false;
     }
 
@@ -187,7 +198,7 @@ bool ActClientReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsCo
 {
     if ( !connected )
     {
-        cout << "ClientReceivePackets: Client not connected to server" << endl;
+        ErrorManager::getInstance()->SetLastError("Unable to receive data : Client not connected to a server.\n");
         return false;
     }
 
@@ -207,13 +218,12 @@ bool ActClientReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsCo
                 std::string title; packet >> title;
                 double number; packet >> number;
 
-                cout << "Received " << number;
-
                 ReceivedDataManager::getInstance()->values[title] = number;
                 break;
             }
             default:
-                cout << "Client received unknown data ( Type " << type << " )" << endl;
+                ErrorManager::getInstance()->SetLastError("Received unknown data ( Type "+ToString(type)+" )\n");
+                break;
         }
     }
 

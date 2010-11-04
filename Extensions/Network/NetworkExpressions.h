@@ -6,8 +6,10 @@
 class RuntimeScene;
 class ObjectsConcerned;
 class StrExpressionInstruction;
-/*
-std::string ExpEncrypt( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction );
-std::string ExpDecrypt( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction );
-*/
+class ExpressionInstruction;
+
+std::string ExpGetReceivedDataString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction );
+double ExpGetReceivedDataValue( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+std::string ExpGetLastError( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction );
+
 #endif // NetworkEXPRESSIONS_H

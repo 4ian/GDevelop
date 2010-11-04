@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1288817901 source:d:\florian\programmation\gamedevelop\extensions\network\extension.cpp
+1288902031 source:d:\florian\programmation\gamedevelop\extensions\network\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"NetworkActions.h"
@@ -7661,9 +7661,9 @@
 
 1288171886 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 
-1288817808 d:\florian\programmation\gamedevelop\extensions\network\networkactions.h
+1288901933 d:\florian\programmation\gamedevelop\extensions\network\networkactions.h
 
-1288712874 d:\florian\programmation\gamedevelop\extensions\network\networkexpressions.h
+1288902106 d:\florian\programmation\gamedevelop\extensions\network\networkexpressions.h
 	<string>
 	"GDL/Object.h"
 
@@ -8364,11 +8364,12 @@
 
 1272742171 c:\libs\boost_1_43_0\boost\version.hpp
 
-1288818206 source:d:\florian\programmation\gamedevelop\extensions\network\networkactions.cpp
+1288906660 source:d:\florian\programmation\gamedevelop\extensions\network\networkactions.cpp
 	"GDL/Instruction.h"
 	"GDL/ObjectsConcerned.h"
 	"GDL/RuntimeScene.h"
 	"ReceivedDataManager.h"
+	"ErrorManager.h"
 	<SFML/Network.hpp>
 	<iostream>
 	<fstream>
@@ -8703,15 +8704,23 @@
 1281604508 c:\libs\sfml\include\sfml\network\udpsocket.hpp
 	<SFML/Network/Socket.hpp>
 
-1288717974 source:d:\florian\programmation\gamedevelop\extensions\network\networkexpressions.cpp
+1288902281 source:d:\florian\programmation\gamedevelop\extensions\network\networkexpressions.cpp
 	"GDL/ExpressionInstruction.h"
 	"GDL/RuntimeScene.h"
 	"GDL/ObjectsConcerned.h"
+	"ReceivedDataManager.h"
+	"ErrorManager.h"
 
-1288818235 source:d:\florian\programmation\gamedevelop\extensions\network\receiveddatamanager.cpp
+1288823174 source:d:\florian\programmation\gamedevelop\extensions\network\receiveddatamanager.cpp
 	"ReceivedDataManager.h"
 
-1288818243 d:\florian\programmation\gamedevelop\extensions\network\receiveddatamanager.h
+1288901365 d:\florian\programmation\gamedevelop\extensions\network\receiveddatamanager.h
 	<map>
+	<string>
+
+1288901365 source:d:\florian\programmation\gamedevelop\extensions\network\errormanager.cpp
+	"ErrorManager.h"
+
+1288902385 d:\florian\programmation\gamedevelop\extensions\network\errormanager.h
 	<string>
 

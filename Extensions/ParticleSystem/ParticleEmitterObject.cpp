@@ -63,8 +63,8 @@ emitterForceMax(65.0f),
 emitterXDirection(0.0f),
 emitterYDirection(1.0f),
 emitterZDirection(0.0f),
-emitterAngleA(3.14159f/4.0f),
-emitterAngleB(3.14159f),
+emitterAngleA(0),
+emitterAngleB(180),
 zoneRadius(3.0f),
 particleGravityX(0.0f),
 particleGravityY(-100.0f),
@@ -78,18 +78,20 @@ blueParam(Random),
 alphaParam(Mutable),
 sizeParam(Mutable),
 angleParam(Mutable),
-particleRed1(1.0f),
-particleRed2(1.0f),
-particleGreen1(0.2f),
-particleGreen2(0.8f),
-particleBlue1(0.2f),
+particleRed1(255.0f),
+particleRed2(255.0f),
+particleGreen1(51),
+particleGreen2(255),
+particleBlue1(51),
 particleBlue2(0.0f),
-particleAlpha1(0.8f),
+particleAlpha1(204),
 particleAlpha2(0.0f),
-particleSize1(1.0f),
-particleSize2(1.0f),
+particleSize1(100.0f),
+particleSize2(100.0f),
 particleAngle1(0.0f),
 particleAngle2(0.0f),
+particleAlphaRandomness1(0), particleAlphaRandomness2(0),
+particleSizeRandomness1(0), particleSizeRandomness2(0), particleAngleRandomness1(0), particleAngleRandomness2(0),
 maxParticleNb(5000),
 hasSomeParticles(true),
 opacity( 255 ),
@@ -132,6 +134,12 @@ void ParticleEmitterObject::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleSize2", particleSize2);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleAngle1", particleAngle1);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleAngle2", particleAngle2);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleAlphaRandomness1", particleAlphaRandomness1);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleAlphaRandomness2", particleAlphaRandomness2);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleSizeRandomness1", particleSizeRandomness1);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleSizeRandomness2", particleSizeRandomness2);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleAngleRandomness1", particleAngleRandomness1);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("particleAngleRandomness2", particleAngleRandomness2);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("additive", additive);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("textureParticleName", textureParticleName);
 
@@ -237,6 +245,12 @@ void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleAngle2", particleAngle2);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("rendererParam1", rendererParam1);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("rendererParam2", rendererParam2);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleAlphaRandomness1", particleAlphaRandomness1);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleAlphaRandomness2", particleAlphaRandomness2);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleSizeRandomness1", particleSizeRandomness1);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleSizeRandomness2", particleSizeRandomness2);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleAngleRandomness1", particleAngleRandomness1);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("particleAngleRandomness2", particleAngleRandomness2);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("additive", additive);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("textureParticleName", textureParticleName);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("maxParticleNb", maxParticleNb);
@@ -330,7 +344,7 @@ void ParticleEmitterObject::CreateParticleSystem()
     if ( alphaParam == Enabled ) enabledFlag |= SPK::FLAG_ALPHA;
     else if ( alphaParam == Mutable )
     {
-        enabledFlag |= SPK::FLAG_ALPHA; mutableFlag |= SPK::FLAG_ALPHA;
+        enabledFlag |= SPK::FLAG_ALPHA;  randomFlag |= SPK::FLAG_ALPHA; mutableFlag |= SPK::FLAG_ALPHA;
     }
     else if ( alphaParam == Random )
     {
@@ -339,7 +353,7 @@ void ParticleEmitterObject::CreateParticleSystem()
 
     if ( sizeParam == Mutable )
     {
-        enabledFlag |= SPK::FLAG_SIZE; mutableFlag |= SPK::FLAG_SIZE;
+        enabledFlag |= SPK::FLAG_SIZE; randomFlag |= SPK::FLAG_SIZE; mutableFlag |= SPK::FLAG_SIZE;
     }
     else if ( sizeParam == Random )
     {
@@ -348,7 +362,7 @@ void ParticleEmitterObject::CreateParticleSystem()
 
     if ( angleParam == Mutable )
     {
-        enabledFlag |= SPK::FLAG_ANGLE; mutableFlag |= SPK::FLAG_ANGLE;
+        enabledFlag |= SPK::FLAG_ANGLE; randomFlag |= SPK::FLAG_ANGLE; mutableFlag |= SPK::FLAG_ANGLE;
     }
     else if ( angleParam == Random )
     {
@@ -359,25 +373,13 @@ void ParticleEmitterObject::CreateParticleSystem()
 
 	// Create the model
 	particleSystem.particleModel = SPK::Model::create( enabledFlag, mutableFlag, randomFlag );
-	if ( redParam == Mutable || redParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_RED, particleRed1,particleRed2);
-	else particleSystem.particleModel->setParam(SPK::PARAM_RED, particleRed1);
-
-	if ( greenParam == Mutable || greenParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_GREEN, particleGreen1,particleGreen2);
-	else particleSystem.particleModel->setParam(SPK::PARAM_GREEN, particleGreen1);
-
-	if ( blueParam == Mutable || blueParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_BLUE, particleBlue1,particleBlue2);
-	else particleSystem.particleModel->setParam(SPK::PARAM_BLUE, particleBlue1);
-
-	if ( alphaParam == Mutable || alphaParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_ALPHA, particleAlpha1,particleAlpha2);
-	else particleSystem.particleModel->setParam(SPK::PARAM_ALPHA, particleAlpha1);
-
-	if ( sizeParam == Mutable || sizeParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_SIZE, particleSize1,particleSize2);
-	else particleSystem.particleModel->setParam(SPK::PARAM_SIZE, particleSize1);
-
-	if ( angleParam == Mutable || angleParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_ANGLE, particleAngle1,particleAngle2);
-	else particleSystem.particleModel->setParam(SPK::PARAM_ANGLE, particleAngle1);
-
-	particleSystem.particleModel->setLifeTime(particleLifeTimeMin,particleLifeTimeMax);
+	UpdateRedParameters();
+	UpdateGreenParameters();
+    UpdateBlueParameters();
+    UpdateAlphaParameters();
+    UpdateSizeParameters();
+    UpdateAngleParameters();
+	UpdateLifeTime();
 
 	// Create the renderer
 	SPK::GL::GLRenderer* renderer = NULL;
@@ -414,14 +416,13 @@ void ParticleEmitterObject::CreateParticleSystem()
 	particleSystem.zone = SPK::Sphere::create(SPK::Vector3D(GetX()*0.25f, -GetY()*0.25f, 0.0f), zoneRadius);
 
 	// Create the emitter
-	particleSystem.emitter = SPK::SphericEmitter::create(SPK::Vector3D(emitterXDirection,-emitterYDirection,emitterZDirection), emitterAngleA, emitterAngleB); //TODO : Personalize this
+	particleSystem.emitter = SPK::SphericEmitter::create(SPK::Vector3D(emitterXDirection,-emitterYDirection,emitterZDirection), emitterAngleA/180.0f*3.14159f, emitterAngleB/180.0f*3.14159f);
 	particleSystem.emitter->setForce(emitterForceMin,emitterForceMax);
 	particleSystem.emitter->setZone(particleSystem.zone);
 	particleSystem.emitter->setTank(tank);
 	particleSystem.emitter->setFlow(flow);
 
 	// Create the Group
-	cout << "Creating <ith" << maxParticleNb << endl;
 	particleSystem.group = SPK::Group::create(particleSystem.particleModel, maxParticleNb);
 	particleSystem.group->addEmitter(particleSystem.emitter);
 	particleSystem.group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
@@ -431,6 +432,76 @@ void ParticleEmitterObject::CreateParticleSystem()
 	// Create the System
 	particleSystem.particleSystem = SPK::System::create();
 	particleSystem.particleSystem->addGroup(particleSystem.group);
+}
+
+void ParticleEmitterObject::UpdateRedParameters()
+{
+    if ( !particleSystem.particleModel ) return;
+
+	if ( redParam == Mutable || redParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_RED, particleRed1/255.0f,particleRed2/255.0f);
+	else particleSystem.particleModel->setParam(SPK::PARAM_RED, particleRed1/255.0f);
+}
+
+void ParticleEmitterObject::UpdateGreenParameters()
+{
+    if ( !particleSystem.particleModel ) return;
+
+	if ( greenParam == Mutable || greenParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_GREEN, particleGreen1/255.0f,particleGreen2/255.0f);
+	else particleSystem.particleModel->setParam(SPK::PARAM_GREEN, particleGreen1/255.0f);
+}
+
+void ParticleEmitterObject::UpdateBlueParameters()
+{
+    if ( !particleSystem.particleModel ) return;
+
+	if ( blueParam == Mutable || blueParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_BLUE, particleBlue1/255.0f,particleBlue2/255.0f);
+	else particleSystem.particleModel->setParam(SPK::PARAM_BLUE, particleBlue1/255.0f);
+}
+
+void ParticleEmitterObject::UpdateAlphaParameters()
+{
+    if ( !particleSystem.particleModel ) return;
+
+	if ( alphaParam == Mutable ) particleSystem.particleModel->setParam(SPK::PARAM_ALPHA,
+                                                                        (particleAlpha1-particleAlphaRandomness1/2.0f)/255.0f,
+                                                                        (particleAlpha1+particleAlphaRandomness1/2.0f)/255.0f,
+                                                                        (particleAlpha2-particleAlphaRandomness2/2.0f)/255.0f,
+                                                                        (particleAlpha2+particleAlphaRandomness2/2.0f)/255.0f);
+	else if ( alphaParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_ALPHA,(particleAlpha1)/255.0f,(particleAlpha2)/255.0f);
+	else particleSystem.particleModel->setParam(SPK::PARAM_ALPHA, particleAlpha1/255.0f);
+}
+
+void ParticleEmitterObject::UpdateSizeParameters()
+{
+    if ( !particleSystem.particleModel ) return;
+
+	if ( sizeParam == Mutable ) particleSystem.particleModel->setParam(SPK::PARAM_SIZE,
+                                                                       (particleSize1-particleSizeRandomness1/2.0f)/100.0f,
+                                                                       (particleSize1+particleSizeRandomness1/2.0f)/100.0f,
+                                                                       (particleSize2-particleSizeRandomness2/2.0f)/100.0f,
+                                                                       (particleSize2+particleSizeRandomness2/2.0f)/100.0f);
+	else if ( sizeParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_SIZE,(particleSize1)/100.0f, (particleSize2)/100.0f);
+	else particleSystem.particleModel->setParam(SPK::PARAM_SIZE, particleSize1/100.0f);
+}
+
+void ParticleEmitterObject::UpdateAngleParameters()
+{
+    if ( !particleSystem.particleModel ) return;
+
+	if ( angleParam == Mutable ) particleSystem.particleModel->setParam(SPK::PARAM_ANGLE,
+                                                                        (particleAngle1-particleAngleRandomness1/2.0f)/180.0f*3.14159f,
+                                                                        (particleAngle1+particleAngleRandomness1/2.0f)/180.0f*3.14159f,
+                                                                        (particleAngle2-particleAngleRandomness2/2.0f)/180.0f*3.14159f,
+                                                                        (particleAngle2+particleAngleRandomness2/2.0f)/180.0f*3.14159f);
+	else if ( angleParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_ANGLE, (particleAngle1)/180.0f*3.14159f, (particleAngle2)/180.0f*3.14159f);
+	else particleSystem.particleModel->setParam(SPK::PARAM_ANGLE, particleAngle1/180.0f*3.14159f);
+}
+
+void ParticleEmitterObject::UpdateLifeTime()
+{
+    if ( !particleSystem.particleModel ) return;
+
+    particleSystem.particleModel->setLifeTime(particleLifeTimeMin,particleLifeTimeMax);
 }
 
 bool ParticleEmitterObject::LoadRuntimeResources(const ImageManager & imageMgr )
@@ -622,12 +693,12 @@ void ParticleEmitterObject::SetEmitterZDirection(float newValue)
 void ParticleEmitterObject::SetEmitterAngleA(float newValue)
 {
     emitterAngleA = newValue;
-    if ( particleSystem.emitter ) particleSystem.emitter->setAngles(emitterAngleA, emitterAngleB);
+    if ( particleSystem.emitter ) particleSystem.emitter->setAngles(emitterAngleA/180.0f*3.14159f, emitterAngleB/180.0f*3.14159f);
 }
 void ParticleEmitterObject::SetEmitterAngleB(float newValue)
 {
     emitterAngleB = newValue;
-    if ( particleSystem.emitter ) particleSystem.emitter->setAngles(emitterAngleA, emitterAngleB);
+    if ( particleSystem.emitter ) particleSystem.emitter->setAngles(emitterAngleA/180.0f*3.14159f, emitterAngleB/180.0f*3.14159f);
 }
 void ParticleEmitterObject::SetZoneRadius(float newValue)
 {

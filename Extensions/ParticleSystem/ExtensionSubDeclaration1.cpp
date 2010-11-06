@@ -35,6 +35,38 @@ freely, subject to the following restrictions:
  */
 void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
 {
+    DECLARE_OBJECT_ACTION("EmitterForceMin",
+                   _("Force minimale de l'émission"),
+                   _("Modifie la force minimale d'émission des particules."),
+                   _("Faire _PARAM2__PARAM1_ à la force minimale d'émission des particules de _PARAM0_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::ActEmitterForceMin);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_ACTION()
+
+    DECLARE_OBJECT_ACTION("EmitterForceMax",
+                   _("Force maximale de l'émission"),
+                   _("Modifie la force maximale d'émission des particules."),
+                   _("Faire _PARAM2__PARAM1_ à la force maximale d'émission des particules de _PARAM0_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::ActEmitterForceMax);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_ACTION()
+
     DECLARE_OBJECT_ACTION("EmitterXDirection",
                    _("Direction d'émission en X"),
                    _("Modifie la direction d'émission des particules en X."),
@@ -261,7 +293,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("Friction",
                    _("Friction"),
-                   _("Modifie la friction appliquée aux particules.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie la friction appliquée aux particules."),
                    _("Faire _PARAM2__PARAM1_ à la friction des particules _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
@@ -327,7 +359,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Temps de vie minimum"),
                    _("Modifie le temps de vie minimum des particules.\nNécessite de recréer les particules pour prendre en compte les changements."),
                    _("Faire _PARAM2__PARAM1_ au temps de vie minimum des particules de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleLifeTimeMin);
@@ -343,7 +375,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Temps de vie minimum"),
                    _("Teste la valeur du temps de vie minimum des particules."),
                    _("Le temps de vie minimum des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleLifeTimeMin);
@@ -359,7 +391,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Temps de vie maximum"),
                    _("Modifie le temps de vie maximum des particules.\nNécessite de recréer les particules pour prendre en compte les changements."),
                    _("Faire _PARAM2__PARAM1_ au temps de vie maximum des particules de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleLifeTimeMax);
@@ -375,7 +407,7 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Temps de vie maximum"),
                    _("Teste la valeur du temps de vie maximum des particules."),
                    _("Le temps de vie maximum des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleLifeTimeMax);

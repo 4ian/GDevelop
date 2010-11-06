@@ -97,7 +97,127 @@ class ParticleEmitterObject : public Object
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
 
+        void UpdateRedParameters();
+        void UpdateGreenParameters();
+        void UpdateBlueParameters();
+        void UpdateAlphaParameters();
+        void UpdateSizeParameters();
+        void UpdateAngleParameters();
+        void UpdateLifeTime();
         void RecreateParticleSystem();
+
+        //Getters/Setters
+        void SetRendererParam1(float newValue) { rendererParam1 = newValue; };
+        void SetRendererParam2(float newValue) { rendererParam2 = newValue; };
+        void SetTank(float newValue);
+        void SetFlow(float newValue);
+        void SetEmitterForceMin(float newValue);
+        void SetEmitterForceMax(float newValue);
+        void SetEmitterXDirection(float newValue);
+        void SetEmitterYDirection(float newValue);
+        void SetEmitterZDirection(float newValue);
+        void SetEmitterAngleA(float newValue);
+        void SetEmitterAngleB(float newValue);
+        void SetZoneRadius(float newValue);
+        void SetParticleGravityX(float newValue);
+        void SetParticleGravityY(float newValue);
+        void SetParticleGravityZ(float newValue);
+        void SetFriction(float newValue);
+
+        enum ParticleParameterType {Nothing, Enabled, Mutable, Random};
+        void SetRedParameterType(ParticleParameterType type) { redParam = type; };
+        void SetGreenParameterType(ParticleParameterType type) { greenParam = type; };
+        void SetBlueParameterType(ParticleParameterType type) { blueParam = type; };
+        void SetAlphaParameterType(ParticleParameterType type) { alphaParam = type; };
+        void SetSizeParameterType(ParticleParameterType type) { sizeParam = type; };
+        void SetAngleParameterType(ParticleParameterType type) { angleParam = type; };
+
+        void SetParticleRed1(float newValue) { particleRed1= newValue; UpdateRedParameters();};
+        void SetParticleRed2(float newValue) { particleRed2= newValue; UpdateRedParameters();};
+        void SetParticleGreen1(float newValue) { particleGreen1= newValue; UpdateGreenParameters();};
+        void SetParticleGreen2(float newValue) { particleGreen2= newValue; UpdateGreenParameters();};
+        void SetParticleBlue1(float newValue) { particleBlue1= newValue; UpdateBlueParameters();};
+        void SetParticleBlue2(float newValue) { particleBlue2= newValue; UpdateBlueParameters();};
+        void SetParticleAlpha1(float newValue) { particleAlpha1= newValue; UpdateAlphaParameters();};
+        void SetParticleAlpha2(float newValue) { particleAlpha2= newValue; UpdateAlphaParameters();};
+        void SetParticleSize1(float newValue) { particleSize1= newValue; UpdateSizeParameters();};
+        void SetParticleSize2(float newValue) { particleSize2= newValue; UpdateSizeParameters();};
+        void SetParticleAngle1(float newValue) { particleAngle1= newValue; UpdateAngleParameters();};
+        void SetParticleAngle2(float newValue) { particleAngle2= newValue; UpdateAngleParameters();};
+        void SetParticleAlphaRandomness1(float newValue) { particleAlphaRandomness1= newValue; UpdateAlphaParameters();};
+        void SetParticleAlphaRandomness2(float newValue) { particleAlphaRandomness2= newValue; UpdateAlphaParameters();};
+        void SetParticleSizeRandomness1(float newValue) { particleSizeRandomness1= newValue; UpdateSizeParameters();};
+        void SetParticleSizeRandomness2(float newValue) { particleSizeRandomness2= newValue; UpdateSizeParameters();};
+        void SetParticleAngleRandomness1(float newValue) { particleAngleRandomness1= newValue; UpdateAngleParameters();};
+        void SetParticleAngleRandomness2(float newValue) { particleAngleRandomness2= newValue; UpdateAngleParameters();};
+        void SetParticleLifeTimeMin(float newValue) { particleLifeTimeMin= newValue; UpdateLifeTime();};
+        void SetParticleLifeTimeMax(float newValue) { particleLifeTimeMax= newValue; UpdateLifeTime();};
+        void SetMaxParticleNb(unsigned int newValue) { maxParticleNb = newValue; };
+
+        float GetRendererParam1() const { return rendererParam1; };
+        float GetRendererParam2() const { return rendererParam2; };
+        float GetTank() const { return tank; };
+        float GetFlow() const { return flow; };
+        float GetEmitterForceMin() const { return emitterForceMin; };
+        float GetEmitterForceMax() const { return emitterForceMax; };
+        float GetEmitterXDirection() const { return emitterXDirection; };
+        float GetEmitterYDirection() const { return emitterYDirection; };
+        float GetEmitterZDirection() const { return emitterZDirection; };
+        float GetEmitterAngleA() const { return emitterAngleA; };
+        float GetEmitterAngleB() const { return  emitterAngleB; };
+        float GetZoneRadius() const { return  zoneRadius; };
+        float GetParticleGravityX() const { return particleGravityX; };
+        float GetParticleGravityY() const { return particleGravityY; };
+        float GetParticleGravityZ() const { return particleGravityZ; };
+        float GetFriction() const { return friction; };
+        float GetParticleLifeTimeMin() const { return particleLifeTimeMin; };
+        float GetParticleLifeTimeMax() const { return particleLifeTimeMax; };
+        unsigned int GetMaxParticleNb() const { return maxParticleNb; };
+
+        ParticleParameterType GetRedParameterType() const { return redParam; };
+        ParticleParameterType GetGreenParameterType() const { return greenParam; };
+        ParticleParameterType GetBlueParameterType() const { return blueParam; };
+        ParticleParameterType GetAlphaParameterType() const { return alphaParam; };
+        ParticleParameterType GetSizeParameterType() const { return sizeParam; };
+        ParticleParameterType GetAngleParameterType() const { return angleParam; };
+
+        float GetParticleRed1() const { return particleRed1; };
+        float GetParticleRed2() const { return particleRed2; };
+        float GetParticleGreen1() const { return particleGreen1; };
+        float GetParticleGreen2() const { return particleGreen2; };
+        float GetParticleBlue1() const { return particleBlue1; };
+        float GetParticleBlue2() const { return particleBlue2; };
+        float GetParticleAlpha1() const { return particleAlpha1; };
+        float GetParticleAlpha2() const { return particleAlpha2; };
+        float GetParticleSize1() const { return particleSize1; };
+        float GetParticleSize2() const { return particleSize2; };
+        float GetParticleAngle1() const { return particleAngle1; };
+        float GetParticleAngle2() const { return particleAngle2; };
+        float GetParticleAlphaRandomness1() const { return particleAlphaRandomness1; };
+        float GetParticleAlphaRandomness2() const { return particleAlphaRandomness2; };
+        float GetParticleSizeRandomness1() const { return particleSizeRandomness1; };
+        float GetParticleSizeRandomness2() const { return particleSizeRandomness2; };
+        float GetParticleAngleRandomness1() const { return particleAngleRandomness1; };
+        float GetParticleAngleRandomness2() const { return particleAngleRandomness2; };
+
+        enum RendererType {Point, Line, Quad};
+        void SetRendererType(RendererType type) { rendererType = type; };
+        RendererType GetRendererType() const { return rendererType; };
+
+        bool IsRenderingAdditive() { return additive; };
+        void SetRenderingAdditive() { additive = true;};
+        void SetRenderingAlpha() { additive = false;};
+
+        void SetParticleTexture(std::string imageName) { textureParticleName = imageName; };
+        std::string GetParticleTexture() const { return textureParticleName; };
+
+        #if defined(GDE)
+        bool particleEditionSimpleMode; ///< User preference related to object's edition
+        bool emissionEditionSimpleMode; ///< User preference related to object's edition
+        bool gravityEditionSimpleMode; ///< User preference related to object's edition
+        #endif
+
+        //Actions, conditions and expressions
         bool ActRecreateParticleSystem( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         bool CondEmitterXDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
@@ -167,6 +287,8 @@ class ParticleEmitterObject : public Object
         double ExpParticleGravityAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return atan2(GetParticleGravityY(), GetParticleGravityX())*180.0f/3.14159f; };
         double ExpParticleGravityLength( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return sqrt(GetParticleGravityY()*GetParticleGravityY() + GetParticleGravityX()*GetParticleGravityX()); };
 
+        bool ActParticleColor1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleColor2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool ActParticleRed1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool ActParticleRed2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool ActParticleGreen1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
@@ -179,6 +301,12 @@ class ParticleEmitterObject : public Object
         bool ActParticleSize2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool ActParticleAngle1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool ActParticleAngle2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleAlphaRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleAlphaRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleSizeRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleSizeRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleAngleRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActParticleAngleRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool CondParticleRed1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool CondParticleRed2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool CondParticleGreen1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
@@ -191,6 +319,12 @@ class ParticleEmitterObject : public Object
         bool CondParticleSize2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool CondParticleAngle1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool CondParticleAngle2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleAlphaRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleAlphaRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleSizeRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleSizeRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleAngleRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleAngleRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
         double ExpParticleRed1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleRed1; };
         double ExpParticleRed2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleRed2; };
@@ -204,107 +338,15 @@ class ParticleEmitterObject : public Object
         double ExpParticleSize2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleSize2; };
         double ExpParticleAngle1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAngle1; };
         double ExpParticleAngle2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAngle2; };
+        double ExpParticleAlphaRandomness1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAlphaRandomness1; };
+        double ExpParticleAlphaRandomness2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAlphaRandomness2; };
+        double ExpParticleSizeRandomness1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleSizeRandomness1; };
+        double ExpParticleSizeRandomness2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleSizeRandomness2; };
+        double ExpParticleAngleRandomness1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAngleRandomness1; };
+        double ExpParticleAngleRandomness2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAngleRandomness2; };
 
         bool CondNoMoreParticles( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         double ExpNbParticles( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-
-        void SetRendererParam1(float newValue) { rendererParam1 = newValue; };
-        void SetRendererParam2(float newValue) { rendererParam2 = newValue; };
-        void SetTank(float newValue);
-        void SetFlow(float newValue);
-        void SetEmitterForceMin(float newValue);
-        void SetEmitterForceMax(float newValue);
-        void SetEmitterXDirection(float newValue);
-        void SetEmitterYDirection(float newValue);
-        void SetEmitterZDirection(float newValue);
-        void SetEmitterAngleA(float newValue);
-        void SetEmitterAngleB(float newValue);
-        void SetZoneRadius(float newValue);
-        void SetParticleGravityX(float newValue);
-        void SetParticleGravityY(float newValue);
-        void SetParticleGravityZ(float newValue);
-        void SetFriction(float newValue);
-
-        enum ParticleParameterType {Nothing, Enabled, Mutable, Random};
-        void SetRedParameterType(ParticleParameterType type) { redParam = type; };
-        void SetGreenParameterType(ParticleParameterType type) { greenParam = type; };
-        void SetBlueParameterType(ParticleParameterType type) { blueParam = type; };
-        void SetAlphaParameterType(ParticleParameterType type) { alphaParam = type; };
-        void SetSizeParameterType(ParticleParameterType type) { sizeParam = type; };
-        void SetAngleParameterType(ParticleParameterType type) { angleParam = type; };
-
-        void SetParticleRed1(float newValue) { particleRed1= newValue; };
-        void SetParticleRed2(float newValue) { particleRed2= newValue; };
-        void SetParticleGreen1(float newValue) { particleGreen1= newValue; };
-        void SetParticleGreen2(float newValue) { particleGreen2= newValue; };
-        void SetParticleBlue1(float newValue) { particleBlue1= newValue; };
-        void SetParticleBlue2(float newValue) { particleBlue2= newValue; };
-        void SetParticleAlpha1(float newValue) { particleAlpha1= newValue; };
-        void SetParticleAlpha2(float newValue) { particleAlpha2= newValue; };
-        void SetParticleSize1(float newValue) { particleSize1= newValue; };
-        void SetParticleSize2(float newValue) { particleSize2= newValue; };
-        void SetParticleAngle1(float newValue) { particleAngle1= newValue; };
-        void SetParticleAngle2(float newValue) { particleAngle2= newValue; };
-        void SetParticleLifeTimeMin(float newValue) { particleLifeTimeMin= newValue; };
-        void SetParticleLifeTimeMax(float newValue) { particleLifeTimeMax= newValue; };
-        void SetMaxParticleNb(unsigned int newValue) { maxParticleNb = newValue; };
-
-        float GetRendererParam1() const { return rendererParam1; };
-        float GetRendererParam2() const { return rendererParam2; };
-        float GetTank() const { return tank; };
-        float GetFlow() const { return flow; };
-        float GetEmitterForceMin() const { return emitterForceMin; };
-        float GetEmitterForceMax() const { return emitterForceMax; };
-        float GetEmitterXDirection() const { return emitterXDirection; };
-        float GetEmitterYDirection() const { return emitterYDirection; };
-        float GetEmitterZDirection() const { return emitterZDirection; };
-        float GetEmitterAngleA() const { return emitterAngleA; };
-        float GetEmitterAngleB() const { return  emitterAngleB; };
-        float GetZoneRadius() const { return  zoneRadius; };
-        float GetParticleGravityX() const { return particleGravityX; };
-        float GetParticleGravityY() const { return particleGravityY; };
-        float GetParticleGravityZ() const { return particleGravityZ; };
-        float GetFriction() const { return friction; };
-        float GetParticleLifeTimeMin() const { return particleLifeTimeMin; };
-        float GetParticleLifeTimeMax() const { return particleLifeTimeMax; };
-        unsigned int GetMaxParticleNb() const { return maxParticleNb; };
-
-        ParticleParameterType GetRedParameterType() const { return redParam; };
-        ParticleParameterType GetGreenParameterType() const { return greenParam; };
-        ParticleParameterType GetBlueParameterType() const { return blueParam; };
-        ParticleParameterType GetAlphaParameterType() const { return alphaParam; };
-        ParticleParameterType GetSizeParameterType() const { return sizeParam; };
-        ParticleParameterType GetAngleParameterType() const { return angleParam; };
-
-        float GetParticleRed1() const { return particleRed1; };
-        float GetParticleRed2() const { return particleRed2; };
-        float GetParticleGreen1() const { return particleGreen1; };
-        float GetParticleGreen2() const { return particleGreen2; };
-        float GetParticleBlue1() const { return particleBlue1; };
-        float GetParticleBlue2() const { return particleBlue2; };
-        float GetParticleAlpha1() const { return particleAlpha1; };
-        float GetParticleAlpha2() const { return particleAlpha2; };
-        float GetParticleSize1() const { return particleSize1; };
-        float GetParticleSize2() const { return particleSize2; };
-        float GetParticleAngle1() const { return particleAngle1; };
-        float GetParticleAngle2() const { return particleAngle2; };
-
-        enum RendererType {Point, Line, Quad};
-        void SetRendererType(RendererType type) { rendererType = type; };
-        RendererType GetRendererType() const { return rendererType; };
-
-        bool IsRenderingAdditive() { return additive; };
-        void SetRenderingAdditive() { additive = true;};
-        void SetRenderingAlpha() { additive = false;};
-
-        void SetParticleTexture(std::string imageName) { textureParticleName = imageName; };
-        std::string GetParticleTexture() const { return textureParticleName; };
-
-        #if defined(GDE)
-        bool particleEditionSimpleMode; ///< User preference related to object's edition
-        bool emissionEditionSimpleMode; ///< User preference related to object's edition
-        bool gravityEditionSimpleMode; ///< User preference related to object's edition
-        #endif
 
     private:
 
@@ -334,6 +376,8 @@ class ParticleEmitterObject : public Object
         ParticleParameterType redParam, greenParam, blueParam, alphaParam, sizeParam, angleParam;
         float particleRed1, particleRed2, particleGreen1, particleGreen2, particleBlue1, particleBlue2, particleAlpha1, particleAlpha2;
         float particleSize1, particleSize2, particleAngle1, particleAngle2;
+        float particleAlphaRandomness1, particleAlphaRandomness2;
+        float particleSizeRandomness1, particleSizeRandomness2, particleAngleRandomness1, particleAngleRandomness2;
         unsigned int maxParticleNb;
 
         bool hasSomeParticles;

@@ -380,6 +380,32 @@ bool ParticleEmitterObject::ActTank( RuntimeScene & scene, ObjectsConcerned & ob
 
     return true;
 }
+
+bool ParticleEmitterObject::ActParticleColor1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), ';');
+
+    if ( colors.size() < 3 ) return false; //La couleur est incorrecte
+
+    SetParticleRed1(ToInt(colors[0]));
+    SetParticleBlue1(ToInt(colors[1]));
+    SetParticleGreen1(ToInt(colors[2]));
+
+    return true;
+}
+bool ParticleEmitterObject::ActParticleColor2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    vector < string > colors = SpliterStringToVector <string> (action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()), ';');
+
+    if ( colors.size() < 3 ) return false; //La couleur est incorrecte
+
+    SetParticleRed2(ToInt(colors[0]));
+    SetParticleBlue2(ToInt(colors[1]));
+    SetParticleGreen2(ToInt(colors[2]));
+
+    return true;
+}
+
 bool ParticleEmitterObject::ActParticleRed1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
@@ -500,6 +526,36 @@ bool ParticleEmitterObject::ActParticleAlpha2( RuntimeScene & scene, ObjectsConc
 
     return true;
 }
+bool ParticleEmitterObject::ActParticleAlphaRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
+        SetParticleAlphaRandomness1( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
+        SetParticleAlphaRandomness1( GetParticleAlphaRandomness1() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
+        SetParticleAlphaRandomness1( GetParticleAlphaRandomness1() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
+        SetParticleAlphaRandomness1( GetParticleAlphaRandomness1() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
+        SetParticleAlphaRandomness1( GetParticleAlphaRandomness1() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+
+    return true;
+}
+bool ParticleEmitterObject::ActParticleAlphaRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
+        SetParticleAlphaRandomness2( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
+        SetParticleAlphaRandomness2( GetParticleAlphaRandomness2() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
+        SetParticleAlphaRandomness2( GetParticleAlphaRandomness2() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
+        SetParticleAlphaRandomness2( GetParticleAlphaRandomness2() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
+        SetParticleAlphaRandomness2( GetParticleAlphaRandomness2() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+
+    return true;
+}
 bool ParticleEmitterObject::ActParticleSize1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
@@ -530,6 +586,36 @@ bool ParticleEmitterObject::ActParticleSize2( RuntimeScene & scene, ObjectsConce
 
     return true;
 }
+bool ParticleEmitterObject::ActParticleSizeRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
+        SetParticleSizeRandomness1( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
+        SetParticleSizeRandomness1( GetParticleSizeRandomness1() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
+        SetParticleSizeRandomness1( GetParticleSizeRandomness1() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
+        SetParticleSizeRandomness1( GetParticleSizeRandomness1() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
+        SetParticleSizeRandomness1( GetParticleSizeRandomness1() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+
+    return true;
+}
+bool ParticleEmitterObject::ActParticleSizeRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
+        SetParticleSizeRandomness2( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
+        SetParticleSizeRandomness2( GetParticleSizeRandomness2() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
+        SetParticleSizeRandomness2( GetParticleSizeRandomness2() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
+        SetParticleSizeRandomness2( GetParticleSizeRandomness2() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
+        SetParticleSizeRandomness2( GetParticleSizeRandomness2() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+
+    return true;
+}
 bool ParticleEmitterObject::ActParticleAngle1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
@@ -557,6 +643,36 @@ bool ParticleEmitterObject::ActParticleAngle2( RuntimeScene & scene, ObjectsConc
         SetParticleAngle2( GetParticleAngle2() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
         SetParticleAngle2( GetParticleAngle2() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+
+    return true;
+}
+bool ParticleEmitterObject::ActParticleAngleRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
+        SetParticleAngleRandomness1( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
+        SetParticleAngleRandomness1( GetParticleAngleRandomness1() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
+        SetParticleAngleRandomness1( GetParticleAngleRandomness1() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
+        SetParticleAngleRandomness1( GetParticleAngleRandomness1() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
+        SetParticleAngleRandomness1( GetParticleAngleRandomness1() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+
+    return true;
+}
+bool ParticleEmitterObject::ActParticleAngleRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
+        SetParticleAngleRandomness2( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
+        SetParticleAngleRandomness2( GetParticleAngleRandomness2() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Substract )
+        SetParticleAngleRandomness2( GetParticleAngleRandomness2() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
+        SetParticleAngleRandomness2( GetParticleAngleRandomness2() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
+    else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
+        SetParticleAngleRandomness2( GetParticleAngleRandomness2() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()));
 
     return true;
 }

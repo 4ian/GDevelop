@@ -34,11 +34,41 @@ freely, subject to the following restrictions:
  */
 void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 {
+    DECLARE_OBJECT_ACTION("ParticleColor1",
+                   _("Couleur initiale"),
+                   _("Modifie la couleur initiale des particules."),
+                   _("Mettre la couleur initiale des particules de _PARAM0_ à _PARAM1_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::ActParticleColor1);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("color", _("Couleur initiale"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_ACTION()
+
+    DECLARE_OBJECT_ACTION("ParticleColor2",
+                   _("Couleur finale"),
+                   _("Modifie la couleur finale des particules."),
+                   _("Mettre la couleur finale des particules de _PARAM0_ à _PARAM1_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::ActParticleColor2);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("color", _("Couleur finale"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_ACTION()
+
     DECLARE_OBJECT_ACTION("ParticleRed1",
                    _("Couleur rouge, paramètre 1"),
-                   _("Modifie le paramètre 1 de la couleur rouge.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le paramètre 1 de la couleur rouge."),
                    _("Faire _PARAM2__PARAM1_ au paramètre 1 de la couleur rouge de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleRed1);
@@ -54,7 +84,7 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
                    _("Couleur rouge, paramètre 1"),
                    _("Teste le paramètre 1 de la couleur rouge"),
                    _("Le paramètre 1 de la couleur rouge de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleRed1);
@@ -68,9 +98,9 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleRed2",
                    _("Couleur rouge, paramètre 2"),
-                   _("Modifie le paramètre 2 de la couleur rouge.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le paramètre 2 de la couleur rouge."),
                    _("Faire _PARAM2__PARAM1_ au paramètre 2 de la couleur rouge de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleRed2);
@@ -86,7 +116,7 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
                    _("Couleur rouge, paramètre 2"),
                    _("Teste le paramètre 2 de la couleur rouge"),
                    _("Le paramètre 2 de la couleur rouge de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleRed2);
@@ -100,9 +130,9 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleBlue1",
                    _("Couleur bleu, paramètre 1"),
-                   _("Modifie le paramètre 1 de la couleur bleu.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le paramètre 1 de la couleur bleu."),
                    _("Faire _PARAM2__PARAM1_ au paramètre 1 de la couleur bleu de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleBlue1);
@@ -118,7 +148,7 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
                    _("Couleur bleu, paramètre 1"),
                    _("Teste le paramètre 1 de la couleur bleu"),
                    _("Le paramètre 1 de la couleur bleu de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleBlue1);
@@ -132,9 +162,9 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleBlue2",
                    _("Couleur bleu, paramètre 2"),
-                   _("Modifie le paramètre 2 de la couleur bleu.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le paramètre 2 de la couleur bleu."),
                    _("Faire _PARAM2__PARAM1_ au paramètre 2 de la couleur bleu de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleBlue2);
@@ -150,7 +180,7 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
                    _("Couleur bleu, paramètre 2"),
                    _("Teste le paramètre 2 de la couleur bleu"),
                    _("Le paramètre 2 de la couleur bleu de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleBlue2);
@@ -164,9 +194,9 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleGreen1",
                    _("Couleur vert, paramètre 1"),
-                   _("Modifie le paramètre 1 de la couleur vert.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le paramètre 1 de la couleur vert."),
                    _("Faire _PARAM2__PARAM1_ au paramètre 1 de la couleur vert de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleGreen1);
@@ -182,7 +212,7 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
                    _("Couleur vert, paramètre 1"),
                    _("Teste le paramètre 1 de la couleur vert"),
                    _("Le paramètre 1 de la couleur vert de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleGreen1);
@@ -196,9 +226,9 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleGreen2",
                    _("Couleur vert, paramètre 2"),
-                   _("Modifie le paramètre 2 de la couleur vert.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le paramètre 2 de la couleur vert."),
                    _("Faire _PARAM2__PARAM1_ au paramètre 2 de la couleur vert de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleGreen2);
@@ -214,7 +244,7 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
                    _("Couleur vert, paramètre 2"),
                    _("Teste le paramètre 2 de la couleur vert"),
                    _("Le paramètre 2 de la couleur vert de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Avancé"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleGreen2);
@@ -228,9 +258,9 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleSize1",
                    _("Taille, paramètre 1"),
-                   _("Modifie le paramètre 1 de la taille des particules.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le paramètre 1 de la taille des particules."),
                    _("Faire _PARAM2__PARAM1_ au paramètre 1 de la taille des particules de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleSize1);
@@ -246,7 +276,7 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
                    _("Taille, paramètre 1"),
                    _("Teste le paramètre 1 de la taille des particules"),
                    _("Le paramètre 1 de la taille des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleSize1);
@@ -260,9 +290,9 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleSize2",
                    _("Taille, paramètre 2"),
-                   _("Modifie le paramètre 2 de la taille des particules.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le paramètre 2 de la taille des particules."),
                    _("Faire _PARAM2__PARAM1_ au paramètre 2 de la taille des particules de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleSize2);
@@ -278,7 +308,7 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
                    _("Taille, paramètre 2"),
                    _("Teste le paramètre 2 de la taille des particules"),
                    _("Le paramètre 2 de la taille des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleSize2);
@@ -292,9 +322,9 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleAngle1",
                    _("Angle, paramètre 1"),
-                   _("Modifie le paramètre 1 de l'angle des particules.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le paramètre 1 de l'angle des particules."),
                    _("Faire _PARAM2__PARAM1_ au paramètre 1 de l'angle des particules de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleAngle1);
@@ -310,7 +340,7 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
                    _("Angle, paramètre 1"),
                    _("Teste le paramètre 1 de l'angle des particules"),
                    _("Le paramètre 1 de l'angle des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleAngle1);
@@ -324,9 +354,9 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleAngle2",
                    _("Angle, paramètre 2"),
-                   _("Modifie le paramètre 2 de l'angle des particules.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le paramètre 2 de l'angle des particules."),
                    _("Faire _PARAM2__PARAM1_ au paramètre 2 de l'angle des particules de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleAngle2);
@@ -342,7 +372,7 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
                    _("Angle, paramètre 2"),
                    _("Teste le paramètre 2 de l'angle des particules"),
                    _("Le paramètre 2 de l'angle des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleAngle2);
@@ -356,9 +386,9 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleAlpha1",
                    _("Transparence, paramètre 1"),
-                   _("Modifie le paramètre 1 de la transparence des particules.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le paramètre 1 de la transparence des particules."),
                    _("Faire _PARAM2__PARAM1_ au paramètre 1 de la transparence des particules de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleAlpha1);
@@ -374,7 +404,7 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
                    _("Transparence, paramètre 1"),
                    _("Teste le paramètre 1 de la transparence des particules"),
                    _("Le paramètre 1 de la transparence des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleAlpha1);
@@ -388,9 +418,9 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_ACTION("ParticleAlpha2",
                    _("Transparence, paramètre 2"),
-                   _("Modifie le paramètre 2 de la transparence des particules.\nNécessite de recréer les particules pour prendre en compte les changements."),
+                   _("Modifie le paramètre 2 de la transparence des particules."),
                    _("Faire _PARAM2__PARAM1_ au paramètre 2 de la transparence des particules de _PARAM0_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::ActParticleAlpha2);
@@ -406,7 +436,7 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
                    _("Transparence, paramètre 2"),
                    _("Teste le paramètre 2 de la transparence des particules"),
                    _("Le paramètre 2 de la transparence des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Paramétrage"),
+                   _("Commun"),
                    "Extensions/particleSystemicon24.png",
                    "Extensions/particleSystemicon16.png",
                    &ParticleEmitterObject::CondParticleAlpha2);

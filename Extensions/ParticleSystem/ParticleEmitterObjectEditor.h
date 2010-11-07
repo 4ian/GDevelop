@@ -109,8 +109,8 @@ class ParticleEmitterObjectEditor: public wxDialog
 		wxStaticText* StaticText31;
 		wxPanel* Panel1;
 		wxRadioButton* pointCheck;
-		wxStaticText* StaticText1;
 		wxSpinCtrlDouble* red1Edit;
+		wxStaticText* StaticText1;
 		wxStaticText* StaticText58;
 		wxStaticText* StaticText27;
 		wxSpinCtrlDouble* size2RandomnessEdit;
@@ -215,6 +215,11 @@ class ParticleEmitterObjectEditor: public wxDialog
 		static const long ID_STATICTEXT30;
 		static const long ID_TEXTCTRL12;
 		static const long ID_STATICTEXT31;
+		static const long ID_CHECKBOX1;
+		static const long ID_STATICTEXT3;
+		static const long ID_TEXTCTRL1;
+		static const long ID_STATICTEXT1;
+		static const long ID_TEXTCTRL2;
 		static const long ID_STATICTEXT62;
 		static const long ID_TEXTCTRL24;
 		static const long ID_STATICTEXT40;
@@ -304,11 +309,6 @@ class ParticleEmitterObjectEditor: public wxDialog
 		static const long ID_STATICTEXT14;
 		static const long ID_PANEL4;
 		static const long ID_NOTEBOOK2;
-		static const long ID_CHECKBOX1;
-		static const long ID_STATICTEXT3;
-		static const long ID_TEXTCTRL1;
-		static const long ID_STATICTEXT1;
-		static const long ID_TEXTCTRL2;
 		static const long ID_STATICTEXT50;
 		static const long ID_TEXTCTRL23;
 		static const long ID_STATICTEXT52;
@@ -364,6 +364,12 @@ class ParticleEmitterObjectEditor: public wxDialog
 		void OnsimpleConeAngleText(wxCommandEvent& event);
 		void OnsimpleGravityAngleText(wxCommandEvent& event);
 		void OnsimpleFrictionEditText(wxCommandEvent& event);
+		void OnalphaMutableCheckSelect(wxCommandEvent& event);
+		void OnalphaRandomCheckSelect1(wxCommandEvent& event);
+		void OnangleRandomCheckSelect1(wxCommandEvent& event);
+		void OnangleMutableCheckSelect(wxCommandEvent& event);
+		void OnsizeRandomCheckSelect1(wxCommandEvent& event);
+		void OnsizeMutableCheckSelect(wxCommandEvent& event);
 		//*)
 		void PrepareControlsForPointRenderer();
 		void PrepareControlsForQuadRenderer();

@@ -489,12 +489,12 @@ void ParticleEmitterObject::UpdateAngleParameters()
     if ( !particleSystem.particleModel ) return;
 
 	if ( angleParam == Mutable ) particleSystem.particleModel->setParam(SPK::PARAM_ANGLE,
-                                                                        (particleAngle1-particleAngleRandomness1/2.0f)/180.0f*3.14159f,
-                                                                        (particleAngle1+particleAngleRandomness1/2.0f)/180.0f*3.14159f,
-                                                                        (particleAngle2-particleAngleRandomness2/2.0f)/180.0f*3.14159f,
-                                                                        (particleAngle2+particleAngleRandomness2/2.0f)/180.0f*3.14159f);
-	else if ( angleParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_ANGLE, (particleAngle1)/180.0f*3.14159f, (particleAngle2)/180.0f*3.14159f);
-	else particleSystem.particleModel->setParam(SPK::PARAM_ANGLE, particleAngle1/180.0f*3.14159f);
+                                                                        -(particleAngle1-particleAngleRandomness1/2.0f)/180.0f*3.14159f,
+                                                                        -(particleAngle1+particleAngleRandomness1/2.0f)/180.0f*3.14159f,
+                                                                        -(particleAngle2-particleAngleRandomness2/2.0f)/180.0f*3.14159f,
+                                                                        -(particleAngle2+particleAngleRandomness2/2.0f)/180.0f*3.14159f);
+	else if ( angleParam == Random ) particleSystem.particleModel->setParam(SPK::PARAM_ANGLE, -(particleAngle1)/180.0f*3.14159f, -(particleAngle2)/180.0f*3.14159f);
+	else particleSystem.particleModel->setParam(SPK::PARAM_ANGLE, -particleAngle1/180.0f*3.14159f);
 }
 
 void ParticleEmitterObject::UpdateLifeTime()

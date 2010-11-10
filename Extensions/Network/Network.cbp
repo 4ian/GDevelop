@@ -465,6 +465,8 @@
 		<Linker>
 			<Add directory="C:\Libs\SFML\lib\mingw" />
 		</Linker>
+		<Unit filename="ErrorManager.cpp" />
+		<Unit filename="ErrorManager.h" />
 		<Unit filename="Extension.cpp" />
 		<Unit filename="NetworkActions.cpp" />
 		<Unit filename="NetworkActions.h" />

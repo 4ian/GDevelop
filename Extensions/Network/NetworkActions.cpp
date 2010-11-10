@@ -37,13 +37,15 @@ freely, subject to the following restrictions:
 
 const unsigned short Port = 2435;
 
-sf::TcpListener serverListener;
+boost::shared_ptr<sf::TcpListener> serverListener;
 sf::SocketSelector serverSelector;
-std::list<sf::TcpSocket*> serverClients;
+std::list< boost::shared_ptr<sf::TcpSocket> > serverClients;
 
 bool ActDoServer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    if (!serverListener.Listen(Port) == sf::Socket::Done)
+    serverListener = boost::shared_ptr<sf::TcpListener>(new sf::TcpListener);
+
+    if (!serverListener->Listen(Port) == sf::Socket::Done)
     {
         ErrorManager::getInstance()->SetLastError("Server unable to listen to port "+ToString(Port)+"\n");
         return false;
@@ -55,23 +57,29 @@ bool ActDoServer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, con
     serverClients.clear();
 
     // Add the listener
-    serverSelector.Add(serverListener);
+    serverSelector.Add(*serverListener);
 
     return true;
 }
 
 bool ActAcceptNewClients( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
+    if (!serverListener)
+    {
+        ErrorManager::getInstance()->SetLastError("Server not launched\n");
+        return false;
+    }
+
     // Get the sockets ready for reading
     unsigned int NbSockets = serverSelector.Wait(0.001);
 
     // We can read from each returned socket
     for (unsigned int i = 0; i < NbSockets; ++i)
     {
-        if (serverSelector.IsReady(serverListener))
+        if (serverSelector.IsReady(*serverListener))
         {
-            sf::TcpSocket* client = new sf::TcpSocket;
-             if (serverListener.Accept(*client) == sf::Socket::Done)
+            boost::shared_ptr<sf::TcpSocket> client = boost::shared_ptr<sf::TcpSocket>(new sf::TcpSocket);
+             if (serverListener->Accept(*client) == sf::Socket::Done)
              {
                  // Add the new client to the clients list
                  serverClients.push_back(client);
@@ -88,20 +96,26 @@ bool ActAcceptNewClients( RuntimeScene & scene, ObjectsConcerned & objectsConcer
 
 bool ActServerReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
+    if (!serverListener)
+    {
+        ErrorManager::getInstance()->SetLastError("Server not launched\n");
+        return false;
+    }
+
     // Get the sockets ready for reading
     unsigned int NbSockets = serverSelector.Wait(0.001);
 
     // We can read from each returned socket
     for (unsigned int i = 0; i < NbSockets; ++i)
     {
-        if (serverSelector.IsReady(serverListener))
+        if (serverSelector.IsReady(*serverListener))
         {
             //Pass, connection of new clients are handled in another action.
         }
         else
         {
             // The listener socket is not ready, test all other sockets (the clients)
-             for (std::list<sf::TcpSocket*>::iterator it = serverClients.begin(); it != serverClients.end(); ++it)
+             for (std::list< boost::shared_ptr<sf::TcpSocket> >::iterator it = serverClients.begin(); it != serverClients.end(); ++it)
              {
                  sf::TcpSocket& client = **it;
                  if (serverSelector.IsReady(client))
@@ -142,7 +156,7 @@ bool ActServerSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcern
             << action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)
             << static_cast<double>(action.GetParameter(1).GetAsMathExpressionResult(scene, objectsConcerned));
 
-    for (std::list<sf::TcpSocket*>::iterator it = serverClients.begin(); it != serverClients.end(); ++it)
+    for (std::list< boost::shared_ptr<sf::TcpSocket> >::iterator it = serverClients.begin(); it != serverClients.end(); ++it)
     {
         sf::TcpSocket& client = **it;
 
@@ -165,6 +179,8 @@ bool ActDoClient( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, con
         ErrorManager::getInstance()->SetLastError("IP Adress malformated\n");
         return false;
     }
+
+    clientSocket.Disconnect();
 
     // Connect to the server
     if (clientSocket.Connect(ServerAddress, Port) != sf::Socket::Done)

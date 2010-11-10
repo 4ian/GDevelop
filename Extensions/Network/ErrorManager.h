@@ -2,6 +2,7 @@
 #define ERRORMANAGER_H
 
 #include <string>
+#include <iostream>
 
 class ErrorManager
 {
@@ -26,7 +27,13 @@ class ErrorManager
         }
     }
 
-    void SetLastError(std::string error) {lastErrorString = error;};
+    void SetLastError(std::string error)
+    {
+        lastErrorString = error;
+        #if !defined(RELEASE)
+        std::cout << lastErrorString;
+        #endif
+    };
     std::string GetLastError() const {return lastErrorString;};
 
     private:

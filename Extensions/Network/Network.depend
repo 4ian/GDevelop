@@ -7659,7 +7659,7 @@
 1253304910 c:\libs\wxwidgets\include\wx\cocoa\mdi.h
 	"wx/frame.h"
 
-1288171886 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1289148818 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 
 1288901933 d:\florian\programmation\gamedevelop\extensions\network\networkactions.h
 
@@ -8364,7 +8364,7 @@
 
 1272742171 c:\libs\boost_1_43_0\boost\version.hpp
 
-1288906660 source:d:\florian\programmation\gamedevelop\extensions\network\networkactions.cpp
+1289139934 source:d:\florian\programmation\gamedevelop\extensions\network\networkactions.cpp
 	"GDL/Instruction.h"
 	"GDL/ObjectsConcerned.h"
 	"GDL/RuntimeScene.h"
@@ -8721,6 +8721,9 @@
 1288901365 source:d:\florian\programmation\gamedevelop\extensions\network\errormanager.cpp
 	"ErrorManager.h"
 
-1288902385 d:\florian\programmation\gamedevelop\extensions\network\errormanager.h
+1289059459 d:\florian\programmation\gamedevelop\extensions\network\errormanager.h
 	<string>
+	<iostream>
+
+1253304862 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 

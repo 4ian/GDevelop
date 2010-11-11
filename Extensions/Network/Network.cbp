@@ -25,11 +25,11 @@
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lsfml-audio-d.dll" />
-					<Add option="-lsfml-graphics-d.dll" />
-					<Add option="-lsfml-network-d.dll" />
-					<Add option="-lsfml-window-d.dll" />
-					<Add option="-lsfml-system-d.dll" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\Runtime\bin\debug" />
@@ -74,11 +74,11 @@
 					<Add option="-lwxjpegd" />
 					<Add option="-lwxzlibd" />
 					<Add option="-lwxtiffd" />
-					<Add option="-lsfml-audio-d.dll" />
-					<Add option="-lsfml-graphics-d.dll" />
-					<Add option="-lsfml-network-d.dll" />
-					<Add option="-lsfml-window-d.dll" />
-					<Add option="-lsfml-system-d.dll" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
 					<Add option="-lopengl32" />
@@ -121,11 +121,11 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\Runtime\bin\release" />
@@ -170,11 +170,11 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
 					<Add option="-lopengl32" />
@@ -217,11 +217,11 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\Runtime\bin\dev" />
@@ -266,11 +266,11 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
 					<Add option="-lopengl32" />
@@ -463,7 +463,7 @@
 			<Add directory="C:\Libs\boost_1_43_0" />
 		</Compiler>
 		<Linker>
-			<Add directory="C:\Libs\SFML\lib\mingw" />
+			<Add directory="C:\Libs\SFML\lib" />
 		</Linker>
 		<Unit filename="ErrorManager.cpp" />
 		<Unit filename="ErrorManager.h" />

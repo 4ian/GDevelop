@@ -42,6 +42,7 @@ freely, subject to the following restrictions:
 #if defined(WINDOWS)
 #include <windows.h>
 #include <Commdlg.h>
+#include <unistd.h>
 #endif
 
 //Linux build uses dlib for dialogs
@@ -91,7 +92,8 @@ bool ActShowOpenFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     std::replace(filters.begin(), filters.end(), '|', '\0');
 
     OPENFILENAME toGetFileName; //Struct for the dialog
-    char filePath[MAX_PATH] = "";
+    char filePath[MAX_PATH];
+    getcwd(filePath, MAX_PATH);
 
     ZeroMemory(&toGetFileName, sizeof(OPENFILENAME));
     toGetFileName.lStructSize = sizeof(OPENFILENAME);

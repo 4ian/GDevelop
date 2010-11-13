@@ -25,11 +25,11 @@
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lsfml-audio-d.dll" />
-					<Add option="-lsfml-graphics-d.dll" />
-					<Add option="-lsfml-network-d.dll" />
-					<Add option="-lsfml-window-d.dll" />
-					<Add option="-lsfml-system-d.dll" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
 					<Add option="-lgdi32" />
 					<Add option="-lComdlg32" />
 					<Add library="opengl32" />
@@ -76,11 +76,11 @@
 					<Add option="-lwxjpegd" />
 					<Add option="-lwxzlibd" />
 					<Add option="-lwxtiffd" />
-					<Add option="-lsfml-audio-d.dll" />
-					<Add option="-lsfml-graphics-d.dll" />
-					<Add option="-lsfml-network-d.dll" />
-					<Add option="-lsfml-window-d.dll" />
-					<Add option="-lsfml-system-d.dll" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
 					<Add option="-lopengl32" />
@@ -123,11 +123,11 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lgdi32" />
 					<Add option="-lComdlg32" />
 					<Add library="opengl32" />
@@ -174,11 +174,11 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
 					<Add option="-lopengl32" />
@@ -221,11 +221,11 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lgdi32" />
 					<Add option="-lComdlg32" />
 					<Add library="opengl32" />
@@ -272,11 +272,11 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
 					<Add option="-lopengl32" />
@@ -318,16 +318,16 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="nwidgets" />
 					<Add directory="dlib-17.12" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl" />
-					<Add option="-lsfml-audio" />
-					<Add option="-lsfml-graphics" />
-					<Add option="-lsfml-window" />
-					<Add option="-lsfml-system" />
+					<Add option="-lsfml2-audio" />
+					<Add option="-lsfml2-graphics" />
+					<Add option="-lsfml2-window" />
+					<Add option="-lsfml2-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -362,17 +362,17 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="nwidgets" />
 					<Add directory="dlib-17.12" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
-					<Add option="-lsfml-audio" />
-					<Add option="-lsfml-graphics" />
-					<Add option="-lsfml-window" />
-					<Add option="-lsfml-system" />
+					<Add option="-lsfml2-audio" />
+					<Add option="-lsfml2-graphics" />
+					<Add option="-lsfml2-window" />
+					<Add option="-lsfml2-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -406,16 +406,16 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add directory="nwidgets" />
 					<Add directory="dlib-17.12" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_38_0" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
-					<Add option="-lsfml-audio" />
-					<Add option="-lsfml-graphics" />
-					<Add option="-lsfml-window" />
-					<Add option="-lsfml-system" />
+					<Add option="-lsfml2-audio" />
+					<Add option="-lsfml2-graphics" />
+					<Add option="-lsfml2-window" />
+					<Add option="-lsfml2-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -429,6 +429,47 @@
 					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
 				</Linker>
 			</Target>
+			<Target title="Linux - Debug">
+				<Option output="..\..\Runtime\bin\debug\CommonDialogs.xgdl" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Debug\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option="-DGDP" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="nwidgets" />
+					<Add directory="dlib-17.12" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
+					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lgdl" />
+					<Add option="-lsfml2-audio" />
+					<Add option="-lsfml2-graphics" />
+					<Add option="-lsfml2-window" />
+					<Add option="-lsfml2-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="..\..\Runtime\bin\debug" />
+					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add directory="..\..\GDL" />
@@ -436,7 +477,8 @@
 			<Add directory="C:\Libs\boost_1_43_0" />
 		</Compiler>
 		<Linker>
-			<Add directory="C:\Libs\SFML\lib\mingw" />
+			<Add directory="C:\Libs\SFML\bin-mingw-debug\lib" />
+			<Add directory="C:\Libs\SFML\bin-mingw-release\lib" />
 		</Linker>
 		<Unit filename="CommonDialogsActions.cpp" />
 		<Unit filename="CommonDialogsActions.h" />
@@ -445,11 +487,13 @@
 			<Option target="Linux - Release" />
 			<Option target="Linux - Release - Edittime" />
 			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
 		</Unit>
 		<Unit filename="nwidgets\nsource.cpp">
 			<Option target="Linux - Release" />
 			<Option target="Linux - Release - Edittime" />
 			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
 		</Unit>
 		<Extensions>
 			<code_completion />

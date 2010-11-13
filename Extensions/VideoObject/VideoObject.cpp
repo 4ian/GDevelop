@@ -149,6 +149,7 @@ bool VideoObject::DrawEdittime(sf::RenderWindow& renderWindow)
 
 void VideoObject::PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper)
 {
+    videoFile = resourcesMergingHelper.GetNewFilename(videoFile);
 }
 
 bool VideoObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)

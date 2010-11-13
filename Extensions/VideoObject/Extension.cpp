@@ -38,6 +38,9 @@ Mingw :
 -Type "make" and "make install" to build and install libtheora
 -Build libtheoraplayer using Code::Blocks projects. Define DTHEORAVIDEO_STATIC if necessary.
 
+Linux :
+-Install libogg and libvorbis ( development packages )
+-Install or download and manually rebuild ( make/make install ) libtheora if this latter is too old.
 
 */
 
@@ -60,14 +63,14 @@ class Extension : public ExtensionBase
         {
             DECLARE_THE_EXTENSION("VideoObject",
                                   _("Objet Video"),
-                                  _("Extension permettant d'utiliser un objet affichant du texte."),
+                                  _("Extension permettant d'utiliser un objet affichant une vidéo."),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
             //Declaration of all objects available
             DECLARE_OBJECT("Video",
                            _("Video"),
-                           _("Objet affichant un texte"),
+                           _("Objet affichant une vidéo sans son."),
                            "Extensions/videoicon.png",
                            &CreateVideoObject,
                            &DestroyVideoObject);
@@ -75,7 +78,7 @@ class Extension : public ExtensionBase
                 DECLARE_OBJECT_ACTION("LoadVideo",
                                _("Charger et jouer une vidéo"),
                                _("Charge la vidéo et la joue."),
-                               _("Charge et jouer _PARAM1_"),
+                               _("Charger et jouer _PARAM1_"),
                                _("Vidéo"),
                                "res/starticon24.png",
                                "res/starticon.png",
@@ -192,7 +195,7 @@ class Extension : public ExtensionBase
 
                 DECLARE_OBJECT_ACTION("ChangeColor",
                                _("Changer la couleur d'un objet vidéo"),
-                               _("Change la couleur du vidéo. Par défaut, la couleur est le blanc."),
+                               _("Change la couleur globale de la vidéo. Par défaut, la couleur est le blanc."),
                                _("Changer la couleur de _PARAM0_ en _PARAM1_"),
                                _("Effets"),
                                "res/actions/color24.png",
@@ -290,6 +293,15 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_STR_EXPRESSION()
 
             DECLARE_END_OBJECT()
+
+            #if defined(GDE)
+            supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libogg-0.dll"));
+            supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libtheoradec-1.dll"));
+            supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libtheoraplayer.dll"));
+            supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libvorbis-0.dll"));
+            supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libtheoradec.so.1"));
+            #endif
+
 
             CompleteCompilationInformation();
         };

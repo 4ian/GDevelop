@@ -25,11 +25,11 @@
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lsfml-audio-d.dll" />
-					<Add option="-lsfml-graphics-d.dll" />
-					<Add option="-lsfml-network-d.dll" />
-					<Add option="-lsfml-window-d.dll" />
-					<Add option="-lsfml-system-d.dll" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.dll.a" />
@@ -76,11 +76,11 @@
 					<Add option="-lwxjpegd" />
 					<Add option="-lwxzlibd" />
 					<Add option="-lwxtiffd" />
-					<Add option="-lsfml-audio-d.dll" />
-					<Add option="-lsfml-graphics-d.dll" />
-					<Add option="-lsfml-network-d.dll" />
-					<Add option="-lsfml-window-d.dll" />
-					<Add option="-lsfml-system-d.dll" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
 					<Add option="-lopengl32" />
@@ -124,11 +124,11 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
@@ -174,11 +174,11 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
 					<Add option="-lopengl32" />
@@ -222,11 +222,11 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
@@ -272,11 +272,11 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
 					<Add option="-lopengl32" />
@@ -319,10 +319,14 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					<Add directory="\home\florian\Programmation\libs\libtheoraplayer\trunk\include\theoraplayer" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl" />
+					<Add option="-ltheoradec" />
+					<Add option="-lvorbis" />
+					<Add option="-logg" />
 					<Add option="-lsfml2-audio" />
 					<Add option="-lsfml2-graphics" />
 					<Add option="-lsfml2-window" />
@@ -361,10 +365,14 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					<Add directory="\home\florian\Programmation\libs\libtheoraplayer\trunk\include\theoraplayer" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl" />
+					<Add option="-ltheoradec" />
+					<Add option="-lvorbis" />
+					<Add option="-logg" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml2-audio" />
 					<Add option="-lsfml2-graphics" />
@@ -403,14 +411,18 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					<Add directory="\home\florian\Programmation\libs\libtheoraplayer\trunk\include\theoraplayer" />
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
+					<Add option="-ltheoradec" />
+					<Add option="-lvorbis" />
+					<Add option="-logg" />
 					<Add option="`wx-config --libs all`" />
-					<Add option="-lsfml-audio" />
-					<Add option="-lsfml-graphics" />
-					<Add option="-lsfml-window" />
-					<Add option="-lsfml-system" />
+					<Add option="-lsfml2-audio" />
+					<Add option="-lsfml2-graphics" />
+					<Add option="-lsfml2-window" />
+					<Add option="-lsfml2-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -424,6 +436,49 @@
 					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
 				</Linker>
 			</Target>
+			<Target title="Linux - Debug">
+				<Option output="..\..\Runtime\bin\debug\VideoObject.xgdl" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Debug\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option="-DGDP" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
+					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					<Add directory="\home\florian\Programmation\libs\libtheoraplayer\trunk\include\theoraplayer" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lgdl" />
+					<Add option="-ltheoradec" />
+					<Add option="-lvorbis" />
+					<Add option="-logg" />
+					<Add option="-lsfml2-audio" />
+					<Add option="-lsfml2-graphics" />
+					<Add option="-lsfml2-window" />
+					<Add option="-lsfml2-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="..\..\Runtime\bin\debug" />
+					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add directory="..\..\GDL" />
@@ -432,7 +487,8 @@
 			<Add directory="C:\Libs\libtheoraplayer\trunk\include" />
 		</Compiler>
 		<Linker>
-			<Add directory="C:\Libs\SFML\lib\mingw" />
+			<Add directory="C:\Libs\SFML\bin-mingw-debug\lib" />
+			<Add directory="C:\Libs\SFML\bin-mingw-release\lib" />
 		</Linker>
 		<Unit filename="Extension.cpp" />
 		<Unit filename="VideoActions.cpp" />
@@ -457,7 +513,7 @@
 			<lib_finder disable_auto="1" />
 			<wxsmith version="1">
 				<resources>
-					<wxDialog wxs="wxsmith/VideoObjectEditor.wxs" src="VideoObjectEditor.cpp" hdr="VideoObjectEditor.h" name="VideoObjectEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/VideoObjectEditor.wxs" src="VideoObjectEditor.cpp" hdr="VideoObjectEditor.h" fwddecl="0" i18n="1" name="VideoObjectEditor" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

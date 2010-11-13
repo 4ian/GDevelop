@@ -1,37 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
-	<File name="Extension.cpp" open="1" top="0" tabpos="13">
-		<Cursor position="2676" topLine="49" />
+	<ActiveTarget name="Release - Edittime" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="3073" topLine="58" />
 	</File>
-	<File name="VideoActions.cpp" open="1" top="0" tabpos="9">
+	<File name="VideoActions.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="1177" topLine="24" />
 	</File>
-	<File name="VideoConditions.cpp" open="1" top="0" tabpos="10">
+	<File name="VideoConditions.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="1149" topLine="16" />
 	</File>
-	<File name="VideoExpressions.cpp" open="1" top="0" tabpos="11">
+	<File name="VideoExpressions.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="1717" topLine="11" />
 	</File>
-	<File name="VideoObject.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="4879" topLine="163" />
+	<File name="VideoObject.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="2767" topLine="71" />
 	</File>
-	<File name="VideoObject.h" open="1" top="0" tabpos="2">
-		<Cursor position="5683" topLine="120" />
+	<File name="VideoObject.h" open="0" top="0" tabpos="3">
+		<Cursor position="7178" topLine="147" />
 	</File>
-	<File name="VideoObjectEditor.cpp" open="1" top="1" tabpos="16">
-		<Cursor position="1277" topLine="13" />
+	<File name="VideoObjectEditor.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="7708" topLine="128" />
 	</File>
 	<File name="VideoObjectEditor.h" open="0" top="0" tabpos="1">
 		<Cursor position="1019" topLine="0" />
 	</File>
-	<File name="VideoWrapper.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="2209" topLine="83" />
+	<File name="VideoWrapper.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="905" topLine="29" />
 	</File>
-	<File name="VideoWrapper.h" open="1" top="0" tabpos="4">
-		<Cursor position="1831" topLine="45" />
+	<File name="VideoWrapper.h" open="0" top="0" tabpos="3">
+		<Cursor position="717" topLine="11" />
 	</File>
 	<File name="..\..\GDL\GDL\tinyxml.h" open="0" top="0" tabpos="0">
 		<Cursor position="35952" topLine="975" />
+	</File>
+	<File name="..\..\GDL\GDL\tinyxmlparser.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="9006" topLine="339" />
 	</File>
 </CodeBlocks_layout_file>

@@ -152,7 +152,7 @@ void VideoObjectEditor::OnbrowseBtClick(wxCommandEvent& event)
 
 void VideoObjectEditor::OnconverterBtClick(wxCommandEvent& event)
 {
-    if ( !wxFileExists("Extensions/ffmpeg2theora.exe"))
+    if ( !wxFileExists(wxGetCwd()+"/Extensions/ffmpeg2theora.exe"))
     {
         wxLogError(_("L'executable ffmpeg2theora.exe n'a pas été trouvé dans le répertoire Extensions de Game Develop."));
         return;
@@ -162,8 +162,12 @@ void VideoObjectEditor::OnconverterBtClick(wxCommandEvent& event)
 
     if ( fileDialog.ShowModal() == wxID_OK )
     {
+        string parameters;
+        if ( wxMessageBox(_("Voulez vous enlever le son de la vidéo ?\nGame Develop ne lit actuellement pas le son des vidéos."), _("Suppression de l'audio"), wxYES_NO | wxICON_QUESTION, this) == wxYES )
+            parameters += " --noaudio";
+
         wxProgressDialog dialog(_("Conversion en cours"), _("Veuillez patienter pendant la durée de la conversion"));
-        wxExecute("Extensions/ffmpeg2theora.exe "+fileDialog.GetPath(), wxEXEC_SYNC);;
+        wxExecute(wxGetCwd()+"/Extensions/ffmpeg2theora.exe "+fileDialog.GetPath()+parameters, wxEXEC_SYNC);;
         wxLogMessage("Conversion terminée.");
     }
 }

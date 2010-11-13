@@ -463,7 +463,8 @@
 			<Add directory="C:\Libs\boost_1_43_0" />
 		</Compiler>
 		<Linker>
-			<Add directory="C:\Libs\SFML\lib" />
+			<Add directory="C:\Libs\SFML\bin-mingw-debug\lib" />
+			<Add directory="C:\Libs\SFML\bin-mingw-release\lib" />
 		</Linker>
 		<Unit filename="ErrorManager.cpp" />
 		<Unit filename="ErrorManager.h" />

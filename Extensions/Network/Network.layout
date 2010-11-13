@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="ErrorManager.cpp" open="1" top="0" tabpos="2">
+	<File name="ErrorManager.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="75" topLine="0" />
 	</File>
-	<File name="ErrorManager.h" open="0" top="0" tabpos="8">
-		<Cursor position="88" topLine="0" />
+	<File name="ErrorManager.h" open="0" top="0" tabpos="5">
+		<Cursor position="907" topLine="9" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="NetworkActions.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="8393" topLine="233" />
+	<File name="NetworkActions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="4486" topLine="123" />
 	</File>
 	<File name="NetworkActions.h" open="0" top="0" tabpos="3">
 		<Cursor position="1239" topLine="6" />
@@ -22,10 +22,10 @@
 	<File name="NetworkExpressions.h" open="0" top="0" tabpos="7">
 		<Cursor position="581" topLine="0" />
 	</File>
-	<File name="ReceivedDataManager.cpp" open="1" top="0" tabpos="3">
+	<File name="ReceivedDataManager.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="34" topLine="0" />
 	</File>
-	<File name="ReceivedDataManager.h" open="1" top="0" tabpos="4">
+	<File name="ReceivedDataManager.h" open="0" top="0" tabpos="4">
 		<Cursor position="547" topLine="2" />
 	</File>
 </CodeBlocks_layout_file>

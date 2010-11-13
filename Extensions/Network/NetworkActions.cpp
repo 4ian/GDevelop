@@ -35,8 +35,6 @@ freely, subject to the following restrictions:
 #include <string>
 #include <list>
 
-const unsigned short Port = 2435;
-
 sf::UdpSocket serverSocket;
 bool serverInitialized;
 
@@ -52,6 +50,7 @@ bool ActDoServer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, con
 
 bool ActAcceptNewClients( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
+    return true;
 }
 
 bool ActServerReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
@@ -62,16 +61,12 @@ bool ActServerReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsCo
         return false;
     }
 
-    // Receive a message from anyone
     sf::Packet packet;
     sf::IpAddress sender;
     unsigned short port;
 
-    sf::Socket::Status status = serverSocket.Receive(packet, sender, port);
-
-    if (status == sf::Socket::Done)
+    while (serverSocket.Receive(packet, sender, port) == sf::Socket::Done)
     {
-        cout << "ServerReceive" << endl;
         sf::Int32 type = -1;
         packet >> type; //Read the primary type of the packet
 
@@ -92,18 +87,7 @@ bool ActServerReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsCo
             break;
         }
     }
-    else if (status == sf::Socket::Error)
-    {
-        cout << "Server R Error" << endl;
-    }
-    else if (status == sf::Socket::NotReady)
-    {
-        cout << "Server R NotReady" << endl;
-    }
-    else if (status == sf::Socket::Disconnected)
-    {
-        cout << "Server R Disconnected" << endl;
-    }
+    return true;
 }
 
 bool ActServerSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
@@ -117,6 +101,8 @@ bool ActServerSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcern
 
     if (!serverSocket.Send(packet, sendto, 55001) == sf::Socket::Done)
         ErrorManager::getInstance()->SetLastError("Failed to send packet to "+sendto.ToString()+".\n");
+
+    return true;
 }
 
 bool connected;
@@ -145,6 +131,8 @@ bool ActClientSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcern
             << static_cast<double>(action.GetParameter(1).GetAsMathExpressionResult(scene, objectsConcerned));
 
     clientSocket.Send(packet, "127.0.0.1", 55002);
+
+    return true;
 }
 
 bool ActClientReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
@@ -159,7 +147,7 @@ bool ActClientReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsCo
     sf::IpAddress address;
     short unsigned int port;
 
-    if ( clientSocket.Receive(packet, address, port) == sf::Socket::Done)
+    while ( clientSocket.Receive(packet, address, port) == sf::Socket::Done)
     {
         sf::Int32 type = -1;
         packet >> type; //Read the primary type of the packet

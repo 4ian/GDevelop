@@ -471,15 +471,41 @@
 		<Unit filename="Extension.cpp" />
 		<Unit filename="NetworkActions.cpp" />
 		<Unit filename="NetworkActions.h" />
+		<Unit filename="NetworkAutomatism.cpp" />
+		<Unit filename="NetworkAutomatism.h" />
+		<Unit filename="NetworkAutomatismActions.cpp" />
+		<Unit filename="NetworkAutomatismActions.h" />
+		<Unit filename="NetworkAutomatismEditor.cpp" />
+		<Unit filename="NetworkAutomatismEditor.h" />
 		<Unit filename="NetworkExpressions.cpp" />
 		<Unit filename="NetworkExpressions.h" />
+		<Unit filename="NetworkManager.cpp" />
+		<Unit filename="NetworkManager.h" />
 		<Unit filename="ReceivedDataManager.cpp" />
 		<Unit filename="ReceivedDataManager.h" />
+		<Unit filename="RuntimeSceneNetworkDatas.cpp" />
+		<Unit filename="RuntimeSceneNetworkDatas.h" />
+		<Unit filename="SceneNetworkDatas.cpp" />
+		<Unit filename="SceneNetworkDatas.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
 			<debugger />
 			<lib_finder disable_auto="1" />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project output_directory="doc" />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+			<wxsmith version="1">
+				<resources>
+					<wxDialog wxs="wxsmith/NetworkAutomatismEditor.wxs" src="NetworkAutomatismEditor.cpp" hdr="NetworkAutomatismEditor.h" fwddecl="0" i18n="1" name="NetworkAutomatismEditor" language="CPP" />
+				</resources>
+			</wxsmith>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

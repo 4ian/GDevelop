@@ -32,12 +32,10 @@ class ObjectsConcerned;
 class Instruction;
 class Evaluateur;
 
-bool ActDoServer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActAcceptNewClients( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActServerReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActServerSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActDoClient( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActClientSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActClientReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActAddRecipient( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActRemoveAllRecipients( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActListenToPort( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 #endif // NetworkACTIONS_H_INCLUDED

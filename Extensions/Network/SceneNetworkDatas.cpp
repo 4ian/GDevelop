@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,6 +24,17 @@ freely, subject to the following restrictions:
 
 */
 
-#include "ReceivedDataManager.h"
+#include "SceneNetworkDatas.h"
+#include "GDL/tinyxml.h"
+#include "GDL/XmlMacros.h"
+#include <iostream>
 
-ReceivedDataManager * ReceivedDataManager::_singleton = 0;
+#if defined(GDE)
+void SceneNetworkDatas::SaveToXml(TiXmlElement * elem) const
+{
+}
+#endif
+
+void SceneNetworkDatas::LoadFromXml(const TiXmlElement * elem)
+{
+}

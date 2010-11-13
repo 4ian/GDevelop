@@ -27,6 +27,8 @@ freely, subject to the following restrictions:
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
 #include "NetworkActions.h"
+#include "NetworkAutomatismActions.h"
+#include "NetworkAutomatism.h"
 #include "NetworkExpressions.h"
 #include <boost/version.hpp>
 
@@ -48,50 +50,52 @@ class Extension : public ExtensionBase
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
-            DECLARE_ACTION("DoServer",
-                           _("Serveur"),
-                           _(""),
-                           _("Serveur"),
-                           _("Serveur"),
+            DECLARE_ACTION("AddRecipient",
+                           _("Ajouter un destinataire"),
+                           _("Ajoute l'ordinateur ayant l'adresse IP indiquée comme destinataire des données envoyées."),
+                           _("Ajouter _PARAM0_ en destinataire"),
+                           _("Réseau : Envoi"),
                            "res/actions/camera24.png",
                            "res/actions/camera.png",
-                           &ActDoServer);
+                           &ActAddRecipient);
+
+                DECLARE_PARAMETER("text", _("Adresse IP du destinataire"), false, "")
+                DECLARE_PARAMETER_OPTIONAL("expression", _("Port du destinataire (Par défaut : 50001)"), false, "")
 
             DECLARE_END_ACTION()
 
-            DECLARE_ACTION("AcceptNewClients",
-                           _("Accepter de nouveaux clients"),
-                           _(""),
-                           _("Serveur"),
-                           _("Serveur"),
+            DECLARE_ACTION("RemoveAllRecipients",
+                           _("Supprimer tous les destinataires"),
+                           _("Vide la liste des destinataires des données envoyées"),
+                           _("Vider la liste des destinataires"),
+                           _("Réseau : Envoi"),
                            "res/actions/camera24.png",
                            "res/actions/camera.png",
-                           &ActAcceptNewClients);
+                           &ActRemoveAllRecipients);
 
             DECLARE_END_ACTION()
 
-            DECLARE_ACTION("DoClient",
-                           _("Client"),
-                           _(""),
-                           _("Client"),
-                           _("Client"),
+            DECLARE_ACTION("ListenToPort",
+                           _("Initialiser la réception de données"),
+                           _("Initialise le réseau afin de pouvoir recevoir des données depuis d'autres ordinateurs."),
+                           _("Initialiser la réception de données"),
+                           _("Réseau : Reception"),
                            "res/actions/camera24.png",
                            "res/actions/camera.png",
-                           &ActDoClient);
+                           &ActListenToPort);
 
-                DECLARE_PARAMETER("text", _("Adresse IP du serveur"), false, "")
-                MAIN_OBJECTS_IN_PARAMETER(0)
+                DECLARE_PARAMETER_OPTIONAL("expression", _("Port d'écoute (Par défaut : 50001)"), false, "")
 
             DECLARE_END_ACTION()
 
-            DECLARE_ACTION("ClientSendNumber",
+            DECLARE_ACTION("SendValue",
                            _("Envoyer une valeur"),
-                           _(""),
-                           _("Client"),
-                           _("Client"),
+                           _("Envoi une valeur aux destinataires"),
+                           _("Envoyer la valeur _PARAM1_ avec l'intitulé _PARAM0_ aux destinataires"),
+                           _("Réseau : Envoi"),
                            "res/actions/camera24.png",
                            "res/actions/camera.png",
-                           &ActClientSendValue);
+                           &ActSendValue);
 
                 DECLARE_PARAMETER("text", _("Groupe"), false, "")
                 DECLARE_PARAMETER("expression", _("Valeur"), false, "")
@@ -99,61 +103,104 @@ class Extension : public ExtensionBase
 
             DECLARE_END_ACTION()
 
-            DECLARE_ACTION("ServerSendNumber",
-                           _("Envoyer une valeur"),
-                           _(""),
-                           _("Serveur"),
-                           _("Serveur"),
+            DECLARE_ACTION("ReceivePackets",
+                           _("Recevoir les données en attente"),
+                           _("Reçois les données envoyées depuis d'autre ordinateurs.\nVous pouvez ensuite les consulter avec les expressions appropriées"),
+                           _("Recevoir les données"),
+                           _("Réseau : Reception"),
                            "res/actions/camera24.png",
                            "res/actions/camera.png",
-                           &ActServerSendValue);
-
-                DECLARE_PARAMETER("text", _("Groupe"), false, "")
-                DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                MAIN_OBJECTS_IN_PARAMETER(0)
+                           &ActReceivePackets);
 
             DECLARE_END_ACTION()
 
-            DECLARE_ACTION("ServerReceivePackets",
-                           _("Recevoir les paquets"),
-                           _(""),
-                           _("Serveur"),
-                           _("Serveur"),
-                           "res/actions/camera24.png",
-                           "res/actions/camera.png",
-                           &ActServerReceivePackets);
-
-                DECLARE_PARAMETER("text", _("Groupe"), false, "")
-                DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                MAIN_OBJECTS_IN_PARAMETER(0)
-
-            DECLARE_END_ACTION()
-
-            DECLARE_ACTION("ClientReceivePackets",
-                           _("Recevoir les paquets"),
-                           _(""),
-                           _("Client"),
-                           _("Client"),
-                           "res/actions/camera24.png",
-                           "res/actions/camera.png",
-                           &ActClientReceivePackets);
-
-                DECLARE_PARAMETER("text", _("Groupe"), false, "")
-                DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                MAIN_OBJECTS_IN_PARAMETER(0)
-
-            DECLARE_END_ACTION()
-
-            DECLARE_STR_EXPRESSION("GetReceivedDataString", _("Obtenir le texte d'une donnée"), _("Obtenir le texte contenu dans une donnée"), _("Données reçues"), "res/actions/scaleHeight.png", &ExpGetReceivedDataString)
+            DECLARE_STR_EXPRESSION("GetReceivedDataString", _("Obtenir le texte d'une donnée"), _("Obtenir le texte contenu dans une donnée"), _("Réseau : Reception"), "res/actions/scaleHeight.png", &ExpGetReceivedDataString)
                 DECLARE_PARAMETER("text", _("Nom de la donnée contenant le texte à récupérer"), false, "")
             DECLARE_END_STR_EXPRESSION()
 
-            DECLARE_EXPRESSION("GetReceivedDataValue", _("Obtenir la valeur d'une donnée"), _("Obtenir la valeur contenue dans une donnée"), _("Données reçues"), "res/texteicon.png", &ExpGetReceivedDataValue)
+            DECLARE_EXPRESSION("GetReceivedDataValue", _("Obtenir la valeur d'une donnée"), _("Obtenir la valeur contenue dans une donnée"), _("Réseau : Reception"), "res/texteicon.png", &ExpGetReceivedDataValue)
                 DECLARE_PARAMETER("text", _("Nom de la donnée contenant le texte à récupérer"), false, "")
             DECLARE_END_EXPRESSION()
 
-            DECLARE_STR_EXPRESSION("GetLastError", _("Dernière erreur survenue"), _("Obtenir le texte décrivant la dernière erreur survenue."), _("Erreurs"), "res/error.png", &ExpGetLastError)
+            DECLARE_STR_EXPRESSION("GetLastError", _("Dernière erreur survenue"), _("Obtenir le texte décrivant la dernière erreur survenue."), _("Réseau : Erreurs"), "res/error.png", &ExpGetLastError)
             DECLARE_END_STR_EXPRESSION()
+
+            DECLARE_AUTOMATISM("NetworkAutomatism",
+                      _("Mise à jour en réseau automatique"),
+                      _("NetworkUpdater"),
+                      _("Automatisme permettant de déplacer automatiquement les objets d'un jeu en réseau"),
+                      "",
+                      "res/physics32.png",
+                      NetworkAutomatism,
+                      SceneNetworkDatas)
+
+                DECLARE_AUTOMATISM_ACTION("SetAsSender",
+                               _("Mettre en envoi de données"),
+                               _("L'automatisme enverra les données de ses objets.\nAssurez vous d'avoir généré les identifiants des objets auparavant"),
+                               _("Mettre _PARAM0_ en envoi de données"),
+                               _("Comportement"),
+                               "res/actions/camera24.png",
+                               "res/actions/camera.png",
+                               &NetworkAutomatism::ActSetAsSender);
+
+                    DECLARE_PARAMETER("object", _("Object"), true, "")
+                    DECLARE_PARAMETER("automatism", _("Automatism"), false, "NetworkAutomatism")
+                    MAIN_OBJECTS_IN_PARAMETER(0)
+
+                DECLARE_END_AUTOMATISM_ACTION()
+
+                DECLARE_AUTOMATISM_ACTION("SetAsReceiver",
+                               _("Mettre en réception de données"),
+                               _("L'automatisme recevra les données et mettera à jours les objets.\nAssurez vous d'avoir généré les identifiants des objets auparavant"),
+                               _("Mettre _PARAM0_ en réception de données"),
+                               _("Comportement"),
+                               "res/actions/camera24.png",
+                               "res/actions/camera.png",
+                               &NetworkAutomatism::ActSetAsReceiver);
+
+                    DECLARE_PARAMETER("object", _("Object"), true, "")
+                    DECLARE_PARAMETER("automatism", _("Automatism"), false, "NetworkAutomatism")
+                    MAIN_OBJECTS_IN_PARAMETER(0)
+
+                DECLARE_END_AUTOMATISM_ACTION()
+
+                DECLARE_AUTOMATISM_ACTION("SetIdentifier",
+                               _("Changer l'identifiant de l'objet"),
+                               _("Chaque objet nécessite un identifiant unique, le même sur tous les ordinateurs, afin d'être identifié et mis à jour"),
+                               _("Mettre l'identifiant de _PARAM0_ à _PARAM2_"),
+                               _("Comportement"),
+                               "res/actions/camera24.png",
+                               "res/actions/camera.png",
+                               &NetworkAutomatism::ActSetIdentifier);
+
+                    DECLARE_PARAMETER("object", _("Object"), true, "")
+                    DECLARE_PARAMETER("automatism", _("Automatism"), false, "NetworkAutomatism")
+                    DECLARE_PARAMETER("expression", _("Identifiant"), false, "")
+                    MAIN_OBJECTS_IN_PARAMETER(0)
+
+                DECLARE_END_AUTOMATISM_ACTION()
+
+                DECLARE_AUTOMATISM_EXPRESSION("GetIdentifier", _("Obtenir l'identifiant de l'objet"), _("Obtenir l'identifiant de l'objet"), _("Automatisme Mise à jour en réseau automatique"), "res/texteicon.png", &NetworkAutomatism::ExpGetIdentifier)
+                    DECLARE_PARAMETER("object", _("Objet"), true, "")
+                    DECLARE_PARAMETER("automatism", _("Automatisme"), false, "NetworkAutomatism")
+                DECLARE_END_AUTOMATISM_EXPRESSION()
+
+            DECLARE_END_AUTOMATISM()
+
+            DECLARE_ACTION("GenerateObjectNetworkId",
+                           _("Générer les identifiants des objets"),
+                           _("Génère automatiquement des identifiants différents pour les objets indiqués.\nNotez qu'il est préférable d'utiliser cette action en début de scène par exemple, pour assurer que les objets aient\nbien les mêmes identifiants sur les différents ordinateurs."),
+                           _("Générer des identifiants réseau unique pour _PARAM0_"),
+                           _("Automatisme Mise à jour en réseau automatique"),
+                           "res/actions/camera24.png",
+                           "res/actions/camera.png",
+                           &ActGenereateObjectNetworkId);
+
+                DECLARE_PARAMETER("object", _("Object"), true, "")
+                DECLARE_PARAMETER("automatism", _("Automatism"), false, "NetworkAutomatism")
+                MAIN_OBJECTS_IN_PARAMETER(0)
+
+            DECLARE_END_ACTION()
 
             CompleteCompilationInformation();
         };

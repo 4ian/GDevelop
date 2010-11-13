@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,47 +24,24 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef RECEIVEDDATAMANAGER_H
-#define RECEIVEDDATAMANAGER_H
-#include <map>
-#include <string>
+#ifndef RUNTIMESCENENETWORKDATAS_H
+#define RUNTIMESCENENETWORKDATAS_H
+
+#include <iostream>
+#include "GDL/AutomatismsRuntimeSharedDatas.h"
+class SceneNetworkDatas;
 
 /**
- * Singleton where is stocked receveid data from other peers.
+ * Datas shared by Network Automatism at runtime
  */
-class ReceivedDataManager
+class RuntimeSceneNetworkDatas : public AutomatismsRuntimeSharedDatas
 {
     public:
+        RuntimeSceneNetworkDatas(const SceneNetworkDatas & automatismSharedDatas);
+        virtual ~RuntimeSceneNetworkDatas();
+        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneNetworkDatas(*this));}
 
-    static ReceivedDataManager *getInstance()
-    {
-        if ( !_singleton )
-        {
-            _singleton = new ReceivedDataManager;
-        }
-
-        return ( static_cast<ReceivedDataManager*>( _singleton ) );
-    }
-
-    static void kill()
-    {
-        if ( _singleton )
-        {
-            delete _singleton;
-            _singleton = 0;
-        }
-    }
-
-    std::map<std::string, double> values;
-    std::map<std::string, std::string> strings;
-
-    protected:
     private:
-
-    ReceivedDataManager() {};
-    ~ReceivedDataManager() {};
-
-    static ReceivedDataManager *_singleton;
 };
 
-#endif // RECEIVEDDATAMANAGER_H
+#endif // RUNTIMESCENENETWORKDATAS_H

@@ -116,7 +116,7 @@ bool ActTourneVers( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
         float angle = atan2(
         (obj2->GetDrawableY() + obj2->GetCenterY()) - ((*obj)->GetDrawableY()+(*obj)->GetCenterY()),
         (obj2->GetDrawableX() + obj2->GetCenterX()) - ((*obj)->GetDrawableX()+(*obj)->GetCenterX())
-        ) * 180 / 3.14;
+        ) * 180 / 3.14159;
 
         boost::static_pointer_cast<SpriteObject>(*obj)->SetAngle(angle);
     }
@@ -132,7 +132,7 @@ bool SpriteObject::ActTourneVersPos( RuntimeScene & scene, ObjectsConcerned & ob
 	//Work around for a Visual C++ internal compiler error (!)
 	double y = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()) - (GetDrawableY()+GetCenterY());
 	double x = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()) - (GetDrawableX()+GetCenterX());
-    float angle = atan2(y,x) * 180 / 3.14;
+    float angle = atan2(y,x) * 180 / 3.14159;
 
     SetAngle(angle);
     return true;

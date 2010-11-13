@@ -116,11 +116,11 @@ bool ActMettreAutour( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     for ( ; obj != obj_end; ++obj )
     {
         (*obj)->SetX( (obj2)->GetDrawableX()+(obj2)->GetCenterX()
-                                               + cos(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, obj2 )/180*3.14)*action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, obj2 )
+                                               + cos(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, obj2 )/180*3.14159)*action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, obj2 )
                                                - (*obj)->GetCenterX() );
 
         (*obj)->SetY( (obj2)->GetDrawableY()+(obj2)->GetCenterY()
-                                               + sin(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, obj2 )/180*3.14)*action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, obj2 )
+                                               + sin(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, obj2 )/180*3.14159)*action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, *obj, obj2 )
                                                - (*obj)->GetCenterY() );
     }
 
@@ -141,11 +141,11 @@ bool ActMettreAutour( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
 bool Object::ActMettreAutourPos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )
-                                           + cos(action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )/180*3.14)*action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )
+                                           + cos(action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )/180*3.14159)*action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )
                                            - GetCenterX() );
 
     SetY( action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )
-                                           + sin(action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )/180*3.14)*action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )
+                                           + sin(action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )/180*3.14159)*action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )
                                            - GetCenterY() );
 
     return true;

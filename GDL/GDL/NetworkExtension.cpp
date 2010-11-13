@@ -4,7 +4,7 @@
 NetworkExtension::NetworkExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinNetwork",
-                          _("Fonctionnalités réseau"),
+                          _("Fonctionnalités internet basiques"),
                           _("Extension pour utiliser internet, integrée en standard"),
                           "Compil Games",
                           "Freeware")

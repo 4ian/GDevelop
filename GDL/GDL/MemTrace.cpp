@@ -1,5 +1,6 @@
 #include "GDL/MemTrace.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 
 
@@ -38,7 +39,7 @@ void MemTrace::Rapport()
     printf("\n------------------");
     for( unsigned int i = 0;i < adresse.size();i++)
     {
-        printf("\nUn \"%s\" non libéré ( adresse : %d)", nom.at(i).c_str(), adresse.at(i));
+        printf("\nUn \"%s\" non libéré ( adresse : %ld)", nom.at(i).c_str(), adresse.at(i));
     }
     printf("\n------------------\n");
 }

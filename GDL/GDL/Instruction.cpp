@@ -13,14 +13,14 @@ Instruction::Instruction(string type_) :
 function(NULL),
 objectFunction(NULL),
 automatismFunction(NULL),
+#if defined(GDE)
+renderedHeightNeedUpdate(true),
+renderedHeight(0),
+selected(false),
+#endif
 type(type_),
 isLocal(true),
 inverted(false)
-#if defined(GDE)
-,renderedHeightNeedUpdate(true),
-renderedHeight(0),
-selected(false)
-#endif
 {
     //ctor
     parameters.reserve(8);
@@ -30,15 +30,15 @@ Instruction::Instruction(string type_, const vector <GDExpression> & parameters_
 function(NULL),
 objectFunction(NULL),
 automatismFunction(NULL),
+#if defined(GDE)
+renderedHeightNeedUpdate(true),
+renderedHeight(0),
+selected(false),
+#endif
 type(type_),
 isLocal(isLocal_),
 inverted(inverted_),
 parameters(parameters_)
-#if defined(GDE)
-,renderedHeightNeedUpdate(true),
-renderedHeight(0),
-selected(false)
-#endif
 {
     parameters.reserve(8);
 }

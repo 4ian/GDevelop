@@ -36,11 +36,11 @@
 					<Add option="-lws2_32" />
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
-					<Add option="-lsfml-audio-d.dll" />
-					<Add option="-lsfml-graphics-d.dll" />
-					<Add option="-lsfml-window-d.dll" />
-					<Add option="-lsfml-network-d.dll" />
-					<Add option="-lsfml-system-d.dll" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-system-d" />
 					<Add option="-lgmon" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
@@ -99,11 +99,11 @@
 					<Add option="-lwxjpegd" />
 					<Add option="-lwxzlibd" />
 					<Add option="-lwxtiffd" />
-					<Add option="-lsfml-audio-d.dll" />
-					<Add option="-lsfml-graphics-d.dll" />
-					<Add option="-lsfml-window-d.dll" />
-					<Add option="-lsfml-network-d.dll" />
-					<Add option="-lsfml-system-d.dll" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-system-d" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
 					<Add option="-luuid" />
@@ -149,11 +149,11 @@
 					<Add option="-lws2_32" />
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
@@ -210,11 +210,11 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
 					<Add option="-luuid" />
@@ -260,11 +260,11 @@
 					<Add option="-lws2_32" />
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
@@ -322,11 +322,11 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
 					<Add option="-lkernel32" />
 					<Add option="-luser32" />
 					<Add option="-luuid" />
@@ -388,7 +388,7 @@
 			<Target title="Linux - Release - Edittime">
 				<Option platforms="Windows;Unix;" />
 				<Option output="..\IDE\bin\release\libgdl.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="obj\Release\" />
+				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -434,7 +434,7 @@
 			<Target title="Linux - Debug - Edittime">
 				<Option platforms="Windows;Unix;" />
 				<Option output="..\IDE\bin\debug\libgdl.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="obj\Debug\" />
+				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -475,6 +475,47 @@
 					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
 				</Linker>
 			</Target>
+			<Target title="Linux - Debug">
+				<Option platforms="Windows;Unix;" />
+				<Option output="..\Runtime\bin\debug\libgdl.so" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Debug\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option="-DGDP" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
+					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-lsfml2-audio" />
+					<Add option="-lsfml2-graphics" />
+					<Add option="-lsfml2-window" />
+					<Add option="-lsfml2-network" />
+					<Add option="-lsfml2-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGLU" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add option="-g" />
+					<Add option="-pg" />
+					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add directory="..\GDL\" />
@@ -484,7 +525,8 @@
 			<Add directory="C:\Libs\SFML\include" />
 		</Compiler>
 		<Linker>
-			<Add directory="C:\Libs\SFML\lib\mingw" />
+			<Add directory="C:\Libs\SFML\bin-mingw-debug\lib" />
+			<Add directory="C:\Libs\SFML\bin-mingw-release\lib" />
 		</Linker>
 		<Unit filename="GDL\AES.cpp">
 			<Option virtualFolder="AES\" />
@@ -875,19 +917,19 @@
 			</AutoVersioning>
 			<wxsmith version="1">
 				<resources>
-					<wxPanel wxs="wxsmith/EditorImages.wxs" src="GDL/EditorImages.cpp" hdr="GDL/EditorImages.h" name="EditorImages" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseObject.wxs" src="GDL/ChooseObject.cpp" hdr="GDL/ChooseObject.h" name="ChooseObject" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseLayer.wxs" src="GDL/ChooseLayer.cpp" hdr="GDL/ChooseLayer.h" name="ChooseLayer" language="CPP" />
-					<wxDialog wxs="wxsmith/EditLink.wxs" src="GDL/EditLink.cpp" hdr="GDL/EditLink.h" name="EditLink" language="CPP" />
-					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDL/EditComment.cpp" hdr="GDL/EditComment.h" name="EditComment" language="CPP" />
-					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDL/EditForEachEvent.cpp" hdr="GDL/EditForEachEvent.h" name="EditForEachEvent" language="CPP" />
-					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDL/EditRepeatEvent.cpp" hdr="GDL/EditRepeatEvent.h" name="EditRepeatEvent" language="CPP" />
-					<wxDialog wxs="wxsmith/EditExpression.wxs" src="GDL/EditExpression.cpp" hdr="GDL/EditExpression.h" name="EditExpression" language="CPP" />
-					<wxDialog wxs="wxsmith/EditorObjet.wxs" src="GDL/EditorObjet.cpp" hdr="GDL/EditorObjet.h" name="EditorObjet" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseVariableDialog.wxs" src="GDL/ChooseVariableDialog.cpp" hdr="GDL/ChooseVariableDialog.h" name="ChooseVariableDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/EditTextDialog.wxs" src="GDL/EditTextDialog.cpp" hdr="GDL/EditTextDialog.h" name="EditTextDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseAutomatismDlg.wxs" src="GDL/ChooseAutomatismDlg.cpp" hdr="GDL/ChooseAutomatismDlg.h" name="ChooseAutomatismDlg" language="CPP" />
-					<wxDialog wxs="wxsmith/PropImage.wxs" src="GDL/PropImage.cpp" hdr="GDL/PropImage.h" name="PropImage" language="CPP" />
+					<wxPanel wxs="wxsmith/EditorImages.wxs" src="GDL/EditorImages.cpp" hdr="GDL/EditorImages.h" fwddecl="0" i18n="1" name="EditorImages" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseObject.wxs" src="GDL/ChooseObject.cpp" hdr="GDL/ChooseObject.h" fwddecl="0" i18n="1" name="ChooseObject" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseLayer.wxs" src="GDL/ChooseLayer.cpp" hdr="GDL/ChooseLayer.h" fwddecl="0" i18n="1" name="ChooseLayer" language="CPP" />
+					<wxDialog wxs="wxsmith/EditLink.wxs" src="GDL/EditLink.cpp" hdr="GDL/EditLink.h" fwddecl="0" i18n="1" name="EditLink" language="CPP" />
+					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDL/EditComment.cpp" hdr="GDL/EditComment.h" fwddecl="0" i18n="1" name="EditComment" language="CPP" />
+					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDL/EditForEachEvent.cpp" hdr="GDL/EditForEachEvent.h" fwddecl="0" i18n="1" name="EditForEachEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDL/EditRepeatEvent.cpp" hdr="GDL/EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/EditExpression.wxs" src="GDL/EditExpression.cpp" hdr="GDL/EditExpression.h" fwddecl="0" i18n="1" name="EditExpression" language="CPP" />
+					<wxDialog wxs="wxsmith/EditorObjet.wxs" src="GDL/EditorObjet.cpp" hdr="GDL/EditorObjet.h" fwddecl="0" i18n="1" name="EditorObjet" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseVariableDialog.wxs" src="GDL/ChooseVariableDialog.cpp" hdr="GDL/ChooseVariableDialog.h" fwddecl="0" i18n="1" name="ChooseVariableDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditTextDialog.wxs" src="GDL/EditTextDialog.cpp" hdr="GDL/EditTextDialog.h" fwddecl="0" i18n="1" name="EditTextDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseAutomatismDlg.wxs" src="GDL/ChooseAutomatismDlg.cpp" hdr="GDL/ChooseAutomatismDlg.h" fwddecl="0" i18n="1" name="ChooseAutomatismDlg" language="CPP" />
+					<wxDialog wxs="wxsmith/PropImage.wxs" src="GDL/PropImage.cpp" hdr="GDL/PropImage.h" fwddecl="0" i18n="1" name="PropImage" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

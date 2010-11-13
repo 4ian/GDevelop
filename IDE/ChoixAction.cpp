@@ -104,7 +104,7 @@ scene(scene_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxBoxSizer* BoxSizer3;
-	
+
 	Create(parent, wxID_ANY, _("Editer l\'action"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	SetClientSize(wxSize(717,396));
 	SetMinSize(wxSize(640,480));
@@ -216,7 +216,7 @@ scene(scene_)
 	SetSizer(BoxSizer6);
 	BoxSizer6->SetSizeHints(this);
 	Center();
-	
+
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnActionsTreeSelectionChanged);
 	Connect(ID_TREECTRL2,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnObjetsListSelectionChanged);
 	Connect(ID_TREECTRL3,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnObjetsListSelectionChanged);
@@ -392,8 +392,6 @@ void ChoixAction::RefreshList()
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
                 ActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
             }
-
-            if ( !ActionsTree->HasChildren(objectTypeItem) ) ActionsTree->Delete(objectTypeItem);
 	    }
 
 	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
@@ -433,8 +431,6 @@ void ChoixAction::RefreshList()
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
                 ActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
             }
-
-            if ( !ActionsTree->HasChildren(automatismTypeItem) ) ActionsTree->Delete(automatismTypeItem);
 	    }
 
         //Add each (free) actions
@@ -454,6 +450,7 @@ void ChoixAction::RefreshList()
             {
                 groupItem = ActionsTree->GetNextSibling(groupItem);
             }
+            std::cout << "Add with it->second.group " << it->second.group << std::endl;
             if ( !groupItem.IsOk() ) groupItem = ActionsTree->AppendItem(extensionItem, it->second.group, 0);
 
             //Add action item
@@ -465,8 +462,11 @@ void ChoixAction::RefreshList()
             }
 
             gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+            cout << "groupItem" << groupItem << "extensionItem" << extensionItem;
             ActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
         }
+
+        if ( !ActionsTree->HasChildren(extensionItem) ) ActionsTree->Delete(extensionItem);
 	}
 }
 

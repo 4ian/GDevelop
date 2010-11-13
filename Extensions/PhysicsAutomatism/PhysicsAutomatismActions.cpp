@@ -126,7 +126,7 @@ bool PhysicsAutomatism::ActApplyForce( RuntimeScene & scene, ObjectsConcerned & 
  */
 bool PhysicsAutomatism::ActApplyForceUsingPolarCoordinates( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    float angle = -action.GetParameter(2).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject())/180.0f*3.14f;
+    float angle = -action.GetParameter(2).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject())/180.0f*3.14159f;
     float length = action.GetParameter(3).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject());
 
     if ( !body ) CreateBody(scene);

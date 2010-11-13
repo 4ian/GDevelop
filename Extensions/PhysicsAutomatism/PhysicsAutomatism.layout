@@ -1,35 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
-	<File name="Box2D\Box2D\Box2D\Box2D.h" open="0" top="0" tabpos="0">
-		<Cursor position="902" topLine="27" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2CircleShape.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="596" topLine="0" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.h" open="0" top="0" tabpos="0">
-		<Cursor position="1165" topLine="8" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Common\b2Math.h" open="0" top="0" tabpos="0">
-		<Cursor position="3435" topLine="127" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Common\b2Settings.h" open="0" top="0" tabpos="0">
-		<Cursor position="1383" topLine="80" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\Joints\b2Joint.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="4351" topLine="151" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="1444" topLine="8" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.h" open="0" top="0" tabpos="6">
-		<Cursor position="4015" topLine="104" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\b2Fixture.h" open="0" top="0" tabpos="0">
-		<Cursor position="1081" topLine="39" />
+	<ActiveTarget name="Release - Edittime" />
+	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2ContactSolver.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="17243" topLine="565" />
 	</File>
 	<File name="Box2D\Box2D\Box2D\Dynamics\b2World.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="2802" topLine="73" />
+		<Cursor position="20413" topLine="881" />
 	</File>
 	<File name="ContactListener.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="639" topLine="0" />
@@ -37,20 +13,20 @@
 	<File name="ContactListener.h" open="0" top="0" tabpos="4">
 		<Cursor position="238" topLine="0" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="1863" topLine="34" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="23515" topLine="40" />
 	</File>
-	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="5210" topLine="116" />
+	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="6024" topLine="138" />
 	</File>
 	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="2">
-		<Cursor position="4992" topLine="79" />
+		<Cursor position="5971" topLine="105" />
 	</File>
 	<File name="PhysicsAutomatismActions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="9557" topLine="247" />
+		<Cursor position="3742" topLine="110" />
 	</File>
-	<File name="PhysicsAutomatismConditions.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="9963" topLine="120" />
+	<File name="PhysicsAutomatismConditions.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="9820" topLine="125" />
 	</File>
 	<File name="PhysicsAutomatismEditor.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="16275" topLine="239" />
@@ -78,5 +54,8 @@
 	</File>
 	<File name="..\..\GDL\GDL\tinyxml.h" open="0" top="0" tabpos="0">
 		<Cursor position="743" topLine="87" />
+	</File>
+	<File name="..\..\GDL\GDL\tinyxmlparser.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="9006" topLine="338" />
 	</File>
 </CodeBlocks_layout_file>

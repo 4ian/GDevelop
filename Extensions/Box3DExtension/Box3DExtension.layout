@@ -8,7 +8,7 @@
 		<Cursor position="999" topLine="27" />
 	</File>
 	<File name="Box3DExpressions.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="2030" topLine="21" />
+		<Cursor position="1332" topLine="21" />
 	</File>
 	<File name="Box3DInitialPositionPanel.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="969" topLine="0" />
@@ -16,20 +16,20 @@
 	<File name="Box3DInitialPositionPanel.h" open="0" top="0" tabpos="0">
 		<Cursor position="969" topLine="0" />
 	</File>
-	<File name="Box3DObject.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="13862" topLine="354" />
+	<File name="Box3DObject.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="6677" topLine="194" />
 	</File>
 	<File name="Box3DObject.h" open="0" top="0" tabpos="1">
-		<Cursor position="6882" topLine="125" />
+		<Cursor position="3742" topLine="80" />
 	</File>
 	<File name="Box3DObjectEditor.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="14441" topLine="170" />
+		<Cursor position="15349" topLine="210" />
 	</File>
 	<File name="Box3DObjectEditor.h" open="0" top="0" tabpos="2">
-		<Cursor position="3649" topLine="111" />
+		<Cursor position="1366" topLine="15" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="12894" topLine="247" />
+		<Cursor position="14490" topLine="283" />
 	</File>
 	<File name="..\..\GDL\GDL\tinyxmlparser.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="9006" topLine="339" />

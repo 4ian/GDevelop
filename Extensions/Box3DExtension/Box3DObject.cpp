@@ -192,12 +192,12 @@ void Box3DObject::SaveToXml(TiXmlElement * object)
 
 bool Box3DObject::LoadResources(const ImageManager & imageMgr )
 {
-    frontTexture =  imageMgr.GetImage(frontTextureName);
-    topTexture =    imageMgr.GetImage(topTextureName);
-    bottomTexture = imageMgr.GetImage(bottomTextureName) ;
-    leftTexture =   imageMgr.GetImage(leftTextureName);
-    rightTexture =  imageMgr.GetImage(rightTextureName);
-    backTexture =   imageMgr.GetImage(backTextureName);
+    frontTexture =  imageMgr.GetSFMLImage(frontTextureName);
+    topTexture =    imageMgr.GetSFMLImage(topTextureName);
+    bottomTexture = imageMgr.GetSFMLImage(bottomTextureName) ;
+    leftTexture =   imageMgr.GetSFMLImage(leftTextureName);
+    rightTexture =  imageMgr.GetSFMLImage(rightTextureName);
+    backTexture =   imageMgr.GetSFMLImage(backTextureName);
 
     return true;
 }
@@ -241,7 +241,7 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glRotatef(window.GetView().GetRotation(), 0, 0, 1);
-    glTranslatef(x, y, -100+zPosition*0.3125);
+    glTranslatef(x, y, -100+zPosition*0.3125); //Note : If -100 is changed to -50, 200.f must be changed to 100.f in x and y for example.
 
     //Prepare size of the renderered box
     float sizeWidth =   width * sizeRatio;
@@ -400,7 +400,7 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
 
 bool Box3DObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
 {
-    thumbnail = wxBitmap("Extensions/Box3Dicon.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("Extensions/Box3Dicon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }

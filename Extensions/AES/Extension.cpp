@@ -27,6 +27,7 @@ freely, subject to the following restrictions:
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
 #include "AESActions.h"
+#include "AESExpressions.h"
 #include <boost/version.hpp>
 
 /**
@@ -78,6 +79,17 @@ class Extension : public ExtensionBase
                 MAIN_OBJECTS_IN_PARAMETER(0)
 
             DECLARE_END_ACTION()
+            /*
+            DECLARE_STR_EXPRESSION("Encrypt", _("Crypter"), _("Crypter"), _("Cryptage"), "res/actions/scaleHeight.png", &ExpEncrypt)
+                DECLARE_PARAMETER("text", _("Texte à crypter"), false, "")
+                DECLARE_PARAMETER("text", _("Mot de passe ( 24 caractères )"), false, "")
+            DECLARE_END_STR_EXPRESSION()
+
+            DECLARE_STR_EXPRESSION("Decrypt", _("Decrypter"), _("Decrypter"), _("Cryptage"), "res/actions/scaleHeight.png", &ExpDecrypt)
+                DECLARE_PARAMETER("text", _("Texte à décrypter"), false, "")
+                DECLARE_PARAMETER("text", _("Mot de passe ( 24 caractères )"), false, "")
+            DECLARE_END_STR_EXPRESSION()
+            */
 
             CompleteCompilationInformation();
         };

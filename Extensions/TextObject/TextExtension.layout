@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug - Edittime" />
-	<File name="Extension.cpp" open="1" top="1" tabpos="6">
-		<Cursor position="10757" topLine="200" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="1758" topLine="32" />
 	</File>
 	<File name="TextActions.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="5079" topLine="89" />
@@ -10,19 +10,22 @@
 	<File name="TextConditions.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="6416" topLine="69" />
 	</File>
-	<File name="TextExpressions.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="1165" topLine="11" />
+	<File name="TextExpressions.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="1752" topLine="11" />
 	</File>
-	<File name="TextObject.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="4084" topLine="89" />
+	<File name="TextObject.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="4976" topLine="153" />
 	</File>
-	<File name="TextObject.h" open="1" top="0" tabpos="4">
-		<Cursor position="3507" topLine="81" />
+	<File name="TextObject.h" open="0" top="0" tabpos="2">
+		<Cursor position="4764" topLine="101" />
 	</File>
 	<File name="TextObjectEditor.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="7434" topLine="134" />
 	</File>
 	<File name="TextObjectEditor.h" open="0" top="0" tabpos="1">
 		<Cursor position="2482" topLine="63" />
+	</File>
+	<File name="..\..\GDL\GDL\tinyxmlparser.cpp" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

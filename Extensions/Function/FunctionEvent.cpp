@@ -215,7 +215,7 @@ void FunctionEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
 
     //Test selection for the name
-    if ( y <= forEachTextHeight )
+    if ( y >= 0 && y <= forEachTextHeight )
     {
         nameSelected = true;
         return;
@@ -306,7 +306,7 @@ void FunctionEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int wi
     }
 
     //Name Selection
-    if ( nameSelected )
+    if ( selected && nameSelected )
     {
         dc.SetBrush(renderingHelper->GetSelectedRectangleFillBrush());
         dc.SetPen(renderingHelper->GetSelectedRectangleOutlinePen());

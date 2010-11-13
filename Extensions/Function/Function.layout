@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release - Edittime" />
+	<ActiveTarget name="Debug - Edittime" />
 	<File name="Extension.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="4191" topLine="57" />
+		<Cursor position="4191" topLine="89" />
 	</File>
 	<File name="FunctionActions.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="2627" topLine="55" />
@@ -10,8 +10,8 @@
 	<File name="FunctionActions.h" open="0" top="0" tabpos="2">
 		<Cursor position="1276" topLine="2" />
 	</File>
-	<File name="FunctionEvent.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="7092" topLine="203" />
+	<File name="FunctionEvent.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="7336" topLine="209" />
 	</File>
 	<File name="FunctionEvent.h" open="0" top="0" tabpos="1">
 		<Cursor position="5594" topLine="100" />
@@ -21,5 +21,8 @@
 	</File>
 	<File name="FunctionExpressions.h" open="0" top="0" tabpos="4">
 		<Cursor position="1126" topLine="6" />
+	</File>
+	<File name="..\..\GDL\GDL\tinyxmlparser.cpp" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

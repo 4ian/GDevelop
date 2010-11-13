@@ -64,6 +64,7 @@ class EditorScene: public wxPanel
 		wxPanel* Panel2;
 		wxMenuItem* zoom500;
 		wxMenuItem* zoom150;
+		wxMenuItem* zoom5;
 		//*)
 		EditorObjets *  objectsEditor;
 		EditorLayers *  layersEditor;
@@ -133,6 +134,7 @@ class EditorScene: public wxPanel
         static const long idRibbonOrigine;
         static const long idRibbonOriginalZoom;
         static const long idRibbonGrid;
+        static const long idRibbonWindowMask;
         static const long idRibbonGridSetup;
         static const long idRibbonUndo;
         static const long idRibbonRedo;
@@ -173,6 +175,7 @@ class EditorScene: public wxPanel
 		void Onzoom500Selected(wxCommandEvent& event);
 		void Onzoom5Selected(wxCommandEvent& event);
 		//*)
+        void OnWindowMaskBtClick( wxCommandEvent & event );
         void UpdateSceneCanvasSize(int parentPanelWidht, int parentPanelHeight);
         void UpdateScenePanelSize(int parentPanelWidht, int parentPanelHeight);
 

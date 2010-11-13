@@ -50,6 +50,7 @@ class EdittimeScene : public RuntimeScene
         int gridR;
         int gridG;
         int gridB;
+        bool windowMask;
 
         //Déplacement d'objets
         bool isMovingObject;

@@ -964,7 +964,7 @@ void SceneCanvas::OnMouseWheel( wxMouseEvent &event )
         return;
 
     //La rotation de la molette
-    float rotation = event.GetWheelRotation();
+    float rotation = event.GetWheelRotation()*3;
     scene.zoom += ( rotation / 25 );
 
     //Le rapport entre la largeur et la hauteur

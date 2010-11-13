@@ -61,11 +61,11 @@
 					<Add option="-lwxjpegd" />
 					<Add option="-lwxzlibd" />
 					<Add option="-lwxtiffd" />
-					<Add option="-lsfml-audio-d.dll" />
-					<Add option="-lsfml-graphics-d.dll" />
-					<Add option="-lsfml-network-d.dll" />
-					<Add option="-lsfml-window-d.dll" />
-					<Add option="-lsfml-system-d.dll" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="libkernel32.a" />
@@ -87,7 +87,7 @@
 					<Add directory="bin\debug" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
-					<Add directory="c:\Libs\SFML\lib\mingw" />
+					<Add directory="C:\Libs\SFML\bin-mingw-debug\lib" />
 					<Add directory="C:\Libs\SFML\extlibs\libs-mingw" />
 				</Linker>
 			</Target>
@@ -143,11 +143,11 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lopenal32" />
 					<Add option="-lsndfile" />
 					<Add option="-lfreetype" />
@@ -172,8 +172,8 @@
 					<Add directory="bin\release" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll" />
-					<Add directory="c:\Libs\SFML\lib\mingw" />
 					<Add directory="C:\Libs\SFML\extlibs\libs-mingw" />
+					<Add directory="C:\Libs\SFML\bin-mingw-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
@@ -231,11 +231,11 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add option="-lsfml-audio.dll" />
-					<Add option="-lsfml-graphics.dll" />
-					<Add option="-lsfml-network.dll" />
-					<Add option="-lsfml-window.dll" />
-					<Add option="-lsfml-system.dll" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="libkernel32.a" />
@@ -257,7 +257,7 @@
 					<Add directory="bin\dev" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll" />
-					<Add directory="c:\Libs\SFML\lib\mingw" />
+					<Add directory="C:\Libs\SFML\bin-mingw-release\lib" />
 					<Add directory="C:\Libs\SFML\extlibs\libs-mingw" />
 				</Linker>
 				<ExtraCommands>
@@ -710,8 +710,6 @@
 		<Unit filename="MyStatusBar.h">
 			<Option virtualFolder="LIB MyStatusBar\" />
 		</Unit>
-		<Unit filename="ObjectListPanel.cpp" />
-		<Unit filename="ObjectListPanel.h" />
 		<Unit filename="ObjectTypeChoice.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\Editeur objets\" />
 		</Unit>
@@ -900,7 +898,6 @@
 					<wxPanel wxs="wxsmith/StartHerePage.wxs" src="StartHerePage.cpp" hdr="StartHerePage.h" fwddecl="0" i18n="1" name="StartHerePage" language="CPP" />
 					<wxPanel wxs="wxsmith/ExternalEventsEditor.wxs" src="ExternalEventsEditor.cpp" hdr="ExternalEventsEditor.h" fwddecl="0" i18n="1" name="ExternalEventsEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/AutomatismTypeChoice.wxs" src="AutomatismTypeChoice.cpp" hdr="AutomatismTypeChoice.h" fwddecl="0" i18n="1" name="AutomatismTypeChoice" language="CPP" />
-					<wxPanel wxs="wxsmith/ObjectListPanel.wxs" src="ObjectListPanel.cpp" hdr="ObjectListPanel.h" fwddecl="0" i18n="1" name="ObjectListPanel" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

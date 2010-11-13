@@ -48,6 +48,9 @@ const long Preferences::ID_STATICTEXT8 = wxNewId();
 const long Preferences::ID_TEXTCTRL4 = wxNewId();
 const long Preferences::ID_BUTTON4 = wxNewId();
 const long Preferences::ID_PANEL7 = wxNewId();
+const long Preferences::ID_STATICTEXT15 = wxNewId();
+const long Preferences::ID_CHOICE1 = wxNewId();
+const long Preferences::ID_PANEL16 = wxNewId();
 const long Preferences::ID_BUTTON6 = wxNewId();
 const long Preferences::ID_BUTTON7 = wxNewId();
 const long Preferences::ID_BUTTON8 = wxNewId();
@@ -108,7 +111,10 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer15;
     wxFlexGridSizer* FlexGridSizer18;
     wxFlexGridSizer* FlexGridSizer8;
+    wxFlexGridSizer* FlexGridSizer21;
     wxFlexGridSizer* FlexGridSizer14;
+    wxStaticBoxSizer* StaticBoxSizer11;
+    wxFlexGridSizer* FlexGridSizer20;
     wxFlexGridSizer* FlexGridSizer13;
     wxFlexGridSizer* FlexGridSizer12;
     wxFlexGridSizer* FlexGridSizer6;
@@ -209,6 +215,21 @@ changesNeedRestart(false)
     Panel3->SetSizer(FlexGridSizer15);
     FlexGridSizer15->Fit(Panel3);
     FlexGridSizer15->SetSizeHints(Panel3);
+    Panel6 = new wxPanel(Listbook1, ID_PANEL16, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL16"));
+    FlexGridSizer20 = new wxFlexGridSizer(0, 3, 0, 0);
+    StaticBoxSizer11 = new wxStaticBoxSizer(wxHORIZONTAL, Panel6, _("Editeur de scènes"));
+    FlexGridSizer21 = new wxFlexGridSizer(0, 3, 0, 0);
+    StaticText15 = new wxStaticText(Panel6, ID_STATICTEXT15, _("Onglet \"Scène/Evenements\" :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT15"));
+    FlexGridSizer21->Add(StaticText15, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    sceneEventsTabPosition = new wxChoice(Panel6, ID_CHOICE1, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
+    sceneEventsTabPosition->Append(_("En haut"));
+    sceneEventsTabPosition->SetSelection( sceneEventsTabPosition->Append(_("En bas")) );
+    FlexGridSizer21->Add(sceneEventsTabPosition, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer11->Add(FlexGridSizer21, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    FlexGridSizer20->Add(StaticBoxSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Panel6->SetSizer(FlexGridSizer20);
+    FlexGridSizer20->Fit(Panel6);
+    FlexGridSizer20->SetSizeHints(Panel6);
     Panel4 = new wxPanel(Listbook1, ID_PANEL8, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL8"));
     FlexGridSizer16 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer16->AddGrowableCol(0);
@@ -297,6 +318,7 @@ changesNeedRestart(false)
     Listbook1->AddPage(Panel2, _("Général"), false);
     Listbook1->AddPage(Panel5, _("Langue"), false);
     Listbook1->AddPage(Panel3, _("Répertoires"), false);
+    Listbook1->AddPage(Panel6, _("Positionnements par défaut"), false);
     Listbook1->AddPage(Panel4, _("Apparence"), false);
     FlexGridSizer1->Add(Listbook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
@@ -491,6 +513,13 @@ changesNeedRestart(false)
         autosaveTimeEdit->ChangeValue( ToString(static_cast<float>(time)/60.0f/1000.0f) );
         autosaveActivatedCheck->SetValue(activated);
     }
+
+    {
+        int position = 1;
+        pConfig->Read( _T( "/SceneEditor/SceneEventsTab" ), &position );
+
+        sceneEventsTabPosition->SetSelection(position);
+    }
 }
 
 Preferences::~Preferences()
@@ -606,6 +635,8 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     pConfig->Write( "/Autosave/Activated", autosaveActivatedCheck->GetValue());
     pConfig->Write( "/Autosave/Time", ToFloat(string(autosaveTimeEdit->GetValue().mb_str()))*60*1000);
+
+    pConfig->Write( "/SceneEditor/SceneEventsTab", sceneEventsTabPosition->GetSelection());
 
     EndModal( 1 );
 }

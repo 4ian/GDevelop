@@ -58,7 +58,7 @@ wxControl(Parent, Id, Position, Size, Style)
     #else
 
         // Tested under Windows XP only (should work with X11 and other Windows versions - no idea about MacOS)
-        sf::RenderWindow::Create(GetHandle());
+        sf::RenderWindow::Create(static_cast<sf::WindowHandle>(GetHandle()));
 
     #endif
 

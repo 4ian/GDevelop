@@ -41,6 +41,7 @@ class Preferences: public wxDialog
 		wxPanel* ActifColor2Pnl;
 		wxStaticText* StaticText2;
 		wxPanel* Panel4;
+		wxChoice* sceneEventsTabPosition;
 		wxStaticText* StaticText14;
 		wxStaticText* StaticText6;
 		wxPanel* borderColorPnl;
@@ -54,6 +55,7 @@ class Preferences: public wxDialog
 		wxTextCtrl* EditeurImageEdit;
 		wxPanel* inactiveTextColorPnl;
 		wxPanel* InactifColor2Pnl;
+		wxPanel* Panel6;
 		wxPanel* Panel3;
 		wxStaticLine* StaticLine2;
 		wxPanel* ActifColorPnl;
@@ -64,6 +66,7 @@ class Preferences: public wxDialog
 		wxCheckBox* autosaveActivatedCheck;
 		wxStaticLine* StaticLine1;
 		wxButton* BrowseEditionImage;
+		wxStaticText* StaticText15;
 		wxStaticText* StaticText12;
 		wxButton* AnnulerBt;
 		wxPanel* Panel2;
@@ -101,6 +104,9 @@ class Preferences: public wxDialog
 		static const long ID_TEXTCTRL4;
 		static const long ID_BUTTON4;
 		static const long ID_PANEL7;
+		static const long ID_STATICTEXT15;
+		static const long ID_CHOICE1;
+		static const long ID_PANEL16;
 		static const long ID_BUTTON6;
 		static const long ID_BUTTON7;
 		static const long ID_BUTTON8;

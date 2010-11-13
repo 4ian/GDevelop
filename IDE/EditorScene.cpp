@@ -80,6 +80,7 @@ const long EditorScene::idRibbonChooseLayer = wxNewId();
 const long EditorScene::idRibbonOrigine = wxNewId();
 const long EditorScene::idRibbonOriginalZoom = wxNewId();
 const long EditorScene::idRibbonGrid = wxNewId();
+const long EditorScene::idRibbonWindowMask = wxNewId();
 const long EditorScene::idRibbonGridSetup = wxNewId();
 
 const long EditorScene::idRibbonRefresh = wxNewId();
@@ -110,7 +111,6 @@ externalWindow(this)
 	//(*Initialize(EditorScene)
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer1;
-	wxMenuItem* zoom5;
 
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, _T("wxID_ANY"));
 	SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
@@ -203,6 +203,19 @@ externalWindow(this)
 
     Connect(ID_DEBUGBUTTON,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorScene::OnDebugBtClick);
 
+    {
+        int position = 1;
+        wxConfigBase::Get()->Read("/SceneEditor/SceneEventsTab", &position);
+        if (position == 0)
+        {
+            long style = notebook->GetWindowStyleFlag();
+            style |= wxAUI_NB_TOP;
+            style &= ~wxAUI_NB_BOTTOM;
+            notebook->SetWindowStyleFlag(style);
+        }
+    }
+
+
 	//Initialisation des éditeurs
     objectsEditor = new EditorObjets(this, game, scene, mainEditorCommand);
     layersEditor = new EditorLayers(this, game, scene, &scene.initialLayers, mainEditorCommand);
@@ -284,6 +297,7 @@ void EditorScene::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
         bar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Zoom initial") : "", wxBitmap("res/zoom24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonGrid, !hideLabels ? _("Grille") : "", wxBitmap("res/grid24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonGridSetup, !hideLabels ? _("Editer la grille") : "", wxBitmap("res/gridedit24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonWindowMask, !hideLabels ? _("Masque de la fenêtre de jeu") : "", wxBitmap("res/windowMask24.png", wxBITMAP_TYPE_ANY));
     }
     else
     {
@@ -311,6 +325,7 @@ void EditorScene::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonOriginalZoom, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&EditorScene::OnZoomMoreBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonGrid, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnGridBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonGridSetup, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnGridSetupBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonWindowMask, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorScene::OnWindowMaskBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&EditorScene::OnUndoBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&EditorScene::OnRedoBtClick, NULL, this);
 
@@ -613,7 +628,7 @@ void EditorScene::OnScrollBar1Scroll(wxScrollEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorScene::OnOrigineBtClick(wxCommandEvent & event )
 {
-    sceneCanvas->scene.view.SetCenter( (sceneCanvas->GetWidth()/2),(sceneCanvas->GetHeight()/2));
+    sceneCanvas->scene.view.SetCenter( (game.windowWidth/2),(game.windowHeight/2));
 }
 
 
@@ -647,6 +662,11 @@ void EditorScene::OnChoisirLayerBtClick( wxCommandEvent & event )
 void EditorScene::OnGridBtClick( wxCommandEvent & event )
 {
     sceneCanvas->scene.grid = !sceneCanvas->scene.grid;
+}
+
+void EditorScene::OnWindowMaskBtClick( wxCommandEvent & event )
+{
+    sceneCanvas->scene.windowMask = !sceneCanvas->scene.windowMask;
 }
 
 void EditorScene::OnUndoBtClick( wxCommandEvent & event )

@@ -18,6 +18,7 @@ gridHeight( 32 ),
 gridR( 158 ),
 gridG( 180 ),
 gridB( 255 ),
+windowMask(false),
 isMovingObject( false ),
 isResizingX( false ),
 isResizingY( false ),
@@ -187,6 +188,15 @@ void EdittimeScene::RenderEdittimeScene()
         catch ( ... ) { }
     }
 
+
+    if ( windowMask )
+    {
+        sf::Shape windowMaskShape = sf::Shape::Rectangle(view.GetCenter().x-game->windowWidth/2, view.GetCenter().y-game->windowHeight/2,
+                                                         game->windowWidth, game->windowHeight, sf::Color( 0, 0, 0, 0 ), 1, sf::Color( 255, 255, 255, 128 ) );
+
+        renderWindow->Draw(windowMaskShape);
+        renderWindow->SetView(view);
+    }
 
     renderWindow->RestoreGLStates();
     renderWindow->Display();

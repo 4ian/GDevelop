@@ -177,7 +177,6 @@ void DrawerObject::SaveToXml(TiXmlElement * object)
 
 bool DrawerObject::LoadResources(const ImageManager & imageMgr )
 {
-    //No ressources to load.
     #if defined(GDE)
     edittimeIconImage.LoadFromFile("Extensions/primitivedrawingicon.png");
     edittimeIcon.SetImage(edittimeIconImage);

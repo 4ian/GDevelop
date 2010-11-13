@@ -175,7 +175,7 @@ bool ActCopyImageOnAnother( RuntimeScene & scene, ObjectsConcerned & objectsConc
 {
     std::string destName = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
     if ( !scene.game->imageManager->HasImage(destName) ) return false;
-    boost::shared_ptr<sf::Image> dest = scene.game->imageManager->GetImage(destName);
+    boost::shared_ptr<sf::Image> dest = scene.game->imageManager->GetSFMLImage(destName);
 
     std::string srcName = action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned);
     if ( !scene.game->imageManager->HasImage(srcName) ) return false;
@@ -187,7 +187,7 @@ bool ActCopyImageOnAnother( RuntimeScene & scene, ObjectsConcerned & objectsConc
     int destY = action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
     if ( destY < 0 || static_cast<unsigned>(destY) >= dest->GetWidth()) return false;
 
-    dest->Copy(*scene.game->imageManager->GetImage(srcName), destX, destY);
+    dest->Copy(*scene.game->imageManager->GetSFMLImage(srcName), destX, destY);
 
     return true;
 }

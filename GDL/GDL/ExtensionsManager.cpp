@@ -65,6 +65,12 @@ ExtensionsManager::ExtensionsManager()
     AddExtension(boost::shared_ptr<ExtensionBase>(new NetworkExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new SceneExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
+
+#if defined(GDE)
+    badInstructionInfos.fullname = _("Instruction inconnue");
+    badInstructionInfos.description = _("Instruction inconnue");
+    badInstructionInfos.sentence = _("Instruction inconnue");
+#endif
 }
 
 ////////////////////////////////////////////////////////////
@@ -187,7 +193,8 @@ const AutomatismInfo& ExtensionsManager::GetAutomatismInfo(std::string automatis
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        if ( find(extensionsLoaded[i]->GetAutomatismsTypes().begin(), extensionsLoaded[i]->GetAutomatismsTypes().end(), automatism) != extensionsLoaded[i]->GetAutomatismsTypes().end())
+        vector < string > automatismsTypes = extensionsLoaded[i]->GetAutomatismsTypes();
+        if ( find(automatismsTypes.begin(), automatismsTypes.end(), automatism) != automatismsTypes.end())
             return extensionsLoaded[i]->GetAutomatismInfo(automatism);
     }
 

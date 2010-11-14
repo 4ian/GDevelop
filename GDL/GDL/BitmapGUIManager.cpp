@@ -43,5 +43,6 @@ BitmapGUIManager::BitmapGUIManager()
     joyaxisBt.LoadFile("res/joystick16.png", wxBITMAP_TYPE_ANY);
     backthumbsBg.LoadFile("res/backthumbs.png", wxBITMAP_TYPE_ANY);
     varBt.LoadFile("res/var.png", wxBITMAP_TYPE_ANY);
+    unknown24.LoadFile("res/unknown24.png", wxBITMAP_TYPE_ANY);
 }
 #endif

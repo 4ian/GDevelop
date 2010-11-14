@@ -40,6 +40,7 @@ public:
     wxBitmap point;
     wxBitmap objects24;
     wxBitmap add24;
+    wxBitmap unknown24;
     wxBitmap scene;
     wxBitmap layerBt;
     wxBitmap joyaxisBt;

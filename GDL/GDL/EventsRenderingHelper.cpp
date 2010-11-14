@@ -133,7 +133,8 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
         }
 
         //Draw the condition icon
-        dc.DrawBitmap( instructionInfos.smallicon, x + sideSeparation + leftIconsWidth, yCondition, true );
+        if ( instructionInfos.smallicon.IsOk() )
+            dc.DrawBitmap( instructionInfos.smallicon, x + sideSeparation + leftIconsWidth, yCondition, true );
 
         //Draw the condition text
         std::string beginTag = disabled ? "<FONT color=#BDBDBD>" : "";
@@ -210,7 +211,8 @@ int EventsRenderingHelper::DrawActionsList(const vector < Instruction > & action
                              actions[j].renderedHeight);
         }
 
-        dc.DrawBitmap( instructionInfos.smallicon, x + sideSeparation + leftIconsWidth, yAction, true );
+        if ( instructionInfos.smallicon.IsOk() )
+            dc.DrawBitmap( instructionInfos.smallicon, x + sideSeparation + leftIconsWidth, yAction, true );
 
         //Draw the action text
         std::string beginTag = disabled ? "<FONT color=#BDBDBD>" : "";

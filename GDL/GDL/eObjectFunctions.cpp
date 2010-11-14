@@ -32,8 +32,8 @@ double SpriteObject::ExpGetObjectX( const RuntimeScene & scene, ObjectsConcerned
 
         return GetCurrentSFMLSprite().TransformToGlobal(
                     sf::Vector2f(
-                        GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetX(),
-                        GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetY()
+                        !isFlippedX ? GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetX() : GetCurrentSprite().GetSFMLSprite().GetSize().x/2-GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetX(),
+                        !isFlippedY ? GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetY() : GetCurrentSprite().GetSFMLSprite().GetSize().y/2-GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetY()
                     )).x;
     }
 
@@ -46,8 +46,8 @@ double SpriteObject::ExpGetObjectY( const RuntimeScene & scene, ObjectsConcerned
     {
         return GetCurrentSFMLSprite().TransformToGlobal(
                     sf::Vector2f(
-                        GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetX(),
-                        GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetY()
+                        !isFlippedX ? GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetX() : GetCurrentSprite().GetSFMLSprite().GetSize().x/2-GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetX(),
+                        !isFlippedY ? GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetY() : GetCurrentSprite().GetSFMLSprite().GetSize().y/2-GetCurrentSprite().GetPoint(exprInstruction.parameters[1].GetPlainString()).GetY()
                     )).y;
     }
 

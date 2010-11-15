@@ -381,32 +381,33 @@ void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
         wxLogStatus( _( "Ajout des images" ) );
 
         wxArrayString Fichiers;
-        wxArrayString Noms;
-        FileDialog.GetFilenames( Noms );
+        wxArrayString names;
+        FileDialog.GetFilenames( names );
         FileDialog.GetPaths( Fichiers );
         string imageNonAjoutees;
 
         for ( unsigned int i = 0; i < Fichiers.GetCount();i++ )
         {
             wxString Status = _( "Ajout de l'image " );
-            wxLogStatus( Status + Noms[i] );
+            wxLogStatus( Status + names[i] );
 
             //Vérifier que l'image n'est pas déjà dans la liste
-            if ( FindImage(game.images, static_cast<string>(Noms[i])) == -1 )
+            if ( FindImage(game.images, string(names[i])) == -1 )
             {
                 //On ajoute l'image
                 Image image;
 
                 image.file = ( string ) Fichiers[i];
-                image.nom = ( string ) Noms[i];
+                image.nom = ( string ) names[i];
 
                 game.images.push_back(image);
-                Dossier::Add( &game.dossierImages, (string)Noms[i], dossierId );
+                game.imagesChanged.push_back(image.nom);
+                Dossier::Add( &game.dossierImages, (string)names[i], dossierId );
 
-                BanqueImageList->AppendItem( rootId, Noms[i] );
+                BanqueImageList->AppendItem( rootId, names[i] );
             }
             else
-                imageNonAjoutees += "\n"+Noms[i];
+                imageNonAjoutees += "\n"+string(names[i].mb_str());
 
         }
 
@@ -416,7 +417,6 @@ void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
         }
 
         //Fin du processus, nécessitée de mettre à jour les scènes.
-        game.imagesWereModified = true;
         wxLogStatus( _( "L'image a été correctement ajoutée à la banque d'image" ) );
     }
 
@@ -435,11 +435,11 @@ void EditorImages::OnDelImageBtClick( wxCommandEvent& event )
         if ( i != -1 )
         {
             //On enlève l'image
+            game.imagesChanged.push_back(game.images[i].nom);
             game.images.erase( game.images.begin() + i );
             Dossier::RemoveImage(&game.dossierImages, ( string ) BanqueImageList->GetItemText( Item ));
         }
 
-        game.imagesWereModified = true;
         BanqueImageList->Delete( Item );
 
         return;
@@ -493,7 +493,6 @@ void EditorImages::OnMoreOptions( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorImages::OnRefreshBtClick( wxCommandEvent& event )
 {
-    game.imagesWereModified = true;
     Refresh();
 }
 
@@ -531,8 +530,10 @@ void EditorImages::OnBanqueImageListEndLabelEdit( wxTreeEvent& event )
 {
     if ( !event.IsEditCancelled() )
     {
+        std::string newName = string(event.GetLabel().mb_str());
+
         //Si le nom n'existe pas
-        if ( FindImage( game.images, ( string ) event.GetLabel() ) != -1 )
+        if ( FindImage( game.images, newName ) != -1 )
         {
             wxLogWarning( _( "Impossible de renommer l'image : une autre image porte déjà ce nom." ) );
             Refresh();
@@ -543,10 +544,12 @@ void EditorImages::OnBanqueImageListEndLabelEdit( wxTreeEvent& event )
             int i = FindImage( game.images, m_NomItem );
             if ( i != -1 )
             {
-                game.images.at( i ).nom = event.GetLabel();
-                Dossier::ReplaceNomImage(&game.dossierImages, m_NomItem, static_cast<string> (event.GetLabel()));
+                game.imagesChanged.push_back(game.images.at( i ).nom);
+                game.imagesChanged.push_back(newName);
 
-                game.imagesWereModified = true;
+                game.images.at( i ).nom = newName;
+                Dossier::ReplaceNomImage(&game.dossierImages, m_NomItem, newName);
+
                 BanqueImageList->SetItemText( event.GetItem(), event.GetLabel() );
 
                 return;
@@ -631,13 +634,12 @@ void EditorImages::OnModFileImage( wxCommandEvent& event )
     {
         wxLogStatus( _( "Changement du fichier de l'image..." ) );
 
-        string Fichier;
-        Fichier = ( string ) FileDialog.GetPath();
+        string newFile = string(FileDialog.GetPath().mb_str());
 
-        game.images.at( i ).file = Fichier;
+        game.images.at( i ).file = newFile;
         //Ne concerne pas les dossiers
 
-        game.imagesWereModified = true;
+        game.imagesChanged.push_back(game.images.at( i ).nom);
         wxLogStatus( _( "Changement du fichier de l'image effectué" ) );
     }
 
@@ -774,7 +776,7 @@ void EditorImages::OnModPropSelected(wxCommandEvent& event)
 
     PropImage dialog(this, game.images.at(i));
     if ( dialog.ShowModal() == 1 )
-        game.imagesWereModified = true;
+        game.imagesChanged.push_back(game.images.at(i).nom);
 }
 void EditorImages::OnBanqueImageListItemActivated1(wxTreeEvent& event)
 {

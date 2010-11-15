@@ -61,7 +61,7 @@ class GD_API Game
 
         #if defined(GDE)
         std::string gameFile; ///< File of the game
-        bool imagesWereModified;
+        vector < string > imagesChanged;
         #endif
 
     protected:

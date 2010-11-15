@@ -30,6 +30,7 @@ class GD_API ImageManager
 
         boost::shared_ptr<OpenGLTextureWrapper> GetOpenGLTexture(std::string name) const;
         boost::shared_ptr<sf::Image> GetSFMLImage(std::string name) const;
+        void ReloadImage(std::string name) const;
         bool HasImage(std::string name) const;
 
 

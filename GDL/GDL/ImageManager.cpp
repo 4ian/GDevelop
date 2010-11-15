@@ -50,6 +50,37 @@ boost::shared_ptr<sf::Image> ImageManager::GetSFMLImage(std::string name) const
     return badImage;
 }
 
+void ImageManager::ReloadImage(std::string name) const
+{
+    if ( !game )
+    {
+        cout << "Image manager has no game associated with.";
+        return;
+    }
+
+    //Verify if image is in memory. If not, it will be automatically reloaded when necessary.
+    if ( alreadyLoadedImages.find(name) == alreadyLoadedImages.end() || alreadyLoadedImages.find(name)->second.expired() ) return;
+
+    //Image still in memory, get it and update it.
+    boost::shared_ptr<sf::Image> image = alreadyLoadedImages.find(name)->second.lock();
+
+    cout << "Reload " << name << endl;
+
+    for (unsigned int i = 0;i<game->images.size();++i)
+    {
+    	if ( game->images[i].nom == name )
+    	{
+    	    boost::shared_ptr<sf::Image> newImage = boost::shared_ptr<sf::Image>(RessourcesLoader::getInstance()->LoadImage( game->images[i].file ));
+
+            image->Create(newImage->GetWidth(), newImage->GetHeight());
+    	    image->LoadFromPixels(newImage->GetWidth(), newImage->GetHeight(), newImage->GetPixelsPtr());
+    	    image->SetSmooth(game->images[i].smooth);
+
+            return;
+    	}
+    }
+}
+
 boost::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(std::string name) const
 {
     if ( !game )

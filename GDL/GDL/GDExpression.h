@@ -35,7 +35,7 @@ class GD_API GDExpression
         /**
          * Get the plain string representing the expression
          */
-        inline std::string GetPlainString() const { return plainString; };
+        inline const std::string & GetPlainString() const { return plainString; };
 
         /**
          * Get a number representing a comparision operator.

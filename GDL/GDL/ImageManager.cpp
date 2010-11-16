@@ -31,7 +31,7 @@ boost::shared_ptr<sf::Image> ImageManager::GetSFMLImage(std::string name) const
     if ( alreadyLoadedImages.find(name) != alreadyLoadedImages.end() && !alreadyLoadedImages.find(name)->second.expired() )
         return alreadyLoadedImages.find(name)->second.lock();
 
-    cout << "Load " << name << endl;
+    cout << "ImageManager: Load " << name << endl;
 
     //Load only an image when necessary
     RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
@@ -46,6 +46,8 @@ boost::shared_ptr<sf::Image> ImageManager::GetSFMLImage(std::string name) const
             return image;
     	}
     }
+
+    cout << "ImageManager: Not found:" << name << endl;
 
     return badImage;
 }
@@ -64,21 +66,24 @@ void ImageManager::ReloadImage(std::string name) const
     //Image still in memory, get it and update it.
     boost::shared_ptr<sf::Image> image = alreadyLoadedImages.find(name)->second.lock();
 
-    cout << "Reload " << name << endl;
-
     for (unsigned int i = 0;i<game->images.size();++i)
     {
     	if ( game->images[i].nom == name )
     	{
+            cout << "ImageManager: Reload " << name << endl;
+
     	    boost::shared_ptr<sf::Image> newImage = boost::shared_ptr<sf::Image>(RessourcesLoader::getInstance()->LoadImage( game->images[i].file ));
 
-            image->Create(newImage->GetWidth(), newImage->GetHeight());
-    	    image->LoadFromPixels(newImage->GetWidth(), newImage->GetHeight(), newImage->GetPixelsPtr());
+            *image = *newImage;
     	    image->SetSmooth(game->images[i].smooth);
 
             return;
     	}
     }
+
+    //Image not present anymore in image list.
+    cout << "ImageManager: " << name << " is not available anymore." << endl;
+    *image = *badImage;
 }
 
 boost::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(std::string name) const

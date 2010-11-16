@@ -23,7 +23,7 @@ class GD_API ListVariable
         /**
          * Get the text of a variable
          */
-        inline string GetVariableText(string varName) const
+        inline const string & GetVariableText(string varName) const
         {
             vector < Variable >::const_iterator end = variables.end();
             for (vector < Variable >::const_iterator i = variables.begin();i != end;++i)

@@ -44,7 +44,7 @@ bool Object::CondVarObjet( RuntimeScene & scene, ObjectsConcerned & objectsConce
  */
 bool Object::CondVarObjetTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    string varValue = variablesObjet.GetVariableText(condition.GetParameter( 1 ).GetPlainString());
+    const string & varValue = variablesObjet.GetVariableText(condition.GetParameter( 1 ).GetPlainString());
 
     //Enfin, on teste vraiment.
     //optimisation : le test de signe en premier

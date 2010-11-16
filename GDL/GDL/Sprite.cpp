@@ -80,7 +80,7 @@ Point & Sprite::GetPoint(const string & name)
 void Sprite::LoadImage(boost::shared_ptr<sf::Image> image_)
 {
     sfmlImage = image_;
-    sfmlSprite.SetImage(*sfmlImage);
+    sfmlSprite.SetImage(*sfmlImage, true);
     hasItsOwnImage = false;
 
     if ( automaticCentre )

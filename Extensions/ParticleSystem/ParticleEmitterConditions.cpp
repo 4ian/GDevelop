@@ -584,6 +584,21 @@ bool ParticleEmitterObject::CondParticleAngle2( RuntimeScene & scene, ObjectsCon
 }
 
 /**
+ * Test the name of the texture
+ */
+bool ParticleEmitterObject::CondTexture( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && textureParticleName == condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+        ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && textureParticleName != condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this() ) )
+       )
+    {
+        return true;
+    }
+
+    return false;
+}
+
+/**
  * Test if there is some particles remaining
  */
 bool ParticleEmitterObject::CondNoMoreParticles( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )

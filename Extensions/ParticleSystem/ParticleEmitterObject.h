@@ -258,12 +258,14 @@ class ParticleEmitterObject : public Object
         bool ActParticleLifeTimeMax( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool CondConeSprayAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool ActConeSprayAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleGravityLength( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondParticleGravityAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondParticleGravityLength( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondParticleGravityAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool ActParticleGravityLength( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActParticleGravityAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondEmitterAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondEmitterAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool ActEmitterAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool CondTexture( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool ActTexture( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         double ExpRendererParam1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return rendererParam1; };
         double ExpRendererParam2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return rendererParam2; };
@@ -286,6 +288,7 @@ class ParticleEmitterObject : public Object
         double ExpEmitterAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return atan2(GetEmitterYDirection(), GetEmitterXDirection())*180.0f/3.14159f; };
         double ExpParticleGravityAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return atan2(GetParticleGravityY(), GetParticleGravityX())*180.0f/3.14159f; };
         double ExpParticleGravityLength( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return sqrt(GetParticleGravityY()*GetParticleGravityY() + GetParticleGravityX()*GetParticleGravityX()); };
+        std::string ExpTexture( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction ){ return textureParticleName; };
 
         bool ActParticleColor1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool ActParticleColor2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
@@ -345,6 +348,7 @@ class ParticleEmitterObject : public Object
         double ExpParticleAngleRandomness1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAngleRandomness1; };
         double ExpParticleAngleRandomness2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAngleRandomness2; };
 
+
         bool CondNoMoreParticles( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         double ExpNbParticles( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 
@@ -355,7 +359,6 @@ class ParticleEmitterObject : public Object
         ParticleSystemWrapper particleSystem;
 
         std::string textureParticleName;
-        boost::shared_ptr<sf::Image> textureParticle;
         RendererType rendererType;
         float rendererParam1;
         float rendererParam2;

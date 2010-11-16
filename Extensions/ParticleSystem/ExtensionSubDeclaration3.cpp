@@ -176,6 +176,37 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
 
     DECLARE_END_OBJECT_CONDITION()
 
+    DECLARE_OBJECT_ACTION("Texture",
+                   _("Image"),
+                   _("Modifie l'image des particules ( si affichée )."),
+                   _("Changer l'image des particules de _PARAM0_ en _PARAM1_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::ActTexture);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("text", _("Nouvelle image"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_ACTION()
+
+    DECLARE_OBJECT_CONDITION("Texture",
+                   _("Image"),
+                   _("Teste le nom de l'image affichée par les partiucles."),
+                   _("L'image affichée par les particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Commun"),
+                   "Extensions/particleSystemicon24.png",
+                   "Extensions/particleSystemicon16.png",
+                   &ParticleEmitterObject::CondTexture);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+        DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+        MAIN_OBJECTS_IN_PARAMETER(0)
+
+    DECLARE_END_OBJECT_CONDITION()
+
     DECLARE_OBJECT_EXPRESSION("NbParticles", _("Nombre de particules"), _("Nombre de particules"), _("Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpNbParticles)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()

@@ -677,6 +677,15 @@ bool ParticleEmitterObject::ActParticleAngleRandomness2( RuntimeScene & scene, O
     return true;
 }
 
+/**
+ * Change the texture
+ */
+bool ParticleEmitterObject::ActTexture( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    textureParticleName = action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this());
+    if ( rendererType == Quad ) particleSystem.openGLTextureParticle = scene.game->imageManager->GetOpenGLTexture(textureParticleName);
+}
+
 bool ParticleEmitterObject::ActRecreateParticleSystem( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     RecreateParticleSystem();

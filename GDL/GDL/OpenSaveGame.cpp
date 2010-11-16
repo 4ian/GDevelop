@@ -1625,7 +1625,7 @@ void OpenSaveGame::OpenVariablesList(ListVariable & list, const TiXmlElement * e
         string name = elemScene->Attribute( "Name" ) != NULL ? elemScene->Attribute( "Name" ) : "";
         Variable & variable = list.ObtainVariable(name);
 
-        if ( elemScene->Attribute( "Value" ) != NULL ) { variable.Settexte(elemScene->Attribute( "Value" ));}
+        if ( elemScene->Attribute( "Value" ) != NULL ) { variable.SetString(elemScene->Attribute( "Value" ));}
         else { MSG( "Les informations concernant la valeur d'une variable manquent." ); }
 
         elemScene = elemScene->NextSiblingElement();
@@ -2095,7 +2095,7 @@ void OpenSaveGame::SaveVariablesList(const ListVariable & list, TiXmlElement * e
         elem->LinkEndChild( variable );
 
         variable->SetAttribute("Name", variables[j].GetName().c_str());
-        variable->SetAttribute("Value", variables[j].Gettexte().c_str());
+        variable->SetAttribute("Value", variables[j].GetString().c_str());
     }
 }
 

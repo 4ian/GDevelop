@@ -82,7 +82,7 @@ BOOST_PYTHON_MODULE(gd)
     class_<Variable>("Variable", init<std::string>())
                         .add_property("name", &Variable::GetName, &Variable::SetName)
                         .add_property("value", &Variable::Getvalue, &Variable::Setvalue)
-                        .add_property("text", &Variable::Gettexte, &Variable::Settexte)
+                        .add_property("text", &Variable::GetString, &Variable::SetString)
                         /*.def("assign", &Variable::operator=)*/
                         .def(self += double())
                         .def(self -= double())

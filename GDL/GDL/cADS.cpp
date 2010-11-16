@@ -123,6 +123,7 @@ bool CondEstTourne( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
 
     bool isTrue = false;
 
+    //Test each object against each other objects
 	ObjList::iterator obj = list.begin();
 	ObjList::const_iterator obj_end = list.end();
     for ( ; obj != obj_end; ++obj )
@@ -131,7 +132,6 @@ bool CondEstTourne( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
         ObjList::const_iterator obj2_end = list2.end();
         for (; obj2 != obj2_end; ++obj2 )
         {
-            //Enfin, on teste vraiment.
             if ( *obj != *obj2 )
             {
                 Force force;

@@ -4,67 +4,18 @@
 
 using namespace std;
 
-Variable::Variable(string name_) :
-name(name_),
-value(0),
-texte("")
-{
-    //ctor
-}
-
-Variable::~Variable()
-{
-    //dtor
-}
-
 void Variable::Setvalue(double val)
 {
     value = val;
 
     stringstream s; s << (val);
-    texte = s.str();
+    str = s.str();
 }
 
-void Variable::Settexte(string val)
+void Variable::SetString(const string & val)
 {
-    texte = val;
+    str = val;
 
-    stringstream ss;
-    ss << val;
+    stringstream ss; ss << val;
     ss >> value;
-}
-
-void Variable::operator=(double val)
-{
-    Setvalue(val);
-}
-
-void Variable::operator+=(double val)
-{
-    Setvalue(val+Getvalue());
-}
-
-void Variable::operator-=(double val)
-{
-    Setvalue(Getvalue()-val);
-}
-
-void Variable::operator*=(double val)
-{
-    Setvalue(val*Getvalue());
-}
-
-void Variable::operator/=(double val)
-{
-    Setvalue(Getvalue()/val);
-}
-
-void Variable::operator=(string val)
-{
-    Settexte(val);
-}
-
-void Variable::operator+=(string val)
-{
-    Settexte(Gettexte()+val);
 }

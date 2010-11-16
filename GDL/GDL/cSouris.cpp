@@ -43,8 +43,6 @@ bool CondSourisX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, con
     //On calcule la position de la souris dans le calque donné
     int mouseX = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), view).x;
 
-    //Enfin, on teste vraiment.
-    //optimisation : test du signe en premier
     if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && ( mouseX ) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
             ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && ( mouseX ) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
             ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && ( mouseX ) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||

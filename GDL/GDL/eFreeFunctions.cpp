@@ -168,7 +168,7 @@ double ExpGetVariableValue( const RuntimeScene & scene, ObjectsConcerned & objec
 
 std::string ExpGetVariableString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction )
 {
-    return scene.variables.GetVariableText( exprInstruction.parameters[0].GetPlainString() );
+    return scene.variables.GetVariableString( exprInstruction.parameters[0].GetPlainString() );
 }
 
 double ExpGetGlobalVariableValue( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
@@ -178,7 +178,7 @@ double ExpGetGlobalVariableValue( const RuntimeScene & scene, ObjectsConcerned &
 
 std::string ExpGetGlobalVariableString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction )
 {
-    return scene.game->variables.GetVariableText( exprInstruction.parameters[0].GetPlainString() );
+    return scene.game->variables.GetVariableString( exprInstruction.parameters[0].GetPlainString() );
 }
 
 double ExpGetObjectCount( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )

@@ -80,6 +80,7 @@ bool CondDistance( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
         list2 = list;
     bool isTrue = false;
 
+    //Test each object with each others objects
 	ObjList::iterator obj = list.begin();
 	ObjList::const_iterator obj_end = list.end();
     for ( ; obj != obj_end; ++obj )
@@ -88,13 +89,11 @@ bool CondDistance( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
         ObjList::const_iterator obj2_end = list2.end();
         for ( ; obj2 != obj2_end; ++obj2 )
         {
-            //Enfin, on teste vraiment.
             if ( *obj != *obj2 )
             {
                 float X = (*obj)->GetDrawableX()+(*obj)->GetCenterX() - ((*obj2)->GetDrawableX()+(*obj2)->GetCenterX());
                 float Y = (*obj)->GetDrawableY()+(*obj)->GetCenterY() - ((*obj2)->GetDrawableY()+(*obj2)->GetCenterY());
 
-                //optimisation : le test de signe en premier
                 if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && sqrt(X*X+Y*Y) == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
                         ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && sqrt(X*X+Y*Y) < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||
                         ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && sqrt(X*X+Y*Y) > condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcernedForExpressions, *obj, *obj2 ) ) ||

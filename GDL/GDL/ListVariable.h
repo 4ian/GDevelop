@@ -23,16 +23,15 @@ class GD_API ListVariable
         /**
          * Get the text of a variable
          */
-        inline const string & GetVariableText(string varName) const
+        inline const string & GetVariableString(const string & varName) const
         {
-            vector < Variable >::const_iterator end = variables.end();
-            for (vector < Variable >::const_iterator i = variables.begin();i != end;++i)
+            for (unsigned int i = 0;i<variables.size();++i)
             {
-            	if ( i->GetName() == varName)
-                    return i->Gettexte();
+            	if ( variables[i].GetName() == varName)
+                    return variables[i].GetString();
             }
 
-            return "";
+            return notFoundText;
         }
 
         /**
@@ -126,6 +125,8 @@ class GD_API ListVariable
 
     private:
         vector < Variable > variables;
+
+        static const std::string notFoundText;
 };
 
 #endif // LISTVARIABLE_H

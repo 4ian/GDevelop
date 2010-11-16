@@ -97,10 +97,8 @@ bool CondCameraX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, con
     if ( condition.GetParameters().size() >= 4 )
         camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
+    const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
-    //Enfin, on teste vraiment.
-    //optimisation : test du signe en premier
     if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && (view.GetCenter().x - view.GetSize().x/2) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
             ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && (view.GetCenter().x - view.GetSize().x/2) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
             ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && (view.GetCenter().x - view.GetSize().x/2) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
@@ -140,10 +138,8 @@ bool CondCameraY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, con
     if ( condition.GetParameters().size() >= 4 )
         camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
+    const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
-    //Enfin, on teste vraiment.
-    //optimisation : test du signe en premier
     if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && (view.GetCenter().y - view.GetSize().y/2) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
             ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && (view.GetCenter().y - view.GetSize().y/2) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
             ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && (view.GetCenter().y - view.GetSize().y/2) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
@@ -182,10 +178,8 @@ bool CondCameraAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     if ( condition.GetParameters().size() >= 4 )
         camera = condition.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
-    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
+    const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
-    //Enfin, on teste vraiment.
-    //optimisation : test du signe en premier
     if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && (view.GetRotation()) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
             ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && (view.GetRotation()) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
             ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && (view.GetRotation()) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||

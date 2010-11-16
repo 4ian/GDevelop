@@ -23,8 +23,6 @@ bool Object::CondVarObjet( RuntimeScene & scene, ObjectsConcerned & objectsConce
 {
     double varValue = variablesObjet.GetVariableValue(condition.GetParameter( 1 ).GetPlainString());
 
-    //Enfin, on teste vraiment.
-    //optimisation : le test de signe en premier
     if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && varValue == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
             ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && varValue < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
             ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && varValue > condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -44,10 +42,8 @@ bool Object::CondVarObjet( RuntimeScene & scene, ObjectsConcerned & objectsConce
  */
 bool Object::CondVarObjetTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    const string & varValue = variablesObjet.GetVariableText(condition.GetParameter( 1 ).GetPlainString());
+    const string & varValue = variablesObjet.GetVariableString(condition.GetParameter( 1 ).GetPlainString());
 
-    //Enfin, on teste vraiment.
-    //optimisation : le test de signe en premier
     if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && varValue == condition.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
         ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && varValue != condition.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )

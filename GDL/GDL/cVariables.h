@@ -49,7 +49,7 @@ inline bool CondVar( const ListVariable & variables, std::string varName, short 
  */
 inline bool CondVarTxt( const ListVariable & variables, std::string varName, short int compOperator, string valueToCompare )
 {
-    const std::string & varValue = variables.GetVariableText(varName);
+    const std::string & varValue = variables.GetVariableString(varName);
 
     if (( compOperator == GDExpression::Equal && varValue == valueToCompare ) ||
         ( compOperator == GDExpression::Different && varValue != valueToCompare )

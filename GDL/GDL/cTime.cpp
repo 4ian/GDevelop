@@ -98,8 +98,6 @@ bool CondTimeScale( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
 {
     bool Ok = false;
 
-    //Enfin, on teste vraiment.
-    //optimisation : test du signe en premier
     if (( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Equal && ( scene.GetTimeScale() ) == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
             ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Inferior && ( scene.GetTimeScale() ) < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
             ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Superior && ( scene.GetTimeScale() ) > condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
@@ -108,7 +106,7 @@ bool CondTimeScale( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
             ( condition.GetParameter( 1 ).GetAsCompOperator() == GDExpression::Different && ( scene.GetTimeScale() ) != condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned) )
        )
     {
-        Ok = true; //Cette condition est vrai
+        Ok = true;
     }
 
     if ( condition.IsInverted() )

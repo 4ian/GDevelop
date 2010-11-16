@@ -162,7 +162,7 @@ void InitialVariablesDialog::Refresh()
     for (unsigned int i = 0;i<variablesVector.size();++i)
     {
     	variablesList->InsertItem(i, variablesVector[i].GetName());
-    	variablesList->SetItem(i, 1, variablesVector[i].Gettexte());
+    	variablesList->SetItem(i, 1, variablesVector[i].GetString());
     }
 
     //Resize columns with a little margin
@@ -257,7 +257,7 @@ void InitialVariablesDialog::OnMoveUpVarSelected(wxCommandEvent& event)
             long variableIdInList = variablesList->FindItem(-1, selectedVariable);
             variablesList->DeleteItem(variableIdInList);
             variablesList->InsertItem(variableIdInList-1, variable.GetName());
-            variablesList->SetItem(variableIdInList-1, 1, variable.Gettexte());
+            variablesList->SetItem(variableIdInList-1, 1, variable.GetString());
 
             return;
         }
@@ -283,7 +283,7 @@ void InitialVariablesDialog::OnMoveDownVarSelected(wxCommandEvent& event)
             long variableIdInList = variablesList->FindItem(-1, selectedVariable);
             variablesList->DeleteItem(variableIdInList);
             variablesList->InsertItem(variableIdInList+1, variable.GetName());
-            variablesList->SetItem(variableIdInList+1, 1, variable.Gettexte());
+            variablesList->SetItem(variableIdInList+1, 1, variable.GetString());
 
             return;
         }
@@ -298,9 +298,9 @@ void InitialVariablesDialog::OnEditVarSelected(wxCommandEvent& event)
     if ( !variables.HasVariable(selectedVariable) )
         return;
 
-    string value = string(wxGetTextFromUser("Entrez la valeur initiale de la variable", "Valeur initiale", variables.GetVariableText(selectedVariable)).mb_str());
+    string value = string(wxGetTextFromUser("Entrez la valeur initiale de la variable", "Valeur initiale", variables.GetVariableString(selectedVariable)).mb_str());
 
-    variables.ObtainVariable(selectedVariable).Settexte(value);
+    variables.ObtainVariable(selectedVariable).SetString(value);
     variablesList->SetItem(variablesList->FindItem(-1, selectedVariable), 1, value);
 }
 

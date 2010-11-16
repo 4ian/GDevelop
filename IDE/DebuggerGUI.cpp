@@ -270,7 +270,7 @@ void DebuggerGUI::UpdateGUI()
     for (unsigned int i =0;i<sceneVariables.size();++i)
     {
         generalList->SetItem(generalBaseItemCount+i, 0, sceneVariables[i].GetName());
-        generalList->SetItem(generalBaseItemCount+i, 1, sceneVariables[i].Gettexte());
+        generalList->SetItem(generalBaseItemCount+i, 1, sceneVariables[i].GetString());
         generalList->SetItemFont(generalBaseItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -288,7 +288,7 @@ void DebuggerGUI::UpdateGUI()
     for (unsigned int i =0;i<gameVariables.size();++i)
     {
         generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, gameVariables[i].GetName());
-        generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, gameVariables[i].Gettexte());
+        generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, gameVariables[i].GetString());
         generalList->SetItemFont(generalBaseAndVariablesItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -423,7 +423,7 @@ void DebuggerGUI::UpdateGUI()
     for (unsigned int i =0;i<objectVariables.size();++i)
     {
         objectList->SetItem(baseItemCount+i, 0, objectVariables[i].GetName());
-        objectList->SetItem(baseItemCount+i, 1, objectVariables[i].Gettexte());
+        objectList->SetItem(baseItemCount+i, 1, objectVariables[i].GetString());
     }
 }
 
@@ -540,7 +540,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         if ( idVariable >= 0 && idVariable < objectVariables.size() )
         {
-            string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une variable"), objectVariables[idVariable].Gettexte()).mb_str());
+            string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une variable"), objectVariables[idVariable].GetString()).mb_str());
 
             object->variablesObjet.ObtainVariable(objectVariables[idVariable].GetName()) = newValue;
         }
@@ -562,8 +562,8 @@ void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
         if (id < 0 || id > sceneVariables.size())
             return;
 
-        string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), sceneVariables[id].Gettexte()).mb_str());
-        scene.variables.ObtainVariable(sceneVariables[id].GetName()).Settexte(newValue);
+        string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), sceneVariables[id].GetString()).mb_str());
+        scene.variables.ObtainVariable(sceneVariables[id].GetName()).SetString(newValue);
     }
     else if ( event.GetIndex() < ( generalBaseAndVariablesItemCount + gameVariables.size()) )
     {
@@ -571,8 +571,8 @@ void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
         if (id < 0 || id > gameVariables.size())
             return;
 
-        string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"),gameVariables[id].Gettexte()).mb_str());
-        scene.game->variables.ObtainVariable(gameVariables[id].GetName()).Settexte(newValue);
+        string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"),gameVariables[id].GetString()).mb_str());
+        scene.game->variables.ObtainVariable(gameVariables[id].GetName()).SetString(newValue);
     }
 }
 

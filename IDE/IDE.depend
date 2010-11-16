@@ -62,7 +62,7 @@
 
 1253304887 c:\libs\wxwidgets\include\wx\osx\config_xcode.h
 
-1253304862 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+1253304862 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
 
 1253304918 c:\libs\wxwidgets\include\wx\setup_gccxml.h
 
@@ -1753,7 +1753,7 @@
 1253304853 c:\libs\wxwidgets\include\wx\palmos\imaglist.h
 	"wx/bitmap.h"
 
-1278074136 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
+1289760454 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
 	"GDL/Object.h"
 	"GDL/Scene.h"
 	"GDL/ListVariable.h"
@@ -4479,7 +4479,7 @@
 	<iostream>
 	"GDL/GDExpression.h"
 
-1282045322 d:\florian\programmation\gamedevelop\gdl\gdl\gdexpression.h
+1289854222 d:\florian\programmation\gamedevelop\gdl\gdl\gdexpression.h
 	<string>
 	<vector>
 	<iostream>
@@ -8679,7 +8679,7 @@
 	<string>
 	<vector>
 
-1289658566 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
+1289670721 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
 	"ChoixAction.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -9193,7 +9193,7 @@
 	<string>
 	<vector>
 
-1281536340 d:\florian\programmation\gamedevelop\gdl\gdl\bitmapguimanager.h
+1289669969 d:\florian\programmation\gamedevelop\gdl\gdl\bitmapguimanager.h
 	<wx/bitmap.h>
 	<string>
 
@@ -10012,7 +10012,7 @@
 	<vector>
 	<wx/msgdlg.h>
 
-1284915001 source:d:\florian\programmation\gamedevelop\ide\choixcondition.cpp
+1289670721 source:d:\florian\programmation\gamedevelop\ide\choixcondition.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"ChoixCondition.h"
@@ -10489,7 +10489,7 @@
 	"GDL/Game.h"
 	"GDL/ImageManager.h"
 
-1287766808 d:\florian\programmation\gamedevelop\gdl\gdl\imagemanager.h
+1289761284 d:\florian\programmation\gamedevelop\gdl\gdl\imagemanager.h
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
@@ -11448,7 +11448,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1285009480 source:d:\florian\programmation\gamedevelop\ide\editorobjectlist.cpp
+1289748398 source:d:\florian\programmation\gamedevelop\ide\editorobjectlist.cpp
 	"EditorObjectList.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -12914,7 +12914,7 @@
 	<wx/string.h>
 	<iostream>
 
-1288989176 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1289938635 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<SFML/System.hpp>
@@ -13024,9 +13024,9 @@
 	"wx/msw/rcdefs.h"
 	"version.h"
 
-1253433586 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\msw\rcdefs.h
+1263934043 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1289658566 d:\florian\programmation\gamedevelop\ide\version.h
+1289938637 d:\florian\programmation\gamedevelop\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -13167,5 +13167,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1289606607 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1289938158 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

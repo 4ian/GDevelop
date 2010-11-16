@@ -908,10 +908,10 @@
 			</AutoVersioning>
 			<DoxyBlocks>
 				<comment_style block="0" line="0" />
-				<doxyfile_project />
+				<doxyfile_project output_directory="doc" />
 				<doxyfile_build />
 				<doxyfile_warnings />
-				<doxyfile_output />
+				<doxyfile_output html_help="1" />
 				<doxyfile_dot />
 				<general />
 			</DoxyBlocks>

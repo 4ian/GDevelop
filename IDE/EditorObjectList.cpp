@@ -706,7 +706,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     //Be sure the name is valid
     if ( !CheckObjectName(newName) )
     {
-        wxMessageBox(_("Le nom de l'objet contient des espaces, des caractères non autorisés ou représente un nom d'une expression. Utilisez uniquement des lettres, chiffres et underscores ( _ )."), _("Attention"), wxICON_EXCLAMATION, this);
+        wxMessageBox(_("Le nom de l'objet contient des espaces, des caractères non autorisés ou représente un nom d'une expression. Utilisez uniquement des lettres, chiffres et underscores ( _ )."), _("Attention"), wxOK | wxICON_EXCLAMATION, this);
 
         Refresh();
         return;

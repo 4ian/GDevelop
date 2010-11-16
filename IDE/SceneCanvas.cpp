@@ -195,18 +195,22 @@ void SceneCanvas::OnKey( wxKeyEvent& evt )
 
 void SceneCanvas::Refresh()
 {
-    //On vérifie qu'on ne doit pas mettre à jour la scène
     if ( !scene.running || scene.editing )
     {
-        if ( gameEdited.imagesWereModified )
+        //Reload changed images.
+        for (unsigned int i = 0;i<gameEdited.imagesChanged.size();++i)
+            game.imageManager->ReloadImage(gameEdited.imagesChanged[i]);
+
+        if ( !gameEdited.imagesChanged.empty() )
         {
             gameEdited.imageManager->LoadPermanentImages();
-            gameEdited.imagesWereModified = false;
+            gameEdited.imagesChanged.clear();
+            sceneEdited.wasModified = true;
         }
-        else if ( sceneEdited.wasModified )
+
+        if ( sceneEdited.wasModified )
             Reload();
     }
-
     if ( scene.running )
     {
         int retourEvent = scene.RenderAndStep(1);

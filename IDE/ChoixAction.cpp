@@ -450,7 +450,6 @@ void ChoixAction::RefreshList()
             {
                 groupItem = ActionsTree->GetNextSibling(groupItem);
             }
-            std::cout << "Add with it->second.group " << it->second.group << std::endl;
             if ( !groupItem.IsOk() ) groupItem = ActionsTree->AppendItem(extensionItem, it->second.group, 0);
 
             //Add action item
@@ -462,12 +461,13 @@ void ChoixAction::RefreshList()
             }
 
             gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
-            cout << "groupItem" << groupItem << "extensionItem" << extensionItem;
             ActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
         }
 
         if ( !ActionsTree->HasChildren(extensionItem) ) ActionsTree->Delete(extensionItem);
 	}
+
+	if ( searching ) ActionsTree->ExpandAll();
 }
 
 void ChoixAction::RefreshObjectsLists()
@@ -594,6 +594,8 @@ void ChoixAction::RefreshObjectActionsList()
 
 	    if ( !objectActionsTree->HasChildren(extensionItem) ) objectActionsTree->Delete(extensionItem);
 	}
+
+	if ( searching ) objectActionsTree->ExpandAll();
 }
 
 /**
@@ -642,7 +644,8 @@ void ChoixAction::RefreshFromAction()
 
     NomActionTxt->SetLabel( instructionInfos.fullname );
     ActionTextTxt->SetLabel( instructionInfos.description );
-    ActionImg->SetBitmap( instructionInfos.icon );
+    if ( instructionInfos.icon.IsOk() ) ActionImg->SetBitmap( instructionInfos.icon );
+    else ActionImg->SetBitmap(BitmapGUIManager::getInstance()->unknown24);
 
     //Update parameters values
     for ( unsigned int i = 0;i < Param.size();i++ )

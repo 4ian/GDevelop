@@ -136,7 +136,7 @@ scene(scene_)
     wxStaticBoxSizer* StaticBoxSizer1;
     wxFlexGridSizer* FlexGridSizer1;
     wxBoxSizer* BoxSizer3;
-    
+
     Create(parent, wxID_ANY, _("Editer la condition"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(650,236));
     SetMinSize(wxSize(640,480));
@@ -261,7 +261,7 @@ scene(scene_)
     SetSizer(BoxSizer6);
     BoxSizer6->SetSizeHints(this);
     Center();
-    
+
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixCondition::OnConditionsTreeSelectionChanged);
     Connect(ID_TREECTRL2,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixCondition::OnObjetsListSelectionChanged);
     Connect(ID_TREECTRL3,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixCondition::OnObjetsListSelectionChanged);
@@ -519,6 +519,8 @@ void ChoixCondition::RefreshList()
 
 	    if ( !ConditionsTree->HasChildren(extensionItem) ) ConditionsTree->Delete(extensionItem);
 	}
+
+	if ( searching ) ConditionsTree->ExpandAll();
 }
 
 void ChoixCondition::RefreshObjectsLists()
@@ -645,6 +647,8 @@ void ChoixCondition::RefreshObjectConditionsList()
 
 	    if ( !objectConditionsTree->HasChildren(extensionItem) ) objectConditionsTree->Delete(extensionItem);
 	}
+
+	if ( searching ) objectConditionsTree->ExpandAll();
 }
 
 void ChoixCondition::OnConditionsTreeSelectionChanged( wxTreeEvent& event )
@@ -691,7 +695,8 @@ void ChoixCondition::RefreshFromCondition()
 
     NomConditionTxt->SetLabel( instructionInfos.fullname );
     ConditionTextTxt->SetLabel( instructionInfos.description );
-    ConditionImg->SetBitmap( instructionInfos.icon );
+    if ( instructionInfos.icon.IsOk() ) ConditionImg->SetBitmap( instructionInfos.icon );
+    else ConditionImg->SetBitmap(BitmapGUIManager::getInstance()->unknown24);
 
     for ( unsigned int i = 0;i < MaxPara;i++ )
     {

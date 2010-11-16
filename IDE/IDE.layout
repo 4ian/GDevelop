@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug - Edittime" />
+	<ActiveTarget name="Development - Edittime" />
 	<File name="AutomatismTypeChoice.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="1129" topLine="18" />
 	</File>
@@ -28,14 +28,14 @@
 	<File name="ChoiceJoyAxis.h" open="0" top="0" tabpos="13">
 		<Cursor position="288" topLine="0" />
 	</File>
-	<File name="ChoixAction.cpp" open="1" top="1" tabpos="17">
-		<Cursor position="18423" topLine="367" />
+	<File name="ChoixAction.cpp" open="0" top="0" tabpos="17">
+		<Cursor position="31856" topLine="562" />
 	</File>
 	<File name="ChoixAction.h" open="0" top="0" tabpos="4">
 		<Cursor position="596" topLine="6" />
 	</File>
 	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="28475" topLine="509" />
+		<Cursor position="28222" topLine="513" />
 	</File>
 	<File name="ChoixCondition.h" open="0" top="0" tabpos="0">
 		<Cursor position="692" topLine="17" />
@@ -226,8 +226,8 @@
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="9">
 		<Cursor position="912" topLine="1" />
 	</File>
-	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="23580" topLine="450" />
+	<File name="Game_Develop_EditorMain.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="23922" topLine="450" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="5">
 		<Cursor position="8569" topLine="181" />
@@ -292,8 +292,8 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="22" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="10145" topLine="248" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="8402" topLine="194" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="21">
 		<Cursor position="3411" topLine="44" />

@@ -683,7 +683,22 @@ bool ParticleEmitterObject::ActParticleAngleRandomness2( RuntimeScene & scene, O
 bool ParticleEmitterObject::ActTexture( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     textureParticleName = action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this());
-    if ( rendererType == Quad ) particleSystem.openGLTextureParticle = scene.game->imageManager->GetOpenGLTexture(textureParticleName);
+    if ( rendererType == Quad )
+    {
+        //Load new texture
+        particleSystem.openGLTextureParticle = scene.game->imageManager->GetOpenGLTexture(textureParticleName);
+
+	    //Notify the renderer of the change
+	    SPK::GL::GLQuadRenderer * quadRenderer = dynamic_cast<SPK::GL::GLQuadRenderer*>(particleSystem.renderer);
+
+        if ( quadRenderer && particleSystem.openGLTextureParticle->GetOpenGLTexture() != 0 )
+        {
+            quadRenderer->setTexturingMode(SPK::TEXTURE_2D);
+            quadRenderer->setTexture(particleSystem.openGLTextureParticle->GetOpenGLTexture());
+        }
+    }
+
+    return true;
 }
 
 bool ParticleEmitterObject::ActRecreateParticleSystem( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )

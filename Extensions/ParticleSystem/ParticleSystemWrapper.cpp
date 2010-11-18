@@ -34,7 +34,8 @@ particleSystem(NULL),
 particleModel(NULL),
 emitter(NULL),
 zone(NULL),
-group(NULL)
+group(NULL),
+renderer(NULL)
 {
     if ( !SPKinitialized )
     {
@@ -53,6 +54,7 @@ ParticleSystemWrapper::~ParticleSystemWrapper()
     if ( emitter ) delete emitter;
     if ( zone ) delete zone;
     if ( group ) delete group;
+    if ( renderer ) delete renderer;
 }
 
 void ParticleSystemWrapper::Init(const ParticleSystemWrapper & other)
@@ -62,6 +64,7 @@ void ParticleSystemWrapper::Init(const ParticleSystemWrapper & other)
     if ( emitter ) delete emitter;
     if ( zone ) delete zone;
     if ( group ) delete group;
+    if ( renderer ) delete renderer;
 
     //Don't initialize members if the other object's member are NULL.
     if ( other.particleModel == NULL ) return;

@@ -50,6 +50,7 @@ class ParticleSystemWrapper
             emitter = NULL;
             zone = NULL;
             group = NULL;
+            renderer = NULL;
             Init(other);
         };
         ParticleSystemWrapper & operator=(const ParticleSystemWrapper & other)
@@ -64,6 +65,7 @@ class ParticleSystemWrapper
         SPK::SphericEmitter * emitter;
         SPK::Sphere * zone;
         SPK::Group * group;
+        SPK::GL::GLRenderer * renderer;
         boost::shared_ptr<OpenGLTextureWrapper> openGLTextureParticle;
 
     private:

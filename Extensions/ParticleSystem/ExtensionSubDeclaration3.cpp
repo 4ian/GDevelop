@@ -207,6 +207,10 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
 
     DECLARE_END_OBJECT_CONDITION()
 
+    DECLARE_OBJECT_STR_EXPRESSION("Texture", _("Image des particules"), _("Nom de l'image affichée par les particules"), _("Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpTexture)
+        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_END_OBJECT_STR_EXPRESSION()
+
     DECLARE_OBJECT_EXPRESSION("NbParticles", _("Nombre de particules"), _("Nombre de particules"), _("Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpNbParticles)
         DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
     DECLARE_END_OBJECT_EXPRESSION()

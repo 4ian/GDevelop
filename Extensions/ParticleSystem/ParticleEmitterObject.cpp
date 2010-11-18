@@ -382,9 +382,8 @@ void ParticleEmitterObject::CreateParticleSystem()
 	UpdateLifeTime();
 
 	// Create the renderer
-	SPK::GL::GLRenderer* renderer = NULL;
 	if ( rendererType == Line )
-	    renderer = SPK::GL::GLLineRenderer::create(rendererParam1,rendererParam2);
+	    particleSystem.renderer = SPK::GL::GLLineRenderer::create(rendererParam1,rendererParam2);
 	else if ( rendererType == Quad)
 	{
 	    SPK::GL::GLQuadRenderer * quadRenderer = new SPK::GL::GLQuadRenderer(rendererParam1,rendererParam2);
@@ -395,7 +394,7 @@ void ParticleEmitterObject::CreateParticleSystem()
             quadRenderer->setTexture(particleSystem.openGLTextureParticle->GetOpenGLTexture());
         }
 
-        renderer = quadRenderer;
+        particleSystem.renderer = quadRenderer;
 	}
 	else
 	{
@@ -403,14 +402,14 @@ void ParticleEmitterObject::CreateParticleSystem()
         pointRenderer->setType(SPK::POINT_CIRCLE);
         pointRenderer->setSize(rendererParam1);
 
-        renderer = pointRenderer;
+        particleSystem.renderer = pointRenderer;
 	}
 
-	renderer->enableBlending(true);
-	if ( additive ) renderer->setBlendingFunctions(GL_SRC_ALPHA,GL_ONE);
-    else renderer->setBlendingFunctions(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	renderer->setTextureBlending(GL_MODULATE); //Texture color modulated with particle color
-	renderer->enableRenderingHint(SPK::DEPTH_TEST,false); //No depth test for performance
+	particleSystem.renderer->enableBlending(true);
+	if ( additive ) particleSystem.renderer->setBlendingFunctions(GL_SRC_ALPHA,GL_ONE);
+    else particleSystem.renderer->setBlendingFunctions(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	particleSystem.renderer->setTextureBlending(GL_MODULATE); //Texture color modulated with particle color
+	particleSystem.renderer->enableRenderingHint(SPK::DEPTH_TEST,false); //No depth test for performance
 
 	// Create the zone
 	particleSystem.zone = SPK::Sphere::create(SPK::Vector3D(GetX()*0.25f, -GetY()*0.25f, 0.0f), zoneRadius);
@@ -427,7 +426,7 @@ void ParticleEmitterObject::CreateParticleSystem()
 	particleSystem.group->addEmitter(particleSystem.emitter);
 	particleSystem.group->setGravity(SPK::Vector3D(particleGravityX,-particleGravityY,particleGravityZ));
 	particleSystem.group->setFriction(friction);
-	particleSystem.group->setRenderer(renderer);
+	particleSystem.group->setRenderer(particleSystem.renderer);
 
 	// Create the System
 	particleSystem.particleSystem = SPK::System::create();

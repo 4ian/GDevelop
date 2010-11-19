@@ -24,6 +24,7 @@
 #include "GDL/MainEditorCommand.h"
 #include "MemTrace.h"
 #include "EdittimeScene.h"
+class InitialPositionBrowserDlg;
 
 extern MemTrace MemTracer;
 
@@ -61,9 +62,12 @@ public :
 
     void UpdateScrollbars();
     void SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_);
+    void SetInitialPositionBrowser(InitialPositionBrowserDlg * browser) { initialPositionsBrowser = browser; }
 
     void OnAddObjetSelected(wxCommandEvent & event);
     void AddObjetSelected(float x, float y);
+
+    int GetInitialPositionFromObject(ObjSPtr object);
 
 private :
 
@@ -92,7 +96,6 @@ private :
     void OnPasteSelected(wxCommandEvent & event);
 
     //Fonctions outils
-    int GetInitialPositionFromObject(ObjSPtr object);
     int GetObjectsSelectedHighestLayer();
     int GetObjectsSelectedLowestLayer();
 
@@ -110,9 +113,10 @@ private :
     wxMenu contextMenu;
     wxMenu noObjectContextMenu;
 
-    //Pointeurs vers les barres de défilements
-    wxScrollBar * scrollBar1;
-    wxScrollBar * scrollBar2;
+    wxScrollBar * scrollBar1; ///< Link to the scrollbar used by the sceneCanvas.
+    wxScrollBar * scrollBar2; ///< Link to the scrollbar used by the sceneCanvas.
+
+    InitialPositionBrowserDlg * initialPositionsBrowser; ///< Link to the initial positions browser used by the sceneCanvas.
 };
 
 

@@ -672,6 +672,8 @@
 		<Unit filename="ImportImage.h">
 			<Option virtualFolder="Editeur principal\Outils\" />
 		</Unit>
+		<Unit filename="InitialPositionBrowserDlg.cpp" />
+		<Unit filename="InitialPositionBrowserDlg.h" />
 		<Unit filename="InitialVariablesDialog.cpp" />
 		<Unit filename="InitialVariablesDialog.h" />
 		<Unit filename="MAJ.cpp">
@@ -898,6 +900,7 @@
 					<wxPanel wxs="wxsmith/StartHerePage.wxs" src="StartHerePage.cpp" hdr="StartHerePage.h" fwddecl="0" i18n="1" name="StartHerePage" language="CPP" />
 					<wxPanel wxs="wxsmith/ExternalEventsEditor.wxs" src="ExternalEventsEditor.cpp" hdr="ExternalEventsEditor.h" fwddecl="0" i18n="1" name="ExternalEventsEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/AutomatismTypeChoice.wxs" src="AutomatismTypeChoice.cpp" hdr="AutomatismTypeChoice.h" fwddecl="0" i18n="1" name="AutomatismTypeChoice" language="CPP" />
+					<wxPanel wxs="wxsmith/InitialPositionBrowserDlg.wxs" src="InitialPositionBrowserDlg.cpp" hdr="InitialPositionBrowserDlg.h" fwddecl="0" i18n="1" name="InitialPositionBrowserDlg" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

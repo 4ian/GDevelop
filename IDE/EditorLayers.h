@@ -6,6 +6,7 @@
 #include <wx/sizer.h>
 #include <wx/menu.h>
 #include <wx/panel.h>
+#include <wx/imaglist.h>
 //*)
 #include <wx/toolbar.h>
 #include "GDL/Scene.h"
@@ -25,6 +26,7 @@ class EditorLayers: public wxPanel
 		wxListCtrl* layersList;
 		wxMenu contextMenu;
 		wxPanel* toolBarPanel;
+		wxImageList* imageList;
 		//*)
 
 		void Refresh();

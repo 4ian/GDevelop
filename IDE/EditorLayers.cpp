@@ -73,6 +73,7 @@ mainEditorCommand(mainEditorCommand_)
 	MenuItem5 = new wxMenuItem((&contextMenu), idMenuDown, _("Déplacer au dessous"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
 	contextMenu.Append(MenuItem5);
+	imageList = new wxImageList(16, 16, 1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
@@ -89,6 +90,10 @@ mainEditorCommand(mainEditorCommand_)
 	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorLayers::OnRefresh);
 	Connect(ID_BITMAPBUTTON6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorLayers::OnMoreOptions);
 	Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorLayers::OnHelp);
+
+    imageList->Add(wxBitmap("res/1rightarrow.png", wxBITMAP_TYPE_ANY));
+    imageList->Add(wxBitmap("res/1rightarrow.png", wxBITMAP_TYPE_ANY));
+    layersList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
     CreateToolbar();
 
@@ -171,8 +176,8 @@ void EditorLayers::Refresh()
 {
     layersList->ClearAll();
 
-	layersList->InsertColumn(0, "Nom du calque");
-	layersList->InsertColumn(1, "Visible");
+	layersList->InsertColumn(1, "Calque");
+	layersList->InsertColumn(2, "Visible");
 
     for (unsigned int i =0;i<layers->size();++i)
     {
@@ -184,6 +189,8 @@ void EditorLayers::Refresh()
             layersList->SetItem(0, 1, _("Oui"));
         else
             layersList->SetItem(0, 1, _("Non"));
+
+        //layersList->SetItemImage(0,1,0); //TODO
     }
     layersList->SetColumnWidth( 0, wxLIST_AUTOSIZE );
     layersList->SetColumnWidth( 0, wxLIST_AUTOSIZE );

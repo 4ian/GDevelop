@@ -27,6 +27,7 @@
 #include "GDL/RuntimeGame.h"
 #include "Clipboard.h"
 #include "DndTextSceneEditor.h"
+#include "InitialPositionBrowserDlg.h"
 #include <wx/cursor.h>
 
 const long SceneCanvas::ID_ADDOBJMENU = wxNewId();
@@ -47,7 +48,8 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
         mainEditorCommand( mainEditorCommand_ ),
         hasJustRightClicked(false),
         scrollBar1(NULL),
-        scrollBar2(NULL)
+        scrollBar2(NULL),
+        initialPositionsBrowser(NULL)
 {
     MemTracer.AddObj( "Editeur de scène", ( long )this );
 
@@ -333,6 +335,8 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
         scene.xObjectsSelected.clear();
         scene.yObjectsSelected.clear();
 
+        if ( initialPositionsBrowser )
+            initialPositionsBrowser->DeselectAll();
     }
 
     //Manage selection area
@@ -390,6 +394,9 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
             //Et on renseigne sa position de départ :
             scene.xObjectsSelected.push_back(object->GetX());
             scene.yObjectsSelected.push_back(object->GetY());
+
+            if ( initialPositionsBrowser )
+                initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
         }
 
         scene.isMovingObject = true;
@@ -422,6 +429,9 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
             {
                 scene.xObjectsSelected[i] = sceneEdited.initialObjectsPositions.at( IDInitialPosition ).x;
                 scene.yObjectsSelected[i] = sceneEdited.initialObjectsPositions.at( IDInitialPosition ).y;
+
+                if ( initialPositionsBrowser )
+                    initialPositionsBrowser->SelectInitialPosition(IDInitialPosition);
             }
         }
     }
@@ -454,6 +464,9 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
                         //Et on renseigne sa position de départ :
                         scene.xObjectsSelected.push_back(object->GetX());
                         scene.yObjectsSelected.push_back(object->GetY());
+
+                        if ( initialPositionsBrowser )
+                            initialPositionsBrowser->SelectInitialPosition(IDInitialPosition);
                     }
                 }
              }
@@ -701,6 +714,9 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
         scene.objectsSelected.clear();
         scene.xObjectsSelected.clear();
         scene.yObjectsSelected.clear();
+
+        if ( initialPositionsBrowser )
+            initialPositionsBrowser->DeselectAll();
     }
 
     if ( object == boost::shared_ptr<Object> () ) //Popup "no object" context menu
@@ -717,6 +733,9 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
         //Must also register its position
         scene.xObjectsSelected.push_back(object->GetX());
         scene.yObjectsSelected.push_back(object->GetY());
+
+        if ( initialPositionsBrowser )
+            initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
     }
 
     OnUpdate(); //So as to display selection rectangle for the newly selected object
@@ -792,6 +811,9 @@ void SceneCanvas::OnCutSelected(wxCommandEvent & event)
     scene.objectsSelected.clear();
     scene.xObjectsSelected.clear();
     scene.yObjectsSelected.clear();
+
+    if ( initialPositionsBrowser )
+        initialPositionsBrowser->DeselectAll();
 
     Clipboard::getInstance()->SetPositionsSelection(copiedPositions);
 }
@@ -914,6 +936,9 @@ void SceneCanvas::OnDelObjetSelected(wxCommandEvent & event)
     scene.objectsSelected.clear();
     scene.xObjectsSelected.clear();
     scene.yObjectsSelected.clear();
+
+    if ( initialPositionsBrowser )
+        initialPositionsBrowser->Refresh();
 
     ChangesMade();
 }

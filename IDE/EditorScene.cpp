@@ -26,6 +26,7 @@
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/toolbar.h>
+class InitialPositionBrowserDlg;
 
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
@@ -222,6 +223,8 @@ externalWindow(this)
     sceneCanvas->SetScrollbars(ScrollBar1, ScrollBar2);
     debugger = new DebuggerGUI(this, sceneCanvas->scene);
     sceneCanvas->scene.debugger = debugger;
+    positionsBrowser = new InitialPositionBrowserDlg(this, scene.initialObjectsPositions, *sceneCanvas);
+    sceneCanvas->SetInitialPositionBrowser(positionsBrowser);
 
     notebook->SetArtProvider(new GDAuiTabArt);
     notebook->SetPageBitmap(0, wxBitmap( "res/sceneeditor.png", wxBITMAP_TYPE_ANY ) );
@@ -235,6 +238,7 @@ externalWindow(this)
     m_mgr.AddPane( objectsEditor, wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Editeur d'objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
     m_mgr.AddPane( layersEditor, wxAuiPaneInfo().Name( wxT( "EL" ) ).Float().CloseButton( true ).Caption( _( "Editeur de calques" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
     m_mgr.AddPane( debugger, wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+    m_mgr.AddPane( positionsBrowser, wxAuiPaneInfo().Name( wxT( "IPB" ) ).Float().CloseButton( true ).Caption( _( "Positions initiales des objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(true) );
 
     toolbar = new wxToolBar( Panel2, -1, wxDefaultPosition, wxDefaultSize,
                                    wxTB_FLAT | wxTB_NODIVIDER );

@@ -28,6 +28,7 @@ class EditorEvents;
 #include "EditorLayers.h"
 #include "RenderDialog.h"
 #include "DebuggerGUI.h"
+#include "InitialPositionBrowserDlg.h"
 #include <string>
 #include <vector>
 
@@ -69,6 +70,7 @@ class EditorScene: public wxPanel
 		EditorObjets *  objectsEditor;
 		EditorLayers *  layersEditor;
         DebuggerGUI *   debugger;
+        InitialPositionBrowserDlg * positionsBrowser;
 
 		Scene & scene;
 

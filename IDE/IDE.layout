@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="AutomatismTypeChoice.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="1129" topLine="18" />
+	<File name="AutomatismTypeChoice.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="7920" topLine="121" />
 	</File>
 	<File name="AutomatismTypeChoice.h" open="0" top="0" tabpos="3">
 		<Cursor position="847" topLine="17" />
@@ -100,8 +100,8 @@
 	<File name="Credits.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="13263" topLine="204" />
 	</File>
-	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="12027" topLine="243" />
+	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="24886" topLine="556" />
 	</File>
 	<File name="DebuggerGUI.h" open="0" top="0" tabpos="0">
 		<Cursor position="2773" topLine="93" />
@@ -178,17 +178,17 @@
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="24741" topLine="404" />
+	<File name="EditorScene.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="33674" topLine="601" />
 	</File>
-	<File name="EditorScene.h" open="0" top="0" tabpos="20">
-		<Cursor position="5473" topLine="154" />
+	<File name="EditorScene.h" open="1" top="0" tabpos="5">
+		<Cursor position="682" topLine="10" />
 	</File>
-	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="7407" topLine="157" />
+	<File name="EdittimeScene.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="2488" topLine="70" />
 	</File>
 	<File name="EdittimeScene.h" open="0" top="0" tabpos="23">
-		<Cursor position="584" topLine="19" />
+		<Cursor position="1315" topLine="32" />
 	</File>
 	<File name="EventsRefactorer.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="22579" topLine="527" />
@@ -226,7 +226,7 @@
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="9">
 		<Cursor position="912" topLine="1" />
 	</File>
-	<File name="Game_Develop_EditorMain.cpp" open="1" top="0" tabpos="1">
+	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="23922" topLine="450" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="5">
@@ -244,8 +244,14 @@
 	<File name="ImportImage.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="29134" topLine="422" />
 	</File>
-	<File name="InitialVariablesDialog.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="6709" topLine="95" />
+	<File name="InitialPositionBrowserDlg.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="2739" topLine="40" />
+	</File>
+	<File name="InitialPositionBrowserDlg.h" open="1" top="0" tabpos="3">
+		<Cursor position="801" topLine="4" />
+	</File>
+	<File name="InitialVariablesDialog.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="13929" topLine="282" />
 	</File>
 	<File name="InitialVariablesDialog.h" open="0" top="0" tabpos="1">
 		<Cursor position="1416" topLine="54" />
@@ -292,11 +298,11 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="22" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="8402" topLine="194" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="384" topLine="12" />
 	</File>
-	<File name="SceneCanvas.h" open="0" top="0" tabpos="21">
-		<Cursor position="3411" topLine="44" />
+	<File name="SceneCanvas.h" open="1" top="0" tabpos="7">
+		<Cursor position="640" topLine="43" />
 	</File>
 	<File name="SearchEvents.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="15843" topLine="234" />

@@ -290,7 +290,7 @@ ribbonSceneEditorButtonBar(NULL)
     }
     {
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Scène"));
-        ribbonSceneEditorButtonBar = EditorScene::CreateRibbonPage(ribbonEditorPage);
+        ribbonSceneEditorButtonBar = SceneCanvas::CreateRibbonPage(ribbonEditorPage);
     }
     {
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Evènements"));

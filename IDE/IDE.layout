@@ -154,11 +154,11 @@
 	<File name="EditorEventsConditions.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="564" topLine="0" />
 	</File>
-	<File name="EditorLayers.cpp" open="0" top="0" tabpos="15">
-		<Cursor position="8908" topLine="197" />
+	<File name="EditorLayers.cpp" open="1" top="1" tabpos="8">
+		<Cursor position="8092" topLine="163" />
 	</File>
-	<File name="EditorLayers.h" open="0" top="0" tabpos="10">
-		<Cursor position="2112" topLine="61" />
+	<File name="EditorLayers.h" open="1" top="0" tabpos="9">
+		<Cursor position="688" topLine="16" />
 	</File>
 	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="38045" topLine="826" />
@@ -178,14 +178,14 @@
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="1" top="0" tabpos="6">
+	<File name="EditorScene.cpp" open="1" top="0" tabpos="4">
 		<Cursor position="33674" topLine="601" />
 	</File>
-	<File name="EditorScene.h" open="1" top="0" tabpos="5">
+	<File name="EditorScene.h" open="1" top="0" tabpos="3">
 		<Cursor position="682" topLine="10" />
 	</File>
-	<File name="EdittimeScene.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="2488" topLine="70" />
+	<File name="EdittimeScene.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="2488" topLine="270" />
 	</File>
 	<File name="EdittimeScene.h" open="0" top="0" tabpos="23">
 		<Cursor position="1315" topLine="32" />
@@ -244,11 +244,11 @@
 	<File name="ImportImage.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="29134" topLine="422" />
 	</File>
-	<File name="InitialPositionBrowserDlg.cpp" open="1" top="1" tabpos="2">
-		<Cursor position="2739" topLine="40" />
+	<File name="InitialPositionBrowserDlg.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="2904" topLine="58" />
 	</File>
-	<File name="InitialPositionBrowserDlg.h" open="1" top="0" tabpos="3">
-		<Cursor position="801" topLine="4" />
+	<File name="InitialPositionBrowserDlg.h" open="1" top="0" tabpos="2">
+		<Cursor position="768" topLine="8" />
 	</File>
 	<File name="InitialVariablesDialog.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="13929" topLine="282" />
@@ -298,11 +298,11 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="22" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="384" topLine="12" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="16549" topLine="170" />
 	</File>
-	<File name="SceneCanvas.h" open="1" top="0" tabpos="7">
-		<Cursor position="640" topLine="43" />
+	<File name="SceneCanvas.h" open="1" top="0" tabpos="5">
+		<Cursor position="2171" topLine="62" />
 	</File>
 	<File name="SearchEvents.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="15843" topLine="234" />

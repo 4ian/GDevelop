@@ -5,6 +5,7 @@
 #include <SFML/System.hpp>
 #include "wxSFMLCanvas.hpp"
 #include <wx/dnd.h>
+#include <wx/aui/aui.h>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -24,6 +25,10 @@
 #include "GDL/MainEditorCommand.h"
 #include "MemTrace.h"
 #include "EdittimeScene.h"
+class RenderDialog;
+class EditorObjets;
+class EditorLayers;
+class DebuggerGUI;
 class InitialPositionBrowserDlg;
 
 extern MemTrace MemTracer;
@@ -36,8 +41,7 @@ class SceneCanvas : public wxSFMLCanvas
 {
 public :
 
-    SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & nr_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style );
-
+    SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style );
     ~SceneCanvas() { MemTracer.DelObj((long)this); }
 
     //Le jeu
@@ -47,8 +51,6 @@ public :
     //Used during testing
     RuntimeGame game;
     EdittimeScene scene;
-
-    MainEditorCommand & mainEditorCommand;
 
     /**
      * Call this method when any changes are made so as to manage undo/redo.
@@ -68,6 +70,24 @@ public :
     void AddObjetSelected(float x, float y);
 
     int GetInitialPositionFromObject(ObjSPtr object);
+
+    EditorObjets *  objectsEditor;
+    EditorLayers *  layersEditor;
+    DebuggerGUI *   debugger;
+    RenderDialog *   externalWindow;
+    InitialPositionBrowserDlg * initialPositionsBrowser;
+    wxAuiManager * m_mgr;
+
+    static wxRibbonButtonBar * CreateRibbonPage(wxRibbonPage * page);
+
+    /**
+     * Tool function so as to easily create toolbars for edition or preview
+     */
+    static void CreateToolsBar(wxRibbonButtonBar * bar, bool editing);
+
+    void ConnectEvents();
+
+    void ChangeSize(int parentPanelWidht, int parentPanelHeight);
 
 private :
 
@@ -108,15 +128,69 @@ private :
     static const long ID_CUTMENU;
     static const long ID_PASTEMENU;
 
+    //Identifiers for changing mode
+    static const long idRibbonEditMode;
+    static const long idRibbonPreviewMode;
+
+    //Edition mode identifiers
+    static const long idRibbonObjectsEditor;
+    static const long idRibbonLayersEditor;
+    static const long idRibbonChooseObject;
+    static const long idRibbonChooseLayer;
+    static const long idRibbonOrigine;
+    static const long idRibbonOriginalZoom;
+    static const long idRibbonGrid;
+    static const long idRibbonWindowMask;
+    static const long idRibbonGridSetup;
+    static const long idRibbonUndo;
+    static const long idRibbonRedo;
+
+    //Preview mode identifiers
+    static const long idRibbonRefresh;
+    static const long idRibbonPlay;
+    static const long idRibbonPlayWin;
+    static const long idRibbonPause;
+    static const long idRibbonResetGlobalVars;
+    static const long idRibbonDebugger;
+
+    static const long idRibbonHelp;
+
     bool hasJustRightClicked;
 
     wxMenu contextMenu;
     wxMenu noObjectContextMenu;
 
+    MainEditorCommand & mainEditorCommand;
+
     wxScrollBar * scrollBar1; ///< Link to the scrollbar used by the sceneCanvas.
     wxScrollBar * scrollBar2; ///< Link to the scrollbar used by the sceneCanvas.
 
-    InitialPositionBrowserDlg * initialPositionsBrowser; ///< Link to the initial positions browser used by the sceneCanvas.
+    void OnRefreshBtClick( wxCommandEvent & event );
+    void OnPreviewBtClick( wxCommandEvent & event );
+    void OnEditionBtClick( wxCommandEvent & event );
+
+    void OnOrigineBtClick( wxCommandEvent & event );
+    void OnChoisirObjetBtClick( wxCommandEvent & event );
+    void OnChoisirLayerBtClick( wxCommandEvent & event );
+    void OnZoomInitBtClick( wxCommandEvent & event );
+    void OnZoomMoreBtClick( wxRibbonButtonBarEvent & event );
+    void OnGridBtClick( wxCommandEvent & event );
+    void OnGridSetupBtClick( wxCommandEvent & event );
+
+    void OnPlayBtClick( wxCommandEvent & event );
+    void OnPlayWindowBtClick( wxCommandEvent & event );
+    void OnPauseBtClick( wxCommandEvent & event );
+
+    void OnDebugBtClick( wxCommandEvent & event );
+
+    void OnObjectsEditor( wxCommandEvent & event );
+    void OnLayersEditor( wxCommandEvent & event );
+
+    void OnUndoBtClick( wxCommandEvent & event );
+    void OnRedoBtClick( wxCommandEvent & event );
+    void OnWindowMaskBtClick( wxCommandEvent & event );
+
+    void OnHelpBtClick( wxCommandEvent & event );
 };
 
 

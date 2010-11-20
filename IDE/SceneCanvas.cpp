@@ -1,34 +1,40 @@
 #include "SceneCanvas.h"
 #include <string>
-#include <SFML/System.hpp>
 #include <iostream>
-#include <SFML/Graphics.hpp>
 #include <vector>
-#include <string>
-#include "GDL/Object.h"
 #include <cmath>
-#include "GDL/Collisions.h"
-#include "GDL/Event.h"
-#include <iostream>
 #include <sstream>
-#include "GDL/Chercher.h"
-#include "GDL/CommonTools.h"
-#include "GDL/CommonTools.h"
-#include "EditOptionsPosition.h"
+#include <wx/config.h>
+#include <wx/cursor.h>
 #include <wx/log.h>
 #include <wx/scrolbar.h>
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
+#include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
 #include "GDL/RuntimeScene.h"
 #include "GDL/Chercher.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ImageManager.h"
 #include "GDL/RuntimeGame.h"
+#include "GDL/Object.h"
+#include "GDL/Collisions.h"
+#include "GDL/Event.h"
+#include "GDL/Chercher.h"
+#include "GDL/CommonTools.h"
+#include "GDL/HelpFileAccess.h"
+#include "GDL/ChooseLayer.h"
+#include "GDL/ChooseObject.h"
+#include "EditOptionsPosition.h"
 #include "Clipboard.h"
 #include "DndTextSceneEditor.h"
 #include "InitialPositionBrowserDlg.h"
-#include <wx/cursor.h>
+#include "RenderDialog.h"
+#include "EditorObjets.h"
+#include "EditorLayers.h"
+#include "DebuggerGUI.h"
+#include "GridSetup.h"
 
 const long SceneCanvas::ID_ADDOBJMENU = wxNewId();
 const long SceneCanvas::ID_DELOBJMENU = wxNewId();
@@ -38,6 +44,31 @@ const long SceneCanvas::ID_LAYERDOWNMENU = wxNewId();
 const long SceneCanvas::ID_COPYMENU = wxNewId();
 const long SceneCanvas::ID_CUTMENU = wxNewId();
 const long SceneCanvas::ID_PASTEMENU = wxNewId();
+const long SceneCanvas::idRibbonEditMode = wxNewId();
+const long SceneCanvas::idRibbonPreviewMode = wxNewId();
+
+const long SceneCanvas::idRibbonObjectsEditor = wxNewId();
+const long SceneCanvas::idRibbonLayersEditor = wxNewId();
+const long SceneCanvas::idRibbonChooseObject = wxNewId();
+const long SceneCanvas::idRibbonChooseLayer = wxNewId();
+const long SceneCanvas::idRibbonOrigine = wxNewId();
+const long SceneCanvas::idRibbonOriginalZoom = wxNewId();
+const long SceneCanvas::idRibbonGrid = wxNewId();
+const long SceneCanvas::idRibbonWindowMask = wxNewId();
+const long SceneCanvas::idRibbonGridSetup = wxNewId();
+
+const long SceneCanvas::idRibbonRefresh = wxNewId();
+const long SceneCanvas::idRibbonPlay = wxNewId();
+const long SceneCanvas::idRibbonPlayWin = wxNewId();
+const long SceneCanvas::idRibbonPause = wxNewId();
+const long SceneCanvas::idRibbonResetGlobalVars = wxNewId();
+const long SceneCanvas::idRibbonDebugger = wxNewId();
+
+const long SceneCanvas::idRibbonUndo = wxNewId();
+const long SceneCanvas::idRibbonRedo = wxNewId();
+
+const long SceneCanvas::idRibbonHelp = wxNewId();
+
 
 SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style ) :
         wxSFMLCanvas( Parent, Id, Position, Size, Style ),
@@ -47,9 +78,12 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
         scene(this, &game),
         mainEditorCommand( mainEditorCommand_ ),
         hasJustRightClicked(false),
+        objectsEditor(NULL),
+        layersEditor(NULL),
+        debugger(NULL),
+        initialPositionsBrowser(NULL),
         scrollBar1(NULL),
-        scrollBar2(NULL),
-        initialPositionsBrowser(NULL)
+        scrollBar2(NULL)
 {
     MemTracer.AddObj( "Editeur de scène", ( long )this );
 
@@ -109,12 +143,359 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
     }
 
     SetDropTarget(new DndTextSceneEditor(*this));
+
+    CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), scene.editing);
 }
 
 void SceneCanvas::SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_)
 {
     scrollBar1 = scrollbar1_;
     scrollBar2 = scrollbar2_;
+}
+
+void SceneCanvas::ConnectEvents()
+{
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonEditMode, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnEditionBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonPreviewMode, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPreviewBtClick, NULL, this);
+
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonObjectsEditor, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnObjectsEditor, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonLayersEditor, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnLayersEditor, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonChooseObject, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnChoisirObjetBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonChooseLayer, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnChoisirLayerBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonOrigine, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnOrigineBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonOriginalZoom, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnZoomInitBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonOriginalZoom, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnZoomMoreBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonGrid, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnGridBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonGridSetup, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnGridSetupBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonWindowMask, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnWindowMaskBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnUndoBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnRedoBtClick, NULL, this);
+
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnRefreshBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonPlay, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPlayBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonPlayWin, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPlayWindowBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonPause, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPauseBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonDebugger, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnDebugBtClick, NULL, this);
+/*
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom5Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom10Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom25Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom50Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom100Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom150Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom200Selected, NULL, this);
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom500Selected, NULL, this);*/
+}
+
+/**
+ * Static method for creating the ribbon's page used by Images Editors
+ */
+wxRibbonButtonBar* SceneCanvas::CreateRibbonPage(wxRibbonPage * page)
+{
+    bool hideLabels = false;
+    wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels );
+
+    {
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        ribbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Edition") : "", wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Aperçu") : "", wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY));
+    }
+
+    wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Outils"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonButtonBar *toolsBar = new wxRibbonButtonBar(toolsPanel, wxID_ANY);
+    CreateToolsBar(toolsBar, true); //Create an initial tool bar
+
+    {
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+    }
+
+    return toolsBar; //Returned to the mainEditor, and will then be passed to Scene Editors with MainEditorCommand
+}
+
+void SceneCanvas::OnZoomMoreBtClick(wxRibbonButtonBarEvent& evt)
+{
+    //evt.PopupMenu(&zoomMenu); TODO
+}
+
+void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
+{
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    bool hideLabels = false;
+    pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
+
+    bar->ClearButtons();
+
+    if ( editing )
+    {
+        bar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Editeur d'objets") : "", wxBitmap("res/objeticon24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Editeur de calques") : "", wxBitmap("res/layers24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonChooseObject, !hideLabels ? _("Choisir un objet") : "", wxBitmap("res/addobjet24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonChooseLayer, !hideLabels ? _("Choisir un calque") : "", wxBitmap("res/selectlayer24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonUndo, !hideLabels ? _("Annuler") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonRedo, !hideLabels ? _("Refaire") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonOrigine, !hideLabels ? _("Revenir à l'origine") : "", wxBitmap("res/center24.png", wxBITMAP_TYPE_ANY));
+        bar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Zoom initial") : "", wxBitmap("res/zoom24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonGrid, !hideLabels ? _("Grille") : "", wxBitmap("res/grid24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonGridSetup, !hideLabels ? _("Editer la grille") : "", wxBitmap("res/gridedit24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonWindowMask, !hideLabels ? _("Masque de la fenêtre de jeu") : "", wxBitmap("res/windowMask24.png", wxBITMAP_TYPE_ANY));
+    }
+    else
+    {
+        bar->AddButton(idRibbonRefresh, !hideLabels ? _("Rafraichir") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonPlay, !hideLabels ? _("Jouer") : "", wxBitmap("res/starticon24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonPlayWin, !hideLabels ? _("Jouer dans une fenêtre") : "", wxBitmap("res/startwindow24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", wxBitmap("res/pauseicon24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", wxBitmap("res/bug24.png", wxBITMAP_TYPE_ANY));
+    }
+
+    bar->Realize();
+}
+
+/**
+ * Update the size and position of the canvas displaying the scene
+ */
+void SceneCanvas::ChangeSize(int parentPanelWidht, int parentPanelHeight)
+{
+    cout << "called change size" << parentPanelWidht << parentPanelHeight;
+
+    if ( scene.editing )
+    {
+        //Scene takes all the space available in edition mode.
+        Window::SetSize(parentPanelWidht, parentPanelHeight);
+        wxWindowBase::SetSize(0,0, parentPanelWidht, parentPanelHeight);
+        scene.view.SetSize(parentPanelWidht, parentPanelHeight);
+    }
+    else
+    {
+        //Scene has the size of the game's window size in preview mode.
+        Window::SetSize(game.windowWidth, game.windowHeight);
+        wxWindowBase::SetSize(game.windowWidth, game.windowHeight);
+
+        externalWindow->SetSize(game.windowWidth, game.windowHeight);
+
+        //Scene is centered in preview mode
+        wxWindowBase::SetSize((parentPanelWidht-wxWindowBase::GetSize().GetX())/2,
+                                            (parentPanelHeight-wxWindowBase::GetSize().GetY())/2,
+                                            game.windowWidth, game.windowHeight);
+    }
+}
+
+
+/**
+ * Go in preview mode
+ */
+void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
+{
+    scene.editing = false;
+    scene.running = false;
+
+    scrollBar1->Show(false);
+    scrollBar2->Show(false);
+
+    debugger->Play();
+
+    CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), false);
+    mainEditorCommand.GetRibbonSceneEditorButtonBar()->Refresh();
+}
+
+/**
+ * Go in edition mode
+ */
+void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
+{
+    scene.editing = true;
+    scene.running = false;
+
+    scrollBar1->Show(true);
+    scrollBar2->Show(true);
+
+    scrollBar1->SetSize(0, GetHeight()-scrollBar1->GetSize().GetY(),
+                        GetWidth()-scrollBar2->GetSize().GetX(), wxDefaultCoord);
+    scrollBar2->SetSize(GetWidth()-scrollBar2->GetSize().GetX(), 0,
+                        wxDefaultCoord, GetHeight()-scrollBar1->GetSize().GetY());
+
+    externalWindow->Show(false);
+
+    scene.ChangeRenderWindow(this);
+
+    Reload();
+    scene.RenderEdittimeScene(); //FIXME : Hack to make sure OpenGL Rendering is correct
+
+    scene.ChangeRenderWindow(this);
+
+    debugger->Pause();
+
+    CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), true);
+    mainEditorCommand.GetRibbonSceneEditorButtonBar()->Refresh();
+}
+
+
+void SceneCanvas::OnHelpBtClick( wxCommandEvent & event )
+{
+    HelpFileAccess::getInstance()->DisplaySection(12);
+}
+
+void SceneCanvas::OnLayersEditor( wxCommandEvent & event )
+{
+    m_mgr->GetPane(layersEditor).Show();
+    m_mgr->Update();
+}
+
+void SceneCanvas::OnObjectsEditor( wxCommandEvent & event )
+{
+    m_mgr->GetPane(objectsEditor).Show();
+    m_mgr->Update();
+}
+
+void SceneCanvas::OnRefreshBtClick( wxCommandEvent & event )
+{
+    scene.editing = false;
+    scene.running = false;
+
+    Reload();
+}
+
+void SceneCanvas::OnZoomInitBtClick( wxCommandEvent & event )
+{
+    scene.view.SetSize(GetWidth(), GetHeight());
+}
+
+////////////////////////////////////////////////////////////
+/// Retour aux coordonnées 0;0 de la scène
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnOrigineBtClick(wxCommandEvent & event )
+{
+    scene.view.SetCenter( (game.windowWidth/2),(game.windowHeight/2));
+}
+
+
+////////////////////////////////////////////////////////////
+/// Choisir un objet à ajouter
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnChoisirObjetBtClick( wxCommandEvent & event )
+{
+    ChooseObject Dialog( this, game, scene, false );
+    if ( Dialog.ShowModal() == 1 )
+    {
+        scene.objectToAdd = Dialog.objectChosen;
+    }
+}
+
+////////////////////////////////////////////////////////////
+/// Choisir le calque sur lequel ajouter l'objet
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnChoisirLayerBtClick( wxCommandEvent & event )
+{
+    ChooseLayer Dialog( this, scene.initialLayers, false );
+    if ( Dialog.ShowModal() == 1 )
+    {
+        scene.addOnLayer = Dialog.layerChosen;
+    }
+}
+
+////////////////////////////////////////////////////////////
+/// Activer/Desactiver la grille
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnGridBtClick( wxCommandEvent & event )
+{
+    scene.grid = !scene.grid;
+}
+
+void SceneCanvas::OnWindowMaskBtClick( wxCommandEvent & event )
+{
+    scene.windowMask = !scene.windowMask;
+}
+
+void SceneCanvas::OnUndoBtClick( wxCommandEvent & event )
+{
+    if ( history.size() < 2 )
+        return;
+
+    redoHistory.push_back(sceneEdited.initialObjectsPositions); //On pourra revenir à l'état actuel avec "Refaire"
+    sceneEdited.initialObjectsPositions = history.at( history.size() - 2 ); //-2 car le dernier élément est la liste d'évènement actuelle
+    history.pop_back();
+
+    Reload();
+}
+
+void SceneCanvas::OnRedoBtClick( wxCommandEvent & event )
+{
+    if ( redoHistory.empty() )
+        return;
+
+    history.push_back(redoHistory.back()); //Le dernier élément est la liste d'évènement actuellement éditée
+    sceneEdited.initialObjectsPositions = redoHistory.back();
+    redoHistory.pop_back();
+
+    Reload();
+}
+
+////////////////////////////////////////////////////////////
+/// Activer/Desactiver la grille
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnGridSetupBtClick( wxCommandEvent & event )
+{
+    GridSetup dialog(this, scene.gridWidth, scene.gridHeight, scene.snap, scene.gridR, scene.gridG, scene.gridB);
+    dialog.ShowModal();
+}
+
+/**
+ * Test scene in editor
+ */
+void SceneCanvas::OnPlayBtClick( wxCommandEvent & event )
+{
+    scene.running = true;
+    scene.editing = false;
+
+    externalWindow->Show(false);
+    scene.ChangeRenderWindow(this);
+
+
+    debugger->Play();
+}
+
+/**
+ * Test scene in an external window
+ */
+void SceneCanvas::OnPlayWindowBtClick( wxCommandEvent & event )
+{
+    scene.running = true;
+    scene.editing = false;
+
+    externalWindow->Show(true);
+    externalWindow->renderCanvas->SetFramerateLimit( game.maxFPS );
+    externalWindow->SetSize(GetWidth(), GetHeight());
+    scene.ChangeRenderWindow(externalWindow->renderCanvas);
+
+    scene.RenderAndStep(1);  //FIXME : Hack to make sure OpenGL Rendering is correct
+
+    externalWindow->SetSize(GetWidth(), GetHeight());
+    scene.ChangeRenderWindow(externalWindow->renderCanvas);
+
+    debugger->Play();
+}
+
+////////////////////////////////////////////////////////////
+/// Mettre la scène en pause
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnPauseBtClick( wxCommandEvent & event )
+{
+    scene.running = false;
+    scene.editing = false;
+
+    debugger->Pause();
+}
+
+////////////////////////////////////////////////////////////
+/// Afficher le debugger de la scène
+////////////////////////////////////////////////////////////
+void SceneCanvas::OnDebugBtClick( wxCommandEvent & event )
+{
+    m_mgr->GetPane(debugger).Show();
+    m_mgr->Update();
 }
 
 void SceneCanvas::OnKey( wxKeyEvent& evt )

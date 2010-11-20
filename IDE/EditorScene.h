@@ -24,11 +24,7 @@ class RuntimeGame;
 #endif
 #include "SceneCanvas.h"
 class EditorEvents;
-#include "EditorObjets.h"
-#include "EditorLayers.h"
 #include "RenderDialog.h"
-#include "DebuggerGUI.h"
-#include "InitialPositionBrowserDlg.h"
 #include <string>
 #include <vector>
 
@@ -62,24 +58,12 @@ class EditorScene: public wxPanel
 		EditorEvents* eventsEditor;
 		wxMenuItem* zoom100;
 		wxAuiNotebook* notebook;
-		wxPanel* Panel2;
 		wxMenuItem* zoom500;
 		wxMenuItem* zoom150;
 		wxMenuItem* zoom5;
 		//*)
-		EditorObjets *  objectsEditor;
-		EditorLayers *  layersEditor;
-        DebuggerGUI *   debugger;
-        InitialPositionBrowserDlg * positionsBrowser;
 
 		Scene & scene;
-
-        static wxRibbonButtonBar * CreateRibbonPage(wxRibbonPage * page);
-
-        /**
-         * Tool function so as to easily create toolbars for edition or preview
-         */
-        static void CreateToolsBar(wxRibbonButtonBar * bar, bool editing);
 
         /**
          * Can be called by parent so as to refresh ribbon for this editor.
@@ -89,7 +73,6 @@ class EditorScene: public wxPanel
 	protected:
 
 		//(*Identifiers(EditorScene)
-		static const long ID_PANEL2;
 		static const long ID_SCROLLBAR2;
 		static const long ID_SCROLLBAR1;
 		static const long ID_CUSTOM1;
@@ -108,53 +91,10 @@ class EditorScene: public wxPanel
 		static const long ID_MENUITEM6;
 		static const long ID_MENUITEM7;
 		//*)
-		static const long ID_EDITIONBUTTON;
-		static const long ID_APERCUBUTTON;
-		static const long ID_REFRESHBUTTON;
-		static const long ID_PLAYBUTTON;
-		static const long ID_PAUSEBUTTON;
-		static const long ID_ORIGINEBUTTON;
-        static const long ID_CHOISIROBJBUTTON;
-        static const long ID_ZOOMINITBUTTON;
-        static const long ID_GRIDBUTTON;
-        static const long ID_GRIDSETUPBUTTON;
-        static const long ID_DEBUGBUTTON;
-        static const long ID_VARRAZBUTTON;
-        static const long ID_OBJECTSEDITOR;
-        static const long ID_LAYERSEDITOR;
-        static const long ID_CHOISIRLAYERBUTTON;
-
-        //Identifiers for changing mode
-        static const long idRibbonEditMode;
-        static const long idRibbonPreviewMode;
-
-        //Edition mode identifiers
-        static const long idRibbonObjectsEditor;
-        static const long idRibbonLayersEditor;
-        static const long idRibbonChooseObject;
-        static const long idRibbonChooseLayer;
-        static const long idRibbonOrigine;
-        static const long idRibbonOriginalZoom;
-        static const long idRibbonGrid;
-        static const long idRibbonWindowMask;
-        static const long idRibbonGridSetup;
-        static const long idRibbonUndo;
-        static const long idRibbonRedo;
-
-        //Preview mode identifiers
-        static const long idRibbonRefresh;
-        static const long idRibbonPlay;
-        static const long idRibbonPlayWin;
-        static const long idRibbonPause;
-        static const long idRibbonResetGlobalVars;
-        static const long idRibbonDebugger;
-
-        static const long idRibbonHelp;
 
 	private:
 
 		//(*Handlers(EditorScene)
-		void OnPanel2Resize(wxSizeEvent& event);
 		void OnScrollBar2Scroll(wxScrollEvent& event);
 		void OnScrollBar1Scroll(wxScrollEvent& event);
 		void OnCorePaint(wxPaintEvent& event);
@@ -176,45 +116,12 @@ class EditorScene: public wxPanel
 		void Onzoom300Selected(wxCommandEvent& event);
 		void Onzoom500Selected(wxCommandEvent& event);
 		void Onzoom5Selected(wxCommandEvent& event);
+		void OnPanel2Resize(wxSizeEvent& event);
+		void OnCoreResize1(wxSizeEvent& event);
 		//*)
-        void OnWindowMaskBtClick( wxCommandEvent & event );
-        void UpdateSceneCanvasSize(int parentPanelWidht, int parentPanelHeight);
-        void UpdateScenePanelSize(int parentPanelWidht, int parentPanelHeight);
-
-		void SetToolbarEdition();
-		void SetToolbarApercu();
-
-        void OnRefreshBtClick( wxCommandEvent & event );
-        void OnPreviewBtClick( wxCommandEvent & event );
-        void OnEditionBtClick( wxCommandEvent & event );
-
-        void OnOrigineBtClick( wxCommandEvent & event );
-        void OnChoisirObjetBtClick( wxCommandEvent & event );
-        void OnChoisirLayerBtClick( wxCommandEvent & event );
-        void OnZoomInitBtClick( wxCommandEvent & event );
-        void OnZoomMoreBtClick( wxRibbonButtonBarEvent & event );
-        void OnGridBtClick( wxCommandEvent & event );
-        void OnGridSetupBtClick( wxCommandEvent & event );
-
-        void OnPlayBtClick( wxCommandEvent & event );
-        void OnPlayWindowBtClick( wxCommandEvent & event );
-        void OnPauseBtClick( wxCommandEvent & event );
-
-        void OnDebugBtClick( wxCommandEvent & event );
-
-        void OnObjectsEditor( wxCommandEvent & event );
-        void OnLayersEditor( wxCommandEvent & event );
-
-        void OnUndoBtClick( wxCommandEvent & event );
-        void OnRedoBtClick( wxCommandEvent & event );
-
-        void OnHelpBtClick( wxCommandEvent & event );
-
-        void ConnectEvents();
 
 		RuntimeGame & game;
 		MainEditorCommand mainEditorCommand;
-		wxToolBar * toolbar;
 		RenderDialog externalWindow;
 
         wxAuiManager m_mgr;

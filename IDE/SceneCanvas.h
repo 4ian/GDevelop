@@ -44,6 +44,24 @@ public :
     SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style );
     ~SceneCanvas() { MemTracer.DelObj((long)this); }
 
+    void SetAssociatedObjectsEditor(boost::shared_ptr<EditorObjets> objectsEditor_) { objectsEditor = objectsEditor_; };
+    void SetAssociatedLayersEditor(boost::shared_ptr<EditorLayers> layersEditor_) { layersEditor = layersEditor_; };
+    void SetAssociatedDebugger(boost::shared_ptr<DebuggerGUI> debugger_) { debugger = debugger_; };
+    void SetAssociatedExternalWindow(boost::shared_ptr<RenderDialog> externalWindow_) { externalWindow = externalWindow_; };
+    void SetAssociatedInitialPositionBrowser(boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser_) {initialPositionsBrowser = initialPositionsBrowser_; };
+
+    boost::shared_ptr<EditorObjets> GetAssociatedObjectsEditor() const { return objectsEditor; };
+    boost::shared_ptr<EditorLayers> GetAssociatedLayersEditor() const { return layersEditor; };
+    boost::shared_ptr<DebuggerGUI> GetAssociatedDebugger() const { return debugger; };
+    boost::shared_ptr<RenderDialog> GetAssociatedExternalWindow() const { return externalWindow; };
+    boost::shared_ptr<InitialPositionBrowserDlg> GetAssociatedInitialPositionBrowser() const { return initialPositionsBrowser; };
+
+    void SetParentPanelAndDockManager(wxPanel * parentPanel_, wxAuiManager * m_mgr_) {parentPanel = parentPanel_; m_mgr = m_mgr_; };
+    void SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_) { scrollBar1 = scrollbar1_; scrollBar2 = scrollbar2_;};
+
+    wxScrollBar * GetHorizontalScrollbar() const { return scrollBar1; };
+    wxScrollBar * GetVerticalScrollbar() const { return scrollBar2; };
+
     //Le jeu
     RuntimeGame & gameEdited;
     Scene & sceneEdited;
@@ -56,27 +74,15 @@ public :
      * Call this method when any changes are made so as to manage undo/redo.
      */
     void ChangesMade();
-    vector < vector < InitialPosition > > history; //History of changes
-    vector < vector < InitialPosition > > redoHistory; //Histoy of changes so as to "redo"
-
     void Reload();
     inline void ManualRefresh() { Refresh(); };
 
     void UpdateScrollbars();
-    void SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_);
-    void SetInitialPositionBrowser(InitialPositionBrowserDlg * browser) { initialPositionsBrowser = browser; }
 
     void OnAddObjetSelected(wxCommandEvent & event);
     void AddObjetSelected(float x, float y);
 
     int GetInitialPositionFromObject(ObjSPtr object);
-
-    EditorObjets *  objectsEditor;
-    EditorLayers *  layersEditor;
-    DebuggerGUI *   debugger;
-    RenderDialog *   externalWindow;
-    InitialPositionBrowserDlg * initialPositionsBrowser;
-    wxAuiManager * m_mgr;
 
     static wxRibbonButtonBar * CreateRibbonPage(wxRibbonPage * page);
 
@@ -86,8 +92,7 @@ public :
     static void CreateToolsBar(wxRibbonButtonBar * bar, bool editing);
 
     void ConnectEvents();
-
-    void ChangeSize(int parentPanelWidht, int parentPanelHeight);
+    void UpdateSize();
 
 private :
 
@@ -114,8 +119,27 @@ private :
     void OnCopySelected(wxCommandEvent & event);
     void OnCutSelected(wxCommandEvent & event);
     void OnPasteSelected(wxCommandEvent & event);
+    void OnRefreshBtClick( wxCommandEvent & event );
+    void OnPreviewBtClick( wxCommandEvent & event );
+    void OnEditionBtClick( wxCommandEvent & event );
+    void OnOrigineBtClick( wxCommandEvent & event );
+    void OnChoisirObjetBtClick( wxCommandEvent & event );
+    void OnChoisirLayerBtClick( wxCommandEvent & event );
+    void OnZoomInitBtClick( wxCommandEvent & event );
+    void OnZoomMoreBtClick( wxRibbonButtonBarEvent & event );
+    void OnGridBtClick( wxCommandEvent & event );
+    void OnGridSetupBtClick( wxCommandEvent & event );
+    void OnPlayBtClick( wxCommandEvent & event );
+    void OnPlayWindowBtClick( wxCommandEvent & event );
+    void OnPauseBtClick( wxCommandEvent & event );
+    void OnDebugBtClick( wxCommandEvent & event );
+    void OnObjectsEditor( wxCommandEvent & event );
+    void OnLayersEditor( wxCommandEvent & event );
+    void OnUndoBtClick( wxCommandEvent & event );
+    void OnRedoBtClick( wxCommandEvent & event );
+    void OnWindowMaskBtClick( wxCommandEvent & event );
+    void OnHelpBtClick( wxCommandEvent & event );
 
-    //Fonctions outils
     int GetObjectsSelectedHighestLayer();
     int GetObjectsSelectedLowestLayer();
 
@@ -127,11 +151,9 @@ private :
     static const long ID_COPYMENU;
     static const long ID_CUTMENU;
     static const long ID_PASTEMENU;
-
     //Identifiers for changing mode
     static const long idRibbonEditMode;
     static const long idRibbonPreviewMode;
-
     //Edition mode identifiers
     static const long idRibbonObjectsEditor;
     static const long idRibbonLayersEditor;
@@ -144,7 +166,6 @@ private :
     static const long idRibbonGridSetup;
     static const long idRibbonUndo;
     static const long idRibbonRedo;
-
     //Preview mode identifiers
     static const long idRibbonRefresh;
     static const long idRibbonPlay;
@@ -152,7 +173,6 @@ private :
     static const long idRibbonPause;
     static const long idRibbonResetGlobalVars;
     static const long idRibbonDebugger;
-
     static const long idRibbonHelp;
 
     bool hasJustRightClicked;
@@ -164,33 +184,16 @@ private :
 
     wxScrollBar * scrollBar1; ///< Link to the scrollbar used by the sceneCanvas.
     wxScrollBar * scrollBar2; ///< Link to the scrollbar used by the sceneCanvas.
+    boost::shared_ptr<EditorObjets> objectsEditor;
+    boost::shared_ptr<EditorLayers> layersEditor;
+    boost::shared_ptr<DebuggerGUI> debugger;
+    boost::shared_ptr<RenderDialog> externalWindow;
+    boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser;
+    wxAuiManager * m_mgr;
+    wxPanel * parentPanel;
 
-    void OnRefreshBtClick( wxCommandEvent & event );
-    void OnPreviewBtClick( wxCommandEvent & event );
-    void OnEditionBtClick( wxCommandEvent & event );
-
-    void OnOrigineBtClick( wxCommandEvent & event );
-    void OnChoisirObjetBtClick( wxCommandEvent & event );
-    void OnChoisirLayerBtClick( wxCommandEvent & event );
-    void OnZoomInitBtClick( wxCommandEvent & event );
-    void OnZoomMoreBtClick( wxRibbonButtonBarEvent & event );
-    void OnGridBtClick( wxCommandEvent & event );
-    void OnGridSetupBtClick( wxCommandEvent & event );
-
-    void OnPlayBtClick( wxCommandEvent & event );
-    void OnPlayWindowBtClick( wxCommandEvent & event );
-    void OnPauseBtClick( wxCommandEvent & event );
-
-    void OnDebugBtClick( wxCommandEvent & event );
-
-    void OnObjectsEditor( wxCommandEvent & event );
-    void OnLayersEditor( wxCommandEvent & event );
-
-    void OnUndoBtClick( wxCommandEvent & event );
-    void OnRedoBtClick( wxCommandEvent & event );
-    void OnWindowMaskBtClick( wxCommandEvent & event );
-
-    void OnHelpBtClick( wxCommandEvent & event );
+    vector < vector < InitialPosition > > history; ///< History of changes
+    vector < vector < InitialPosition > > redoHistory; ///< Histoy of changes so as to "redo"
 };
 
 

@@ -1,8 +1,10 @@
 #include "EditorScene.h"
 
 //(*InternalHeaders(EditorScene)
+#include <wx/bitmap.h>
 #include <wx/settings.h>
 #include <wx/intl.h>
+#include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <wx/aui/aui.h>
@@ -39,9 +41,7 @@
 const long EditorScene::ID_SCROLLBAR2 = wxNewId();
 const long EditorScene::ID_SCROLLBAR1 = wxNewId();
 const long EditorScene::ID_CUSTOM1 = wxNewId();
-const long EditorScene::ID_PANEL4 = wxNewId();
 const long EditorScene::ID_PANEL5 = wxNewId();
-const long EditorScene::ID_PANEL1 = wxNewId();
 const long EditorScene::ID_CUSTOM2 = wxNewId();
 const long EditorScene::ID_PANEL6 = wxNewId();
 const long EditorScene::ID_AUINOTEBOOK1 = wxNewId();
@@ -64,8 +64,7 @@ END_EVENT_TABLE()
 EditorScene::EditorScene(wxWindow* parent, RuntimeGame & game_, Scene & scene_, const MainEditorCommand & mainEditorCommand_) :
 scene(scene_),
 game(game_),
-mainEditorCommand(mainEditorCommand_),
-externalWindow(this)
+mainEditorCommand(mainEditorCommand_)
 {
 	//(*Initialize(EditorScene)
 	wxFlexGridSizer* FlexGridSizer3;
@@ -77,29 +76,26 @@ externalWindow(this)
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
 	notebook = new wxAuiNotebook(this, ID_AUINOTEBOOK1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_BOTTOM|wxNO_BORDER);
-	scenePanel = new wxPanel(notebook, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+	scenePanel = new wxPanel(notebook, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL5"));
 	scenePanel->SetBackgroundColour(wxColour(255,255,255));
-	scenePanel->SetToolTip(_("Editer l\'aspect initial de la scène"));
-	Core = new wxPanel(scenePanel, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL5"));
-	ScrollBar2 = new wxScrollBar(Core, ID_SCROLLBAR2, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL, wxDefaultValidator, _T("ID_SCROLLBAR2"));
-	ScrollBar2->SetScrollbar(2500, 10, 5000, 10);
-	ScrollBar1 = new wxScrollBar(Core, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
-	ScrollBar1->SetScrollbar(2500, 10, 5000, 10);
-	Panel4 = new wxPanel(Core, ID_PANEL4, wxDefaultPosition, wxSize(1,1), 0, _T("ID_PANEL4"));
-	sceneCanvas = new SceneCanvas(Panel4, game, scene, mainEditorCommand, ID_CUSTOM1,wxPoint(0,0),wxSize(800,600), wxWANTS_CHARS | wxBORDER_SIMPLE);
-	Panel5 = new wxPanel(notebook, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL6"));
-	Panel5->SetBackgroundColour(wxColour(255,255,255));
-	Panel5->SetToolTip(_("Editer les évènements de la scène."));
+	scrollBar2 = new wxScrollBar(scenePanel, ID_SCROLLBAR2, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL, wxDefaultValidator, _T("ID_SCROLLBAR2"));
+	scrollBar2->SetScrollbar(2500, 10, 5000, 10);
+	scrollBar1 = new wxScrollBar(scenePanel, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
+	scrollBar1->SetScrollbar(2500, 10, 5000, 10);
+	sceneCanvas = new SceneCanvas(scenePanel, game, scene, mainEditorCommand, ID_CUSTOM1,wxPoint(0,0),wxSize(800,600), wxWANTS_CHARS | wxBORDER_SIMPLE);
+	eventsPanel = new wxPanel(notebook, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL6"));
+	eventsPanel->SetBackgroundColour(wxColour(255,255,255));
+	eventsPanel->SetToolTip(_("Editer les évènements de la scène."));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
 	FlexGridSizer3->AddGrowableRow(0);
-	eventsEditor = new EditorEvents(Panel5, game, scene, &scene.events, mainEditorCommand);
+	eventsEditor = new EditorEvents(eventsPanel, game, scene, &scene.events, mainEditorCommand);
 	FlexGridSizer3->Add(eventsEditor, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Panel5->SetSizer(FlexGridSizer3);
-	FlexGridSizer3->Fit(Panel5);
-	FlexGridSizer3->SetSizeHints(Panel5);
-	notebook->AddPage(scenePanel, _("Scène"));
-	notebook->AddPage(Panel5, _("Evènements"));
+	eventsPanel->SetSizer(FlexGridSizer3);
+	FlexGridSizer3->Fit(eventsPanel);
+	FlexGridSizer3->SetSizeHints(eventsPanel);
+	notebook->AddPage(scenePanel, _("Scène"), false, wxBitmap(wxImage(_T("res/sceneeditor.png"))));
+	notebook->AddPage(eventsPanel, _("Evènements"), false, wxBitmap(wxImage(_T("res/events16.png"))));
 	FlexGridSizer1->Add(notebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	zoom5 = new wxMenuItem((&zoomMenu), ID_MENUITEM8, _("5%"), wxEmptyString, wxITEM_NORMAL);
@@ -128,8 +124,6 @@ externalWindow(this)
 	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&EditorScene::OnScrollBar1Scroll);
 	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnScrollBar1Scroll);
 	sceneCanvas->Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorScene::OnsceneCanvasSetFocus,0,this);
-	Panel4->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnPanel4Resize,0,this);
-	Core->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnCoreResize1,0,this);
 	scenePanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnscenePanelResize,0,this);
 	Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&EditorScene::OnnotebookPageChanged);
 	Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom5Selected);
@@ -142,6 +136,26 @@ externalWindow(this)
 	Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom500Selected);
 	//*)
 
+	//Prepare pane manager
+    m_mgr.SetManagedWindow( this );
+
+    //Create all editors linked to scene canvas.
+    sceneCanvas->SetAssociatedObjectsEditor( boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainEditorCommand) ));
+    sceneCanvas->SetAssociatedLayersEditor( boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, &scene.initialLayers, mainEditorCommand) ));
+    sceneCanvas->SetAssociatedDebugger( boost::shared_ptr<DebuggerGUI>(new DebuggerGUI(this, sceneCanvas->scene) ));
+    sceneCanvas->SetAssociatedExternalWindow( boost::shared_ptr<RenderDialog>(new RenderDialog(this) ));
+    sceneCanvas->SetAssociatedInitialPositionBrowser( boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, scene.initialObjectsPositions, *sceneCanvas) ));
+    sceneCanvas->SetParentPanelAndDockManager( scenePanel, &m_mgr );
+    sceneCanvas->SetScrollbars(scrollBar1, scrollBar2);
+
+    //Display editors in panes
+    m_mgr.AddPane( notebook, wxAuiPaneInfo().Name( wxT( "ESCenter" ) ).Center().CloseButton( false ).Caption( _( "Editeur de scène" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
+    m_mgr.AddPane( sceneCanvas->GetAssociatedObjectsEditor().get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Editeur d'objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+    m_mgr.AddPane( sceneCanvas->GetAssociatedLayersEditor().get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Float().CloseButton( true ).Caption( _( "Editeur de calques" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+    m_mgr.AddPane( sceneCanvas->GetAssociatedDebugger().get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+    m_mgr.AddPane( sceneCanvas->GetAssociatedInitialPositionBrowser().get(), wxAuiPaneInfo().Name( wxT( "IPB" ) ).Float().CloseButton( true ).Caption( _( "Positions initiales des objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(true) );
+
+    //Load preferences
     {
         int position = 1;
         wxConfigBase::Get()->Read("/SceneEditor/SceneEventsTab", &position);
@@ -153,32 +167,8 @@ externalWindow(this)
             notebook->SetWindowStyleFlag(style);
         }
     }
-
-
-	//Initialisation des éditeurs
-    sceneCanvas->objectsEditor = new EditorObjets(this, game, scene, mainEditorCommand);
-    sceneCanvas->layersEditor = new EditorLayers(this, game, scene, &scene.initialLayers, mainEditorCommand);
-    sceneCanvas->SetScrollbars(ScrollBar1, ScrollBar2);
-    sceneCanvas->debugger = new DebuggerGUI(this, sceneCanvas->scene);
-    sceneCanvas->scene.debugger = sceneCanvas->debugger;
-    sceneCanvas->initialPositionsBrowser = new InitialPositionBrowserDlg(this, scene.initialObjectsPositions, *sceneCanvas);
-    sceneCanvas->m_mgr = &m_mgr;
-    sceneCanvas->externalWindow = &externalWindow;
-    sceneCanvas->SetInitialPositionBrowser(sceneCanvas->initialPositionsBrowser);
-
-    notebook->SetArtProvider(new GDAuiTabArt);
-    notebook->SetPageBitmap(0, wxBitmap( "res/sceneeditor.png", wxBITMAP_TYPE_ANY ) );
-    notebook->SetPageBitmap(1, wxBitmap( "res/events16.png", wxBITMAP_TYPE_ANY ) );
-
-    //notify wxAUI which frame to use
-    m_mgr.SetManagedWindow( this );
     Game_Develop_EditorFrame::LoadSkin(&m_mgr);
-
-    m_mgr.AddPane( notebook, wxAuiPaneInfo().Name( wxT( "ESCenter" ) ).Center().CloseButton( false ).Caption( _( "Editeur de scène" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
-    m_mgr.AddPane( sceneCanvas->objectsEditor, wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Editeur d'objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
-    m_mgr.AddPane( sceneCanvas->layersEditor, wxAuiPaneInfo().Name( wxT( "EL" ) ).Float().CloseButton( true ).Caption( _( "Editeur de calques" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
-    m_mgr.AddPane( sceneCanvas->debugger, wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
-    m_mgr.AddPane( sceneCanvas->initialPositionsBrowser, wxAuiPaneInfo().Name( wxT( "IPB" ) ).Float().CloseButton( true ).Caption( _( "Positions initiales des objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(true) );
+    notebook->SetArtProvider(new GDAuiTabArt);
 
     mainEditorCommand.GetRibbon()->SetActivePage(3);
     sceneCanvas->ConnectEvents();
@@ -192,50 +182,13 @@ externalWindow(this)
 void EditorScene::OnscenePanelResize(wxSizeEvent& event)
 {
     //Manual resizing of scene's panel
-    Core->SetSize(0, 0, event.GetSize().GetX(), event.GetSize().GetY());
+    sceneCanvas->UpdateSize();
+
+    scrollBar1->SetSize(0, sceneCanvas->GetHeight(), sceneCanvas->GetWidth(), wxDefaultCoord);
+    scrollBar2->SetSize(sceneCanvas->GetWidth(), 0, wxDefaultCoord, sceneCanvas->GetHeight());
 
     cout << "ScenePanel" << scenePanel->GetSize().GetWidth() << ";" << scenePanel->GetSize().GetHeight() << endl;
-    cout << "Core" << Core->GetSize().GetWidth() << ";" << Core->GetSize().GetHeight() << endl;
-    cout << "Panel4" << Panel4->GetSize().GetWidth() << ";" << Panel4->GetSize().GetHeight() << endl;
 }
-
-void EditorScene::OnPanel4Resize(wxSizeEvent& event)
-{
-    sceneCanvas->ChangeSize(event.GetSize().GetX(), event.GetSize().GetY());
-    cout << "ScenePanel" << scenePanel->GetSize().GetWidth() << ";" << scenePanel->GetSize().GetHeight() << endl;
-    cout << "Core" << Core->GetSize().GetWidth() << ";" << Core->GetSize().GetHeight() << endl;
-    cout << "Panel4" << Panel4->GetSize().GetWidth() << ";" << Panel4->GetSize().GetHeight() << endl;
-}
-
-void EditorScene::OnCoreResize1(wxSizeEvent& event)
-{
-    //Manual resizing of scene's sub panel
-    Panel4->SetSize(0, 0, event.GetSize().GetX(), event.GetSize().GetY());
-
-    sceneCanvas->ChangeSize(event.GetSize().GetX(), event.GetSize().GetY());
-    cout << "ScenePanel" << scenePanel->GetSize().GetWidth() << ";" << scenePanel->GetSize().GetHeight() << endl;
-    cout << "Core" << Core->GetSize().GetWidth() << ";" << Core->GetSize().GetHeight() << endl;
-    cout << "Panel4" << Panel4->GetSize().GetWidth() << ";" << Panel4->GetSize().GetHeight() << endl;
-}
-
-/**
- * Update the size and position of the panel containing the scene, and the scrollbars
- */
-/*void EditorScene::UpdateScenePanelSize(int parentPanelWidht, int parentPanelHeight)
-{
-    if ( sceneCanvas->scene.editing )
-    {
-        //In edition mode, panel containing the scene must not use scrollbars space.
-        Panel4->SetSize(parentPanelWidht-ScrollBar2->GetSize().GetX(), parentPanelHeight-ScrollBar1->GetSize().GetY());
-
-    }
-    else
-    {
-
-        //In preview mode, panel containing the scene can take all the space
-        Panel4->SetSize(parentPanelWidht, parentPanelHeight);
-    }
-}*/
 
 EditorScene::~EditorScene()
 {
@@ -244,28 +197,8 @@ EditorScene::~EditorScene()
 	//(*Destroy(EditorScene)
 	//*)
 	m_mgr.UnInit();
-	std::cout << "Debug Message : Start deleting in destructor of EditorScene" << endl;
-	if ( sceneCanvas->objectsEditor ) delete sceneCanvas->objectsEditor;
-	if ( sceneCanvas->layersEditor ) delete sceneCanvas->layersEditor;
-	if ( sceneCanvas->debugger ) delete sceneCanvas->debugger;
-	if ( sceneCanvas->initialPositionsBrowser ) delete sceneCanvas->initialPositionsBrowser;
 	std::cout << "Debug Message : END deleting in destructor of EditorScene" << endl;
 }
-
-/*
-void EditorScene::Resize( int width, int height )
-{
-    if ( sceneCanvas != NULL )
-        delete sceneCanvas;
-
-	sceneCanvas = new SceneCanvas(Panel4, game, scene, mainEditorCommand, ID_CUSTOM1,wxPoint(0,0),wxSize(width, height), wxWANTS_CHARS | wxBORDER_SIMPLE);
-    sceneCanvas->SetScrollbars(ScrollBar1, ScrollBar2);
-    sceneCanvas->Reload();
-
-	Refresh();
-	Update();
-	Layout();
-}*/
 
 ////////////////////////////////////////////////////////////
 /// Change la vue en fonction de la scrollbar, et agrandit celle ci si besoin.
@@ -274,7 +207,7 @@ void EditorScene::OnScrollBar2Scroll(wxScrollEvent& event)
 {
     int position = event.GetPosition();
 
-    int newY = position-(ScrollBar2->GetRange()/2)+(sceneCanvas->GetHeight()/2);
+    int newY = position-(scrollBar2->GetRange()/2)+(sceneCanvas->GetHeight()/2);
     sceneCanvas->scene.view.SetCenter( sceneCanvas->scene.view.GetCenter().x, newY);
 
     sceneCanvas->ManualRefresh();
@@ -287,11 +220,12 @@ void EditorScene::OnScrollBar1Scroll(wxScrollEvent& event)
 {
     int position = event.GetPosition();
 
-    int newX = position-(ScrollBar1->GetRange()/2)+(sceneCanvas->GetWidth()/2);
+    int newX = position-(scrollBar1->GetRange()/2)+(sceneCanvas->GetWidth()/2);
     sceneCanvas->scene.view.SetCenter( newX,  sceneCanvas->scene.view.GetCenter().y);
 
     sceneCanvas->ManualRefresh();
 }
+
 void EditorScene::ForceRefreshRibbonAndConnect()
 {
     if ( notebook->GetPageText(notebook->GetSelection()) == _("Scène") )
@@ -362,4 +296,3 @@ void EditorScene::Onzoom500Selected(wxCommandEvent& event)
 {
     sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/5.f, sceneCanvas->GetHeight()/5.f);
 }
-

@@ -43,19 +43,17 @@ class EditorScene: public wxPanel
         void Resize( int width, int height );
 
 		//(*Declarations(EditorScene)
-		wxPanel* Core;
-		wxScrollBar* ScrollBar2;
-		wxPanel* Panel5;
+		wxScrollBar* scrollBar1;
 		wxMenuItem* zoom10;
 		wxMenuItem* zoom50;
-		wxPanel* Panel4;
+		wxScrollBar* scrollBar2;
 		wxMenu zoomMenu;
-		wxScrollBar* ScrollBar1;
 		SceneCanvas* sceneCanvas;
 		wxMenuItem* zoom200;
 		wxMenuItem* zoom25;
 		wxPanel* scenePanel;
 		EditorEvents* eventsEditor;
+		wxPanel* eventsPanel;
 		wxMenuItem* zoom100;
 		wxAuiNotebook* notebook;
 		wxMenuItem* zoom500;
@@ -76,9 +74,7 @@ class EditorScene: public wxPanel
 		static const long ID_SCROLLBAR2;
 		static const long ID_SCROLLBAR1;
 		static const long ID_CUSTOM1;
-		static const long ID_PANEL4;
 		static const long ID_PANEL5;
-		static const long ID_PANEL1;
 		static const long ID_CUSTOM2;
 		static const long ID_PANEL6;
 		static const long ID_AUINOTEBOOK1;
@@ -101,8 +97,6 @@ class EditorScene: public wxPanel
 		void OnPanel1KeyDown(wxKeyEvent& event);
 		void OnsceneCanvasRightDown(wxMouseEvent& event);
 		void OnsceneCanvasPaint(wxPaintEvent& event);
-		void OnPanel4Resize(wxSizeEvent& event);
-		void OnCoreResize(wxSizeEvent& event);
 		void OnPanel1Resize(wxSizeEvent& event);
 		void OnscenePanelResize(wxSizeEvent& event);
 		void OnnotebookPageChanged(wxAuiNotebookEvent& event);
@@ -118,11 +112,11 @@ class EditorScene: public wxPanel
 		void Onzoom5Selected(wxCommandEvent& event);
 		void OnPanel2Resize(wxSizeEvent& event);
 		void OnCoreResize1(wxSizeEvent& event);
+		void OnsceneCanvasPanelResize(wxSizeEvent& event);
 		//*)
 
 		RuntimeGame & game;
 		MainEditorCommand mainEditorCommand;
-		RenderDialog externalWindow;
 
         wxAuiManager m_mgr;
 

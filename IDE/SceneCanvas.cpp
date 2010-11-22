@@ -76,12 +76,8 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
         sceneEdited(scene_),
         game(gameEdited),
         scene(this, &game),
-        mainEditorCommand( mainEditorCommand_ ),
         hasJustRightClicked(false),
-        objectsEditor(NULL),
-        layersEditor(NULL),
-        debugger(NULL),
-        initialPositionsBrowser(NULL),
+        mainEditorCommand( mainEditorCommand_ ),
         scrollBar1(NULL),
         scrollBar2(NULL)
 {
@@ -145,12 +141,6 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
     SetDropTarget(new DndTextSceneEditor(*this));
 
     CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), scene.editing);
-}
-
-void SceneCanvas::SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_)
-{
-    scrollBar1 = scrollbar1_;
-    scrollBar2 = scrollbar2_;
 }
 
 void SceneCanvas::ConnectEvents()
@@ -257,16 +247,14 @@ void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
 /**
  * Update the size and position of the canvas displaying the scene
  */
-void SceneCanvas::ChangeSize(int parentPanelWidht, int parentPanelHeight)
+void SceneCanvas::UpdateSize()
 {
-    cout << "called change size" << parentPanelWidht << parentPanelHeight;
-
     if ( scene.editing )
     {
         //Scene takes all the space available in edition mode.
-        Window::SetSize(parentPanelWidht, parentPanelHeight);
-        wxWindowBase::SetSize(0,0, parentPanelWidht, parentPanelHeight);
-        scene.view.SetSize(parentPanelWidht, parentPanelHeight);
+        Window::SetSize(parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
+        wxWindowBase::SetSize(0,0, parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
+        scene.view.SetSize(parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
     }
     else
     {
@@ -277,9 +265,9 @@ void SceneCanvas::ChangeSize(int parentPanelWidht, int parentPanelHeight)
         externalWindow->SetSize(game.windowWidth, game.windowHeight);
 
         //Scene is centered in preview mode
-        wxWindowBase::SetSize((parentPanelWidht-wxWindowBase::GetSize().GetX())/2,
-                                            (parentPanelHeight-wxWindowBase::GetSize().GetY())/2,
-                                            game.windowWidth, game.windowHeight);
+        wxWindowBase::SetSize((parentPanel->GetSize().GetWidth()-wxWindowBase::GetSize().GetX())/2,
+                              (parentPanel->GetSize().GetHeight()-wxWindowBase::GetSize().GetY())/2,
+                              game.windowWidth, game.windowHeight);
     }
 }
 
@@ -294,8 +282,9 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
 
     scrollBar1->Show(false);
     scrollBar2->Show(false);
+    UpdateSize();
 
-    debugger->Play();
+    if ( debugger ) debugger->Play();
 
     CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), false);
     mainEditorCommand.GetRibbonSceneEditorButtonBar()->Refresh();
@@ -311,11 +300,7 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 
     scrollBar1->Show(true);
     scrollBar2->Show(true);
-
-    scrollBar1->SetSize(0, GetHeight()-scrollBar1->GetSize().GetY(),
-                        GetWidth()-scrollBar2->GetSize().GetX(), wxDefaultCoord);
-    scrollBar2->SetSize(GetWidth()-scrollBar2->GetSize().GetX(), 0,
-                        wxDefaultCoord, GetHeight()-scrollBar1->GetSize().GetY());
+    UpdateSize();
 
     externalWindow->Show(false);
 
@@ -326,7 +311,7 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 
     scene.ChangeRenderWindow(this);
 
-    debugger->Pause();
+    if ( debugger ) debugger->Pause();
 
     CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), true);
     mainEditorCommand.GetRibbonSceneEditorButtonBar()->Refresh();
@@ -340,13 +325,13 @@ void SceneCanvas::OnHelpBtClick( wxCommandEvent & event )
 
 void SceneCanvas::OnLayersEditor( wxCommandEvent & event )
 {
-    m_mgr->GetPane(layersEditor).Show();
+    m_mgr->GetPane(layersEditor.get()).Show();
     m_mgr->Update();
 }
 
 void SceneCanvas::OnObjectsEditor( wxCommandEvent & event )
 {
-    m_mgr->GetPane(objectsEditor).Show();
+    m_mgr->GetPane(objectsEditor.get()).Show();
     m_mgr->Update();
 }
 
@@ -393,6 +378,7 @@ void SceneCanvas::OnChoisirLayerBtClick( wxCommandEvent & event )
     if ( Dialog.ShowModal() == 1 )
     {
         scene.addOnLayer = Dialog.layerChosen;
+        if ( layersEditor ) layersEditor->SetCurrentLayer(Dialog.layerChosen);
     }
 }
 
@@ -454,7 +440,7 @@ void SceneCanvas::OnPlayBtClick( wxCommandEvent & event )
     scene.ChangeRenderWindow(this);
 
 
-    debugger->Play();
+    if ( debugger ) debugger->Play();
 }
 
 /**
@@ -475,7 +461,7 @@ void SceneCanvas::OnPlayWindowBtClick( wxCommandEvent & event )
     externalWindow->SetSize(GetWidth(), GetHeight());
     scene.ChangeRenderWindow(externalWindow->renderCanvas);
 
-    debugger->Play();
+    if ( debugger ) debugger->Play();
 }
 
 ////////////////////////////////////////////////////////////
@@ -486,7 +472,7 @@ void SceneCanvas::OnPauseBtClick( wxCommandEvent & event )
     scene.running = false;
     scene.editing = false;
 
-    debugger->Pause();
+    if ( debugger ) debugger->Pause();
 }
 
 ////////////////////////////////////////////////////////////
@@ -494,7 +480,9 @@ void SceneCanvas::OnPauseBtClick( wxCommandEvent & event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnDebugBtClick( wxCommandEvent & event )
 {
-    m_mgr->GetPane(debugger).Show();
+    if ( !m_mgr || !debugger ) return;
+
+    m_mgr->GetPane(debugger.get()).Show();
     m_mgr->Update();
 }
 
@@ -632,9 +620,7 @@ void SceneCanvas::ChangesMade()
 ////////////////////////////////////////////////////////////
 void SceneCanvas::UpdateScrollbars()
 {
-    if ( scrollBar1 == NULL )
-        return;
-    if ( scrollBar2 == NULL )
+    if ( scrollBar1 == NULL || scrollBar2 == NULL)
         return;
 
     //On calcule la position du thumb

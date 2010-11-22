@@ -30,6 +30,7 @@ class EditorLayers: public wxPanel
 		//*)
 
 		void Refresh();
+		void SetCurrentLayer(std::string name);
 
 	protected:
 

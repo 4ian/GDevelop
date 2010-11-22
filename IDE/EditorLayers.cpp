@@ -91,8 +91,10 @@ mainEditorCommand(mainEditorCommand_)
 	Connect(ID_BITMAPBUTTON6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorLayers::OnMoreOptions);
 	Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorLayers::OnHelp);
 
+    imageList->Add(wxBitmap("res/rightArrowGrey.png", wxBITMAP_TYPE_ANY));
     imageList->Add(wxBitmap("res/1rightarrow.png", wxBITMAP_TYPE_ANY));
-    imageList->Add(wxBitmap("res/1rightarrow.png", wxBITMAP_TYPE_ANY));
+    imageList->Add(wxBitmap("res/eye.png", wxBITMAP_TYPE_ANY));
+    imageList->Add(wxBitmap("res/eyeGrey.png", wxBITMAP_TYPE_ANY));
     layersList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
     CreateToolbar();
@@ -186,14 +188,25 @@ void EditorLayers::Refresh()
     	layersList->InsertItem(0, name);
 
     	if ( layers->at(i).GetVisibility() )
-            layersList->SetItem(0, 1, _("Oui"));
+            layersList->SetItemColumnImage(0, 1, 2);
         else
-            layersList->SetItem(0, 1, _("Non"));
+            layersList->SetItemColumnImage(0, 1, 3);
 
-        //layersList->SetItemImage(0,1,0); //TODO
+        layersList->SetItemImage(0,-1,0);
     }
     layersList->SetColumnWidth( 0, wxLIST_AUTOSIZE );
     layersList->SetColumnWidth( 0, wxLIST_AUTOSIZE );
+}
+
+void EditorLayers::SetCurrentLayer(std::string name)
+{
+    for (unsigned int i =0;i<layers->size();++i)
+    {
+    	if ( layers->at(i).GetName() == name )
+            layersList->SetItemImage(layers->size()-i-1,1,1);
+        else
+            layersList->SetItemImage(layers->size()-i-1,-1,-1);
+    }
 }
 
 ////////////////////////////////////////////////////////////
@@ -394,8 +407,36 @@ long EditorLayers::GetItemSelected()
 ////////////////////////////////////////////////////////////
 void EditorLayers::OnlayersListItemActivated(wxListEvent& event)
 {
-    layerSelected = static_cast<string>(event.GetText());
-    EditLayerParam();
+    //Get selected layer
+    if ( layers->size()-event.GetIndex()-1 < 0 || layers->size()-event.GetIndex()-1 > layers->size() ) return;
+    Layer & selectedLayer = layers->at(layers->size()-event.GetIndex()-1);
+
+    //Get selected column
+    wxPoint click_point=::wxGetMousePosition();
+    wxPoint list_point=layersList->GetScreenPosition();
+
+    // delta x
+    int dx=click_point.x - list_point.x;
+
+    // work out the column
+    int ex=0; // cumulative sum of column widths
+    int column = -1;
+    for (column=0; column<layersList->GetColumnCount(); column++) {
+            ex+=layersList->GetColumnWidth(column);
+            if (ex > dx) break;
+    }
+
+    if ( column == 1 )
+    {
+        selectedLayer.SetVisibility(!selectedLayer.GetVisibility());
+        Refresh();
+        return;
+    }
+    else
+    {
+        layerSelected = static_cast<string>(event.GetText());
+        EditLayerParam();
+    }
 }
 
 void EditorLayers::EditLayerParam()

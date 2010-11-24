@@ -234,7 +234,14 @@ ribbonSceneEditorButtonBar(NULL)
     MyStatusBar * myStatusBar = new MyStatusBar(this);
 
     //Ribbon setup
-    m_ribbon = new wxRibbonBar(ribbonPanel, wxID_ANY, wxDefaultPosition, wxSize(-1, 75));
+    long ribbonStyle = wxRIBBON_BAR_DEFAULT_STYLE;
+    bool hidePageTabs = false;
+    pConfig->Read( _T( "/Skin/HidePageTabs" ), &hidePageTabs );
+    if ( hidePageTabs )
+    {
+        ribbonStyle &= ~wxRIBBON_BAR_SHOW_PAGE_LABELS;
+    }
+    m_ribbon = new wxRibbonBar(ribbonPanel, wxID_ANY, wxDefaultPosition, wxSize(-1, 75), ribbonStyle);
     bool hideLabels = false;
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
     {

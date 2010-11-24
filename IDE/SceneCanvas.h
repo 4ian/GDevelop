@@ -44,17 +44,17 @@ public :
     SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style );
     ~SceneCanvas() { MemTracer.DelObj((long)this); }
 
-    void SetAssociatedObjectsEditor(boost::shared_ptr<EditorObjets> objectsEditor_) { objectsEditor = objectsEditor_; };
-    void SetAssociatedLayersEditor(boost::shared_ptr<EditorLayers> layersEditor_) { layersEditor = layersEditor_; };
-    void SetAssociatedDebugger(boost::shared_ptr<DebuggerGUI> debugger_) { debugger = debugger_; };
-    void SetAssociatedExternalWindow(boost::shared_ptr<RenderDialog> externalWindow_) { externalWindow = externalWindow_; };
-    void SetAssociatedInitialPositionBrowser(boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser_) {initialPositionsBrowser = initialPositionsBrowser_; };
+    void SetOwnedObjectsEditor(boost::shared_ptr<EditorObjets> objectsEditor_);
+    void SetOwnedLayersEditor(boost::shared_ptr<EditorLayers> layersEditor_);
+    void SetOwnedDebugger(boost::shared_ptr<DebuggerGUI> debugger_);
+    void SetOwnedExternalWindow(boost::shared_ptr<RenderDialog> externalWindow_);
+    void SetOwnedInitialPositionBrowser(boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser_);
 
-    boost::shared_ptr<EditorObjets> GetAssociatedObjectsEditor() const { return objectsEditor; };
-    boost::shared_ptr<EditorLayers> GetAssociatedLayersEditor() const { return layersEditor; };
-    boost::shared_ptr<DebuggerGUI> GetAssociatedDebugger() const { return debugger; };
-    boost::shared_ptr<RenderDialog> GetAssociatedExternalWindow() const { return externalWindow; };
-    boost::shared_ptr<InitialPositionBrowserDlg> GetAssociatedInitialPositionBrowser() const { return initialPositionsBrowser; };
+    boost::shared_ptr<EditorObjets> GetOwnedObjectsEditor() const { return objectsEditor; };
+    boost::shared_ptr<EditorLayers> GetOwnedLayersEditor() const { return layersEditor; };
+    boost::shared_ptr<DebuggerGUI> GetOwnedDebugger() const { return debugger; };
+    boost::shared_ptr<RenderDialog> GetOwnedExternalWindow() const { return externalWindow; };
+    boost::shared_ptr<InitialPositionBrowserDlg> GetOwnedInitialPositionBrowser() const { return initialPositionsBrowser; };
 
     void SetParentPanelAndDockManager(wxPanel * parentPanel_, wxAuiManager * m_mgr_) {parentPanel = parentPanel_; m_mgr = m_mgr_; };
     void SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_) { scrollBar1 = scrollbar1_; scrollBar2 = scrollbar2_;};
@@ -124,7 +124,6 @@ private :
     void OnEditionBtClick( wxCommandEvent & event );
     void OnOrigineBtClick( wxCommandEvent & event );
     void OnChoisirObjetBtClick( wxCommandEvent & event );
-    void OnChoisirLayerBtClick( wxCommandEvent & event );
     void OnZoomInitBtClick( wxCommandEvent & event );
     void OnZoomMoreBtClick( wxRibbonButtonBarEvent & event );
     void OnGridBtClick( wxCommandEvent & event );
@@ -158,7 +157,6 @@ private :
     static const long idRibbonObjectsEditor;
     static const long idRibbonLayersEditor;
     static const long idRibbonChooseObject;
-    static const long idRibbonChooseLayer;
     static const long idRibbonOrigine;
     static const long idRibbonOriginalZoom;
     static const long idRibbonGrid;

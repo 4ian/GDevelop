@@ -60,6 +60,7 @@ const long Preferences::ID_PANEL9 = wxNewId();
 const long Preferences::ID_STATICTEXT2 = wxNewId();
 const long Preferences::ID_PANEL10 = wxNewId();
 const long Preferences::ID_CHECKBOX2 = wxNewId();
+const long Preferences::ID_CHECKBOX5 = wxNewId();
 const long Preferences::ID_STATICTEXT4 = wxNewId();
 const long Preferences::ID_PANEL3 = wxNewId();
 const long Preferences::ID_PANEL4 = wxNewId();
@@ -99,6 +100,7 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer10;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
+    wxFlexGridSizer* FlexGridSizer22;
     wxFlexGridSizer* FlexGridSizer9;
     wxFlexGridSizer* FlexGridSizer2;
     wxStaticBoxSizer* StaticBoxSizer9;
@@ -265,9 +267,14 @@ changesNeedRestart(false)
     StaticBoxSizer7->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3->Add(StaticBoxSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer10 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Textes"));
+    FlexGridSizer22 = new wxFlexGridSizer(0, 1, 0, 0);
     hideLabelsCheck = new wxCheckBox(Panel4, ID_CHECKBOX2, _("Cacher les noms des boutons"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
     hideLabelsCheck->SetValue(false);
-    StaticBoxSizer10->Add(hideLabelsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    FlexGridSizer22->Add(hideLabelsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    hidePageTabsCheck = new wxCheckBox(Panel4, ID_CHECKBOX5, _("Cacher les onglets des pages"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
+    hidePageTabsCheck->SetValue(false);
+    FlexGridSizer22->Add(hidePageTabsCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer10->Add(FlexGridSizer22, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3->Add(StaticBoxSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer16->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer18 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -345,6 +352,7 @@ changesNeedRestart(false)
     ribbonColor1Pnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnribbonColor1PnlLeftUp,0,this);
     ribbonColor2Pnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnribbonColor2PnlLeftUp,0,this);
     Connect(ID_CHECKBOX2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&Preferences::OnhideLabelsCheckClick);
+    Connect(ID_CHECKBOX5,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&Preferences::OnhideLabelsCheckClick);
     ActifColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnActifColorPnlRightUp,0,this);
     ActifColor2Pnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnActifColor2PnlRightUp,0,this);
     InactifColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnInactifColorPnlRightUp,0,this);
@@ -421,6 +429,11 @@ changesNeedRestart(false)
             pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
             if ( hideLabels )
                 hideLabelsCheck->SetValue(true);
+
+            bool hidePageTabs = false;
+            pConfig->Read( _T( "/Skin/HidePageTabs" ), &hidePageTabs );
+            if ( hidePageTabs )
+                hidePageTabsCheck->SetValue(true);
         }
         else
             SetSkinDefault();
@@ -619,6 +632,8 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     pConfig->Write( _T( "/Skin/ITextB" ), cData.GetColour().Blue() );
 
     pConfig->Write( _T( "/Skin/HideLabels"), hideLabelsCheck->GetValue() );
+    pConfig->Write( _T( "/Skin/HidePageTabs"), hidePageTabsCheck->GetValue() );
+
 
     pConfig->Write( _T( "/EditeursExternes/Image" ), EditeurImageEdit->GetValue() );
     pConfig->Write( _T( "/Dossier/Compilation" ), DossierTempCompEdit->GetValue() );

@@ -12,6 +12,7 @@
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/MainEditorCommand.h"
+class SceneCanvas;
 
 class EditorLayers: public wxPanel
 {
@@ -30,7 +31,8 @@ class EditorLayers: public wxPanel
 		//*)
 
 		void Refresh();
-		void SetCurrentLayer(std::string name);
+		void SetAssociatedSceneCanvas(SceneCanvas * sceneCanvas_) { sceneCanvas = sceneCanvas_; Refresh(); };
+		SceneCanvas * GetAssociatedSceneCanvas() { return sceneCanvas; };
 
 	protected:
 
@@ -60,7 +62,9 @@ class EditorLayers: public wxPanel
 		void OnlayersListItemActivated(wxListEvent& event);
 		void OnEditSelected1(wxCommandEvent& event);
 		void OnlayersListItemSelect1(wxListEvent& event);
+		void OnlayersListItemFocused(wxListEvent& event);
 		//*)
+		void UpdateSelectedLayerIcon();
         void OnRefresh(wxCommandEvent& event);
         void OnMoreOptions(wxCommandEvent& event);
         void EditLayerParam();
@@ -78,6 +82,8 @@ class EditorLayers: public wxPanel
          */
 		Scene & scene;
 		vector < Layer > * layers;
+
+		SceneCanvas * sceneCanvas;
 
 		MainEditorCommand & mainEditorCommand;
 

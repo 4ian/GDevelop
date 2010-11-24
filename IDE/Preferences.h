@@ -55,6 +55,7 @@ class Preferences: public wxDialog
 		wxTextCtrl* EditeurImageEdit;
 		wxPanel* inactiveTextColorPnl;
 		wxPanel* InactifColor2Pnl;
+		wxCheckBox* hidePageTabsCheck;
 		wxPanel* Panel6;
 		wxPanel* Panel3;
 		wxStaticLine* StaticLine2;
@@ -116,6 +117,7 @@ class Preferences: public wxDialog
 		static const long ID_STATICTEXT2;
 		static const long ID_PANEL10;
 		static const long ID_CHECKBOX2;
+		static const long ID_CHECKBOX5;
 		static const long ID_STATICTEXT4;
 		static const long ID_PANEL3;
 		static const long ID_PANEL4;

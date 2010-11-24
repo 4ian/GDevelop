@@ -12,6 +12,7 @@
 #include "GDL/Position.h"
 #include "ObjectsOnBadLayerBox.h"
 #include "EditLayer.h"
+#include "SceneCanvas.h"
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
 #endif
@@ -38,6 +39,7 @@ EditorLayers::EditorLayers(wxWindow* parent, Game & game_, Scene & scene_, vecto
 game(game_),
 scene(scene_),
 layers(layers_),
+sceneCanvas(NULL),
 mainEditorCommand(mainEditorCommand_)
 {
 
@@ -80,6 +82,7 @@ mainEditorCommand(mainEditorCommand_)
 	toolBarPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorLayers::OntoolBarPanelResize,0,this);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&EditorLayers::OnlayersListItemSelect1);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&EditorLayers::OnlayersListItemActivated);
+	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_FOCUSED,(wxObjectEventFunction)&EditorLayers::OnlayersListItemFocused);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&EditorLayers::OnlayersListItemRClick);
 	Connect(idMenuEdit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorLayers::OnEditSelected1);
 	Connect(idMenuAdd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorLayers::OnAddSelected);
@@ -96,6 +99,9 @@ mainEditorCommand(mainEditorCommand_)
     imageList->Add(wxBitmap("res/eye.png", wxBITMAP_TYPE_ANY));
     imageList->Add(wxBitmap("res/eyeGrey.png", wxBITMAP_TYPE_ANY));
     layersList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
+
+	layersList->InsertColumn(1, "Calque");
+	layersList->InsertColumn(2, "Visible");
 
     CreateToolbar();
 
@@ -176,10 +182,7 @@ void EditorLayers::OnHelp(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorLayers::Refresh()
 {
-    layersList->ClearAll();
-
-	layersList->InsertColumn(1, "Calque");
-	layersList->InsertColumn(2, "Visible");
+    layersList->DeleteAllItems();
 
     for (unsigned int i =0;i<layers->size();++i)
     {
@@ -195,14 +198,18 @@ void EditorLayers::Refresh()
         layersList->SetItemImage(0,-1,0);
     }
     layersList->SetColumnWidth( 0, wxLIST_AUTOSIZE );
-    layersList->SetColumnWidth( 0, wxLIST_AUTOSIZE );
+    layersList->SetColumnWidth( 1, wxLIST_AUTOSIZE );
+
+    UpdateSelectedLayerIcon();
 }
 
-void EditorLayers::SetCurrentLayer(std::string name)
+void EditorLayers::UpdateSelectedLayerIcon()
 {
+    if ( !sceneCanvas ) return;
+
     for (unsigned int i =0;i<layers->size();++i)
     {
-    	if ( layers->at(i).GetName() == name )
+    	if ( layers->at(i).GetName() == sceneCanvas->scene.addOnLayer )
             layersList->SetItemImage(layers->size()-i-1,1,1);
         else
             layersList->SetItemImage(layers->size()-i-1,-1,-1);
@@ -489,4 +496,13 @@ void EditorLayers::OnEditSelected1(wxCommandEvent& event)
 void EditorLayers::OnlayersListItemSelect1(wxListEvent& event)
 {
     layerSelected = static_cast<string>(event.GetText());
+    UpdateSelectedLayerIcon();
+    if ( sceneCanvas ) sceneCanvas->scene.addOnLayer = layerSelected;
+}
+
+void EditorLayers::OnlayersListItemFocused(wxListEvent& event)
+{
+    layerSelected = static_cast<string>(event.GetText());
+    UpdateSelectedLayerIcon();
+    if ( sceneCanvas ) sceneCanvas->scene.addOnLayer = layerSelected;
 }

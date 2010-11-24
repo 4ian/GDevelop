@@ -50,7 +50,6 @@ const long SceneCanvas::idRibbonPreviewMode = wxNewId();
 const long SceneCanvas::idRibbonObjectsEditor = wxNewId();
 const long SceneCanvas::idRibbonLayersEditor = wxNewId();
 const long SceneCanvas::idRibbonChooseObject = wxNewId();
-const long SceneCanvas::idRibbonChooseLayer = wxNewId();
 const long SceneCanvas::idRibbonOrigine = wxNewId();
 const long SceneCanvas::idRibbonOriginalZoom = wxNewId();
 const long SceneCanvas::idRibbonGrid = wxNewId();
@@ -151,7 +150,6 @@ void SceneCanvas::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonObjectsEditor, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnObjectsEditor, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonLayersEditor, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnLayersEditor, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonChooseObject, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnChoisirObjetBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonChooseLayer, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnChoisirLayerBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonOrigine, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnOrigineBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonOriginalZoom, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnZoomInitBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonOriginalZoom, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnZoomMoreBtClick, NULL, this);
@@ -223,7 +221,6 @@ void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
         bar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Editeur d'objets") : "", wxBitmap("res/objeticon24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Editeur de calques") : "", wxBitmap("res/layers24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonChooseObject, !hideLabels ? _("Choisir un objet") : "", wxBitmap("res/addobjet24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonChooseLayer, !hideLabels ? _("Choisir un calque") : "", wxBitmap("res/selectlayer24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonUndo, !hideLabels ? _("Annuler") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonRedo, !hideLabels ? _("Refaire") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonOrigine, !hideLabels ? _("Revenir à l'origine") : "", wxBitmap("res/center24.png", wxBITMAP_TYPE_ANY));
@@ -242,6 +239,30 @@ void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
     }
 
     bar->Realize();
+}
+
+
+void SceneCanvas::SetOwnedObjectsEditor(boost::shared_ptr<EditorObjets> objectsEditor_)
+{
+    objectsEditor = objectsEditor_;
+}
+void SceneCanvas::SetOwnedLayersEditor(boost::shared_ptr<EditorLayers> layersEditor_)
+{
+    layersEditor = layersEditor_;
+    if ( layersEditor && layersEditor->GetAssociatedSceneCanvas() != this)
+        layersEditor->SetAssociatedSceneCanvas(this);
+}
+void SceneCanvas::SetOwnedDebugger(boost::shared_ptr<DebuggerGUI> debugger_)
+{
+    debugger = debugger_;
+}
+void SceneCanvas::SetOwnedExternalWindow(boost::shared_ptr<RenderDialog> externalWindow_)
+{
+    externalWindow = externalWindow_;
+}
+void SceneCanvas::SetOwnedInitialPositionBrowser(boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser_)
+{
+    initialPositionsBrowser = initialPositionsBrowser_;
 }
 
 /**
@@ -366,19 +387,6 @@ void SceneCanvas::OnChoisirObjetBtClick( wxCommandEvent & event )
     if ( Dialog.ShowModal() == 1 )
     {
         scene.objectToAdd = Dialog.objectChosen;
-    }
-}
-
-////////////////////////////////////////////////////////////
-/// Choisir le calque sur lequel ajouter l'objet
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnChoisirLayerBtClick( wxCommandEvent & event )
-{
-    ChooseLayer Dialog( this, scene.initialLayers, false );
-    if ( Dialog.ShowModal() == 1 )
-    {
-        scene.addOnLayer = Dialog.layerChosen;
-        if ( layersEditor ) layersEditor->SetCurrentLayer(Dialog.layerChosen);
     }
 }
 

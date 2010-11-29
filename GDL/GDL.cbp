@@ -711,6 +711,8 @@
 		<Unit filename="GDL\Point.h" />
 		<Unit filename="GDL\Position.cpp" />
 		<Unit filename="GDL\Position.h" />
+		<Unit filename="GDL\ProfileEvent.cpp" />
+		<Unit filename="GDL\ProfileEvent.h" />
 		<Unit filename="GDL\PropImage.cpp" />
 		<Unit filename="GDL\PropImage.h" />
 		<Unit filename="GDL\RepeatEvent.cpp" />

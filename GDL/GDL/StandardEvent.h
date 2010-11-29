@@ -10,11 +10,6 @@
 #include <wx/dcbuffer.h>
 #include <wx/html/htmprint.h>
 #endif
-/*#include <boost/shared_ptr.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/nvp.hpp>*/
 #include "Event.h"
 class RuntimeScene;
 class ObjectsConcerned;
@@ -22,6 +17,9 @@ class Instruction;
 class Evaluateur;
 class TiXmlElement;
 
+/**
+ * Standard event, with conditions, actions and sub events.
+ */
 class GD_API StandardEvent : public BaseEvent
 {
     public:

@@ -477,6 +477,8 @@ void EditorImages::OnBanqueImageListItemMenu( wxTreeEvent& event )
     wxFocusEvent unusedEvent;
     OnSetFocus(unusedEvent);
 
+    m_itemSelected = event.GetItem();
+
     PopupMenu( &ContextMenu );
 }
 

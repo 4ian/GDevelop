@@ -23,6 +23,10 @@
 #include "GDL/FontManager.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/AutomatismsSharedDatas.h"
+#if defined(GDE)
+#include "GDL/ProfileEvent.h"
+#include "GDL/profile.h"
+#endif
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
@@ -663,10 +667,31 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
  */
 void RuntimeScene::PreprocessEventList( const Game & game, vector < BaseEventSPtr > & listEvent )
 {
-    for ( unsigned int i = 0;i < listEvent.size();i++ )
+    #if defined(GDE)
+    boost::shared_ptr<ProfileEvent> previousProfileEvent;
+    boost::shared_ptr<btClock> clock = boost::shared_ptr<btClock>(new btClock);
+    #endif
+
+    for ( unsigned int i = 0;i < listEvent.size();++i )
     {
         listEvent[i]->Preprocess(game, *this, listEvent, i);
         if ( listEvent[i]->CanHaveSubEvents() )
             PreprocessEventList( game, listEvent[i]->GetSubEvents());
+
+        #if defined(GDE)
+        if ( listEvent[i]->IsExecutable() )
+        {
+            //Define a new profile event
+            boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
+            profileEvent->SetClock(clock);
+            profileEvent->SetPreviousProfileEvent(previousProfileEvent);
+
+            //Add it before the event to profile
+            listEvent.insert(listEvent.begin()+i, profileEvent);
+
+            previousProfileEvent = profileEvent;
+            ++i;
+        }
+        #endif
     }
 }

@@ -553,6 +553,8 @@
 		<Unit filename="GDL\BaseObjectExtension.cpp" />
 		<Unit filename="GDL\BaseObjectExtension.h" />
 		<Unit filename="GDL\BaseObjectExtension2.cpp" />
+		<Unit filename="GDL\BaseProfiler.cpp" />
+		<Unit filename="GDL\BaseProfiler.h" />
 		<Unit filename="GDL\BitmapGUIManager.cpp" />
 		<Unit filename="GDL\BitmapGUIManager.h" />
 		<Unit filename="GDL\Camera.cpp" />

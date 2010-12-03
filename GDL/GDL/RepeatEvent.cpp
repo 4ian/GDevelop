@@ -299,9 +299,7 @@ void RepeatEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, Mai
  */
 void RepeatEvent::Init(const RepeatEvent & event)
 {
-    events.clear();
-    for (unsigned int i =0;i<event.events.size();++i)
-    	events.push_back( event.events[i]->Clone() );
+    events = CloneVectorOfEvents(event.events);
 
     conditions = event.conditions;
     actions = event.actions;

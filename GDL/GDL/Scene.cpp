@@ -39,9 +39,7 @@ void Scene::Init(const Scene & scene)
     oglZNear = scene.oglZNear;
     oglZFar = scene.oglZFar;
 
-    events.clear();
-    for (unsigned int i =0;i<scene.events.size();++i)
-    	events.push_back( scene.events[i]->Clone() );
+    events = CloneVectorOfEvents(scene.events);
 
     initialObjects.clear();
     for (unsigned int i =0;i<scene.initialObjects.size();++i)

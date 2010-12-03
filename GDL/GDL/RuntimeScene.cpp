@@ -25,7 +25,8 @@
 #include "GDL/AutomatismsSharedDatas.h"
 #if defined(GDE)
 #include "GDL/ProfileEvent.h"
-#include "GDL/profile.h"
+#include "GDL/BaseProfiler.h"
+#include "GDL/BaseDebugger.h"
 #endif
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
@@ -39,6 +40,7 @@ game(game_),
 input(&renderWindow->GetInput()),
 #ifdef GDE
 debugger(NULL),
+profiler(NULL),
 #endif
 running(true),
 pauseTime(0),
@@ -79,6 +81,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     input = scene.input;
     #ifdef GDE
     debugger = scene.debugger;
+    profiler = scene.profiler;
     #endif
     running = scene.running;
 
@@ -155,9 +158,13 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
 ////////////////////////////////////////////////////////////
 int RuntimeScene::RenderAndStep(unsigned int nbStep)
 {
-    BT_PROFILE("RenderAndStep");
     for (unsigned int step = 0;step<nbStep;++step)
     {
+        #ifdef GDE
+        if( profiler )
+            profiler->eventsClock.reset();
+        #endif
+
         //Gestion pré-évènements
         ManageRenderTargetEvents();
         UpdateTime();
@@ -180,12 +187,26 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         #ifdef GDE
         if( debugger )
             debugger->Update();
+        if( profiler )
+        {
+            profiler->lastEventsTime = profiler->renderingClock.getTimeMicroseconds();
+            profiler->renderingClock.reset();
+        }
         #endif
+
+        //Rendering
         Render();
+        textes.clear(); //Legacy texts
 
-        textes.clear();
+        #ifdef GDE
+        if( profiler )
+        {
+            profiler->lastRenderingTime = profiler->renderingClock.getTimeMicroseconds();
+            profiler->Update();
+        }
+        #endif
 
-        if ( firstLoop ) firstLoop = false; //On n'est plus la première fois
+        if ( firstLoop ) firstLoop = false; //The first frame is passed
     }
 
     return specialAction;
@@ -248,37 +269,6 @@ void RuntimeScene::RenderWithoutStep()
     #endif
 }
 
-#ifndef RELEASE
-void RuntimeScene::DisplayProfile(CProfileIterator * iter, int x, int & y)
-{
-    FontManager * fontManager = FontManager::getInstance();
-
-    y += 15;
-    while ( !iter->Is_Done() )
-    {
-        sf::Text text("", *fontManager->GetFont(""));
-        text.SetCharacterSize(12);
-        ostringstream texte;
-        if ( CProfileManager::Get_Frame_Count_Since_Reset() != 0 )
-            texte << iter->Get_Current_Name()   << " Calls/Frame:" << iter->Get_Current_Total_Calls()/CProfileManager::Get_Frame_Count_Since_Reset()
-                                                << " Time/Frame:" << iter->Get_Current_Total_Time()/CProfileManager::Get_Frame_Count_Since_Reset();
-        text.SetString(texte.str());
-        text.SetPosition(x,y);
-        renderWindow->Draw(text);
-
-        //Childs
-        CProfileIterator * childIter = CProfileManager::Get_Iterator();
-        *childIter = *iter;
-        childIter->Enter_Child(0);
-        DisplayProfile(childIter, x+15, y);
-        CProfileManager::Release_Iterator(childIter);
-
-        y += 15;
-        iter->Next();
-    }
-}
-#endif
-
 ////////////////////////////////////////////////////////////
 /// Affichage dans une sf::RenderWindow
 ////////////////////////////////////////////////////////////
@@ -336,19 +326,6 @@ void RuntimeScene::Render()
             }
         }
     }
-
-    //Résultats du profiler
-    #ifndef RELEASE
-    if ( renderWindow->GetInput().IsKeyDown(sf::Key::F2))
-        CProfileManager::Reset();
-
-    renderWindow->SetView(renderWindow->GetDefaultView());
-
-    CProfileIterator * iter = CProfileManager::Get_Iterator();
-    int y = 0;
-    DisplayProfile(iter, 0,y);
-    CProfileManager::Increment_Frame_Counter();
-    #endif
 
     // Display window contents on screen
     renderWindow->RestoreGLStates();
@@ -562,9 +539,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     initialLayers = scene.initialLayers;
     variables = scene.variables;
 
-    events.clear();
-    for (unsigned int i =0;i<scene.events.size();++i)
-    	events.push_back( scene.events[i]->Clone() );
+    events = CloneVectorOfEvents(scene.events);
 
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;
@@ -684,6 +659,7 @@ void RuntimeScene::PreprocessEventList( const Game & game, vector < BaseEventSPt
             //Define a new profile event
             boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
             profileEvent->SetClock(clock);
+            profileEvent->originalEvent = listEvent[i]->originalEvent;
             profileEvent->SetPreviousProfileEvent(previousProfileEvent);
 
             //Add it before the event to profile
@@ -694,4 +670,13 @@ void RuntimeScene::PreprocessEventList( const Game & game, vector < BaseEventSPt
         }
         #endif
     }
+    #if defined(GDE)
+    //Define a new profile event
+    boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
+    profileEvent->SetClock(clock);
+    profileEvent->SetPreviousProfileEvent(previousProfileEvent);
+
+    //Add it before the event to profile
+    listEvent.push_back(profileEvent);
+    #endif
 }

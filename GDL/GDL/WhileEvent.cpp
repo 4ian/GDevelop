@@ -317,9 +317,7 @@ void WhileEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, Main
  */
 void WhileEvent::Init(const WhileEvent & event)
 {
-    events.clear();
-    for (unsigned int i =0;i<event.events.size();++i)
-    	events.push_back( event.events[i]->Clone() );
+    events = CloneVectorOfEvents(event.events);
 
     whileConditions = event.whileConditions;
     conditions = event.conditions;

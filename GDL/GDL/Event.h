@@ -24,6 +24,7 @@ class Game;
 
 #if defined(GDE)
 #include <wx/dcbuffer.h>
+#include <boost/weak_ptr.hpp>
 class Scene;
 class Game;
 class MainEditorCommand;
@@ -142,6 +143,9 @@ class GD_API BaseEvent
         bool            selected;
         mutable bool    eventHeightNeedUpdate; ///<Automatically set to true/false by the events editor
 
+        boost::weak_ptr<BaseEvent> originalEvent; ///< Pointer only used for profiling events, so as to remember the original event from which it has been copied.
+        unsigned long int totalTimeDuringLastSession; ///< Total time used by the event during the last run. Used for profiling.
+
     protected:
         mutable unsigned int    renderedHeight;
 #endif
@@ -152,6 +156,14 @@ class GD_API BaseEvent
 
         static vector <BaseEventSPtr> badSubEvents;
 };
+
+#if defined(GDE)
+/**
+ * Clone an event and insert a reference to the original event into the newly created event.
+ * Used for profiling events for example.
+ */
+BaseEventSPtr CloneRememberingOriginalEvent(BaseEventSPtr event);
+#endif
 
 /**
  * Helper function for copying vector of shared_ptr of events

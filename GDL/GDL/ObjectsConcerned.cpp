@@ -19,7 +19,6 @@ parent(NULL)
 ////////////////////////////////////////////////////////////
 ObjList ObjectsConcerned::Pick(unsigned int oID, bool forceGlobal)
 {
-    //BT_PROFILE("Pick");
     ObjList objectsToTest;
 
     vector < ObjectGroup >::iterator groupsIter = allGroups->begin();
@@ -51,7 +50,6 @@ ObjList ObjectsConcerned::Pick(unsigned int oID, bool forceGlobal)
 ////////////////////////////////////////////////////////////
 ObjList ObjectsConcerned::PickAndRemove(unsigned int oID, bool forceGlobal)
 {
-    //BT_PROFILE("PickAndRemove");
     ObjList objectsToTest;
 
     vector < ObjectGroup >::iterator groupsIter = allGroups->begin();

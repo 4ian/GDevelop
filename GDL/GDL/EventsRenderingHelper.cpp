@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #if defined(GDE)
 #include "EventsRenderingHelper.h"
 #include "GDL/Instruction.h"

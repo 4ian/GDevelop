@@ -26,7 +26,7 @@ void ProfileEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConc
 void ProfileEvent::Stop()
 {
     if ( profileClock )
-        time += profileClock->getTimeMilliseconds();
+        time += profileClock->getTimeMicroseconds();
 }
 
 /**

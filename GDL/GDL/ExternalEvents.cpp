@@ -21,8 +21,5 @@ ExternalEvents& ExternalEvents::operator=(const ExternalEvents & rhs)
 void ExternalEvents::Init(const ExternalEvents & externalEvents)
 {
     name = externalEvents.GetName();
-
-    events.clear();
-    for (unsigned int i =0;i<externalEvents.events.size();++i)
-    	events.push_back( externalEvents.events[i]->Clone() );
+    events = CloneVectorOfEvents(externalEvents.events);
 }

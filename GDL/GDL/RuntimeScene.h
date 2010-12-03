@@ -33,12 +33,9 @@
 #include "GDL/ObjInstancesHolder.h"
 class AutomatismsRuntimeSharedDatas;
 
-#ifdef GDE
-#include "GDL/BaseDebugger.h"
-#endif
-
-#ifndef RELEASE
-#include "GDL/profile.h"
+#if defined GDE
+class BaseDebugger;
+class BaseProfiler;
 #endif
 
 /**
@@ -62,6 +59,7 @@ class GD_API RuntimeScene : public Scene
         const sf::Input *   input;
         #ifdef GDE
         BaseDebugger *      debugger;
+        BaseProfiler *      profiler;
         #endif
 
         bool running;
@@ -121,9 +119,6 @@ class GD_API RuntimeScene : public Scene
         void ManageRenderTargetEvents();
         bool UpdateTime();
         void ManageSounds();
-        #ifndef RELEASE
-        void DisplayProfile(CProfileIterator * iter, int x, int & y);
-        #endif
 
         //Données supplémentaires pour une RuntimeScene
         bool firstLoop;

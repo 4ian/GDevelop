@@ -102,7 +102,11 @@ void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector 
 
     for ( unsigned int insertion = 0;insertion <= static_cast<unsigned>(lastEvent-firstEvent);insertion++ ) //Insertion des évènements du lien
     {
+        #if defined(GDE) //Profiling can be enabled in editor.
+        eventList.insert( eventList.begin() + indexOfTheEventInThisList + insertion, CloneRememberingOriginalEvent(eventsToInclude->at( firstEvent+insertion )) );
+        #else
         eventList.insert( eventList.begin() + indexOfTheEventInThisList + insertion, eventsToInclude->at( firstEvent+insertion )->Clone() );
+        #endif
     }
     eventList.erase( eventList.begin() + indexOfTheEventInThisList + static_cast<unsigned>(lastEvent-firstEvent)+1 ); //Suppression du lien
 }

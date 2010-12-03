@@ -4,12 +4,6 @@
  */
 
 #include "GDL/Event.h"
-/*
-//This is used to make the serialization library aware that code should be instantiated for serialization
-//of a given class even though the class hasn't been otherwise referred to by the program.
-#include <boost/serialization/export.hpp>
-BOOST_CLASS_EXPORT_IMPLEMENT(BaseEvent)*/
-//TODO : Maybe declare serialization for xml_archives ?
 
 vector <BaseEventSPtr> BaseEvent::badSubEvents;
 
@@ -17,6 +11,7 @@ BaseEvent::BaseEvent() :
 #ifdef GDE
 selected(false),
 eventHeightNeedUpdate(true),
+totalTimeDuringLastSession(0),
 #endif
 disabled(false)
 {
@@ -30,7 +25,21 @@ std::vector < BaseEventSPtr > GD_API CloneVectorOfEvents(const vector < BaseEven
     vector<BaseEventSPtr>::const_iterator end = events.end();
 
     for(;e != end;++e)
+    {
+        #if defined(GDE) //Profiling can be enabled in editor
+        newVector.push_back(CloneRememberingOriginalEvent(*e));
+        #else
         newVector.push_back((*e)->Clone());
+        #endif
+    }
 
     return newVector;
+}
+
+BaseEventSPtr CloneRememberingOriginalEvent(BaseEventSPtr event)
+{
+    BaseEventSPtr copy = event->Clone();
+    copy->originalEvent = event;
+
+    return copy;
 }

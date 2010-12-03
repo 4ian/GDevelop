@@ -18,8 +18,8 @@
 class GD_API BaseDebugger
 {
     public:
-        BaseDebugger();
-        virtual ~BaseDebugger();
+        BaseDebugger() {};
+        virtual ~BaseDebugger() {};
 
         void Update();
 

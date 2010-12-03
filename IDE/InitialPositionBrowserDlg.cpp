@@ -33,7 +33,7 @@ sceneCanvas(sceneCanvas_)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
-	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&InitialPositionBrowserDlg::OninitialPositionsListItemActivated);
+	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_FOCUSED,(wxObjectEventFunction)&InitialPositionBrowserDlg::OninitialPositionsListItemActivated);
 	//*)
 
 	initialPositionsList->InsertColumn(0, _("Objet"));
@@ -76,6 +76,35 @@ void InitialPositionBrowserDlg::OninitialPositionsListItemActivated(wxListEvent&
     if ( id >= initialPositions.size() ) return;
 
     sceneCanvas.scene.view.SetCenter( initialPositions[id].x,  initialPositions[id].y);
+
+    //Update scene canvas selection with list selection
+    sceneCanvas.scene.objectsSelected.clear();
+    sceneCanvas.scene.xObjectsSelected.clear();
+    sceneCanvas.scene.yObjectsSelected.clear();
+
+    long itemIndex = -1;
+    for (;;) { //Iterate over all controls
+        itemIndex = initialPositionsList->GetNextItem(itemIndex,
+                                             wxLIST_NEXT_ALL,
+                                             wxLIST_STATE_SELECTED);
+
+        if (itemIndex == -1) break;
+        cout << "Repered a selection" << endl;
+
+        // Add each selected object to scene canvas selection
+        if ( itemIndex < initialPositions.size() && itemIndex >= 0 )
+        {
+            ObjSPtr object = sceneCanvas.GetObjectFromInitialPosition(initialPositions[itemIndex]);
+            if ( object )
+            {
+                cout << "Adding one object" << endl;
+                sceneCanvas.scene.objectsSelected.push_back(object);
+                sceneCanvas.scene.xObjectsSelected.push_back(object->GetX());
+                sceneCanvas.scene.yObjectsSelected.push_back(object->GetY());
+            }
+        }
+    }
+        cout << "END" << endl;
 }
 
 void InitialPositionBrowserDlg::DeselectAll()

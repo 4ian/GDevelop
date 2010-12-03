@@ -249,7 +249,7 @@ void EditorLayers::OnAddSelected(wxCommandEvent& event)
     layers->push_back(layer);
 
     Refresh();
-    scene.wasModified = true;
+    if ( sceneCanvas ) sceneCanvas->Reload();
 }
 
 /**
@@ -257,15 +257,15 @@ void EditorLayers::OnAddSelected(wxCommandEvent& event)
  */
 void EditorLayers::OnDelSelected(wxCommandEvent& event)
 {
-    long itemSelected = GetItemSelected();
-    if ( itemSelected == -1 ) return;
+    //Get selected layer
+    Layer * selectedLayer = GetSelectedLayer();
+    if ( !selectedLayer || selectedLayer->GetName().empty() ) return;
 
-    string name = static_cast<string>(layersList->GetItemText(itemSelected));
-    //Can't delete the base layer.
+    std::string name = selectedLayer->GetName();
 
     for (unsigned int i = 0;i<layers->size();++i)
     {
-    	if ( layers->at(i).GetName() == name )
+    	if ( &layers->at(i) == selectedLayer )
     	{
     	    //Liste de calques sans celui à supprimer
     	    vector < Layer > layersWithoutLayerToDelete = *layers;
@@ -283,10 +283,10 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
     	    if ( objectsOnThisLayer )
     	    {
                 ObjectsOnBadLayerBox dialog(this, layersWithoutLayerToDelete);
-                int retour = dialog.ShowModal();
+                int choice = dialog.ShowModal();
 
-                if ( retour == 0 ) return; //Annulation
-                else if ( retour == 1 )
+                if ( choice == 0 ) return; //Annulation
+                else if ( choice == 1 )
                 {
                     for (int i = scene.initialObjectsPositions.size()-1;i>=0;--i)
                     {
@@ -294,7 +294,7 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
                             scene.initialObjectsPositions.erase(scene.initialObjectsPositions.begin()+i);
                     }
                 }
-                else if ( retour == 2 )
+                else if ( choice == 2 )
                 {
                     for (unsigned int i =0;i<scene.initialObjectsPositions.size();++i)
                     {
@@ -307,7 +307,7 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
             //Delete the layer
     	    layers->erase(layers->begin() + i );
             Refresh();
-            scene.wasModified = true;
+            if ( sceneCanvas ) sceneCanvas->Reload();
     	    return;
     	}
     }
@@ -319,15 +319,13 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorLayers::OnUpSelected(wxCommandEvent& event)
 {
-    long itemSelected = GetItemSelected();
-    if ( itemSelected == -1 ) return;
-
-    string name = static_cast<string>(layersList->GetItemText(itemSelected));
-    if ( name == _("Calque de base")) name = "";
+    //Get selected layer
+    Layer * selectedLayer = GetSelectedLayer();
+    if ( !selectedLayer ) return;
 
     for (unsigned int i = 0;i<layers->size();++i)
     {
-    	if ( layers->at(i).GetName() == name )
+    	if ( &layers->at(i) == selectedLayer )
     	{
     	    if ( i <= layers->size()-1-1 )
     	    {
@@ -337,10 +335,11 @@ void EditorLayers::OnUpSelected(wxCommandEvent& event)
                 layers->insert(layers->begin()+i+1, layer);
 
                 Refresh();
-                scene.wasModified = true;
+                if ( sceneCanvas ) sceneCanvas->Reload();
 
                 //On reslectionne le calque
-                layersList->SetItemState(itemSelected-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+                layersList->SetItemState(layers->size()-i-1-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+                cout << "Selecte" << layers->size()-i-1;
     	    }
     	    return;
     	}
@@ -353,15 +352,13 @@ void EditorLayers::OnUpSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorLayers::OnDownSelected(wxCommandEvent& event)
 {
-    long itemSelected = GetItemSelected();
-    if ( itemSelected == -1 ) return;
-
-    string name = static_cast<string>(layersList->GetItemText(itemSelected));
-    if ( name == _("Calque de base")) name = "";
+    //Get selected layer
+    Layer * selectedLayer = GetSelectedLayer();
+    if ( !selectedLayer ) return;
 
     for (unsigned int i = 0;i<layers->size();++i)
     {
-    	if ( layers->at(i).GetName() == name )
+    	if ( &layers->at(i) == selectedLayer )
     	{
     	    if ( i >= 1 )
     	    {
@@ -371,10 +368,11 @@ void EditorLayers::OnDownSelected(wxCommandEvent& event)
                 layers->insert(layers->begin()+i-1, layer);
 
                 Refresh();
-                scene.wasModified = true;
+                if ( sceneCanvas ) sceneCanvas->Reload();
 
                 //On reslectionne le calque
-                layersList->SetItemState(itemSelected+1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+                layersList->SetItemState(layers->size()-i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+                cout << "Selecte" << layers->size()-i+1;
     	    }
     	    return;
     	}
@@ -393,7 +391,7 @@ void EditorLayers::OnlayersListItemRClick(wxListEvent& event)
 ////////////////////////////////////////////////////////////
 /// Connaitre le numéro de l'item selectionné dans la liste
 ////////////////////////////////////////////////////////////
-long EditorLayers::GetItemSelected()
+Layer* EditorLayers::GetSelectedLayer()
 {
     long itemIndex = -1;
 
@@ -403,10 +401,14 @@ long EditorLayers::GetItemSelected()
         if (itemIndex == -1) break;
 
         // Got the selected item index
-        return itemIndex;
+        unsigned int layerId = layers->size()-itemIndex-1;
+        if ( layerId < layers->size() )
+        {
+            return &layers->at(layerId);
+        }
     }
 
-    return -1;
+    return NULL;
 }
 
 ////////////////////////////////////////////////////////////
@@ -415,8 +417,8 @@ long EditorLayers::GetItemSelected()
 void EditorLayers::OnlayersListItemActivated(wxListEvent& event)
 {
     //Get selected layer
-    if ( layers->size()-event.GetIndex()-1 < 0 || layers->size()-event.GetIndex()-1 > layers->size() ) return;
-    Layer & selectedLayer = layers->at(layers->size()-event.GetIndex()-1);
+    Layer * selectedLayer = GetSelectedLayer();
+    if ( !selectedLayer ) return;
 
     //Get selected column
     wxPoint click_point=::wxGetMousePosition();
@@ -435,33 +437,31 @@ void EditorLayers::OnlayersListItemActivated(wxListEvent& event)
 
     if ( column == 1 )
     {
-        selectedLayer.SetVisibility(!selectedLayer.GetVisibility());
+        selectedLayer->SetVisibility(!selectedLayer->GetVisibility());
         Refresh();
+
+        //Changes without reloading
+        if ( sceneCanvas )
+        {
+            for (unsigned int i = 0;i<sceneCanvas->scene.layers.size();++i)
+            {
+                if ( sceneCanvas->scene.layers[i].GetName() == selectedLayer->GetName() )
+                    sceneCanvas->scene.layers[i].SetVisibility(selectedLayer->GetVisibility());
+            }
+        }
         return;
     }
     else
     {
-        layerSelected = static_cast<string>(event.GetText());
-        EditLayerParam();
+        EditSelectedLayer();
     }
 }
 
-void EditorLayers::EditLayerParam()
+void EditorLayers::EditSelectedLayer()
 {
-    string name = layerSelected;
-    if ( name == _("Calque de base") ) name = "";
-
-    Layer * layer = NULL;
-
-    //On cherche le layer à éditer
-    for (unsigned int i = 0;i<layers->size();++i)
-    {
-        if ( layers->at(i).GetName() == name )
-            layer = &layers->at(i);
-    }
-
-    if ( layer == NULL )
-        return;
+    //Get selected layer
+    Layer * layer = GetSelectedLayer();
+    if ( !layer ) return;
 
     //Edition du calque
     string oldName = layer->GetName();
@@ -479,7 +479,7 @@ void EditorLayers::EditLayerParam()
     }
 
     Refresh();
-    scene.wasModified = true;
+    if ( sceneCanvas ) sceneCanvas->Reload();
 }
 
 ////////////////////////////////////////////////////////////
@@ -487,7 +487,7 @@ void EditorLayers::EditLayerParam()
 ////////////////////////////////////////////////////////////
 void EditorLayers::OnEditSelected1(wxCommandEvent& event)
 {
-    EditLayerParam();
+    EditSelectedLayer();
 }
 
 ////////////////////////////////////////////////////////////
@@ -495,14 +495,20 @@ void EditorLayers::OnEditSelected1(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorLayers::OnlayersListItemSelect1(wxListEvent& event)
 {
-    layerSelected = static_cast<string>(event.GetText());
+    //Get selected layer
+    Layer * layer = GetSelectedLayer();
+    if ( !layer ) return;
+
+    if ( sceneCanvas ) sceneCanvas->scene.addOnLayer = layer->GetName();
     UpdateSelectedLayerIcon();
-    if ( sceneCanvas ) sceneCanvas->scene.addOnLayer = layerSelected;
 }
 
 void EditorLayers::OnlayersListItemFocused(wxListEvent& event)
 {
-    layerSelected = static_cast<string>(event.GetText());
+    //Get selected layer
+    Layer * layer = GetSelectedLayer();
+    if ( !layer ) return;
+
+    if ( sceneCanvas ) sceneCanvas->scene.addOnLayer = layer->GetName();
     UpdateSelectedLayerIcon();
-    if ( sceneCanvas ) sceneCanvas->scene.addOnLayer = layerSelected;
 }

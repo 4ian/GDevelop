@@ -71,7 +71,7 @@
 		<Cursor position="1074" topLine="12" />
 	</File>
 	<File name="ConvertJRC.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="11578" topLine="245" />
+		<Cursor position="14677" topLine="348" />
 	</File>
 	<File name="CppUnitLite\CppUnitLite\Failure.h" open="0" top="0" tabpos="0">
 		<Cursor position="0" topLine="6" />
@@ -100,11 +100,11 @@
 	<File name="Credits.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="13263" topLine="204" />
 	</File>
-	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="24886" topLine="556" />
+	<File name="DebuggerGUI.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="20077" topLine="441" />
 	</File>
-	<File name="DebuggerGUI.h" open="0" top="0" tabpos="0">
-		<Cursor position="2773" topLine="93" />
+	<File name="DebuggerGUI.h" open="1" top="0" tabpos="2">
+		<Cursor position="2222" topLine="70" />
 	</File>
 	<File name="Demarrage.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="16468" topLine="426" />
@@ -119,7 +119,7 @@
 		<Cursor position="916" topLine="1" />
 	</File>
 	<File name="DndTextSceneEditor.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="241" topLine="0" />
+		<Cursor position="447" topLine="0" />
 	</File>
 	<File name="EditLayer.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="16393" topLine="309" />
@@ -142,8 +142,8 @@
 	<File name="EditPropScene.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="12120" topLine="333" />
 	</File>
-	<File name="EditorEvents.cpp" open="0" top="0" tabpos="15">
-		<Cursor position="33349" topLine="521" />
+	<File name="EditorEvents.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="39046" topLine="659" />
 	</File>
 	<File name="EditorEvents.h" open="0" top="0" tabpos="8">
 		<Cursor position="1413" topLine="35" />
@@ -154,11 +154,11 @@
 	<File name="EditorEventsConditions.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="564" topLine="0" />
 	</File>
-	<File name="EditorLayers.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="339" topLine="20" />
+	<File name="EditorLayers.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="17302" topLine="421" />
 	</File>
-	<File name="EditorLayers.h" open="1" top="0" tabpos="4">
-		<Cursor position="709" topLine="14" />
+	<File name="EditorLayers.h" open="0" top="0" tabpos="10">
+		<Cursor position="2051" topLine="54" />
 	</File>
 	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="12">
 		<Cursor position="38045" topLine="826" />
@@ -178,17 +178,17 @@
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="8482" topLine="131" />
+	<File name="EditorScene.cpp" open="0" top="0" tabpos="6">
+		<Cursor position="8361" topLine="125" />
 	</File>
 	<File name="EditorScene.h" open="0" top="0" tabpos="4">
 		<Cursor position="3270" topLine="90" />
 	</File>
-	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="2488" topLine="19" />
+	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="12">
+		<Cursor position="10982" topLine="263" />
 	</File>
-	<File name="EdittimeScene.h" open="0" top="0" tabpos="11">
-		<Cursor position="1315" topLine="46" />
+	<File name="EdittimeScene.h" open="0" top="0" tabpos="6">
+		<Cursor position="2039" topLine="49" />
 	</File>
 	<File name="EventsRefactorer.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="22579" topLine="527" />
@@ -244,11 +244,11 @@
 	<File name="ImportImage.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="29134" topLine="422" />
 	</File>
-	<File name="InitialPositionBrowserDlg.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="2904" topLine="58" />
+	<File name="InitialPositionBrowserDlg.cpp" open="0" top="0" tabpos="13">
+		<Cursor position="1819" topLine="42" />
 	</File>
-	<File name="InitialPositionBrowserDlg.h" open="0" top="0" tabpos="2">
-		<Cursor position="768" topLine="8" />
+	<File name="InitialPositionBrowserDlg.h" open="0" top="0" tabpos="14">
+		<Cursor position="249" topLine="8" />
 	</File>
 	<File name="InitialVariablesDialog.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="13929" topLine="282" />
@@ -286,8 +286,14 @@
 	<File name="Preferences.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="30103" topLine="412" />
 	</File>
+	<File name="ProfileDlg.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="2221" topLine="21" />
+	</File>
+	<File name="ProfileDlg.h" open="1" top="1" tabpos="1">
+		<Cursor position="229" topLine="0" />
+	</File>
 	<File name="ProjectManager.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="34604" topLine="720" />
+		<Cursor position="51130" topLine="1177" />
 	</File>
 	<File name="ProjectManager.h" open="0" top="0" tabpos="7">
 		<Cursor position="2517" topLine="113" />
@@ -298,11 +304,11 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="22" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="1" top="1" tabpos="3">
-		<Cursor position="19741" topLine="362" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="16097" topLine="253" />
 	</File>
-	<File name="SceneCanvas.h" open="1" top="0" tabpos="2">
-		<Cursor position="1507" topLine="29" />
+	<File name="SceneCanvas.h" open="1" top="0" tabpos="7">
+		<Cursor position="4169" topLine="99" />
 	</File>
 	<File name="SearchEvents.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="15843" topLine="234" />
@@ -323,7 +329,7 @@
 		<Cursor position="933" topLine="13" />
 	</File>
 	<File name="TemplateEvents.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="771" topLine="5" />
+		<Cursor position="328" topLine="0" />
 	</File>
 	<File name="TemplateEvents.h" open="0" top="0" tabpos="10">
 		<Cursor position="552" topLine="0" />

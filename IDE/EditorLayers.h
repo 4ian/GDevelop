@@ -67,9 +67,9 @@ class EditorLayers: public wxPanel
 		void UpdateSelectedLayerIcon();
         void OnRefresh(wxCommandEvent& event);
         void OnMoreOptions(wxCommandEvent& event);
-        void EditLayerParam();
+        void EditSelectedLayer();
+        Layer* GetSelectedLayer();
         void OnHelp(wxCommandEvent& event);
-        long GetItemSelected();
 
         /**
          * Reference to game containing the datas to edit

@@ -11,9 +11,7 @@
  */
 void TemplateEvents::Init(const TemplateEvents & other)
 {
-    events.clear();
-    for (unsigned int i =0;i<other.events.size();++i)
-    	events.push_back( other.events[i]->Clone() );
+    events = CloneVectorOfEvents(other.events);
 
     name = other.name;
     desc = other.desc;

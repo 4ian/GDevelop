@@ -626,6 +626,7 @@ void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
     int positionScrollbar = ScrollBar1->GetThumbPosition();
     int initialXposition = 2 + dc.GetTextExtent(ToString(events->size())).GetWidth() + 2 - horizontalScrollbar->GetThumbPosition();
     int maximalWidth = 0;
+    if ( true ) initialXposition+=30; //TODO : Dis/enable profiling
 
     //Setup renderings datas which are constants.
     eventsRenderingHelper->SetConditionsColumnWidth(conditionsColumnWidth);
@@ -670,7 +671,14 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
         if ( draw )
         {
             dc.SetFont( eventsRenderingHelper->GetFont() );
-            dc.DrawText(ToString(i+1), initialXposition-(dc.GetTextExtent(ToString(i+1)).GetWidth()+2), Yposition);
+
+            if (true && list[i]->IsExecutable())  //TODO : Dis/enable profiling
+            {
+                dc.DrawText(ToString(i+1), initialXposition-(dc.GetTextExtent(ToString(i+1)).GetWidth()+2)-30, Yposition);
+                dc.DrawText(ToString(list[i]->totalTimeDuringLastSession)+"µs", initialXposition-30, Yposition);
+            }
+            else
+                dc.DrawText(ToString(i+1), initialXposition-(dc.GetTextExtent(ToString(i+1)).GetWidth()+2), Yposition);
         }
 
         int width = EventsPanel->GetSize().x-initialXposition;

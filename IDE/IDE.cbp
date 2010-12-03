@@ -737,6 +737,8 @@
 		<Unit filename="Preferences.h">
 			<Option virtualFolder="Editeur principal\" />
 		</Unit>
+		<Unit filename="ProfileDlg.cpp" />
+		<Unit filename="ProfileDlg.h" />
 		<Unit filename="ProjectManager.cpp" />
 		<Unit filename="ProjectManager.h" />
 		<Unit filename="RecentList.cpp">
@@ -901,6 +903,7 @@
 					<wxPanel wxs="wxsmith/ExternalEventsEditor.wxs" src="ExternalEventsEditor.cpp" hdr="ExternalEventsEditor.h" fwddecl="0" i18n="1" name="ExternalEventsEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/AutomatismTypeChoice.wxs" src="AutomatismTypeChoice.cpp" hdr="AutomatismTypeChoice.h" fwddecl="0" i18n="1" name="AutomatismTypeChoice" language="CPP" />
 					<wxPanel wxs="wxsmith/InitialPositionBrowserDlg.wxs" src="InitialPositionBrowserDlg.cpp" hdr="InitialPositionBrowserDlg.h" fwddecl="0" i18n="1" name="InitialPositionBrowserDlg" language="CPP" />
+					<wxPanel wxs="wxsmith/ProfileDlg.wxs" src="ProfileDlg.cpp" hdr="ProfileDlg.h" fwddecl="0" i18n="1" name="ProfileDlg" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

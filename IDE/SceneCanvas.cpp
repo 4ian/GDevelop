@@ -35,6 +35,7 @@
 #include "EditorLayers.h"
 #include "DebuggerGUI.h"
 #include "GridSetup.h"
+#include "ProfileDlg.h"
 
 const long SceneCanvas::ID_ADDOBJMENU = wxNewId();
 const long SceneCanvas::ID_DELOBJMENU = wxNewId();
@@ -65,6 +66,8 @@ const long SceneCanvas::idRibbonDebugger = wxNewId();
 
 const long SceneCanvas::idRibbonUndo = wxNewId();
 const long SceneCanvas::idRibbonRedo = wxNewId();
+
+const long SceneCanvas::idRibbonObjectsPositionList = wxNewId();
 
 const long SceneCanvas::idRibbonHelp = wxNewId();
 
@@ -158,12 +161,16 @@ void SceneCanvas::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonWindowMask, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnWindowMaskBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnUndoBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnRedoBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonObjectsPositionList,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnObjectsPositionList, NULL, this);
+
 
     mainEditorCommand.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnRefreshBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonPlay, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPlayBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonPlayWin, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPlayWindowBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonPause, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPauseBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonDebugger, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnDebugBtClick, NULL, this);
+
+
 /*
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom5Selected, NULL, this);
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom10Selected, NULL, this);
@@ -228,6 +235,7 @@ void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
         bar->AddButton(idRibbonGrid, !hideLabels ? _("Grille") : "", wxBitmap("res/grid24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonGridSetup, !hideLabels ? _("Editer la grille") : "", wxBitmap("res/gridedit24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonWindowMask, !hideLabels ? _("Masque de la fenêtre de jeu") : "", wxBitmap("res/windowMask24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Liste des objets de la scène") : "", wxBitmap("res/ObjectsPositionsList24.png", wxBITMAP_TYPE_ANY));
     }
     else
     {
@@ -263,6 +271,14 @@ void SceneCanvas::SetOwnedExternalWindow(boost::shared_ptr<RenderDialog> externa
 void SceneCanvas::SetOwnedInitialPositionBrowser(boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser_)
 {
     initialPositionsBrowser = initialPositionsBrowser_;
+}
+void SceneCanvas::SetOwnedProfileDialog(boost::shared_ptr<ProfileDlg> profileDialog_)
+{
+    profileDialog = profileDialog_;
+    if ( profileDialog && profileDialog->GetAssociatedSceneCanvas() != this)
+        profileDialog->SetAssociatedSceneCanvas(this);
+
+    scene.profiler = profileDialog.get();
 }
 
 /**
@@ -325,6 +341,8 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 
     externalWindow->Show(false);
 
+    if ( profileDialog ) profileDialog->ParseProfileEvents();
+
     scene.ChangeRenderWindow(this);
 
     Reload();
@@ -353,6 +371,12 @@ void SceneCanvas::OnLayersEditor( wxCommandEvent & event )
 void SceneCanvas::OnObjectsEditor( wxCommandEvent & event )
 {
     m_mgr->GetPane(objectsEditor.get()).Show();
+    m_mgr->Update();
+}
+
+void SceneCanvas::OnObjectsPositionList( wxCommandEvent & event )
+{
+    m_mgr->GetPane(initialPositionsBrowser.get()).Show();
     m_mgr->Update();
 }
 
@@ -796,6 +820,7 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
     //position de départ est celle où ils sont.
     if ( scene.isMovingObject )
     {
+        if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
         for (unsigned int i = 0;i<scene.objectsSelected.size();++i)
         {
             ObjSPtr object = scene.objectsSelected.at(i);
@@ -1068,6 +1093,7 @@ void SceneCanvas::AddObjetSelected(float x, float y)
 
     newObject->LoadResources(*game.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
 
+    if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
     ChangesMade();
 }
 
@@ -1187,8 +1213,8 @@ void SceneCanvas::OnCutSelected(wxCommandEvent & event)
     scene.xObjectsSelected.clear();
     scene.yObjectsSelected.clear();
 
-    if ( initialPositionsBrowser )
-        initialPositionsBrowser->DeselectAll();
+    if ( initialPositionsBrowser ) initialPositionsBrowser->DeselectAll();
+    if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
 
     Clipboard::getInstance()->SetPositionsSelection(copiedPositions);
 }
@@ -1206,6 +1232,7 @@ void SceneCanvas::OnPasteSelected(wxCommandEvent & event)
         sceneEdited.initialObjectsPositions.back().y += ConvertCoords(0, scene.input->GetMouseY()).y;
     }
 
+    if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
     Reload();
 }
 
@@ -1273,6 +1300,7 @@ void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
         {
             Reload();
         }
+        if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
         ChangesMade();
     }
 
@@ -1312,8 +1340,7 @@ void SceneCanvas::OnDelObjetSelected(wxCommandEvent & event)
     scene.xObjectsSelected.clear();
     scene.yObjectsSelected.clear();
 
-    if ( initialPositionsBrowser )
-        initialPositionsBrowser->Refresh();
+    if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
 
     ChangesMade();
 }
@@ -1339,11 +1366,6 @@ void SceneCanvas::OnMiddleDown( wxMouseEvent &event )
         SetCursor( wxNullCursor );
     }
 }
-
-void SceneCanvas::OnMiddleUp( wxMouseEvent &event )
-{
-}
-
 
 void SceneCanvas::Reload()
 {
@@ -1448,4 +1470,22 @@ int SceneCanvas::GetInitialPositionFromObject(ObjSPtr object)
     }
 
     return -1;
+}
+
+ObjSPtr SceneCanvas::GetObjectFromInitialPosition(const InitialPosition & initialPosition)
+{
+    ObjList allObjects = scene.objectsInstances.GetAllObjects();
+
+    for (unsigned int id = 0;id < allObjects.size();++id)
+    {
+        if ( allObjects[id]->GetX() == initialPosition.x &&
+                allObjects[id]->GetY() == initialPosition.y &&
+                allObjects[id]->GetAngle() == initialPosition.angle)
+        {
+            return allObjects[id];
+        }
+    }
+
+    cout << "Object not found";
+    return boost::shared_ptr<Object> ();
 }

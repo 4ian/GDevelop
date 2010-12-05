@@ -142,6 +142,7 @@ private :
     void OnWindowMaskBtClick( wxCommandEvent & event );
     void OnHelpBtClick( wxCommandEvent & event );
     void OnObjectsPositionList( wxCommandEvent & event );
+    void OnProfilerBtClick( wxCommandEvent & event );
 
     int GetObjectsSelectedHighestLayer();
     int GetObjectsSelectedLowestLayer();
@@ -176,6 +177,7 @@ private :
     static const long idRibbonPause;
     static const long idRibbonResetGlobalVars;
     static const long idRibbonDebugger;
+    static const long idRibbonProfiler;
     static const long idRibbonHelp;
 
     bool hasJustRightClicked;

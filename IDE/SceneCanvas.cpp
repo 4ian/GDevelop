@@ -63,6 +63,7 @@ const long SceneCanvas::idRibbonPlayWin = wxNewId();
 const long SceneCanvas::idRibbonPause = wxNewId();
 const long SceneCanvas::idRibbonResetGlobalVars = wxNewId();
 const long SceneCanvas::idRibbonDebugger = wxNewId();
+const long SceneCanvas::idRibbonProfiler = wxNewId();
 
 const long SceneCanvas::idRibbonUndo = wxNewId();
 const long SceneCanvas::idRibbonRedo = wxNewId();
@@ -169,6 +170,7 @@ void SceneCanvas::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonPlayWin, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPlayWindowBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonPause, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPauseBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonDebugger, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnDebugBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonProfiler, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnProfilerBtClick, NULL, this);
 
 
 /*
@@ -244,6 +246,7 @@ void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
         bar->AddButton(idRibbonPlayWin, !hideLabels ? _("Jouer dans une fenêtre") : "", wxBitmap("res/startwindow24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", wxBitmap("res/pauseicon24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", wxBitmap("res/bug24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonProfiler, !hideLabels ? _("Performances") : "", wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY));
     }
 
     bar->Realize();
@@ -263,6 +266,9 @@ void SceneCanvas::SetOwnedLayersEditor(boost::shared_ptr<EditorLayers> layersEdi
 void SceneCanvas::SetOwnedDebugger(boost::shared_ptr<DebuggerGUI> debugger_)
 {
     debugger = debugger_;
+
+    if ( debugger )
+        scene.debugger = debugger.get();
 }
 void SceneCanvas::SetOwnedExternalWindow(boost::shared_ptr<RenderDialog> externalWindow_)
 {
@@ -278,7 +284,8 @@ void SceneCanvas::SetOwnedProfileDialog(boost::shared_ptr<ProfileDlg> profileDia
     if ( profileDialog && profileDialog->GetAssociatedSceneCanvas() != this)
         profileDialog->SetAssociatedSceneCanvas(this);
 
-    scene.profiler = profileDialog.get();
+    if ( profileDialog )
+        scene.profiler = profileDialog.get();
 }
 
 /**
@@ -377,6 +384,14 @@ void SceneCanvas::OnObjectsEditor( wxCommandEvent & event )
 void SceneCanvas::OnObjectsPositionList( wxCommandEvent & event )
 {
     m_mgr->GetPane(initialPositionsBrowser.get()).Show();
+    m_mgr->Update();
+}
+
+void SceneCanvas::OnProfilerBtClick( wxCommandEvent & event )
+{
+    if ( !profileDialog ) return;
+
+    m_mgr->GetPane(profileDialog.get()).Show();
     m_mgr->Update();
 }
 

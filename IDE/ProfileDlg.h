@@ -9,9 +9,12 @@
 //(*Headers(ProfileDlg)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/menu.h>
+#include <wx/checkbox.h>
 #include <wx/panel.h>
 //*)
 #include <vector>
+#include <deque>
 #include "GDL/Event.h"
 #include "GDL/BaseProfiler.h"
 class SceneCanvas;
@@ -27,29 +30,66 @@ class ProfileDlg: public wxPanel, public BaseProfiler
 		void SetAssociatedSceneCanvas(SceneCanvas * sceneCanvas_) { sceneCanvas = sceneCanvas_; Refresh(); };
 		SceneCanvas * GetAssociatedSceneCanvas() { return sceneCanvas; };
 
+        bool profilingActivated;
 
 		//(*Declarations(ProfileDlg)
+		wxStaticText* scaleMidTxt;
+		wxStaticText* scaleMaxTxt;
+		wxMenuItem* MenuItem2;
 		wxStaticText* eventsTimeTxt;
-		wxStaticText* ratioTxt;
-		wxStaticText* renderingTimeTxt;
+		wxMenuItem* objectsCountCheck;
+		wxMenuItem* MenuItem1;
+		wxCheckBox* activateCheck;
+		wxMenuItem* eventsTimeCheck;
+		wxPanel* Panel1;
+		wxPanel* ratioGraphics;
+		wxMenuItem* totalTimeCheck;
+		wxPanel* Panel3;
+		wxStaticText* objectsCountTxt;
+		wxMenu contextMenu;
+		wxStaticText* totalTimeTxt;
+		wxMenuItem* infiniteDataCheck;
+		wxPanel* Panel2;
 		//*)
 	protected:
 
 		//(*Identifiers(ProfileDlg)
-		static const long ID_STATICTEXT1;
+		static const long ID_CHECKBOX1;
+		static const long ID_STATICTEXT8;
+		static const long ID_STATICTEXT9;
+		static const long ID_PANEL1;
+		static const long ID_PANEL3;
 		static const long ID_STATICTEXT2;
+		static const long ID_PANEL2;
+		static const long ID_STATICTEXT1;
+		static const long ID_PANEL4;
 		static const long ID_STATICTEXT3;
+		static const long ID_MENUITEM1;
+		static const long ID_MENUITEM3;
+		static const long ID_MENUITEM2;
 		//*)
 
 	private:
 
 		//(*Handlers(ProfileDlg)
+		void OnratioGraphicsPaint(wxPaintEvent& event);
+		void OnapplyBtClick(wxCommandEvent& event);
+		void OnratioGraphicsResize(wxSizeEvent& event);
+		void OnratioGraphicsRightUp(wxMouseEvent& event);
+		void OnChangeDurationSelected(wxCommandEvent& event);
+		void OnStepTimeSelected(wxCommandEvent& event);
+		void OnactivateCheckClick(wxCommandEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()
 
 		void ParseProfileEvents(const std::vector < BaseEventSPtr > & events);
 		void UpdateGUI();
+
+        unsigned int maxData;
+		std::deque <unsigned long int> eventsData;
+		std::deque <unsigned long int> totalTimeData;
+		std::deque <unsigned int> objectsCountData;
 
 		SceneCanvas * sceneCanvas;
 };

@@ -20,6 +20,7 @@
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/Game.h"
 class SearchEvents;
+class SceneCanvas;
 
 class EditorEvents: public wxPanel
 {
@@ -32,6 +33,9 @@ class EditorEvents: public wxPanel
 
 		static void CreateRibbonPage(wxRibbonPage * page);
 		void ConnectEvents();
+
+		void SetAssociatedSceneCanvas(SceneCanvas * sceneCanvas_) { sceneCanvas = sceneCanvas_; };
+		SceneCanvas * GetAssociatedSceneCanvas() { return sceneCanvas; };
 
 		/**
 		 * Called (internally by EventsEditor or by modeless dialogs like Search/Replace dialog) when some changes
@@ -154,6 +158,7 @@ class EditorEvents: public wxPanel
 		static const long idRibbonCreateTemplate;
 		static const long idRibbonHelp;
 		static const long idSearchReplace;
+		static const long idRibbonProfiling;
 		static vector < std::pair<long, std::string> > idForEventTypesMenu;
 
 	private:
@@ -211,6 +216,7 @@ class EditorEvents: public wxPanel
         void DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & maximalWidth, bool draw);
 
         void OnSearchBtClick(wxCommandEvent& event);
+        void OnProfilingBtClick(wxCommandEvent& event);
 		void OnInsertSomeEventSelected(wxCommandEvent& event);
 		void OnAddSomeEventSelected(wxRibbonButtonBarEvent& evt);
 		void SetEventsNeedUpdate(vector < BaseEventSPtr > & eventsToRefresh);
@@ -237,10 +243,12 @@ class EditorEvents: public wxPanel
         bool ScrollToEvent(vector < BaseEventSPtr > & list, BaseEventSPtr eventToScrollTo, int & Yposition, int initialXposition);
 
         SearchEvents * searchDialog;
+        bool profilingActivated;
 
 		Game & game;
 		Scene & scene;
         vector < BaseEventSPtr > * events; //Pointeur vers les évènements à modifier
+        SceneCanvas * sceneCanvas;
 
 		MainEditorCommand & mainEditorCommand;
 

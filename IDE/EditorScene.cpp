@@ -150,13 +150,15 @@ mainEditorCommand(mainEditorCommand_)
     sceneCanvas->SetParentPanelAndDockManager( scenePanel, &m_mgr );
     sceneCanvas->SetScrollbars(scrollBar1, scrollBar2);
 
+    eventsEditor->SetAssociatedSceneCanvas(sceneCanvas);
+
     //Display editors in panes
     m_mgr.AddPane( notebook, wxAuiPaneInfo().Name( wxT( "ESCenter" ) ).Center().CloseButton( false ).Caption( _( "Editeur de scène" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
     m_mgr.AddPane( sceneCanvas->GetOwnedObjectsEditor().get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Editeur d'objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
     m_mgr.AddPane( sceneCanvas->GetOwnedLayersEditor().get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Float().CloseButton( true ).Caption( _( "Editeur de calques" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
     m_mgr.AddPane( sceneCanvas->GetOwnedDebugger().get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
     m_mgr.AddPane( sceneCanvas->GetOwnedInitialPositionBrowser().get(), wxAuiPaneInfo().Name( wxT( "IPB" ) ).Float().CloseButton( true ).Caption( _( "Positions initiales des objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
-    m_mgr.AddPane( sceneCanvas->GetOwnedProfileDialog().get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Performances" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(true) );
+    m_mgr.AddPane( sceneCanvas->GetOwnedProfileDialog().get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Performances" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );
 
     //Load preferences
     {
@@ -175,6 +177,10 @@ mainEditorCommand(mainEditorCommand_)
 
     mainEditorCommand.GetRibbon()->SetActivePage(3);
     sceneCanvas->ConnectEvents();
+
+    wxString perspective;
+	wxConfigBase::Get()->Read("/SceneEditor/LastWorkspace", &perspective);
+	m_mgr.LoadPerspective(perspective);
 
     m_mgr.Update();
     sceneCanvas->Reload();
@@ -195,12 +201,11 @@ void EditorScene::OnscenePanelResize(wxSizeEvent& event)
 
 EditorScene::~EditorScene()
 {
-	std::cout << "Debug Message : Start destructor of EditorScene" << endl;
-
 	//(*Destroy(EditorScene)
 	//*)
+
+	wxConfigBase::Get()->Write("/SceneEditor/LastWorkspace", m_mgr.SavePerspective());
 	m_mgr.UnInit();
-	std::cout << "Debug Message : END deleting in destructor of EditorScene" << endl;
 }
 
 ////////////////////////////////////////////////////////////

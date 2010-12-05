@@ -32,6 +32,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/StandardEvent.h"
 #include "GDL/CommonTools.h"
+#include "GDL/BaseProfiler.h"
 #include "GDL/HelpFileAccess.h"
 #include "SearchEvents.h"
 #ifdef __WXMSW__
@@ -39,6 +40,7 @@
 #endif
 #include "Clipboard.h"
 #include "ChoixTemplateEvent.h"
+#include "ProfileDlg.h"
 #include "CreateTemplate.h"
 #include "Game_Develop_EditorMain.h"
 #include <time.h>
@@ -109,6 +111,7 @@ const long EditorEvents::idRibbonPaste = wxNewId();
 const long EditorEvents::idRibbonTemplate = wxNewId();
 const long EditorEvents::idRibbonCreateTemplate = wxNewId();
 const long EditorEvents::idRibbonHelp = wxNewId();
+const long EditorEvents::idRibbonProfiling = wxNewId();
 const long EditorEvents::idSearchReplace = wxNewId();
 
 vector < std::pair<long, std::string> > EditorEvents::idForEventTypesMenu;
@@ -122,9 +125,12 @@ BaseEventSPtr EditorEvents::badEvent(new BaseEvent);
 Instruction EditorEvents::badInstruction;
 
 EditorEvents::EditorEvents( wxWindow* parent, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ ) :
+searchDialog(NULL),
+profilingActivated(false),
 game(game_),
 scene(scene_),
 events(events_),
+sceneCanvas(NULL),
 mainEditorCommand(mainEditorCommand_),
 conditionsColumnWidth(350),
 ctrlPressed(false),
@@ -446,6 +452,11 @@ void EditorEvents::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idSearchReplace, !hideLabels ? _("Chercher / Remplacer") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
     }
     {
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Outils"), wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        ribbonBar->AddButton(idRibbonProfiling, !hideLabels ? _("Afficher les performances") : "", wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY));
+    }
+    {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
@@ -467,6 +478,7 @@ void EditorEvents::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnTemplateBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonCreateTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnCreateTemplateBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idSearchReplace, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnSearchBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonProfiling, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnProfilingBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnAideBtClick, NULL, this);
 }
 
@@ -626,7 +638,7 @@ void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
     int positionScrollbar = ScrollBar1->GetThumbPosition();
     int initialXposition = 2 + dc.GetTextExtent(ToString(events->size())).GetWidth() + 2 - horizontalScrollbar->GetThumbPosition();
     int maximalWidth = 0;
-    if ( true ) initialXposition+=30; //TODO : Dis/enable profiling
+    if ( profilingActivated ) initialXposition+=62;
 
     //Setup renderings datas which are constants.
     eventsRenderingHelper->SetConditionsColumnWidth(conditionsColumnWidth);
@@ -670,12 +682,29 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
         //i+1 permet de commencer la numérotation à 1
         if ( draw )
         {
+            dc.SetTextForeground(wxColour(0,0,0));
             dc.SetFont( eventsRenderingHelper->GetFont() );
 
-            if (true && list[i]->IsExecutable())  //TODO : Dis/enable profiling
+            if (profilingActivated && list[i]->IsExecutable())
             {
-                dc.DrawText(ToString(i+1), initialXposition-(dc.GetTextExtent(ToString(i+1)).GetWidth()+2)-30, Yposition);
-                dc.DrawText(ToString(list[i]->totalTimeDuringLastSession)+"µs", initialXposition-30, Yposition);
+                dc.DrawText(ToString(i+1), initialXposition-(dc.GetTextExtent(ToString(i+1)).GetWidth()+2)-62, Yposition);
+
+                //Draw profile results
+                float ratio = sceneCanvas ? static_cast<double>(list[i]->totalTimeDuringLastSession)/static_cast<double>(sceneCanvas->scene.profiler->totalEventsTime) : -1;
+                if ( ratio != -1 )
+                {
+                    dc.SetPen(wxPen(wxColour(0,0,0)));
+                    dc.SetBrush(wxColour(255.0f,255.0f*(1.0f-ratio*50),255.0f*(1.0f-ratio*50)));
+                    dc.DrawRectangle(initialXposition-61, Yposition, 61,31);
+
+                    std::ostringstream timeStr; timeStr.setf(ios::fixed,ios::floatfield); timeStr.precision(2);
+                    timeStr << list[i]->totalTimeDuringLastSession/1000.0f;
+                    dc.DrawText(timeStr.str()+"ms", initialXposition-59, Yposition);
+
+                    std::ostringstream percentStr; percentStr.setf(ios::fixed,ios::floatfield); percentStr.precision(2);
+                    percentStr << ratio*100.0f;
+                    dc.DrawText(percentStr.str()+"%", initialXposition-59, Yposition+15);
+                }
             }
             else
                 dc.DrawText(ToString(i+1), initialXposition-(dc.GetTextExtent(ToString(i+1)).GetWidth()+2), Yposition);
@@ -703,6 +732,10 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
         {
             list[i]->Render(dc, initialXposition, Yposition, width < 0 ? 0 : width );
         }
+
+        //Be sure there is enough place for profiling results
+        if ( profilingActivated && renderedHeight < 35 )
+            renderedHeight = 35;
 
         Yposition += renderedHeight;
 
@@ -1229,6 +1262,21 @@ void EditorEvents::OnEventsPanelRightUp( wxMouseEvent& event )
 void EditorEvents::OnEventsPanelMouseWheel(wxMouseEvent& event)
 {
     ScrollBar1->SetScrollbar(ScrollBar1->GetThumbPosition()-event.GetWheelRotation(), ScrollBar1->GetThumbSize(), ScrollBar1->GetRange(), ScrollBar1->GetPageSize());
+    ForceRefresh();
+}
+
+/**
+ * De/activate profiling
+ */
+void EditorEvents::OnProfilingBtClick(wxCommandEvent& event)
+{
+    if ( !profilingActivated && (!sceneCanvas || sceneCanvas->GetOwnedProfileDialog() == boost::shared_ptr<ProfileDlg>() || !sceneCanvas->GetOwnedProfileDialog()->profilingActivated) )
+    {
+        wxLogMessage(_("Le suivi des performances n'est pas activé. Activez le suivi des évènements à l'aide de la fenêtre Performances lors de l'aperçu puis lancez un aperçu de la scène."));
+        return;
+    }
+
+    profilingActivated = !profilingActivated;
     ForceRefresh();
 }
 

@@ -18,16 +18,20 @@ class GD_API BaseProfiler
 
         unsigned long int lastEventsTime;
         unsigned long int lastRenderingTime;
+        unsigned long int totalSceneTime;
+        unsigned long int totalEventsTime;
 
         btClock eventsClock;
         btClock renderingClock;
 
         void Update();
+        void Reset();
 
-    private:
+    protected:
+        sf::Clock stepClock;
+        float stepTime;
+
         virtual void UpdateGUI() = 0;
-
-        sf::Clock timeInterval;
 };
 
 #endif // BASEPROFILER_H

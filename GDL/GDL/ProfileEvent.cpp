@@ -11,7 +11,6 @@ time(0)
 
 ProfileEvent::~ProfileEvent()
 {
-    std::cout << "ProfileEvent destroyed, time :" << time << std::endl;
 }
 
 /**

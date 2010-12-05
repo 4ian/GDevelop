@@ -8,17 +8,28 @@
 
 BaseProfiler::BaseProfiler() :
 lastEventsTime(0),
-lastRenderingTime(0)
+lastRenderingTime(0),
+totalSceneTime(0),
+totalEventsTime(0),
+stepTime(0.050f)
 {
     //ctor
 }
 
 void BaseProfiler::Update()
 {
-    if ( timeInterval.GetElapsedTime() > 0.200 )
+    if ( stepClock.GetElapsedTime() > stepTime )
     {
         UpdateGUI();
-        timeInterval.Reset();
+        stepClock.Reset();
     }
+}
+
+void BaseProfiler::Reset()
+{
+    lastEventsTime = 0;
+    lastRenderingTime = 0;
+    totalSceneTime = 0;
+    totalEventsTime = 0;
 }
 #endif

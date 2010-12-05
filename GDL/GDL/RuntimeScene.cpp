@@ -162,7 +162,10 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
     {
         #ifdef GDE
         if( profiler )
+        {
+            if ( firstLoop ) profiler->Reset();
             profiler->eventsClock.reset();
+        }
         #endif
 
         //Gestion pré-évènements
@@ -202,6 +205,8 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         if( profiler )
         {
             profiler->lastRenderingTime = profiler->renderingClock.getTimeMicroseconds();
+            profiler->totalSceneTime += profiler->lastRenderingTime + profiler->lastEventsTime;
+            profiler->totalEventsTime += profiler->lastEventsTime;
             profiler->Update();
         }
         #endif

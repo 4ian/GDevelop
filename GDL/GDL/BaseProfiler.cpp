@@ -7,6 +7,7 @@
 #include "BaseProfiler.h"
 
 BaseProfiler::BaseProfiler() :
+profilingActivated(false),
 lastEventsTime(0),
 lastRenderingTime(0),
 totalSceneTime(0),

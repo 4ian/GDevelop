@@ -190,7 +190,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         #ifdef GDE
         if( debugger )
             debugger->Update();
-        if( profiler )
+        if( profiler && profiler->profilingActivated )
         {
             profiler->lastEventsTime = profiler->renderingClock.getTimeMicroseconds();
             profiler->renderingClock.reset();
@@ -202,7 +202,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         textes.clear(); //Legacy texts
 
         #ifdef GDE
-        if( profiler )
+        if( profiler && profiler->profilingActivated )
         {
             profiler->lastRenderingTime = profiler->renderingClock.getTimeMicroseconds();
             profiler->totalSceneTime += profiler->lastRenderingTime + profiler->lastEventsTime;
@@ -525,6 +525,8 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
 ////////////////////////////////////////////////////////////
 bool RuntimeScene::LoadFromScene( const Scene & scene )
 {
+    MessageLoading( "Loading scene", 10 );
+
     //Clear RuntimeScene datas
     objectsInstances.Clear();
     textes.clear();
@@ -567,25 +569,19 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     }
 
     //Load resources of initial objects
+    MessageLoading( "Loading objects resources", 30 );
     for (unsigned int i = 0; i < scene.initialObjects.size();++i)
-    {
-        MessageLoading( "Loading object resources : " + scene.initialObjects.at( i )->GetName(), i + 1 / scene.initialObjects.size()*100 / 3 + 33 );
         scene.initialObjects[i]->LoadResources(*game->imageManager);
-    }
 
     //Load resources of global objects
     //TODO : Make this only one time during game
     for (unsigned int i = 0; i < game->globalObjects.size();++i)
-    {
-        MessageLoading( "Loading object resources : " + game->globalObjects[i]->GetName(), i + 1 /  game->globalObjects.size()*100 / 3 + 33 );
         game->globalObjects[i]->LoadResources(*game->imageManager);
-    }
 
     //Create object instances which are originally positionned on scene
+    MessageLoading( "Adding objects to their initial position", 66 );
     for(unsigned int i = 0;i < scene.initialObjectsPositions.size();++i)
     {
-        MessageLoading( "Placing object : " + scene.initialObjectsPositions[i].objectName, i + 1 / scene.initialObjectsPositions.size()*100 / 3 + 33 );
-
         int IDsceneObject = Picker::PickOneObject( &initialObjects, scene.initialObjectsPositions[i].objectName );
         int IDglobalObject = Picker::PickOneObject( &game->globalObjects, scene.initialObjectsPositions[i].objectName );
 
@@ -624,6 +620,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     }
 
     //Preprocess events
+    MessageLoading( "Preprocessing events", 80 );
     PreprocessEventList( *game, events );
     EventsPreprocessor::DeleteUselessEvents(events);
     EventsPreprocessor::PreprocessEvents(*this, events);
@@ -659,7 +656,7 @@ void RuntimeScene::PreprocessEventList( const Game & game, vector < BaseEventSPt
             PreprocessEventList( game, listEvent[i]->GetSubEvents());
 
         #if defined(GDE)
-        if ( listEvent[i]->IsExecutable() )
+        if ( profiler && profiler->profilingActivated && listEvent[i]->IsExecutable() )
         {
             //Define a new profile event
             boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
@@ -671,17 +668,20 @@ void RuntimeScene::PreprocessEventList( const Game & game, vector < BaseEventSPt
             listEvent.insert(listEvent.begin()+i, profileEvent);
 
             previousProfileEvent = profileEvent;
-            ++i;
+            ++i; //Don't preprocess the newly added profile event
         }
         #endif
     }
     #if defined(GDE)
-    //Define a new profile event
-    boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
-    profileEvent->SetClock(clock);
-    profileEvent->SetPreviousProfileEvent(previousProfileEvent);
+    if ( profiler && profiler->profilingActivated )
+    {
+        //Define a new profile event
+        boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
+        profileEvent->SetClock(clock);
+        profileEvent->SetPreviousProfileEvent(previousProfileEvent);
 
-    //Add it before the event to profile
-    listEvent.push_back(profileEvent);
+        //Add it before the event to profile
+        listEvent.push_back(profileEvent);
+    }
     #endif
 }

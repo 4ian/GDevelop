@@ -10,28 +10,37 @@
 #include <SFML/System.hpp>
 #include "GDL/profile.h"
 
+/**
+ * Base class to create a profiler.
+ */
 class GD_API BaseProfiler
 {
     public:
         BaseProfiler();
         virtual ~BaseProfiler() {};
 
-        unsigned long int lastEventsTime;
-        unsigned long int lastRenderingTime;
-        unsigned long int totalSceneTime;
-        unsigned long int totalEventsTime;
+        bool profilingActivated; ///< Set this to true so as to activate profiling.
 
-        btClock eventsClock;
-        btClock renderingClock;
+        unsigned long int lastEventsTime; ///< Time used by events during the last frame
+        unsigned long int lastRenderingTime; ///< Time used by rendering during the last frame
+        unsigned long int totalSceneTime; ///< Total time used by events and rendering since the beginning.
+        unsigned long int totalEventsTime; ///< Total time used by events since the beginning.
+
+        btClock eventsClock; ///< Used to compute time used by events during the frame
+        btClock renderingClock; ///< Used to compute time used by rendering during the frame
 
         void Update();
         void Reset();
 
     protected:
-        sf::Clock stepClock;
-        float stepTime;
+        float stepTime; ///< Time between each UpdateGUI.
 
+        /**
+         * Redefine this function so as to update GUI.
+         */
         virtual void UpdateGUI() = 0;
+    private:
+        sf::Clock stepClock;
 };
 
 #endif // BASEPROFILER_H

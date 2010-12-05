@@ -30,8 +30,6 @@ class ProfileDlg: public wxPanel, public BaseProfiler
 		void SetAssociatedSceneCanvas(SceneCanvas * sceneCanvas_) { sceneCanvas = sceneCanvas_; Refresh(); };
 		SceneCanvas * GetAssociatedSceneCanvas() { return sceneCanvas; };
 
-        bool profilingActivated;
-
 		//(*Declarations(ProfileDlg)
 		wxStaticText* scaleMidTxt;
 		wxStaticText* scaleMaxTxt;

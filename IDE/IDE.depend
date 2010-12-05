@@ -11239,7 +11239,7 @@
 	<wx/html/htmprint.h>
 	"Event.h"
 
-1291497178 d:\florian\programmation\gamedevelop\gdl\gdl\baseprofiler.h
+1291576124 d:\florian\programmation\gamedevelop\gdl\gdl\baseprofiler.h
 	<SFML/System.hpp>
 	"GDL/profile.h"
 
@@ -11286,7 +11286,7 @@
 	<vector>
 	"GDL/Event.h"
 
-1291567167 d:\florian\programmation\gamedevelop\ide\profiledlg.h
+1291575580 d:\florian\programmation\gamedevelop\ide\profiledlg.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/menu.h>
@@ -12889,7 +12889,7 @@
 	<vector>
 	<iostream>
 
-1291567903 source:d:\florian\programmation\gamedevelop\ide\profiledlg.cpp
+1291576807 source:d:\florian\programmation\gamedevelop\ide\profiledlg.cpp
 	"ProfileDlg.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -13062,7 +13062,7 @@
 
 1263934043 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1291575090 d:\florian\programmation\gamedevelop\ide\version.h
+1291576808 d:\florian\programmation\gamedevelop\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

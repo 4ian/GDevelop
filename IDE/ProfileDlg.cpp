@@ -38,7 +38,6 @@ END_EVENT_TABLE()
 
 ProfileDlg::ProfileDlg(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size) :
 BaseProfiler(),
-profilingActivated(false),
 maxData(300),
 sceneCanvas(NULL)
 {
@@ -312,6 +311,6 @@ void ProfileDlg::OnStepTimeSelected(wxCommandEvent& event)
 void ProfileDlg::OnactivateCheckClick(wxCommandEvent& event)
 {
     profilingActivated = activateCheck->GetValue();
-    if ( profilingActivated && sceneCanvas && sceneCanvas->scene.running )
+    if ( sceneCanvas  )
         sceneCanvas->Reload();
 }

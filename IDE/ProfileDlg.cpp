@@ -275,7 +275,12 @@ void ProfileDlg::ParseProfileEvents(const std::vector < BaseEventSPtr > & events
         {
             BaseEventSPtr originalEvent = profileEvent->originalEvent.lock();
             if ( originalEvent )
+            {
                 originalEvent->totalTimeDuringLastSession = profileEvent->GetTime();
+                originalEvent->percentDuringLastSession = static_cast<double>(originalEvent->totalTimeDuringLastSession)/static_cast<double>(totalSceneTime)*100.0f;
+            }
+            else
+                cout << "OriginalEvent not found";
         }
         else
         {

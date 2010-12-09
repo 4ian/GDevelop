@@ -34,10 +34,10 @@ class InitialPositionBrowserDlg;
 
 extern MemTrace MemTracer;
 
-////////////////////////////////////////////////////////////
-/// Partie graphique de l'éditeur de scène
-/// Utilise la SFML
-////////////////////////////////////////////////////////////
+/**
+ * Canvas for display, edit and preview a scene.
+ * Several editors can be plugged in ( and then owned ) by the scene canvas.
+ */
 class SceneCanvas : public wxSFMLCanvas
 {
 public :
@@ -45,11 +45,34 @@ public :
     SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style );
     ~SceneCanvas() { MemTracer.DelObj((long)this); }
 
+    /**
+     * Set the scene canvas to own the object editor passed in parameter
+     */
     void SetOwnedObjectsEditor(boost::shared_ptr<EditorObjets> objectsEditor_);
+
+    /**
+     * Set the scene canvas to own the layer editor passed in parameter
+     */
     void SetOwnedLayersEditor(boost::shared_ptr<EditorLayers> layersEditor_);
+
+    /**
+     * Set the scene canvas to own the debugger passed in parameter
+     */
     void SetOwnedDebugger(boost::shared_ptr<DebuggerGUI> debugger_);
+
+    /**
+     * Set the scene canvas to own the preview window passed in parameter
+     */
     void SetOwnedExternalWindow(boost::shared_ptr<RenderDialog> externalWindow_);
+
+    /**
+     * Set the scene canvas to own the initial position browser passed in parameter
+     */
     void SetOwnedInitialPositionBrowser(boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser_);
+
+    /**
+     * Set the scene canvas to own the profile dialog passed in parameter
+     */
     void SetOwnedProfileDialog(boost::shared_ptr<ProfileDlg> profileDialog_);
 
     boost::shared_ptr<EditorObjets> GetOwnedObjectsEditor() const { return objectsEditor; };
@@ -59,25 +82,38 @@ public :
     boost::shared_ptr<InitialPositionBrowserDlg> GetOwnedInitialPositionBrowser() const { return initialPositionsBrowser; };
     boost::shared_ptr<ProfileDlg> GetOwnedProfileDialog() const { return profileDialog; };
 
+    /**
+     * Set the parent panel in which the sceneCanvas is placed and the wxAuiManager managing editors panes.
+     */
     void SetParentPanelAndDockManager(wxPanel * parentPanel_, wxAuiManager * m_mgr_) {parentPanel = parentPanel_; m_mgr = m_mgr_; };
+
+    /**
+     * Set scrollbars to be used with the sceneCanvas
+     */
     void SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_) { scrollBar1 = scrollbar1_; scrollBar2 = scrollbar2_;};
 
     wxScrollBar * GetHorizontalScrollbar() const { return scrollBar1; };
     wxScrollBar * GetVerticalScrollbar() const { return scrollBar2; };
 
-    //Le jeu
-    RuntimeGame & gameEdited;
-    Scene & sceneEdited;
+    RuntimeGame & gameEdited; ///< Game to edit
+    Scene & sceneEdited; ///< Scene to edit
 
-    //Used during testing
-    RuntimeGame game;
-    EdittimeScene scene;
+    RuntimeGame game; ///< Runtime game used during preview
+    EdittimeScene scene; ///< Edittime scene used for preview
 
     /**
      * Call this method when any changes are made so as to manage undo/redo.
      */
     void ChangesMade();
+
+    /**
+     * Reload the scene edited
+     */
     void Reload();
+
+    /**
+     * Refresh the scene canvas immediatly
+     */
     inline void ManualRefresh() { Refresh(); };
 
     void UpdateScrollbars();
@@ -143,6 +179,15 @@ private :
     void OnHelpBtClick( wxCommandEvent & event );
     void OnObjectsPositionList( wxCommandEvent & event );
     void OnProfilerBtClick( wxCommandEvent & event );
+    void Onzoom10Selected(wxCommandEvent& event);
+    void Onzoom25Selected(wxCommandEvent& event);
+    void Onzoom50Selected(wxCommandEvent& event);
+    void Onzoom100Selected(wxCommandEvent& event);
+    void Onzoom150Selected(wxCommandEvent& event);
+    void Onzoom200Selected(wxCommandEvent& event);
+    void Onzoom300Selected(wxCommandEvent& event);
+    void Onzoom500Selected(wxCommandEvent& event);
+    void Onzoom5Selected(wxCommandEvent& event);
 
     int GetObjectsSelectedHighestLayer();
     int GetObjectsSelectedLowestLayer();
@@ -179,24 +224,33 @@ private :
     static const long idRibbonDebugger;
     static const long idRibbonProfiler;
     static const long idRibbonHelp;
+    static const long ID_MENUITEM8; ///< Zoom menu item
+    static const long ID_MENUITEM1; ///< Zoom menu item
+    static const long ID_MENUITEM2; ///< Zoom menu item
+    static const long ID_MENUITEM3; ///< Zoom menu item
+    static const long ID_MENUITEM4; ///< Zoom menu item
+    static const long ID_MENUITEM5; ///< Zoom menu item
+    static const long ID_MENUITEM6; ///< Zoom menu item
+    static const long ID_MENUITEM7; ///< Zoom menu item
 
     bool hasJustRightClicked;
 
     wxMenu contextMenu;
     wxMenu noObjectContextMenu;
+    wxMenu zoomMenu;
 
     MainEditorCommand & mainEditorCommand;
 
     wxScrollBar * scrollBar1; ///< Link to the scrollbar used by the sceneCanvas.
     wxScrollBar * scrollBar2; ///< Link to the scrollbar used by the sceneCanvas.
-    boost::shared_ptr<EditorObjets> objectsEditor;
-    boost::shared_ptr<EditorLayers> layersEditor;
-    boost::shared_ptr<DebuggerGUI> debugger;
-    boost::shared_ptr<RenderDialog> externalWindow;
-    boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser;
-    boost::shared_ptr<ProfileDlg> profileDialog;
-    wxAuiManager * m_mgr;
-    wxPanel * parentPanel;
+    boost::shared_ptr<EditorObjets> objectsEditor; ///< Object editor owned by the sceneCanvas
+    boost::shared_ptr<EditorLayers> layersEditor; ///< Layer editor owned by the sceneCanvas
+    boost::shared_ptr<DebuggerGUI> debugger; ///< Debugger owned by the sceneCanvas
+    boost::shared_ptr<RenderDialog> externalWindow; ///< External preview window owned by the sceneCanvas
+    boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser;  ///< Initial position browser owned by the sceneCanvas
+    boost::shared_ptr<ProfileDlg> profileDialog;  ///< Profile dialog window owned by the sceneCanvas
+    wxAuiManager * m_mgr; ///< Link to the wxAuiManager managing editors windows.
+    wxPanel * parentPanel;  ///< Link to the panel in which the sceneCanvas is inserted
 
     vector < vector < InitialPosition > > history; ///< History of changes
     vector < vector < InitialPosition > > redoHistory; ///< Histoy of changes so as to "redo"

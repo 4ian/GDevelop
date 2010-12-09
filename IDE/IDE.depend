@@ -3560,7 +3560,7 @@
 	<string>
 	<vector>
 
-1291154169 d:\florian\programmation\gamedevelop\gdl\gdl\event.h
+1291926406 d:\florian\programmation\gamedevelop\gdl\gdl\event.h
 	<iostream>
 	<vector>
 	<string>
@@ -10814,9 +10814,8 @@
 	<wx/ribbon/buttonbar.h>
 	<iostream>
 
-1290459305 d:\florian\programmation\gamedevelop\ide\editorscene.h
+1291931820 d:\florian\programmation\gamedevelop\ide\editorscene.h
 	<wx/sizer.h>
-	<wx/menu.h>
 	<wx/aui/aui.h>
 	<wx/panel.h>
 	<wx/scrolbar.h>
@@ -10834,7 +10833,7 @@
 	<string>
 	<vector>
 
-1291561725 d:\florian\programmation\gamedevelop\ide\scenecanvas.h
+1291931605 d:\florian\programmation\gamedevelop\ide\scenecanvas.h
 	<SFML/Graphics.hpp>
 	<SFML/System.hpp>
 	"wxSFMLCanvas.hpp"
@@ -11180,7 +11179,7 @@
 	<wx/dialog.h>
 	"GDL/Scene.h"
 
-1291567711 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
+1291928091 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"EditorEvents.h"
@@ -11519,7 +11518,7 @@
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
-1291575090 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
+1291931820 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
 	"EditorScene.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -12889,7 +12888,7 @@
 	<vector>
 	<iostream>
 
-1291576807 source:d:\florian\programmation\gamedevelop\ide\profiledlg.cpp
+1291927221 source:d:\florian\programmation\gamedevelop\ide\profiledlg.cpp
 	"ProfileDlg.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -12904,7 +12903,7 @@
 	"Event.h"
 	"GDL/profile.h"
 
-1288199937 source:d:\florian\programmation\gamedevelop\ide\projectmanager.cpp
+1291926519 source:d:\florian\programmation\gamedevelop\ide\projectmanager.cpp
 	"ProjectManager.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -12942,7 +12941,7 @@
 	<wx/string.h>
 	<iostream>
 
-1291561725 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1291932396 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -13062,7 +13061,7 @@
 
 1263934043 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1291576808 d:\florian\programmation\gamedevelop\ide\version.h
+1291932396 d:\florian\programmation\gamedevelop\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

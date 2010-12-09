@@ -690,21 +690,17 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
                 dc.DrawText(ToString(i+1), initialXposition-(dc.GetTextExtent(ToString(i+1)).GetWidth()+2)-62, Yposition);
 
                 //Draw profile results
-                float ratio = sceneCanvas ? static_cast<double>(list[i]->totalTimeDuringLastSession)/static_cast<double>(sceneCanvas->scene.profiler->totalEventsTime) : -1;
-                if ( ratio != -1 )
-                {
-                    dc.SetPen(wxPen(wxColour(0,0,0)));
-                    dc.SetBrush(wxColour(255.0f,255.0f*(1.0f-ratio*50),255.0f*(1.0f-ratio*50)));
-                    dc.DrawRectangle(initialXposition-61, Yposition, 61,31);
+                dc.SetPen(wxPen(wxColour(0,0,0)));
+                dc.SetBrush(wxColour(255.0f,255.0f*(1.0f-list[i]->percentDuringLastSession*0.05f),255.0f*(1.0f-list[i]->percentDuringLastSession*0.05f)));
+                dc.DrawRectangle(initialXposition-61, Yposition, 61,31);
 
-                    std::ostringstream timeStr; timeStr.setf(ios::fixed,ios::floatfield); timeStr.precision(2);
-                    timeStr << list[i]->totalTimeDuringLastSession/1000.0f;
-                    dc.DrawText(timeStr.str()+"ms", initialXposition-59, Yposition);
+                std::ostringstream timeStr; timeStr.setf(ios::fixed,ios::floatfield); timeStr.precision(2);
+                timeStr << list[i]->totalTimeDuringLastSession/1000.0f;
+                dc.DrawText(timeStr.str()+"ms", initialXposition-59, Yposition);
 
-                    std::ostringstream percentStr; percentStr.setf(ios::fixed,ios::floatfield); percentStr.precision(2);
-                    percentStr << ratio*100.0f;
-                    dc.DrawText(percentStr.str()+"%", initialXposition-59, Yposition+15);
-                }
+                std::ostringstream percentStr; percentStr.setf(ios::fixed,ios::floatfield); percentStr.precision(2);
+                percentStr << list[i]->percentDuringLastSession;
+                dc.DrawText(percentStr.str()+"%", initialXposition-59, Yposition+15);
             }
             else
                 dc.DrawText(ToString(i+1), initialXposition-(dc.GetTextExtent(ToString(i+1)).GetWidth()+2), Yposition);

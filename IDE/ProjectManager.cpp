@@ -955,60 +955,35 @@ void ProjectManager::OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event)
  */
 void ProjectManager::CloseGame(Game * game)
 {
-    cout << "Start CloseGame" << endl;
     //Closing all editors related to game
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
-    cout << "Start For" << endl;
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
         ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
         EditorImages * imagesEditorPtr = dynamic_cast<EditorImages*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-        cout << "sceneEditorPtr " << sceneEditorPtr << endl;
-        cout << "imagesEditorPtr " << imagesEditorPtr << endl;
-        cout << "mainEditor " << &mainEditor << endl;
-        cout << "mainEditor.GetEditorsNotebook() " << mainEditor.GetEditorsNotebook() << endl;
-        cout << "mainEditor.GetEditorsNotebook()->GetPage(k) " << mainEditor.GetEditorsNotebook()->GetPage(k) << endl;
-        cout << "k " << k << endl;
-        cout << "static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) " << static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) << endl;
-
         if ( sceneEditorPtr != NULL )
         {
-    cout << "Scene" << endl;
             bool sceneBelongToGame = false;
             for (unsigned int i = 0;i<game->scenes.size();++i)
             {
-                cout << "ForScene Start" << endl;
-                cout << "game->scenes[i].get " << game->scenes[i].get() << endl;
-                cout << "&sceneEditorPtr->scene " << &sceneEditorPtr->scene << endl;
-                cout << "i " << i << endl;
-                cout << "game->scenes.size() " << game->scenes.size() << endl;
-
             	if ( game->scenes[i].get() == &sceneEditorPtr->scene )
                     sceneBelongToGame = true;
-
-                cout << "ForScene Continue" << endl;
             }
-                cout << "ForScene End" << endl;
 
             if ( sceneBelongToGame )
             {
-    cout << "Delete" << endl;
                 if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                     wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
-    cout << "ENDDelete" << endl;
                 k--;
             }
         }
         else if ( imagesEditorPtr != NULL )
         {
-    cout << "ImageEditor" << endl;
             if ( &imagesEditorPtr->game == game)
             {
-    cout << "DeleteImageEditor" << endl;
                 if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                     wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
-    cout << "ENDDelete" << endl;
                 k--;
             }
         }
@@ -1016,28 +991,20 @@ void ProjectManager::CloseGame(Game * game)
         {
             if ( &externalEventsEditorPtr->game == game)
             {
-    cout << "DeleteExternalEventsEditor" << endl;
                 if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                     wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
-    cout << "ENDDelete" << endl;
                 k--;
             }
         }
-    cout << "Continue For" << endl;
     }
-    cout << "End For" << endl;
 
     for (unsigned int i = 0;i<mainEditor.games.size();++i)
     {
-    cout << "Start For2" << endl;
     	if ( mainEditor.games[i].get() == game)
             mainEditor.games.erase(mainEditor.games.begin()+i);
-    cout << "Continue For2" << endl;
     }
-    cout << "End For2" << endl;
 
     mainEditor.SetCurrentGame(mainEditor.games.size()-1);
-    cout << "End CloseGame" << endl;
 }
 
 /**
@@ -1182,28 +1149,6 @@ void ProjectManager::AddExternalEventsToGame(Game * game)
 
     boost::shared_ptr<ExternalEvents> externalEventsPtr = boost::shared_ptr<ExternalEvents>(new ExternalEvents());
     externalEventsPtr->SetName(newName);
-
-    /*try
-    {
-        std::ifstream ifile("out.txt");
-        boost::archive::xml_iarchive ar(ifile);
-
-        ExternalEvents & externalEvents = *externalEventsPtr;
-
-        ar.register_type(static_cast<BaseEvent *>(NULL));
-        ar.register_type(static_cast<StandardEvent *>(NULL));
-        ar.register_type(static_cast<CommentEvent *>(NULL));
-        boost::serialization::void_cast_register(static_cast<StandardEvent *>(NULL),static_cast<BaseEvent *>(NULL));
-        boost::serialization::void_cast_register(static_cast<CommentEvent *>(NULL),static_cast<BaseEvent *>(NULL));
-
-        ar >> BOOST_SERIALIZATION_NVP(externalEvents);
-        ifile.close();
-    }
-    catch(boost::archive::archive_exception & e)
-    {
-        std::cout << e.what();
-    }*/
-
 
     game->externalEvents.push_back(externalEventsPtr);
 }

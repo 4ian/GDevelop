@@ -72,6 +72,15 @@ const long SceneCanvas::idRibbonObjectsPositionList = wxNewId();
 
 const long SceneCanvas::idRibbonHelp = wxNewId();
 
+const long SceneCanvas::ID_MENUITEM8 = wxNewId();
+const long SceneCanvas::ID_MENUITEM1 = wxNewId();
+const long SceneCanvas::ID_MENUITEM2 = wxNewId();
+const long SceneCanvas::ID_MENUITEM3 = wxNewId();
+const long SceneCanvas::ID_MENUITEM4 = wxNewId();
+const long SceneCanvas::ID_MENUITEM5 = wxNewId();
+const long SceneCanvas::ID_MENUITEM6 = wxNewId();
+const long SceneCanvas::ID_MENUITEM7 = wxNewId();
+
 
 SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style ) :
         wxSFMLCanvas( Parent, Id, Position, Size, Style ),
@@ -141,6 +150,24 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
         noObjectContextMenu.Append(pasteItem);
     }
 
+    //Generate zoom menu
+	wxMenuItem * zoom5 = new wxMenuItem((&zoomMenu), ID_MENUITEM8, _("5%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom5);
+	wxMenuItem * zoom10 = new wxMenuItem((&zoomMenu), ID_MENUITEM1, _("10%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom10);
+	wxMenuItem * zoom25 = new wxMenuItem((&zoomMenu), ID_MENUITEM2, _("25%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom25);
+	wxMenuItem * zoom50 = new wxMenuItem((&zoomMenu), ID_MENUITEM3, _("50%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom50);
+	wxMenuItem * zoom100 = new wxMenuItem((&zoomMenu), ID_MENUITEM4, _("100%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom100);
+	wxMenuItem * zoom150 = new wxMenuItem((&zoomMenu), ID_MENUITEM5, _("150%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom150);
+	wxMenuItem * zoom200 = new wxMenuItem((&zoomMenu), ID_MENUITEM6, _("200%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom200);
+	wxMenuItem * zoom500 = new wxMenuItem((&zoomMenu), ID_MENUITEM7, _("500%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom500);
+
     SetDropTarget(new DndTextSceneEditor(*this));
 
     CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), scene.editing);
@@ -172,8 +199,6 @@ void SceneCanvas::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonDebugger, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnDebugBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonProfiler, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnProfilerBtClick, NULL, this);
 
-
-/*
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom5Selected, NULL, this);
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom10Selected, NULL, this);
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom25Selected, NULL, this);
@@ -181,7 +206,7 @@ void SceneCanvas::ConnectEvents()
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom100Selected, NULL, this);
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom150Selected, NULL, this);
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom200Selected, NULL, this);
-	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom500Selected, NULL, this);*/
+	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom500Selected, NULL, this);
 }
 
 /**
@@ -214,7 +239,7 @@ wxRibbonButtonBar* SceneCanvas::CreateRibbonPage(wxRibbonPage * page)
 
 void SceneCanvas::OnZoomMoreBtClick(wxRibbonButtonBarEvent& evt)
 {
-    //evt.PopupMenu(&zoomMenu); TODO
+    evt.PopupMenu(&zoomMenu);
 }
 
 void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
@@ -347,6 +372,15 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
     UpdateSize();
 
     externalWindow->Show(false);
+
+    for (unsigned int i = 0;i<game.scenes.size();++i)
+    {
+        std::cout << "scene" << i<< std::endl;
+        for (unsigned int j = 0;j<game.scenes[i]->events.size();++j)
+        {
+            std::cout << "event" << game.scenes[i]->events[j] << std::endl;
+        }
+    }
 
     if ( profileDialog ) profileDialog->ParseProfileEvents();
 
@@ -1503,4 +1537,44 @@ ObjSPtr SceneCanvas::GetObjectFromInitialPosition(const InitialPosition & initia
 
     cout << "Object not found";
     return boost::shared_ptr<Object> ();
+}
+
+void SceneCanvas::Onzoom5Selected(wxCommandEvent& event)
+{
+    scene.view.SetSize(GetWidth()/0.05f, GetHeight()/0.05f);
+}
+
+void SceneCanvas::Onzoom10Selected(wxCommandEvent& event)
+{
+    scene.view.SetSize(GetWidth()/0.1f, GetHeight()/0.1f);
+}
+
+void SceneCanvas::Onzoom25Selected(wxCommandEvent& event)
+{
+    scene.view.SetSize(GetWidth()/0.25f, GetHeight()/0.25f);
+}
+
+void SceneCanvas::Onzoom50Selected(wxCommandEvent& event)
+{
+    scene.view.SetSize(GetWidth()/0.5f, GetHeight()/0.5f);
+}
+
+void SceneCanvas::Onzoom100Selected(wxCommandEvent& event)
+{
+    scene.view.SetSize(GetWidth(), GetHeight());
+}
+
+void SceneCanvas::Onzoom150Selected(wxCommandEvent& event)
+{
+    scene.view.SetSize(GetWidth()/1.5f, GetHeight()/1.5f);
+}
+
+void SceneCanvas::Onzoom200Selected(wxCommandEvent& event)
+{
+    scene.view.SetSize(GetWidth()/2.f, GetHeight()/2.f);
+}
+
+void SceneCanvas::Onzoom500Selected(wxCommandEvent& event)
+{
+    scene.view.SetSize(GetWidth()/5.f, GetHeight()/5.f);
 }

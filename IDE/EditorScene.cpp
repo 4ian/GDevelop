@@ -46,14 +46,6 @@ const long EditorScene::ID_PANEL5 = wxNewId();
 const long EditorScene::ID_CUSTOM2 = wxNewId();
 const long EditorScene::ID_PANEL6 = wxNewId();
 const long EditorScene::ID_AUINOTEBOOK1 = wxNewId();
-const long EditorScene::ID_MENUITEM8 = wxNewId();
-const long EditorScene::ID_MENUITEM1 = wxNewId();
-const long EditorScene::ID_MENUITEM2 = wxNewId();
-const long EditorScene::ID_MENUITEM3 = wxNewId();
-const long EditorScene::ID_MENUITEM4 = wxNewId();
-const long EditorScene::ID_MENUITEM5 = wxNewId();
-const long EditorScene::ID_MENUITEM6 = wxNewId();
-const long EditorScene::ID_MENUITEM7 = wxNewId();
 //*)
 
 
@@ -99,22 +91,6 @@ mainEditorCommand(mainEditorCommand_)
 	notebook->AddPage(eventsPanel, _("Evènements"), false, wxBitmap(wxImage(_T("res/events16.png"))));
 	FlexGridSizer1->Add(notebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
-	zoom5 = new wxMenuItem((&zoomMenu), ID_MENUITEM8, _("5%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom5);
-	zoom10 = new wxMenuItem((&zoomMenu), ID_MENUITEM1, _("10%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom10);
-	zoom25 = new wxMenuItem((&zoomMenu), ID_MENUITEM2, _("25%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom25);
-	zoom50 = new wxMenuItem((&zoomMenu), ID_MENUITEM3, _("50%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom50);
-	zoom100 = new wxMenuItem((&zoomMenu), ID_MENUITEM4, _("100%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom100);
-	zoom150 = new wxMenuItem((&zoomMenu), ID_MENUITEM5, _("150%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom150);
-	zoom200 = new wxMenuItem((&zoomMenu), ID_MENUITEM6, _("200%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom200);
-	zoom500 = new wxMenuItem((&zoomMenu), ID_MENUITEM7, _("500%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom500);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
@@ -127,14 +103,6 @@ mainEditorCommand(mainEditorCommand_)
 	sceneCanvas->Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorScene::OnsceneCanvasSetFocus,0,this);
 	scenePanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnscenePanelResize,0,this);
 	Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&EditorScene::OnnotebookPageChanged);
-	Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom5Selected);
-	Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom10Selected);
-	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom25Selected);
-	Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom50Selected);
-	Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom100Selected);
-	Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom150Selected);
-	Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom200Selected);
-	Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorScene::Onzoom500Selected);
 	//*)
 
 	//Prepare pane manager
@@ -262,45 +230,4 @@ void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
     sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->scene.editing);
     mainEditorCommand.GetRibbon()->SetActivePage(3);
     sceneCanvas->ConnectEvents();
-}
-
-
-void EditorScene::Onzoom5Selected(wxCommandEvent& event)
-{
-    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/0.05f, sceneCanvas->GetHeight()/0.05f);
-}
-
-void EditorScene::Onzoom10Selected(wxCommandEvent& event)
-{
-    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/0.1f, sceneCanvas->GetHeight()/0.1f);
-}
-
-void EditorScene::Onzoom25Selected(wxCommandEvent& event)
-{
-    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/0.25f, sceneCanvas->GetHeight()/0.25f);
-}
-
-void EditorScene::Onzoom50Selected(wxCommandEvent& event)
-{
-    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/0.5f, sceneCanvas->GetHeight()/0.5f);
-}
-
-void EditorScene::Onzoom100Selected(wxCommandEvent& event)
-{
-    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth(), sceneCanvas->GetHeight());
-}
-
-void EditorScene::Onzoom150Selected(wxCommandEvent& event)
-{
-    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/1.5f, sceneCanvas->GetHeight()/1.5f);
-}
-
-void EditorScene::Onzoom200Selected(wxCommandEvent& event)
-{
-    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/2.f, sceneCanvas->GetHeight()/2.f);
-}
-
-void EditorScene::Onzoom500Selected(wxCommandEvent& event)
-{
-    sceneCanvas->scene.view.SetSize(sceneCanvas->GetWidth()/5.f, sceneCanvas->GetHeight()/5.f);
 }

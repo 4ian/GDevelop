@@ -42,7 +42,7 @@ class GD_API BaseEvent
 {
     public:
         BaseEvent();
-        virtual ~BaseEvent() {};
+        virtual ~BaseEvent();
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new BaseEvent(*this));}
 
         /**
@@ -145,6 +145,7 @@ class GD_API BaseEvent
 
         boost::weak_ptr<BaseEvent> originalEvent; ///< Pointer only used for profiling events, so as to remember the original event from which it has been copied.
         unsigned long int totalTimeDuringLastSession; ///< Total time used by the event during the last run. Used for profiling.
+        float percentDuringLastSession; ///< Total time used by the event during the last run. Used for profiling.
 
     protected:
         mutable unsigned int    renderedHeight;

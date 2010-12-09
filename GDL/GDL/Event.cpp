@@ -17,6 +17,10 @@ disabled(false)
 {
 }
 
+BaseEvent::~BaseEvent()
+{
+}
+
 std::vector < BaseEventSPtr > GD_API CloneVectorOfEvents(const vector < BaseEventSPtr > & events)
 {
     std::vector < BaseEventSPtr > newVector;
@@ -39,7 +43,8 @@ std::vector < BaseEventSPtr > GD_API CloneVectorOfEvents(const vector < BaseEven
 BaseEventSPtr CloneRememberingOriginalEvent(BaseEventSPtr event)
 {
     BaseEventSPtr copy = event->Clone();
-    copy->originalEvent = event;
+    //Original event is either the original event of the copied event, or the event copied.
+    copy->originalEvent = event->originalEvent.expired() ? event : event->originalEvent;
 
     return copy;
 }

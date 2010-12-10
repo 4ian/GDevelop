@@ -160,6 +160,13 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
 {
     for (unsigned int step = 0;step<nbStep;++step)
     {
+
+        //Gestion pré-évènements
+        ManageRenderTargetEvents();
+        UpdateTime();
+        ManageObjectsBeforeEvents();
+        ManageSounds();
+
         #ifdef GDE
         if( profiler )
         {
@@ -167,12 +174,6 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
             profiler->eventsClock.reset();
         }
         #endif
-
-        //Gestion pré-évènements
-        ManageRenderTargetEvents();
-        UpdateTime();
-        ManageObjectsBeforeEvents();
-        ManageSounds();
 
         //Gestions des évènements
         ObjectsConcerned objectsConcerned(&objectsInstances, &objectGroups);
@@ -184,17 +185,20 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
             events[i]->Execute(*this, objectsConcernedForEvent);
         }
 
+        #if defined(GDE)
+        if( profiler && profiler->profilingActivated )
+        {
+            profiler->lastEventsTime = profiler->eventsClock.getTimeMicroseconds();
+            profiler->renderingClock.reset();
+        }
+        #endif
+
         //Gestions post-évènements
         ManageObjectsAfterEvents();
 
         #ifdef GDE
         if( debugger )
             debugger->Update();
-        if( profiler && profiler->profilingActivated )
-        {
-            profiler->lastEventsTime = profiler->renderingClock.getTimeMicroseconds();
-            profiler->renderingClock.reset();
-        }
         #endif
 
         //Rendering

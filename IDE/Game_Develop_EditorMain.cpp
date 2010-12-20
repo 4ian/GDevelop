@@ -339,11 +339,6 @@ ribbonSceneEditorButtonBar(NULL)
     startPage = new StartHerePage(editorsNotebook, *this);
     editorsNotebook->AddPage(startPage, _("Page de démarrage"));
 
-    if ( !FileToOpen.empty() )
-        Open(FileToOpen);
-    else
-        games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
-
     projectManager = new ProjectManager(this, *this);
     projectManager->ConnectEvents();
 
@@ -371,6 +366,11 @@ ribbonSceneEditorButtonBar(NULL)
     SetSize(900,740);
     Center();
     Maximize(true);
+
+    if ( !FileToOpen.empty() )
+        Open(FileToOpen);
+    else
+        games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
 }
 
 /**

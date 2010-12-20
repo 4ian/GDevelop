@@ -32,9 +32,8 @@ using namespace std;
 /// Télécharge news.txt depuis compilgames.net.
 /// Il faut ensuite procéder à l'analyse de news.txt
 ////////////////////////////////////////////////////////////
-CheckMAJ::CheckMAJ()
+void CheckMAJ::DownloadInformation()
 {
-
     wxHTTP http;
 
     wxURL *url = new wxURL(_T("http://www.compilgames.net/news.txt"));
@@ -49,30 +48,20 @@ CheckMAJ::CheckMAJ()
             input->Read(out);
         }
         else
-            wxLogWarning( _( "Impossible d'écrire le fichier de mise à jour.\nVérifiez que vous possédez les droits requis pour écrire dans le dossier de Game Develop ou désactivez la vérification des mises à jour dans les préférences." ) );
+        {
+            wxLogWarning( _( "Impossible d'écrire le fichier de mise à jour.\nVérifiez que vous possédez les droits requis pour écrire dans le dossier de Game Develop ou désactivez la vérification des mises à jour dans les préférences.\n\nVous pouvez désactiver la vérification des mises à jour dans les préférences." ) );
+        }
 
         delete input;
     } else {
         wxLogWarning( _( "Impossible de se connecter au serveur de vérification des mises à jour de Compil Games.\nVérifiez :\n-Votre connexion internet\n-Votre pare-feu\n-Si il vous est possible d'accéder à notre site.\n\nVous pouvez désactiver la vérification des mises à jour dans les préférences." ) );
+        return;
     }
 
-
-
-}
-
-////////////////////////////////////////////////////////////
-/// Controle de la version
-///
-/// Utilise le fichier news.txt pour controler la version
-////////////////////////////////////////////////////////////
-void CheckMAJ::Check()
-{
     TiXmlDocument doc( "news.txt" );
     if ( !doc.LoadFile() )
     {
-        wxString ErrorDescription = doc.ErrorDesc();
-        wxString Error = _( "Erreur lors du chargement du fichier de mise à jour ( " ) + ErrorDescription + _(" )\nVérifiez :\n-Votre connexion internet\n-Votre pare-feu\n-Si il vous est possible d'accéder à notre site.\n\nVous pouvez désactiver la vérification des mises à jour dans les préférences.");
-        wxLogWarning( Error );
+        wxLogWarning( _( "Erreur lors du chargement du fichier de mise à jour.\nVérifiez :\n-Votre connexion internet\n-Votre pare-feu\n-Si il vous est possible d'accéder à notre site.\n\nVous pouvez désactiver la vérification des mises à jour dans les préférences.") );
         return;
     }
 
@@ -80,35 +69,32 @@ void CheckMAJ::Check()
     TiXmlElement *elem = hdl.FirstChildElement().FirstChildElement().Element();
 
     //Comparaison de versions
-    int Major = 0;
-    elem->QueryIntAttribute( "Major", &Major );
-    if ( Major > GDLVersionWrapper::Major() )
-    {
-        if ( wxMessageBox( "Une nouvelle version de Game Develop est disponible !\nVoulez vous ouvrir la fenêtre de mise à jour ?\n\nVous pouvez désactiver la vérification automatique dans les préférences.", "Nouvelle version", wxYES_NO ) == wxYES )
-        {
-            MAJ dialog( NULL );
-            dialog.ShowModal();
-        }
+    newMajor = 0;
+    elem->QueryIntAttribute( "Major", &newMajor );
+    newMinor = 0;
+    elem->QueryIntAttribute( "Minor", &newMinor );
+    newBuild = 0;
+    elem->QueryIntAttribute( "Build", &newBuild );
+    newRevision = 0;
+    elem->QueryIntAttribute( "Revision", &newRevision );
 
+    if ( newMajor > GDLVersionWrapper::Major() ||
+         (newMajor == GDLVersionWrapper::Major() && newMinor > GDLVersionWrapper::Minor()) ||
+         (newMajor == GDLVersionWrapper::Major() && newMinor == GDLVersionWrapper::Minor() && newBuild > GDLVersionWrapper::Build()) ||
+         (newMajor == GDLVersionWrapper::Major() && newMinor == GDLVersionWrapper::Minor() && newBuild == GDLVersionWrapper::Build() && newRevision > GDLVersionWrapper::Revision() ) )
+    {
+        newVersionAvailable = true;
     }
     else
-    {
-        int Minor = 0;
-        elem->QueryIntAttribute( "Minor", &Minor );
-        int Build = 0;
-        elem->QueryIntAttribute( "Build", &Build );
-        int Revision = 0;
-        elem->QueryIntAttribute( "Revision", &Revision );
+        newVersionAvailable = false;
 
-        if ( Build > GDLVersionWrapper::Build() || Minor > GDLVersionWrapper::Minor() || Revision > GDLVersionWrapper::Revision() )
-        {
-            if ( wxMessageBox( "Une nouvelle version de Game Develop est disponible !\nVoulez vous ouvrir la fenêtre de mise à jour ?\n\nVous pouvez désactiver la vérification automatique dans les préférences.", "Nouvelle version", wxYES_NO ) == wxYES )
-            {
-                MAJ dialog( NULL );
-                dialog.ShowModal();
-            }
-        }
-    }
+    elem = hdl.FirstChildElement().FirstChildElement("Info").Element();
+
+    if ( elem->Attribute( "Info") != NULL )
+         info = elem->Attribute( "Info");
+
+    if ( elem->Attribute( "Lien") != NULL )
+         link = elem->Attribute( "Lien");
 
     return;
 }

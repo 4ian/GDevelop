@@ -35,6 +35,7 @@ class Fusion: public wxDialog
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticLine* StaticLine2;
+		wxCheckBox* externalEventsCheck;
 		wxCheckBox* objectsCheck;
 		wxStaticLine* StaticLine1;
 		wxCheckBox* ImageCheck;
@@ -51,6 +52,7 @@ class Fusion: public wxDialog
 		static const long ID_CHECKBOX2;
 		static const long ID_CHECKBOX3;
 		static const long ID_CHECKBOX4;
+		static const long ID_CHECKBOX5;
 		static const long ID_STATICLINE2;
 		static const long ID_STATICTEXT2;
 		static const long ID_BUTTON1;

@@ -36,6 +36,7 @@ class ProfileDlg: public wxPanel, public BaseProfiler
 		wxMenuItem* MenuItem2;
 		wxStaticText* eventsTimeTxt;
 		wxMenuItem* objectsCountCheck;
+		wxMenu* MenuItem3;
 		wxMenuItem* MenuItem1;
 		wxCheckBox* activateCheck;
 		wxMenuItem* eventsTimeCheck;
@@ -56,9 +57,9 @@ class ProfileDlg: public wxPanel, public BaseProfiler
 		static const long ID_STATICTEXT8;
 		static const long ID_STATICTEXT9;
 		static const long ID_PANEL1;
-		static const long ID_PANEL3;
-		static const long ID_STATICTEXT2;
 		static const long ID_PANEL2;
+		static const long ID_STATICTEXT2;
+		static const long ID_PANEL3;
 		static const long ID_STATICTEXT1;
 		static const long ID_PANEL4;
 		static const long ID_STATICTEXT3;

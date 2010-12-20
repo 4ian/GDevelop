@@ -13,12 +13,15 @@
 #include <wx/config.h>
 #include "wx/aui/aui.h"
 #include <wx/filedlg.h>
+#include <wx/dir.h>
 #include <wx/colordlg.h>
 #include <wx/help.h>
 #include <wx/dirdlg.h>
 #include <wx/log.h>
 #include "GDL/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
+#include "LocaleManager.h"
+#include <wx/listctrl.h>
 
 #include <string>
 #include <vector>
@@ -146,7 +149,7 @@ changesNeedRestart(false)
     StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
     FlexGridSizer17->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    Listbook1 = new wxListbook(this, ID_LISTBOOK1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_LISTBOOK1"));
+    Listbook1 = new wxListbook(this, ID_LISTBOOK1, wxDefaultPosition, wxDefaultSize, wxLB_DEFAULT, _T("ID_LISTBOOK1"));
     Panel2 = new wxPanel(Listbook1, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL6"));
     FlexGridSizer14 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer14->AddGrowableCol(0);
@@ -181,8 +184,6 @@ changesNeedRestart(false)
     StaticText13 = new wxStaticText(Panel5, ID_STATICTEXT13, _("Langue :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT13"));
     FlexGridSizer9->Add(StaticText13, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     langChoice = new wxChoice(Panel5, ID_CHOICE2, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE2"));
-    langChoice->Append(_("English"));
-    langChoice->Append(_("Français"));
     FlexGridSizer9->Add(langChoice, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel5->SetSizer(FlexGridSizer9);
     FlexGridSizer9->Fit(Panel5);
@@ -366,14 +367,25 @@ changesNeedRestart(false)
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnAideBtClick);
     //*)
 
-
-    wxImageList * imageList = new wxImageList( 16, 16 );
-    imageList->Add(( wxBitmap( "res/objeticon.png", wxBITMAP_TYPE_ANY ) ) );
-    imageList->Add(( wxBitmap( "res/groupeobjeticon.png", wxBITMAP_TYPE_ANY ) ) );
+    wxImageList * imageList = new wxImageList( 24, 24 );
+    imageList->Add(( wxBitmap( "res/pref24.png", wxBITMAP_TYPE_ANY ) ) );
+    imageList->Add(( wxBitmap( "res/locale.png", wxBITMAP_TYPE_ANY ) ) );
+    imageList->Add(( wxBitmap( "res/folder.png", wxBITMAP_TYPE_ANY ) ) );
+    imageList->Add(( wxBitmap( "res/layout.png", wxBITMAP_TYPE_ANY ) ) );
+    imageList->Add(( wxBitmap( "res/looknfeel.png", wxBITMAP_TYPE_ANY ) ) );
     Listbook1->AssignImageList(imageList);
 
-    wxConfigBase *pConfig = wxConfigBase::Get();
+    //Adding manually pages so as to specify image number
+    while (Listbook1->GetPageCount() > 0)
+        Listbook1->RemovePage(0);
 
+    Listbook1->AddPage(Panel2, _("Général"), false, 0);
+    Listbook1->AddPage(Panel5, _("Langue"), false, 1);
+    Listbook1->AddPage(Panel3, _("Répertoires"), false, 2);
+    Listbook1->AddPage(Panel6, _("Positionnements par défaut"), false, 3);
+    Listbook1->AddPage(Panel4, _("Apparence"), false, 4);
+
+    wxConfigBase *pConfig = wxConfigBase::Get();
     {
         wxString result;
 
@@ -505,14 +517,26 @@ changesNeedRestart(false)
     }
 
     {
-        wxString result;
+        //Retrieve available languages files
+        std::vector <std::string> languagesAvailables;
+        wxDir dir(wxGetCwd()+"/locale/");
+        wxString filename;
 
-        if ( pConfig->Read( _T( "/Lang" ), &result ) )
+        bool cont = dir.GetFirst(&filename, "", wxDIR_DIRS);
+        while ( cont )
         {
-            if ( result == "English")
-                langChoice->SetSelection(0);
-            else if ( result == "French")
-                langChoice->SetSelection(1);
+            languagesAvailables.push_back(string(filename.mb_str()));
+            cont = dir.GetNext(&filename);
+        }
+
+        //Add languages to list and retrieve selected language
+        for (unsigned int i = 0;i<languagesAvailables.size();++i)
+        {
+            const wxLanguageInfo * language = wxLocale::FindLanguageInfo(languagesAvailables[i]);
+            langChoice->Append(language->Description);
+
+            if (LocaleManager::getInstance()->locale->GetLanguage() == language->Language)
+                langChoice->SetSelection(i);
         }
     }
 
@@ -634,14 +658,12 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     pConfig->Write( _T( "/Skin/HideLabels"), hideLabelsCheck->GetValue() );
     pConfig->Write( _T( "/Skin/HidePageTabs"), hidePageTabsCheck->GetValue() );
 
-
     pConfig->Write( _T( "/EditeursExternes/Image" ), EditeurImageEdit->GetValue() );
     pConfig->Write( _T( "/Dossier/Compilation" ), DossierTempCompEdit->GetValue() );
 
-    if ( langChoice->GetSelection() == 0 )
-        pConfig->Write( _T( "/Lang" ), "English" );
-    else if ( langChoice->GetSelection() == 1 )
-        pConfig->Write( _T( "/Lang" ), "French" );
+    const wxLanguageInfo * language = wxLocale::FindLanguageInfo(langChoice->GetString(langChoice->GetSelection()));
+    pConfig->Write( _T( "/Lang" ), language->CanonicalName );
+    LocaleManager::getInstance()->SetLanguage(language->Language);
 
     if ( changesNeedRestart )
     {

@@ -2,15 +2,26 @@
 #define CHECKMAJ_H
 
 /**
- * Check for update
+ * Class to check and retrieve information
+ * about Game Develop updates
  */
 class CheckMAJ
 {
     public:
-        CheckMAJ();
+        CheckMAJ() : newVersionAvailable(false), newMajor(0), newMinor(0), newBuild(0), newRevision(0) {};
         virtual ~CheckMAJ() {};
-        void Check();
-    protected:
+
+        void DownloadInformation();
+
+        bool newVersionAvailable;
+
+        int newMajor;
+        int newMinor;
+        int newBuild;
+        int newRevision;
+        std::string info;
+        std::string link;
+
     private:
 };
 

@@ -10,6 +10,7 @@
 #include <wx/log.h>
 #include "GDL/CommonTools.h"
 #include "GDL/Position.h"
+#include "GDL/HelpFileAccess.h"
 #include "ObjectsOnBadLayerBox.h"
 #include "EditLayer.h"
 #include "SceneCanvas.h"
@@ -100,8 +101,8 @@ mainEditorCommand(mainEditorCommand_)
     imageList->Add(wxBitmap("res/eyeGrey.png", wxBITMAP_TYPE_ANY));
     layersList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
-	layersList->InsertColumn(1, "Calque");
-	layersList->InsertColumn(2, "Visible");
+	layersList->InsertColumn(1, _("Calque"));
+	layersList->InsertColumn(2, _("Visible"));
 
     CreateToolbar();
 
@@ -174,7 +175,8 @@ void EditorLayers::OnMoreOptions(wxCommandEvent& event)
 
 void EditorLayers::OnHelp(wxCommandEvent& event)
 {
-    //TODO
+    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    helpFileAccess->DisplaySection(226);
 }
 
 ////////////////////////////////////////////////////////////
@@ -372,7 +374,6 @@ void EditorLayers::OnDownSelected(wxCommandEvent& event)
 
                 //On reslectionne le calque
                 layersList->SetItemState(layers->size()-i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-                cout << "Selecte" << layers->size()-i+1;
     	    }
     	    return;
     	}

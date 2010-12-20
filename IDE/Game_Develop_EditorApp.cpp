@@ -23,7 +23,6 @@
 #include <wx/fileconf.h>
 #include <wx/log.h>
 #include <wx/msgdlg.h>
-#include <wx/fileconf.h>
 #include <wx/filename.h>
 #include <wx/config.h>
 #include <wx/help.h>
@@ -31,6 +30,7 @@
 #include <wx/url.h>
 #include <wx/splash.h>
 #include <wx/app.h>
+#include <wx/dir.h>
 #include <string>
 #include <unistd.h>
 #include <stdexcept>
@@ -38,6 +38,7 @@
 #include <wx/filename.h>
 #include <SFML/System.hpp>
 #include "CppUnitLite/TestHarness.h"
+#include "LocaleManager.h"
 
 #include "Game_Develop_EditorMain.h"
 #include "Game_Develop_EditorApp.h"
@@ -45,6 +46,7 @@
 #include "MemTrace.h"
 #include "Demarrage.h"
 #include "CheckMAJ.h"
+#include "MAJ.h"
 #include "SplashScreen.h"
 #include "ConsoleManager.h"
 #include "BugReport.h"
@@ -97,6 +99,8 @@ void MessageLoading( string message, float avancement )
 ////////////////////////////////////////////////////////////
 bool Game_Develop_EditorApp::OnInit()
 {
+    cout << "OnInitCalled" << endl;
+
     //Get file to open from first argument.
     string fileToOpen;
     if ( wxApp::argc > 1 )
@@ -106,6 +110,7 @@ bool Game_Develop_EditorApp::OnInit()
         filename.MakeAbsolute();
         fileToOpen = filename.GetFullPath();
     }
+    cout << "CommandLineParsed" << endl;
 
 #ifdef LINUX
     string tmp; //Make sure current working directory is executable directory.
@@ -129,8 +134,10 @@ bool Game_Develop_EditorApp::OnInit()
     exeDirectory = exeDirectory.substr( 0, slashpos > backslashpos ? slashpos : backslashpos );
     chdir( exeDirectory.c_str() );
 #endif
+    cout << "CwdSetted" << endl;
 
     wxInitAllImageHandlers();
+    cout << "ImageHandlersInit" << endl;
 
     //Load configuration
     wxString ConfigPath = wxFileName::GetHomeDir() + "/.Game Develop/";
@@ -139,32 +146,37 @@ bool Game_Develop_EditorApp::OnInit()
 
     wxFileConfig *Config = new wxFileConfig( _T( "Game Develop" ), _T( "Compil Games" ), ConfigPath + "options.cfg" );
     wxConfigBase::Set( Config );
+    cout << "Config file setted" << endl;
 
     //Set language
     {
-        wxString result;
+        wxString wantedLanguage;
+        Config->Read("/Lang", &wantedLanguage);
 
-        Config->Read("/Lang", &result);
+        //Retrieve languages files
+        std::vector <std::string> languagesAvailables;
+        wxDir dir(wxGetCwd()+"/locale/");
+        wxString filename;
 
-
-        if ( result == "English" )
-            m_locale.Init(wxLANGUAGE_ENGLISH);
-        else if ( result == "French" )
-            m_locale.Init(wxLANGUAGE_FRENCH);
-        else
-            m_locale.Init(wxLANGUAGE_DEFAULT);
-
+        bool cont = dir.GetFirst(&filename, "", wxDIR_DIRS);
+        while ( cont )
         {
-            wxLogNull noLog;
-            wxLocale::AddCatalogLookupPathPrefix(wxT("."));
-            wxLocale::AddCatalogLookupPathPrefix(wxT(".."));
-            wxLocale::AddCatalogLookupPathPrefix(_T("locale"));
-            m_locale.AddCatalog(_T("GD"));      //Application translations
-            m_locale.AddCatalog(_T("wxstd"));   //wxWidgets specific translations
+            languagesAvailables.push_back(string(filename.mb_str()));
+            cont = dir.GetNext(&filename);
         }
-        // This sets the decimal point to be '.', whatever the language defined !
-        wxSetlocale(LC_NUMERIC, "C");        // didn't understand why "C"...
+
+        //Retrieve selected language
+        int languageId = wxLANGUAGE_DEFAULT;
+        for (unsigned int i = 0;i<languagesAvailables.size();++i)
+        {
+            if ( wxLocale::FindLanguageInfo(languagesAvailables[i])->CanonicalName == wantedLanguage )
+                languageId = wxLocale::FindLanguageInfo(languagesAvailables[i])->Language;
+        }
+
+        LocaleManager::getInstance()->SetLanguage(languageId);
+
     }
+    cout << "Language loaded" << endl;
 
     #ifdef RELEASE
     singleInstanceChecker = new wxSingleInstanceChecker;
@@ -172,13 +184,14 @@ bool Game_Develop_EditorApp::OnInit()
     {
         wxLogMessage(_("Une autre instance de Game Develop est actuellement ouverte. Glissez-déposez dessus un fichier pour l'ouvrir."));
 
-        delete singleInstanceChecker; // OnExit() won't be called if we return false
+        delete singleInstanceChecker;
         singleInstanceChecker = NULL;
 
-        return false;
+        return false; // OnExit() won't be called if we return false
     }
     #endif
 
+    cout << "Single instance checked" << endl;
     //Safety check for gdl.dll
     bool sameGDLdllAsDuringCompilation = CompilationChecker::EnsureCorrectGDLVersion();
     if ( !sameGDLdllAsDuringCompilation )
@@ -187,15 +200,17 @@ bool Game_Develop_EditorApp::OnInit()
                      "Si le problème persiste, assurez vous qu'il n'existe pas une nouvelle version de Game Develop sur le site officiel : http://www.compilgames.net\n"
                      "Si non, prenez contact avec l'auteur."));
     }
+    cout << "GDL checked" << endl;
 
     //Set help file
     {
         HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
-        if ( m_locale.GetLanguage() == wxLANGUAGE_ENGLISH )
+        if ( LocaleManager::getInstance()->locale->GetLanguage() == wxLANGUAGE_ENGLISH )
             helpFileAccess->InitWithHelpFile("help.chm");
-        else if ( m_locale.GetLanguage() == wxLANGUAGE_FRENCH )
+        else if ( LocaleManager::getInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
             helpFileAccess->InitWithHelpFile("aide.chm");
     }
+    cout << "Help file setted" << endl;
 
     //Test si le programme n'aurait pas planté la dernière fois
     //En vérifiant si un fichier existe toujours
@@ -205,6 +220,7 @@ bool Game_Develop_EditorApp::OnInit()
         BugReport dialog(NULL);
         if ( dialog.ShowModal() == 1 ) openRecupFiles = true;
     }
+    cout << "Crash management ended" << endl;
 
     //Creating the console Manager
     #ifdef RELEASE
@@ -212,11 +228,13 @@ bool Game_Develop_EditorApp::OnInit()
     consoleManager = ConsoleManager::getInstance();
     #endif
 
+    cout << "ConsoleManager created" << endl;
     //Splash screen
     wxBitmap bitmap;
     bitmap.LoadFile( wxString("res/splash.png"), wxBITMAP_TYPE_PNG );
     SplashScreen * splash = new SplashScreen(bitmap, 2, 0, -1, wxNO_BORDER | wxFRAME_SHAPED);
 
+    cout << "Splash Screen created" << endl;
     //Création du fichier de détection des erreurs
     wxFile errorDetectFile("errordetect.dat", wxFile::write);
     errorDetectFile.Write(" ");
@@ -224,13 +242,9 @@ bool Game_Develop_EditorApp::OnInit()
     //Les log
     log = new wxLogGui(); // Affichage des messages d'erreurs
     InitLog(); // Log sous forme de fichier détaillé
+    logChain = new wxLogChain( log );
 
-    FILE * stderr_ = fopen( "log.txt", "a" );
-    log_stderr_ = new wxLogStderr( stderr_ ); //Ecriture en plus des messages d'erreurs
-
-    logChain = new wxLogChain( log_stderr_ );
-    logChain2 = new wxLogChain( log );
-
+    cout << "Loading extensions" << endl;
     //Load extensions
     ExtensionsLoader * extensionsLoader = ExtensionsLoader::getInstance();
     extensionsLoader->SetExtensionsDir("./Extensions/");
@@ -240,6 +254,7 @@ bool Game_Develop_EditorApp::OnInit()
     wxSetAssertHandler(NULL); //Don't want to have annoying assert dialogs in release
     #endif
 
+    cout << "Loading extensions : End" << endl;
     wxFileSystem::AddHandler( new wxZipFSHandler );
 
     //Welcome window
@@ -261,6 +276,7 @@ bool Game_Develop_EditorApp::OnInit()
     }
 
 
+    cout << "Creating main window" << endl;
     //Creating main window
     mainEditor = new Game_Develop_EditorFrame( 0, fileToOpen );
     SetTopWindow( mainEditor );
@@ -276,6 +292,11 @@ bool Game_Develop_EditorApp::OnInit()
         }
     }
 
+
+    //Fin du splash screen, affichage de la fenêtre
+    splash->Destroy();
+    mainEditor->Show();
+
     //Checking for updates
     {
         wxString result;
@@ -283,13 +304,17 @@ bool Game_Develop_EditorApp::OnInit()
         if ( result != "false" )
         {
             CheckMAJ verif;
-            verif.Check();
+            verif.DownloadInformation();
+            if ( verif.newVersionAvailable )
+            {
+                MAJ dialog(mainEditor, true);
+                if ( dialog.ShowModal() == 2 )
+                {
+                    mainEditor->Destroy();
+                }
+            }
         }
     }
-
-    //Fin du splash screen, affichage de la fenêtre
-    splash->Destroy();
-    mainEditor->Show();
 
     //wxLogWarning("Cette version de Game Develop n'est utilisable qu'à des fins de tests. Merci d'utiliser la version disponible sur notre site pour toute autre utilisation.");
 

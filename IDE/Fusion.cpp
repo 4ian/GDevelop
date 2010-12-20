@@ -21,6 +21,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/OpenSaveGame.h"
+#include "GDL/ExternalEvents.h"
 
 
 using namespace std;
@@ -34,6 +35,7 @@ const long Fusion::ID_CHECKBOX1 = wxNewId();
 const long Fusion::ID_CHECKBOX2 = wxNewId();
 const long Fusion::ID_CHECKBOX3 = wxNewId();
 const long Fusion::ID_CHECKBOX4 = wxNewId();
+const long Fusion::ID_CHECKBOX5 = wxNewId();
 const long Fusion::ID_STATICLINE2 = wxNewId();
 const long Fusion::ID_STATICTEXT2 = wxNewId();
 const long Fusion::ID_BUTTON1 = wxNewId();
@@ -65,7 +67,7 @@ game(game_)
 	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticBitmap1 = new wxStaticBitmap(Panel1, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/fusion.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP1"));
+	StaticBitmap1 = new wxStaticBitmap(Panel1, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/fusion.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	FlexGridSizer6->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("L\'importation permet de rajouter les éléments \nd\'un autre jeu à celui actuellement ouvert."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -88,6 +90,9 @@ game(game_)
 	groupsCheck = new wxCheckBox(this, ID_CHECKBOX4, _("Groupes d\'objets globaux"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
 	groupsCheck->SetValue(true);
 	StaticBoxSizer1->Add(groupsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	externalEventsCheck = new wxCheckBox(this, ID_CHECKBOX5, _("Evenements externes"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
+	externalEventsCheck->SetValue(true);
+	StaticBoxSizer1->Add(externalEventsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -213,6 +218,27 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
             }
             else
                 game.objectGroups.push_back(secondGame.objectGroups[i]);
+        }
+    }
+    if ( externalEventsCheck->GetValue() )
+    {
+        for(unsigned int i = 0;i<secondGame.externalEvents.size();i++)
+        {
+            vector< boost::shared_ptr<ExternalEvents> >::iterator externalEvents =
+                find_if(game.externalEvents.begin(), game.externalEvents.end(), bind2nd(ExternalEventsHasName(), secondGame.externalEvents[i]->GetName()));
+
+            if ( externalEvents != game.externalEvents.end())
+            {
+                wxString depart = _("Des évènements externes nommés \"");
+                wxString fin = _("\" sont déjà présent dans le jeu. Voulez vous les remplacer ?");
+                if (wxMessageBox(depart+secondGame.externalEvents[i]->GetName()+fin, "Evenements externes déjà existants",wxYES_NO ) == wxYES)
+                {
+                    //Remplacement
+                    *(*externalEvents) = *secondGame.externalEvents[i];
+                }
+            }
+            else
+                game.externalEvents.push_back( boost::shared_ptr<ExternalEvents>(new ExternalEvents(*secondGame.externalEvents[i])) );
         }
     }
 

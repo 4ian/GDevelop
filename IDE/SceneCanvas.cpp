@@ -373,15 +373,6 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 
     externalWindow->Show(false);
 
-    for (unsigned int i = 0;i<game.scenes.size();++i)
-    {
-        std::cout << "scene" << i<< std::endl;
-        for (unsigned int j = 0;j<game.scenes[i]->events.size();++j)
-        {
-            std::cout << "event" << game.scenes[i]->events[j] << std::endl;
-        }
-    }
-
     if ( profileDialog ) profileDialog->ParseProfileEvents();
 
     scene.ChangeRenderWindow(this);

@@ -20,9 +20,9 @@ const long ProfileDlg::ID_CHECKBOX1 = wxNewId();
 const long ProfileDlg::ID_STATICTEXT8 = wxNewId();
 const long ProfileDlg::ID_STATICTEXT9 = wxNewId();
 const long ProfileDlg::ID_PANEL1 = wxNewId();
-const long ProfileDlg::ID_PANEL3 = wxNewId();
-const long ProfileDlg::ID_STATICTEXT2 = wxNewId();
 const long ProfileDlg::ID_PANEL2 = wxNewId();
+const long ProfileDlg::ID_STATICTEXT2 = wxNewId();
+const long ProfileDlg::ID_PANEL3 = wxNewId();
 const long ProfileDlg::ID_STATICTEXT1 = wxNewId();
 const long ProfileDlg::ID_PANEL4 = wxNewId();
 const long ProfileDlg::ID_STATICTEXT3 = wxNewId();
@@ -43,7 +43,6 @@ sceneCanvas(NULL)
 {
 	//(*Initialize(ProfileDlg)
 	wxFlexGridSizer* FlexGridSizer3;
-	wxMenu* MenuItem3;
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
 	wxGridSizer* GridSizer1;
@@ -74,18 +73,18 @@ sceneCanvas(NULL)
 	FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer8->AddGrowableCol(1);
 	FlexGridSizer8->AddGrowableRow(0);
-	Panel2 = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxSize(10,10), wxSIMPLE_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
-	Panel2->SetBackgroundColour(wxColour(255,209,12));
-	FlexGridSizer8->Add(Panel2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	Panel1 = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxSize(10,10), wxSIMPLE_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL2"));
+	Panel1->SetBackgroundColour(wxColour(116,132,255));
+	FlexGridSizer8->Add(Panel1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	eventsTimeTxt = new wxStaticText(this, ID_STATICTEXT2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer8->Add(eventsTimeTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer3->AddGrowableCol(1);
 	FlexGridSizer3->AddGrowableRow(0);
-	Panel1 = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxSize(10,10), wxSIMPLE_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL2"));
-	Panel1->SetBackgroundColour(wxColour(116,132,255));
-	FlexGridSizer3->Add(Panel1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	Panel2 = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxSize(10,10), wxSIMPLE_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
+	Panel2->SetBackgroundColour(wxColour(255,209,12));
+	FlexGridSizer3->Add(Panel2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	totalTimeTxt = new wxStaticText(this, ID_STATICTEXT1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer3->Add(totalTimeTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -110,13 +109,10 @@ sceneCanvas(NULL)
 	contextMenu.AppendSeparator();
 	totalTimeCheck = new wxMenuItem((&contextMenu), wxID_ANY, _("Afficher le temps total"), wxEmptyString, wxITEM_CHECK);
 	contextMenu.Append(totalTimeCheck);
-	totalTimeCheck->Check(true);
 	eventsTimeCheck = new wxMenuItem((&contextMenu), wxID_ANY, _("Afficher le temps des évènements"), wxEmptyString, wxITEM_CHECK);
 	contextMenu.Append(eventsTimeCheck);
-	eventsTimeCheck->Check(true);
 	objectsCountCheck = new wxMenuItem((&contextMenu), wxID_ANY, _("Afficher le nombre d\'objets"), wxEmptyString, wxITEM_CHECK);
 	contextMenu.Append(objectsCountCheck);
-	objectsCountCheck->Check(true);
 	FlexGridSizer2->Fit(this);
 	FlexGridSizer2->SetSizeHints(this);
 
@@ -277,10 +273,8 @@ void ProfileDlg::ParseProfileEvents(const std::vector < BaseEventSPtr > & events
             if ( originalEvent )
             {
                 originalEvent->totalTimeDuringLastSession = profileEvent->GetTime();
-                originalEvent->percentDuringLastSession = static_cast<double>(originalEvent->totalTimeDuringLastSession)/static_cast<double>(totalSceneTime)*100.0f;
+                originalEvent->percentDuringLastSession = static_cast<double>(originalEvent->totalTimeDuringLastSession)/static_cast<double>(totalEventsTime)*100.0f;
             }
-            else
-                cout << "OriginalEvent not found";
         }
         else
         {
@@ -303,7 +297,7 @@ void ProfileDlg::OnratioGraphicsRightUp(wxMouseEvent& event)
 
 void ProfileDlg::OnChangeDurationSelected(wxCommandEvent& event)
 {
-    std::string newMaxData = string(wxGetTextFromUser(_("Entrez le temps de mesure à conserver"), _("Nombre de mesures"), ToString(maxData)).mb_str());
+    std::string newMaxData = string(wxGetTextFromUser(_("Entrez le nombre de mesure à conserver"), _("Nombre de mesures"), ToString(maxData)).mb_str());
     maxData = ToInt(newMaxData);
 }
 

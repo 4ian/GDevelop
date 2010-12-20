@@ -163,8 +163,6 @@ void EditorScene::OnscenePanelResize(wxSizeEvent& event)
 
     scrollBar1->SetSize(0, sceneCanvas->GetHeight(), sceneCanvas->GetWidth(), wxDefaultCoord);
     scrollBar2->SetSize(sceneCanvas->GetWidth(), 0, wxDefaultCoord, sceneCanvas->GetHeight());
-
-    cout << "ScenePanel" << scenePanel->GetSize().GetWidth() << ";" << scenePanel->GetSize().GetHeight() << endl;
 }
 
 EditorScene::~EditorScene()

@@ -484,20 +484,20 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
             if ( wxCopyFile( "Runtime/gdl.dll", repTemp + "/gdl.dll", true ) == false )
                 report += _( "Impossible de créer l'executable gdl.dll dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "sfml-audio.dll", repTemp + "/sfml-audio.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-audio.dll dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "sfml-audio-2.dll", repTemp + "/sfml-audio-2.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-audio-2.dll dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "sfml-graphics.dll", repTemp + "/sfml-graphics.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-graphics.dll dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "sfml-graphics-2.dll", repTemp + "/sfml-graphics-2.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-graphics-2.dll dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "sfml-network.dll", repTemp + "/sfml-network.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-network.dll dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "sfml-network-2.dll", repTemp + "/sfml-network-2.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-network-2.dll dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "sfml-system.dll", repTemp + "/sfml-system.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-system.dll dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "sfml-system-2.dll", repTemp + "/sfml-system-2.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-system-2.dll dans le répertoire de compilation.\n" );
 
-            if ( wxCopyFile( "sfml-window.dll", repTemp + "/sfml-window.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-window.dll dans le répertoire de compilation.\n" );
+            if ( wxCopyFile( "sfml-window-2.dll", repTemp + "/sfml-window-2.dll", true ) == false )
+                report += _( "Impossible de créer l'executable sfml-window-2.dll dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "libsndfile-1.dll", repTemp + "/libsndfile-1.dll", true ) == false )
                 report += _( "Impossible de copier libsndfile-1.dll dans le répertoire de compilation.\n" );
@@ -688,9 +688,9 @@ wxString Compilation::GetTempDir()
     wxString repTemp = *result;
     if ( repTemp == "" ) //If the user has not forced a directory
     {
-        repTemp = wxGetCwd();
+        repTemp = wxFileName::GetHomeDir()+"/.Game Develop/";
         if ( !wxFileName::IsDirWritable(repTemp) )
-            repTemp = wxFileName::GetHomeDir()+"/.Game Develop/";
+            repTemp = wxGetCwd();
 
         if ( !wxFileName::IsDirWritable(repTemp) )
             repTemp = wxFileName::GetHomeDir();

@@ -94,7 +94,8 @@ void Game_Develop_EditorFrame::OnMenuSiteSelected(wxCommandEvent& event)
 void Game_Develop_EditorFrame::OnMenuItem36Selected(wxCommandEvent& event)
 {
     MAJ dialog(this);
-    dialog.ShowModal();
+    if ( dialog.ShowModal() == 2)
+        Destroy();
 }
 
 ////////////////////////////////////////////////////////////

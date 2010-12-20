@@ -210,10 +210,11 @@ void PropImage::OnapercuPanelPaint(wxPaintEvent& event)
                                size.GetHeight());
 
     //Affichage au centre de l'image
-    dc.DrawBitmap(bmp,
-                  (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2 ,
-                  (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2,
-                  true /* use mask */);
+    if ( bmp.IsOk() )
+        dc.DrawBitmap(bmp,
+                      (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2 ,
+                      (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2,
+                      true /* use mask */);
 }
 
 void PropImage::OnscrollWidthScroll(wxScrollEvent& event)

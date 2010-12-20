@@ -351,7 +351,7 @@ void EditExpression::TextModified(wxStyledTextEvent& event)
     }
     else
     {
-        errorTxt->SetLabel("Pas d'erreurs.");
+        errorTxt->SetLabel(_("Pas d'erreurs."));
         lastErrorPos = std::string::npos;
     }
 

@@ -850,11 +850,12 @@ void EditorImages::OnapercuPanelPaint(wxPaintEvent& event)
         bmp = wxBitmap(image.Scale(bmp.GetWidth()*factor, bmp.GetHeight()*factor));
     }
 
-    //Affichage au centre de l'image
-    dc.DrawBitmap(bmp,
-                  (size.GetWidth() - bmp.GetWidth()) / 2,
-                  (size.GetHeight() - bmp.GetHeight()) / 2,
-                  true /* use mask */);
+    //Display image in the center
+    if ( bmp.IsOk() )
+        dc.DrawBitmap(bmp,
+                      (size.GetWidth() - bmp.GetWidth()) / 2,
+                      (size.GetHeight() - bmp.GetHeight()) / 2,
+                      true /* use mask */);
 }
 
 /**

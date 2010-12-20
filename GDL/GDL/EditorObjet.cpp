@@ -138,7 +138,7 @@ placingPoint(false)
     wxFlexGridSizer* FlexGridSizer11;
     wxFlexGridSizer* FlexGridSizer17;
     wxMenu* MenuItem17;
-    
+
     Create(parent, wxID_ANY, _("Editer l\'objet"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(356,215));
     wxIcon FrameIcon;
@@ -370,7 +370,7 @@ placingPoint(false)
     imageContextMenu.Append(MenuItem18);
     FlexGridSizer1->SetSizeHints(this);
     Center();
-    
+
     Connect(ID_CHOICE1,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAnimationsBoxSelect);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnAddAnimBtClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnDelAnimBtClick);
@@ -956,7 +956,7 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
                 bmp = wxBitmap(image.Scale(48, 48));
             }
 
-            dc.DrawBitmap(bmp, 2+i*48+i*3+1-decalage, 3, true);
+            if ( bmp.IsOk() ) dc.DrawBitmap(bmp, 2+i*48+i*3+1-decalage, 3, true);
         }
         else
         {
@@ -1052,7 +1052,8 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
             int SpritePosX = (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2;
             int SpritePosY = (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2;
 
-            dc.DrawBitmap(bmp, SpritePosX, SpritePosY, true /* use mask */); //Affichage de l'image
+            if ( bmp.IsOk() )
+                dc.DrawBitmap(bmp, SpritePosX, SpritePosY, true /* use mask */); //Affichage de l'image
 
             //Affichage du point
             if ( sprite.HasPoint(selectedPoint))

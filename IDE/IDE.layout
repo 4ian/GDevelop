@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release - Edittime" />
+	<ActiveTarget name="Debug - Edittime" />
 	<File name="AutomatismTypeChoice.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="7920" topLine="121" />
 	</File>
@@ -214,20 +214,20 @@
 	<File name="Fusion.h" open="0" top="0" tabpos="0">
 		<Cursor position="441" topLine="3" />
 	</File>
-	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="2862" topLine="97" />
+	<File name="GDAuiTabArt.cpp" open="1" top="0" tabpos="18">
+		<Cursor position="20180" topLine="614" />
 	</File>
 	<File name="GDAuiTabArt.h" open="0" top="0" tabpos="0">
 		<Cursor position="933" topLine="18" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="1" top="1" tabpos="4">
-		<Cursor position="9209" topLine="92" />
+	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="9344" topLine="275" />
 	</File>
 	<File name="Game_Develop_EditorApp.h" open="1" top="0" tabpos="3">
-		<Cursor position="0" topLine="0" />
+		<Cursor position="482" topLine="0" />
 	</File>
 	<File name="Game_Develop_EditorMain.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="16295" topLine="251" />
+		<Cursor position="20908" topLine="300" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="5">
 		<Cursor position="8569" topLine="181" />
@@ -325,8 +325,8 @@
 	<File name="SearchEvents.h" open="0" top="0" tabpos="7">
 		<Cursor position="2675" topLine="22" />
 	</File>
-	<File name="SplashScreen.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="400" topLine="6" />
+	<File name="SplashScreen.cpp" open="1" top="0" tabpos="19">
+		<Cursor position="1863" topLine="65" />
 	</File>
 	<File name="SplashScreen.h" open="0" top="0" tabpos="6">
 		<Cursor position="288" topLine="6" />

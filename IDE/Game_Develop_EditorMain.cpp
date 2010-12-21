@@ -370,7 +370,10 @@ ribbonSceneEditorButtonBar(NULL)
     if ( !FileToOpen.empty() )
         Open(FileToOpen);
     else
+    {
         games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
+        projectManager->Refresh();
+    }
 }
 
 /**

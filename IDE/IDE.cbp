@@ -98,6 +98,7 @@
 				<Option object_output="obj\release" />
 				<Option type="0" />
 				<Option compiler="gcc" />
+				<Option host_application="bin\release\GDEditor.exe" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-O3" />

@@ -28,4 +28,7 @@ bool CondSoundCanalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConce
 bool CondMusicCanalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 bool CondGlobalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
+bool CondSoundChannelPitch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondMusicChannelPitch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+
 #endif // CMUSIC_H

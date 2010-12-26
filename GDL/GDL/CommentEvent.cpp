@@ -106,7 +106,7 @@ void CommentEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int wid
     dc.DrawLabel( com1, texteRect );
 
     //Optional text
-    if ( com2 != "" )
+    if ( !com2.empty() )
     {
         texteRect.SetX(texteRect.GetX()+width/2);
         dc.DrawLabel( com2, texteRect );

@@ -49,6 +49,7 @@
 #include "GDL/ExternalEvents.h"
 #include "GDL/StandardEvent.h"
 #include "GDL/RepeatEvent.h"
+#include "GDL/XmlMacros.h"
 
 using namespace std;
 
@@ -230,6 +231,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         if ( elem->Attribute( "oglFOV" ) != NULL ) { elem->QueryFloatAttribute("oglFOV", &newScene->oglFOV); }
         if ( elem->Attribute( "oglZNear" ) != NULL ) { elem->QueryFloatAttribute("oglZNear", &newScene->oglZNear); }
         if ( elem->Attribute( "oglZFar" ) != NULL ) { elem->QueryFloatAttribute("oglZFar", &newScene->oglZFar); }
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("stopSoundsOnStartup", newScene->stopSoundsOnStartup);
 
         if ( elem->FirstChildElement( "GroupesObjets" ) != NULL )
             OpenGroupesObjets(newScene->objectGroups, elem->FirstChildElement( "GroupesObjets" ));
@@ -365,6 +367,10 @@ void OpenSaveGame::OpenGameInformations(TiXmlElement * elem)
         }
     } else { MSG(_("Aucune information sur la portabilité du jeu")); }
 
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableFilename", game.winExecutableFilename);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableIconFile", game.winExecutableIconFile);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("linuxExecutableFilename", game.linuxExecutableFilename);
+
     return;
 }
 
@@ -394,7 +400,7 @@ void OpenSaveGame::OpenImages(const TiXmlElement * imagesElem, TiXmlElement * do
     }
 
     //Dossiers d'images
-    game.dossierImages.clear();
+    game.imagesFolders.clear();
     while ( dossierElem )
     {
         Dossier dossierToAdd;
@@ -406,9 +412,9 @@ void OpenSaveGame::OpenImages(const TiXmlElement * imagesElem, TiXmlElement * do
         //Notamment pour purger les fichiers qui ont eu des dossiers dupliqués suite à un bug
         //27/04/09
         bool alreadyexist = false;
-        for (unsigned int i =0;i<game.dossierImages.size();++i)
+        for (unsigned int i =0;i<game.imagesFolders.size();++i)
         {
-        	if ( dossierToAdd.nom == game.dossierImages.at(i).nom )
+        	if ( dossierToAdd.nom == game.imagesFolders.at(i).nom )
                 alreadyexist = true;
         }
 
@@ -427,7 +433,7 @@ void OpenSaveGame::OpenImages(const TiXmlElement * imagesElem, TiXmlElement * do
                 }
             }
 
-            game.dossierImages.push_back( dossierToAdd );
+            game.imagesFolders.push_back( dossierToAdd );
         }
 
         dossierElem = dossierElem->NextSiblingElement();
@@ -1677,6 +1683,13 @@ bool OpenSaveGame::SaveToFile(string file)
     else
         info->SetAttribute( "value", "false" );
 
+    {
+        TiXmlElement * elem = info;
+        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("winExecutableFilename", game.winExecutableFilename);
+        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("winExecutableIconFile", game.winExecutableIconFile);
+        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("linuxExecutableFilename", game.linuxExecutableFilename);
+    }
+
     TiXmlElement * extensions = new TiXmlElement( "Extensions" );
     infos->LinkEndChild( extensions );
     for (unsigned int i =0;i<game.extensionsUsed.size();++i)
@@ -1736,22 +1749,22 @@ bool OpenSaveGame::SaveToFile(string file)
     root->LinkEndChild( dossiers );
     TiXmlElement * dossier;
 
-    for ( unsigned int i = 0;i < game.dossierImages.size();++i )
+    for ( unsigned int i = 0;i < game.imagesFolders.size();++i )
     {
 
         dossier = new TiXmlElement( "Dossier" );
         dossiers->LinkEndChild( dossier );
-        dossier->SetAttribute( "nom", game.dossierImages.at( i ).nom.c_str() );
+        dossier->SetAttribute( "nom", game.imagesFolders.at( i ).nom.c_str() );
 
         TiXmlElement * contenu = new TiXmlElement( "Contenu" );
         dossier->LinkEndChild( contenu );
         TiXmlElement * imageDossier;
 
-        for ( unsigned int j = 0;j < game.dossierImages.at( i ).contenu.size();j++ )
+        for ( unsigned int j = 0;j < game.imagesFolders.at( i ).contenu.size();j++ )
         {
             imageDossier = new TiXmlElement( "Image" );
             contenu->LinkEndChild( imageDossier );
-            imageDossier->SetAttribute( "nom", game.dossierImages.at( i ).contenu.at(j).c_str() );
+            imageDossier->SetAttribute( "nom", game.imagesFolders.at( i ).contenu.at(j).c_str() );
         }
     }
 
@@ -1789,6 +1802,7 @@ bool OpenSaveGame::SaveToFile(string file)
             scene->SetDoubleAttribute( "oglFOV", game.scenes[i]->oglFOV );
             scene->SetDoubleAttribute( "oglZNear", game.scenes[i]->oglZNear );
             scene->SetDoubleAttribute( "oglZFar", game.scenes[i]->oglZFar );
+            if ( game.scenes[i]->stopSoundsOnStartup ) scene->SetAttribute( "stopSoundsOnStartup", "true" ); else scene->SetAttribute( "stopSoundsOnStartup", "false" );
 
             TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
             scene->LinkEndChild( grpsobjets );

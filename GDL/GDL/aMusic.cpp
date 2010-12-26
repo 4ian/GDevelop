@@ -59,12 +59,20 @@ bool ActPlaySound( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
     //On verifie si l'argument 3 ( Volume ) existe
     if ( action.GetParameters().size() > 2 )
     {
-        if ( action.GetParameter(2).GetPlainString() != "" )
+        if ( !action.GetParameter(2).GetPlainString().empty() )
             soundManager->sounds.back()->SetVolume(action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
         else
             soundManager->sounds.back()->SetVolume(100);
     }
 
+    //Compatibility with Game Develop 1.5.9980 and below
+    if ( action.GetParameters().size() > 3 )
+    {
+        if ( !action.GetParameter(3).GetPlainString().empty() )
+            soundManager->sounds.back()->SetPitch(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned));
+        else
+            soundManager->sounds.back()->SetPitch(1);
+    }
 
     scene.pauseTime += Latence.GetElapsedTime();
 
@@ -83,12 +91,7 @@ bool ActPlaySound( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
 bool ActPlaySoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) );
-
-    if ( canal < 0 || canal > MAX_CANAUX_SON )
-    {
-        scene.errors.Add("Canal invalide pour jouer le son", "", "", -1, 1);
-        return false;
-    }
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
     //Chargement
     SoundManager * soundManager;
@@ -111,10 +114,19 @@ bool ActPlaySoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
     //On verifie si l'argument 4 ( Volume ) existe
     if ( action.GetParameters().size() > 3 )
     {
-        if ( action.GetParameter(3).GetPlainString() != "" )
+        if ( !action.GetParameter(3).GetPlainString().empty() )
             soundManager->GetSoundOnChannel(canal)->SetVolume(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned));
         else
             soundManager->GetSoundOnChannel(canal)->SetVolume(100);
+    }
+
+    //Compatibility with Game Develop 1.5.9980 and below
+    if ( action.GetParameters().size() > 4 )
+    {
+        if ( !action.GetParameter(4).GetPlainString().empty() )
+            soundManager->GetSoundOnChannel(canal)->SetPitch(action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned));
+        else
+            soundManager->GetSoundOnChannel(canal)->SetPitch(1);
     }
 
     return true;
@@ -131,17 +143,9 @@ bool ActStopSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
 {
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
-    if ( canal < 0 || canal > MAX_CANAUX_SON )
-    {
-        scene.errors.Add("Canal invalide pour jouer le son", "", "", -1, 1);
-        return false;
-    }
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    //Chargement
-    SoundManager * soundManager;
-    soundManager = SoundManager::getInstance();
-
-    soundManager->GetSoundOnChannel(canal)->sound.Stop();
+    SoundManager::getInstance()->GetSoundOnChannel(canal)->sound.Stop();
 
     return true;
 }
@@ -155,18 +159,9 @@ bool ActStopSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
 bool ActPauseSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_SON )
-    {
-        scene.errors.Add("Canal invalide pour jouer le son", "", "", -1, 1);
-        return false;
-    }
-
-    //Chargement
-    SoundManager * soundManager;
-    soundManager = SoundManager::getInstance();
-
-    soundManager->GetSoundOnChannel(canal)->sound.Pause();
+    SoundManager::getInstance()->GetSoundOnChannel(canal)->sound.Pause();
 
     return true;
 }
@@ -180,18 +175,9 @@ bool ActPauseSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcern
 bool ActRePlaySoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON )  return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_SON )
-    {
-        scene.errors.Add("Canal invalide pour jouer le son", "", "", -1, 1);
-        return false;
-    }
-
-    //Chargement
-    SoundManager * soundManager;
-    soundManager = SoundManager::getInstance();
-
-    soundManager->GetSoundOnChannel(canal)->sound.Play();
+    SoundManager::getInstance()->GetSoundOnChannel(canal)->sound.Play();
 
     return true;
 }
@@ -212,7 +198,7 @@ bool ActPlayMusic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
     Music * music = ressourcesLoader->LoadMusic(action.GetParameter(0).GetPlainString()); //Chargement
 
     soundManager->musics.push_back(music); //Ajout aux soundManager qui prend en charge la musique
-    soundManager->musics.at(soundManager->musics.size()-1)->Play();
+    soundManager->musics.back()->Play();
 
     //Compatibilité avec Game Develop 1.0.1979 et inférieur
     //On verifie si l'argument 2 ( Bouclage ) existe
@@ -225,12 +211,20 @@ bool ActPlayMusic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
     //On verifie si l'argument 3 ( Volume ) existe
     if ( action.GetParameters().size() > 2 )
     {
-        if ( action.GetParameter(2).GetPlainString() != "" )
+        if ( !action.GetParameter(2).GetPlainString().empty() )
             music->SetVolume(action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
         else
             music->SetVolume(100);
     }
 
+    //Compatibility with Game Develop 1.5.9980 and below
+    if ( action.GetParameters().size() > 3 )
+    {
+        if ( !action.GetParameter(3).GetPlainString().empty() )
+            music->SetPitch(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned));
+        else
+            music->SetPitch(1);
+    }
 
     return true;
 }
@@ -247,12 +241,7 @@ bool ActPlayMusic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
 bool ActPlayMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
-
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
-    {
-        scene.errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
-        return false;
-    }
+    if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
 
     SoundManager * soundManager = SoundManager::getInstance();
     RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
@@ -273,11 +262,21 @@ bool ActPlayMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
     //On verifie si l'argument 4 ( Volume ) existe
     if ( action.GetParameters().size() > 3 )
     {
-        if ( action.GetParameter(3).GetPlainString() != "" )
+        if ( !action.GetParameter(3).GetPlainString().empty() )
             music->SetVolume(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned));
         else
             music->SetVolume(100);
     }
+
+    //Compatibility with Game Develop 1.5.9980 and below
+    if ( action.GetParameters().size() > 4 )
+    {
+        if ( !action.GetParameter(4).GetPlainString().empty() )
+            music->SetPitch(action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned));
+        else
+            music->SetPitch(1);
+    }
+
     return true;
 }
 
@@ -290,18 +289,9 @@ bool ActPlayMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
 bool ActStopMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
-    {
-        scene.errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
-        return false;
-    }
-
-    //Chargement
-    SoundManager * soundManager;
-    soundManager = SoundManager::getInstance();
-
-    soundManager->GetMusicOnChannel(canal)->Stop();
+    SoundManager::getInstance()->GetMusicOnChannel(canal)->Stop();
 
     return true;
 }
@@ -315,18 +305,9 @@ bool ActStopMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
 bool ActPauseMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
-    {
-        scene.errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
-        return false;
-    }
-
-    //Chargement
-    SoundManager * soundManager;
-    soundManager = SoundManager::getInstance();
-
-    soundManager->GetMusicOnChannel(canal)->Pause();
+    SoundManager::getInstance()->GetMusicOnChannel(canal)->Pause();
 
     return true;
 }
@@ -340,18 +321,9 @@ bool ActPauseMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcern
 bool ActRePlayMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )  return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
-    {
-        scene.errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
-        return false;
-    }
-
-    //Chargement
-    SoundManager * soundManager;
-    soundManager = SoundManager::getInstance();
-
-    soundManager->GetMusicOnChannel(canal)->Play();
+    SoundManager::getInstance()->GetMusicOnChannel(canal)->Play();
 
     return true;
 }
@@ -367,15 +339,9 @@ bool ActRePlayMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcer
 bool ActModVolumeSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_SON )
-    {
-        scene.errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
-        return false;
-    }
-
-    SoundManager * soundManager;
-    soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::getInstance();
 
     if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
         soundManager->GetSoundOnChannel(canal)->SetVolume(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
@@ -403,15 +369,9 @@ bool ActModVolumeSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsCon
 bool ActModVolumeMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )  return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
-    {
-        scene.errors.Add("Canal invalide pour jouer la musique", "", "", -1, 1);
-        return false;
-    }
-
-    SoundManager * soundManager;
-    soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::getInstance();
 
     if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
         soundManager->GetMusicOnChannel(canal)->SetVolume(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
@@ -448,6 +408,54 @@ bool ActModGlobalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcern
         soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() * action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     else if (action.GetParameter(1).GetAsModOperator() == GDExpression::Divide)
         soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() / action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+
+    return true;
+}
+
+/**
+ * Change pitch of the sound of a chnnel
+ */
+bool ActModPitchSoundChannel( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
+
+    SoundManager * soundManager = SoundManager::getInstance();
+
+    if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
+        soundManager->GetSoundOnChannel(canal)->SetPitch(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Add)
+        soundManager->GetSoundOnChannel(canal)->SetPitch(soundManager->GetSoundOnChannel(canal)->GetPitch() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Substract)
+        soundManager->GetSoundOnChannel(canal)->SetPitch(soundManager->GetSoundOnChannel(canal)->GetPitch() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Multiply)
+        soundManager->GetSoundOnChannel(canal)->SetPitch(soundManager->GetSoundOnChannel(canal)->GetPitch() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Divide)
+        soundManager->GetSoundOnChannel(canal)->SetPitch(soundManager->GetSoundOnChannel(canal)->GetPitch() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+
+    return true;
+}
+
+/**
+ * Change pitch of the sound of a chnnel
+ */
+bool ActModPitchMusicChannel( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
+
+    SoundManager * soundManager = SoundManager::getInstance();
+
+    if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
+        soundManager->GetMusicOnChannel(canal)->SetPitch(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Add)
+        soundManager->GetMusicOnChannel(canal)->SetPitch(soundManager->GetSoundOnChannel(canal)->GetPitch() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Substract)
+        soundManager->GetMusicOnChannel(canal)->SetPitch(soundManager->GetSoundOnChannel(canal)->GetPitch() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Multiply)
+        soundManager->GetMusicOnChannel(canal)->SetPitch(soundManager->GetSoundOnChannel(canal)->GetPitch() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Divide)
+        soundManager->GetMusicOnChannel(canal)->SetPitch(soundManager->GetSoundOnChannel(canal)->GetPitch() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
 
     return true;
 }

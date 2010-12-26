@@ -62,7 +62,7 @@ void Game::Init(const Game & game)
 
     //Resources
     images = game.images;
-    dossierImages = game.dossierImages;
+    imagesFolders = game.imagesFolders;
 
     globalObjects.clear();
     for (unsigned int i =0;i<game.globalObjects.size();++i)
@@ -82,6 +82,10 @@ void Game::Init(const Game & game)
     #if defined(GDE)
     gameFile = game.gameFile;
     imagesChanged = game.imagesChanged;
+
+    winExecutableFilename = game.winExecutableFilename;
+    winExecutableIconFile = game.winExecutableIconFile;
+    linuxExecutableFilename = game.linuxExecutableFilename;
     #endif
 }
 

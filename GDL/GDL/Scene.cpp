@@ -15,7 +15,8 @@ backgroundColorB(125),
 standardSortMethod(true),
 oglFOV(90.0f),
 oglZNear(1.0f),
-oglZFar(500.0f)
+oglZFar(500.0f),
+stopSoundsOnStartup(true)
 #if defined(GDE)
 ,wasModified(false)
 #endif
@@ -38,6 +39,7 @@ void Scene::Init(const Scene & scene)
     oglFOV = scene.oglFOV;
     oglZNear = scene.oglZNear;
     oglZFar = scene.oglZFar;
+    stopSoundsOnStartup = scene.stopSoundsOnStartup;
 
     events = CloneVectorOfEvents(scene.events);
 

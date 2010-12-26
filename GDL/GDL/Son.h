@@ -16,9 +16,13 @@ class GD_API Son : sf::NonCopyable
         virtual ~Son();
 
         inline sf::Sound::Status GetStatus() const { return sound.GetStatus(); }
+
         void SetVolume(float volume_);
         inline float GetVolume() const { return volume; }
         void UpdateVolume();
+
+        void SetPitch(float newPitch) { sound.SetPitch(newPitch); };
+        float GetPitch() const { return sound.GetPitch(); };
 
         //L'ordre de ceux deux là est important :
         sf::SoundBuffer buffer;
@@ -28,7 +32,7 @@ class GD_API Son : sf::NonCopyable
 
     protected:
     private:
-        float volume;
+        float volume; ///< Volume is not directly stored in the sf::Sound as GD allows to change global volume.
 };
 
 #endif // SON_H

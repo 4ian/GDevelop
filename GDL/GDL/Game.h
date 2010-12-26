@@ -34,34 +34,35 @@ class GD_API Game
         //Some properties
         string name;
         string author;
-        int windowWidth;
-        int windowHeight;
-        int maxFPS;
-        int minFPS;
-        bool verticalSync;
-        bool portable;
-        bool fullscreen;
+        int windowWidth; ///< Default window width
+        int windowHeight; ///< Default window height
+        int maxFPS; ///< Maximum Frame Per Seconds, -1 for unlimited
+        int minFPS; ///< Minimum Frame Per Seconds ( slow down game if FPS are below this number )
+        bool verticalSync; ///< If true, must activate vertical synchronization.
+        bool portable; ///< True if the game was saved as a portable game file
+        bool fullscreen; ///< True if the game is displayed full screen
 
-        //Extensions used
-        vector < string > extensionsUsed;
+        vector < string > extensionsUsed; ///< List of extensions used
 
-        LoadingScreen loadingScreen;
+        LoadingScreen loadingScreen; ///< Data concerning the loading screen
 
-        //Resources
-        vector < Image >    images;
-        vector < Dossier >  dossierImages;
+        vector < Image >    images; ///< List of images available for the game
+        vector < Dossier >  imagesFolders; ///< Folder used to organize images
 
-        vector < boost::shared_ptr<Scene> >             scenes;
-        vector < boost::shared_ptr<ExternalEvents> >    externalEvents;
-        vector < boost::shared_ptr<Object> >            globalObjects;
-        vector < ObjectGroup >                          objectGroups;
+        vector < boost::shared_ptr<Scene> >             scenes; ///< List of all scenes
+        vector < boost::shared_ptr<ExternalEvents> >    externalEvents; ///< List of all externals events
+        vector < boost::shared_ptr<Object> >            globalObjects; ///< Global objects
+        vector < ObjectGroup >                          objectGroups; ///< Global objects groups
 
-        //Initial
-        ListVariable variables;
+        ListVariable variables; ///< Initial global variables
 
         #if defined(GDE)
         std::string gameFile; ///< File of the game
-        vector < string > imagesChanged;
+        vector < string > imagesChanged; ///< Images that have been changed and which have to be reloaded
+
+        std::string winExecutableFilename; ///< Windows executable name
+        std::string winExecutableIconFile; ///< Icon for Windows executable
+        std::string linuxExecutableFilename;  ///< Linux executable name
         #endif
 
     protected:

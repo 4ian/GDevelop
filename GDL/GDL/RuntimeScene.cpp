@@ -638,6 +638,8 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
         automatismsSharedDatas[it->first] = it->second->CreateRuntimeSharedDatas();
     }
 
+    if ( stopSoundsOnStartup ) StopMusic();
+
     MessageLoading( "Loading finished", 100 );
 
     return true;

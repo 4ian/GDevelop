@@ -12,251 +12,92 @@
 #include "GDL/ObjectsConcerned.h"
 #include <SFML/Audio.hpp>
 
-////////////////////////////////////////////////////////////
-/// Test si une musique est entrain d'être jouée
-///
-/// Type : MusicPlayed
-/// Paramètre 1 : Canal
-////////////////////////////////////////////////////////////
+
+/**
+ * Test if a music is played
+ */
 bool CondMusicPlaying( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    bool Ok = false;
-    bool OkContraire = false;
-
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
-    {
-        scene.errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
-        return false;
-    }
+    if (SoundManager::getInstance()->GetMusicOnChannel(canal)->GetStatus() == sf::Sound::Playing) return !condition.IsInverted();
 
-    SoundManager * soundManager = SoundManager::getInstance();
-
-    if (soundManager->GetMusicOnChannel(canal)->GetStatus() == sf::Sound::Playing)
-    {
-        Ok = true;
-        OkContraire = false;
-    }
-    else
-    {
-        Ok = false;
-        OkContraire = true;
-    }
-
-    if ( condition.IsInverted() )
-        return OkContraire;
-
-    return Ok;
+    return condition.IsInverted();
 }
 
-////////////////////////////////////////////////////////////
-/// Test si une musique est en pause
-///
-/// Type : MusicPaused
-/// Paramètre 1 : Canal
-////////////////////////////////////////////////////////////
+/**
+ * Test if a music is paused
+ */
 bool CondMusicPaused( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    bool Ok = false;
-    bool OkContraire = false;
-
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
-    {
-        scene.errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
-        return false;
-    }
+    if (SoundManager::getInstance()->GetMusicOnChannel(canal)->GetStatus() == sf::Sound::Paused) return !condition.IsInverted();
 
-    SoundManager * soundManager = SoundManager::getInstance();
-
-    if (soundManager->GetMusicOnChannel(canal)->GetStatus() == sf::Sound::Paused)
-    {
-        Ok = true;
-        OkContraire = false;
-    }
-    else
-    {
-        Ok = false;
-        OkContraire = true;
-    }
-
-    if ( condition.IsInverted() )
-        return OkContraire;
-
-    return Ok;
+    return condition.IsInverted();
 }
 
-////////////////////////////////////////////////////////////
-/// Test si une musique est stoppée
-///
-/// Type : MusicStopped
-/// Paramètre 1 : Canal
-////////////////////////////////////////////////////////////
+/**
+ * Test if a music is stopped
+ */
 bool CondMusicStopped( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    bool Ok = false;
-    bool OkContraire = false;
-
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
-    {
-        scene.errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
-        return false;
-    }
+    if (SoundManager::getInstance()->GetMusicOnChannel(canal)->GetStatus() == sf::Sound::Stopped) return !condition.IsInverted();
 
-    SoundManager * soundManager = SoundManager::getInstance();
-
-    if (soundManager->GetMusicOnChannel(canal)->GetStatus() == sf::Sound::Stopped)
-    {
-        Ok = true;
-        OkContraire = false;
-    }
-    else
-    {
-        Ok = false;
-        OkContraire = true;
-    }
-
-    if ( condition.IsInverted() )
-        return OkContraire;
-
-    return Ok;
+    return condition.IsInverted();
 }
 
 
-////////////////////////////////////////////////////////////
-/// Test si un son est entrain d'être joué
-///
-/// Type : SoundPlaying
-/// Paramètre 1 : Canal
-////////////////////////////////////////////////////////////
+/**
+ * Test if a sound is being played
+ */
 bool CondSoundPlaying( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    SoundManager * soundManager = SoundManager::getInstance();
-
-    bool Ok = false;
-    bool OkContraire = false;
-
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_SON )
-    {
-        scene.errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
-        return false;
-    }
+    if (SoundManager::getInstance()->GetSoundOnChannel(canal)->GetStatus() == sf::Sound::Playing) return !condition.IsInverted();
 
-    if (soundManager->GetSoundOnChannel(canal)->GetStatus() == sf::Sound::Playing)
-    {
-        Ok = true;
-        OkContraire = false;
-    }
-    else
-    {
-        Ok = false;
-        OkContraire = true;
-    }
-
-    if ( condition.IsInverted() )
-        return OkContraire;
-
-    return Ok;
+    return condition.IsInverted();
 }
 
-////////////////////////////////////////////////////////////
-/// Test si un son est en pause
-///
-/// Type : SoundPaused
-/// Paramètre 1 : Canal
-////////////////////////////////////////////////////////////
+/**
+ * Test if a sound is paused
+ */
 bool CondSoundPaused( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    bool Ok = false;
-    bool OkContraire = false;
-
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_SON )
-    {
-        scene.errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
-        return false;
-    }
+    if (SoundManager::getInstance()->GetSoundOnChannel(canal)->GetStatus() == sf::Sound::Paused) return !condition.IsInverted();
 
-    SoundManager * soundManager = SoundManager::getInstance();
-
-    if (soundManager->GetSoundOnChannel(canal)->GetStatus() == sf::Sound::Paused)
-    {
-        Ok = true;
-        OkContraire = false;
-    }
-    else
-    {
-        Ok = false;
-        OkContraire = true;
-    }
-
-    if ( condition.IsInverted() )
-        return OkContraire;
-
-    return Ok;
+    return condition.IsInverted();
 }
 
-
-////////////////////////////////////////////////////////////
-/// Test si un son est en pause
-///
-/// Type : SoundStopped
-/// Paramètre 1 : Canal
-////////////////////////////////////////////////////////////
+/**
+ * Test if a sound is stopped
+ */
 bool CondSoundStopped( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    bool Ok = false;
-    bool OkContraire = false;
-
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    if ( canal < 0 || canal > MAX_CANAUX_SON )
-    {
-        scene.errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
-        return false;
-    }
+    if (SoundManager::getInstance()->GetSoundOnChannel(canal)->GetStatus() == sf::Sound::Stopped) return !condition.IsInverted();
 
-    SoundManager * soundManager = SoundManager::getInstance();
-
-    if (soundManager->GetSoundOnChannel(canal)->GetStatus() == sf::Sound::Stopped)
-    {
-        Ok = true;
-        OkContraire = false;
-    }
-    else
-    {
-        Ok = false;
-        OkContraire = true;
-    }
-
-    if ( condition.IsInverted() )
-        return OkContraire;
-
-    return Ok;
+    return condition.IsInverted();
 }
 
-////////////////////////////////////////////////////////////
-/// Teste le volume global
-///
-/// Type : GlobalVolume
-/// Paramètre 1 : Volume à tester
-/// Paramètre 2 : Signe du test
-////////////////////////////////////////////////////////////
+/**
+ * Test global volume
+ */
 bool CondGlobalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    bool Ok = false;
-    bool OkContraire = false;
-
-    SoundManager * soundManager = SoundManager::getInstance();
-
-    float volume = soundManager->GetGlobalVolume();
+    float volume = SoundManager::getInstance()->GetGlobalVolume();
 
     if (   (condition.GetParameter(1).GetAsCompOperator() == GDExpression::Equal && volume == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned))
         || (condition.GetParameter(1).GetAsCompOperator() == GDExpression::Inferior && volume < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned))
@@ -264,44 +105,22 @@ bool CondGlobalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
         || (condition.GetParameter(1).GetAsCompOperator() == GDExpression::InferiorOrEqual && volume <= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned))
         || (condition.GetParameter(1).GetAsCompOperator() == GDExpression::SuperiorOrEqual && volume >= condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned)))
     {
-        Ok = true;
-        OkContraire = false;
-    }
-    else
-    {
-        Ok = false;
-        OkContraire = true;
+        return !condition.IsInverted();
     }
 
-    if ( condition.IsInverted() )
-        return OkContraire;
-
-    return Ok;
+    return condition.IsInverted();
 }
 
 
-////////////////////////////////////////////////////////////
-/// Teste le volume d'un son d'un canal
-///
-/// Type : SoundCanalVolume
-/// Paramètre 1 : Canal
-/// Paramètre 2 : Volume à tester
-/// Paramètre 3 : Signe du test
-////////////////////////////////////////////////////////////
+/**
+ * Test volume of the sound of a channel
+ */
 bool CondSoundCanalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    bool Ok = false;
-    bool OkContraire = false;
-
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    if ( canal < 0 || canal > MAX_CANAUX_SON )
-    {
-        scene.errors.Add("Canal invalide pour tester le son", "", "", -1, 1);
-        return false;
-    }
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    SoundManager * soundManager = SoundManager::getInstance();
-    float volume = soundManager->GetSoundOnChannel(canal)->sound.GetVolume();
+    float volume = SoundManager::getInstance()->GetSoundOnChannel(canal)->sound.GetVolume();
 
     if (   (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Equal && volume == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
         || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Inferior && volume < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
@@ -309,42 +128,20 @@ bool CondSoundCanalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConce
         || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::InferiorOrEqual && volume <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
         || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::SuperiorOrEqual && volume >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned)))
     {
-        Ok = true;
-        OkContraire = false;
-    }
-    else
-    {
-        Ok = false;
-        OkContraire = true;
+        return !condition.IsInverted();
     }
 
-    if ( condition.IsInverted() )
-        return OkContraire;
-
-    return Ok;
+    return condition.IsInverted();
 }
 
-
-
-////////////////////////////////////////////////////////////
-/// Teste le volume d'une musique d'un canal
-///
-/// Type : MusicCanalVolume
-/// Paramètre 1 : Canal
-/// Paramètre 2 : Volume à tester
-/// Paramètre 3 : Signe du test
-////////////////////////////////////////////////////////////
+/**
+ * Test volume of the music of a channel
+ */
 bool CondMusicCanalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    bool Ok = false;
-    bool OkContraire = false;
-
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
-    {
-        scene.errors.Add("Canal invalide pour tester la musique", "", "", -1, 1);
         return false;
-    }
 
     SoundManager * soundManager = SoundManager::getInstance();
     float volume = soundManager->GetMusicOnChannel(canal)->music.GetVolume();
@@ -355,17 +152,62 @@ bool CondMusicCanalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConce
         || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::InferiorOrEqual && volume <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
         || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::SuperiorOrEqual && volume >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned)))
     {
-        Ok = true;
-        OkContraire = false;
+        return !condition.IsInverted();
     }
-    else
+
+    return condition.IsInverted();
+}
+
+/**
+ * Test the pitch of a music
+ */
+bool CondMusicChannelPitch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
+        return false;
+
+    SoundManager * soundManager = SoundManager::getInstance();
+    float pitch = soundManager->GetMusicOnChannel(canal)->music.GetPitch();
+
+    //optimisation : le test de signe en premier
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && pitch == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && pitch < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && pitch > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && pitch <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && pitch >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && pitch != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) )
+       )
     {
-        Ok = false;
-        OkContraire = true;
+        return !condition.IsInverted();
     }
 
-    if ( condition.IsInverted() )
-        return OkContraire;
+    return condition.IsInverted();
+}
 
-    return Ok;
+/**
+ * Test the pitch of a music
+ */
+bool CondSoundChannelPitch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
+        return false;
+
+    SoundManager * soundManager = SoundManager::getInstance();
+    float pitch = soundManager->GetSoundOnChannel(canal)->GetPitch();
+
+    //optimisation : le test de signe en premier
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && pitch == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && pitch < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && pitch > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && pitch <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && pitch >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && pitch != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) )
+       )
+    {
+        return !condition.IsInverted();
+    }
+
+    return condition.IsInverted();
 }

@@ -25,6 +25,10 @@ class GD_API Music
         inline float GetVolume() const { return volume; }
         void UpdateVolume();
 
+        void SetPitch(float newPitch) { music.SetPitch(newPitch); };
+        float GetPitch() const { return music.GetPitch(); };
+
+
         bool OpenFromFile(const string & filename);
         void SetBuffer(const char * newbuffer, std::size_t size);
         bool OpenFromMemory(std::size_t size);

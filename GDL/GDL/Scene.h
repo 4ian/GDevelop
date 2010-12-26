@@ -39,6 +39,7 @@ class GD_API Scene
         float oglFOV;
         float oglZNear;
         float oglZFar;
+        bool stopSoundsOnStartup;
 
         vector < BaseEventSPtr >                events;
         vector < boost::shared_ptr<Object> >    initialObjects;

@@ -32,4 +32,7 @@ bool ActModVolumeSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsCon
 bool ActModVolumeMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActModGlobalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
+bool ActModPitchSoundChannel( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActModPitchMusicChannel( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+
 #endif // AMUSIC_H_INCLUDED

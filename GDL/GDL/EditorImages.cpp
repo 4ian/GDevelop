@@ -402,7 +402,7 @@ void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
 
                 game.images.push_back(image);
                 game.imagesChanged.push_back(image.nom);
-                Dossier::Add( &game.dossierImages, (string)names[i], dossierId );
+                Dossier::Add( &game.imagesFolders, (string)names[i], dossierId );
 
                 BanqueImageList->AppendItem( rootId, names[i] );
             }
@@ -437,7 +437,7 @@ void EditorImages::OnDelImageBtClick( wxCommandEvent& event )
             //On enlève l'image
             game.imagesChanged.push_back(game.images[i].nom);
             game.images.erase( game.images.begin() + i );
-            Dossier::RemoveImage(&game.dossierImages, ( string ) BanqueImageList->GetItemText( Item ));
+            Dossier::RemoveImage(&game.imagesFolders, ( string ) BanqueImageList->GetItemText( Item ));
         }
 
         BanqueImageList->Delete( Item );
@@ -550,7 +550,7 @@ void EditorImages::OnBanqueImageListEndLabelEdit( wxTreeEvent& event )
                 game.imagesChanged.push_back(newName);
 
                 game.images.at( i ).nom = newName;
-                Dossier::ReplaceNomImage(&game.dossierImages, m_NomItem, newName);
+                Dossier::ReplaceNomImage(&game.imagesFolders, m_NomItem, newName);
 
                 BanqueImageList->SetItemText( event.GetItem(), event.GetLabel() );
 
@@ -585,14 +585,14 @@ void EditorImages::Refresh()
 
     //On vérifie bien la validité de dossierId, car on a très bien pu changer
     //de jeu entre son choix et le rafraichissement
-    if ( dossierNom != "" && dossierId >= 0 && static_cast<unsigned>(dossierId) < game.dossierImages.size())
+    if ( dossierNom != "" && dossierId >= 0 && static_cast<unsigned>(dossierId) < game.imagesFolders.size())
     {
         BanqueImageList->AddRoot( dossierNom );
-        if ( !game.dossierImages.at(dossierId).contenu.empty() )
+        if ( !game.imagesFolders.at(dossierId).contenu.empty() )
         {
-            for ( unsigned int i = 0;i < game.dossierImages.at(dossierId).contenu.size();i++ )
+            for ( unsigned int i = 0;i < game.imagesFolders.at(dossierId).contenu.size();i++ )
             {
-                wxString nom = game.dossierImages.at(dossierId).contenu.at( i );
+                wxString nom = game.imagesFolders.at(dossierId).contenu.at( i );
 
                 //Ajout à la liste
                 BanqueImageList->AppendItem( BanqueImageList->GetRootItem(), nom );
@@ -678,16 +678,16 @@ void EditorImages::OnAideBtClick( wxCommandEvent& event )
 
 void EditorImages::DossierBt( wxCommandEvent& event )
 {
-    ChoixDossier Dialog( this, &game.dossierImages );
+    ChoixDossier Dialog( this, &game.imagesFolders );
     int returnValue = Dialog.ShowModal();
     if ( returnValue == 1 )
     {
         dossierNom = Dialog.dossierNom;
         dossierId = -1;
 
-        for ( unsigned int i = 0;i < game.dossierImages.size() ;i++ )
+        for ( unsigned int i = 0;i < game.imagesFolders.size() ;i++ )
         {
-            if ( game.dossierImages.at( i ).nom == dossierNom )
+            if ( game.imagesFolders.at( i ).nom == dossierNom )
             {
                 dossierId = i;
             }
@@ -738,7 +738,7 @@ void EditorImages::OnMenuItem5Selected(wxCommandEvent& event)
         return;
     }
 
-    Dossier::Add(&game.dossierImages, name, dossierId);
+    Dossier::Add(&game.imagesFolders, name, dossierId);
     BanqueImageList->AppendItem(BanqueImageList->GetRootItem(), name);
 }
 
@@ -751,7 +751,7 @@ void EditorImages::OnMenuItem6Selected(wxCommandEvent& event)
     wxTreeItemId ItemNul = NULL;
     if ( Item != ItemNul && BanqueImageList->GetChildrenCount( m_itemSelected ) == 0 )
     {
-        Dossier::RemoveImage(&game.dossierImages, ( string ) BanqueImageList->GetItemText( Item ), dossierId);
+        Dossier::RemoveImage(&game.imagesFolders, ( string ) BanqueImageList->GetItemText( Item ), dossierId);
 
         BanqueImageList->Delete( Item );
 
@@ -897,12 +897,12 @@ void EditorImages::OnMoveUpSelected(wxCommandEvent& event)
         }
     }
     //Un dossier
-    else if ( dossierId >= 0 && static_cast<unsigned>(dossierId) < game.dossierImages.size())
+    else if ( dossierId >= 0 && static_cast<unsigned>(dossierId) < game.imagesFolders.size())
     {
         int imageId = -1;
-        for (unsigned int i =0;i<game.dossierImages[dossierId].contenu.size();++i)
+        for (unsigned int i =0;i<game.imagesFolders[dossierId].contenu.size();++i)
         {
-        	if ( game.dossierImages[dossierId].contenu[i] == name )
+        	if ( game.imagesFolders[dossierId].contenu[i] == name )
                 imageId = i;
         }
         if ( imageId == -1 )
@@ -913,9 +913,9 @@ void EditorImages::OnMoveUpSelected(wxCommandEvent& event)
         else if ( imageId-1 >= 0)
         {
             //On déplace l'image
-            string image = game.dossierImages[dossierId].contenu[imageId];
-            game.dossierImages[dossierId].contenu.erase( game.dossierImages[dossierId].contenu.begin()+imageId );
-            game.dossierImages[dossierId].contenu.insert( game.dossierImages[dossierId].contenu.begin()+imageId-1, image);
+            string image = game.imagesFolders[dossierId].contenu[imageId];
+            game.imagesFolders[dossierId].contenu.erase( game.imagesFolders[dossierId].contenu.begin()+imageId );
+            game.imagesFolders[dossierId].contenu.insert( game.imagesFolders[dossierId].contenu.begin()+imageId-1, image);
 
             Refresh();
 
@@ -975,12 +975,12 @@ void EditorImages::OnMoveDownSelected(wxCommandEvent& event)
         }
     }
     //Un dossier
-    else if ( dossierId >= 0 && static_cast<unsigned>(dossierId) < game.dossierImages.size())
+    else if ( dossierId >= 0 && static_cast<unsigned>(dossierId) < game.imagesFolders.size())
     {
         int imageId = -1;
-        for (unsigned int i =0;i<game.dossierImages[dossierId].contenu.size();++i)
+        for (unsigned int i =0;i<game.imagesFolders[dossierId].contenu.size();++i)
         {
-        	if ( game.dossierImages[dossierId].contenu[i] == name )
+        	if ( game.imagesFolders[dossierId].contenu[i] == name )
                 imageId = i;
         }
         if ( imageId == -1 )
@@ -988,12 +988,12 @@ void EditorImages::OnMoveDownSelected(wxCommandEvent& event)
             wxLogStatus( _( "L'image à déplacer n'a pas été trouvée." ) );
             return;
         }
-        else if ( static_cast<unsigned>(imageId+1) < game.dossierImages[dossierId].contenu.size())
+        else if ( static_cast<unsigned>(imageId+1) < game.imagesFolders[dossierId].contenu.size())
         {
             //On déplace l'image
-            string image = game.dossierImages[dossierId].contenu[imageId];
-            game.dossierImages[dossierId].contenu.erase( game.dossierImages[dossierId].contenu.begin()+imageId );
-            game.dossierImages[dossierId].contenu.insert( game.dossierImages[dossierId].contenu.begin()+imageId+1, image);
+            string image = game.imagesFolders[dossierId].contenu[imageId];
+            game.imagesFolders[dossierId].contenu.erase( game.imagesFolders[dossierId].contenu.begin()+imageId );
+            game.imagesFolders[dossierId].contenu.insert( game.imagesFolders[dossierId].contenu.begin()+imageId+1, image);
 
             Refresh();
 

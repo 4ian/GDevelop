@@ -23,6 +23,7 @@ AudioExtension::AudioExtension()
         DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), false, "")
         DECLARE_PARAMETER_OPTIONAL("yesorno", _("Boucler le son ?"), false, "")
         DECLARE_PARAMETER_OPTIONAL("expression", _("Volume ( De 0 à 100, 100 par défaut )"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), false, "")
 
     DECLARE_END_ACTION()
 
@@ -78,6 +79,7 @@ AudioExtension::AudioExtension()
         DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), false, "")
         DECLARE_PARAMETER_OPTIONAL("yesorno", _("Boucler le son ?"), false, "")
         DECLARE_PARAMETER_OPTIONAL("expression", _("Volume ( De 0 à 100, 100 par défaut )"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), false, "")
 
     DECLARE_END_ACTION()
 
@@ -164,6 +166,36 @@ AudioExtension::AudioExtension()
 
     DECLARE_END_ACTION()
 
+    DECLARE_ACTION("ModPitchSoundChannel",
+                   _("Modifier le pitch d'un son sur un canal"),
+                   _("Cette action modifie le pitch ( vitesse ) du son d'un canal.\nUn pitch de 1 indique une vitesse normale."),
+                   _("Faire _PARAM2__PARAM1_ au pitch du son sur le canal  _PARAM0_"),
+                   _("Pitch ( vitesse )"),
+                   "res/actions/son24.png",
+                   "res/actions/son.png",
+                   &ActModPitchSoundChannel);
+
+        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), false, "")
+        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+
+    DECLARE_END_ACTION()
+
+    DECLARE_ACTION("ModPitchMusicChannel",
+                   _("Modifier le pitch de la musique d'un canal"),
+                   _("Cette action modifie le pitch de la musique sur un canal.\nUn pitch de 1 indique une vitesse normale."),
+                   _("Faire _PARAM2__PARAM1_ au pitch de la musique du canal  _PARAM0_"),
+                   _("Pitch ( vitesse )"),
+                   "res/actions/music24.png",
+                   "res/actions/music.png",
+                   &ActModPitchMusicChannel);
+
+        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), false, "")
+        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+
+    DECLARE_END_ACTION()
+
     DECLARE_ACTION("PlaySound",
                    _("Jouer un son"),
                    _("Joue un son."),
@@ -176,6 +208,7 @@ AudioExtension::AudioExtension()
         DECLARE_PARAMETER("soundfile", _("Fichier audio"), false, "")
         DECLARE_PARAMETER_OPTIONAL("yesorno", _("Boucler le son ?"), false, "")
         DECLARE_PARAMETER_OPTIONAL("expression", _("Volume ( De 0 à 100, 100 par défaut )"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), false, "")
 
     DECLARE_END_ACTION()
 
@@ -191,6 +224,7 @@ AudioExtension::AudioExtension()
         DECLARE_PARAMETER("musicfile", _("Fichier audio"), false, "")
         DECLARE_PARAMETER_OPTIONAL("yesorno", _("Boucler le son ?"), false, "")
         DECLARE_PARAMETER_OPTIONAL("expression", _("Volume ( De 0 à 100, 100 par défaut )"), false, "")
+        DECLARE_PARAMETER_OPTIONAL("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), false, "")
 
     DECLARE_END_ACTION()
 
@@ -311,6 +345,36 @@ AudioExtension::AudioExtension()
                    &CondGlobalVolume);
 
         DECLARE_PARAMETER("expression", _("Volume à tester"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+
+    DECLARE_END_CONDITION()
+
+    DECLARE_CONDITION("SoundChannelPitch",
+                   _("Pitch du son d'un canal"),
+                   _("Teste le pitch ( vitesse ) du son sur le canal indiqué. Un pitch de 1 indique une vitesse normale."),
+                   _("Le pitch du son sur le canal _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Pitch ( vitesse )"),
+                   "res/conditions/sonVolume24.png",
+                   "res/conditions/sonVolume.png",
+                   &CondSoundChannelPitch);
+
+        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), false, "")
+        DECLARE_PARAMETER("expression", _("Pitch à tester"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+
+    DECLARE_END_CONDITION()
+
+    DECLARE_CONDITION("MusicChannelPitch",
+                   _("Pitch de la musique d'un canal"),
+                   _("Teste le pitch ( vitesse ) de la musique sur le canal indiqué. Un pitch de 1 indique une vitesse normale."),
+                   _("Le volume de la musique sur le canal _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Volume sonore"),
+                   "res/conditions/musicVolume24.png",
+                   "res/conditions/musicVolume.png",
+                   &CondMusicChannelPitch);
+
+        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), false, "")
+        DECLARE_PARAMETER("expression", _("Pitch à tester"), false, "")
         DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
 
     DECLARE_END_CONDITION()

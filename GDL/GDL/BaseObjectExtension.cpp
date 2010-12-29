@@ -109,7 +109,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         DECLARE_OBJECT_ACTION("MettreAutourPos",
                        _("Mettre un objet autour d'une position"),
                        _("Positionne un objet autour d'une position, avec l'angle et la distance indiquée."),
-                       _("Mettre _PARAM0_ autour de _PARAM1_;_PARAM2_ à _PARAM3_° et à _PARAM4_ pixels de distance"),
+                       _("Mettre _PARAM0_ autour de _PARAM1_;_PARAM2_ à _PARAM4_° et à _PARAM3_ pixels de distance"),
                        _("Position"),
                        "res/actions/positionAutour24.png",
                        "res/actions/positionAutour.png",

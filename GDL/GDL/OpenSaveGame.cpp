@@ -2176,7 +2176,7 @@ void OpenSaveGame::RecreatePaths(string file)
                     }
                     if ( allActionsVectors[i]->at(k).GetType() == "EcrireTexte" )
                     {
-                        if ( allActionsVectors[i]->at(k).GetParameterSafely(5).GetPlainString() != "" )
+                        if ( !allActionsVectors[i]->at(k).GetParameterSafely(5).GetPlainString().empty() )
                         {
                             //Rajout répertoire
                             allActionsVectors[i]->at(k).SetParameter(5, GDExpression(rep + allActionsVectors[i]->at(k).GetParameterSafely(5).GetPlainString()));

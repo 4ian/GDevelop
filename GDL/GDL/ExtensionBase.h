@@ -22,6 +22,7 @@ class ExpressionInstruction;
 class StrExpressionInstruction;
 class BaseEvent;
 class AutomatismsSharedDatas;
+class ResourcesMergingHelper;
 
 #if defined(GDE)
 class Game;
@@ -949,6 +950,9 @@ class GD_API ExtensionObjectInfos
     std::map<std::string, StrExpressionInfos > strExpressionsInfos;
 };
 
+/**
+ * Class used in extension to be sure that extension is compatible.
+ */
 class GD_API CompilationInfos
 {
     public :
@@ -957,11 +961,7 @@ class GD_API CompilationInfos
 
     bool informationCompleted;
 
-    /**
-     * Information about if the extension was compiled for
-     * runtime use only
-     */
-    bool runtimeOnly;
+    bool runtimeOnly; ///< True if the extension was compiled for a runtime use only
 
     #if defined(__GNUC__)
     int gccMajorVersion;
@@ -1089,7 +1089,20 @@ class GD_API ExtensionBase
      */
     boost::shared_ptr<AutomatismsSharedDatas> CreateAutomatismSharedDatas(std::string automatismType) const;
 
+    /**
+     * Get the namespace
+     */
     inline std::string GetNameSpace() { return nameSpace; };
+
+    /**
+     * Called ( e.g. during compilation ) so as to inventory resources used by conditions and update their filename
+     */
+    virtual void PrepareConditionsResourcesForMerging(Instruction & condition, ResourcesMergingHelper & resourcesMergingHelper) {};
+
+    /**
+     * Called ( e.g. during compilation ) so as to inventory resources used by actions and update their filename
+     */
+    virtual void PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper) {};
 
     protected :
 
@@ -1101,10 +1114,10 @@ class GD_API ExtensionBase
     std::string name;
 
     #ifdef GDE //Information available only at edittime
-    std::string fullname;
-    std::string informations;
-    std::string author;
-    std::string license;
+    std::string fullname; ///<Name displayed to users at edittime
+    std::string informations; ///<Description displayed to users at edittime
+    std::string author; ///<Author displayed to users at edittime
+    std::string license;  ///<License name displayed to users at edittime
     std::vector < std::pair<std::string, std::string> > supplementaryRuntimeFiles; ///<Supplementary runtime files to copy on compilation
     #endif
 
@@ -1116,11 +1129,11 @@ class GD_API ExtensionBase
     std::map<std::string, EventInfos > eventsInfos;
     std::map<std::string, AutomatismInfo > automatismsInfo;
 
-    static std::map<std::string, InstructionInfos > badConditionsInfos;
-    static std::map<std::string, InstructionInfos > badActionsInfos;
-    static std::map<std::string, ExpressionInfos > badExpressionsInfos;
-    static std::map<std::string, StrExpressionInfos > badStrExpressionsInfos;
-    static std::map<std::string, AutomatismInfo > badAutomatismsInfo;
+    static std::map<std::string, InstructionInfos > badConditionsInfos; ///< Used when a condition is not found in the extension
+    static std::map<std::string, InstructionInfos > badActionsInfos;  ///< Used when an action is not found in the extension
+    static std::map<std::string, ExpressionInfos > badExpressionsInfos; ///< Used when an expression is not found in the extension
+    static std::map<std::string, StrExpressionInfos > badStrExpressionsInfos;///< Used when an expression is not found in the extension
+    static std::map<std::string, AutomatismInfo > badAutomatismsInfo;///< Used when an automatism is not found in the extension
 
     private:
 

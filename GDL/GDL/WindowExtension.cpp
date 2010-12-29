@@ -3,6 +3,7 @@
 #include "GDL/aWindow.h"
 #include "GDL/eFreeFunctions.h"
 #include "GDL/actions.h"
+#include "GDL/ResourcesMergingHelper.h"
 
 WindowExtension::WindowExtension()
 {
@@ -64,4 +65,10 @@ WindowExtension::WindowExtension()
     DECLARE_END_EXPRESSION()
     DECLARE_EXPRESSION("ColorDepth", "Profondeur de couleur de la résolution actuelle", "Profondeur de couleur de la résolution actuelle", "Ecran", "res/display16.png", &ExpGetScreenColorDepth)
     DECLARE_END_EXPRESSION()
+}
+
+void WindowExtension::PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper)
+{
+    if ( action.GetType() == "EcrireTexte" && !action.GetParameterSafely( 5 ).GetPlainString().empty() )
+        action.SetParameter( 5, resourcesMergingHelper.GetNewFilename( action.GetParameterSafely( 5 ).GetPlainString() ) );
 }

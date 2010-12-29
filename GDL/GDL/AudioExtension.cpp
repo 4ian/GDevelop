@@ -1,6 +1,8 @@
 #include "GDL/AudioExtension.h"
 #include "GDL/cMusic.h"
 #include "GDL/aMusic.h"
+#include "GDL/ResourcesMergingHelper.h"
+#include <iostream>
 
 AudioExtension::AudioExtension()
 {
@@ -378,4 +380,15 @@ AudioExtension::AudioExtension()
         DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
 
     DECLARE_END_CONDITION()
+}
+
+void AudioExtension::PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper)
+{
+    if ( action.GetType() == "PlaySound" || action.GetType() == "PlaySoundCanal" || action.GetType() == "PlayMusic" || action.GetType() == "PlayMusicCanal" )
+    {
+        std::string before = action.GetParameter(0).GetPlainString();
+        cout << "BEFREAudioResource :" << before << endl;
+        action.SetParameter( 0, resourcesMergingHelper.GetNewFilename(action.GetParameter(0).GetPlainString()));
+        cout << "AudioResource :" << action.GetParameter(0).GetPlainString() << endl;
+    }
 }

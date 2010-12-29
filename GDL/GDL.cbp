@@ -516,6 +516,46 @@
 					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
 				</Linker>
 			</Target>
+			<Target title="Debug - Clang">
+				<Option platforms="Windows;" />
+				<Option output="..\Runtime\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="3" />
+				<Option compiler="clang_dropin_substitute_for_gnu_gcc_compiler" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-m32" />
+					<Add option="-DGDP" />
+					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DDEBUG" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lmingw32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-system-d" />
+					<Add option="-lgmon" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add directory="..\GDL\" />

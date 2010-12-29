@@ -8,8 +8,8 @@ class WindowExtension : public ExtensionBase
     public:
         WindowExtension();
         virtual ~WindowExtension() {};
-    protected:
-    private:
+
+        virtual void PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper);
 };
 
 #endif // WINDOWEXTENSION_H

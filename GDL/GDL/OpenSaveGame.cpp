@@ -26,7 +26,7 @@
 
 #include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml.h"
-
+#include "GDL/ResourcesUnmergingHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
@@ -2138,54 +2138,29 @@ void OpenSaveGame::SaveExternalEvents(const vector < boost::shared_ptr<ExternalE
 void OpenSaveGame::RecreatePaths(string file)
 {
 #ifdef GDE
-    string rep = static_cast<string>( wxPathOnly( file ) ) + "/";
-    if ( rep == "" ) return;
+    string newDirectory = string( wxPathOnly( file ).mb_str() );
+    if ( newDirectory.empty() ) return;
+
+    ResourcesUnmergingHelper resourcesUnmergingHelper(newDirectory);
 
     //Image du chargement
-    if ( game.loadingScreen.imageFichier != "" )
-    {
-        game.loadingScreen.imageFichier = rep + game.loadingScreen.imageFichier;
-    }
+    if ( !game.loadingScreen.imageFichier.empty() )
+        game.loadingScreen.imageFichier = resourcesUnmergingHelper.GetNewFilename(game.loadingScreen.imageFichier);
 
 
     //Images : copie et enlève le répertoire des chemins
     for ( unsigned int i = 0;i < game.images.size() ;i++ )
-    {
-        game.images.at( i ).file = rep + game.images.at( i ).file;
-        wxSafeYield();
-    }
+        game.images.at( i ).file = resourcesUnmergingHelper.GetNewFilename(game.images.at( i ).file);
 
-    for ( unsigned int s = 0;s < game.scenes.size();s++ )
+    //Add scenes resources
+    for ( unsigned int i = 0;i < game.scenes.size();i++ )
     {
-        for ( unsigned int j = 0;j < game.scenes[s]->events.size() ;j++ )
-        {
-            vector < vector<Instruction>* > allActionsVectors = game.scenes[s]->events[j]->GetAllActionsVectors();
-            for (unsigned int i = 0;i<allActionsVectors.size();++i)
-            {
-                for ( unsigned int k = 0;k < allActionsVectors[i]->size() ;k++ )
-                {
-                    if ( allActionsVectors[i]->at(k).GetType() == "PlaySound" || allActionsVectors[i]->at(k).GetType() == "PlaySoundCanal" )
-                    {
-                        //Rajout répertoire
-                        allActionsVectors[i]->at(k).SetParameter(0, GDExpression(rep + allActionsVectors[i]->at(k).GetParameterSafely(0).GetPlainString()));
-                    }
-                    if ( allActionsVectors[i]->at(k).GetType() == "PlayMusic" || allActionsVectors[i]->at(k).GetType() == "PlayMusicCanal" )
-                    {
-                        //Rajout répertoire
-                        allActionsVectors[i]->at(k).SetParameter(0, GDExpression(rep + allActionsVectors[i]->at(k).GetParameterSafely(0).GetPlainString()));
-                    }
-                    if ( allActionsVectors[i]->at(k).GetType() == "EcrireTexte" )
-                    {
-                        if ( !allActionsVectors[i]->at(k).GetParameterSafely(5).GetPlainString().empty() )
-                        {
-                            //Rajout répertoire
-                            allActionsVectors[i]->at(k).SetParameter(5, GDExpression(rep + allActionsVectors[i]->at(k).GetParameterSafely(5).GetPlainString()));
-                        }
-                    }
-                }
-            }
-        }
-        wxSafeYield();
+        for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j) //Add objects resources
+        	game.scenes[i]->initialObjects[j]->PrepareResourcesForMerging(resourcesUnmergingHelper);
+
+        InventoryEventsResources(game, game.scenes[i]->events, resourcesUnmergingHelper);
     }
+    for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
+        game.globalObjects[j]->PrepareResourcesForMerging(resourcesUnmergingHelper);
 #endif //GDE
 }

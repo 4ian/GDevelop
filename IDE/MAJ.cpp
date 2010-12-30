@@ -207,18 +207,18 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
     if ( wxMessageBox(_("Attention, Game Develop sera fermé à la fin du téléchargement afin d'installer la nouvelle version. Pensez à sauvegarder votre travail.\nContinuer ?"), _("Installation de la nouvelle version"), wxYES_NO | wxICON_QUESTION, this) == wxNO )
         return;
 
+    wxString tempDir = wxFileName::GetHomeDir()+"/.Game Develop";
+
     //Open connection to file
     wxHTTP http;
     wxURL *url = new wxURL(_T("http://www.compilgames.net/dl/gd.exe"));
     wxInputStream * input = url->GetInputStream();
 
-    wxString tempDir = wxFileName::GetHomeDir()+"/.Game Develop";
-
     if (input!=NULL) {
         unsigned int current_progress = 0;
         char buffer[1024];
 
-        wxProgressDialog progress(_("Téléchargement"),_("Progression du téléchargement"),(int)input->GetSize(), NULL, wxPD_CAN_ABORT | wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_ELAPSED_TIME | wxPD_ESTIMATED_TIME);
+        wxProgressDialog progress(_("Téléchargement"),_("Progression du téléchargement"),(int)input->GetSize(), NULL, wxPD_CAN_ABORT | wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_ELAPSED_TIME | wxPD_REMAINING_TIME);
         wxFileOutputStream outputfile(tempDir+"/newgd.exe");
         while(!input->Eof() && current_progress!=input->GetSize()) { //Download part as long we haven't reached the end
             input->Read((void *)buffer,1024);

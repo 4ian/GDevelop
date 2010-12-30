@@ -6,6 +6,7 @@
 #include <wx/stattext.h>
 #include <wx/radiobox.h>
 #include <wx/textctrl.h>
+#include <wx/checkbox.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
 #include <wx/button.h>
@@ -40,6 +41,7 @@ class EditPropScene: public wxDialog
 		wxStaticLine* StaticLine1;
 		wxButton* AnnulerBt;
 		wxPanel* Panel2;
+		wxCheckBox* stopSoundsCheck;
 		wxStaticText* StaticText4;
 		wxRadioBox* TriBox;
 		wxButton* AideBt;
@@ -55,6 +57,7 @@ class EditPropScene: public wxDialog
 		static const long ID_TEXTCTRL1;
 		static const long ID_PANEL1;
 		static const long ID_BUTTON1;
+		static const long ID_CHECKBOX1;
 		static const long ID_RADIOBOX1;
 		static const long ID_STATICTEXT3;
 		static const long ID_STATICTEXT4;

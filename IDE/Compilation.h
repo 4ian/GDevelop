@@ -31,7 +31,7 @@ class Compilation: public wxDialog
 {
 	public:
 
-		Compilation(wxWindow* parent, Game * jeu);
+		Compilation(wxWindow* parent, const Game & gameToCompile_);
 		virtual ~Compilation();
 
 		//(*Declarations(Compilation)
@@ -109,22 +109,17 @@ class Compilation: public wxDialog
 		void OnCompilBtClick(wxCommandEvent& event);
 		void OnOuvrirBtClick(wxCommandEvent& event);
 		void OnAideBtClick(wxCommandEvent& event);
-		void OnTypeBoxSelect(wxCommandEvent& event);
 		void OnNext1Click(wxCommandEvent& event);
 		void OnNext2Click(wxCommandEvent& event);
 		void OnCGShareBtClick(wxCommandEvent& event);
 		void OnDistribuerBtClick(wxCommandEvent& event);
 		//*)
 
-        string CopyAndReduceFileName( string file, string & report );
-        void CopyEventsRes(const Game & Jeu, vector < BaseEventSPtr > & events, string & report);
-        void PrepareTempDir(string & report);
-		Game * m_jeu;
-		bool IsCompressing;
+        void ClearDirectory(std::string directory, string & report);
+		const Game & gameToCompile;
 		wxString GetTempDir();
 
-		wxString dirFinal;
-		wxString fileFinal;
+		wxString destinationDirectory;
 
 		DECLARE_EVENT_TABLE()
 };

@@ -70,9 +70,20 @@ const long EditPropJeu::ID_CHECKBOX8 = wxNewId();
 const long EditPropJeu::ID_STATICTEXT13 = wxNewId();
 const long EditPropJeu::ID_BUTTON4 = wxNewId();
 const long EditPropJeu::ID_PANEL3 = wxNewId();
+const long EditPropJeu::ID_STATICTEXT14 = wxNewId();
+const long EditPropJeu::ID_TEXTCTRL13 = wxNewId();
+const long EditPropJeu::ID_STATICTEXT16 = wxNewId();
+const long EditPropJeu::ID_STATICTEXT15 = wxNewId();
+const long EditPropJeu::ID_STATICBITMAP6 = wxNewId();
+const long EditPropJeu::ID_TEXTCTRL14 = wxNewId();
+const long EditPropJeu::ID_BUTTON5 = wxNewId();
+const long EditPropJeu::ID_STATICTEXT17 = wxNewId();
+const long EditPropJeu::ID_TEXTCTRL15 = wxNewId();
+const long EditPropJeu::ID_PANEL4 = wxNewId();
 const long EditPropJeu::ID_NOTEBOOK1 = wxNewId();
 const long EditPropJeu::ID_STATICLINE3 = wxNewId();
 const long EditPropJeu::ID_BUTTON1 = wxNewId();
+const long EditPropJeu::ID_BUTTON6 = wxNewId();
 const long EditPropJeu::ID_BUTTON2 = wxNewId();
 //*)
 
@@ -81,18 +92,26 @@ BEGIN_EVENT_TABLE( EditPropJeu, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
+EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
+    game(game_)
 {
     //(*Initialize(EditPropJeu)
+    wxStaticBoxSizer* StaticBoxSizer2;
     wxFlexGridSizer* FlexGridSizer4;
     wxFlexGridSizer* FlexGridSizer16;
+    wxFlexGridSizer* FlexGridSizer24;
     wxFlexGridSizer* FlexGridSizer19;
+    wxFlexGridSizer* FlexGridSizer23;
     wxFlexGridSizer* FlexGridSizer10;
     wxFlexGridSizer* FlexGridSizer3;
+    wxFlexGridSizer* FlexGridSizer27;
+    wxFlexGridSizer* FlexGridSizer25;
     wxFlexGridSizer* FlexGridSizer5;
+    wxFlexGridSizer* FlexGridSizer22;
     wxFlexGridSizer* FlexGridSizer9;
     wxFlexGridSizer* FlexGridSizer2;
     wxFlexGridSizer* FlexGridSizer7;
+    wxStaticBoxSizer* StaticBoxSizer3;
     wxFlexGridSizer* FlexGridSizer15;
     wxFlexGridSizer* FlexGridSizer18;
     wxFlexGridSizer* FlexGridSizer8;
@@ -106,7 +125,9 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
     wxFlexGridSizer* FlexGridSizer1;
     wxFlexGridSizer* FlexGridSizer11;
     wxFlexGridSizer* FlexGridSizer17;
-    
+    wxFlexGridSizer* FlexGridSizer28;
+    wxFlexGridSizer* FlexGridSizer26;
+
     Create(parent, wxID_ANY, _("Editer les propriétés du jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer1->AddGrowableCol(0);
@@ -271,8 +292,55 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
     Panel3->SetSizer(FlexGridSizer7);
     FlexGridSizer7->Fit(Panel3);
     FlexGridSizer7->SetSizeHints(Panel3);
+    Panel4 = new wxPanel(Notebook1, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL4"));
+    FlexGridSizer22 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer22->AddGrowableCol(0);
+    StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Windows"));
+    FlexGridSizer23 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer23->AddGrowableCol(0);
+    FlexGridSizer24 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer24->AddGrowableCol(1);
+    StaticText14 = new wxStaticText(Panel4, ID_STATICTEXT14, _("Nom de l\'executable Windows :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
+    FlexGridSizer24->Add(StaticText14, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    winExeEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL13, _("PlayWin"), wxDefaultPosition, wxDefaultSize, wxTE_RIGHT, wxDefaultValidator, _T("ID_TEXTCTRL13"));
+    FlexGridSizer24->Add(winExeEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText16 = new wxStaticText(Panel4, ID_STATICTEXT16, _(".exe"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT16"));
+    FlexGridSizer24->Add(StaticText16, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer23->Add(FlexGridSizer24, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    FlexGridSizer25 = new wxFlexGridSizer(0, 4, 0, 0);
+    FlexGridSizer25->AddGrowableCol(2);
+    StaticText15 = new wxStaticText(Panel4, ID_STATICTEXT15, _("Icône :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT15"));
+    FlexGridSizer25->Add(StaticText15, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+    iconPreview = new wxStaticBitmap(Panel4, ID_STATICBITMAP6, wxNullBitmap, wxDefaultPosition, wxSize(32,32), wxSIMPLE_BORDER, _T("ID_STATICBITMAP6"));
+    FlexGridSizer25->Add(iconPreview, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer26 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer26->AddGrowableCol(0);
+    winIconEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL14, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL14"));
+    FlexGridSizer26->Add(winIconEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer25->Add(FlexGridSizer26, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    browseIcon = new wxButton(Panel4, ID_BUTTON5, _("Parcourir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
+    FlexGridSizer25->Add(browseIcon, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer23->Add(FlexGridSizer25, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    StaticBoxSizer2->Add(FlexGridSizer23, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    FlexGridSizer22->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Linux"));
+    FlexGridSizer27 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer27->AddGrowableCol(0);
+    FlexGridSizer28 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer28->AddGrowableCol(1);
+    StaticText17 = new wxStaticText(Panel4, ID_STATICTEXT17, _("Nom de l\'executable Linux :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT17"));
+    FlexGridSizer28->Add(StaticText17, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    linuxExeEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL15, _("PlayLinux"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL15"));
+    FlexGridSizer28->Add(linuxExeEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer27->Add(FlexGridSizer28, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    StaticBoxSizer3->Add(FlexGridSizer27, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    FlexGridSizer22->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Panel4->SetSizer(FlexGridSizer22);
+    FlexGridSizer22->Fit(Panel4);
+    FlexGridSizer22->SetSizeHints(Panel4);
     Notebook1->AddPage(Panel2, _("Paramètres du jeu"), false);
     Notebook1->AddPage(Panel3, _("Ecran de chargement"), false);
+    Notebook1->AddPage(Panel4, _("Executables"), false);
     FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer12->AddGrowableCol(0);
@@ -283,6 +351,8 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
     FlexGridSizer6->AddGrowableCol(0);
     OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     FlexGridSizer6->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+    cancelBt = new wxButton(this, ID_BUTTON6, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
+    FlexGridSizer6->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     AideBt = new wxButton(this, ID_BUTTON2, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     FlexGridSizer6->Add(AideBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -290,55 +360,57 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
     FlexGridSizer1->Fit(this);
     FlexGridSizer1->SetSizeHints(this);
     Center();
-    
+
     Connect(ID_CHECKBOX5,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnFPSmaxCheckClick);
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnBrowseBtClick);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnButton2Click);
+    Connect(ID_TEXTCTRL14,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditPropJeu::OnwinIconEditText);
+    Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnbrowseIconClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnOkBtClick);
+    Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OncancelBtClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnAideBtClick);
     //*)
 
-    m_jeu = pJeu;
-    NomEdit->ChangeValue( m_jeu->name );
-    AuteurEdit->ChangeValue( m_jeu->author );
+    NomEdit->ChangeValue( game.name );
+    AuteurEdit->ChangeValue( game.author );
 
-    HeightEdit->ChangeValue(ToString( m_jeu->windowHeight ) );
-    WidthEdit->ChangeValue(ToString( m_jeu->windowWidth ) );
+    HeightEdit->ChangeValue(ToString( game.windowHeight ) );
+    WidthEdit->ChangeValue(ToString( game.windowWidth ) );
 
     afficherEcranCheck->SetValue( true );
-    if ( !m_jeu->loadingScreen.afficher )
+    if ( !game.loadingScreen.afficher )
         afficherEcranCheck->SetValue( false );
 
 
-    widthECEdit->ChangeValue(ToString( m_jeu->loadingScreen.width ) );
-    heightECEdit->ChangeValue(ToString( m_jeu->loadingScreen.height ) );
+    widthECEdit->ChangeValue(ToString( game.loadingScreen.width ) );
+    heightECEdit->ChangeValue(ToString( game.loadingScreen.height ) );
 
     texteCheck->SetValue( true );
-    if ( !m_jeu->loadingScreen.texte )
+    if ( !game.loadingScreen.texte )
         texteCheck->SetValue( false );
 
-    texteXPosEdit->ChangeValue(ToString( m_jeu->loadingScreen.texteXPos ) );
-    texteYPosEdit->ChangeValue(ToString( m_jeu->loadingScreen.texteYPos ) );
-    texteEdit->ChangeValue( m_jeu->loadingScreen.texteChargement );
+    texteXPosEdit->ChangeValue(ToString( game.loadingScreen.texteXPos ) );
+    texteYPosEdit->ChangeValue(ToString( game.loadingScreen.texteYPos ) );
+    texteEdit->ChangeValue( game.loadingScreen.texteChargement );
 
     pourcentCheck->SetValue( false );
-    if ( m_jeu->loadingScreen.pourcent )
+    if ( game.loadingScreen.pourcent )
         pourcentCheck->SetValue( true );
 
-    pourcentXPosEdit->ChangeValue(ToString( m_jeu->loadingScreen.pourcentXPos ) );
-    pourcentYPosEdit->ChangeValue(ToString( m_jeu->loadingScreen.pourcentYPos ) );
+    pourcentXPosEdit->ChangeValue(ToString( game.loadingScreen.pourcentXPos ) );
+    pourcentYPosEdit->ChangeValue(ToString( game.loadingScreen.pourcentYPos ) );
 
     imageCheck->SetValue( false );
-    if ( m_jeu->loadingScreen.image )
+    if ( game.loadingScreen.image )
         imageCheck->SetValue( true );
 
-    imageEdit->ChangeValue( m_jeu->loadingScreen.imageFichier );
+    imageEdit->ChangeValue( game.loadingScreen.imageFichier );
 
-    borderCheck->SetValue(m_jeu->loadingScreen.border);
-    smoothCheck->SetValue(m_jeu->loadingScreen.smooth);
+    borderCheck->SetValue(game.loadingScreen.border);
+    smoothCheck->SetValue(game.loadingScreen.smooth);
 
-    SyncCheck->SetValue( m_jeu->verticalSync );
-    if ( m_jeu->maxFPS == -1 )
+    SyncCheck->SetValue( game.verticalSync );
+    if ( game.maxFPS == -1 )
     {
         FPSmaxCheck->SetValue(false);
         FPSmax->Enable(false);
@@ -346,11 +418,14 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game * pJeu )
     else
     {
         FPSmaxCheck->SetValue(true);
-        FPSmax->SetValue(m_jeu->maxFPS);
+        FPSmax->SetValue(game.maxFPS);
     }
 
-    FPSmin->SetValue(m_jeu->minFPS);
+    FPSmin->SetValue(game.minFPS);
 
+    winExeEdit->SetValue(game.winExecutableFilename);
+    winIconEdit->SetValue(game.winExecutableIconFile);
+    linuxExeEdit->SetValue(game.linuxExecutableFilename);
 
     //On vérifie si on est pas en mode simple.
     wxConfigBase * pConfig = wxConfigBase::Get();
@@ -398,8 +473,8 @@ EditPropJeu::~EditPropJeu()
 
 void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
 {
-    m_jeu->name = NomEdit->GetValue();
-    m_jeu->author = AuteurEdit->GetValue();
+    game.name = NomEdit->GetValue();
+    game.author = AuteurEdit->GetValue();
 
     {
         int i;
@@ -407,7 +482,7 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
         std::istringstream iss( width );
         if (( iss >> i ) && ( iss.eof() ) )
         {
-            m_jeu->windowWidth = i;
+            game.windowWidth = i;
             StaticBitmap1->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
         }
         else
@@ -423,7 +498,7 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
         std::istringstream iss2( height );
         if (( iss2 >> j ) && ( iss2.eof() ) )
         {
-            m_jeu->windowHeight = j;
+            game.windowHeight = j;
             StaticBitmap1->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
         }
         else
@@ -433,9 +508,9 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
         }
     }
 
-    m_jeu->loadingScreen.afficher=true;
+    game.loadingScreen.afficher=true;
     if ( !afficherEcranCheck->GetValue() )
-        m_jeu->loadingScreen.afficher=false;
+        game.loadingScreen.afficher=false;
 
     {
         int j;
@@ -443,7 +518,7 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
         std::istringstream iss( str );
         if (( iss >> j ) && ( iss.eof() ) )
         {
-            m_jeu->loadingScreen.width = j;
+            game.loadingScreen.width = j;
             StaticBitmap2->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
         }
         else
@@ -459,7 +534,7 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
         std::istringstream iss( str );
         if (( iss >> j ) && ( iss.eof() ) )
         {
-            m_jeu->loadingScreen.height = j;
+            game.loadingScreen.height = j;
             StaticBitmap2->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
         }
         else
@@ -469,18 +544,18 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
         }
     }
 
-    m_jeu->loadingScreen.texte=true;
+    game.loadingScreen.texte=true;
     if ( !texteCheck->GetValue() )
-        m_jeu->loadingScreen.texte=false;
+        game.loadingScreen.texte=false;
 
-    m_jeu->loadingScreen.texteChargement = static_cast<string>(texteEdit->GetValue());
+    game.loadingScreen.texteChargement = static_cast<string>(texteEdit->GetValue());
     {
         int j;
         string str = ( string ) texteXPosEdit->GetValue();
         std::istringstream iss( str );
         if (( iss >> j ) && ( iss.eof() ) )
         {
-            m_jeu->loadingScreen.texteXPos = j;
+            game.loadingScreen.texteXPos = j;
             StaticBitmap3->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
         }
         else
@@ -496,7 +571,7 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
         std::istringstream iss( str );
         if (( iss >> j ) && ( iss.eof() ) )
         {
-            m_jeu->loadingScreen.texteYPos = j;
+            game.loadingScreen.texteYPos = j;
             StaticBitmap3->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
         }
         else
@@ -507,16 +582,16 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
     }
 
 
-    m_jeu->loadingScreen.pourcent=false;
+    game.loadingScreen.pourcent=false;
     if ( pourcentCheck->GetValue() )
-        m_jeu->loadingScreen.pourcent=true;
+        game.loadingScreen.pourcent=true;
     {
         int j;
         string str = ( string ) pourcentXPosEdit->GetValue();
         std::istringstream iss( str );
         if (( iss >> j ) && ( iss.eof() ) )
         {
-            m_jeu->loadingScreen.pourcentXPos = j;
+            game.loadingScreen.pourcentXPos = j;
             StaticBitmap4->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
         }
         else
@@ -532,7 +607,7 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
         std::istringstream iss( str );
         if (( iss >> j ) && ( iss.eof() ) )
         {
-            m_jeu->loadingScreen.pourcentYPos = j;
+            game.loadingScreen.pourcentYPos = j;
             StaticBitmap4->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
         }
         else
@@ -542,21 +617,25 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
         }
     }
 
-    m_jeu->loadingScreen.image=false;
+    game.loadingScreen.image=false;
     if ( imageCheck->GetValue() )
-        m_jeu->loadingScreen.image=true;
+        game.loadingScreen.image=true;
 
-    m_jeu->loadingScreen.imageFichier = imageEdit->GetValue();
-    m_jeu->loadingScreen.border = borderCheck->GetValue();
-    m_jeu->loadingScreen.smooth = smoothCheck->GetValue();
+    game.loadingScreen.imageFichier = imageEdit->GetValue();
+    game.loadingScreen.border = borderCheck->GetValue();
+    game.loadingScreen.smooth = smoothCheck->GetValue();
 
     if ( FPSmaxCheck->GetValue() )
-        m_jeu->maxFPS = FPSmax->GetValue();
+        game.maxFPS = FPSmax->GetValue();
     else
-        m_jeu->maxFPS = -1;
+        game.maxFPS = -1;
 
-    m_jeu->minFPS = FPSmin->GetValue();
-    m_jeu->verticalSync = SyncCheck->GetValue();
+    game.minFPS = FPSmin->GetValue();
+    game.verticalSync = SyncCheck->GetValue();
+
+    game.winExecutableFilename = string(winExeEdit->GetValue().mb_str());
+    game.winExecutableIconFile = string(winIconEdit->GetValue().mb_str());
+    game.linuxExecutableFilename = string(linuxExeEdit->GetValue().mb_str());
 
     EndModal( 0 );
 }
@@ -693,7 +772,7 @@ void EditPropJeu::OnBrowseBtClick(wxCommandEvent& event)
     wxFileDialog dialog(this, _("Choisissez une image"), "", "", "Images|*.*");
     dialog.ShowModal();
 
-    if ( dialog.GetPath() != "" )
+    if ( !dialog.GetPath().empty() )
         imageEdit->ChangeValue(dialog.GetPath());
 }
 
@@ -703,4 +782,25 @@ void EditPropJeu::OnFPSmaxCheckClick(wxCommandEvent& event)
         FPSmax->Enable(true);
     else
         FPSmax->Enable(false);
+}
+
+void EditPropJeu::OncancelBtClick(wxCommandEvent& event)
+{
+    EndModal(1);
+}
+
+void EditPropJeu::OnwinIconEditText(wxCommandEvent& event)
+{
+    wxBitmap icon( winIconEdit->GetValue(), wxBITMAP_TYPE_ANY);
+    if ( icon.IsOk())
+        iconPreview->SetBitmap(icon);
+    iconPreview->SetSize(32,32);
+}
+
+void EditPropJeu::OnbrowseIconClick(wxCommandEvent& event)
+{
+    wxFileDialog fileDialog( this, _( "Choisissez une icône" ), "", "", "Icônes (*.ico)|*.ico" );
+    fileDialog.ShowModal();
+
+    if ( !fileDialog.GetPath().empty() ) winIconEdit->SetValue(fileDialog.GetPath());
 }

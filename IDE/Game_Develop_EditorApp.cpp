@@ -75,7 +75,7 @@
 #include "GDL/CommentEvent.h"
 #include <boost/archive/xml_iarchive.hpp>
 
-IMPLEMENT_APP( Game_Develop_EditorApp );
+IMPLEMENT_APP(Game_Develop_EditorApp)
 
 MemTrace MemTracer;
 
@@ -311,6 +311,7 @@ bool Game_Develop_EditorApp::OnInit()
                 if ( dialog.ShowModal() == 2 )
                 {
                     mainEditor->Destroy();
+                    return true;
                 }
             }
         }

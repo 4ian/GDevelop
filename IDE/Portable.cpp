@@ -13,7 +13,7 @@
 #include <vector>
 #include <wx/dirdlg.h>
 #include <wx/log.h>
-
+#include "GDL/ResourcesMergingHelper.h"
 #include "Portable.h"
 #include "GDL/Game.h"
 #include "GDL/OpenSaveGame.h"
@@ -41,8 +41,8 @@ BEGIN_EVENT_TABLE(Portable,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-Portable::Portable(wxWindow* parent, Game * pJeu) :
-jeu(pJeu)
+Portable::Portable(wxWindow* parent, Game * pgame) :
+jeu(pgame)
 {
 	//(*Initialize(Portable)
 	wxFlexGridSizer* FlexGridSizer2;
@@ -108,88 +108,61 @@ void Portable::OnButton2Click(wxCommandEvent& event)
 
 void Portable::OnButton1Click(wxCommandEvent& event)
 {
-
     wxDirDialog dialog(this, _("Choisissez le répertoire où sera rassemblé le jeu"));
     dialog.ShowModal();
 
-    string rep = static_cast<string> ( dialog.GetPath() );
-    if ( rep == "" ) return;
+    string rep = string( dialog.GetPath().mb_str() );
+    if ( rep.empty() ) return;
 
     //Copie du jeu
-    Game Jeu = *jeu;
+    Game game = *jeu;
 
-    //Image du chargement
-    if ( Jeu.loadingScreen.imageFichier != "" )
-        Jeu.loadingScreen.imageFichier = CopyAndReduceFileName(Jeu.loadingScreen.imageFichier, rep);
+    ResourcesMergingHelper resourcesMergingHelper;
 
-    //Images : copie et enlève le répertoire des chemins
-    for ( unsigned int i = 0;i < Jeu.images.size() ;i++ )
+    //Add loading image
+    if ( !game.loadingScreen.imageFichier.empty() )
+        game.loadingScreen.imageFichier = resourcesMergingHelper.GetNewFilename(game.loadingScreen.imageFichier);
+
+    //Add images
+    for ( unsigned int i = 0;i < game.images.size() ;i++ )
     {
-        Jeu.images.at( i ).file = CopyAndReduceFileName(Jeu.images.at( i ).file, rep); //Pour chaque image
-        AvancementGauge->SetValue(i/Jeu.images.size()*100/3);
-        wxSafeYield();
+        game.images.at( i ).file = resourcesMergingHelper.GetNewFilename(game.images.at( i ).file); //Pour chaque image
+        AvancementGauge->SetValue(i/game.images.size()*33.0f);
     }
-
-    for ( unsigned int s = 0;s < Jeu.scenes.size();s++ )
-    {
-        for ( unsigned int j = 0;j < Jeu.scenes[s]->events.size() ;j++ )
-        {
-            vector < vector<Instruction>* > allActionsVectors = Jeu.scenes[s]->events[j]->GetAllActionsVectors();
-            for (unsigned int i = 0;i<allActionsVectors.size();++i)
-            {
-                for ( unsigned int k = 0;k < allActionsVectors[i]->size() ;k++ )
-                {
-                    if ( allActionsVectors[i]->at(k).GetType() == "PlaySound" || allActionsVectors[i]->at(k).GetType() == "PlaySoundCanal" )
-                    {
-                        StaticText2->SetLabel( allActionsVectors[i]->at(k).GetParameterSafely( 0 ).GetPlainString() );
-                        //Copie et réduction du nom des sons
-                        allActionsVectors[i]->at(k).SetParameter( 0, CopyAndReduceFileName( allActionsVectors[i]->at(k).GetParameterSafely( 0 ).GetPlainString(), rep ));
-                    }
-                    if ( allActionsVectors[i]->at(k).GetType() == "PlayMusic" || allActionsVectors[i]->at(k).GetType() == "PlayMusicCanal" )
-                    {
-                        StaticText2->SetLabel( allActionsVectors[i]->at(k).GetParameterSafely( 0 ).GetPlainString() );
-                        //Copie et réduction du nom des musiques
-                        allActionsVectors[i]->at(k).SetParameter( 0, CopyAndReduceFileName( allActionsVectors[i]->at(k).GetParameterSafely( 0 ).GetPlainString(), rep ));
-                    }
-                    if ( allActionsVectors[i]->at(k).GetType() == "EcrireTexte" )
-                    {
-                        if ( allActionsVectors[i]->at(k).GetParameterSafely( 5 ).GetPlainString() != "" )
-                        {
-
-                            StaticText2->SetLabel( allActionsVectors[i]->at(k).GetParameterSafely( 5 ).GetPlainString() );
-                            //Copie et réduction du nom des musiques
-                            allActionsVectors[i]->at(k).SetParameter( 5, CopyAndReduceFileName( allActionsVectors[i]->at(k).GetParameterSafely( 5 ).GetPlainString(), rep ));
-                        }
-                    }
-                }
-            }
-        }
-        wxSafeYield();
-        AvancementGauge->SetValue(s/Jeu.scenes.size()*100/3+33);
-    }
-
     wxSafeYield();
-    Jeu.portable = true;
-    OpenSaveGame saveGame(Jeu);
-    saveGame.SaveToFile(rep+"/Game.gdg");
 
-    Jeu.portable = false;
+    //Add scenes resources
+    for ( unsigned int s = 0;s < game.scenes.size();s++ )
+    {
+        for (unsigned int j = 0;j<game.scenes[s]->initialObjects.size();++j) //Add objects resources
+        	game.scenes[s]->initialObjects[j]->PrepareResourcesForMerging(resourcesMergingHelper);
+
+        InventoryEventsResources(game, game.scenes[s]->events, resourcesMergingHelper);
+        AvancementGauge->SetValue(s/game.scenes.size()*16.0f+33.0f);
+    }
+    wxSafeYield();
+    //Add global objects resources
+    for (unsigned int j = 0;j<game.globalObjects.size();++j)
+        game.globalObjects[j]->PrepareResourcesForMerging(resourcesMergingHelper);
+    wxSafeYield();
+
+    //Copy resources
+    map<string, string> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesNewFilename();
+    unsigned int i = 0;
+    for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
+    {
+        if ( !it->first.empty() && wxCopyFile( it->first, rep + "/" + it->second, true ) == false )
+            wxLogWarning( _( "Impossible de copier \""+it->first+"\" dans le répertoire de compilation.\n" ) );
+
+        ++i;
+        AvancementGauge->SetValue( i/static_cast<float>(resourcesNewFilename.size())*50.0f + 50.0f );
+        wxSafeYield();
+    }
+
+    game.portable = true;
+    OpenSaveGame saveGame(game);
+    saveGame.SaveToFile(rep+"/Game.gdg");
 
     AvancementGauge->SetValue(100);
     wxLogMessage(_("Le jeu est disponible dans le répertoire choisi sous le nom de Game.gdg."));
-}
-
-string Portable::CopyAndReduceFileName( string file, string rep )
-{
-    string Complet = file;
-    string FileName = static_cast<string>( wxFileNameFromPath( Complet ) );
-
-    if ( wxCopyFile( Complet, rep+"/" + FileName, true ) == false ) //Copie
-    {
-        string error = ( string )_( "Erreur lors de la copie de" ) + Complet + ( string )_( "\n. Des fichiers risquent de manquer." );
-
-        wxLogError( error.c_str() );
-    }
-
-    return FileName; //Changement du nom
 }

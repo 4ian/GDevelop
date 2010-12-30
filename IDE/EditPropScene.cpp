@@ -28,6 +28,7 @@
 const long EditPropScene::ID_TEXTCTRL1 = wxNewId();
 const long EditPropScene::ID_PANEL1 = wxNewId();
 const long EditPropScene::ID_BUTTON1 = wxNewId();
+const long EditPropScene::ID_CHECKBOX1 = wxNewId();
 const long EditPropScene::ID_RADIOBOX1 = wxNewId();
 const long EditPropScene::ID_STATICTEXT3 = wxNewId();
 const long EditPropScene::ID_STATICTEXT4 = wxNewId();
@@ -53,6 +54,7 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
 	//(*Initialize(EditPropScene)
 	wxStaticBoxSizer* StaticBoxSizer2;
 	wxFlexGridSizer* FlexGridSizer4;
+	wxStaticBoxSizer* StaticBoxSizer4;
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer5;
 	wxFlexGridSizer* FlexGridSizer9;
@@ -64,7 +66,7 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
 	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
-	
+
 	Create(parent, wxID_ANY, _("Editer les propriétés de la scène"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
@@ -105,7 +107,12 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
 	StaticBoxSizer1->Add(FlexGridSizer4, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	GridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	wxString __wxRadioBoxChoices_1[2] = 
+	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Musiques et sons"));
+	stopSoundsCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Stopper tous les sons et musiques au démarrage"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	stopSoundsCheck->SetValue(true);
+	StaticBoxSizer4->Add(stopSoundsCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer5->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	wxString __wxRadioBoxChoices_1[2] =
 	{
 		_("Tri rapide ( rapide mais risque de \"clignotement\" )"),
 		_("Tri stable ( plus lent mais pas de \"clignotement\" )")
@@ -159,7 +166,7 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 	Center();
-	
+
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropScene::OnColorBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropScene::OnOkBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropScene::OnAnnulerBtClick);
@@ -180,6 +187,7 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
     fovEdit->SetValue(ToString(scene->oglFOV));
     zNearEdit->SetValue(ToString(scene->oglZNear));
     zFarEdit->SetValue(ToString(scene->oglZFar));
+    stopSoundsCheck->SetValue(scene->stopSoundsOnStartup);
 
     //On vérifie si on est pas en mode simple.
     wxConfigBase * pConfig = wxConfigBase::Get();
@@ -211,6 +219,7 @@ void EditPropScene::OnOkBtClick(wxCommandEvent& event)
     scene->oglFOV = ToFloat(string(fovEdit->GetValue().mb_str()));
     scene->oglZNear = ToFloat(string(zNearEdit->GetValue().mb_str()));
     scene->oglZFar = ToFloat(string(zFarEdit->GetValue().mb_str()));
+    scene->stopSoundsOnStartup = stopSoundsCheck->GetValue();
 
     if ( TriBox->GetSelection() == 0 )
         scene->standardSortMethod = true;

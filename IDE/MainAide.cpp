@@ -95,7 +95,10 @@ void Game_Develop_EditorFrame::OnMenuItem36Selected(wxCommandEvent& event)
 {
     MAJ dialog(this);
     if ( dialog.ShowModal() == 2)
+    {
         Destroy();
+        wxExit();
+    }
 }
 
 ////////////////////////////////////////////////////////////

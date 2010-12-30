@@ -20,7 +20,7 @@ class EditPropJeu: public wxDialog
 {
 	public:
 
-		EditPropJeu(wxWindow* parent, Game * pJeu);
+		EditPropJeu(wxWindow* parent, Game & game_);
 		virtual ~EditPropJeu();
 
 		//(*Declarations(EditPropJeu)
@@ -36,11 +36,15 @@ class EditPropJeu: public wxDialog
 		wxNotebook* Notebook1;
 		wxTextCtrl* texteXPosEdit;
 		wxTextCtrl* AuteurEdit;
+		wxStaticBitmap* iconPreview;
 		wxStaticText* StaticText13;
 		wxStaticText* StaticText2;
+		wxPanel* Panel4;
+		wxStaticText* StaticText14;
 		wxButton* BrowseBt;
 		wxStaticText* StaticText6;
 		wxStaticBitmap* StaticBitmap1;
+		wxTextCtrl* winExeEdit;
 		wxStaticText* StaticText8;
 		wxStaticText* StaticText11;
 		wxStaticBitmap* StaticBitmap4;
@@ -49,6 +53,7 @@ class EditPropJeu: public wxDialog
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
 		wxCheckBox* SyncCheck;
+		wxButton* cancelBt;
 		wxButton* Button2;
 		wxPanel* Panel3;
 		wxCheckBox* pourcentCheck;
@@ -56,9 +61,13 @@ class EditPropJeu: public wxDialog
 		wxStaticText* StaticText5;
 		wxTextCtrl* NomEdit;
 		wxStaticText* StaticText7;
+		wxTextCtrl* winIconEdit;
 		wxStaticLine* StaticLine3;
 		wxStaticLine* StaticLine1;
+		wxTextCtrl* linuxExeEdit;
 		wxTextCtrl* texteEdit;
+		wxButton* browseIcon;
+		wxStaticText* StaticText15;
 		wxCheckBox* imageCheck;
 		wxStaticText* StaticText12;
 		wxTextCtrl* pourcentXPosEdit;
@@ -67,8 +76,10 @@ class EditPropJeu: public wxDialog
 		wxPanel* Panel2;
 		wxCheckBox* smoothCheck;
 		wxTextCtrl* pourcentYPosEdit;
+		wxStaticText* StaticText17;
 		wxStaticText* StaticText4;
 		wxCheckBox* texteCheck;
+		wxStaticText* StaticText16;
 		wxCheckBox* borderCheck;
 		wxStaticBitmap* StaticBitmap3;
 		wxSpinCtrl* FPSmin;
@@ -76,7 +87,6 @@ class EditPropJeu: public wxDialog
 		wxButton* AideBt;
 		//*)
 
-		Game * m_jeu;
 
 	protected:
 
@@ -127,9 +137,20 @@ class EditPropJeu: public wxDialog
 		static const long ID_STATICTEXT13;
 		static const long ID_BUTTON4;
 		static const long ID_PANEL3;
+		static const long ID_STATICTEXT14;
+		static const long ID_TEXTCTRL13;
+		static const long ID_STATICTEXT16;
+		static const long ID_STATICTEXT15;
+		static const long ID_STATICBITMAP6;
+		static const long ID_TEXTCTRL14;
+		static const long ID_BUTTON5;
+		static const long ID_STATICTEXT17;
+		static const long ID_TEXTCTRL15;
+		static const long ID_PANEL4;
 		static const long ID_NOTEBOOK1;
 		static const long ID_STATICLINE3;
 		static const long ID_BUTTON1;
+		static const long ID_BUTTON6;
 		static const long ID_BUTTON2;
 		//*)
 
@@ -142,7 +163,12 @@ class EditPropJeu: public wxDialog
 		void OnButton2Click(wxCommandEvent& event);
 		void OnBrowseBtClick(wxCommandEvent& event);
 		void OnFPSmaxCheckClick(wxCommandEvent& event);
+		void OncancelBtClick(wxCommandEvent& event);
+		void OnwinIconEditText(wxCommandEvent& event);
+		void OnbrowseIconClick(wxCommandEvent& event);
 		//*)
+
+		Game & game;
 
 		DECLARE_EVENT_TABLE()
 };

@@ -625,6 +625,8 @@
 		</Unit>
 		<Unit filename="EventsRefactorer.cpp" />
 		<Unit filename="EventsRefactorer.h" />
+		<Unit filename="ExecutableIconChanger.cpp" />
+		<Unit filename="ExecutableIconChanger.h" />
 		<Unit filename="Extensions.cpp" />
 		<Unit filename="Extensions.h" />
 		<Unit filename="ExternalEventsEditor.cpp" />

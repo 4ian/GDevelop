@@ -926,7 +926,7 @@ void ProjectManager::OneditPropGameMenuItemSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    EditPropJeu Dialog( this, game );
+    EditPropJeu Dialog( this, *game );
     Dialog.ShowModal();
 
     projectsTree->SetItemText(selectedItem, game->name); //The name can have been changed

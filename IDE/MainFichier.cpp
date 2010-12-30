@@ -254,7 +254,7 @@ void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event 
 {
     if ( !CurrentGameIsValid() ) return;
 
-    Compilation Dialog( this, GetCurrentGame().get() );
+    Compilation Dialog( this, *GetCurrentGame() );
     Dialog.ShowModal();
 }
 

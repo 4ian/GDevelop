@@ -2,7 +2,6 @@
 #define RENDERDIALOG_H
 
 //(*Headers(RenderDialog)
-#include <wx/sizer.h>
 #include "wxSFMLCanvas.hpp"
 #include <wx/dialog.h>
 //*)
@@ -13,6 +12,8 @@ class RenderDialog: public wxDialog
 
 		RenderDialog(wxWindow* parent);
 		virtual ~RenderDialog();
+
+		void SetSizeOfRenderingZone(unsigned int width, unsigned int height);
 
 		//(*Declarations(RenderDialog)
 		wxSFMLCanvas* renderCanvas;
@@ -27,7 +28,6 @@ class RenderDialog: public wxDialog
 	private:
 
 		//(*Handlers(RenderDialog)
-		void OnResize(wxSizeEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

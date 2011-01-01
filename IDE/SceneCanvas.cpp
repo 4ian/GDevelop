@@ -331,7 +331,7 @@ void SceneCanvas::UpdateSize()
         Window::SetSize(game.windowWidth, game.windowHeight);
         wxWindowBase::SetSize(game.windowWidth, game.windowHeight);
 
-        externalWindow->SetSize(game.windowWidth, game.windowHeight);
+        externalWindow->SetSizeOfRenderingZone(game.windowWidth, game.windowHeight);
 
         //Scene is centered in preview mode
         wxWindowBase::SetSize((parentPanel->GetSize().GetWidth()-wxWindowBase::GetSize().GetX())/2,

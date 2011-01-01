@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1286216833 source:d:\florian\programmation\gamedevelop\ide\automatismtypechoice.cpp
+1293729435 source:d:\florian\programmation\gamedevelop\ide\automatismtypechoice.cpp
 	"AutomatismTypeChoice.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -10884,8 +10884,7 @@
 	<string>
 	<vector>
 
-1266005150 d:\florian\programmation\gamedevelop\ide\renderdialog.h
-	<wx/sizer.h>
+1293729467 d:\florian\programmation\gamedevelop\ide\renderdialog.h
 	"wxSFMLCanvas.hpp"
 	<wx/dialog.h>
 
@@ -11056,7 +11055,7 @@
 	"GDL/Position.h"
 	"GDL/Object.h"
 
-1293393468 source:d:\florian\programmation\gamedevelop\ide\editpropjeu.cpp
+1293722168 source:d:\florian\programmation\gamedevelop\ide\editpropjeu.cpp
 	"EditPropJeu.h"
 	"nommgr.h"
 	<wx/bitmap.h>
@@ -11185,7 +11184,7 @@
 	<wx/dialog.h>
 	"GDL/Scene.h"
 
-1291928091 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
+1293752744 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"EditorEvents.h"
@@ -11525,7 +11524,7 @@
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
-1291932823 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
+1293719297 source:d:\florian\programmation\gamedevelop\ide\editorscene.cpp
 	"EditorScene.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -12997,13 +12996,13 @@
 1264360534 source:d:\florian\programmation\gamedevelop\ide\recentlist.cpp
 	"RecentList.h"
 
-1286216603 source:d:\florian\programmation\gamedevelop\ide\renderdialog.cpp
+1293729995 source:d:\florian\programmation\gamedevelop\ide\renderdialog.cpp
 	"RenderDialog.h"
 	<wx/intl.h>
 	<wx/string.h>
 	<iostream>
 
-1292183155 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1293728274 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -13123,7 +13122,7 @@
 
 1263934043 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1293658396 d:\florian\programmation\gamedevelop\ide\version.h
+1293752744 d:\florian\programmation\gamedevelop\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

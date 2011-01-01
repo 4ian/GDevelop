@@ -19,17 +19,8 @@ END_EVENT_TABLE()
 RenderDialog::RenderDialog(wxWindow* parent)
 {
 	//(*Initialize(RenderDialog)
-	wxFlexGridSizer* FlexGridSizer1;
-	
 	Create(parent, wxID_ANY, _("Aperçu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
-	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	renderCanvas = new wxSFMLCanvas(this,ID_CUSTOM1,wxDefaultPosition,wxSize(800,600),wxWANTS_CHARS | wxNO_BORDER);
-	FlexGridSizer1->Add(renderCanvas, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	SetSizer(FlexGridSizer1);
-	FlexGridSizer1->Fit(this);
-	FlexGridSizer1->SetSizeHints(this);
-	
-	Connect(wxEVT_SIZE,(wxObjectEventFunction)&RenderDialog::OnResize);
 	//*)
 }
 
@@ -43,8 +34,13 @@ RenderDialog::~RenderDialog()
 /**
  * Resize manually the canvas to accord to windows size.
  */
-void RenderDialog::OnResize(wxSizeEvent& event)
+void RenderDialog::SetSizeOfRenderingZone(unsigned int width, unsigned int height)
 {
-    renderCanvas->sf::RenderWindow::SetSize(event.GetSize().GetWidth(), event.GetSize().GetHeight());
-    renderCanvas->wxWindowBase::SetVirtualSize(event.GetSize());
+    renderCanvas->sf::RenderWindow::SetSize(width, height);
+    renderCanvas->wxWindowBase::SetSize(wxSize(width, height));
+
+    SetVirtualSize(width, height);
+
+    Update();
+    Refresh();
 }

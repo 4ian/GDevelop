@@ -791,9 +791,10 @@ void EditPropJeu::OncancelBtClick(wxCommandEvent& event)
 
 void EditPropJeu::OnwinIconEditText(wxCommandEvent& event)
 {
+    if ( !wxFileExists(winIconEdit->GetValue()) ) return;
+
     wxBitmap icon( winIconEdit->GetValue(), wxBITMAP_TYPE_ANY);
-    if ( icon.IsOk())
-        iconPreview->SetBitmap(icon);
+    if ( icon.IsOk() ) iconPreview->SetBitmap(icon);
     iconPreview->SetSize(32,32);
 }
 

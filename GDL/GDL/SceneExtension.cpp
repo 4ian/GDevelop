@@ -2,7 +2,8 @@
 #include "GDL/aWindow.h"
 #include "GDL/actions.h"
 #include "GDL/conditions.h"
-
+#include "GDL/cScene.h"
+#include "GDL/aScene.h"
 #include "GDL/ExtensionBase.h"
 
 SceneExtension::SceneExtension()

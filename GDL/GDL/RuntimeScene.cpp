@@ -1,13 +1,11 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-#include <exception>
-#include <stdexcept>
 #include <sstream>
 #include "GDL/RuntimeScene.h"
 #include "GDL/Scene.h"
@@ -36,8 +34,9 @@ RuntimeLayer RuntimeScene::badLayer;
 
 RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
 renderWindow(renderWindow_),
-game(game_),
 input(&renderWindow->GetInput()),
+inputKeyPressed(false),
+game(game_),
 #ifdef GDE
 debugger(NULL),
 profiler(NULL),
@@ -94,7 +93,6 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;
     backgroundColorB = scene.backgroundColorB;
-    errors = scene.errors;
 
     firstLoop = scene.firstLoop;
     isFullScreen = scene.isFullScreen;
@@ -239,13 +237,9 @@ void RuntimeScene::ManageRenderTargetEvents()
             #endif
         }
         else if (event.Type == sf::Event::KeyPressed)
-        {
             inputKeyPressed = true;
-        }
         else if (event.Type == sf::Event::KeyReleased )
-        {
             inputKeyPressed = false;
-        }
         else if (event.Type == sf::Event::Resized)
         {
             //Resetup OpenGL
@@ -595,15 +589,9 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
             newObject = initialObjects[IDsceneObject]->Clone();
         else if ( IDglobalObject != -1 ) //Then the global object list
             newObject = game->globalObjects.at( IDglobalObject )->Clone();
-        else
-        {
-            string nom = scene.initialObjectsPositions[i].objectName;
-            errors.Add( "N'a pas pu trouver et positionner l'objet nommé " + nom + " ( N'existe pas dans la liste des objets de la scène ou globale )", "", nom, -1, 2 );
-        }
 
         if ( newObject != boost::shared_ptr<Object> () )
         {
-            newObject->errors = &errors;
             newObject->SetX( scene.initialObjectsPositions[i].x );
             newObject->SetY( scene.initialObjectsPositions[i].y );
             newObject->SetZOrder( scene.initialObjectsPositions[i].zOrder );
@@ -621,6 +609,8 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
             objectsInstances.AddObject(newObject);
         }
+        else
+            std::cout << "Could not find and put object " << scene.initialObjectsPositions[i].objectName << std::endl;
     }
 
     //Preprocess events

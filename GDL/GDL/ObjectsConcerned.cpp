@@ -2,7 +2,6 @@
 #include "GDL/Object.h"
 #include <boost/shared_ptr.hpp>
 #include "GDL/ObjectGroup.h"
-#include "GDL/ObjectType.h"
 #include "GDL/profile.h"
 
 ObjectsConcerned::ObjectsConcerned(ObjInstancesHolder * allObjects_, vector < ObjectGroup > * allGroups_ ) :

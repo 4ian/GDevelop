@@ -1,13 +1,9 @@
 #ifndef AWINDOW_H
 #define AWINDOW_H
 
-#include "GDL/RuntimeScene.h"
-#include "GDL/Instruction.h"
-
-#include <string>
-#include <vector>
-
-using namespace std;
+class RuntimeScene;
+class ObjectsConcerned;
+class Instruction;
 
 bool ActSetWindowSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActSetFullScreen( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

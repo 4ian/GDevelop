@@ -228,6 +228,20 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
     DECLARE_END_CONDITION()
 
+    DECLARE_CONDITION("CollisionNP", //CollisionNP cames from an old condition to test collision between two sprites non precisely.
+                   _("Collision"),
+                   _("Teste la collision entre deux objets en utilisant leurs masques de collisions.\nNotez que certains objets peuvent ne pas avoir de masque de collisions.\nD'autres, comme les Sprites, proposent des conditions de collisions plus précises."),
+                   _("_PARAM0_ est en collision avec _PARAM1_ ( Masques de collisions )"),
+                   _("Collision"),
+                   "res/conditions/collision24.png",
+                   "res/conditions/collision.png",
+                   &CondHBCollision);
+
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
+        DECLARE_PARAMETER("object", _("Objet"), true, "")
+
+    DECLARE_END_CONDITION()
+
     DECLARE_EXPRESSION("Count", _("Nombre d'objets"), _("Compte le nombre d'objets indiqué actuellement concernés"), _("Objets"), "res/conditions/nbObjet.png", &ExpGetObjectCount)
         DECLARE_PARAMETER("object", _("Objet"), true, "")
     DECLARE_END_EXPRESSION()

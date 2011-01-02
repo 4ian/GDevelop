@@ -129,6 +129,8 @@ class SpriteObject : public Object
         unsigned int GetColorV() const;
         unsigned int GetColorB() const;
 
+        virtual std::vector<RotatedRectangle> GetHitBoxes() const;
+
         //Conditions
         bool CondAnim( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool CondSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );

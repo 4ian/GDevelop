@@ -1,6 +1,7 @@
-#include "GDL/aEffects.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/SpriteObject.h"
+#include "GDL/CommonTools.h"
+#include "GDL/RuntimeScene.h"
 
 /**
  * Change the color filter of a sprite

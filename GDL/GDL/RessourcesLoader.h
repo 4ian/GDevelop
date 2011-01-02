@@ -1,6 +1,6 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef RESSOURCESLOADER_H
@@ -80,10 +80,7 @@ private:
     RessourcesLoader() {};
     virtual ~RessourcesLoader() {};
 
-    /**
-     * So as to load datas from an executable Game Develop
-     */
-    DatFile ExeGD;
+    DatFile ExeGD; ///< Used to load data from an Executable Game Develop.
 
     static RessourcesLoader *_singleton;
 };

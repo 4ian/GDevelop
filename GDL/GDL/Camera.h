@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef CAMERA_H
 #define CAMERA_H
 #include <SFML/System.hpp>

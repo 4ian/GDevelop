@@ -1,6 +1,6 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef OBJECT_H
@@ -20,9 +20,8 @@
 #include "GDL/Sprite.h"
 #include "GDL/ListVariable.h"
 #include "GDL/Animation.h"
-#include "GDL/ErrorReport.h"
-#include "GDL/ObjectType.h"
-using namespace std;
+#include "GDL/ObjectHelpers.h"
+#include "GDL/RotatedRectangle.h"
 
 class RuntimeScene;
 class Object;
@@ -51,10 +50,30 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 {
     public:
 
-        Object(string name);
+        /**
+         * Create a new object with the name passed as argument.
+         * \param name Object's name
+         */
+        Object(std::string name);
+
+        /**
+         * Copy constructor. Calls Init().
+         */
         Object(const Object & object) { Init(object); };
+
+        /**
+         * Assignement operator. Calls Init().
+         */
         Object& operator=(const Object & object) {if( (this) != &object ) Init(object); return *this; }
+
+        /**
+         * Destructor. Does nothing particular.
+         */
         virtual ~Object() {};
+
+        /**
+         * Return a new shared_ptr pointing to a copy of the object.
+         */
         virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new Object(*this));}
 
         /**
@@ -77,8 +96,15 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
          */
         virtual bool Draw(sf::RenderWindow& main_window) {return true;};
 
+        /**
+         * Load object from an xml element.
+         */
         virtual void LoadFromXml(const TiXmlElement * elemScene) {};
         #if defined(GDE)
+
+        /**
+         * Save object to an xml element.
+         */
         virtual void SaveToXml(TiXmlElement * elemScene) {};
         #endif
 
@@ -174,7 +200,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
         //Forces
         Force Force5;
-        vector < Force > Forces;
+        std::vector < Force > Forces; ///< Forces applied to object
 
         /**
          * Automatically called at each frame so as to update forces applied on the object.
@@ -184,13 +210,21 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         float TotalForceY() const;
         float TotalForceAngle() const;
         float TotalForceLength() const;
+
+        /**
+         * Delete all forces applied to the object
+         */
         bool ClearForce();
 
         /**
          * Change name ( and object identifier )
          */
-        void SetName(string name_);
-        inline string GetName() { return name; }
+        void SetName(std::string name_);
+
+        /**
+         * Get string representing object's name.
+         */
+        inline std::string GetName() { return name; }
 
         /**
          * Get object identifier ( number representing the object name )
@@ -206,15 +240,40 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
          */
         inline void SetTypeId(unsigned int typeId_) { typeId = typeId_; }
 
-
+        /**
+         * Query the Z order of the object
+         */
         inline int GetZOrder() const { return zOrder; }
+
+        /**
+         * Change the Z order of the object
+         */
         inline void SetZOrder(int zOrder_ ) { zOrder = zOrder_; }
 
+        /**
+         * Return if the object is hidden or not
+         */
         inline bool IsHidden() const {return hidden;};
+
+        /**
+         * Hide/Show the object
+         */
         inline void SetHidden(bool hide = true) {hidden = hide;};
 
-        inline void SetLayer(string layer_) { layer = layer_;}
-        inline string GetLayer() const { return layer; }
+        /**
+         * Change the layer of the object
+         */
+        inline void SetLayer(std::string layer_) { layer = layer_;}
+
+        /**
+         * Get the layer of the object
+         */
+        inline std::string GetLayer() const { return layer; }
+
+        /**
+         * Get object hit box(es)
+         */
+        virtual std::vector<RotatedRectangle> GetHitBoxes() const { return std::vector<RotatedRectangle>(); };
 
         /**
          * Call each automatism before events
@@ -244,7 +303,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Get all types of automatisms used by the object
          */
-        vector < unsigned int > GetAllAutomatismsNameIdentifiers();
+        std::vector < unsigned int > GetAllAutomatismsNameIdentifiers();
 
         /**
          * Test if object has an automaism
@@ -273,12 +332,6 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         {
             return shared_from_this();
         }
-
-
-        //Variables
-        ListVariable variablesObjet;
-
-        ErrorReport * errors; ///<Pointer to a legacy object meant to report errors
 
         #ifdef GDE
         /**
@@ -314,12 +367,12 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Called by the debugger so as to get a property value and name
          */
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, string & name, string & value) const;
+        virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
 
         /**
          * Called by the debugger so as to update a property
          */
-        virtual bool ChangeProperty(unsigned int propertyNb, string newValue);
+        virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
 
         /**
          * Must return the number of available properties for the debugger
@@ -375,21 +428,23 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         double ExpGetSqDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
         double ExpGetDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 
+        ListVariable variablesObjet; ///<List of the variables of the object
+
     protected:
 
-        string name;
+        std::string name; ///< The full name of the object
         unsigned int objectId; ///< The ObjectId, associated with the name, is used ( instead of the name ) by the runtime to identify objects.
         unsigned int typeId; ///< The TypeId indicate of which type is the object. ( To test if we can do something reserved to some objects with it )
 
-        float X;
-        float Y;
-        int zOrder;
-        bool hidden;
-        string layer;
-        boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> > automatisms; ///<Containing all automatisms of the object. Note the use of flat_map for better performance.
+        float X; ///<X position on the scene
+        float Y; ///<Y position on the scene
+        int zOrder; ///<Z order on the scene, to choose if an object is displayed before another object.
+        bool hidden; ///<True to prevent the object from being rendered.
+        std::string layer; ///<Name of the layer on which the object is.
+        boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> > automatisms; ///<Contains all automatisms of the object. Note the use of flat_map for better performance.
 
         /**
-         * Initialize from another object. Used by copy-ctor and assign-op.
+         * Initialize object using another object. Used by copy-ctor and assign-op.
          * Don't forget to update me if members were changed !
          */
         void Init(const Object & object);
@@ -413,17 +468,17 @@ bool CondDistance( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
 bool CondNbObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 bool CondAjoutObjConcern( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 bool CondAjoutHasard( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondHBCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
 /**
- * As extensions, need to provide creations and destruction functions
+ * As extensions, a function used to delete the object. ( Simply a "delete object;" )
  */
 void DestroyBaseObject(Object * object);
-Object * CreateBaseObject(std::string name);
-Object * CreateBaseObjectByCopy(Object * object);
 
-//Usual typedefs
-typedef vector < boost::shared_ptr<Object> > ObjList;
-typedef boost::shared_ptr<Object> ObjSPtr;
+/**
+ * As extensions, a function used to create an object. ( Simply a "return new Object(name);" )
+ */
+Object * CreateBaseObject(std::string name);
 
 /**
  * Test if an object must be deleted

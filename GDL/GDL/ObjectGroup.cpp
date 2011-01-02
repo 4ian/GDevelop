@@ -1,10 +1,9 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDL/ObjectGroup.h"
-#include "GDL/ObjectType.h"
 #include "GDL/ObjectIdentifiersManager.h"
 #include <vector>
 #include <string>

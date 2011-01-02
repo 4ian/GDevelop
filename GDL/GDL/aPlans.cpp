@@ -1,13 +1,12 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <vector>
 #include <string>
 #include "GDL/Object.h"
 #include <cmath>
-#include "GDL/aPlans.h"
 #include "GDL/Event.h"
 #include <iostream>
 #include <sstream>

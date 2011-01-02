@@ -1,14 +1,10 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef REPEATEVENT_H
 #define REPEATEVENT_H
-/*#include <boost/shared_ptr.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/nvp.hpp>*/
 #include "Event.h"
 class RuntimeScene;
 class ObjectsConcerned;

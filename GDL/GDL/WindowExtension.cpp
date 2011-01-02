@@ -4,6 +4,7 @@
 #include "GDL/eFreeFunctions.h"
 #include "GDL/actions.h"
 #include "GDL/ResourcesMergingHelper.h"
+#include "GDL/Instruction.h"
 
 WindowExtension::WindowExtension()
 {

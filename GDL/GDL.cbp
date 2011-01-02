@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="GDL" />
+		<Option title="Game Develop Library" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Option virtualFolders="Math parser\LIB fparser\;Math parser\;AES\;md5\;" />
@@ -633,6 +633,7 @@
 		<Unit filename="GDL\DatFile.h" />
 		<Unit filename="GDL\Direction.cpp" />
 		<Unit filename="GDL\Direction.h" />
+		<Unit filename="GDL\DocMainPage.h" />
 		<Unit filename="GDL\Dossier.cpp" />
 		<Unit filename="GDL\Dossier.h" />
 		<Unit filename="GDL\EditComment.cpp" />
@@ -723,8 +724,6 @@
 		<Unit filename="GDL\ManualTimer.h" />
 		<Unit filename="GDL\MemTrace.cpp" />
 		<Unit filename="GDL\MemTrace.h" />
-		<Unit filename="GDL\Modules.cpp" />
-		<Unit filename="GDL\Modules.h" />
 		<Unit filename="GDL\MouseExtension.cpp" />
 		<Unit filename="GDL\MouseExtension.h" />
 		<Unit filename="GDL\Music.cpp" />
@@ -737,12 +736,12 @@
 		<Unit filename="GDL\Object.h" />
 		<Unit filename="GDL\ObjectGroup.cpp" />
 		<Unit filename="GDL\ObjectGroup.h" />
+		<Unit filename="GDL\ObjectHelpers.cpp" />
+		<Unit filename="GDL\ObjectHelpers.h" />
 		<Unit filename="GDL\ObjectIdentifiersManager.cpp" />
 		<Unit filename="GDL\ObjectIdentifiersManager.h" />
 		<Unit filename="GDL\ObjectListDialogsHelper.cpp" />
 		<Unit filename="GDL\ObjectListDialogsHelper.h" />
-		<Unit filename="GDL\ObjectType.cpp" />
-		<Unit filename="GDL\ObjectType.h" />
 		<Unit filename="GDL\ObjectsConcerned.cpp" />
 		<Unit filename="GDL\ObjectsConcerned.h" />
 		<Unit filename="GDL\OpenSaveGame.cpp" />
@@ -761,8 +760,14 @@
 		<Unit filename="GDL\RepeatEvent.h" />
 		<Unit filename="GDL\ResourcesMergingHelper.cpp" />
 		<Unit filename="GDL\ResourcesMergingHelper.h" />
+		<Unit filename="GDL\ResourcesUnmergingHelper.cpp" />
+		<Unit filename="GDL\ResourcesUnmergingHelper.h" />
 		<Unit filename="GDL\RessourcesLoader.cpp" />
 		<Unit filename="GDL\RessourcesLoader.h" />
+		<Unit filename="GDL\RotatedRectangle.cpp" />
+		<Unit filename="GDL\RotatedRectangle.h" />
+		<Unit filename="GDL\RotatedRectangleCollision.cpp" />
+		<Unit filename="GDL\RotatedRectangleCollision.h" />
 		<Unit filename="GDL\RuntimeCamera.cpp" />
 		<Unit filename="GDL\RuntimeCamera.h" />
 		<Unit filename="GDL\RuntimeGame.cpp" />
@@ -825,13 +830,10 @@
 		<Unit filename="GDL\XmlFilesHelper.h" />
 		<Unit filename="GDL\XmlMacros.h" />
 		<Unit filename="GDL\aADS.cpp" />
-		<Unit filename="GDL\aADS.h" />
 		<Unit filename="GDL\aAdvanced.cpp" />
-		<Unit filename="GDL\aAdvanced.h" />
 		<Unit filename="GDL\aCamera.cpp" />
 		<Unit filename="GDL\aCamera.h" />
 		<Unit filename="GDL\aEffects.cpp" />
-		<Unit filename="GDL\aEffects.h" />
 		<Unit filename="GDL\aFichier.cpp" />
 		<Unit filename="GDL\aFichier.h" />
 		<Unit filename="GDL\aJoystick.cpp" />
@@ -839,19 +841,14 @@
 		<Unit filename="GDL\aLayer.cpp" />
 		<Unit filename="GDL\aLayer.h" />
 		<Unit filename="GDL\aMove.cpp" />
-		<Unit filename="GDL\aMove.h" />
 		<Unit filename="GDL\aMusic.cpp" />
 		<Unit filename="GDL\aMusic.h" />
 		<Unit filename="GDL\aNet.cpp" />
 		<Unit filename="GDL\aNet.h" />
 		<Unit filename="GDL\aObjet.cpp" />
-		<Unit filename="GDL\aObjet.h" />
 		<Unit filename="GDL\aPlans.cpp" />
-		<Unit filename="GDL\aPlans.h" />
 		<Unit filename="GDL\aPosition.cpp" />
-		<Unit filename="GDL\aPosition.h" />
 		<Unit filename="GDL\aScale.cpp" />
-		<Unit filename="GDL\aScale.h" />
 		<Unit filename="GDL\aScene.cpp" />
 		<Unit filename="GDL\aScene.h" />
 		<Unit filename="GDL\aSouris.cpp" />
@@ -863,7 +860,6 @@
 		<Unit filename="GDL\aVariables.cpp" />
 		<Unit filename="GDL\aVariables.h" />
 		<Unit filename="GDL\aVisibilite.cpp" />
-		<Unit filename="GDL\aVisibilite.h" />
 		<Unit filename="GDL\aWindow.cpp" />
 		<Unit filename="GDL\aWindow.h" />
 		<Unit filename="GDL\actions.cpp" />
@@ -871,15 +867,12 @@
 		<Unit filename="GDL\btAlignedAllocator.h" />
 		<Unit filename="GDL\btScalar.h" />
 		<Unit filename="GDL\cADS.cpp" />
-		<Unit filename="GDL\cADS.h" />
 		<Unit filename="GDL\cCamera.cpp" />
 		<Unit filename="GDL\cCamera.h" />
 		<Unit filename="GDL\cClavier.cpp" />
 		<Unit filename="GDL\cClavier.h" />
 		<Unit filename="GDL\cCollisions.cpp" />
-		<Unit filename="GDL\cCollisions.h" />
 		<Unit filename="GDL\cEffects.cpp" />
-		<Unit filename="GDL\cEffects.h" />
 		<Unit filename="GDL\cFichier.cpp" />
 		<Unit filename="GDL\cFichier.h" />
 		<Unit filename="GDL\cJoystick.cpp" />
@@ -887,17 +880,12 @@
 		<Unit filename="GDL\cLayer.cpp" />
 		<Unit filename="GDL\cLayer.h" />
 		<Unit filename="GDL\cMove.cpp" />
-		<Unit filename="GDL\cMove.h" />
 		<Unit filename="GDL\cMusic.cpp" />
 		<Unit filename="GDL\cMusic.h" />
 		<Unit filename="GDL\cObjet.cpp" />
-		<Unit filename="GDL\cObjet.h" />
 		<Unit filename="GDL\cPlans.cpp" />
-		<Unit filename="GDL\cPlans.h" />
 		<Unit filename="GDL\cPos.cpp" />
-		<Unit filename="GDL\cPos.h" />
 		<Unit filename="GDL\cScale.cpp" />
-		<Unit filename="GDL\cScale.h" />
 		<Unit filename="GDL\cScene.cpp" />
 		<Unit filename="GDL\cScene.h" />
 		<Unit filename="GDL\cSouris.cpp" />
@@ -907,7 +895,6 @@
 		<Unit filename="GDL\cVariables.cpp" />
 		<Unit filename="GDL\cVariables.h" />
 		<Unit filename="GDL\cVisibilite.cpp" />
-		<Unit filename="GDL\cVisibilite.h" />
 		<Unit filename="GDL\conditions.cpp" />
 		<Unit filename="GDL\conditions.h" />
 		<Unit filename="GDL\constantes.h" />
@@ -978,7 +965,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="1.5.9958" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="1.5.9992" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

@@ -1,27 +1,20 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <vector>
 #include <string>
+#include <iostream>
 #include "GDL/Object.h"
-#include <cmath>
-#include "GDL/cCollisions.h"
 #include "GDL/Event.h"
-#include <iostream>
-#include <sstream>
-#include "GDL/Chercher.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Force.h"
-#include <iostream>
-
-#include <SFML/Window.hpp>
 #include "GDL/RuntimeScene.h"
-#include "GDL/profile.h"
 #include "GDL/ObjectsConcerned.h"
-
 #include "GDL/Instruction.h"
+#include "GDL/SpriteObject.h"
+#include "GDL/RotatedRectangleCollision.h"
+#include "GDL/Collisions.h"
 
 /**
  * Test a collision between two sprites objects
@@ -30,7 +23,7 @@ bool CondCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
 {
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());
-    if ( condition.GetParameter( 1 ).GetPlainString() == condition.GetParameter( 0 ).GetPlainString())
+    if ( condition.GetParameter( 1 ).GetAsObjectIdentifier() == condition.GetParameter( 0 ).GetAsObjectIdentifier())
         list2 = list;
 
     //Pour chaque objet, on retient son ID, et la liste des objets avec lesquels il est en collision.
@@ -104,13 +97,13 @@ bool CondCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
 }
 
 /**
- * Test a collision between two sprites objects with only theirs coordinates/size.
+ * Test a collision between two objects using their hitboxes
  */
-bool CondCollisionNP( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+bool CondHBCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());
-    if ( condition.GetParameter( 1 ).GetPlainString() == condition.GetParameter( 0 ).GetPlainString())
+    if ( condition.GetParameter( 1 ).GetAsObjectIdentifier() == condition.GetParameter( 0 ).GetAsObjectIdentifier())
         list2 = list;
     bool isTrue = false;
 
@@ -126,9 +119,22 @@ bool CondCollisionNP( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
         {
             if ( *obj != *obj2 )
             {
-                sf::Clock Latence;
-                if ( CheckCollisionNP(  boost::static_pointer_cast<SpriteObject>(*obj),
-                                        boost::static_pointer_cast<SpriteObject>(*obj2)) )
+                bool collision = false;
+
+                std::vector<RotatedRectangle> objHitboxes = (*obj)->GetHitBoxes();
+                std::vector<RotatedRectangle> obj2Hitboxes = (*obj2)->GetHitBoxes();
+                for (unsigned int i = 0;i<objHitboxes.size();++i)
+                {
+                    for (unsigned int j = 0;j<obj2Hitboxes.size();++j)
+                    {
+                        if ( RotatedRectanglesCollisionTest(&objHitboxes[i], &obj2Hitboxes[j]) != 0 )
+                            collision = true;
+                    }
+
+                    if ( collision ) break;
+                }
+
+                if ( collision )
                 {
                     if ( !condition.IsInverted() )
                     {
@@ -141,19 +147,12 @@ bool CondCollisionNP( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
             }
         }
         //Si l'objet n'est en collision avec AUCUN autre objets
-        if ( AuMoinsUnObjet == false )
+        if ( AuMoinsUnObjet == false && condition.IsInverted())
         {
-            if ( condition.IsInverted() )
-            {
-                isTrue = true;
-                objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
-            }
+            isTrue = true;
+            objectsConcerned.objectsPicked.AddObject( *obj ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
         }
     }
 
     return isTrue;
 }
-
-#undef PARAM
-#undef PREPARATION
-#undef RENVOI

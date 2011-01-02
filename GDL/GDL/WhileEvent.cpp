@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "WhileEvent.h"
 #include "tinyxml.h"
 #include "RuntimeScene.h"

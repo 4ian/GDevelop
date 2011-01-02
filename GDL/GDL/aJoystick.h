@@ -1,13 +1,9 @@
 #ifndef AJOYSTICK_H
 #define AJOYSTICK_H
 
-#include <vector>
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <iostream>
-#include "GDL/CommonTools.h"
-#include "GDL/RuntimeScene.h"
+class RuntimeScene;
+class ObjectsConcerned;
+class Instruction;
 
 bool ActGetJoystickAxis( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 

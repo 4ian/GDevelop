@@ -1,6 +1,6 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDL/LinkEvent.h"
@@ -86,17 +86,17 @@ void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector 
     //On teste la validité de l'insertion
     if ( firstEvent >= eventsToInclude->size() )
     {
-        scene.errors.Add( "Impossible d'insérer les évènements du lien ( Début invalide )", "", "", indexOfTheEventInThisList, 2 );
+        std::cout << "Unable to get events from a link ( Invalid start )" << std::endl;
         return;
     }
     if ( lastEvent >= eventsToInclude->size() )
     {
-        scene.errors.Add( "Impossible d'insérer les évènements du lien ( Fin invalide )", "", "", indexOfTheEventInThisList, 2 );
+        std::cout << "Unable to get events from a link ( Invalid end )" << std::endl;
         return;
     }
     if ( firstEvent > lastEvent )
     {
-        scene.errors.Add( "Impossible d'insérer les évènements du lien ( la fin est avant le départ )", "", "", indexOfTheEventInThisList, 2 );
+        std::cout << "Unable to get events from a link ( End is before start )" << std::endl;
         return;
     }
 

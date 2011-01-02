@@ -3,15 +3,10 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 #include "GDL/Object.h"
-#include <cmath>
 #include "GDL/Event.h"
-#include <iostream>
-#include <sstream>
-#include "GDL/Chercher.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Force.h"
-#include <iostream>
 #include "GDL/ListVariable.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/GDExpression.h"

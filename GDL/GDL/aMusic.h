@@ -1,20 +1,9 @@
 #ifndef AMUSIC_H_INCLUDED
 #define AMUSIC_H_INCLUDED
 
-#include <vector>
-#include <string>
-#include "GDL/Object.h"
-#include <cmath>
-#include "GDL/aMusic.h"
-#include "GDL/Event.h"
-#include <iostream>
-#include <sstream>
-#include "GDL/Chercher.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Force.h"
-#include <iostream>
-#include <SFML/Audio.hpp>
-#include "GDL/RuntimeScene.h"
+class RuntimeScene;
+class ObjectsConcerned;
+class Instruction;
 
 bool ActPlaySound( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActPlaySoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

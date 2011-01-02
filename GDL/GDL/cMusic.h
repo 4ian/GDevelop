@@ -1,20 +1,9 @@
 #ifndef CMUSIC_H
 #define CMUSIC_H
 
-#include <vector>
-#include <string>
-#include <iostream>
-#include <sstream>
-#include "GDL/cMusic.h"
-#include "GDL/Object.h"
-#include "GDL/Event.h"
-#include "GDL/Chercher.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/CommonTools.h"
-#include <iostream>
-
-#include "GDL/SoundManager.h"
-#include <SFML/Audio.hpp>
+class RuntimeScene;
+class ObjectsConcerned;
+class Instruction;
 
 bool CondMusicPlaying( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 bool CondMusicPaused( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );

@@ -507,24 +507,11 @@ ExtensionSprite::ExtensionSprite()
     DECLARE_CONDITION("Collision",
                       _("Collision"),
                       _("La condition est vraie si il y a collision entre les deux objets donnés.\nLa collision est faite au pixel près.\nAttention ! Cette condition est couteuse pour l'ordinateur en terme de perfomance."),
-                      _("L'objet _PARAM0_ est en collision avec _PARAM1_"),
+                      _("_PARAM0_ est en collision avec _PARAM1_"),
                       _("Collision"),
                       "res/conditions/collision24.png",
                       "res/conditions/collision.png",
                       &CondCollision);
-
-        DECLARE_PARAMETER("object", _("Objet 1"), true, "Sprite")
-        DECLARE_PARAMETER("object", _("Objet 2"), true, "Sprite")
-
-    DECLARE_END_CONDITION()
-    DECLARE_CONDITION("CollisionNP",
-                      _("Collision ( non précise )"),
-                      _("Teste rapidement si il y a collision entre deux objets.\nLe test n'est pas précis ( rectangle englobant ) mais beaucoup plus rapide que le test précis."),
-                      _("L'objet _PARAM0_ est en collision avec _PARAM1_ ( non précis )"),
-                      _("Collision"),
-                      "res/conditions/collision24.png",
-                      "res/conditions/collision.png",
-                      &CondCollisionNP);
 
         DECLARE_PARAMETER("object", _("Objet 1"), true, "Sprite")
         DECLARE_PARAMETER("object", _("Objet 2"), true, "Sprite")

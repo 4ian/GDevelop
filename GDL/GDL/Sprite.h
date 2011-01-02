@@ -1,6 +1,6 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef SPRITE_H
@@ -32,6 +32,10 @@ public:
     inline void SetImageName(const string & image_) { image = image_; }
     inline const string & GetImageName() const { return image; }
 
+    std::vector<RotatedRectangle> GetCollisionMask() const;
+    inline bool IsCollisionMaskAutomatic() const { return automaticCollisionMask; }
+    inline bool SetCollisionMaskAutomatic(bool enabled) { automaticCollisionMask = enabled };
+
     inline vector < Point > & GetAllNonDefaultPoints() { return points; }
     inline const vector < Point > & GetAllNonDefaultPoints() const { return points; }
 
@@ -61,6 +65,9 @@ private:
     boost::shared_ptr<sf::Image> sfmlImage; ///< Pointer to the image displayed by the sprite.
     bool hasItsOwnImage; ///< True if sfmlImage is only owned by this Sprite.
     string image; ///< Name of the image to be loaded in Image Manager.
+
+    bool automaticCollisionMask;
+    std::vector<RotatedRectangle> customCollisionMask;
 
     vector < Point > points;
     Point origine;

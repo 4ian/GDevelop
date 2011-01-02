@@ -1,13 +1,12 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <vector>
 #include <string>
 #include "GDL/Object.h"
 #include <cmath>
-#include "GDL/aObjet.h"
 #include "GDL/Event.h"
 #include <iostream>
 #include <sstream>
@@ -53,12 +52,10 @@ bool ActCreate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const
         newObject = scene.game->globalObjects[IDglobalObject]->Clone();
     else
     {
-        scene.errors.Add("L'objet à créer ("+objectWanted+") n'existe pas dans la liste des objets", "", "", -1, 1);
         return false;
     }
 
     //Ajout à la liste d'objet et configuration de sa position
-    newObject->errors = &scene.errors;
     newObject->SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) );
     newObject->SetY( action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) );
     newObject->LoadRuntimeResources(*scene.game->imageManager);
@@ -95,12 +92,10 @@ bool ActCreateByName( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
         newObject = scene.game->globalObjects[IDglobalObject]->Clone();
     else
     {
-        scene.errors.Add("L'objet à créer ("+objectWanted+") n'existe pas dans la liste des objets", "", "", -1, 1);
         return false;
     }
 
     //Ajout à la liste d'objet et configuration de sa position
-    newObject->errors = &scene.errors;
     newObject->SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) );
     newObject->SetY( action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) );
     newObject->LoadRuntimeResources(*scene.game->imageManager);

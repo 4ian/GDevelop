@@ -1,6 +1,6 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef OBJECTGROUP_H
@@ -9,7 +9,6 @@
 #include <string>
 #include <set>
 #include <utility>
-#include "GDL/ObjectType.h"
 #include "GDL/ObjectIdentifiersManager.h"
 #include <boost/interprocess/containers/flat_set.hpp>
 

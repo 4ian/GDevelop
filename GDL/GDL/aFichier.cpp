@@ -1,6 +1,6 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDL/tinyxml.h"
@@ -98,17 +98,11 @@ bool ActDeleteGroupFichier( RuntimeScene & scene, ObjectsConcerned & objectsConc
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
     if ( groups.empty() )
-    {
-        scene.errors.Add("Aucun groupe disponible à supprimer", "", "", -1, 2);
         return false;
-    }
     groups.push_back("");
 
     //Création si besoin est de la racine
     if ( hdl.FirstChildElement(groups.at(0).c_str()).Element() == NULL )
-    {
-        scene.errors.Add("Impossible d'accéder au groupe à supprimer", "", "", -1, 2);
-    }
 
 
     //A chaque fois, on vérifie si le groupe voulu existe
@@ -128,7 +122,6 @@ bool ActDeleteGroupFichier( RuntimeScene & scene, ObjectsConcerned & objectsConc
         hdl = hdl.FirstChildElement(groups.at(i).c_str());
     }
 
-    scene.errors.Add("Aucun groupe du nom indiqué à supprimer", "", "", -1, 2);
     return false;
 }
 
@@ -156,10 +149,7 @@ bool ActEcrireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcer
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
     if ( groups.empty() )
-    {
-        scene.errors.Add("Aucun groupe dans lequel enregistrer la valeur.", "", "", -1, 2);
         return false;
-    }
 
     //Insertion de la déclaration
     TiXmlDeclaration decl( "1.0", "ISO-8859-1", "" );
@@ -194,10 +184,7 @@ bool ActEcrireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcer
 
     //Ecriture dans le groupe
     if ( hdl.Element() != NULL )
-    {
         hdl.Element()->SetDoubleAttribute("value", action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    }
-    else { scene.errors.Add("Erreur interne : Le groupe finale aurait dû être valide.", "", "", -1, 2); }
 
     return true;
 }
@@ -226,10 +213,7 @@ bool ActEcrireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcer
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
     if ( groups.empty() )
-    {
-        scene.errors.Add("Aucun groupe dans lequel enregistrer la valeur.", "", "", -1, 2);
         return false;
-    }
 
     //Insertion de la déclaration
     TiXmlDeclaration decl( "1.0", "ISO-8859-1", "" );
@@ -263,11 +247,7 @@ bool ActEcrireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcer
     }
 
     //Ecriture dans le groupe
-    if ( hdl.Element() != NULL )
-    {
-        hdl.Element()->SetAttribute("texte", action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned).c_str());
-    }
-    else { scene.errors.Add("Erreur interne : Le groupe final aurait dû être valide.", "", "", -1, 2); }
+    if ( hdl.Element() != NULL ) hdl.Element()->SetAttribute("texte", action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned).c_str());
 
     return true;
 }
@@ -300,7 +280,6 @@ bool ActLireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
         {
-            scene.errors.Add("Impossible d'accéder à "+action.GetParameter(1).GetPlainString()+" dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
             return false;
         }
         hdl = hdl.FirstChildElement(groups.at(i).c_str());
@@ -346,7 +325,6 @@ bool ActLireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
         {
-            scene.errors.Add("Impossible d'accéder à "+action.GetParameter(1).GetPlainString()+" dans le fichier "+action.GetParameter(0).GetPlainString(), "", "", -1, 2);
             return false;
         }
         hdl = hdl.FirstChildElement(groups.at(i).c_str());

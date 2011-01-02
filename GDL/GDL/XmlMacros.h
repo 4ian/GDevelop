@@ -1,4 +1,9 @@
 /**
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
+ /**
  * @file Experimentals macros for accerelerating saving and loading function creation with TinyXml.
  */
 

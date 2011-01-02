@@ -106,3 +106,22 @@ void Sprite::MakeSpriteOwnsItsImage()
         hasItsOwnImage = true;
     }
 }
+
+std::vector<RotatedRectangle> Sprite::GetCollisionMask() const
+{
+    if ( automaticCollisionMask )
+    {
+        std::vector<RotatedRectangle> boxes;
+
+        RotatedRectangle rectangle;
+        rectangle.center.x = GetWidth()/2;
+        rectangle.center.y = GetHeight()/2;
+        rectangle.size.x = GetWidth()/2;
+        rectangle.size.y = GetHeight()/2;
+
+        boxes.push_back(rectangle);
+        return boxes;
+    }
+
+    return customCollisionMask;
+}

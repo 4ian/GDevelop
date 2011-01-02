@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/VariablesExtension.h"
 #include "GDL/cVariables.h"
 #include "GDL/aVariables.h"

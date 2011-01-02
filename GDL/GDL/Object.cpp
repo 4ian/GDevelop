@@ -1,6 +1,6 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDL/Object.h"
@@ -27,7 +27,6 @@
 using namespace std;
 
 Object::Object(string name_) :
-        errors( NULL ),
         name( name_ ),
         objectId(0),
         typeId(0), //0 is the default typeId for an object
@@ -47,7 +46,6 @@ void Object::Init(const Object & object)
     Forces = object.Forces;
     Force5 = object.Force5;
     variablesObjet = object.variablesObjet;
-    errors = object.errors;
 
     name = object.name;
     objectId = object.objectId;
@@ -277,9 +275,4 @@ void DestroyBaseObject(Object * object)
 Object * CreateBaseObject(std::string name)
 {
     return new Object(name);
-}
-
-Object * CreateBaseObjectByCopy(Object * object)
-{
-    return new Object(*object);
 }

@@ -1,18 +1,14 @@
+/**
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef CCAMERA_H_INCLUDED
 #define CCAMERA_H_INCLUDED
 
-#include <vector>
-#include <string>
-#include <iostream>
-#include "GDL/Object.h"
-#include <cmath>
-#include "GDL/Event.h"
-#include <iostream>
-#include <sstream>
-#include "GDL/Chercher.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Force.h"
-#include "GDL/RuntimeScene.h"
+class RuntimeScene;
+class ObjectsConcerned;
+class Instruction;
 
 bool CondCameraWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 bool CondCameraHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );

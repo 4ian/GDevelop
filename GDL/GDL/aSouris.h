@@ -1,21 +1,9 @@
 #ifndef ASOURIS_H_INCLUDED
 #define ASOURIS_H_INCLUDED
 
-#include <vector>
-#include <string>
-#include "GDL/Object.h"
-#include <cmath>
-#include "GDL/Collisions.h"
-#include "GDL/Event.h"
-#include <iostream>
-#include <sstream>
-#include "GDL/Chercher.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Force.h"
-#include <iostream>
-
-#include <SFML/Graphics.hpp>
-#include "GDL/RuntimeScene.h"
+class RuntimeScene;
+class ObjectsConcerned;
+class Instruction;
 
 bool ActCentreSouris( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActCentreSourisX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

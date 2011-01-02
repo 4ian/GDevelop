@@ -1,6 +1,6 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef OBJECTSCONCERNED_H
@@ -8,7 +8,6 @@
 
 #include "GDL/Object.h"
 #include "GDL/ObjectGroup.h"
-#include "GDL/ObjectType.h"
 #include "GDL/ObjInstancesHolder.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/interprocess/containers/flat_set.hpp>
@@ -46,23 +45,23 @@ class GD_API ObjectsConcerned
         }
 
         /**
-        * Search objects matching the name and add them to
+        * Search objects matching the identifier and add them to
         * the picked objects list.
         *
-        * @param Name
-        * @param Force searching in all objects
-        * @return A list of objects matching the name
+        * @param oID Identifier of the objects to pick
+        * @param forceGlobal Force searching in all objects
+        * @return A list of objects having the requested identifier
         */
         ObjList Pick(unsigned int oID, bool forceGlobal = false);
 
         /**
-        * Search objects matching the name and remove them to
+        * Search objects matching the identifier and remove them to
         * the picked objects list. ( They will usually be reinsert
         * by conditions if they match this latters )
         *
-        * @param Name
-        * @param Force searching in all objects
-        * @return A list of objects matching the name
+        * @param oID Identifier of the objects to pick
+        * @param forceGlobal Force searching in all objects
+        * @return A list of objects having the requested identifier
         */
         ObjList PickAndRemove(unsigned int oID, bool forceGlobal = false);
 
@@ -70,7 +69,7 @@ class GD_API ObjectsConcerned
         * Add an object to the list of already concerned
         * objects.
         *
-        * @param Name of the object concerned
+        * @param oID Identifier of the objects to pick
         */
         inline void AddAnObjectConcerned(unsigned int oID)
         {
@@ -121,11 +120,8 @@ class GD_API ObjectsConcerned
     protected:
     private:
 
-        /** Reference to all objects list */
-        ObjInstancesHolder * allObjects;
-
-        /** Reference to groups */
-        vector < ObjectGroup > * allGroups;
+        ObjInstancesHolder * allObjects; ///< Reference to all objects list
+        vector < ObjectGroup > * allGroups; ///< Reference to groups
 
         /** A set containing identifers of objects already picked.
         If an object is not in this list, pickers functions will
@@ -136,15 +132,15 @@ class GD_API ObjectsConcerned
         /**
         * Pick only object. Called by generals picking functions.
         *
-        * @param Name
-        * @param Force searching in picked objects list
-        * @param Force searching in all objects
-        * @param Remove picked objects from picked list. See PickAndRemove
-        * @return A list of objects matching the name
+        * @param oID Identifier of the objects to pick
+        * @param onlyAlreadyConcernedObjects Force searching in picked objects list
+        * @param forceGlobal Force searching in all objects
+        * @param removeFromAlreadyConcernedObjects Remove picked objects from picked list. See PickAndRemove
+        * @return A list of objects matching the identifier
         */
         ObjList PickOnlyObjects(unsigned int oID, bool onlyAlreadyConcernedObjects, bool forceGlobal, bool removeFromAlreadyConcernedObjects);
 
-        ObjectsConcerned * parent;
+        ObjectsConcerned * parent; ///< Keep a reference of the parent, so as to notify it about an object suppression. Can be NULL.
 };
 
 #endif // OBJECTSCONCERNED_H

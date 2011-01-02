@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef CAMERAEXTENSION_H
 #define CAMERAEXTENSION_H
 

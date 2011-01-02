@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef OPENSAVELOADINGSCREEN_H
 #define OPENSAVELOADINGSCREEN_H
 #include <string>

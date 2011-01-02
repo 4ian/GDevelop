@@ -1,6 +1,6 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef SCENEIG_H
@@ -52,81 +52,122 @@ class GD_API RuntimeScene : public Scene
         RuntimeScene& operator=(const RuntimeScene & scene);
         RuntimeScene(const RuntimeScene & scene);
 
-        //Pointeurs vers divers élements utilisés par la scène
-        sf::RenderWindow *  renderWindow;
-        RuntimeGame *       game;
-        SoundManager *      soundManager;
-        const sf::Input *   input;
-        #ifdef GDE
-        BaseDebugger *      debugger;
-        BaseProfiler *      profiler;
-        #endif
-
-        bool running;
-
-        //Données supplémentaires pour une RuntimeScene
-        ObjInstancesHolder                      objectsInstances;
-        ListVariable                            variables;
-        vector < RuntimeLayer >                 layers;
-        vector < Text >                         textes;
-        vector < ManualTimer >                  timers;
-        float                                   pauseTime;
+        sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display
+        const sf::Input *                       input; ///< Pointer to the SFML class used to get user input
         bool                                    inputKeyPressed;    ///< Supplementary input : True if any key was pressed
-        int                                     backgroundColorR;
-        int                                     backgroundColorG;
-        int                                     backgroundColorB;
-        ErrorReport                             errors;
-        boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas;
+        RuntimeGame *                           game; ///< Pointer to the game the scene is linked to
+        SoundManager *                          soundManager; ///< Pointer to the sound manager.
+        #ifdef GDE
+        BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
+        BaseProfiler *                          profiler; ///< Pointer to the profiler. Can be NULL.
+        #endif
+        ObjInstancesHolder                      objectsInstances; ///< Contains all of the objects on the scene
+        ListVariable                            variables; ///<List of the scene variables
+        vector < RuntimeLayer >                 layers; ///<List of the layers
+        vector < Text >                         textes; ///<Deprecated way of displaying a text
+        vector < ManualTimer >                  timers; ///<List of the timer currently used.
+        bool                                    running; ///< True if the scene is being played
+        float                                   pauseTime; ///<Time that has been spent during the frame but which must not be taken in account in elpased time.
+        int                                     backgroundColorR; ///< Background color Red component
+        int                                     backgroundColorG; ///< Background color Green component
+        int                                     backgroundColorB; ///< Background color Blue component
+        boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas. Note the use of flat_map for better performance.
 
-        //Fonctions supplémentaires pour une RuntimeScene
-        //-> Chargement à partir d'une scène
+        /**
+         * Set up the Runtime Scene using a Scene
+         */
         bool LoadFromScene( const Scene & scene );
-        void PreprocessEventList( const Game & Jeu, vector < BaseEventSPtr > & listEvent );
 
+        /**
+         * Change the window used for rendering the scene
+         */
         void ChangeRenderWindow(sf::RenderWindow * window);
+
+        /**
+         * Return true if scene is rendered full screen.
+         */
         bool RenderWindowIsFullScreen() { return isFullScreen; }
         void SetRenderWindowIsFullScreen(bool yes = true) { isFullScreen = yes; }
+
+        /**
+         * By calling this method, scene will
+         */
         void GotoSceneWhenEventsAreFinished(int scene);
 
-        //-> Gestion de la boucle de jeu
+        /**
+         * Render and play the scene one frame.
+         */
         int RenderAndStep(unsigned int nbStep);
+
+        /**
+         * Just render a frame.
+         */
         void RenderWithoutStep();
 
-        //Calques
+        /**
+         * Return the layer with the name passed in argument
+         */
         const RuntimeLayer & GetLayer(string name) const;
+
+        /**
+         * Return the layer with the name passed in argument
+         */
         RuntimeLayer & GetLayer(string name);
 
-        //Accès au temps
+        /**
+         * Change scene time scale.
+         */
         inline void SetTimeScale(float timeScale_) { timeScale = timeScale_; };
+
+        /**
+         * Return scene time scale.
+         */
         inline float GetTimeScale() const { return timeScale; };
+
+        /**
+         * Get elapsed time since last frame, in seconds.
+         */
         inline float GetElapsedTime() const { return realElapsedTime*timeScale; };
+
+        /**
+         * Get time elapsed since beginning, in seconds.
+         */
         inline float GetTimeFromStart() const { return timeFromStart; };
+
+        /**
+         * Return true if the scene was just rendered once.
+         */
         inline bool IsFirstLoop() const { return firstLoop; };
 
+        /**
+         * Helper function to stop all musics played in the soundManager.
+         */
         bool StopMusic();
 
     protected:
 
         void Init(const RuntimeScene & scene);
 
-        //Fonctions supplémentaires pour une RuntimeScene
-        //-> Gestion de la boucle de jeu
+        /**
+         * Render a frame in the window
+         */
         void Render();
-        bool DisplayLegacyTexts(string layer = "");
-        bool OrderObjectsByZOrder( ObjList & objList );
         void ManageObjectsBeforeEvents();
         void ManageObjectsAfterEvents();
         void ManageRenderTargetEvents();
-        bool UpdateTime();
         void ManageSounds();
+        bool OrderObjectsByZOrder( ObjList & objList );
+        bool UpdateTime();
 
-        //Données supplémentaires pour une RuntimeScene
-        bool firstLoop;
+        bool DisplayLegacyTexts(string layer = "");
+        void PreprocessEventList( const Game & Jeu, vector < BaseEventSPtr > & listEvent );
+
+        bool firstLoop; ///<true if the scene was just rendered once.
         bool isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
-        float realElapsedTime;
-        float elapsedTime;
-        float timeScale;
-        float timeFromStart;
+        float realElapsedTime; ///< Elpased time since last frame, in seconds, without taking time scale in account.
+        float elapsedTime; ///< Elpased time since last frame, in seconds
+        float timeScale; ///< Time scale
+        float timeFromStart; ///< Time in seconds elapsed from start
         int   specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
 
         static RuntimeLayer badLayer;

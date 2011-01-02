@@ -2,6 +2,7 @@
 #include "GDL/cMusic.h"
 #include "GDL/aMusic.h"
 #include "GDL/ResourcesMergingHelper.h"
+#include "GDL/Instruction.h"
 #include <iostream>
 
 AudioExtension::AudioExtension()
@@ -355,7 +356,7 @@ AudioExtension::AudioExtension()
                    _("Pitch du son d'un canal"),
                    _("Teste le pitch ( vitesse ) du son sur le canal indiqué. Un pitch de 1 indique une vitesse normale."),
                    _("Le pitch du son sur le canal _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Pitch ( vitesse )"),
+                   _("Sons"),
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png",
                    &CondSoundChannelPitch);
@@ -370,7 +371,7 @@ AudioExtension::AudioExtension()
                    _("Pitch de la musique d'un canal"),
                    _("Teste le pitch ( vitesse ) de la musique sur le canal indiqué. Un pitch de 1 indique une vitesse normale."),
                    _("Le volume de la musique sur le canal _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                   _("Volume sonore"),
+                   _("Musiques"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png",
                    &CondMusicChannelPitch);
@@ -385,10 +386,5 @@ AudioExtension::AudioExtension()
 void AudioExtension::PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper)
 {
     if ( action.GetType() == "PlaySound" || action.GetType() == "PlaySoundCanal" || action.GetType() == "PlayMusic" || action.GetType() == "PlayMusicCanal" )
-    {
-        std::string before = action.GetParameter(0).GetPlainString();
-        cout << "BEFREAudioResource :" << before << endl;
         action.SetParameter( 0, resourcesMergingHelper.GetNewFilename(action.GetParameter(0).GetPlainString()));
-        cout << "AudioResource :" << action.GetParameter(0).GetPlainString() << endl;
-    }
 }

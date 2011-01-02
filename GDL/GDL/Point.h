@@ -1,9 +1,17 @@
+/**
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef POINT_H
 #define POINT_H
 #include <string>
 
 using namespace std;
 
+/**
+ * Named point used for Sprites.
+ */
 class GD_API Point
 {
     public:
@@ -19,7 +27,6 @@ class GD_API Point
         inline int GetX() const { return x; }
         inline int GetY() const { return y; }
 
-    protected:
     private:
         string name;
         int x;

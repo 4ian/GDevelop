@@ -2,9 +2,9 @@
 #define AFICHIER_H
 
 #include "GDL/tinyxml.h"
-#include "GDL/RuntimeScene.h"
-#include <vector>
-#include <string>
+class RuntimeScene;
+class ObjectsConcerned;
+class Instruction;
 
 bool ActLaunchFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActExecuteCmd( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

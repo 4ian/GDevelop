@@ -1,20 +1,15 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <vector>
 #include <string>
-#include "GDL/Object.h"
+#include <iostream>
 #include <cmath>
-#include "GDL/aPosition.h"
+#include "GDL/Object.h"
 #include "GDL/Event.h"
-#include <iostream>
-#include <sstream>
-#include "GDL/Chercher.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Force.h"
-#include <iostream>
 #include "GDL/ListVariable.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"

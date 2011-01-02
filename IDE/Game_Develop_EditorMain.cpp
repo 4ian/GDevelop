@@ -1,6 +1,6 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "MemTrace.h"
@@ -325,12 +325,12 @@ ribbonSceneEditorButtonBar(NULL)
     {
         SetStatusBar(myStatusBar);
         myStatusBar->SetStatusText(_("Mode simple activé"), 1);
-        myStatusBar->SetStatusText( "2008-2010 Compil Games", 2 );
+        myStatusBar->SetStatusText( "2008-2011 Compil Games", 2 );
     }
     else
     {
         SetStatusBar(myStatusBar);
-        myStatusBar->SetStatusText( "2008-2010 Compil Games", 1 );
+        myStatusBar->SetStatusText( "2008-2011 Compil Games", 1 );
     }
     SetStatusBar(myStatusBar);
 

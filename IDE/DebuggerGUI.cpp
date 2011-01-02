@@ -662,9 +662,6 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
         return;
     }
 
-    //Initialisation
-    newObject->errors = &scene.errors;
-
     int x = ToInt(string(wxGetTextFromUser(_("Entrez la position X de l'objet"), _("Ajout d'un objet")).mb_str()));
     int y = ToInt(string(wxGetTextFromUser(_("Entrez la position Y de l'objet"), _("Ajout d'un objet")).mb_str()));
     newObject->SetX( x );

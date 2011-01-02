@@ -1120,7 +1120,6 @@ void SceneCanvas::AddObjetSelected(float x, float y)
     sceneEdited.initialObjectsPositions.push_back( pos );
 
     //Edittime scene object creation
-    newObject->errors = &scene.errors;
     newObject->SetX( pos.x );
     newObject->SetY( pos.y );
     newObject->SetZOrder( pos.zOrder );

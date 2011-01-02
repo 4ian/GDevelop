@@ -1,15 +1,14 @@
 #include "CppUnitLite/TestHarness.h"
-#include "GDL/Object.h"
-#include "GDL/aMove.h"
-#include "GDL/cMove.h"
 
-#include "GDL/ObjectsConcerned.h"
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
+#include "GDL/Object.h"
+#include "GDL/ObjectsConcerned.h"
 #include "GDL/SpriteObject.h"
 #include "GDL/Object.h"
 #include "GDL/RuntimeGame.h"
+#include "GDL/RuntimeScene.h"
 #include "GDL/GDExpression.h"
 
 #ifdef ___WXMSW___

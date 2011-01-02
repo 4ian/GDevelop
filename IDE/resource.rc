@@ -21,7 +21,7 @@ BEGIN
             VALUE "FileDescription",  "Game Develop"
             VALUE "FileVersion",      RC_FILEVERSION_STRING
             VALUE "InternalName",     "Game Develop"
-            VALUE "LegalCopyright",   "2008-2010 Compil Games"
+            VALUE "LegalCopyright",   "2008-2011 Compil Games"
             VALUE "LegalTrademarks1", ""
             VALUE "LegalTrademarks2", ""
             VALUE "OriginalFilename", "GDEditor.exe"

@@ -1,6 +1,6 @@
 /**
  *  Game Develop
- *  2008-2010 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
  #include "ProfileDlg.h"
@@ -123,6 +123,10 @@ sceneCanvas(NULL)
 	Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProfileDlg::OnChangeDurationSelected);
 	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProfileDlg::OnStepTimeSelected);
 	//*)
+
+	totalTimeCheck->Check();
+	eventsTimeCheck->Check();
+	objectsCountCheck->Check();
 
 	UpdateGUI();
 }

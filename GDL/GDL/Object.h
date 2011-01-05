@@ -16,10 +16,7 @@
 #include <boost/enable_shared_from_this.hpp>
 
 #include "GDL/Force.h"
-#include "GDL/constantes.h"
-#include "GDL/Sprite.h"
 #include "GDL/ListVariable.h"
-#include "GDL/Animation.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/RotatedRectangle.h"
 

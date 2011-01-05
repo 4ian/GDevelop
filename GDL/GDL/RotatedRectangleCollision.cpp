@@ -42,18 +42,18 @@ int GD_API RotatedRectanglesCollisionTest(RotatedRectangle * rr1, RotatedRectang
 
 // calculate vertices of (moved and axis-aligned := 'ma') rr2
     BL = TR = center;
-    BL -= rr2->size;
-    TR += rr2->size;
+    BL -= rr2->halfSize;
+    TR += rr2->halfSize;
 
 // calculate vertices of (rotated := 'r') rr1
-    A.x = -rr1->size.y*sina;
+    A.x = -rr1->halfSize.y*sina;
     B.x = A.x;
-    t = rr1->size.x*cosa;
+    t = rr1->halfSize.x*cosa;
     A.x += t;
     B.x -= t;
-    A.y =  rr1->size.y*cosa;
+    A.y =  rr1->halfSize.y*cosa;
     B.y = A.y;
-    t = rr1->size.x*sina;
+    t = rr1->halfSize.x*sina;
     A.y += t;
     B.y -= t;
 

@@ -96,6 +96,15 @@ const long EditorObjet::idMenuPosEverywhere = wxNewId();
 const long EditorObjet::idMenuOptions = wxNewId();
 const long EditorObjet::idAddPoint = wxNewId();
 const long EditorObjet::idDelPoint = wxNewId();
+const long EditorObjet::ID_MENUITEM2 = wxNewId();
+const long EditorObjet::ID_MENUITEM3 = wxNewId();
+const long EditorObjet::ID_MENUITEM5 = wxNewId();
+const long EditorObjet::ID_MENUITEM8 = wxNewId();
+const long EditorObjet::ID_MENUITEM9 = wxNewId();
+const long EditorObjet::ID_MENUITEM6 = wxNewId();
+const long EditorObjet::ID_MENUITEM7 = wxNewId();
+const long EditorObjet::ID_MENUITEM4 = wxNewId();
+const long EditorObjet::ID_MENUITEM10 = wxNewId();
 //*)
 
 const long EditorObjet::ID_BUTTONARRAY = wxNewId();
@@ -115,10 +124,18 @@ game(game_),
 mainEditorCommand(mainEditorCommand_),
 object(object_),
 selectedImage(0),
-placingPoint(false)
+placingPoint(false),
+spritePosX(0),
+spritePosY(0),
+editingMask(false),
+movingBox(false),
+selectedBox(0),
+xSelectionOffset(0),
+ySelectionOffset(0)
 {
     //(*Initialize(EditorObjet)
     wxFlexGridSizer* FlexGridSizer16;
+    wxMenuItem* MenuItem25;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
     wxFlexGridSizer* FlexGridSizer9;
@@ -126,6 +143,8 @@ placingPoint(false)
     wxBoxSizer* BoxSizer2;
     wxFlexGridSizer* FlexGridSizer7;
     wxFlexGridSizer* thumbsSizer;
+    wxMenuItem* MenuItem20;
+    wxMenu* MenuItem22;
     wxFlexGridSizer* FlexGridSizer15;
     wxFlexGridSizer* FlexGridSizer8;
     wxStaticBoxSizer* animationSizer;
@@ -352,22 +371,45 @@ placingPoint(false)
     MenuItem15 = new wxMenuItem((&contextMenu), idMenuCopyFrom, _("Copier toutes les images depuis..."), wxEmptyString, wxITEM_NORMAL);
     MenuItem15->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
     contextMenu.Append(MenuItem15);
-    MenuItem16 = new wxMenuItem((&imageContextMenu), idPosPoint, _("Positionner un point"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem1 = new wxMenu();
+    MenuItem16 = new wxMenuItem(MenuItem1, idPosPoint, _("Positionner un point"), wxEmptyString, wxITEM_NORMAL);
     MenuItem16->SetBitmap(wxBitmap(wxImage(_T("res/pointmod.png"))));
-    imageContextMenu.Append(MenuItem16);
-    MenuItem19 = new wxMenuItem((&imageContextMenu), idPosPrecis, _("Positionner précisement un point"), wxEmptyString, wxITEM_NORMAL);
-    imageContextMenu.Append(MenuItem19);
+    MenuItem1->Append(MenuItem16);
+    MenuItem19 = new wxMenuItem(MenuItem1, idPosPrecis, _("Positionner précisement un point"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem1->Append(MenuItem19);
     MenuItem17 = new wxMenu();
     posEverywhereMenuItem = new wxMenuItem(MenuItem17, idMenuPosEverywhere, _("Positionner le point sur les autres images de la direction"), wxEmptyString, wxITEM_CHECK);
     MenuItem17->Append(posEverywhereMenuItem);
-    imageContextMenu.Append(idMenuOptions, _("Options"), MenuItem17, wxEmptyString);
-    imageContextMenu.AppendSeparator();
-    MenuItem21 = new wxMenuItem((&imageContextMenu), idAddPoint, _("Ajouter un point"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem1->Append(idMenuOptions, _("Options"), MenuItem17, wxEmptyString);
+    MenuItem1->AppendSeparator();
+    MenuItem21 = new wxMenuItem(MenuItem1, idAddPoint, _("Ajouter un point"), wxEmptyString, wxITEM_NORMAL);
     MenuItem21->SetBitmap(wxBitmap(wxImage(_T("res/pointadd.png"))));
-    imageContextMenu.Append(MenuItem21);
-    MenuItem18 = new wxMenuItem((&imageContextMenu), idDelPoint, _("Supprimer un point"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem1->Append(MenuItem21);
+    MenuItem18 = new wxMenuItem(MenuItem1, idDelPoint, _("Supprimer un point"), wxEmptyString, wxITEM_NORMAL);
     MenuItem18->SetBitmap(wxBitmap(wxImage(_T("res/pointdel.png"))));
-    imageContextMenu.Append(MenuItem18);
+    MenuItem1->Append(MenuItem18);
+    imageContextMenu.Append(ID_MENUITEM2, _("Points"), MenuItem1, wxEmptyString);
+    MenuItem2 = new wxMenuItem((&imageContextMenu), ID_MENUITEM3, _("Editer le masque de collision"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/mask16.png"))));
+    imageContextMenu.Append(MenuItem2);
+    MenuItem3 = new wxMenuItem((&maskContextMenu), ID_MENUITEM5, _("Arrêter l\'édition du masque"), wxEmptyString, wxITEM_NORMAL);
+    maskContextMenu.Append(MenuItem3);
+    maskContextMenu.AppendSeparator();
+    MenuItem4 = new wxMenuItem((&maskContextMenu), ID_MENUITEM8, _("Ajouter un rectangle de collision"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/maskAdd16.png"))));
+    maskContextMenu.Append(MenuItem4);
+    MenuItem22 = new wxMenu();
+    MenuItem23 = new wxMenuItem(MenuItem22, ID_MENUITEM9, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem23->SetBitmap(wxBitmap(wxImage(_T("res/maskRemove16.png"))));
+    MenuItem22->Append(MenuItem23);
+    MenuItem20 = new wxMenuItem(MenuItem22, ID_MENUITEM6, _("Modifier"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem22->Append(MenuItem20);
+    MenuItem25 = new wxMenuItem(MenuItem22, ID_MENUITEM7, _("Positionner précisement"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem22->Append(MenuItem25);
+    maskContextMenu.Append(ID_MENUITEM4, _("Rectangle sélectionné"), MenuItem22, wxEmptyString);
+    maskContextMenu.AppendSeparator();
+    MenuItem24 = new wxMenuItem((&maskContextMenu), ID_MENUITEM10, _("Retourner au masque par défaut"), wxEmptyString, wxITEM_NORMAL);
+    maskContextMenu.Append(MenuItem24);
     FlexGridSizer1->SetSizeHints(this);
     Center();
 
@@ -386,15 +428,15 @@ placingPoint(false)
     Connect(ID_CHECKBOX2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&EditorObjet::OnRotationCheckSelect);
     toolbarPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorObjet::OntoolbarPanelResize,0,this);
     imagePanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EditorObjet::OnimagePanelPaint,0,this);
-    imagePanel->Connect(wxEVT_ERASE_BACKGROUND,(wxObjectEventFunction)&EditorObjet::OnimagePanelEraseBackground,0,this);
+    imagePanel->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&EditorObjet::OnimagePanelLeftDown,0,this);
     imagePanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&EditorObjet::OnimagePanelLeftUp,0,this);
     imagePanel->Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&EditorObjet::OnimagePanelRightUp,0,this);
+    imagePanel->Connect(wxEVT_MOTION,(wxObjectEventFunction)&EditorObjet::OnimagePanelMouseMove,0,this);
     Connect(ID_SCROLLBAR1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorObjet::OnscrollHeightScroll);
     Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorObjet::OnscrollHeightScroll);
     Connect(ID_SCROLLBAR3,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorObjet::OnscrollWidthScroll);
     Connect(ID_SCROLLBAR3,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorObjet::OnscrollWidthScroll);
     thumbsPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EditorObjet::OnthumbsPanelPaint,0,this);
-    thumbsPanel->Connect(wxEVT_ERASE_BACKGROUND,(wxObjectEventFunction)&EditorObjet::OnthumbsPanelEraseBackground,0,this);
     thumbsPanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&EditorObjet::OnthumbsPanelLeftUp,0,this);
     thumbsPanel->Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&EditorObjet::OnthumbsPanelRightUp,0,this);
     thumbsPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorObjet::OnthumbsPanelResize,0,this);
@@ -419,6 +461,13 @@ placingPoint(false)
     Connect(idPosPrecis,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnModPointPrecisSelected);
     Connect(idAddPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddPointSelected);
     Connect(idDelPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDelPointSelected);
+    Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnEditMaskSelected);
+    Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnStopMaskEditionSelected);
+    Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddMaskRectangleSelected);
+    Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDelMaskRectangleSelected);
+    Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnModifyMaskRectangleSelected);
+    Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnEnterMaskRectanglePositionSelected);
+    Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnautomaticMaskSelected);
     //*)
 
     toolbar = new wxToolBar( toolbarPanel, -1, wxDefaultPosition, wxDefaultSize,
@@ -434,6 +483,10 @@ placingPoint(false)
     toolbar->AddTool( idPosPoint, wxT( "Positionner un point" ), wxBitmap( wxImage( "res/pointmod.png" ) ), _( "Positionner un point" ) );
     toolbar->AddTool( idAddPoint, wxT( "Ajouter un point" ), wxBitmap( wxImage( "res/pointadd.png" ) ), _( "Ajouter un point" ) );
     toolbar->AddTool( idDelPoint, wxT( "Supprimer un point" ), wxBitmap( wxImage( "res/pointdel.png" ) ), _( "Supprimer un point" ) );
+    toolbar->AddSeparator();
+    toolbar->AddTool( ID_MENUITEM3, wxT( "Editer le masque de collision" ), wxBitmap( wxImage( "res/mask16.png" ) ), _( "Editer le masque de collision" ) );
+    toolbar->AddTool( ID_MENUITEM8, wxT( "Ajouter un rectangle au masque" ), wxBitmap( wxImage( "res/maskAdd16.png" ) ), _( "Ajouter un rectangle au masque" ) );
+    toolbar->AddTool( ID_MENUITEM9, wxT( "Supprimer le rectangle selectionné du masque" ), wxBitmap( wxImage( "res/maskRemove16.png" ) ), _( "Supprimer le rectangle selectionné du masque" ) );
     toolbar->Realize();
 
     //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
@@ -699,6 +752,39 @@ void EditorObjet::OnBt7Toggle( wxCommandEvent& event )
     RefreshImages();
 }
 
+bool EditorObjet::AnimationAndDirectionValid()
+{
+    cout << "testanim";
+    if ( animation < object.GetAnimationsNumber() && direction < object.GetAnimation( animation ).GetDirectionsNumber())
+        return true;
+
+    cout << "AnimNOTvalid";
+    return false;
+}
+
+bool EditorObjet::SpriteValid()
+{
+    if ( AnimationAndDirectionValid() && selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size() )
+        return true;
+
+    return false;
+}
+
+Sprite & EditorObjet::GetEditedSprite()
+{
+    return object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
+}
+
+Animation & EditorObjet::GetEditedAnimation()
+{
+    return object.GetAnimation( animation );
+}
+
+Direction & EditorObjet::GetEditedDirection()
+{
+    return object.GetAnimation( animation ).GetDirectionToModify( direction );
+}
+
 void EditorObjet::OnAddAnimBtClick( wxCommandEvent& event )
 {
     Animation newAnimation;
@@ -737,8 +823,7 @@ void EditorObjet::OnAnimationsBoxSelect( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnTempsEditText( wxCommandEvent& event )
 {
-    if ( animation < object.GetAnimationsNumber() && direction < object.GetAnimation( animation ).GetDirectionsNumber())
-        object.GetAnimation( animation ).GetDirectionToModify( direction ).SetTimeBetweenFrames( ToFloat(string(TempsEdit->GetValue().mb_str())) );
+    if ( AnimationAndDirectionValid() ) GetEditedDirection().SetTimeBetweenFrames( ToFloat(string(TempsEdit->GetValue().mb_str())) );
 }
 
 ////////////////////////////////////////////////////////////
@@ -748,8 +833,7 @@ void EditorObjet::OnTempsEditText( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnBoucleOuiCheckSelect( wxCommandEvent& event )
 {
-    if ( animation < object.GetAnimationsNumber() && direction < object.GetAnimation( animation ).GetDirectionsNumber())
-        object.GetAnimation( animation ).GetDirectionToModify( direction ).SetLoop( true );
+   if ( AnimationAndDirectionValid() ) GetEditedDirection().SetLoop( true );
 }
 
 ////////////////////////////////////////////////////////////
@@ -759,8 +843,7 @@ void EditorObjet::OnBoucleOuiCheckSelect( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnBoucleNonCheckSelect( wxCommandEvent& event )
 {
-    if ( animation < object.GetAnimationsNumber() && direction < object.GetAnimation( animation ).GetDirectionsNumber())
-        object.GetAnimation( animation ).GetDirectionToModify( direction ).SetLoop( false );
+    if ( AnimationAndDirectionValid() ) GetEditedDirection().SetLoop( false );
 }
 
 /**
@@ -785,8 +868,7 @@ void EditorObjet::OnRotationCheckSelect( wxCommandEvent& event )
     }
     NormalCheck->SetValue( false );
 
-    if ( animation < object.GetAnimationsNumber() )
-        object.GetAnimation( animation ).typeNormal = false;
+    if ( AnimationAndDirectionValid() ) GetEditedAnimation().typeNormal = false;
 
     direction = 0;
     Bt0->Enable( false );
@@ -808,8 +890,7 @@ void EditorObjet::OnNormalCheckSelect( wxCommandEvent& event )
     }
     RotationCheck->SetValue( false );
 
-    if ( animation < object.GetAnimationsNumber() )
-        object.GetAnimation( animation ).typeNormal = true;
+    if ( AnimationAndDirectionValid() ) GetEditedAnimation().typeNormal = true;
 
 
     Bt0->Enable( true );
@@ -820,7 +901,6 @@ void EditorObjet::OnNormalCheckSelect( wxCommandEvent& event )
     Bt5->Enable( true );
     Bt6->Enable( true );
     Bt7->Enable( true );
-
 }
 
 void EditorObjet::OnAideBtClick( wxCommandEvent& event )
@@ -840,13 +920,10 @@ void EditorObjet::OnOkBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnDeleteAllBtClick(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || direction >= object.GetAnimation( animation ).GetDirectionsNumber())
-        return;
+    if ( !AnimationAndDirectionValid() ) return;
 
     if (wxMessageBox("Etes-vous sûr de vouloir supprimer toutes les images ?", "Êtes vous sur ?",wxYES_NO ) == wxYES)
-    {
-        object.GetAnimation( animation ).GetDirectionToModify( direction ).RemoveAllSprites();
-    }
+        GetEditedDirection().RemoveAllSprites();
 
     RefreshImages();
 }
@@ -856,8 +933,7 @@ void EditorObjet::OnDeleteAllBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnAjoutPlusBtClick(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || direction >= object.GetAnimation( animation ).GetDirectionsNumber())
-        return;
+    if ( !AnimationAndDirectionValid() ) return;
 
     AjoutPlusImage dialog(this);
     if ( dialog.ShowModal() == 0 ) return;
@@ -867,7 +943,7 @@ void EditorObjet::OnAjoutPlusBtClick(wxCommandEvent& event)
     {
         Sprite sprite;
         sprite.SetImageName(dialog.ImagesToAdd.at(i));
-        object.GetAnimation( animation ).GetDirectionToModify( direction ).AddSprite(sprite);
+        GetEditedDirection().AddSprite(sprite);
     }
 
     RefreshImages();
@@ -878,8 +954,7 @@ void EditorObjet::OnAjoutPlusBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnCopyBtClick(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || direction >= object.GetAnimation( animation ).GetDirectionsNumber())
-        return;
+    if ( !AnimationAndDirectionValid() ) return;
 
     int animToCopy = wxGetNumberFromUser( "Animation à copier", "", "Entrez le numéro de l'animation dans laquelle se trouve la direction à copier", 0, 0, object.GetAnimationsNumber()-1, this);
     if (animToCopy < 0 || static_cast<unsigned int>(animToCopy) >= object.GetAnimationsNumber()) return;
@@ -892,7 +967,7 @@ void EditorObjet::OnCopyBtClick(wxCommandEvent& event)
         if (directionToCopy < 0 || static_cast<unsigned int>(directionToCopy) >= object.GetAnimation( animToCopy ).GetDirectionsNumber() ) return;
     }
 
-    object.GetAnimation( animation ).SetDirection(object.GetAnimation(animToCopy).GetDirection(directionToCopy), direction);
+    GetEditedAnimation().SetDirection(object.GetAnimation(animToCopy).GetDirection(directionToCopy), direction);
 
     RefreshImages();
 }
@@ -923,18 +998,13 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
     dc.SetBrush(bitmapGUIManager->backthumbsBg);
     dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
-
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
-
     int decalage = thumbsScroll->GetThumbPosition();
 
     //Fond en damier pour les images
     dc.SetBrush(bitmapGUIManager->transparentBg);
 
     //Affichage des images
+    if ( !AnimationAndDirectionValid() ) return;
     const Direction & directionToDisplay = object.GetAnimation( animation ).GetDirection( direction );
 
     for (unsigned int i = 0;i<directionToDisplay.GetSpritesNumber();++i)
@@ -1000,13 +1070,6 @@ void EditorObjet::OnthumbsPanelLeftUp(wxMouseEvent& event)
     imagePanel->Update(); //Immédiatement
 }
 
-void EditorObjet::OnthumbsPanelEraseBackground(wxEraseEvent& event)
-{
-}
-void EditorObjet::OnimagePanelEraseBackground(wxEraseEvent& event)
-{
-}
-
 ////////////////////////////////////////////////////////////
 /// Affichage de l'image selectionnée
 ////////////////////////////////////////////////////////////
@@ -1023,11 +1086,7 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
     dc.SetBrush(bitmapGUIManager->transparentBg);
     dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
-
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
+    if ( !AnimationAndDirectionValid() ) return;
 
     if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirection( direction ).GetSpritesNumber() )
     {
@@ -1049,11 +1108,11 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
                                        bmp.GetHeight(),
                                        size.GetHeight());
 
-            int SpritePosX = (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2;
-            int SpritePosY = (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2;
+            spritePosX = (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2;
+            spritePosY = (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2;
 
             if ( bmp.IsOk() )
-                dc.DrawBitmap(bmp, SpritePosX, SpritePosY, true /* use mask */); //Affichage de l'image
+                dc.DrawBitmap(bmp, spritePosX, spritePosY, true /* use mask */); //Affichage de l'image
 
             //Affichage du point
             if ( sprite.HasPoint(selectedPoint))
@@ -1063,10 +1122,23 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
                               sprite.GetPoint(selectedPoint).GetY() - point.GetHeight()/2 + ((size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2),
                               true /* use mask */);
             }
-        }
-        else
-        {
-            dc.DrawBitmap(wxBitmap( "res/errorimage.png", wxBITMAP_TYPE_ANY ), 0, 0);
+
+            //Display hit boxes
+            if ( editingMask )
+            {
+                //dc.SetLogicalFunction(wxINVERT);
+                std::vector<RotatedRectangle> boxes = sprite.GetCollisionMask();
+                for (unsigned int i = 0;i<boxes.size();++i)
+                {
+                    dc.SetBrush(wxBrush(wxColour(128,128,128), wxBRUSHSTYLE_FDIAGONAL_HATCH));
+                    if ( i == selectedBox ) dc.SetBrush(wxBrush(wxColour(255,255,255), wxBRUSHSTYLE_FDIAGONAL_HATCH));
+                    dc.DrawRectangle(spritePosX+boxes[i].center.x-boxes[i].halfSize.x,
+                                     spritePosY+boxes[i].center.y-boxes[i].halfSize.y,
+                                     boxes[i].halfSize.x*2,
+                                     boxes[i].halfSize.y*2);
+                }
+                //dc.SetLogicalFunction(wxCOPY);
+            }
         }
     }
 }
@@ -1093,86 +1165,9 @@ void EditorObjet::OnthumbsPanelRightUp(wxMouseEvent& event)
     PopupMenu(&contextMenu);
 }
 
-////////////////////////////////////////////////////////////
-/// Ajouter une image
-////////////////////////////////////////////////////////////
-void EditorObjet::OnAddImageEndSelected(wxCommandEvent& event)
-{
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
-
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
-
-    string nom = static_cast<string> (wxGetTextFromUser(_("Entrez le nom de l'image à ajouter"), _("Nom de l'image"), "", this));
-    if ( nom != "" )
-    {
-        Sprite sprite;
-        sprite.SetImageName(nom);
-        object.GetAnimation( animation ).GetDirectionToModify( direction ).AddSprite(sprite);
-    }
-
-    thumbsPanel->Refresh();
-    thumbsPanel->Update(); //Immédiatement
-}
-
-void EditorObjet::OnAddImageAfterSelected(wxCommandEvent& event)
-{
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
-
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
-
-    string nom = static_cast<string> (wxGetTextFromUser(_("Entrez le nom de l'image à ajouter"), _("Nom de l'image"), "", this));
-    if ( nom != "" )
-    {
-        Sprite sprite;
-        sprite.SetImageName(nom);
-        vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
-
-        if ( static_cast<unsigned>(selectedImage)+1 < sprites.size() )
-            sprites.insert(sprites.begin() + selectedImage + 1, sprite);
-        else
-            sprites.push_back(sprite);
-    }
-
-    thumbsPanel->Refresh();
-    thumbsPanel->Update(); //Immédiatement
-}
-
-void EditorObjet::OnAddImageBeforeSelected(wxCommandEvent& event)
-{
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
-
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
-
-    string nom = static_cast<string> (wxGetTextFromUser(_("Entrez le nom de l'image à ajouter"), _("Nom de l'image"), "", this));
-    if ( nom != "" )
-    {
-        Sprite sprite;
-        sprite.SetImageName(nom);
-        vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
-
-        if ( static_cast<unsigned>(selectedImage) < sprites.size() )
-            sprites.insert(sprites.begin() + selectedImage, sprite);
-        else
-            sprites.push_back(sprite);
-    }
-
-    thumbsPanel->Refresh();
-    thumbsPanel->Update(); //Immédiatement
-}
-
 void EditorObjet::OnAddMoreEndSelected(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
-
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
+    if ( !AnimationAndDirectionValid() ) return;
 
     //Fenêtre d'ajouts de plusieurs images
     AjoutPlusImage dialog(this);
@@ -1192,11 +1187,7 @@ void EditorObjet::OnAddMoreEndSelected(wxCommandEvent& event)
 
 void EditorObjet::OnAddMoreAfterSelected(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
-
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
+    if ( !AnimationAndDirectionValid() ) return;
 
     //Fenêtre d'ajouts de plusieurs images
     AjoutPlusImage dialog(this);
@@ -1222,11 +1213,7 @@ void EditorObjet::OnAddMoreAfterSelected(wxCommandEvent& event)
 
 void EditorObjet::OnAddMoreBeforeSelected(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
-
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
+    if ( !AnimationAndDirectionValid() ) return;
 
     //Fenêtre d'ajouts de plusieurs images
     AjoutPlusImage dialog(this);
@@ -1252,11 +1239,12 @@ void EditorObjet::OnAddMoreBeforeSelected(wxCommandEvent& event)
 
 void EditorObjet::OnAddFromEndSelected(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
+    cout << "called";
+    if ( !AnimationAndDirectionValid() )
+    {
+        cout << "return";
         return;
-
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
+    }
 
     if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
     {
@@ -1280,11 +1268,7 @@ void EditorObjet::OnAddFromEndSelected(wxCommandEvent& event)
 
 void EditorObjet::OnAddFromAfterSelected(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
-
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
+    if ( !AnimationAndDirectionValid() ) return;
 
     if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
     {
@@ -1318,11 +1302,7 @@ void EditorObjet::OnAddFromAfterSelected(wxCommandEvent& event)
 
 void EditorObjet::OnAddFromBeforeSelected(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
-
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
+    if ( !AnimationAndDirectionValid() ) return;
 
     if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
     {
@@ -1356,11 +1336,7 @@ void EditorObjet::OnAddFromBeforeSelected(wxCommandEvent& event)
 
 void EditorObjet::OnDeleteSelected(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
-
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
+    if ( !AnimationAndDirectionValid() ) return;
 
     vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
 
@@ -1369,6 +1345,9 @@ void EditorObjet::OnDeleteSelected(wxCommandEvent& event)
 
     thumbsPanel->Refresh();
     thumbsPanel->Update(); //Immédiatement
+
+    imagePanel->Refresh();
+    imagePanel->Update(); //Immédiatement
 }
 
 
@@ -1403,14 +1382,14 @@ void EditorObjet::OnscrollWidthScroll(wxScrollEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnimagePanelRightUp(wxMouseEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
+    if ( SpriteValid() )
+    {
+        if ( !editingMask )
+            PopupMenu(&imageContextMenu);
+        else
+            PopupMenu(&maskContextMenu);
+    }
 
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
-
-    if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size() )
-        PopupMenu(&imageContextMenu);
 }
 
 ////////////////////////////////////////////////////////////
@@ -1418,17 +1397,13 @@ void EditorObjet::OnimagePanelRightUp(wxMouseEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
+    if ( !SpriteValid() ) return;
 
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
-
-    if ( placingPoint && selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size())
+    if ( editingMask && movingBox )
+        movingBox = false;
+    else if ( placingPoint )
     {
-        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
-
-        int j = FindImage( game.images, sprite.GetImageName() );
+        int j = FindImage( game.images, GetEditedSprite().GetImageName() );
         if ( j == -1 ) return;
 
         //Tailles nécessaire pour placer le point
@@ -1438,7 +1413,7 @@ void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
         int SpritePosX = (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2;
         int SpritePosY = (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2;
 
-        MovePoint(sprite, selectedPoint, event.GetX() - SpritePosX, event.GetY() - SpritePosY);
+        MovePoint(GetEditedSprite(), selectedPoint, event.GetX() - SpritePosX, event.GetY() - SpritePosY);
 
         //Repositionnement pour les autres sprites si besoin
         if ( posEverywhereMenuItem->IsChecked() )
@@ -1460,42 +1435,36 @@ void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnModPointSelected(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
+    if ( !SpriteValid() ) return;
 
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
+    Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
 
-    if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size() )
+    wxArrayString points;
+    points.Add("Origin");
+    points.Add("Centre");
+    for (unsigned int i =0;i<sprite.GetAllNonDefaultPoints().size();++i)
+        points.Add(sprite.GetAllNonDefaultPoints().at(i).GetName());
+
+    string name = static_cast<string>(wxGetSingleChoice(_("Choisissez le point à éditer.\nVous pourrez ensuite le placer en faisant un clic gauche sur l'image."), _("Choisir le point à positionner"), points));
+    if ( name == "" ) return;
+    if ( name == "Centre" )
     {
-        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
-
-        wxArrayString points;
-        points.Add("Origin");
-        points.Add("Centre");
-        for (unsigned int i =0;i<sprite.GetAllNonDefaultPoints().size();++i)
-        	points.Add(sprite.GetAllNonDefaultPoints().at(i).GetName());
-
-        string name = static_cast<string>(wxGetSingleChoice(_("Choisissez le point à éditer.\nVous pourrez ensuite le placer en faisant un clic gauche sur l'image."), _("Choisir le point à positionner"), points));
-        if ( name == "" ) return;
-        if ( name == "Centre" )
+        if (wxMessageBox(_("Le point centre peut être positionné automatiquement par Game Develop au centre (comportement par défaut).\nVoulez vous modifier ce point ?\nCliquez sur oui pour le modifier, cliquez sur non pour que Game Develop le place automatiquement."),
+                       _("Position du point \"Centre\""), wxYES_NO ) == wxNO)
         {
-            if (wxMessageBox(_("Le point centre peut être positionné automatiquement par Game Develop au centre (comportement par défaut).\nVoulez vous modifier ce point ?\nCliquez sur oui pour le modifier, cliquez sur non pour que Game Develop le place automatiquement."),
-                           _("Position du point \"Centre\""), wxYES_NO ) == wxNO)
-            {
-                sprite.SetCentreAutomatic(true);
+            sprite.SetCentreAutomatic(true);
 
-                imagePanel->Refresh();
-                imagePanel->Update(); //Immédiatement
+            imagePanel->Refresh();
+            imagePanel->Update(); //Immédiatement
 
-                return;
-            }
-            sprite.SetCentreAutomatic(false);
+            return;
         }
-
-        placingPoint = true;
-        selectedPoint = name;
+        sprite.SetCentreAutomatic(false);
     }
+
+    placingPoint = true;
+    editingMask = false;
+    selectedPoint = name;
 
     imagePanel->Refresh();
     imagePanel->Update(); //Immédiatement
@@ -1506,55 +1475,48 @@ void EditorObjet::OnModPointSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnModPointPrecisSelected(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
+    if ( !SpriteValid() ) return;
 
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
+    Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
 
-    if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size() )
+    //Choix du point
+    wxArrayString points;
+    points.Add("Origin");
+    points.Add("Centre");
+    for (unsigned int i =0;i<sprite.GetAllNonDefaultPoints().size();++i)
+        points.Add(sprite.GetAllNonDefaultPoints().at(i).GetName());
+
+    string name = static_cast<string>(wxGetSingleChoice(_("Choisissez le point à éditer.\nVous pourrez ensuite le placer en faisant un clic gauche sur l'image."), _("Choisir le point à positionner"), points));
+    if ( name == "" ) return;
+    if ( name == "Centre" )
     {
-        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
-
-        //Choix du point
-        wxArrayString points;
-        points.Add("Origin");
-        points.Add("Centre");
-        for (unsigned int i =0;i<sprite.GetAllNonDefaultPoints().size();++i)
-        	points.Add(sprite.GetAllNonDefaultPoints().at(i).GetName());
-
-        string name = static_cast<string>(wxGetSingleChoice(_("Choisissez le point à éditer.\nVous pourrez ensuite le placer en faisant un clic gauche sur l'image."), _("Choisir le point à positionner"), points));
-        if ( name == "" ) return;
-        if ( name == "Centre" )
+        if (wxMessageBox(_("Le point centre peut être positionné automatiquement par Game Develop au centre (comportement par défaut).\nVoulez vous modifier ce point ?\nCliquez sur oui pour le modifier, cliquez sur non pour que Game Develop le place automatiquement."),
+                       _("Position du point \"Centre\""), wxYES_NO ) == wxNO)
         {
-            if (wxMessageBox(_("Le point centre peut être positionné automatiquement par Game Develop au centre (comportement par défaut).\nVoulez vous modifier ce point ?\nCliquez sur oui pour le modifier, cliquez sur non pour que Game Develop le place automatiquement."),
-                           _("Position du point \"Centre\""), wxYES_NO ) == wxNO)
-            {
-                sprite.SetCentreAutomatic(true);
+            sprite.SetCentreAutomatic(true);
 
-                imagePanel->Refresh();
-                imagePanel->Update(); //Immédiatement
+            imagePanel->Refresh();
+            imagePanel->Update(); //Immédiatement
 
-                return;
-            }
-            sprite.SetCentreAutomatic(false);
+            return;
         }
+        sprite.SetCentreAutomatic(false);
+    }
 
-        selectedPoint = name;
+    selectedPoint = name;
 
-        string x_str = static_cast<string>(wxGetTextFromUser(_("Entrez la position X du point par rapport à l'image"), "Position X du point",ToString(sprite.GetPoint(name).GetX())));
-        string y_str = static_cast<string>(wxGetTextFromUser(_("Entrez la position Y du point par rapport à l'image"), "Position Y du point",ToString(sprite.GetPoint(name).GetY())));
+    string x_str = static_cast<string>(wxGetTextFromUser(_("Entrez la position X du point par rapport à l'image"), "Position X du point",ToString(sprite.GetPoint(name).GetX())));
+    string y_str = static_cast<string>(wxGetTextFromUser(_("Entrez la position Y du point par rapport à l'image"), "Position Y du point",ToString(sprite.GetPoint(name).GetY())));
 
-        MovePoint(sprite, name, ToInt(x_str), ToInt(y_str));
+    MovePoint(sprite, name, ToInt(x_str), ToInt(y_str));
 
-        //Repositionnement pour les autres sprites si besoin
-        if ( posEverywhereMenuItem->IsChecked() )
+    //Repositionnement pour les autres sprites si besoin
+    if ( posEverywhereMenuItem->IsChecked() )
+    {
+        for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesNumber();++i)
         {
-            for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesNumber();++i)
-            {
-                MovePoint(object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i),
-                          name, ToInt(x_str), ToInt(y_str));
-            }
+            MovePoint(object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i),
+                      name, ToInt(x_str), ToInt(y_str));
         }
     }
 
@@ -1579,35 +1541,28 @@ void EditorObjet::MovePoint(Sprite & sprite, string pointName, int X, int Y)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnAddPointSelected(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
+    if ( !SpriteValid() ) return;
 
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
+    Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
 
-    if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size() )
+    string name = static_cast<string>(wxGetTextFromUser(_("Entrez le nom du nouveau point"), _("Création d'un point")));
+    if ( name == "" ) return;
+    if ( sprite.HasPoint(name) )
     {
-        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
-
-        string name = static_cast<string>(wxGetTextFromUser(_("Entrez le nom du nouveau point"), _("Création d'un point")));
-        if ( name == "" ) return;
-        if ( sprite.HasPoint(name) )
-        {
-            wxLogMessage(_("Un point ayant ce nom existe déjà !"));
-            return;
-        }
-
-        sprite.AddPoint(name);
-        if (wxMessageBox(_("Voulez vous ajouter ce point à toutes les images de la direction ?"),
-                       _("Ajouter ce point à toutes les images"), wxYES_NO ) == wxYES)
-        {
-            for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
-            {
-            	object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).AddPoint(name);
-            }
-        }
-
+        wxLogMessage(_("Un point ayant ce nom existe déjà !"));
+        return;
     }
+
+    sprite.AddPoint(name);
+    if (wxMessageBox(_("Voulez vous ajouter ce point à toutes les images de la direction ?"),
+                   _("Ajouter ce point à toutes les images"), wxYES_NO ) == wxYES)
+    {
+        for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
+        {
+            object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).AddPoint(name);
+        }
+    }
+
 }
 
 ////////////////////////////////////////////////////////////
@@ -1615,85 +1570,177 @@ void EditorObjet::OnAddPointSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnDelPointSelected(wxCommandEvent& event)
 {
-    if ( animation >= object.GetAnimationsNumber() || animation < 0)
-        return;
+    if ( !SpriteValid() ) return;
 
-    if ( direction >= object.GetAnimation( animation ).GetDirectionsNumber() || direction < 0)
-        return;
+    Sprite & sprite = GetEditedSprite();
 
-    if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size() )
+    wxArrayString points;
+    for (unsigned int i =0;i<sprite.GetAllNonDefaultPoints().size();++i)
+        points.Add(sprite.GetAllNonDefaultPoints().at(i).GetName());
+
+    if ( points.IsEmpty() )
     {
-        Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
+        wxLogMessage(_("Aucun point à éditer. Ajoutez un point avant de pouvoir le positionner."));
+        return;
+    }
 
-        wxArrayString points;
-        for (unsigned int i =0;i<sprite.GetAllNonDefaultPoints().size();++i)
-        	points.Add(sprite.GetAllNonDefaultPoints().at(i).GetName());
+    string name = static_cast<string>(wxGetSingleChoice(_("Choisissez le point à éditer."), _("Choisir le point à positionner"), points));
+    if ( name == "" ) return;
 
-        if ( points.IsEmpty() )
+    sprite.DelPoint(name);
+
+    if (wxMessageBox(_("Voulez vous supprimer ce point de toutes les images de la direction ?"),
+                   _("Supprimer ce point de toutes les images"), wxYES_NO ) == wxYES)
+    {
+        for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
         {
-            wxLogMessage(_("Aucun point à éditer. Ajoutez un point avant de pouvoir le positionner."));
-            return;
-        }
-
-        string name = static_cast<string>(wxGetSingleChoice(_("Choisissez le point à éditer."), _("Choisir le point à positionner"), points));
-        if ( name == "" ) return;
-
-        sprite.DelPoint(name);
-
-        if (wxMessageBox(_("Voulez vous supprimer ce point de toutes les images de la direction ?"),
-                       _("Supprimer ce point de toutes les images"), wxYES_NO ) == wxYES)
-        {
-            for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
-            {
-            	object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).DelPoint(name);
-            }
+            object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).DelPoint(name);
         }
     }
 }
 
-/*
-TEST( Dialogues, EditorObjet )
+void EditorObjet::OnautomaticMaskSelected(wxCommandEvent& event)
 {
-    //wxLogNull log;
+    if ( !SpriteValid() ) return;
 
-    Game game;
-    SpriteObject object("unnamed");
-    Animation AnimToAdd;
-    MainEditorCommand nrC(nr, 3);
+    Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
+    sprite.SetCollisionMaskAutomatic(true);
+    std::vector<RotatedRectangle> emptyVector;
+    sprite.SetCustomCollisionMask(emptyVector);
 
-    EditorObjet Dialog( NULL, game, object, nrC );
+    imagePanel->Refresh();
+    imagePanel->Update(); //Immédiatement
+}
 
-    object.AddAnimation( AnimToAdd ); //Ajout de 1 animation
-    object.AddAnimation( AnimToAdd ); //Et d'une autre
+void EditorObjet::OnimagePanelLeftDown(wxMouseEvent& event)
+{
+    if ( editingMask && SpriteValid())
+    {
+        std::vector<RotatedRectangle> boxes = GetEditedSprite().GetCollisionMask();
+        for (unsigned int i = 0;i<boxes.size();++i)
+        {
+            if ( spritePosX+boxes[i].center.x-boxes[i].halfSize.x < event.GetX() &&
+                             spritePosY+boxes[i].center.y-boxes[i].halfSize.y <  event.GetY() &&
+                             spritePosX+boxes[i].center.x+boxes[i].halfSize.x >  event.GetY()&&
+                             spritePosY+boxes[i].center.y+boxes[i].halfSize.y >  event.GetY() )
+             {
+                movingBox = true;
+                selectedBox = i;
+                xSelectionOffset = boxes[i].center.x-event.GetX()+spritePosX;
+                ySelectionOffset = boxes[i].center.y-event.GetY()+spritePosY;
+             }
+        }
+    }
+}
 
-    Dialog.RefreshImages();
+void EditorObjet::OnimagePanelMouseMove(wxMouseEvent& event)
+{
+    if ( editingMask && movingBox && SpriteValid())
+    {
+        std::vector<RotatedRectangle> boxes = GetEditedSprite().GetCollisionMask();
+        if ( selectedBox < boxes.size())
+        {
+            boxes[selectedBox].center.x = event.GetX()-spritePosX-xSelectionOffset;
+            boxes[selectedBox].center.y = event.GetY()-spritePosY-ySelectionOffset;
+        }
+        GetEditedSprite().SetCollisionMaskAutomatic(false);
+        GetEditedSprite().SetCustomCollisionMask(boxes);
 
-    CHECK_EQUAL( false ,Dialog.BoucleOuiCheck->GetValue() ); //Valeurs par défaut
-    CHECK_EQUAL( true, Dialog.BoucleNonCheck->GetValue() );
-    CHECK_EQUAL( "1", static_cast<string>(Dialog.TempsEdit->GetValue()) );
+        imagePanel->Refresh();
+        imagePanel->Update(); //Immédiatement
+    }
+}
 
-    Direction direction;
-    direction.SetTimeBetweenFrames(0.95);
-    direction.SetLoop(true);
-    vector < Sprite > sprites;
-    sprites.push_back(Sprite());
-    sprites.push_back(Sprite());
-    direction.SetSprites(sprites);
+void EditorObjet::OnDelMaskRectangleSelected(wxCommandEvent& event)
+{
+    if ( editingMask && SpriteValid())
+    {
+        std::vector<RotatedRectangle> boxes = GetEditedSprite().GetCollisionMask();
+        if ( selectedBox < boxes.size())
+            boxes.erase(boxes.begin() + selectedBox);
 
-    object.GetAnimation(0).SetDirection(direction, 0);
-    Dialog.RefreshImages();
+        GetEditedSprite().SetCollisionMaskAutomatic(false);
+        GetEditedSprite().SetCustomCollisionMask(boxes);
 
-    CHECK_EQUAL( true, Dialog.BoucleOuiCheck->GetValue() ); //Boucle : oui
-    CHECK_EQUAL( false, Dialog.BoucleNonCheck->GetValue() );
-    CHECK_EQUAL( "0.95", static_cast<string>(Dialog.TempsEdit->GetValue()) ); //Temps entre : 0.95
+        imagePanel->Refresh();
+        imagePanel->Update(); //Immédiatement
+    }
+}
+
+void EditorObjet::OnAddMaskRectangleSelected(wxCommandEvent& event)
+{
+    if ( editingMask && SpriteValid())
+    {
+        std::vector<RotatedRectangle> boxes = GetEditedSprite().GetCollisionMask();
+
+        RotatedRectangle newRectangle;
+        newRectangle.halfSize.x = ToFloat(string(wxGetTextFromUser(_("Entrez la largeur du rectangle"), _("Nouveau rectangle"), "32").mb_str()))/2.0f;
+        newRectangle.halfSize.y = ToFloat(string(wxGetTextFromUser(_("Entrez la hauteur du rectangle"), _("Nouveau rectangle"), "32").mb_str()))/2.0f;
+        newRectangle.angle = 0;//ToFloat(string(wxGetTextFromUser(_("Angle du rectangle, en degrés."), _("Nouveau rectangle"), "0").mb_str()))/180.0f*3.14159f;
+        boxes.push_back(newRectangle);
+
+        GetEditedSprite().SetCollisionMaskAutomatic(false);
+        GetEditedSprite().SetCustomCollisionMask(boxes);
+
+        imagePanel->Refresh();
+        imagePanel->Update(); //Immédiatement
+    }
+}
+
+void EditorObjet::OnStopMaskEditionSelected(wxCommandEvent& event)
+{
+    editingMask = false;
+    placingPoint = false;
+
+    imagePanel->Refresh();
+    imagePanel->Update(); //Immédiatement
+}
+
+void EditorObjet::OnEditMaskSelected(wxCommandEvent& event)
+{
+    editingMask = true;
+    placingPoint = false;
+
+    imagePanel->Refresh();
+    imagePanel->Update(); //Immédiatement
+}
+
+void EditorObjet::OnModifyMaskRectangleSelected(wxCommandEvent& event)
+{
+    if ( editingMask && SpriteValid())
+    {
+        std::vector<RotatedRectangle> boxes = GetEditedSprite().GetCollisionMask();
+        if ( selectedBox < boxes.size())
+        {
+            boxes[selectedBox].halfSize.x = ToFloat(string(wxGetTextFromUser(_("Entrez la largeur du rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].halfSize.x*2.0f)).mb_str()))/2.0f;
+            boxes[selectedBox].halfSize.y = ToFloat(string(wxGetTextFromUser(_("Entrez la hauteur du rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].halfSize.y*2.0f)).mb_str()))/2.0f;
+            //boxes[selectedBox].angle = ToFloat(string(wxGetTextFromUser(_("Angle du rectangle, en degrés."), _("Edition d'un rectangle"), ToString(boxes[selectedBox].angle/3.14159f*180.0f)).mb_str()))/180.0f*3.14159f;
+        }
+        GetEditedSprite().SetCollisionMaskAutomatic(false);
+        GetEditedSprite().SetCustomCollisionMask(boxes);
+
+        imagePanel->Refresh();
+        imagePanel->Update(); //Immédiatement
+    }
+}
 
 
-    Dialog.animation = 1; //Animation 1
-    Dialog.direction = 0; //Direction par défaut
-    Dialog.RefreshImages();
+void EditorObjet::OnEnterMaskRectanglePositionSelected(wxCommandEvent& event)
+{
+    if ( editingMask && SpriteValid())
+    {
+        std::vector<RotatedRectangle> boxes = GetEditedSprite().GetCollisionMask();
+        if ( selectedBox < boxes.size())
+        {
+            boxes[selectedBox].center.x = ToFloat(string(wxGetTextFromUser(_("Entrez la position X rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].center.x)).mb_str()));
+            boxes[selectedBox].center.y = ToFloat(string(wxGetTextFromUser(_("Entrez la position Y rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].center.y)).mb_str()));
+        }
+        GetEditedSprite().SetCollisionMaskAutomatic(false);
+        GetEditedSprite().SetCustomCollisionMask(boxes);
 
-    CHECK_EQUAL( false, Dialog.BoucleOuiCheck->GetValue() ); //Boucle : non
-    CHECK_EQUAL( true, Dialog.BoucleNonCheck->GetValue() );
-    CHECK_EQUAL( "1", static_cast<string>(Dialog.TempsEdit->GetValue()) ); //Temps entre : 1
-}*/
+        imagePanel->Refresh();
+        imagePanel->Update(); //Immédiatement
+    }
+}
+
 #endif

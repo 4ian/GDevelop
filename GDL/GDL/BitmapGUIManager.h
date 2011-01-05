@@ -46,6 +46,7 @@ public:
     wxBitmap joyaxisBt;
     wxBitmap backthumbsBg;
     wxBitmap varBt;
+    wxBitmap semitransparentHitBox;
 
     static BitmapGUIManager *getInstance()
     {

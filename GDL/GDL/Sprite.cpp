@@ -9,8 +9,8 @@ Point Sprite::badPoint("");
 Sprite::Sprite() :
 hasItsOwnImage(false),
 origine("origine"),
-automaticCentre(true),
-centre("centre")
+centre("centre"),
+automaticCentre(true)
 {
     //ctor
 }
@@ -114,10 +114,11 @@ std::vector<RotatedRectangle> Sprite::GetCollisionMask() const
         std::vector<RotatedRectangle> boxes;
 
         RotatedRectangle rectangle;
-        rectangle.center.x = GetWidth()/2;
-        rectangle.center.y = GetHeight()/2;
-        rectangle.size.x = GetWidth()/2;
-        rectangle.size.y = GetHeight()/2;
+        rectangle.center.x = sfmlSprite.GetSubRect().Width/2;
+        rectangle.center.y = sfmlSprite.GetSubRect().Height/2;
+        rectangle.halfSize.x = sfmlSprite.GetSubRect().Width/2;
+        rectangle.halfSize.y = sfmlSprite.GetSubRect().Height/2;
+        rectangle.angle = 0;
 
         boxes.push_back(rectangle);
         return boxes;

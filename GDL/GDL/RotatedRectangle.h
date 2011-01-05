@@ -13,7 +13,7 @@ class RotatedRectangle
 {
 public:
     sf::Vector2f center;
-    sf::Vector2f size;
+    sf::Vector2f halfSize;
     float angle;
 };
 

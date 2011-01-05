@@ -629,16 +629,18 @@ const Sprite & SpriteObject::GetCurrentSprite() const
 std::vector<RotatedRectangle> SpriteObject::GetHitBoxes() const
 {
     std::vector<RotatedRectangle> boxes = GetCurrentSprite().GetCollisionMask();
-    int originX = GetCurrentSprite().GetOrigine().GetX();
-    int originY = GetCurrentSprite().GetOrigine().GetY();
-    float radAngle = GetAngle()*3.14159f/180.0f;
-
     for (unsigned int i = 0;i<boxes.size();++i)
     {
-        boxes[i].center.x = (boxes[i].center.x-originX)*cos(radAngle)-(boxes[i].center.y-originY)*sin(radAngle)+originX;
-        boxes[i].center.y = (boxes[i].center.x-originX)*sin(radAngle)+(boxes[i].center.y-originY)*cos(radAngle)+originY;
+        sf::Vector2f newCenter = GetCurrentSFMLSprite().TransformToGlobal(
+                    sf::Vector2f(
+                        !isFlippedX ? boxes[i].center.x : GetCurrentSprite().GetSFMLSprite().GetSize().x/2-boxes[i].center.x,
+                        !isFlippedY ? boxes[i].center.y : GetCurrentSprite().GetSFMLSprite().GetSize().y/2-boxes[i].center.y
+                    ));
 
-        boxes[i].angle += radAngle;
+        boxes[i].center = newCenter;
+        boxes[i].halfSize.x *= scaleX;
+        boxes[i].halfSize.y *= scaleY;
+        boxes[i].angle += GetAngle()*3.14159f/180.0f;
     }
 
     return boxes;

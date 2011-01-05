@@ -2,6 +2,8 @@
 #define SPRITEOBJECT_H
 
 #include "GDL/Object.h"
+#include "GDL/Sprite.h"
+#include "GDL/Animation.h"
 class Evaluateur;
 class ImageManager;
 class RuntimeScene;

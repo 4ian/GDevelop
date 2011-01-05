@@ -53,6 +53,7 @@ class EditorObjet: public wxDialog
 		wxMenuItem* MenuItem8;
 		wxFlexGridSizer* FlexGridSizer4;
 		wxScrollBar* scrollWidth;
+		wxMenu maskContextMenu;
 		wxCheckBox* NormalCheck;
 		wxPanel* toolbarPanel;
 		wxMenuItem* MenuItem7;
@@ -63,12 +64,14 @@ class EditorObjet: public wxDialog
 		wxToggleButton* Bt4;
 		wxToggleButton* Bt6;
 		wxPanel* thumbsPanel;
+		wxMenuItem* MenuItem2;
 		wxToggleButton* Bt0;
 		wxFlexGridSizer* FlexGridSizer10;
 		wxButton* ListImageBt;
 		wxStaticBoxSizer* imagesSizer;
 		wxToggleButton* Bt5;
 		wxStaticBitmap* StaticBitmap1;
+		wxMenuItem* MenuItem4;
 		wxMenuItem* MenuItem14;
 		wxButton* DelAnimBt;
 		wxMenuItem* MenuItem11;
@@ -82,6 +85,8 @@ class EditorObjet: public wxDialog
 		wxScrollBar* scrollHeight;
 		wxStaticLine* StaticLine2;
 		wxMenuItem* MenuItem12;
+		wxMenuItem* MenuItem24;
+		wxMenuItem* MenuItem3;
 		wxPanel* imagePanel;
 		wxButton* AddAnimBt;
 		wxGridSizer* GridSizer3;
@@ -91,6 +96,7 @@ class EditorObjet: public wxDialog
 		wxStaticLine* StaticLine3;
 		wxStaticBoxSizer* directionSizer;
 		wxStaticLine* StaticLine1;
+		wxMenuItem* MenuItem23;
 		wxFlexGridSizer* animAndDirecSizer;
 		wxToggleButton* Bt1;
 		wxTextCtrl* TempsEdit;
@@ -102,6 +108,7 @@ class EditorObjet: public wxDialog
 		wxMenuItem* MenuItem9;
 		wxChoice* AnimationsBox;
 		wxStaticText* StaticText4;
+		wxMenu* MenuItem1;
 		wxStaticBitmap* CheckTempsEntreImg;
 		wxMenuItem* MenuItem18;
 		wxRadioButton* BoucleOuiCheck;
@@ -171,6 +178,15 @@ class EditorObjet: public wxDialog
 		static const long idMenuOptions;
 		static const long idAddPoint;
 		static const long idDelPoint;
+		static const long ID_MENUITEM2;
+		static const long ID_MENUITEM3;
+		static const long ID_MENUITEM5;
+		static const long ID_MENUITEM8;
+		static const long ID_MENUITEM9;
+		static const long ID_MENUITEM6;
+		static const long ID_MENUITEM7;
+		static const long ID_MENUITEM4;
+		static const long ID_MENUITEM10;
 		//*)
 		static const long ID_BITMAPARRAY;
 		static const long ID_BUTTONARRAY;
@@ -231,11 +247,29 @@ class EditorObjet: public wxDialog
 		void OnAddPointSelected(wxCommandEvent& event);
 		void OnDelPointSelected(wxCommandEvent& event);
 		void OnModPointPrecisSelected(wxCommandEvent& event);
+		void OnshowMaskSelected(wxCommandEvent& event);
+		void OnshowMaskSelected1(wxCommandEvent& event);
+		void OnautomaticMaskSelected(wxCommandEvent& event);
+		void OnimagePanelLeftDown(wxMouseEvent& event);
+		void OnimagePanelMouseMove(wxMouseEvent& event);
+		void OnDelMaskRectangleSelected(wxCommandEvent& event);
+		void OnMenuItem4Selected(wxCommandEvent& event);
+		void OnAddMaskRectangleSelected(wxCommandEvent& event);
+		void OnStopMaskEditionSelected(wxCommandEvent& event);
+		void OnEditMaskSelected(wxCommandEvent& event);
+		void OnModifyMaskRectangleSelected(wxCommandEvent& event);
+		void OnEnterMaskRectanglePositionSelected(wxCommandEvent& event);
 		//*)
 		void OnPointSelected(wxMenuEvent& event);
 		void MovePoint(Sprite & sprite, string pointName, int X, int Y);
 
 		DECLARE_EVENT_TABLE()
+
+		bool AnimationAndDirectionValid();
+		Animation & GetEditedAnimation();
+		Direction & GetEditedDirection();
+		bool SpriteValid();
+		Sprite & GetEditedSprite();
 
 		Game & game;
 		MainEditorCommand & mainEditorCommand;
@@ -245,6 +279,14 @@ class EditorObjet: public wxDialog
 		bool placingPoint;
 		string selectedPoint;
 
+        float spritePosX;
+        float spritePosY;
+
+        bool editingMask;
+		bool movingBox;
+		unsigned int selectedBox;
+		float xSelectionOffset;
+		float ySelectionOffset;
 
 		wxAuiManager m_mgr;
 };

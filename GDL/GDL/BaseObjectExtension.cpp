@@ -470,7 +470,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         DECLARE_END_OBJECT_CONDITION()
 
         DECLARE_OBJECT_CONDITION("VarObjetDef",
-                       _("Une variable d'un objet est elle définie ?"),
+                       _("Variable définie"),
                        _("Teste si une variable d'un objet existe."),
                        _("La variable _PARAM1_ de _PARAM0_ est définie"),
                        _("Variables"),
@@ -483,6 +483,37 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_CONDITION()
+
+        DECLARE_OBJECT_CONDITION("AutomatismActivated",
+                       _("Automatisme activé"),
+                       _("Renvoi vrai si l'automatisme spécifié est activé pour l'objet."),
+                       _("L'automatisme _PARAM1_ de _PARAM0_ est activé"),
+                       _("Automatismes"),
+                       "res/conditions/automatism24.png",
+                       "res/conditions/automatism16.png",
+                       &Object::CondAutomatismActivated);
+
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
+            DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+            MAIN_OBJECTS_IN_PARAMETER(0)
+
+        DECLARE_END_OBJECT_CONDITION()
+
+        DECLARE_OBJECT_ACTION("ActivateAutomatism",
+                       _("De/Activer un automatisme"),
+                       _("Dés/active l'automatisme spécifié pour l'objet."),
+                       _("Activer l'automatisme _PARAM1_ de _PARAM0_ : _PARAM2_"),
+                       _("Automatismes"),
+                       "res/conditions/automatism24.png",
+                       "res/conditions/automatism16.png",
+                       &Object::ActActivateAutomatism);
+
+            DECLARE_PARAMETER("object", _("Objet"), true, "")
+            DECLARE_PARAMETER("automatism", _("Automatisme"), false, "")
+            DECLARE_PARAMETER("yesorno", _("Activer ?"), false, "")
+            MAIN_OBJECTS_IN_PARAMETER(0)
+
+        DECLARE_END_OBJECT_ACTION()
 
         DECLARE_OBJECT_EXPRESSION("X", _("Position X"), _("Position X de l'objet"), _("Position"), "res/actions/position.png", &Object::ExpGetObjectX)
             DECLARE_PARAMETER("object", _("Objet"), true, "")

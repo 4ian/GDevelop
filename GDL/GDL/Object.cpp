@@ -19,7 +19,6 @@
 #include <list>
 #include <sstream>
 #include "GDL/MemTrace.h"
-#include "GDL/ErrorReport.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Automatism.h"
 #include <typeinfo>

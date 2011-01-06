@@ -602,46 +602,21 @@
 			</object>
 		</object>
 		<object class="wxMenu" variable="imageContextMenu" member="yes">
-			<object class="wxMenu" name="ID_MENUITEM2" variable="MenuItem1" member="yes">
-				<label>Points</label>
-				<object class="wxMenuItem" name="idPosPoint" variable="MenuItem16" member="yes">
-					<label>Positionner un point</label>
-					<bitmap>res/pointmod.png</bitmap>
-					<handler function="OnModPointSelected" entry="EVT_MENU" />
-				</object>
-				<object class="wxMenuItem" name="idPosPrecis" variable="MenuItem19" member="yes">
-					<label>Positionner précisement un point</label>
-					<handler function="OnModPointPrecisSelected" entry="EVT_MENU" />
-				</object>
-				<object class="wxMenu" name="idMenuOptions" variable="MenuItem17" member="no">
-					<label>Options</label>
-					<object class="wxMenuItem" name="idMenuPosEverywhere" variable="posEverywhereMenuItem" member="yes">
-						<label>Positionner le point sur les autres images de la direction</label>
-						<checkable>1</checkable>
-					</object>
-				</object>
-				<object class="separator" />
-				<object class="wxMenuItem" name="idAddPoint" variable="MenuItem21" member="no">
-					<label>Ajouter un point</label>
-					<bitmap>res/pointadd.png</bitmap>
-					<handler function="OnAddPointSelected" entry="EVT_MENU" />
-				</object>
-				<object class="wxMenuItem" name="idDelPoint" variable="MenuItem18" member="yes">
-					<label>Supprimer un point</label>
-					<bitmap>res/pointdel.png</bitmap>
-					<handler function="OnDelPointSelected" entry="EVT_MENU" />
-				</object>
+			<object class="wxMenuItem" name="idPosPoint" variable="MenuItem1" member="yes">
+				<label>Editer les points</label>
+				<bitmap>res/pointmod.png</bitmap>
+				<handler function="OnModPointSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItem2" member="yes">
 				<label>Editer le masque de collision</label>
-				<bitmap>res/mask16.png</bitmap>
+				<bitmap>res/maskEdit16.png</bitmap>
 				<handler function="OnEditMaskSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="maskContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM5" variable="MenuItem3" member="yes">
 				<label>Arrêter l&apos;édition du masque</label>
-				<handler function="OnStopMaskEditionSelected" entry="EVT_MENU" />
+				<handler function="OnEditMaskSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM8" variable="MenuItem4" member="yes">
@@ -660,7 +635,7 @@
 					<label>Modifier</label>
 					<handler function="OnModifyMaskRectangleSelected" entry="EVT_MENU" />
 				</object>
-				<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem25" member="yes">
+				<object class="wxMenuItem" name="idMenuPosEverywhere2" variable="MenuItem25" member="yes">
 					<label>Positionner précisement</label>
 					<handler function="OnEnterMaskRectanglePositionSelected" entry="EVT_MENU" />
 				</object>
@@ -669,6 +644,35 @@
 			<object class="wxMenuItem" name="ID_MENUITEM10" variable="MenuItem24" member="yes">
 				<label>Retourner au masque par défaut</label>
 				<handler function="OnautomaticMaskSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+		<object class="wxMenu" variable="pointsContextMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM11" variable="MenuItem26" member="yes">
+				<label>Arrêter de positionner les points</label>
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem27" member="yes">
+				<label>Choisir le point</label>
+				<handler function="OnModPointSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem28" member="yes">
+				<label>Positionner précisement</label>
+				<handler function="OnModPointPrecisSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenu" name="ID_MENUITEM14" variable="MenuItem29" member="yes">
+				<label>Options</label>
+				<object class="wxMenuItem" name="idMenuPosEverywhere" variable="posEverywhereMenuItem" member="yes">
+					<label>Positionner en même temps sur les autres images</label>
+				</object>
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="idAddPoint" variable="MenuItem31" member="yes">
+				<label>Ajouter un point</label>
+				<handler function="OnAddPointSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idDelPoint" variable="MenuItem32" member="yes">
+				<label>Supprimer un point</label>
+				<handler function="OnDelPointSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 	</object>

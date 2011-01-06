@@ -230,10 +230,10 @@
 		<Cursor position="236" topLine="3" />
 	</File>
 	<File name="GDL\EditorObjet.cpp" open="1" top="1" tabpos="12">
-		<Cursor position="76285" topLine="1649" />
+		<Cursor position="56060" topLine="1083" />
 	</File>
 	<File name="GDL\EditorObjet.h" open="1" top="0" tabpos="17">
-		<Cursor position="8754" topLine="190" />
+		<Cursor position="5598" topLine="44" />
 	</File>
 	<File name="GDL\EmptyEvent.cpp" open="0" top="0" tabpos="37">
 		<Cursor position="0" topLine="0" />
@@ -602,7 +602,7 @@
 		<Cursor position="636" topLine="8" />
 	</File>
 	<File name="GDL\SpriteObject.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="23605" topLine="620" />
+		<Cursor position="25941" topLine="716" />
 	</File>
 	<File name="GDL\SpriteObject.h" open="1" top="0" tabpos="6">
 		<Cursor position="118" topLine="0" />

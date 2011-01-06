@@ -49,6 +49,13 @@ class GD_API Automatism
         inline void StepPreEvents(RuntimeScene & scene) { if (activated) DoStepPreEvents(scene); };
         inline void StepPostEvents(RuntimeScene & scene) { if (activated) DoStepPostEvents(scene); };
 
+        /**
+         * De/Activate the automatism
+         */
+        inline void Activate(bool enable = true) { activated = enable; };
+        inline bool Activated() const { return activated; };
+
+
         #if defined(GDE)
         /**
          * Save Automatism to XML

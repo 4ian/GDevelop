@@ -50,16 +50,20 @@ class EditorObjet: public wxDialog
 		//(*Declarations(EditorObjet)
 		wxPanel* Core;
 		wxButton* OkBt;
+		wxMenuItem* MenuItem31;
 		wxMenuItem* MenuItem8;
 		wxFlexGridSizer* FlexGridSizer4;
 		wxScrollBar* scrollWidth;
 		wxMenu maskContextMenu;
 		wxCheckBox* NormalCheck;
 		wxPanel* toolbarPanel;
+		wxMenuItem* MenuItem26;
 		wxMenuItem* MenuItem7;
+		wxMenuItem* MenuItem25;
 		wxScrollBar* thumbsScroll;
 		wxCheckBox* RotationCheck;
 		wxMenuItem* posEverywhereMenuItem;
+		wxMenu pointsContextMenu;
 		wxStaticText* StaticText2;
 		wxToggleButton* Bt4;
 		wxToggleButton* Bt6;
@@ -71,6 +75,7 @@ class EditorObjet: public wxDialog
 		wxStaticBoxSizer* imagesSizer;
 		wxToggleButton* Bt5;
 		wxStaticBitmap* StaticBitmap1;
+		wxMenuItem* MenuItem1;
 		wxMenuItem* MenuItem4;
 		wxMenuItem* MenuItem14;
 		wxButton* DelAnimBt;
@@ -79,6 +84,7 @@ class EditorObjet: public wxDialog
 		wxMenu* MenuItem6;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
+		wxMenuItem* MenuItem32;
 		wxStaticText* StaticText3;
 		wxMenuItem* MenuItem13;
 		wxMenuItem* MenuItem10;
@@ -86,9 +92,13 @@ class EditorObjet: public wxDialog
 		wxStaticLine* StaticLine2;
 		wxMenuItem* MenuItem12;
 		wxMenuItem* MenuItem24;
+		wxMenuItem* MenuItem27;
 		wxMenuItem* MenuItem3;
+		wxMenuItem* MenuItem20;
 		wxPanel* imagePanel;
 		wxButton* AddAnimBt;
+		wxMenuItem* MenuItem28;
+		wxMenu* MenuItem22;
 		wxGridSizer* GridSizer3;
 		wxMenu imageContextMenu;
 		wxMenu contextMenu;
@@ -102,19 +112,16 @@ class EditorObjet: public wxDialog
 		wxTextCtrl* TempsEdit;
 		wxToggleButton* Bt3;
 		wxToggleButton* Bt7;
+		wxMenu* MenuItem29;
 		wxPanel* Panel2;
 		wxMenu* MenuItem5;
-		wxMenuItem* MenuItem16;
 		wxMenuItem* MenuItem9;
 		wxChoice* AnimationsBox;
 		wxStaticText* StaticText4;
-		wxMenu* MenuItem1;
 		wxStaticBitmap* CheckTempsEntreImg;
-		wxMenuItem* MenuItem18;
 		wxRadioButton* BoucleOuiCheck;
 		wxStaticText* NomObjetTxt;
 		wxRadioButton* BoucleNonCheck;
-		wxMenuItem* MenuItem19;
 		wxButton* AideBt;
 		//*)
 		EditorImages * editorImagesPnl;
@@ -173,20 +180,21 @@ class EditorObjet: public wxDialog
 		static const long idMenuDelAll;
 		static const long idMenuCopyFrom;
 		static const long idPosPoint;
-		static const long idPosPrecis;
-		static const long idMenuPosEverywhere;
-		static const long idMenuOptions;
-		static const long idAddPoint;
-		static const long idDelPoint;
-		static const long ID_MENUITEM2;
 		static const long ID_MENUITEM3;
 		static const long ID_MENUITEM5;
 		static const long ID_MENUITEM8;
 		static const long ID_MENUITEM9;
 		static const long ID_MENUITEM6;
-		static const long ID_MENUITEM7;
+		static const long idMenuPosEverywhere2;
 		static const long ID_MENUITEM4;
 		static const long ID_MENUITEM10;
+		static const long ID_MENUITEM11;
+		static const long ID_MENUITEM2;
+		static const long ID_MENUITEM7;
+		static const long idMenuPosEverywhere;
+		static const long ID_MENUITEM14;
+		static const long idAddPoint;
+		static const long idDelPoint;
 		//*)
 		static const long ID_BITMAPARRAY;
 		static const long ID_BUTTONARRAY;
@@ -255,10 +263,10 @@ class EditorObjet: public wxDialog
 		void OnDelMaskRectangleSelected(wxCommandEvent& event);
 		void OnMenuItem4Selected(wxCommandEvent& event);
 		void OnAddMaskRectangleSelected(wxCommandEvent& event);
-		void OnStopMaskEditionSelected(wxCommandEvent& event);
 		void OnEditMaskSelected(wxCommandEvent& event);
 		void OnModifyMaskRectangleSelected(wxCommandEvent& event);
 		void OnEnterMaskRectanglePositionSelected(wxCommandEvent& event);
+		void OnEditPointsSelected(wxCommandEvent& event);
 		//*)
 		void OnPointSelected(wxMenuEvent& event);
 		void MovePoint(Sprite & sprite, string pointName, int X, int Y);

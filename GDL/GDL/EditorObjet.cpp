@@ -91,20 +91,21 @@ const long EditorObjet::idMenuDel = wxNewId();
 const long EditorObjet::idMenuDelAll = wxNewId();
 const long EditorObjet::idMenuCopyFrom = wxNewId();
 const long EditorObjet::idPosPoint = wxNewId();
-const long EditorObjet::idPosPrecis = wxNewId();
-const long EditorObjet::idMenuPosEverywhere = wxNewId();
-const long EditorObjet::idMenuOptions = wxNewId();
-const long EditorObjet::idAddPoint = wxNewId();
-const long EditorObjet::idDelPoint = wxNewId();
-const long EditorObjet::ID_MENUITEM2 = wxNewId();
 const long EditorObjet::ID_MENUITEM3 = wxNewId();
 const long EditorObjet::ID_MENUITEM5 = wxNewId();
 const long EditorObjet::ID_MENUITEM8 = wxNewId();
 const long EditorObjet::ID_MENUITEM9 = wxNewId();
 const long EditorObjet::ID_MENUITEM6 = wxNewId();
-const long EditorObjet::ID_MENUITEM7 = wxNewId();
+const long EditorObjet::idMenuPosEverywhere2 = wxNewId();
 const long EditorObjet::ID_MENUITEM4 = wxNewId();
 const long EditorObjet::ID_MENUITEM10 = wxNewId();
+const long EditorObjet::ID_MENUITEM11 = wxNewId();
+const long EditorObjet::ID_MENUITEM2 = wxNewId();
+const long EditorObjet::ID_MENUITEM7 = wxNewId();
+const long EditorObjet::idMenuPosEverywhere = wxNewId();
+const long EditorObjet::ID_MENUITEM14 = wxNewId();
+const long EditorObjet::idAddPoint = wxNewId();
+const long EditorObjet::idDelPoint = wxNewId();
 //*)
 
 const long EditorObjet::ID_BUTTONARRAY = wxNewId();
@@ -135,7 +136,6 @@ ySelectionOffset(0)
 {
     //(*Initialize(EditorObjet)
     wxFlexGridSizer* FlexGridSizer16;
-    wxMenuItem* MenuItem25;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
     wxFlexGridSizer* FlexGridSizer9;
@@ -143,8 +143,6 @@ ySelectionOffset(0)
     wxBoxSizer* BoxSizer2;
     wxFlexGridSizer* FlexGridSizer7;
     wxFlexGridSizer* thumbsSizer;
-    wxMenuItem* MenuItem20;
-    wxMenu* MenuItem22;
     wxFlexGridSizer* FlexGridSizer15;
     wxFlexGridSizer* FlexGridSizer8;
     wxStaticBoxSizer* animationSizer;
@@ -152,11 +150,9 @@ ySelectionOffset(0)
     wxFlexGridSizer* FlexGridSizer13;
     wxFlexGridSizer* FlexGridSizer12;
     wxFlexGridSizer* FlexGridSizer6;
-    wxMenuItem* MenuItem21;
     wxFlexGridSizer* FlexGridSizer1;
     wxFlexGridSizer* FlexGridSizer11;
     wxFlexGridSizer* FlexGridSizer17;
-    wxMenu* MenuItem17;
 
     Create(parent, wxID_ANY, _("Editer l\'objet"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(356,215));
@@ -371,26 +367,11 @@ ySelectionOffset(0)
     MenuItem15 = new wxMenuItem((&contextMenu), idMenuCopyFrom, _("Copier toutes les images depuis..."), wxEmptyString, wxITEM_NORMAL);
     MenuItem15->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
     contextMenu.Append(MenuItem15);
-    MenuItem1 = new wxMenu();
-    MenuItem16 = new wxMenuItem(MenuItem1, idPosPoint, _("Positionner un point"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem16->SetBitmap(wxBitmap(wxImage(_T("res/pointmod.png"))));
-    MenuItem1->Append(MenuItem16);
-    MenuItem19 = new wxMenuItem(MenuItem1, idPosPrecis, _("Positionner précisement un point"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem1->Append(MenuItem19);
-    MenuItem17 = new wxMenu();
-    posEverywhereMenuItem = new wxMenuItem(MenuItem17, idMenuPosEverywhere, _("Positionner le point sur les autres images de la direction"), wxEmptyString, wxITEM_CHECK);
-    MenuItem17->Append(posEverywhereMenuItem);
-    MenuItem1->Append(idMenuOptions, _("Options"), MenuItem17, wxEmptyString);
-    MenuItem1->AppendSeparator();
-    MenuItem21 = new wxMenuItem(MenuItem1, idAddPoint, _("Ajouter un point"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem21->SetBitmap(wxBitmap(wxImage(_T("res/pointadd.png"))));
-    MenuItem1->Append(MenuItem21);
-    MenuItem18 = new wxMenuItem(MenuItem1, idDelPoint, _("Supprimer un point"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem18->SetBitmap(wxBitmap(wxImage(_T("res/pointdel.png"))));
-    MenuItem1->Append(MenuItem18);
-    imageContextMenu.Append(ID_MENUITEM2, _("Points"), MenuItem1, wxEmptyString);
+    MenuItem1 = new wxMenuItem((&imageContextMenu), idPosPoint, _("Editer les points"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/pointmod.png"))));
+    imageContextMenu.Append(MenuItem1);
     MenuItem2 = new wxMenuItem((&imageContextMenu), ID_MENUITEM3, _("Editer le masque de collision"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/mask16.png"))));
+    MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/maskEdit16.png"))));
     imageContextMenu.Append(MenuItem2);
     MenuItem3 = new wxMenuItem((&maskContextMenu), ID_MENUITEM5, _("Arrêter l\'édition du masque"), wxEmptyString, wxITEM_NORMAL);
     maskContextMenu.Append(MenuItem3);
@@ -404,12 +385,28 @@ ySelectionOffset(0)
     MenuItem22->Append(MenuItem23);
     MenuItem20 = new wxMenuItem(MenuItem22, ID_MENUITEM6, _("Modifier"), wxEmptyString, wxITEM_NORMAL);
     MenuItem22->Append(MenuItem20);
-    MenuItem25 = new wxMenuItem(MenuItem22, ID_MENUITEM7, _("Positionner précisement"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem25 = new wxMenuItem(MenuItem22, idMenuPosEverywhere2, _("Positionner précisement"), wxEmptyString, wxITEM_NORMAL);
     MenuItem22->Append(MenuItem25);
     maskContextMenu.Append(ID_MENUITEM4, _("Rectangle sélectionné"), MenuItem22, wxEmptyString);
     maskContextMenu.AppendSeparator();
     MenuItem24 = new wxMenuItem((&maskContextMenu), ID_MENUITEM10, _("Retourner au masque par défaut"), wxEmptyString, wxITEM_NORMAL);
     maskContextMenu.Append(MenuItem24);
+    MenuItem26 = new wxMenuItem((&pointsContextMenu), ID_MENUITEM11, _("Arrêter de positionner les points"), wxEmptyString, wxITEM_NORMAL);
+    pointsContextMenu.Append(MenuItem26);
+    pointsContextMenu.AppendSeparator();
+    MenuItem27 = new wxMenuItem((&pointsContextMenu), ID_MENUITEM2, _("Choisir le point"), wxEmptyString, wxITEM_NORMAL);
+    pointsContextMenu.Append(MenuItem27);
+    MenuItem28 = new wxMenuItem((&pointsContextMenu), ID_MENUITEM7, _("Positionner précisement"), wxEmptyString, wxITEM_NORMAL);
+    pointsContextMenu.Append(MenuItem28);
+    MenuItem29 = new wxMenu();
+    posEverywhereMenuItem = new wxMenuItem(MenuItem29, idMenuPosEverywhere, _("Positionner en même temps sur les autres images"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem29->Append(posEverywhereMenuItem);
+    pointsContextMenu.Append(ID_MENUITEM14, _("Options"), MenuItem29, wxEmptyString);
+    pointsContextMenu.AppendSeparator();
+    MenuItem31 = new wxMenuItem((&pointsContextMenu), idAddPoint, _("Ajouter un point"), wxEmptyString, wxITEM_NORMAL);
+    pointsContextMenu.Append(MenuItem31);
+    MenuItem32 = new wxMenuItem((&pointsContextMenu), idDelPoint, _("Supprimer un point"), wxEmptyString, wxITEM_NORMAL);
+    pointsContextMenu.Append(MenuItem32);
     FlexGridSizer1->SetSizeHints(this);
     Center();
 
@@ -458,16 +455,17 @@ ySelectionOffset(0)
     Connect(idMenuDelAll,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDeleteAllBtClick);
     Connect(idMenuCopyFrom,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnCopyBtClick);
     Connect(idPosPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnModPointSelected);
-    Connect(idPosPrecis,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnModPointPrecisSelected);
-    Connect(idAddPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddPointSelected);
-    Connect(idDelPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDelPointSelected);
     Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnEditMaskSelected);
-    Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnStopMaskEditionSelected);
+    Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnEditMaskSelected);
     Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddMaskRectangleSelected);
     Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDelMaskRectangleSelected);
     Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnModifyMaskRectangleSelected);
-    Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnEnterMaskRectanglePositionSelected);
+    Connect(idMenuPosEverywhere2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnEnterMaskRectanglePositionSelected);
     Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnautomaticMaskSelected);
+    Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnModPointSelected);
+    Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnModPointPrecisSelected);
+    Connect(idAddPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddPointSelected);
+    Connect(idDelPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDelPointSelected);
     //*)
 
     toolbar = new wxToolBar( toolbarPanel, -1, wxDefaultPosition, wxDefaultSize,
@@ -477,17 +475,21 @@ ySelectionOffset(0)
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
     toolbar->AddTool( idMenuAddFromEnd, wxT( "Ajouter l'image à la fin" ), wxBitmap( wxImage( "res/addfromimagebanque.png" ) ), _( "Ajouter une image à la fin depuis la banque d'image" ) );
     toolbar->AddTool( idMenuDel, wxT( "Supprimer l'image selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _( "Supprimer l'image selectionnée" ) );
-    toolbar->AddSeparator();
     toolbar->AddTool( idMenuCopyFrom, wxT( "Copier les images depuis une animation/direction" ), wxBitmap( wxImage( "res/copyicon.png" ) ), _( "Copier les images depuis une animation/direction" ) );
     toolbar->AddSeparator();
     toolbar->AddTool( idPosPoint, wxT( "Positionner un point" ), wxBitmap( wxImage( "res/pointmod.png" ) ), _( "Positionner un point" ) );
     toolbar->AddTool( idAddPoint, wxT( "Ajouter un point" ), wxBitmap( wxImage( "res/pointadd.png" ) ), _( "Ajouter un point" ) );
     toolbar->AddTool( idDelPoint, wxT( "Supprimer un point" ), wxBitmap( wxImage( "res/pointdel.png" ) ), _( "Supprimer un point" ) );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_MENUITEM3, wxT( "Editer le masque de collision" ), wxBitmap( wxImage( "res/mask16.png" ) ), _( "Editer le masque de collision" ) );
+    toolbar->AddTool( ID_MENUITEM3, wxT( "Editer le masque de collision" ), wxBitmap( wxImage( "res/maskEdit16.png" ) ), _( "Editer le masque de collision" ) );
     toolbar->AddTool( ID_MENUITEM8, wxT( "Ajouter un rectangle au masque" ), wxBitmap( wxImage( "res/maskAdd16.png" ) ), _( "Ajouter un rectangle au masque" ) );
     toolbar->AddTool( ID_MENUITEM9, wxT( "Supprimer le rectangle selectionné du masque" ), wxBitmap( wxImage( "res/maskRemove16.png" ) ), _( "Supprimer le rectangle selectionné du masque" ) );
     toolbar->Realize();
+
+    toolbar->EnableTool(idAddPoint, false);
+    toolbar->EnableTool(idDelPoint, false);
+    toolbar->EnableTool(ID_MENUITEM8, false);
+    toolbar->EnableTool(ID_MENUITEM9, false);
 
     //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
 #ifdef __WXGTK__
@@ -496,29 +498,6 @@ ySelectionOffset(0)
 #endif
 
     NomObjetTxt->SetLabel( object.GetName() );
-
-    //On vérifie si on est pas en mode simple.
-    wxConfigBase * pConfig = wxConfigBase::Get();
-
-    bool result = false;
-    pConfig->Read("/ModeSimple", &result);
-
-    if ( result )
-    {
-        toolbar->EnableTool(idPosPoint, false);
-        toolbar->EnableTool(idAddPoint, false);
-        toolbar->EnableTool(idDelPoint, false);
-        toolbar->EnableTool(idMenuCopyFrom, false);
-        MenuItem11->Enable(false);
-        MenuItem12->Enable(false);
-        MenuItem13->Enable(false);
-        MenuItem15->Enable(false);
-        MenuItem16->Enable(false);
-        MenuItem21->Enable(false);
-        MenuItem18->Enable(false);
-        MenuItem19->Enable(false);
-        posEverywhereMenuItem->Enable(false);
-    }
 
     m_mgr.SetManagedWindow( this );
 
@@ -1115,7 +1094,7 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
                 dc.DrawBitmap(bmp, spritePosX, spritePosY, true /* use mask */); //Affichage de l'image
 
             //Affichage du point
-            if ( sprite.HasPoint(selectedPoint))
+            if ( placingPoint && sprite.HasPoint(selectedPoint))
             {
                 dc.DrawBitmap(point,
                               sprite.GetPoint(selectedPoint).GetX() - point.GetWidth()/2 + ((size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2),
@@ -1382,13 +1361,14 @@ void EditorObjet::OnscrollWidthScroll(wxScrollEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjet::OnimagePanelRightUp(wxMouseEvent& event)
 {
-    if ( SpriteValid() )
-    {
-        if ( !editingMask )
-            PopupMenu(&imageContextMenu);
-        else
-            PopupMenu(&maskContextMenu);
-    }
+    if ( !SpriteValid() )return;
+
+    if ( !editingMask && !placingPoint )
+        PopupMenu(&imageContextMenu);
+    else if ( editingMask )
+        PopupMenu(&maskContextMenu);
+    else if ( placingPoint )
+        PopupMenu(&pointsContextMenu);
 
 }
 
@@ -1463,7 +1443,12 @@ void EditorObjet::OnModPointSelected(wxCommandEvent& event)
     }
 
     placingPoint = true;
+    toolbar->EnableTool(ID_MENUITEM8, false);
+    toolbar->EnableTool(ID_MENUITEM9, false);
+    toolbar->EnableTool(idAddPoint, true);
+    toolbar->EnableTool(idDelPoint, true);
     editingMask = false;
+
     selectedPoint = name;
 
     imagePanel->Refresh();
@@ -1687,19 +1672,24 @@ void EditorObjet::OnAddMaskRectangleSelected(wxCommandEvent& event)
     }
 }
 
-void EditorObjet::OnStopMaskEditionSelected(wxCommandEvent& event)
-{
-    editingMask = false;
-    placingPoint = false;
-
-    imagePanel->Refresh();
-    imagePanel->Update(); //Immédiatement
-}
-
 void EditorObjet::OnEditMaskSelected(wxCommandEvent& event)
 {
-    editingMask = true;
-    placingPoint = false;
+    editingMask = !editingMask;
+
+    if ( editingMask )
+    {
+        placingPoint = false;
+
+        toolbar->EnableTool(idAddPoint, false);
+        toolbar->EnableTool(idDelPoint, false);
+        toolbar->EnableTool(ID_MENUITEM8, true);
+        toolbar->EnableTool(ID_MENUITEM9, true);
+    }
+    else
+    {
+        toolbar->EnableTool(ID_MENUITEM8, false);
+        toolbar->EnableTool(ID_MENUITEM9, false);
+    }
 
     imagePanel->Refresh();
     imagePanel->Update(); //Immédiatement
@@ -1741,6 +1731,17 @@ void EditorObjet::OnEnterMaskRectanglePositionSelected(wxCommandEvent& event)
         imagePanel->Refresh();
         imagePanel->Update(); //Immédiatement
     }
+}
+
+/**
+ * Exit point editing
+ */
+void EditorObjet::OnEditPointsSelected(wxCommandEvent& event)
+{
+    placingPoint = false;
+
+    toolbar->EnableTool(idAddPoint, false);
+    toolbar->EnableTool(idDelPoint, false);
 }
 
 #endif

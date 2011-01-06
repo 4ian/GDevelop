@@ -395,6 +395,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         bool ActCacheObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActMontreObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActDuplicate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActActivateAutomatism( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         //Conditions
         bool CondLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
@@ -409,6 +410,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         bool CondVarObjetDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool CondInvisibleObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
         bool CondVisibleObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        bool CondAutomatismActivated( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
         //Expressions
         double ExpGetObjectX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );

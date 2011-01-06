@@ -105,6 +105,38 @@ void OpenSpritesDirection(vector < Sprite > & sprites, const TiXmlElement * elem
             }
         }
 
+        const TiXmlElement * customCollisionMaskElem= elemSprite->FirstChildElement("CustomCollisionMask");
+        if ( customCollisionMaskElem )
+        {
+            bool customCollisionMask = false;
+            if ( customCollisionMaskElem->Attribute("custom") && string (customCollisionMaskElem->Attribute("custom")) == "true")
+                customCollisionMask = true;
+
+            sprite.SetCollisionMaskAutomatic(!customCollisionMask);
+
+            if ( customCollisionMask )
+            {
+                std::vector<RotatedRectangle> boxes;
+                const TiXmlElement * rectangleElem = customCollisionMaskElem->FirstChildElement("Rectangle");
+                while ( rectangleElem )
+                {
+                    RotatedRectangle rectangle;
+                    rectangle.angle = 0;
+
+                    if ( rectangleElem->Attribute("centerX") ) rectangleElem->QueryFloatAttribute("centerX", &rectangle.center.x);
+                    if ( rectangleElem->Attribute("centerY") ) rectangleElem->QueryFloatAttribute("centerY", &rectangle.center.y);
+                    if ( rectangleElem->Attribute("halfSizeX") ) rectangleElem->QueryFloatAttribute("halfSizeX", &rectangle.halfSize.x);
+                    if ( rectangleElem->Attribute("halfSizeY") ) rectangleElem->QueryFloatAttribute("halfSizeY", &rectangle.halfSize.y);
+                    if ( rectangleElem->Attribute("angle") ) rectangleElem->QueryFloatAttribute("angle", &rectangle.angle);
+
+                    boxes.push_back(rectangle);
+                    rectangleElem = rectangleElem->NextSiblingElement();
+                }
+                sprite.SetCustomCollisionMask(boxes);
+            }
+
+        }
+
         sprites.push_back(sprite);
         elemSprite = elemSprite->NextSiblingElement();
     }
@@ -234,6 +266,26 @@ void SaveSpritesDirection(const vector < Sprite > & sprites, TiXmlElement * elem
             pointCentre->SetAttribute("automatic", "true");
         else
             pointCentre->SetAttribute("automatic", "false");
+
+        TiXmlElement * customCollisionMask = new TiXmlElement( "CustomCollisionMask" );
+        sprite->LinkEndChild( customCollisionMask );
+
+        customCollisionMask->SetAttribute("custom", "false");
+        if ( !sprites.at(i).IsCollisionMaskAutomatic() )
+        {
+            customCollisionMask->SetAttribute("custom", "true");
+            std::vector<RotatedRectangle> boxes = sprites.at(i).GetCollisionMask();
+            for (unsigned int i = 0;i<boxes.size();++i)
+            {
+                TiXmlElement * box = new TiXmlElement( "Rectangle" );
+                box->SetDoubleAttribute("centerX", boxes[i].center.x);
+                box->SetDoubleAttribute("centerY", boxes[i].center.y);
+                box->SetDoubleAttribute("halfSizeX", boxes[i].halfSize.x);
+                box->SetDoubleAttribute("halfSizeY", boxes[i].halfSize.y);
+                box->SetDoubleAttribute("angle", boxes[i].angle);
+                customCollisionMask->LinkEndChild( box );
+            }
+        }
     }
 }
 #if defined(GDE)

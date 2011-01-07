@@ -1763,7 +1763,7 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1293909713 d:\florian\programmation\gamedevelop\gdl\gdl\object.h
+1294348867 d:\florian\programmation\gamedevelop\gdl\gdl\object.h
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 	<iostream>
@@ -1773,10 +1773,7 @@
 	<boost/interprocess/containers/flat_map.hpp>
 	<boost/enable_shared_from_this.hpp>
 	"GDL/Force.h"
-	"GDL/constantes.h"
-	"GDL/Sprite.h"
 	"GDL/ListVariable.h"
-	"GDL/Animation.h"
 	"GDL/ObjectHelpers.h"
 	"GDL/RotatedRectangle.h"
 	<wx/wx.h>
@@ -5205,17 +5202,6 @@
 1236010936 c:\libs\boost_1_43_0\boost\weak_ptr.hpp
 	<boost/smart_ptr/weak_ptr.hpp>
 
-1293900639 d:\florian\programmation\gamedevelop\gdl\gdl\constantes.h
-
-1293900639 d:\florian\programmation\gamedevelop\gdl\gdl\sprite.h
-	<SFML/Graphics.hpp>
-	<boost/shared_ptr.hpp>
-	"GDL/Point.h"
-	<string>
-
-1293906916 d:\florian\programmation\gamedevelop\gdl\gdl\point.h
-	<string>
-
 1293900639 d:\florian\programmation\gamedevelop\gdl\gdl\listvariable.h
 	<vector>
 	<string>
@@ -5226,24 +5212,11 @@
 	<iostream>
 	<functional>
 
-1293900638 d:\florian\programmation\gamedevelop\gdl\gdl\animation.h
-	<iostream>
-	<SFML/Graphics.hpp>
-	<string>
-	<vector>
-	"GDL/Direction.h"
-
-1282338034 d:\florian\programmation\gamedevelop\gdl\gdl\direction.h
-	<string>
-	<vector>
-	<SFML/Graphics.hpp>
-	"GDL/Sprite.h"
-
 1293901836 d:\florian\programmation\gamedevelop\gdl\gdl\objecthelpers.h
 	<boost/shared_ptr.hpp>
 	<vector>
 
-1293910399 d:\florian\programmation\gamedevelop\gdl\gdl\rotatedrectangle.h
+1294091278 d:\florian\programmation\gamedevelop\gdl\gdl\rotatedrectangle.h
 
 1253304927 c:\libs\wxwidgets\include\wx\wx.h
 	"wx/defs.h"
@@ -8469,7 +8442,7 @@
 	<string>
 	<vector>
 
-1281265627 d:\florian\programmation\gamedevelop\gdl\gdl\automatism.h
+1294349155 d:\florian\programmation\gamedevelop\gdl\gdl\automatism.h
 	<boost/shared_ptr.hpp>
 	<string>
 
@@ -9214,7 +9187,7 @@
 	<string>
 	<vector>
 
-1293900638 d:\florian\programmation\gamedevelop\gdl\gdl\bitmapguimanager.h
+1294090862 d:\florian\programmation\gamedevelop\gdl\gdl\bitmapguimanager.h
 	<wx/bitmap.h>
 	<string>
 
@@ -10587,6 +10560,8 @@
 	<SFML/Audio.hpp>
 	<string>
 
+1293900639 d:\florian\programmation\gamedevelop\gdl\gdl\constantes.h
+
 1268857936 d:\florian\programmation\gamedevelop\gdl\gdl\runtimelayer.h
 	<SFML/Graphics.hpp>
 	"GDL/Layer.h"
@@ -10831,9 +10806,10 @@
 	"GDL/ImageManager.h"
 	"GDL/MainEditorCommand.h"
 
-1293900639 d:\florian\programmation\gamedevelop\gdl\gdl\maineditorcommand.h
+1294433668 d:\florian\programmation\gamedevelop\gdl\gdl\maineditorcommand.h
 	<wx/ribbon/bar.h>
 	<wx/ribbon/buttonbar.h>
+	<wx/toplevel.h>
 	<iostream>
 
 1291931820 d:\florian\programmation\gamedevelop\ide\editorscene.h
@@ -10855,7 +10831,7 @@
 	<string>
 	<vector>
 
-1291931605 d:\florian\programmation\gamedevelop\ide\scenecanvas.h
+1294433271 d:\florian\programmation\gamedevelop\ide\scenecanvas.h
 	<SFML/Graphics.hpp>
 	<SFML/System.hpp>
 	"wxSFMLCanvas.hpp"
@@ -10891,8 +10867,33 @@
 	"GDL/SpriteObject.h"
 	<cmath>
 
-1293914307 d:\florian\programmation\gamedevelop\gdl\gdl\spriteobject.h
+1293994195 d:\florian\programmation\gamedevelop\gdl\gdl\spriteobject.h
 	"GDL/Object.h"
+	"GDL/Sprite.h"
+	"GDL/Animation.h"
+
+1293994619 d:\florian\programmation\gamedevelop\gdl\gdl\sprite.h
+	<SFML/Graphics.hpp>
+	<boost/shared_ptr.hpp>
+	"GDL/Point.h"
+	<string>
+	"GDL/RotatedRectangle.h"
+
+1293906916 d:\florian\programmation\gamedevelop\gdl\gdl\point.h
+	<string>
+
+1293900638 d:\florian\programmation\gamedevelop\gdl\gdl\animation.h
+	<iostream>
+	<SFML/Graphics.hpp>
+	<string>
+	<vector>
+	"GDL/Direction.h"
+
+1282338034 d:\florian\programmation\gamedevelop\gdl\gdl\direction.h
+	<string>
+	<vector>
+	<SFML/Graphics.hpp>
+	"GDL/Sprite.h"
 
 1288990989 d:\florian\programmation\gamedevelop\ide\edittimescene.h
 	<SFML/Graphics.hpp>
@@ -12442,7 +12443,7 @@
 1236010936 c:\libs\boost_1_43_0\boost\detail\quick_allocator.hpp
 	<boost/smart_ptr/detail/quick_allocator.hpp>
 
-1293900639 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
+1294433271 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
 	"MemTrace.h"
 	<wx/bitmap.h>
 	<wx/icon.h>
@@ -12988,7 +12989,7 @@
 	<wx/string.h>
 	<iostream>
 
-1293913571 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1294434014 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -13108,7 +13109,7 @@
 
 1263934043 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
 
-1293984520 d:\florian\programmation\gamedevelop\ide\version.h
+1294434014 d:\florian\programmation\gamedevelop\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -13234,5 +13235,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1293914585 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1294349716 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

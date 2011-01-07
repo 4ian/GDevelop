@@ -56,6 +56,10 @@ const long SceneCanvas::idRibbonOriginalZoom = wxNewId();
 const long SceneCanvas::idRibbonGrid = wxNewId();
 const long SceneCanvas::idRibbonWindowMask = wxNewId();
 const long SceneCanvas::idRibbonGridSetup = wxNewId();
+const long SceneCanvas::idRibbonUndo = wxNewId();
+const long SceneCanvas::idRibbonRedo = wxNewId();
+const long SceneCanvas::idRibbonObjectsPositionList = wxNewId();
+const long SceneCanvas::idRibbonHelp = wxNewId();
 
 const long SceneCanvas::idRibbonRefresh = wxNewId();
 const long SceneCanvas::idRibbonPlay = wxNewId();
@@ -64,13 +68,7 @@ const long SceneCanvas::idRibbonPause = wxNewId();
 const long SceneCanvas::idRibbonResetGlobalVars = wxNewId();
 const long SceneCanvas::idRibbonDebugger = wxNewId();
 const long SceneCanvas::idRibbonProfiler = wxNewId();
-
-const long SceneCanvas::idRibbonUndo = wxNewId();
-const long SceneCanvas::idRibbonRedo = wxNewId();
-
-const long SceneCanvas::idRibbonObjectsPositionList = wxNewId();
-
-const long SceneCanvas::idRibbonHelp = wxNewId();
+const long SceneCanvas::idRibbonFullScreen = wxNewId();
 
 const long SceneCanvas::ID_MENUITEM8 = wxNewId();
 const long SceneCanvas::ID_MENUITEM1 = wxNewId();
@@ -80,6 +78,7 @@ const long SceneCanvas::ID_MENUITEM4 = wxNewId();
 const long SceneCanvas::ID_MENUITEM5 = wxNewId();
 const long SceneCanvas::ID_MENUITEM6 = wxNewId();
 const long SceneCanvas::ID_MENUITEM7 = wxNewId();
+
 
 
 SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style ) :
@@ -198,6 +197,7 @@ void SceneCanvas::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonPause, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPauseBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonDebugger, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnDebugBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonProfiler, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnProfilerBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonFullScreen, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnFullScreenBtClick, NULL, this);
 
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom5Selected, NULL, this);
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom10Selected, NULL, this);
@@ -210,7 +210,7 @@ void SceneCanvas::ConnectEvents()
 }
 
 /**
- * Static method for creating the ribbon's page used by Images Editors
+ * Static method for creating the ribbon's page used by Scene canvas
  */
 wxRibbonButtonBar* SceneCanvas::CreateRibbonPage(wxRibbonPage * page)
 {
@@ -272,11 +272,22 @@ void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
         bar->AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", wxBitmap("res/pauseicon24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", wxBitmap("res/bug24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonProfiler, !hideLabels ? _("Performances") : "", wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonFullScreen, !hideLabels ? _("Afficher l'éditeur en plein écran") : "", wxBitmap("res/fullscreen24.png", wxBITMAP_TYPE_ANY));
     }
 
     bar->Realize();
 }
 
+/**
+ * Toggle Game Develop full screen mode.
+ */
+void SceneCanvas::OnFullScreenBtClick(wxCommandEvent & event)
+{
+    if (!mainEditorCommand.GetMainEditor()->IsFullScreen())
+        mainEditorCommand.GetMainEditor()->ShowFullScreen(true, wxFULLSCREEN_NOBORDER | wxFULLSCREEN_NOCAPTION);
+    else
+        mainEditorCommand.GetMainEditor()->ShowFullScreen(false);
+}
 
 void SceneCanvas::SetOwnedObjectsEditor(boost::shared_ptr<EditorObjets> objectsEditor_)
 {

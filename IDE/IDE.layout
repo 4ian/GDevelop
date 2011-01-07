@@ -145,7 +145,7 @@
 	<File name="EditPropScene.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="12899" topLine="364" />
 	</File>
-	<File name="EditorEvents.cpp" open="1" top="0" tabpos="3">
+	<File name="EditorEvents.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="63824" topLine="1318" />
 	</File>
 	<File name="EditorEvents.h" open="0" top="0" tabpos="9">
@@ -163,8 +163,8 @@
 	<File name="EditorLayers.h" open="0" top="0" tabpos="8">
 		<Cursor position="737" topLine="15" />
 	</File>
-	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="12">
-		<Cursor position="38045" topLine="826" />
+	<File name="EditorObjectList.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="37940" topLine="826" />
 	</File>
 	<File name="EditorObjectList.h" open="0" top="0" tabpos="13">
 		<Cursor position="1186" topLine="20" />
@@ -206,10 +206,10 @@
 		<Cursor position="210" topLine="0" />
 	</File>
 	<File name="Extensions.cpp" open="0" top="0" tabpos="21">
-		<Cursor position="13457" topLine="235" />
+		<Cursor position="11498" topLine="195" />
 	</File>
 	<File name="Extensions.h" open="0" top="0" tabpos="2">
-		<Cursor position="1971" topLine="58" />
+		<Cursor position="593" topLine="0" />
 	</File>
 	<File name="ExternalEventsEditor.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="3730" topLine="65" />
@@ -230,7 +230,7 @@
 		<Cursor position="85" topLine="32" />
 	</File>
 	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="9984" topLine="297" />
+		<Cursor position="8421" topLine="226" />
 	</File>
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="3">
 		<Cursor position="36" topLine="0" />
@@ -253,8 +253,8 @@
 	<File name="ImportImage.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="29134" topLine="422" />
 	</File>
-	<File name="InitialPositionBrowserDlg.cpp" open="0" top="0" tabpos="13">
-		<Cursor position="1819" topLine="42" />
+	<File name="InitialPositionBrowserDlg.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="2555" topLine="52" />
 	</File>
 	<File name="InitialPositionBrowserDlg.h" open="0" top="0" tabpos="14">
 		<Cursor position="249" topLine="8" />
@@ -295,8 +295,8 @@
 	<File name="ObjectTypeChoice.h" open="0" top="0" tabpos="0">
 		<Cursor position="802" topLine="10" />
 	</File>
-	<File name="PlayerUnitTests.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="283" topLine="0" />
+	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="6863" topLine="206" />
 	</File>
 	<File name="Portable.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="6938" topLine="133" />
@@ -305,7 +305,7 @@
 		<Cursor position="27966" topLine="92" />
 	</File>
 	<File name="ProfileDlg.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="36" topLine="2" />
+		<Cursor position="7710" topLine="132" />
 	</File>
 	<File name="ProfileDlg.h" open="0" top="0" tabpos="1">
 		<Cursor position="36" topLine="2" />
@@ -322,8 +322,8 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="510" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="31226" topLine="707" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="35573" topLine="1011" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="6">
 		<Cursor position="798" topLine="97" />

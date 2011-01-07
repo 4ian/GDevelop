@@ -188,6 +188,7 @@ private :
     void Onzoom300Selected(wxCommandEvent& event);
     void Onzoom500Selected(wxCommandEvent& event);
     void Onzoom5Selected(wxCommandEvent& event);
+    void OnFullScreenBtClick(wxCommandEvent& event);
 
     int GetObjectsSelectedHighestLayer();
     int GetObjectsSelectedLowestLayer();
@@ -223,6 +224,7 @@ private :
     static const long idRibbonResetGlobalVars;
     static const long idRibbonDebugger;
     static const long idRibbonProfiler;
+    static const long idRibbonFullScreen;
     static const long idRibbonHelp;
     static const long ID_MENUITEM8; ///< Zoom menu item
     static const long ID_MENUITEM1; ///< Zoom menu item

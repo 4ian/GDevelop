@@ -151,8 +151,13 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     unsigned int i = 0;
     for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
     {
-        if ( !it->first.empty() && wxCopyFile( it->first, rep + "/" + it->second, true ) == false )
-            wxLogWarning( _( "Impossible de copier \""+it->first+"\" dans le répertoire de compilation.\n" ) );
+        if ( !it->first.empty() )
+        {
+            if ( !wxFileExists(rep + "/" + it->second) )
+                wxCopyFile( it->first, rep + "/" + it->second, true );
+            else if ( wxCopyFile( it->first, rep + "/" + it->second, true ) == false )
+                wxLogWarning( _( "Impossible de copier \""+it->first+"\" dans le répertoire de compilation.\n" ) );
+        }
 
         ++i;
         AvancementGauge->SetValue( i/static_cast<float>(resourcesNewFilename.size())*50.0f + 50.0f );

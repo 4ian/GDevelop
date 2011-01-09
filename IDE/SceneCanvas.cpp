@@ -26,6 +26,7 @@
 #include "GDL/HelpFileAccess.h"
 #include "GDL/ChooseLayer.h"
 #include "GDL/ChooseObject.h"
+#include "GDL/DynamicExtensionsManager.h"
 #include "EditOptionsPosition.h"
 #include "Clipboard.h"
 #include "DndTextSceneEditor.h"
@@ -1423,9 +1424,14 @@ void SceneCanvas::Reload()
     game.imageManager = gameEdited.imageManager; //Use same image manager.
 
     scene.StopMusic();
-    scene.LoadFromScene( sceneEdited );
 
-    sceneEdited.wasModified = false;
+    EdittimeScene newScene(this, &game);
+    scene = newScene;
+    #if defined(GD_DYNAMIC_EXTENSIONS)
+    GDpriv::DynamicExtensionsManager::getInstance()->UnloadAllDynamicExtensions();
+    GDpriv::DynamicExtensionsManager::getInstance()->LoadDynamicExtension("test.dxgd");
+    #endif
+    scene.LoadFromScene( sceneEdited );
 
     UpdateScrollbars();
 }

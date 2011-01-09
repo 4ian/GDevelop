@@ -234,7 +234,7 @@ bool EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
 
     for (unsigned int aId = 0;aId < actions.size();++aId)
     {
-        InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetActionInfos(actions[aId].GetType());
+        InstructionInfos instrInfos = GDpriv::ExtensionsManager::getInstance()->GetActionInfos(actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -285,7 +285,7 @@ bool EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vect
 
     for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
-        InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetConditionInfos(conditions[cId].GetType());
+        InstructionInfos instrInfos = GDpriv::ExtensionsManager::getInstance()->GetConditionInfos(conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -338,7 +338,7 @@ void EventsRefactorer::RenameObjectInEvents(Game & game, Scene & scene, vector <
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
         {
             bool somethingModified = RenameObjectInConditions(game, scene, *conditionsVectors[j], oldName, newName);
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             if ( somethingModified )  events[i]->eventHeightNeedUpdate = true;
             #endif
         }
@@ -347,7 +347,7 @@ void EventsRefactorer::RenameObjectInEvents(Game & game, Scene & scene, vector <
         for (unsigned int j = 0;j < actionsVectors.size();++j)
         {
             bool somethingModified = RenameObjectInActions(game, scene, *actionsVectors[j], oldName, newName);
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             if ( somethingModified )  events[i]->eventHeightNeedUpdate = true;
             #endif
         }
@@ -364,7 +364,7 @@ bool EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector 
     {
         bool deleteMe = false;
 
-        InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetActionInfos(actions[aId].GetType());
+        InstructionInfos instrInfos = GDpriv::ExtensionsManager::getInstance()->GetActionInfos(actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -420,7 +420,7 @@ bool EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vect
     {
         bool deleteMe = false;
 
-        InstructionInfos instrInfos = gdp::ExtensionsManager::getInstance()->GetConditionInfos(conditions[cId].GetType());
+        InstructionInfos instrInfos = GDpriv::ExtensionsManager::getInstance()->GetConditionInfos(conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -474,7 +474,7 @@ void EventsRefactorer::RemoveObjectInEvents(Game & game, Scene & scene, vector <
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
         {
             bool conditionsModified = RemoveObjectInConditions(game, scene, *conditionsVectors[j], name);
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             if ( conditionsModified ) events[i]->eventHeightNeedUpdate = true;
             #endif
         }
@@ -483,7 +483,7 @@ void EventsRefactorer::RemoveObjectInEvents(Game & game, Scene & scene, vector <
         for (unsigned int j = 0;j < actionsVectors.size();++j)
         {
             bool actionsModified = RemoveObjectInActions(game, scene, *actionsVectors[j], name);
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             if ( actionsModified ) events[i]->eventHeightNeedUpdate = true;
             #endif
         }
@@ -507,7 +507,7 @@ void EventsRefactorer::ReplaceStringInEvents(Game & game, Scene & scene, std::ve
             for (unsigned int j = 0;j < conditionsVectors.size();++j)
             {
                 bool conditionsModified = ReplaceStringInConditions(game, scene, *conditionsVectors[j], toReplace, newString, matchCase);
-                #if defined(GDE)
+                #if defined(GD_IDE_ONLY)
                 if ( conditionsModified ) events[i]->eventHeightNeedUpdate = true;
                 #endif
             }
@@ -519,7 +519,7 @@ void EventsRefactorer::ReplaceStringInEvents(Game & game, Scene & scene, std::ve
             for (unsigned int j = 0;j < actionsVectors.size();++j)
             {
                 bool actionsModified = ReplaceStringInActions(game, scene, *actionsVectors[j], toReplace, newString, matchCase);
-                #if defined(GDE)
+                #if defined(GD_IDE_ONLY)
                 if ( actionsModified ) events[i]->eventHeightNeedUpdate = true;
                 #endif
             }
@@ -572,7 +572,7 @@ bool EventsRefactorer::ReplaceStringInActions(Game & game, Scene & scene, vector
             {
                 actions[aId].SetParameter(pNb, GDExpression(newParameter));
                 somethingModified = true;
-                #if defined(GDE)
+                #if defined(GD_IDE_ONLY)
                 actions[aId].renderedHeightNeedUpdate = true;
                 #endif
             }
@@ -599,7 +599,7 @@ bool EventsRefactorer::ReplaceStringInConditions(Game & game, Scene & scene, vec
             {
                 conditions[cId].SetParameter(pNb, GDExpression(newParameter));
                 somethingModified = true;
-                #if defined(GDE)
+                #if defined(GD_IDE_ONLY)
                 conditions[cId].renderedHeightNeedUpdate = true;
                 #endif
             }

@@ -331,7 +331,7 @@ void ChoixAction::RefreshList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects actions
@@ -484,7 +484,7 @@ void ChoixAction::RefreshObjectActionsList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
     std::string selectedObjectType = extensionManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, selectedObject));
 
@@ -639,7 +639,7 @@ void ChoixAction::RefreshFromAction()
     if ( Type.empty() )
         return;
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(Type);
 
     NomActionTxt->SetLabel( instructionInfos.fullname );
@@ -728,7 +728,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
     string num = ( string ) wxWindow::FindFocus()->GetName();
     unsigned int i = ToInt(num);
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(Type);
 
     vector < string > mainObjectsName; //On cherche maintenant le nom des objets principaux
@@ -963,7 +963,7 @@ void ChoixAction::OnFacClicked(wxCommandEvent& event)
 
 void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 {
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(Type);
 
     if ( Type == "" )

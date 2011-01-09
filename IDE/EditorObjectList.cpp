@@ -575,7 +575,7 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     }
 
     //Add a new object of selected type to objects list
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
     objects->push_back( extensionsManager->CreateObject(extensionsManager->GetTypeIdFromString(chooseTypeDialog.selectedObjectType),
                                                         string(name.mb_str())));
 
@@ -744,7 +744,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
  */
 bool EditorObjectList::CheckObjectName(std::string name)
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionsManager->GetExtensions();
 
     string allowedCharacter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
@@ -1044,7 +1044,7 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
     AutomatismTypeChoice dialog(this, game);
     if ( dialog.ShowModal() == 1)
     {
-        gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+        GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
         boost::shared_ptr<Automatism> automatism = extensionManager->CreateAutomatism(dialog.selectedAutomatismType);
 
         if (automatism == boost::shared_ptr<Automatism>())
@@ -1165,7 +1165,7 @@ void EditorObjectList::RemoveSharedDatasIfNecessary(unsigned int automatismId)
  */
 void EditorObjectList::CreateSharedDatasIfNecessary(boost::shared_ptr<Automatism> automatism)
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     if ( scene != NULL && scene->automatismsInitialSharedDatas.find(automatism->GetAutomatismId()) == scene->automatismsInitialSharedDatas.end() )
     {

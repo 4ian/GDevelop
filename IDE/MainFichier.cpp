@@ -113,7 +113,7 @@ void Game_Develop_EditorFrame::Open( string file )
         if ( startPage ) startPage->Refresh();
 
         string unknownExtensions = "";
-        gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+        GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
         for (unsigned int i = 0;i<newGame->extensionsUsed.size();++i)
         {
             if ( extensionsManager->GetExtension(newGame->extensionsUsed[i]) == boost::shared_ptr<ExtensionBase> () )

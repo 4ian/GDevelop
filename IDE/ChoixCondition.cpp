@@ -382,7 +382,7 @@ void ChoixCondition::RefreshList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects conditions
@@ -537,7 +537,7 @@ void ChoixCondition::RefreshObjectConditionsList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
     std::string selectedObjectType = extensionManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, selectedObject));
 
@@ -690,7 +690,7 @@ void ChoixCondition::RefreshFromCondition()
     if ( Type == "" )
         return;
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(Type);
 
     NomConditionTxt->SetLabel( instructionInfos.fullname );
@@ -799,7 +799,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
     string num = ( string ) wxWindow::FindFocus()->GetName();
     unsigned int i = atoi( num.c_str() );
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(Type);
 
     vector < string > mainObjectsName; //On cherche maintenant le nom des objets principaux
@@ -976,7 +976,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
 
 void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
 {
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(Type);
 
     if ( Type == "" )

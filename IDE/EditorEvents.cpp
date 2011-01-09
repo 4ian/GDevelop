@@ -363,7 +363,7 @@ isResizingColumns(false)
     noConditionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
 
     //Adding events types
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects actions
@@ -890,7 +890,7 @@ void EditorEvents::OnInsertSomeEventSelected( wxCommandEvent& event )
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     if ( !extensionsManager->HasEventType(eventType) ) return;
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent(eventType);
@@ -914,7 +914,7 @@ void EditorEvents::OnMenuItem7Selected( wxCommandEvent& event )
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Comment");
     eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
@@ -937,7 +937,7 @@ void EditorEvents::OnInsertEventSelected( wxCommandEvent& event )
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Standard");
     eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
@@ -965,7 +965,7 @@ void EditorEvents::OnSubEventMenuItemSelected(wxCommandEvent& event)
     if ( !GetLastSelectedEvent()->CanHaveSubEvents() ) return;
 
     //Creating the event
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Standard");
 
     GetLastSelectedEvent()->GetSubEvents().push_back(eventToAdd);
@@ -983,7 +983,7 @@ void EditorEvents::OnAddLienSelected( wxCommandEvent& event )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
     //Creating the event
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Link");
 
     eventToAdd->EditEvent(this, game, scene, mainEditorCommand);

@@ -161,7 +161,7 @@ void Extensions::UpdateList()
 {
     ExtensionsList->Clear();
 
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > & extensionsInstalled = extensionsManager->GetExtensions();
 
     //Créer la liste à partir des extensions installées
@@ -217,7 +217,7 @@ void Extensions::OnExtensionsListSelect(wxCommandEvent& event)
 
     if (associatedData == NULL) return;
 
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > & extensionsInstalled = extensionsManager->GetExtensions();
 
     for (unsigned int i = 0;i<extensionsInstalled.size();++i)

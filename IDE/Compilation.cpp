@@ -400,7 +400,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     wxSafeYield();
 
     //Copy extensions
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
     for (unsigned int i = 0;i<game.extensionsUsed.size();++i)
     {
         //Builtin extensions does not have a namespace.

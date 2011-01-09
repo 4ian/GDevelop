@@ -246,9 +246,9 @@ bool Game_Develop_EditorApp::OnInit()
 
     cout << "Loading extensions" << endl;
     //Load extensions
-    ExtensionsLoader * extensionsLoader = ExtensionsLoader::getInstance();
+    GDpriv::ExtensionsLoader * extensionsLoader = GDpriv::ExtensionsLoader::getInstance();
     extensionsLoader->SetExtensionsDir("./Extensions/");
-    extensionsLoader->LoadAllExtensionsAvailable();
+    extensionsLoader->LoadAllStaticExtensionsAvailable();
 
     #ifdef RELEASE
     wxSetAssertHandler(NULL); //Don't want to have annoying assert dialogs in release

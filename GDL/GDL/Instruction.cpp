@@ -13,7 +13,7 @@ Instruction::Instruction(string type_) :
 function(NULL),
 objectFunction(NULL),
 automatismFunction(NULL),
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 renderedHeightNeedUpdate(true),
 renderedHeight(0),
 selected(false),
@@ -30,7 +30,7 @@ Instruction::Instruction(string type_, const vector <GDExpression> & parameters_
 function(NULL),
 objectFunction(NULL),
 automatismFunction(NULL),
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 renderedHeightNeedUpdate(true),
 renderedHeight(0),
 selected(false),

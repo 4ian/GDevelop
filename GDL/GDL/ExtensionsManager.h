@@ -14,14 +14,14 @@
 #include "GDL/ExtensionBase.h"
 class Object;
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 class Game;
 class MainEditorCommand;
 #endif
 
 using namespace std;
 
-namespace gdp
+namespace GDpriv
 {
 
 /**

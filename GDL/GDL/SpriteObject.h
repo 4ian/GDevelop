@@ -12,7 +12,7 @@ class ExpressionInstruction;
 class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 class wxBitmap;
 class Game;
 class wxWindow;
@@ -35,7 +35,7 @@ class SpriteObject : public Object
 
         virtual bool Draw(sf::RenderWindow& main_window);
 
-        #ifdef GDE
+        #if defined(GD_IDE_ONLY)
         virtual bool DrawEdittime(sf::RenderWindow& main_window);
         virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
 
@@ -49,7 +49,7 @@ class SpriteObject : public Object
         #endif
 
         virtual void LoadFromXml(const TiXmlElement * elemScene);
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * elemScene);
         #endif
 
@@ -218,6 +218,5 @@ bool ActTourneVers( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
 
 GD_API void DestroySpriteObject(Object * object);
 GD_API Object * CreateSpriteObject(std::string name);
-GD_API Object * CreateSpriteObjectByCopy(Object * object);
 
 #endif // SPRITEOBJECT_H

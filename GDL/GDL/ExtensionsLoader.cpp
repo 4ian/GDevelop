@@ -30,32 +30,17 @@
 #include "GDL/Game.h"
 #include "GDL/Version.h"
 #include "GDL/ExtensionBase.h"
+#include "GDL/DynamicExtensionBase.h"
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include <wx/log.h>
 #include <wx/msgdlg.h>
-#endif
-
-#if defined(WINDOWS)
-    #include <windows.h>
-    typedef HINSTANCE Handle;
-    Handle OpenLibrary(const char* path) {return LoadLibrary(path);}
-    void* GetSymbol(Handle library, const char* name) { return (void*)GetProcAddress(library, name);}
-    void CloseLibrary(Handle library) {FreeLibrary(library);}
-#elif defined(LINUX)
-    #include <dlfcn.h>
-    typedef void* Handle;
-    Handle OpenLibrary(const char* path) {return dlopen(path, RTLD_LAZY);}
-    void* GetSymbol(Handle library, const char* name) { return dlsym(library, name);}
-    void CloseLibrary(Handle library) {dlclose(library);}
-#else
-    #error No system defined
 #endif
 
 typedef ExtensionBase* (*createExtension)();
 typedef void (*destroyExtension)(ExtensionBase*);
 
-using namespace gdp;
+using namespace GDpriv;
 
 ExtensionsLoader::ExtensionsLoader() :
 directory("./")
@@ -70,9 +55,9 @@ ExtensionsLoader::~ExtensionsLoader()
 
 ExtensionsLoader *ExtensionsLoader::_singleton = NULL;
 
-void ExtensionsLoader::LoadAllExtensionsAvailable()
+void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     //Built-in extensions
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new ExtensionSprite()) );
@@ -99,7 +84,7 @@ void ExtensionsLoader::LoadAllExtensionsAvailable()
         #error No target system defined.
     #endif
 
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
         suffix += "e";
     #endif
 
@@ -122,7 +107,7 @@ void ExtensionsLoader::LoadAllExtensionsAvailable()
         if ( lec != "." && lec != ".." && lec.find(".xgd"+suffix, lec.length()-4-suffix.length()) != string::npos)
         {
             //Charger l'extension
-            LoadExtensionInManager(directory+"/"+lec);
+            LoadStaticExtensionInManager(directory+"/"+lec);
 
             l++;
         }
@@ -138,26 +123,22 @@ void ExtensionsLoader::LoadAllExtensionsAvailable()
 	{
 		do
 		{
-			LoadExtensionInManager(f.cFileName);
+			LoadStaticExtensionInManager(f.cFileName);
 		} while(FindNextFile(h, &f));
 	}
 	#else
-		#error Compiler not supported ( but might support one style of directory listing, update defines if necessary )
+		#warning Compiler not supported ( but might support one style of directory listing, update defines if necessary ) for dynamic libraries loading
 	#endif
 }
 
-////////////////////////////////////////////////////////////
-/// Charge l'extension voulu
-/// dans le gestionnaire d'extension pour le jeu
-////////////////////////////////////////////////////////////
-void ExtensionsLoader::LoadExtensionInManager(std::string fullpath)
+void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
     Handle extensionHdl = OpenLibrary(fullpath.c_str());
     if (extensionHdl == NULL)
     {
         cout << "Unable to load extension " << fullpath << "." << endl;
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" n'a pas pû être chargée.\nPrenez contact avec le développeur pour plus d'informations." ));
         wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
         #endif
@@ -171,7 +152,7 @@ void ExtensionsLoader::LoadExtensionInManager(std::string fullpath)
         {
             cout << "Unable to load extension " << fullpath << " ( no valid create/destroy functions )." << endl;
 
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             CloseLibrary(extensionHdl);
             wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" n'a pas pû être chargée.\nPrenez contact avec le développeur pour plus d'informations." ));
             wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
@@ -188,7 +169,7 @@ void ExtensionsLoader::LoadExtensionInManager(std::string fullpath)
             if ( !extensionPtr->compilationInfo.informationCompleted )
                 error += "Compilation information not filled.\n";
 
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             if ( extensionPtr->compilationInfo.runtimeOnly )
                 error += "Extension compiled for runtime only.\n";
 
@@ -225,7 +206,7 @@ void ExtensionsLoader::LoadExtensionInManager(std::string fullpath)
                 cout << "Bad extension " + fullpath + " loaded :\n" + error;
                 cout << "---------------" << endl;
 
-                #if defined(GDE)
+                #if defined(GD_IDE_ONLY)
                 CloseLibrary(extensionHdl);
                 wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" présente des erreurs :\n")) + error + string(_("\nL'extension n'a pas été chargée. Prenez contact avec le développeur pour plus d'informations." ));
                 wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_EXCLAMATION);

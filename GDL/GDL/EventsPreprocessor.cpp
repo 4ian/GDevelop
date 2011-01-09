@@ -18,7 +18,7 @@
  */
 void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector < Instruction > & conditions, bool & eventHasToBeDeleted)
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     for (unsigned int cId =0;cId < conditions.size();++cId)
     {
@@ -108,7 +108,7 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
  */
 void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < Instruction > & actions)
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     for (unsigned int aId =0;aId < actions.size();++aId)
     {

@@ -33,7 +33,7 @@
 #include "GDL/ObjInstancesHolder.h"
 class AutomatismsRuntimeSharedDatas;
 
-#if defined GDE
+#if defined(GD_IDE_ONLY)
 class BaseDebugger;
 class BaseProfiler;
 #endif
@@ -57,7 +57,7 @@ class GD_API RuntimeScene : public Scene
         bool                                    inputKeyPressed;    ///< Supplementary input : True if any key was pressed
         RuntimeGame *                           game; ///< Pointer to the game the scene is linked to
         SoundManager *                          soundManager; ///< Pointer to the sound manager.
-        #ifdef GDE
+        #if defined(GD_IDE_ONLY)
         BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
         BaseProfiler *                          profiler; ///< Pointer to the profiler. Can be NULL.
         #endif

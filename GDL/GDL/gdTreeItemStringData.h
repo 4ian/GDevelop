@@ -1,4 +1,4 @@
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #ifndef GDTREEITEMSTRINGDATA_H
 #define GDTREEITEMSTRINGDATA_H
 

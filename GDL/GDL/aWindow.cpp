@@ -16,7 +16,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////
 bool ActSetFullScreen( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    #ifdef GDP
+    #if !defined(GD_IDE_ONLY)
     if ( action.GetParameter(0).GetAsBool() && !scene.RenderWindowIsFullScreen() )
     {
         scene.SetRenderWindowIsFullScreen();
@@ -39,7 +39,7 @@ bool ActSetFullScreen( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
  */
 bool ActSetWindowSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    #ifdef GDP
+    #if !defined(GD_IDE_ONLY)
     int windowWidth = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
     int windowHeight = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 

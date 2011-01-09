@@ -28,7 +28,7 @@ class ImageManager;
 class InitialPosition;
 class TiXmlElement;
 class Automatism;
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 class wxBitmap;
 class Game;
 class Scene;
@@ -66,7 +66,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Destructor. Does nothing particular.
          */
-        virtual ~Object() {};
+        virtual ~Object();
 
         /**
          * Return a new shared_ptr pointing to a copy of the object.
@@ -97,7 +97,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
          * Load object from an xml element.
          */
         virtual void LoadFromXml(const TiXmlElement * elemScene) {};
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
 
         /**
          * Save object to an xml element.
@@ -307,7 +307,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
          */
         bool HasAutomatism(unsigned int type) { return automatisms.find(type) != automatisms.end(); };
 
-        #ifdef GDE
+        #if defined(GD_IDE_ONLY)
         /**
          * Remove an automatism
          */
@@ -330,7 +330,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
             return shared_from_this();
         }
 
-        #ifdef GDE
+        #if defined(GD_IDE_ONLY)
         /**
          * Draw the object at edittime ( on a scene editor )
          */

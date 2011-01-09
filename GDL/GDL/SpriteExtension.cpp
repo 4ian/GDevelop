@@ -17,7 +17,7 @@
 #include "GDL/SpriteObject.h"
 #include <iostream>
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 #include <wx/textdlg.h>
 #include <wx/bitmap.h>
 #include <wx/wx.h>

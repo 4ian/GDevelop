@@ -8,7 +8,7 @@
 vector <BaseEventSPtr> BaseEvent::badSubEvents;
 
 BaseEvent::BaseEvent() :
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 selected(false),
 eventHeightNeedUpdate(true),
 totalTimeDuringLastSession(0),
@@ -30,7 +30,7 @@ std::vector < BaseEventSPtr > GD_API CloneVectorOfEvents(const vector < BaseEven
 
     for(;e != end;++e)
     {
-        #if defined(GDE) //Profiling can be enabled in editor
+        #if defined(GD_IDE_ONLY) //Profiling can be enabled in editor
         newVector.push_back(CloneRememberingOriginalEvent(*e));
         #else
         newVector.push_back((*e)->Clone());
@@ -43,7 +43,7 @@ std::vector < BaseEventSPtr > GD_API CloneVectorOfEvents(const vector < BaseEven
 BaseEventSPtr CloneRememberingOriginalEvent(BaseEventSPtr event)
 {
     BaseEventSPtr copy = event->Clone();
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     //Original event is either the original event of the copied event, or the event copied.
     copy->originalEvent = event->originalEvent.expired() ? event : event->originalEvent;
     #endif

@@ -9,11 +9,11 @@
 #include "tinyxml.h"
 #include "GDL/XmlMacros.h"
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "GDL/EditComment.h"
 #endif
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void CommentEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * color;
@@ -55,7 +55,7 @@ void CommentEvent::LoadFromXml(const TiXmlElement * eventElem)
     if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "textB" ) != NULL ) { eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "textB", &textB );}
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void CommentEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
     EditComment dialog(parent_, *this);

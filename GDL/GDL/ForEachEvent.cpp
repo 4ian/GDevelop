@@ -5,7 +5,7 @@
 #include "RuntimeScene.h"
 #include "tinyxml.h"
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/EditForEachEvent.h"
 #endif
@@ -13,7 +13,7 @@
 ForEachEvent::ForEachEvent() :
 BaseEvent(),
 objectsToPick("")
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 ,objectsToPickSelected(false)
 #endif
 {
@@ -100,7 +100,7 @@ vector < GDExpression* > ForEachEvent::GetAllExpressions()
 
     return allExpressions;
 }
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void ForEachEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * objectElem = new TiXmlElement( "Object" );
@@ -152,7 +152,7 @@ void ForEachEvent::LoadFromXml(const TiXmlElement * eventElem)
 }
 
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void ForEachEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
                          bool & conditionsSelected, bool & instructionsSelected)
 {

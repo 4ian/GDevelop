@@ -1,4 +1,4 @@
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 
 #include "GDL/EditorImages.h"
 #ifdef __WXMSW__

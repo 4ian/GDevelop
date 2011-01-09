@@ -1,4 +1,4 @@
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "GDL/ChooseLayer.h"
 
 //(*InternalHeaders(ChooseLayer)
@@ -34,7 +34,7 @@ addQuotes(addQuotes_)
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
-	
+
 	Create(parent, wxID_ANY, _("Choisir un calque"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -69,7 +69,7 @@ addQuotes(addQuotes_)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseLayer::OnokBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseLayer::OncancelBtClick);
 	//*)

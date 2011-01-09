@@ -52,7 +52,7 @@
 
 #include <windows.h>
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 
 #ifdef ___WXMSW___
 #include <wx/msw/winundef.h>

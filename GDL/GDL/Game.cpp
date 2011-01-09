@@ -3,7 +3,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExternalEvents.h"
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #elif !defined(_)
 #define _(x) x
@@ -79,7 +79,7 @@ void Game::Init(const Game & game)
     variables = game.variables;
     objectGroups = game.objectGroups;
 
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     gameFile = game.gameFile;
     imagesChanged = game.imagesChanged;
 

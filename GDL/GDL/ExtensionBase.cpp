@@ -28,7 +28,7 @@ createFunPtr(NULL)
 }
 
 ExpressionInfos::ExpressionInfos() :
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 shown(true),
 #endif
 expressionFunPtr(NULL),
@@ -37,7 +37,7 @@ expressionObjectFunPtr(NULL)
 }
 
 StrExpressionInfos::StrExpressionInfos() :
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 shown(true),
 #endif
 strExpressionFunPtr(NULL),
@@ -46,7 +46,7 @@ strExpressionObjectFunPtr(NULL)
 }
 
 InstructionInfos::InstructionInfos() :
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 canHaveSubInstructions(false),
 #endif
 instructionFunPtr(NULL),
@@ -56,7 +56,7 @@ instructionObjectFunPtr(NULL)
 
 ParameterInfo::ParameterInfo() :
 useObject(false)
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 ,optional(false)
 #endif
 {
@@ -218,7 +218,7 @@ const std::map<std::string, StrExpressionInfos > & ExtensionBase::GetAllStrExpre
     return badStrExpressionsInfos;
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 const ExtensionObjectInfos & ExtensionBase::GetObjectInfo(std::string objectType) const
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())

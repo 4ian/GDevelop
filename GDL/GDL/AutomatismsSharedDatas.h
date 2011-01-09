@@ -35,7 +35,7 @@ class GD_API AutomatismsSharedDatas
             return boost::shared_ptr<AutomatismsRuntimeSharedDatas>();
         }
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         /**
          * Save AutomatismsSharedDatas to XML
          */

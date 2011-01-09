@@ -10,7 +10,7 @@
 #include "GDL/GDExpressionParser.h"
 #include <string>
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #elif !defined(_)
 #define _(x) x
@@ -95,7 +95,7 @@ class CallbacksForPreparingMathEvaluation : public ParserCallbacks
     {
         if ( !expression.PrepareForMathEvaluationOnly(game, scene) )
         {
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             firstErrorStr = expression.GetFirstErrorDuringPreprocessingText();
             firstErrorPos = expression.GetFirstErrorDuringPreprocessingPosition();
             #endif
@@ -109,7 +109,7 @@ class CallbacksForPreparingMathEvaluation : public ParserCallbacks
     {
         if ( !expression.PrepareForTextEvaluationOnly(game, scene) )
         {
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             firstErrorStr = expression.GetFirstErrorDuringPreprocessingText();
             firstErrorPos = expression.GetFirstErrorDuringPreprocessingPosition();
             #endif
@@ -142,7 +142,7 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
     if ( !expressionParser.ParseMathExpression(game, scene, callbacks) )
     {
         //Parsing failed
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         firstErrorStr = expressionParser.firstErrorStr;
         firstErrorPos = expressionParser.firstErrorPos;
         #endif
@@ -161,7 +161,7 @@ bool GDExpression::PrepareForMathEvaluationOnly(const Game & game, const Scene &
     //Parse math expression
     if ( -1 != mathExpression.Parse(mathPlainExpression, parametersStr))
     {
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         firstErrorStr = mathExpression.ErrorMsg();
         firstErrorPos = string::npos;
         #endif
@@ -209,7 +209,7 @@ class CallbacksForPreparingTextEvaluation : public ParserCallbacks
     {
         if ( !expression.PrepareForMathEvaluationOnly(game, scene) )
         {
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             firstErrorStr = expression.GetFirstErrorDuringPreprocessingText();
             firstErrorPos = expression.GetFirstErrorDuringPreprocessingPosition();
             #endif
@@ -223,7 +223,7 @@ class CallbacksForPreparingTextEvaluation : public ParserCallbacks
     {
         if ( !expression.PrepareForTextEvaluationOnly(game, scene) )
         {
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             firstErrorStr = expression.GetFirstErrorDuringPreprocessingText();
             firstErrorPos = expression.GetFirstErrorDuringPreprocessingPosition();
             #endif
@@ -254,7 +254,7 @@ bool GDExpression::PrepareForTextEvaluationOnly(const Game & game, const Scene &
     if ( !expressionParser.ParseTextExpression(game, scene, callbacks) )
     {
         //Parsing failed
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         firstErrorStr = expressionParser.firstErrorStr;
         firstErrorPos = expressionParser.firstErrorPos;
         #endif

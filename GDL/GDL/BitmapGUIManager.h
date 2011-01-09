@@ -3,7 +3,7 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 
 #ifndef BITMAPGUIMANAGER_H
 #define BITMAPGUIMANAGER_H

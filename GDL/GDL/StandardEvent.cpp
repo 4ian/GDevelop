@@ -8,7 +8,7 @@
 #include "tinyxml.h"
 #include "GDL/OpenSaveGame.h"
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "EventsRenderingHelper.h"
 #endif
 
@@ -80,7 +80,7 @@ vector < vector<Instruction>* > StandardEvent::GetAllActionsVectors()
 
     return allActions;
 }
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void StandardEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     //Les conditions
@@ -124,7 +124,7 @@ void StandardEvent::LoadFromXml(const TiXmlElement * eventElem)
         OpenSaveGame::OpenEvents(events, eventElem->FirstChildElement( "Events" ));
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 /**
  * Render the event in the bitmap
  */

@@ -13,7 +13,7 @@
 #include "Event.h"
 class TiXmlElement;
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 class Scene;
 class Game;
 class MainEditorCommand;
@@ -27,7 +27,7 @@ class GD_API CommentEvent : public BaseEvent
         virtual ~CommentEvent() {};
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new CommentEvent(*this));}
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         void SaveToXml(TiXmlElement * eventElem) const;
         #endif
         void LoadFromXml(const TiXmlElement * eventElem);
@@ -43,7 +43,7 @@ class GD_API CommentEvent : public BaseEvent
         string com1;
         string com2;
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */

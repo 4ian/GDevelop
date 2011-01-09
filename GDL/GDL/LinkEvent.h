@@ -15,7 +15,7 @@
 class Game;
 class RuntimeScene;
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 class Scene;
 class MainEditorCommand;
 class wxWindow;
@@ -28,7 +28,7 @@ class LinkEvent : public BaseEvent
         virtual ~LinkEvent() {};
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new LinkEvent(*this));}
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
@@ -39,7 +39,7 @@ class LinkEvent : public BaseEvent
         int start;
         int end;
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */

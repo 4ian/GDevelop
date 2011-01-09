@@ -3,7 +3,7 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "EventsRenderingHelper.h"
 #include "GDL/Instruction.h"
 #include "GDL/ExtensionsManager.h"
@@ -74,7 +74,7 @@ void EventsRenderingHelper::DrawNiceRectangle(wxDC & dc, const wxRect & rect, co
 
 int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & conditions, wxDC & dc, const int x, const int y, const int width, bool disabled)
 {
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const int iconWidth = 18;
     const int separation = 1;
     const int sideSeparation = 1;
@@ -168,7 +168,7 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
 
 int EventsRenderingHelper::DrawActionsList(const vector < Instruction > & actions, wxDC & dc, const int x, const int y, const int width, bool disabled)
 {
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const int iconWidth = 18;
     const int separation = 1;
     const int sideSeparation = 1;
@@ -235,7 +235,7 @@ int EventsRenderingHelper::DrawActionsList(const vector < Instruction > & action
 
 unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector < Instruction > & conditions, int width)
 {
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
 
     const int separation = 1;
     const int sideSeparation = 1;
@@ -290,7 +290,7 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
 
 unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < Instruction > & actions, int width)
 {
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
 
     const int separation = 1;
     const int sideSeparation = 1;
@@ -339,7 +339,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
 
 bool EventsRenderingHelper::GetConditionAt(vector < Instruction > & conditions, int x, int y, vector < Instruction > *& conditionList, unsigned int & conditionIdInList)
 {
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
 
     int conditionsY = 1;
     for (unsigned int c = 0;c<conditions.size();++c)

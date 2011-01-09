@@ -1,4 +1,4 @@
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 
 #ifndef EDITOROBJET_H
 #define EDITOROBJET_H
@@ -111,6 +111,7 @@ class EditorObjet: public wxDialog
 		wxToggleButton* Bt1;
 		wxTextCtrl* TempsEdit;
 		wxToggleButton* Bt3;
+		wxMenuItem* applyMaskToAllDirectionSprites;
 		wxToggleButton* Bt7;
 		wxMenu* MenuItem29;
 		wxPanel* Panel2;
@@ -187,6 +188,8 @@ class EditorObjet: public wxDialog
 		static const long ID_MENUITEM6;
 		static const long idMenuPosEverywhere2;
 		static const long ID_MENUITEM4;
+		static const long ID_MENUITEM13;
+		static const long ID_MENUITEM12;
 		static const long ID_MENUITEM10;
 		static const long ID_MENUITEM11;
 		static const long ID_MENUITEM2;

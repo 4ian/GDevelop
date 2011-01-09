@@ -12,6 +12,7 @@
 #include "GDL/RepeatEvent.h"
 #include "GDL/ForEachEvent.h"
 #include "GDL/Event.h"
+#include "GDL/DynamicExtensionCallerEvent.h"
 
 #include "GDL/ExtensionBase.h"
 
@@ -116,4 +117,14 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     DECLARE_END_EVENT()
 
+    #if defined(GD_DYNAMIC_EXTENSIONS)
+    DECLARE_EVENT("DynamicExtensionCaller",
+                  _("Code C++"),
+                  "Execute du code C++",
+                  "",
+                  "res/foreach.png",
+                  DynamicExtensionCallerEvent)
+
+    DECLARE_END_EVENT()
+    #endif
 }

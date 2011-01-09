@@ -6,7 +6,7 @@
 #include "GDL/CommonTools.h"
 #include <SFML/Graphics.hpp>
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
@@ -288,7 +288,7 @@ void SaveSpritesDirection(const vector < Sprite > & sprites, TiXmlElement * elem
         }
     }
 }
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void SpriteObject::SaveToXml(TiXmlElement * objet)
 {
     //Animations
@@ -391,7 +391,7 @@ bool SpriteObject::Draw( sf::RenderWindow& window )
     return true;
 }
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 /**
  * Render object at edittime
  */
@@ -865,16 +865,4 @@ void DestroySpriteObject(Object * object)
 Object * CreateSpriteObject(std::string name)
 {
     return new SpriteObject(name);
-}
-
-/**
- * Function creating an extension Object from another.
- * Game Develop can not directly create an extension object.
- *
- * Note that it is safe to do the static cast, as this function
- * is called owing to the typeId of the object to copy.
- */
-Object * CreateSpriteObjectByCopy(Object * object)
-{
-    return new SpriteObject(*static_cast<SpriteObject *>(object));
 }

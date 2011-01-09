@@ -1,4 +1,4 @@
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "GDL/MainEditorCommand.h"
 #include <wx/ribbon/page.h>
 #include <iostream>

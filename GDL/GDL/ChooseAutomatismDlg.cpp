@@ -1,4 +1,4 @@
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "ChooseAutomatismDlg.h"
 
 //(*InternalHeaders(ChooseAutomatismDlg)
@@ -39,7 +39,7 @@ automatismTypeAllowed(automatismTypeAllowed_)
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
-	
+
 	Create(parent, wxID_ANY, _("Choisir un automatisme"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
@@ -72,7 +72,7 @@ automatismTypeAllowed(automatismTypeAllowed_)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ChooseAutomatismDlg::OnsearchCtrlText);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseAutomatismDlg::OnChoisirBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseAutomatismDlg::OnCancelBtClick);

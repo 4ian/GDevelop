@@ -27,13 +27,13 @@
 #include "GDL/StringInstructionsExtension.h"
 #include "GDL/Object.h"
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 #include "GDL/Game.h"
 #include "GDL/MainEditorCommand.h"
 #endif
 
 
-namespace gdp
+namespace GDpriv
 {
 
 ExtensionsManager *ExtensionsManager::_singleton = NULL;
@@ -66,7 +66,7 @@ ExtensionsManager::ExtensionsManager()
     AddExtension(boost::shared_ptr<ExtensionBase>(new SceneExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
     badInstructionInfos.fullname = _("Instruction inconnue");
     badInstructionInfos.description = _("Instruction inconnue");
     badInstructionInfos.sentence = _("Instruction inconnue");

@@ -16,7 +16,7 @@ class Instruction;
 class Evaluateur;
 class TiXmlElement;
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 class Scene;
 class MainEditorCommand;
 class wxWindow;
@@ -59,12 +59,12 @@ class ForEachEvent : public BaseEvent
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
         virtual vector < GDExpression* > GetAllExpressions();
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
 #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */
@@ -97,7 +97,7 @@ class ForEachEvent : public BaseEvent
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
         bool objectsToPickSelected;
 #endif
 };

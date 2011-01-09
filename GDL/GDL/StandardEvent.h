@@ -5,7 +5,7 @@
 
 #ifndef STANDARDEVENT_H
 #define STANDARDEVENT_H
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include <wx/bitmap.h>
 #include <wx/dcbuffer.h>
 #include <wx/html/htmprint.h>
@@ -48,12 +48,12 @@ class GD_API StandardEvent : public BaseEvent
         virtual vector < vector<Instruction>* > GetAllConditionsVectors();
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */

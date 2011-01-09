@@ -3,7 +3,7 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 
 #ifndef PROFILEEVENT_H
 #define PROFILEEVENT_H

@@ -14,13 +14,13 @@
 #include "Event.h"
 #include <iostream>
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "GDL/EditLink.h"
 #endif
 
 using namespace std;
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void LinkEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * type = new TiXmlElement( "Type" );
@@ -102,7 +102,7 @@ void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector 
 
     for ( unsigned int insertion = 0;insertion <= static_cast<unsigned>(lastEvent-firstEvent);insertion++ ) //Insertion des évènements du lien
     {
-        #if defined(GDE) //Profiling can be enabled in editor.
+        #if defined(GD_IDE_ONLY) //Profiling can be enabled in editor.
         eventList.insert( eventList.begin() + indexOfTheEventInThisList + insertion, CloneRememberingOriginalEvent(eventsToInclude->at( firstEvent+insertion )));
         #else
         eventList.insert( eventList.begin() + indexOfTheEventInThisList + insertion, eventsToInclude->at( firstEvent+insertion )->Clone() );
@@ -111,7 +111,7 @@ void LinkEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector 
     eventList.erase( eventList.begin() + indexOfTheEventInThisList + static_cast<unsigned>(lastEvent-firstEvent)+1 ); //Suppression du lien
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void LinkEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
     EditLink dialog(parent_, *this);

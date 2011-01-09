@@ -34,7 +34,7 @@ std::string ReplaceTildesBySpaces(std::string text)
 bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks)
 {
 
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
     string expression = expressionPlainString;
 
     //Constants
@@ -173,7 +173,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
 
                     if(parametersEnd == expression.length() || expression[parametersEnd] != ')')
                     {
-                        #if defined(GDE)
+                        #if defined(GD_IDE_ONLY)
                         firstErrorStr = _("Parenthèses non fermées");
                         firstErrorPos = parametersEnd-1;
                         #endif
@@ -183,7 +183,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                     //Testing the number of parameters
                     if ( parameters.size() > instructionInfos.parameters.size() || parameters.size() < GetMinimalParametersNumber(instructionInfos.parameters) )
                     {
-                        #if defined(GDE)
+                        #if defined(GD_IDE_ONLY)
                         firstErrorPos = functionNameEnd;
                         firstErrorStr = _("Nombre de paramètre incorrect.");
                         firstErrorStr += " ";
@@ -195,7 +195,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                 }
                 else
                 {
-                    #if defined(GDE)
+                    #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
                     firstErrorStr = _("Parenthèses des paramètres manquantes");
                     #endif
@@ -240,7 +240,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
 
 bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks)
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
     string expression = expressionPlainString;
 
     //Constants
@@ -256,7 +256,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
     if ( firstPointPos == string::npos && firstParPos == string::npos && firstQuotePos == string::npos  )
     {
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         firstErrorPos = 0;
         firstErrorStr = _("L'expression est invalide ou vide. Entrez un texte ( entouré de guillemets ) ou une fonction.");
         #endif
@@ -276,7 +276,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
             if ( finalQuotePosition == string::npos )
             {
-                #if defined(GDE)
+                #if defined(GD_IDE_ONLY)
                 firstErrorPos = firstQuotePos;
                 firstErrorStr = _("Guillemets non fermés.");
                 #endif
@@ -361,7 +361,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
             if ( parametersEnd == expression.length() || expression[parametersEnd] != ')' )
             {
-                #if defined(GDE)
+                #if defined(GD_IDE_ONLY)
                 firstErrorPos = parametersEnd-1;
                 firstErrorStr = _("Parenthèses non fermées");
                 #endif
@@ -382,7 +382,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 //Testing the number of parameters
                 if ( parametersInfos.size() > parameters.size() || parameters.size() < GetMinimalParametersNumber(parametersInfos))
                 {
-                    #if defined(GDE)
+                    #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
                     firstErrorStr = _("Nombre de paramètres incorrect.");
                     #endif
@@ -409,7 +409,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 //Testing the number of parameters
                 if ( parametersInfos.size() > parameters.size() || parameters.size() < GetMinimalParametersNumber(parametersInfos))
                 {
-                    #if defined(GDE)
+                    #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
                     firstErrorStr = _("Nombre de paramètres incorrect.");
                     #endif
@@ -460,7 +460,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                             //Testing the number of parameters
                             if ( parametersInfos.size() > parameters.size() || parameters.size() < GetMinimalParametersNumber(parametersInfos))
                             {
-                                #if defined(GDE)
+                                #if defined(GD_IDE_ONLY)
                                 firstErrorPos = functionNameEnd;
                                 firstErrorStr = _("Nombre de paramètres incorrect.");
                                 #endif
@@ -498,7 +498,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
             if ( instruction.function == NULL ) //Function was not found
             {
-                #if defined(GDE)
+                #if defined(GD_IDE_ONLY)
                 firstErrorPos = nameStart;
                 firstErrorStr = _("Fonction non reconnue.");
                 #endif
@@ -523,7 +523,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
             if (nextTokenPos < firstPlusPos)
             {
-                #if defined(GDE)
+                #if defined(GD_IDE_ONLY)
                 firstErrorPos = nextTokenPos;
                 firstErrorStr = _("+ manquant entre deux chaines.");
                 #endif
@@ -531,7 +531,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             }
             else if ( expression.find("+", firstPlusPos+1) < nextTokenPos )
             {
-                #if defined(GDE)
+                #if defined(GD_IDE_ONLY)
                 firstErrorPos = firstPlusPos;
                 firstErrorStr = _("Symbole manquant entre deux +.");
                 #endif
@@ -542,7 +542,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
     if ( expression.substr(parsePosition, expression.length()).find_first_not_of(" \n") != std::string::npos )
     {
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         firstErrorPos = parsePosition;
         firstErrorStr = _("Symbole erroné en fin d'expression.");
         #endif
@@ -557,7 +557,7 @@ bool GDExpressionParser::AddParameterToList(const Game & game, const Scene & sce
     parameters.push_back(GDExpression(parameterStr));
     if ( parameters.size()-1 >= parametersInfos.size() )
     {
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         firstErrorStr = _("Trop de paramètre lors de l'appel à une fonction");
         firstErrorPos = positionInExpression;
 
@@ -577,7 +577,7 @@ bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene
     {
         if ( !callbacks.OnSubMathExpression(game, scene, parameter) )
         {
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             firstErrorStr = callbacks.firstErrorStr;
             firstErrorPos = callbacks.firstErrorPos;
             #endif
@@ -588,7 +588,7 @@ bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene
     {
         if ( !callbacks.OnSubTextExpression(game, scene, parameter) )
         {
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             firstErrorStr = callbacks.firstErrorStr;
             firstErrorPos = callbacks.firstErrorPos;
             #endif

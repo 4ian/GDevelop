@@ -1,4 +1,4 @@
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "GDL/EditTextDialog.h"
 
 //(*InternalHeaders(EditTextDialog)
@@ -165,7 +165,7 @@ lastErrorPos(std::string::npos)
     ValList->DeleteAllItems();
     ValList->AddRoot( _( "Toutes les valeurs spéciales" ), 0 );
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects expressions

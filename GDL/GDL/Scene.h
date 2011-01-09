@@ -49,7 +49,7 @@ class GD_API Scene
         ListVariable                            variables;
         boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas;
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         bool wasModified;
         #endif
 

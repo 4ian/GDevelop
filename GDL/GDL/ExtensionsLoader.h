@@ -3,20 +3,34 @@
 
 #include <string>
 #include <vector>
+#include "GDL/DynamicLibrariesTools.h"
 
-using namespace std;
+namespace GDpriv
+{
 
 /**
- * Class that load extensions and store them in extensionsManager
+ * Class that load static extensions ( only ) and store them in ExtensionsManager
  */
 class GD_API ExtensionsLoader
 {
 public:
 
-    void LoadExtensionInManager(std::string extension);
-    void LoadAllExtensionsAvailable();
-    inline void SetExtensionsDir(string directory_) { directory = directory_; }
-    inline string GetExtensionsDir() const { return directory; }
+    /**
+     * Load all extensions located in the extensions directory.
+     * Extensions files must have extensions *.xgd(w|l)(e),
+     * w for Windows, l for Linux, e for Edittime extensions.
+     */
+    void LoadAllStaticExtensionsAvailable();
+
+    /**
+     * Change extensions files search path.
+     */
+    inline void SetExtensionsDir(std::string directory_) { directory = directory_; }
+
+    /**
+     * Get extensions files search path.
+     */
+    inline std::string GetExtensionsDir() const { return directory; }
 
     static ExtensionsLoader *getInstance()
     {
@@ -41,9 +55,13 @@ private:
     ExtensionsLoader();
     virtual ~ExtensionsLoader();
 
-    string directory;
+    void LoadStaticExtensionInManager(std::string fullpath);
+
+    std::string directory; ///< Search directory when loading all extensions
 
     static ExtensionsLoader *_singleton;
 };
+
+}
 
 #endif // EXTENSIONSLOADER_H

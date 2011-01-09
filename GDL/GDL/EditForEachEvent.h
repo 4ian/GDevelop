@@ -1,4 +1,4 @@
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #ifndef EDITFOREACHEVENT_H
 #define EDITFOREACHEVENT_H
 

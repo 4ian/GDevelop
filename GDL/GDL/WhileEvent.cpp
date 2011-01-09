@@ -9,7 +9,7 @@
 #include "ObjectsConcerned.h"
 #include "GDL/OpenSaveGame.h"
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/TranslateAction.h"
@@ -101,7 +101,7 @@ vector < vector<Instruction>* > WhileEvent::GetAllActionsVectors()
 
     return allActions;
 }
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void WhileEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     //Save "While conditions"
@@ -155,7 +155,7 @@ void WhileEvent::LoadFromXml(const TiXmlElement * eventElem)
         OpenSaveGame::OpenEvents(events, eventElem->FirstChildElement( "Events" ));
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 
 void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
                          bool & conditionsSelected, bool & instructionsSelected)

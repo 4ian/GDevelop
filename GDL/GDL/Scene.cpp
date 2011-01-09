@@ -17,7 +17,7 @@ oglFOV(90.0f),
 oglZNear(1.0f),
 oglZFar(500.0f),
 stopSoundsOnStartup(true)
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 ,wasModified(false)
 #endif
 {

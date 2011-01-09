@@ -3,20 +3,19 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#ifdef GDP
+#if defined(GD_IDE_ONLY)
+    #include <wx/wx.h>
+    #include "GDL/CommonTools.h"
+    #define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
+    #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
+    #define ToString(x)ToString(x) // Méthode de conversion int vers string
+#else
     #define MSG(x) EcrireLog("Chargement", x); //Macro pour rapporter des erreurs
     #define MSGERR(x) EcrireLog("Chargement, erreur", x);
 
     #ifndef _
     #define _(x) x // "Emule" la macro de WxWidgets
     #endif
-#endif
-#ifdef GDE
-    #include <wx/wx.h>
-    #include "GDL/CommonTools.h"
-    #define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
-    #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
-    #define ToString(x)ToString(x) // Méthode de conversion int vers string
 #endif
 
 #include <string>
@@ -71,20 +70,19 @@ bool OpenSaveGame::OpenFromFile(string file)
     TiXmlDocument doc;
     if ( !doc.LoadFile(file.c_str()) )
     {
-#if defined(GDP)
-        string ErrorDescription = doc.ErrorDesc();
-        string Error =  "Erreur lors du chargement : " + ErrorDescription + _("\nVérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder.");
-#endif
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
         wxString ErrorDescription = doc.ErrorDesc();
         wxString Error = _( "Erreur lors du chargement : " ) + ErrorDescription + _("\nVérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder.");
+#else
+        string ErrorDescription = doc.ErrorDesc();
+        string Error =  "Erreur lors du chargement : " + ErrorDescription + _("\nVérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder.");
 #endif
         MSGERR( Error );
         return false;
     }
 
     OpenDocument(doc);
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     game.gameFile = file;
     #endif
 
@@ -112,7 +110,7 @@ void OpenSaveGame::OpenFromString(string text)
 ////////////////////////////////////////////////////////////
 void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     bool notBackwardCompatible = false;
 
@@ -444,7 +442,7 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, T
 {
     TiXmlElement * elemScene = elem->FirstChildElement("Objet");
 
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     //Passage en revue des objets
     while ( elemScene )
@@ -613,7 +611,7 @@ void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement
 void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElement * elem)
 {
     const TiXmlElement * elemScene = elem->FirstChildElement();
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     //Passage en revue des évènements
     while ( elemScene )
@@ -901,7 +899,7 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
 
 std::string AdaptLegacyMathExpression(std::string expression, Game & game, Scene & scene)
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     string newExpression;
     size_t lastPos = 0;
@@ -1168,7 +1166,7 @@ std::string AdaptLegacyTextExpression(std::string expression, Game & game, Scene
  */
 void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list, Game & game, Scene & scene)
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     for (unsigned int eId = 0;eId < list.size();++eId)
     {
@@ -1242,7 +1240,7 @@ void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list,
  */
 void OpenSaveGame::AdaptExpressionsFromGD149552(vector < BaseEventSPtr > & list, Game & game, Scene & scene)
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     for (unsigned int eId = 0;eId < list.size();++eId)
     {
@@ -1311,7 +1309,7 @@ void OpenSaveGame::AdaptExpressionsFromGD149552(vector < BaseEventSPtr > & list,
  */
 void OpenSaveGame::AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list, Game & game, Scene & scene)
 {
-    gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
 
     for (unsigned int eId = 0;eId < list.size();++eId)
     {
@@ -1638,7 +1636,7 @@ void OpenSaveGame::OpenVariablesList(ListVariable & list, const TiXmlElement * e
     }
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 ////////////////////////////////////////////////////////////
 /// Sauvegarde le jeu dans le fichier indiqué
 ////////////////////////////////////////////////////////////
@@ -1879,7 +1877,7 @@ void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<Object> > & list
 
         objet->SetAttribute( "nom", list.at( j )->GetName().c_str() );
 
-        gdp::ExtensionsManager * extensionsManager = gdp::ExtensionsManager::getInstance();
+        GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
         objet->SetAttribute( "type", extensionsManager->GetStringFromTypeId(list.at( j )->GetTypeId()).c_str() );
 
         TiXmlElement * variables = new TiXmlElement( "Variables" );
@@ -2137,7 +2135,7 @@ void OpenSaveGame::SaveExternalEvents(const vector < boost::shared_ptr<ExternalE
 ////////////////////////////////////////////////////////////
 void OpenSaveGame::RecreatePaths(string file)
 {
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
     string newDirectory = string( wxPathOnly( file ).mb_str() );
     if ( newDirectory.empty() ) return;
 

@@ -56,7 +56,7 @@ class GD_API Game
 
         ListVariable variables; ///< Initial global variables
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         std::string gameFile; ///< File of the game
         vector < string > imagesChanged; ///< Images that have been changed and which have to be reloaded
 

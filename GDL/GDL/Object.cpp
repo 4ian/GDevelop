@@ -40,6 +40,13 @@ Object::Object(string name_) :
     this->ClearForce();
 }
 
+Object::~Object()
+{
+    //C++ is like hell sometimes, his implementation at last.
+    //Implementing the, empty, destructor here prevent compiler to say that there is
+    //an undefined reference to "vtable of Object".
+}
+
 void Object::Init(const Object & object)
 {
     Forces = object.Forces;
@@ -195,14 +202,14 @@ void Object::AddAutomatism(boost::shared_ptr<Automatism> automatism)
     automatisms[automatism->GetAutomatismId()] = automatism;
     automatisms[automatism->GetAutomatismId()]->SetOwner(this);
 }
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 void Object::RemoveAutomatism(unsigned int type)
 {
     automatisms.erase(type);
 }
 #endif
 
-#if GDE
+#if defined(GD_IDE_ONLY)
 void Object::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Position");      value = ToString(GetX())+";"+ToString(GetY());}

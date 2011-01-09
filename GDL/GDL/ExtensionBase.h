@@ -24,7 +24,7 @@ class BaseEvent;
 class AutomatismsSharedDatas;
 class ResourcesMergingHelper;
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 class Game;
 class MainEditorCommand;
 #include <wx/bitmap.h>
@@ -50,7 +50,7 @@ typedef std::string (Automatism::*StrExpressionAutomatismFunPtr)( const RuntimeS
 typedef void (*DestroyFunPtr)(Object*);
 typedef Object * (*CreateFunPtr)(std::string name);
 
-#if defined(GDE) //Condition, Action and expressions declare more things at edittime ( Description, icons... )
+#if defined(GD_IDE_ONLY) //Condition, Action and expressions declare more things at edittime ( Description, icons... )
 
 /**
  * Declare the extension.
@@ -794,7 +794,7 @@ class GD_API ParameterInfo
     std::string type;
     bool optional;
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
     std::string description;
 #endif
 };
@@ -810,7 +810,7 @@ class GD_API InstructionInfos
     InstructionInfos();
     virtual ~InstructionInfos() {};
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string description;
     std::string sentence;
@@ -837,7 +837,7 @@ class GD_API ExpressionInfos
     ExpressionInfos();
     virtual ~ExpressionInfos() {};
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string description;
     std::string group;
@@ -862,7 +862,7 @@ class GD_API StrExpressionInfos
     StrExpressionInfos();
     virtual ~StrExpressionInfos() {};
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string description;
     std::string group;
@@ -887,7 +887,7 @@ class GD_API EventInfos
     EventInfos();
     virtual ~EventInfos() {};
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string description;
     std::string group;
@@ -908,7 +908,7 @@ class GD_API AutomatismInfo
     AutomatismInfo();
     virtual ~AutomatismInfo() {};
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string defaultName;
     std::string description;
@@ -935,7 +935,7 @@ class GD_API ExtensionObjectInfos
     ExtensionObjectInfos();
     virtual ~ExtensionObjectInfos() {};
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string informations;
     wxBitmap icon;
@@ -974,7 +974,7 @@ class GD_API CompilationInfos
     int sfmlMajorVersion;
     int sfmlMinorVersion;
 
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     int wxWidgetsMajorVersion;
     int wxWidgetsMinorVersion;
     int wxWidgetsReleaseNumber;
@@ -1007,7 +1007,7 @@ class GD_API ExtensionBase
 
     inline std::string GetName() const { return name; }
 
-    #ifdef GDE
+    #if defined(GD_IDE_ONLY)
     inline std::string GetInfo() const { return informations; }
     inline std::string GetAuthor() const { return author; }
     inline std::string GetLicense() const { return license; }
@@ -1056,7 +1056,7 @@ class GD_API ExtensionBase
     const std::map<std::string, ExpressionInfos > & GetAllExpressionsForAutomatism(std::string autoType) const;
     const std::map<std::string, StrExpressionInfos > & GetAllStrExpressionsForAutomatism(std::string autoType) const;
 
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     const ExtensionObjectInfos & GetObjectInfo(std::string objectType) const;
     #endif
     const AutomatismInfo & GetAutomatismInfo(std::string objectType) const;
@@ -1113,7 +1113,7 @@ class GD_API ExtensionBase
 
     std::string name;
 
-    #ifdef GDE //Information available only at edittime
+    #if defined(GD_IDE_ONLY) //Information available only at edittime
     std::string fullname; ///<Name displayed to users at edittime
     std::string informations; ///<Description displayed to users at edittime
     std::string author; ///<Author displayed to users at edittime

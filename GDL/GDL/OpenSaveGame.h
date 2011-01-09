@@ -29,7 +29,7 @@ public:
     static void OpenConditions(vector < Instruction > & list, const TiXmlElement * elem);
     static void OpenActions(vector < Instruction > & list, const TiXmlElement * elem);
 
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     bool SaveToFile(string file);
     static void SaveEvents( const vector < BaseEventSPtr > & list, TiXmlElement * events );
     static void SaveConditions(const vector < Instruction > & list, TiXmlElement * elem);
@@ -64,7 +64,7 @@ private:
     void OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * elem );
     static void OpenVariablesList(ListVariable & list, const TiXmlElement * elem);
 
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     void SavePositions( const vector < InitialPosition > & list, TiXmlElement * positions );
     void SaveObjects( const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects );
     void SaveGroupesObjets( const vector < ObjectGroup > & list, TiXmlElement * grpsobjets );

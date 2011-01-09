@@ -49,12 +49,12 @@ class WhileEvent : public BaseEvent
         virtual vector < vector<Instruction>* > GetAllConditionsVectors();
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */
@@ -88,7 +88,7 @@ class WhileEvent : public BaseEvent
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
         mutable unsigned int whileConditionsHeight;
 
         int GetConditionsHeight() const;

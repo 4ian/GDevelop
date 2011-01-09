@@ -8,7 +8,7 @@ class RuntimeScene;
 class Scene;
 typedef boost::shared_ptr<Object> ObjSPtr;
 class TiXmlElement;
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 class wxWindow;
 class Game;
 class MainEditorCommand;
@@ -56,7 +56,7 @@ class GD_API Automatism
         inline bool Activated() const { return activated; };
 
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         /**
          * Save Automatism to XML
          */
@@ -68,7 +68,7 @@ class GD_API Automatism
          */
         virtual void LoadFromXml(const TiXmlElement * eventElem) {}
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         /**
          * Called when user wants to edit the automatism.
          */

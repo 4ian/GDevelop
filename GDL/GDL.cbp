@@ -62,7 +62,7 @@
 					<Add option="-m32" />
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
-					<Add option="-DGDE" />
+					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -172,7 +172,7 @@
 					<Add option="-m32" />
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
-					<Add option="-DGDE" />
+					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
@@ -284,7 +284,8 @@
 					<Add option="-m32" />
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
-					<Add option="-DGDE" />
+					<Add option="-DGD_IDE_ONLY" />
+					<Add option="-DGD_DYNAMIC_EXTENSIONS" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -401,7 +402,7 @@
 					<Add option="-m32" />
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
-					<Add option="-DGDE" />
+					<Add option="-DGD_IDE_ONLY" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -447,7 +448,7 @@
 					<Add option="-m32" />
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
-					<Add option="-DGDE" />
+					<Add option="-DGD_IDE_ONLY" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
@@ -636,6 +637,12 @@
 		<Unit filename="GDL\DocMainPage.h" />
 		<Unit filename="GDL\Dossier.cpp" />
 		<Unit filename="GDL\Dossier.h" />
+		<Unit filename="GDL\DynamicExtensionBase.cpp" />
+		<Unit filename="GDL\DynamicExtensionBase.h" />
+		<Unit filename="GDL\DynamicExtensionsManager.cpp" />
+		<Unit filename="GDL\DynamicExtensionsManager.h" />
+		<Unit filename="GDL\DynamicLibrariesTools.cpp" />
+		<Unit filename="GDL\DynamicLibrariesTools.h" />
 		<Unit filename="GDL\EditComment.cpp" />
 		<Unit filename="GDL\EditComment.h" />
 		<Unit filename="GDL\EditExpression.cpp" />
@@ -787,6 +794,8 @@
 		<Unit filename="GDL\SoundManager.h" />
 		<Unit filename="GDL\Sprite.cpp" />
 		<Unit filename="GDL\Sprite.h" />
+		<Unit filename="GDL\SpriteActionsAutomatisms.cpp" />
+		<Unit filename="GDL\SpriteConditionsAutomatisms.cpp" />
 		<Unit filename="GDL\SpriteExtension.cpp" />
 		<Unit filename="GDL\SpriteExtension.h" />
 		<Unit filename="GDL\SpriteInitialPositionPanel.cpp" />
@@ -965,7 +974,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="1.5.9992" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="1.5.10031" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

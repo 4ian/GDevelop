@@ -35,7 +35,7 @@ class GD_API GDExpressionParser
         bool ParseTextExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks);
 
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         std::string firstErrorStr;
         size_t firstErrorPos;
         #endif
@@ -80,7 +80,7 @@ class ParserCallbacks
     virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression) = 0;
     virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression) = 0;
 
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     std::string firstErrorStr;
     size_t firstErrorPos;
     #endif

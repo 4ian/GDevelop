@@ -21,7 +21,7 @@
 #include "GDL/FontManager.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/AutomatismsSharedDatas.h"
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "GDL/ProfileEvent.h"
 #include "GDL/BaseProfiler.h"
 #include "GDL/BaseDebugger.h"
@@ -37,7 +37,7 @@ renderWindow(renderWindow_),
 input(&renderWindow->GetInput()),
 inputKeyPressed(false),
 game(game_),
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 debugger(NULL),
 profiler(NULL),
 #endif
@@ -78,7 +78,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     game = scene.game;
     soundManager = scene.soundManager;
     input = scene.input;
-    #ifdef GDE
+    #if defined(GD_IDE_ONLY)
     debugger = scene.debugger;
     profiler = scene.profiler;
     #endif
@@ -165,7 +165,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         ManageObjectsBeforeEvents();
         ManageSounds();
 
-        #ifdef GDE
+        #if defined(GD_IDE_ONLY)
         if( profiler )
         {
             if ( firstLoop ) profiler->Reset();
@@ -183,7 +183,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
             events[i]->Execute(*this, objectsConcernedForEvent);
         }
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         if( profiler && profiler->profilingActivated )
         {
             profiler->lastEventsTime = profiler->eventsClock.getTimeMicroseconds();
@@ -194,7 +194,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         //Gestions post-évènements
         ManageObjectsAfterEvents();
 
-        #ifdef GDE
+        #if defined(GD_IDE_ONLY)
         if( debugger )
             debugger->Update();
         #endif
@@ -203,7 +203,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         Render();
         textes.clear(); //Legacy texts
 
-        #ifdef GDE
+        #if defined(GD_IDE_ONLY)
         if( profiler && profiler->profilingActivated )
         {
             profiler->lastRenderingTime = profiler->renderingClock.getTimeMicroseconds();
@@ -232,7 +232,7 @@ void RuntimeScene::ManageRenderTargetEvents()
         if ( event.Type == sf::Event::Closed )
         {
             running = false;
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             renderWindow->Close();
             #endif
         }
@@ -266,7 +266,7 @@ void RuntimeScene::RenderWithoutStep()
 
     Render();
 
-    #ifdef GDE
+    #if defined(GD_IDE_ONLY)
     if( debugger )
         debugger->Update();
     #endif
@@ -640,7 +640,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
  */
 void RuntimeScene::PreprocessEventList( const Game & game, vector < BaseEventSPtr > & listEvent )
 {
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     boost::shared_ptr<ProfileEvent> previousProfileEvent;
     boost::shared_ptr<btClock> clock = boost::shared_ptr<btClock>(new btClock);
     #endif
@@ -651,7 +651,7 @@ void RuntimeScene::PreprocessEventList( const Game & game, vector < BaseEventSPt
         if ( listEvent[i]->CanHaveSubEvents() )
             PreprocessEventList( game, listEvent[i]->GetSubEvents());
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         if ( profiler && profiler->profilingActivated && listEvent[i]->IsExecutable() )
         {
             //Define a new profile event
@@ -668,7 +668,7 @@ void RuntimeScene::PreprocessEventList( const Game & game, vector < BaseEventSPt
         }
         #endif
     }
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     if ( profiler && profiler->profilingActivated )
     {
         //Define a new profile event

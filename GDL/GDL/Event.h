@@ -22,7 +22,7 @@ class Evaluateur;
 class TiXmlElement;
 class Game;
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include <wx/dcbuffer.h>
 #include <boost/weak_ptr.hpp>
 class Scene;
@@ -98,7 +98,7 @@ class GD_API BaseEvent
          */
         virtual vector < GDExpression* > GetAllExpressions() { vector < GDExpression* > noExpr; return noExpr;};
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         /**
          * Save event to XML
          */
@@ -118,7 +118,7 @@ class GD_API BaseEvent
         std::string GetType() const { return type; };
         void SetType(std::string type_) { type = type_; };
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */
@@ -158,7 +158,7 @@ class GD_API BaseEvent
         static vector <BaseEventSPtr> badSubEvents;
 };
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 /**
  * Clone an event and insert a reference to the original event into the newly created event.
  * Used for profiling events for example.

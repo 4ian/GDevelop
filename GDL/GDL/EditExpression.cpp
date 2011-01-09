@@ -1,4 +1,4 @@
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 
 #include "GDL/EditExpression.h"
 
@@ -258,7 +258,7 @@ lastErrorPos(std::string::npos)
 
     //Prepare keyword highlighting
     std::string keywords;
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = gdp::ExtensionsManager::getInstance()->GetExtensions();
+    const vector < boost::shared_ptr<ExtensionBase> > extensions = GDpriv::ExtensionsManager::getInstance()->GetExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -378,7 +378,7 @@ void EditExpression::RefreshLists()
     ValList->DeleteAllItems();
     ValList->AddRoot( _( "Toutes les valeurs spéciales" ), 0 );
 
-    gdp::ExtensionsManager * extensionManager = gdp::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects expressions

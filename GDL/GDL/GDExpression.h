@@ -106,7 +106,7 @@ class GD_API GDExpression
          */
         bool PrepareForTextEvaluationOnly(const Game & game, const Scene & scene);
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         std::string GetFirstErrorDuringPreprocessingText() { return firstErrorStr; };
         size_t GetFirstErrorDuringPreprocessingPosition() { return firstErrorPos; };
         #endif
@@ -152,7 +152,7 @@ class GD_API GDExpression
         std::vector < StrExpressionInstruction > textExpressionFunctions; ///< The functions to call to generate the text
         bool            isTextExpressionPreprocessed; ///<Indicate if the functions to call have been generated.
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         std::string firstErrorStr;
         size_t firstErrorPos;
         #endif

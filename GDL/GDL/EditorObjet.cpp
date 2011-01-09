@@ -1,4 +1,4 @@
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 
 #include "GDL/EditorObjet.h"
 
@@ -98,6 +98,8 @@ const long EditorObjet::ID_MENUITEM9 = wxNewId();
 const long EditorObjet::ID_MENUITEM6 = wxNewId();
 const long EditorObjet::idMenuPosEverywhere2 = wxNewId();
 const long EditorObjet::ID_MENUITEM4 = wxNewId();
+const long EditorObjet::ID_MENUITEM13 = wxNewId();
+const long EditorObjet::ID_MENUITEM12 = wxNewId();
 const long EditorObjet::ID_MENUITEM10 = wxNewId();
 const long EditorObjet::ID_MENUITEM11 = wxNewId();
 const long EditorObjet::ID_MENUITEM2 = wxNewId();
@@ -138,6 +140,7 @@ ySelectionOffset(0)
     wxFlexGridSizer* FlexGridSizer16;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
+    wxMenu* MenuItem16;
     wxFlexGridSizer* FlexGridSizer9;
     wxFlexGridSizer* FlexGridSizer2;
     wxBoxSizer* BoxSizer2;
@@ -388,6 +391,10 @@ ySelectionOffset(0)
     MenuItem25 = new wxMenuItem(MenuItem22, idMenuPosEverywhere2, _("Positionner précisement"), wxEmptyString, wxITEM_NORMAL);
     MenuItem22->Append(MenuItem25);
     maskContextMenu.Append(ID_MENUITEM4, _("Rectangle sélectionné"), MenuItem22, wxEmptyString);
+    MenuItem16 = new wxMenu();
+    applyMaskToAllDirectionSprites = new wxMenuItem(MenuItem16, ID_MENUITEM13, _("Appliquer à toutes les images de la direction"), wxEmptyString, wxITEM_CHECK);
+    MenuItem16->Append(applyMaskToAllDirectionSprites);
+    maskContextMenu.Append(ID_MENUITEM12, _("Options"), MenuItem16, wxEmptyString);
     maskContextMenu.AppendSeparator();
     MenuItem24 = new wxMenuItem((&maskContextMenu), ID_MENUITEM10, _("Retourner au masque par défaut"), wxEmptyString, wxITEM_NORMAL);
     maskContextMenu.Append(MenuItem24);
@@ -1631,6 +1638,15 @@ void EditorObjet::OnimagePanelMouseMove(wxMouseEvent& event)
         GetEditedSprite().SetCollisionMaskAutomatic(false);
         GetEditedSprite().SetCustomCollisionMask(boxes);
 
+        if ( applyMaskToAllDirectionSprites->IsChecked() )
+        {
+            for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
+            {
+                object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).SetCollisionMaskAutomatic(false);
+                object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).SetCustomCollisionMask(boxes);
+            }
+        }
+
         imagePanel->Refresh();
         imagePanel->Update(); //Immédiatement
     }
@@ -1646,6 +1662,15 @@ void EditorObjet::OnDelMaskRectangleSelected(wxCommandEvent& event)
 
         GetEditedSprite().SetCollisionMaskAutomatic(false);
         GetEditedSprite().SetCustomCollisionMask(boxes);
+
+        if ( applyMaskToAllDirectionSprites->IsChecked() )
+        {
+            for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
+            {
+                object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).SetCollisionMaskAutomatic(false);
+                object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).SetCustomCollisionMask(boxes);
+            }
+        }
 
         imagePanel->Refresh();
         imagePanel->Update(); //Immédiatement
@@ -1666,6 +1691,15 @@ void EditorObjet::OnAddMaskRectangleSelected(wxCommandEvent& event)
 
         GetEditedSprite().SetCollisionMaskAutomatic(false);
         GetEditedSprite().SetCustomCollisionMask(boxes);
+
+        if ( applyMaskToAllDirectionSprites->IsChecked() )
+        {
+            for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
+            {
+                object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).SetCollisionMaskAutomatic(false);
+                object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).SetCustomCollisionMask(boxes);
+            }
+        }
 
         imagePanel->Refresh();
         imagePanel->Update(); //Immédiatement
@@ -1709,6 +1743,15 @@ void EditorObjet::OnModifyMaskRectangleSelected(wxCommandEvent& event)
         GetEditedSprite().SetCollisionMaskAutomatic(false);
         GetEditedSprite().SetCustomCollisionMask(boxes);
 
+        if ( applyMaskToAllDirectionSprites->IsChecked() )
+        {
+            for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
+            {
+                object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).SetCollisionMaskAutomatic(false);
+                object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).SetCustomCollisionMask(boxes);
+            }
+        }
+
         imagePanel->Refresh();
         imagePanel->Update(); //Immédiatement
     }
@@ -1727,6 +1770,17 @@ void EditorObjet::OnEnterMaskRectanglePositionSelected(wxCommandEvent& event)
         }
         GetEditedSprite().SetCollisionMaskAutomatic(false);
         GetEditedSprite().SetCustomCollisionMask(boxes);
+
+        if ( applyMaskToAllDirectionSprites->IsChecked() )
+        {
+            cout << "Apply";
+            for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
+            {
+                cout << "ApplyToSprite";
+                object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).SetCollisionMaskAutomatic(false);
+                object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).SetCustomCollisionMask(boxes);
+            }
+        }
 
         imagePanel->Refresh();
         imagePanel->Update(); //Immédiatement

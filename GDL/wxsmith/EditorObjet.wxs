@@ -640,6 +640,13 @@
 					<handler function="OnEnterMaskRectanglePositionSelected" entry="EVT_MENU" />
 				</object>
 			</object>
+			<object class="wxMenu" name="ID_MENUITEM12" variable="MenuItem16" member="yes">
+				<label>Options</label>
+				<object class="wxMenuItem" name="ID_MENUITEM13" variable="applyMaskToAllDirectionSprites" member="yes">
+					<label>Appliquer à toutes les images de la direction</label>
+					<checkable>1</checkable>
+				</object>
+			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM10" variable="MenuItem24" member="yes">
 				<label>Retourner au masque par défaut</label>

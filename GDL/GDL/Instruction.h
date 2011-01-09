@@ -127,7 +127,7 @@ class GD_API Instruction
         inline vector < Instruction > & GetSubInstructions() { return subInstructions; };
         inline void SetSubInstructions(const vector < Instruction > & subInstructions_) { subInstructions = subInstructions_; };
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         mutable bool renderedHeightNeedUpdate;
         mutable unsigned int renderedHeight; ///<Height of the instruction rendered in an event editor
         mutable bool selected; ///<True if selected in an event editor

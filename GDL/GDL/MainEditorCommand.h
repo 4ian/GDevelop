@@ -3,13 +3,14 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 
 #ifndef NEEDREFRESHCOMMAND_H
 #define NEEDREFRESHCOMMAND_H
 
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
+#include <wx/toplevel.h>
 #include <iostream>
 
 /**
@@ -46,19 +47,17 @@ class GD_API MainEditorCommand
          * Return the pointer to the Main Editor.
          * Assert if no pointer has been set.
          */
-        wxWindow * GetMainEditor() { assert(mainEditor); return mainEditor; };
+        wxTopLevelWindow * GetMainEditor() { assert(mainEditor); return mainEditor; };
         /**
          * Set the pointer to the main editor.
          */
-        void SetMainEditor(wxWindow * mainEditor_) { mainEditor = mainEditor_; };
+        void SetMainEditor(wxTopLevelWindow * mainEditor_) { mainEditor = mainEditor_; };
 
-    protected:
     private:
 
-        int sceneID;
         wxRibbonBar * ribbon;
         wxRibbonButtonBar * ribbonSceneEditorButtonBar;
-        wxWindow * mainEditor;
+        wxTopLevelWindow * mainEditor;
 };
 
 #endif // NEEDREFRESHCOMMAND_H

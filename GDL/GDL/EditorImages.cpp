@@ -91,6 +91,9 @@ END_EVENT_TABLE()
 ////////////////////////////////////////////////////////////
 EditorImages::EditorImages( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_, bool useRibbon_ ) :
 game(game_),
+#if defined(DESACTIVATED_FOR_WX290)
+filesWatcher(game),
+#endif
 mainEditorCommand(mainEditorCommand_),
 useRibbon(useRibbon_),
 dossierId(-1),
@@ -204,7 +207,6 @@ toolbar(NULL)
     {
         ConnectEvents();
     }
-
 
     Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorImages::OnRefreshBtClick);
     Connect(ID_BITMAPBUTTON5,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorImages::OnOpenPaintProgramClick);
@@ -583,8 +585,6 @@ void EditorImages::Refresh()
 {
     BanqueImageList->DeleteAllItems();
 
-    //On vérifie bien la validité de dossierId, car on a très bien pu changer
-    //de jeu entre son choix et le rafraichissement
     if ( dossierNom != "" && dossierId >= 0 && static_cast<unsigned>(dossierId) < game.imagesFolders.size())
     {
         BanqueImageList->AddRoot( dossierNom );
@@ -616,6 +616,12 @@ void EditorImages::Refresh()
         }
     }
     BanqueImageList->Expand( BanqueImageList->GetRootItem() );
+
+#if defined(DESACTIVATED_FOR_WX290)
+    filesWatcher.RemoveAll();
+    for ( unsigned int i = 0;i < game.images.size();i++ )
+        filesWatcher.Add(wxFileName(game.images[i].file).GetPath());
+        #endif
 }
 
 ////////////////////////////////////////////////////////////

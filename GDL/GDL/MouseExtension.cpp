@@ -144,8 +144,11 @@ MouseExtension::MouseExtension()
         DECLARE_PARAMETER_OPTIONAL("camera", _("Caméra"), false, "")
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("Random", _("Valeur aléatoire"), _("Valeur aléatoire"), _("Aléatoire"), "res/actions/position.png", &ExpRandom)
+    DECLARE_EXPRESSION("MouseWheelDelta", _("Roulette : Déplacement"), _("Déplacement de la roulette de la souris"), _("Souris"), "res/actions/mouse.png", &ExpMouseWheelDelta)
+    DECLARE_END_EXPRESSION()
 
+    //I myself wonder why I put this here.
+    DECLARE_EXPRESSION("Random", _("Valeur aléatoire"), _("Valeur aléatoire"), _("Aléatoire"), "res/actions/position.png", &ExpRandom)
         DECLARE_PARAMETER("expression", _("Valeur maximale"), false, "")
     DECLARE_END_EXPRESSION()
 }

@@ -63,6 +63,7 @@
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGD_IDE_ONLY" />
+					<Add option="-DGD_DYNAMIC_EXTENSIONS" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -557,6 +558,80 @@
 					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
 				</Linker>
 			</Target>
+			<Target title="Development - Edittime - wx291">
+				<Option platforms="Windows;" />
+				<Option output="..\IDE\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Dev Edittime\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-finput-charset=iso-8859-1" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DGD_IDE_ONLY" />
+					<Add option="-DGD_DYNAMIC_EXTENSIONS" />
+					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DDEV" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswu" />
+					<Add directory="C:\Libs\wxwidgets\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lmingw32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-lwxmsw29u_xrc" />
+					<Add option="-lwxmsw29u_stc" />
+					<Add option="-lwxmsw29u_richtext" />
+					<Add option="-lwxmsw29u_ribbon" />
+					<Add option="-lwxmsw29u_aui" />
+					<Add option="-lwxmsw29u_adv" />
+					<Add option="-lwxmsw29u_html" />
+					<Add option="-lwxmsw29u_core" />
+					<Add option="-lwxbase29u_xml" />
+					<Add option="-lwxbase29u_net" />
+					<Add option="-lwxexpat" />
+					<Add option="-lwxbase29u" />
+					<Add option="-lwxpng" />
+					<Add option="-lwxjpeg" />
+					<Add option="-lwxzlib" />
+					<Add option="-lwxtiff" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
+					<Add option="-lkernel32" />
+					<Add option="-luser32" />
+					<Add option="-luuid" />
+					<Add option="-lshell32" />
+					<Add option="-lole32" />
+					<Add option="-lwinspool" />
+					<Add option="-ladvapi32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-loleaut32" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswu" />
+					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add directory="..\GDL\" />
@@ -639,6 +714,8 @@
 		<Unit filename="GDL\Dossier.h" />
 		<Unit filename="GDL\DynamicExtensionBase.cpp" />
 		<Unit filename="GDL\DynamicExtensionBase.h" />
+		<Unit filename="GDL\DynamicExtensionCallerEvent.cpp" />
+		<Unit filename="GDL\DynamicExtensionCallerEvent.h" />
 		<Unit filename="GDL\DynamicExtensionsManager.cpp" />
 		<Unit filename="GDL\DynamicExtensionsManager.h" />
 		<Unit filename="GDL\DynamicLibrariesTools.cpp" />
@@ -705,6 +782,8 @@
 		<Unit filename="GDL\HelpFileAccess.h" />
 		<Unit filename="GDL\Image.cpp" />
 		<Unit filename="GDL\Image.h" />
+		<Unit filename="GDL\ImageFilesWatcher.cpp" />
+		<Unit filename="GDL\ImageFilesWatcher.h" />
 		<Unit filename="GDL\ImageManager.cpp" />
 		<Unit filename="GDL\ImageManager.h" />
 		<Unit filename="GDL\Instruction.cpp" />

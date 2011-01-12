@@ -6,12 +6,12 @@
 #ifndef FORCE_H_INCLUDED
 #define FORCE_H_INCLUDED
 
+#include "GDL/Event.h" //This include file must be placed first
 #include <iostream>
 #include <vector>
 #include <string>
 #include <cmath>
 #include "GDL/Log.h"
-#include "GDL/Event.h"
 
 class GD_API Force
 {

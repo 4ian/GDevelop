@@ -6,6 +6,7 @@
 #ifndef SCENEIG_H
 #define SCENEIG_H
 
+#include "GDL/Scene.h" //This include must be placed first
 #include "GDL/MemTrace.h"
 
 #include <iostream>
@@ -17,7 +18,6 @@
 #include <boost/weak_ptr.hpp>
 #include <boost/interprocess/containers/flat_map.hpp>
 
-#include "GDL/Scene.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/Object.h"
 #include "GDL/Event.h"
@@ -55,6 +55,7 @@ class GD_API RuntimeScene : public Scene
         sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display
         const sf::Input *                       input; ///< Pointer to the SFML class used to get user input
         bool                                    inputKeyPressed;    ///< Supplementary input : True if any key was pressed
+        int                                     inputWheelDelta;    ///< Supplementary input : Amount of mouse wheel moved
         RuntimeGame *                           game; ///< Pointer to the game the scene is linked to
         SoundManager *                          soundManager; ///< Pointer to the sound manager.
         #if defined(GD_IDE_ONLY)

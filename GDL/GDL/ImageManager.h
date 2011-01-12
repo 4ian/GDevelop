@@ -1,11 +1,11 @@
 #ifndef ImageManager_H
 #define ImageManager_H
 
+#include "GDL/Game.h" //This include file must be placed first
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include <boost/shared_ptr.hpp>
-#include "GDL/Game.h"
 #include <iostream>
 #include <vector>
 #include <string>

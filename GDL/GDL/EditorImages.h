@@ -14,6 +14,7 @@
 #include "GDL/RuntimeGame.h"
 #include "GDL/ImageManager.h"
 #include "GDL/MainEditorCommand.h"
+#include "GDL/ImageFilesWatcher.h"
 
 class GD_API EditorImages: public wxPanel
 {
@@ -124,10 +125,12 @@ class GD_API EditorImages: public wxPanel
 		void OnResize(wxSizeEvent& event);
 		//*)
         void OnMoreOptions( wxCommandEvent& event );
-
         void CreateToolbar();
-
         void ConnectEvents();
+
+#if defined(DESACTIVATED_FOR_WX290)
+        ImageFilesWatcher filesWatcher;
+#endif
 
 		MainEditorCommand mainEditorCommand;
 		bool useRibbon;

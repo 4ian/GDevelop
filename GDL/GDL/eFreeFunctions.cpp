@@ -53,6 +53,11 @@ double ExpMouseY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerne
     return scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), view).y;
 }
 
+double ExpMouseWheelDelta( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    return scene.inputWheelDelta;
+}
+
 double ExpCameraWidth( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);

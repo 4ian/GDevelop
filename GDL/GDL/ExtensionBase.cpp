@@ -13,13 +13,12 @@
 
 using namespace std;
 
+std::map<std::string, ExtensionObjectInfos > ExtensionBase::badObjectsInfos;
 std::map<std::string, InstructionInfos > ExtensionBase::badConditionsInfos;
 std::map<std::string, InstructionInfos > ExtensionBase::badActionsInfos;
 std::map<std::string, ExpressionInfos > ExtensionBase::badExpressionsInfos;
 std::map<std::string, StrExpressionInfos > ExtensionBase::badStrExpressionsInfos;
 std::map<std::string, AutomatismInfo > ExtensionBase::badAutomatismsInfo;
-
-
 
 ExtensionObjectInfos::ExtensionObjectInfos() :
 destroyFunPtr(NULL),
@@ -223,6 +222,8 @@ const ExtensionObjectInfos & ExtensionBase::GetObjectInfo(std::string objectType
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second;
+
+    return badObjectsInfos[""];
 }
 #endif
 

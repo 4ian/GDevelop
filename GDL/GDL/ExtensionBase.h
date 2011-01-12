@@ -6,6 +6,13 @@
 #ifndef EXTENSIONBASE_H
 #define EXTENSIONBASE_H
 
+#if defined(GD_IDE_ONLY)
+class Game;
+class MainEditorCommand;
+#include <wx/bitmap.h>
+#include <wx/file.h>
+#include <wx/wx.h>
+#endif
 #include <string>
 #include <vector>
 #include <map>
@@ -23,14 +30,6 @@ class StrExpressionInstruction;
 class BaseEvent;
 class AutomatismsSharedDatas;
 class ResourcesMergingHelper;
-
-#if defined(GD_IDE_ONLY)
-class Game;
-class MainEditorCommand;
-#include <wx/bitmap.h>
-#include <wx/file.h>
-#include <wx/wx.h>
-#endif
 
 typedef boost::shared_ptr<Object> ObjSPtr;
 typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
@@ -1129,6 +1128,7 @@ class GD_API ExtensionBase
     std::map<std::string, EventInfos > eventsInfos;
     std::map<std::string, AutomatismInfo > automatismsInfo;
 
+    static std::map<std::string, ExtensionObjectInfos > badObjectsInfos; ///< Used when an object is not found in the extension
     static std::map<std::string, InstructionInfos > badConditionsInfos; ///< Used when a condition is not found in the extension
     static std::map<std::string, InstructionInfos > badActionsInfos;  ///< Used when an action is not found in the extension
     static std::map<std::string, ExpressionInfos > badExpressionsInfos; ///< Used when an expression is not found in the extension

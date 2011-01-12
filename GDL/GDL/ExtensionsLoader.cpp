@@ -1,5 +1,5 @@
+#include "GDL/ExtensionsManager.h" // Must be placed first
 #include "GDL/ExtensionsLoader.h"
-#include "GDL/ExtensionsManager.h"
 #include <stdio.h>
 #include <sys/types.h>
 

@@ -1,6 +1,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include "GDL/Event.h" //This include must be placed first
 #include <vector>
 #include <map>
 #include <string>
@@ -8,7 +9,6 @@
 #include <boost/interprocess/containers/flat_map.hpp>
 
 class Game;
-#include "GDL/Event.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectGroup.h"
 #include "GDL/Position.h"

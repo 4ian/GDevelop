@@ -3,11 +3,11 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#include "GDL/RuntimeScene.h" // must be placed first, thx wx
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include <sstream>
-#include "GDL/RuntimeScene.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/ImageManager.h"
@@ -224,6 +224,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
 ////////////////////////////////////////////////////////////
 void RuntimeScene::ManageRenderTargetEvents()
 {
+    inputWheelDelta = 0;
 
     sf::Event event;
     while ( renderWindow->GetEvent( event ) )
@@ -240,6 +241,8 @@ void RuntimeScene::ManageRenderTargetEvents()
             inputKeyPressed = true;
         else if (event.Type == sf::Event::KeyReleased )
             inputKeyPressed = false;
+        else if (event.Type == sf::Event::MouseWheelMoved )
+            inputWheelDelta = event.MouseWheel.Delta;
         else if (event.Type == sf::Event::Resized)
         {
             //Resetup OpenGL

@@ -6,6 +6,14 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#if defined(GD_IDE_ONLY)
+#include <wx/dcbuffer.h> //This include file must be placed first
+#include <boost/weak_ptr.hpp>
+class Scene;
+class Game;
+class MainEditorCommand;
+class wxWindow;
+#endif
 #include <iostream>
 #include <vector>
 #include <string>
@@ -21,15 +29,6 @@ class Instruction;
 class Evaluateur;
 class TiXmlElement;
 class Game;
-
-#if defined(GD_IDE_ONLY)
-#include <wx/dcbuffer.h>
-#include <boost/weak_ptr.hpp>
-class Scene;
-class Game;
-class MainEditorCommand;
-class wxWindow;
-#endif
 
 class BaseEvent;
 typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;

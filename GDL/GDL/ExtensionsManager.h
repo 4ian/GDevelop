@@ -5,13 +5,12 @@
 
 #ifndef EXTENSIONSMANAGER_H
 #define EXTENSIONSMANAGER_H
+#include "GDL/ExtensionBase.h"
 #include <string>
 #include <iostream>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/bimap/bimap.hpp>
-
-#include "GDL/ExtensionBase.h"
 class Object;
 
 #if defined(GD_IDE_ONLY)

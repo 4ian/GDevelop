@@ -6,6 +6,11 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#if defined(GD_IDE_ONLY)
+#include <wx/wx.h> //This include file must be placed first
+#endif
+#include "GDL/Force.h" //This include file must be placed first
+
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -15,7 +20,6 @@
 #include <boost/interprocess/containers/flat_map.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#include "GDL/Force.h"
 #include "GDL/ListVariable.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/RotatedRectangle.h"
@@ -35,7 +39,6 @@ class Scene;
 class wxWindow;
 class MainEditorCommand;
 class ResourcesMergingHelper;
-#include <wx/wx.h>
 #endif
 
 /**

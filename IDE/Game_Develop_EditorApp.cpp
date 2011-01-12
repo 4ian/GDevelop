@@ -125,6 +125,9 @@ bool Game_Develop_EditorApp::OnInit()
     chdir( tmp.c_str() );
 #endif
 #ifdef WINDOWS
+#if defined(NOT_FOR_WX290)
+    string exeDirectory = string(argv[0].mb_str()); //Make sure current working directory is executable directory.
+#endif
     string exeDirectory = argv[0]; //Make sure current working directory is executable directory.
     unsigned int backslashpos = exeDirectory.find_last_of( "\\" );
     if ( backslashpos > exeDirectory.length() ) backslashpos = 0;

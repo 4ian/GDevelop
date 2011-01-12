@@ -1763,7 +1763,9 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1294519989 d:\florian\programmation\gamedevelop\gdl\gdl\object.h
+1294605308 d:\florian\programmation\gamedevelop\gdl\gdl\object.h
+	<wx/wx.h>
+	"GDL/Force.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 	<iostream>
@@ -1772,287 +1774,1285 @@
 	<boost/shared_ptr.hpp>
 	<boost/interprocess/containers/flat_map.hpp>
 	<boost/enable_shared_from_this.hpp>
-	"GDL/Force.h"
 	"GDL/ListVariable.h"
 	"GDL/ObjectHelpers.h"
 	"GDL/RotatedRectangle.h"
-	<wx/wx.h>
 
-1289573463 c:\libs\sfml\include\sfml\system.hpp
-	<SFML/Config.hpp>
-	<SFML/System/Clock.hpp>
-	<SFML/System/Err.hpp>
-	<SFML/System/Lock.hpp>
-	<SFML/System/Mutex.hpp>
-	<SFML/System/Randomizer.hpp>
-	<SFML/System/Sleep.hpp>
-	<SFML/System/String.hpp>
-	<SFML/System/Thread.hpp>
-	<SFML/System/ThreadLocal.hpp>
-	<SFML/System/ThreadLocalPtr.hpp>
-	<SFML/System/Utf.hpp>
-	<SFML/System/Vector2.hpp>
-	<SFML/System/Vector3.hpp>
+1253304927 c:\libs\wxwidgets\include\wx\wx.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/dynarray.h"
+	"wx/list.h"
+	"wx/hash.h"
+	"wx/string.h"
+	"wx/hashmap.h"
+	"wx/arrstr.h"
+	"wx/intl.h"
+	"wx/log.h"
+	"wx/event.h"
+	"wx/app.h"
+	"wx/utils.h"
+	"wx/stream.h"
+	"wx/memory.h"
+	"wx/math.h"
+	"wx/stopwatch.h"
+	"wx/timer.h"
+	"wx/module.h"
+	"wx/wxcrt.h"
+	"wx/wxcrtvararg.h"
+	"wx/window.h"
+	"wx/containr.h"
+	"wx/panel.h"
+	"wx/toplevel.h"
+	"wx/frame.h"
+	"wx/gdicmn.h"
+	"wx/gdiobj.h"
+	"wx/region.h"
+	"wx/bitmap.h"
+	"wx/image.h"
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/dc.h"
+	"wx/dcclient.h"
+	"wx/dcmemory.h"
+	"wx/dcprint.h"
+	"wx/dcscreen.h"
+	"wx/button.h"
+	"wx/menuitem.h"
+	"wx/menu.h"
+	"wx/pen.h"
+	"wx/brush.h"
+	"wx/palette.h"
+	"wx/icon.h"
+	"wx/cursor.h"
+	"wx/dialog.h"
+	"wx/settings.h"
+	"wx/msgdlg.h"
+	"wx/cmndata.h"
+	"wx/dataobj.h"
+	"wx/control.h"
+	"wx/ctrlsub.h"
+	"wx/bmpbuttn.h"
+	"wx/checkbox.h"
+	"wx/checklst.h"
+	"wx/choice.h"
+	"wx/scrolbar.h"
+	"wx/stattext.h"
+	"wx/statbmp.h"
+	"wx/statbox.h"
+	"wx/listbox.h"
+	"wx/radiobox.h"
+	"wx/radiobut.h"
+	"wx/textctrl.h"
+	"wx/slider.h"
+	"wx/gauge.h"
+	"wx/scrolwin.h"
+	"wx/dirdlg.h"
+	"wx/toolbar.h"
+	"wx/combobox.h"
+	"wx/layout.h"
+	"wx/sizer.h"
+	"wx/statusbr.h"
+	"wx/choicdlg.h"
+	"wx/textdlg.h"
+	"wx/filedlg.h"
+	"wx/mdi.h"
+	"wx/validate.h"
+	"wx/valtext.h"
 
-1289599436 c:\libs\sfml\include\sfml\config.hpp
-	<climits>
+1253304913 c:\libs\wxwidgets\include\wx\app.h
+	"wx/event.h"
+	"wx/build.h"
+	"wx/cmdargs.h"
+	"wx/init.h"
+	"wx/intl.h"
+	"wx/log.h"
+	"wx/unix/app.h"
+	"wx/palmos/app.h"
+	"wx/msw/app.h"
+	"wx/motif/app.h"
+	"wx/mgl/app.h"
+	"wx/dfb/app.h"
+	"wx/gtk/app.h"
+	"wx/gtk1/app.h"
+	"wx/x11/app.h"
+	"wx/osx/app.h"
+	"wx/cocoa/app.h"
+	"wx/os2/app.h"
+	"wx/univ/theme.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\clock.hpp
-	<SFML/Config.hpp>
+1253304920 c:\libs\wxwidgets\include\wx\build.h
+	"wx/version.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\err.hpp
-	<SFML/Config.hpp>
-	<ostream>
+1253304924 c:\libs\wxwidgets\include\wx\cmdargs.h
+	"wx/arrstr.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\lock.hpp
-	<SFML/System/NonCopyable.hpp>
+1253304921 c:\libs\wxwidgets\include\wx\init.h
+	"wx/defs.h"
+	"wx/chartype.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\noncopyable.hpp
-	<SFML/Config.hpp>
+1253304841 c:\libs\wxwidgets\include\wx\unix\app.h
+	<signal.h>
 
-1289599436 c:\libs\sfml\include\sfml\system\mutex.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
+1253304853 c:\libs\wxwidgets\include\wx\palmos\app.h
+	"wx/event.h"
+	"wx/icon.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\randomizer.hpp
-	<SFML/Config.hpp>
+1253304862 c:\libs\wxwidgets\include\wx\msw\app.h
+	"wx/event.h"
+	"wx/icon.h"
+	"wx/msw/wrapwin.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\sleep.hpp
-	<SFML/Config.hpp>
+1253304843 c:\libs\wxwidgets\include\wx\motif\app.h
+	"wx/event.h"
+	"wx/hashmap.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\string.hpp
-	<SFML/Config.hpp>
-	<locale>
-	<string>
+1253304882 c:\libs\wxwidgets\include\wx\mgl\app.h
+	"wx/frame.h"
+	"wx/icon.h"
+	"wx/vidmode.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\thread.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<cstdlib>
+1253304919 c:\libs\wxwidgets\include\wx\frame.h
+	"wx/toplevel.h"
+	"wx/statusbr.h"
+	"wx/univ/frame.h"
+	"wx/palmos/frame.h"
+	"wx/msw/frame.h"
+	"wx/gtk/frame.h"
+	"wx/gtk1/frame.h"
+	"wx/motif/frame.h"
+	"wx/osx/frame.h"
+	"wx/cocoa/frame.h"
+	"wx/os2/frame.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\threadlocal.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<cstdlib>
+1253304920 c:\libs\wxwidgets\include\wx\statusbr.h
+	"wx/defs.h"
+	"wx/window.h"
+	"wx/list.h"
+	"wx/dynarray.h"
+	"wx/univ/statusbr.h"
+	"wx/palmos/statusbr.h"
+	"wx/msw/statusbar.h"
+	"wx/generic/statusbr.h"
+	"wx/osx/statusbr.h"
+	"wx/generic/statusbr.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\threadlocalptr.hpp
-	<SFML/System/ThreadLocal.hpp>
-	<SFML/System/ThreadLocalPtr.inl>
+1253304839 c:\libs\wxwidgets\include\wx\univ\statusbr.h
+	"wx/univ/inpcons.h"
+	"wx/arrstr.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\threadlocalptr.inl
+1253304854 c:\libs\wxwidgets\include\wx\palmos\statusbr.h
 
-1289573463 c:\libs\sfml\include\sfml\system\utf.hpp
-	<SFML/Config.hpp>
-	<algorithm>
-	<locale>
-	<string>
-	<cstdlib>
-	<SFML/System/Utf.inl>
+1253304864 c:\libs\wxwidgets\include\wx\msw\statusbar.h
+	"wx/vector.h"
+	"wx/tooltip.h"
 
-1289599436 c:\libs\sfml\include\sfml\system\utf.inl
+1253304918 c:\libs\wxwidgets\include\wx\tooltip.h
+	"wx/defs.h"
+	"wx/msw/tooltip.h"
+	"wx/gtk/tooltip.h"
+	"wx/gtk1/tooltip.h"
+	"wx/osx/tooltip.h"
+	"wx/cocoa/tooltip.h"
+	"wx/os2/tooltip.h"
 
-1289599436 c:\libs\sfml\include\sfml\system\vector2.hpp
-	<SFML/System/Vector2.inl>
+1253304864 c:\libs\wxwidgets\include\wx\msw\tooltip.h
+	"wx/object.h"
+	"wx/gdicmn.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\vector2.inl
+1253304894 c:\libs\wxwidgets\include\wx\gtk\tooltip.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/object.h"
 
-1289599436 c:\libs\sfml\include\sfml\system\vector3.hpp
-	<SFML/System/Vector3.inl>
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\tooltip.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/object.h"
 
-1289573463 c:\libs\sfml\include\sfml\system\vector3.inl
+1253304887 c:\libs\wxwidgets\include\wx\osx\tooltip.h
+	"wx/string.h"
+	"wx/event.h"
 
-1289573463 c:\libs\sfml\include\sfml\graphics.hpp
-	<SFML/Window.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Font.hpp>
-	<SFML/Graphics/Glyph.hpp>
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/Renderer.hpp>
-	<SFML/Graphics/RenderImage.hpp>
-	<SFML/Graphics/RenderWindow.hpp>
-	<SFML/Graphics/Shader.hpp>
-	<SFML/Graphics/Shape.hpp>
-	<SFML/Graphics/Sprite.hpp>
-	<SFML/Graphics/Text.hpp>
-	<SFML/Graphics/View.hpp>
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\tooltip.h
+	"wx/object.h"
 
-1289573463 c:\libs\sfml\include\sfml\window.hpp
-	<SFML/System.hpp>
-	<SFML/Window/Context.hpp>
-	<SFML/Window/ContextSettings.hpp>
-	<SFML/Window/Event.hpp>
-	<SFML/Window/Input.hpp>
-	<SFML/Window/VideoMode.hpp>
-	<SFML/Window/Window.hpp>
-	<SFML/Window/WindowStyle.hpp>
+1253304874 c:\libs\wxwidgets\include\wx\os2\tooltip.h
 
-1289573463 c:\libs\sfml\include\sfml\window\context.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
+1253304906 c:\libs\wxwidgets\include\wx\generic\statusbr.h
+	"wx/defs.h"
+	"wx/pen.h"
+	"wx/arrstr.h"
 
-1289573463 c:\libs\sfml\include\sfml\window\contextsettings.hpp
+1253304888 c:\libs\wxwidgets\include\wx\osx\statusbr.h
 
-1289599436 c:\libs\sfml\include\sfml\window\event.hpp
-	<SFML/Config.hpp>
+1253304838 c:\libs\wxwidgets\include\wx\univ\frame.h
 
-1289573463 c:\libs\sfml\include\sfml\window\input.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Window/Event.hpp>
+1253304853 c:\libs\wxwidgets\include\wx\palmos\frame.h
 
-1289573463 c:\libs\sfml\include\sfml\window\videomode.hpp
-	<SFML/Config.hpp>
+1253304865 c:\libs\wxwidgets\include\wx\msw\frame.h
+
+1253304894 c:\libs\wxwidgets\include\wx\gtk\frame.h
+
+1253304846 c:\libs\wxwidgets\include\wx\gtk1\frame.h
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\frame.h
+
+1253304888 c:\libs\wxwidgets\include\wx\osx\frame.h
+	"wx/window.h"
+	"wx/toolbar.h"
+	"wx/accel.h"
+	"wx/icon.h"
+
+1253304921 c:\libs\wxwidgets\include\wx\toolbar.h
+	"wx/defs.h"
+	"wx/tbarbase.h"
+	"wx/univ/toolbar.h"
+	"wx/palmos/toolbar.h"
+	"wx/msw/toolbar.h"
+	"wx/msw/wince/tbarwce.h"
+	"wx/motif/toolbar.h"
+	"wx/gtk/tbargtk.h"
+	"wx/gtk1/tbargtk.h"
+	"wx/osx/toolbar.h"
+	"wx/cocoa/toolbar.h"
+	"wx/os2/toolbar.h"
+
+1253304918 c:\libs\wxwidgets\include\wx\tbarbase.h
+	"wx/defs.h"
+	"wx/bitmap.h"
+	"wx/list.h"
+	"wx/control.h"
+
+1253304838 c:\libs\wxwidgets\include\wx\univ\toolbar.h
+	"wx/button.h"
+
+1253304853 c:\libs\wxwidgets\include\wx\palmos\toolbar.h
+	"wx/dynarray.h"
+
+1253304862 c:\libs\wxwidgets\include\wx\msw\toolbar.h
+	"wx/dynarray.h"
+	"wx/imaglist.h"
+
+1253304861 c:\libs\wxwidgets\include\wx\msw\wince\tbarwce.h
+	"wx/dynarray.h"
+	"wx/msw/toolbar.h"
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\toolbar.h
+
+1253304894 c:\libs\wxwidgets\include\wx\gtk\tbargtk.h
+
+1253304846 c:\libs\wxwidgets\include\wx\gtk1\tbargtk.h
+
+1253304886 c:\libs\wxwidgets\include\wx\osx\toolbar.h
+	"wx/tbarbase.h"
+	"wx/dynarray.h"
+
+1253304909 c:\libs\wxwidgets\include\wx\cocoa\toolbar.h
+
+1253304873 c:\libs\wxwidgets\include\wx\os2\toolbar.h
+	"wx/timer.h"
+	"wx/tbarbase.h"
+
+1253304927 c:\libs\wxwidgets\include\wx\timer.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/longlong.h"
+	"wx/event.h"
+	"wx/stopwatch.h"
+	"wx/utils.h"
+
+1253304917 c:\libs\wxwidgets\include\wx\stopwatch.h
+	"wx/defs.h"
+	"wx/longlong.h"
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\frame.h
+
+1253304875 c:\libs\wxwidgets\include\wx\os2\frame.h
+	"wx/os2/wxrsc.h"
+
+1253304875 c:\libs\wxwidgets\include\wx\os2\wxrsc.h
+
+1253304917 c:\libs\wxwidgets\include\wx\vidmode.h
+
+1253304857 c:\libs\wxwidgets\include\wx\dfb\app.h
+	"wx/dfb/dfbptr.h"
+	"wx/vidmode.h"
+
+1253304893 c:\libs\wxwidgets\include\wx\gtk\app.h
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\app.h
+	"wx/frame.h"
+	"wx/icon.h"
+	"wx/strconv.h"
+
+1253304867 c:\libs\wxwidgets\include\wx\x11\app.h
+	"wx/gdicmn.h"
+	"wx/event.h"
+
+1253304886 c:\libs\wxwidgets\include\wx\osx\app.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/gdicmn.h"
+	"wx/event.h"
+
+1253304909 c:\libs\wxwidgets\include\wx\cocoa\app.h
+	"wx/osx/core/cfref.h"
+
+1253304873 c:\libs\wxwidgets\include\wx\os2\app.h
+	<types.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/time.h>
+	<sys/types.h>
+	<unistd.h>
+	<utils.h>
+	<types.h>
+	"wx/event.h"
+	"wx/icon.h"
+
+1253304838 c:\libs\wxwidgets\include\wx\univ\theme.h
+	"wx/string.h"
+
+1253304915 c:\libs\wxwidgets\include\wx\module.h
+	"wx/object.h"
+	"wx/list.h"
+	"wx/arrstr.h"
+	"wx/dynarray.h"
+
+1253304921 c:\libs\wxwidgets\include\wx\dcclient.h
+	"wx/dc.h"
+
+1253304920 c:\libs\wxwidgets\include\wx\dcmemory.h
+	"wx/dc.h"
+	"wx/bitmap.h"
+
+1253304927 c:\libs\wxwidgets\include\wx\dcprint.h
+	"wx/defs.h"
+	"wx/dc.h"
+
+1253304921 c:\libs\wxwidgets\include\wx\dcscreen.h
+	"wx/defs.h"
+	"wx/dc.h"
+
+1253304914 c:\libs\wxwidgets\include\wx\menuitem.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/univ/menuitem.h"
+	"wx/palmos/menuitem.h"
+	"wx/msw/menuitem.h"
+	"wx/motif/menuitem.h"
+	"wx/gtk/menuitem.h"
+	"wx/gtk1/menuitem.h"
+	"wx/osx/menuitem.h"
+	"wx/cocoa/menuitem.h"
+	"wx/os2/menuitem.h"
+
+1253304838 c:\libs\wxwidgets\include\wx\univ\menuitem.h
+
+1253304853 c:\libs\wxwidgets\include\wx\palmos\menuitem.h
+	"wx/ownerdrw.h"
+
+1253304923 c:\libs\wxwidgets\include\wx\ownerdrw.h
+	"wx/defs.h"
+	"wx/bitmap.h"
+	"wx/colour.h"
+	"wx/font.h"
+
+1253304862 c:\libs\wxwidgets\include\wx\msw\menuitem.h
+	"wx/ownerdrw.h"
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\menuitem.h
+	"wx/bitmap.h"
+
+1253304893 c:\libs\wxwidgets\include\wx\gtk\menuitem.h
+	"wx/bitmap.h"
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\menuitem.h
+	"wx/bitmap.h"
+
+1253304886 c:\libs\wxwidgets\include\wx\osx\menuitem.h
+	"wx/defs.h"
+	"wx/bitmap.h"
+
+1253304909 c:\libs\wxwidgets\include\wx\cocoa\menuitem.h
+	"wx/hashmap.h"
+	"wx/bitmap.h"
+	"wx/cocoa/ObjcRef.h"
+
+1253304873 c:\libs\wxwidgets\include\wx\os2\menuitem.h
+	"wx/defs.h"
+	"wx/os2/private.h"
+	"wx/ownerdrw.h"
+
+1253304922 c:\libs\wxwidgets\include\wx\menu.h
+	"wx/defs.h"
+	"wx/list.h"
+	"wx/window.h"
+	"wx/menuitem.h"
+	"wx/univ/menu.h"
+	"wx/palmos/menu.h"
+	"wx/msw/menu.h"
+	"wx/motif/menu.h"
+	"wx/gtk/menu.h"
+	"wx/gtk1/menu.h"
+	"wx/osx/menu.h"
+	"wx/cocoa/menu.h"
+	"wx/os2/menu.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\menu.h
+	"wx/accel.h"
+	"wx/dynarray.h"
+
+1253304853 c:\libs\wxwidgets\include\wx\palmos\menu.h
+	"wx/accel.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253304863 c:\libs\wxwidgets\include\wx\msw\menu.h
+	"wx/accel.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\menu.h
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/arrstr.h"
+
+1253304894 c:\libs\wxwidgets\include\wx\gtk\menu.h
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\menu.h
+
+1253304887 c:\libs\wxwidgets\include\wx\osx\menu.h
+	"wx/arrstr.h"
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\menu.h
+	"wx/cocoa/NSMenu.h"
+	"wx/accel.h"
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\nsmenu.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1253304874 c:\libs\wxwidgets\include\wx\os2\menu.h
+	"wx/accel.h"
+	"wx/list.h"
+	"wx/dynarray.h"
+
+1253304918 c:\libs\wxwidgets\include\wx\settings.h
+	"wx/colour.h"
+	"wx/font.h"
+
+1253304921 c:\libs\wxwidgets\include\wx\msgdlg.h
+	"wx/defs.h"
+	"wx/dialog.h"
+	"wx/stockitem.h"
+	"wx/generic/msgdlgg.h"
+	"wx/cocoa/msgdlg.h"
+	"wx/palmos/msgdlg.h"
+	"wx/msw/msgdlg.h"
+	"wx/motif/msgdlg.h"
+	"wx/gtk/msgdlg.h"
+	"wx/osx/msgdlg.h"
+	"wx/os2/msgdlg.h"
+
+1253304921 c:\libs\wxwidgets\include\wx\stockitem.h
+	"wx/defs.h"
+	"wx/chartype.h"
+	"wx/string.h"
+	"wx/accel.h"
+
+1253304906 c:\libs\wxwidgets\include\wx\generic\msgdlgg.h
+
+1253304909 c:\libs\wxwidgets\include\wx\cocoa\msgdlg.h
+	"wx/msgdlg.h"
+	"wx/generic/msgdlgg.h"
+
+1253304853 c:\libs\wxwidgets\include\wx\palmos\msgdlg.h
+
+1253304862 c:\libs\wxwidgets\include\wx\msw\msgdlg.h
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\msgdlg.h
+
+1253304893 c:\libs\wxwidgets\include\wx\gtk\msgdlg.h
+
+1253304886 c:\libs\wxwidgets\include\wx\osx\msgdlg.h
+
+1253304873 c:\libs\wxwidgets\include\wx\os2\msgdlg.h
+
+1253304916 c:\libs\wxwidgets\include\wx\dataobj.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/bitmap.h"
+	"wx/list.h"
+	"wx/arrstr.h"
+	"wx/msw/ole/dataform.h"
+	"wx/motif/dataform.h"
+	"wx/gtk/dataform.h"
+	"wx/gtk1/dataform.h"
+	"wx/x11/dataform.h"
+	"wx/osx/dataform.h"
+	"wx/cocoa/dataform.h"
+	"wx/os2/dataform.h"
+	"wx/msw/ole/dataobj.h"
+	"wx/motif/dataobj.h"
+	"wx/x11/dataobj.h"
+	"wx/gtk/dataobj.h"
+	"wx/gtk1/dataobj.h"
+	"wx/osx/dataobj.h"
+	"wx/cocoa/dataobj.h"
+	"wx/os2/dataobj.h"
+	"wx/msw/ole/dataobj2.h"
+	"wx/gtk/dataobj2.h"
+	"wx/gtk1/dataobj2.h"
+	"wx/x11/dataobj2.h"
+	"wx/motif/dataobj2.h"
+	"wx/osx/dataobj2.h"
+	"wx/cocoa/dataobj2.h"
+	"wx/os2/dataobj2.h"
+
+1253304859 c:\libs\wxwidgets\include\wx\msw\ole\dataform.h
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\dataform.h
+
+1253304894 c:\libs\wxwidgets\include\wx\gtk\dataform.h
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\dataform.h
+
+1253304867 c:\libs\wxwidgets\include\wx\x11\dataform.h
+
+1253304887 c:\libs\wxwidgets\include\wx\osx\dataform.h
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\dataform.h
+
+1253304874 c:\libs\wxwidgets\include\wx\os2\dataform.h
+
+1253304859 c:\libs\wxwidgets\include\wx\msw\ole\dataobj.h
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\dataobj.h
+
+1253304867 c:\libs\wxwidgets\include\wx\x11\dataobj.h
+
+1253304895 c:\libs\wxwidgets\include\wx\gtk\dataobj.h
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\dataobj.h
+
+1253304888 c:\libs\wxwidgets\include\wx\osx\dataobj.h
+
+1253304911 c:\libs\wxwidgets\include\wx\cocoa\dataobj.h
+
+1253304877 c:\libs\wxwidgets\include\wx\os2\dataobj.h
+
+1253304859 c:\libs\wxwidgets\include\wx\msw\ole\dataobj2.h
+
+1253304894 c:\libs\wxwidgets\include\wx\gtk\dataobj2.h
+
+1253304848 c:\libs\wxwidgets\include\wx\gtk1\dataobj2.h
+
+1253304868 c:\libs\wxwidgets\include\wx\x11\dataobj2.h
+
+1253304844 c:\libs\wxwidgets\include\wx\motif\dataobj2.h
+
+1253304887 c:\libs\wxwidgets\include\wx\osx\dataobj2.h
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\dataobj2.h
+
+1253304875 c:\libs\wxwidgets\include\wx\os2\dataobj2.h
+
+1253304919 c:\libs\wxwidgets\include\wx\ctrlsub.h
+	"wx/defs.h"
+	"wx/arrstr.h"
+	"wx/control.h"
+	"wx/msw/ctrlsub.h"
+	"wx/motif/ctrlsub.h"
+
+1253304865 c:\libs\wxwidgets\include\wx\msw\ctrlsub.h
+
+1253304844 c:\libs\wxwidgets\include\wx\motif\ctrlsub.h
+	"wx/dynarray.h"
+	"wx/generic/ctrlsub.h"
+
+1253304906 c:\libs\wxwidgets\include\wx\generic\ctrlsub.h
+	"wx/dynarray.h"
+
+1253304918 c:\libs\wxwidgets\include\wx\bmpbuttn.h
+	"wx/defs.h"
+	"wx/button.h"
+	"wx/univ/bmpbuttn.h"
+	"wx/msw/bmpbuttn.h"
+	"wx/motif/bmpbuttn.h"
+	"wx/gtk/bmpbuttn.h"
+	"wx/gtk1/bmpbuttn.h"
+	"wx/osx/bmpbuttn.h"
+	"wx/cocoa/bmpbuttn.h"
+	"wx/os2/bmpbuttn.h"
+	"wx/palmos/bmpbuttn.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\bmpbuttn.h
+
+1253304864 c:\libs\wxwidgets\include\wx\msw\bmpbuttn.h
+	"wx/button.h"
+	"wx/bitmap.h"
+	"wx/brush.h"
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\bmpbuttn.h
+	"wx/motif/bmpmotif.h"
+
+1253304894 c:\libs\wxwidgets\include\wx\gtk\bmpbuttn.h
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\bmpbuttn.h
+
+1253304887 c:\libs\wxwidgets\include\wx\osx\bmpbuttn.h
+	"wx/button.h"
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\bmpbuttn.h
+	"wx/cocoa/NSButton.h"
+
+1253304874 c:\libs\wxwidgets\include\wx\os2\bmpbuttn.h
+	"wx/button.h"
+	"wx/dcclient.h"
+
+1253304853 c:\libs\wxwidgets\include\wx\palmos\bmpbuttn.h
+	"wx/button.h"
+	"wx/bitmap.h"
+
+1253304921 c:\libs\wxwidgets\include\wx\checkbox.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/checkbox.h"
+	"wx/msw/checkbox.h"
+	"wx/motif/checkbox.h"
+	"wx/gtk/checkbox.h"
+	"wx/gtk1/checkbox.h"
+	"wx/osx/checkbox.h"
+	"wx/cocoa/checkbox.h"
+	"wx/os2/checkbox.h"
+	"wx/palmos/checkbox.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\checkbox.h
+	"wx/button.h"
+
+1253304862 c:\libs\wxwidgets\include\wx\msw\checkbox.h
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\checkbox.h
+
+1253304893 c:\libs\wxwidgets\include\wx\gtk\checkbox.h
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\checkbox.h
+
+1253304887 c:\libs\wxwidgets\include\wx\osx\checkbox.h
+
+1253304909 c:\libs\wxwidgets\include\wx\cocoa\checkbox.h
+	"wx/cocoa/NSButton.h"
+
+1253304873 c:\libs\wxwidgets\include\wx\os2\checkbox.h
+	"wx/control.h"
+
+1253304853 c:\libs\wxwidgets\include\wx\palmos\checkbox.h
+
+1253304918 c:\libs\wxwidgets\include\wx\checklst.h
+	"wx/listbox.h"
+	"wx/univ/checklst.h"
+	"wx/msw/wince/checklst.h"
+	"wx/msw/checklst.h"
+	"wx/motif/checklst.h"
+	"wx/gtk/checklst.h"
+	"wx/gtk1/checklst.h"
+	"wx/osx/checklst.h"
+	"wx/cocoa/checklst.h"
+	"wx/os2/checklst.h"
+
+1253304918 c:\libs\wxwidgets\include\wx\listbox.h
+	"wx/defs.h"
+	"wx/ctrlsub.h"
+	"wx/univ/listbox.h"
+	"wx/msw/listbox.h"
+	"wx/motif/listbox.h"
+	"wx/gtk/listbox.h"
+	"wx/gtk1/listbox.h"
+	"wx/osx/listbox.h"
+	"wx/os2/listbox.h"
+	"wx/cocoa/listbox.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\listbox.h
+	"wx/scrolwin.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253304864 c:\libs\wxwidgets\include\wx\msw\listbox.h
+	"wx/dynarray.h"
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\listbox.h
+	"wx/ctrlsub.h"
+	"wx/clntdata.h"
+
+1253304893 c:\libs\wxwidgets\include\wx\gtk\listbox.h
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\listbox.h
+	"wx/list.h"
+
+1253304887 c:\libs\wxwidgets\include\wx\osx\listbox.h
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253304873 c:\libs\wxwidgets\include\wx\os2\listbox.h
+	"wx/dynarray.h"
+
+1253304909 c:\libs\wxwidgets\include\wx\cocoa\listbox.h
+	"wx/cocoa/NSTableView.h"
+	"wx/dynarray.h"
+
+1253304911 c:\libs\wxwidgets\include\wx\cocoa\nstableview.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\checklst.h
+
+1253304861 c:\libs\wxwidgets\include\wx\msw\wince\checklst.h
+
+1253304864 c:\libs\wxwidgets\include\wx\msw\checklst.h
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\checklst.h
+	"wx/listbox.h"
+
+1253304894 c:\libs\wxwidgets\include\wx\gtk\checklst.h
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\checklst.h
+
+1253304887 c:\libs\wxwidgets\include\wx\osx\checklst.h
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\checklst.h
+
+1253304874 c:\libs\wxwidgets\include\wx\os2\checklst.h
+	<stddef.h>
+	"wx/defs.h"
+
+1253304925 c:\libs\wxwidgets\include\wx\choice.h
+	"wx/defs.h"
+	"wx/ctrlsub.h"
+	"wx/univ/choice.h"
+	"wx/msw/wince/choicece.h"
+	"wx/msw/choice.h"
+	"wx/motif/choice.h"
+	"wx/gtk/choice.h"
+	"wx/gtk1/choice.h"
+	"wx/osx/choice.h"
+	"wx/cocoa/choice.h"
+	"wx/os2/choice.h"
+	"wx/palmos/choice.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\choice.h
+	"wx/combobox.h"
+
+1253304920 c:\libs\wxwidgets\include\wx\combobox.h
+	"wx/defs.h"
+	"wx/ctrlsub.h"
+	"wx/textentry.h"
+	"wx/univ/combobox.h"
+	"wx/msw/combobox.h"
+	"wx/motif/combobox.h"
+	"wx/gtk/combobox.h"
+	"wx/gtk1/combobox.h"
+	"wx/osx/combobox.h"
+	"wx/cocoa/combobox.h"
+	"wx/os2/combobox.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\combobox.h
+	"wx/combo.h"
+
+1253304920 c:\libs\wxwidgets\include\wx\combo.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/renderer.h"
+	"wx/bitmap.h"
+	"wx/msw/combo.h"
+	"wx/generic/combo.h"
+
+1253304918 c:\libs\wxwidgets\include\wx\renderer.h
+	"wx/gdicmn.h"
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/bitmap.h"
+	"wx/string.h"
+
+1253304862 c:\libs\wxwidgets\include\wx\msw\combo.h
+	"wx/timer.h"
+
+1253304905 c:\libs\wxwidgets\include\wx\generic\combo.h
+
+1253304865 c:\libs\wxwidgets\include\wx\msw\combobox.h
+	"wx/choice.h"
+	"wx/textentry.h"
+
+1253304844 c:\libs\wxwidgets\include\wx\motif\combobox.h
+	"wx/choice.h"
+	"wx/textentry.h"
+
+1253304895 c:\libs\wxwidgets\include\wx\gtk\combobox.h
+	"wx/choice.h"
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\combobox.h
+	"wx/defs.h"
+	"wx/object.h"
+
+1253304888 c:\libs\wxwidgets\include\wx\osx\combobox.h
+	"wx/containr.h"
+	"wx/choice.h"
+
+1253304911 c:\libs\wxwidgets\include\wx\cocoa\combobox.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+	"wx/textctrl.h"
+	"wx/dynarray.h"
+
+1253304877 c:\libs\wxwidgets\include\wx\os2\combobox.h
+	"wx/choice.h"
+	"wx/textentry.h"
+
+1253304861 c:\libs\wxwidgets\include\wx\msw\wince\choicece.h
+	"wx/defs.h"
+	"wx/dynarray.h"
+
+1253304864 c:\libs\wxwidgets\include\wx\msw\choice.h
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\choice.h
+	"wx/clntdata.h"
+	"wx/dynarray.h"
+
+1253304894 c:\libs\wxwidgets\include\wx\gtk\choice.h
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\choice.h
+
+1253304887 c:\libs\wxwidgets\include\wx\osx\choice.h
+	"wx/control.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\choice.h
+	"wx/cocoa/NSMenu.h"
+
+1253304874 c:\libs\wxwidgets\include\wx\os2\choice.h
+
+1253304853 c:\libs\wxwidgets\include\wx\palmos\choice.h
+
+1253304916 c:\libs\wxwidgets\include\wx\scrolbar.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/scrolbar.h"
+	"wx/msw/scrolbar.h"
+	"wx/motif/scrolbar.h"
+	"wx/gtk/scrolbar.h"
+	"wx/gtk1/scrolbar.h"
+	"wx/osx/scrolbar.h"
+	"wx/cocoa/scrolbar.h"
+	"wx/os2/scrolbar.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\scrolbar.h
+	"wx/univ/scrarrow.h"
+	"wx/renderer.h"
+
+1253304838 c:\libs\wxwidgets\include\wx\univ\scrarrow.h
+
+1253304864 c:\libs\wxwidgets\include\wx\msw\scrolbar.h
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\scrolbar.h
+
+1253304895 c:\libs\wxwidgets\include\wx\gtk\scrolbar.h
+	"wx/defs.h"
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\scrolbar.h
+	"wx/defs.h"
+
+1253304888 c:\libs\wxwidgets\include\wx\osx\scrolbar.h
+
+1253304911 c:\libs\wxwidgets\include\wx\cocoa\scrolbar.h
+	"wx/cocoa/NSScroller.h"
+
+1253304911 c:\libs\wxwidgets\include\wx\cocoa\nsscroller.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+	"wx/cocoa/ObjcRef.h"
+
+1253304877 c:\libs\wxwidgets\include\wx\os2\scrolbar.h
+	"wx/scrolbar.h"
+
+1253304926 c:\libs\wxwidgets\include\wx\statbox.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/statbox.h"
+	"wx/msw/statbox.h"
+	"wx/motif/statbox.h"
+	"wx/gtk/statbox.h"
+	"wx/gtk1/statbox.h"
+	"wx/osx/statbox.h"
+	"wx/cocoa/statbox.h"
+	"wx/os2/statbox.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\statbox.h
+
+1253304865 c:\libs\wxwidgets\include\wx\msw\statbox.h
+
+1253304844 c:\libs\wxwidgets\include\wx\motif\statbox.h
+
+1253304894 c:\libs\wxwidgets\include\wx\gtk\statbox.h
+
+1253304848 c:\libs\wxwidgets\include\wx\gtk1\statbox.h
+
+1253304887 c:\libs\wxwidgets\include\wx\osx\statbox.h
+	"wx/control.h"
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\statbox.h
+	"wx/cocoa/NSBox.h"
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\nsbox.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1253304875 c:\libs\wxwidgets\include\wx\os2\statbox.h
+	"wx/control.h"
+
+1253304922 c:\libs\wxwidgets\include\wx\radiobox.h
+	"wx/ctrlsub.h"
+	"wx/dynarray.h"
+	"wx/univ/radiobox.h"
+	"wx/msw/radiobox.h"
+	"wx/motif/radiobox.h"
+	"wx/gtk/radiobox.h"
+	"wx/gtk1/radiobox.h"
+	"wx/osx/radiobox.h"
+	"wx/cocoa/radiobox.h"
+	"wx/os2/radiobox.h"
+	"wx/palmos/radiobox.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\radiobox.h
+	"wx/statbox.h"
+	"wx/dynarray.h"
+
+1253304863 c:\libs\wxwidgets\include\wx\msw\radiobox.h
+	"wx/statbox.h"
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\radiobox.h
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253304894 c:\libs\wxwidgets\include\wx\gtk\radiobox.h
+	"wx/bitmap.h"
+	"wx/list.h"
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\radiobox.h
+	"wx/bitmap.h"
+
+1253304887 c:\libs\wxwidgets\include\wx\osx\radiobox.h
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\radiobox.h
+
+1253304875 c:\libs\wxwidgets\include\wx\os2\radiobox.h
+
+1253304853 c:\libs\wxwidgets\include\wx\palmos\radiobox.h
+
+1253304916 c:\libs\wxwidgets\include\wx\radiobut.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/radiobut.h"
+	"wx/msw/radiobut.h"
+	"wx/motif/radiobut.h"
+	"wx/gtk/radiobut.h"
+	"wx/gtk1/radiobut.h"
+	"wx/osx/radiobut.h"
+	"wx/cocoa/radiobut.h"
+	"wx/os2/radiobut.h"
+	"wx/palmos/radiobut.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\radiobut.h
+	"wx/checkbox.h"
+
+1253304864 c:\libs\wxwidgets\include\wx\msw\radiobut.h
+
+1253304844 c:\libs\wxwidgets\include\wx\motif\radiobut.h
+
+1253304895 c:\libs\wxwidgets\include\wx\gtk\radiobut.h
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\radiobut.h
+
+1253304888 c:\libs\wxwidgets\include\wx\osx\radiobut.h
+
+1253304911 c:\libs\wxwidgets\include\wx\cocoa\radiobut.h
+	"wx/cocoa/NSButton.h"
+
+1253304877 c:\libs\wxwidgets\include\wx\os2\radiobut.h
+	"wx/control.h"
+
+1253304854 c:\libs\wxwidgets\include\wx\palmos\radiobut.h
+
+1253304917 c:\libs\wxwidgets\include\wx\slider.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/slider.h"
+	"wx/msw/slider.h"
+	"wx/motif/slider.h"
+	"wx/gtk/slider.h"
+	"wx/gtk1/slider.h"
+	"wx/osx/slider.h"
+	"wx/cocoa/slider.h"
+	"wx/os2/slider.h"
+	"wx/palmos/slider.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\slider.h
+	"wx/univ/scrthumb.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\scrthumb.h
+	"wx/timer.h"
+
+1253304864 c:\libs\wxwidgets\include\wx\msw\slider.h
+
+1253304844 c:\libs\wxwidgets\include\wx\motif\slider.h
+	"wx/control.h"
+
+1253304895 c:\libs\wxwidgets\include\wx\gtk\slider.h
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\slider.h
+
+1253304889 c:\libs\wxwidgets\include\wx\osx\slider.h
+	"wx/control.h"
+	"wx/slider.h"
+	"wx/stattext.h"
+
+1253304911 c:\libs\wxwidgets\include\wx\cocoa\slider.h
+	"wx/cocoa/NSSlider.h"
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\nsslider.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+	"wx/cocoa/ObjcRef.h"
+
+1253304878 c:\libs\wxwidgets\include\wx\os2\slider.h
+	"wx/control.h"
+
+1253304854 c:\libs\wxwidgets\include\wx\palmos\slider.h
+
+1253304918 c:\libs\wxwidgets\include\wx\gauge.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/gauge.h"
+	"wx/msw/gauge.h"
+	"wx/motif/gauge.h"
+	"wx/gtk/gauge.h"
+	"wx/gtk1/gauge.h"
+	"wx/osx/gauge.h"
+	"wx/cocoa/gauge.h"
+	"wx/os2/gauge.h"
+
+1253304839 c:\libs\wxwidgets\include\wx\univ\gauge.h
+
+1253304864 c:\libs\wxwidgets\include\wx\msw\gauge.h
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\gauge.h
+
+1253304894 c:\libs\wxwidgets\include\wx\gtk\gauge.h
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\gauge.h
+
+1253304887 c:\libs\wxwidgets\include\wx\osx\gauge.h
+	"wx/control.h"
+
+1253304909 c:\libs\wxwidgets\include\wx\cocoa\gauge.h
+
+1253304873 c:\libs\wxwidgets\include\wx\os2\gauge.h
+
+1253304917 c:\libs\wxwidgets\include\wx\dirdlg.h
+	"wx/dialog.h"
+	"wx/generic/dirdlgg.h"
+	"wx/generic/dirdlgg.h"
+	"wx/generic/dirdlgg.h"
+	"wx/msw/dirdlg.h"
+	"wx/gtk/dirdlg.h"
+	"wx/generic/dirdlgg.h"
+	"wx/osx/dirdlg.h"
+	"wx/cocoa/dirdlg.h"
+	"wx/generic/dirdlgg.h"
+
+1253304906 c:\libs\wxwidgets\include\wx\generic\dirdlgg.h
+	"wx/dialog.h"
+
+1253304864 c:\libs\wxwidgets\include\wx\msw\dirdlg.h
+
+1253304893 c:\libs\wxwidgets\include\wx\gtk\dirdlg.h
+
+1253304886 c:\libs\wxwidgets\include\wx\osx\dirdlg.h
+
+1253304909 c:\libs\wxwidgets\include\wx\cocoa\dirdlg.h
+
+1253304915 c:\libs\wxwidgets\include\wx\layout.h
+	"wx/object.h"
+
+1253304920 c:\libs\wxwidgets\include\wx\choicdlg.h
+	"wx/generic/choicdgg.h"
+
+1253304905 c:\libs\wxwidgets\include\wx\generic\choicdgg.h
+	"wx/dynarray.h"
+	"wx/dialog.h"
+
+1253304917 c:\libs\wxwidgets\include\wx\textdlg.h
+	"wx/generic/textdlgg.h"
+
+1253304906 c:\libs\wxwidgets\include\wx\generic\textdlgg.h
+	"wx/defs.h"
+	"wx/dialog.h"
+	"wx/valtext.h"
+	"wx/textctrl.h"
+
+1253304915 c:\libs\wxwidgets\include\wx\valtext.h
+	"wx/defs.h"
+	"wx/validate.h"
+
+1253304923 c:\libs\wxwidgets\include\wx\filedlg.h
+	"wx/defs.h"
+	"wx/dialog.h"
+	"wx/arrstr.h"
+	"wx/generic/filedlgg.h"
+	"wx/msw/filedlg.h"
+	"wx/motif/filedlg.h"
+	"wx/gtk/filedlg.h"
+	"wx/gtk1/filedlg.h"
+	"wx/osx/filedlg.h"
+	"wx/cocoa/filedlg.h"
+	"wx/os2/filedlg.h"
+	"wx/generic/filedlgg.h"
+
+1253304906 c:\libs\wxwidgets\include\wx\generic\filedlgg.h
+	"wx/listctrl.h"
+	"wx/datetime.h"
+	"wx/filefn.h"
+	"wx/artprov.h"
+	"wx/filedlg.h"
+	"wx/generic/filectrlg.h"
+
+1253304922 c:\libs\wxwidgets\include\wx\artprov.h
+	"wx/string.h"
+	"wx/bitmap.h"
+	"wx/icon.h"
+	"wx/iconbndl.h"
+
+1253304906 c:\libs\wxwidgets\include\wx\generic\filectrlg.h
+	"wx/panel.h"
+	"wx/listctrl.h"
+	"wx/filectrl.h"
+	"wx/filename.h"
+
+1253304922 c:\libs\wxwidgets\include\wx\filectrl.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/event.h"
+	"wx/gtk/filectrl.h"
+	"wx/generic/filectrlg.h"
+
+1253304894 c:\libs\wxwidgets\include\wx\gtk\filectrl.h
+	"wx/control.h"
+	"wx/filectrl.h"
+
+1253304920 c:\libs\wxwidgets\include\wx\filename.h
+	"wx/arrstr.h"
+	"wx/filefn.h"
+	"wx/datetime.h"
+	"wx/intl.h"
+	"wx/longlong.h"
+	"wx/file.h"
+
+1253304927 c:\libs\wxwidgets\include\wx\file.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/filefn.h"
+	"wx/strconv.h"
+
+1253304864 c:\libs\wxwidgets\include\wx\msw\filedlg.h
+
+1253304843 c:\libs\wxwidgets\include\wx\motif\filedlg.h
+
+1253304895 c:\libs\wxwidgets\include\wx\gtk\filedlg.h
+	"wx/gtk/filectrl.h"
+
+1253304847 c:\libs\wxwidgets\include\wx\gtk1\filedlg.h
+	"wx/generic/filedlgg.h"
+
+1253304888 c:\libs\wxwidgets\include\wx\osx\filedlg.h
+
+1253304911 c:\libs\wxwidgets\include\wx\cocoa\filedlg.h
+
+1253304877 c:\libs\wxwidgets\include\wx\os2\filedlg.h
+
+1253304927 c:\libs\wxwidgets\include\wx\mdi.h
+	"wx/defs.h"
+	"wx/frame.h"
+	"wx/menu.h"
+	"wx/generic/mdig.h"
+	"wx/msw/mdi.h"
+	"wx/gtk/mdi.h"
+	"wx/gtk1/mdi.h"
+	"wx/osx/mdi.h"
+	"wx/cocoa/mdi.h"
+
+1253304906 c:\libs\wxwidgets\include\wx\generic\mdig.h
+	"wx/panel.h"
+
+1253304865 c:\libs\wxwidgets\include\wx\msw\mdi.h
+	"wx/frame.h"
+
+1253304895 c:\libs\wxwidgets\include\wx\gtk\mdi.h
+	"wx/frame.h"
+
+1253304846 c:\libs\wxwidgets\include\wx\gtk1\mdi.h
+	"wx/frame.h"
+
+1253304888 c:\libs\wxwidgets\include\wx\osx\mdi.h
+
+1253304910 c:\libs\wxwidgets\include\wx\cocoa\mdi.h
+	"wx/frame.h"
+
+1294605307 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
+	"GDL/Event.h"
+	<iostream>
 	<vector>
-
-1289599436 c:\libs\sfml\include\sfml\window\window.hpp
-	<SFML/Window/ContextSettings.hpp>
-	<SFML/Window/Input.hpp>
-	<SFML/Window/VideoMode.hpp>
-	<SFML/Window/WindowHandle.hpp>
-	<SFML/Window/WindowStyle.hpp>
-	<SFML/System/Clock.hpp>
-	<SFML/System/NonCopyable.hpp>
 	<string>
-
-1289599436 c:\libs\sfml\include\sfml\window\windowhandle.hpp
-	<SFML/Config.hpp>
-
-1289573463 c:\libs\sfml\include\sfml\window\windowstyle.hpp
-
-1289573462 c:\libs\sfml\include\sfml\graphics\color.hpp
-	<SFML/Config.hpp>
-
-1289599436 c:\libs\sfml\include\sfml\graphics\font.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/System/Vector2.hpp>
-	<SFML/System/String.hpp>
-	<SFML/Graphics/Glyph.hpp>
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<map>
-	<string>
-	<vector>
-
-1289573463 c:\libs\sfml\include\sfml\system\resource.hpp
-	<SFML/System/Lock.hpp>
-	<SFML/System/Mutex.hpp>
-	<set>
-	<SFML/System/Resource.inl>
-	<SFML/System/ResourcePtr.inl>
-
-1289573463 c:\libs\sfml\include\sfml\system\resource.inl
-
-1289573463 c:\libs\sfml\include\sfml\system\resourceptr.inl
-
-1289573462 c:\libs\sfml\include\sfml\graphics\glyph.hpp
-	<SFML/Config.hpp>
-	<SFML/Graphics/Rect.hpp>
-
-1289573462 c:\libs\sfml\include\sfml\graphics\rect.hpp
-	<SFML/System/Vector2.hpp>
-	<algorithm>
-	<SFML/Graphics/Rect.inl>
-
-1289573462 c:\libs\sfml\include\sfml\graphics\rect.inl
-
-1289573462 c:\libs\sfml\include\sfml\graphics\image.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<string>
-	<vector>
-
-1289599436 c:\libs\sfml\include\sfml\graphics\renderer.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/Graphics/Matrix3.hpp>
-
-1289573462 c:\libs\sfml\include\sfml\graphics\drawable.hpp
-	<SFML/System/Vector2.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Matrix3.hpp>
-
-1289573462 c:\libs\sfml\include\sfml\graphics\matrix3.hpp
-	<SFML/Config.hpp>
-	<SFML/System/Vector2.hpp>
-	<SFML/Graphics/Rect.hpp>
 	<cmath>
-	<SFML/Graphics/Matrix3.inl>
+	"GDL/Log.h"
 
-1289573462 c:\libs\sfml\include\sfml\graphics\matrix3.inl
-
-1289573462 c:\libs\sfml\include\sfml\graphics\renderimage.hpp
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/RenderTarget.hpp>
-
-1289599436 c:\libs\sfml\include\sfml\graphics\rendertarget.hpp
-	<SFML/System/NonCopyable.hpp>
-	<SFML/Graphics/Color.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<SFML/Graphics/Renderer.hpp>
-	<SFML/Graphics/View.hpp>
-
-1289573462 c:\libs\sfml\include\sfml\graphics\view.hpp
-	<SFML/Config.hpp>
-	<SFML/Graphics/Rect.hpp>
-	<SFML/Graphics/Matrix3.hpp>
-	<SFML/System/Vector2.hpp>
-
-1289573462 c:\libs\sfml\include\sfml\graphics\renderwindow.hpp
-	<SFML/Graphics/Image.hpp>
-	<SFML/Graphics/RenderTarget.hpp>
-	<SFML/Window/Window.hpp>
-	<string>
-
-1289573462 c:\libs\sfml\include\sfml\graphics\shader.hpp
-	<SFML/Config.hpp>
-	<SFML/Graphics/Image.hpp>
-	<SFML/System/Vector2.hpp>
-	<SFML/System/Vector3.hpp>
-	<map>
-	<string>
-
-1289573462 c:\libs\sfml\include\sfml\graphics\shape.hpp
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/System/Vector2.hpp>
+1294604945 d:\florian\programmation\gamedevelop\gdl\gdl\event.h
+	<wx/dcbuffer.h>
+	<boost/weak_ptr.hpp>
+	<iostream>
 	<vector>
-
-1289573462 c:\libs\sfml\include\sfml\graphics\sprite.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/Graphics/Rect.hpp>
-
-1289573462 c:\libs\sfml\include\sfml\graphics\text.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/System/String.hpp>
-	<SFML/Graphics/Drawable.hpp>
-	<SFML/Graphics/Font.hpp>
-	<SFML/Graphics/Rect.hpp>
 	<string>
+	<cmath>
+	<vector>
+	<boost/shared_ptr.hpp>
+	<boost/tuple/tuple.hpp>
+	"GDL/Log.h"
+	"GDL/Instruction.h"
 
-1236010936 c:\libs\boost_1_43_0\boost\shared_ptr.hpp
+1253304925 c:\libs\wxwidgets\include\wx\dcbuffer.h
+	"wx/dcmemory.h"
+	"wx/dcclient.h"
+	"wx/window.h"
+
+1236010936 c:\libs\boost_1_43_0\boost\weak_ptr.hpp
+	<boost/smart_ptr/weak_ptr.hpp>
+
+1260812659 c:\libs\boost_1_43_0\boost\smart_ptr\weak_ptr.hpp
+	<memory>
+	<boost/smart_ptr/detail/shared_count.hpp>
 	<boost/smart_ptr/shared_ptr.hpp>
 
-1260812659 c:\libs\boost_1_43_0\boost\smart_ptr\shared_ptr.hpp
+1249770075 c:\libs\boost_1_43_0\boost\smart_ptr\detail\shared_count.hpp
 	<boost/config.hpp>
-	<boost/smart_ptr/detail/shared_ptr_nmt.hpp>
-	<boost/config/no_tr1/memory.hpp>
-	<boost/assert.hpp>
 	<boost/checked_delete.hpp>
 	<boost/throw_exception.hpp>
-	<boost/smart_ptr/detail/shared_count.hpp>
+	<boost/smart_ptr/bad_weak_ptr.hpp>
+	<boost/smart_ptr/detail/sp_counted_base.hpp>
+	<boost/smart_ptr/detail/sp_counted_impl.hpp>
 	<boost/detail/workaround.hpp>
-	<boost/smart_ptr/detail/sp_convertible.hpp>
-	<boost/smart_ptr/detail/spinlock_pool.hpp>
-	<boost/memory_order.hpp>
-	<algorithm>
+	<boost/config/no_tr1/memory.hpp>
 	<functional>
-	<typeinfo>
-	<iosfwd>
-	<ostream>
-	<boost/smart_ptr/detail/operator_bool.hpp>
+	<new>
 
 1088727692 c:\libs\boost_1_43_0\boost\config.hpp
 	<boost/config/select_compiler_config.hpp>
@@ -2085,22 +3085,6 @@
 
 1084695475 c:\libs\boost_1_43_0\boost\non_type.hpp
 
-1236010936 c:\libs\boost_1_43_0\boost\smart_ptr\detail\shared_ptr_nmt.hpp
-	<boost/assert.hpp>
-	<boost/checked_delete.hpp>
-	<boost/throw_exception.hpp>
-	<boost/smart_ptr/detail/atomic_count.hpp>
-	<memory>
-	<algorithm>
-	<functional>
-	<new>
-
-1196014039 c:\libs\boost_1_43_0\boost\assert.hpp
-	<boost/current_function.hpp>
-	<assert.h>
-
-1196014039 c:\libs\boost_1_43_0\boost\current_function.hpp
-
 1092327187 c:\libs\boost_1_43_0\boost\checked_delete.hpp
 
 1268036305 c:\libs\boost_1_43_0\boost\throw_exception.hpp
@@ -2118,51 +3102,7 @@
 
 1268036305 c:\libs\boost_1_43_0\boost\exception\exception.hpp
 
-1240132670 c:\libs\boost_1_43_0\boost\smart_ptr\detail\atomic_count.hpp
-	<boost/config.hpp>
-	<boost/smart_ptr/detail/sp_has_sync.hpp>
-	<boost/smart_ptr/detail/atomic_count_pthreads.hpp>
-	<boost/smart_ptr/detail/atomic_count_gcc_x86.hpp>
-	<boost/smart_ptr/detail/atomic_count_win32.hpp>
-	<boost/smart_ptr/detail/atomic_count_sync.hpp>
-	<boost/smart_ptr/detail/atomic_count_gcc.hpp>
-	<boost/smart_ptr/detail/atomic_count_pthreads.hpp>
-
-1259612452 c:\libs\boost_1_43_0\boost\smart_ptr\detail\sp_has_sync.hpp
-
-1240132670 c:\libs\boost_1_43_0\boost\smart_ptr\detail\atomic_count_pthreads.hpp
-	<pthread.h>
-
-1240132670 c:\libs\boost_1_43_0\boost\smart_ptr\detail\atomic_count_gcc_x86.hpp
-
-1236010936 c:\libs\boost_1_43_0\boost\smart_ptr\detail\atomic_count_win32.hpp
-	<boost/detail/interlocked.hpp>
-
-1259613511 c:\libs\boost_1_43_0\boost\detail\interlocked.hpp
-	<boost/config.hpp>
-	<windows.h>
-
-1240132670 c:\libs\boost_1_43_0\boost\smart_ptr\detail\atomic_count_sync.hpp
-	<ia64intrin.h>
-
-1240132670 c:\libs\boost_1_43_0\boost\smart_ptr\detail\atomic_count_gcc.hpp
-	<ext/atomicity.h>
-	<bits/atomicity.h>
-
-1129736320 c:\libs\boost_1_43_0\boost\config\no_tr1\memory.hpp
-	<memory>
-
-1249770075 c:\libs\boost_1_43_0\boost\smart_ptr\detail\shared_count.hpp
-	<boost/config.hpp>
-	<boost/checked_delete.hpp>
-	<boost/throw_exception.hpp>
-	<boost/smart_ptr/bad_weak_ptr.hpp>
-	<boost/smart_ptr/detail/sp_counted_base.hpp>
-	<boost/smart_ptr/detail/sp_counted_impl.hpp>
-	<boost/detail/workaround.hpp>
-	<boost/config/no_tr1/memory.hpp>
-	<functional>
-	<new>
+1196014039 c:\libs\boost_1_43_0\boost\current_function.hpp
 
 1236010936 c:\libs\boost_1_43_0\boost\smart_ptr\bad_weak_ptr.hpp
 	<exception>
@@ -2185,6 +3125,8 @@
 	<boost/smart_ptr/detail/sp_counted_base_w32.hpp>
 	<boost/smart_ptr/detail/sp_counted_base_nt.hpp>
 	<boost/smart_ptr/detail/sp_counted_base_spin.hpp>
+
+1259612452 c:\libs\boost_1_43_0\boost\smart_ptr\detail\sp_has_sync.hpp
 
 1236010936 c:\libs\boost_1_43_0\boost\smart_ptr\detail\sp_counted_base_nt.hpp
 	<boost/detail/sp_typeinfo.hpp>
@@ -2230,11 +3172,19 @@
 	<boost/detail/interlocked.hpp>
 	<boost/smart_ptr/detail/yield_k.hpp>
 
+1259613511 c:\libs\boost_1_43_0\boost\detail\interlocked.hpp
+	<boost/config.hpp>
+	<windows.h>
+
 1236010936 c:\libs\boost_1_43_0\boost\smart_ptr\detail\spinlock_pt.hpp
 	<pthread.h>
 
 1236010936 c:\libs\boost_1_43_0\boost\smart_ptr\detail\spinlock_nt.hpp
 	<boost/assert.hpp>
+
+1196014039 c:\libs\boost_1_43_0\boost\assert.hpp
+	<boost/current_function.hpp>
+	<assert.h>
 
 1236010936 c:\libs\boost_1_43_0\boost\smart_ptr\detail\sp_counted_base_pt.hpp
 	<boost/detail/sp_typeinfo.hpp>
@@ -3244,6 +4194,63 @@
 	<boost/type_traits/msvc/typeof.hpp>
 	<boost/type_traits/is_reference.hpp>
 
+1129736320 c:\libs\boost_1_43_0\boost\config\no_tr1\memory.hpp
+	<memory>
+
+1260812659 c:\libs\boost_1_43_0\boost\smart_ptr\shared_ptr.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/shared_ptr_nmt.hpp>
+	<boost/config/no_tr1/memory.hpp>
+	<boost/assert.hpp>
+	<boost/checked_delete.hpp>
+	<boost/throw_exception.hpp>
+	<boost/smart_ptr/detail/shared_count.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/smart_ptr/detail/sp_convertible.hpp>
+	<boost/smart_ptr/detail/spinlock_pool.hpp>
+	<boost/memory_order.hpp>
+	<algorithm>
+	<functional>
+	<typeinfo>
+	<iosfwd>
+	<ostream>
+	<boost/smart_ptr/detail/operator_bool.hpp>
+
+1236010936 c:\libs\boost_1_43_0\boost\smart_ptr\detail\shared_ptr_nmt.hpp
+	<boost/assert.hpp>
+	<boost/checked_delete.hpp>
+	<boost/throw_exception.hpp>
+	<boost/smart_ptr/detail/atomic_count.hpp>
+	<memory>
+	<algorithm>
+	<functional>
+	<new>
+
+1240132670 c:\libs\boost_1_43_0\boost\smart_ptr\detail\atomic_count.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/sp_has_sync.hpp>
+	<boost/smart_ptr/detail/atomic_count_pthreads.hpp>
+	<boost/smart_ptr/detail/atomic_count_gcc_x86.hpp>
+	<boost/smart_ptr/detail/atomic_count_win32.hpp>
+	<boost/smart_ptr/detail/atomic_count_sync.hpp>
+	<boost/smart_ptr/detail/atomic_count_gcc.hpp>
+	<boost/smart_ptr/detail/atomic_count_pthreads.hpp>
+
+1240132670 c:\libs\boost_1_43_0\boost\smart_ptr\detail\atomic_count_pthreads.hpp
+	<pthread.h>
+
+1240132670 c:\libs\boost_1_43_0\boost\smart_ptr\detail\atomic_count_gcc_x86.hpp
+
+1236010936 c:\libs\boost_1_43_0\boost\smart_ptr\detail\atomic_count_win32.hpp
+	<boost/detail/interlocked.hpp>
+
+1240132670 c:\libs\boost_1_43_0\boost\smart_ptr\detail\atomic_count_sync.hpp
+	<ia64intrin.h>
+
+1240132670 c:\libs\boost_1_43_0\boost\smart_ptr\detail\atomic_count_gcc.hpp
+	<ext/atomicity.h>
+	<bits/atomicity.h>
+
 1270492652 c:\libs\boost_1_43_0\boost\smart_ptr\detail\sp_convertible.hpp
 	<boost/config.hpp>
 
@@ -3251,324 +4258,8 @@
 
 1236012322 c:\libs\boost_1_43_0\boost\smart_ptr\detail\operator_bool.hpp
 
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\flat_map.hpp
-	<boost/interprocess/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/flat_map.hpp>
-	<boost/interprocess/containers/containers_fwd.hpp>
-	<boost/interprocess/detail/config_end.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\detail\config_begin.hpp
-	<boost/config.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\flat_map.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/workaround.hpp>
-	<boost/interprocess/containers/container/container_fwd.hpp>
-	<utility>
-	<functional>
-	<memory>
-	<stdexcept>
-	<boost/interprocess/containers/container/detail/flat_tree.hpp>
-	<boost/type_traits/has_trivial_destructor.hpp>
-	<boost/interprocess/containers/container/detail/mpl.hpp>
-	<boost/interprocess/detail/move.hpp>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\config_begin.hpp
-	<boost/config.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\workaround.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\config_end.hpp
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\container_fwd.hpp
-
-1255701264 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\flat_tree.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/workaround.hpp>
-	<boost/interprocess/containers/container/container_fwd.hpp>
-	<algorithm>
-	<functional>
-	<utility>
-	<boost/type_traits/has_trivial_destructor.hpp>
-	<boost/interprocess/detail/move.hpp>
-	<boost/interprocess/containers/container/detail/utilities.hpp>
-	<boost/interprocess/containers/container/detail/pair.hpp>
-	<boost/interprocess/containers/container/vector.hpp>
-	<boost/interprocess/containers/container/detail/value_init.hpp>
-	<boost/interprocess/containers/container/detail/destroyers.hpp>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1128691598 c:\libs\boost_1_43_0\boost\type_traits\has_trivial_destructor.hpp
-	<boost/type_traits/config.hpp>
-	<boost/type_traits/intrinsics.hpp>
-	<boost/type_traits/is_pod.hpp>
-	<boost/type_traits/detail/ice_or.hpp>
-	<boost/type_traits/detail/bool_trait_def.hpp>
-	<boost/type_traits/detail/bool_trait_undef.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\detail\move.hpp
-	<boost/config.hpp>
-	<algorithm>
-	<memory>
-	<iterator>
-	<boost/mpl/if.hpp>
-	<boost/utility/enable_if.hpp>
-	<boost/mpl/bool.hpp>
-	<boost/type_traits/has_trivial_destructor.hpp>
-	<boost/utility/addressof.hpp>
-	<boost/type_traits/remove_reference.hpp>
-
-1221702843 c:\libs\boost_1_43_0\boost\utility\enable_if.hpp
-	"boost/config.hpp"
-
-1242494117 c:\libs\boost_1_43_0\boost\utility\addressof.hpp
-	<boost/config.hpp>
-	<boost/detail/workaround.hpp>
-
-1256050813 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\utilities.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<cstdio>
-	<boost/type_traits/is_fundamental.hpp>
-	<boost/type_traits/is_pointer.hpp>
-	<boost/interprocess/detail/move.hpp>
-	<boost/interprocess/containers/container/detail/mpl.hpp>
-	<boost/interprocess/containers/container/detail/type_traits.hpp>
-	<algorithm>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1224059369 c:\libs\boost_1_43_0\boost\type_traits\is_fundamental.hpp
-	<boost/type_traits/is_arithmetic.hpp>
-	<boost/type_traits/is_void.hpp>
-	<boost/type_traits/detail/ice_or.hpp>
-	<boost/type_traits/detail/bool_trait_def.hpp>
-	<boost/type_traits/detail/bool_trait_undef.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\mpl.hpp
-	<cstddef>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\type_traits.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\pair.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/workaround.hpp>
-	<boost/interprocess/containers/container/detail/mpl.hpp>
-	<boost/interprocess/containers/container/detail/type_traits.hpp>
-	<utility>
-	<boost/interprocess/detail/move.hpp>
-	<boost/interprocess/containers/container/detail/preprocessor.hpp>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\preprocessor.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/workaround.hpp>
-	<boost/preprocessor/iteration/local.hpp>
-	<boost/preprocessor/repetition/enum_params.hpp>
-	<boost/preprocessor/cat.hpp>
-	<boost/preprocessor/repetition/enum.hpp>
-	<boost/preprocessor/repetition/repeat.hpp>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1090896214 c:\libs\boost_1_43_0\boost\preprocessor\iteration\local.hpp
-	<boost/preprocessor/config/config.hpp>
-	<boost/preprocessor/slot/slot.hpp>
-	<boost/preprocessor/tuple/elem.hpp>
-
-1095087089 c:\libs\boost_1_43_0\boost\preprocessor\repetition\enum.hpp
-	<boost/preprocessor/cat.hpp>
-	<boost/preprocessor/config/config.hpp>
-	<boost/preprocessor/debug/error.hpp>
-	<boost/preprocessor/detail/auto_rec.hpp>
-	<boost/preprocessor/punctuation/comma_if.hpp>
-	<boost/preprocessor/repetition/repeat.hpp>
-	<boost/preprocessor/tuple/elem.hpp>
-	<boost/preprocessor/tuple/rem.hpp>
-
-1255701264 c:\libs\boost_1_43_0\boost\interprocess\containers\container\vector.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/workaround.hpp>
-	<boost/interprocess/containers/container/container_fwd.hpp>
-	<cstddef>
-	<memory>
-	<algorithm>
-	<stdexcept>
-	<iterator>
-	<utility>
-	<boost/detail/no_exceptions_support.hpp>
-	<boost/type_traits/has_trivial_destructor.hpp>
-	<boost/type_traits/has_trivial_copy.hpp>
-	<boost/type_traits/has_trivial_assign.hpp>
-	<boost/type_traits/has_nothrow_copy.hpp>
-	<boost/type_traits/has_nothrow_assign.hpp>
-	<boost/interprocess/containers/container/detail/version_type.hpp>
-	<boost/interprocess/containers/container/detail/allocation_type.hpp>
-	<boost/interprocess/containers/container/detail/utilities.hpp>
-	<boost/interprocess/containers/container/detail/iterators.hpp>
-	<boost/interprocess/containers/container/detail/algorithms.hpp>
-	<boost/interprocess/containers/container/detail/destroyers.hpp>
-	<boost/interprocess/containers/container/container_fwd.hpp>
-	<boost/interprocess/detail/move.hpp>
-	<boost/pointer_to_other.hpp>
-	<boost/interprocess/containers/container/detail/mpl.hpp>
-	<boost/interprocess/containers/container/detail/advanced_insert_int.hpp>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1083923063 c:\libs\boost_1_43_0\boost\detail\no_exceptions_support.hpp
-	<boost/config.hpp>
-	<boost/detail/workaround.hpp>
-
-1196014039 c:\libs\boost_1_43_0\boost\type_traits\has_trivial_copy.hpp
-	<boost/type_traits/config.hpp>
-	<boost/type_traits/intrinsics.hpp>
-	<boost/type_traits/is_volatile.hpp>
-	<boost/type_traits/is_pod.hpp>
-	<boost/type_traits/detail/ice_and.hpp>
-	<boost/type_traits/detail/ice_or.hpp>
-	<boost/type_traits/detail/ice_not.hpp>
-	<boost/type_traits/detail/bool_trait_def.hpp>
-	<boost/type_traits/detail/bool_trait_undef.hpp>
-
-1128691598 c:\libs\boost_1_43_0\boost\type_traits\has_trivial_assign.hpp
-	<boost/type_traits/config.hpp>
-	<boost/type_traits/intrinsics.hpp>
-	<boost/type_traits/is_pod.hpp>
-	<boost/type_traits/is_const.hpp>
-	<boost/type_traits/is_volatile.hpp>
-	<boost/type_traits/detail/ice_and.hpp>
-	<boost/type_traits/detail/ice_or.hpp>
-	<boost/type_traits/detail/ice_not.hpp>
-	<boost/type_traits/detail/bool_trait_def.hpp>
-	<boost/type_traits/detail/bool_trait_undef.hpp>
-
-1196014039 c:\libs\boost_1_43_0\boost\type_traits\has_nothrow_copy.hpp
-	<boost/type_traits/has_trivial_copy.hpp>
-	<boost/type_traits/detail/bool_trait_def.hpp>
-	<boost/type_traits/detail/bool_trait_undef.hpp>
-
-1128691598 c:\libs\boost_1_43_0\boost\type_traits\has_nothrow_assign.hpp
-	<boost/type_traits/has_trivial_assign.hpp>
-	<boost/type_traits/detail/bool_trait_def.hpp>
-	<boost/type_traits/detail/bool_trait_undef.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\version_type.hpp
-	<boost/interprocess/containers/container/detail/mpl.hpp>
-	<boost/interprocess/containers/container/detail/type_traits.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\allocation_type.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/workaround.hpp>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\iterators.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/workaround.hpp>
-	<boost/interprocess/detail/move.hpp>
-	<boost/interprocess/containers/container/detail/variadic_templates_tools.hpp>
-	<boost/interprocess/containers/container/detail/preprocessor.hpp>
-	<iterator>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\variadic_templates_tools.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/workaround.hpp>
-	<boost/interprocess/containers/container/detail/type_traits.hpp>
-	<cstddef>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\algorithms.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/workaround.hpp>
-	<boost/type_traits/has_trivial_copy.hpp>
-	<boost/type_traits/has_trivial_assign.hpp>
-	<boost/detail/no_exceptions_support.hpp>
-	<boost/get_pointer.hpp>
-	<boost/interprocess/containers/container/detail/type_traits.hpp>
-	<boost/interprocess/containers/container/detail/mpl.hpp>
-	<boost/interprocess/containers/container/detail/iterators.hpp>
-	<cstring>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1239049518 c:\libs\boost_1_43_0\boost\get_pointer.hpp
-	<boost/config/no_tr1/memory.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\destroyers.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/workaround.hpp>
-	<boost/interprocess/containers/container/detail/version_type.hpp>
-	<boost/interprocess/containers/container/detail/utilities.hpp>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1215870433 c:\libs\boost_1_43_0\boost\pointer_to_other.hpp
-
-1255701264 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\advanced_insert_int.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/workaround.hpp>
-	<boost/interprocess/detail/move.hpp>
-	<iterator>
-	<algorithm>
-	<new>
-	<cassert>
-	<boost/interprocess/containers/container/detail/variadic_templates_tools.hpp>
-	<boost/interprocess/detail/move.hpp>
-	<typeinfo>
-	<boost/interprocess/containers/container/detail/preprocessor.hpp>
-	<boost/interprocess/containers/container/detail/value_init.hpp>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\value_init.hpp
-	<boost/interprocess/containers/container/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/detail/workaround.hpp>
-	<boost/interprocess/containers/container/detail/config_end.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\containers_fwd.hpp
-	<boost/interprocess/detail/config_begin.hpp>
-	<boost/interprocess/containers/container/container_fwd.hpp>
-	<boost/interprocess/detail/config_end.hpp>
-
-1255628786 c:\libs\boost_1_43_0\boost\interprocess\detail\config_end.hpp
-
-1236010936 c:\libs\boost_1_43_0\boost\enable_shared_from_this.hpp
-	<boost/smart_ptr/enable_shared_from_this.hpp>
-
-1236294377 c:\libs\boost_1_43_0\boost\smart_ptr\enable_shared_from_this.hpp
-	<boost/smart_ptr/weak_ptr.hpp>
+1236010936 c:\libs\boost_1_43_0\boost\shared_ptr.hpp
 	<boost/smart_ptr/shared_ptr.hpp>
-	<boost/assert.hpp>
-	<boost/config.hpp>
-
-1260812659 c:\libs\boost_1_43_0\boost\smart_ptr\weak_ptr.hpp
-	<memory>
-	<boost/smart_ptr/detail/shared_count.hpp>
-	<boost/smart_ptr/shared_ptr.hpp>
-
-1293900639 d:\florian\programmation\gamedevelop\gdl\gdl\force.h
-	<iostream>
-	<vector>
-	<string>
-	<cmath>
-	"GDL/Log.h"
-	"GDL/Event.h"
-
-1293900639 d:\florian\programmation\gamedevelop\gdl\gdl\log.h
-	<string>
-	<vector>
-
-1294508059 d:\florian\programmation\gamedevelop\gdl\gdl\event.h
-	<iostream>
-	<vector>
-	<string>
-	<cmath>
-	<vector>
-	<boost/shared_ptr.hpp>
-	<boost/tuple/tuple.hpp>
-	"GDL/Log.h"
-	"GDL/Instruction.h"
-	<wx/dcbuffer.h>
-	<boost/weak_ptr.hpp>
 
 1214657840 c:\libs\boost_1_43_0\boost\tuple\tuple.hpp
 	"boost/config.hpp"
@@ -3671,6 +4362,23 @@
 	<boost/type_traits/detail/type_trait_def.hpp>
 	<boost/type_traits/detail/type_trait_undef.hpp>
 
+1128691598 c:\libs\boost_1_43_0\boost\type_traits\has_nothrow_assign.hpp
+	<boost/type_traits/has_trivial_assign.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1128691598 c:\libs\boost_1_43_0\boost\type_traits\has_trivial_assign.hpp
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/intrinsics.hpp>
+	<boost/type_traits/is_pod.hpp>
+	<boost/type_traits/is_const.hpp>
+	<boost/type_traits/is_volatile.hpp>
+	<boost/type_traits/detail/ice_and.hpp>
+	<boost/type_traits/detail/ice_or.hpp>
+	<boost/type_traits/detail/ice_not.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
 1196014039 c:\libs\boost_1_43_0\boost\type_traits\has_nothrow_constructor.hpp
 	<boost/type_traits/has_trivial_constructor.hpp>
 	<boost/type_traits/detail/bool_trait_def.hpp>
@@ -3684,8 +4392,32 @@
 	<boost/type_traits/detail/bool_trait_def.hpp>
 	<boost/type_traits/detail/bool_trait_undef.hpp>
 
+1196014039 c:\libs\boost_1_43_0\boost\type_traits\has_nothrow_copy.hpp
+	<boost/type_traits/has_trivial_copy.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1196014039 c:\libs\boost_1_43_0\boost\type_traits\has_trivial_copy.hpp
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/intrinsics.hpp>
+	<boost/type_traits/is_volatile.hpp>
+	<boost/type_traits/is_pod.hpp>
+	<boost/type_traits/detail/ice_and.hpp>
+	<boost/type_traits/detail/ice_or.hpp>
+	<boost/type_traits/detail/ice_not.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
 1128691598 c:\libs\boost_1_43_0\boost\type_traits\has_nothrow_destructor.hpp
 	<boost/type_traits/has_trivial_destructor.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1128691598 c:\libs\boost_1_43_0\boost\type_traits\has_trivial_destructor.hpp
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/intrinsics.hpp>
+	<boost/type_traits/is_pod.hpp>
+	<boost/type_traits/detail/ice_or.hpp>
 	<boost/type_traits/detail/bool_trait_def.hpp>
 	<boost/type_traits/detail/bool_trait_undef.hpp>
 
@@ -3735,6 +4467,13 @@
 	<boost/config.hpp>
 	<boost/type_traits/is_fundamental.hpp>
 	<boost/type_traits/detail/ice_not.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1224059369 c:\libs\boost_1_43_0\boost\type_traits\is_fundamental.hpp
+	<boost/type_traits/is_arithmetic.hpp>
+	<boost/type_traits/is_void.hpp>
+	<boost/type_traits/detail/ice_or.hpp>
 	<boost/type_traits/detail/bool_trait_def.hpp>
 	<boost/type_traits/detail/bool_trait_undef.hpp>
 
@@ -4346,6 +5085,16 @@
 1090896214 c:\libs\boost_1_43_0\boost\preprocessor\enum.hpp
 	<boost/preprocessor/repetition/enum.hpp>
 
+1095087089 c:\libs\boost_1_43_0\boost\preprocessor\repetition\enum.hpp
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/debug/error.hpp>
+	<boost/preprocessor/detail/auto_rec.hpp>
+	<boost/preprocessor/punctuation/comma_if.hpp>
+	<boost/preprocessor/repetition/repeat.hpp>
+	<boost/preprocessor/tuple/elem.hpp>
+	<boost/preprocessor/tuple/rem.hpp>
+
 1223702342 c:\libs\boost_1_43_0\boost\mpl\aux_\count_args.hpp
 	<boost/preprocessor/expr_if.hpp>
 	<boost/preprocessor/inc.hpp>
@@ -4455,6 +5204,10 @@
 	<boost/detail/workaround.hpp>
 	<boost/type.hpp>
 
+1242494117 c:\libs\boost_1_43_0\boost\utility\addressof.hpp
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+
 1244914231 c:\libs\boost_1_43_0\boost\tuple\detail\tuple_basic.hpp
 	<utility>
 	"boost/type_traits/cv_traits.hpp"
@@ -4470,6 +5223,10 @@
 	<boost/type_traits/remove_const.hpp>
 	<boost/type_traits/remove_volatile.hpp>
 	<boost/type_traits/remove_cv.hpp>
+
+1293900639 d:\florian\programmation\gamedevelop\gdl\gdl\log.h
+	<string>
+	<vector>
 
 1294508059 d:\florian\programmation\gamedevelop\gdl\gdl\instruction.h
 	<string>
@@ -5187,20 +5944,486 @@
 	<boost/serialization/vector.hpp>
 	<boost/serialization/nvp.hpp>
 
-1253304925 c:\libs\wxwidgets\include\wx\dcbuffer.h
-	"wx/dcmemory.h"
-	"wx/dcclient.h"
-	"wx/window.h"
+1289573463 c:\libs\sfml\include\sfml\system.hpp
+	<SFML/Config.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/System/Err.hpp>
+	<SFML/System/Lock.hpp>
+	<SFML/System/Mutex.hpp>
+	<SFML/System/Randomizer.hpp>
+	<SFML/System/Sleep.hpp>
+	<SFML/System/String.hpp>
+	<SFML/System/Thread.hpp>
+	<SFML/System/ThreadLocal.hpp>
+	<SFML/System/ThreadLocalPtr.hpp>
+	<SFML/System/Utf.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/Vector3.hpp>
 
-1253304920 c:\libs\wxwidgets\include\wx\dcmemory.h
-	"wx/dc.h"
-	"wx/bitmap.h"
+1289599436 c:\libs\sfml\include\sfml\config.hpp
+	<climits>
 
-1253304921 c:\libs\wxwidgets\include\wx\dcclient.h
-	"wx/dc.h"
+1289573463 c:\libs\sfml\include\sfml\system\clock.hpp
+	<SFML/Config.hpp>
 
-1236010936 c:\libs\boost_1_43_0\boost\weak_ptr.hpp
+1289573463 c:\libs\sfml\include\sfml\system\err.hpp
+	<SFML/Config.hpp>
+	<ostream>
+
+1289573463 c:\libs\sfml\include\sfml\system\lock.hpp
+	<SFML/System/NonCopyable.hpp>
+
+1289573463 c:\libs\sfml\include\sfml\system\noncopyable.hpp
+	<SFML/Config.hpp>
+
+1289599436 c:\libs\sfml\include\sfml\system\mutex.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+
+1289573463 c:\libs\sfml\include\sfml\system\randomizer.hpp
+	<SFML/Config.hpp>
+
+1289573463 c:\libs\sfml\include\sfml\system\sleep.hpp
+	<SFML/Config.hpp>
+
+1289573463 c:\libs\sfml\include\sfml\system\string.hpp
+	<SFML/Config.hpp>
+	<locale>
+	<string>
+
+1289573463 c:\libs\sfml\include\sfml\system\thread.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<cstdlib>
+
+1289573463 c:\libs\sfml\include\sfml\system\threadlocal.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<cstdlib>
+
+1289573463 c:\libs\sfml\include\sfml\system\threadlocalptr.hpp
+	<SFML/System/ThreadLocal.hpp>
+	<SFML/System/ThreadLocalPtr.inl>
+
+1289573463 c:\libs\sfml\include\sfml\system\threadlocalptr.inl
+
+1289573463 c:\libs\sfml\include\sfml\system\utf.hpp
+	<SFML/Config.hpp>
+	<algorithm>
+	<locale>
+	<string>
+	<cstdlib>
+	<SFML/System/Utf.inl>
+
+1289599436 c:\libs\sfml\include\sfml\system\utf.inl
+
+1289599436 c:\libs\sfml\include\sfml\system\vector2.hpp
+	<SFML/System/Vector2.inl>
+
+1289573463 c:\libs\sfml\include\sfml\system\vector2.inl
+
+1289599436 c:\libs\sfml\include\sfml\system\vector3.hpp
+	<SFML/System/Vector3.inl>
+
+1289573463 c:\libs\sfml\include\sfml\system\vector3.inl
+
+1289573463 c:\libs\sfml\include\sfml\graphics.hpp
+	<SFML/Window.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Font.hpp>
+	<SFML/Graphics/Glyph.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/Renderer.hpp>
+	<SFML/Graphics/RenderImage.hpp>
+	<SFML/Graphics/RenderWindow.hpp>
+	<SFML/Graphics/Shader.hpp>
+	<SFML/Graphics/Shape.hpp>
+	<SFML/Graphics/Sprite.hpp>
+	<SFML/Graphics/Text.hpp>
+	<SFML/Graphics/View.hpp>
+
+1289573463 c:\libs\sfml\include\sfml\window.hpp
+	<SFML/System.hpp>
+	<SFML/Window/Context.hpp>
+	<SFML/Window/ContextSettings.hpp>
+	<SFML/Window/Event.hpp>
+	<SFML/Window/Input.hpp>
+	<SFML/Window/VideoMode.hpp>
+	<SFML/Window/Window.hpp>
+	<SFML/Window/WindowStyle.hpp>
+
+1289573463 c:\libs\sfml\include\sfml\window\context.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+
+1289573463 c:\libs\sfml\include\sfml\window\contextsettings.hpp
+
+1289599436 c:\libs\sfml\include\sfml\window\event.hpp
+	<SFML/Config.hpp>
+
+1289573463 c:\libs\sfml\include\sfml\window\input.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Window/Event.hpp>
+
+1289573463 c:\libs\sfml\include\sfml\window\videomode.hpp
+	<SFML/Config.hpp>
+	<vector>
+
+1289599436 c:\libs\sfml\include\sfml\window\window.hpp
+	<SFML/Window/ContextSettings.hpp>
+	<SFML/Window/Input.hpp>
+	<SFML/Window/VideoMode.hpp>
+	<SFML/Window/WindowHandle.hpp>
+	<SFML/Window/WindowStyle.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<string>
+
+1289599436 c:\libs\sfml\include\sfml\window\windowhandle.hpp
+	<SFML/Config.hpp>
+
+1289573463 c:\libs\sfml\include\sfml\window\windowstyle.hpp
+
+1289573462 c:\libs\sfml\include\sfml\graphics\color.hpp
+	<SFML/Config.hpp>
+
+1289599436 c:\libs\sfml\include\sfml\graphics\font.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/String.hpp>
+	<SFML/Graphics/Glyph.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<map>
+	<string>
+	<vector>
+
+1289573463 c:\libs\sfml\include\sfml\system\resource.hpp
+	<SFML/System/Lock.hpp>
+	<SFML/System/Mutex.hpp>
+	<set>
+	<SFML/System/Resource.inl>
+	<SFML/System/ResourcePtr.inl>
+
+1289573463 c:\libs\sfml\include\sfml\system\resource.inl
+
+1289573463 c:\libs\sfml\include\sfml\system\resourceptr.inl
+
+1289573462 c:\libs\sfml\include\sfml\graphics\glyph.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Rect.hpp>
+
+1289573462 c:\libs\sfml\include\sfml\graphics\rect.hpp
+	<SFML/System/Vector2.hpp>
+	<algorithm>
+	<SFML/Graphics/Rect.inl>
+
+1289573462 c:\libs\sfml\include\sfml\graphics\rect.inl
+
+1289573462 c:\libs\sfml\include\sfml\graphics\image.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<string>
+	<vector>
+
+1289599436 c:\libs\sfml\include\sfml\graphics\renderer.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+
+1289573462 c:\libs\sfml\include\sfml\graphics\drawable.hpp
+	<SFML/System/Vector2.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+
+1289573462 c:\libs\sfml\include\sfml\graphics\matrix3.hpp
+	<SFML/Config.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<cmath>
+	<SFML/Graphics/Matrix3.inl>
+
+1289573462 c:\libs\sfml\include\sfml\graphics\matrix3.inl
+
+1289573462 c:\libs\sfml\include\sfml\graphics\renderimage.hpp
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/RenderTarget.hpp>
+
+1289599436 c:\libs\sfml\include\sfml\graphics\rendertarget.hpp
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<SFML/Graphics/Renderer.hpp>
+	<SFML/Graphics/View.hpp>
+
+1289573462 c:\libs\sfml\include\sfml\graphics\view.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+	<SFML/System/Vector2.hpp>
+
+1289573462 c:\libs\sfml\include\sfml\graphics\renderwindow.hpp
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/RenderTarget.hpp>
+	<SFML/Window/Window.hpp>
+	<string>
+
+1289573462 c:\libs\sfml\include\sfml\graphics\shader.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/Vector3.hpp>
+	<map>
+	<string>
+
+1289573462 c:\libs\sfml\include\sfml\graphics\shape.hpp
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/System/Vector2.hpp>
+	<vector>
+
+1289573462 c:\libs\sfml\include\sfml\graphics\sprite.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Rect.hpp>
+
+1289573462 c:\libs\sfml\include\sfml\graphics\text.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/System/String.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Font.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<string>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\flat_map.hpp
+	<boost/interprocess/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/flat_map.hpp>
+	<boost/interprocess/containers/containers_fwd.hpp>
+	<boost/interprocess/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\detail\config_begin.hpp
+	<boost/config.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\flat_map.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/workaround.hpp>
+	<boost/interprocess/containers/container/container_fwd.hpp>
+	<utility>
+	<functional>
+	<memory>
+	<stdexcept>
+	<boost/interprocess/containers/container/detail/flat_tree.hpp>
+	<boost/type_traits/has_trivial_destructor.hpp>
+	<boost/interprocess/containers/container/detail/mpl.hpp>
+	<boost/interprocess/detail/move.hpp>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\config_begin.hpp
+	<boost/config.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\workaround.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\config_end.hpp
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\container_fwd.hpp
+
+1255701264 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\flat_tree.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/workaround.hpp>
+	<boost/interprocess/containers/container/container_fwd.hpp>
+	<algorithm>
+	<functional>
+	<utility>
+	<boost/type_traits/has_trivial_destructor.hpp>
+	<boost/interprocess/detail/move.hpp>
+	<boost/interprocess/containers/container/detail/utilities.hpp>
+	<boost/interprocess/containers/container/detail/pair.hpp>
+	<boost/interprocess/containers/container/vector.hpp>
+	<boost/interprocess/containers/container/detail/value_init.hpp>
+	<boost/interprocess/containers/container/detail/destroyers.hpp>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\detail\move.hpp
+	<boost/config.hpp>
+	<algorithm>
+	<memory>
+	<iterator>
+	<boost/mpl/if.hpp>
+	<boost/utility/enable_if.hpp>
+	<boost/mpl/bool.hpp>
+	<boost/type_traits/has_trivial_destructor.hpp>
+	<boost/utility/addressof.hpp>
+	<boost/type_traits/remove_reference.hpp>
+
+1221702843 c:\libs\boost_1_43_0\boost\utility\enable_if.hpp
+	"boost/config.hpp"
+
+1256050813 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\utilities.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<cstdio>
+	<boost/type_traits/is_fundamental.hpp>
+	<boost/type_traits/is_pointer.hpp>
+	<boost/interprocess/detail/move.hpp>
+	<boost/interprocess/containers/container/detail/mpl.hpp>
+	<boost/interprocess/containers/container/detail/type_traits.hpp>
+	<algorithm>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\mpl.hpp
+	<cstddef>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\type_traits.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\pair.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/workaround.hpp>
+	<boost/interprocess/containers/container/detail/mpl.hpp>
+	<boost/interprocess/containers/container/detail/type_traits.hpp>
+	<utility>
+	<boost/interprocess/detail/move.hpp>
+	<boost/interprocess/containers/container/detail/preprocessor.hpp>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\preprocessor.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/workaround.hpp>
+	<boost/preprocessor/iteration/local.hpp>
+	<boost/preprocessor/repetition/enum_params.hpp>
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/repetition/enum.hpp>
+	<boost/preprocessor/repetition/repeat.hpp>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1090896214 c:\libs\boost_1_43_0\boost\preprocessor\iteration\local.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/slot/slot.hpp>
+	<boost/preprocessor/tuple/elem.hpp>
+
+1255701264 c:\libs\boost_1_43_0\boost\interprocess\containers\container\vector.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/workaround.hpp>
+	<boost/interprocess/containers/container/container_fwd.hpp>
+	<cstddef>
+	<memory>
+	<algorithm>
+	<stdexcept>
+	<iterator>
+	<utility>
+	<boost/detail/no_exceptions_support.hpp>
+	<boost/type_traits/has_trivial_destructor.hpp>
+	<boost/type_traits/has_trivial_copy.hpp>
+	<boost/type_traits/has_trivial_assign.hpp>
+	<boost/type_traits/has_nothrow_copy.hpp>
+	<boost/type_traits/has_nothrow_assign.hpp>
+	<boost/interprocess/containers/container/detail/version_type.hpp>
+	<boost/interprocess/containers/container/detail/allocation_type.hpp>
+	<boost/interprocess/containers/container/detail/utilities.hpp>
+	<boost/interprocess/containers/container/detail/iterators.hpp>
+	<boost/interprocess/containers/container/detail/algorithms.hpp>
+	<boost/interprocess/containers/container/detail/destroyers.hpp>
+	<boost/interprocess/containers/container/container_fwd.hpp>
+	<boost/interprocess/detail/move.hpp>
+	<boost/pointer_to_other.hpp>
+	<boost/interprocess/containers/container/detail/mpl.hpp>
+	<boost/interprocess/containers/container/detail/advanced_insert_int.hpp>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1083923063 c:\libs\boost_1_43_0\boost\detail\no_exceptions_support.hpp
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\version_type.hpp
+	<boost/interprocess/containers/container/detail/mpl.hpp>
+	<boost/interprocess/containers/container/detail/type_traits.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\allocation_type.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/workaround.hpp>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\iterators.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/workaround.hpp>
+	<boost/interprocess/detail/move.hpp>
+	<boost/interprocess/containers/container/detail/variadic_templates_tools.hpp>
+	<boost/interprocess/containers/container/detail/preprocessor.hpp>
+	<iterator>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\variadic_templates_tools.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/workaround.hpp>
+	<boost/interprocess/containers/container/detail/type_traits.hpp>
+	<cstddef>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\algorithms.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/workaround.hpp>
+	<boost/type_traits/has_trivial_copy.hpp>
+	<boost/type_traits/has_trivial_assign.hpp>
+	<boost/detail/no_exceptions_support.hpp>
+	<boost/get_pointer.hpp>
+	<boost/interprocess/containers/container/detail/type_traits.hpp>
+	<boost/interprocess/containers/container/detail/mpl.hpp>
+	<boost/interprocess/containers/container/detail/iterators.hpp>
+	<cstring>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1239049518 c:\libs\boost_1_43_0\boost\get_pointer.hpp
+	<boost/config/no_tr1/memory.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\destroyers.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/workaround.hpp>
+	<boost/interprocess/containers/container/detail/version_type.hpp>
+	<boost/interprocess/containers/container/detail/utilities.hpp>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1215870433 c:\libs\boost_1_43_0\boost\pointer_to_other.hpp
+
+1255701264 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\advanced_insert_int.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/workaround.hpp>
+	<boost/interprocess/detail/move.hpp>
+	<iterator>
+	<algorithm>
+	<new>
+	<cassert>
+	<boost/interprocess/containers/container/detail/variadic_templates_tools.hpp>
+	<boost/interprocess/detail/move.hpp>
+	<typeinfo>
+	<boost/interprocess/containers/container/detail/preprocessor.hpp>
+	<boost/interprocess/containers/container/detail/value_init.hpp>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\container\detail\value_init.hpp
+	<boost/interprocess/containers/container/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/detail/workaround.hpp>
+	<boost/interprocess/containers/container/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\containers\containers_fwd.hpp
+	<boost/interprocess/detail/config_begin.hpp>
+	<boost/interprocess/containers/container/container_fwd.hpp>
+	<boost/interprocess/detail/config_end.hpp>
+
+1255628786 c:\libs\boost_1_43_0\boost\interprocess\detail\config_end.hpp
+
+1236010936 c:\libs\boost_1_43_0\boost\enable_shared_from_this.hpp
+	<boost/smart_ptr/enable_shared_from_this.hpp>
+
+1236294377 c:\libs\boost_1_43_0\boost\smart_ptr\enable_shared_from_this.hpp
 	<boost/smart_ptr/weak_ptr.hpp>
+	<boost/smart_ptr/shared_ptr.hpp>
+	<boost/assert.hpp>
+	<boost/config.hpp>
 
 1293900639 d:\florian\programmation\gamedevelop\gdl\gdl\listvariable.h
 	<vector>
@@ -5218,1236 +6441,13 @@
 
 1294091278 d:\florian\programmation\gamedevelop\gdl\gdl\rotatedrectangle.h
 
-1253304927 c:\libs\wxwidgets\include\wx\wx.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/dynarray.h"
-	"wx/list.h"
-	"wx/hash.h"
-	"wx/string.h"
-	"wx/hashmap.h"
-	"wx/arrstr.h"
-	"wx/intl.h"
-	"wx/log.h"
-	"wx/event.h"
-	"wx/app.h"
-	"wx/utils.h"
-	"wx/stream.h"
-	"wx/memory.h"
-	"wx/math.h"
-	"wx/stopwatch.h"
-	"wx/timer.h"
-	"wx/module.h"
-	"wx/wxcrt.h"
-	"wx/wxcrtvararg.h"
-	"wx/window.h"
-	"wx/containr.h"
-	"wx/panel.h"
-	"wx/toplevel.h"
-	"wx/frame.h"
-	"wx/gdicmn.h"
-	"wx/gdiobj.h"
-	"wx/region.h"
-	"wx/bitmap.h"
-	"wx/image.h"
-	"wx/colour.h"
-	"wx/font.h"
-	"wx/dc.h"
-	"wx/dcclient.h"
-	"wx/dcmemory.h"
-	"wx/dcprint.h"
-	"wx/dcscreen.h"
-	"wx/button.h"
-	"wx/menuitem.h"
-	"wx/menu.h"
-	"wx/pen.h"
-	"wx/brush.h"
-	"wx/palette.h"
-	"wx/icon.h"
-	"wx/cursor.h"
-	"wx/dialog.h"
-	"wx/settings.h"
-	"wx/msgdlg.h"
-	"wx/cmndata.h"
-	"wx/dataobj.h"
-	"wx/control.h"
-	"wx/ctrlsub.h"
-	"wx/bmpbuttn.h"
-	"wx/checkbox.h"
-	"wx/checklst.h"
-	"wx/choice.h"
-	"wx/scrolbar.h"
-	"wx/stattext.h"
-	"wx/statbmp.h"
-	"wx/statbox.h"
-	"wx/listbox.h"
-	"wx/radiobox.h"
-	"wx/radiobut.h"
-	"wx/textctrl.h"
-	"wx/slider.h"
-	"wx/gauge.h"
-	"wx/scrolwin.h"
-	"wx/dirdlg.h"
-	"wx/toolbar.h"
-	"wx/combobox.h"
-	"wx/layout.h"
-	"wx/sizer.h"
-	"wx/statusbr.h"
-	"wx/choicdlg.h"
-	"wx/textdlg.h"
-	"wx/filedlg.h"
-	"wx/mdi.h"
-	"wx/validate.h"
-	"wx/valtext.h"
-
-1253304913 c:\libs\wxwidgets\include\wx\app.h
-	"wx/event.h"
-	"wx/build.h"
-	"wx/cmdargs.h"
-	"wx/init.h"
-	"wx/intl.h"
-	"wx/log.h"
-	"wx/unix/app.h"
-	"wx/palmos/app.h"
-	"wx/msw/app.h"
-	"wx/motif/app.h"
-	"wx/mgl/app.h"
-	"wx/dfb/app.h"
-	"wx/gtk/app.h"
-	"wx/gtk1/app.h"
-	"wx/x11/app.h"
-	"wx/osx/app.h"
-	"wx/cocoa/app.h"
-	"wx/os2/app.h"
-	"wx/univ/theme.h"
-
-1253304920 c:\libs\wxwidgets\include\wx\build.h
-	"wx/version.h"
-
-1253304924 c:\libs\wxwidgets\include\wx\cmdargs.h
-	"wx/arrstr.h"
-
-1253304921 c:\libs\wxwidgets\include\wx\init.h
-	"wx/defs.h"
-	"wx/chartype.h"
-
-1253304841 c:\libs\wxwidgets\include\wx\unix\app.h
-	<signal.h>
-
-1253304853 c:\libs\wxwidgets\include\wx\palmos\app.h
-	"wx/event.h"
-	"wx/icon.h"
-
-1253304862 c:\libs\wxwidgets\include\wx\msw\app.h
-	"wx/event.h"
-	"wx/icon.h"
-	"wx/msw/wrapwin.h"
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\app.h
-	"wx/event.h"
-	"wx/hashmap.h"
-
-1253304882 c:\libs\wxwidgets\include\wx\mgl\app.h
-	"wx/frame.h"
-	"wx/icon.h"
-	"wx/vidmode.h"
-
-1253304919 c:\libs\wxwidgets\include\wx\frame.h
-	"wx/toplevel.h"
-	"wx/statusbr.h"
-	"wx/univ/frame.h"
-	"wx/palmos/frame.h"
-	"wx/msw/frame.h"
-	"wx/gtk/frame.h"
-	"wx/gtk1/frame.h"
-	"wx/motif/frame.h"
-	"wx/osx/frame.h"
-	"wx/cocoa/frame.h"
-	"wx/os2/frame.h"
-
-1253304920 c:\libs\wxwidgets\include\wx\statusbr.h
-	"wx/defs.h"
-	"wx/window.h"
-	"wx/list.h"
-	"wx/dynarray.h"
-	"wx/univ/statusbr.h"
-	"wx/palmos/statusbr.h"
-	"wx/msw/statusbar.h"
-	"wx/generic/statusbr.h"
-	"wx/osx/statusbr.h"
-	"wx/generic/statusbr.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\statusbr.h
-	"wx/univ/inpcons.h"
-	"wx/arrstr.h"
-
-1253304854 c:\libs\wxwidgets\include\wx\palmos\statusbr.h
-
-1253304864 c:\libs\wxwidgets\include\wx\msw\statusbar.h
-	"wx/vector.h"
-	"wx/tooltip.h"
-
-1253304918 c:\libs\wxwidgets\include\wx\tooltip.h
-	"wx/defs.h"
-	"wx/msw/tooltip.h"
-	"wx/gtk/tooltip.h"
-	"wx/gtk1/tooltip.h"
-	"wx/osx/tooltip.h"
-	"wx/cocoa/tooltip.h"
-	"wx/os2/tooltip.h"
-
-1253304864 c:\libs\wxwidgets\include\wx\msw\tooltip.h
-	"wx/object.h"
-	"wx/gdicmn.h"
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\tooltip.h
-	"wx/defs.h"
-	"wx/string.h"
-	"wx/object.h"
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\tooltip.h
-	"wx/defs.h"
-	"wx/string.h"
-	"wx/object.h"
-
-1253304887 c:\libs\wxwidgets\include\wx\osx\tooltip.h
-	"wx/string.h"
-	"wx/event.h"
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\tooltip.h
-	"wx/object.h"
-
-1253304874 c:\libs\wxwidgets\include\wx\os2\tooltip.h
-
-1253304906 c:\libs\wxwidgets\include\wx\generic\statusbr.h
-	"wx/defs.h"
-	"wx/pen.h"
-	"wx/arrstr.h"
-
-1253304888 c:\libs\wxwidgets\include\wx\osx\statusbr.h
-
-1253304838 c:\libs\wxwidgets\include\wx\univ\frame.h
-
-1253304853 c:\libs\wxwidgets\include\wx\palmos\frame.h
-
-1253304865 c:\libs\wxwidgets\include\wx\msw\frame.h
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\frame.h
-
-1253304846 c:\libs\wxwidgets\include\wx\gtk1\frame.h
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\frame.h
-
-1253304888 c:\libs\wxwidgets\include\wx\osx\frame.h
-	"wx/window.h"
-	"wx/toolbar.h"
-	"wx/accel.h"
-	"wx/icon.h"
-
-1253304921 c:\libs\wxwidgets\include\wx\toolbar.h
-	"wx/defs.h"
-	"wx/tbarbase.h"
-	"wx/univ/toolbar.h"
-	"wx/palmos/toolbar.h"
-	"wx/msw/toolbar.h"
-	"wx/msw/wince/tbarwce.h"
-	"wx/motif/toolbar.h"
-	"wx/gtk/tbargtk.h"
-	"wx/gtk1/tbargtk.h"
-	"wx/osx/toolbar.h"
-	"wx/cocoa/toolbar.h"
-	"wx/os2/toolbar.h"
-
-1253304918 c:\libs\wxwidgets\include\wx\tbarbase.h
-	"wx/defs.h"
-	"wx/bitmap.h"
-	"wx/list.h"
-	"wx/control.h"
-
-1253304838 c:\libs\wxwidgets\include\wx\univ\toolbar.h
-	"wx/button.h"
-
-1253304853 c:\libs\wxwidgets\include\wx\palmos\toolbar.h
-	"wx/dynarray.h"
-
-1253304862 c:\libs\wxwidgets\include\wx\msw\toolbar.h
-	"wx/dynarray.h"
-	"wx/imaglist.h"
-
-1253304861 c:\libs\wxwidgets\include\wx\msw\wince\tbarwce.h
-	"wx/dynarray.h"
-	"wx/msw/toolbar.h"
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\toolbar.h
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\tbargtk.h
-
-1253304846 c:\libs\wxwidgets\include\wx\gtk1\tbargtk.h
-
-1253304886 c:\libs\wxwidgets\include\wx\osx\toolbar.h
-	"wx/tbarbase.h"
-	"wx/dynarray.h"
-
-1253304909 c:\libs\wxwidgets\include\wx\cocoa\toolbar.h
-
-1253304873 c:\libs\wxwidgets\include\wx\os2\toolbar.h
-	"wx/timer.h"
-	"wx/tbarbase.h"
-
-1253304927 c:\libs\wxwidgets\include\wx\timer.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/longlong.h"
-	"wx/event.h"
-	"wx/stopwatch.h"
-	"wx/utils.h"
-
-1253304917 c:\libs\wxwidgets\include\wx\stopwatch.h
-	"wx/defs.h"
-	"wx/longlong.h"
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\frame.h
-
-1253304875 c:\libs\wxwidgets\include\wx\os2\frame.h
-	"wx/os2/wxrsc.h"
-
-1253304875 c:\libs\wxwidgets\include\wx\os2\wxrsc.h
-
-1253304917 c:\libs\wxwidgets\include\wx\vidmode.h
-
-1253304857 c:\libs\wxwidgets\include\wx\dfb\app.h
-	"wx/dfb/dfbptr.h"
-	"wx/vidmode.h"
-
-1253304893 c:\libs\wxwidgets\include\wx\gtk\app.h
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\app.h
-	"wx/frame.h"
-	"wx/icon.h"
-	"wx/strconv.h"
-
-1253304867 c:\libs\wxwidgets\include\wx\x11\app.h
-	"wx/gdicmn.h"
-	"wx/event.h"
-
-1253304886 c:\libs\wxwidgets\include\wx\osx\app.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/gdicmn.h"
-	"wx/event.h"
-
-1253304909 c:\libs\wxwidgets\include\wx\cocoa\app.h
-	"wx/osx/core/cfref.h"
-
-1253304873 c:\libs\wxwidgets\include\wx\os2\app.h
-	<types.h>
-	<sys/ioctl.h>
-	<sys/select.h>
-	<sys/time.h>
-	<sys/types.h>
-	<unistd.h>
-	<utils.h>
-	<types.h>
-	"wx/event.h"
-	"wx/icon.h"
-
-1253304838 c:\libs\wxwidgets\include\wx\univ\theme.h
-	"wx/string.h"
-
-1253304915 c:\libs\wxwidgets\include\wx\module.h
-	"wx/object.h"
-	"wx/list.h"
-	"wx/arrstr.h"
-	"wx/dynarray.h"
-
-1253304927 c:\libs\wxwidgets\include\wx\dcprint.h
-	"wx/defs.h"
-	"wx/dc.h"
-
-1253304921 c:\libs\wxwidgets\include\wx\dcscreen.h
-	"wx/defs.h"
-	"wx/dc.h"
-
-1253304914 c:\libs\wxwidgets\include\wx\menuitem.h
-	"wx/defs.h"
-	"wx/object.h"
-	"wx/univ/menuitem.h"
-	"wx/palmos/menuitem.h"
-	"wx/msw/menuitem.h"
-	"wx/motif/menuitem.h"
-	"wx/gtk/menuitem.h"
-	"wx/gtk1/menuitem.h"
-	"wx/osx/menuitem.h"
-	"wx/cocoa/menuitem.h"
-	"wx/os2/menuitem.h"
-
-1253304838 c:\libs\wxwidgets\include\wx\univ\menuitem.h
-
-1253304853 c:\libs\wxwidgets\include\wx\palmos\menuitem.h
-	"wx/ownerdrw.h"
-
-1253304923 c:\libs\wxwidgets\include\wx\ownerdrw.h
-	"wx/defs.h"
-	"wx/bitmap.h"
-	"wx/colour.h"
-	"wx/font.h"
-
-1253304862 c:\libs\wxwidgets\include\wx\msw\menuitem.h
-	"wx/ownerdrw.h"
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\menuitem.h
-	"wx/bitmap.h"
-
-1253304893 c:\libs\wxwidgets\include\wx\gtk\menuitem.h
-	"wx/bitmap.h"
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\menuitem.h
-	"wx/bitmap.h"
-
-1253304886 c:\libs\wxwidgets\include\wx\osx\menuitem.h
-	"wx/defs.h"
-	"wx/bitmap.h"
-
-1253304909 c:\libs\wxwidgets\include\wx\cocoa\menuitem.h
-	"wx/hashmap.h"
-	"wx/bitmap.h"
-	"wx/cocoa/ObjcRef.h"
-
-1253304873 c:\libs\wxwidgets\include\wx\os2\menuitem.h
-	"wx/defs.h"
-	"wx/os2/private.h"
-	"wx/ownerdrw.h"
-
-1253304922 c:\libs\wxwidgets\include\wx\menu.h
-	"wx/defs.h"
-	"wx/list.h"
-	"wx/window.h"
-	"wx/menuitem.h"
-	"wx/univ/menu.h"
-	"wx/palmos/menu.h"
-	"wx/msw/menu.h"
-	"wx/motif/menu.h"
-	"wx/gtk/menu.h"
-	"wx/gtk1/menu.h"
-	"wx/osx/menu.h"
-	"wx/cocoa/menu.h"
-	"wx/os2/menu.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\menu.h
-	"wx/accel.h"
-	"wx/dynarray.h"
-
-1253304853 c:\libs\wxwidgets\include\wx\palmos\menu.h
-	"wx/accel.h"
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1253304863 c:\libs\wxwidgets\include\wx\msw\menu.h
-	"wx/accel.h"
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\menu.h
-	"wx/colour.h"
-	"wx/font.h"
-	"wx/arrstr.h"
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\menu.h
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\menu.h
-
-1253304887 c:\libs\wxwidgets\include\wx\osx\menu.h
-	"wx/arrstr.h"
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\menu.h
-	"wx/cocoa/NSMenu.h"
-	"wx/accel.h"
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\nsmenu.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-
-1253304874 c:\libs\wxwidgets\include\wx\os2\menu.h
-	"wx/accel.h"
-	"wx/list.h"
-	"wx/dynarray.h"
-
-1253304918 c:\libs\wxwidgets\include\wx\settings.h
-	"wx/colour.h"
-	"wx/font.h"
-
-1253304921 c:\libs\wxwidgets\include\wx\msgdlg.h
-	"wx/defs.h"
-	"wx/dialog.h"
-	"wx/stockitem.h"
-	"wx/generic/msgdlgg.h"
-	"wx/cocoa/msgdlg.h"
-	"wx/palmos/msgdlg.h"
-	"wx/msw/msgdlg.h"
-	"wx/motif/msgdlg.h"
-	"wx/gtk/msgdlg.h"
-	"wx/osx/msgdlg.h"
-	"wx/os2/msgdlg.h"
-
-1253304921 c:\libs\wxwidgets\include\wx\stockitem.h
-	"wx/defs.h"
-	"wx/chartype.h"
-	"wx/string.h"
-	"wx/accel.h"
-
-1253304906 c:\libs\wxwidgets\include\wx\generic\msgdlgg.h
-
-1253304909 c:\libs\wxwidgets\include\wx\cocoa\msgdlg.h
-	"wx/msgdlg.h"
-	"wx/generic/msgdlgg.h"
-
-1253304853 c:\libs\wxwidgets\include\wx\palmos\msgdlg.h
-
-1253304862 c:\libs\wxwidgets\include\wx\msw\msgdlg.h
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\msgdlg.h
-
-1253304893 c:\libs\wxwidgets\include\wx\gtk\msgdlg.h
-
-1253304886 c:\libs\wxwidgets\include\wx\osx\msgdlg.h
-
-1253304873 c:\libs\wxwidgets\include\wx\os2\msgdlg.h
-
-1253304916 c:\libs\wxwidgets\include\wx\dataobj.h
-	"wx/defs.h"
-	"wx/string.h"
-	"wx/bitmap.h"
-	"wx/list.h"
-	"wx/arrstr.h"
-	"wx/msw/ole/dataform.h"
-	"wx/motif/dataform.h"
-	"wx/gtk/dataform.h"
-	"wx/gtk1/dataform.h"
-	"wx/x11/dataform.h"
-	"wx/osx/dataform.h"
-	"wx/cocoa/dataform.h"
-	"wx/os2/dataform.h"
-	"wx/msw/ole/dataobj.h"
-	"wx/motif/dataobj.h"
-	"wx/x11/dataobj.h"
-	"wx/gtk/dataobj.h"
-	"wx/gtk1/dataobj.h"
-	"wx/osx/dataobj.h"
-	"wx/cocoa/dataobj.h"
-	"wx/os2/dataobj.h"
-	"wx/msw/ole/dataobj2.h"
-	"wx/gtk/dataobj2.h"
-	"wx/gtk1/dataobj2.h"
-	"wx/x11/dataobj2.h"
-	"wx/motif/dataobj2.h"
-	"wx/osx/dataobj2.h"
-	"wx/cocoa/dataobj2.h"
-	"wx/os2/dataobj2.h"
-
-1253304859 c:\libs\wxwidgets\include\wx\msw\ole\dataform.h
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\dataform.h
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\dataform.h
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\dataform.h
-
-1253304867 c:\libs\wxwidgets\include\wx\x11\dataform.h
-
-1253304887 c:\libs\wxwidgets\include\wx\osx\dataform.h
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\dataform.h
-
-1253304874 c:\libs\wxwidgets\include\wx\os2\dataform.h
-
-1253304859 c:\libs\wxwidgets\include\wx\msw\ole\dataobj.h
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\dataobj.h
-
-1253304867 c:\libs\wxwidgets\include\wx\x11\dataobj.h
-
-1253304895 c:\libs\wxwidgets\include\wx\gtk\dataobj.h
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\dataobj.h
-
-1253304888 c:\libs\wxwidgets\include\wx\osx\dataobj.h
-
-1253304911 c:\libs\wxwidgets\include\wx\cocoa\dataobj.h
-
-1253304877 c:\libs\wxwidgets\include\wx\os2\dataobj.h
-
-1253304859 c:\libs\wxwidgets\include\wx\msw\ole\dataobj2.h
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\dataobj2.h
-
-1253304848 c:\libs\wxwidgets\include\wx\gtk1\dataobj2.h
-
-1253304868 c:\libs\wxwidgets\include\wx\x11\dataobj2.h
-
-1253304844 c:\libs\wxwidgets\include\wx\motif\dataobj2.h
-
-1253304887 c:\libs\wxwidgets\include\wx\osx\dataobj2.h
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\dataobj2.h
-
-1253304875 c:\libs\wxwidgets\include\wx\os2\dataobj2.h
-
-1253304919 c:\libs\wxwidgets\include\wx\ctrlsub.h
-	"wx/defs.h"
-	"wx/arrstr.h"
-	"wx/control.h"
-	"wx/msw/ctrlsub.h"
-	"wx/motif/ctrlsub.h"
-
-1253304865 c:\libs\wxwidgets\include\wx\msw\ctrlsub.h
-
-1253304844 c:\libs\wxwidgets\include\wx\motif\ctrlsub.h
-	"wx/dynarray.h"
-	"wx/generic/ctrlsub.h"
-
-1253304906 c:\libs\wxwidgets\include\wx\generic\ctrlsub.h
-	"wx/dynarray.h"
-
-1253304918 c:\libs\wxwidgets\include\wx\bmpbuttn.h
-	"wx/defs.h"
-	"wx/button.h"
-	"wx/univ/bmpbuttn.h"
-	"wx/msw/bmpbuttn.h"
-	"wx/motif/bmpbuttn.h"
-	"wx/gtk/bmpbuttn.h"
-	"wx/gtk1/bmpbuttn.h"
-	"wx/osx/bmpbuttn.h"
-	"wx/cocoa/bmpbuttn.h"
-	"wx/os2/bmpbuttn.h"
-	"wx/palmos/bmpbuttn.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\bmpbuttn.h
-
-1253304864 c:\libs\wxwidgets\include\wx\msw\bmpbuttn.h
-	"wx/button.h"
-	"wx/bitmap.h"
-	"wx/brush.h"
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\bmpbuttn.h
-	"wx/motif/bmpmotif.h"
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\bmpbuttn.h
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\bmpbuttn.h
-
-1253304887 c:\libs\wxwidgets\include\wx\osx\bmpbuttn.h
-	"wx/button.h"
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\bmpbuttn.h
-	"wx/cocoa/NSButton.h"
-
-1253304874 c:\libs\wxwidgets\include\wx\os2\bmpbuttn.h
-	"wx/button.h"
-	"wx/dcclient.h"
-
-1253304853 c:\libs\wxwidgets\include\wx\palmos\bmpbuttn.h
-	"wx/button.h"
-	"wx/bitmap.h"
-
-1253304921 c:\libs\wxwidgets\include\wx\checkbox.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/checkbox.h"
-	"wx/msw/checkbox.h"
-	"wx/motif/checkbox.h"
-	"wx/gtk/checkbox.h"
-	"wx/gtk1/checkbox.h"
-	"wx/osx/checkbox.h"
-	"wx/cocoa/checkbox.h"
-	"wx/os2/checkbox.h"
-	"wx/palmos/checkbox.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\checkbox.h
-	"wx/button.h"
-
-1253304862 c:\libs\wxwidgets\include\wx\msw\checkbox.h
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\checkbox.h
-
-1253304893 c:\libs\wxwidgets\include\wx\gtk\checkbox.h
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\checkbox.h
-
-1253304887 c:\libs\wxwidgets\include\wx\osx\checkbox.h
-
-1253304909 c:\libs\wxwidgets\include\wx\cocoa\checkbox.h
-	"wx/cocoa/NSButton.h"
-
-1253304873 c:\libs\wxwidgets\include\wx\os2\checkbox.h
-	"wx/control.h"
-
-1253304853 c:\libs\wxwidgets\include\wx\palmos\checkbox.h
-
-1253304918 c:\libs\wxwidgets\include\wx\checklst.h
-	"wx/listbox.h"
-	"wx/univ/checklst.h"
-	"wx/msw/wince/checklst.h"
-	"wx/msw/checklst.h"
-	"wx/motif/checklst.h"
-	"wx/gtk/checklst.h"
-	"wx/gtk1/checklst.h"
-	"wx/osx/checklst.h"
-	"wx/cocoa/checklst.h"
-	"wx/os2/checklst.h"
-
-1253304918 c:\libs\wxwidgets\include\wx\listbox.h
-	"wx/defs.h"
-	"wx/ctrlsub.h"
-	"wx/univ/listbox.h"
-	"wx/msw/listbox.h"
-	"wx/motif/listbox.h"
-	"wx/gtk/listbox.h"
-	"wx/gtk1/listbox.h"
-	"wx/osx/listbox.h"
-	"wx/os2/listbox.h"
-	"wx/cocoa/listbox.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\listbox.h
-	"wx/scrolwin.h"
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1253304864 c:\libs\wxwidgets\include\wx\msw\listbox.h
-	"wx/dynarray.h"
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\listbox.h
-	"wx/ctrlsub.h"
-	"wx/clntdata.h"
-
-1253304893 c:\libs\wxwidgets\include\wx\gtk\listbox.h
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\listbox.h
-	"wx/list.h"
-
-1253304887 c:\libs\wxwidgets\include\wx\osx\listbox.h
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1253304873 c:\libs\wxwidgets\include\wx\os2\listbox.h
-	"wx/dynarray.h"
-
-1253304909 c:\libs\wxwidgets\include\wx\cocoa\listbox.h
-	"wx/cocoa/NSTableView.h"
-	"wx/dynarray.h"
-
-1253304911 c:\libs\wxwidgets\include\wx\cocoa\nstableview.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\checklst.h
-
-1253304861 c:\libs\wxwidgets\include\wx\msw\wince\checklst.h
-
-1253304864 c:\libs\wxwidgets\include\wx\msw\checklst.h
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\checklst.h
-	"wx/listbox.h"
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\checklst.h
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\checklst.h
-
-1253304887 c:\libs\wxwidgets\include\wx\osx\checklst.h
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\checklst.h
-
-1253304874 c:\libs\wxwidgets\include\wx\os2\checklst.h
-	<stddef.h>
-	"wx/defs.h"
-
-1253304925 c:\libs\wxwidgets\include\wx\choice.h
-	"wx/defs.h"
-	"wx/ctrlsub.h"
-	"wx/univ/choice.h"
-	"wx/msw/wince/choicece.h"
-	"wx/msw/choice.h"
-	"wx/motif/choice.h"
-	"wx/gtk/choice.h"
-	"wx/gtk1/choice.h"
-	"wx/osx/choice.h"
-	"wx/cocoa/choice.h"
-	"wx/os2/choice.h"
-	"wx/palmos/choice.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\choice.h
-	"wx/combobox.h"
-
-1253304920 c:\libs\wxwidgets\include\wx\combobox.h
-	"wx/defs.h"
-	"wx/ctrlsub.h"
-	"wx/textentry.h"
-	"wx/univ/combobox.h"
-	"wx/msw/combobox.h"
-	"wx/motif/combobox.h"
-	"wx/gtk/combobox.h"
-	"wx/gtk1/combobox.h"
-	"wx/osx/combobox.h"
-	"wx/cocoa/combobox.h"
-	"wx/os2/combobox.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\combobox.h
-	"wx/combo.h"
-
-1253304920 c:\libs\wxwidgets\include\wx\combo.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/renderer.h"
-	"wx/bitmap.h"
-	"wx/msw/combo.h"
-	"wx/generic/combo.h"
-
-1253304918 c:\libs\wxwidgets\include\wx\renderer.h
-	"wx/gdicmn.h"
-	"wx/colour.h"
-	"wx/font.h"
-	"wx/bitmap.h"
-	"wx/string.h"
-
-1253304862 c:\libs\wxwidgets\include\wx\msw\combo.h
-	"wx/timer.h"
-
-1253304905 c:\libs\wxwidgets\include\wx\generic\combo.h
-
-1253304865 c:\libs\wxwidgets\include\wx\msw\combobox.h
-	"wx/choice.h"
-	"wx/textentry.h"
-
-1253304844 c:\libs\wxwidgets\include\wx\motif\combobox.h
-	"wx/choice.h"
-	"wx/textentry.h"
-
-1253304895 c:\libs\wxwidgets\include\wx\gtk\combobox.h
-	"wx/choice.h"
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\combobox.h
-	"wx/defs.h"
-	"wx/object.h"
-
-1253304888 c:\libs\wxwidgets\include\wx\osx\combobox.h
-	"wx/containr.h"
-	"wx/choice.h"
-
-1253304911 c:\libs\wxwidgets\include\wx\cocoa\combobox.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-	"wx/textctrl.h"
-	"wx/dynarray.h"
-
-1253304877 c:\libs\wxwidgets\include\wx\os2\combobox.h
-	"wx/choice.h"
-	"wx/textentry.h"
-
-1253304861 c:\libs\wxwidgets\include\wx\msw\wince\choicece.h
-	"wx/defs.h"
-	"wx/dynarray.h"
-
-1253304864 c:\libs\wxwidgets\include\wx\msw\choice.h
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\choice.h
-	"wx/clntdata.h"
-	"wx/dynarray.h"
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\choice.h
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\choice.h
-
-1253304887 c:\libs\wxwidgets\include\wx\osx\choice.h
-	"wx/control.h"
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\choice.h
-	"wx/cocoa/NSMenu.h"
-
-1253304874 c:\libs\wxwidgets\include\wx\os2\choice.h
-
-1253304853 c:\libs\wxwidgets\include\wx\palmos\choice.h
-
-1253304916 c:\libs\wxwidgets\include\wx\scrolbar.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/scrolbar.h"
-	"wx/msw/scrolbar.h"
-	"wx/motif/scrolbar.h"
-	"wx/gtk/scrolbar.h"
-	"wx/gtk1/scrolbar.h"
-	"wx/osx/scrolbar.h"
-	"wx/cocoa/scrolbar.h"
-	"wx/os2/scrolbar.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\scrolbar.h
-	"wx/univ/scrarrow.h"
-	"wx/renderer.h"
-
-1253304838 c:\libs\wxwidgets\include\wx\univ\scrarrow.h
-
-1253304864 c:\libs\wxwidgets\include\wx\msw\scrolbar.h
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\scrolbar.h
-
-1253304895 c:\libs\wxwidgets\include\wx\gtk\scrolbar.h
-	"wx/defs.h"
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\scrolbar.h
-	"wx/defs.h"
-
-1253304888 c:\libs\wxwidgets\include\wx\osx\scrolbar.h
-
-1253304911 c:\libs\wxwidgets\include\wx\cocoa\scrolbar.h
-	"wx/cocoa/NSScroller.h"
-
-1253304911 c:\libs\wxwidgets\include\wx\cocoa\nsscroller.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-	"wx/cocoa/ObjcRef.h"
-
-1253304877 c:\libs\wxwidgets\include\wx\os2\scrolbar.h
-	"wx/scrolbar.h"
-
-1253304926 c:\libs\wxwidgets\include\wx\statbox.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/statbox.h"
-	"wx/msw/statbox.h"
-	"wx/motif/statbox.h"
-	"wx/gtk/statbox.h"
-	"wx/gtk1/statbox.h"
-	"wx/osx/statbox.h"
-	"wx/cocoa/statbox.h"
-	"wx/os2/statbox.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\statbox.h
-
-1253304865 c:\libs\wxwidgets\include\wx\msw\statbox.h
-
-1253304844 c:\libs\wxwidgets\include\wx\motif\statbox.h
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\statbox.h
-
-1253304848 c:\libs\wxwidgets\include\wx\gtk1\statbox.h
-
-1253304887 c:\libs\wxwidgets\include\wx\osx\statbox.h
-	"wx/control.h"
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\statbox.h
-	"wx/cocoa/NSBox.h"
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\nsbox.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-
-1253304875 c:\libs\wxwidgets\include\wx\os2\statbox.h
-	"wx/control.h"
-
-1253304922 c:\libs\wxwidgets\include\wx\radiobox.h
-	"wx/ctrlsub.h"
-	"wx/dynarray.h"
-	"wx/univ/radiobox.h"
-	"wx/msw/radiobox.h"
-	"wx/motif/radiobox.h"
-	"wx/gtk/radiobox.h"
-	"wx/gtk1/radiobox.h"
-	"wx/osx/radiobox.h"
-	"wx/cocoa/radiobox.h"
-	"wx/os2/radiobox.h"
-	"wx/palmos/radiobox.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\radiobox.h
-	"wx/statbox.h"
-	"wx/dynarray.h"
-
-1253304863 c:\libs\wxwidgets\include\wx\msw\radiobox.h
-	"wx/statbox.h"
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\radiobox.h
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\radiobox.h
-	"wx/bitmap.h"
-	"wx/list.h"
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\radiobox.h
-	"wx/bitmap.h"
-
-1253304887 c:\libs\wxwidgets\include\wx\osx\radiobox.h
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\radiobox.h
-
-1253304875 c:\libs\wxwidgets\include\wx\os2\radiobox.h
-
-1253304853 c:\libs\wxwidgets\include\wx\palmos\radiobox.h
-
-1253304916 c:\libs\wxwidgets\include\wx\radiobut.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/radiobut.h"
-	"wx/msw/radiobut.h"
-	"wx/motif/radiobut.h"
-	"wx/gtk/radiobut.h"
-	"wx/gtk1/radiobut.h"
-	"wx/osx/radiobut.h"
-	"wx/cocoa/radiobut.h"
-	"wx/os2/radiobut.h"
-	"wx/palmos/radiobut.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\radiobut.h
-	"wx/checkbox.h"
-
-1253304864 c:\libs\wxwidgets\include\wx\msw\radiobut.h
-
-1253304844 c:\libs\wxwidgets\include\wx\motif\radiobut.h
-
-1253304895 c:\libs\wxwidgets\include\wx\gtk\radiobut.h
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\radiobut.h
-
-1253304888 c:\libs\wxwidgets\include\wx\osx\radiobut.h
-
-1253304911 c:\libs\wxwidgets\include\wx\cocoa\radiobut.h
-	"wx/cocoa/NSButton.h"
-
-1253304877 c:\libs\wxwidgets\include\wx\os2\radiobut.h
-	"wx/control.h"
-
-1253304854 c:\libs\wxwidgets\include\wx\palmos\radiobut.h
-
-1253304917 c:\libs\wxwidgets\include\wx\slider.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/slider.h"
-	"wx/msw/slider.h"
-	"wx/motif/slider.h"
-	"wx/gtk/slider.h"
-	"wx/gtk1/slider.h"
-	"wx/osx/slider.h"
-	"wx/cocoa/slider.h"
-	"wx/os2/slider.h"
-	"wx/palmos/slider.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\slider.h
-	"wx/univ/scrthumb.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\scrthumb.h
-	"wx/timer.h"
-
-1253304864 c:\libs\wxwidgets\include\wx\msw\slider.h
-
-1253304844 c:\libs\wxwidgets\include\wx\motif\slider.h
-	"wx/control.h"
-
-1253304895 c:\libs\wxwidgets\include\wx\gtk\slider.h
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\slider.h
-
-1253304889 c:\libs\wxwidgets\include\wx\osx\slider.h
-	"wx/control.h"
-	"wx/slider.h"
-	"wx/stattext.h"
-
-1253304911 c:\libs\wxwidgets\include\wx\cocoa\slider.h
-	"wx/cocoa/NSSlider.h"
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\nsslider.h
-	"wx/hashmap.h"
-	"wx/cocoa/ObjcAssociate.h"
-	"wx/cocoa/ObjcRef.h"
-
-1253304878 c:\libs\wxwidgets\include\wx\os2\slider.h
-	"wx/control.h"
-
-1253304854 c:\libs\wxwidgets\include\wx\palmos\slider.h
-
-1253304918 c:\libs\wxwidgets\include\wx\gauge.h
-	"wx/defs.h"
-	"wx/control.h"
-	"wx/univ/gauge.h"
-	"wx/msw/gauge.h"
-	"wx/motif/gauge.h"
-	"wx/gtk/gauge.h"
-	"wx/gtk1/gauge.h"
-	"wx/osx/gauge.h"
-	"wx/cocoa/gauge.h"
-	"wx/os2/gauge.h"
-
-1253304839 c:\libs\wxwidgets\include\wx\univ\gauge.h
-
-1253304864 c:\libs\wxwidgets\include\wx\msw\gauge.h
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\gauge.h
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\gauge.h
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\gauge.h
-
-1253304887 c:\libs\wxwidgets\include\wx\osx\gauge.h
-	"wx/control.h"
-
-1253304909 c:\libs\wxwidgets\include\wx\cocoa\gauge.h
-
-1253304873 c:\libs\wxwidgets\include\wx\os2\gauge.h
-
-1253304917 c:\libs\wxwidgets\include\wx\dirdlg.h
-	"wx/dialog.h"
-	"wx/generic/dirdlgg.h"
-	"wx/generic/dirdlgg.h"
-	"wx/generic/dirdlgg.h"
-	"wx/msw/dirdlg.h"
-	"wx/gtk/dirdlg.h"
-	"wx/generic/dirdlgg.h"
-	"wx/osx/dirdlg.h"
-	"wx/cocoa/dirdlg.h"
-	"wx/generic/dirdlgg.h"
-
-1253304906 c:\libs\wxwidgets\include\wx\generic\dirdlgg.h
-	"wx/dialog.h"
-
-1253304864 c:\libs\wxwidgets\include\wx\msw\dirdlg.h
-
-1253304893 c:\libs\wxwidgets\include\wx\gtk\dirdlg.h
-
-1253304886 c:\libs\wxwidgets\include\wx\osx\dirdlg.h
-
-1253304909 c:\libs\wxwidgets\include\wx\cocoa\dirdlg.h
-
-1253304915 c:\libs\wxwidgets\include\wx\layout.h
-	"wx/object.h"
-
-1253304920 c:\libs\wxwidgets\include\wx\choicdlg.h
-	"wx/generic/choicdgg.h"
-
-1253304905 c:\libs\wxwidgets\include\wx\generic\choicdgg.h
-	"wx/dynarray.h"
-	"wx/dialog.h"
-
-1253304917 c:\libs\wxwidgets\include\wx\textdlg.h
-	"wx/generic/textdlgg.h"
-
-1253304906 c:\libs\wxwidgets\include\wx\generic\textdlgg.h
-	"wx/defs.h"
-	"wx/dialog.h"
-	"wx/valtext.h"
-	"wx/textctrl.h"
-
-1253304915 c:\libs\wxwidgets\include\wx\valtext.h
-	"wx/defs.h"
-	"wx/validate.h"
-
-1253304923 c:\libs\wxwidgets\include\wx\filedlg.h
-	"wx/defs.h"
-	"wx/dialog.h"
-	"wx/arrstr.h"
-	"wx/generic/filedlgg.h"
-	"wx/msw/filedlg.h"
-	"wx/motif/filedlg.h"
-	"wx/gtk/filedlg.h"
-	"wx/gtk1/filedlg.h"
-	"wx/osx/filedlg.h"
-	"wx/cocoa/filedlg.h"
-	"wx/os2/filedlg.h"
-	"wx/generic/filedlgg.h"
-
-1253304906 c:\libs\wxwidgets\include\wx\generic\filedlgg.h
-	"wx/listctrl.h"
-	"wx/datetime.h"
-	"wx/filefn.h"
-	"wx/artprov.h"
-	"wx/filedlg.h"
-	"wx/generic/filectrlg.h"
-
-1253304922 c:\libs\wxwidgets\include\wx\artprov.h
-	"wx/string.h"
-	"wx/bitmap.h"
-	"wx/icon.h"
-	"wx/iconbndl.h"
-
-1253304906 c:\libs\wxwidgets\include\wx\generic\filectrlg.h
-	"wx/panel.h"
-	"wx/listctrl.h"
-	"wx/filectrl.h"
-	"wx/filename.h"
-
-1253304922 c:\libs\wxwidgets\include\wx\filectrl.h
-	"wx/defs.h"
-	"wx/string.h"
-	"wx/event.h"
-	"wx/gtk/filectrl.h"
-	"wx/generic/filectrlg.h"
-
-1253304894 c:\libs\wxwidgets\include\wx\gtk\filectrl.h
-	"wx/control.h"
-	"wx/filectrl.h"
-
-1253304920 c:\libs\wxwidgets\include\wx\filename.h
-	"wx/arrstr.h"
-	"wx/filefn.h"
-	"wx/datetime.h"
-	"wx/intl.h"
-	"wx/longlong.h"
-	"wx/file.h"
-
-1253304927 c:\libs\wxwidgets\include\wx\file.h
-	"wx/defs.h"
-	"wx/string.h"
-	"wx/filefn.h"
-	"wx/strconv.h"
-
-1253304864 c:\libs\wxwidgets\include\wx\msw\filedlg.h
-
-1253304843 c:\libs\wxwidgets\include\wx\motif\filedlg.h
-
-1253304895 c:\libs\wxwidgets\include\wx\gtk\filedlg.h
-	"wx/gtk/filectrl.h"
-
-1253304847 c:\libs\wxwidgets\include\wx\gtk1\filedlg.h
-	"wx/generic/filedlgg.h"
-
-1253304888 c:\libs\wxwidgets\include\wx\osx\filedlg.h
-
-1253304911 c:\libs\wxwidgets\include\wx\cocoa\filedlg.h
-
-1253304877 c:\libs\wxwidgets\include\wx\os2\filedlg.h
-
-1253304927 c:\libs\wxwidgets\include\wx\mdi.h
-	"wx/defs.h"
-	"wx/frame.h"
-	"wx/menu.h"
-	"wx/generic/mdig.h"
-	"wx/msw/mdi.h"
-	"wx/gtk/mdi.h"
-	"wx/gtk1/mdi.h"
-	"wx/osx/mdi.h"
-	"wx/cocoa/mdi.h"
-
-1253304906 c:\libs\wxwidgets\include\wx\generic\mdig.h
-	"wx/panel.h"
-
-1253304865 c:\libs\wxwidgets\include\wx\msw\mdi.h
-	"wx/frame.h"
-
-1253304895 c:\libs\wxwidgets\include\wx\gtk\mdi.h
-	"wx/frame.h"
-
-1253304846 c:\libs\wxwidgets\include\wx\gtk1\mdi.h
-	"wx/frame.h"
-
-1253304888 c:\libs\wxwidgets\include\wx\osx\mdi.h
-
-1253304910 c:\libs\wxwidgets\include\wx\cocoa\mdi.h
-	"wx/frame.h"
-
-1294508059 d:\florian\programmation\gamedevelop\gdl\gdl\scene.h
+1294605541 d:\florian\programmation\gamedevelop\gdl\gdl\scene.h
+	"GDL/Event.h"
 	<vector>
 	<map>
 	<string>
 	<boost/shared_ptr.hpp>
 	<boost/interprocess/containers/flat_map.hpp>
-	"GDL/Event.h"
 	"GDL/Object.h"
 	"GDL/ObjectGroup.h"
 	"GDL/Position.h"
@@ -8446,23 +8446,23 @@
 	<boost/shared_ptr.hpp>
 	<string>
 
-1294508059 d:\florian\programmation\gamedevelop\gdl\gdl\extensionsmanager.h
+1294602960 d:\florian\programmation\gamedevelop\gdl\gdl\extensionsmanager.h
+	"GDL/ExtensionBase.h"
 	<string>
 	<iostream>
 	<vector>
 	<boost/shared_ptr.hpp>
 	<boost/bimap/bimap.hpp>
-	"GDL/ExtensionBase.h"
 
-1294508059 d:\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
+1294601247 d:\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
+	<wx/bitmap.h>
+	<wx/file.h>
+	<wx/wx.h>
 	<string>
 	<vector>
 	<map>
 	<boost/shared_ptr.hpp>
 	"GDL/ObjectIdentifiersManager.h"
-	<wx/bitmap.h>
-	<wx/file.h>
-	<wx/wx.h>
 
 1294508060 d:\florian\programmation\gamedevelop\gdl\gdl\gdtreeitemstringdata.h
 	<string>
@@ -10447,7 +10447,8 @@
 	"GDL/BaseDebugger.h"
 	<wx/msw/winundef.h>
 
-1294509149 d:\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
+1294691574 d:\florian\programmation\gamedevelop\gdl\gdl\runtimescene.h
+	"GDL/Scene.h"
 	"GDL/MemTrace.h"
 	<iostream>
 	<sstream>
@@ -10457,7 +10458,6 @@
 	<boost/shared_ptr.hpp>
 	<boost/weak_ptr.hpp>
 	<boost/interprocess/containers/flat_map.hpp>
-	"GDL/Scene.h"
 	"GDL/RuntimeGame.h"
 	"GDL/Object.h"
 	"GDL/Event.h"
@@ -10481,12 +10481,12 @@
 	"GDL/Game.h"
 	"GDL/ImageManager.h"
 
-1289761284 d:\florian\programmation\gamedevelop\gdl\gdl\imagemanager.h
+1294605307 d:\florian\programmation\gamedevelop\gdl\gdl\imagemanager.h
+	"GDL/Game.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
 	<boost/shared_ptr.hpp>
-	"GDL/Game.h"
 	<iostream>
 	<vector>
 	<string>
@@ -10795,7 +10795,7 @@
 	"wx/ribbon/control.h"
 	"wx/ribbon/art.h"
 
-1294508058 d:\florian\programmation\gamedevelop\gdl\gdl\editorimages.h
+1294691891 d:\florian\programmation\gamedevelop\gdl\gdl\editorimages.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/menu.h>
@@ -10805,12 +10805,16 @@
 	"GDL/RuntimeGame.h"
 	"GDL/ImageManager.h"
 	"GDL/MainEditorCommand.h"
+	"GDL/ImageFilesWatcher.h"
 
 1294508058 d:\florian\programmation\gamedevelop\gdl\gdl\maineditorcommand.h
 	<wx/ribbon/bar.h>
 	<wx/ribbon/buttonbar.h>
 	<wx/toplevel.h>
 	<iostream>
+
+1294691681 d:\florian\programmation\gamedevelop\gdl\gdl\imagefileswatcher.h
+	<wx/fswatcher.h>
 
 1291931820 d:\florian\programmation\gamedevelop\ide\editorscene.h
 	<wx/sizer.h>
@@ -10895,10 +10899,10 @@
 	<SFML/Graphics.hpp>
 	"GDL/Sprite.h"
 
-1288990989 d:\florian\programmation\gamedevelop\ide\edittimescene.h
-	<SFML/Graphics.hpp>
+1294608865 d:\florian\programmation\gamedevelop\ide\edittimescene.h
 	"GDL/RuntimeScene.h"
 	"GDL/Game.h"
+	<SFML/Graphics.hpp>
 	<string>
 	<vector>
 
@@ -11595,10 +11599,10 @@
 1264360536 d:\florian\programmation\gamedevelop\ide\gdauitabart.h
 	<wx/aui/auibook.h>
 
-1289128642 source:d:\florian\programmation\gamedevelop\ide\edittimescene.cpp
+1294608865 source:d:\florian\programmation\gamedevelop\ide\edittimescene.cpp
+	"EdittimeScene.h"
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
-	"EdittimeScene.h"
 	"GDL/RuntimeScene.h"
 	"GDL/Game.h"
 	"GDL/Chercher.h"
@@ -11715,7 +11719,7 @@
 	<iostream>
 	<wx/dcbuffer.h>
 
-1294521389 source:d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
+1294692858 source:d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
 	"debugMem.h"
 	<wx/msw/winundef.h>
 	<wx/image.h>
@@ -12993,7 +12997,7 @@
 	<wx/string.h>
 	<iostream>
 
-1294590851 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1294867146 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -13120,13 +13124,10 @@
 	<wx/filename.h>
 	"mp3ogg.h"
 
-1293900640 source:d:\florian\programmation\gamedevelop\ide\resource.rc
-	"wx/msw/rcdefs.h"
+1294609130 source:d:\florian\programmation\gamedevelop\ide\resource.rc
 	"version.h"
 
-1263934043 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\msw\rcdefs.h
-
-1294591544 d:\florian\programmation\gamedevelop\ide\version.h
+1294867146 d:\florian\programmation\gamedevelop\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -13252,5 +13253,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1294580310 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1294608055 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

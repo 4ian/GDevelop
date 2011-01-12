@@ -1433,6 +1433,8 @@ void SceneCanvas::Reload()
     #endif
     scene.LoadFromScene( sceneEdited );
 
+    sceneEdited.wasModified = false;
+
     UpdateScrollbars();
 }
 

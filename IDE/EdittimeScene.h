@@ -1,35 +1,26 @@
 /**
- * Game Develop
- *    Editor
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- *
- *  Une "EdittimeScene" est une scène utilisée pour l'édition
- *  ( éditée et affichée par un EditorScene et un sceneCanvas )
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef EDITTIMESCENE_H
 #define EDITTIMESCENE_H
 
-#include <SFML/Graphics.hpp>
-#include "GDL/RuntimeScene.h"
+#include "GDL/RuntimeScene.h" // Must be placed first
 #include "GDL/Game.h"
+#include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
 
 using namespace std;
 
-
+/**
+ * Used by a SceneCanvas to edit a scene
+ */
 class EdittimeScene : public RuntimeScene
 {
     public:
-        /** Default constructor */
         EdittimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_);
-        /** Default destructor */
         virtual ~EdittimeScene();
         void RenderEdittimeScene();
 

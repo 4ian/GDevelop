@@ -1,6 +1,5 @@
 aaaa ICON "icon.ico"
 
-#include "wx/msw/rcdefs.h"
 #include "version.h"
 
 #ifndef DEBUG

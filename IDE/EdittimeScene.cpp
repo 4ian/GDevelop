@@ -1,7 +1,8 @@
+#include "EdittimeScene.h" //Must be placed first
+
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 
-#include "EdittimeScene.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/Game.h"
 #include "GDL/Chercher.h"

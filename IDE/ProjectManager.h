@@ -32,11 +32,17 @@ class ProjectManager: public wxPanel
 		wxMenuItem* MenuItem1;
 		wxMenuItem* MenuItem4;
 		wxMenuItem* editNameGameMenuItem;
+		wxMenuItem* MenuItem11;
 		wxTreeCtrl* projectsTree;
 		wxMenuItem* cutSceneMenuItem;
+		wxMenuItem* MenuItem13;
 		wxMenuItem* modVarSceneMenuI;
+		wxMenuItem* MenuItem10;
+		wxMenuItem* MenuItem12;
 		wxMenu externalEventsContextMenu;
 		wxMenuItem* MenuItem3;
+		wxMenu sourceFilesContextMenu;
+		wxMenu sourceFileContextMenu;
 		wxMenu scenesContextMenu;
 		wxMenuItem* copySceneMenuItem;
 		wxMenuItem* MenuItem6;
@@ -83,6 +89,10 @@ class ProjectManager: public wxPanel
 		static const long ID_MENUITEM10;
 		static const long ID_MENUITEM11;
 		static const long ID_MENUITEM12;
+		static const long ID_MENUITEM14;
+		static const long ID_MENUITEM15;
+		static const long ID_MENUITEM16;
+		static const long ID_MENUITEM17;
 		//*)
         static const long idRibbonNew;
         static const long idRibbonOpen;
@@ -125,6 +135,9 @@ class ProjectManager: public wxPanel
 		void OnCopyExternalEventsSelected(wxCommandEvent& event);
 		void OnCutExternalEventsSelected(wxCommandEvent& event);
 		void OnPasteExternalEventsSelected(wxCommandEvent& event);
+		void OnAddCppSourceFileSelected(wxCommandEvent& event);
+		void OnDeleteSourceFileSelected(wxCommandEvent& event);
+		void OnEditSourceFileSelected(wxCommandEvent& event);
 		//*)
 
 		bool GetGameOfSelectedItem(RuntimeGame *& game, gdTreeItemGameData *& data);

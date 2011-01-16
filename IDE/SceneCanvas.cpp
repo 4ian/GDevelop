@@ -27,6 +27,7 @@
 #include "GDL/ChooseLayer.h"
 #include "GDL/ChooseObject.h"
 #include "GDL/DynamicExtensionsManager.h"
+#include "GDL/SourceFileBuilder.h"
 #include "EditOptionsPosition.h"
 #include "Clipboard.h"
 #include "DndTextSceneEditor.h"
@@ -358,6 +359,8 @@ void SceneCanvas::UpdateSize()
  */
 void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
 {
+    if ( !scene.editing ) return;
+
     scene.editing = false;
     scene.running = false;
 
@@ -365,8 +368,9 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
     scrollBar2->Show(false);
     UpdateSize();
 
-    if ( debugger ) debugger->Play();
+    Reload();
 
+    if ( debugger ) debugger->Play();
     CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), false);
     mainEditorCommand.GetRibbonSceneEditorButtonBar()->Refresh();
 }
@@ -376,26 +380,22 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
  */
 void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 {
+    if ( scene.editing ) return;
+
     scene.editing = true;
     scene.running = false;
 
     scrollBar1->Show(true);
     scrollBar2->Show(true);
-    UpdateSize();
-
     externalWindow->Show(false);
+    scene.ChangeRenderWindow(this);
+    UpdateSize();
 
     if ( profileDialog ) profileDialog->ParseProfileEvents();
 
-    scene.ChangeRenderWindow(this);
-
     Reload();
-    scene.RenderEdittimeScene(); //FIXME : Hack to make sure OpenGL Rendering is correct
-
-    scene.ChangeRenderWindow(this);
 
     if ( debugger ) debugger->Pause();
-
     CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), true);
     mainEditorCommand.GetRibbonSceneEditorButtonBar()->Refresh();
 }
@@ -1420,6 +1420,8 @@ void SceneCanvas::OnMiddleDown( wxMouseEvent &event )
 
 void SceneCanvas::Reload()
 {
+    bool oldEditingState = scene.editing;
+
     game = gameEdited;
     game.imageManager = gameEdited.imageManager; //Use same image manager.
 
@@ -1427,14 +1429,22 @@ void SceneCanvas::Reload()
 
     EdittimeScene newScene(this, &game);
     scene = newScene;
+    scene.editing = oldEditingState;
+
     #if defined(GD_DYNAMIC_EXTENSIONS)
-    GDpriv::DynamicExtensionsManager::getInstance()->UnloadAllDynamicExtensions();
-    GDpriv::DynamicExtensionsManager::getInstance()->LoadDynamicExtension("test.dxgd");
+    if ( !scene.editing )
+    {
+        GDpriv::DynamicExtensionsManager::getInstance()->UnloadAllDynamicExtensions();
+        SourceFileBuilder sourceFileBuilder(gameEdited);
+        sourceFileBuilder.BuildSourceFiles();
+        GDpriv::DynamicExtensionsManager::getInstance()->LoadDynamicExtension("test.dxgd");
+    }
     #endif
     scene.LoadFromScene( sceneEdited );
 
     sceneEdited.wasModified = false;
 
+    UpdateSize();
     UpdateScrollbars();
 }
 

@@ -39,8 +39,6 @@ class EditorScene: public wxPanel
 		EditorScene(wxWindow* parent, RuntimeGame & game_, Scene & scene_, const MainEditorCommand & mainEditorCommand_);
 		virtual ~EditorScene();
 
-        void Resize( int width, int height );
-
 		//(*Declarations(EditorScene)
 		wxScrollBar* scrollBar1;
 		wxScrollBar* scrollBar2;

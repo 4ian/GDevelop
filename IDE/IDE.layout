@@ -52,6 +52,12 @@
 	<File name="Clipboard.h" open="0" top="0" tabpos="7">
 		<Cursor position="1522" topLine="0" />
 	</File>
+	<File name="CodeEditor.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="4547" topLine="68" />
+	</File>
+	<File name="CodeEditor.h" open="1" top="0" tabpos="2">
+		<Cursor position="660" topLine="7" />
+	</File>
 	<File name="Compilation.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="21618" topLine="367" />
 	</File>
@@ -181,13 +187,13 @@
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="7978" topLine="0" />
+	<File name="EditorScene.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="8355" topLine="135" />
 	</File>
 	<File name="EditorScene.h" open="0" top="0" tabpos="11">
 		<Cursor position="2305" topLine="64" />
 	</File>
-	<File name="EdittimeScene.cpp" open="1" top="1" tabpos="9">
+	<File name="EdittimeScene.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="396" topLine="0" />
 	</File>
 	<File name="EdittimeScene.h" open="0" top="0" tabpos="3">
@@ -322,8 +328,8 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="510" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="59187" topLine="1410" />
+	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="25269" topLine="509" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="2">
 		<Cursor position="3698" topLine="63" />

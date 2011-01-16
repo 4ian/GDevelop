@@ -48,6 +48,7 @@
 					<Add option="-lsndfile" />
 					<Add option="-lgdl.dll" />
 					<Add option="-lwxmsw29d_xrc" />
+					<Add option="-lwxmsw29d_stc" />
 					<Add option="-lwxmsw29d_richtext" />
 					<Add option="-lwxmsw29d_ribbon" />
 					<Add option="-lwxmsw29d_aui" />
@@ -130,6 +131,7 @@
 					<Add option="-s" />
 					<Add option="-lgdl.dll" />
 					<Add option="-lwxmsw29_xrc" />
+					<Add option="-lwxmsw29_stc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
 					<Add option="-lwxmsw29_aui" />
@@ -218,6 +220,7 @@
 					<Add option="-lfreetype" />
 					<Add option="-lgdl.dll" />
 					<Add option="-lwxmsw29_xrc" />
+					<Add option="-lwxmsw29_stc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
 					<Add option="-lwxmsw29_aui" />
@@ -364,7 +367,7 @@
 				<Option platforms="Windows;" />
 				<Option output="bin\dev\GDEditor" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin\dev" />
-				<Option object_output="obj\dev" />
+				<Option object_output="obj\dev wx291" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -401,6 +404,7 @@
 					<Add option="-lfreetype" />
 					<Add option="-lgdl.dll" />
 					<Add option="-lwxmsw29u_xrc" />
+					<Add option="-lwxmsw29u_stc" />
 					<Add option="-lwxmsw29u_richtext" />
 					<Add option="-lwxmsw29u_ribbon" />
 					<Add option="-lwxmsw29u_aui" />
@@ -524,6 +528,8 @@
 		<Unit filename="Clipboard.h">
 			<Option virtualFolder="Racine\" />
 		</Unit>
+		<Unit filename="CodeEditor.cpp" />
+		<Unit filename="CodeEditor.h" />
 		<Unit filename="Compilation.cpp">
 			<Option virtualFolder="Editeur principal\Fichier\" />
 		</Unit>
@@ -998,6 +1004,7 @@
 					<wxDialog wxs="wxsmith/AutomatismTypeChoice.wxs" src="AutomatismTypeChoice.cpp" hdr="AutomatismTypeChoice.h" fwddecl="0" i18n="1" name="AutomatismTypeChoice" language="CPP" />
 					<wxPanel wxs="wxsmith/InitialPositionBrowserDlg.wxs" src="InitialPositionBrowserDlg.cpp" hdr="InitialPositionBrowserDlg.h" fwddecl="0" i18n="1" name="InitialPositionBrowserDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/ProfileDlg.wxs" src="ProfileDlg.cpp" hdr="ProfileDlg.h" fwddecl="0" i18n="1" name="ProfileDlg" language="CPP" />
+					<wxPanel wxs="wxsmith/CodeEditor.wxs" src="CodeEditor.cpp" hdr="CodeEditor.h" fwddecl="0" i18n="1" name="CodeEditor" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

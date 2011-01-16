@@ -24,7 +24,6 @@ extern MemTrace MemTracer;
 #include <wx/log.h>
 #include <wx/fileconf.h>
 #include <wx/artprov.h>
-
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/gallery.h>
@@ -49,6 +48,7 @@ extern MemTrace MemTracer;
 #include "EditorObjets.h"
 #include "EditorEvents.h"
 #include "EditorScene.h"
+#include "CodeEditor.h"
 #include "EditorObjectList.h"
 #include "DnDFileEditor.h"
 #include "ConsoleManager.h"
@@ -311,6 +311,10 @@ ribbonSceneEditorButtonBar(NULL)
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Groupes"));
         EditorObjetsGroups::CreateRibbonPage(ribbonEditorPage);
     }
+    {
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Code"));
+        CodeEditor::CreateRibbonPage(ribbonEditorPage);
+    }
     ribbonSizer->Add(m_ribbon, 0, wxEXPAND);
 
     //Load wxAUI
@@ -478,9 +482,11 @@ void Game_Develop_EditorFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
     //Update ribbon for new selected editor
     EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(event.GetSelection()));
     EditorImages * imagesEditorPtr = dynamic_cast<EditorImages*>(editorsNotebook->GetPage(event.GetSelection()));
+    CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(editorsNotebook->GetPage(event.GetSelection()));
 
     if ( sceneEditorPtr != NULL ) sceneEditorPtr->ForceRefreshRibbonAndConnect();
     if ( imagesEditorPtr != NULL ) imagesEditorPtr->ForceRefreshRibbonAndConnect();
+    if ( codeEditorPtr != NULL ) codeEditorPtr->ForceRefreshRibbonAndConnect();
 }
 
 void Game_Develop_EditorFrame::LoadSkin(wxRibbonBar * bar)

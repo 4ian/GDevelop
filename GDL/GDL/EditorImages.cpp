@@ -375,7 +375,7 @@ void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
     wxTreeItemId rootId = BanqueImageList->GetRootItem();
 
     //Boite de dialogue d'ajout d'une image
-    wxFileDialog FileDialog( this, "Choisissez une ou plusieurs images à ajouter", "", "", "Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*", wxFD_MULTIPLE );
+    wxFileDialog FileDialog( this, _("Choisissez une ou plusieurs images à ajouter"), "", "", _("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_MULTIPLE );
 
     //Si c'est ok
     if ( FileDialog.ShowModal() == wxID_OK )
@@ -637,7 +637,7 @@ void EditorImages::OnModFileImage( wxCommandEvent& event )
     }
 
     //Boite de dialogue d'ajout d'une image
-    wxFileDialog FileDialog( this, _( "Choisissez le fichier de l'image" ), "", "", "Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*", wxFD_OPEN );
+    wxFileDialog FileDialog( this, _( "Choisissez le fichier de l'image" ), "", "", _("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_OPEN );
     if ( FileDialog.ShowModal() == wxID_OK )
     {
         wxLogStatus( _( "Changement du fichier de l'image..." ) );
@@ -807,7 +807,7 @@ void EditorImages::OnOpenPaintProgramClick(wxCommandEvent& event)
 
     if ( result == "" )
     {
-        wxFileDialog dialog(this, _("Choisissez le programme d'édition d'images ( fichier exe )"), "", "", "Programmes (*.exe)|*.exe");
+        wxFileDialog dialog(this, _("Choisissez le programme d'édition d'images ( fichier exe )"), "", "", _("Programmes (*.exe)|*.exe"));
         dialog.ShowModal();
 
         pConfig->Write( _T( "/EditeursExternes/Image" ), dialog.GetPath() );

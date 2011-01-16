@@ -2,8 +2,6 @@
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
-#define GD_DYNAMIC_EXTENSIONS
-
 #if defined(GD_DYNAMIC_EXTENSIONS)
 
 #include "GDL/DynamicExtensionCallerEvent.h"

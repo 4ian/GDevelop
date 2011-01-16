@@ -235,7 +235,7 @@ void PropImage::OnscrollHeightScroll(wxScrollEvent& event)
 ////////////////////////////////////////////////////////////
 void PropImage::OnBrowseBtClick(wxCommandEvent& event)
 {
-    wxFileDialog FileDialog( this, "Choisissez l'image", "", "", "Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*", wxFD_MULTIPLE );
+    wxFileDialog FileDialog( this, _("Choisissez l'image"), "", "", _("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_MULTIPLE );
 
     if ( FileDialog.ShowModal() == wxID_OK )
     {

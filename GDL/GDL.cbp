@@ -561,7 +561,7 @@
 			<Target title="Development - Edittime - wx291">
 				<Option platforms="Windows;" />
 				<Option output="..\IDE\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Dev Edittime\" />
+				<Option object_output="obj\Dev Edittime wx291\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -871,6 +871,10 @@
 		<Unit filename="GDL\SortBySurface.h" />
 		<Unit filename="GDL\SoundManager.cpp" />
 		<Unit filename="GDL\SoundManager.h" />
+		<Unit filename="GDL\SourceFile.cpp" />
+		<Unit filename="GDL\SourceFile.h" />
+		<Unit filename="GDL\SourceFileBuilder.cpp" />
+		<Unit filename="GDL\SourceFileBuilder.h" />
 		<Unit filename="GDL\Sprite.cpp" />
 		<Unit filename="GDL\Sprite.h" />
 		<Unit filename="GDL\SpriteActionsAutomatisms.cpp" />

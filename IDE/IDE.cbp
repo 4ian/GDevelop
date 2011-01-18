@@ -473,6 +473,8 @@
 		<Unit filename="BugReport.h">
 			<Option virtualFolder="Racine\" />
 		</Unit>
+		<Unit filename="BuildMessagesPnl.cpp" />
+		<Unit filename="BuildMessagesPnl.h" />
 		<Unit filename="CheckMAJ.cpp">
 			<Option weight="60" />
 			<Option virtualFolder="Racine\Demarrage\" />
@@ -1005,6 +1007,7 @@
 					<wxPanel wxs="wxsmith/InitialPositionBrowserDlg.wxs" src="InitialPositionBrowserDlg.cpp" hdr="InitialPositionBrowserDlg.h" fwddecl="0" i18n="1" name="InitialPositionBrowserDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/ProfileDlg.wxs" src="ProfileDlg.cpp" hdr="ProfileDlg.h" fwddecl="0" i18n="1" name="ProfileDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/CodeEditor.wxs" src="CodeEditor.cpp" hdr="CodeEditor.h" fwddecl="0" i18n="1" name="CodeEditor" language="CPP" />
+					<wxPanel wxs="wxsmith/BuildMessagesPnl.wxs" src="BuildMessagesPnl.cpp" hdr="BuildMessagesPnl.h" fwddecl="0" i18n="1" name="BuildMessagesPnl" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

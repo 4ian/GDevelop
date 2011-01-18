@@ -10,6 +10,12 @@
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="36" topLine="0" />
 	</File>
+	<File name="BuildMessagesPnl.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="1646" topLine="22" />
+	</File>
+	<File name="BuildMessagesPnl.h" open="0" top="0" tabpos="0">
+		<Cursor position="484" topLine="4" />
+	</File>
 	<File name="CheckMAJ.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="3161" topLine="64" />
 	</File>
@@ -29,13 +35,13 @@
 		<Cursor position="288" topLine="0" />
 	</File>
 	<File name="ChoixAction.cpp" open="0" top="0" tabpos="17">
-		<Cursor position="45486" topLine="930" />
+		<Cursor position="17241" topLine="268" />
 	</File>
 	<File name="ChoixAction.h" open="0" top="0" tabpos="4">
 		<Cursor position="36" topLine="2" />
 	</File>
 	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="47441" topLine="943" />
+		<Cursor position="45707" topLine="922" />
 	</File>
 	<File name="ChoixCondition.h" open="0" top="0" tabpos="0">
 		<Cursor position="692" topLine="17" />
@@ -52,11 +58,11 @@
 	<File name="Clipboard.h" open="0" top="0" tabpos="7">
 		<Cursor position="1522" topLine="0" />
 	</File>
-	<File name="CodeEditor.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="4547" topLine="68" />
+	<File name="CodeEditor.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="9263" topLine="157" />
 	</File>
-	<File name="CodeEditor.h" open="1" top="0" tabpos="2">
-		<Cursor position="660" topLine="7" />
+	<File name="CodeEditor.h" open="0" top="0" tabpos="2">
+		<Cursor position="2123" topLine="47" />
 	</File>
 	<File name="Compilation.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="21618" topLine="367" />
@@ -187,8 +193,8 @@
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="8355" topLine="135" />
+	<File name="EditorScene.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="6422" topLine="102" />
 	</File>
 	<File name="EditorScene.h" open="0" top="0" tabpos="11">
 		<Cursor position="2305" topLine="64" />
@@ -200,7 +206,7 @@
 		<Cursor position="497" topLine="0" />
 	</File>
 	<File name="EventsRefactorer.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="25453" topLine="566" />
+		<Cursor position="17990" topLine="415" />
 	</File>
 	<File name="EventsRefactorer.h" open="0" top="0" tabpos="6">
 		<Cursor position="1905" topLine="20" />
@@ -242,10 +248,10 @@
 		<Cursor position="36" topLine="0" />
 	</File>
 	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="21595" topLine="356" />
+		<Cursor position="21558" topLine="346" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="5">
-		<Cursor position="36" topLine="2" />
+		<Cursor position="1091" topLine="28" />
 	</File>
 	<File name="GeneratePassword.cpp" open="0" top="0" tabpos="22">
 		<Cursor position="6280" topLine="95" />
@@ -317,7 +323,7 @@
 		<Cursor position="36" topLine="2" />
 	</File>
 	<File name="ProjectManager.cpp" open="0" top="0" tabpos="10">
-		<Cursor position="25742" topLine="436" />
+		<Cursor position="30324" topLine="522" />
 	</File>
 	<File name="ProjectManager.h" open="0" top="0" tabpos="7">
 		<Cursor position="2517" topLine="113" />
@@ -329,7 +335,7 @@
 		<Cursor position="510" topLine="0" />
 	</File>
 	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="25269" topLine="509" />
+		<Cursor position="58800" topLine="1408" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="2">
 		<Cursor position="3698" topLine="63" />

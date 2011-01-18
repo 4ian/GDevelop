@@ -54,6 +54,7 @@ extern MemTrace MemTracer;
 #include "ConsoleManager.h"
 #include "ProjectManager.h"
 #include "StartHerePage.h"
+#include "BuildMessagesPnl.h"
 
 //(*IdInit(Game_Develop_EditorFrame)
 const long Game_Develop_EditorFrame::ID_PANEL3 = wxNewId();
@@ -102,7 +103,8 @@ END_EVENT_TABLE()
 Game_Develop_EditorFrame::Game_Develop_EditorFrame( wxWindow* parent, string FileToOpen) :
 gameCurrentlyEdited(0),
 m_ribbon(NULL),
-ribbonSceneEditorButtonBar(NULL)
+ribbonSceneEditorButtonBar(NULL),
+buildMessagesPnl(NULL)
 {
 
     //(*Initialize(Game_Develop_EditorFrame)
@@ -323,6 +325,7 @@ ribbonSceneEditorButtonBar(NULL)
     LoadSkin(&m_mgr);
     LoadSkin(m_ribbon);
 
+    //Setup status bar
     bool simpleModeActivated = false;
     pConfig->Read("/ModeSimple", &simpleModeActivated);
     if ( simpleModeActivated )
@@ -340,15 +343,20 @@ ribbonSceneEditorButtonBar(NULL)
 
     editorsNotebook->SetArtProvider(new GDAuiTabArt());
 
+    //Create start page
     startPage = new StartHerePage(editorsNotebook, *this);
     editorsNotebook->AddPage(startPage, _("Page de démarrage"));
 
+    //Create project manager
     projectManager = new ProjectManager(this, *this);
     projectManager->ConnectEvents();
+
+    buildMessagesPnl = new BuildMessagesPnl(this);
 
     m_mgr.AddPane( projectManager, wxAuiPaneInfo().Name( wxT( "PM" ) ).Caption( _( "Gestionnaire de projets" ) ).Left().MaximizeButton( true ).MinimizeButton( false ).MinSize(170,100) );
     m_mgr.AddPane( Panel1, wxAuiPaneInfo().Name( wxT( "EP" ) ).Caption( _( "Editeur principal" ) ).Center().CaptionVisible(false).CloseButton( false ).MaximizeButton( true ).MinimizeButton( false ) );
     m_mgr.AddPane( ribbonPanel, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ruban" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).MinSize(1, 107).Resizable(false) );
+    m_mgr.AddPane( buildMessagesPnl, wxAuiPaneInfo().Name( wxT( "BL" ) ).Caption( _( "Messages de la compilation du code C++" ) ).Bottom().MaximizeButton( true ).MinimizeButton( false ).Show(true));
 
     wxString result;
     pConfig->Read( _T( "/Workspace/Actuel" ), &result );

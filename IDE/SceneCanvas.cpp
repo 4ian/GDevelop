@@ -28,6 +28,8 @@
 #include "GDL/ChooseObject.h"
 #include "GDL/DynamicExtensionsManager.h"
 #include "GDL/SourceFileBuilder.h"
+#include "GDL/CompilerMessagesParser.h"
+#include "BuildMessagesPnl.h"
 #include "EditOptionsPosition.h"
 #include "Clipboard.h"
 #include "DndTextSceneEditor.h"
@@ -1435,14 +1437,22 @@ void SceneCanvas::Reload()
     if ( !scene.editing )
     {
         GDpriv::DynamicExtensionsManager::getInstance()->UnloadAllDynamicExtensions();
+
         SourceFileBuilder sourceFileBuilder(gameEdited);
-        sourceFileBuilder.BuildSourceFiles();
+        bool buildSuccessed = sourceFileBuilder.BuildSourceFiles();
+
+        CompilerMessagesParser errorsParser;
+        errorsParser.ParseOutput(sourceFileBuilder.GetErrors());
+        mainEditorCommand.GetBuildMessagesPanel()->RefreshWith(errorsParser.parsedErrors);
+
         GDpriv::DynamicExtensionsManager::getInstance()->LoadDynamicExtension("test.dxgd");
     }
     #endif
     scene.LoadFromScene( sceneEdited );
 
     sceneEdited.wasModified = false;
+    if ( profileDialog )   scene.profiler = profileDialog.get();
+    if ( debugger ) scene.debugger = debugger.get();
 
     UpdateSize();
     UpdateScrollbars();

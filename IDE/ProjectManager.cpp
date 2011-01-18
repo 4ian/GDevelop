@@ -537,6 +537,7 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
     mainEditorCommand.SetMainEditor(&mainEditor);
     mainEditorCommand.SetRibbonSceneEditorButtonBar(mainEditor.GetRibbonSceneEditorButtonBar()); //Need link to the scene editor wxRibbonButtonBar
     mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
+    mainEditorCommand.SetBuildMessagesPanel(mainEditor.GetBuildMessagesPanel());
 
     vector< boost::shared_ptr<Scene> >::const_iterator scene =
         find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));

@@ -8673,6 +8673,31 @@
 	<assert.h>
 	<string.h>
 
+1295389141 source:d:\florian\programmation\gamedevelop\ide\buildmessagespnl.cpp
+	"BuildMessagesPnl.h"
+	<wx/intl.h>
+	<wx/string.h>
+	"GDL/CommonTools.h"
+
+1295388121 d:\florian\programmation\gamedevelop\ide\buildmessagespnl.h
+	<wx/listctrl.h>
+	<wx/sizer.h>
+	<wx/panel.h>
+	<vector>
+	"GDL/CompilerMessagesParser.h"
+
+1295388686 d:\florian\programmation\gamedevelop\gdl\gdl\compilermessagesparser.h
+	<string>
+	<vector>
+
+1293900639 d:\florian\programmation\gamedevelop\gdl\gdl\commontools.h
+	<string>
+	<sstream>
+	<iostream>
+	<vector>
+	"GDL/Image.h"
+	<cmath>
+
 1264360534 source:d:\florian\programmation\gamedevelop\ide\tinyxmlerror.cpp
 	"tinyxml.h"
 
@@ -9099,14 +9124,6 @@
 	"wx/defs.h"
 	"wx/filesys.h"
 	"wx/hashmap.h"
-
-1293900639 d:\florian\programmation\gamedevelop\gdl\gdl\commontools.h
-	<string>
-	<sstream>
-	<iostream>
-	<vector>
-	"GDL/Image.h"
-	<cmath>
 
 1294508060 d:\florian\programmation\gamedevelop\gdl\gdl\translateaction.h
 	<string>
@@ -10183,7 +10200,7 @@
 	<string>
 	"GDL/Event.h"
 
-1295193965 source:d:\florian\programmation\gamedevelop\ide\codeeditor.cpp
+1295198420 source:d:\florian\programmation\gamedevelop\ide\codeeditor.cpp
 	"CodeEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -10194,7 +10211,7 @@
 	"GDL/Game.h"
 	"GDL/MainEditorCommand.h"
 
-1295193965 d:\florian\programmation\gamedevelop\ide\codeeditor.h
+1295198113 d:\florian\programmation\gamedevelop\ide\codeeditor.h
 	<wx/sizer.h>
 	<wx/menu.h>
 	<wx/panel.h>
@@ -10246,7 +10263,7 @@
 	"wx/ribbon/control.h"
 	"wx/ribbon/art.h"
 
-1294508058 d:\florian\programmation\gamedevelop\gdl\gdl\maineditorcommand.h
+1295387515 d:\florian\programmation\gamedevelop\gdl\gdl\maineditorcommand.h
 	<wx/ribbon/bar.h>
 	<wx/ribbon/buttonbar.h>
 	<wx/toplevel.h>
@@ -10700,7 +10717,7 @@
 	<wx/dnd.h>
 	<wx/log.h>
 
-1293900639 d:\florian\programmation\gamedevelop\ide\game_develop_editormain.h
+1295385208 d:\florian\programmation\gamedevelop\ide\game_develop_editormain.h
 	<wx/sizer.h>
 	<wx/menu.h>
 	<wx/aui/aui.h>
@@ -12474,7 +12491,7 @@
 1236010936 c:\libs\boost_1_43_0\boost\detail\quick_allocator.hpp
 	<boost/smart_ptr/detail/quick_allocator.hpp>
 
-1295127215 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
+1295387941 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
 	"MemTrace.h"
 	<wx/bitmap.h>
 	<wx/icon.h>
@@ -12517,6 +12534,7 @@
 	"ConsoleManager.h"
 	"ProjectManager.h"
 	"StartHerePage.h"
+	"BuildMessagesPnl.h"
 
 1264360536 d:\florian\programmation\gamedevelop\ide\mystatusbar.h
 	<wx/app.h>
@@ -12983,7 +13001,7 @@
 	"Event.h"
 	"GDL/profile.h"
 
-1295126413 source:d:\florian\programmation\gamedevelop\ide\projectmanager.cpp
+1295385401 source:d:\florian\programmation\gamedevelop\ide\projectmanager.cpp
 	"ProjectManager.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -13014,7 +13032,7 @@
 	<string>
 	<wx/treectrl.h>
 
-1295100121 d:\florian\programmation\gamedevelop\gdl\gdl\sourcefile.h
+1295202933 d:\florian\programmation\gamedevelop\gdl\gdl\sourcefile.h
 	<ctime>
 	<string>
 	<boost/shared_ptr.hpp>
@@ -13028,7 +13046,7 @@
 	<wx/string.h>
 	<iostream>
 
-1295121423 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1295388121 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -13057,6 +13075,8 @@
 	"GDL/ChooseObject.h"
 	"GDL/DynamicExtensionsManager.h"
 	"GDL/SourceFileBuilder.h"
+	"GDL/CompilerMessagesParser.h"
+	"BuildMessagesPnl.h"
 	"EditOptionsPosition.h"
 	"Clipboard.h"
 	"DndTextSceneEditor.h"
@@ -13080,7 +13100,10 @@
 	<map>
 	"GDL/Event.h"
 
-1295118592 d:\florian\programmation\gamedevelop\gdl\gdl\sourcefilebuilder.h
+1295299141 d:\florian\programmation\gamedevelop\gdl\gdl\sourcefilebuilder.h
+	"GDL/CompilerToolchainPathManager.h"
+
+1295297908 d:\florian\programmation\gamedevelop\gdl\gdl\compilertoolchainpathmanager.h
 
 1285428093 source:d:\florian\programmation\gamedevelop\ide\searchevents.cpp
 	"SearchEvents.h"
@@ -13161,7 +13184,7 @@
 1294609130 source:d:\florian\programmation\gamedevelop\ide\resource.rc
 	"version.h"
 
-1295196259 d:\florian\programmation\gamedevelop\ide\version.h
+1295389141 d:\florian\programmation\gamedevelop\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -13287,5 +13310,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1295114960 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+1295388184 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

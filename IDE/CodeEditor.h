@@ -76,6 +76,8 @@ class CodeEditor: public wxPanel
 
 		MainEditorCommand mainEditorCommand;
 
+        char lastCharEntered;
+        long lastCharEnteredPos;
 
 		DECLARE_EVENT_TABLE()
 };

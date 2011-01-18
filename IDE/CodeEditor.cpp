@@ -163,17 +163,8 @@ void CodeEditor::ConnectEvents()
 /**
  * Auto indent
  */
-void CodeEditor::OnCharAdded (wxStyledTextEvent &event) {
-    char chr = (char)event.GetKey();
-    int currentLine = textEditor->GetCurrentLine();
-    // Change this if support for mac files with \r is needed
-    if (chr == '\n') {
-        if (currentLine <= 0) return;
-
-        int lineInd = textEditor->GetLineIndentation(currentLine - 1);
-        textEditor->SetLineIndentation (currentLine, lineInd);
-        //textEditor->GotoPos(textEditor->PositionFromLine (currentLine) + lineInd);
-    }
+void CodeEditor::OnCharAdded (wxStyledTextEvent &event)
+{
 }
 
 /**

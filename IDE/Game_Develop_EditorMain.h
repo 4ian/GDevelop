@@ -46,6 +46,7 @@
 class RuntimeGame;
 class ProjectManager;
 class StartHerePage;
+class BuildMessagesPnl;
 
 using namespace std;
 
@@ -112,6 +113,8 @@ class Game_Develop_EditorFrame: public wxFrame
          * Get a pointer to ribbon bar which can be changed by scene editors
          */
         inline wxRibbonButtonBar * GetRibbonSceneEditorButtonBar() const { return ribbonSceneEditorButtonBar; };
+
+        inline BuildMessagesPnl * GetBuildMessagesPanel() const { return buildMessagesPnl; }
 
 
         //(*Handlers(Game_Develop_EditorFrame)
@@ -262,6 +265,7 @@ class Game_Develop_EditorFrame: public wxFrame
         wxAuiManager m_mgr;
         wxRibbonBar * m_ribbon; ///< Pointer to the ribbon
         wxRibbonButtonBar * ribbonSceneEditorButtonBar; ///Pointer to the ribbon bar which can be changed by scene editors
+        BuildMessagesPnl * buildMessagesPnl;
 
         StartHerePage * startPage;
         ProjectManager * projectManager;

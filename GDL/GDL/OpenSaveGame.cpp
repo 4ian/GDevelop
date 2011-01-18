@@ -49,6 +49,7 @@
 #include "GDL/StandardEvent.h"
 #include "GDL/RepeatEvent.h"
 #include "GDL/XmlMacros.h"
+#include "GDL/SourceFile.h"
 
 using namespace std;
 
@@ -277,6 +278,20 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     elem = hdl.FirstChildElement().FirstChildElement( "ExternalEvents" ).Element();
     if ( elem )
         OpenExternalEvents(game.externalEvents, elem);
+
+    elem = hdl.FirstChildElement().FirstChildElement( "ExternalSourceFiles" ).Element();
+    if ( elem )
+    {
+        TiXmlElement * sourceFileElem = elem->FirstChildElement( "SourceFile" );
+        while (sourceFileElem)
+        {
+            boost::shared_ptr<SourceFile> newSourceFile(new SourceFile);
+            newSourceFile->LoadFromXml(sourceFileElem);
+            game.externalSourceFiles.push_back(newSourceFile);
+
+            sourceFileElem = sourceFileElem->NextSiblingElement();
+        }
+    }
 
     //Compatibility code --- with Game Develop 1.3.9262 and inferior
     if ( major <= 1 && minor <= 3 && build <= 9262 && revision <= 46622)
@@ -1855,6 +1870,16 @@ bool OpenSaveGame::SaveToFile(string file)
     TiXmlElement * externalEvents = new TiXmlElement( "ExternalEvents" );
     root->LinkEndChild( externalEvents );
     SaveExternalEvents(game.externalEvents, externalEvents);
+
+    //External events
+    TiXmlElement * externalSourceFiles = new TiXmlElement( "ExternalSourceFiles" );
+    root->LinkEndChild( externalSourceFiles );
+    for (unsigned int i = 0;i<game.externalSourceFiles.size();++i)
+    {
+        TiXmlElement * sourceFile = new TiXmlElement( "SourceFile" );
+        externalSourceFiles->LinkEndChild( sourceFile );
+        game.externalSourceFiles[i]->SaveToXml(sourceFile);
+    }
 
     //Sauvegarde le tout
     if ( !doc.SaveFile( file.c_str() ) )

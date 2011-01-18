@@ -11,6 +11,7 @@
 #include <ctime>
 #include <string>
 #include <boost/shared_ptr.hpp>
+class TiXmlElement;
 
 /**
  * SourceFile represents a "physical" source file that must be compiled
@@ -41,6 +42,16 @@ public:
      * Change the filename
      */
     void SetFileName(std::string filename_) { filename = filename_; };
+
+    /**
+     * Load from XML element
+     */
+    void LoadFromXml(const TiXmlElement * elem);
+
+    /**
+     * Save to XML element
+     */
+    void SaveToXml(TiXmlElement * elem);
 
     enum sourceFileLanguage
     {

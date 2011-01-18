@@ -12,6 +12,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/toplevel.h>
 #include <iostream>
+class BuildMessagesPnl;
 
 /**
  *  MainEditorCommand is used to give access to some members of the mainEditor
@@ -43,6 +44,9 @@ class GD_API MainEditorCommand
          */
         void SetRibbonSceneEditorButtonBar(wxRibbonButtonBar * ribbonSEBBar_) { ribbonSceneEditorButtonBar = ribbonSEBBar_; };
 
+        BuildMessagesPnl * GetBuildMessagesPanel() { assert(buildMessagesPnl); return buildMessagesPnl; };
+        void SetBuildMessagesPanel(BuildMessagesPnl * buildMessagesPnl_) { buildMessagesPnl = buildMessagesPnl_; };
+
         /**
          * Return the pointer to the Main Editor.
          * Assert if no pointer has been set.
@@ -58,6 +62,7 @@ class GD_API MainEditorCommand
         wxRibbonBar * ribbon;
         wxRibbonButtonBar * ribbonSceneEditorButtonBar;
         wxTopLevelWindow * mainEditor;
+        BuildMessagesPnl * buildMessagesPnl;
 };
 
 #endif // NEEDREFRESHCOMMAND_H

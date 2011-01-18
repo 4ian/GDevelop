@@ -6,7 +6,8 @@
 MainEditorCommand::MainEditorCommand() :
 ribbon(NULL),
 ribbonSceneEditorButtonBar(NULL),
-mainEditor(NULL)
+mainEditor(NULL),
+buildMessagesPnl(NULL)
 {
     //ctor
 }

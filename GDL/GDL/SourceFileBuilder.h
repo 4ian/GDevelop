@@ -9,7 +9,9 @@
 #ifndef SOURCEFILEBUILDER_H
 #define SOURCEFILEBUILDER_H
 
+#include "GDL/CompilerToolchainPathManager.h"
 class Game;
+
 
 /**
  * Manage build of sources file of a project.
@@ -26,32 +28,31 @@ class GD_API SourceFileBuilder
          */
         bool BuildSourceFiles();
 
+        /**
+         * Return a vector of string containing errors messages.
+         */
+        std::vector<std::string > GetErrors() const { return errors; };
+
     private:
 
-        bool BuildSourceFile(std::string filename, std::string & compilerOutput);
-        bool LinkSourceFiles(std::vector<std::string> files, std::string & compilerOutput);
+        bool BuildSourceFile(std::string filename);
+        bool LinkSourceFiles(std::vector<std::string> files);
 
         Game & game;
 
-        static std::string gccCompilerExecutablePath;
-        static std::string wxwidgetsIncludeDir;
-        static std::string wxwidgetsIncludeDir2;
-        static std::string wxwidgetsLibDir;
-        static std::string wxwidgetsLibDir2;
-        static std::string wxwidgetsLibs;
-        static std::string wxwidgetsDefines;
-        static std::string sfmlIncludeDir;
-        static std::string sfmlLibDir;
-        static std::string sfmlLibs;
-        static std::string sfmlDefines;
-        static std::string boostIncludeDir;
-        static std::string boostDefines;
-        static std::string gdlIncludeDir;
-        static std::string gdlLibDir;
-        static std::string gdlLibs;
-        static std::string gdlDefines;
-        static std::string osLibs;
-        static std::string osDefines;
+        std::string wxwidgetsLibs;
+        std::string wxwidgetsDefines;
+        std::string sfmlLibs;
+        std::string sfmlDefines;
+        std::string boostDefines;
+        std::string gdlLibs;
+        std::string gdlDefines;
+        std::string osLibs;
+        std::string osDefines;
+
+        std::vector<std::string > errors;
+
+        CompilerToolchainPathManager pathManager;
 };
 
 #endif // SOURCEFILEBUILDER_H

@@ -209,7 +209,9 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
                 #if defined(GD_IDE_ONLY)
                 CloseLibrary(extensionHdl);
                 wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" présente des erreurs :\n")) + error + string(_("\nL'extension n'a pas été chargée. Prenez contact avec le développeur pour plus d'informations." ));
+                #if defined(RELEASE)
                 wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
+                #endif
                 #endif
                 #if defined(RELEASE) //Load extension despite errors in non release build
                 return;

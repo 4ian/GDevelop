@@ -705,6 +705,10 @@
 		<Unit filename="GDL\CommonInstructionsExtension.h" />
 		<Unit filename="GDL\CommonTools.cpp" />
 		<Unit filename="GDL\CommonTools.h" />
+		<Unit filename="GDL\CompilerMessagesParser.cpp" />
+		<Unit filename="GDL\CompilerMessagesParser.h" />
+		<Unit filename="GDL\CompilerToolchainPathManager.cpp" />
+		<Unit filename="GDL\CompilerToolchainPathManager.h" />
 		<Unit filename="GDL\DatFile.cpp" />
 		<Unit filename="GDL\DatFile.h" />
 		<Unit filename="GDL\Direction.cpp" />

@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Function Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -26,11 +26,6 @@ freely, subject to the following restrictions:
 
 #ifndef FUNCTIONEVENT_H
 #define FUNCTIONEVENT_H
-
-/*#include <boost/shared_ptr.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/extended_type_info.hpp>
-#include <boost/serialization/export.hpp>*/
 #include "GDL/Event.h"
 class RuntimeScene;
 class ObjectsConcerned;
@@ -38,7 +33,7 @@ class Instruction;
 class Evaluateur;
 class TiXmlElement;
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 class Scene;
 class MainEditorCommand;
 class wxWindow;
@@ -83,18 +78,17 @@ class FunctionEvent : public BaseEvent
         void SetActions(vector < Instruction > & actions_) { actions = actions_; };
 
         string GetName() const { return name; };
-        string GetName() { return name; };
         void SetName(string name_) { name = name_; };
 
         virtual vector < vector<Instruction>* > GetAllConditionsVectors();
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */
@@ -127,7 +121,7 @@ class FunctionEvent : public BaseEvent
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
         bool nameSelected;
 #endif
 };

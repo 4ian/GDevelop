@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Function Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -30,7 +30,7 @@ freely, subject to the following restrictions:
 #include "GDL/RuntimeScene.h"
 #include "GDL/tinyxml.h"
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
 #endif
 
@@ -40,7 +40,7 @@ std::map < const Scene* , std::vector < std::string >* > FunctionEvent::currentF
 FunctionEvent::FunctionEvent() :
 BaseEvent(),
 name("MyFunction")
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 ,nameSelected(false)
 #endif
 {
@@ -114,7 +114,7 @@ vector < vector<Instruction>* > FunctionEvent::GetAllActionsVectors()
 
     return allActions;
 }
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void FunctionEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * objectElem = new TiXmlElement( "Name" );
@@ -207,7 +207,7 @@ void FunctionEvent::UnreferenceFunction()
     }
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void FunctionEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
                          bool & conditionsSelected, bool & instructionsSelected)
 {
@@ -353,9 +353,7 @@ void FunctionEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, M
  */
 void FunctionEvent::Init(const FunctionEvent & event)
 {
-    events.clear();
-    for (unsigned int i =0;i<event.events.size();++i)
-    	events.push_back( event.events[i]->Clone() );
+    events = CloneVectorOfEvents(event.events);
 
     name = event.name;
     conditions = event.conditions;

@@ -6,7 +6,7 @@
 #ifndef DYNAMICEXTENSIONSMANAGER_H
 #define DYNAMICEXTENSIONSMANAGER_H
 
-#if defined(GD_DYNAMIC_EXTENSIONS)
+#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 
 #include <vector>
 #include <map>

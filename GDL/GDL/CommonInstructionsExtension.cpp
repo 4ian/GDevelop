@@ -117,7 +117,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     DECLARE_END_EVENT()
 
-    #if defined(GD_DYNAMIC_EXTENSIONS)
+    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     DECLARE_EVENT("DynamicExtensionCaller",
                   _("Code C++"),
                   "Execute du code C++",

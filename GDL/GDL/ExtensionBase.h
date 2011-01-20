@@ -12,6 +12,9 @@ class MainEditorCommand;
 #include <wx/bitmap.h>
 #include <wx/file.h>
 #include <wx/wx.h>
+#ifdef __WXMSW__
+#include <wx/msw/winundef.h>
+#endif
 #endif
 #include <string>
 #include <vector>
@@ -30,6 +33,7 @@ class StrExpressionInstruction;
 class BaseEvent;
 class AutomatismsSharedDatas;
 class ResourcesMergingHelper;
+#undef CreateEvent
 
 typedef boost::shared_ptr<Object> ObjSPtr;
 typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
@@ -1093,6 +1097,7 @@ class GD_API ExtensionBase
      */
     inline std::string GetNameSpace() { return nameSpace; };
 
+    #if defined(GD_IDE_ONLY)
     /**
      * Called ( e.g. during compilation ) so as to inventory resources used by conditions and update their filename
      */
@@ -1102,6 +1107,7 @@ class GD_API ExtensionBase
      * Called ( e.g. during compilation ) so as to inventory resources used by actions and update their filename
      */
     virtual void PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper) {};
+    #endif
 
     protected :
 

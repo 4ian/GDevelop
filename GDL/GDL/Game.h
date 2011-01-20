@@ -15,7 +15,7 @@
 #include "GDL/Image.h"
 #include "GDL/LoadingScreen.h"
 class ExternalEvents;
-#if defined(GD_DYNAMIC_EXTENSIONS)
+#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 class SourceFile;
 #endif
 
@@ -56,7 +56,7 @@ class GD_API Game
         vector < boost::shared_ptr<ExternalEvents> >    externalEvents; ///< List of all externals events
         vector < boost::shared_ptr<Object> >            globalObjects; ///< Global objects
         vector < ObjectGroup >                          objectGroups; ///< Global objects groups
-        #if defined(GD_DYNAMIC_EXTENSIONS)
+        #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
         vector < boost::shared_ptr<SourceFile> >        externalSourceFiles; ///< List of C++ source files used.
         #endif
 

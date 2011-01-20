@@ -11,6 +11,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/bimap/bimap.hpp>
+#undef CreateEvent //Thanks windows.h
 class Object;
 
 #if defined(GD_IDE_ONLY)

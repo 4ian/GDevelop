@@ -3,8 +3,9 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_DYNAMIC_EXTENSIONS)
-#include "SourceFile.h"
+#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
+#if defined(GD_IDE_ONLY)
+#include "GDL/SourceFile.h"
 #include "tinyxml.h"
 #include "GDL/XmlMacros.h"
 
@@ -39,4 +40,5 @@ void SourceFile::SaveToXml(TiXmlElement * elem)
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("lastBuildTimeStamp", lastBuildTimeStamp);  //Todo : Long + lang
 }
 
+#endif
 #endif

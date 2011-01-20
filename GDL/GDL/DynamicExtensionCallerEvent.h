@@ -1,13 +1,15 @@
 #ifndef DYNAMICEXTENSIONCALLEREVENT_H
 #define DYNAMICEXTENSIONCALLEREVENT_H
 
-#if defined(GD_DYNAMIC_EXTENSIONS)
+#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 
 #if defined(GD_IDE_ONLY)
 #include <wx/bitmap.h>
 #include <wx/dcbuffer.h>
 #include <wx/html/htmprint.h>
 #endif
+#include <string>
+#include <boost/weak_ptr.hpp>
 #include "Event.h"
 class RuntimeScene;
 class Game;

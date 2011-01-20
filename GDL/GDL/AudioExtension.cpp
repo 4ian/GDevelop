@@ -383,8 +383,10 @@ AudioExtension::AudioExtension()
     DECLARE_END_CONDITION()
 }
 
+#if defined(GD_IDE_ONLY)
 void AudioExtension::PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper)
 {
     if ( action.GetType() == "PlaySound" || action.GetType() == "PlaySoundCanal" || action.GetType() == "PlayMusic" || action.GetType() == "PlayMusicCanal" )
         action.SetParameter( 0, resourcesMergingHelper.GetNewFilename(action.GetParameter(0).GetPlainString()));
 }
+#endif

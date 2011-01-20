@@ -10,7 +10,9 @@ class AudioExtension : public ExtensionBase
         AudioExtension();
         virtual ~AudioExtension() {};
 
+        #if defined(GD_IDE_ONLY)
         virtual void PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper);
+        #endif
 };
 
 #endif // AUDIOEXTENSION_H

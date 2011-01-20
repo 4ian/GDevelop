@@ -9,7 +9,9 @@ class WindowExtension : public ExtensionBase
         WindowExtension();
         virtual ~WindowExtension() {};
 
+        #if defined(GD_IDE_ONLY)
         virtual void PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper);
+        #endif
 };
 
 #endif // WINDOWEXTENSION_H

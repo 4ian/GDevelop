@@ -20,7 +20,6 @@
 					<Add option="-pg" />
 					<Add option="-g" />
 					<Add option="-m32" />
-					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -133,7 +132,6 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-m32" />
-					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
@@ -244,7 +242,6 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-m32" />
-					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -286,7 +283,6 @@
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGD_IDE_ONLY" />
-					<Add option="-DGD_DYNAMIC_EXTENSIONS" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -358,7 +354,6 @@
 					<Add option="-Wall" />
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
-					<Add option="-DGDP" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -489,7 +484,6 @@
 					<Add option="-Wall" />
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
-					<Add option="-DGDP" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
@@ -531,7 +525,6 @@
 					<Add option="-pg" />
 					<Add option="-g" />
 					<Add option="-m32" />
-					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -574,7 +567,6 @@
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGD_IDE_ONLY" />
-					<Add option="-DGD_DYNAMIC_EXTENSIONS" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />

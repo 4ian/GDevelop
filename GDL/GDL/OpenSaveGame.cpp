@@ -279,6 +279,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     if ( elem )
         OpenExternalEvents(game.externalEvents, elem);
 
+    #if defined(GD_IDE_ONLY)
     elem = hdl.FirstChildElement().FirstChildElement( "ExternalSourceFiles" ).Element();
     if ( elem )
     {
@@ -292,6 +293,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
             sourceFileElem = sourceFileElem->NextSiblingElement();
         }
     }
+    #endif
 
     //Compatibility code --- with Game Develop 1.3.9262 and inferior
     if ( major <= 1 && minor <= 3 && build <= 9262 && revision <= 46622)
@@ -380,9 +382,11 @@ void OpenSaveGame::OpenGameInformations(TiXmlElement * elem)
         }
     } else { MSG(_("Aucune information sur la portabilité du jeu")); }
 
+    #if defined(GD_IDE_ONLY)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableFilename", game.winExecutableFilename);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableIconFile", game.winExecutableIconFile);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("linuxExecutableFilename", game.linuxExecutableFilename);
+    #endif
 
     return;
 }

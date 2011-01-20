@@ -68,8 +68,10 @@ WindowExtension::WindowExtension()
     DECLARE_END_EXPRESSION()
 }
 
+#if defined(GD_IDE_ONLY)
 void WindowExtension::PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper)
 {
     if ( action.GetType() == "EcrireTexte" && !action.GetParameterSafely( 5 ).GetPlainString().empty() )
         action.SetParameter( 5, resourcesMergingHelper.GetNewFilename( action.GetParameterSafely( 5 ).GetPlainString() ) );
 }
+#endif

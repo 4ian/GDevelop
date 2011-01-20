@@ -1,7 +1,7 @@
 #ifndef DYNAMICEXTENSIONBASE_H
 #define DYNAMICEXTENSIONBASE_H
 
-#if defined(GD_DYNAMIC_EXTENSIONS)
+#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 
 #include <map>
 #include "GDL/Event.h"

@@ -3,7 +3,7 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_DYNAMIC_EXTENSIONS)
+#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 #if defined(GD_IDE_ONLY)
 
 #ifndef SOURCEFILEBUILDER_H

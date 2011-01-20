@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Video Object Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -34,7 +34,7 @@ freely, subject to the following restrictions:
 #include "GDL/XmlMacros.h"
 #include "VideoObject.h"
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
 #include "GDL/ResourcesMergingHelper.h"
@@ -73,7 +73,7 @@ void VideoObject::LoadFromXml(const TiXmlElement * elem)
     SetColor(r,g,b);
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void VideoObject::SaveToXml(TiXmlElement * elem)
 {
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("videoFile", videoFile);
@@ -122,7 +122,7 @@ bool VideoObject::Draw( sf::RenderWindow& window )
     return true;
 }
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 /**
  * Render object at edittime
  */
@@ -232,6 +232,23 @@ void VideoObject::OnPositionChanged()
 {
     renderSprite.SetX( GetX() );
     renderSprite.SetY( GetY() );
+}
+
+/**
+ * VideoObject provides a basic bounding box.
+ */
+std::vector<RotatedRectangle> VideoObject::GetHitBoxes() const
+{
+    std::vector<RotatedRectangle> boxes;
+    RotatedRectangle rectangle;
+    rectangle.angle = GetAngle()*3.14/180.0f;
+    rectangle.center.x = GetX()+GetCenterX();
+    rectangle.center.y = GetY()+GetCenterY();
+    rectangle.halfSize.x = GetWidth()/2;
+    rectangle.halfSize.y = GetHeight()/2;
+
+    boxes.push_back(rectangle);
+    return boxes;
 }
 
 /**

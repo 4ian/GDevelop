@@ -16,7 +16,6 @@
 					<Add option="-pg" />
 					<Add option="-g" />
 					<Add option="-m32" />
-					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -46,7 +45,7 @@
 					<Add option="-pg" />
 					<Add option="-g" />
 					<Add option="-m32" />
-					<Add option="-DGDE" />
+					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -114,7 +113,6 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-m32" />
-					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
@@ -144,7 +142,7 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-m32" />
-					<Add option="-DGDE" />
+					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
@@ -212,7 +210,6 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-m32" />
-					<Add option="-DGDP" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -242,7 +239,7 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-m32" />
-					<Add option="-DGDE" />
+					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -311,7 +308,6 @@
 					<Add option="-Wall" />
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
-					<Add option="-DGDP" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -357,7 +353,7 @@
 					<Add option="-m32" />
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
-					<Add option="-DGDE" />
+					<Add option="-DGD_IDE_ONLY" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -404,7 +400,7 @@
 					<Add option="-m32" />
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
-					<Add option="-DGDE" />
+					<Add option="-DGD_IDE_ONLY" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
@@ -447,7 +443,6 @@
 					<Add option="-g" />
 					<Add option="-fno-stack-protector" />
 					<Add option="-m32" />
-					<Add option="-DGDP" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />

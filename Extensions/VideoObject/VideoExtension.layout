@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release - Edittime" />
-	<File name="Extension.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="3073" topLine="58" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="16243" topLine="301" />
 	</File>
 	<File name="VideoActions.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="1177" topLine="24" />
+		<Cursor position="69" topLine="3" />
 	</File>
 	<File name="VideoConditions.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="1149" topLine="16" />
+		<Cursor position="69" topLine="3" />
 	</File>
 	<File name="VideoExpressions.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="1717" topLine="11" />
+		<Cursor position="69" topLine="3" />
 	</File>
-	<File name="VideoObject.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="2767" topLine="71" />
+	<File name="VideoObject.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="3512" topLine="89" />
 	</File>
 	<File name="VideoObject.h" open="0" top="0" tabpos="3">
-		<Cursor position="7178" topLine="147" />
+		<Cursor position="1934" topLine="40" />
 	</File>
-	<File name="VideoObjectEditor.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="7708" topLine="128" />
+	<File name="VideoObjectEditor.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="1003" topLine="3" />
 	</File>
 	<File name="VideoObjectEditor.h" open="0" top="0" tabpos="1">
-		<Cursor position="1019" topLine="0" />
+		<Cursor position="1003" topLine="0" />
 	</File>
 	<File name="VideoWrapper.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="905" topLine="29" />

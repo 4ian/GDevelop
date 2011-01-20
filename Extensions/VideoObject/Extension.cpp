@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Video Object Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -294,7 +294,7 @@ class Extension : public ExtensionBase
 
             DECLARE_END_OBJECT()
 
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libogg-0.dll"));
             supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libtheoradec-1.dll"));
             supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libtheoraplayer.dll"));
@@ -317,7 +317,7 @@ class Extension : public ExtensionBase
          */
         void CompleteCompilationInformation()
         {
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             compilationInfo.runtimeOnly = false;
             #else
             compilationInfo.runtimeOnly = true;
@@ -334,7 +334,7 @@ class Extension : public ExtensionBase
             compilationInfo.sfmlMajorVersion = 2;
             compilationInfo.sfmlMinorVersion = 0;
 
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION;
             compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION;
             compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER;

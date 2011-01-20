@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Video Object Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 
 */
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 
 #include "VideoObjectEditor.h"
 
@@ -168,7 +168,7 @@ void VideoObjectEditor::OnconverterBtClick(wxCommandEvent& event)
 
         wxProgressDialog dialog(_("Conversion en cours"), _("Veuillez patienter pendant la durée de la conversion"));
         wxExecute(wxGetCwd()+"/Extensions/ffmpeg2theora.exe "+fileDialog.GetPath()+parameters, wxEXEC_SYNC);;
-        wxLogMessage("Conversion terminée.");
+        wxLogMessage(_("Conversion terminée."));
     }
 }
 

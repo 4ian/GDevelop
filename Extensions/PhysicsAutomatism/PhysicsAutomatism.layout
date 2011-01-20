@@ -4,6 +4,12 @@
 	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2ContactSolver.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="17243" topLine="565" />
 	</File>
+	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="4" topLine="0" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.h" open="0" top="0" tabpos="0">
+		<Cursor position="4" topLine="0" />
+	</File>
 	<File name="Box2D\Box2D\Box2D\Dynamics\b2World.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="20413" topLine="881" />
 	</File>
@@ -14,40 +20,40 @@
 		<Cursor position="238" topLine="0" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="23515" topLine="40" />
+		<Cursor position="30605" topLine="488" />
 	</File>
 	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="6024" topLine="138" />
+		<Cursor position="6364" topLine="132" />
 	</File>
-	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="2">
-		<Cursor position="5971" topLine="105" />
+	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="1">
+		<Cursor position="2003" topLine="28" />
 	</File>
 	<File name="PhysicsAutomatismActions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="3742" topLine="110" />
+		<Cursor position="74" topLine="3" />
 	</File>
 	<File name="PhysicsAutomatismConditions.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="9820" topLine="125" />
+		<Cursor position="74" topLine="3" />
 	</File>
 	<File name="PhysicsAutomatismEditor.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="16275" topLine="239" />
+		<Cursor position="1008" topLine="3" />
 	</File>
 	<File name="PhysicsAutomatismEditor.h" open="0" top="0" tabpos="7">
-		<Cursor position="69" topLine="3" />
+		<Cursor position="1008" topLine="3" />
 	</File>
 	<File name="PhysicsAutomatismExpressions.cpp" open="0" top="0" tabpos="17">
-		<Cursor position="1988" topLine="19" />
+		<Cursor position="74" topLine="3" />
 	</File>
 	<File name="RuntimeScenePhysicsDatas.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="1379" topLine="17" />
+		<Cursor position="74" topLine="3" />
 	</File>
 	<File name="RuntimeScenePhysicsDatas.h" open="0" top="0" tabpos="2">
-		<Cursor position="2503" topLine="43" />
+		<Cursor position="74" topLine="3" />
 	</File>
 	<File name="ScenePhysicsDatas.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="1084" topLine="3" />
+		<Cursor position="1117" topLine="3" />
 	</File>
 	<File name="ScenePhysicsDatas.h" open="0" top="0" tabpos="10">
-		<Cursor position="1435" topLine="30" />
+		<Cursor position="2002" topLine="21" />
 	</File>
 	<File name="..\..\GDL\GDL\tinystr.h" open="0" top="0" tabpos="0">
 		<Cursor position="7349" topLine="69" />

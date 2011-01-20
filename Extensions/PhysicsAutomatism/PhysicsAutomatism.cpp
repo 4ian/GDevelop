@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -52,7 +52,7 @@ PhysicsAutomatism::~PhysicsAutomatism()
         runtimeScenesPhysicsDatas->world->DestroyBody(body);
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void PhysicsAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ )
 {
     PhysicsAutomatismEditor editor(parent, game_, scene, *this, mainEditorCommand_);
@@ -165,7 +165,7 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
     objectOldWidth = object->GetWidth();
     objectOldHeight = object->GetHeight();
 }
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void PhysicsAutomatism::SaveToXml(TiXmlElement * elem) const
 {
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("dynamic", dynamic);

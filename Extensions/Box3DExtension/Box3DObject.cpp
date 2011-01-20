@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Box 3D Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -34,7 +34,7 @@ freely, subject to the following restrictions:
 #include "GDL/Position.h"
 #include "GDL/tinyxml.h"
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
@@ -139,7 +139,7 @@ void Box3DObject::LoadFromXml(const TiXmlElement * object)
         object->FirstChildElement("depth")->QueryFloatAttribute("value", &depth);
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void Box3DObject::SaveToXml(TiXmlElement * object)
 {
     {
@@ -229,35 +229,31 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
 
     window.RestoreGLStates();
 
-    float windowRatio = static_cast<float>(window.GetView().GetSize().x)/static_cast<float>(window.GetView().GetSize().y);
-    float sizeRatio =   0.3330 //To make base have the same size as a rectangle drawn by SFML
-                        *1/window.GetView().GetSize().y*600.f; //To make size window's size independant
+    float xView =  window.GetView().GetCenter().x*0.25f;
+    float yView = -window.GetView().GetCenter().y*0.25f;
 
-    //Get the position of the box
-    float x = ( (GetX()-window.GetView().GetCenter().x+window.GetView().GetSize().x/2) * 200.f / window.GetView().GetSize().x  - 100.f)*windowRatio;
-    float y = -(GetY()-window.GetView().GetCenter().y+window.GetView().GetSize().y/2) * 200.f / window.GetView().GetSize().y + 100.f;
-
-    //Prepare for rendering
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    //Position
     glRotatef(window.GetView().GetRotation(), 0, 0, 1);
-    glTranslatef(x, y, -100+zPosition*0.3125); //Note : If -100 is changed to -50, 200.f must be changed to 100.f in x and y for example.
+    glTranslatef(GetX()*0.25f - xView, -GetY()*0.25f - yView, zPosition*0.25f - 75.0f*(window.GetView().GetSize().y/600.0f));
 
-    //Prepare size of the renderered box
-    float sizeWidth =   width * sizeRatio;
-    float sizeHeight =  -height * sizeRatio;
-    float sizeDepth =   depth * sizeRatio;
+    float sizeWidth  =  width*0.25f;
+    float sizeHeight = -height*0.25f;
+    float sizeDepth  =  depth*0.25f;
 
+    //Rotation
     glTranslatef(sizeWidth/2, sizeHeight/2, sizeDepth/2);
     glRotatef(-yaw, 0, 0, 1);
     glRotatef(pitch, 0, 1, 0);
     glRotatef(roll, 1, 0, 0);
     glTranslatef(-sizeWidth/2, -sizeHeight/2, -sizeDepth/2);
 
+    //Render the box
     glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //Render the box
     backTexture->Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0        , 0,            0);
@@ -311,7 +307,7 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
     return true;
 }
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 /**
  * Render object at edittime
  */
@@ -319,25 +315,21 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
 {
     window.RestoreGLStates();
 
-    float windowRatio = static_cast<float>(window.GetView().GetSize().x)/static_cast<float>(window.GetView().GetSize().y);
-    float sizeRatio =   0.3330 //To make base have the same size as a rectangle drawn by SFML
-                        *1/window.GetView().GetSize().y*600.f; //To make size window's size independant
+    float xView =  window.GetView().GetCenter().x*0.25f;
+    float yView = -window.GetView().GetCenter().y*0.25f;
 
-    //Get the position of the box
-    float x = ( (GetX()-window.GetView().GetCenter().x+window.GetView().GetSize().x/2) * 200.f / window.GetView().GetSize().x  - 100.f)*windowRatio;
-    float y = -(GetY()-window.GetView().GetCenter().y+window.GetView().GetSize().y/2) * 200.f / window.GetView().GetSize().y + 100.f;
-
-    //Prepare for rendering
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    //Position
     glRotatef(window.GetView().GetRotation(), 0, 0, 1);
-    glTranslatef(x, y, -100+zPosition*0.3125);
+    glTranslatef(GetX()*0.25f - xView, -GetY()*0.25f - yView, zPosition*0.25f - 75.0f*(window.GetView().GetSize().y/600.0f));
 
-    //Prepare size of the renderered box
-    float sizeWidth =   width * sizeRatio;
-    float sizeHeight =  -height * sizeRatio;
-    float sizeDepth =   depth * sizeRatio;
+    float sizeWidth  =  width*0.25f;
+    float sizeHeight = -height*0.25f;
+    float sizeDepth  =  depth*0.25f;
 
+    //Rotation
     glTranslatef(sizeWidth/2, sizeHeight/2, sizeDepth/2);
     glRotatef(-yaw, 0, 0, 1);
     glRotatef(pitch, 0, 1, 0);
@@ -345,6 +337,9 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
     glTranslatef(-sizeWidth/2, -sizeHeight/2, -sizeDepth/2);
 
     //Render the box
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     backTexture->Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0        , 0,            0);
@@ -470,8 +465,21 @@ unsigned int Box3DObject::GetNumberOfProperties() const
 }
 #endif
 
-void Box3DObject::UpdateTime(float)
+/**
+ * Box3D object provides a basic bounding box.
+ */
+std::vector<RotatedRectangle> Box3DObject::GetHitBoxes() const
 {
+    std::vector<RotatedRectangle> boxes;
+    RotatedRectangle rectangle;
+    rectangle.angle = GetAngle()*3.14/180.0f;
+    rectangle.center.x = GetX()+GetCenterX();
+    rectangle.center.y = GetY()+GetCenterY();
+    rectangle.halfSize.x = GetWidth()/2;
+    rectangle.halfSize.y = GetHeight()/2;
+
+    boxes.push_back(rectangle);
+    return boxes;
 }
 
 /**
@@ -539,16 +547,4 @@ void DestroyBox3DObject(Object * object)
 Object * CreateBox3DObject(std::string name)
 {
     return new Box3DObject(name);
-}
-
-/**
- * Function creating an extension Object from another.
- * Game Develop can not directly create an extension object.
- *
- * Note that it is safe to do the static cast, as this function
- * is called owing to the typeId of the object to copy.
- */
-Object * CreateBox3DObjectByCopy(Object * object)
-{
-    return new Box3DObject(*static_cast<Box3DObject *>(object));
 }

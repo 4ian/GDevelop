@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Box 3D Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -38,7 +38,7 @@ class ExpressionInstruction;
 class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 class wxBitmap;
 class Game;
 class wxWindow;
@@ -61,7 +61,7 @@ class Box3DObject : public Object
 
         virtual bool Draw(sf::RenderWindow& main_window);
 
-        #ifdef GDE
+        #if defined(GD_IDE_ONLY)
         virtual bool DrawEdittime(sf::RenderWindow& main_window);
         virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
 
@@ -75,11 +75,9 @@ class Box3DObject : public Object
         #endif
 
         virtual void LoadFromXml(const TiXmlElement * elemScene);
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * elemScene);
         #endif
-
-        virtual void UpdateTime(float timeElapsed);
 
         virtual void OnPositionChanged() {};
 
@@ -102,6 +100,8 @@ class Box3DObject : public Object
         virtual inline void SetWidth(float newWidth) {width = newWidth;};
         virtual inline void SetHeight(float newHeight) {height = newHeight;};
         inline void SetDepth(float newDepth) {depth = newDepth;};
+
+        virtual std::vector<RotatedRectangle> GetHitBoxes() const;
 
         std::string frontTextureName;
         std::string topTextureName;
@@ -155,6 +155,5 @@ class Box3DObject : public Object
 
 void DestroyBox3DObject(Object * object);
 Object * CreateBox3DObject(std::string name);
-Object * CreateBox3DObjectByCopy(Object * object);
 
 #endif // BOX3DOBJECT_H

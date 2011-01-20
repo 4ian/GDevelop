@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Box 3D Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 
 */
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 #include "Box3DObjectEditor.h"
 
 //(*InternalHeaders(Box3DObjectEditor)
@@ -92,7 +92,7 @@ object(object_)
 	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
-	
+
 	Create(parent, wxID_ANY, _("Paramétrage de l\'objet Boite 3D"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
@@ -182,7 +182,7 @@ object(object_)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Box3DObjectEditor::OnfrontAddFromBtClick);
 	Connect(ID_BITMAPBUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Box3DObjectEditor::OntopAddFromBtClick);
 	Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Box3DObjectEditor::OnbottomAddFromBtClick);

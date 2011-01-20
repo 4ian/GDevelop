@@ -351,7 +351,7 @@ buildMessagesPnl(NULL)
     projectManager = new ProjectManager(this, *this);
     projectManager->ConnectEvents();
 
-    buildMessagesPnl = new BuildMessagesPnl(this);
+    buildMessagesPnl = new BuildMessagesPnl(this, projectManager);
 
     m_mgr.AddPane( projectManager, wxAuiPaneInfo().Name( wxT( "PM" ) ).Caption( _( "Gestionnaire de projets" ) ).Left().MaximizeButton( true ).MinimizeButton( false ).MinSize(170,100) );
     m_mgr.AddPane( Panel1, wxAuiPaneInfo().Name( wxT( "EP" ) ).Caption( _( "Editeur principal" ) ).Center().CaptionVisible(false).CloseButton( false ).MaximizeButton( true ).MinimizeButton( false ) );

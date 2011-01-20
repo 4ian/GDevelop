@@ -1433,7 +1433,7 @@ void SceneCanvas::Reload()
     scene = newScene;
     scene.editing = oldEditingState;
 
-    #if defined(GD_DYNAMIC_EXTENSIONS)
+    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( !scene.editing )
     {
         GDpriv::DynamicExtensionsManager::getInstance()->UnloadAllDynamicExtensions();
@@ -1443,7 +1443,7 @@ void SceneCanvas::Reload()
 
         CompilerMessagesParser errorsParser;
         errorsParser.ParseOutput(sourceFileBuilder.GetErrors());
-        mainEditorCommand.GetBuildMessagesPanel()->RefreshWith(errorsParser.parsedErrors);
+        mainEditorCommand.GetBuildMessagesPanel()->RefreshWith(&gameEdited, errorsParser.parsedErrors);
 
         GDpriv::DynamicExtensionsManager::getInstance()->LoadDynamicExtension("test.dxgd");
     }

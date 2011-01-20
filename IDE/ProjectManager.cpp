@@ -332,7 +332,7 @@ void ProjectManager::Refresh()
             projectsTree->AppendItem(eventsItem, mainEditor.games[i]->externalEvents[j]->GetName(), 4 ,4, eventsItemData);
         }
 
-        #if defined(GD_DYNAMIC_EXTENSIONS)
+        #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
         gdTreeItemGameData * sourceFilesItemData = new gdTreeItemGameData("SourceFiles", "", mainEditor.games[i].get());
         wxTreeItemId sourceFilesItem = projectsTree->AppendItem(projectItem, _("Fichiers sources C++"), 5 ,5, sourceFilesItemData);
         for (unsigned int j = 0;j<mainEditor.games[i]->externalSourceFiles.size();++j)
@@ -491,17 +491,23 @@ void ProjectManager::OnEditSourceFileSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
+    EditSourceFile(game, data->GetSecondString());
+}
+
+void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t line)
+{
     MainEditorCommand mainEditorCommand;
     mainEditorCommand.SetMainEditor(&mainEditor);
     mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
 
-    vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
-        find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), data->GetSecondString()));
-
-    if ( sourceFile == game->externalSourceFiles.end() )
+    //Having a game associated with the editor is optional
+    Game * associatedGame = NULL;
+    if ( game )
     {
-        wxLogWarning(_("Fichier introuvable."));
-        return;
+        vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
+            find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), filename));
+
+        if ( sourceFile != game->externalSourceFiles.end() ) associatedGame = game;
     }
 
     //Verify if the editor is not already opened
@@ -509,19 +515,21 @@ void ProjectManager::OnEditSourceFileSelected(wxCommandEvent& event)
     {
         CodeEditor * editorPtr = dynamic_cast<CodeEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
 
-        if ( editorPtr != NULL && editorPtr->filename == (*sourceFile)->GetFileName() )
+        if ( editorPtr != NULL && editorPtr->filename == filename )
         {
             //Change notebook page to scene page
             mainEditor.GetEditorsNotebook()->SetSelection(j);
+            if ( line != std::string::npos ) editorPtr->SelectLine(line);
             return;
         }
     }
 
-    CodeEditor * editorScene = new CodeEditor(mainEditor.GetEditorsNotebook(), (*sourceFile)->GetFileName(), *game, mainEditorCommand);
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, wxFileName(data->GetSecondString()).GetFullName(), true, wxBitmap("res/source_cpp16.png", wxBITMAP_TYPE_ANY)) )
+    CodeEditor * editorScene = new CodeEditor(mainEditor.GetEditorsNotebook(), filename, associatedGame, mainEditorCommand);
+    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, wxFileName(filename).GetFullName(), true, wxBitmap("res/source_cpp16.png", wxBITMAP_TYPE_ANY)) )
     {
         wxLogError(_("Impossible d'ajouter le nouvel onglet !"));
     }
+    if ( line != std::string::npos ) editorScene->SelectLine(line);
 }
 
 /**
@@ -1083,7 +1091,7 @@ void ProjectManager::CloseGame(Game * game)
         }
         else if ( codeEditorPtr != NULL )
         {
-            if ( &codeEditorPtr->game == game)
+            if ( codeEditorPtr->game == game)
             {
                 if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                     wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );

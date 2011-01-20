@@ -25,7 +25,6 @@
 					<Add option="-mthreads" />
 					<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
 					<Add option="-DGD_IDE_ONLY" />
-					<Add option="-DGD_DYNAMIC_EXTENSIONS" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -195,7 +194,6 @@
 					<Add option="-mthreads" />
 					<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
 					<Add option="-DGD_IDE_ONLY" />
-					<Add option="-DGD_DYNAMIC_EXTENSIONS" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -380,7 +378,6 @@
 					<Add option="-mthreads" />
 					<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
 					<Add option="-DGD_IDE_ONLY" />
-					<Add option="-DGD_DYNAMIC_EXTENSIONS" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />

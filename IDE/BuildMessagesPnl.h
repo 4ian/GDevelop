@@ -6,6 +6,8 @@
 #include <wx/sizer.h>
 #include <wx/panel.h>
 //*)
+class Game;
+class ProjectManager;
 #include <vector>
 #include "GDL/CompilerMessagesParser.h"
 
@@ -13,10 +15,14 @@ class BuildMessagesPnl: public wxPanel
 {
 	public:
 
-		BuildMessagesPnl(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
+		BuildMessagesPnl(wxWindow* parent, ProjectManager * projectManager);
 		virtual ~BuildMessagesPnl();
 
-		void RefreshWith(std::vector < CompilerMessage > messages);
+		void RefreshWith(Game * game, std::vector < CompilerMessage > messages);
+		void OpenFileContainingFirstError();
+
+        ProjectManager * projectManager; ///< Used to open files.
+		Game * gameAssociatedWithErrors; ///< Game for which errors have been emitted.
 
 		//(*Declarations(BuildMessagesPnl)
 		wxListCtrl* messagesList;
@@ -31,6 +37,7 @@ class BuildMessagesPnl: public wxPanel
 	private:
 
 		//(*Handlers(BuildMessagesPnl)
+		void OnmessagesListItemActivated(wxListEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

@@ -24,6 +24,17 @@ class ProjectManager: public wxPanel
 		ProjectManager(wxWindow* parent, Game_Develop_EditorFrame & mainEditor_);
 		virtual ~ProjectManager();
 
+        /**
+         * Open a source file. Game can be NULL.
+         */
+		void EditSourceFile(Game * game, std::string filename, size_t line = std::string::npos);
+        void Refresh();
+
+        static void CreateRibbonPage(wxRibbonPage * page);
+        void ConnectEvents();
+
+		Game_Develop_EditorFrame & mainEditor;
+
 		//(*Declarations(ProjectManager)
 		wxMenuItem* MenuItem8;
 		wxMenuItem* MenuItem7;
@@ -56,12 +67,6 @@ class ProjectManager: public wxPanel
 		wxMenuItem* closeGameBt;
 		wxMenuItem* editScenePropMenuItem;
 		//*)
-
-        static void CreateRibbonPage(wxRibbonPage * page);
-        void ConnectEvents();
-
-		Game_Develop_EditorFrame & mainEditor;
-        void Refresh();
 
 	protected:
 

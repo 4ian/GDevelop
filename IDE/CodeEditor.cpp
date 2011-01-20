@@ -31,7 +31,7 @@ BEGIN_EVENT_TABLE(CodeEditor,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-CodeEditor::CodeEditor(wxWindow* parent, std::string filename_, RuntimeGame & game_, const MainEditorCommand & mainEditorCommand_) :
+CodeEditor::CodeEditor(wxWindow* parent, std::string filename_, Game * game_, const MainEditorCommand & mainEditorCommand_) :
 filename(filename_),
 game(game_),
 mainEditorCommand(mainEditorCommand_)
@@ -158,6 +158,11 @@ void CodeEditor::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonPaste, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuPasteSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuUndoSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuRedoSelected, NULL, this);
+}
+
+void CodeEditor::SelectLine(size_t line)
+{
+    textEditor->GotoLine(line-1);
 }
 
 /**

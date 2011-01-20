@@ -13,14 +13,14 @@
 #include <string>
 #include <vector>
 #include "GDL/MainEditorCommand.h"
-class RuntimeGame;
+class Game;
 class Scene;
 
 class CodeEditor: public wxPanel
 {
 	public:
 
-		CodeEditor(wxWindow* parent, std::string filename, RuntimeGame & game_, const MainEditorCommand & mainEditorCommand_);
+		CodeEditor(wxWindow* parent, std::string filename, Game * game_, const MainEditorCommand & mainEditorCommand_);
 		virtual ~CodeEditor();
 
 		//(*Declarations(CodeEditor)
@@ -32,7 +32,9 @@ class CodeEditor: public wxPanel
 		//*)
 
 		std::string filename; ///< File being edited.
-		RuntimeGame & game;
+		Game * game; ///< Game associated with the file. Can be NULL.
+
+		void SelectLine(size_t line);
 
 		static void CreateRibbonPage(wxRibbonPage * page);
 		void ConnectEvents();

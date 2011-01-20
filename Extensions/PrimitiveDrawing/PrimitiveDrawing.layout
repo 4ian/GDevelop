@@ -2,28 +2,28 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="DrawerActions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="5275" topLine="76" />
+		<Cursor position="74" topLine="3" />
 	</File>
 	<File name="DrawerConditions.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="982" topLine="30" />
+		<Cursor position="74" topLine="3" />
 	</File>
 	<File name="DrawerExpressions.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="1450" topLine="2" />
+		<Cursor position="74" topLine="2" />
 	</File>
 	<File name="DrawerObject.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="10126" topLine="268" />
+		<Cursor position="7262" topLine="180" />
 	</File>
 	<File name="DrawerObject.h" open="0" top="0" tabpos="0">
-		<Cursor position="6554" topLine="126" />
+		<Cursor position="1910" topLine="39" />
 	</File>
 	<File name="DrawerObjectEditor.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="8800" topLine="129" />
+		<Cursor position="1008" topLine="3" />
 	</File>
 	<File name="DrawerObjectEditor.h" open="0" top="0" tabpos="0">
-		<Cursor position="1372" topLine="36" />
+		<Cursor position="1008" topLine="3" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="12506" topLine="38" />
+		<Cursor position="14283" topLine="251" />
 	</File>
 	<File name="..\..\GDL\GDL\tinystr.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="247" topLine="30" />

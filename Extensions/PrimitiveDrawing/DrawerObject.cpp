@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Primitive Drawing Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -33,7 +33,7 @@ freely, subject to the following restrictions:
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
@@ -139,7 +139,7 @@ void DrawerObject::LoadFromXml(const TiXmlElement * object)
             absoluteCoordinates = false;
     }
 }
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void DrawerObject::SaveToXml(TiXmlElement * object)
 {
     TiXmlElement * fillOpacityElem = new TiXmlElement( "FillOpacity" );
@@ -177,7 +177,7 @@ void DrawerObject::SaveToXml(TiXmlElement * object)
 
 bool DrawerObject::LoadResources(const ImageManager & imageMgr )
 {
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     edittimeIconImage.LoadFromFile("Extensions/primitivedrawingicon.png");
     edittimeIcon.SetImage(edittimeIconImage);
     #endif
@@ -213,7 +213,7 @@ bool DrawerObject::Draw( sf::RenderWindow& window )
     return true;
 }
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 /**
  * Render object at edittime
  */
@@ -434,16 +434,4 @@ void DestroyDrawerObject(Object * object)
 Object * CreateDrawerObject(std::string name)
 {
     return new DrawerObject(name);
-}
-
-/**
- * Function creating an extension Object from another.
- * Game Develop can not directly create an extension object.
- *
- * Note that it is safe to do the static cast, as this function
- * is called owing to the typeId of the object to copy.
- */
-Object * CreateDrawerObjectByCopy(Object * object)
-{
-    return new DrawerObject(*static_cast<DrawerObject *>(object));
 }

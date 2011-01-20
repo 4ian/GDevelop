@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Primitive Drawing Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -37,7 +37,7 @@ class ExpressionInstruction;
 class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 class wxBitmap;
 class Game;
 class wxWindow;
@@ -60,7 +60,7 @@ class DrawerObject : public Object
 
         virtual bool Draw(sf::RenderWindow& main_window);
 
-        #ifdef GDE
+        #if defined(GD_IDE_ONLY)
         virtual bool DrawEdittime(sf::RenderWindow& main_window);
         virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
 
@@ -74,7 +74,7 @@ class DrawerObject : public Object
         #endif
 
         virtual void LoadFromXml(const TiXmlElement * elemScene);
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * elemScene);
         #endif
 
@@ -157,7 +157,7 @@ class DrawerObject : public Object
 
         bool absoluteCoordinates;
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         sf::Image edittimeIconImage;
         sf::Sprite edittimeIcon;
         #endif
@@ -167,7 +167,6 @@ bool ActCopyImageOnAnother( RuntimeScene & scene, ObjectsConcerned & objectsConc
 
 void DestroyDrawerObject(Object * object);
 Object * CreateDrawerObject(std::string name);
-Object * CreateDrawerObjectByCopy(Object * object);
 
 
 #endif // DRAWEROBJECT_H

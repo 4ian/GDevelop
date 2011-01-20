@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -32,7 +32,7 @@ freely, subject to the following restrictions:
 #include <iostream>
 
 /**
- * Datas shared by Network Automatism
+ * Datas shared by Network Automatism ( i.e. Nothing )
  */
 class SceneNetworkDatas : public AutomatismsSharedDatas
 {
@@ -48,7 +48,7 @@ class SceneNetworkDatas : public AutomatismsSharedDatas
             return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneNetworkDatas(*this));
         }
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         #endif
 

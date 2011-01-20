@@ -31,6 +31,16 @@ void NetworkManager::ReceivePackets()
                 ReceivedDataManager::getInstance()->values[title] = number;
                 break;
             }
+            case 1:
+            {
+                std::string title;
+                packet >> title;
+                std::string str;
+                packet >> str;
+
+                ReceivedDataManager::getInstance()->strings[title] = str;
+                break;
+            }
             default:
                 ErrorManager::getInstance()->SetLastError("Received unknown data ( Type "+ToString(type)+" )\n");
                 break;

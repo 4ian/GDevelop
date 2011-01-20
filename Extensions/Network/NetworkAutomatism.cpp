@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -36,14 +36,14 @@ freely, subject to the following restrictions:
 
 NetworkAutomatism::NetworkAutomatism(std::string automatismTypeName) :
 Automatism(automatismTypeName),
-sending(true),
-objectNetworkId(0),
 dataPrefix("Object"),
 xPosition(true),
 yPosition(true),
 angle(true),
 width(false),
-height(false)
+height(false),
+sending(true),
+objectNetworkId(0)
 {
 }
 
@@ -51,7 +51,7 @@ NetworkAutomatism::~NetworkAutomatism()
 {
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void NetworkAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ )
 {
     NetworkAutomatismEditor editor(parent, game_, scene, *this, mainEditorCommand_);
@@ -128,12 +128,26 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
     }
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void NetworkAutomatism::SaveToXml(TiXmlElement * elem) const
 {
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("sending", sending);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("xPosition", xPosition);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("yPosition", yPosition);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("angle", angle);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("width", width);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("height", height);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("dataPrefix", dataPrefix);
 }
 #endif
 
 void NetworkAutomatism::LoadFromXml(const TiXmlElement * elem)
 {
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("sending", sending);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("xPosition", xPosition);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("yPosition", yPosition);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("angle", angle);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("width", width);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("height", height);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("dataPrefix", dataPrefix);
 }

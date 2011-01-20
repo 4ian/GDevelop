@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -69,6 +69,18 @@ bool ActSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
     packet  << sf::Int32(0)
             << action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)
             << static_cast<double>(action.GetParameter(1).GetAsMathExpressionResult(scene, objectsConcerned));
+
+    NetworkManager::getInstance()->Send(packet);
+
+    return true;
+}
+
+bool ActSendString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    sf::Packet packet;
+    packet  << sf::Int32(1)
+            << action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)
+            << action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned);
 
     NetworkManager::getInstance()->Send(packet);
 

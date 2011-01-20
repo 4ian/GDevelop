@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -55,8 +55,8 @@ class Extension : public ExtensionBase
                            _("Ajoute l'ordinateur ayant l'adresse IP indiquée comme destinataire des données envoyées."),
                            _("Ajouter _PARAM0_ en destinataire"),
                            _("Réseau : Envoi"),
-                           "res/actions/camera24.png",
-                           "res/actions/camera.png",
+                           "Extensions/networkicon24.png",
+                           "Extensions/networkicon.png",
                            &ActAddRecipient);
 
                 DECLARE_PARAMETER("text", _("Adresse IP du destinataire"), false, "")
@@ -69,8 +69,8 @@ class Extension : public ExtensionBase
                            _("Vide la liste des destinataires des données envoyées"),
                            _("Vider la liste des destinataires"),
                            _("Réseau : Envoi"),
-                           "res/actions/camera24.png",
-                           "res/actions/camera.png",
+                           "Extensions/networkicon24.png",
+                           "Extensions/networkicon.png",
                            &ActRemoveAllRecipients);
 
             DECLARE_END_ACTION()
@@ -80,8 +80,8 @@ class Extension : public ExtensionBase
                            _("Initialise le réseau afin de pouvoir recevoir des données depuis d'autres ordinateurs."),
                            _("Initialiser la réception de données"),
                            _("Réseau : Reception"),
-                           "res/actions/camera24.png",
-                           "res/actions/camera.png",
+                           "Extensions/networkicon24.png",
+                           "Extensions/networkicon.png",
                            &ActListenToPort);
 
                 DECLARE_PARAMETER_OPTIONAL("expression", _("Port d'écoute (Par défaut : 50001)"), false, "")
@@ -93,8 +93,8 @@ class Extension : public ExtensionBase
                            _("Envoi une valeur aux destinataires"),
                            _("Envoyer la valeur _PARAM1_ avec l'intitulé _PARAM0_ aux destinataires"),
                            _("Réseau : Envoi"),
-                           "res/actions/camera24.png",
-                           "res/actions/camera.png",
+                           "Extensions/networkicon24.png",
+                           "Extensions/networkicon.png",
                            &ActSendValue);
 
                 DECLARE_PARAMETER("text", _("Groupe"), false, "")
@@ -103,13 +103,27 @@ class Extension : public ExtensionBase
 
             DECLARE_END_ACTION()
 
+            DECLARE_ACTION("SendString",
+                           _("Envoyer un texte"),
+                           _("Envoi un texte aux destinataires"),
+                           _("Envoyer le texte _PARAM1_ avec l'intitulé _PARAM0_ aux destinataires"),
+                           _("Réseau : Envoi"),
+                           "Extensions/networkicon24.png",
+                           "Extensions/networkicon.png",
+                           &ActSendString);
+
+                DECLARE_PARAMETER("text", _("Groupe"), false, "")
+                DECLARE_PARAMETER("text", _("Texte"), false, "")
+
+            DECLARE_END_ACTION()
+
             DECLARE_ACTION("ReceivePackets",
                            _("Recevoir les données en attente"),
                            _("Reçois les données envoyées depuis d'autre ordinateurs.\nVous pouvez ensuite les consulter avec les expressions appropriées"),
                            _("Recevoir les données"),
                            _("Réseau : Reception"),
-                           "res/actions/camera24.png",
-                           "res/actions/camera.png",
+                           "Extensions/networkicon24.png",
+                           "Extensions/networkicon.png",
                            &ActReceivePackets);
 
             DECLARE_END_ACTION()
@@ -130,7 +144,7 @@ class Extension : public ExtensionBase
                       _("NetworkUpdater"),
                       _("Automatisme permettant de déplacer automatiquement les objets d'un jeu en réseau"),
                       "",
-                      "res/physics32.png",
+                      "Extensions/networkicon32.png",
                       NetworkAutomatism,
                       SceneNetworkDatas)
 
@@ -138,9 +152,9 @@ class Extension : public ExtensionBase
                                _("Mettre en envoi de données"),
                                _("L'automatisme enverra les données de ses objets.\nAssurez vous d'avoir généré les identifiants des objets auparavant"),
                                _("Mettre _PARAM0_ en envoi de données"),
-                               _("Comportement"),
-                               "res/actions/camera24.png",
-                               "res/actions/camera.png",
+                               _("Automatisme Mise à jour en réseau automatique"),
+                               "Extensions/networkicon24.png",
+                               "Extensions/networkicon.png",
                                &NetworkAutomatism::ActSetAsSender);
 
                     DECLARE_PARAMETER("object", _("Object"), true, "")
@@ -153,9 +167,9 @@ class Extension : public ExtensionBase
                                _("Mettre en réception de données"),
                                _("L'automatisme recevra les données et mettera à jours les objets.\nAssurez vous d'avoir généré les identifiants des objets auparavant"),
                                _("Mettre _PARAM0_ en réception de données"),
-                               _("Comportement"),
-                               "res/actions/camera24.png",
-                               "res/actions/camera.png",
+                               _("Automatisme Mise à jour en réseau automatique"),
+                               "Extensions/networkicon24.png",
+                               "Extensions/networkicon.png",
                                &NetworkAutomatism::ActSetAsReceiver);
 
                     DECLARE_PARAMETER("object", _("Object"), true, "")
@@ -168,9 +182,9 @@ class Extension : public ExtensionBase
                                _("Changer l'identifiant de l'objet"),
                                _("Chaque objet nécessite un identifiant unique, le même sur tous les ordinateurs, afin d'être identifié et mis à jour"),
                                _("Mettre l'identifiant de _PARAM0_ à _PARAM2_"),
-                               _("Comportement"),
-                               "res/actions/camera24.png",
-                               "res/actions/camera.png",
+                               _("Automatisme Mise à jour en réseau automatique"),
+                               "Extensions/networkicon24.png",
+                               "Extensions/networkicon.png",
                                &NetworkAutomatism::ActSetIdentifier);
 
                     DECLARE_PARAMETER("object", _("Object"), true, "")
@@ -192,8 +206,8 @@ class Extension : public ExtensionBase
                            _("Génère automatiquement des identifiants différents pour les objets indiqués.\nNotez qu'il est préférable d'utiliser cette action en début de scène par exemple, pour assurer que les objets aient\nbien les mêmes identifiants sur les différents ordinateurs."),
                            _("Générer des identifiants réseau unique pour _PARAM0_"),
                            _("Automatisme Mise à jour en réseau automatique"),
-                           "res/actions/camera24.png",
-                           "res/actions/camera.png",
+                           "Extensions/networkicon24.png",
+                           "Extensions/networkicon.png",
                            &ActGenereateObjectNetworkId);
 
                 DECLARE_PARAMETER("object", _("Object"), true, "")
@@ -216,7 +230,7 @@ class Extension : public ExtensionBase
          */
         void CompleteCompilationInformation()
         {
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             compilationInfo.runtimeOnly = false;
             #else
             compilationInfo.runtimeOnly = true;
@@ -233,7 +247,7 @@ class Extension : public ExtensionBase
             compilationInfo.sfmlMajorVersion = 2;
             compilationInfo.sfmlMinorVersion = 0;
 
-            #if defined(GDE)
+            #if defined(GD_IDE_ONLY)
             compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION;
             compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION;
             compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER;

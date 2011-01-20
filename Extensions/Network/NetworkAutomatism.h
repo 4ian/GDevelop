@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -48,7 +48,7 @@ class NetworkAutomatism : public Automatism
         virtual ~NetworkAutomatism();
         virtual boost::shared_ptr<Automatism> Clone() { return boost::shared_ptr<Automatism>(new NetworkAutomatism(*this));}
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         /**
          * Save Automatism to XML
          */
@@ -60,7 +60,7 @@ class NetworkAutomatism : public Automatism
          */
         virtual void LoadFromXml(const TiXmlElement * elem);
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         /**
          * Called when user wants to edit the automatism.
          */

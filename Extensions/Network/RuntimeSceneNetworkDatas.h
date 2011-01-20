@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -32,7 +32,7 @@ freely, subject to the following restrictions:
 class SceneNetworkDatas;
 
 /**
- * Datas shared by Network Automatism at runtime
+ * Datas shared by Network Automatism at runtime ( i.e. Nothing )
  */
 class RuntimeSceneNetworkDatas : public AutomatismsRuntimeSharedDatas
 {

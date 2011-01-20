@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -193,7 +193,7 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
 
     DECLARE_OBJECT_CONDITION("Texture",
                    _("Image"),
-                   _("Teste le nom de l'image affichée par les partiucles."),
+                   _("Teste le nom de l'image affichée par les particules."),
                    _("L'image affichée par les particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",

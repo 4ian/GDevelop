@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -37,7 +37,7 @@ freely, subject to the following restrictions:
 #include "ParticleSystemWrapper.h"
 #include <SPK_GL.h>
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
 #include "GDL/ResourcesMergingHelper.h"
@@ -47,7 +47,7 @@ freely, subject to the following restrictions:
 
 ParticleEmitterObject::ParticleEmitterObject(std::string name_) :
 Object(name_),
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 particleEditionSimpleMode(true),
 emissionEditionSimpleMode(true),
 gravityEditionSimpleMode(true),
@@ -205,14 +205,14 @@ void ParticleEmitterObject::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorB", b);
     colorR = r; colorG = g; colorB = b;
 
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("particleEditionSimpleMode", particleEditionSimpleMode);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("emissionEditionSimpleMode", emissionEditionSimpleMode);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("gravityEditionSimpleMode", gravityEditionSimpleMode);
     #endif
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
 {
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("tank", tank);
@@ -294,7 +294,7 @@ void ParticleEmitterObject::SaveToXml(TiXmlElement * elem)
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorG", colorG);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorB", colorB);
 
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("particleEditionSimpleMode", particleEditionSimpleMode);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("emissionEditionSimpleMode", emissionEditionSimpleMode);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("gravityEditionSimpleMode", gravityEditionSimpleMode);
@@ -515,7 +515,7 @@ bool ParticleEmitterObject::LoadRuntimeResources(const ImageManager & imageMgr )
 
 bool ParticleEmitterObject::LoadResources(const ImageManager & imageMgr)
 {
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     edittimeIconImage.LoadFromFile("Extensions/particleSystemSceneIcon.png");
     edittimeIconImage.SetSmooth(false);
     edittimeIcon.SetImage(edittimeIconImage);
@@ -576,7 +576,7 @@ void ParticleEmitterObject::OnPositionChanged()
         particleSystem.zone->setPosition(SPK::Vector3D(GetX()*0.25f, -GetY()*0.25f, 0));
 }
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 /**
  * Render object at edittime
  */

@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 
 */
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 
 #include "ParticleEmitterObjectEditor.h"
 
@@ -917,7 +917,7 @@ object(object_)
     {
         float x = ToFloat(string(emitterDirXEdit->GetValue().mb_str()));
         float y = ToFloat(string(emitterDirYEdit->GetValue().mb_str()));
-        simpleAngleEdit->SetValue(ToString(atan2(y,x)*180.0f/3.14159f));
+        simpleAngleEdit->ChangeValue(ToString(atan2(y,x)*180.0f/3.14159f));
     }
     simpleConeAngleEdit->ChangeValue(emitterAngleBEdit->GetValue().mb_str());
 

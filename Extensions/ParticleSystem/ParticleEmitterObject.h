@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -38,7 +38,7 @@ class ExpressionInstruction;
 class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 class wxBitmap;
 class Game;
 class wxWindow;
@@ -63,7 +63,7 @@ class ParticleEmitterObject : public Object
 
         virtual bool Draw(sf::RenderWindow& main_window);
 
-        #ifdef GDE
+        #if defined(GD_IDE_ONLY)
         virtual bool DrawEdittime(sf::RenderWindow& main_window);
         virtual void PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper);
         virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
@@ -78,7 +78,7 @@ class ParticleEmitterObject : public Object
         #endif
 
         virtual void LoadFromXml(const TiXmlElement * elemScene);
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * elemScene);
         #endif
 
@@ -211,7 +211,7 @@ class ParticleEmitterObject : public Object
         void SetParticleTexture(std::string imageName) { textureParticleName = imageName; };
         std::string GetParticleTexture() const { return textureParticleName; };
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         bool particleEditionSimpleMode; ///< User preference related to object's edition
         bool emissionEditionSimpleMode; ///< User preference related to object's edition
         bool gravityEditionSimpleMode; ///< User preference related to object's edition
@@ -395,7 +395,7 @@ class ParticleEmitterObject : public Object
 
         float angle;
 
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         sf::Image edittimeIconImage;
         sf::Sprite edittimeIcon;
         #endif

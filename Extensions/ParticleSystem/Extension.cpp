@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -69,7 +69,7 @@ Extension::Extension()
  */
 void Extension::CompleteCompilationInformation()
 {
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     compilationInfo.runtimeOnly = false;
     #else
     compilationInfo.runtimeOnly = true;
@@ -86,7 +86,7 @@ void Extension::CompleteCompilationInformation()
     compilationInfo.sfmlMajorVersion = 2;
     compilationInfo.sfmlMinorVersion = 0;
 
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     compilationInfo.wxWidgetsMajorVersion = wxMAJOR_VERSION;
     compilationInfo.wxWidgetsMinorVersion = wxMINOR_VERSION;
     compilationInfo.wxWidgetsReleaseNumber = wxRELEASE_NUMBER;

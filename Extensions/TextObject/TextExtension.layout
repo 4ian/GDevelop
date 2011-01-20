@@ -2,30 +2,27 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug - Edittime" />
 	<File name="Extension.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="1758" topLine="32" />
+		<Cursor position="12218" topLine="226" />
 	</File>
 	<File name="TextActions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="5079" topLine="89" />
+		<Cursor position="68" topLine="3" />
 	</File>
 	<File name="TextConditions.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="6416" topLine="69" />
+		<Cursor position="68" topLine="3" />
 	</File>
 	<File name="TextExpressions.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="1752" topLine="11" />
+		<Cursor position="68" topLine="3" />
 	</File>
 	<File name="TextObject.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="4976" topLine="153" />
+		<Cursor position="4752" topLine="125" />
 	</File>
 	<File name="TextObject.h" open="0" top="0" tabpos="2">
-		<Cursor position="4764" topLine="101" />
+		<Cursor position="1895" topLine="39" />
 	</File>
 	<File name="TextObjectEditor.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="7434" topLine="134" />
+		<Cursor position="1002" topLine="3" />
 	</File>
 	<File name="TextObjectEditor.h" open="0" top="0" tabpos="1">
-		<Cursor position="2482" topLine="63" />
-	</File>
-	<File name="..\..\GDL\GDL\tinyxmlparser.cpp" open="1" top="0" tabpos="0">
-		<Cursor position="0" topLine="0" />
+		<Cursor position="1002" topLine="3" />
 	</File>
 </CodeBlocks_layout_file>

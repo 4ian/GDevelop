@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Text Object Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -37,7 +37,7 @@ class ExpressionInstruction;
 class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 class wxBitmap;
 class Game;
 class wxWindow;
@@ -61,7 +61,7 @@ class TextObject : public Object
 
         virtual bool Draw(sf::RenderWindow& main_window);
 
-        #ifdef GDE
+        #if defined(GD_IDE_ONLY)
         virtual bool DrawEdittime(sf::RenderWindow& main_window);
         virtual void PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper);
         virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
@@ -76,7 +76,7 @@ class TextObject : public Object
         #endif
 
         virtual void LoadFromXml(const TiXmlElement * elemScene);
-        #if defined(GDE)
+        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * elemScene);
         #endif
 
@@ -114,6 +114,8 @@ class TextObject : public Object
         inline unsigned int GetColorR() const { return colorR; };
         inline unsigned int GetColorG() const { return colorG; };
         inline unsigned int GetColorB() const { return colorB; };
+
+        virtual std::vector<RotatedRectangle> GetHitBoxes() const;
 
         //ACE for string
         bool CondString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );

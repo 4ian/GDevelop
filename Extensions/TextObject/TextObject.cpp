@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Text Object Extension
-Copyright (c) 2008-2010 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -33,7 +33,7 @@ freely, subject to the following restrictions:
 #include "GDL/Position.h"
 #include "TextObject.h"
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
 #include "GDL/ResourcesMergingHelper.h"
@@ -107,7 +107,7 @@ void TextObject::LoadFromXml(const TiXmlElement * object)
     }
 }
 
-#if defined(GDE)
+#if defined(GD_IDE_ONLY)
 void TextObject::SaveToXml(TiXmlElement * object)
 {
     TiXmlElement * str = new TiXmlElement( "String" );
@@ -158,7 +158,7 @@ bool TextObject::Draw( sf::RenderWindow& window )
     return true;
 }
 
-#ifdef GDE
+#if defined(GD_IDE_ONLY)
 /**
  * Render object at edittime
  */
@@ -250,6 +250,23 @@ void TextObject::OnPositionChanged()
 {
     text.SetX( GetX()+text.GetRect().Width/2 );
     text.SetY( GetY()+text.GetRect().Height/2 );
+}
+
+/**
+ * TextObject provides a basic bounding box.
+ */
+std::vector<RotatedRectangle> TextObject::GetHitBoxes() const
+{
+    std::vector<RotatedRectangle> boxes;
+    RotatedRectangle rectangle;
+    rectangle.angle = GetAngle()*3.14/180.0f;
+    rectangle.center.x = GetX()+GetCenterX();
+    rectangle.center.y = GetY()+GetCenterY();
+    rectangle.halfSize.x = GetWidth()/2;
+    rectangle.halfSize.y = GetHeight()/2;
+
+    boxes.push_back(rectangle);
+    return boxes;
 }
 
 /**

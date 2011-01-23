@@ -88,6 +88,17 @@ class Extension : public ExtensionBase
 
             DECLARE_END_ACTION()
 
+            DECLARE_ACTION("StopListening",
+                           _("Arrêter la réception de données"),
+                           _("Arrête la réception de données."),
+                           _("Arrêter la réception de données"),
+                           _("Réseau : Reception"),
+                           "Extensions/networkicon24.png",
+                           "Extensions/networkicon.png",
+                           &ActStopListening);
+
+            DECLARE_END_ACTION()
+
             DECLARE_ACTION("SendValue",
                            _("Envoyer une valeur"),
                            _("Envoi une valeur aux destinataires"),
@@ -125,6 +136,17 @@ class Extension : public ExtensionBase
                            "Extensions/networkicon24.png",
                            "Extensions/networkicon.png",
                            &ActReceivePackets);
+
+            DECLARE_END_ACTION()
+
+            DECLARE_ACTION("ResetReceivedData",
+                           _("Supprimer toutes les données reçues en mémoire"),
+                           _("Supprime toutes les données reçues et stockées en mémoire"),
+                           _("Supprimer toutes les données reçues et stockées en mémoire"),
+                           _("Réseau : Reception"),
+                           "Extensions/networkicon24.png",
+                           "Extensions/networkicon.png",
+                           &ActResetReceivedData);
 
             DECLARE_END_ACTION()
 

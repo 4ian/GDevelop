@@ -35,6 +35,21 @@ freely, subject to the following restrictions:
 #include <string>
 #include <list>
 
+bool ActResetReceivedData( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    ReceivedDataManager::getInstance()->values.clear();
+    ReceivedDataManager::getInstance()->strings.clear();
+
+    return true;
+}
+
+bool ActStopListening( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    NetworkManager::getInstance()->StopListening();
+
+    return true;
+}
+
 bool ActAddRecipient( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     sf::IpAddress address = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);

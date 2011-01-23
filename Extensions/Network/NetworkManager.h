@@ -13,8 +13,16 @@ public:
      */
     void ListenToPort(unsigned int port)
     {
-        socket.Unbind();
+        StopListening();
         socket.Bind(port);
+    }
+
+    /**
+     * Stop listening to a port
+     */
+    void StopListening()
+    {
+        socket.Unbind();
     }
 
     /**

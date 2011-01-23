@@ -32,6 +32,8 @@ class ObjectsConcerned;
 class Instruction;
 class Evaluateur;
 
+bool ActStopListening( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActResetReceivedData( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActAddRecipient( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActRemoveAllRecipients( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActListenToPort( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Development - Edittime" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="2040" topLine="33" />
+	</File>
+	<File name="TimedEvent.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="3058" topLine="81" />
+	</File>
+	<File name="TimedEvent.h" open="0" top="0" tabpos="2">
+		<Cursor position="1679" topLine="34" />
+	</File>
+	<File name="TimedEventEditorDlg.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="7902" topLine="114" />
+	</File>
+	<File name="TimedEventEditorDlg.h" open="0" top="0" tabpos="3">
+		<Cursor position="973" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>

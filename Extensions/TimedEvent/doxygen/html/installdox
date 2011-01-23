@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+
+%subst = ( );
+$quiet   = 0;
+
+if (open(F,"search.cfg"))
+{
+  $_=<F> ; s/[ \t\n]*$//g ; $subst{"_doc"} = $_;
+  $_=<F> ; s/[ \t\n]*$//g ; $subst{"_cgi"} = $_;
+}
+
+while ( @ARGV ) {
+  $_ = shift @ARGV;
+  if ( s/^-// ) {
+    if ( /^l(.*)/ ) {
+      $v = ($1 eq "") ? shift @ARGV : $1;
+      ($v =~ /\/$/) || ($v .= "/");
+      $_ = $v;
+      if ( /(.+)\@(.+)/ ) {
+        if ( exists $subst{$1} ) {
+          $subst{$1} = $2;
+        } else {
+          print STDERR "Unknown tag file $1 given with option -l\n";
+          &usage();
+        }
+      } else {
+        print STDERR "Argument $_ is invalid for option -l\n";
+        &usage();
+      }
+    }
+    elsif ( /^q/ ) {
+      $quiet = 1;
+    }
+    elsif ( /^\?|^h/ ) {
+      &usage();
+    }
+    else {
+      print STDERR "Illegal option -$_\n";
+      &usage();
+    }
+  }
+  else {
+    push (@files, $_ );
+  }
+}
+
+foreach $sub (keys %subst)
+{
+  if ( $subst{$sub} eq "" ) 
+  {
+    print STDERR "No substitute given for tag file `$sub'\n";
+    &usage();
+  }
+  elsif ( ! $quiet && $sub ne "_doc" && $sub ne "_cgi" )
+  {
+    print "Substituting $subst{$sub} for each occurrence of tag file $sub\n"; 
+  }
+}
+
+if ( ! @files ) {
+  if (opendir(D,".")) {
+    foreach $file ( readdir(D) ) {
+      $match = ".html";
+      next if ( $file =~ /^\.\.?$/ );
+      ($file =~ /$match/) && (push @files, $file);
+      ($file =~ "tree.js") && (push @files, $file);
+    }
+    closedir(D);
+  }
+}
+
+if ( ! @files ) {
+  print STDERR "Warning: No input files given and none found!\n";
+}
+
+foreach $f (@files)
+{
+  if ( ! $quiet ) {
+    print "Editing: $f...\n";
+  }
+  $oldf = $f;
+  $f   .= ".bak";
+  unless (rename $oldf,$f) {
+    print STDERR "Error: cannot rename file $oldf\n";
+    exit 1;
+  }
+  if (open(F,"<$f")) {
+    unless (open(G,">$oldf")) {
+      print STDERR "Error: opening file $oldf for writing\n";
+      exit 1;
+    }
+    if ($oldf ne "tree.js") {
+      while (<F>) {
+        s/doxygen\=\"([^ \"\:\t\>\<]*)\:([^ \"\t\>\<]*)\" (href|src)=\"\2/doxygen\=\"$1:$subst{$1}\" \3=\"$subst{$1}/g;
+        print G "$_";
+      }
+    }
+    else {
+      while (<F>) {
+        s/\"([^ \"\:\t\>\<]*)\:([^ \"\t\>\<]*)\", \"\2/\"$1:$subst{$1}\" ,\"$subst{$1}/g;
+        print G "$_";
+      }
+    }
+  } 
+  else {
+    print STDERR "Warning file $f does not exist\n";
+  }
+  unlink $f;
+}
+
+sub usage {
+  print STDERR "Usage: installdox [options] [html-file [html-file ...]]\n";
+  print STDERR "Options:\n";
+  print STDERR "     -l tagfile\@linkName   tag file + URL or directory \n";
+  print STDERR "     -q                    Quiet mode\n\n";
+  exit 1;
+}

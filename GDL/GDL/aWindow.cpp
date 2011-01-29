@@ -43,6 +43,12 @@ bool ActSetWindowSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
     int windowWidth = action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned);
     int windowHeight = action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned);
 
+    if ( action.GetParameter(2).GetAsBool() ) //Change future cameras default size if wanted.
+    {
+        game->windowWidth = windowWidth;
+        game->windowHeight = windowHeight;
+    }
+
     if ( scene.RenderWindowIsFullScreen() )
     {
         scene.renderWindow->Create( sf::VideoMode( windowWidth, windowHeight, 32 ), scene.title, sf::Style::Close | sf::Style::Fullscreen );

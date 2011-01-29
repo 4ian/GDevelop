@@ -2,6 +2,7 @@
 #include "GDL/MemTrace.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExternalEvents.h"
+#include "GDL/SourceFile.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
@@ -18,7 +19,8 @@ maxFPS(60),
 minFPS(10),
 verticalSync(false),
 portable(false),
-fullscreen(false)
+fullscreen(false),
+useExternalSourceFiles(false)
 {
     //Game use builtin extensions by default
     extensionsUsed.push_back("BuiltinObject");
@@ -75,6 +77,14 @@ void Game::Init(const Game & game)
     externalEvents.clear();
     for (unsigned int i =0;i<game.externalEvents.size();++i)
     	externalEvents.push_back( boost::shared_ptr<ExternalEvents>(new ExternalEvents(*game.externalEvents[i])) );
+
+    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
+    useExternalSourceFiles = game.useExternalSourceFiles;
+
+    externalSourceFiles.clear();
+    for (unsigned int i =0;i<game.externalSourceFiles.size();++i)
+    	externalSourceFiles.push_back( boost::shared_ptr<SourceFile>(new SourceFile(*game.externalSourceFiles[i])) );
+    #endif
 
     variables = game.variables;
     objectGroups = game.objectGroups;

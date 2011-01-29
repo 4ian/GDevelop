@@ -57,6 +57,7 @@ WindowExtension::WindowExtension()
 
         DECLARE_PARAMETER("expression", _("Largeur"), false, "")
         DECLARE_PARAMETER("expression", _("Hauteur"), false, "")
+        DECLARE_PARAMETER("yesorno", _("Utiliser cette taille pour la taille par défaut des caméras des scènes ?"), false, "")
 
     DECLARE_END_ACTION()
 

@@ -57,6 +57,7 @@ class GD_API Game
         vector < boost::shared_ptr<Object> >            globalObjects; ///< Global objects
         vector < ObjectGroup >                          objectGroups; ///< Global objects groups
         #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
+        bool useExternalSourceFiles; ///< True if game used external source files, and thus dynamic extensions.
         vector < boost::shared_ptr<SourceFile> >        externalSourceFiles; ///< List of C++ source files used.
         #endif
 

@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #if defined(GD_IDE_ONLY)
 
 #include "GDL/ChooseObject.h"
@@ -162,23 +167,6 @@ onlyObjectOfType(onlyObjectOfType_)
     Notebook1->SetPageImage(1,1);
     Notebook1->SetPageImage(2,0);
     Notebook1->SetPageImage(3,1);
-
-    //On vérifie si on est pas en mode simple.
-    wxConfigBase * pConfig = wxConfigBase::Get();
-
-    bool result = false;
-    pConfig->Read("/ModeSimple", &result);
-
-    if ( result == true )
-        CanSelectGroup = false;
-
-    if ( !CanSelectGroup )
-    {
-        GroupesList->Enable(false);
-        globalObjectGroups->Enable(false);
-    }
-
-	objectChosen = "";
 
 	Refresh();
 }

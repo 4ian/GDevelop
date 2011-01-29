@@ -1,3 +1,7 @@
+/**
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
 
 #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 #if defined(GD_IDE_ONLY)
@@ -28,9 +32,12 @@ void CompilerMessagesParser::ParseOutput(std::vector<std::string> output)
             if ( lineEndPos != std::string::npos ) newMessage.line = ToInt(output[i].substr(fileEndPos+1, lineEndPos));
         }
 
-        newMessage.message = output[i].substr(lineEndPos != std::string::npos ? lineEndPos+1 : fileEndPos, output[i].length());
+        if ( fileEndPos < output[i].length() )
+            newMessage.message = output[i].substr(lineEndPos != std::string::npos ? lineEndPos+1 : fileEndPos, output[i].length());
+        else
+            newMessage.message = output[i];
 
-        if ( output[i].find("error") ) newMessage.messageType = CompilerMessage::error;
+        if ( output[i].find("error") < output[i].length() ) newMessage.messageType = CompilerMessage::error;
         else newMessage.messageType = CompilerMessage::simple;
 
         parsedErrors.push_back(newMessage);

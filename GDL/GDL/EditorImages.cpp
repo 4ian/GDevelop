@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #if defined(GD_IDE_ONLY)
 
 #include "GDL/EditorImages.h"
@@ -340,19 +345,6 @@ void EditorImages::CreateToolbar()
     toolbar->AddSeparator();
     toolbar->AddTool( ID_BITMAPBUTTON3, wxT( "Aide de l'éditeur de la banque d'images" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur de la banque d'images") );
     toolbar->Realize();
-
-    wxConfigBase * pConfig = wxConfigBase::Get();
-
-    bool result = false;
-    pConfig->Read("/ModeSimple", &result);
-
-    if ( result )
-    {
-        toolbar->EnableTool(ID_BITMAPBUTTON1, false);
-        toolbar->EnableTool(ID_BITMAPBUTTON6, false);
-        toolbar->EnableTool(ID_BITMAPBUTTON4, false);
-        toolbar->EnableTool(ID_BITMAPBUTTON2, false);
-    }
 
     //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
 #ifdef __WXGTK__

@@ -9,36 +9,76 @@
 #ifndef SOURCEFILEBUILDER_H
 #define SOURCEFILEBUILDER_H
 
+#include <wx/process.h>
+class wxGauge;
+class wxStaticText;
+#include <vector>
+#include <string>
+#include <boost/shared_ptr.hpp>
 #include "GDL/CompilerToolchainPathManager.h"
 class Game;
-
+class SourceFile;
+class BuildProcess;
 
 /**
  * Manage build of sources file of a project.
+ * Use process to allow asynchronous compilation.
  */
 class GD_API SourceFileBuilder
 {
     public:
-        SourceFileBuilder(Game & game_);
+        friend class BuildProcess;
+
+        SourceFileBuilder(wxGauge * progressGauge = NULL, wxStaticText * statusText = NULL);
         virtual ~SourceFileBuilder() {};
 
         /**
-         * Build game external sources files.
-         * \return true if build was successful
+         * Launch build process.
+         * Build end can be tested with IsBuilding();
          */
-        bool BuildSourceFiles();
+        bool LaunchSourceFilesBuild();
 
         /**
-         * Return a vector of string containing errors messages.
+         * Set files to compile
          */
-        std::vector<std::string > GetErrors() const { return errors; };
+        void SetFiles(std::vector < boost::shared_ptr<SourceFile> > sourceFiles_) { sourceFiles = sourceFiles_; };
+
+        /**
+         * Return true if the IsBuilding is compiling sources files.
+         */
+        bool IsBuilding() const { return (state != 0); }
+
+        /**
+         * Return true if the IsBuilding is compiling sources files.
+         */
+        bool LastBuildSuccessed() const { return lastBuildSuccessed; }
+
+        /**
+         * Return a vector of string containing raw errors messages.
+         */
+        std::vector<std::string> GetErrors() const { return errors; };
+
+        /**
+         * Try to abord build process.
+         */
+        void AbordBuild() { abordBuild = true; };
+
+        /**
+         * Change wxWidgets controls used for display progress
+         */
+        void SetProgressControls(wxGauge * progressGauge_, wxStaticText * statusText) { progressGauge = progressGauge_; currentTaskTxt = statusText; }
+
+        /**
+         * Called by processes so as to advance build.
+         */
+        void OnCurrentBuildProcessTerminated(bool success);
 
     private:
 
         bool BuildSourceFile(std::string filename);
         bool LinkSourceFiles(std::vector<std::string> files);
 
-        Game & game;
+        std::vector < boost::shared_ptr<SourceFile> > sourceFiles;
 
         std::string wxwidgetsLibs;
         std::string wxwidgetsDefines;
@@ -52,7 +92,40 @@ class GD_API SourceFileBuilder
 
         std::vector<std::string > errors;
 
+        BuildProcess * currentBuildProcess; ///< Each build step is realized using a separate process to allow continue working with Game Develop
+        int state; ///< Used to remember the build state ( Idle, compiling, linking, finishing... )
+        unsigned int currentFileBuilded; ///< The file currently/lastly compiled.
+        bool abordBuild;
+        bool linkingNeed;
+        bool lastBuildSuccessed;
+
+        wxGauge * progressGauge;
+        wxStaticText * currentTaskTxt;
+
         CompilerToolchainPathManager pathManager;
+};
+
+/**
+ * Process used for building tasks.
+ */
+class BuildProcess : public wxProcess
+{
+public:
+    BuildProcess(SourceFileBuilder *parent) :
+        wxProcess(NULL),
+        m_parent(parent)
+    {
+        Redirect();
+    }
+
+    virtual void OnTerminate(int pid, int status);
+    virtual bool HasInput();
+
+    std::vector<std::string> output;
+    std::vector<std::string> outputErrors;
+
+protected:
+    SourceFileBuilder *m_parent; ///< Build process must be able to notify its parent his work is finished.
 };
 
 #endif // SOURCEFILEBUILDER_H

@@ -386,6 +386,7 @@ void OpenSaveGame::OpenGameInformations(TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableFilename", game.winExecutableFilename);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableIconFile", game.winExecutableIconFile);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("linuxExecutableFilename", game.linuxExecutableFilename);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("useExternalSourceFiles", game.useExternalSourceFiles);
     #endif
 
     return;
@@ -1705,6 +1706,7 @@ bool OpenSaveGame::SaveToFile(string file)
         GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("winExecutableFilename", game.winExecutableFilename);
         GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("winExecutableIconFile", game.winExecutableIconFile);
         GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("linuxExecutableFilename", game.linuxExecutableFilename);
+        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("useExternalSourceFiles", game.useExternalSourceFiles);
     }
 
     TiXmlElement * extensions = new TiXmlElement( "Extensions" );

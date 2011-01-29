@@ -91,7 +91,7 @@
 											<object class="sizeritem">
 												<object class="wxButton" name="ID_BUTTON3" variable="MinusBt" member="yes">
 													<label>-</label>
-													<size>10,23</size>
+													<size>25,23</size>
 													<handler function="OnMinusBtClick" entry="EVT_BUTTON" />
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -100,7 +100,7 @@
 											<object class="sizeritem">
 												<object class="wxButton" name="ID_BUTTON4" variable="MultBt" member="yes">
 													<label>*</label>
-													<size>10,23</size>
+													<size>25,23</size>
 													<handler function="OnMultBtClick" entry="EVT_BUTTON" />
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -192,6 +192,7 @@
 												<object class="wxButton" name="ID_BUTTON15" variable="Button4" member="yes">
 													<label>exp</label>
 													<size>25,23</size>
+													<tooltip>Exponentielle</tooltip>
 													<handler function="OnButton4Click" entry="EVT_BUTTON" />
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -201,6 +202,7 @@
 												<object class="wxButton" name="ID_BUTTON12" variable="Button1" member="yes">
 													<label>log</label>
 													<size>25,23</size>
+													<tooltip>Logarithme népérien</tooltip>
 													<handler function="OnButton1Click" entry="EVT_BUTTON" />
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -210,6 +212,7 @@
 												<object class="wxButton" name="ID_BUTTON8" variable="CosBt" member="yes">
 													<label>cos</label>
 													<size>25,23</size>
+													<tooltip>Cosinus</tooltip>
 													<handler function="OnCosBtClick" entry="EVT_BUTTON" />
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -219,6 +222,7 @@
 												<object class="wxButton" name="ID_BUTTON9" variable="SinBt" member="yes">
 													<label>sin</label>
 													<size>25,23</size>
+													<tooltip>Sinus</tooltip>
 													<handler function="OnSinBtClick" entry="EVT_BUTTON" />
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -228,17 +232,73 @@
 												<object class="wxButton" name="ID_BUTTON16" variable="Button5" member="yes">
 													<label>tan</label>
 													<size>25,23</size>
+													<tooltip>Tangente</tooltip>
 													<handler function="OnButton5Click" entry="EVT_BUTTON" />
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 												<option>1</option>
 											</object>
 											<object class="sizeritem">
-												<object class="wxButton" name="ID_BUTTON17" variable="Button6" member="yes">
-													<label>abs</label>
+												<object class="wxButton" name="ID_BUTTON33" variable="Button21" member="yes">
+													<label>log10</label>
 													<size>25,23</size>
-													<tooltip>abs(x) renvoie la valeur absolue de x.</tooltip>
-													<handler function="OnButton6Click" entry="EVT_BUTTON" />
+													<font>
+														<size>6</size>
+													</font>
+													<tooltip>Logarithme en base 10.</tooltip>
+													<handler function="OnButton21Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON29" variable="Button17" member="yes">
+													<label>cosh</label>
+													<size>25,23</size>
+													<font>
+														<size>7</size>
+													</font>
+													<tooltip>Cosinus hyperbolique</tooltip>
+													<handler function="OnButton17Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON28" variable="Button16" member="yes">
+													<label>sinh</label>
+													<size>25,23</size>
+													<font>
+														<size>7</size>
+													</font>
+													<tooltip>Sinus hyperbolique</tooltip>
+													<handler function="OnButton16Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON27" variable="Button15" member="yes">
+													<label>tanh</label>
+													<size>25,23</size>
+													<font>
+														<size>7</size>
+													</font>
+													<tooltip>Tangente hyperbolique</tooltip>
+													<handler function="OnButton15Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON26" variable="Button14" member="yes">
+													<label>floor</label>
+													<size>25,23</size>
+													<font>
+														<size>7</size>
+													</font>
+													<tooltip>Arrondi à l&apos;entier le plus petit.</tooltip>
+													<handler function="OnButton14Click" entry="EVT_BUTTON" />
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 												<option>1</option>
@@ -280,11 +340,106 @@
 												<option>1</option>
 											</object>
 											<object class="sizeritem">
-												<object class="wxButton" name="ID_BUTTON21" variable="intBt" member="yes">
+												<object class="wxButton" name="ID_BUTTON21" variable="ceilBt" member="yes">
+													<label>ceil</label>
+													<size>25,23</size>
+													<tooltip>Arrondi à l&apos;entier le plus grand.</tooltip>
+													<handler function="OnceilBtClick" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON22" variable="Button10" member="yes">
+													<label>a&#x0A;cosh</label>
+													<size>25,23</size>
+													<font>
+														<size>6</size>
+													</font>
+													<handler function="OnButton10Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON23" variable="Button11" member="yes">
+													<label>a&#x0A;sinh</label>
+													<size>25,23</size>
+													<font>
+														<size>6</size>
+													</font>
+													<handler function="OnButton11Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON24" variable="Button12" member="yes">
+													<label>a&#x0A;tanh</label>
+													<size>25,23</size>
+													<font>
+														<size>6</size>
+													</font>
+													<handler function="OnButton12Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON25" variable="intBt" member="yes">
 													<label>int</label>
 													<size>25,23</size>
 													<tooltip>int(x) convertit x en un entier.</tooltip>
 													<handler function="OnintBtClick" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON30" variable="Button18" member="yes">
+													<label>sec</label>
+													<size>25,23</size>
+													<font>
+														<size>7</size>
+													</font>
+													<tooltip>Sécante ( 1/cos(x) )</tooltip>
+													<handler function="OnButton18Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON31" variable="Button19" member="yes">
+													<label>csc</label>
+													<size>25,23</size>
+													<font>
+														<size>7</size>
+													</font>
+													<tooltip>Cosécante ( 1/sin(x) )</tooltip>
+													<handler function="OnButton19Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON32" variable="Button20" member="yes">
+													<label>cot</label>
+													<size>25,23</size>
+													<font>
+														<size>7</size>
+													</font>
+													<tooltip>Cotangente ( 1/tan(x) )</tooltip>
+													<handler function="OnButton20Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON17" variable="Button6" member="yes">
+													<label>abs</label>
+													<size>25,23</size>
+													<tooltip>abs(x) renvoie la valeur absolue de x.</tooltip>
+													<handler function="OnButton6Click" entry="EVT_BUTTON" />
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 												<option>1</option>

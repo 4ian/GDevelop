@@ -1,3 +1,8 @@
+/**
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #if defined(GD_IDE_ONLY)
 
 #include "GDL/EditExpression.h"
@@ -52,11 +57,23 @@ const long EditExpression::ID_BUTTON12 = wxNewId();
 const long EditExpression::ID_BUTTON8 = wxNewId();
 const long EditExpression::ID_BUTTON9 = wxNewId();
 const long EditExpression::ID_BUTTON16 = wxNewId();
-const long EditExpression::ID_BUTTON17 = wxNewId();
+const long EditExpression::ID_BUTTON33 = wxNewId();
+const long EditExpression::ID_BUTTON29 = wxNewId();
+const long EditExpression::ID_BUTTON28 = wxNewId();
+const long EditExpression::ID_BUTTON27 = wxNewId();
+const long EditExpression::ID_BUTTON26 = wxNewId();
 const long EditExpression::ID_BUTTON18 = wxNewId();
 const long EditExpression::ID_BUTTON19 = wxNewId();
 const long EditExpression::ID_BUTTON20 = wxNewId();
 const long EditExpression::ID_BUTTON21 = wxNewId();
+const long EditExpression::ID_BUTTON22 = wxNewId();
+const long EditExpression::ID_BUTTON23 = wxNewId();
+const long EditExpression::ID_BUTTON24 = wxNewId();
+const long EditExpression::ID_BUTTON25 = wxNewId();
+const long EditExpression::ID_BUTTON30 = wxNewId();
+const long EditExpression::ID_BUTTON31 = wxNewId();
+const long EditExpression::ID_BUTTON32 = wxNewId();
+const long EditExpression::ID_BUTTON17 = wxNewId();
 const long EditExpression::ID_STATICTEXT3 = wxNewId();
 const long EditExpression::ID_TREECTRL1 = wxNewId();
 const long EditExpression::ID_BUTTON10 = wxNewId();
@@ -123,9 +140,9 @@ lastErrorPos(std::string::npos)
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
 	PlusBt = new wxButton(this, ID_BUTTON2, _("+"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	BoxSizer1->Add(PlusBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	MinusBt = new wxButton(this, ID_BUTTON3, _("-"), wxDefaultPosition, wxSize(10,23), 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	MinusBt = new wxButton(this, ID_BUTTON3, _("-"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	BoxSizer1->Add(MinusBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	MultBt = new wxButton(this, ID_BUTTON4, _("*"), wxDefaultPosition, wxSize(10,23), 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	MultBt = new wxButton(this, ID_BUTTON4, _("*"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	BoxSizer1->Add(MultBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	DivBt = new wxButton(this, ID_BUTTON5, _("/"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON5"));
 	BoxSizer1->Add(DivBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -149,18 +166,45 @@ lastErrorPos(std::string::npos)
 	BitmapButton1->SetToolTip(_("Racine n-ième. nthroot(27, 3) donnera 3"));
 	GridSizer2->Add(BitmapButton1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button4 = new wxButton(this, ID_BUTTON15, _("exp"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON15"));
+	Button4->SetToolTip(_("Exponentielle"));
 	GridSizer2->Add(Button4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button1 = new wxButton(this, ID_BUTTON12, _("log"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON12"));
+	Button1->SetToolTip(_("Logarithme népérien"));
 	GridSizer2->Add(Button1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	CosBt = new wxButton(this, ID_BUTTON8, _("cos"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON8"));
+	CosBt->SetToolTip(_("Cosinus"));
 	GridSizer2->Add(CosBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SinBt = new wxButton(this, ID_BUTTON9, _("sin"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON9"));
+	SinBt->SetToolTip(_("Sinus"));
 	GridSizer2->Add(SinBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button5 = new wxButton(this, ID_BUTTON16, _("tan"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON16"));
+	Button5->SetToolTip(_("Tangente"));
 	GridSizer2->Add(Button5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button6 = new wxButton(this, ID_BUTTON17, _("abs"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON17"));
-	Button6->SetToolTip(_("abs(x) renvoie la valeur absolue de x."));
-	GridSizer2->Add(Button6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Button21 = new wxButton(this, ID_BUTTON33, _("log10"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON33"));
+	wxFont Button21Font(6,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	Button21->SetFont(Button21Font);
+	Button21->SetToolTip(_("Logarithme en base 10."));
+	GridSizer2->Add(Button21, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Button17 = new wxButton(this, ID_BUTTON29, _("cosh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON29"));
+	wxFont Button17Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	Button17->SetFont(Button17Font);
+	Button17->SetToolTip(_("Cosinus hyperbolique"));
+	GridSizer2->Add(Button17, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Button16 = new wxButton(this, ID_BUTTON28, _("sinh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON28"));
+	wxFont Button16Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	Button16->SetFont(Button16Font);
+	Button16->SetToolTip(_("Sinus hyperbolique"));
+	GridSizer2->Add(Button16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Button15 = new wxButton(this, ID_BUTTON27, _("tanh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON27"));
+	wxFont Button15Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	Button15->SetFont(Button15Font);
+	Button15->SetToolTip(_("Tangente hyperbolique"));
+	GridSizer2->Add(Button15, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Button14 = new wxButton(this, ID_BUTTON26, _("floor"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON26"));
+	wxFont Button14Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	Button14->SetFont(Button14Font);
+	Button14->SetToolTip(_("Arrondi à l\'entier le plus petit."));
+	GridSizer2->Add(Button14, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button7 = new wxButton(this, ID_BUTTON18, _("acos"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON18"));
 	wxFont Button7Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button7->SetFont(Button7Font);
@@ -173,9 +217,42 @@ lastErrorPos(std::string::npos)
 	wxFont Button9Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button9->SetFont(Button9Font);
 	GridSizer2->Add(Button9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	intBt = new wxButton(this, ID_BUTTON21, _("int"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON21"));
+	ceilBt = new wxButton(this, ID_BUTTON21, _("ceil"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON21"));
+	ceilBt->SetToolTip(_("Arrondi à l\'entier le plus grand."));
+	GridSizer2->Add(ceilBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Button10 = new wxButton(this, ID_BUTTON22, _("a\ncosh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON22"));
+	wxFont Button10Font(6,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	Button10->SetFont(Button10Font);
+	GridSizer2->Add(Button10, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Button11 = new wxButton(this, ID_BUTTON23, _("a\nsinh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON23"));
+	wxFont Button11Font(6,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	Button11->SetFont(Button11Font);
+	GridSizer2->Add(Button11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Button12 = new wxButton(this, ID_BUTTON24, _("a\ntanh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON24"));
+	wxFont Button12Font(6,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	Button12->SetFont(Button12Font);
+	GridSizer2->Add(Button12, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	intBt = new wxButton(this, ID_BUTTON25, _("int"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON25"));
 	intBt->SetToolTip(_("int(x) convertit x en un entier."));
 	GridSizer2->Add(intBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Button18 = new wxButton(this, ID_BUTTON30, _("sec"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON30"));
+	wxFont Button18Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	Button18->SetFont(Button18Font);
+	Button18->SetToolTip(_("Sécante ( 1/cos(x) )"));
+	GridSizer2->Add(Button18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Button19 = new wxButton(this, ID_BUTTON31, _("csc"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON31"));
+	wxFont Button19Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	Button19->SetFont(Button19Font);
+	Button19->SetToolTip(_("Cosécante ( 1/sin(x) )"));
+	GridSizer2->Add(Button19, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Button20 = new wxButton(this, ID_BUTTON32, _("cot"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON32"));
+	wxFont Button20Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	Button20->SetFont(Button20Font);
+	Button20->SetToolTip(_("Cotangente ( 1/tan(x) )"));
+	GridSizer2->Add(Button20, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Button6 = new wxButton(this, ID_BUTTON17, _("abs"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON17"));
+	Button6->SetToolTip(_("abs(x) renvoie la valeur absolue de x."));
+	GridSizer2->Add(Button6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(GridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	GridSizer1 = new wxGridSizer(0, 2, 0, 0);
@@ -222,11 +299,23 @@ lastErrorPos(std::string::npos)
 	Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnCosBtClick);
 	Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnSinBtClick);
 	Connect(ID_BUTTON16,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton5Click);
-	Connect(ID_BUTTON17,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton6Click);
+	Connect(ID_BUTTON33,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton21Click);
+	Connect(ID_BUTTON29,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton17Click);
+	Connect(ID_BUTTON28,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton16Click);
+	Connect(ID_BUTTON27,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton15Click);
+	Connect(ID_BUTTON26,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton14Click);
 	Connect(ID_BUTTON18,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton7Click);
 	Connect(ID_BUTTON19,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton8Click);
 	Connect(ID_BUTTON20,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton9Click);
-	Connect(ID_BUTTON21,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnintBtClick);
+	Connect(ID_BUTTON21,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnceilBtClick);
+	Connect(ID_BUTTON22,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton10Click);
+	Connect(ID_BUTTON23,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton11Click);
+	Connect(ID_BUTTON24,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton12Click);
+	Connect(ID_BUTTON25,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnintBtClick);
+	Connect(ID_BUTTON30,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton18Click);
+	Connect(ID_BUTTON31,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton19Click);
+	Connect(ID_BUTTON32,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton20Click);
+	Connect(ID_BUTTON17,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnButton6Click);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&EditExpression::OnObjListItemDoubleClicked);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&EditExpression::OnObjListItemActivated);
 	Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnAddPropBtClick);
@@ -740,3 +829,63 @@ void EditExpression::OnerrorTxtClick(wxCommandEvent& event)
         ExpressionEdit->GotoPos(lastErrorPos);
 }
 #endif
+
+void EditExpression::OnButton21Click(wxCommandEvent& event)
+{
+	ExpressionEdit->AddText("log10(");
+}
+
+void EditExpression::OnButton14Click(wxCommandEvent& event)
+{
+	ExpressionEdit->AddText("floor(");
+}
+
+void EditExpression::OnceilBtClick(wxCommandEvent& event)
+{
+	ExpressionEdit->AddText("ceil(");
+}
+
+void EditExpression::OnButton10Click(wxCommandEvent& event)
+{
+	ExpressionEdit->AddText("acosh(");
+}
+
+void EditExpression::OnButton11Click(wxCommandEvent& event)
+{
+	ExpressionEdit->AddText("asinh(");
+}
+
+void EditExpression::OnButton12Click(wxCommandEvent& event)
+{
+	ExpressionEdit->AddText("atanh(");
+}
+
+void EditExpression::OnButton18Click(wxCommandEvent& event)
+{
+	ExpressionEdit->AddText("sec(");
+}
+
+void EditExpression::OnButton19Click(wxCommandEvent& event)
+{
+	ExpressionEdit->AddText("csc(");
+}
+
+void EditExpression::OnButton20Click(wxCommandEvent& event)
+{
+	ExpressionEdit->AddText("cot(");
+}
+
+void EditExpression::OnButton15Click(wxCommandEvent& event)
+{
+	ExpressionEdit->AddText("tanh(");
+}
+
+void EditExpression::OnButton16Click(wxCommandEvent& event)
+{
+	ExpressionEdit->AddText("sinh(");
+}
+
+void EditExpression::OnButton17Click(wxCommandEvent& event)
+{
+	ExpressionEdit->AddText("cosh(");
+}

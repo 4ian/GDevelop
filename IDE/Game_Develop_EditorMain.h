@@ -46,7 +46,7 @@
 class RuntimeGame;
 class ProjectManager;
 class StartHerePage;
-class BuildMessagesPnl;
+class BuildToolsPnl;
 
 using namespace std;
 
@@ -114,7 +114,7 @@ class Game_Develop_EditorFrame: public wxFrame
          */
         inline wxRibbonButtonBar * GetRibbonSceneEditorButtonBar() const { return ribbonSceneEditorButtonBar; };
 
-        inline BuildMessagesPnl * GetBuildMessagesPanel() const { return buildMessagesPnl; }
+        inline BuildToolsPnl * GetBuildToolsPanel() const { return buildToolsPnl; }
 
 
         //(*Handlers(Game_Develop_EditorFrame)
@@ -165,7 +165,6 @@ class Game_Develop_EditorFrame: public wxFrame
         void OnMenuSaveWSSelected(wxCommandEvent& event);
         void OnRefreshAnalyseBtClick(wxCommandEvent& event);
         void OnMenuCompilationSelected(wxCommandEvent& event);
-        void OnMenuConvertirJRCSelected(wxCommandEvent& event);
         void OnMenuPortableSelected(wxCommandEvent& event);
         void OnWSDefautSelected(wxCommandEvent& event);
         void OnWSDetacheSelected(wxCommandEvent& event);
@@ -184,7 +183,6 @@ class Game_Develop_EditorFrame: public wxFrame
         void OnMenuFusionSelected(wxCommandEvent& event);
         void OnMenuItem36Selected(wxCommandEvent& event);
         void OnMenuTutoSelected(wxCommandEvent& event);
-        void OnMenuModeSimpleSelected(wxCommandEvent& event);
         void OnDecomposeGIFSelected(wxCommandEvent& event);
         void OnDecomposeRPGSelected(wxCommandEvent& event);
         void OnMenuWikiSelected(wxCommandEvent& event);
@@ -238,7 +236,6 @@ class Game_Develop_EditorFrame: public wxFrame
         static const long idRibbonPortable;
         static const long idRibbonCompil;
         static const long idRibbonProjectsManager;
-        static const long idRibbonSimpleMode;
         static const long idRibbonImporter;
         static const long idRibbonEncoder;
         static const long idRibbonOptions;
@@ -265,7 +262,7 @@ class Game_Develop_EditorFrame: public wxFrame
         wxAuiManager m_mgr;
         wxRibbonBar * m_ribbon; ///< Pointer to the ribbon
         wxRibbonButtonBar * ribbonSceneEditorButtonBar; ///Pointer to the ribbon bar which can be changed by scene editors
-        BuildMessagesPnl * buildMessagesPnl;
+        BuildToolsPnl * buildToolsPnl;
 
         StartHerePage * startPage;
         ProjectManager * projectManager;

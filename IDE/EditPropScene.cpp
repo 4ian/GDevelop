@@ -188,16 +188,6 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
     zNearEdit->SetValue(ToString(scene->oglZNear));
     zFarEdit->SetValue(ToString(scene->oglZFar));
     stopSoundsCheck->SetValue(scene->stopSoundsOnStartup);
-
-    //On vérifie si on est pas en mode simple.
-    wxConfigBase * pConfig = wxConfigBase::Get();
-
-    bool result = false;
-    pConfig->Read("/ModeSimple", &result);
-
-    if ( result )
-        TriBox->Enable(false);
-
 }
 
 EditPropScene::~EditPropScene()

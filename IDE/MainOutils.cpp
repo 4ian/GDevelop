@@ -8,7 +8,6 @@ extern MemTrace MemTracer;
 #include "Game_Develop_EditorMain.h"
 #include "mp3ogg.h"
 #include "ConvertJRC.h"
-#include "ModeSimple.h"
 #include "ImportImage.h"
 
 ////////////////////////////////////////////////////////////
@@ -17,28 +16,6 @@ extern MemTrace MemTracer;
 void Game_Develop_EditorFrame::OnMenuItem23Selected(wxCommandEvent& event)
 {
     mp3ogg dialog(this);
-    dialog.ShowModal();
-}
-
-////////////////////////////////////////////////////////////
-/// Convertir un jeu JRC 3.1.x
-////////////////////////////////////////////////////////////
-void Game_Develop_EditorFrame::OnMenuConvertirJRCSelected( wxCommandEvent& event )
-{
-    /*ConvertJRC dialog( this, games[gameCurrentlyEdited].get() );
-    dialog.ShowModal();
-
-    RefreshParaJeu();
-    ReloadEditors();
-    RefreshListScene();*/
-}
-
-////////////////////////////////////////////////////////////
-/// Activer le mode simple de Game Develop
-////////////////////////////////////////////////////////////
-void Game_Develop_EditorFrame::OnMenuModeSimpleSelected(wxCommandEvent& event)
-{
-    ModeSimple dialog(this);
     dialog.ShowModal();
 }
 

@@ -66,7 +66,20 @@ void BuildMessagesPnl::RefreshWith(Game * game, std::vector < CompilerMessage > 
 
 void BuildMessagesPnl::OpenFileContainingFirstError()
 {
+    if ( messagesList->GetItemCount() == 0)
+        return;
 
+    //Painful
+    wxListItem row_info;
+    row_info.m_itemId = 0;
+    row_info.m_col = 1;
+    row_info.m_mask = wxLIST_MASK_TEXT;
+
+    messagesList->GetItem( row_info );
+    size_t line = row_info.m_text.empty() ? std::string::npos : ToInt(string(row_info.m_text.mb_str()));
+    std::string file = string(messagesList->GetItemText(0).mb_str());
+
+    if ( projectManager && wxFileExists(file) ) projectManager->EditSourceFile(gameAssociatedWithErrors, file, line);
 }
 
 void BuildMessagesPnl::OnmessagesListItemActivated(wxListEvent& event)
@@ -81,5 +94,5 @@ void BuildMessagesPnl::OnmessagesListItemActivated(wxListEvent& event)
     size_t line = row_info.m_text.empty() ? std::string::npos : ToInt(string(row_info.m_text.mb_str()));
     std::string file = string(messagesList->GetItemText(event.GetIndex()).mb_str());
 
-    if ( projectManager ) projectManager->EditSourceFile(gameAssociatedWithErrors, file, line);
+    if ( projectManager && wxFileExists(file) ) projectManager->EditSourceFile(gameAssociatedWithErrors, file, line);
 }

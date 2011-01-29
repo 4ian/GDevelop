@@ -250,11 +250,6 @@ void Demarrage::OnExempleBtClick(wxCommandEvent& event)
     else
         pConfig->Write("Démarrage/MAJ", "false");
 
-    if ( simpleCheck->GetValue() )
-        pConfig->Write("/ModeSimple", true);
-    else
-        pConfig->Write("/ModeSimple", false);
-
     EndModal(1);
 }
 
@@ -266,11 +261,6 @@ void Demarrage::OnFermerBtClick(wxCommandEvent& event)
         pConfig->Write("Démarrage/MAJ", "true");
     else
         pConfig->Write("Démarrage/MAJ", "false");
-
-    if ( simpleCheck->GetValue() )
-        pConfig->Write("/ModeSimple", true);
-    else
-        pConfig->Write("/ModeSimple", false);
 
     EndModal(0);
 }

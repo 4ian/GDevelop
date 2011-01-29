@@ -22,6 +22,7 @@
 #include "GDL/CommonTools.h"
 #include "LocaleManager.h"
 #include <wx/listctrl.h>
+#include "SetupCompilerToolchainDlg.h"
 
 #include <string>
 #include <vector>
@@ -79,6 +80,13 @@ const long Preferences::ID_PANEL12 = wxNewId();
 const long Preferences::ID_STATICTEXT12 = wxNewId();
 const long Preferences::ID_PANEL14 = wxNewId();
 const long Preferences::ID_PANEL8 = wxNewId();
+const long Preferences::ID_STATICTEXT16 = wxNewId();
+const long Preferences::ID_BUTTON9 = wxNewId();
+const long Preferences::ID_RADIOBUTTON2 = wxNewId();
+const long Preferences::ID_RADIOBUTTON1 = wxNewId();
+const long Preferences::ID_TEXTCTRL2 = wxNewId();
+const long Preferences::ID_BUTTON11 = wxNewId();
+const long Preferences::ID_PANEL17 = wxNewId();
 const long Preferences::ID_LISTBOOK1 = wxNewId();
 const long Preferences::ID_STATICLINE1 = wxNewId();
 const long Preferences::ID_BUTTON1 = wxNewId();
@@ -98,17 +106,22 @@ changesNeedRestart(false)
     wxStaticBoxSizer* StaticBoxSizer2;
     wxFlexGridSizer* FlexGridSizer4;
     wxFlexGridSizer* FlexGridSizer16;
+    wxFlexGridSizer* FlexGridSizer24;
     wxFlexGridSizer* FlexGridSizer19;
+    wxStaticBoxSizer* StaticBoxSizer12;
+    wxFlexGridSizer* FlexGridSizer23;
     wxStaticBoxSizer* StaticBoxSizer4;
     wxFlexGridSizer* FlexGridSizer10;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
+    wxFlexGridSizer* FlexGridSizer25;
     wxFlexGridSizer* FlexGridSizer22;
     wxFlexGridSizer* FlexGridSizer9;
     wxFlexGridSizer* FlexGridSizer2;
     wxStaticBoxSizer* StaticBoxSizer9;
     wxFlexGridSizer* FlexGridSizer7;
     wxStaticBoxSizer* StaticBoxSizer7;
+    wxStaticBoxSizer* StaticBoxSizer13;
     wxStaticBoxSizer* StaticBoxSizer10;
     wxStaticBoxSizer* StaticBoxSizer8;
     wxStaticBoxSizer* StaticBoxSizer3;
@@ -128,6 +141,7 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer11;
     wxFlexGridSizer* FlexGridSizer17;
     wxStaticBoxSizer* StaticBoxSizer5;
+    wxFlexGridSizer* FlexGridSizer26;
 
     Create(parent, wxID_ANY, _("Préférences de Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(467,330));
@@ -323,11 +337,43 @@ changesNeedRestart(false)
     Panel4->SetSizer(FlexGridSizer16);
     FlexGridSizer16->Fit(Panel4);
     FlexGridSizer16->SetSizeHints(Panel4);
+    Panel7 = new wxPanel(Listbook1, ID_PANEL17, wxDefaultPosition, wxSize(463,247), wxTAB_TRAVERSAL, _T("ID_PANEL17"));
+    FlexGridSizer23 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer23->AddGrowableCol(0);
+    StaticBoxSizer12 = new wxStaticBoxSizer(wxHORIZONTAL, Panel7, _("Paramétrage de la compilation"));
+    FlexGridSizer24 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer24->AddGrowableCol(0);
+    StaticText16 = new wxStaticText(Panel7, ID_STATICTEXT16, _("Afin de compiler les sources C++ qui peuvent être utilisé\npar les jeux, Game Develop a besoin d\'accéder à des fichiers\nsupplémentaires."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT16"));
+    FlexGridSizer24->Add(StaticText16, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    compilerToolchainBt = new wxButton(Panel7, ID_BUTTON9, _("Ouvrir le paramétrage de la compilation des sources C++"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON9"));
+    FlexGridSizer24->Add(compilerToolchainBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer12->Add(FlexGridSizer24, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    FlexGridSizer23->Add(StaticBoxSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer13 = new wxStaticBoxSizer(wxHORIZONTAL, Panel7, _("Edition des sources"));
+    FlexGridSizer25 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer25->AddGrowableCol(0);
+    internalCodeEditorCheck = new wxRadioButton(Panel7, ID_RADIOBUTTON2, _("Editer les sources avec l\'éditeur intégré à Game Develop"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
+    internalCodeEditorCheck->SetValue(true);
+    FlexGridSizer25->Add(internalCodeEditorCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer26 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer26->AddGrowableCol(1);
+    externalCodeEditorCheck = new wxRadioButton(Panel7, ID_RADIOBUTTON1, _("Utiliser un programme externe :"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
+    FlexGridSizer26->Add(externalCodeEditorCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    codeEditorEdit = new wxTextCtrl(Panel7, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+    FlexGridSizer26->Add(codeEditorEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    browseCodeEditorBt = new wxButton(Panel7, ID_BUTTON11, _("Parcourir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON11"));
+    FlexGridSizer26->Add(browseCodeEditorBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer25->Add(FlexGridSizer26, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    StaticBoxSizer13->Add(FlexGridSizer25, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    FlexGridSizer23->Add(StaticBoxSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Panel7->SetSizer(FlexGridSizer23);
+    FlexGridSizer23->SetSizeHints(Panel7);
     Listbook1->AddPage(Panel2, _("Général"), false);
     Listbook1->AddPage(Panel5, _("Langue"), false);
     Listbook1->AddPage(Panel3, _("Répertoires"), false);
     Listbook1->AddPage(Panel6, _("Positionnements par défaut"), false);
     Listbook1->AddPage(Panel4, _("Apparence"), false);
+    Listbook1->AddPage(Panel7, _("Compilation C++"), false);
     FlexGridSizer1->Add(Listbook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
     FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -362,6 +408,8 @@ changesNeedRestart(false)
     borderColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnborderColorPnlLeftUp,0,this);
     activeTextColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnbackColorPnlLeftUp,0,this);
     inactiveTextColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnbackColorPnlLeftUp,0,this);
+    Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OncompilerToolchainBtClick);
+    Connect(ID_BUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnbrowseCodeEditorBtClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnOkBtClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnAnnulerBtClick);
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnAideBtClick);
@@ -373,6 +421,7 @@ changesNeedRestart(false)
     imageList->Add(( wxBitmap( "res/folder.png", wxBITMAP_TYPE_ANY ) ) );
     imageList->Add(( wxBitmap( "res/layout.png", wxBITMAP_TYPE_ANY ) ) );
     imageList->Add(( wxBitmap( "res/looknfeel.png", wxBITMAP_TYPE_ANY ) ) );
+    imageList->Add(( wxBitmap( "res/source_cpp24.png", wxBITMAP_TYPE_ANY ) ) );
     Listbook1->AssignImageList(imageList);
 
     //Adding manually pages so as to specify image number
@@ -384,6 +433,7 @@ changesNeedRestart(false)
     Listbook1->AddPage(Panel3, _("Répertoires"), false, 2);
     Listbook1->AddPage(Panel6, _("Positionnements par défaut"), false, 3);
     Listbook1->AddPage(Panel4, _("Apparence"), false, 4);
+    Listbook1->AddPage(Panel7, _("Compilation C++"), false, 5);
 
     wxConfigBase *pConfig = wxConfigBase::Get();
     {
@@ -557,6 +607,14 @@ changesNeedRestart(false)
 
         sceneEventsTabPosition->SetSelection(position);
     }
+    {
+        wxString result;
+        pConfig->Read("/Code/ExternalEditor", &result);
+        codeEditorEdit->SetValue(result);
+        bool useExternalEditor;
+        pConfig->Read("/Code/UseExternalEditor", &useExternalEditor, false);
+        if ( useExternalEditor ) externalCodeEditorCheck->SetValue(true);
+    }
 }
 
 Preferences::~Preferences()
@@ -674,6 +732,9 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     pConfig->Write( "/Autosave/Time", ToFloat(string(autosaveTimeEdit->GetValue().mb_str()))*60*1000);
 
     pConfig->Write( "/SceneEditor/SceneEventsTab", sceneEventsTabPosition->GetSelection());
+
+    pConfig->Write("/Code/ExternalEditor", codeEditorEdit->GetValue());
+    pConfig->Write("/Code/UseExternalEditor", externalCodeEditorCheck->GetValue());
 
     EndModal( 1 );
 }
@@ -885,10 +946,8 @@ void Preferences::OnBrowseEditionImageClick(wxCommandEvent& event)
     wxFileDialog dialog( this, _( "Choisissez un programme d'édition d'image" ), "", "", "Programme (*.exe)|*.exe" );
     dialog.ShowModal();
 
-    if ( dialog.GetPath() != "" )
-    {
+    if ( !dialog.GetPath().empty() )
         EditeurImageEdit->ChangeValue(dialog.GetPath());
-    }
 }
 
 void Preferences::OnribbonColor1PnlLeftUp(wxMouseEvent& event)
@@ -951,4 +1010,19 @@ void Preferences::OnhideLabelsCheckClick(wxCommandEvent& event)
 void Preferences::OnlangChoiceSelect(wxCommandEvent& event)
 {
     changesNeedRestart = true;
+}
+
+void Preferences::OncompilerToolchainBtClick(wxCommandEvent& event)
+{
+    SetupCompilerToolchainDlg dialog(this);
+    dialog.ShowModal();
+}
+
+void Preferences::OnbrowseCodeEditorBtClick(wxCommandEvent& event)
+{
+    wxFileDialog dialog( this, _( "Choisissez un éditeur de code externe" ), "", "", _("Programme (*.exe)|*.exe") );
+    dialog.ShowModal();
+
+    if ( !dialog.GetPath().empty() )
+        codeEditorEdit->ChangeValue(dialog.GetPath());
 }

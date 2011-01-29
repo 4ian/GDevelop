@@ -472,6 +472,10 @@
 		</Unit>
 		<Unit filename="BuildMessagesPnl.cpp" />
 		<Unit filename="BuildMessagesPnl.h" />
+		<Unit filename="BuildProgressPnl.cpp" />
+		<Unit filename="BuildProgressPnl.h" />
+		<Unit filename="BuildToolsPnl.cpp" />
+		<Unit filename="BuildToolsPnl.h" />
 		<Unit filename="CheckMAJ.cpp">
 			<Option weight="60" />
 			<Option virtualFolder="Racine\Demarrage\" />
@@ -799,18 +803,14 @@
 		<Unit filename="MessagePlus.h">
 			<Option virtualFolder="Racine\" />
 		</Unit>
-		<Unit filename="ModeSimple.cpp">
-			<Option virtualFolder="Editeur principal\Outils\" />
-		</Unit>
-		<Unit filename="ModeSimple.h">
-			<Option virtualFolder="Editeur principal\Outils\" />
-		</Unit>
 		<Unit filename="MyStatusBar.cpp">
 			<Option virtualFolder="LIB MyStatusBar\" />
 		</Unit>
 		<Unit filename="MyStatusBar.h">
 			<Option virtualFolder="LIB MyStatusBar\" />
 		</Unit>
+		<Unit filename="NewCppFileDlg.cpp" />
+		<Unit filename="NewCppFileDlg.h" />
 		<Unit filename="ObjectTypeChoice.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\Editeur objets\" />
 		</Unit>
@@ -860,6 +860,8 @@
 		<Unit filename="SearchEvents.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
 		</Unit>
+		<Unit filename="SetupCompilerToolchainDlg.cpp" />
+		<Unit filename="SetupCompilerToolchainDlg.h" />
 		<Unit filename="SigneModification.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
 		</Unit>
@@ -975,7 +977,6 @@
 					<wxPanel wxs="wxsmith/EditorJeu.wxs" src="EditorJeu.cpp" hdr="EditorJeu.h" fwddecl="0" i18n="1" name="EditorJeu" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorObjetsGroups.wxs" src="EditorObjetsGroups.cpp" hdr="EditorObjetsGroups.h" fwddecl="0" i18n="1" name="EditorObjetsGroups" language="CPP" />
 					<wxDialog wxs="wxsmith/EditObjectGroup.wxs" src="EditObjectGroup.cpp" hdr="EditObjectGroup.h" fwddecl="0" i18n="1" name="EditObjectGroup" language="CPP" />
-					<wxDialog wxs="wxsmith/ModeSimple.wxs" src="ModeSimple.cpp" hdr="ModeSimple.h" fwddecl="0" i18n="1" name="ModeSimple" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixObjetExpression.wxs" src="ChoixObjetExpression.cpp" hdr="ChoixObjetExpression.h" fwddecl="0" i18n="1" name="ChoixObjetExpression" language="CPP" />
 					<wxDialog wxs="wxsmith/ImportImage.wxs" src="ImportImage.cpp" hdr="ImportImage.h" fwddecl="0" i18n="1" name="ImportImage" language="CPP" />
 					<wxFrame wxs="wxsmith/ImageEditor.wxs" src="ImageEditor.cpp" hdr="ImageEditor.h" fwddecl="0" i18n="1" name="ImageEditor" language="CPP" />
@@ -1005,6 +1006,10 @@
 					<wxPanel wxs="wxsmith/ProfileDlg.wxs" src="ProfileDlg.cpp" hdr="ProfileDlg.h" fwddecl="0" i18n="1" name="ProfileDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/CodeEditor.wxs" src="CodeEditor.cpp" hdr="CodeEditor.h" fwddecl="0" i18n="1" name="CodeEditor" language="CPP" />
 					<wxPanel wxs="wxsmith/BuildMessagesPnl.wxs" src="BuildMessagesPnl.cpp" hdr="BuildMessagesPnl.h" fwddecl="0" i18n="1" name="BuildMessagesPnl" language="CPP" />
+					<wxPanel wxs="wxsmith/BuildProgressPnl.wxs" src="BuildProgressPnl.cpp" hdr="BuildProgressPnl.h" fwddecl="0" i18n="1" name="BuildProgressPnl" language="CPP" />
+					<wxPanel wxs="wxsmith/BuildToolsPnl.wxs" src="BuildToolsPnl.cpp" hdr="BuildToolsPnl.h" fwddecl="0" i18n="1" name="BuildToolsPnl" language="CPP" />
+					<wxDialog wxs="wxsmith/SetupCompilerToolchainDlg.wxs" src="SetupCompilerToolchainDlg.cpp" hdr="SetupCompilerToolchainDlg.h" fwddecl="0" i18n="1" name="SetupCompilerToolchainDlg" language="CPP" />
+					<wxDialog wxs="wxsmith/NewCppFileDlg.wxs" src="NewCppFileDlg.cpp" hdr="NewCppFileDlg.h" fwddecl="0" i18n="1" name="NewCppFileDlg" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

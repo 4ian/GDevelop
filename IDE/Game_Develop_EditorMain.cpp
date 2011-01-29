@@ -54,7 +54,7 @@ extern MemTrace MemTracer;
 #include "ConsoleManager.h"
 #include "ProjectManager.h"
 #include "StartHerePage.h"
-#include "BuildMessagesPnl.h"
+#include "BuildToolsPnl.h"
 
 //(*IdInit(Game_Develop_EditorFrame)
 const long Game_Develop_EditorFrame::ID_PANEL3 = wxNewId();
@@ -78,7 +78,6 @@ const long Game_Develop_EditorFrame::idRibbonSaveAs = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonSaveAll = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonPortable = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonCompil = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonSimpleMode = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonImporter = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonEncoder = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonOptions = wxNewId();
@@ -104,7 +103,7 @@ Game_Develop_EditorFrame::Game_Develop_EditorFrame( wxWindow* parent, string Fil
 gameCurrentlyEdited(0),
 m_ribbon(NULL),
 ribbonSceneEditorButtonBar(NULL),
-buildMessagesPnl(NULL)
+buildToolsPnl(NULL)
 {
 
     //(*Initialize(Game_Develop_EditorFrame)
@@ -200,7 +199,6 @@ buildMessagesPnl(NULL)
     Connect( idRibbonProjectsManager, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnProjectsManagerClicked );
     Connect( idRibbonEncoder, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuItem23Selected );
     Connect( idRibbonImporter, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonDecomposerDropDownClicked );
-    Connect( idRibbonSimpleMode, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuModeSimpleSelected );
     Connect( idRibbonOptions, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuPrefSelected );
     Connect( idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuAideSelected );
     Connect( idRibbonTuto, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuTutoSelected );
@@ -234,6 +232,8 @@ buildMessagesPnl(NULL)
 
     //Create status bar
     MyStatusBar * myStatusBar = new MyStatusBar(this);
+    myStatusBar->SetStatusText( "2008-2011 Compil Games", 1 );
+    SetStatusBar(myStatusBar);
 
     //Ribbon setup
     long ribbonStyle = wxRIBBON_BAR_DEFAULT_STYLE;
@@ -270,7 +270,6 @@ buildMessagesPnl(NULL)
         wxRibbonButtonBar *tools_bar = new wxRibbonButtonBar(toolsPanel, wxID_ANY);
         tools_bar->AddButton(idRibbonEncoder, !hideLabels ? _("Convertisseur") : "", wxBitmap("res/musicicon24.png", wxBITMAP_TYPE_ANY));
         tools_bar->AddDropdownButton(idRibbonImporter, !hideLabels ? _("Décomposeur") : "", wxBitmap("res/strip24.png", wxBITMAP_TYPE_ANY));
-        tools_bar->AddButton(idRibbonSimpleMode, !hideLabels ? _("Mode simple") : "", wxBitmap("res/modesimple24.png", wxBITMAP_TYPE_ANY));
 
         wxRibbonPanel *optionsPanel = new wxRibbonPanel(home, wxID_ANY, _("Options"), wxBitmap("res/preficon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *options_bar = new wxRibbonButtonBar(optionsPanel, wxID_ANY);
@@ -325,22 +324,6 @@ buildMessagesPnl(NULL)
     LoadSkin(&m_mgr);
     LoadSkin(m_ribbon);
 
-    //Setup status bar
-    bool simpleModeActivated = false;
-    pConfig->Read("/ModeSimple", &simpleModeActivated);
-    if ( simpleModeActivated )
-    {
-        SetStatusBar(myStatusBar);
-        myStatusBar->SetStatusText(_("Mode simple activé"), 1);
-        myStatusBar->SetStatusText( "2008-2011 Compil Games", 2 );
-    }
-    else
-    {
-        SetStatusBar(myStatusBar);
-        myStatusBar->SetStatusText( "2008-2011 Compil Games", 1 );
-    }
-    SetStatusBar(myStatusBar);
-
     editorsNotebook->SetArtProvider(new GDAuiTabArt());
 
     //Create start page
@@ -351,12 +334,12 @@ buildMessagesPnl(NULL)
     projectManager = new ProjectManager(this, *this);
     projectManager->ConnectEvents();
 
-    buildMessagesPnl = new BuildMessagesPnl(this, projectManager);
+    buildToolsPnl = new BuildToolsPnl(this, projectManager);
 
     m_mgr.AddPane( projectManager, wxAuiPaneInfo().Name( wxT( "PM" ) ).Caption( _( "Gestionnaire de projets" ) ).Left().MaximizeButton( true ).MinimizeButton( false ).MinSize(170,100) );
     m_mgr.AddPane( Panel1, wxAuiPaneInfo().Name( wxT( "EP" ) ).Caption( _( "Editeur principal" ) ).Center().CaptionVisible(false).CloseButton( false ).MaximizeButton( true ).MinimizeButton( false ) );
     m_mgr.AddPane( ribbonPanel, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ruban" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).MinSize(1, 107).Resizable(false) );
-    m_mgr.AddPane( buildMessagesPnl, wxAuiPaneInfo().Name( wxT( "BL" ) ).Caption( _( "Messages de la compilation du code C++" ) ).Bottom().MaximizeButton( true ).MinimizeButton( false ).Show(true));
+    m_mgr.AddPane( buildToolsPnl, wxAuiPaneInfo().Name( wxT( "CT" ) ).Caption( _( "Outils de compilations" ) ).Bottom().MaximizeButton( true ).MinimizeButton( false ).Show(true).MinSize(120,130));
 
     wxString result;
     pConfig->Read( _T( "/Workspace/Actuel" ), &result );

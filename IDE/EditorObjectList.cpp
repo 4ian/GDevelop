@@ -303,19 +303,6 @@ void EditorObjectList::CreateToolbar()
     toolbar->AddTool( ID_BITMAPBUTTON3, wxT( "Aide de l'éditeur d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur d'objets") );
     toolbar->Realize();
 
-    //On vérifie si on est pas en mode simple.
-    wxConfigBase * pConfig = wxConfigBase::Get();
-
-    bool result;
-    pConfig->Read("/ModeSimple", &result);
-
-    if ( result )
-    {
-        toolbar->EnableTool(ID_BITMAPBUTTON1, false);
-        toolbar->EnableTool(ID_BITMAPBUTTON6, false);
-        toolbar->EnableTool(ID_BITMAPBUTTON2, false);
-    }
-
     //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
 #ifdef __WXGTK__
     wxSize tbSize = toolbar->GetSize();

@@ -20,6 +20,7 @@
 #include <wx/config.h>
 #include "GDL/HelpFileAccess.h"
 #include "GDL/FontManager.h"
+#include "SetupCompilerToolchainDlg.h"
 
 #include "GDL/Game.h"
 
@@ -80,6 +81,12 @@ const long EditPropJeu::ID_BUTTON5 = wxNewId();
 const long EditPropJeu::ID_STATICTEXT17 = wxNewId();
 const long EditPropJeu::ID_TEXTCTRL15 = wxNewId();
 const long EditPropJeu::ID_PANEL4 = wxNewId();
+const long EditPropJeu::ID_CHECKBOX9 = wxNewId();
+const long EditPropJeu::ID_STATICTEXT18 = wxNewId();
+const long EditPropJeu::ID_BUTTON7 = wxNewId();
+const long EditPropJeu::ID_STATICTEXT19 = wxNewId();
+const long EditPropJeu::ID_BUTTON8 = wxNewId();
+const long EditPropJeu::ID_PANEL5 = wxNewId();
 const long EditPropJeu::ID_NOTEBOOK1 = wxNewId();
 const long EditPropJeu::ID_STATICLINE3 = wxNewId();
 const long EditPropJeu::ID_BUTTON1 = wxNewId();
@@ -111,6 +118,7 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     wxFlexGridSizer* FlexGridSizer9;
     wxFlexGridSizer* FlexGridSizer2;
     wxFlexGridSizer* FlexGridSizer7;
+    wxFlexGridSizer* FlexGridSizer29;
     wxStaticBoxSizer* StaticBoxSizer3;
     wxFlexGridSizer* FlexGridSizer15;
     wxFlexGridSizer* FlexGridSizer18;
@@ -338,9 +346,26 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     Panel4->SetSizer(FlexGridSizer22);
     FlexGridSizer22->Fit(Panel4);
     FlexGridSizer22->SetSizeHints(Panel4);
+    Panel5 = new wxPanel(Notebook1, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL5"));
+    FlexGridSizer29 = new wxFlexGridSizer(0, 1, 0, 0);
+    useExternalSourcesCheck = new wxCheckBox(Panel5, ID_CHECKBOX9, _("Utiliser des sources C++ dans le jeu"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX9"));
+    useExternalSourcesCheck->SetValue(false);
+    FlexGridSizer29->Add(useExternalSourcesCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText18 = new wxStaticText(Panel5, ID_STATICTEXT18, _("L\'utilisation de sources C++ permet d\'inclure du code C++ dans les jeux,\nau travers par exemple d\'évènements spéciaux.\nAttention, activer cette option nécessitera que vous lanciez Game Develop\nsur Linux pour compiler votre jeu pour Linux ( et inversement pour Windows )."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT18"));
+    FlexGridSizer29->Add(StaticText18, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    Button1 = new wxButton(Panel5, ID_BUTTON7, _("Accéder aux options de compilation"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
+    FlexGridSizer29->Add(Button1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText19 = new wxStaticText(Panel5, ID_STATICTEXT19, _("Game Develop nécessite des fichiers supplémentaires afin de pouvoir\ncompiler des sources C++ pour les jeux."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT19"));
+    FlexGridSizer29->Add(StaticText19, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    compilerToolchainBt = new wxButton(Panel5, ID_BUTTON8, _("Paramétrer Game Develop pour la compilation des sources C++"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
+    FlexGridSizer29->Add(compilerToolchainBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    Panel5->SetSizer(FlexGridSizer29);
+    FlexGridSizer29->Fit(Panel5);
+    FlexGridSizer29->SetSizeHints(Panel5);
     Notebook1->AddPage(Panel2, _("Paramètres du jeu"), false);
     Notebook1->AddPage(Panel3, _("Ecran de chargement"), false);
     Notebook1->AddPage(Panel4, _("Executables"), false);
+    Notebook1->AddPage(Panel5, _("Sources C++"), false);
     FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer12->AddGrowableCol(0);
@@ -366,6 +391,7 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnButton2Click);
     Connect(ID_TEXTCTRL14,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditPropJeu::OnwinIconEditText);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnbrowseIconClick);
+    Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OncompilerToolchainBtClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnOkBtClick);
     Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OncancelBtClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnAideBtClick);
@@ -426,42 +452,6 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     winExeEdit->SetValue(game.winExecutableFilename);
     winIconEdit->SetValue(game.winExecutableIconFile);
     linuxExeEdit->SetValue(game.linuxExecutableFilename);
-
-    //On vérifie si on est pas en mode simple.
-    wxConfigBase * pConfig = wxConfigBase::Get();
-
-    bool result = false;
-    pConfig->Read("/ModeSimple", &result);
-
-    if ( result )
-    {
-        FPSmax->Enable(false);
-        FPSmaxCheck->Enable(false);
-        FPSmin->Enable(false);
-        afficherEcranCheck->Enable(false);
-        StaticText1->Enable(false);
-        widthECEdit->Enable(false);
-        StaticText11->Enable(false);
-        heightECEdit->Enable(false);
-        StaticBitmap2->Enable(false);
-        texteCheck->Enable(false);
-        texteEdit->Enable(false);
-        StaticText7->Enable(false);
-        texteXPosEdit->Enable(false);
-        texteYPosEdit->Enable(false);
-        StaticBitmap3->Enable(false);
-        pourcentCheck->Enable(false);
-        StaticText9->Enable(false);
-        pourcentXPosEdit->Enable(false);
-        StaticText10->Enable(false);
-        pourcentYPosEdit->Enable(false);
-        StaticBitmap4->Enable(false);
-        imageCheck->Enable(false);
-        imageEdit->Enable(false);
-        BrowseBt->Enable(false);
-        Button2->Enable(false);
-    }
-
 }
 
 EditPropJeu::~EditPropJeu()
@@ -637,6 +627,8 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
     game.winExecutableIconFile = string(winIconEdit->GetValue().mb_str());
     game.linuxExecutableFilename = string(linuxExeEdit->GetValue().mb_str());
 
+    game.useExternalSourceFiles = useExternalSourcesCheck->GetValue();
+
     EndModal( 0 );
 }
 
@@ -804,4 +796,10 @@ void EditPropJeu::OnbrowseIconClick(wxCommandEvent& event)
     fileDialog.ShowModal();
 
     if ( !fileDialog.GetPath().empty() ) winIconEdit->SetValue(fileDialog.GetPath());
+}
+
+void EditPropJeu::OncompilerToolchainBtClick(wxCommandEvent& event)
+{
+    SetupCompilerToolchainDlg dialog(this);
+    dialog.ShowModal();
 }

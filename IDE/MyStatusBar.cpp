@@ -83,25 +83,11 @@ END_EVENT_TABLE()
 MyStatusBar::MyStatusBar(wxWindow *parent)
            : wxStatusBar(parent, wxID_ANY)
 {
-    //On vérifie si on est pas en mode simple.
-    wxConfigBase * pConfig = wxConfigBase::Get();
-
-    bool result = false;
-    pConfig->Read("/ModeSimple", &result);
-
     static int widths[Field_Max] = { -1, 175 };
     static int widthsSimple[Field_Max] = { -1, 150, 175 };
 
-    if ( result )
-    {
-        SetFieldsCount(3);
-        SetStatusWidths(3, widthsSimple);
-    }
-    else
-    {
-        SetFieldsCount(2);
-        SetStatusWidths(2, widths);
-    }
+    SetFieldsCount(2);
+    SetStatusWidths(2, widths);
 
     BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::getInstance();
 
@@ -126,25 +112,9 @@ void MyStatusBar::OnSize(wxSizeEvent& event)
     //On vérifie si on est pas en mode simple.
     wxConfigBase * pConfig = wxConfigBase::Get();
 
-    bool result = false;
-    pConfig->Read("/ModeSimple", &result);
-
     wxRect rect;
 
-    if ( result )
-    {
-        m_statbmp->Show(true);
-        GetFieldRect(1, rect);
-        wxSize size = m_statbmp->GetSize();
-
-        m_statbmp->Move(rect.x + (rect.width - size.x),
-                        rect.y + (rect.height - size.y)+3);
-
-    }
-    else
-    {
-        m_statbmp->Show(false);
-    }
+    m_statbmp->Show(false);
 
     event.Skip();
 }

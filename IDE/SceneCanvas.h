@@ -241,6 +241,11 @@ private :
     wxMenu noObjectContextMenu;
     wxMenu zoomMenu;
 
+    void ReloadFirstPart();
+    void ReloadSecondPart();
+
+    bool isReloading; ///< True when the scene is being reloaded ( and dynamic extensions compiled ) and cannot be previewed yet.
+
     MainEditorCommand & mainEditorCommand;
 
     wxScrollBar * scrollBar1; ///< Link to the scrollbar used by the sceneCanvas.
@@ -256,6 +261,10 @@ private :
 
     vector < vector < InitialPosition > > history; ///< History of changes
     vector < vector < InitialPosition > > redoHistory; ///< Histoy of changes so as to "redo"
+
+    static sf::Image reloadingIconImage;
+    static sf::Sprite reloadingIconSprite;
+    static sf::Text reloadingText;
 };
 
 

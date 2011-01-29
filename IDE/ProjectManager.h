@@ -43,8 +43,10 @@ class ProjectManager: public wxPanel
 		wxMenuItem* MenuItem1;
 		wxMenuItem* MenuItem4;
 		wxMenuItem* editNameGameMenuItem;
+		wxMenuItem* MenuItem14;
 		wxMenuItem* MenuItem11;
 		wxTreeCtrl* projectsTree;
+		wxMenuItem* MenuItem15;
 		wxMenuItem* cutSceneMenuItem;
 		wxMenuItem* MenuItem13;
 		wxMenuItem* modVarSceneMenuI;
@@ -94,9 +96,11 @@ class ProjectManager: public wxPanel
 		static const long ID_MENUITEM10;
 		static const long ID_MENUITEM11;
 		static const long ID_MENUITEM12;
+		static const long ID_MENUITEM18;
 		static const long ID_MENUITEM14;
 		static const long ID_MENUITEM15;
 		static const long ID_MENUITEM16;
+		static const long ID_MENUITEM19;
 		static const long ID_MENUITEM17;
 		//*)
         static const long idRibbonNew;
@@ -143,6 +147,7 @@ class ProjectManager: public wxPanel
 		void OnAddCppSourceFileSelected(wxCommandEvent& event);
 		void OnDeleteSourceFileSelected(wxCommandEvent& event);
 		void OnEditSourceFileSelected(wxCommandEvent& event);
+		void OnCreateNewCppFileSelected(wxCommandEvent& event);
 		//*)
 
 		bool GetGameOfSelectedItem(RuntimeGame *& game, gdTreeItemGameData *& data);

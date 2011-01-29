@@ -17,8 +17,9 @@
 #include "GDL/StandardEvent.h"
 #include "GDL/CommentEvent.h"
 #include "GDL/SourceFile.h"
-#include "CodeEditor.h"
 
+#include "CodeEditor.h"
+#include "NewCppFileDlg.h"
 #include "Extensions.h"
 #include "ExternalEventsEditor.h"
 #include "EditPropJeu.h"
@@ -55,9 +56,11 @@ const long ProjectManager::ID_MENUITEM9 = wxNewId();
 const long ProjectManager::ID_MENUITEM10 = wxNewId();
 const long ProjectManager::ID_MENUITEM11 = wxNewId();
 const long ProjectManager::ID_MENUITEM12 = wxNewId();
+const long ProjectManager::ID_MENUITEM18 = wxNewId();
 const long ProjectManager::ID_MENUITEM14 = wxNewId();
 const long ProjectManager::ID_MENUITEM15 = wxNewId();
 const long ProjectManager::ID_MENUITEM16 = wxNewId();
+const long ProjectManager::ID_MENUITEM19 = wxNewId();
 const long ProjectManager::ID_MENUITEM17 = wxNewId();
 //*)
 const long ProjectManager::idRibbonNew = wxNewId();
@@ -172,15 +175,23 @@ mainEditor(mainEditor_)
 	MenuItem8 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM12, _("Coller"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem8->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	externalEventsContextMenu.Append(MenuItem8);
-	MenuItem10 = new wxMenuItem((&sourceFilesContextMenu), ID_MENUITEM14, _("Ajouter un fichier C++"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem14 = new wxMenuItem((&sourceFilesContextMenu), ID_MENUITEM18, _("Créer un nouveau fichier C++"), wxEmptyString, wxITEM_NORMAL);
+	sourceFilesContextMenu.Append(MenuItem14);
+	MenuItem10 = new wxMenuItem((&sourceFilesContextMenu), ID_MENUITEM14, _("Ajouter un fichier C++ déjà existant"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	sourceFilesContextMenu.Append(MenuItem10);
 	MenuItem11 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM15, _("Editer"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem11->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
 	sourceFileContextMenu.Append(MenuItem11);
 	sourceFileContextMenu.AppendSeparator();
 	MenuItem12 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM16, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem12->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	sourceFileContextMenu.Append(MenuItem12);
 	sourceFileContextMenu.AppendSeparator();
-	MenuItem13 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM17, _("Ajouter un fichier C++"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem15 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM19, _("Créer un nouveau fichier C++"), wxEmptyString, wxITEM_NORMAL);
+	sourceFileContextMenu.Append(MenuItem15);
+	MenuItem13 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM17, _("Ajouter un fichier C++ déjà existant"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem13->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	sourceFileContextMenu.Append(MenuItem13);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
@@ -212,9 +223,11 @@ mainEditor(mainEditor_)
 	Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCopyExternalEventsSelected);
 	Connect(ID_MENUITEM11,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCutExternalEventsSelected);
 	Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnPasteExternalEventsSelected);
+	Connect(ID_MENUITEM18,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCreateNewCppFileSelected);
 	Connect(ID_MENUITEM14,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnAddCppSourceFileSelected);
 	Connect(ID_MENUITEM15,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnEditSourceFileSelected);
 	Connect(ID_MENUITEM16,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnDeleteSourceFileSelected);
+	Connect(ID_MENUITEM19,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCreateNewCppFileSelected);
 	Connect(ID_MENUITEM17,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnAddCppSourceFileSelected);
 	//*)
 
@@ -333,12 +346,15 @@ void ProjectManager::Refresh()
         }
 
         #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
-        gdTreeItemGameData * sourceFilesItemData = new gdTreeItemGameData("SourceFiles", "", mainEditor.games[i].get());
-        wxTreeItemId sourceFilesItem = projectsTree->AppendItem(projectItem, _("Fichiers sources C++"), 5 ,5, sourceFilesItemData);
-        for (unsigned int j = 0;j<mainEditor.games[i]->externalSourceFiles.size();++j)
+        if ( mainEditor.games[i]->useExternalSourceFiles )
         {
-            gdTreeItemGameData * sourceFileItem = new gdTreeItemGameData("SourceFile", mainEditor.games[i]->externalSourceFiles[j]->GetFileName(), mainEditor.games[i].get());
-            projectsTree->AppendItem(sourceFilesItem, mainEditor.games[i]->externalSourceFiles[j]->GetFileName(), 5 ,5, sourceFileItem);
+            gdTreeItemGameData * sourceFilesItemData = new gdTreeItemGameData("SourceFiles", "", mainEditor.games[i].get());
+            wxTreeItemId sourceFilesItem = projectsTree->AppendItem(projectItem, _("Fichiers sources C++"), 5 ,5, sourceFilesItemData);
+            for (unsigned int j = 0;j<mainEditor.games[i]->externalSourceFiles.size();++j)
+            {
+                gdTreeItemGameData * sourceFileItem = new gdTreeItemGameData("SourceFile", mainEditor.games[i]->externalSourceFiles[j]->GetFileName(), mainEditor.games[i].get());
+                projectsTree->AppendItem(sourceFilesItem, mainEditor.games[i]->externalSourceFiles[j]->GetFileName(), 5 ,5, sourceFileItem);
+            }
         }
         #endif
 
@@ -496,6 +512,25 @@ void ProjectManager::OnEditSourceFileSelected(wxCommandEvent& event)
 
 void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t line)
 {
+    if ( !wxFileExists(filename) )
+    {
+        wxLogWarning(_("Impossible d'ouvrir "+filename+", le fichier n'existe pas"));
+        return;
+    }
+
+    //Launch external source editor if one must be used
+    bool useExternalEditor;
+    wxConfigBase::Get()->Read("/Code/UseExternalEditor", &useExternalEditor, false);
+    if ( useExternalEditor )
+    {
+        wxString program;
+        wxConfigBase::Get()->Read("/Code/ExternalEditor", &program);
+
+        wxExecute(program+" "+filename);
+        return;
+    }
+    //Launch an internal code editor else
+
     MainEditorCommand mainEditorCommand;
     mainEditorCommand.SetMainEditor(&mainEditor);
     mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
@@ -545,7 +580,7 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
     mainEditorCommand.SetMainEditor(&mainEditor);
     mainEditorCommand.SetRibbonSceneEditorButtonBar(mainEditor.GetRibbonSceneEditorButtonBar()); //Need link to the scene editor wxRibbonButtonBar
     mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
-    mainEditorCommand.SetBuildMessagesPanel(mainEditor.GetBuildMessagesPanel());
+    mainEditorCommand.SetBuildToolsPanel(mainEditor.GetBuildToolsPanel());
 
     vector< boost::shared_ptr<Scene> >::const_iterator scene =
         find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
@@ -1018,10 +1053,13 @@ void ProjectManager::OneditPropGameMenuItemSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
+    bool oldExternalSourcesFileUse = game->useExternalSourceFiles;
     EditPropJeu Dialog( this, *game );
-    Dialog.ShowModal();
+    if ( Dialog.ShowModal() )
 
     projectsTree->SetItemText(selectedItem, game->name); //The name can have been changed
+    if ( oldExternalSourcesFileUse != game->useExternalSourceFiles )
+        Refresh();
 }
 
 /**
@@ -1448,4 +1486,22 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
         projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), newName, 4, 4, eventsItemData);
     else
         projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, newName, 4, 4, eventsItemData);
+}
+
+void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    NewCppFileDlg dialog(this, *game);
+
+    if ( dialog.ShowModal() == 1 )
+    {
+        boost::shared_ptr<SourceFile> sourceFile(new SourceFile);
+        sourceFile->SetFileName(dialog.fileCreated);
+
+        game->externalSourceFiles.push_back(sourceFile);
+        Refresh();
+    }
 }

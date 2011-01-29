@@ -104,15 +104,6 @@ mainEditorCommand(mainEditorCommand_)
     sceneNotebook->SetPageImage(1,1);
     globalNotebook->SetPageImage(0,0);
     globalNotebook->SetPageImage(1,1);
-
-    //On vérifie si on est pas en mode simple.
-    wxConfigBase * pConfig = wxConfigBase::Get();
-
-    bool result = false;
-    pConfig->Read("/ModeSimple", &result);
-
-    if ( result )
-        Notebook1->RemovePage(1);
 }
 
 EditorObjets::~EditorObjets()

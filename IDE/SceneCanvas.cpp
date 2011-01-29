@@ -30,6 +30,8 @@
 #include "GDL/SourceFileBuilder.h"
 #include "GDL/CompilerMessagesParser.h"
 #include "BuildMessagesPnl.h"
+#include "BuildProgressPnl.h"
+#include "BuildToolsPnl.h"
 #include "EditOptionsPosition.h"
 #include "Clipboard.h"
 #include "DndTextSceneEditor.h"
@@ -84,6 +86,9 @@ const long SceneCanvas::ID_MENUITEM6 = wxNewId();
 const long SceneCanvas::ID_MENUITEM7 = wxNewId();
 
 
+sf::Image SceneCanvas::reloadingIconImage;
+sf::Sprite SceneCanvas::reloadingIconSprite;
+sf::Text SceneCanvas::reloadingText;
 
 SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style ) :
         wxSFMLCanvas( Parent, Id, Position, Size, Style ),
@@ -92,11 +97,17 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
         game(gameEdited),
         scene(this, &game),
         hasJustRightClicked(false),
+        isReloading(false),
         mainEditorCommand( mainEditorCommand_ ),
         scrollBar1(NULL),
         scrollBar2(NULL)
 {
     MemTracer.AddObj( "Editeur de scène", ( long )this );
+    reloadingIconImage.LoadFromFile("res/compile128.png");
+    reloadingIconSprite.SetImage(reloadingIconImage);
+    reloadingText.SetColor(sf::Color(0,0,0));
+    reloadingText.SetString(string(_("Compilation en cours des sources C++").mb_str()));
+    reloadingText.SetCharacterSize(40);
 
     SetView( scene.view );
     SetFramerateLimit( gameEdited.maxFPS );
@@ -392,6 +403,7 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
     externalWindow->Show(false);
     scene.ChangeRenderWindow(this);
     UpdateSize();
+    UpdateScrollbars();
 
     if ( profileDialog ) profileDialog->ParseProfileEvents();
 
@@ -649,43 +661,138 @@ void SceneCanvas::OnKey( wxKeyEvent& evt )
     evt.StopPropagation();
 }
 
+void SceneCanvas::Reload()
+{
+    ReloadFirstPart();
+}
+
+void SceneCanvas::ReloadFirstPart()
+{
+    isReloading = true;
+    bool oldEditingState = scene.editing;
+
+    game = gameEdited;
+    game.imageManager = gameEdited.imageManager; //Use same image manager.
+
+    scene.StopMusic();
+
+    EdittimeScene newScene(this, &game);
+    scene = newScene;
+    scene.editing = oldEditingState;
+    if ( profileDialog )   scene.profiler = profileDialog.get();
+    if ( debugger ) scene.debugger = debugger.get();
+
+    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
+    if ( !scene.editing )
+    {
+        GDpriv::DynamicExtensionsManager::getInstance()->UnloadAllDynamicExtensions();
+
+        if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->LaunchGameSourceFilesBuild(gameEdited, this) )
+        {
+            wxLogWarning(_("Game Develop est entrain de compiler les sources C++ et ne pourra lancer un aperçu qu'une fois ce processus terminé."));
+        }
+
+        //Wait dynamic extensions for being compiled when previewing.
+    }
+    else
+    #endif
+    {
+        ReloadSecondPart(); //Finalize immediatly reloading when editing.
+    }
+}
+
+void SceneCanvas::ReloadSecondPart()
+{
+    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
+    if ( !scene.editing )
+    {
+        CompilerMessagesParser errorsParser;
+        errorsParser.ParseOutput(mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->sourceFileBuilder.GetErrors());
+        mainEditorCommand.GetBuildToolsPanel()->buildMessagesPnl->RefreshWith(&gameEdited, errorsParser.parsedErrors);
+
+        if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->LastBuildSuccessed() )
+        {
+            mainEditorCommand.GetBuildToolsPanel()->buildMessagesPnl->OpenFileContainingFirstError();
+        }
+
+        GDpriv::DynamicExtensionsManager::getInstance()->LoadDynamicExtension("test.dxgd");
+    }
+    #endif
+
+    scene.LoadFromScene( sceneEdited );
+    sceneEdited.wasModified = false;
+
+    UpdateSize();
+    UpdateScrollbars();
+
+    isReloading = false;
+}
+
 
 void SceneCanvas::Refresh()
 {
-    if ( !scene.running || scene.editing )
+    if ( isReloading )
     {
-        //Reload changed images.
-        for (unsigned int i = 0;i<gameEdited.imagesChanged.size();++i)
-            game.imageManager->ReloadImage(gameEdited.imagesChanged[i]);
+        //Wait extensions to be compiled
+        if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->IsBuilding() )
+            ReloadSecondPart();
 
-        if ( !gameEdited.imagesChanged.empty() )
-        {
-            gameEdited.imageManager->LoadPermanentImages();
-            gameEdited.imagesChanged.clear();
-            sceneEdited.wasModified = true;
-        }
+        //Display a message when compiling
+        sf::Event event;
+        while ( GetEvent( event ) )
+            ;
 
-        if ( sceneEdited.wasModified )
-            Reload();
+        SaveGLStates();
+        Clear(sf::Color(255,255,255));
+        SetView(sf::View(sf::Vector2f(GetWidth()/2,GetHeight()/2), sf::Vector2f(GetWidth(),GetHeight())));
+
+        reloadingIconSprite.SetImage(reloadingIconImage);
+        reloadingIconSprite.SetPosition(GetWidth()/2-reloadingIconSprite.GetSize().x/2, GetHeight()/2-reloadingIconSprite.GetSize().y/2);
+        reloadingText.SetPosition(GetWidth()/2-reloadingText.GetRect().Width/2, reloadingIconSprite.GetPosition().y+reloadingIconSprite.GetSize().y+10);
+
+        Draw(reloadingIconSprite);
+        Draw(reloadingText);
+
+        RestoreGLStates();
+        Display();
     }
-    if ( scene.running )
-    {
-        int retourEvent = scene.RenderAndStep(1);
-
-        if ( retourEvent == -2 )
-        {
-            wxLogStatus( _( "Dans le jeu final, le jeu se terminera." ) );
-        }
-        else if ( retourEvent != -1 )
-        {
-            wxLogStatus( _( "Dans le jeu final, un changement de scène s'effectuera." ) );
-        }
-
-    }
-    else if ( !scene.running && !scene.editing )
-        scene.RenderWithoutStep();
     else
-        scene.RenderEdittimeScene();
+    {
+        if ( !scene.running || scene.editing )
+        {
+            //Reload changed images.
+            for (unsigned int i = 0;i<gameEdited.imagesChanged.size();++i)
+                game.imageManager->ReloadImage(gameEdited.imagesChanged[i]);
+
+            if ( !gameEdited.imagesChanged.empty() )
+            {
+                gameEdited.imageManager->LoadPermanentImages();
+                gameEdited.imagesChanged.clear();
+                sceneEdited.wasModified = true;
+            }
+
+            if ( sceneEdited.wasModified )
+                Reload();
+        }
+        if ( scene.running )
+        {
+            int retourEvent = scene.RenderAndStep(1);
+
+            if ( retourEvent == -2 )
+            {
+                wxLogStatus( _( "Dans le jeu final, le jeu se terminera." ) );
+            }
+            else if ( retourEvent != -1 )
+            {
+                wxLogStatus( _( "Dans le jeu final, un changement de scène s'effectuera." ) );
+            }
+
+        }
+        else if ( !scene.running && !scene.editing )
+            scene.RenderWithoutStep();
+        else
+            scene.RenderEdittimeScene();
+    }
 }
 
 void SceneCanvas::OnUpdate()
@@ -717,13 +824,13 @@ void SceneCanvas::UpdateScrollbars()
     scrollBar1->SetScrollbar(thumbX, GetWidth(), scrollBar1->GetRange(), GetWidth());
 
     //On agrandit les scrollbars si besoin est
-    if ( (thumbY+0) <= 0 || (thumbY+GetHeight()) >= scrollBar2->GetRange())
+    if ( thumbY <= 0 || static_cast<int>(thumbY+GetHeight()) >= scrollBar2->GetRange())
     {
         int ajout = GetHeight();
         scrollBar2->SetScrollbar(thumbY+ajout/2, GetHeight(), scrollBar2->GetRange()+ajout, GetHeight());
     }
 
-    if ( (thumbX+0) <= 0 || (thumbX+GetWidth()) >= scrollBar1->GetRange())
+    if ( thumbX <= 0 || static_cast<int>(thumbX+GetWidth()) >= scrollBar1->GetRange())
     {
         int ajout = GetWidth();
         scrollBar1->SetScrollbar(thumbX+ajout/2, GetWidth(), scrollBar1->GetRange()+ajout, GetWidth());
@@ -736,7 +843,7 @@ void SceneCanvas::UpdateContextMenu()
     int lowestLayer = GetObjectsSelectedLowestLayer();
 
     contextMenu.FindItem(ID_LAYERUPMENU)->Enable(false);
-    if ( lowestLayer+1 < scene.initialLayers.size() )
+    if ( static_cast<unsigned>(lowestLayer+1) < scene.initialLayers.size() )
     {
         string name = scene.initialLayers[lowestLayer+1].GetName();
         if ( name == "" ) name = _("Calque de base");
@@ -1418,44 +1525,6 @@ void SceneCanvas::OnMiddleDown( wxMouseEvent &event )
         scene.isMoving = false;
         SetCursor( wxNullCursor );
     }
-}
-
-void SceneCanvas::Reload()
-{
-    bool oldEditingState = scene.editing;
-
-    game = gameEdited;
-    game.imageManager = gameEdited.imageManager; //Use same image manager.
-
-    scene.StopMusic();
-
-    EdittimeScene newScene(this, &game);
-    scene = newScene;
-    scene.editing = oldEditingState;
-
-    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
-    if ( !scene.editing )
-    {
-        GDpriv::DynamicExtensionsManager::getInstance()->UnloadAllDynamicExtensions();
-
-        SourceFileBuilder sourceFileBuilder(gameEdited);
-        bool buildSuccessed = sourceFileBuilder.BuildSourceFiles();
-
-        CompilerMessagesParser errorsParser;
-        errorsParser.ParseOutput(sourceFileBuilder.GetErrors());
-        mainEditorCommand.GetBuildMessagesPanel()->RefreshWith(&gameEdited, errorsParser.parsedErrors);
-
-        GDpriv::DynamicExtensionsManager::getInstance()->LoadDynamicExtension("test.dxgd");
-    }
-    #endif
-    scene.LoadFromScene( sceneEdited );
-
-    sceneEdited.wasModified = false;
-    if ( profileDialog )   scene.profiler = profileDialog.get();
-    if ( debugger ) scene.debugger = debugger.get();
-
-    UpdateSize();
-    UpdateScrollbars();
 }
 
 ////////////////////////////////////////////////////////////

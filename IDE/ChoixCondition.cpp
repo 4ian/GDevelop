@@ -333,19 +333,6 @@ scene(scene_)
     Loc = true;
     Contraire = false;
 
-    //On vérifie si on est pas en mode simple.
-    wxConfigBase * pConfig = wxConfigBase::Get();
-
-    bool result = false;
-    pConfig->Read("/ModeSimple", &result);
-
-    if ( result == true )
-    {
-        LocaliseCheck->Enable(false);
-        GlobalCheck->Enable(false);
-        ContraireCheck->Enable(false);
-    }
-
     RefreshAllLists();
     Center();
 }

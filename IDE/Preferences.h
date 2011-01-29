@@ -9,6 +9,7 @@
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/statline.h>
+#include <wx/radiobut.h>
 #include <wx/panel.h>
 #include <wx/choice.h>
 #include <wx/statbmp.h>
@@ -26,8 +27,10 @@ class Preferences: public wxDialog
 
 		//(*Declarations(Preferences)
 		wxStaticText* StaticText10;
+		wxRadioButton* externalCodeEditorCheck;
 		wxPanel* InactifColorPnl;
 		wxButton* OkBt;
+		wxButton* compilerToolchainBt;
 		wxStaticText* StaticText9;
 		wxPanel* backColorPnl;
 		wxPanel* Panel5;
@@ -37,6 +40,7 @@ class Preferences: public wxDialog
 		wxRadioBox* ribbonStyleBox;
 		wxButton* gdStyleBt;
 		wxButton* BrowseDossierTempBt;
+		wxTextCtrl* codeEditorEdit;
 		wxStaticText* StaticText13;
 		wxPanel* ActifColor2Pnl;
 		wxStaticText* StaticText2;
@@ -64,6 +68,7 @@ class Preferences: public wxDialog
 		wxListbook* Listbook1;
 		wxStaticText* StaticText5;
 		wxStaticText* StaticText7;
+		wxPanel* Panel7;
 		wxCheckBox* autosaveActivatedCheck;
 		wxStaticLine* StaticLine1;
 		wxButton* BrowseEditionImage;
@@ -76,8 +81,11 @@ class Preferences: public wxDialog
 		wxPanel* ribbonColor1Pnl;
 		wxPanel* ribbonColor2Pnl;
 		wxStaticText* StaticText4;
+		wxButton* browseCodeEditorBt;
 		wxButton* officeStyleBt;
+		wxStaticText* StaticText16;
 		wxStaticBitmap* StaticBitmap3;
+		wxRadioButton* internalCodeEditorCheck;
 		wxButton* AideBt;
 		//*)
 
@@ -133,6 +141,13 @@ class Preferences: public wxDialog
 		static const long ID_STATICTEXT12;
 		static const long ID_PANEL14;
 		static const long ID_PANEL8;
+		static const long ID_STATICTEXT16;
+		static const long ID_BUTTON9;
+		static const long ID_RADIOBUTTON2;
+		static const long ID_RADIOBUTTON1;
+		static const long ID_TEXTCTRL2;
+		static const long ID_BUTTON11;
+		static const long ID_PANEL17;
 		static const long ID_LISTBOOK1;
 		static const long ID_STATICLINE1;
 		static const long ID_BUTTON1;
@@ -161,6 +176,8 @@ class Preferences: public wxDialog
 		void OnauiStyleBtClick(wxCommandEvent& event);
 		void OnhideLabelsCheckClick(wxCommandEvent& event);
 		void OnlangChoiceSelect(wxCommandEvent& event);
+		void OncompilerToolchainBtClick(wxCommandEvent& event);
+		void OnbrowseCodeEditorBtClick(wxCommandEvent& event);
 		//*)
 		void SetSkinDefault();
 		void SetSkinOffice();

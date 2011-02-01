@@ -175,7 +175,7 @@ void DrawerObject::SaveToXml(TiXmlElement * object)
 }
 #endif
 
-bool DrawerObject::LoadResources(const ImageManager & imageMgr )
+bool DrawerObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
 {
     #if defined(GD_IDE_ONLY)
     edittimeIconImage.LoadFromFile("Extensions/primitivedrawingicon.png");

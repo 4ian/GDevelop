@@ -10,11 +10,11 @@
 	<File name="DrawerExpressions.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="74" topLine="2" />
 	</File>
-	<File name="DrawerObject.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="7262" topLine="180" />
+	<File name="DrawerObject.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="6434" topLine="160" />
 	</File>
-	<File name="DrawerObject.h" open="0" top="0" tabpos="0">
-		<Cursor position="1910" topLine="39" />
+	<File name="DrawerObject.h" open="1" top="0" tabpos="2">
+		<Cursor position="1659" topLine="43" />
 	</File>
 	<File name="DrawerObjectEditor.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="1008" topLine="3" />

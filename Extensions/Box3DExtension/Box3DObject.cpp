@@ -190,7 +190,7 @@ void Box3DObject::SaveToXml(TiXmlElement * object)
 }
 #endif
 
-bool Box3DObject::LoadResources(const ImageManager & imageMgr )
+bool Box3DObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
 {
     frontTexture =  imageMgr.GetSFMLImage(frontTextureName);
     topTexture =    imageMgr.GetSFMLImage(topTextureName);

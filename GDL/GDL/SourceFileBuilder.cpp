@@ -35,6 +35,10 @@ SourceFileBuilder::SourceFileBuilder(wxGauge * progressGauge_, wxStaticText * st
     gdlLibs = "-lgdl.dll";
     osLibs = "-lkernel32 -luser32 -lopengl32 -limm32 -lcomctl32 -lglu32 -lws2_32 -lgdi32 -lwinmm -luuid -lshell32 -lole32 -lwinspool -ladvapi32 -lcomdlg32 -loleaut32 -lopengl32 -lglu32";
     osDefines = "WINDOWS";
+
+    fileExtensionsToCompile.push_back("cpp");
+    fileExtensionsToCompile.push_back("c");
+    fileExtensionsToCompile.push_back("cc");
 }
 
 void BuildProcess::OnTerminate(int pid, int status)
@@ -71,6 +75,7 @@ void SourceFileBuilder::OnCurrentBuildProcessTerminated(bool success)
 {
     if ( currentBuildProcess )
     {
+        std::cout << "Task ended." << std::endl;
         delete currentBuildProcess;
         currentBuildProcess = NULL;
     }
@@ -92,10 +97,18 @@ void SourceFileBuilder::OnCurrentBuildProcessTerminated(bool success)
         }
         else state = 2;
 
-        while ( currentFileBuilded < sourceFiles.size() &&
-                ( wxFileExists(sourceFiles[currentFileBuilded]->GetFileName()) &&
-                  sourceFiles[currentFileBuilded]->GetLastBuildTimeStamp() > wxFileName(sourceFiles[currentFileBuilded]->GetFileName()).GetModificationTime().GetTicks() ) )
+        while ( currentFileBuilded < sourceFiles.size() )
+        {
+            if ( !wxFileExists(sourceFiles[currentFileBuilded]->GetFileName()) )
+                break;
+
+            wxFileName fileInfo(sourceFiles[currentFileBuilded]->GetFileName());
+            if ( std::find(fileExtensionsToCompile.begin(), fileExtensionsToCompile.end(), string(fileInfo.GetExt().mb_str())) != fileExtensionsToCompile.end()
+                 && sourceFiles[currentFileBuilded]->GetLastBuildTimeStamp() < fileInfo.GetModificationTime().GetTicks() )
+                break;
+
             currentFileBuilded++;
+        }
 
         if ( currentFileBuilded < sourceFiles.size() ) //Continue building...
         {
@@ -131,8 +144,9 @@ void SourceFileBuilder::OnCurrentBuildProcessTerminated(bool success)
             std::vector<std::string> sourcesFilesToLink;
             for (unsigned int i = 0;i<sourceFiles.size();++i)
             {
-                wxFileName file(sourceFiles[i]->GetFileName());
-                sourcesFilesToLink.push_back(string(file.GetPath().mb_str())+"/"+string(file.GetName().mb_str())+".o");
+                wxFileName fileInfo(sourceFiles[i]->GetFileName());
+                if ( std::find(fileExtensionsToCompile.begin(), fileExtensionsToCompile.end(), string(fileInfo.GetExt().mb_str())) != fileExtensionsToCompile.end() )
+                    sourcesFilesToLink.push_back(string(fileInfo.GetPath().mb_str())+"/"+string(fileInfo.GetName().mb_str())+".o");
             }
 
             if ( !LinkSourceFiles(sourcesFilesToLink) )
@@ -196,10 +210,13 @@ bool SourceFileBuilder::BuildSourceFile(std::string filename)
     }
 
     std::string cmd = string(wxString(pathManager.gccCompilerExecutablePath+" -O2 -Wall -m32 "+definesStr+" "+includesStr+" -c \""+filename+"\" -o \""+file.GetPath()+"/"+file.GetName()+".o\"").mb_str());
+    std::cout << "Compiling "<< filename<<"..." << std::endl;
+    std::cout << cmd << std::endl;
 
     BuildProcess * process = new BuildProcess(this);
     if ( !wxExecute(cmd, wxEXEC_ASYNC, process) )
     {
+        std::cout << "Failed to start compilation." << std::endl;
         delete process;
         return false;
     }
@@ -221,6 +238,7 @@ bool SourceFileBuilder::LinkSourceFiles(std::vector<std::string> files)
         filesStr += " \""+files[i]+"\"";
 
     std::string cmd = pathManager.gccCompilerExecutablePath+" -shared -Wl,--dll "+libsDirStr +" " + filesStr +" -o test.dxgd -s " + libsStr + " ";
+    std::cout << "Linking..." << std::endl;
 
     BuildProcess * process = new BuildProcess(this);
     if ( !wxExecute(cmd, wxEXEC_ASYNC, process) )

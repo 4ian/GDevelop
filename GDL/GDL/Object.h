@@ -10,7 +10,6 @@
 #include <wx/wx.h> //This include file must be placed first
 #endif
 #include "GDL/Force.h" //This include file must be placed first
-
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -19,7 +18,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/interprocess/containers/flat_map.hpp>
 #include <boost/enable_shared_from_this.hpp>
-
 #include "GDL/ListVariable.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/RotatedRectangle.h"
@@ -43,7 +41,7 @@ class ResourcesMergingHelper;
 
 /**
  * An object is something displayed on the scene.
- * Games use not directly this class, but derived classes
+ * Games don't directly use this class, but derived classes
  * provided by extensions.
  */
 class GD_API Object : public boost::enable_shared_from_this<Object>
@@ -79,12 +77,12 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Called by RuntimeScene at loading. The object is not necessarily used on the scene.
          */
-        virtual bool LoadResources(const ImageManager & imageMgr) {return true;};
+        virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr) {return true;};
 
         /**
          * Called by RuntimeScene when the object is going to be used on the scene.
          */
-        virtual bool LoadRuntimeResources(const ImageManager & imageMgr) {return true;};
+        virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr) {return true;};
 
         /**
          * Called by RuntimeScene when placing an real object from a position

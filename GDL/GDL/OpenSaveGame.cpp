@@ -230,6 +230,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         if ( elem->Attribute( "oglFOV" ) != NULL ) { elem->QueryFloatAttribute("oglFOV", &newScene->oglFOV); }
         if ( elem->Attribute( "oglZNear" ) != NULL ) { elem->QueryFloatAttribute("oglZNear", &newScene->oglZNear); }
         if ( elem->Attribute( "oglZFar" ) != NULL ) { elem->QueryFloatAttribute("oglZFar", &newScene->oglZFar); }
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("standardSortMethod", newScene->standardSortMethod);
         GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("stopSoundsOnStartup", newScene->stopSoundsOnStartup);
 
         if ( elem->FirstChildElement( "GroupesObjets" ) != NULL )
@@ -1821,6 +1822,7 @@ bool OpenSaveGame::SaveToFile(string file)
             scene->SetDoubleAttribute( "oglFOV", game.scenes[i]->oglFOV );
             scene->SetDoubleAttribute( "oglZNear", game.scenes[i]->oglZNear );
             scene->SetDoubleAttribute( "oglZFar", game.scenes[i]->oglZFar );
+            if ( game.scenes[i]->standardSortMethod ) scene->SetAttribute( "standardSortMethod", "true" ); else scene->SetAttribute( "standardSortMethod", "false" );
             if ( game.scenes[i]->stopSoundsOnStartup ) scene->SetAttribute( "stopSoundsOnStartup", "true" ); else scene->SetAttribute( "stopSoundsOnStartup", "false" );
 
             TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );

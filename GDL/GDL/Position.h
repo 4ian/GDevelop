@@ -32,9 +32,6 @@ class GD_API InitialPosition
         float height;
         map < string, float > floatInfos;
         map < string, string > stringInfos;
-
-    protected:
-    private:
 };
 
 #endif // POSITION_H

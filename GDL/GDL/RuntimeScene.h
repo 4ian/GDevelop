@@ -56,6 +56,7 @@ class GD_API RuntimeScene : public Scene
         const sf::Input *                       input; ///< Pointer to the SFML class used to get user input
         bool                                    inputKeyPressed;    ///< Supplementary input : True if any key was pressed
         int                                     inputWheelDelta;    ///< Supplementary input : Amount of mouse wheel moved
+        std::string                             inputTextEntered;   ///< Supplementary input : Text entered using keyboard
         RuntimeGame *                           game; ///< Pointer to the game the scene is linked to
         SoundManager *                          soundManager; ///< Pointer to the sound manager.
         #if defined(GD_IDE_ONLY)
@@ -88,6 +89,10 @@ class GD_API RuntimeScene : public Scene
          * Return true if scene is rendered full screen.
          */
         bool RenderWindowIsFullScreen() { return isFullScreen; }
+
+        /**
+         * Change full screen state. The render window is itself not changed so as to be displayed fullscreen or not.
+         */
         void SetRenderWindowIsFullScreen(bool yes = true) { isFullScreen = yes; }
 
         /**

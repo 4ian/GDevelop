@@ -58,7 +58,7 @@ bool ActCreate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const
     //Ajout à la liste d'objet et configuration de sa position
     newObject->SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) );
     newObject->SetY( action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) );
-    newObject->LoadRuntimeResources(*scene.game->imageManager);
+    newObject->LoadRuntimeResources(scene, *scene.game->imageManager);
 
     //Compatibilité avec les versions de Game Develop précédentes
     if ( action.GetParameters().size() > 3 )
@@ -98,7 +98,7 @@ bool ActCreateByName( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     //Ajout à la liste d'objet et configuration de sa position
     newObject->SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) );
     newObject->SetY( action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned) );
-    newObject->LoadRuntimeResources(*scene.game->imageManager);
+    newObject->LoadRuntimeResources(scene, *scene.game->imageManager);
 
     //Compatibilité avec les versions de Game Develop précédentes
     if ( action.GetParameters().size() > 3 )

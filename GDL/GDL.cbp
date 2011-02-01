@@ -718,6 +718,8 @@
 		<Unit filename="GDL\DynamicLibrariesTools.h" />
 		<Unit filename="GDL\EditComment.cpp" />
 		<Unit filename="GDL\EditComment.h" />
+		<Unit filename="GDL\EditDynamicExtensionCallerEvent.cpp" />
+		<Unit filename="GDL\EditDynamicExtensionCallerEvent.h" />
 		<Unit filename="GDL\EditExpression.cpp" />
 		<Unit filename="GDL\EditExpression.h" />
 		<Unit filename="GDL\EditForEachEvent.cpp" />
@@ -1049,6 +1051,7 @@
 					<wxDialog wxs="wxsmith/EditTextDialog.wxs" src="GDL/EditTextDialog.cpp" hdr="GDL/EditTextDialog.h" fwddecl="0" i18n="1" name="EditTextDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseAutomatismDlg.wxs" src="GDL/ChooseAutomatismDlg.cpp" hdr="GDL/ChooseAutomatismDlg.h" fwddecl="0" i18n="1" name="ChooseAutomatismDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/PropImage.wxs" src="GDL/PropImage.cpp" hdr="GDL/PropImage.h" fwddecl="0" i18n="1" name="PropImage" language="CPP" />
+					<wxDialog wxs="wxsmith/EditDynamicExtensionCallerEvent.wxs" src="GDL/EditDynamicExtensionCallerEvent.cpp" hdr="GDL/EditDynamicExtensionCallerEvent.h" fwddecl="0" i18n="1" name="EditDynamicExtensionCallerEvent" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

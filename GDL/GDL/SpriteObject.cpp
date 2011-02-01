@@ -333,7 +333,7 @@ void SpriteObject::SaveToXml(TiXmlElement * objet)
 }
 #endif
 
-bool SpriteObject::LoadResources(const ImageManager & imageMgr )
+bool SpriteObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
 {
     for ( unsigned int j = 0; j < GetAnimationsNumber();j++ )
     {

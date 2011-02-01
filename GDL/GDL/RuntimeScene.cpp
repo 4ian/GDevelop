@@ -225,6 +225,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
 void RuntimeScene::ManageRenderTargetEvents()
 {
     inputWheelDelta = 0;
+    inputTextEntered.clear();
 
     sf::Event event;
     while ( renderWindow->GetEvent( event ) )
@@ -243,6 +244,10 @@ void RuntimeScene::ManageRenderTargetEvents()
             inputKeyPressed = false;
         else if (event.Type == sf::Event::MouseWheelMoved )
             inputWheelDelta = event.MouseWheel.Delta;
+        else if (event.Type == sf::Event::TextEntered )
+        {
+            inputTextEntered += event.Text.Unicode;
+        }
         else if (event.Type == sf::Event::Resized)
         {
             //Resetup OpenGL
@@ -572,12 +577,12 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     //Load resources of initial objects
     MessageLoading( "Loading objects resources", 30 );
     for (unsigned int i = 0; i < scene.initialObjects.size();++i)
-        scene.initialObjects[i]->LoadResources(*game->imageManager);
+        scene.initialObjects[i]->LoadResources(*this, *game->imageManager);
 
     //Load resources of global objects
     //TODO : Make this only one time during game
     for (unsigned int i = 0; i < game->globalObjects.size();++i)
-        game->globalObjects[i]->LoadResources(*game->imageManager);
+        game->globalObjects[i]->LoadResources(*this, *game->imageManager);
 
     //Create object instances which are originally positionned on scene
     MessageLoading( "Adding objects to their initial position", 66 );
@@ -608,7 +613,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
                 newObject->SetHeight(scene.initialObjectsPositions[i].height);
             }
 
-            newObject->LoadRuntimeResources(*game->imageManager);
+            newObject->LoadRuntimeResources(*this, *game->imageManager);
 
             objectsInstances.AddObject(newObject);
         }

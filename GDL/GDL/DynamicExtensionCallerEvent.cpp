@@ -10,10 +10,12 @@
 #include "GDL/CommonTools.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/DynamicExtensionsManager.h"
+#include "GDL/EditDynamicExtensionCallerEvent.h"
 #include "tinyxml.h"
 #include "RuntimeScene.h"
 #include "Game.h"
 #include "Event.h"
+#include "XmlMacros.h"
 #include <iostream>
 
 #if defined(GD_IDE_ONLY)
@@ -27,56 +29,44 @@ using namespace std;
  */
 void DynamicExtensionCallerEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
-    cout << "Executed" << endl;
     if ( !dynamicExtensionEvent.expired() ) dynamicExtensionEvent.lock()->Execute(scene, objectsConcerned);
 }
 
 #if defined(GD_IDE_ONLY)
-void DynamicExtensionCallerEvent::SaveToXml(TiXmlElement * eventElem) const
+void DynamicExtensionCallerEvent::SaveToXml(TiXmlElement * elem) const
 {
-    /*TiXmlElement * type = new TiXmlElement( "Type" );
-    eventElem->LinkEndChild( type );
-    type->SetAttribute( "value", "Link" );
-
-    TiXmlElement * couleur;
-    couleur = new TiXmlElement( "Limites" );
-    eventElem->LinkEndChild( couleur );
-
-    couleur->SetDoubleAttribute( "start", start );
-    couleur->SetDoubleAttribute( "end", end );
-
-    TiXmlElement * com1;
-    com1 = new TiXmlElement( "Scene" );
-    eventElem->LinkEndChild( com1 );
-    com1->SetAttribute( "value", sceneLinked.c_str() );*/
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("dynamicExtensionEventName", dynamicExtensionEventName);
 }
 #endif
 
-void DynamicExtensionCallerEvent::LoadFromXml(const TiXmlElement * eventElem)
+void DynamicExtensionCallerEvent::LoadFromXml(const TiXmlElement * elem)
 {
-    /*if ( eventElem->FirstChildElement( "Limites" )->Attribute( "start" ) != NULL ) { int value;eventElem->FirstChildElement( "Limites" )->QueryIntAttribute( "start", &value ); start = value;}
-    else { cout <<"Les informations concernant le départ d'un lien manquent."; }
-    if ( eventElem->FirstChildElement( "Limites" )->Attribute( "end" ) != NULL ) { int value;eventElem->FirstChildElement( "Limites" )->QueryIntAttribute( "end", &value ); end = value;}
-    else { cout <<"Les informations concernant la fin d'un lien manquent."; }
-    if ( eventElem->FirstChildElement( "Scene" )->Attribute( "value" ) != NULL ) { sceneLinked = eventElem->FirstChildElement( "Scene" )->Attribute( "value" );}
-    else { cout <<"Les informations concernant le nom de la scène liée."; }*/
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("dynamicExtensionEventName", dynamicExtensionEventName);
 }
 
 void DynamicExtensionCallerEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
 {
     if ( IsDisabled() ) return;
-    cout << "Preprocess" << endl;
-
     dynamicExtensionEvent = boost::shared_ptr<BaseEvent>();
+
+    //Stop preprocessing if game does not use external source files.
+    if ( !game.useExternalSourceFiles )
+    {
+        wxLogWarning(_("L'évènement C++ nommé")+" \""+dynamicExtensionEventName+"\" "+_("ne sera pas executé car le jeu n'utilise pas de sources C++."));
+        return;
+    }
+
     if ( GDpriv::DynamicExtensionsManager::getInstance()->HasEvent(dynamicExtensionEventName) )
         dynamicExtensionEvent = GDpriv::DynamicExtensionsManager::getInstance()->CreateEvent(dynamicExtensionEventName);
+    else
+        wxLogStatus(_("L'évènement C++ nommé")+" \""+dynamicExtensionEventName+"\" "+_("n'a pas été trouvé.\nAssurez vous de l'avoir declaré dans le fichier de déclaration."));
 }
 
 #if defined(GD_IDE_ONLY)
 void DynamicExtensionCallerEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
-    /*EditLink dialog(parent_, *this);
-    dialog.ShowModal();*/
+    EditDynamicExtensionCallerEvent dialog(parent_, game_, *this);
+    dialog.ShowModal();
 }
 
 /**

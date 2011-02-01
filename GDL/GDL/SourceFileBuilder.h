@@ -103,6 +103,7 @@ class GD_API SourceFileBuilder
         wxStaticText * currentTaskTxt;
 
         CompilerToolchainPathManager pathManager;
+        std::vector<std::string> fileExtensionsToCompile;
 };
 
 /**

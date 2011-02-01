@@ -13,6 +13,7 @@
 #include <wx/toplevel.h>
 #include <iostream>
 class BuildToolsPnl;
+class wxAuiManager;
 
 /**
  *  MainEditorCommand is used to give access to some members of the mainEditor
@@ -44,8 +45,25 @@ class GD_API MainEditorCommand
          */
         void SetRibbonSceneEditorButtonBar(wxRibbonButtonBar * ribbonSEBBar_) { ribbonSceneEditorButtonBar = ribbonSEBBar_; };
 
+        /**
+         * Get pointer to the build tools panel.
+         */
         BuildToolsPnl * GetBuildToolsPanel() { assert(buildToolsPnl); return buildToolsPnl; };
+
+        /**
+         * Change pointer to the build tools panel.
+         */
         void SetBuildToolsPanel(BuildToolsPnl * buildToolsPnl_) { buildToolsPnl = buildToolsPnl_; };
+
+        /**
+         * Get pointer to the pane manager
+         */
+        wxAuiManager * GetPaneManager() { assert(paneManager); return paneManager; };
+
+        /**
+         * Change pointer to the pane manager
+         */
+        void SetPaneManager(wxAuiManager * paneManager_) { paneManager = paneManager_; };
 
         /**
          * Return the pointer to the Main Editor.
@@ -63,6 +81,7 @@ class GD_API MainEditorCommand
         wxRibbonButtonBar * ribbonSceneEditorButtonBar;
         wxTopLevelWindow * mainEditor;
         BuildToolsPnl * buildToolsPnl;
+        wxAuiManager * paneManager;
 };
 
 #endif // NEEDREFRESHCOMMAND_H

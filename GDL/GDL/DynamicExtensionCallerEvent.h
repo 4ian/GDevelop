@@ -24,7 +24,7 @@ class TiXmlElement;
 class GD_API DynamicExtensionCallerEvent : public BaseEvent
 {
     public:
-        DynamicExtensionCallerEvent() : BaseEvent(), dynamicExtensionEventName("MyEvent") {};
+        DynamicExtensionCallerEvent() : BaseEvent() {};
         DynamicExtensionCallerEvent(const DynamicExtensionCallerEvent & event);
         virtual ~DynamicExtensionCallerEvent() {};
 
@@ -42,6 +42,9 @@ class GD_API DynamicExtensionCallerEvent : public BaseEvent
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
+
+        void SetDynamicExtensionEventName(std::string name) { dynamicExtensionEventName = name; }
+        std::string GetDynamicExtensionEventName() const { return dynamicExtensionEventName; }
 
 #if defined(GD_IDE_ONLY)
         /**

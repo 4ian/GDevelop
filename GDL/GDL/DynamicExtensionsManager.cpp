@@ -24,8 +24,8 @@ bool DynamicExtensionsManager::LoadDynamicExtension(std::string fullpath)
     {
         cout << "Unable to load dynamic extension " << fullpath << "." << endl;
         #if defined(GD_IDE_ONLY)
-        wxString userMsg = string(_("Impossible de charger le code." ));
-        wxMessageBox(userMsg, _("Impossible de charger le code"), wxOK | wxICON_ERROR);
+        wxString userMsg = string(_("Impossible de charger le code : Vérifiez que la compilation se soit deroulée avec succès." ));
+        wxMessageBox(userMsg, _("Impossible de charger le code C++."), wxOK | wxICON_ERROR);
         #endif
     }
     else
@@ -39,8 +39,8 @@ bool DynamicExtensionsManager::LoadDynamicExtension(std::string fullpath)
 
             #if defined(GD_IDE_ONLY)
             CloseLibrary(extensionHdl);
-            wxString userMsg = string(_("L'extension dynamique "))+ fullpath + string(_(" est invalide." ));
-            wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_ERROR);
+            wxString userMsg = string(_("Aucun fichier de déclaration n'a été trouvé pour le code C++ : Insérez en un au projet à l'aide de la fenêtre de création de fichiers sources." ));
+            wxMessageBox(userMsg, _("Code C++ manquant."), wxOK | wxICON_ERROR);
             #endif
         }
         else
@@ -77,7 +77,6 @@ void DynamicExtensionsManager::UnloadAllDynamicExtensions()
 
 boost::shared_ptr<BaseEvent> DynamicExtensionsManager::CreateEvent(std::string name) const
 {
-    cout << "CreateEvent for" << name << endl;
     for (unsigned int i =0;i<dynamicExtensionsLoaded.size();++i)
     {
         if ( dynamicExtensionsLoaded[i].second->callableEvents.find(name) != dynamicExtensionsLoaded[i].second->callableEvents.end() )
@@ -89,13 +88,11 @@ boost::shared_ptr<BaseEvent> DynamicExtensionsManager::CreateEvent(std::string n
 
 bool DynamicExtensionsManager::HasEvent(std::string name) const
 {
-    cout << "HasEvent for" << name << endl;
     for (unsigned int i =0;i<dynamicExtensionsLoaded.size();++i)
     {
         if ( dynamicExtensionsLoaded[i].second->callableEvents.find(name) != dynamicExtensionsLoaded[i].second->callableEvents.end() )
             return true;
     }
-    cout << "False" << endl;
 
     return false;
 }

@@ -56,7 +56,7 @@ class TextObject : public Object
         virtual ~TextObject() {};
         virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new TextObject(*this));}
 
-        virtual bool LoadResources(const ImageManager & imageMgr );
+        virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
         virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
         virtual bool Draw(sf::RenderWindow& main_window);

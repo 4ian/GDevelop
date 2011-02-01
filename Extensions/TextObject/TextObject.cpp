@@ -130,7 +130,7 @@ void TextObject::SaveToXml(TiXmlElement * object)
 }
 #endif
 
-bool TextObject::LoadResources(const ImageManager & imageMgr )
+bool TextObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
 {
     //No ressources to load.
 

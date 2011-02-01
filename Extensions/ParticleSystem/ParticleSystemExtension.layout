@@ -31,11 +31,11 @@
 	<File name="ParticleEmitterInitialPositionPanel.h" open="0" top="0" tabpos="14">
 		<Cursor position="1006" topLine="3" />
 	</File>
-	<File name="ParticleEmitterObject.cpp" open="0" top="0" tabpos="13">
-		<Cursor position="25046" topLine="543" />
+	<File name="ParticleEmitterObject.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="23191" topLine="488" />
 	</File>
-	<File name="ParticleEmitterObject.h" open="0" top="0" tabpos="1">
-		<Cursor position="2052" topLine="40" />
+	<File name="ParticleEmitterObject.h" open="1" top="0" tabpos="3">
+		<Cursor position="1795" topLine="42" />
 	</File>
 	<File name="ParticleEmitterObjectEditor.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="1006" topLine="3" />

@@ -503,7 +503,7 @@ void ParticleEmitterObject::UpdateLifeTime()
     particleSystem.particleModel->setLifeTime(particleLifeTimeMin,particleLifeTimeMax);
 }
 
-bool ParticleEmitterObject::LoadRuntimeResources(const ImageManager & imageMgr )
+bool ParticleEmitterObject::LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr )
 {
     //Get the texture if necessary
     if ( rendererType == Quad ) particleSystem.openGLTextureParticle = imageMgr.GetOpenGLTexture(textureParticleName);
@@ -513,7 +513,7 @@ bool ParticleEmitterObject::LoadRuntimeResources(const ImageManager & imageMgr )
     return true;
 }
 
-bool ParticleEmitterObject::LoadResources(const ImageManager & imageMgr)
+bool ParticleEmitterObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr)
 {
     #if defined(GD_IDE_ONLY)
     edittimeIconImage.LoadFromFile("Extensions/particleSystemSceneIcon.png");

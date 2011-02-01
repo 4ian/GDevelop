@@ -85,7 +85,7 @@ void VideoObject::SaveToXml(TiXmlElement * elem)
 }
 #endif
 
-bool VideoObject::LoadRuntimeResources(const ImageManager & imageMgr )
+bool VideoObject::LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr )
 {
     ReloadVideo();
     return true;

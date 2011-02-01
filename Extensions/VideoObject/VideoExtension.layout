@@ -13,11 +13,11 @@
 	<File name="VideoExpressions.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="69" topLine="3" />
 	</File>
-	<File name="VideoObject.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="3512" topLine="89" />
+	<File name="VideoObject.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="2633" topLine="70" />
 	</File>
-	<File name="VideoObject.h" open="0" top="0" tabpos="3">
-		<Cursor position="1934" topLine="40" />
+	<File name="VideoObject.h" open="1" top="0" tabpos="1">
+		<Cursor position="3201" topLine="71" />
 	</File>
 	<File name="VideoObjectEditor.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="1003" topLine="3" />

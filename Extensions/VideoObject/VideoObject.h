@@ -57,7 +57,7 @@ class VideoObject : public Object
         virtual ~VideoObject();
         virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new VideoObject(*this));}
 
-        virtual bool LoadRuntimeResources(const ImageManager & imageMgr );
+        virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
         virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
         virtual bool Draw(sf::RenderWindow& main_window);

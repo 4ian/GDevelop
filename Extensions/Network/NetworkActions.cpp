@@ -29,6 +29,7 @@ freely, subject to the following restrictions:
 #include "GDL/RuntimeScene.h"
 #include "NetworkManager.h"
 #include "ErrorManager.h"
+#include "ReceivedDataManager.h"
 #include <SFML/Network.hpp>
 #include <iostream>
 #include <fstream>

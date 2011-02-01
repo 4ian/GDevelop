@@ -8,13 +8,13 @@
 		<Cursor position="126" topLine="6" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="12655" topLine="214" />
+		<Cursor position="6272" topLine="77" />
 	</File>
-	<File name="NetworkActions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="64" topLine="3" />
+	<File name="NetworkActions.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="1158" topLine="22" />
 	</File>
-	<File name="NetworkActions.h" open="0" top="0" tabpos="5">
-		<Cursor position="64" topLine="3" />
+	<File name="NetworkActions.h" open="0" top="0" tabpos="3">
+		<Cursor position="1244" topLine="8" />
 	</File>
 	<File name="NetworkAutomatism.cpp" open="0" top="0" tabpos="13">
 		<Cursor position="4176" topLine="95" />
@@ -22,8 +22,8 @@
 	<File name="NetworkAutomatism.h" open="0" top="0" tabpos="3">
 		<Cursor position="1967" topLine="27" />
 	</File>
-	<File name="NetworkAutomatismActions.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="1404" topLine="19" />
+	<File name="NetworkAutomatismActions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="506" topLine="2" />
 	</File>
 	<File name="NetworkAutomatismActions.h" open="0" top="0" tabpos="10">
 		<Cursor position="70" topLine="0" />
@@ -43,14 +43,14 @@
 	<File name="NetworkManager.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="706" topLine="0" />
 	</File>
-	<File name="NetworkManager.h" open="0" top="0" tabpos="4">
-		<Cursor position="909" topLine="36" />
+	<File name="NetworkManager.h" open="0" top="0" tabpos="5">
+		<Cursor position="420" topLine="1" />
 	</File>
 	<File name="ReceivedDataManager.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="64" topLine="0" />
 	</File>
 	<File name="ReceivedDataManager.h" open="0" top="0" tabpos="1">
-		<Cursor position="64" topLine="3" />
+		<Cursor position="1482" topLine="35" />
 	</File>
 	<File name="RuntimeSceneNetworkDatas.cpp" open="0" top="0" tabpos="14">
 		<Cursor position="64" topLine="0" />

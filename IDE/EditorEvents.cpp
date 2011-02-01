@@ -1161,6 +1161,7 @@ void EditorEvents::OnEventsPanelLeftDClick( wxMouseEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnEventsPanelLeftUp(wxMouseEvent& event)
 {
+    SetFocus();
     wxFocusEvent unusedEvent;
     OnEventsPanelSetFocus(unusedEvent);
 
@@ -1392,54 +1393,25 @@ void EditorEvents::DeselectAllInstructions(BaseEventSPtr parentEvent, vector<Ins
 }
 
 ////////////////////////////////////////////////////////////
-/// Tests unitaires
-////////////////////////////////////////////////////////////
-TEST( Dialogues, EditorEvents )
-{
-    Game game;
-    MainEditorCommand nrC;
-    Scene scene;
-
-    wxLogNull noLog;
-
-    //On vérifie que rien ne plante
-/*    EditorEvents editor(NULL, game, scene, &scene.events, nrC);
-
-    wxCommandEvent unusedEvent;
-    editor.OnDelEventSelected(unusedEvent);
-    editor.OnDelConditionsSelected(unusedEvent);
-    editor.OnDelActionsSelected(unusedEvent);
-
-    editor.OnCutSelected(unusedEvent);
-    editor.OnMenuCopySelected(unusedEvent);
-    //editor.OnMenuItem7Selected(unusedEvent);
-    //editor.OnAddLienSelected(unusedEvent);
-    editor.OnInsertEventSelected(unusedEvent);
-    editor.OnSubEventMenuItemSelected(unusedEvent);
-    //editor.OnAddLienSelected(unusedEvent);
-    editor.OnMenuPasteAfterSelected(unusedEvent);
-    editor.OnMenuPasteSelected(unusedEvent);
-    editor.OnPasteAsASubEventSelected(unusedEvent);
-    editor.OnDelSubEventsSelected(unusedEvent);*/
-
-}
-
-////////////////////////////////////////////////////////////
 /// Raccourcis clavier, renvoyant aux fonctions déjà existantes
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnEventsPanelKeyUp(wxKeyEvent& event)
 {
     ctrlPressed = event.GetModifiers() == wxMOD_CMD ? true : false;
 
-    if ( event.GetKeyCode() == WXK_DELETE )
+    if ( event.GetModifiers() == wxMOD_SHIFT ) //Shift-xxx
     {
-        wxCommandEvent unusedEvent;
-        OnDelEventSelected( unusedEvent );
-    }
-    if ( event.GetKeyCode() == WXK_INSERT )
-    {
-        wxCommandEvent unusedEvent;
-        OnInsertEventSelected( unusedEvent );
+        switch ( event.GetKeyCode() )
+        {
+            case WXK_INSERT:
+            {
+                wxCommandEvent unusedEvent;
+                OnSubEventMenuItemSelected( unusedEvent );
+                break;
+            }
+            default:
+                break;
+        }
     }
     else if ( event.GetModifiers() == wxMOD_CMD ) //Ctrl-xxx
     {
@@ -1480,15 +1452,41 @@ void EditorEvents::OnEventsPanelKeyUp(wxKeyEvent& event)
                 break;
         }
     }
-    else if ( event.GetModifiers() == (wxMOD_CMD|wxMOD_SHIFT) )
+    else if ( event.GetModifiers() == (wxMOD_CMD|wxMOD_SHIFT) ) //Ctrl-Shift-xxx
     {
-
         switch ( event.GetKeyCode() )
         {
             case 86: //Ctrl-V
             {
                 wxCommandEvent unusedEvent;
                 OnPasteAsASubEventSelected( unusedEvent );
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    else
+    {
+        switch ( event.GetKeyCode() )
+        {
+            case WXK_DELETE:
+            {
+                wxCommandEvent unusedEvent;
+
+                if ( GetLastSelectedListOfInstructions() == NULL || GetLastSelectedListOfInstructions()->empty() )
+                    OnDelEventSelected( unusedEvent );
+                else if ( conditionsSelected )
+                    OnDelConditionMenuSelected( unusedEvent );
+                else
+                    OnDelActionMenuSelected( unusedEvent );
+
+                break;
+            }
+            case WXK_INSERT:
+            {
+                wxCommandEvent unusedEvent;
+                OnInsertEventSelected( unusedEvent );
                 break;
             }
             default:

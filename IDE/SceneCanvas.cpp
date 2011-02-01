@@ -686,6 +686,7 @@ void SceneCanvas::ReloadFirstPart()
     if ( !scene.editing )
     {
         GDpriv::DynamicExtensionsManager::getInstance()->UnloadAllDynamicExtensions();
+        mainEditorCommand.GetBuildToolsPanel()->notebook->SetSelection(0);
 
         if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->LaunchGameSourceFilesBuild(gameEdited, this) )
         {
@@ -712,6 +713,8 @@ void SceneCanvas::ReloadSecondPart()
 
         if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->LastBuildSuccessed() )
         {
+            mainEditorCommand.GetPaneManager()->GetPane(mainEditorCommand.GetBuildToolsPanel()).Show(true);
+            mainEditorCommand.GetBuildToolsPanel()->notebook->SetSelection(1);
             mainEditorCommand.GetBuildToolsPanel()->buildMessagesPnl->OpenFileContainingFirstError();
         }
 
@@ -1204,7 +1207,7 @@ void SceneCanvas::AddObjetSelected(float x, float y)
 
     scene.isMovingObject = false;
 
-    if ( scene.objectToAdd == "" ) { wxLogMessage( _( "Vous n'avez selectionné aucun objet à ajouter.\nSélectionnez en un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils." ) ); return;}
+    if ( scene.objectToAdd.empty() ) { wxLogMessage( _( "Vous n'avez selectionné aucun objet à ajouter.\nSélectionnez en un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils." ) ); return;}
 
     int IDsceneObject = Picker::PickOneObject( &sceneEdited.initialObjects, scene.objectToAdd );
     int IDglobalObject = Picker::PickOneObject( &gameEdited.globalObjects, scene.objectToAdd );
@@ -1247,11 +1250,11 @@ void SceneCanvas::AddObjetSelected(float x, float y)
     newObject->SetLayer( pos.layer );
 
     newObject->InitializeFromInitialPosition(pos);
-    newObject->LoadRuntimeResources( *game.imageManager );
+    newObject->LoadRuntimeResources( scene, *game.imageManager );
 
     scene.objectsInstances.AddObject(newObject);
 
-    newObject->LoadResources(*game.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
+    newObject->LoadResources(scene, *game.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
 
     if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
     ChangesMade();

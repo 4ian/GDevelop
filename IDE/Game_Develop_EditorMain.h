@@ -114,7 +114,19 @@ class Game_Develop_EditorFrame: public wxFrame
          */
         inline wxRibbonButtonBar * GetRibbonSceneEditorButtonBar() const { return ribbonSceneEditorButtonBar; };
 
+        /**
+         * Get a pointer to the build tools panel
+         */
         inline BuildToolsPnl * GetBuildToolsPanel() const { return buildToolsPnl; }
+
+        /**
+         * Get a pointer to the wxAUI pane manager
+         */
+        inline const wxAuiManager * GetAUIPaneManger() const { return &m_mgr; }
+        /**
+         * Get a pointer to the wxAUI pane manager
+         */
+        inline wxAuiManager * GetAUIPaneManger() { return &m_mgr; }
 
 
         //(*Handlers(Game_Develop_EditorFrame)
@@ -206,6 +218,7 @@ class Game_Develop_EditorFrame: public wxFrame
         void OnProjectsManagerClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonDecomposerDropDownClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonStartPageClicked(wxRibbonButtonBarEvent& evt);
+        void OnRibbonCppToolsClicked(wxRibbonButtonBarEvent& evt);
         void SaveAs();
         void OnRecentClicked(wxCommandEvent& event );
         void UpdateNotebook();
@@ -247,6 +260,7 @@ class Game_Develop_EditorFrame: public wxFrame
         static const long idRibbonWebSite;
         static const long idRibbonCredits;
         static const long idRibbonStartPage;
+        static const long idRibbonCppTools;
 
         //(*Declarations(Game_Develop_EditorFrame)
         wxTimer autoSaveTimer;

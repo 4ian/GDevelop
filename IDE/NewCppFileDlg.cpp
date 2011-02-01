@@ -52,7 +52,7 @@ NewCppFileDlg::NewCppFileDlg(wxWindow* parent, Game & game_) :
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Créer un nouveau fichier C++"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	Panel1->SetBackgroundColour(wxColour(255,255,255));
@@ -140,42 +140,149 @@ void NewCppFileDlg::OncancelBtClick(wxCommandEvent& event)
     EndModal(0);
 }
 
-void NewCppFileDlg::OnextensionMainFileBtClick(wxCommandEvent& event)
+void NewCppFileDlg::OneventFileBtClick(wxCommandEvent& event)
 {
-    wxString file = dirEdit->GetValue()+"/";
+    std::string sourceBeingCreated = string(wxString(dirEdit->GetValue()+"/"+filenameEdit->GetValue()+".cpp").mb_str());
+    std::string headerBeingCreated = string(wxString(dirEdit->GetValue()+"/"+filenameEdit->GetValue()+".h").mb_str());
+
+
+    if ( CreateEventImplementationFile(sourceBeingCreated) ) createdFiles.push_back(sourceBeingCreated);
+    if ( CreateEventHeaderFile(headerBeingCreated) ) createdFiles.push_back(headerBeingCreated);
 
     EndModal(1);
 }
 
-void NewCppFileDlg::OneventFileBtClick(wxCommandEvent& event)
+void NewCppFileDlg::OnextensionMainFileBtClick(wxCommandEvent& event)
 {
-    fileCreated = string(wxString(dirEdit->GetValue()+"/"+filenameEdit->GetValue()+".cpp").mb_str());
+    std::string fileBeingCreated = string(wxString(dirEdit->GetValue()+"/"+filenameEdit->GetValue()+".cpp").mb_str());
 
-    bool alreadyExists = wxFileExists(fileCreated);
+    if ( CreateExtensionMainFile(fileBeingCreated) ) createdFiles.push_back(fileBeingCreated);
 
-    if ( alreadyExists && wxMessageBox(_("Le fichier existe déjà. Le remplacer ?"), _("Fichier déjà existant."), wxYES_NO | wxICON_QUESTION, this) == wxNO )
-        return;
+    EndModal(1);
+}
 
-    wxTextFile newFile(fileCreated);
-    if ( alreadyExists )
-    {
-        newFile.Open();
-        newFile.Clear();
-    }
-    else
-        newFile.Create();
+bool NewCppFileDlg::CreateExtensionMainFile(std::string filename)
+{
+    bool alreadyExists = wxFileExists(filename);
 
-    newFile.AddLine("/*Test*/");
-    newFile.AddLine("class Event\n{\n};\n");
+    if ( alreadyExists && wxMessageBox(_("Le fichier existe déjà. Le remplacer ?"), _("Fichier déjà existant."), wxYES_NO | wxICON_QUESTION) == wxNO )
+        return true;
+
+    wxTextFile newFile(filename);
+    if ( alreadyExists ) newFile.Open();
+    else newFile.Create();
+    newFile.Clear();
+
+    newFile.AddLine(
+  "#include \"GDL/DynamicExtensionBase.h\""
+"\n#include \"GDL/Event.h\""
+"\n#include \"GDL/RuntimeScene.h\""
+"\n#include \"GDL/ObjectsConcerned.h\""
+"\n"+_("//Insérez ici les fichiers d'entête de vos évènements.")+
+"\n//#include \""+_("FichierEvenement.h")+"\""
+"\n"
+"\nclass DynamicExtension : public DynamicExtensionBase"
+"\n{"
+"\n    public:"
+"\n"
+"\n        DynamicExtension()"
+"\n        {"
+"\n            "+_("//Vous pouvez créer des évènements simplement grâce aux modèles lors de la création d'un nouveau fichier C++.")+
+"\n            "+_("//Déclarez ici les noms des évènements. N'oubliez pas d'inclure les fichiers d'entête ci dessus.")+
+"\n            //callableEvents[\"MyEvent\"] = boost::shared_ptr<BaseEvent>(new MyEvent);"
+"\n        };"
+"\n        virtual ~DynamicExtension() {};"
+"\n};"
+"\n"
+"\n/**"
+"\n * "+_("Utilisé en interne par Game Develop")+
+"\n */"
+"\nextern \"C\" DynamicExtensionBase * CreateGDDynamicExtension() {"
+"\n    return new DynamicExtension;"
+"\n}"
+"\n"
+"\n/**"
+"\n * "+_("Utilisé en interne par Game Develop")+
+"\n */"
+"\nextern \"C\" void DestroyGDDynamicExtension(DynamicExtensionBase * p) {"
+"\n    delete p;"
+"\n}");
 
     if ( !newFile.Write() )
     {
         wxLogError(_("Le fichier n'a pas pu être créé."));
-        return;
+        return false;
     }
 
-    EndModal(1);
+    return true;
 }
+
+bool NewCppFileDlg::CreateEventHeaderFile(std::string filename)
+{
+    bool alreadyExists = wxFileExists(filename);
+
+    if ( alreadyExists && wxMessageBox(_("Le fichier existe déjà. Le remplacer ?"), _("Fichier déjà existant."), wxYES_NO | wxICON_QUESTION) == wxNO )
+        return true;
+
+    wxTextFile newFile(filename);
+    if ( alreadyExists ) newFile.Open();
+    else newFile.Create();
+    newFile.Clear();
+
+    newFile.AddLine(
+"\n#include \"GDL/Event.h\""
+"\n#include \"GDL/RuntimeScene.h\""
+"\n#include \"GDL/ObjectsConcerned.h\""
+"\n"
+"\n/**"
+"\n * "+_("Classe de l'évènement. L'évènement peut être personnalisé en éditant la fonction membre Execute.")+
+"\n * "+_("Vous devez déclarer l'évènement dans le fichier de déclaration pour le rendre accessible.")+
+"\n */"
+"\nclass MyEvent : public BaseEvent"
+"\n{"
+"\npublic:"
+"\n     virtual void Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );"
+"\n};");
+
+    if ( !newFile.Write() )
+    {
+        wxLogError(_("Le fichier n'a pas pu être créé."));
+        return false;
+    }
+
+    return true;
+}
+
+bool NewCppFileDlg::CreateEventImplementationFile(std::string filename)
+{
+    bool alreadyExists = wxFileExists(filename);
+
+    if ( alreadyExists && wxMessageBox(_("Le fichier ")+filename+_(" existe déjà. Le remplacer ?"), _("Fichier déjà existant."), wxYES_NO | wxICON_QUESTION) == wxNO )
+        return true;
+
+    wxTextFile newFile(filename);
+    if ( alreadyExists ) newFile.Open();
+    else newFile.Create();
+    newFile.Clear();
+
+    newFile.AddLine(
+"\n#include \"GDL/Event.h\""
+"\n#include \"GDL/RuntimeScene.h\""
+"\n#include \"GDL/ObjectsConcerned.h\""
+"\n"
+"\nvoid MyEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )"
+"\n{"
+"\n     "+_("//Cette fonction membre sera lancée lors de l'appel de l'évènement.")+
+"\n}");
+
+    if ( !newFile.Write() )
+    {
+        wxLogError(_("Le fichier n'a pas pu être créé."));
+        return false;
+    }
+    return true;
+}
+
 
 void NewCppFileDlg::OnbrowseBtClick(wxCommandEvent& event)
 {

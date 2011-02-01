@@ -12,7 +12,10 @@
 #include <wx/dialog.h>
 //*)
 #include <string>
+#include <vector>
 class Game;
+
+
 
 class NewCppFileDlg: public wxDialog
 {
@@ -21,7 +24,11 @@ class NewCppFileDlg: public wxDialog
 		NewCppFileDlg(wxWindow* parent, Game & game_);
 		virtual ~NewCppFileDlg();
 
-		std::string fileCreated;
+		std::vector<std::string> createdFiles;
+
+		static bool CreateExtensionMainFile(std::string filename);
+		static bool CreateEventHeaderFile(std::string filename);
+		static bool CreateEventImplementationFile(std::string filename);
 
 		//(*Declarations(NewCppFileDlg)
 		wxStaticBitmap* StaticBitmap2;

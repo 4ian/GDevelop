@@ -179,6 +179,7 @@ class EditPropJeu: public wxDialog
 		void OnwinIconEditText(wxCommandEvent& event);
 		void OnbrowseIconClick(wxCommandEvent& event);
 		void OncompilerToolchainBtClick(wxCommandEvent& event);
+		void OnuseExternalSourcesCheckClick(wxCommandEvent& event);
 		//*)
 
 		Game & game;

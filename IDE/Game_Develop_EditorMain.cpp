@@ -89,6 +89,8 @@ const long Game_Develop_EditorFrame::idRibbonUpdate = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonWebSite = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonCredits = wxNewId();
 const long Game_Develop_EditorFrame::idRibbonStartPage = wxNewId();
+const long Game_Develop_EditorFrame::idRibbonCppTools = wxNewId();
+
 
 BEGIN_EVENT_TABLE( Game_Develop_EditorFrame, wxFrame )
     //(*EventTable(Game_Develop_EditorFrame)
@@ -208,6 +210,7 @@ buildToolsPnl(NULL)
     Connect( idRibbonWebSite, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuSiteSelected );
     Connect( idRibbonCredits, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnAbout );
     Connect( idRibbonStartPage, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonStartPageClicked );
+    Connect( idRibbonCppTools, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonCppToolsClicked );
 
     SetDropTarget(new DnDFileEditor(*this));
 
@@ -265,6 +268,7 @@ buildToolsPnl(NULL)
         wxRibbonButtonBar *affichage_bar = new wxRibbonButtonBar(affichagePanel, wxID_ANY);
         affichage_bar->AddButton(idRibbonProjectsManager, !hideLabels ? _("Projets") : "", wxBitmap("res/projectManager24.png", wxBITMAP_TYPE_ANY));
         affichage_bar->AddButton(idRibbonStartPage, !hideLabels ? _("Page de démarrage") : "", wxBitmap("res/startPage24.png", wxBITMAP_TYPE_ANY));
+        affichage_bar->AddButton(idRibbonCppTools, !hideLabels ? _("Outils C++") : "", wxBitmap("res/source_cpp24.png", wxBITMAP_TYPE_ANY));
 
         wxRibbonPanel *toolsPanel = new wxRibbonPanel(home, wxID_ANY, _("Outils"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *tools_bar = new wxRibbonButtonBar(toolsPanel, wxID_ANY);
@@ -413,6 +417,15 @@ void Game_Develop_EditorFrame::UpdateNotebook()
 void Game_Develop_EditorFrame::OnProjectsManagerClicked(wxRibbonButtonBarEvent& evt)
 {
     m_mgr.GetPane(projectManager).Show(true);
+    m_mgr.Update();
+}
+
+/**
+ * Show project manager
+ */
+void Game_Develop_EditorFrame::OnRibbonCppToolsClicked(wxRibbonButtonBarEvent& evt)
+{
+    m_mgr.GetPane(buildToolsPnl).Show(true);
     m_mgr.Update();
 }
 

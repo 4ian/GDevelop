@@ -89,7 +89,6 @@ void InitialPositionBrowserDlg::OninitialPositionsListItemActivated(wxListEvent&
                                              wxLIST_STATE_SELECTED);
 
         if (itemIndex == -1) break;
-        cout << "Repered a selection" << endl;
 
         // Add each selected object to scene canvas selection
         if ( itemIndex < initialPositions.size() && itemIndex >= 0 )
@@ -97,14 +96,12 @@ void InitialPositionBrowserDlg::OninitialPositionsListItemActivated(wxListEvent&
             ObjSPtr object = sceneCanvas.GetObjectFromInitialPosition(initialPositions[itemIndex]);
             if ( object )
             {
-                cout << "Adding one object" << endl;
                 sceneCanvas.scene.objectsSelected.push_back(object);
                 sceneCanvas.scene.xObjectsSelected.push_back(object->GetX());
                 sceneCanvas.scene.yObjectsSelected.push_back(object->GetY());
             }
         }
     }
-        cout << "END" << endl;
 }
 
 void InitialPositionBrowserDlg::DeselectAll()

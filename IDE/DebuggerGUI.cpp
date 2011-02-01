@@ -671,7 +671,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     layerDialog.ShowModal();
     newObject->SetLayer( layerDialog.layerChosen );
 
-    newObject->LoadRuntimeResources(*scene.game->imageManager);
+    newObject->LoadRuntimeResources(scene, *scene.game->imageManager);
 
     scene.objectsInstances.AddObject(newObject);
 

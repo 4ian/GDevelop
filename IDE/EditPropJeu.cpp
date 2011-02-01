@@ -20,7 +20,9 @@
 #include <wx/config.h>
 #include "GDL/HelpFileAccess.h"
 #include "GDL/FontManager.h"
+#include "GDL/SourceFile.h"
 #include "SetupCompilerToolchainDlg.h"
+#include "NewCppFileDlg.h"
 
 #include "GDL/Game.h"
 
@@ -391,6 +393,7 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnButton2Click);
     Connect(ID_TEXTCTRL14,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditPropJeu::OnwinIconEditText);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnbrowseIconClick);
+    Connect(ID_CHECKBOX9,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnuseExternalSourcesCheckClick);
     Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OncompilerToolchainBtClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnOkBtClick);
     Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OncancelBtClick);
@@ -403,32 +406,23 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     HeightEdit->ChangeValue(ToString( game.windowHeight ) );
     WidthEdit->ChangeValue(ToString( game.windowWidth ) );
 
-    afficherEcranCheck->SetValue( true );
-    if ( !game.loadingScreen.afficher )
-        afficherEcranCheck->SetValue( false );
-
+    afficherEcranCheck->SetValue( game.loadingScreen.afficher );
 
     widthECEdit->ChangeValue(ToString( game.loadingScreen.width ) );
     heightECEdit->ChangeValue(ToString( game.loadingScreen.height ) );
 
-    texteCheck->SetValue( true );
-    if ( !game.loadingScreen.texte )
-        texteCheck->SetValue( false );
+    texteCheck->SetValue( game.loadingScreen.texte );
 
     texteXPosEdit->ChangeValue(ToString( game.loadingScreen.texteXPos ) );
     texteYPosEdit->ChangeValue(ToString( game.loadingScreen.texteYPos ) );
     texteEdit->ChangeValue( game.loadingScreen.texteChargement );
 
-    pourcentCheck->SetValue( false );
-    if ( game.loadingScreen.pourcent )
-        pourcentCheck->SetValue( true );
+    pourcentCheck->SetValue( game.loadingScreen.pourcent );
 
     pourcentXPosEdit->ChangeValue(ToString( game.loadingScreen.pourcentXPos ) );
     pourcentYPosEdit->ChangeValue(ToString( game.loadingScreen.pourcentYPos ) );
 
-    imageCheck->SetValue( false );
-    if ( game.loadingScreen.image )
-        imageCheck->SetValue( true );
+    imageCheck->SetValue( game.loadingScreen.image );
 
     imageEdit->ChangeValue( game.loadingScreen.imageFichier );
 
@@ -452,6 +446,8 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     winExeEdit->SetValue(game.winExecutableFilename);
     winIconEdit->SetValue(game.winExecutableIconFile);
     linuxExeEdit->SetValue(game.linuxExecutableFilename);
+
+    useExternalSourcesCheck->SetValue(game.useExternalSourceFiles);
 }
 
 EditPropJeu::~EditPropJeu()
@@ -466,150 +462,26 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
     game.name = NomEdit->GetValue();
     game.author = AuteurEdit->GetValue();
 
-    {
-        int i;
-        string width = ( string ) WidthEdit->GetValue();
-        std::istringstream iss( width );
-        if (( iss >> i ) && ( iss.eof() ) )
-        {
-            game.windowWidth = i;
-            StaticBitmap1->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
-        }
-        else
-        {
-            StaticBitmap1->SetBitmap( wxBitmap( "res/error.png", wxBITMAP_TYPE_ANY ) );
-            return;
-        }
-    }
+    game.windowWidth = ToInt(string(WidthEdit->GetValue().mb_str()));
+    game.windowHeight = ToInt(string(HeightEdit->GetValue().mb_str()));
 
-    {
-        int j;
-        string height = ( string ) HeightEdit->GetValue();
-        std::istringstream iss2( height );
-        if (( iss2 >> j ) && ( iss2.eof() ) )
-        {
-            game.windowHeight = j;
-            StaticBitmap1->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
-        }
-        else
-        {
-            StaticBitmap1->SetBitmap( wxBitmap( "res/error.png", wxBITMAP_TYPE_ANY ) );
-            return;
-        }
-    }
+    game.loadingScreen.afficher = afficherEcranCheck->GetValue();
 
-    game.loadingScreen.afficher=true;
-    if ( !afficherEcranCheck->GetValue() )
-        game.loadingScreen.afficher=false;
+    game.loadingScreen.width = ToInt(string(widthECEdit->GetValue().mb_str()));
+    game.loadingScreen.height = ToInt(string(heightECEdit->GetValue().mb_str()));
 
-    {
-        int j;
-        string str = ( string ) widthECEdit->GetValue();
-        std::istringstream iss( str );
-        if (( iss >> j ) && ( iss.eof() ) )
-        {
-            game.loadingScreen.width = j;
-            StaticBitmap2->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
-        }
-        else
-        {
-            StaticBitmap2->SetBitmap( wxBitmap( "res/error.png", wxBITMAP_TYPE_ANY ) );
-            return;
-        }
-    }
-
-    {
-        int j;
-        string str = ( string ) heightECEdit->GetValue();
-        std::istringstream iss( str );
-        if (( iss >> j ) && ( iss.eof() ) )
-        {
-            game.loadingScreen.height = j;
-            StaticBitmap2->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
-        }
-        else
-        {
-            StaticBitmap2->SetBitmap( wxBitmap( "res/error.png", wxBITMAP_TYPE_ANY ) );
-            return;
-        }
-    }
-
-    game.loadingScreen.texte=true;
-    if ( !texteCheck->GetValue() )
-        game.loadingScreen.texte=false;
+    game.loadingScreen.texte = texteCheck->GetValue();
 
     game.loadingScreen.texteChargement = static_cast<string>(texteEdit->GetValue());
-    {
-        int j;
-        string str = ( string ) texteXPosEdit->GetValue();
-        std::istringstream iss( str );
-        if (( iss >> j ) && ( iss.eof() ) )
-        {
-            game.loadingScreen.texteXPos = j;
-            StaticBitmap3->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
-        }
-        else
-        {
-            StaticBitmap3->SetBitmap( wxBitmap( "res/error.png", wxBITMAP_TYPE_ANY ) );
-            return;
-        }
-    }
+    game.loadingScreen.texteXPos = ToInt(string(texteXPosEdit->GetValue().mb_str()));
+    game.loadingScreen.texteYPos = ToInt(string(texteYPosEdit->GetValue().mb_str()));
 
-    {
-        int j;
-        string str = ( string ) texteYPosEdit->GetValue();
-        std::istringstream iss( str );
-        if (( iss >> j ) && ( iss.eof() ) )
-        {
-            game.loadingScreen.texteYPos = j;
-            StaticBitmap3->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
-        }
-        else
-        {
-            StaticBitmap3->SetBitmap( wxBitmap( "res/error.png", wxBITMAP_TYPE_ANY ) );
-            return;
-        }
-    }
+    game.loadingScreen.pourcent = pourcentCheck->GetValue();
 
+    game.loadingScreen.pourcentXPos = ToInt(string(pourcentXPosEdit->GetValue().mb_str()));
+    game.loadingScreen.pourcentYPos = ToInt(string(pourcentYPosEdit->GetValue().mb_str()));
 
-    game.loadingScreen.pourcent=false;
-    if ( pourcentCheck->GetValue() )
-        game.loadingScreen.pourcent=true;
-    {
-        int j;
-        string str = ( string ) pourcentXPosEdit->GetValue();
-        std::istringstream iss( str );
-        if (( iss >> j ) && ( iss.eof() ) )
-        {
-            game.loadingScreen.pourcentXPos = j;
-            StaticBitmap4->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
-        }
-        else
-        {
-            StaticBitmap4->SetBitmap( wxBitmap( "res/error.png", wxBITMAP_TYPE_ANY ) );
-            return;
-        }
-    }
-
-    {
-        int j;
-        string str = ( string ) pourcentYPosEdit->GetValue();
-        std::istringstream iss( str );
-        if (( iss >> j ) && ( iss.eof() ) )
-        {
-            game.loadingScreen.pourcentYPos = j;
-            StaticBitmap4->SetBitmap( wxBitmap( "res/ok.png", wxBITMAP_TYPE_ANY ) );
-        }
-        else
-        {
-            StaticBitmap4->SetBitmap( wxBitmap( "res/error.png", wxBITMAP_TYPE_ANY ) );
-            return;
-        }
-    }
-
-    game.loadingScreen.image=false;
-    if ( imageCheck->GetValue() )
-        game.loadingScreen.image=true;
+    game.loadingScreen.image = imageCheck->GetValue();
 
     game.loadingScreen.imageFichier = imageEdit->GetValue();
     game.loadingScreen.border = borderCheck->GetValue();
@@ -802,4 +674,36 @@ void EditPropJeu::OncompilerToolchainBtClick(wxCommandEvent& event)
 {
     SetupCompilerToolchainDlg dialog(this);
     dialog.ShowModal();
+}
+
+void EditPropJeu::OnuseExternalSourcesCheckClick(wxCommandEvent& event)
+{
+    if ( useExternalSourcesCheck->GetValue() && game.externalSourceFiles.empty() )
+    {
+        if ( wxMessageBox(_("Voulez vous créer les fichiers de base permettant de créer et déclarer des évènement codés en C++ ?"), _("Création de fichiers de base"), wxYES_NO | wxICON_QUESTION, this) == wxNO )
+            return;
+
+        //Generate basic files
+        if ( NewCppFileDlg::CreateEventHeaderFile(game.gameFile+"/MyEvent.h") )
+        {
+            boost::shared_ptr<SourceFile> newSourceFile(new SourceFile);
+            newSourceFile->SetFileName(game.gameFile+"/MyEvent.h");
+
+            game.externalSourceFiles.push_back(newSourceFile);
+        }
+        if ( NewCppFileDlg::CreateEventImplementationFile(game.gameFile+"/MyEvent.cpp"))
+        {
+            boost::shared_ptr<SourceFile> newSourceFile(new SourceFile);
+            newSourceFile->SetFileName(game.gameFile+"/MyEvent.cpp");
+
+            game.externalSourceFiles.push_back(newSourceFile);
+        }
+        if ( NewCppFileDlg::CreateExtensionMainFile(game.gameFile+"/Main.cpp"))
+        {
+            boost::shared_ptr<SourceFile> newSourceFile(new SourceFile);
+            newSourceFile->SetFileName(game.gameFile+"/Main.cpp");
+
+            game.externalSourceFiles.push_back(newSourceFile);
+        }
+    }
 }

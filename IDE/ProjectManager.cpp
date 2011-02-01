@@ -581,6 +581,7 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
     mainEditorCommand.SetRibbonSceneEditorButtonBar(mainEditor.GetRibbonSceneEditorButtonBar()); //Need link to the scene editor wxRibbonButtonBar
     mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
     mainEditorCommand.SetBuildToolsPanel(mainEditor.GetBuildToolsPanel());
+    mainEditorCommand.SetPaneManager(mainEditor.GetAUIPaneManger());
 
     vector< boost::shared_ptr<Scene> >::const_iterator scene =
         find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
@@ -1498,10 +1499,17 @@ void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
 
     if ( dialog.ShowModal() == 1 )
     {
-        boost::shared_ptr<SourceFile> sourceFile(new SourceFile);
-        sourceFile->SetFileName(dialog.fileCreated);
+        for (unsigned int i = 0;i<dialog.createdFiles.size();++i)
+        {
+            boost::shared_ptr<SourceFile> sourceFile(new SourceFile);
+            sourceFile->SetFileName(dialog.createdFiles[i]);
 
-        game->externalSourceFiles.push_back(sourceFile);
+            vector< boost::shared_ptr<SourceFile> >::iterator alreadyExistingSourceFile =
+                find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), dialog.createdFiles[i]));
+
+            if ( alreadyExistingSourceFile == game->externalSourceFiles.end() )
+                game->externalSourceFiles.push_back(sourceFile);
+        }
         Refresh();
     }
 }

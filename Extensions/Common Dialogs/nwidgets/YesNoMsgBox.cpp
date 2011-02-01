@@ -70,7 +70,7 @@ YesNoMsgBox::YesNoMsgBox( string title, string message, string & result_ ) :
 
     // set the size of this window
     rectangle size = yesBt.get_rect() + msg_rect;
-    set_size( size.width() + 10, size.height() + 15 );
+    set_size( size.width() + 200, size.height() + 150 );
 
     //Set the background of this window
     set_background_color( 240, 240, 240 );

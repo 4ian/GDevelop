@@ -28,10 +28,19 @@ class ProjectManager: public wxPanel
          * Open a source file. Game can be NULL.
          */
 		void EditSourceFile(Game * game, std::string filename, size_t line = std::string::npos);
+
+		/**
+		 * Refresh project tree
+		 */
         void Refresh();
 
         static void CreateRibbonPage(wxRibbonPage * page);
         void ConnectEvents();
+
+        /**
+         * Close current game
+         */
+		void OnRibbonCloseSelected(wxRibbonButtonBarEvent& event);
 
 		Game_Develop_EditorFrame & mainEditor;
 
@@ -154,7 +163,6 @@ class ProjectManager: public wxPanel
 
 		void OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event);
 		void EditExtensionsOfGame(Game * game);
-		void OnRibbonCloseSelected(wxRibbonButtonBarEvent& event);
 		void CloseGame(Game * game);
 		void OnRibbonAddSceneSelected(wxRibbonButtonBarEvent& event);
 		void AddSceneToGame(Game * game);

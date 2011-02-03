@@ -24,6 +24,7 @@ class Game_Develop_EditorApp : public wxApp
         virtual void    OnUnhandledException();
         #endif
         virtual bool    OnExceptionInMainLoop();
+        virtual void    OnKeyPressed(wxKeyEvent& event) { if (mainEditor) mainEditor->OnKeyDown(event);};
 
         Game_Develop_EditorFrame * mainEditor;
         wxSingleInstanceChecker * singleInstanceChecker;

@@ -139,19 +139,16 @@ void Game_Develop_EditorFrame::OnMenuSaveSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
 
-    if ( GetCurrentGame()->gameFile == "" )
-    {
+    if ( GetCurrentGame()->gameFile.empty() )
         SaveAs();
-    }
     else
     {
         OpenSaveGame saveGame( *GetCurrentGame() );
         if ( !saveGame.SaveToFile(GetCurrentGame()->gameFile) )
-        {
             wxLogError( "L'enregistrement a échoué." );
-        }
+        else
+            wxLogStatus(_("Enregistrement du fichier terminé."));
 
-        wxLogStatus(_("Enregistrement du fichier terminé."));
         return;
     }
 }

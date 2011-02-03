@@ -208,6 +208,7 @@ class Game_Develop_EditorFrame: public wxFrame
         void OneditorsNotebookPageClose(wxAuiNotebookEvent& event);
         void OnOpenExampleSelected(wxCommandEvent& event);
         void OnautoSaveTimerTrigger(wxTimerEvent& event);
+        void OnKeyDown(wxKeyEvent& event);
         //*)
         void OnRibbonNewClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonOpenClicked(wxRibbonButtonBarEvent& evt);

@@ -278,7 +278,6 @@ bool Game_Develop_EditorApp::OnInit()
         }
     }
 
-
     cout << "Creating main window" << endl;
     //Creating main window
     mainEditor = new Game_Develop_EditorFrame( 0, fileToOpen );
@@ -295,6 +294,8 @@ bool Game_Develop_EditorApp::OnInit()
         }
     }
 
+    cout << "Connecting shortcuts" << endl;
+    Connect(wxID_ANY,wxEVT_KEY_DOWN, wxKeyEventHandler(Game_Develop_EditorApp::OnKeyPressed));
 
     //Fin du splash screen, affichage de la fenêtre
     splash->Destroy();

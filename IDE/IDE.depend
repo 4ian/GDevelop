@@ -8701,7 +8701,7 @@
 	"GDL/Image.h"
 	<cmath>
 
-1296162963 d:\florian\programmation\gamedevelop\ide\projectmanager.h
+1296768556 d:\florian\programmation\gamedevelop\ide\projectmanager.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/menu.h>
@@ -10940,7 +10940,7 @@
 	<wx/dnd.h>
 	<wx/log.h>
 
-1296399931 d:\florian\programmation\gamedevelop\ide\game_develop_editormain.h
+1296766718 d:\florian\programmation\gamedevelop\ide\game_develop_editormain.h
 	<wx/sizer.h>
 	<wx/menu.h>
 	<wx/aui/aui.h>
@@ -11849,7 +11849,7 @@
 	<iostream>
 	<wx/dcbuffer.h>
 
-1294692858 source:d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
+1296767527 source:d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.cpp
 	"debugMem.h"
 	<wx/msw/winundef.h>
 	<wx/image.h>
@@ -11969,7 +11969,7 @@
 1293900639 d:\florian\programmation\gamedevelop\ide\localemanager.h
 	<wx/intl.h>
 
-1293900639 d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.h
+1296767429 d:\florian\programmation\gamedevelop\ide\game_develop_editorapp.h
 	<wx/app.h>
 	<wx/log.h>
 	<wx/snglinst.h>
@@ -12581,7 +12581,7 @@
 1236010936 c:\libs\boost_1_43_0\boost\detail\quick_allocator.hpp
 	<boost/smart_ptr/detail/quick_allocator.hpp>
 
-1296325792 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
+1296768556 source:d:\florian\programmation\gamedevelop\ide\game_develop_editormain.cpp
 	"MemTrace.h"
 	<wx/bitmap.h>
 	<wx/icon.h>
@@ -12840,7 +12840,7 @@
 	<wx/button.h>
 	<wx/dialog.h>
 
-1294506776 source:d:\florian\programmation\gamedevelop\ide\mainfichier.cpp
+1296767976 source:d:\florian\programmation\gamedevelop\ide\mainfichier.cpp
 	<boost/shared_ptr.hpp>
 	"GDL/OpenSaveGame.h"
 	"GDL/ExtensionsManager.h"
@@ -13264,7 +13264,7 @@
 1294609130 source:d:\florian\programmation\gamedevelop\ide\resource.rc
 	"version.h"
 
-1296509106 d:\florian\programmation\gamedevelop\ide\version.h
+1296768557 d:\florian\programmation\gamedevelop\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

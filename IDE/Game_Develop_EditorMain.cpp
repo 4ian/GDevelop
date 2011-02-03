@@ -647,3 +647,55 @@ void Game_Develop_EditorFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
         }
     }
 }
+
+void Game_Develop_EditorFrame::OnKeyDown(wxKeyEvent& event)
+{
+    if(event.GetModifiers() == wxMOD_CONTROL)
+    {
+        switch(event.GetKeyCode()) {
+            case 'S':
+            {
+                wxCommandEvent uselessEvent;
+                OnMenuSaveSelected(uselessEvent);
+                break;
+            }
+            case 'O':
+            {
+                wxCommandEvent uselessEvent;
+                OnMenuOpenSelected(uselessEvent);
+                break;
+            }
+            case 'N':
+            {
+                wxCommandEvent uselessEvent;
+                OnMenuNewSelected(uselessEvent);
+                break;
+            }
+            case 'W':
+            {
+                wxRibbonButtonBarEvent uselessEvent;
+                if ( projectManager ) projectManager->OnRibbonCloseSelected(uselessEvent);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    else
+    {
+        switch(event.GetKeyCode())
+        {
+            case WXK_F1:
+            {
+                wxCommandEvent uselessEvent;
+                OnMenuAideSelected(uselessEvent);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    //Not a shortcut, let the event propagates.
+    event.Skip();
+}

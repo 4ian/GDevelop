@@ -20,8 +20,10 @@ class BuildProgressPnl: public wxPanel
 		BuildProgressPnl(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
 		virtual ~BuildProgressPnl();
 
-		bool LaunchGameSourceFilesBuild(Game & game, SceneCanvas * caller = NULL);
+		bool LaunchGameSourceFilesBuild(Game & game);
 		bool IsBuilding();
+		bool BuildNeeded();
+		bool AbortBuild();
 		bool LastBuildSuccessed();
 
 		SourceFileBuilder sourceFileBuilder;
@@ -47,8 +49,6 @@ class BuildProgressPnl: public wxPanel
 		//*)
 
 		void BuildSourceFiles();
-
-		SceneCanvas * caller;
 
 		DECLARE_EVENT_TABLE()
 };

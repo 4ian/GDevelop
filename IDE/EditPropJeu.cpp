@@ -683,25 +683,27 @@ void EditPropJeu::OnuseExternalSourcesCheckClick(wxCommandEvent& event)
         if ( wxMessageBox(_("Voulez vous créer les fichiers de base permettant de créer et déclarer des évènement codés en C++ ?"), _("Création de fichiers de base"), wxYES_NO | wxICON_QUESTION, this) == wxNO )
             return;
 
+        std::string dir = game.gameFile.empty() ? "" : string(wxFileName(game.gameFile).GetPath().mb_str());
+
         //Generate basic files
-        if ( NewCppFileDlg::CreateEventHeaderFile(game.gameFile+"/MyEvent.h") )
+        if ( NewCppFileDlg::CreateEventHeaderFile(dir+"/MyEvent.h") )
         {
             boost::shared_ptr<SourceFile> newSourceFile(new SourceFile);
-            newSourceFile->SetFileName(game.gameFile+"/MyEvent.h");
+            newSourceFile->SetFileName(dir+"/MyEvent.h");
 
             game.externalSourceFiles.push_back(newSourceFile);
         }
-        if ( NewCppFileDlg::CreateEventImplementationFile(game.gameFile+"/MyEvent.cpp"))
+        if ( NewCppFileDlg::CreateEventImplementationFile(dir+"/MyEvent.cpp"))
         {
             boost::shared_ptr<SourceFile> newSourceFile(new SourceFile);
-            newSourceFile->SetFileName(game.gameFile+"/MyEvent.cpp");
+            newSourceFile->SetFileName(dir+"/MyEvent.cpp");
 
             game.externalSourceFiles.push_back(newSourceFile);
         }
-        if ( NewCppFileDlg::CreateExtensionMainFile(game.gameFile+"/Main.cpp"))
+        if ( NewCppFileDlg::CreateExtensionMainFile(dir+"/Main.cpp"))
         {
             boost::shared_ptr<SourceFile> newSourceFile(new SourceFile);
-            newSourceFile->SetFileName(game.gameFile+"/Main.cpp");
+            newSourceFile->SetFileName(dir+"/Main.cpp");
 
             game.externalSourceFiles.push_back(newSourceFile);
         }

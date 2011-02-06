@@ -172,7 +172,7 @@ isResizingColumns(false)
     MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/commentaireaddicon.png"))));
     ContextMenu.Append(MenuItem7);
     eventTypesMenu = new wxMenu();
-    SubEventMenuItem = new wxMenuItem(eventTypesMenu, idMenuSubEvent, _("Un sous évènement"), wxEmptyString, wxITEM_NORMAL);
+    SubEventMenuItem = new wxMenuItem(eventTypesMenu, idMenuSubEvent, _("Un sous évènement\tShift-INSERT"), wxEmptyString, wxITEM_NORMAL);
     SubEventMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/subeventaddicon.png"))));
     eventTypesMenu->Append(SubEventMenuItem);
     eventTypesMenu->AppendSeparator();
@@ -215,7 +215,7 @@ isResizingColumns(false)
     MenuItem19->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
     conditionsMenu.Append(MenuItem19);
     conditionsMenu.AppendSeparator();
-    MenuItem20 = new wxMenuItem((&conditionsMenu), idMenuDel, _("Supprimer la condition"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem20 = new wxMenuItem((&conditionsMenu), idMenuDel, _("Supprimer la condition\tDEL"), wxEmptyString, wxITEM_NORMAL);
     MenuItem20->SetBitmap(wxBitmap(wxImage(_T("res/remove.png"))));
     conditionsMenu.Append(MenuItem20);
     MenuItem37 = new wxMenu();
@@ -244,7 +244,7 @@ isResizingColumns(false)
     MenuItem25->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
     actionsMenu.Append(MenuItem25);
     actionsMenu.AppendSeparator();
-    MenuItem26 = new wxMenuItem((&actionsMenu), ID_MENUITEM7, _("Supprimer cette action"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem26 = new wxMenuItem((&actionsMenu), ID_MENUITEM7, _("Supprimer cette action\tDEL"), wxEmptyString, wxITEM_NORMAL);
     MenuItem26->SetBitmap(wxBitmap(wxImage(_T("res/remove.png"))));
     actionsMenu.Append(MenuItem26);
     MenuItem36 = new wxMenu();

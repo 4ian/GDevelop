@@ -165,7 +165,7 @@ bool NewCppFileDlg::CreateExtensionMainFile(std::string filename)
 {
     bool alreadyExists = wxFileExists(filename);
 
-    if ( alreadyExists && wxMessageBox(_("Le fichier existe déjà. Le remplacer ?"), _("Fichier déjà existant."), wxYES_NO | wxICON_QUESTION) == wxNO )
+    if ( alreadyExists && wxMessageBox(_("Le fichier ")+filename+_(" existe déjà. Le remplacer ?"), _("Fichier déjà existant."), wxYES_NO | wxICON_QUESTION) == wxNO )
         return true;
 
     wxTextFile newFile(filename);
@@ -197,16 +197,12 @@ bool NewCppFileDlg::CreateExtensionMainFile(std::string filename)
 "\n/**"
 "\n * "+_("Utilisé en interne par Game Develop")+
 "\n */"
-"\nextern \"C\" DynamicExtensionBase * CreateGDDynamicExtension() {"
-"\n    return new DynamicExtension;"
-"\n}"
+"\nextern \"C\" DynamicExtensionBase * CreateGDDynamicExtension() { return new DynamicExtension; }"
 "\n"
 "\n/**"
 "\n * "+_("Utilisé en interne par Game Develop")+
 "\n */"
-"\nextern \"C\" void DestroyGDDynamicExtension(DynamicExtensionBase * p) {"
-"\n    delete p;"
-"\n}");
+"\nextern \"C\" void DestroyGDDynamicExtension(DynamicExtensionBase * p) { delete p; }\n");
 
     if ( !newFile.Write() )
     {
@@ -221,7 +217,7 @@ bool NewCppFileDlg::CreateEventHeaderFile(std::string filename)
 {
     bool alreadyExists = wxFileExists(filename);
 
-    if ( alreadyExists && wxMessageBox(_("Le fichier existe déjà. Le remplacer ?"), _("Fichier déjà existant."), wxYES_NO | wxICON_QUESTION) == wxNO )
+    if ( alreadyExists && wxMessageBox(_("Le fichier ")+filename+_(" existe déjà. Le remplacer ?"), _("Fichier déjà existant."), wxYES_NO | wxICON_QUESTION) == wxNO )
         return true;
 
     wxTextFile newFile(filename);

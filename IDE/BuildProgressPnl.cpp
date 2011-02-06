@@ -21,8 +21,7 @@ BEGIN_EVENT_TABLE(BuildProgressPnl,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-BuildProgressPnl::BuildProgressPnl(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size) :
-    caller(NULL)
+BuildProgressPnl::BuildProgressPnl(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
 {
 	//(*Initialize(BuildProgressPnl)
 	wxFlexGridSizer* FlexGridSizer2;
@@ -58,13 +57,16 @@ BuildProgressPnl::~BuildProgressPnl()
 	//*)
 }
 
-bool BuildProgressPnl::LaunchGameSourceFilesBuild(Game & game, SceneCanvas * caller_)
+bool BuildProgressPnl::LaunchGameSourceFilesBuild(Game & game)
 {
     if ( sourceFileBuilder.IsBuilding() ) return false;
-    caller = caller_;
-
     sourceFileBuilder.SetFiles(game.externalSourceFiles);
     return sourceFileBuilder.LaunchSourceFilesBuild();
+}
+
+bool BuildProgressPnl::BuildNeeded()
+{
+    return sourceFileBuilder.BuildNeeded();
 }
 
 bool BuildProgressPnl::IsBuilding()
@@ -77,7 +79,12 @@ bool BuildProgressPnl::LastBuildSuccessed()
     return sourceFileBuilder.LastBuildSuccessed();
 }
 
-void BuildProgressPnl::OnstopCompilerBtClick(wxCommandEvent& event)
+bool BuildProgressPnl::AbortBuild()
 {
     sourceFileBuilder.AbordBuild();
+}
+
+void BuildProgressPnl::OnstopCompilerBtClick(wxCommandEvent& event)
+{
+    AbortBuild();
 }

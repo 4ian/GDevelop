@@ -582,6 +582,7 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
     mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
     mainEditorCommand.SetBuildToolsPanel(mainEditor.GetBuildToolsPanel());
     mainEditorCommand.SetPaneManager(mainEditor.GetAUIPaneManger());
+    mainEditorCommand.SetScenesLockingShortcutsList(mainEditor.GetScenesLockingShortcutsList());
 
     vector< boost::shared_ptr<Scene> >::const_iterator scene =
         find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));

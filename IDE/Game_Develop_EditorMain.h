@@ -128,6 +128,10 @@ class Game_Develop_EditorFrame: public wxFrame
          */
         inline wxAuiManager * GetAUIPaneManger() { return &m_mgr; }
 
+        /**
+         * Get a pointer to scene locking shortcuts list.
+         */
+        inline std::vector<SceneCanvas*> * GetScenesLockingShortcutsList() { return &scenesLockingShortcuts; };
 
         //(*Handlers(Game_Develop_EditorFrame)
         void OnQuit(wxCommandEvent& event);
@@ -278,6 +282,7 @@ class Game_Develop_EditorFrame: public wxFrame
         wxRibbonBar * m_ribbon; ///< Pointer to the ribbon
         wxRibbonButtonBar * ribbonSceneEditorButtonBar; ///Pointer to the ribbon bar which can be changed by scene editors
         BuildToolsPnl * buildToolsPnl;
+        std::vector<SceneCanvas*> scenesLockingShortcuts;
 
         StartHerePage * startPage;
         ProjectManager * projectManager;

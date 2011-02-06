@@ -410,7 +410,7 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
 
     int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Supprimer également toutes les références au groupe dans les évènements ( Soit les actions et conditions utilisant le groupe ) ?") :
                                                              wxString::Format(_("Supprimer également toutes les références aux %i groupes dans les évènements ( Soit les actions et conditions utilisant les groupes ) ?"), selection.GetCount()),
-                              _("Confirmation de la suppression"), wxYES_NO | wxCANCEL);
+                              _("Confirmation de la suppression"), wxYES_NO | wxCANCEL | wxCANCEL_DEFAULT);
 
     if ( answer == wxCANCEL ) return;
 

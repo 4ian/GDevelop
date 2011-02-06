@@ -187,6 +187,12 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
     CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), scene.editing);
 }
 
+SceneCanvas::~SceneCanvas()
+{
+    MemTracer.DelObj((long)this); //Old memory tracking tool
+    mainEditorCommand.UnLockShortcuts(this);  //Make sure shortcuts are not locked.
+}
+
 void SceneCanvas::ConnectEvents()
 {
     mainEditorCommand.GetMainEditor()->Connect(idRibbonEditMode, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnEditionBtClick, NULL, this);
@@ -374,6 +380,8 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
 {
     if ( !scene.editing ) return;
 
+    mainEditorCommand.LockShortcuts(this);
+
     scene.editing = false;
     scene.running = false;
 
@@ -394,6 +402,8 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
 void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 {
     if ( scene.editing ) return;
+
+    mainEditorCommand.UnLockShortcuts(this);
 
     scene.editing = true;
     scene.running = false;
@@ -688,7 +698,7 @@ void SceneCanvas::ReloadFirstPart()
         GDpriv::DynamicExtensionsManager::getInstance()->UnloadAllDynamicExtensions();
         mainEditorCommand.GetBuildToolsPanel()->notebook->SetSelection(0);
 
-        if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->LaunchGameSourceFilesBuild(gameEdited, this) )
+        if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->LaunchGameSourceFilesBuild(gameEdited) )
         {
             wxLogWarning(_("Game Develop est entrain de compiler les sources C++ et ne pourra lancer un aperçu qu'une fois ce processus terminé."));
         }
@@ -718,7 +728,7 @@ void SceneCanvas::ReloadSecondPart()
             mainEditorCommand.GetBuildToolsPanel()->buildMessagesPnl->OpenFileContainingFirstError();
         }
 
-        GDpriv::DynamicExtensionsManager::getInstance()->LoadDynamicExtension("test.dxgd");
+        GDpriv::DynamicExtensionsManager::getInstance()->LoadDynamicExtension("dynext.dxgd");
     }
     #endif
 

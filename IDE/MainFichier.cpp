@@ -3,12 +3,16 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#include <wx/progdlg.h>
 #include <boost/shared_ptr.hpp>
 #include "GDL/OpenSaveGame.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Game.h"
+#include "GDL/DynamicExtensionsManager.h"
 
 #include "Game_Develop_EditorMain.h"
+#include "BuildToolsPnl.h"
+#include "BuildProgressPnl.h"
 #include "Compilation.h"
 #include "Portable.h"
 #include "Fusion.h"
@@ -250,6 +254,31 @@ void Game_Develop_EditorFrame::SaveAs()
 void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
+
+    //Compile now source if there are not up to date ( and if game use C++ features ).
+    if ( GetCurrentGame()->useExternalSourceFiles && GetBuildToolsPanel()->buildProgressPnl->BuildNeeded() )
+    {
+        GDpriv::DynamicExtensionsManager::getInstance()->UnloadAllDynamicExtensions();
+        GetBuildToolsPanel()->notebook->SetSelection(0);
+
+        //Be sure another build process is not running, and then launch build.
+        if ( GetBuildToolsPanel()->buildProgressPnl->IsBuilding() || !GetBuildToolsPanel()->buildProgressPnl->LaunchGameSourceFilesBuild(*GetCurrentGame()) )
+        {
+            wxLogWarning(_("Game Develop est entrain de compiler les sources C++ et ne pourra compiler le jeu qu'une fois ce processus terminé."));
+            return;
+        }
+
+        //Wait build to finish.
+        wxProgressDialog progress(_("Compilation"),_("Veuillez patienter pendant la compilation des sources C++..."),100, NULL, wxPD_CAN_ABORT | wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_ELAPSED_TIME);
+        while (GetBuildToolsPanel()->buildProgressPnl->IsBuilding() )
+        {
+            if ( !progress.Update(GetBuildToolsPanel()->buildProgressPnl->progressGauge->GetValue()) ) //Enable the user to stop compilation
+            {
+                GetBuildToolsPanel()->buildProgressPnl->AbortBuild();
+                return;
+            }
+        }
+    }
 
     Compilation Dialog( this, *GetCurrentGame() );
     Dialog.ShowModal();

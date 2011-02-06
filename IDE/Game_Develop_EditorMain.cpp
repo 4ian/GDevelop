@@ -650,7 +650,13 @@ void Game_Develop_EditorFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
 
 void Game_Develop_EditorFrame::OnKeyDown(wxKeyEvent& event)
 {
-    if(event.GetModifiers() == wxMOD_CONTROL)
+    if ( !scenesLockingShortcuts.empty() )
+    {
+        event.Skip();
+        return;
+    }
+
+    if(event.GetModifiers() == wxMOD_CMD)
     {
         switch(event.GetKeyCode()) {
             case 'S':
@@ -675,6 +681,28 @@ void Game_Develop_EditorFrame::OnKeyDown(wxKeyEvent& event)
             {
                 wxRibbonButtonBarEvent uselessEvent;
                 if ( projectManager ) projectManager->OnRibbonCloseSelected(uselessEvent);
+                break;
+            }
+            /*case 'G':
+            {
+                if ( editorsNotebook->GetSelection() == editorsNotebook->GetPageCount()-1 )
+                    editorsNotebook->SetSelection(0);
+                else
+                    editorsNotebook->SetSelection(editorsNotebook->GetSelection()+1);
+
+                break;
+            }*/
+            default:
+                break;
+        }
+    }
+    if(event.GetModifiers() == (wxMOD_CMD|wxMOD_SHIFT) )
+    {
+        switch(event.GetKeyCode()) {
+            case 'S':
+            {
+                wxRibbonButtonBarEvent uselessEvent;
+                OnRibbonSaveAllClicked(uselessEvent);
                 break;
             }
             default:

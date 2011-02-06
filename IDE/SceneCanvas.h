@@ -43,7 +43,7 @@ class SceneCanvas : public wxSFMLCanvas
 public :
 
     SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style );
-    ~SceneCanvas() { MemTracer.DelObj((long)this); }
+    ~SceneCanvas();
 
     /**
      * Set the scene canvas to own the object editor passed in parameter

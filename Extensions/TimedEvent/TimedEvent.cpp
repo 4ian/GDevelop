@@ -29,6 +29,7 @@ freely, subject to the following restrictions:
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/tinyxml.h"
+#include "TimedEventEditorDlg.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
@@ -353,13 +354,10 @@ unsigned int TimedEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-void TimedEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+void TimedEvent::EditEvent(wxWindow* parent, Game & game, Scene & scene, MainEditorCommand & mainEditorCommand)
 {
-    string newName = string(wxGetTextFromUser(_("Entrez le nom"), _("Nom"), name).mb_str());
-    if ( newName != "" ) name = newName;
-
-    string newTimeout = string(wxGetTextFromUser(_("Timeout"), _("Timeout"), name).mb_str());
-    if ( newTimeout != "" ) timeout = GDExpression(newTimeout);
+    TimedEventEditorDlg dialog(parent, *this, game, scene);
+    dialog.ShowModal();
 }
 #endif
 

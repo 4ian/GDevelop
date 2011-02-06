@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="TimedEventEditorDlg">
+		<title>Evenement à retardement</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
@@ -16,7 +17,7 @@
 								<cols>3</cols>
 								<object class="sizeritem">
 									<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
-										<bitmap>res/foreach48.png</bitmap>
+										<bitmap>Extensions/timedevent64.png</bitmap>
 										<style>wxNO_BORDER</style>
 									</object>
 									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -25,7 +26,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-										<label>Les conditions et actions seront executés uniquement une fois&#x0A;que l&apos;évènement aurait été executé un certain nombre de secondes,&#x0A;non nécessaires consécutives.</label>
+										<label>Les conditions et actions seront executés uniquement une fois&#x0A;que l&apos;évènement aurait été executé un certain nombre de secondes,&#x0A;non nécessairement consécutives.</label>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>

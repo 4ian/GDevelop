@@ -34,9 +34,28 @@ freely, subject to the following restrictions:
 
 bool ActResetTimedEvent( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    //Find function
     TimedEvent * eventPtr = TimedEvent::timedEventsList[&scene][action.GetParameter(0).GetPlainString()];
     if ( eventPtr ) eventPtr->Reset();
+
+    return true;
+}
+
+void ResetTimedEventAndSubs(TimedEvent & event)
+{
+    event.Reset();
+    const vector < BaseEventSPtr > & subEvents = event.GetSubEvents();
+    for (unsigned int i = 0;i<subEvents.size();++i)
+    {
+        boost::shared_ptr<TimedEvent> timedEvent = boost::dynamic_pointer_cast<TimedEvent>(subEvents[i]);
+        if ( timedEvent )
+            ResetTimedEventAndSubs(*timedEvent);
+    }
+}
+
+bool ActResetTimedEventAndSubs( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    TimedEvent * eventPtr = TimedEvent::timedEventsList[&scene][action.GetParameter(0).GetPlainString()];
+    if ( eventPtr ) ResetTimedEventAndSubs(*eventPtr);
 
     return true;
 }

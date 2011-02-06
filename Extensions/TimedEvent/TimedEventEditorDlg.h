@@ -27,6 +27,8 @@ freely, subject to the following restrictions:
 #ifndef TIMEDEVENTEDITORDLG_H
 #define TIMEDEVENTEDITORDLG_H
 
+#if defined(GD_IDE_ONLY)
+
 //(*Headers(TimedEventEditorDlg)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
@@ -96,4 +98,5 @@ class TimedEventEditorDlg: public wxDialog
 		DECLARE_EVENT_TABLE()
 };
 
+#endif
 #endif

@@ -49,8 +49,8 @@ class Extension : public ExtensionBase
                                   "zlib/libpng License ( Open Source )")
 
             DECLARE_EVENT("TimedEvent",
-                          _("TimedEvent"),
-                          _("TimedEvent"),
+                          _("Evenement à retardement"),
+                          _("Evenement qui ne se déclenche qu'au bout de l'accumulation d'un certain temps"),
                           "",
                           "res/function.png",
                           TimedEvent)
@@ -59,12 +59,25 @@ class Extension : public ExtensionBase
 
             DECLARE_ACTION("ResetTimedEvent",
                            _("Remettre à zéro un évènement retardé"),
-                           _("Remet à zéro un évènement retardé"),
+                           _("Remet à zéro un évènement à retardement"),
                            _("Remettre à zéro le(s) évènement(s) retardé(s) _PARAM0_"),
                            _("Evenements retardés"),
-                           "res/actions/function24.png",
-                           "res/actions/function.png",
+                           "Extensions/timedevent24.png",
+                           "Extensions/timedevent16.png",
                            &ActResetTimedEvent);
+
+                DECLARE_PARAMETER("", _("Nom"), false, "")
+
+            DECLARE_END_ACTION()
+
+            DECLARE_ACTION("ResetTimedEventAndSubs",
+                           _("Remettre à zéro ainsi que les sous évènements"),
+                           _("Remet à zéro un évènement retardé, ainsi que tous les sous évènements à retardement qu'il contient."),
+                           _("Remettre à zéro le(s) évènement(s) retardé(s) _PARAM0_ et les sous évènements"),
+                           _("Evenements retardés"),
+                           "Extensions/timedevent24.png",
+                           "Extensions/timedevent16.png",
+                           &ActResetTimedEventAndSubs);
 
                 DECLARE_PARAMETER("", _("Nom"), false, "")
 

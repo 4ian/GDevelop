@@ -32,5 +32,6 @@ class ObjectsConcerned;
 class Instruction;
 
 bool ActResetTimedEvent( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActResetTimedEventAndSubs( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 #endif // TIMEDEVENTACTIONS_H

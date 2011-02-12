@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef BUILDMESSAGESPNL_H
 #define BUILDMESSAGESPNL_H
 
@@ -38,6 +43,7 @@ class BuildMessagesPnl: public wxPanel
 
 		//(*Handlers(BuildMessagesPnl)
 		void OnmessagesListItemActivated(wxListEvent& event);
+		void OnResize(wxSizeEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

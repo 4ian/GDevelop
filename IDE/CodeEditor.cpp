@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "CodeEditor.h"
 
 //(*InternalHeaders(CodeEditor)
@@ -6,6 +11,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <wx/mimetype.h>
 #include <wx/config.h>
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
@@ -25,6 +31,10 @@ const long CodeEditor::idRibbonCut = wxNewId();
 const long CodeEditor::idRibbonPaste = wxNewId();
 const long CodeEditor::idRibbonUndo = wxNewId();
 const long CodeEditor::idRibbonRedo = wxNewId();
+const long CodeEditor::idRibbonDocGDL = wxNewId();
+const long CodeEditor::idRibbonDocSFML = wxNewId();
+const long CodeEditor::idRibbonDocWxWidgets = wxNewId();
+const long CodeEditor::idRibbonDocBoost = wxNewId();
 
 BEGIN_EVENT_TABLE(CodeEditor,wxPanel)
 	//(*EventTable(CodeEditor)
@@ -148,6 +158,14 @@ void CodeEditor::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Annuler") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Refaire") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
     }
+    {
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        ribbonBar->AddButton(idRibbonDocGDL, !hideLabels ? _("Doc. GDL") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDocSFML, !hideLabels ? _("Doc. SFML") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDocWxWidgets, !hideLabels ? _("Doc. wxWidgets") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDocBoost, !hideLabels ? _("Doc. Boost") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+    }
 }
 
 void CodeEditor::ConnectEvents()
@@ -158,6 +176,10 @@ void CodeEditor::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonPaste, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuPasteSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuUndoSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuRedoSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonDocGDL, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocGDLSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonDocSFML, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocSFMLSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonDocWxWidgets, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocWxWidgetsSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonDocBoost, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocBoostSelected, NULL, this);
 }
 
 void CodeEditor::SelectLine(size_t line)
@@ -239,4 +261,50 @@ void CodeEditor::OnMenuUndoSelected(wxCommandEvent& event)
 void CodeEditor::OnMenuRedoSelected(wxCommandEvent& event)
 {
     textEditor->Redo();
+}
+
+void CodeEditor::OpenLink(wxString link)
+{
+    wxString mimetype = wxEmptyString;
+    if (link.StartsWith (_T("http://"))) {
+        mimetype = _T("text/html");
+    }else if (link.StartsWith (_T("ftp://"))) {
+        mimetype = _T("text/html");
+    }else if (link.StartsWith (_T("mailto:"))) {
+        mimetype = _T("message/rfc822");
+    }else{
+        return;
+    }
+    wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
+    if (filetype) {
+        wxString cmd;
+        if (filetype->GetOpenCommand (&cmd, wxFileType::MessageParameters (link))) {
+            cmd.Replace(_T("file://"), wxEmptyString);
+            ::wxExecute(cmd);
+        }
+        delete filetype;
+    }
+}
+
+void CodeEditor::OnDocGDLSelected(wxRibbonButtonBarEvent &event)
+{
+	wxString gdlBaseDir;
+    wxConfigBase::Get()->Read("gdlBaseDir", &gdlBaseDir);
+
+    OpenLink(gdlBaseDir+"/help.chm");
+}
+
+void CodeEditor::OnDocSFMLSelected(wxRibbonButtonBarEvent &event)
+{
+    OpenLink("http://www.sfml-dev.org/documentation/2.0/");
+}
+
+void CodeEditor::OnDocWxWidgetsSelected(wxRibbonButtonBarEvent &event)
+{
+    OpenLink("http://docs.wxwidgets.org/2.9.1/");
+}
+
+void CodeEditor::OnDocBoostSelected(wxRibbonButtonBarEvent &event)
+{
+    OpenLink("http://www.boost.org/doc/libs/1_43_0/");
 }

@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 //(*InternalHeaders(Compilation)
 #include <wx/bitmap.h>
 #include <wx/settings.h>
@@ -229,6 +234,17 @@ Compilation::Compilation( wxWindow* parent, const Game & gameToCompile_ ) :
     //*)
 
     Panel4->Enable(false);
+
+    if ( gameToCompile.useExternalSourceFiles )
+    {
+        #if defined(WINDOWS)
+            LinuxCheck->SetValue(false);LinuxCheck->Enable(false);
+        #elif defined(LINUX)
+            WinCheck->SetValue(false);WinCheck->Enable(false);
+        #else
+            #warning Unknown OS
+        #endif
+    }
 }
 
 Compilation::~Compilation()
@@ -400,7 +416,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     wxSafeYield();
 
     //Copy extensions
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     for (unsigned int i = 0;i<game.extensionsUsed.size();++i)
     {
         //Builtin extensions does not have a namespace.
@@ -439,6 +455,11 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
                 }
             }
         }
+    }
+    if ( game.useExternalSourceFiles )
+    {
+        if ( wxCopyFile( "dynext.dxgd", repTemp + "/" + "dynext.dxgd", true ) == false )
+            report += _( "Impossible de copier les sources C++ compilées ( dynext.dxgd ) dans le répertoire de compilation.\n" );
     }
 
     //Copie des derniers fichiers
@@ -615,7 +636,7 @@ void Compilation::OnOuvrirBtClick( wxCommandEvent& event )
 
 void Compilation::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(125);
 }
 
@@ -648,13 +669,13 @@ wxString Compilation::GetTempDir()
 
 void Compilation::OnCGShareBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(192);
 }
 
 void Compilation::OnDistribuerBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(158);
 }
 

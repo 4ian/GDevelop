@@ -11,7 +11,7 @@
 bool DndTextObjectsEditor::OnDropText(wxCoord x, wxCoord y, const wxString& text)
 {
     //TODO : Remake me in GDL Fahsion
-    /*GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    /*GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     if ( extensionsManager->GetTypeIdFromString("Sprite") == 0 )
         return true; //No such extension loaded.

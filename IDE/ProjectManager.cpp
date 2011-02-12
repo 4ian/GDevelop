@@ -935,7 +935,7 @@ void ProjectManager::OncopySceneMenuItemSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     clipboard->SetScene(*(*scene));
 }
 
@@ -957,7 +957,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     clipboard->SetScene(*(*scene));
 
     //Updating editors
@@ -995,7 +995,7 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     if (!clipboard->HasScene()) return;
 
     boost::shared_ptr<Scene> newScene = boost::shared_ptr<Scene>(new Scene(clipboard->GetScene()));
@@ -1410,7 +1410,7 @@ void ProjectManager::OnCopyExternalEventsSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     clipboard->SetExternalEvents(*(*events));
 }
 
@@ -1429,7 +1429,7 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     clipboard->SetExternalEvents(*(*events));
 
     //Updating editors
@@ -1467,7 +1467,7 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     boost::shared_ptr<ExternalEvents> newEvents = boost::shared_ptr<ExternalEvents>(new ExternalEvents(clipboard->GetExternalEvents()));
 
     //Finding a new, unique name for the events

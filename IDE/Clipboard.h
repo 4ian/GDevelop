@@ -13,7 +13,7 @@
 class Clipboard
 {
 public:
-    static Clipboard * getInstance();
+    static Clipboard * GetInstance();
     static void kill();
 
     void SetObject( ObjSPtr object );

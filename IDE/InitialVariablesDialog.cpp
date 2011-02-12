@@ -317,7 +317,7 @@ void InitialVariablesDialog::OnvariablesListItemActivated(wxListEvent& event)
 
 void InitialVariablesDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess::getInstance()->DisplaySection(242);
+    HelpFileAccess::GetInstance()->DisplaySection(242);
 }
 
 

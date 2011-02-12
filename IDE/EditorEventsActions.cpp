@@ -64,7 +64,7 @@ void EditorEvents::OnCopyActionMenuSelected(wxCommandEvent& event)
         boost::tuples::get<3>(eventsSelected[0]) >= GetLastSelectedListOfInstructions()->size() ||
         conditionsSelected ) return;
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     clipboard->SetAction(GetLastSelectedInstruction());
 }
 
@@ -74,7 +74,7 @@ void EditorEvents::OnCutActionMenuSelected(wxCommandEvent& event)
         boost::tuples::get<3>(eventsSelected[0]) >= GetLastSelectedListOfInstructions()->size() ||
         conditionsSelected ) return;
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     clipboard->SetAction(GetLastSelectedInstruction());
 
     GetLastSelectedListOfInstructions()->erase( GetLastSelectedListOfInstructions()->begin() + boost::tuples::get<3>(eventsSelected[0]) );
@@ -87,7 +87,7 @@ void EditorEvents::OnPasteActionMenuSelected(wxCommandEvent& event)
 {
     if ( !instructionsSelected || conditionsSelected) return;
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     if ( !clipboard->HasAction() ) return;
 
     if ( boost::tuples::get<3>(eventsSelected[0]) >= GetLastSelectedListOfInstructions()->size() )

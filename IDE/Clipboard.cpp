@@ -41,7 +41,7 @@ Clipboard::~Clipboard()
     //dtor
 }
 
-Clipboard * Clipboard::getInstance()
+Clipboard * Clipboard::GetInstance()
 {
     if ( NULL == singleton )
         singleton = new Clipboard;

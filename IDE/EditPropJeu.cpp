@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "EditPropJeu.h"
 
 #ifdef DEBUG
@@ -506,7 +511,7 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
 
 void EditPropJeu::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(8);
 }
 
@@ -599,7 +604,7 @@ void EditPropJeu::OnButton2Click(wxCommandEvent& event)
 
     sf::Sprite sprite( image );
 
-    sf::Text Chargement( static_cast<string>(texteEdit->GetValue()), *FontManager::getInstance()->GetFont("") );
+    sf::Text Chargement( static_cast<string>(texteEdit->GetValue()), *FontManager::GetInstance()->GetFont("") );
     Chargement.SetPosition(texteXPos, texteYPos);
     App.Draw( Chargement );
 

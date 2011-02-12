@@ -81,7 +81,7 @@ TEST( Runtime, ObjectsConcerned )
     {
         ObjectsConcerned objectsConcerned(&objectsList, &groupsList);
 
-        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
 
         vector < boost::shared_ptr<Object> > picked;
 

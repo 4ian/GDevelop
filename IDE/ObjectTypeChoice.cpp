@@ -117,7 +117,7 @@ void ObjectTypeChoice::RefreshList()
 {
     objectsList->DeleteAllItems();
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     wxImageList * imageList = new wxImageList(32,32);
@@ -162,7 +162,7 @@ void ObjectTypeChoice::OnobjectsListItemSelect(wxListEvent& event)
         selectedObjectType = associatedData->GetString();
     }
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     boost::shared_ptr<ExtensionBase> extension = boost::shared_ptr<ExtensionBase> ();

@@ -234,7 +234,7 @@ bool EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
 
     for (unsigned int aId = 0;aId < actions.size();++aId)
     {
-        InstructionInfos instrInfos = GDpriv::ExtensionsManager::getInstance()->GetActionInfos(actions[aId].GetType());
+        InstructionInfos instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -285,7 +285,7 @@ bool EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vect
 
     for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
-        InstructionInfos instrInfos = GDpriv::ExtensionsManager::getInstance()->GetConditionInfos(conditions[cId].GetType());
+        InstructionInfos instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -364,7 +364,7 @@ bool EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector 
     {
         bool deleteMe = false;
 
-        InstructionInfos instrInfos = GDpriv::ExtensionsManager::getInstance()->GetActionInfos(actions[aId].GetType());
+        InstructionInfos instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -420,7 +420,7 @@ bool EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vect
     {
         bool deleteMe = false;
 
-        InstructionInfos instrInfos = GDpriv::ExtensionsManager::getInstance()->GetConditionInfos(conditions[cId].GetType());
+        InstructionInfos instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters

@@ -321,7 +321,7 @@ void EditorObjetsGroups::DisableAll()
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnHelp(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(180);
 }
 
@@ -586,7 +586,7 @@ void EditorObjetsGroups::OnSetFocus(wxFocusEvent& event)
 
 void EditorObjetsGroups::OnCopyGroupSelected(wxCommandEvent& event)
 {
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
 
     if ( itemSelected == ObjetsGroupsList->GetRootItem() ) return;
 
@@ -600,7 +600,7 @@ void EditorObjetsGroups::OnCopyGroupSelected(wxCommandEvent& event)
 
 void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
 {
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
 
     if ( itemSelected == ObjetsGroupsList->GetRootItem() ) return;
 
@@ -618,7 +618,7 @@ void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
 
 void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
 {
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     if ( !clipboard->HasObjectGroup() ) return;
     ObjectGroup groupPasted = clipboard->GetObjectGroup();
 

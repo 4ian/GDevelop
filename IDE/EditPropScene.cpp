@@ -239,6 +239,6 @@ void EditPropScene::OnColorBtClick(wxCommandEvent& event)
 
 void EditPropScene::OnAideBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(8);
 }

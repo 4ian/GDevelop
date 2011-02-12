@@ -384,6 +384,6 @@ string ChoixTemplateEvent::ConvertParam( string parameter, const string & toRepl
 
 void ChoixTemplateEvent::OnAideBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(151);
 }

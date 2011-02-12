@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "BuildMessagesPnl.h"
 
 //(*InternalHeaders(BuildMessagesPnl)
@@ -35,6 +40,7 @@ BuildMessagesPnl::BuildMessagesPnl(wxWindow* parent, ProjectManager * projectMan
     FlexGridSizer1->SetSizeHints(this);
 
     Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&BuildMessagesPnl::OnmessagesListItemActivated);
+    Connect(wxEVT_SIZE,(wxObjectEventFunction)&BuildMessagesPnl::OnResize);
     //*)
 
     messagesList->InsertColumn(0, _("Fichier"));
@@ -95,4 +101,10 @@ void BuildMessagesPnl::OnmessagesListItemActivated(wxListEvent& event)
     std::string file = string(messagesList->GetItemText(event.GetIndex()).mb_str());
 
     if ( projectManager && wxFileExists(file) ) projectManager->EditSourceFile(gameAssociatedWithErrors, file, line);
+}
+
+void BuildMessagesPnl::OnResize(wxSizeEvent& event)
+{
+    messagesList->SetSize(event.GetSize());
+    messagesList->SetColumnWidth(2, messagesList->GetSize().GetWidth()-messagesList->GetColumnWidth(0)-messagesList->GetColumnWidth(1));
 }

@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -16,7 +16,7 @@ class LocaleManager
         wxLocale * locale; ///< wxWidgets locale object
         bool SetLanguage(int languageWxWidgetsId);
 
-        static LocaleManager *getInstance()
+        static LocaleManager *GetInstance()
         {
             if ( !_singleton )
             {

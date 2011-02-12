@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "NewCppFileDlg.h"
 
 //(*InternalHeaders(NewCppFileDlg)
@@ -265,6 +270,7 @@ bool NewCppFileDlg::CreateEventImplementationFile(std::string filename)
 "\n#include \"GDL/Event.h\""
 "\n#include \"GDL/RuntimeScene.h\""
 "\n#include \"GDL/ObjectsConcerned.h\""
+"\n#include \""+wxFileName(filename).GetName()+".h"+"\""
 "\n"
 "\nvoid MyEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )"
 "\n{"

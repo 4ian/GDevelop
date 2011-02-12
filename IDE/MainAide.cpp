@@ -18,7 +18,7 @@ extern MemTrace MemTracer;
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuAideSelected( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplayContents();
 }
 

@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -233,7 +233,7 @@ scene(scene_)
 	//*)
     moreBt->SetBitmap(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
 
-    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::getInstance();
+    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
 
     //Pour chaque paramètres
     for ( unsigned int i = 0;i < MaxPara;i++ )
@@ -318,7 +318,7 @@ void ChoixAction::RefreshList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects actions
@@ -471,7 +471,7 @@ void ChoixAction::RefreshObjectActionsList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
     std::string selectedObjectType = extensionManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, selectedObject));
 
@@ -536,7 +536,7 @@ void ChoixAction::RefreshObjectActionsList()
 
 	    for(unsigned int j = 0;j<objectAutomatisms.size();++j)
 	    {
-	        ObjectIdentifiersManager * objectIdentifierManager = ObjectIdentifiersManager::getInstance();
+	        ObjectIdentifiersManager * objectIdentifierManager = ObjectIdentifiersManager::GetInstance();
 	        std::string automatismType = objectIdentifierManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, objectIdentifierManager->GetNamefromOID(objectAutomatisms[j])));
 
 	        if ( find(automatismsTypes.begin(), automatismsTypes.end(), automatismType) == automatismsTypes.end() )
@@ -626,13 +626,13 @@ void ChoixAction::RefreshFromAction()
     if ( Type.empty() )
         return;
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(Type);
 
     NomActionTxt->SetLabel( instructionInfos.fullname );
     ActionTextTxt->SetLabel( instructionInfos.description );
     if ( instructionInfos.icon.IsOk() ) ActionImg->SetBitmap( instructionInfos.icon );
-    else ActionImg->SetBitmap(BitmapGUIManager::getInstance()->unknown24);
+    else ActionImg->SetBitmap(BitmapGUIManager::GetInstance()->unknown24);
 
     //Update parameters values
     for ( unsigned int i = 0;i < Param.size();i++ )
@@ -715,7 +715,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
     string num = ( string ) wxWindow::FindFocus()->GetName();
     unsigned int i = ToInt(num);
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(Type);
 
     vector < string > mainObjectsName; //On cherche maintenant le nom des objets principaux
@@ -950,7 +950,7 @@ void ChoixAction::OnFacClicked(wxCommandEvent& event)
 
 void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 {
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(Type);
 
     if ( Type == "" )
@@ -1028,7 +1028,7 @@ void ChoixAction::OnCancelBtClick(wxCommandEvent& event)
 
 void ChoixAction::OnAideBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(29);
 }
 

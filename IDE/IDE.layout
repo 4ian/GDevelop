@@ -10,11 +10,11 @@
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27">
 		<Cursor position="36" topLine="0" />
 	</File>
-	<File name="BuildMessagesPnl.cpp" open="0" top="0" tabpos="19">
-		<Cursor position="2762" topLine="63" />
+	<File name="BuildMessagesPnl.cpp" open="1" top="0" tabpos="9">
+		<Cursor position="2572" topLine="69" />
 	</File>
-	<File name="BuildMessagesPnl.h" open="0" top="0" tabpos="4">
-		<Cursor position="375" topLine="0" />
+	<File name="BuildMessagesPnl.h" open="1" top="0" tabpos="8">
+		<Cursor position="375" topLine="5" />
 	</File>
 	<File name="BuildProgressPnl.cpp" open="1" top="0" tabpos="3">
 		<Cursor position="2847" topLine="53" />
@@ -70,14 +70,14 @@
 	<File name="Clipboard.h" open="0" top="0" tabpos="7">
 		<Cursor position="1522" topLine="0" />
 	</File>
-	<File name="CodeEditor.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="9529" topLine="204" />
+	<File name="CodeEditor.cpp" open="1" top="0" tabpos="10">
+		<Cursor position="7465" topLine="134" />
 	</File>
-	<File name="CodeEditor.h" open="0" top="0" tabpos="7">
-		<Cursor position="823" topLine="5" />
+	<File name="CodeEditor.h" open="1" top="0" tabpos="11">
+		<Cursor position="2503" topLine="62" />
 	</File>
-	<File name="Compilation.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="15757" topLine="226" />
+	<File name="Compilation.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="15615" topLine="201" />
 	</File>
 	<File name="Compilation.h" open="0" top="0" tabpos="5">
 		<Cursor position="2981" topLine="92" />
@@ -122,7 +122,7 @@
 		<Cursor position="3156" topLine="97" />
 	</File>
 	<File name="Credits.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="13263" topLine="204" />
+		<Cursor position="13017" topLine="186" />
 	</File>
 	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="18">
 		<Cursor position="28350" topLine="644" />
@@ -160,8 +160,8 @@
 	<File name="EditOptionsPosition.h" open="0" top="0" tabpos="0">
 		<Cursor position="601" topLine="6" />
 	</File>
-	<File name="EditPropJeu.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="40606" topLine="674" />
+	<File name="EditPropJeu.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="40280" topLine="668" />
 	</File>
 	<File name="EditPropJeu.h" open="0" top="0" tabpos="11">
 		<Cursor position="410" topLine="4" />
@@ -260,7 +260,7 @@
 		<Cursor position="760" topLine="0" />
 	</File>
 	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="31962" topLine="679" />
+		<Cursor position="17167" topLine="265" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="5">
 		<Cursor position="3315" topLine="84" />
@@ -302,10 +302,10 @@
 		<Cursor position="767" topLine="10" />
 	</File>
 	<File name="MainAide.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="3131" topLine="77" />
+		<Cursor position="205" topLine="4" />
 	</File>
-	<File name="MainFichier.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="9056" topLine="251" />
+	<File name="MainFichier.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="8669" topLine="245" />
 	</File>
 	<File name="MainOptions.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="468" topLine="0" />
@@ -316,8 +316,8 @@
 	<File name="MyStatusBar.cpp" open="0" top="0" tabpos="17">
 		<Cursor position="204" topLine="0" />
 	</File>
-	<File name="NewCppFileDlg.cpp" open="0" top="0" tabpos="10">
-		<Cursor position="10046" topLine="112" />
+	<File name="NewCppFileDlg.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="13288" topLine="256" />
 	</File>
 	<File name="NewCppFileDlg.h" open="0" top="0" tabpos="6">
 		<Cursor position="497" topLine="6" />
@@ -355,8 +355,8 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="510" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="31409" topLine="688" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="31576" topLine="707" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="14">
 		<Cursor position="768" topLine="17" />
@@ -367,8 +367,8 @@
 	<File name="SearchEvents.h" open="0" top="0" tabpos="7">
 		<Cursor position="2675" topLine="22" />
 	</File>
-	<File name="SetupCompilerToolchainDlg.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="22175" topLine="297" />
+	<File name="SetupCompilerToolchainDlg.cpp" open="1" top="0" tabpos="12">
+		<Cursor position="20464" topLine="293" />
 	</File>
 	<File name="SplashScreen.cpp" open="0" top="0" tabpos="19">
 		<Cursor position="1863" topLine="65" />

@@ -279,7 +279,7 @@ scene(scene_)
     //*)
     moreBt->SetBitmap(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
 
-    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::getInstance();
+    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
 
     //Pour chaque paramètres
     for ( unsigned int i = 0;i < MaxPara;i++ )
@@ -369,7 +369,7 @@ void ChoixCondition::RefreshList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects conditions
@@ -524,7 +524,7 @@ void ChoixCondition::RefreshObjectConditionsList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
     std::string selectedObjectType = extensionManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, selectedObject));
 
@@ -589,7 +589,7 @@ void ChoixCondition::RefreshObjectConditionsList()
 
 	    for(unsigned int j = 0;j<objectAutomatisms.size();++j)
 	    {
-	        ObjectIdentifiersManager * objectIdentifierManager = ObjectIdentifiersManager::getInstance();
+	        ObjectIdentifiersManager * objectIdentifierManager = ObjectIdentifiersManager::GetInstance();
 	        std::string automatismType = objectIdentifierManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, objectIdentifierManager->GetNamefromOID(objectAutomatisms[j])));
 
 	        if ( find(automatismsTypes.begin(), automatismsTypes.end(), automatismType) == automatismsTypes.end() )
@@ -677,13 +677,13 @@ void ChoixCondition::RefreshFromCondition()
     if ( Type == "" )
         return;
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(Type);
 
     NomConditionTxt->SetLabel( instructionInfos.fullname );
     ConditionTextTxt->SetLabel( instructionInfos.description );
     if ( instructionInfos.icon.IsOk() ) ConditionImg->SetBitmap( instructionInfos.icon );
-    else ConditionImg->SetBitmap(BitmapGUIManager::getInstance()->unknown24);
+    else ConditionImg->SetBitmap(BitmapGUIManager::GetInstance()->unknown24);
 
     for ( unsigned int i = 0;i < MaxPara;i++ )
     {
@@ -786,7 +786,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
     string num = ( string ) wxWindow::FindFocus()->GetName();
     unsigned int i = atoi( num.c_str() );
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(Type);
 
     vector < string > mainObjectsName; //On cherche maintenant le nom des objets principaux
@@ -963,7 +963,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
 
 void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
 {
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(Type);
 
     if ( Type == "" )
@@ -1044,7 +1044,7 @@ void ChoixCondition::OnCancelBtClick( wxCommandEvent& event )
 
 void ChoixCondition::OnAideBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(23);
 }
 

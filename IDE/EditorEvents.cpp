@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -347,7 +347,7 @@ isResizingColumns(false)
     noConditionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
 
     //Adding events types
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects actions
@@ -598,7 +598,7 @@ vector < BaseEventSPtr > * EditorEvents::GetSelectedListOfEvents(unsigned int nb
 ////////////////////////////////////////////////////////////
 void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
 {
-    EventsRenderingHelper * eventsRenderingHelper = EventsRenderingHelper::getInstance();
+    EventsRenderingHelper * eventsRenderingHelper = EventsRenderingHelper::GetInstance();
 
     wxBufferedPaintDC dc( EventsPanel ); //Création obligatoire du wxBufferedPaintDC
     EventsPanel->SetBackgroundStyle( wxBG_STYLE_PAINT );
@@ -652,7 +652,7 @@ void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & parentMaximalWidth, bool draw)
 {
-    EventsRenderingHelper * eventsRenderingHelper = EventsRenderingHelper::getInstance();
+    EventsRenderingHelper * eventsRenderingHelper = EventsRenderingHelper::GetInstance();
 
     int positionScrollbar = ScrollBar1->GetThumbPosition();
     const int separation = 3;
@@ -768,7 +768,7 @@ bool EditorEvents::ScrollToEvent(vector < BaseEventSPtr > & list, BaseEventSPtr 
             return true;
         }
 
-        EventsRenderingHelper::getInstance()->SetConditionsColumnWidth(conditionsColumnWidth-initialXposition);
+        EventsRenderingHelper::GetInstance()->SetConditionsColumnWidth(conditionsColumnWidth-initialXposition);
 
         int width = EventsPanel->GetSize().x-initialXposition;
         unsigned int renderedHeight = list[i]->GetRenderedHeight(width < 0 ? 0 : width);
@@ -874,7 +874,7 @@ void EditorEvents::OnInsertSomeEventSelected( wxCommandEvent& event )
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     if ( !extensionsManager->HasEventType(eventType) ) return;
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent(eventType);
@@ -898,7 +898,7 @@ void EditorEvents::OnMenuItem7Selected( wxCommandEvent& event )
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Comment");
     eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
@@ -921,7 +921,7 @@ void EditorEvents::OnInsertEventSelected( wxCommandEvent& event )
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Standard");
     eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
@@ -949,7 +949,7 @@ void EditorEvents::OnSubEventMenuItemSelected(wxCommandEvent& event)
     if ( !GetLastSelectedEvent()->CanHaveSubEvents() ) return;
 
     //Creating the event
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Standard");
 
     GetLastSelectedEvent()->GetSubEvents().push_back(eventToAdd);
@@ -967,7 +967,7 @@ void EditorEvents::OnAddLienSelected( wxCommandEvent& event )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
     //Creating the event
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Link");
 
     eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
@@ -989,7 +989,7 @@ void EditorEvents::OnMenuCopySelected( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() ) return;
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     clipboard->SetEvent( GetLastSelectedEvent() );
 }
 
@@ -1000,7 +1000,7 @@ void EditorEvents::OnCutSelected( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() ) return;
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     clipboard->SetEvent( GetLastSelectedEvent() );
 
     GetLastSelectedListOfEvents()->erase( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]) );
@@ -1017,7 +1017,7 @@ void EditorEvents::OnMenuPasteSelected( wxCommandEvent& event )
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     if ( !clipboard->HasEvent() ) return;
 
     if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
@@ -1036,7 +1036,7 @@ void EditorEvents::OnMenuPasteAfterSelected( wxCommandEvent& event )
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     if ( !clipboard->HasEvent() ) return;
 
     if ( boost::tuples::get<1>(eventsSelected[0])+1 < GetLastSelectedListOfEvents()->size() )
@@ -1054,7 +1054,7 @@ void EditorEvents::OnPasteAsASubEventSelected(wxCommandEvent& event)
 {
     if ( eventsSelected.empty() || !GetLastSelectedEvent()->CanHaveSubEvents() ) return;
 
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     if ( !clipboard->HasEvent() ) return;
 
     GetLastSelectedEvent()->GetSubEvents().push_back( clipboard->GetEvent() );
@@ -1095,7 +1095,7 @@ void EditorEvents::OnToggleEventSelected(wxCommandEvent& event)
 
 void EditorEvents::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(11);
 }
 

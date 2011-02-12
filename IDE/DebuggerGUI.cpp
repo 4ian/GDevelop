@@ -212,7 +212,7 @@ void DebuggerGUI::OnStepBtClick(wxCommandEvent& event)
 
 void DebuggerGUI::OnConsoleBtClick(wxCommandEvent& event)
 {
-    ConsoleManager * consoleManager = ConsoleManager::getInstance();
+    ConsoleManager * consoleManager = ConsoleManager::GetInstance();
     consoleManager->ShowConsole();
 }
 

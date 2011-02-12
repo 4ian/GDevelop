@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "SceneCanvas.h"
 #include <string>
 #include <iostream>
@@ -427,7 +432,7 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 
 void SceneCanvas::OnHelpBtClick( wxCommandEvent & event )
 {
-    HelpFileAccess::getInstance()->DisplaySection(12);
+    HelpFileAccess::GetInstance()->DisplaySection(12);
 }
 
 void SceneCanvas::OnLayersEditor( wxCommandEvent & event )
@@ -695,7 +700,7 @@ void SceneCanvas::ReloadFirstPart()
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( !scene.editing )
     {
-        GDpriv::DynamicExtensionsManager::getInstance()->UnloadAllDynamicExtensions();
+        GDpriv::DynamicExtensionsManager::GetInstance()->UnloadAllDynamicExtensions();
         mainEditorCommand.GetBuildToolsPanel()->notebook->SetSelection(0);
 
         if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->LaunchGameSourceFilesBuild(gameEdited) )
@@ -726,9 +731,10 @@ void SceneCanvas::ReloadSecondPart()
             mainEditorCommand.GetPaneManager()->GetPane(mainEditorCommand.GetBuildToolsPanel()).Show(true);
             mainEditorCommand.GetBuildToolsPanel()->notebook->SetSelection(1);
             mainEditorCommand.GetBuildToolsPanel()->buildMessagesPnl->OpenFileContainingFirstError();
+            mainEditorCommand.GetMainEditor()->RequestUserAttention();
         }
 
-        GDpriv::DynamicExtensionsManager::getInstance()->LoadDynamicExtension("dynext.dxgd");
+        GDpriv::DynamicExtensionsManager::GetInstance()->LoadDynamicExtension("dynext.dxgd");
     }
     #endif
 
@@ -1359,7 +1365,7 @@ void SceneCanvas::OnCopySelected(wxCommandEvent & event)
         }
     }
 
-    Clipboard::getInstance()->SetPositionsSelection(copiedPositions);
+    Clipboard::GetInstance()->SetPositionsSelection(copiedPositions);
 }
 
 void SceneCanvas::OnCutSelected(wxCommandEvent & event)
@@ -1389,14 +1395,14 @@ void SceneCanvas::OnCutSelected(wxCommandEvent & event)
     if ( initialPositionsBrowser ) initialPositionsBrowser->DeselectAll();
     if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
 
-    Clipboard::getInstance()->SetPositionsSelection(copiedPositions);
+    Clipboard::GetInstance()->SetPositionsSelection(copiedPositions);
 }
 
 void SceneCanvas::OnPasteSelected(wxCommandEvent & event)
 {
-    if ( !Clipboard::getInstance()->HasPositionsSelection() ) return;
+    if ( !Clipboard::GetInstance()->HasPositionsSelection() ) return;
 
-    vector < InitialPosition > pastedPositions = Clipboard::getInstance()->GetPositionsSelection();
+    vector < InitialPosition > pastedPositions = Clipboard::GetInstance()->GetPositionsSelection();
 
     for (unsigned int i =0;i<pastedPositions.size();++i)
     {

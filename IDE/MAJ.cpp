@@ -244,6 +244,6 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
         return;
     }
 
-    wxExecute(tempDir+"/newgd.exe /SILENT /LANG="+LocaleManager::getInstance()->locale->GetLocale(), wxEXEC_ASYNC);
+    wxExecute(tempDir+"/newgd.exe /SILENT /LANG="+LocaleManager::GetInstance()->locale->GetLocale(), wxEXEC_ASYNC);
     EndModal(2);
 }

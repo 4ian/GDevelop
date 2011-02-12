@@ -176,7 +176,7 @@ bool Game_Develop_EditorApp::OnInit()
                 languageId = wxLocale::FindLanguageInfo(languagesAvailables[i])->Language;
         }
 
-        LocaleManager::getInstance()->SetLanguage(languageId);
+        LocaleManager::GetInstance()->SetLanguage(languageId);
 
     }
     cout << "Language loaded" << endl;
@@ -207,10 +207,10 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Set help file
     {
-        HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
-        if ( LocaleManager::getInstance()->locale->GetLanguage() == wxLANGUAGE_ENGLISH )
+        HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+        if ( LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_ENGLISH )
             helpFileAccess->InitWithHelpFile("help.chm");
-        else if ( LocaleManager::getInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        else if ( LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
             helpFileAccess->InitWithHelpFile("aide.chm");
     }
     cout << "Help file setted" << endl;
@@ -228,7 +228,7 @@ bool Game_Develop_EditorApp::OnInit()
     //Creating the console Manager
     #ifdef RELEASE
     ConsoleManager * consoleManager;
-    consoleManager = ConsoleManager::getInstance();
+    consoleManager = ConsoleManager::GetInstance();
     #endif
 
     cout << "ConsoleManager created" << endl;
@@ -249,7 +249,7 @@ bool Game_Develop_EditorApp::OnInit()
 
     cout << "Loading extensions" << endl;
     //Load extensions
-    GDpriv::ExtensionsLoader * extensionsLoader = GDpriv::ExtensionsLoader::getInstance();
+    GDpriv::ExtensionsLoader * extensionsLoader = GDpriv::ExtensionsLoader::GetInstance();
     extensionsLoader->SetExtensionsDir("./Extensions/");
     extensionsLoader->LoadAllStaticExtensionsAvailable();
 
@@ -337,13 +337,13 @@ int Game_Develop_EditorApp::OnExit()
 
     delete wxConfigBase::Set(( wxConfigBase* )NULL );
 
-    SoundManager * soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
     soundManager->kill();
-    Clipboard * clipboard = Clipboard::getInstance();
+    Clipboard * clipboard = Clipboard::GetInstance();
     clipboard->kill();
-    FontManager * fontManager = FontManager::getInstance();
+    FontManager * fontManager = FontManager::GetInstance();
     fontManager->kill();
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->kill();
 
 #ifndef RELEASE

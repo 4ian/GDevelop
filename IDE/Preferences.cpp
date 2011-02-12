@@ -585,7 +585,7 @@ changesNeedRestart(false)
             const wxLanguageInfo * language = wxLocale::FindLanguageInfo(languagesAvailables[i]);
             langChoice->Append(language->Description);
 
-            if (LocaleManager::getInstance()->locale->GetLanguage() == language->Language)
+            if (LocaleManager::GetInstance()->locale->GetLanguage() == language->Language)
                 langChoice->SetSelection(i);
         }
     }
@@ -721,7 +721,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     const wxLanguageInfo * language = wxLocale::FindLanguageInfo(langChoice->GetString(langChoice->GetSelection()));
     pConfig->Write( _T( "/Lang" ), language->CanonicalName );
-    LocaleManager::getInstance()->SetLanguage(language->Language);
+    LocaleManager::GetInstance()->SetLanguage(language->Language);
 
     if ( changesNeedRestart )
     {
@@ -926,7 +926,7 @@ void Preferences::OnInactifColor2PnlRightUp( wxMouseEvent& event )
 
 void Preferences::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplayContents();
 }
 

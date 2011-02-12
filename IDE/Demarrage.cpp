@@ -213,7 +213,7 @@ Demarrage::~Demarrage()
 
 void Demarrage::OnGuideBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(16);
 }
 

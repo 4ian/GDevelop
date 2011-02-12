@@ -60,6 +60,10 @@ class CodeEditor: public wxPanel
 		static const long idRibbonPaste;
 		static const long idRibbonUndo;
 		static const long idRibbonRedo;
+		static const long idRibbonDocGDL;
+		static const long idRibbonDocSFML;
+		static const long idRibbonDocWxWidgets;
+		static const long idRibbonDocBoost;
 
 	private:
 
@@ -75,6 +79,11 @@ class CodeEditor: public wxPanel
 		void OnSaveSelected(wxRibbonButtonBarEvent& evt);
 		void UpdateTextCtrl(wxStyledTextEvent& event);
 		void OnCharAdded (wxStyledTextEvent &event);
+		void OnDocGDLSelected(wxRibbonButtonBarEvent &event);
+		void OnDocSFMLSelected(wxRibbonButtonBarEvent &event);
+		void OnDocWxWidgetsSelected(wxRibbonButtonBarEvent &event);
+		void OnDocBoostSelected(wxRibbonButtonBarEvent &event);
+		void OpenLink(wxString link);
 
 		MainEditorCommand mainEditorCommand;
 

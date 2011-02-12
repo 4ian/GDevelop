@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -459,7 +459,7 @@ void Game_Develop_EditorFrame::OnClose( wxCloseEvent& event )
 
     //Close the editor close the program.
     //We have to destroy the other frames.
-    ConsoleManager * consoleManager = ConsoleManager::getInstance();
+    ConsoleManager * consoleManager = ConsoleManager::GetInstance();
     consoleManager->kill();
 
     Destroy();

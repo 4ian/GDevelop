@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -117,7 +117,7 @@ void Game_Develop_EditorFrame::Open( string file )
         if ( startPage ) startPage->Refresh();
 
         string unknownExtensions = "";
-        GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+        GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
         for (unsigned int i = 0;i<newGame->extensionsUsed.size();++i)
         {
             if ( extensionsManager->GetExtension(newGame->extensionsUsed[i]) == boost::shared_ptr<ExtensionBase> () )
@@ -258,7 +258,7 @@ void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event 
     //Compile now source if there are not up to date ( and if game use C++ features ).
     if ( GetCurrentGame()->useExternalSourceFiles && GetBuildToolsPanel()->buildProgressPnl->BuildNeeded() )
     {
-        GDpriv::DynamicExtensionsManager::getInstance()->UnloadAllDynamicExtensions();
+        GDpriv::DynamicExtensionsManager::GetInstance()->UnloadAllDynamicExtensions();
         GetBuildToolsPanel()->notebook->SetSelection(0);
 
         //Be sure another build process is not running, and then launch build.

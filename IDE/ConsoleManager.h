@@ -1,26 +1,51 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef CONSOLEMANAGER_H
 #define CONSOLEMANAGER_H
 
-#include "GDL/singleton.h"
 class ConsoleFrame;
 
 /**
+ * \brief Manage Game Develop IDE console.
+ *
  * Class managing the GD console, allowing to display it by a simple function call.
  * Best when created at program start and killed when program exits.
  */
-class ConsoleManager : public Singleton<ConsoleManager>
+class ConsoleManager
 {
-    public:
-        void ShowConsole();
+public:
+    void ShowConsole();
 
-    private:
+    static ConsoleManager *GetInstance()
+    {
+        if ( !_singleton )
+        {
+            _singleton = new ConsoleManager;
+        }
+
+        return ( static_cast<ConsoleManager*>( _singleton ) );
+    }
+
+    static void DestroySingleton()
+    {
+        if ( NULL != _singleton )
+        {
+            delete _singleton;
+            _singleton = NULL;
+        }
+    }
+
+private:
 
     ConsoleManager();
     virtual ~ConsoleManager();
 
     ConsoleFrame * console;
 
-    friend class Singleton<ConsoleManager>;
+    static ConsoleManager *_singleton;
 };
 
 #endif // CONSOLEMANAGER_H

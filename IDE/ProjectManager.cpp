@@ -32,6 +32,8 @@
 #include <boost/archive/xml_iarchive.hpp>
 
 
+using namespace GDpriv;
+
 //(*IdInit(ProjectManager)
 const long ProjectManager::ID_TREECTRL1 = wxNewId();
 const long ProjectManager::idMenuEditScene = wxNewId();

@@ -338,13 +338,13 @@ int Game_Develop_EditorApp::OnExit()
     delete wxConfigBase::Set(( wxConfigBase* )NULL );
 
     SoundManager * soundManager = SoundManager::GetInstance();
-    soundManager->kill();
+    soundManager->DestroySingleton();
     Clipboard * clipboard = Clipboard::GetInstance();
-    clipboard->kill();
+    clipboard->DestroySingleton();
     FontManager * fontManager = FontManager::GetInstance();
-    fontManager->kill();
+    fontManager->DestroySingleton();
     HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
-    helpFileAccess->kill();
+    helpFileAccess->DestroySingleton();
 
 #ifndef RELEASE
     MemTracer.Rapport();

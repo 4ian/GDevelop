@@ -26,7 +26,7 @@ class LocaleManager
             return ( static_cast<LocaleManager*>( _singleton ) );
         }
 
-        static void kill()
+        static void DestroySingleton()
         {
             if ( _singleton )
             {

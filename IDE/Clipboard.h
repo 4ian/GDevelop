@@ -14,7 +14,7 @@ class Clipboard
 {
 public:
     static Clipboard * GetInstance();
-    static void kill();
+    static void DestroySingleton();
 
     void SetObject( ObjSPtr object );
     ObjSPtr GetObject();

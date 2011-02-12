@@ -11,6 +11,8 @@
 #include <wx/msgdlg.h>
 #include "GDL/CompilerToolchainPathManager.h"
 
+using namespace GDpriv;
+
 //(*IdInit(SetupCompilerToolchainDlg)
 const long SetupCompilerToolchainDlg::ID_STATICBITMAP2 = wxNewId();
 const long SetupCompilerToolchainDlg::ID_STATICTEXT1 = wxNewId();

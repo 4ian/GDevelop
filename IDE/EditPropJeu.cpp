@@ -31,6 +31,8 @@
 
 #include "GDL/Game.h"
 
+using namespace GDpriv;
+
 //(*IdInit(EditPropJeu)
 const long EditPropJeu::ID_STATICBITMAP5 = wxNewId();
 const long EditPropJeu::ID_STATICTEXT6 = wxNewId();

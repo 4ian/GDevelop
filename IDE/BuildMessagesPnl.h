@@ -23,7 +23,7 @@ class BuildMessagesPnl: public wxPanel
 		BuildMessagesPnl(wxWindow* parent, ProjectManager * projectManager);
 		virtual ~BuildMessagesPnl();
 
-		void RefreshWith(Game * game, std::vector < CompilerMessage > messages);
+		void RefreshWith(Game * game, std::vector < GDpriv::CompilerMessage > messages);
 		void OpenFileContainingFirstError();
 
         ProjectManager * projectManager; ///< Used to open files.

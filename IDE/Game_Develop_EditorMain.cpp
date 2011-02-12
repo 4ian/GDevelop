@@ -460,7 +460,7 @@ void Game_Develop_EditorFrame::OnClose( wxCloseEvent& event )
     //Close the editor close the program.
     //We have to destroy the other frames.
     ConsoleManager * consoleManager = ConsoleManager::GetInstance();
-    consoleManager->kill();
+    consoleManager->DestroySingleton();
 
     Destroy();
 }

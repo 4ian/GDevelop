@@ -722,7 +722,7 @@ void SceneCanvas::ReloadSecondPart()
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( !scene.editing )
     {
-        CompilerMessagesParser errorsParser;
+        GDpriv::CompilerMessagesParser errorsParser;
         errorsParser.ParseOutput(mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->sourceFileBuilder.GetErrors());
         mainEditorCommand.GetBuildToolsPanel()->buildMessagesPnl->RefreshWith(&gameEdited, errorsParser.parsedErrors);
 

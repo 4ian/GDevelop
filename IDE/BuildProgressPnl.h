@@ -31,7 +31,7 @@ class BuildProgressPnl: public wxPanel
 		bool AbortBuild();
 		bool LastBuildSuccessed();
 
-		SourceFileBuilder sourceFileBuilder;
+		GDpriv::SourceFileBuilder sourceFileBuilder;
 
 		//(*Declarations(BuildProgressPnl)
 		wxButton* stopCompilerBt;

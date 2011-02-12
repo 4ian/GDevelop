@@ -13,6 +13,8 @@
 #include "GDL/CommonTools.h"
 #include "ProjectManager.h"
 
+using namespace GDpriv;
+
 //(*IdInit(BuildMessagesPnl)
 const long BuildMessagesPnl::ID_LISTCTRL1 = wxNewId();
 //*)

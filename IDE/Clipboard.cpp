@@ -49,7 +49,7 @@ Clipboard * Clipboard::GetInstance()
     return singleton;
 }
 
-void Clipboard::kill()
+void Clipboard::DestroySingleton()
 {
     if ( NULL != singleton )
     {

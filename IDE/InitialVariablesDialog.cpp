@@ -157,7 +157,7 @@ void InitialVariablesDialog::OntoolbarPanelResize(wxSizeEvent& event)
 void InitialVariablesDialog::Refresh()
 {
     variablesList->DeleteAllItems();
-    const vector<Variable> & variablesVector = variables.GetVariablesVector();
+    const std::vector<Variable> & variablesVector = variables.GetVariablesVector();
 
     for (unsigned int i = 0;i<variablesVector.size();++i)
     {
@@ -191,7 +191,7 @@ void InitialVariablesDialog::OncancelBtClick(wxCommandEvent& event)
  */
 void InitialVariablesDialog::OnAddVarSelected(wxCommandEvent& event)
 {
-    string variableName = string(wxGetTextFromUser("Entrez le nom de la nouvelle variable", "Insertion d'une variable initiale").mb_str());
+    std::string variableName = std::string(wxGetTextFromUser("Entrez le nom de la nouvelle variable", "Insertion d'une variable initiale").mb_str());
 
     if ( variableName == "" )
         return;
@@ -226,7 +226,7 @@ void InitialVariablesDialog::OnRenameVarSelected(wxCommandEvent& event)
     if ( !variables.HasVariable(selectedVariable) )
         return;
 
-    string newName = string(wxGetTextFromUser("Entrez le nouveau nom de la variable", "Nom de la variable", variables.ObtainVariable(selectedVariable).GetName()).mb_str());
+    std::string newName = std::string(wxGetTextFromUser("Entrez le nouveau nom de la variable", "Nom de la variable", variables.ObtainVariable(selectedVariable).GetName()).mb_str());
 
     if ( variables.HasVariable(newName) )
     {
@@ -243,7 +243,7 @@ void InitialVariablesDialog::OnRenameVarSelected(wxCommandEvent& event)
  */
 void InitialVariablesDialog::OnMoveUpVarSelected(wxCommandEvent& event)
 {
-    vector < Variable > & variablesVector = variables.GetVariablesVector();
+    std::vector < Variable > & variablesVector = variables.GetVariablesVector();
 
     for (unsigned int i = 1;i<variablesVector.size();++i)
     {
@@ -269,7 +269,7 @@ void InitialVariablesDialog::OnMoveUpVarSelected(wxCommandEvent& event)
  */
 void InitialVariablesDialog::OnMoveDownVarSelected(wxCommandEvent& event)
 {
-    vector < Variable > & variablesVector = variables.GetVariablesVector();
+    std::vector < Variable > & variablesVector = variables.GetVariablesVector();
 
     for (unsigned int i = 0;i<variablesVector.size()-1;++i)
     {
@@ -298,7 +298,7 @@ void InitialVariablesDialog::OnEditVarSelected(wxCommandEvent& event)
     if ( !variables.HasVariable(selectedVariable) )
         return;
 
-    string value = string(wxGetTextFromUser("Entrez la valeur initiale de la variable", "Valeur initiale", variables.GetVariableString(selectedVariable)).mb_str());
+    std::string value = std::string(wxGetTextFromUser("Entrez la valeur initiale de la variable", "Valeur initiale", variables.GetVariableString(selectedVariable)).mb_str());
 
     variables.ObtainVariable(selectedVariable).SetString(value);
     variablesList->SetItem(variablesList->FindItem(-1, selectedVariable), 1, value);

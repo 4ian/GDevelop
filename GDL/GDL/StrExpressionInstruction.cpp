@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -12,9 +12,4 @@ objectFunction(NULL),
 automatismFunction(NULL)
 {
     //ctor
-}
-
-StrExpressionInstruction::~StrExpressionInstruction()
-{
-    //dtor
 }

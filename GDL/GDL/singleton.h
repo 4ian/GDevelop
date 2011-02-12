@@ -17,7 +17,7 @@ protected:
 
 public:
     // Interface publique
-    static T *getInstance()
+    static T *GetInstance()
     {
         if ( NULL == _singleton )
         {

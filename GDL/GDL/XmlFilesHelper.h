@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -18,11 +18,30 @@
 class XmlFile
 {
     public :
+
+        /**
+         * Open file
+         */
         XmlFile(std::string filename) : doc(filename.c_str()), modified(false) { doc.LoadFile(); };
+
+        /**
+         * Save file is the document was marked as modified.
+         */
         ~XmlFile() { if (modified) doc.SaveFile(); }
 
+        /**
+         * Set the file to be saved when the object is destroyed.
+         */
         void MarkAsModified() { modified = true; }
+
+        /**
+         * Access to the tinyxml representation of the file
+         */
         TiXmlDocument & GetTinyXmlDocument() { return doc; };
+
+        /**
+         * Access to the tinyxml representation of the file
+         */
         const TiXmlDocument & GetTinyXmlDocument() const { return doc; };
 
     private :

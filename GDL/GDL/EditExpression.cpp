@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -347,7 +347,7 @@ lastErrorPos(std::string::npos)
 
     //Prepare keyword highlighting
     std::string keywords;
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = GDpriv::ExtensionsManager::getInstance()->GetExtensions();
+    const vector < boost::shared_ptr<ExtensionBase> > extensions = GDpriv::ExtensionsManager::GetInstance()->GetExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -467,7 +467,7 @@ void EditExpression::RefreshLists()
     ValList->DeleteAllItems();
     ValList->AddRoot( _( "Toutes les valeurs spéciales" ), 0 );
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects expressions

@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -13,7 +13,12 @@
 #include <boost/shared_ptr.hpp>
 class TiXmlElement;
 
+namespace GDpriv
+{
+
 /**
+ * \brief Internal class representing a "physical" source file.
+ *
  * SourceFile represents a "physical" source file that must be compiled
  * so as to be used by the game as a dynamic extension.
  */
@@ -73,6 +78,8 @@ private:
 struct ExternalSourceFileHasName : public std::binary_function<boost::shared_ptr<SourceFile>, std::string, bool> {
     bool operator()(const boost::shared_ptr<SourceFile> & externalEvents, std::string name) const { return externalEvents->GetFileName() == name; }
 };
+
+}
 
 #endif // SOURCEFILE_H
 

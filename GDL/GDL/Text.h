@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef TEXT_H
 #define TEXT_H
 #include <SFML/Graphics.hpp>
@@ -6,8 +11,8 @@
 using namespace std;
 
 /**
- * Old class for drawing objects.
- * Do not use this anymore.
+ * \brief Old class for drawing objects.
+ * \deprecated Do not use this anymore, but Text objects instead.
  */
 class GD_API Text
 {

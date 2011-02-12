@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -13,7 +13,8 @@
 #undef LoadImage //prevent windows.h polluting everything
 
 /**
- * A sprite contains a SFML sprite to be display,
+ * \brief Game Develop Sprite class.
+ * A sprite contains a SFML sprite to be displayed,
  * some points, and can also have its own image ( rather than a image from ImageManager ).
  */
 class GD_API Sprite

@@ -1,9 +1,17 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef AUDIOEXTENSION_H
 #define AUDIOEXTENSION_H
 #include "GDL/ExtensionBase.h"
 class Instruction;
 class ResourcesMergingHelper;
 
+/**
+ * Internal builtin extension providing audio features.
+ */
 class AudioExtension : public ExtensionBase
 {
     public:

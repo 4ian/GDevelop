@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -17,6 +17,9 @@
 #include "GDL/SourceFileBuilder.h"
 #include "GDL/CommonTools.h"
 #include "GDL/SourceFile.h"
+
+namespace GDpriv
+{
 
 SourceFileBuilder::SourceFileBuilder(wxGauge * progressGauge_, wxStaticText * statusText_) :
     currentBuildProcess(NULL),
@@ -43,16 +46,37 @@ SourceFileBuilder::SourceFileBuilder(wxGauge * progressGauge_, wxStaticText * st
 
 void BuildProcess::OnTerminate(int pid, int status)
 {
+    std::cout << "OnTerminate";
     while ( HasInput() )  //Be sure we've got all output
         ;
 
     //Transfer logs and notify parent task is ended.
     std::copy(outputErrors.begin(), outputErrors.end(), std::back_inserter(m_parent->errors));
+    cout << "status" << status;
     m_parent->OnCurrentBuildProcessTerminated(status == 0);
+
+    std::cout << "OnTerminateEND";
+}
+
+bool SourceFileBuilder::BuildNeeded()
+{
+    for (unsigned int currentFileBuilded = 0;currentFileBuilded<sourceFiles.size();++currentFileBuilded)
+    {
+        if ( !wxFileExists(sourceFiles[currentFileBuilded]->GetFileName()) )
+            return true;
+
+        wxFileName fileInfo(sourceFiles[currentFileBuilded]->GetFileName());
+        if ( std::find(fileExtensionsToCompile.begin(), fileExtensionsToCompile.end(), string(fileInfo.GetExt().mb_str())) != fileExtensionsToCompile.end()
+             && sourceFiles[currentFileBuilded]->GetLastBuildTimeStamp() < fileInfo.GetModificationTime().GetTicks() )
+            return true;
+    }
+
+    return false;
 }
 
 bool SourceFileBuilder::LaunchSourceFilesBuild()
 {
+    std::cout << "LaunchSourceFilesBuild";
     if (IsBuilding()) return false; //Make sure another build is not launched
 
     state = 1;
@@ -65,6 +89,7 @@ bool SourceFileBuilder::LaunchSourceFilesBuild()
     //Launch build process
     OnCurrentBuildProcessTerminated(true);
 
+    std::cout << "LaunchSourceFilesBuildRETURNTRUE";
     return true;
 }
 
@@ -73,6 +98,7 @@ bool SourceFileBuilder::LaunchSourceFilesBuild()
  */
 void SourceFileBuilder::OnCurrentBuildProcessTerminated(bool success)
 {
+    std::cout << "OnCurrentBuildProcessTerminated";
     if ( currentBuildProcess )
     {
         std::cout << "Task ended." << std::endl;
@@ -146,7 +172,7 @@ void SourceFileBuilder::OnCurrentBuildProcessTerminated(bool success)
             {
                 wxFileName fileInfo(sourceFiles[i]->GetFileName());
                 if ( std::find(fileExtensionsToCompile.begin(), fileExtensionsToCompile.end(), string(fileInfo.GetExt().mb_str())) != fileExtensionsToCompile.end() )
-                    sourcesFilesToLink.push_back(string(fileInfo.GetPath().mb_str())+"/"+string(fileInfo.GetName().mb_str())+".o");
+                    sourcesFilesToLink.push_back(string(fileInfo.GetPath().mb_str())+string(fileInfo.GetName().mb_str())+".o");
             }
 
             if ( !LinkSourceFiles(sourcesFilesToLink) )
@@ -177,6 +203,7 @@ void SourceFileBuilder::OnCurrentBuildProcessTerminated(bool success)
  */
 bool SourceFileBuilder::BuildSourceFile(std::string filename)
 {
+    std::cout << "BuildSourceFile";
     wxFileName file(filename);
 
     std::string includesStr = " -I"+pathManager.gdlIncludeDir+" -I"+pathManager.wxwidgetsIncludeDir+" -I"+
@@ -209,7 +236,7 @@ bool SourceFileBuilder::BuildSourceFile(std::string filename)
             definesStr += " -D"+defines[i];
     }
 
-    std::string cmd = string(wxString(pathManager.gccCompilerExecutablePath+" -O2 -Wall -m32 "+definesStr+" "+includesStr+" -c \""+filename+"\" -o \""+file.GetPath()+"/"+file.GetName()+".o\"").mb_str());
+    std::string cmd = string(wxString(pathManager.gccCompilerExecutablePath+" -O2 -Wall -m32 "+definesStr+" "+includesStr+" -c \""+filename+"\" -o \""+file.GetPath()+file.GetName()+".o\"").mb_str());
     std::cout << "Compiling "<< filename<<"..." << std::endl;
     std::cout << cmd << std::endl;
 
@@ -221,6 +248,7 @@ bool SourceFileBuilder::BuildSourceFile(std::string filename)
         return false;
     }
 
+    std::cout << "ProcessSTARTED";
     currentBuildProcess = process;
     return true;
 }
@@ -230,6 +258,7 @@ bool SourceFileBuilder::BuildSourceFile(std::string filename)
  */
 bool SourceFileBuilder::LinkSourceFiles(std::vector<std::string> files)
 {
+    std::cout << "LinkSourceFiles";
     std::string libsDirStr = " -L"+pathManager.gdlLibDir+" -L"+pathManager.wxwidgetsLibDir+" -L"+pathManager.sfmlLibDir;
     std::string libsStr = gdlLibs+" "+wxwidgetsLibs+" "+sfmlLibs+" "+osLibs;
 
@@ -237,7 +266,7 @@ bool SourceFileBuilder::LinkSourceFiles(std::vector<std::string> files)
     for (unsigned int i = 0;i<files.size();++i)
         filesStr += " \""+files[i]+"\"";
 
-    std::string cmd = pathManager.gccCompilerExecutablePath+" -shared -Wl,--dll "+libsDirStr +" " + filesStr +" -o test.dxgd -s " + libsStr + " ";
+    std::string cmd = pathManager.gccCompilerExecutablePath+" -shared -Wl,--dll "+libsDirStr +" " + filesStr +" -o dynext.dxgd -s " + libsStr + " ";
     std::cout << "Linking..." << std::endl;
 
     BuildProcess * process = new BuildProcess(this);
@@ -247,6 +276,7 @@ bool SourceFileBuilder::LinkSourceFiles(std::vector<std::string> files)
         return false;
     }
 
+    std::cout << "ProcessSTARTED";
     currentBuildProcess = process;
     return true;
 }
@@ -285,6 +315,8 @@ bool BuildProcess::HasInput()
     }
 
     return hasInput;
+}
+
 }
 
 #endif

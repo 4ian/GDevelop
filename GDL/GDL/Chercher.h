@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -23,8 +23,8 @@
 using namespace std;
 
 /**
- * Deprecated. Do not use it anymore.
- * Old class to pick objects
+ * Old class picking objects
+ * \deprecated Use ObjectsConcerned now.
  */
 class GD_API Picker
 {

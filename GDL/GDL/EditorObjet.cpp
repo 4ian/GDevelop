@@ -740,11 +740,9 @@ void EditorObjet::OnBt7Toggle( wxCommandEvent& event )
 
 bool EditorObjet::AnimationAndDirectionValid()
 {
-    cout << "testanim";
     if ( animation < object.GetAnimationsNumber() && direction < object.GetAnimation( animation ).GetDirectionsNumber())
         return true;
 
-    cout << "AnimNOTvalid";
     return false;
 }
 
@@ -891,7 +889,7 @@ void EditorObjet::OnNormalCheckSelect( wxCommandEvent& event )
 
 void EditorObjet::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(47);
 }
 
@@ -977,7 +975,7 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
 
     wxSize size = thumbsPanel->GetSize();
 
-    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::getInstance();
+    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
 
     //Fond gris avec des flèches
     dc.SetPen(wxPen(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWFRAME )));
@@ -1066,7 +1064,7 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
 
     wxSize size = imagePanel->GetSize();
 
-    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::getInstance();
+    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
 
     //Fond en damier
     dc.SetBrush(bitmapGUIManager->transparentBg);

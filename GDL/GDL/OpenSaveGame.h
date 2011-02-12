@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -14,7 +14,7 @@
 using namespace std;
 
 /**
- * Class used so as to save and open games files.
+ * Internal class used so as to save and open games files.
  */
 class GD_API OpenSaveGame
 {

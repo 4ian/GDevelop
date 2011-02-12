@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -56,8 +56,8 @@ void DynamicExtensionCallerEvent::Preprocess(const Game & game, RuntimeScene & s
         return;
     }
 
-    if ( GDpriv::DynamicExtensionsManager::getInstance()->HasEvent(dynamicExtensionEventName) )
-        dynamicExtensionEvent = GDpriv::DynamicExtensionsManager::getInstance()->CreateEvent(dynamicExtensionEventName);
+    if ( GDpriv::DynamicExtensionsManager::GetInstance()->HasEvent(dynamicExtensionEventName) )
+        dynamicExtensionEvent = GDpriv::DynamicExtensionsManager::GetInstance()->CreateEvent(dynamicExtensionEventName);
     else
         wxLogStatus(_("L'évènement C++ nommé")+" \""+dynamicExtensionEventName+"\" "+_("n'a pas été trouvé.\nAssurez vous de l'avoir declaré dans le fichier de déclaration."));
 }
@@ -74,7 +74,7 @@ void DynamicExtensionCallerEvent::EditEvent(wxWindow* parent_, Game & game_, Sce
  */
 void DynamicExtensionCallerEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
 
     if ( !selected )
     {
@@ -95,7 +95,7 @@ void DynamicExtensionCallerEvent::Render(wxBufferedPaintDC & dc, int x, int y, u
 
     renderingHelper->DrawNiceRectangle(dc, rect, color1, color2, color3, color4, renderingHelper->eventBorderColor);
 
-    dc.DrawBitmap( wxBitmap( "res/link48.png", wxBITMAP_TYPE_ANY ), x+4, y + 4, true);
+    dc.DrawBitmap( wxBitmap( "res/cppevent48.png", wxBITMAP_TYPE_ANY ), x+4, y + 4, true);
 
     dc.SetTextForeground( wxColour( 0, 0, 0 ) );
     dc.SetTextBackground( wxColour( 255, 255, 255 ) );

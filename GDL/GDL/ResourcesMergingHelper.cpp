@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -28,7 +28,7 @@ void InventoryEventsResources(const Game & game, vector < BaseEventSPtr > & even
     std::vector< boost::shared_ptr<ExtensionBase> > allGameExtensions;
     for (unsigned int i = 0;i<game.extensionsUsed.size();++i)
     {
-        boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::getInstance()->GetExtension(game.extensionsUsed[i]);
+        boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::GetInstance()->GetExtension(game.extensionsUsed[i]);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() )
             allGameExtensions.push_back(extension);

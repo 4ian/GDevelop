@@ -57,7 +57,7 @@ ExtensionsLoader *ExtensionsLoader::_singleton = NULL;
 
 void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     //Built-in extensions
     extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new ExtensionSprite()) );
@@ -133,7 +133,7 @@ void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
 
 void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     Handle extensionHdl = OpenLibrary(fullpath.c_str());
     if (extensionHdl == NULL)
     {

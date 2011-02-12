@@ -14,7 +14,7 @@ class GD_API FontManager
 public:
     const sf::Font * GetFont(string fontName);
 
-    static FontManager *getInstance()
+    static FontManager *GetInstance()
     {
         if ( NULL == _singleton )
         {

@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -670,7 +670,7 @@ void EditorImages::OnChercherBtClick( wxCommandEvent& event )
 
 void EditorImages::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::getInstance();
+    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(9);
 }
 
@@ -828,7 +828,7 @@ void EditorImages::OnapercuPanelPaint(wxPaintEvent& event)
 
     wxSize size = apercuPanel->GetSize();
 
-    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::getInstance();
+    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
 
     //Fond en damier
     dc.SetBrush(bitmapGUIManager->transparentBg);

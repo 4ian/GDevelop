@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -34,7 +34,7 @@ Object::Object(string name_) :
         zOrder( 0 ),
         hidden( false )
 {
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
     objectId = objectIdentifiersManager->GetOIDfromName(name_);
 
     this->ClearForce();
@@ -80,7 +80,7 @@ void Object::SetName(string name_)
 {
     name = name_;
 
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
     objectId = objectIdentifiersManager->GetOIDfromName(name_);
 }
 

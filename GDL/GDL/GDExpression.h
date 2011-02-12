@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef GDEXPRESSION_H
 #define GDEXPRESSION_H
 
@@ -23,7 +28,8 @@ typedef boost::shared_ptr<Object> ObjSPtr;
 /**
  * Class representing an expression.
  * Hold the plain expression string, the functions to call
- * beforing evaluating the expression with a parser, .
+ * beforing evaluating the expression with a parser, the value of the expression as an operator...
+ * All of these values can be used thanks to GetAs[...] members functions.
  */
 class GD_API GDExpression
 {

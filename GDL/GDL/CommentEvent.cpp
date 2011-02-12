@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -67,7 +67,7 @@ void CommentEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, Ma
  */
 void CommentEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
 
     const int sideSeparation = 3; //Espacement en pixel entre le texte et la bordure
     dc.SetFont( renderingHelper->GetFont() );
@@ -117,7 +117,7 @@ unsigned int CommentEvent::GetRenderedHeight(unsigned int width) const
 {
     if ( eventHeightNeedUpdate )
     {
-        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
 
         wxMemoryDC dc;
         wxBitmap fakeBmp(1,1);

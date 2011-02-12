@@ -39,7 +39,7 @@ FileExtension::FileExtension()
 
     DECLARE_ACTION("LoadFile",
                    _("Charger un fichier en mémoire"),
-                   _("Cette action charge le fichier XML en mémoire, pour permettre de lire et écrire dedans.\nIl est possible de lire et d'écrire dans un fichier XML sans passer par cette action, mais les performances seront moindres."),
+                   _("Cette action charge le fichier XML en mémoire, pour permettre de lire et écrire dedans.\nIl est possible de lire et d'écrire dans un fichier XML sans passer par cette action, mais les performances seront moindres.\nN'oubliez surtout pas de décharger le fichier de la mémoire une fois les opérations terminées."),
                    _("Charger le fichier XML _PARAM0_ en mémoire"),
                    _("Fichiers XML"),
                    "res/actions/fichier24.png",

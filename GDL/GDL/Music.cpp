@@ -85,6 +85,6 @@ void Music::SetVolume(float volume_)
 ////////////////////////////////////////////////////////////
 void Music::UpdateVolume()
 {
-    SoundManager * soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
     music.SetVolume(volume * soundManager->GetGlobalVolume()/100.f);
 }

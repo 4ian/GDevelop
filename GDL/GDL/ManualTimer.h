@@ -4,7 +4,6 @@
 
 using namespace std;
 /**
- *  A manual timer.
  *  A manual timer is a timer which is updated manually
  *  by calling UpdateTime.
  */

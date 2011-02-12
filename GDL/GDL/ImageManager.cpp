@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -16,7 +16,7 @@ void MessageLoading( string message, float avancement )
 ImageManager::ImageManager() :
 game(NULL)
 {
-    RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
+    RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
     badImage = boost::shared_ptr<sf::Image>(ressourcesLoader->LoadImage("vide.png"));
 }
 
@@ -34,7 +34,7 @@ boost::shared_ptr<sf::Image> ImageManager::GetSFMLImage(std::string name) const
     cout << "ImageManager: Load " << name << endl;
 
     //Load only an image when necessary
-    RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
+    RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
     for (unsigned int i = 0;i<game->images.size();++i)
     {
     	if ( game->images[i].nom == name )
@@ -72,7 +72,7 @@ void ImageManager::ReloadImage(std::string name) const
     	{
             cout << "ImageManager: Reload " << name << endl;
 
-    	    boost::shared_ptr<sf::Image> newImage = boost::shared_ptr<sf::Image>(RessourcesLoader::getInstance()->LoadImage( game->images[i].file ));
+    	    boost::shared_ptr<sf::Image> newImage = boost::shared_ptr<sf::Image>(RessourcesLoader::GetInstance()->LoadImage( game->images[i].file ));
 
             *image = *newImage;
     	    image->SetSmooth(game->images[i].smooth);

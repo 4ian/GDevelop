@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -9,7 +9,7 @@
 #include <SFML/Graphics.hpp>
 
 /**
- * A camera is used to render the scene.
+ * A camera is used to change the area of a scene to be rendered.
  */
 class GD_API Camera
 {
@@ -17,14 +17,11 @@ class GD_API Camera
         Camera();
         virtual ~Camera() {};
 
-        bool defaultSize;
-        bool defaultViewport;
+        bool defaultSize; ///< True if the camera use the default window size
+        bool defaultViewport; ///< True if the camera use the default viewport size
 
-        sf::FloatRect viewport;
-        sf::Vector2f size;
-
-    protected:
-    private:
+        sf::FloatRect viewport; ///< Viewport, the position where the camera must be rendered in the window. Used as a factor the window size.
+        sf::Vector2f size; ///< Size of the area
 };
 
 #endif // CAMERA_H

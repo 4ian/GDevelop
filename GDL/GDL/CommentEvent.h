@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -6,13 +6,8 @@
 #ifndef COMMENTEVENT_H
 #define COMMENTEVENT_H
 
-/*#include <boost/shared_ptr.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/nvp.hpp>*/
 #include "Event.h"
 class TiXmlElement;
-
 #if defined(GD_IDE_ONLY)
 class Scene;
 class Game;
@@ -20,6 +15,9 @@ class MainEditorCommand;
 class wxWindow;
 #endif
 
+/**
+ * Internal builtin Comment Event, allowing to add a simple text in events.
+ */
 class GD_API CommentEvent : public BaseEvent
 {
     public:
@@ -32,16 +30,16 @@ class GD_API CommentEvent : public BaseEvent
         #endif
         void LoadFromXml(const TiXmlElement * eventElem);
 
-        int r;
-        int v;
-        int b;
+        int r; ///< Background color Red component
+        int v; ///< Background color Green component
+        int b; ///< Background color Blue component
 
-        int textR;
-        int textG;
-        int textB;
+        int textR; ///< Text color Red component
+        int textG; ///< Text color Green component
+        int textB; ///< Text color Blue component
 
-        string com1;
-        string com2;
+        string com1; ///< Comment string
+        string com2; ///< Optional second comment string
 
 #if defined(GD_IDE_ONLY)
         /**

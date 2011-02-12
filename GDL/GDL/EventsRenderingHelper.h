@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -19,7 +19,7 @@ class Instruction;
 class GD_API EventsRenderingHelper
 {
     public:
-        static EventsRenderingHelper * getInstance();
+        static EventsRenderingHelper * GetInstance();
         static void kill();
 
         void DrawNiceRectangle(wxDC & dc, const wxRect & rect, const wxColor & color1, const wxColor & color2,const wxColor & color3,const wxColor & color4,const wxColor & color5) const;

@@ -32,7 +32,7 @@ public:
      */
     inline std::string GetExtensionsDir() const { return directory; }
 
-    static ExtensionsLoader *getInstance()
+    static ExtensionsLoader *GetInstance()
     {
         if ( NULL == _singleton )
         {

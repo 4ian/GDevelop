@@ -21,7 +21,7 @@ bool CondMusicPlaying( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
 
-    if (SoundManager::getInstance()->GetMusicOnChannel(canal)->GetStatus() == sf::Sound::Playing) return !condition.IsInverted();
+    if (SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetStatus() == sf::Sound::Playing) return !condition.IsInverted();
 
     return condition.IsInverted();
 }
@@ -34,7 +34,7 @@ bool CondMusicPaused( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
 
-    if (SoundManager::getInstance()->GetMusicOnChannel(canal)->GetStatus() == sf::Sound::Paused) return !condition.IsInverted();
+    if (SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetStatus() == sf::Sound::Paused) return !condition.IsInverted();
 
     return condition.IsInverted();
 }
@@ -47,7 +47,7 @@ bool CondMusicStopped( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
 
-    if (SoundManager::getInstance()->GetMusicOnChannel(canal)->GetStatus() == sf::Sound::Stopped) return !condition.IsInverted();
+    if (SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetStatus() == sf::Sound::Stopped) return !condition.IsInverted();
 
     return condition.IsInverted();
 }
@@ -61,7 +61,7 @@ bool CondSoundPlaying( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    if (SoundManager::getInstance()->GetSoundOnChannel(canal)->GetStatus() == sf::Sound::Playing) return !condition.IsInverted();
+    if (SoundManager::GetInstance()->GetSoundOnChannel(canal)->GetStatus() == sf::Sound::Playing) return !condition.IsInverted();
 
     return condition.IsInverted();
 }
@@ -74,7 +74,7 @@ bool CondSoundPaused( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    if (SoundManager::getInstance()->GetSoundOnChannel(canal)->GetStatus() == sf::Sound::Paused) return !condition.IsInverted();
+    if (SoundManager::GetInstance()->GetSoundOnChannel(canal)->GetStatus() == sf::Sound::Paused) return !condition.IsInverted();
 
     return condition.IsInverted();
 }
@@ -87,7 +87,7 @@ bool CondSoundStopped( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    if (SoundManager::getInstance()->GetSoundOnChannel(canal)->GetStatus() == sf::Sound::Stopped) return !condition.IsInverted();
+    if (SoundManager::GetInstance()->GetSoundOnChannel(canal)->GetStatus() == sf::Sound::Stopped) return !condition.IsInverted();
 
     return condition.IsInverted();
 }
@@ -97,7 +97,7 @@ bool CondSoundStopped( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
  */
 bool CondGlobalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    float volume = SoundManager::getInstance()->GetGlobalVolume();
+    float volume = SoundManager::GetInstance()->GetGlobalVolume();
 
     if (   (condition.GetParameter(1).GetAsCompOperator() == GDExpression::Equal && volume == condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned))
         || (condition.GetParameter(1).GetAsCompOperator() == GDExpression::Inferior && volume < condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned))
@@ -120,7 +120,7 @@ bool CondSoundCanalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConce
     int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    float volume = SoundManager::getInstance()->GetSoundOnChannel(canal)->sound.GetVolume();
+    float volume = SoundManager::GetInstance()->GetSoundOnChannel(canal)->sound.GetVolume();
 
     if (   (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Equal && volume == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
         || (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Inferior && volume < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
@@ -143,7 +143,7 @@ bool CondMusicCanalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConce
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
         return false;
 
-    SoundManager * soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
     float volume = soundManager->GetMusicOnChannel(canal)->music.GetVolume();
 
     if (   (condition.GetParameter(2).GetAsCompOperator() == GDExpression::Equal && volume == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned))
@@ -167,7 +167,7 @@ bool CondMusicChannelPitch( RuntimeScene & scene, ObjectsConcerned & objectsConc
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
         return false;
 
-    SoundManager * soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
     float pitch = soundManager->GetMusicOnChannel(canal)->music.GetPitch();
 
     //optimisation : le test de signe en premier
@@ -194,7 +194,7 @@ bool CondSoundChannelPitch( RuntimeScene & scene, ObjectsConcerned & objectsConc
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
         return false;
 
-    SoundManager * soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
     float pitch = soundManager->GetSoundOnChannel(canal)->GetPitch();
 
     //optimisation : le test de signe en premier

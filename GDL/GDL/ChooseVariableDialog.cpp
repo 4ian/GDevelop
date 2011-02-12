@@ -313,7 +313,7 @@ void ChooseVariableDialog::OnvariablesListItemActivated(wxListEvent& event)
 
 void ChooseVariableDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess::getInstance()->DisplaySection(242);
+    HelpFileAccess::GetInstance()->DisplaySection(242);
 }
 
 /**

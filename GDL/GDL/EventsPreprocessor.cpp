@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -18,7 +18,7 @@
  */
 void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector < Instruction > & conditions, bool & eventHasToBeDeleted)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     for (unsigned int cId =0;cId < conditions.size();++cId)
     {
@@ -108,7 +108,7 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
  */
 void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < Instruction > & actions)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     for (unsigned int aId =0;aId < actions.size();++aId)
     {
@@ -225,6 +225,9 @@ void EventsPreprocessor::PreprocessEvents(const RuntimeScene & scene, vector < B
     }
 }
 
+/**
+ * Remove events not executed
+ */
 void EventsPreprocessor::DeleteUselessEvents(vector < BaseEventSPtr > & events)
 {
     for ( unsigned int eId = events.size()-1; eId < events.size();--eId )

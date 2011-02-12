@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/CommonConversions.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"

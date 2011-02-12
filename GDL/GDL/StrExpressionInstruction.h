@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -22,7 +22,9 @@ typedef std::vector < boost::shared_ptr<Object> > ObjList;
 typedef boost::shared_ptr<Object> ObjSPtr;
 
 /**
- * Instruction ( function or object function ) of a string expression
+ * \brief Instruction ( function or object function ) of a string expression.
+ * Each string expression is composed of several StrExpressionInstruction at runtime,
+ * which are processed one by one to generate the final string.
  */
 class GD_API StrExpressionInstruction
 {
@@ -32,15 +34,13 @@ class GD_API StrExpressionInstruction
 
     public:
         StrExpressionInstruction();
-        virtual ~StrExpressionInstruction();
+        virtual ~StrExpressionInstruction() {};
 
-        PtrFunction                 function;
-        PtrObjectFunction           objectFunction;
-        PtrAutomatismFunction       automatismFunction;
+        PtrFunction                 function; ///< Function to call
+        PtrObjectFunction           objectFunction; ///< (Optional) Object function to call
+        PtrAutomatismFunction       automatismFunction; ///< (Optional) Automatism function to call
 
-        std::vector<GDExpression>   parameters;
-
-    private:
+        std::vector<GDExpression>   parameters; ///< Parameters to be passed to function
 };
 
 #endif // STREXPRESSIONINSTRUCTION_H

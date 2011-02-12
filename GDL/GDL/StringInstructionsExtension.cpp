@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/StringInstructionsExtension.h"
 #include "GDL/StringExpressions.h"
 #include "GDL/CommentEvent.h"

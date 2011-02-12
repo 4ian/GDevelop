@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -15,7 +15,7 @@
 using namespace std;
 
 /**
- * Animation used by Sprite objects. Contains directions.
+ * \brief Animation class mainly used by Sprite objects. Contains directions.
  */
 class GD_API Animation
 {
@@ -23,12 +23,34 @@ class GD_API Animation
         Animation();
         virtual ~Animation() {};
 
-        const Direction & GetDirection(unsigned int nb) const;
-        Direction & GetDirectionToModify(unsigned int nb);
+        /**
+         * Return the n-th direction
+         */
+        const Direction & GetDirection(unsigned int n) const;
+
+        /**
+         * Return the n-th direction
+         */
+        Direction & GetDirectionToModify(unsigned int n);
+
+        /**
+         * Change a direction
+         */
         void SetDirection(const Direction & direction, unsigned int nb);
 
+        /**
+         * Change direction count
+         */
         void SetDirectionsNumber(unsigned int nb);
+
+        /**
+         * Get direction count
+         */
         unsigned int GetDirectionsNumber() const { return directionsNumber; };
+
+        /**
+         * True if there is no direction in the animation
+         */
         inline bool HasNoDirections() const { return directions.empty(); };
 
         bool typeNormal;

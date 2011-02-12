@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -185,7 +185,7 @@ void PropImage::OnapercuPanelPaint(wxPaintEvent& event)
     wxPaintDC dc( apercuPanel ); //Création obligatoire du wxBufferedPaintDC
     wxSize size = apercuPanel->GetSize();
 
-    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::getInstance();
+    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
 
     //Fond en damier
     dc.SetBrush(bitmapGUIManager->transparentBg);

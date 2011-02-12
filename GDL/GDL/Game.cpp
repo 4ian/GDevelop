@@ -10,6 +10,7 @@
 #define _(x) x
 #endif
 
+using namespace GDpriv;
 
 Game::Game() :
 name(_("Projet")),

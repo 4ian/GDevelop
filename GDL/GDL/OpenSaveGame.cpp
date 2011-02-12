@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -111,7 +111,7 @@ void OpenSaveGame::OpenFromString(string text)
 ////////////////////////////////////////////////////////////
 void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     bool notBackwardCompatible = false;
 
@@ -463,7 +463,7 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, T
 {
     TiXmlElement * elemScene = elem->FirstChildElement("Objet");
 
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     //Passage en revue des objets
     while ( elemScene )
@@ -632,7 +632,7 @@ void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement
 void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElement * elem)
 {
     const TiXmlElement * elemScene = elem->FirstChildElement();
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     //Passage en revue des évènements
     while ( elemScene )
@@ -920,7 +920,7 @@ void OpenSaveGame::AdaptEventsFromGD138892(vector < BaseEventSPtr > & list)
 
 std::string AdaptLegacyMathExpression(std::string expression, Game & game, Scene & scene)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     string newExpression;
     size_t lastPos = 0;
@@ -1187,7 +1187,7 @@ std::string AdaptLegacyTextExpression(std::string expression, Game & game, Scene
  */
 void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list, Game & game, Scene & scene)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     for (unsigned int eId = 0;eId < list.size();++eId)
     {
@@ -1261,7 +1261,7 @@ void OpenSaveGame::AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list,
  */
 void OpenSaveGame::AdaptExpressionsFromGD149552(vector < BaseEventSPtr > & list, Game & game, Scene & scene)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     for (unsigned int eId = 0;eId < list.size();++eId)
     {
@@ -1330,7 +1330,7 @@ void OpenSaveGame::AdaptExpressionsFromGD149552(vector < BaseEventSPtr > & list,
  */
 void OpenSaveGame::AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list, Game & game, Scene & scene)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     for (unsigned int eId = 0;eId < list.size();++eId)
     {
@@ -1910,7 +1910,7 @@ void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<Object> > & list
 
         objet->SetAttribute( "nom", list.at( j )->GetName().c_str() );
 
-        GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+        GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
         objet->SetAttribute( "type", extensionsManager->GetStringFromTypeId(list.at( j )->GetTypeId()).c_str() );
 
         TiXmlElement * variables = new TiXmlElement( "Variables" );

@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -48,7 +48,7 @@ public:
     wxBitmap varBt;
     wxBitmap semitransparentHitBox;
 
-    static BitmapGUIManager *getInstance()
+    static BitmapGUIManager *GetInstance()
     {
         if ( NULL == _singleton )
             _singleton =  new BitmapGUIManager;

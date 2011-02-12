@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -7,7 +7,8 @@
 #define ROTATEDRECTANGLE_H
 
 /**
- * Defines a rotated rectangle
+ * Defines a rotated rectangle.
+ * Mainly used to define hit boxes.
  */
 class RotatedRectangle
 {

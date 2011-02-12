@@ -41,7 +41,7 @@ GDExpression::GDExpression(std::string plainString_) : plainString(plainString_)
 
     if (plainString == "yes" || plainString == "oui") boolEquivalent = true;
 
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
     oID = objectIdentifiersManager->GetOIDfromName(plainString);
 }
 

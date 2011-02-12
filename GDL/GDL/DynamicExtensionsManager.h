@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -15,6 +15,9 @@
 #include "GDL/DynamicExtensionBase.h"
 #include "GDL/DynamicLibrariesTools.h"
 
+/**
+ * \brief Contains classes meant to be used only internally by Game Develop
+ */
 namespace GDpriv
 {
 
@@ -38,7 +41,7 @@ class GD_API DynamicExtensionsManager
         bool HasEvent(std::string name) const;
         boost::shared_ptr<BaseEvent> CreateEvent(std::string name) const;
 
-        static DynamicExtensionsManager *getInstance()
+        static DynamicExtensionsManager *GetInstance()
         {
             if ( NULL == _singleton )
             {

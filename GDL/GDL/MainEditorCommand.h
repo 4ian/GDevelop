@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -12,8 +12,11 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/toplevel.h>
 #include <iostream>
+#include <algorithm>
+#include <vector>
 class BuildToolsPnl;
 class wxAuiManager;
+class SceneCanvas;
 
 /**
  *  MainEditorCommand is used to give access to some members of the mainEditor
@@ -70,10 +73,30 @@ class GD_API MainEditorCommand
          * Assert if no pointer has been set.
          */
         wxTopLevelWindow * GetMainEditor() { assert(mainEditor); return mainEditor; };
+
         /**
          * Set the pointer to the main editor.
          */
         void SetMainEditor(wxTopLevelWindow * mainEditor_) { mainEditor = mainEditor_; };
+
+        /**
+         * Set the pointer to the list managing scene locking shortcuts.
+         */
+        void SetScenesLockingShortcutsList(std::vector<SceneCanvas*> * scenesLockingShortcuts_) { scenesLockingShortcuts = scenesLockingShortcuts_; };
+
+        /**
+         * Add a scene to the list of scenes being previewed and so locking shortcuts
+         */
+        void LockShortcuts(SceneCanvas * sceneCanvas) { assert(scenesLockingShortcuts); scenesLockingShortcuts->push_back(sceneCanvas); }
+
+        /**
+         * Remove a scene from the list of scenes locking shortcuts.
+         */
+        void UnLockShortcuts(SceneCanvas * sceneCanvas)
+        {
+            assert(scenesLockingShortcuts);
+            scenesLockingShortcuts->erase(std::remove(scenesLockingShortcuts->begin(), scenesLockingShortcuts->end(), sceneCanvas), scenesLockingShortcuts->end());
+        }
 
     private:
 
@@ -82,6 +105,7 @@ class GD_API MainEditorCommand
         wxTopLevelWindow * mainEditor;
         BuildToolsPnl * buildToolsPnl;
         wxAuiManager * paneManager;
+        std::vector<SceneCanvas*> * scenesLockingShortcuts; ///< When a scene is being previewed, it is add to this list to disable shortcuts.
 };
 
 #endif // NEEDREFRESHCOMMAND_H

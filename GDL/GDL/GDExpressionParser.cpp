@@ -34,7 +34,7 @@ std::string ReplaceTildesBySpaces(std::string text)
 bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks)
 {
 
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     string expression = expressionPlainString;
 
     //Constants
@@ -115,7 +115,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                             instruction.function = &ExpAutomatismFunction;
                             instruction.automatismFunction = extensionsManager->GetAutomatismExpressionFunctionPtr(GetTypeIdOfAutomatism(game, scene, autoName), functionName);
 
-                            ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+                            ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
                             instructionInfos = extensionsManager->GetAutomatismExpressionInfos(objectIdentifiersManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, autoName)), functionName);
 
                             //Verify that object has automatism.
@@ -240,7 +240,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
 
 bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     string expression = expressionPlainString;
 
     //Constants
@@ -444,7 +444,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                         instruction.function = &ExpAutomatismStrFunction;
                         instruction.automatismFunction = extensionsManager->GetAutomatismStrExpressionFunctionPtr(GetTypeIdOfAutomatism(game, scene, autoName), functionName);
 
-                        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+                        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
                         vector < ParameterInfo > parametersInfos = extensionsManager->GetAutomatismStrExpressionInfos(objectIdentifiersManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, autoName)), functionName).parameters;
 
                         //Verify that object has automatism.

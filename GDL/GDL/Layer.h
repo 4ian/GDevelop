@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef LAYER_H
 #define LAYER_H
 #include <string>
@@ -7,20 +12,39 @@
 
 using namespace std;
 
+/**
+ * Represents a layer of a scene. Contains cameras.
+ * During runtime, RuntimeLayers are used instead of simple Layer.
+ */
 class GD_API Layer
 {
     public:
-        /** Default constructor */
         Layer();
-        /** Default destructor */
         virtual ~Layer();
 
+        /**
+         * Change layer name
+         */
         inline void SetName(string name_) { name = name_; }
+
+        /**
+         * Get layer name
+         */
         inline string GetName() const { return name; }
 
+        /**
+         * Change if layer is displayed or not
+         */
         inline void SetVisibility(bool isVisible_) { isVisible = isVisible_; }
+
+        /**
+         * True if layer will be displayed.
+         */
         inline bool GetVisibility() const { return isVisible; }
 
+        /**
+         * Change cameras count, automatically adding/removing them.
+         */
         inline void SetCamerasNumber(unsigned int n)
         {
             while ( cameras.size() < n)
@@ -30,13 +54,19 @@ class GD_API Layer
                 cameras.erase(cameras.begin()+cameras.size()-1);
         }
 
+        /**
+         * Get cameras count.
+         */
         inline unsigned int GetCamerasNumber() const { return cameras.size(); };
 
         inline const Camera & GetCamera(unsigned int n) const { if ( n >= GetCamerasNumber() ) return badCamera; return cameras[n]; }
         inline Camera & GetCamera(unsigned int n) { if ( n >= GetCamerasNumber() ) return badCamera; return cameras[n]; }
+
+        /**
+         * Delete a camera.
+         */
         inline void DeleteCamera(unsigned int n) { if ( n >= GetCamerasNumber() ) return; cameras.erase(cameras.begin()+n); }
 
-    protected:
     private:
 
         string name;

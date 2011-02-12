@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -157,7 +157,7 @@ void RepeatEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Ba
                          bool & conditionsSelected, bool & instructionsSelected)
 {
     const int repeatTextHeight = 20;
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
 
     //Test selection for the "Repeat x times"
     if ( y >= 0 && y <= repeatTextHeight )
@@ -235,7 +235,7 @@ void RepeatEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Ba
  */
 void RepeatEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
     const int repeatTextHeight = 20;
 
     //Draw event rectangle
@@ -272,7 +272,7 @@ unsigned int RepeatEvent::GetRenderedHeight(unsigned int width) const
 {
     if ( eventHeightNeedUpdate )
     {
-        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
         const int repeatTextHeight = 20;
 
         //Get maximum height needed

@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef AUTOMATISM_H
 #define AUTOMATISM_H
 
@@ -15,7 +20,7 @@ class MainEditorCommand;
 #endif
 
 /**
- * Automatism are linked to objects and provided automatic behaviours to these latters.
+ * \brief Automatism are linked to objects and provided automatic behaviours to these latters.
  */
 class GD_API Automatism
 {
@@ -24,35 +29,54 @@ class GD_API Automatism
         virtual ~Automatism() {};
         virtual boost::shared_ptr<Automatism> Clone() { return boost::shared_ptr<Automatism>(new Automatism(*this));}
 
+        /**
+         * Change the name identifying the automatism. Change also AutomatismId.
+         */
         void SetName(std::string name_);
+
+        /**
+         * Return the name identifying the automatism
+         */
         std::string GetName() { return name; }
+
+        /**
+         * Return the identifier identifying the automatism
+         */
         unsigned int GetAutomatismId() { return automatismId; }
 
+        /**
+         * Return the name identifying the type of the automatism
+         */
         std::string GetTypeName() { return type; }
+
+        /**
+         * Return the identifier identifying the type of the automatism
+         */
         unsigned int GetTypeId() { return typeId; }
-
-        /**
-         * Called -- one time -- when scene is loading
-         */
-        virtual void InitializeSharedDatas(RuntimeScene & scene, const Scene & loadedScene) {}
-
-        /**
-         * Called -- one time -- as a scene is closed
-         */
-        virtual void UnInitializeSharedDatas(RuntimeScene & scene) {}
 
         /**
          * Set the object owning this automatism
          */
         void SetOwner(Object* owner_) { object = owner_; OnOwnerChanged(); };
 
+        /**
+         * Called at each frame before events. Call DoStepPreEvents.
+         */
         inline void StepPreEvents(RuntimeScene & scene) { if (activated) DoStepPreEvents(scene); };
+
+        /**
+         * Called at each frame after events. Call DoStepPostEvents.
+         */
         inline void StepPostEvents(RuntimeScene & scene) { if (activated) DoStepPostEvents(scene); };
 
         /**
          * De/Activate the automatism
          */
         inline void Activate(bool enable = true) { activated = enable; };
+
+        /**
+         * Return true if the automatism is activated
+         */
         inline bool Activated() const { return activated; };
 
 
@@ -93,10 +117,10 @@ class GD_API Automatism
         virtual void OnOwnerChanged() {};
 
         Object* object; ///< Object owning the automatism
-        bool activated;
+        bool activated; ///< True if automatism is running
 
-        std::string name;
-        unsigned int automatismId;
+        std::string name; ///< Name of the automatism
+        unsigned int automatismId; ///< The automatismId is the "unsigned-int-equivalent" of the name.
 
         std::string type; ///< The type indicate of which type is the automatism. ( To test if we can do something, like actions, reserved to specific automatism with it )
         unsigned int typeId; /// The typeId is the "unsigned-int-equivalent" of the type.

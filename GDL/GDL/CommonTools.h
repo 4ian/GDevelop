@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -15,20 +15,35 @@
 
 using namespace std;
 
-int GD_API FindImage( const vector < Image > & vecteur, const string & chaine );
+/**
+ * Find an image in a list
+ */
+int GD_API FindImage( const vector < Image > & vector, const string & name );
 
 #ifdef __GNUC__
+/**
+ * Round the number to the nearest integer
+ * \ingroup Common programming tools
+ */
 inline int GDRound(float x)
 {
     return round(x);
 }
 #else
+/**
+ * Round the number to the nearest integer
+ * \ingroup Common programming tools
+ */
 inline double GDRound( double d )
 {
 return floor( d + 0.5 );
 }
 #endif
 
+/**
+ * Convert anything to an integer
+ * \ingroup Common programming tools
+ */
 template<typename T>
 int ToInt( const T & value )
 {
@@ -38,6 +53,10 @@ int ToInt( const T & value )
     return i;
 }
 
+/**
+ * Convert anything to a float
+ * \ingroup Common programming tools
+ */
 template<typename T>
 float ToFloat( const T & value )
 {
@@ -47,6 +66,10 @@ float ToFloat( const T & value )
     return f;
 }
 
+/**
+ * Convert anything to a double
+ * \ingroup Common programming tools
+ */
 template<typename T>
 double ToDouble( const T & value )
 {
@@ -56,6 +79,10 @@ double ToDouble( const T & value )
     return d;
 }
 
+/**
+ * Convert anything to a std::string
+ * \ingroup Common programming tools
+ */
 template<typename T>
 std::string ToString( const T & value )
 {

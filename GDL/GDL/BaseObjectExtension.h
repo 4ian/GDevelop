@@ -3,6 +3,9 @@
 
 #include "GDL/ExtensionBase.h"
 
+/**
+ * Internal builtin extension providing features for all objects
+ */
 class GD_API BaseObjectExtension : public ExtensionBase
 {
     public:
@@ -12,7 +15,7 @@ class GD_API BaseObjectExtension : public ExtensionBase
     private:
 
         //Put all in a single file result in a compilation
-        //which require large memory.
+        //which requires large memory.
         void DeclareExtensionFirstPart();
         void DeclareExtensionSecondPart();
 };

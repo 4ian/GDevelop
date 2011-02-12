@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -8,6 +8,9 @@
 
 #include "GDL/ExtensionBase.h"
 
+/**
+ *  Internal builtin extension providing features concerning cameras.
+ */
 class CameraExtension : public ExtensionBase
 {
     public:

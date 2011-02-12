@@ -29,7 +29,7 @@ public:
         helpController->DisplayContents();
     }
 
-    static HelpFileAccess *getInstance()
+    static HelpFileAccess *GetInstance()
     {
         if (NULL == _singleton)
             _singleton =  new HelpFileAccess;

@@ -8,6 +8,9 @@ class RuntimeScene;
 
 using namespace std;
 
+/**
+ * Internal class used to prepare events for runtime.
+ */
 class GD_API EventsPreprocessor
 {
     public:

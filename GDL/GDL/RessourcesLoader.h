@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -58,7 +58,7 @@ public:
      */
     void SetExeGD( const string & filename );
 
-    static RessourcesLoader *getInstance()
+    static RessourcesLoader *GetInstance()
     {
         if ( NULL == _singleton )
         {

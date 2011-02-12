@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -12,7 +12,7 @@
 using namespace std;
 
 /**
- * A container for and only for Game Develop variables. Used by objects, games and scenes.
+ * A container containing Game Develop variables. Used by objects, games and scenes.
  */
 class GD_API ListVariable
 {

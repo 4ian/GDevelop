@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -23,7 +23,8 @@
 using namespace std;
 
 /**
- * Deprecated Search for one object
+ * Search for one object
+ * \deprecated Use ObjectsConcerned class now.
  */
 int Picker::PickOneObject(const vector < boost::shared_ptr<Object> > *objets, const string nom)
 {

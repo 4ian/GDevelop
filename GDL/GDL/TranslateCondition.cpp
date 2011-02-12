@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -116,7 +116,7 @@ string TranslateCondition::LabelFromType( string type )
 ////////////////////////////////////////////////////////////
 wxBitmap TranslateCondition::BitmapFromType( string type )
 {
-    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::getInstance();
+    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
 
     if ( type == "" )
         return bitmapGUIManager->unknownBt;

@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -782,8 +782,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
             }
 
 /**
- * ParameterInfo contains user-friendly info about a parameter, only at edittime,
- * and information about what a parameter need
+ * \brief ParameterInfo contains user-friendly info about a parameter, only at edittime, and information about what a parameter need
  */
 class GD_API ParameterInfo
 {
@@ -803,8 +802,7 @@ class GD_API ParameterInfo
 };
 
 /**
- * Contains user-friendly infos about actions/conditions, only at edittime,
- * and members needed to setup an instruction
+ * \brief Contains user-friendly infos about actions/conditions, only at edittime, and members needed to setup an instruction
  */
 class GD_API InstructionInfos
 {
@@ -830,8 +828,7 @@ class GD_API InstructionInfos
 };
 
 /**
- * Contains user-friendly infos about expressions, only at edittime,
- * and members needed to setup an expression
+ * \brief Contains user-friendly infos about expressions, only at edittime, and members needed to setup an expression
  */
 class GD_API ExpressionInfos
 {
@@ -855,8 +852,7 @@ class GD_API ExpressionInfos
 };
 
 /**
- * Contains user-friendly infos about expressions, only at edittime,
- * and members needed to setup an expression
+ * \brief Contains user-friendly infos about expressions, only at edittime, and members needed to setup an expression
  */
 class GD_API StrExpressionInfos
 {
@@ -880,8 +876,7 @@ class GD_API StrExpressionInfos
 };
 
 /**
- * Contains user-friendly infos about event, only at edittime,
- * and members needed to create an event
+ * \brief Contains user-friendly infos about event, only at edittime, and members needed to create an event
  */
 class GD_API EventInfos
 {
@@ -901,8 +896,7 @@ class GD_API EventInfos
 };
 
 /**
- * Contains user-friendly infos about an automatism, only at edittime,
- * and members needed to create the automatism
+ * \brief Contains user-friendly infos about an automatism, only at edittime, and members needed to create the automatism
  */
 class GD_API AutomatismInfo
 {
@@ -929,7 +923,7 @@ class GD_API AutomatismInfo
 };
 
 /**
- * Struct for getting user-friendly infos about objects, only at edittime
+ * \brief Struct for getting user-friendly infos about objects, only at edittime
  */
 class GD_API ExtensionObjectInfos
 {
@@ -954,7 +948,7 @@ class GD_API ExtensionObjectInfos
 };
 
 /**
- * Class used in extension to be sure that extension is compatible.
+ * \brief Class used in extension to be sure that extension is compatible.
  */
 class GD_API CompilationInfos
 {
@@ -989,16 +983,16 @@ class GD_API CompilationInfos
 };
 
 /**
- * Base class for C++ extensions.
+ * \brief Base class for C++ extensions.
  * Extensions can provide :
  *
- * -Static functions ( e.g. GetActionFunctionPtr ).
- * -Objects functions ( e.g. GetObjectActionFunctionPtr )
- * -New objects, which have a type. This type is associated
- *  with a typeId at runtime by ExtensionsManager. The new
- *  objects creations/destructions functions are provided
- *  by the extension.
- * -Information at edittime
+ *  - Static functions ( e.g. GetActionFunctionPtr ).
+ *  - Objects functions ( e.g. GetObjectActionFunctionPtr )
+ *  - New objects, which have a type. This type is associated
+ *   with a typeId at runtime by ExtensionsManager. The new
+ *   objects creations/destructions functions are provided
+ *   by the extension.
+ *  - Information at edittime
  */
 class GD_API ExtensionBase
 {

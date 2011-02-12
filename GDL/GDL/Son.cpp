@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -19,7 +19,7 @@ Son::Son(string pFile) :
 file(pFile),
 volume(100)
 {
-    RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
+    RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
 
     buffer = ressourcesLoader->LoadSoundBuffer(file);
     sound.SetBuffer(buffer);
@@ -39,7 +39,7 @@ Son::~Son()
 Son::Son(const Son & copy) :
 file(copy.file)
 {
-    RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
+    RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
 
     buffer = ressourcesLoader->LoadSoundBuffer(file);
     sound.SetBuffer(buffer);
@@ -63,7 +63,7 @@ void Son::SetVolume(float volume_)
 ////////////////////////////////////////////////////////////
 void Son::UpdateVolume()
 {
-    SoundManager * soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
 
     sound.SetVolume(volume*soundManager->GetGlobalVolume()/100.f);
 }

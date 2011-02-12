@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -16,7 +16,7 @@
 using namespace std;
 
 /**
- * Manage the sound played by the game
+ * \brief Manage sounds and musics played by games.
  */
 class GD_API SoundManager
 {
@@ -24,15 +24,37 @@ public:
     vector < Music * >  musics;
     vector < Son * >    sounds;
 
+    /**
+     * Return pointer to a music on a channel
+     */
     Music * GetMusicOnChannel(int channel);
+
+    /**
+     * Change music on a channel. Automatically destroy the old music.
+     */
     void SetMusicOnChannel(int channel, Music * music);
+
+    /**
+     * Return pointer to a sound on a channel
+     */
     Son * GetSoundOnChannel(int channel);
+
+    /**
+     * Change sound on a channel. Automatically destroy the old sound.
+     */
     void SetSoundOnChannel(int channel, Son * son);
 
+    /**
+     * Change global game sound volume.
+     * Example :
+     * \code
+     * SoundManager::GetInstance()
+     * \endcode
+     */
     inline float GetGlobalVolume() const { return globalVolume; }
     void SetGlobalVolume(float volume);
 
-    static SoundManager *getInstance()
+    static SoundManager *GetInstance()
     {
         if ( NULL == _singleton )
         {

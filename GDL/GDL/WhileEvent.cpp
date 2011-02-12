@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -160,7 +160,7 @@ void WhileEvent::LoadFromXml(const TiXmlElement * eventElem)
 void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
                          bool & conditionsSelected, bool & instructionsSelected)
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
     const int repeatHeight = 20;
 
     if ( y>0 && static_cast<unsigned int>(y) <= whileConditionsHeight)
@@ -263,7 +263,7 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
  */
 void WhileEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
     const int repeatHeight = 20;
 
     //Draw event rectangle
@@ -296,7 +296,7 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
 {
     if ( eventHeightNeedUpdate )
     {
-        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
         const int repeatHeight = 20;
 
         //Get maximum height needed

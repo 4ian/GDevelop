@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -21,6 +21,9 @@ class GD_API BaseDebugger
         BaseDebugger() {};
         virtual ~BaseDebugger() {};
 
+        /**
+         * Called at each frame by RuntimeScene
+         */
         void Update();
 
     protected:

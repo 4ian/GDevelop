@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef AUTOMATISMSSHAREDDATAS_H
 #define AUTOMATISMSSHAREDDATAS_H
 
@@ -18,11 +23,29 @@ class GD_API AutomatismsSharedDatas
         virtual ~AutomatismsSharedDatas() {};
         virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() { return boost::shared_ptr<AutomatismsSharedDatas>(new AutomatismsSharedDatas(*this));}
 
+        /**
+         * Change the name identifying the automatism. Change also AutomatismId.
+         */
         void SetName(std::string name_);
+
+        /**
+         * Return the name identifying the automatism
+         */
         std::string GetName() { return name; }
+
+        /**
+         * Return the identifier identifying the automatism
+         */
         unsigned int GetAutomatismId() { return automatismId; }
 
+        /**
+         * Return the name identifying the type of the automatism
+         */
         std::string GetTypeName() { return type; }
+
+        /**
+         * Return the identifier identifying the type of the automatism
+         */
         unsigned int GetTypeId() { return typeId; }
 
         /**

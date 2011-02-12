@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -13,6 +13,10 @@
 #include <cmath>
 #include "GDL/Log.h"
 
+/**
+ * Represent a force to be applied on an object.
+ * Can have an X/Y component or an angle/length.
+ */
 class GD_API Force
 {
     public:

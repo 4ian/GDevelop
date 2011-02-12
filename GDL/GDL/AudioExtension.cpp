@@ -173,7 +173,7 @@ AudioExtension::AudioExtension()
                    _("Modifier le pitch d'un son sur un canal"),
                    _("Cette action modifie le pitch ( vitesse ) du son d'un canal.\nUn pitch de 1 indique une vitesse normale."),
                    _("Faire _PARAM2__PARAM1_ au pitch du son sur le canal  _PARAM0_"),
-                   _("Pitch ( vitesse )"),
+                   _("Sons"),
                    "res/actions/son24.png",
                    "res/actions/son.png",
                    &ActModPitchSoundChannel);
@@ -188,7 +188,7 @@ AudioExtension::AudioExtension()
                    _("Modifier le pitch de la musique d'un canal"),
                    _("Cette action modifie le pitch de la musique sur un canal.\nUn pitch de 1 indique une vitesse normale."),
                    _("Faire _PARAM2__PARAM1_ au pitch de la musique du canal  _PARAM0_"),
-                   _("Pitch ( vitesse )"),
+                   _("Musiques"),
                    "res/actions/music24.png",
                    "res/actions/music.png",
                    &ActModPitchMusicChannel);

@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -122,7 +122,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   _("Code C++"),
                   "Execute du code C++",
                   "",
-                  "res/foreach.png",
+                  "res/source_cpp16.png",
                   DynamicExtensionCallerEvent)
 
     DECLARE_END_EVENT()

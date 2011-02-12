@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -37,7 +37,7 @@ void ObjectGroup::AddObject(string name)
 {
     if ( !Find(name) )
     {
-        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
         unsigned int oID = objectIdentifiersManager->GetOIDfromName(name);
 
         memberObjects.push_back(std::pair<string, unsigned int>(name, oID));

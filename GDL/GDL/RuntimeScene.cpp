@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -55,7 +55,7 @@ timeFromStart(0),
 specialAction(-1)
 {
     //ctor
-    soundManager = SoundManager::getInstance();
+    soundManager = SoundManager::GetInstance();
     renderWindow->ShowMouseCursor( true );
 
     //Calque par défaut
@@ -245,9 +245,7 @@ void RuntimeScene::ManageRenderTargetEvents()
         else if (event.Type == sf::Event::MouseWheelMoved )
             inputWheelDelta = event.MouseWheel.Delta;
         else if (event.Type == sf::Event::TextEntered )
-        {
             inputTextEntered += event.Text.Unicode;
-        }
         else if (event.Type == sf::Event::Resized)
         {
             //Resetup OpenGL
@@ -429,7 +427,7 @@ bool RuntimeScene::DisplayLegacyTexts(string layer)
 ////////////////////////////////////////////////////////////
 bool RuntimeScene::StopMusic()
 {
-    SoundManager * soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
 
     //Arrêt des musiques : simples musiques
     for ( unsigned int i = 0;i < soundManager->musics.size();i++ )

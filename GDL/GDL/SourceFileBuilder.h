@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -20,9 +20,13 @@ class Game;
 class SourceFile;
 class BuildProcess;
 
+namespace GDpriv
+{
+
 /**
+ * \brief Internal class for building source files.
  * Manage build of sources file of a project.
- * Use process to allow asynchronous compilation.
+ * Use processes to allow asynchronous compilation.
  */
 class GD_API SourceFileBuilder
 {
@@ -37,6 +41,11 @@ class GD_API SourceFileBuilder
          * Build end can be tested with IsBuilding();
          */
         bool LaunchSourceFilesBuild();
+
+        /**
+         * Return true if building source files is needed.
+         */
+        bool BuildNeeded();
 
         /**
          * Set files to compile
@@ -107,6 +116,7 @@ class GD_API SourceFileBuilder
 };
 
 /**
+ * \brief Internal class used to launch building tasks.
  * Process used for building tasks.
  */
 class BuildProcess : public wxProcess
@@ -128,6 +138,8 @@ public:
 protected:
     SourceFileBuilder *m_parent; ///< Build process must be able to notify its parent his work is finished.
 };
+
+}
 
 #endif // SOURCEFILEBUILDER_H
 

@@ -42,7 +42,7 @@ bool ActPlaySound( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
     sf::Clock Latence;
 
     SoundManager * soundManager;
-    soundManager = SoundManager::getInstance();
+    soundManager = SoundManager::GetInstance();
 
     Son * son = new Son(action.GetParameter(0).GetPlainString());
     soundManager->sounds.push_back(son);
@@ -95,7 +95,7 @@ bool ActPlaySoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
 
     //Chargement
     SoundManager * soundManager;
-    soundManager = SoundManager::getInstance();
+    soundManager = SoundManager::GetInstance();
 
     //Son à jouer
     Son * son = new Son(action.GetParameter(0).GetPlainString());
@@ -145,7 +145,7 @@ bool ActStopSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
 
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    SoundManager::getInstance()->GetSoundOnChannel(canal)->sound.Stop();
+    SoundManager::GetInstance()->GetSoundOnChannel(canal)->sound.Stop();
 
     return true;
 }
@@ -161,7 +161,7 @@ bool ActPauseSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcern
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    SoundManager::getInstance()->GetSoundOnChannel(canal)->sound.Pause();
+    SoundManager::GetInstance()->GetSoundOnChannel(canal)->sound.Pause();
 
     return true;
 }
@@ -177,7 +177,7 @@ bool ActRePlaySoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcer
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON )  return false;
 
-    SoundManager::getInstance()->GetSoundOnChannel(canal)->sound.Play();
+    SoundManager::GetInstance()->GetSoundOnChannel(canal)->sound.Play();
 
     return true;
 }
@@ -192,8 +192,8 @@ bool ActRePlaySoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcer
 ////////////////////////////////////////////////////////////
 bool ActPlayMusic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    SoundManager * soundManager = SoundManager::getInstance();
-    RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
+    RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
 
     Music * music = ressourcesLoader->LoadMusic(action.GetParameter(0).GetPlainString()); //Chargement
 
@@ -243,8 +243,8 @@ bool ActPlayMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
     int canal = static_cast<int> ( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
 
-    SoundManager * soundManager = SoundManager::getInstance();
-    RessourcesLoader * ressourcesLoader = RessourcesLoader::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
+    RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
 
     Music * music = ressourcesLoader->LoadMusic(action.GetParameter(0).GetPlainString()); //Chargement
     music->Play();
@@ -291,7 +291,7 @@ bool ActStopMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
 
-    SoundManager::getInstance()->GetMusicOnChannel(canal)->Stop();
+    SoundManager::GetInstance()->GetMusicOnChannel(canal)->Stop();
 
     return true;
 }
@@ -307,7 +307,7 @@ bool ActPauseMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcern
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
 
-    SoundManager::getInstance()->GetMusicOnChannel(canal)->Pause();
+    SoundManager::GetInstance()->GetMusicOnChannel(canal)->Pause();
 
     return true;
 }
@@ -323,7 +323,7 @@ bool ActRePlayMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcer
     int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )  return false;
 
-    SoundManager::getInstance()->GetMusicOnChannel(canal)->Play();
+    SoundManager::GetInstance()->GetMusicOnChannel(canal)->Play();
 
     return true;
 }
@@ -341,7 +341,7 @@ bool ActModVolumeSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsCon
     int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    SoundManager * soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
 
     if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
         soundManager->GetSoundOnChannel(canal)->SetVolume(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
@@ -371,7 +371,7 @@ bool ActModVolumeMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsCon
     int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_MUSIC )  return false;
 
-    SoundManager * soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
 
     if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
         soundManager->GetMusicOnChannel(canal)->SetVolume(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
@@ -396,7 +396,7 @@ bool ActModVolumeMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsCon
 ////////////////////////////////////////////////////////////
 bool ActModGlobalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    SoundManager * soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
 
     if (action.GetParameter(1).GetPlainString().empty() || action.GetParameter(1).GetAsModOperator() == GDExpression::Set)
         soundManager->SetGlobalVolume(action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
@@ -420,7 +420,7 @@ bool ActModPitchSoundChannel( RuntimeScene & scene, ObjectsConcerned & objectsCo
     int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    SoundManager * soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
 
     if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
         soundManager->GetSoundOnChannel(canal)->SetPitch(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
@@ -444,7 +444,7 @@ bool ActModPitchMusicChannel( RuntimeScene & scene, ObjectsConcerned & objectsCo
     int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
 
-    SoundManager * soundManager = SoundManager::getInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
 
     if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
         soundManager->GetMusicOnChannel(canal)->SetPitch(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));

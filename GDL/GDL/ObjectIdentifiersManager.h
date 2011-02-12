@@ -32,7 +32,7 @@ public:
         return "";
     }
 
-    static ObjectIdentifiersManager *getInstance()
+    static ObjectIdentifiersManager *GetInstance()
     {
         if ( NULL == _singleton )
         {

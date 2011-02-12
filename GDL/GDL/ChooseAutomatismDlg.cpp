@@ -93,7 +93,7 @@ void ChooseAutomatismDlg::RefreshList()
     bool searching = search.empty() ? false : true;
 
 	vector <unsigned int> automatisms = GetAutomatismsOfObject(game, scene, parentObject);
-	ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+	ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
 
 	automatismsList->Clear();
 	for (unsigned int i = 0;i<automatisms.size();++i)

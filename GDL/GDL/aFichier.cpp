@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -262,7 +262,7 @@ bool ActEcrireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcer
 ////////////////////////////////////////////////////////////
 bool ActLireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned), false);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
@@ -307,7 +307,7 @@ bool ActLireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
 ////////////////////////////////////////////////////////////
 bool ActLireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned), false);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes

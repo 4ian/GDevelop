@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -20,7 +20,7 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     sceneObjectsList->AddRoot( _( "Tous les objets de la scène" ) );
 
     //Search the typeId we are allowed to pick
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     unsigned int typeIdAllowed = extensionsManager->GetTypeIdFromString(objectTypeAllowed);
 
     for ( unsigned int i = 0;i < scene.initialObjects.size();i++ )

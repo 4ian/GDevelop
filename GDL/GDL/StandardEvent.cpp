@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -130,7 +130,7 @@ void StandardEvent::LoadFromXml(const TiXmlElement * eventElem)
  */
 void StandardEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
 
     //Draw event rectangle
     dc.SetPen(*wxTRANSPARENT_PEN);
@@ -153,7 +153,7 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width) const
 {
     if ( eventHeightNeedUpdate )
     {
-        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
 
         //Get maximum height needed
         int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
@@ -169,7 +169,7 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width) const
 void StandardEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
                          bool & conditionsSelected, bool & instructionsSelected)
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
 
     if ( x <= renderingHelper->GetConditionsColumnWidth())
     {

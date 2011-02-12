@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef SPRITEOBJECT_H
 #define SPRITEOBJECT_H
 
@@ -20,6 +25,7 @@ class MainEditorCommand;
 #endif
 
 /**
+ * \brief Internal built-in Sprite object.
  * Sprite object is an object composed of animations, containing directions with images.
  */
 class SpriteObject : public Object

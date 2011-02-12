@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -435,7 +435,7 @@ bool ExtensionsManager::HasAutomatismAction(unsigned int automatismTypeId, strin
 
 InstructionAutomatismFunPtr ExtensionsManager::GetAutomatismActionFunctionPtr(unsigned int automatismTypeId, string name) const
 {
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
     std::string automatismType = objectIdentifiersManager->GetNamefromOID(automatismTypeId);
 
     //We can afford performing a search each time this function is called,
@@ -515,7 +515,7 @@ bool ExtensionsManager::HasAutomatismCondition(unsigned int automatismTypeId, st
 
 InstructionAutomatismFunPtr ExtensionsManager::GetAutomatismConditionFunctionPtr(unsigned int automatismTypeId, string name) const
 {
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
     std::string automatismType = objectIdentifiersManager->GetNamefromOID(automatismTypeId);
 
     //We can afford performing a search each time this function is called,
@@ -596,7 +596,7 @@ bool ExtensionsManager::HasAutomatismExpression(unsigned int automatismTypeId, s
 
 ExpressionAutomatismFunPtr ExtensionsManager::GetAutomatismExpressionFunctionPtr(unsigned int automatismTypeId, string name) const
 {
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
     std::string automatismType = objectIdentifiersManager->GetNamefromOID(automatismTypeId);
 
     //We can afford performing a search each time this function is called,
@@ -677,7 +677,7 @@ bool ExtensionsManager::HasAutomatismStrExpression(unsigned int automatismTypeId
 
 StrExpressionAutomatismFunPtr ExtensionsManager::GetAutomatismStrExpressionFunctionPtr(unsigned int automatismTypeId, string name) const
 {
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::getInstance();
+    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
     std::string automatismType = objectIdentifiersManager->GetNamefromOID(automatismTypeId);
 
     //We can afford performing a search each time this function is called,

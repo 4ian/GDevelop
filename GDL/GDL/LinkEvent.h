@@ -1,15 +1,10 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef LINKCOMMENT_H
 #define LINKCOMMENT_H
-/*
-#include <boost/shared_ptr.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/nvp.hpp>*/
 #include "Event.h"
 #include <vector>
 class Game;
@@ -21,6 +16,9 @@ class MainEditorCommand;
 class wxWindow;
 #endif
 
+/**
+ * Internal builtin LinkEvent, inserting events from another scene/external events.
+ */
 class LinkEvent : public BaseEvent
 {
     public:

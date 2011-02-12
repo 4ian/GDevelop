@@ -1,4 +1,4 @@
-/**
+/** \file
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
@@ -308,7 +308,7 @@ class GD_API ExtensionsManager
             return "";
         }
 
-        static ExtensionsManager *getInstance()
+        static ExtensionsManager *GetInstance()
         {
             if ( NULL == _singleton )
             {

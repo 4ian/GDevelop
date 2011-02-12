@@ -165,7 +165,7 @@ lastErrorPos(std::string::npos)
     ValList->DeleteAllItems();
     ValList->AddRoot( _( "Toutes les valeurs spéciales" ), 0 );
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::getInstance();
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects expressions

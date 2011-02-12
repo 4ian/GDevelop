@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef FONTMANAGER_H
 #define FONTMANAGER_H
 #include <SFML/Graphics.hpp>
@@ -7,11 +12,19 @@
 using namespace std;
 
 /**
- * FontManager load and manage fonts.
+ * \brief FontManager loads and manages SFML fonts.
  */
 class GD_API FontManager
 {
 public:
+
+    /**
+     * Return a pointer to an SFML font.
+     * Example :
+     * \code
+     * sfmlText.SetFont(*fontManager->GetFont(fontName));
+     * \endcode
+     */
     const sf::Font * GetFont(string fontName);
 
     static FontManager *GetInstance()
@@ -24,7 +37,7 @@ public:
         return ( static_cast<FontManager*>( _singleton ) );
     }
 
-    static void kill()
+    static void DestroySingleton()
     {
         if ( NULL != _singleton )
         {
@@ -33,7 +46,6 @@ public:
         }
     }
 
-protected:
 private:
 
     map < std::string, sf::Font* >   fonts;

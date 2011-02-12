@@ -9,7 +9,7 @@
 #include "GDL/ExtensionBase.h"
 
 /**
- *  Internal builtin extension providing features concerning cameras.
+ * \brief Internal builtin extension providing features concerning cameras.
  */
 class CameraExtension : public ExtensionBase
 {

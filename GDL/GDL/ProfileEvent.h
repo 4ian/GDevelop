@@ -19,7 +19,7 @@ class Evaluateur;
 class TiXmlElement;
 
 /**
- * Event used internally by Game Develop to profile events.
+ * \brief Event used internally by Game Develop to profile events.
  */
 class GD_API ProfileEvent : public BaseEvent
 {

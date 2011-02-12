@@ -26,7 +26,8 @@ typedef boost::shared_ptr<Object> ObjSPtr;
 
 
 /**
- * Class representing an expression.
+ * \brief Class representing an expression ( Used for example in parameters of Instruction ).
+ *
  * Hold the plain expression string, the functions to call
  * beforing evaluating the expression with a parser, the value of the expression as an operator...
  * All of these values can be used thanks to GetAs[...] members functions.

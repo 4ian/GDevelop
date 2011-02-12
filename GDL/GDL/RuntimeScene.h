@@ -39,7 +39,9 @@ class BaseProfiler;
 #endif
 
 /**
- * A Runtime Scene is used when a game is played.
+ * \brief Represents a scene being played.
+ *
+ * A RuntimeScene is used when a game is played.
  * It contains everything a scene provide, but also specific
  * functions and members for runtime ( Render functions, objects instances, variables... )
  */
@@ -150,7 +152,7 @@ class GD_API RuntimeScene : public Scene
          */
         bool StopMusic();
 
-    protected:
+    private:
 
         void Init(const RuntimeScene & scene);
 

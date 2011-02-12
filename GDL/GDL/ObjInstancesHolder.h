@@ -6,7 +6,7 @@
 #include <map>
 
 /**
- * Hold lists of objects classified by the name of the objects
+ * \brief Hold lists of objects classified by the name of the objects.
  */
 class GD_API ObjInstancesHolder
 {
@@ -56,6 +56,12 @@ public:
 
     /**
      * Remove an object
+     *
+     * \attention In an event, do not directly remove an object using this function, but make its name empty instead. Example :
+     * \code
+     * scene.objectsInstances.ObjectIdentifierHasChanged(myObject); //Keep the object in objectsInstances from scene, but notify its identifier has changed.
+     * objectsConcerned.AnObjectWasDeleted(myObject); //Remove object from objectsConcerned.
+     * \endcode
      */
     inline void RemoveObject(const ObjSPtr & object)
     {
@@ -85,7 +91,7 @@ public:
 
     /**
      * Return an new ObjInstancesHolder containing the same
-     * objects but copied
+     * objects but copied.
      */
     ObjInstancesHolder CopyAndCloneAllObjects() const;
 
@@ -94,6 +100,9 @@ public:
      */
     void Merge(ObjInstancesHolder & second);
 
+    /**
+     * Clear the container.
+     */
     inline void Clear()
     {
         objectsInstances.clear();

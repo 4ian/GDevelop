@@ -411,7 +411,7 @@ EventsRenderingHelper * EventsRenderingHelper::GetInstance()
     return singleton;
 }
 
-void EventsRenderingHelper::kill()
+void EventsRenderingHelper::DestroySingleton()
 {
     if ( NULL != singleton )
     {

@@ -13,7 +13,7 @@ class Evaluateur;
 class TiXmlElement;
 
 /**
- * Repeat event is a standard event repeat a number of times
+ * \brief Internal built-in event being repeated a number of times.
  */
 class RepeatEvent : public BaseEvent
 {

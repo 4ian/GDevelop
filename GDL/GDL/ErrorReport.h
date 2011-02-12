@@ -12,7 +12,8 @@
 using namespace std;
 
 /**
- * Nearly deprecated class to report errors.
+ * \brief Old class to report errors.
+ * \deprecated deprecated class to report errors.
  * Need to use a better error handling system for Runtime
  */
 class GD_API ErrorReport

@@ -7,7 +7,7 @@
 #include "GDL/Event.h"
 
 /**
- * Base class for C++ dynamic extensions,
+ * \brief Internal base class for C++ dynamic extensions,
  * meant to be edited and compiled directly with Game Develop,
  * using a C++ compiler, and then used in the game.
  */

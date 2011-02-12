@@ -14,7 +14,7 @@
 #include "GDL/Log.h"
 
 /**
- * Represent a force to be applied on an object.
+ * \brief Represents a force to be applied on an object.
  * Can have an X/Y component or an angle/length.
  */
 class GD_API Force
@@ -49,14 +49,5 @@ class GD_API Force
     static const float PI;
 
 };
-
-struct ForceNulle
-{
-    bool operator ()( const Force &A ) const
-    {
-        return A.GetLength() == 0;
-    }
-};
-
 
 #endif // FORCE_H_INCLUDED

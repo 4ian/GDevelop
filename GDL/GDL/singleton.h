@@ -27,7 +27,7 @@ public:
         return ( static_cast<T*>( _singleton ) );
     }
 
-    static void kill()
+    static void DestroySingleton()
     {
         if ( NULL != _singleton )
         {

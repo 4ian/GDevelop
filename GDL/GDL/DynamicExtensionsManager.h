@@ -22,7 +22,7 @@ namespace GDpriv
 {
 
 /**
- * Manage dynamic extensions.
+ * \brief Manages dynamic extensions.
  * Unlike static ExtensionsManager, DynamicExtensionsManager load itself the libraries.
  */
 class GD_API DynamicExtensionsManager
@@ -51,7 +51,7 @@ class GD_API DynamicExtensionsManager
             return ( static_cast<DynamicExtensionsManager*>( _singleton ) );
         }
 
-        static void kill()
+        static void DestroySingleton()
         {
             if ( NULL != _singleton )
             {

@@ -13,6 +13,7 @@
 class Instruction;
 
 /**
+ * \brief Provides tools to draw events.
  * Class providing default colors, fonts, infos and drawing functions so as to
  * render events.
  */
@@ -20,7 +21,7 @@ class GD_API EventsRenderingHelper
 {
     public:
         static EventsRenderingHelper * GetInstance();
-        static void kill();
+        static void DestroySingleton();
 
         void DrawNiceRectangle(wxDC & dc, const wxRect & rect, const wxColor & color1, const wxColor & color2,const wxColor & color3,const wxColor & color4,const wxColor & color5) const;
 

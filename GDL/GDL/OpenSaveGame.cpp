@@ -287,7 +287,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         TiXmlElement * sourceFileElem = elem->FirstChildElement( "SourceFile" );
         while (sourceFileElem)
         {
-            boost::shared_ptr<SourceFile> newSourceFile(new SourceFile);
+            boost::shared_ptr<GDpriv::SourceFile> newSourceFile(new GDpriv::SourceFile);
             newSourceFile->LoadFromXml(sourceFileElem);
             game.externalSourceFiles.push_back(newSourceFile);
 

@@ -12,20 +12,50 @@
 #include "GDL/ObjectIdentifiersManager.h"
 #include <boost/interprocess/containers/flat_set.hpp>
 
-using namespace std;
-
+/**
+ * \brief Represents an object group.
+ *
+ * Objects groups does not really contains objects : They are just
+ * used in events to create events which can be applied to several objects.
+ */
 class GD_API ObjectGroup
 {
     public:
 
         ObjectGroup();
-        virtual ~ObjectGroup();
+        virtual ~ObjectGroup() {};
 
-        /** Get a vector with only objects names.
+        /**
+         * Return true if an object is found inside the ObjectGroup.
          */
-        inline vector < string > GetAllObjectsNames() const
+        bool Find(std::string name) const;
+
+        /**
+         * Add an object name to the group.
+         */
+        void AddObject(std::string name);
+
+        /**
+         * Remove an object name from the group
+         */
+        void RemoveObject(std::string name);
+
+        inline std::string GetName() const { return name; };
+        inline unsigned int GetIdentifier() const { return id; }
+        inline void SetName(std::string name_)
         {
-            vector < string > objectsNames;
+            name = name_;
+
+            ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
+            id = objectIdentifiersManager->GetOIDfromName(name_);
+        };
+
+        /**
+         * Get a vector with only objects names.
+         */
+        inline std::vector < std::string > GetAllObjectsNames() const
+        {
+            std::vector < std::string > objectsNames;
             for (unsigned int i = 0 ;i<memberObjects.size();++i)
             {
             	objectsNames.push_back(memberObjects[i].first);
@@ -34,36 +64,28 @@ class GD_API ObjectGroup
             return objectsNames;
         }
 
-        inline const vector < std::pair<string, unsigned int> > & GetAllObjectsWithOID() const
+        /**
+         * Get a vector of pair containing all objects name as well as their objects identifier.
+         */
+        inline const std::vector < std::pair<std::string, unsigned int> > & GetAllObjectsWithOID() const
         {
             return memberObjects;
         }
 
-        bool Find(string name) const;
-        void AddObject(string name);
-        void RemoveObject(string name);
-
-        inline string GetName() const { return name; };
-        inline unsigned int GetIdentifier() const { return id; }
-        inline void SetName(string name_)
-        {
-            name = name_;
-
-            ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
-            id = objectIdentifiersManager->GetOIDfromName(name_);
-        };
-
+        /**
+         * True if there at least one similar object between the group and the list.
+         */
         bool HasAnIdenticalValue( const boost::interprocess::flat_set < unsigned int > & list );
 
     private:
-        vector < std::pair<string, unsigned int> > memberObjects; ///<For performance, objects are associated with their objects Id
-        string name;
+        std::vector < std::pair<std::string, unsigned int> > memberObjects; ///<For performance, objects are associated with their objects Id
+        std::string name; ///< Group name
         unsigned int id; ///<As objects, groups must be able to be identifed during runtime with a unique identifier.
 };
 
-struct HasTheSameName : public std::binary_function<ObjectGroup, string, bool>
+struct HasTheSameName : public std::binary_function<ObjectGroup, std::string, bool>
 {
-    bool operator ()( const ObjectGroup & a1, const string & name ) const
+    bool operator ()( const ObjectGroup & a1, const std::string & name ) const
     {
         return a1.GetName() == name;
     }

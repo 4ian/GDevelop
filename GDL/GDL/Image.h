@@ -12,7 +12,8 @@
 using namespace std;
 
 /**
- * Class that represent an image of an image manager.
+ * \brief An image of an ImageManager.
+ * During runtime, objects use SFML images or OpenGL textures using ImageManager.
  */
 class GD_API Image
 {

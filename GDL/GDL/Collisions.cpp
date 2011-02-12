@@ -7,14 +7,12 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include <time.h>
 #include <SFML/Graphics.hpp>
 
 #include "GDL/SpriteObject.h"
 #include "GDL/Collisions.h"
 #include "GDL/Log.h"
 
-//Intéressant
 #ifndef PI
 #define PI (3.14159265358979323846)
 #endif
@@ -152,23 +150,6 @@ bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf:
         }
         return false;
     }
-    return false;
-}
-
-/**
- * Check for a collision between two sprite objects, using only bounding boxes.
- */
-bool GD_API CheckCollisionNP( const boost::shared_ptr<const SpriteObject> objet1, const boost::shared_ptr<const SpriteObject> objet2 )
-{
-    //Get AABBs of the two sprites
-    sf::IntRect Object1AABB = GetAABB( objet1->GetCurrentSFMLSprite() );
-    sf::IntRect Object2AABB = GetAABB( objet2->GetCurrentSFMLSprite() );
-
-    sf::IntRect Intersection;
-
-    if ( Object1AABB.Intersects( Object2AABB, Intersection ) )
-        return true;
-
     return false;
 }
 

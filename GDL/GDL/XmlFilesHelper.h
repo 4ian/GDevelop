@@ -13,7 +13,7 @@
 
 
 /**
- * Helper class wrapping a tinyxml document in RAII fashion
+ * \brief Helper class wrapping a tinyxml document in RAII fashion
  */
 class XmlFile
 {
@@ -50,7 +50,7 @@ class XmlFile
 };
 
 /**
- * Helper class for opening files.
+ * \brief Helper class for opening XML files.
  */
 class XmlFilesManager
 {

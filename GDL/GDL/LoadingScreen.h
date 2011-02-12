@@ -12,7 +12,7 @@
 using namespace std;
 
 /**
- * Class containg information so as to display a loading screen
+ * \brief Internal class containg information so as to display a loading screen.
  */
 class GD_API LoadingScreen
 {

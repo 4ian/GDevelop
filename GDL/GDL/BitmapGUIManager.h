@@ -56,7 +56,7 @@ public:
         return _singleton;
     }
 
-    static void kill()
+    static void DestroySingleton()
     {
         if ( NULL != _singleton )
         {

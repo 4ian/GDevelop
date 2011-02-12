@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef RUNTIMEGAME_H
 #define RUNTIMEGAME_H
 
@@ -6,7 +11,8 @@
 #include "GDL/ImageManager.h"
 
 /**
- * Game class used at Runtime
+ * \brief Game class used at Runtime.
+ *
  * Used so as not to change the initial global variables
  * for example ( in Editor, it could be annoying to let
  * initial global variables be changed when testing a scene! ).

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void Variable::Setvalue(double val)
+void Variable::SetValue(double val)
 {
     value = val;
 

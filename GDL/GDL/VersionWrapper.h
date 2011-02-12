@@ -6,25 +6,58 @@
 #ifndef VERSIONWRAPPER_H
 #define VERSIONWRAPPER_H
 #include <string>
-#include <vector>
 
-using namespace std;
-
+/**
+ * \brief Used to get information about Game Develop Library version.
+ */
 class GD_API GDLVersionWrapper
 {
     public:
 
+        /**
+         * Get Game Develop library Major version number
+         */
         static int Major();
+
+        /**
+         * Get Game Develop library Minor version number
+         */
         static int Minor();
+
+        /**
+         * Get Game Develop library Build version number
+         */
         static int Build();
+
+        /**
+         * Get Game Develop library Revision version number
+         */
         static int Revision();
-        static string FullString();
-        static string Status();
-        static string Year();
-        static string Month();
-        static string Date();
-    protected:
-    private:
+
+        /**
+         * Get a full string containing version.
+         */
+        static std::string FullString();
+
+        /**
+         * Get GDL status ( Alpha/Beta/Release Candidate/Release )
+         */
+        static std::string Status();
+
+        /**
+         * Get Year of the release
+         */
+        static std::string Year();
+
+        /**
+         * Get Month of the release
+         */
+        static std::string Month();
+
+        /**
+         * Get Day of the release
+         */
+        static std::string Date();
 };
 
 #endif // VERSIONWRAPPER_H

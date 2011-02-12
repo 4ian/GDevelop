@@ -7,7 +7,7 @@
 #include <wx/fs_zip.h>
 
 /**
- * Singleton class for access to help file
+ * \brief Singleton class to access to help file
  */
 class GD_API HelpFileAccess
 {
@@ -37,7 +37,7 @@ public:
         return _singleton;
     }
 
-    static void kill ()
+    static void DestroySingleton ()
     {
         if (NULL != _singleton)
         {
@@ -46,7 +46,6 @@ public:
         }
     }
 
-protected:
 private:
     HelpFileAccess() : helpController(NULL) {};
     virtual ~HelpFileAccess() { if (helpController) delete helpController; };

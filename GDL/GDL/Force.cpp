@@ -8,7 +8,6 @@
 #include <string>
 #include <cmath>
 #include "GDL/Log.h"
-#include "GDL/Event.h"
 #include "GDL/Force.h"
 
 float const Force::PI = 3.14159265;

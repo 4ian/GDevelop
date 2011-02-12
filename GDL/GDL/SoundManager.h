@@ -45,13 +45,21 @@ public:
     void SetSoundOnChannel(int channel, Son * son);
 
     /**
-     * Change global game sound volume.
+     * Get global game sound volume.
      * Example :
      * \code
-     * SoundManager::GetInstance()
+     * float currentVolume = SoundManager::GetInstance()->GetGlobalVolume();
      * \endcode
      */
     inline float GetGlobalVolume() const { return globalVolume; }
+
+    /**
+     * Change global game sound volume.
+     * Example :
+     * \code
+     * SoundManager::GetInstance()->SetGlobalVolume(50);
+     * \endcode
+     */
     void SetGlobalVolume(float volume);
 
     static SoundManager *GetInstance()
@@ -64,7 +72,7 @@ public:
         return ( static_cast<SoundManager*>( _singleton ) );
     }
 
-    static void kill()
+    static void DestroySingleton()
     {
         if ( NULL != _singleton )
         {
@@ -82,7 +90,6 @@ private:
 
     SoundManager();
     ~SoundManager();
-
     static SoundManager *_singleton;
 };
 

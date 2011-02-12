@@ -33,10 +33,11 @@ class GD_API ObjectsConcerned
          * Using this constructor implies to call InheritsFrom after.
          */
         ObjectsConcerned() : allObjects(NULL), allGroups(NULL), parent(NULL) {};
-        virtual ~ObjectsConcerned();
+        virtual ~ObjectsConcerned() {};
 
         /**
-         * Make the ObjectsConcerned inherits from another.
+         * Make the ObjectsConcerned inherits from another :
+         * Useful for example so as to notify parent events an object have been destroyed.
          */
         inline void InheritsFrom(ObjectsConcerned * parent_)
         {
@@ -114,8 +115,7 @@ class GD_API ObjectsConcerned
             alreadyConcernedObjects.clear();
         }
 
-        /** Objects already picked */
-        ObjInstancesHolder objectsPicked;
+        ObjInstancesHolder objectsPicked; ///< Objects already picked
 
     protected:
     private:

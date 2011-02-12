@@ -9,7 +9,11 @@
 #ifndef COMPILERTOOLCHAINPATHMANAGER_H
 #define COMPILERTOOLCHAINPATHMANAGER_H
 
+namespace GDpriv
+{
+
 /**
+ * \brief Internal class managing compilers and libraries path.
  * Give access to compilers tools and libraries paths.
  */
 class GD_API CompilerToolchainPathManager
@@ -39,6 +43,8 @@ class GD_API CompilerToolchainPathManager
         std::string gdlIncludeDir;
         std::string gdlLibDir;
 };
+
+}
 
 #endif // COMPILERTOOLCHAINPATHMANAGER_H
 

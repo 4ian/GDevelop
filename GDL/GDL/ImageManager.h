@@ -15,6 +15,7 @@ class OpenGLTextureWrapper;
 using namespace std;
 
 /**
+ * \brief Manage images at runtime, providing an easy way to get SFML images or OpenGL textures.
  * Image manager is used by objects to obtain their images from the image name.
  * Images are loaded dynamically when necessary, and are unloaded if there is no
  * more shared_ptr pointing on an image.

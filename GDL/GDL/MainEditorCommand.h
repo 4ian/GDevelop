@@ -19,8 +19,9 @@ class wxAuiManager;
 class SceneCanvas;
 
 /**
- *  MainEditorCommand is used to give access to some members of the mainEditor
- *  to editors
+ *  \brief Internal class used to transmit information between main editors and sub editors.
+ *
+ *  MainEditorCommand is used to give access to some members of the mainEditor to editors
  */
 class GD_API MainEditorCommand
 {

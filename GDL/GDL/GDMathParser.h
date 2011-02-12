@@ -10,7 +10,9 @@ double DistanceMathFunction(const double* p);
 double AngleMathFunction(const double* p);
 
 /**
- * Game Develop mathematical expression parser
+ * \brief Game Develop mathematical expression parser.
+ * Used by GDExpressions to evaluate mathematical expressions.
+ * See FunctionParser class to more information about how using this class.
  */
 class GDMathParser: public FunctionParser
 {

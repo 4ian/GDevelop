@@ -14,8 +14,8 @@ class Music;
 #undef LoadImage //Undef macro from windows.h
 
 /**
- * Class that is used by games to load ressources
- * from an Game Develop Executable or from an external file.
+ * \brief Class that is used by games to load ressources
+ * from an Game Develop Executable ( DatFile ) or from an external file.
  */
 class GD_API RessourcesLoader
 {
@@ -68,7 +68,7 @@ public:
         return ( static_cast<RessourcesLoader*>( _singleton ) );
     }
 
-    static void kill()
+    static void DestroySingleton()
     {
         if ( NULL != _singleton )
         {

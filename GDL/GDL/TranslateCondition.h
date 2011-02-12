@@ -23,11 +23,30 @@ using namespace std;
 class GD_API TranslateCondition
 {
     public:
+
+        /**
+         * Create a sentence from a condition
+         */
         static string Translate(const Instruction & condition, const InstructionInfos & infos);
+
+        /**
+         * Add some HTML code around the parameter if needed
+         */
         static string AddHTMLToParameter(string & parameter, string type);
+
+        /**
+         * Make sure special characters ( <,>,& ) are transformed to their HTML equivalents.
+         */
         static void RemoveHTMLTags(string & str);
 
+        /**
+         * Return the label of a button from parameter type
+         */
         static string LabelFromType(string type);
+
+        /**
+         * Return the bitmap of a button from parameter type
+         */
         static wxBitmap BitmapFromType(string type);
 
     protected:

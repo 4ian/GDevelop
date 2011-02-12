@@ -67,9 +67,6 @@ void Music::SetLoop(bool loop)
     music.SetLoop(loop);
 }
 
-////////////////////////////////////////////////////////////
-/// Mise à jour du volume fictif de la musique
-////////////////////////////////////////////////////////////
 void Music::SetVolume(float volume_)
 {
     volume = volume_;
@@ -79,10 +76,6 @@ void Music::SetVolume(float volume_)
     UpdateVolume(); //Mise à jour du volume réel
 }
 
-////////////////////////////////////////////////////////////
-/// Mise à jour du volume réel de la musique en fonction du volume
-/// global et de la musique
-////////////////////////////////////////////////////////////
 void Music::UpdateVolume()
 {
     SoundManager * soundManager = SoundManager::GetInstance();

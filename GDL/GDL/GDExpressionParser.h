@@ -11,7 +11,7 @@ class ParameterInfo;
 class ExpressionInstruction;
 class StrExpressionInstruction;
 
-/** \brief Parse a plainExpression by calling functors at each token
+/** \brief Internal class. Parse a plainExpression by calling functors at each token
  *
  * Parse the expression, and call functors when a token is reached
  * ( like a function call )

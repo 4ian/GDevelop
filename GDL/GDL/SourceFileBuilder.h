@@ -17,11 +17,11 @@ class wxStaticText;
 #include <boost/shared_ptr.hpp>
 #include "GDL/CompilerToolchainPathManager.h"
 class Game;
-class SourceFile;
-class BuildProcess;
 
 namespace GDpriv
 {
+class SourceFile;
+class BuildProcess;
 
 /**
  * \brief Internal class for building source files.

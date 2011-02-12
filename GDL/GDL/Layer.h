@@ -13,14 +13,14 @@
 using namespace std;
 
 /**
- * Represents a layer of a scene. Contains cameras.
+ * \brief Represents a layer of a scene. Contains cameras.
  * During runtime, RuntimeLayers are used instead of simple Layer.
  */
 class GD_API Layer
 {
     public:
         Layer();
-        virtual ~Layer();
+        virtual ~Layer() {};
 
         /**
          * Change layer name

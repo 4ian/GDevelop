@@ -10,6 +10,9 @@
 #include "GDL/CommonTools.h"
 #include <iostream>
 
+namespace GDpriv
+{
+
 void CompilerMessagesParser::ParseOutput(std::vector<std::string> output)
 {
     parsedErrors.clear();
@@ -42,6 +45,8 @@ void CompilerMessagesParser::ParseOutput(std::vector<std::string> output)
 
         parsedErrors.push_back(newMessage);
     }
+}
+
 }
 
 #endif

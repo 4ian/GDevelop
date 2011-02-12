@@ -19,7 +19,7 @@ class Evaluateur;
 class TiXmlElement;
 
 /**
- * Event calling a dynamic extension event.
+ * \brief Internal builtin event calling a dynamic extension event.
  */
 class GD_API DynamicExtensionCallerEvent : public BaseEvent
 {

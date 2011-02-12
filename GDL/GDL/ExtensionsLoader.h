@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef EXTENSIONSLOADER_H
 #define EXTENSIONSLOADER_H
 
@@ -9,6 +14,7 @@ namespace GDpriv
 {
 
 /**
+ * \brief Internal class loading static extensions.
  * Class that load static extensions ( only ) and store them in ExtensionsManager
  */
 class GD_API ExtensionsLoader
@@ -42,7 +48,7 @@ public:
         return ( static_cast<ExtensionsLoader*>( _singleton ) );
     }
 
-    static void kill()
+    static void DestroySingleton()
     {
         if ( NULL != _singleton )
         {

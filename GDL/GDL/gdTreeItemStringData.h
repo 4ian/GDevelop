@@ -6,6 +6,7 @@
 #include <wx/treectrl.h>
 
 /**
+ * \brief Internal class used by IDE.
  * This class can be used by wxTreeCtrl, to attach
  * information ( two strings ) to an item
  */

@@ -17,11 +17,6 @@ id(0)
     //ctor
 }
 
-ObjectGroup::~ObjectGroup()
-{
-    //dtor
-}
-
 bool ObjectGroup::Find(string name) const
 {
     for (unsigned int i = 0;i<memberObjects.size();++i)

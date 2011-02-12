@@ -8,6 +8,9 @@
 
 #include "GDL/ExtensionBase.h"
 
+/**
+ * \brief Internal built-in extension providing variables features.
+ */
 class VariablesExtension : public ExtensionBase
 {
     public:

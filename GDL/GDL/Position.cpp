@@ -23,8 +23,3 @@ height(0)
 {
     //ctor
 }
-
-InitialPosition::~InitialPosition()
-{
-    //dtor
-}

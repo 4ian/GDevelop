@@ -4,20 +4,21 @@
 
 using namespace std;
 /**
- *  A manual timer is a timer which is updated manually
- *  by calling UpdateTime.
+ * \brief Manual timer updated using UpdateTime member function.
+ *
+ *  A manual timer is a timer which is updated manually by calling UpdateTime.
  */
 class GD_API ManualTimer
 {
     public:
 
-        ManualTimer(string name_);
+        ManualTimer(std::string name_);
         virtual ~ManualTimer();
         /**
          * Get the name of the timer
          * @return Timer's name
          */
-        inline string GetName() { return name; };
+        inline std::string GetName() { return name; };
 
         /**
          * Update the time of the timer
@@ -51,7 +52,7 @@ class GD_API ManualTimer
     protected:
     private:
 
-        string name;
+        std::string name;
         float time;
         bool isPaused;
 };

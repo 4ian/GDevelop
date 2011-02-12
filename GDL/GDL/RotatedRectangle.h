@@ -7,8 +7,7 @@
 #define ROTATEDRECTANGLE_H
 
 /**
- * Defines a rotated rectangle.
- * Mainly used to define hit boxes.
+ * \brief Defines a rotated rectangle. Mainly used to define hit boxes.
  */
 class RotatedRectangle
 {

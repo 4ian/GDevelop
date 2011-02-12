@@ -22,23 +22,23 @@ int GDLVersionWrapper::Revision()
 {
      return AutoVersion::REVISION;
 }
-string GDLVersionWrapper::FullString()
+std::string GDLVersionWrapper::FullString()
 {
     return AutoVersion::FULLVERSION_STRING;
 }
-string GDLVersionWrapper::Date()
+std::string GDLVersionWrapper::Date()
 {
     return AutoVersion::DATE;
 }
-string GDLVersionWrapper::Month()
+std::string GDLVersionWrapper::Month()
 {
     return AutoVersion::MONTH;
 }
-string GDLVersionWrapper::Year()
+std::string GDLVersionWrapper::Year()
 {
     return AutoVersion::YEAR;
 }
-string GDLVersionWrapper::Status()
+std::string GDLVersionWrapper::Status()
 {
     return AutoVersion::STATUS;
 }

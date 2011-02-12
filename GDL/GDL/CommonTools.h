@@ -23,7 +23,7 @@ int GD_API FindImage( const vector < Image > & vector, const string & name );
 #ifdef __GNUC__
 /**
  * Round the number to the nearest integer
- * \ingroup Common programming tools
+ * \ingroup CommonProgrammingTools
  */
 inline int GDRound(float x)
 {
@@ -32,7 +32,7 @@ inline int GDRound(float x)
 #else
 /**
  * Round the number to the nearest integer
- * \ingroup Common programming tools
+ * \ingroup CommonProgrammingTools
  */
 inline double GDRound( double d )
 {
@@ -41,8 +41,13 @@ return floor( d + 0.5 );
 #endif
 
 /**
- * Convert anything to an integer
- * \ingroup Common programming tools
+ * Convert anything to an integer.
+ * Example :
+ * \code
+ * std::string five = 5;
+ * int number = ToInt(five);
+ * \endcode
+ * \ingroup CommonProgrammingTools
  */
 template<typename T>
 int ToInt( const T & value )
@@ -55,7 +60,7 @@ int ToInt( const T & value )
 
 /**
  * Convert anything to a float
- * \ingroup Common programming tools
+ * \ingroup CommonProgrammingTools
  */
 template<typename T>
 float ToFloat( const T & value )
@@ -68,7 +73,7 @@ float ToFloat( const T & value )
 
 /**
  * Convert anything to a double
- * \ingroup Common programming tools
+ * \ingroup CommonProgrammingTools
  */
 template<typename T>
 double ToDouble( const T & value )
@@ -81,7 +86,7 @@ double ToDouble( const T & value )
 
 /**
  * Convert anything to a std::string
- * \ingroup Common programming tools
+ * \ingroup CommonProgrammingTools
  */
 template<typename T>
 std::string ToString( const T & value )

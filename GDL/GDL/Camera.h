@@ -9,7 +9,8 @@
 #include <SFML/Graphics.hpp>
 
 /**
- * A camera is used to change the area of a scene to be rendered.
+ * \brief A camera is used to change the area of a scene to be rendered.
+ * When a scene is played, RuntimeCamera are used.
  */
 class GD_API Camera
 {

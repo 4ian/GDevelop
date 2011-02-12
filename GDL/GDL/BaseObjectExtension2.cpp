@@ -228,7 +228,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
     DECLARE_END_CONDITION()
 
-    DECLARE_CONDITION("CollisionNP", //CollisionNP cames from an old condition to test collision between two sprites non precisely.
+    DECLARE_CONDITION("CollisionNP", //"CollisionNP" cames from an old condition to test collision between two sprites non precisely.
                    _("Collision"),
                    _("Teste la collision entre deux objets en utilisant leurs masques de collisions.\nNotez que certains objets peuvent ne pas avoir de masque de collisions.\nD'autres, comme les Sprites, proposent des conditions de collisions plus précises."),
                    _("_PARAM0_ est en collision avec _PARAM1_ ( Masques de collisions )"),

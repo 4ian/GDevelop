@@ -5,6 +5,7 @@
 
 
 /**
+ * \brief Internal class used by IDE
  * This class can be used by wxTreeCtrl, to attach
  * information ( an ExpressionInfos and the name of the expression ) to an item
  */

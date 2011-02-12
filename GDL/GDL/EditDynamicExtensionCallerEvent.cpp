@@ -38,8 +38,8 @@ BEGIN_EVENT_TABLE(EditDynamicExtensionCallerEvent,wxDialog)
 END_EVENT_TABLE()
 
 EditDynamicExtensionCallerEvent::EditDynamicExtensionCallerEvent(wxWindow* parent, Game & game_, DynamicExtensionCallerEvent & event_) :
-    game(game_),
-    editedEvent(event_)
+    editedEvent(event_),
+    game(game_)
 {
 	//(*Initialize(EditDynamicExtensionCallerEvent)
 	wxFlexGridSizer* FlexGridSizer3;

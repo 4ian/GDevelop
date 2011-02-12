@@ -11,6 +11,9 @@
 #include <wx/intl.h>
 #include "CompilerToolchainPathManager.h"
 
+namespace GDpriv
+{
+
 CompilerToolchainPathManager::CompilerToolchainPathManager()
 {
     {
@@ -122,5 +125,7 @@ bool CompilerToolchainPathManager::AllPathsAreValid(std::string & report) const
     return ok;
 }
 
+
+}
 #endif
 #endif

@@ -10,7 +10,12 @@
 #include <functional>
 
 /**
- * \brief Class used to represent a simple variable
+ * \brief Class used to represent a simple Game Develop variable.
+ * Example :
+ * \code
+ * myObject->variables.ObtainVariable("Life") = 100;
+ * myObject->variables.ObtainVariable("Armor") += 10;
+ * \endcode
  */
 class GD_API Variable
 {
@@ -35,33 +40,33 @@ class GD_API Variable
         /**
          * Get value as a double
          */
-        inline double Getvalue() const { return value; }
+        inline double GetValue() const { return value; }
 
         /**
          * Change value
          */
-        void Setvalue(double val);
+        void SetValue(double val);
 
         /**
          * Changing value using = operator
          */
-        void operator=(double val)  {Setvalue(val);};
+        void operator=(double val)  {SetValue(val);};
         /**
          * Changing value using += operator
          */
-        void operator+=(double val) {Setvalue(val+Getvalue());}
+        void operator+=(double val) {SetValue(val+GetValue());}
         /**
          * Changing value using -= operator
          */
-        void operator-=(double val) {Setvalue(Getvalue()-val);}
+        void operator-=(double val) {SetValue(GetValue()-val);}
         /**
          * Changing value using *= operator
          */
-        void operator*=(double val) {Setvalue(val*Getvalue());}
+        void operator*=(double val) {SetValue(val*GetValue());}
         /**
          * Changing value using /= operator
          */
-        void operator/=(double val) {Setvalue(Getvalue()/val);}
+        void operator/=(double val) {SetValue(GetValue()/val);}
 
         /**
          * Get value as a string

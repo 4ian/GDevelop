@@ -45,11 +45,6 @@ SoundManager::~SoundManager()
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Récupération d'une musiques sur un canal
-///
-/// Pour pouvoir ensuite agir dessus ( arrêt, pause... )
-////////////////////////////////////////////////////////////
 Music * SoundManager::GetMusicOnChannel(int channel)
 {
     if ( channel >= 0 && static_cast<unsigned>(channel) < musicsChannel.size())
@@ -59,12 +54,6 @@ Music * SoundManager::GetMusicOnChannel(int channel)
     return NULL;
 }
 
-////////////////////////////////////////////////////////////
-/// Assignement d'une musique sur un canal
-///
-/// La musique appartient ensuite au soundManager, qui s'occupera de
-/// la détruire.
-////////////////////////////////////////////////////////////
 void SoundManager::SetMusicOnChannel(int channel, Music * music)
 {
     if ( channel >= 0 && static_cast<unsigned>(channel) < musicsChannel.size())
@@ -78,12 +67,6 @@ void SoundManager::SetMusicOnChannel(int channel, Music * music)
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Assignement d'un son sur un canal
-///
-/// Le son appartient ensuite au soundManager, qui s'occupera de
-/// le détruire.
-////////////////////////////////////////////////////////////
 void SoundManager::SetSoundOnChannel(int channel, Son * son)
 {
     if ( channel >= 0 && static_cast<unsigned>(channel) < soundsChannel.size())
@@ -97,11 +80,6 @@ void SoundManager::SetSoundOnChannel(int channel, Son * son)
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Récupération d'un son sur un canal
-///
-/// Pour pouvoir ensuite agir dessus ( arrêt, pause... )
-////////////////////////////////////////////////////////////
 Son * SoundManager::GetSoundOnChannel(int channel)
 {
     if ( channel >= 0 && static_cast<unsigned>(channel) < soundsChannel.size())
@@ -111,9 +89,6 @@ Son * SoundManager::GetSoundOnChannel(int channel)
     return NULL;
 }
 
-////////////////////////////////////////////////////////////
-/// Modifier le volume global
-////////////////////////////////////////////////////////////
 void SoundManager::SetGlobalVolume(float volume)
 {
     globalVolume = volume;

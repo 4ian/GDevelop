@@ -866,7 +866,6 @@
 		<Unit filename="GDL\SceneExtension.h" />
 		<Unit filename="GDL\Son.cpp" />
 		<Unit filename="GDL\Son.h" />
-		<Unit filename="GDL\SortBySurface.h" />
 		<Unit filename="GDL\SoundManager.cpp" />
 		<Unit filename="GDL\SoundManager.h" />
 		<Unit filename="GDL\SourceFile.cpp" />
@@ -911,7 +910,6 @@
 		<Unit filename="GDL\VersionWrapper.cpp">
 			<Option weight="64" />
 		</Unit>
-		<Unit filename="GDL\VersionWrapper.h" />
 		<Unit filename="GDL\WhileEvent.cpp" />
 		<Unit filename="GDL\WhileEvent.h" />
 		<Unit filename="GDL\WindowExtension.cpp" />
@@ -991,7 +989,6 @@
 		<Unit filename="GDL\eFreeFunctions.cpp" />
 		<Unit filename="GDL\eFreeFunctions.h" />
 		<Unit filename="GDL\eObjectFunctions.cpp" />
-		<Unit filename="GDL\eObjectFunctions.h" />
 		<Unit filename="GDL\fparser\fparser.cc">
 			<Option virtualFolder="Math parser\LIB fparser\" />
 		</Unit>
@@ -1056,7 +1053,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="1.5.10119" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="1.5.10135" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

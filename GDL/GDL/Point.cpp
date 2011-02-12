@@ -15,8 +15,3 @@ y(0)
 {
     //ctor
 }
-
-Point::~Point()
-{
-    //dtor
-}

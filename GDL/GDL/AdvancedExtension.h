@@ -9,7 +9,7 @@
 #include "GDL/ExtensionBase.h"
 
 /**
- * Internal builtin extension providing advanced or special features.
+ * \brief Internal builtin extension providing advanced or special features.
  */
 class AdvancedExtension : public ExtensionBase
 {

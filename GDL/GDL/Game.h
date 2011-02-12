@@ -6,24 +6,25 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <string>
+#include <vector>
 #include "GDL/Object.h"
 #include "GDL/Scene.h"
 #include "GDL/ListVariable.h"
 #include "GDL/Dossier.h"
-#include <string>
-#include <vector>
 #include "GDL/Image.h"
 #include "GDL/LoadingScreen.h"
 class ExternalEvents;
 #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
+namespace GDpriv
+{
 class SourceFile;
+}
 #endif
 
-using namespace std;
-
 /**
- * Game contains all data of a game, from scenes
- * to properties like game's name.
+ * \brief Represent a game.
+ * Game contains all data of a game, from scenes to properties like game's name.
  */
 class GD_API Game
 {
@@ -34,9 +35,8 @@ class GD_API Game
 
         Game& operator=(const Game & rhs);
 
-        //Some properties
-        string name;
-        string author;
+        std::string name; ///< Game name
+        std::string author; ///< Game author name
         int windowWidth; ///< Default window width
         int windowHeight; ///< Default window height
         int maxFPS; ///< Maximum Frame Per Seconds, -1 for unlimited
@@ -49,23 +49,23 @@ class GD_API Game
 
         LoadingScreen loadingScreen; ///< Data concerning the loading screen
 
-        vector < Image >    images; ///< List of images available for the game
-        vector < Dossier >  imagesFolders; ///< Folder used to organize images
+        std::vector < Image >    images; ///< List of images available for the game
+        std::vector < Dossier >  imagesFolders; ///< Folder used to organize images
 
-        vector < boost::shared_ptr<Scene> >             scenes; ///< List of all scenes
-        vector < boost::shared_ptr<ExternalEvents> >    externalEvents; ///< List of all externals events
-        vector < boost::shared_ptr<Object> >            globalObjects; ///< Global objects
-        vector < ObjectGroup >                          objectGroups; ///< Global objects groups
+        std::vector < boost::shared_ptr<Scene> >             scenes; ///< List of all scenes
+        std::vector < boost::shared_ptr<ExternalEvents> >    externalEvents; ///< List of all externals events
+        std::vector < boost::shared_ptr<Object> >            globalObjects; ///< Global objects
+        std::vector < ObjectGroup >                          objectGroups; ///< Global objects groups
         #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
         bool useExternalSourceFiles; ///< True if game used external source files, and thus dynamic extensions.
-        vector < boost::shared_ptr<SourceFile> >        externalSourceFiles; ///< List of C++ source files used.
+        std::vector < boost::shared_ptr<GDpriv::SourceFile> >        externalSourceFiles; ///< List of C++ source files used.
         #endif
 
         ListVariable variables; ///< Initial global variables
 
         #if defined(GD_IDE_ONLY)
         std::string gameFile; ///< File of the game
-        vector < string > imagesChanged; ///< Images that have been changed and which have to be reloaded
+        std::vector < string > imagesChanged; ///< Images that have been changed and which have to be reloaded
 
         std::string winExecutableFilename; ///< Windows executable name
         std::string winExecutableIconFile; ///< Icon for Windows executable

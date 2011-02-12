@@ -25,11 +25,11 @@ namespace GDpriv
 {
 
 /**
- * ExtensionsManager manages extension, and provide useful things like :
- *
- * -Functions for creating an object ( from another or from a type ).
- * -Functions for getting pointers to actions/conditions functions.
- * -Convert typeId to type name and vice-versa.
+ * \brief Internal class managing static extensions.
+ * ExtensionsManager manages static extensions, and provide useful things like :
+ * - Functions for creating an object ( from another or from a type ).
+ * - Functions for getting pointers to actions/conditions functions.
+ * - Convert typeId to type name and vice-versa.
  */
 class GD_API ExtensionsManager
 {
@@ -318,7 +318,7 @@ class GD_API ExtensionsManager
             return ( static_cast<ExtensionsManager*>( _singleton ) );
         }
 
-        static void kill()
+        static void DestroySingleton()
         {
             if ( NULL != _singleton )
             {

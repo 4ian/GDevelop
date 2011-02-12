@@ -5,10 +5,6 @@
 
 #ifndef FOREACHEVENT_H
 #define FOREACHEVENT_H
-/*#include <boost/shared_ptr.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/nvp.hpp>*/
 #include "Event.h"
 class RuntimeScene;
 class ObjectsConcerned;
@@ -23,7 +19,7 @@ class wxWindow;
 #endif
 
 /**
- * Foreach event is a standard event that pick an object of a list each time it is repeated
+ * \brief Builtin internal event that pick an object of a list each time it is repeated
  */
 class ForEachEvent : public BaseEvent
 {

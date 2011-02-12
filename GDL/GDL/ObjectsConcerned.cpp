@@ -12,10 +12,6 @@ parent(NULL)
     //ctor
 }
 
-
-////////////////////////////////////////////////////////////
-/// Prendre les objets ayant le nom voulu ou appartenant au groupe ayant ce nom
-////////////////////////////////////////////////////////////
 ObjList ObjectsConcerned::Pick(unsigned int oID, bool forceGlobal)
 {
     ObjList objectsToTest;
@@ -43,10 +39,6 @@ ObjList ObjectsConcerned::Pick(unsigned int oID, bool forceGlobal)
     return objectsToTest;
 }
 
-////////////////////////////////////////////////////////////
-/// Prendre les objets ayant le nom voulu ou appartenant au groupe ayant ce nom
-/// mais en les supprimant des objectsPicked
-////////////////////////////////////////////////////////////
 ObjList ObjectsConcerned::PickAndRemove(unsigned int oID, bool forceGlobal)
 {
     ObjList objectsToTest;
@@ -74,9 +66,6 @@ ObjList ObjectsConcerned::PickAndRemove(unsigned int oID, bool forceGlobal)
     return objectsToTest;
 }
 
-////////////////////////////////////////////////////////////
-/// Prendre les objets ayant le nom voulu, sans tenir compte des groupes
-////////////////////////////////////////////////////////////
 ObjList ObjectsConcerned::PickOnlyObjects(unsigned int oId, bool onlyAlreadyConcerned, bool forceGlobal, bool removeFromAlreadyConcernedObjects)
 {
     ObjList objectsToTest;
@@ -100,9 +89,4 @@ ObjList ObjectsConcerned::PickOnlyObjects(unsigned int oId, bool onlyAlreadyConc
     alreadyConcernedObjects.insert(oId);
 
     return objectsToTest;
-}
-
-ObjectsConcerned::~ObjectsConcerned()
-{
-    //dtor
 }

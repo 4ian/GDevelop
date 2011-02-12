@@ -7,6 +7,12 @@
 #include <string>
 #include <vector>
 
+namespace GDpriv
+{
+
+/**
+ * \brief Internal class representing a compiler output
+ */
 class GD_API CompilerMessage
 {
 public:
@@ -22,6 +28,9 @@ public:
     } messageType;
 };
 
+/**
+ * \brief Internal class to parse compiler raw output to a CompilerMessage
+ */
 class GD_API CompilerMessagesParser
 {
     public:
@@ -34,6 +43,8 @@ class GD_API CompilerMessagesParser
 
     private:
 };
+
+}
 
 #endif // COMPILERERRORSPARSER_H
 

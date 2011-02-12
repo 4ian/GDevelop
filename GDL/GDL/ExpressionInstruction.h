@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef EXPRESSIONINSTRUCTION_H
 #define EXPRESSIONINSTRUCTION_H
 
@@ -17,7 +22,8 @@ typedef std::vector < boost::shared_ptr<Object> > ObjList;
 typedef boost::shared_ptr<Object> ObjSPtr;
 
 /**
- * Instruction ( function or object function ) of an expression
+ * \brief Instruction ( function or object function ) of an expression
+ * Instruction are processed at runtime to generate the mathematical expression which will be evaluated.
  */
 class GD_API ExpressionInstruction
 {

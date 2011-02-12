@@ -40,7 +40,8 @@ class ResourcesMergingHelper;
 #endif
 
 /**
- * An object is something displayed on the scene.
+ * \brief An object is something displayed on the scene.
+ *
  * Games don't directly use this class, but derived classes
  * provided by extensions.
  */

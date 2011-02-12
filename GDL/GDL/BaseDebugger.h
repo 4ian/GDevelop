@@ -10,7 +10,7 @@
 #include <SFML/System.hpp>
 
 /**
- * Base class to implement a debugger.
+ * \brief Internal base class to implement a debugger.
  * Derive from this class and implement
  * UpdateGUI function which be called
  * automatically by the scene

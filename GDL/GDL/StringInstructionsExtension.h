@@ -16,8 +16,7 @@ class StringInstructionsExtension : public ExtensionBase
     public:
         StringInstructionsExtension();
         virtual ~StringInstructionsExtension() {};
-    protected:
-    private:
+
 };
 
 #endif // STRINGINSTRUCTIONSEXTENSION_H

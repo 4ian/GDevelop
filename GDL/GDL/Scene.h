@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef SCENE_H
 #define SCENE_H
 
@@ -16,8 +21,10 @@ class Game;
 class AutomatismsSharedDatas;
 
 /**
- * A scene is an important part of a game.
- * It contains and manages objects, events...
+ * \brief Represents a scene.
+ *
+ * A scene is basically composed of events, objects and some other members.
+ * RuntimeScene are
  */
 class GD_API Scene
 {
@@ -28,26 +35,33 @@ class GD_API Scene
 
         Scene& operator=(const Scene & rhs);
 
+        /**
+         * Get scene name
+         */
         inline string GetName() const {return name;};
+
+        /**
+         * Change scene name
+         */
         inline void SetName(string name_) {name = name_;};
 
-        unsigned int backgroundColorR;
-        unsigned int backgroundColorG;
-        unsigned int backgroundColorB;
-        bool standardSortMethod;
+        unsigned int backgroundColorR; ///< Background color Red component
+        unsigned int backgroundColorG; ///< Background color Green component
+        unsigned int backgroundColorB; ///< Background color Blue component
+        bool standardSortMethod; ///< True to sort objects using standard sort.
         string title; ///< Title displayed in the window
-        float oglFOV;
-        float oglZNear;
-        float oglZFar;
-        bool stopSoundsOnStartup;
+        float oglFOV; ///< OpenGL Field Of View value
+        float oglZNear; ///< OpenGL Near Z position
+        float oglZFar; ///< OpenGL Far Z position
+        bool stopSoundsOnStartup; ///< True to make the scene stop all sounds at startup.
 
-        vector < BaseEventSPtr >                events;
-        vector < boost::shared_ptr<Object> >    initialObjects;
-        vector < ObjectGroup >                  objectGroups;
-        vector < InitialPosition >              initialObjectsPositions;
-        vector < Layer >                        initialLayers;
-        ListVariable                            variables;
-        boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas;
+        vector < BaseEventSPtr >                events; ///< Scene events
+        vector < boost::shared_ptr<Object> >    initialObjects; ///< Objects availables.
+        vector < ObjectGroup >                  objectGroups; ///< Objects groups availables.
+        vector < InitialPosition >              initialObjectsPositions; ///< List of all objects to be put on the scene at the beginning
+        vector < Layer >                        initialLayers; ///< Initial layers
+        ListVariable                            variables; ///< Variables list
+        boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
 
         #if defined(GD_IDE_ONLY)
         bool wasModified;

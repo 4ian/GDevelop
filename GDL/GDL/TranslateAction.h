@@ -17,21 +17,37 @@ class InstructionInfos;
 using namespace std;
 
 /**
- * Generate user friendly sentences and information from an action
+ * \brief Generate user friendly sentences and information from an action
  */
 class GD_API TranslateAction
 {
     public:
-        //Traduire une action
+
+        /**
+         * Create a sentence from an action
+         */
         static string Translate(const Instruction & action, const InstructionInfos & infos);
+
+        /**
+         * Add some HTML code around the parameter if needed
+         */
         static string AddHTMLToParameter(string & parameter, string type);
+
+        /**
+         * Make sure special characters ( <,>,& ) are transformed to their HTML equivalents.
+         */
         static void RemoveHTMLTags(string & str);
 
-        //Boutons
+        /**
+         * Return the label of a button from parameter type
+         */
         static string LabelFromType(string type);
+
+        /**
+         * Return the bitmap of a button from parameter type
+         */
         static wxBitmap BitmapFromType(string type);
 
-    protected:
     private:
         TranslateAction() {};
         virtual ~TranslateAction() {};

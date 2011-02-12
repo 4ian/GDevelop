@@ -109,6 +109,14 @@ bool Object::ClearForce()
 }
 
 
+struct NullForce
+{
+    bool operator ()( const Force &A ) const
+    {
+        return A.GetLength() == 0;
+    }
+};
+
 ////////////////////////////////////////////////////////////
 /// Met à jour les forces en fonction de leur diffusion
 ////////////////////////////////////////////////////////////
@@ -123,7 +131,7 @@ bool Object::UpdateForce( float ElapsedTime )
         if ( Forces[i].GetClearing() == 0 ) {Forces[i].SetLength(0); }
     }
 
-    Forces.erase( std::remove_if( Forces.begin(), Forces.end(), ForceNulle() ), Forces.end() );
+    Forces.erase( std::remove_if( Forces.begin(), Forces.end(), NullForce() ), Forces.end() );
 
     return true;
 }

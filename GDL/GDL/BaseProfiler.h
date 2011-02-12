@@ -11,7 +11,7 @@
 #include "GDL/profile.h"
 
 /**
- * Base class to create a profiler.
+ * \brief Base class to create a profiler.
  */
 class GD_API BaseProfiler
 {

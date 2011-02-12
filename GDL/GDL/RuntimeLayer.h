@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef RUNTIMELAYER_H
 #define RUNTIMELAYER_H
 
@@ -6,21 +11,40 @@
 #include "GDL/RuntimeCamera.h"
 
 /**
- * Layer used at runtime, containg RuntimeCamera.
+ * \brief Layer used at runtime.
+ *
+ * RuntimeLayer basically contains RuntimeCamera.
  */
 class GD_API RuntimeLayer
 {
     public:
         RuntimeLayer() {};
         RuntimeLayer(const Layer & layer, const sf::View & defaultView);
-        virtual ~RuntimeLayer();
+        virtual ~RuntimeLayer() {};
 
+        /**
+         * Get layer name
+         */
         inline std::string GetName() const { return associatedLayer.GetName(); };
+
+        /**
+         * Change layer name
+         */
         inline void SetName(std::string name_) { associatedLayer.SetName(name_); };
 
+        /**
+         *Get layer visibility
+         */
         inline bool GetVisibility() const { return associatedLayer.GetVisibility(); };
+
+        /**
+         * Change layer visibility
+         */
         inline void SetVisibility(bool isVisible) { associatedLayer.SetVisibility(isVisible); };
 
+        /**
+         * Get camera count
+         */
         inline unsigned int GetCamerasNumber() const { return cameras.size(); };
 
         /**
@@ -57,7 +81,6 @@ class GD_API RuntimeLayer
             return cameras[n];
         }
 
-    protected:
     private:
 
         Layer associatedLayer;

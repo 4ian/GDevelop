@@ -18,8 +18,9 @@ class Automatism;
 using namespace std;
 
 /**
- * An instruction is a member of an event. It can be a condition or an action.
- * Instructions have a type, which is used to link the Instruction to a function
+ * \brief An instruction is a member of an event. It can be a condition or an action.
+ *
+ * Instructions have a type, which is used to link the Instruction to a function.
  */
 class GD_API Instruction
 {
@@ -82,6 +83,10 @@ class GD_API Instruction
          * \return The current value of the parameter
          */
         inline const GDExpression & GetParameter(unsigned int nb) const { return parameters[nb]; }
+
+        /** Access a parameter
+         * \return The current value of the parameter
+         */
         inline GDExpression & GetParameter(unsigned int nb) { return parameters[nb]; }
 
         /** Access a parameter. Return a bad expression if the parameter requested does not exists.
@@ -99,6 +104,10 @@ class GD_API Instruction
 
             return parameters[nb];
         }
+
+        /** Access a parameter. Return a bad expression if the parameter requested does not exists.
+         * \return The current value of the parameter
+         */
         inline GDExpression & GetParameterSafely(unsigned int nb)
         {
             if ( nb >= parameters.size() )
@@ -123,8 +132,19 @@ class GD_API Instruction
          */
         void SetParameter(unsigned int nb, const GDExpression & val);
 
+        /**
+         * Return a reference to the vector containing sub instructions
+         */
         inline const vector < Instruction > & GetSubInstructions() const { return subInstructions; };
+
+        /**
+         * Return a reference to the vector containing sub instructions
+         */
         inline vector < Instruction > & GetSubInstructions() { return subInstructions; };
+
+        /**
+         * Change sub instructions
+         */
         inline void SetSubInstructions(const vector < Instruction > & subInstructions_) { subInstructions = subInstructions_; };
 
         #if defined(GD_IDE_ONLY)

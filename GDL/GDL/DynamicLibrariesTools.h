@@ -19,8 +19,19 @@
 namespace GDpriv
 {
 
+/**
+ * Open a raw C++ dynamic library
+ */
 Handle OpenLibrary(const char* path);
+
+/**
+ * Get a raw symbol from a raw C++ dynamic library
+ */
 void* GetSymbol(Handle library, const char* name);
+
+/**
+ * Close a raw C++ dynamic library
+ */
 void CloseLibrary(Handle library);
 
 };

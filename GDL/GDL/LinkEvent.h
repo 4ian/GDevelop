@@ -17,7 +17,7 @@ class wxWindow;
 #endif
 
 /**
- * Internal builtin LinkEvent, inserting events from another scene/external events.
+ * \brief Internal built-in LinkEvent, inserting events from another scene/external events.
  */
 class LinkEvent : public BaseEvent
 {

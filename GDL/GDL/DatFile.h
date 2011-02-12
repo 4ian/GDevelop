@@ -20,6 +20,9 @@ struct sFileEntry
     long offset; /// Offset, in the DAT file where the file is
 };
 
+/**
+ * \brief Internal class used to create and access "DAT files".
+ */
 class GD_API DatFile
 {
 private :

@@ -10,7 +10,7 @@ class Instruction;
 class ResourcesMergingHelper;
 
 /**
- * Internal builtin extension providing audio features.
+ * \brief Internal builtin extension providing audio features.
  */
 class AudioExtension : public ExtensionBase
 {

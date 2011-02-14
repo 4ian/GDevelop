@@ -1014,8 +1014,6 @@
 		</Unit>
 		<Unit filename="GDL\profile.cpp" />
 		<Unit filename="GDL\profile.h" />
-		<Unit filename="GDL\singleton.cpp" />
-		<Unit filename="GDL\singleton.h" />
 		<Unit filename="GDL\tinystr.cpp" />
 		<Unit filename="GDL\tinystr.h" />
 		<Unit filename="GDL\tinyxml.cpp" />
@@ -1053,11 +1051,11 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="1.5.10135" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="1.5.10138" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />
-				<doxyfile_dot class_diagrams="1" have_dot="1" />
+				<doxyfile_dot />
 				<general />
 			</DoxyBlocks>
 		</Extensions>

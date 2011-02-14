@@ -339,6 +339,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
 
 bool EventsRenderingHelper::GetConditionAt(vector < Instruction > & conditions, int x, int y, vector < Instruction > *& conditionList, unsigned int & conditionIdInList)
 {
+    const int separation = 1;
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
 
     int conditionsY = 1;
@@ -346,7 +347,7 @@ bool EventsRenderingHelper::GetConditionAt(vector < Instruction > & conditions, 
     {
         const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(conditions[c].GetType());
 
-        conditionsY += 1;
+        conditionsY += separation;
         if ( y >= conditionsY && y <= conditionsY+conditions[c].renderedHeight)
         {
             conditionList = &conditions;
@@ -354,7 +355,7 @@ bool EventsRenderingHelper::GetConditionAt(vector < Instruction > & conditions, 
             return true;
         }
 
-        conditionsY += conditions[c].renderedHeight+2;
+        conditionsY += conditions[c].renderedHeight+separation+1;
 
         //Check also sub conditions
         if ( !conditions[c].GetSubInstructions().empty() )
@@ -363,8 +364,9 @@ bool EventsRenderingHelper::GetConditionAt(vector < Instruction > & conditions, 
                 return true;
 
             //Add subconditions height
+            conditionsY += 1;
             for (unsigned int sc = 0;sc<conditions[c].GetSubInstructions().size();++sc)
-                conditionsY += conditions[c].GetSubInstructions()[sc].renderedHeight+2; //TODO : Fail with Sub sub conditions
+                conditionsY += GetRenderedInstructionAndSubInstructionsHeight(conditions[c].GetSubInstructions()[sc]); //TODO : Fail with Sub sub conditions
             conditionsY += 3;
         }
         else if ( instructionInfos.canHaveSubInstructions )
@@ -383,7 +385,29 @@ bool EventsRenderingHelper::GetConditionAt(vector < Instruction > & conditions, 
 
 unsigned int EventsRenderingHelper::GetRenderedInstructionAndSubInstructionsHeight(const Instruction & instr)
 {
-    return 0; //TODO
+    const int separation = 1;
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+    const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(instr.GetType());
+
+    int conditionsY = 0;
+
+    //Condition height
+    conditionsY += separation;
+    conditionsY += instr.renderedHeight+separation+1;
+
+    //Check also sub conditions
+    if ( !instr.GetSubInstructions().empty() )
+    {
+        //Add subconditions height
+        conditionsY += 1;
+        for (unsigned int sc = 0;sc<instr.GetSubInstructions().size();++sc)
+            conditionsY += GetRenderedInstructionAndSubInstructionsHeight(instr.GetSubInstructions()[sc]); //TODO : Fail with Sub sub conditions
+        conditionsY += 3;
+    }
+    else if ( instructionInfos.canHaveSubInstructions )
+        conditionsY += 18;
+
+    return conditionsY;
 }
 
 bool EventsRenderingHelper::GetActionAt(vector < Instruction > & actions, int x, int y, vector < Instruction > *& actionList, unsigned int & actionIdInList)

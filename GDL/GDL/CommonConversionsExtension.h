@@ -3,6 +3,9 @@
 
 #include "GDL/ExtensionBase.h"
 
+/**
+ * \brief Internal builtin-extension providing conversion ( ToString/ToNumber ) features.
+ */
 class CommonConversionsExtension : public ExtensionBase
 {
     public:

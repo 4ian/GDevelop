@@ -16,7 +16,7 @@ class wxWindow;
 #endif
 
 /**
- * Internal builtin Comment Event, allowing to add a simple text in events.
+ * \brief Internal builtin Comment Event, allowing to add a simple text in events.
  */
 class GD_API CommentEvent : public BaseEvent
 {

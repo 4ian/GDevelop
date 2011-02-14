@@ -47,138 +47,138 @@ class BaseProfiler;
  */
 class GD_API RuntimeScene : public Scene
 {
-    public:
-        RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_);
-        virtual ~RuntimeScene();
+public:
+    RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_);
+    virtual ~RuntimeScene();
 
-        RuntimeScene& operator=(const RuntimeScene & scene);
-        RuntimeScene(const RuntimeScene & scene);
+    RuntimeScene& operator=(const RuntimeScene & scene);
+    RuntimeScene(const RuntimeScene & scene);
 
-        sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display
-        const sf::Input *                       input; ///< Pointer to the SFML class used to get user input
-        bool                                    inputKeyPressed;    ///< Supplementary input : True if any key was pressed
-        int                                     inputWheelDelta;    ///< Supplementary input : Amount of mouse wheel moved
-        std::string                             inputTextEntered;   ///< Supplementary input : Text entered using keyboard
-        RuntimeGame *                           game; ///< Pointer to the game the scene is linked to
-        SoundManager *                          soundManager; ///< Pointer to the sound manager.
-        #if defined(GD_IDE_ONLY)
-        BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
-        BaseProfiler *                          profiler; ///< Pointer to the profiler. Can be NULL.
-        #endif
-        ObjInstancesHolder                      objectsInstances; ///< Contains all of the objects on the scene
-        ListVariable                            variables; ///<List of the scene variables
-        vector < RuntimeLayer >                 layers; ///<List of the layers
-        vector < Text >                         textes; ///<Deprecated way of displaying a text
-        vector < ManualTimer >                  timers; ///<List of the timer currently used.
-        bool                                    running; ///< True if the scene is being played
-        float                                   pauseTime; ///<Time that has been spent during the frame but which must not be taken in account in elpased time.
-        int                                     backgroundColorR; ///< Background color Red component
-        int                                     backgroundColorG; ///< Background color Green component
-        int                                     backgroundColorB; ///< Background color Blue component
-        boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas. Note the use of flat_map for better performance.
+    sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display
+    const sf::Input *                       input; ///< Pointer to the SFML class used to get user input
+    bool                                    inputKeyPressed;    ///< Supplementary input : True if any key was pressed
+    int                                     inputWheelDelta;    ///< Supplementary input : Amount of mouse wheel moved
+    std::string                             inputTextEntered;   ///< Supplementary input : Text entered using keyboard
+    RuntimeGame *                           game; ///< Pointer to the game the scene is linked to
+    SoundManager *                          soundManager; ///< Pointer to the sound manager.
+    #if defined(GD_IDE_ONLY)
+    BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
+    BaseProfiler *                          profiler; ///< Pointer to the profiler. Can be NULL.
+    #endif
+    ObjInstancesHolder                      objectsInstances; ///< Contains all of the objects on the scene
+    ListVariable                            variables; ///<List of the scene variables
+    vector < RuntimeLayer >                 layers; ///<List of the layers
+    vector < Text >                         textes; ///<Deprecated way of displaying a text
+    vector < ManualTimer >                  timers; ///<List of the timer currently used.
+    bool                                    running; ///< True if the scene is being played
+    float                                   pauseTime; ///<Time that has been spent during the frame but which must not be taken in account in elpased time.
+    int                                     backgroundColorR; ///< Background color Red component
+    int                                     backgroundColorG; ///< Background color Green component
+    int                                     backgroundColorB; ///< Background color Blue component
+    boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas. Note the use of flat_map for better performance.
 
-        /**
-         * Set up the Runtime Scene using a Scene
-         */
-        bool LoadFromScene( const Scene & scene );
+    /**
+     * Set up the Runtime Scene using a Scene
+     */
+    bool LoadFromScene( const Scene & scene );
 
-        /**
-         * Change the window used for rendering the scene
-         */
-        void ChangeRenderWindow(sf::RenderWindow * window);
+    /**
+     * Change the window used for rendering the scene
+     */
+    void ChangeRenderWindow(sf::RenderWindow * window);
 
-        /**
-         * Return true if scene is rendered full screen.
-         */
-        bool RenderWindowIsFullScreen() { return isFullScreen; }
+    /**
+     * Return true if scene is rendered full screen.
+     */
+    bool RenderWindowIsFullScreen() { return isFullScreen; }
 
-        /**
-         * Change full screen state. The render window is itself not changed so as to be displayed fullscreen or not.
-         */
-        void SetRenderWindowIsFullScreen(bool yes = true) { isFullScreen = yes; }
+    /**
+     * Change full screen state. The render window is itself not changed so as to be displayed fullscreen or not.
+     */
+    void SetRenderWindowIsFullScreen(bool yes = true) { isFullScreen = yes; }
 
-        /**
-         * By calling this method, scene will
-         */
-        void GotoSceneWhenEventsAreFinished(int scene);
+    /**
+     * By calling this method, scene will
+     */
+    void GotoSceneWhenEventsAreFinished(int scene);
 
-        /**
-         * Render and play the scene one frame.
-         */
-        int RenderAndStep(unsigned int nbStep);
+    /**
+     * Render and play the scene one frame.
+     */
+    int RenderAndStep(unsigned int nbStep);
 
-        /**
-         * Just render a frame.
-         */
-        void RenderWithoutStep();
+    /**
+     * Just render a frame.
+     */
+    void RenderWithoutStep();
 
-        /**
-         * Return the layer with the name passed in argument
-         */
-        const RuntimeLayer & GetLayer(string name) const;
+    /**
+     * Return the layer with the name passed in argument
+     */
+    const RuntimeLayer & GetLayer(string name) const;
 
-        /**
-         * Return the layer with the name passed in argument
-         */
-        RuntimeLayer & GetLayer(string name);
+    /**
+     * Return the layer with the name passed in argument
+     */
+    RuntimeLayer & GetLayer(string name);
 
-        /**
-         * Change scene time scale.
-         */
-        inline void SetTimeScale(float timeScale_) { timeScale = timeScale_; };
+    /**
+     * Change scene time scale.
+     */
+    inline void SetTimeScale(float timeScale_) { timeScale = timeScale_; };
 
-        /**
-         * Return scene time scale.
-         */
-        inline float GetTimeScale() const { return timeScale; };
+    /**
+     * Return scene time scale.
+     */
+    inline float GetTimeScale() const { return timeScale; };
 
-        /**
-         * Get elapsed time since last frame, in seconds.
-         */
-        inline float GetElapsedTime() const { return realElapsedTime*timeScale; };
+    /**
+     * Get elapsed time since last frame, in seconds.
+     */
+    inline float GetElapsedTime() const { return realElapsedTime*timeScale; };
 
-        /**
-         * Get time elapsed since beginning, in seconds.
-         */
-        inline float GetTimeFromStart() const { return timeFromStart; };
+    /**
+     * Get time elapsed since beginning, in seconds.
+     */
+    inline float GetTimeFromStart() const { return timeFromStart; };
 
-        /**
-         * Return true if the scene was just rendered once.
-         */
-        inline bool IsFirstLoop() const { return firstLoop; };
+    /**
+     * Return true if the scene was just rendered once.
+     */
+    inline bool IsFirstLoop() const { return firstLoop; };
 
-        /**
-         * Helper function to stop all musics played in the soundManager.
-         */
-        bool StopMusic();
+    /**
+     * Helper function to stop all musics played in the soundManager.
+     */
+    bool StopMusic();
 
-    private:
+protected:
 
-        void Init(const RuntimeScene & scene);
+    void Init(const RuntimeScene & scene);
 
-        /**
-         * Render a frame in the window
-         */
-        void Render();
-        void ManageObjectsBeforeEvents();
-        void ManageObjectsAfterEvents();
-        void ManageRenderTargetEvents();
-        void ManageSounds();
-        bool OrderObjectsByZOrder( ObjList & objList );
-        bool UpdateTime();
+    /**
+     * Render a frame in the window
+     */
+    void Render();
+    void ManageObjectsBeforeEvents();
+    void ManageObjectsAfterEvents();
+    void ManageRenderTargetEvents();
+    void ManageSounds();
+    bool OrderObjectsByZOrder( ObjList & objList );
+    bool UpdateTime();
 
-        bool DisplayLegacyTexts(string layer = "");
-        void PreprocessEventList( const Game & Jeu, vector < BaseEventSPtr > & listEvent );
+    bool DisplayLegacyTexts(string layer = "");
+    void PreprocessEventList( const Game & Jeu, vector < BaseEventSPtr > & listEvent );
 
-        bool firstLoop; ///<true if the scene was just rendered once.
-        bool isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
-        float realElapsedTime; ///< Elpased time since last frame, in seconds, without taking time scale in account.
-        float elapsedTime; ///< Elpased time since last frame, in seconds
-        float timeScale; ///< Time scale
-        float timeFromStart; ///< Time in seconds elapsed from start
-        int   specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
+    bool firstLoop; ///<true if the scene was just rendered once.
+    bool isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
+    float realElapsedTime; ///< Elpased time since last frame, in seconds, without taking time scale in account.
+    float elapsedTime; ///< Elpased time since last frame, in seconds
+    float timeScale; ///< Time scale
+    float timeFromStart; ///< Time in seconds elapsed from start
+    int   specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
 
-        static RuntimeLayer badLayer;
+    static RuntimeLayer badLayer;
 };
 
 #endif // SCENEIG_H

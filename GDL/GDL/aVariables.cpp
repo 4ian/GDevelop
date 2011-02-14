@@ -5,16 +5,11 @@
 
 #include <vector>
 #include <string>
-#include "GDL/aVariables.h"
-#include <cmath>
-#include "GDL/Collisions.h"
-#include "GDL/Event.h"
-#include <iostream>
 #include <sstream>
-#include "GDL/Chercher.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Force.h"
 #include <iostream>
+#include "GDL/aVariables.h"
+#include "GDL/Event.h"
+#include "GDL/CommonTools.h"
 
 #include "GDL/ListVariable.h"
 #include "GDL/RuntimeScene.h"

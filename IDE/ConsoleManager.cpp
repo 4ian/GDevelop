@@ -7,6 +7,8 @@
 #include <wx/msw/winundef.h>
 #endif
 
+ConsoleManager *ConsoleManager::_singleton = NULL;
+
 ConsoleManager::ConsoleManager()
 {
     console = new ConsoleFrame(0);

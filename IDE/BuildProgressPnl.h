@@ -26,6 +26,7 @@ class BuildProgressPnl: public wxPanel
 		virtual ~BuildProgressPnl();
 
 		bool LaunchGameSourceFilesBuild(Game & game);
+		bool ChangeGameWithoutBuilding(Game & game);
 		bool IsBuilding();
 		bool BuildNeeded();
 		bool AbortBuild();

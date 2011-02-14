@@ -31,10 +31,10 @@ public:
 
     static void DestroySingleton()
     {
-        if ( NULL != _singleton )
+        if ( 0 != _singleton )
         {
             delete _singleton;
-            _singleton = NULL;
+            _singleton = 0;
         }
     }
 

@@ -41,9 +41,9 @@ BuildProgressPnl::BuildProgressPnl(wxWindow* parent,wxWindowID id,const wxPoint&
 	FlexGridSizer2->AddGrowableRow(0);
 	stopCompilerBt = new wxButton(this, ID_BUTTON1, _("Arrêter la compilation des sources"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(stopCompilerBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	statusTxt = new wxStaticText(this, ID_STATICTEXT1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-	FlexGridSizer2->Add(statusTxt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	statusTxt = new wxStaticText(this, ID_STATICTEXT1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	FlexGridSizer1->Add(statusTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	progressGauge = new wxGauge(this, ID_GAUGE1, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_GAUGE1"));
 	FlexGridSizer1->Add(progressGauge, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	SetSizer(FlexGridSizer1);
@@ -67,6 +67,14 @@ bool BuildProgressPnl::LaunchGameSourceFilesBuild(Game & game)
     if ( sourceFileBuilder.IsBuilding() ) return false;
     sourceFileBuilder.SetFiles(game.externalSourceFiles);
     return sourceFileBuilder.LaunchSourceFilesBuild();
+}
+
+bool BuildProgressPnl::ChangeGameWithoutBuilding(Game & game)
+{
+    if ( sourceFileBuilder.IsBuilding() ) return false;
+    sourceFileBuilder.SetFiles(game.externalSourceFiles);
+
+    return true;
 }
 
 bool BuildProgressPnl::BuildNeeded()

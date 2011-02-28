@@ -341,11 +341,6 @@ isResizingColumns(false)
     Connect( ID_SEARCHBUTTON, wxEVT_COMMAND_TOOL_CLICKED, ( wxObjectEventFunction )&EditorEvents::OnSearchBtClick );
     Connect( ID_HELPBUTTON, wxEVT_COMMAND_TOOL_CLICKED, ( wxObjectEventFunction )&EditorEvents::OnAideBtClick );
 
-    actionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
-    conditionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
-    noActionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
-    noConditionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
-
     //Adding events types
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
@@ -473,10 +468,10 @@ EditorEvents::~EditorEvents()
     delete searchDialog;
 
     //Be careful to remove ( not delete ) the common sub menu, so as to prevent its multiple deletion.
-    actionsMenu.Remove(actionsMenu.FindItemByPosition(actionsMenu.GetMenuItemCount()-1));
-    conditionsMenu.Remove(conditionsMenu.FindItemByPosition(conditionsMenu.GetMenuItemCount()-1));
-    noActionsMenu.Remove(noActionsMenu.FindItemByPosition(noActionsMenu.GetMenuItemCount()-1));
-    noConditionsMenu.Remove(noConditionsMenu.FindItemByPosition(noConditionsMenu.GetMenuItemCount()-1));
+    if ( actionsMenu.FindItem(_("Evènement")) != wxNOT_FOUND ) actionsMenu.Remove(actionsMenu.FindItem(_("Evènement")));
+    if ( conditionsMenu.FindItem(_("Evènement")) != wxNOT_FOUND ) conditionsMenu.Remove(conditionsMenu.FindItem(_("Evènement")));
+    if ( noActionsMenu.FindItem(_("Evènement")) != wxNOT_FOUND ) noActionsMenu.Remove(noActionsMenu.FindItem(_("Evènement")));
+    if ( noConditionsMenu.FindItem(_("Evènement")) != wxNOT_FOUND ) noConditionsMenu.Remove(noConditionsMenu.FindItem(_("Evènement")));
     //(*Destroy(EditorEvents)
     //*)
 }
@@ -1216,21 +1211,39 @@ void EditorEvents::OnEventsPanelRightUp( wxMouseEvent& event )
     BaseEventSPtr eventSelected = GetLastSelectedEvent();
     vector < Instruction > * instructionsListSelected = GetLastSelectedListOfInstructions();
 
+    //Remove the common submenu from all menus ( wxGTK does not support sub menus to be inserted more than one time )
+    if ( actionsMenu.FindItem(_("Evènement")) != wxNOT_FOUND ) actionsMenu.Remove(actionsMenu.FindItem(_("Evènement")));
+    if ( conditionsMenu.FindItem(_("Evènement")) != wxNOT_FOUND ) conditionsMenu.Remove(conditionsMenu.FindItem(_("Evènement")));
+    if ( noActionsMenu.FindItem(_("Evènement")) != wxNOT_FOUND ) noActionsMenu.Remove(noActionsMenu.FindItem(_("Evènement")));
+    if ( noConditionsMenu.FindItem(_("Evènement")) != wxNOT_FOUND ) noConditionsMenu.Remove(noConditionsMenu.FindItem(_("Evènement")));
+
     //Menu for conditions list
     if ( instructionsListSelected != NULL && conditionsSelected )
     {
         if ( !instructionsListSelected->empty() )
+        {
+            conditionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
             PopupMenu( &conditionsMenu );
+        }
         else
+        {
+            noConditionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
             PopupMenu( &noConditionsMenu );
+        }
     }
     //Menu for actions list
     else if ( instructionsListSelected != NULL && !conditionsSelected )
     {
         if ( !instructionsListSelected->empty() )
+        {
+            actionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
             PopupMenu( &actionsMenu );
+        }
         else
+        {
+            noActionsMenu.AppendSubMenu(&ContextMenu, _("Evènement"), _("Edition de l'évènement"));
             PopupMenu( &noActionsMenu );
+        }
     }
     //Menu for events
     else

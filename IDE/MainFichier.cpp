@@ -61,16 +61,13 @@ void Game_Develop_EditorFrame::OnRibbonNewClicked(wxRibbonButtonBarEvent& evt)
 void Game_Develop_EditorFrame::OnMenuOpenSelected( wxCommandEvent& event )
 {
     //Affichage de la boite de dialogue
-    wxFileDialog FileDialog( this, _( "Choisissez le jeu à ouvrir" ), "", "", "*\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
-    FileDialog.ShowModal();
+    wxFileDialog openFileDialog( this, _( "Choisissez le jeu à ouvrir" ), "", "", "*\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
 
     //A t on  un fichier à ouvrir ?
-    if ( FileDialog.GetPath() != "" )
-    {
-        Open( static_cast<string>( FileDialog.GetPath() ) );
+    if (openFileDialog.ShowModal() == wxID_CANCEL)
+        return;
 
-    }
-
+    Open( string(openFileDialog.GetPath().mb_str()) );
 }
 void Game_Develop_EditorFrame::OnOpenExampleSelected(wxCommandEvent& event)
 {
@@ -266,13 +263,17 @@ void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event 
             return;
         }
 
-        if ( GetBuildToolsPanel()->buildProgressPnl->BuildNeeded() )
+        if ( true )
         {
+            GDpriv::SourceFileBuilder builder(GetBuildToolsPanel()->buildProgressPnl->progressGauge, GetBuildToolsPanel()->buildProgressPnl->statusTxt, true);
+            builder.SetFiles(GetCurrentGame()->externalSourceFiles);
+            builder.SetExtensionsUsed(GetCurrentGame()->extensionsUsed);
+
             GDpriv::DynamicExtensionsManager::GetInstance()->UnloadAllDynamicExtensions();
             GetBuildToolsPanel()->notebook->SetSelection(0);
 
             //Be sure another build process is not running, and then launch build.
-            if ( GetBuildToolsPanel()->buildProgressPnl->IsBuilding() || !GetBuildToolsPanel()->buildProgressPnl->LaunchGameSourceFilesBuild(*GetCurrentGame()) )
+            if ( GetBuildToolsPanel()->buildProgressPnl->IsBuilding() || !builder.LaunchSourceFilesBuild() )
             {
                 wxLogWarning(_("Game Develop est entrain de compiler les sources C++ et ne pourra compiler le jeu qu'une fois ce processus terminé."));
                 return;
@@ -280,21 +281,21 @@ void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event 
 
             //Wait build to finish.
             wxProgressDialog progress(_("Compilation"),_("Veuillez patienter pendant la compilation des sources C++..."),100, NULL, wxPD_CAN_ABORT | wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_ELAPSED_TIME);
-            while (GetBuildToolsPanel()->buildProgressPnl->IsBuilding() )
+            while ( builder.IsBuilding() )
             {
                 if ( !progress.Update(GetBuildToolsPanel()->buildProgressPnl->progressGauge->GetValue()) ) //Enable the user to stop compilation
                 {
-                    GetBuildToolsPanel()->buildProgressPnl->AbortBuild();
+                    builder.AbordBuild();
                     return;
                 }
             }
 
             GDpriv::CompilerMessagesParser errorsParser;
-            errorsParser.ParseOutput(GetBuildToolsPanel()->buildProgressPnl->sourceFileBuilder.GetErrors());
+            errorsParser.ParseOutput(builder.GetErrors());
             GetBuildToolsPanel()->buildMessagesPnl->RefreshWith(&*GetCurrentGame(), errorsParser.parsedErrors);
 
             //Build failed, stop here and show errors
-            if ( !GetBuildToolsPanel()->buildProgressPnl->LastBuildSuccessed() )
+            if ( !builder.LastBuildSuccessed() )
             {
                 m_mgr.GetPane(GetBuildToolsPanel()).Show(true);
                 GetBuildToolsPanel()->notebook->SetSelection(1);

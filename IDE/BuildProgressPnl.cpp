@@ -64,8 +64,8 @@ BuildProgressPnl::~BuildProgressPnl()
 
 bool BuildProgressPnl::LaunchGameSourceFilesBuild(Game & game)
 {
-    if ( sourceFileBuilder.IsBuilding() ) return false;
-    sourceFileBuilder.SetFiles(game.externalSourceFiles);
+    if ( !ChangeGameWithoutBuilding(game) ) return false;
+
     return sourceFileBuilder.LaunchSourceFilesBuild();
 }
 
@@ -73,6 +73,7 @@ bool BuildProgressPnl::ChangeGameWithoutBuilding(Game & game)
 {
     if ( sourceFileBuilder.IsBuilding() ) return false;
     sourceFileBuilder.SetFiles(game.externalSourceFiles);
+    sourceFileBuilder.SetExtensionsUsed(game.extensionsUsed);
 
     return true;
 }
@@ -95,6 +96,7 @@ bool BuildProgressPnl::LastBuildSuccessed()
 bool BuildProgressPnl::AbortBuild()
 {
     sourceFileBuilder.AbordBuild();
+    return true;
 }
 
 void BuildProgressPnl::OnstopCompilerBtClick(wxCommandEvent& event)

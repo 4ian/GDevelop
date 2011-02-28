@@ -335,7 +335,7 @@ void DebuggerGUI::UpdateGUI()
         else
         {
             //Si l'objet qui est dans l'arbre n'est pas le même, on le supprime et le reajoute au bon endroit
-            if ( objectsInTree[weakPtrToObject].first != allObjects[i]->GetName() )
+            if ( objectsInTree[weakPtrToObject].first != allObjects[i]->GetName() && initialObjects.find(allObjects[i]->GetName()) != initialObjects.end() )
             {
                 objectsTree->Delete(objectsInTree[weakPtrToObject].second);
                 wxTreeItemId objectItem = objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], ToString(i));

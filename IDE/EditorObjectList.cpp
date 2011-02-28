@@ -17,6 +17,7 @@
 #include <wx/ribbon/toolbar.h>
 #include <wx/textdlg.h>
 #include <wx/choicdlg.h>
+#include <wx/imaglist.h>
 
 #include <string>
 #include <vector>
@@ -438,7 +439,7 @@ void EditorObjectList::Refresh()
     {
         int thumbnailID = -1;
         wxBitmap thumbnail;
-        if ( objects->at(i)->GenerateThumbnail(game, thumbnail) )
+        if ( objects->at(i)->GenerateThumbnail(game, thumbnail)  && thumbnail.IsOk() )
         {
             objectsImagesList->Add(thumbnail);
             thumbnailID = objectsImagesList->GetImageCount()-1;

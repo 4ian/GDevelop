@@ -10,6 +10,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
+#include <wx/imaglist.h>
 #include "Clipboard.h"
 #include "Game_Develop_EditorMain.h"
 #include "gdTreeItemGameData.h"

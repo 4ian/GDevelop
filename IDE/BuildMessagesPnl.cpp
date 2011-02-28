@@ -25,8 +25,8 @@ BEGIN_EVENT_TABLE(BuildMessagesPnl,wxPanel)
 END_EVENT_TABLE()
 
 BuildMessagesPnl::BuildMessagesPnl(wxWindow* parent, ProjectManager * projectManager_) :
-    gameAssociatedWithErrors(NULL),
-    projectManager(projectManager_)
+    projectManager(projectManager_),
+    gameAssociatedWithErrors(NULL)
 {
     //(*Initialize(BuildMessagesPnl)
     wxFlexGridSizer* FlexGridSizer1;

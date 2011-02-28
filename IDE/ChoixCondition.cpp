@@ -213,7 +213,7 @@ scene(scene_)
     FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer5->AddGrowableCol(0);
     FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
-    LocaliseCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("Par défaut"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
+    LocaliseCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("Par défaut"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
     LocaliseCheck->SetValue(true);
     LocaliseCheck->SetToolTip(_("Ne seront pris en compte que les objets concernés par les autres conditions de l\'évènement."));
     FlexGridSizer6->Add(LocaliseCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

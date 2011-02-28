@@ -698,7 +698,7 @@ void SceneCanvas::ReloadFirstPart()
     if ( debugger ) scene.debugger = debugger.get();
 
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
-    if ( !scene.editing )
+    if ( !scene.editing && gameEdited.useExternalSourceFiles )
     {
         GDpriv::DynamicExtensionsManager::GetInstance()->UnloadAllDynamicExtensions();
         mainEditorCommand.GetBuildToolsPanel()->notebook->SetSelection(0);
@@ -720,7 +720,7 @@ void SceneCanvas::ReloadFirstPart()
 void SceneCanvas::ReloadSecondPart()
 {
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
-    if ( !scene.editing )
+    if ( !scene.editing && gameEdited.useExternalSourceFiles )
     {
         GDpriv::CompilerMessagesParser errorsParser;
         errorsParser.ParseOutput(mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->sourceFileBuilder.GetErrors());
@@ -734,7 +734,7 @@ void SceneCanvas::ReloadSecondPart()
             mainEditorCommand.GetMainEditor()->RequestUserAttention();
         }
 
-        GDpriv::DynamicExtensionsManager::GetInstance()->LoadDynamicExtension("dynext.dxgd");
+        GDpriv::DynamicExtensionsManager::GetInstance()->LoadDynamicExtension("dynext.dxgde");
     }
     #endif
 
@@ -750,7 +750,7 @@ void SceneCanvas::ReloadSecondPart()
 
 void SceneCanvas::Refresh()
 {
-    if ( isReloading )
+    if ( isReloading && gameEdited.useExternalSourceFiles )
     {
         //Wait extensions to be compiled
         if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->IsBuilding() )

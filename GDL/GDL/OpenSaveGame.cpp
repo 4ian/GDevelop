@@ -334,7 +334,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     return;
 }
 
-void OpenSaveGame::OpenGameInformations(TiXmlElement * elem)
+void OpenSaveGame::OpenGameInformations(const TiXmlElement * elem)
 {
     if ( elem->FirstChildElement( "Nom" ) != NULL ) { game.name = elem->FirstChildElement( "Nom" )->Attribute( "value" ); }
     else { MSG( "Les informations concernant le nom manquent." ); }
@@ -347,7 +347,7 @@ void OpenSaveGame::OpenGameInformations(TiXmlElement * elem)
 
     if ( elem->FirstChildElement( "Extensions" ) != NULL )
     {
-        TiXmlElement * extensionsElem = elem->FirstChildElement( "Extensions" )->FirstChildElement();
+        const TiXmlElement * extensionsElem = elem->FirstChildElement( "Extensions" )->FirstChildElement();
         while (extensionsElem)
         {
             if ( extensionsElem->Attribute("name") )
@@ -387,8 +387,9 @@ void OpenSaveGame::OpenGameInformations(TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableFilename", game.winExecutableFilename);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableIconFile", game.winExecutableIconFile);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("linuxExecutableFilename", game.linuxExecutableFilename);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("useExternalSourceFiles", game.useExternalSourceFiles);
     #endif
+    if ( elem->Attribute( "useExternalSourceFiles" )  != NULL )
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("useExternalSourceFiles", game.useExternalSourceFiles);
 
     return;
 }
@@ -1683,27 +1684,28 @@ bool OpenSaveGame::SaveToFile(string file)
 
     //Info du jeu
     TiXmlElement * info;
-    info = new TiXmlElement( "Nom" );
-    infos->LinkEndChild( info );
-    info->SetAttribute( "value", game.name.c_str() );
-    info = new TiXmlElement( "Auteur" );
-    infos->LinkEndChild( info );
-    info->SetAttribute( "value", game.author.c_str() );
-    info = new TiXmlElement( "WindowW" );
-    infos->LinkEndChild( info );
-    info->SetAttribute( "value", game.windowWidth );
-    info = new TiXmlElement( "WindowH" );
-    infos->LinkEndChild( info );
-    info->SetAttribute( "value", game.windowHeight );
-    info = new TiXmlElement( "Portable" );
-    infos->LinkEndChild( info );
-    if ( game.portable )
-        info->SetAttribute( "value", "true" );
-    else
-        info->SetAttribute( "value", "false" );
-
     {
-        TiXmlElement * elem = info;
+        info = new TiXmlElement( "Nom" );
+        infos->LinkEndChild( info );
+        info->SetAttribute( "value", game.name.c_str() );
+        info = new TiXmlElement( "Auteur" );
+        infos->LinkEndChild( info );
+        info->SetAttribute( "value", game.author.c_str() );
+        info = new TiXmlElement( "WindowW" );
+        infos->LinkEndChild( info );
+        info->SetAttribute( "value", game.windowWidth );
+        info = new TiXmlElement( "WindowH" );
+        infos->LinkEndChild( info );
+        info->SetAttribute( "value", game.windowHeight );
+        info = new TiXmlElement( "Portable" );
+        infos->LinkEndChild( info );
+        if ( game.portable )
+            info->SetAttribute( "value", "true" );
+        else
+            info->SetAttribute( "value", "false" );
+    }
+    {
+        TiXmlElement * elem = infos;
         GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("winExecutableFilename", game.winExecutableFilename);
         GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("winExecutableIconFile", game.winExecutableIconFile);
         GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("linuxExecutableFilename", game.linuxExecutableFilename);
@@ -1961,18 +1963,18 @@ void OpenSaveGame::SavePositions(const vector < InitialPosition > & list, TiXmlE
         TiXmlElement * objet = new TiXmlElement( "Objet" );
         positions->LinkEndChild( objet );
         objet->SetAttribute( "nom", list.at( j ).objectName.c_str() );
-        objet->SetAttribute( "x", list.at( j ).x );
-        objet->SetAttribute( "y", list.at( j ).y );
+        objet->SetDoubleAttribute( "x", list.at( j ).x );
+        objet->SetDoubleAttribute( "y", list.at( j ).y );
         objet->SetAttribute( "plan", list.at( j ).zOrder );
         objet->SetAttribute( "layer", list.at( j ).layer.c_str() );
-        objet->SetAttribute( "angle", list.at( j ).angle );
+        objet->SetDoubleAttribute( "angle", list.at( j ).angle );
 
         objet->SetAttribute( "personalizedSize", "false" );
         if ( list.at( j ).personalizedSize )
             objet->SetAttribute( "personalizedSize", "true" );
 
-        objet->SetAttribute( "width", list.at( j ).width );
-        objet->SetAttribute( "height", list.at( j ).height );
+        objet->SetDoubleAttribute( "width", list.at( j ).width );
+        objet->SetDoubleAttribute( "height", list.at( j ).height );
 
         TiXmlElement * floatInfos = new TiXmlElement( "floatInfos" );
         objet->LinkEndChild( floatInfos );
@@ -1982,7 +1984,7 @@ void OpenSaveGame::SavePositions(const vector < InitialPosition > & list, TiXmlE
             TiXmlElement * info = new TiXmlElement( "Info" );
             floatInfos->LinkEndChild( info );
             info->SetAttribute( "name", floatInfo->first.c_str());
-            info->SetAttribute( "value", floatInfo->second);
+            info->SetDoubleAttribute( "value", floatInfo->second);
         }
 
         TiXmlElement * stringInfos = new TiXmlElement( "stringInfos" );

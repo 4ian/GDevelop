@@ -45,8 +45,8 @@ bool ActSetWindowSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
 
     if ( action.GetParameter(2).GetAsBool() ) //Change future cameras default size if wanted.
     {
-        game->windowWidth = windowWidth;
-        game->windowHeight = windowHeight;
+        scene.game->windowWidth = windowWidth;
+        scene.game->windowHeight = windowHeight;
     }
 
     if ( scene.RenderWindowIsFullScreen() )

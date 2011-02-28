@@ -63,27 +63,32 @@ void CommentEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, Ma
 }
 
 /**
- * Render the event in the bitmap
+ * Render the event
  */
 void CommentEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+    renderingHelper->GetHTMLRenderer().SetDC(&dc);
+    renderingHelper->GetHTMLRenderer().SetStandardFonts( 8 );
 
-    const int sideSeparation = 3; //Espacement en pixel entre le texte et la bordure
-    dc.SetFont( renderingHelper->GetFont() );
+    //Prepare HTML texts
+    std::string str1 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com1)+"</FONT>";
+    std::string str2 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com2)+"</FONT>";
 
-    wxRect rectangle = wxRect(dc.GetMultiLineTextExtent(com1));
-    wxRect rectangle2 = wxRect(dc.GetMultiLineTextExtent(com2));
+        cout << str1;
+    //Calculate space constraints
+    const int sideSeparation = 3; //Spacing between text and borders
 
-    //Setup the background
-    rectangle.SetX(x);
-    rectangle.SetY(y);
-    rectangle.SetWidth(width);
-    if ( rectangle.GetHeight() >= rectangle2.GetHeight() )
-        rectangle.SetHeight(rectangle.GetHeight()+sideSeparation*2);
-    else
-        rectangle.SetHeight(rectangle2.GetHeight()+sideSeparation*2);
+    unsigned int textWidth = com2.empty() ? width-sideSeparation*2 : width/2-sideSeparation*2;
+    renderingHelper->GetHTMLRenderer().SetSize(textWidth, 9999);
 
+    renderingHelper->GetHTMLRenderer().SetHtmlText(str1);
+    unsigned int text1Height = renderingHelper->GetHTMLRenderer().GetTotalHeight();
+
+    renderingHelper->GetHTMLRenderer().SetHtmlText(str2);
+    unsigned int text2Height = renderingHelper->GetHTMLRenderer().GetTotalHeight();
+
+    //Prepare background
     if ( !selected )
     {
         dc.SetBrush(wxBrush(wxColour(r, v, b)));
@@ -96,20 +101,19 @@ void CommentEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int wid
     }
 
     //Draw the background
-    dc.DrawRectangle(rectangle);
+    dc.DrawRectangle(x, y, width, text1Height > text2Height ? sideSeparation+text1Height+sideSeparation : sideSeparation+text2Height+sideSeparation);
 
-    //Draw the text
-    dc.SetTextForeground(wxColour(textR, textG, textB));
-    wxRect texteRect = rectangle;
-    texteRect.SetY(texteRect.GetY()+sideSeparation);
-    texteRect.SetX(texteRect.GetX()+sideSeparation);
-    dc.DrawLabel( com1, texteRect );
-
-    //Optional text
-    if ( !com2.empty() )
+    //Draw text
     {
-        texteRect.SetX(texteRect.GetX()+width/2);
-        dc.DrawLabel( com2, texteRect );
+        renderingHelper->GetHTMLRenderer().SetHtmlText(str1);
+        wxArrayInt neededArray;
+        renderingHelper->GetHTMLRenderer().Render(x + sideSeparation, y+sideSeparation, neededArray);
+    }
+    if ( !com2.empty() ) //Optional text
+    {
+        renderingHelper->GetHTMLRenderer().SetHtmlText(str2);
+        wxArrayInt neededArray;
+        renderingHelper->GetHTMLRenderer().Render(x + sideSeparation + textWidth + sideSeparation, y+sideSeparation, neededArray);
     }
 }
 
@@ -123,19 +127,26 @@ unsigned int CommentEvent::GetRenderedHeight(unsigned int width) const
         wxBitmap fakeBmp(1,1);
         dc.SelectObject(fakeBmp);
 
-        dc.SetFont( renderingHelper->GetFont() );
-        const int sideSeparation = 3; //Espacement en pixel entre le texte et la bordure
+        renderingHelper->GetHTMLRenderer().SetDC(&dc);
+        renderingHelper->GetHTMLRenderer().SetStandardFonts( 8 );
 
-        wxRect rectangle = wxRect(dc.GetMultiLineTextExtent(com1));
-        wxRect rectangle2 = wxRect(dc.GetMultiLineTextExtent(com2));
+        std::string str1 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com1)+"</FONT>";
+        std::string str2 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com2)+"</FONT>";
 
-        if ( rectangle.GetHeight() >= rectangle2.GetHeight() )
-            rectangle.SetHeight(rectangle.GetHeight()+sideSeparation*2);
-        else
-            rectangle.SetHeight(rectangle2.GetHeight()+sideSeparation*2);
 
-        renderedHeight = rectangle.GetHeight();
-        eventHeightNeedUpdate = false;
+        //Calculate space constraints
+        const int sideSeparation = 3; //Spacing between text and borders
+
+        unsigned int textWidth = com2.empty() ? width-sideSeparation*2 : width/2-sideSeparation*2;
+        renderingHelper->GetHTMLRenderer().SetSize(textWidth, 9999);
+
+        renderingHelper->GetHTMLRenderer().SetHtmlText(str1);
+        unsigned int text1Height = renderingHelper->GetHTMLRenderer().GetTotalHeight();
+
+        renderingHelper->GetHTMLRenderer().SetHtmlText(str2);
+        unsigned int text2Height = renderingHelper->GetHTMLRenderer().GetTotalHeight();
+
+        renderedHeight = text1Height > text2Height ? sideSeparation+text1Height+sideSeparation : sideSeparation+text2Height+sideSeparation;
     }
 
     return renderedHeight;

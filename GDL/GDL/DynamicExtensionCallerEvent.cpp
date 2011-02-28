@@ -52,14 +52,22 @@ void DynamicExtensionCallerEvent::Preprocess(const Game & game, RuntimeScene & s
     //Stop preprocessing if game does not use external source files.
     if ( !game.useExternalSourceFiles )
     {
+        #if defined(GD_IDE_ONLY)
         wxLogWarning(_("L'évènement C++ nommé")+" \""+dynamicExtensionEventName+"\" "+_("ne sera pas executé car le jeu n'utilise pas de sources C++."));
+        #endif
+        std::cout << "C++ event \"" << dynamicExtensionEventName << "\" won't be executed.";
         return;
     }
 
     if ( GDpriv::DynamicExtensionsManager::GetInstance()->HasEvent(dynamicExtensionEventName) )
         dynamicExtensionEvent = GDpriv::DynamicExtensionsManager::GetInstance()->CreateEvent(dynamicExtensionEventName);
     else
+    {
+        #if defined(GD_IDE_ONLY)
         wxLogStatus(_("L'évènement C++ nommé")+" \""+dynamicExtensionEventName+"\" "+_("n'a pas été trouvé.\nAssurez vous de l'avoir declaré dans le fichier de déclaration."));
+        #endif
+        std::cout << "C++ event \"" << dynamicExtensionEventName << "\" was not found.";
+    }
 }
 
 #if defined(GD_IDE_ONLY)

@@ -82,9 +82,11 @@ void Game::Init(const Game & game)
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     useExternalSourceFiles = game.useExternalSourceFiles;
 
+    #if defined(GD_IDE_ONLY)
     externalSourceFiles.clear();
     for (unsigned int i =0;i<game.externalSourceFiles.size();++i)
-    	externalSourceFiles.push_back( boost::shared_ptr<SourceFile>(new SourceFile(*game.externalSourceFiles[i])) );
+    	externalSourceFiles.push_back( boost::shared_ptr<GDpriv::SourceFile>(new GDpriv::SourceFile(*game.externalSourceFiles[i])) );
+    #endif
     #endif
 
     variables = game.variables;

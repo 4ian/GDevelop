@@ -79,6 +79,7 @@ class EditorObjet: public wxDialog
 		wxMenuItem* MenuItem4;
 		wxMenuItem* MenuItem14;
 		wxButton* DelAnimBt;
+		wxMenu* MenuItem16;
 		wxMenuItem* MenuItem11;
 		wxMenuItem* MenuItem15;
 		wxMenu* MenuItem6;

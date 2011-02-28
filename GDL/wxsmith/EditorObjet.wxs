@@ -449,6 +449,7 @@
 																							<object class="wxRadioButton" name="ID_RADIOBUTTON3" variable="BoucleOuiCheck" member="yes">
 																								<label>Oui</label>
 																								<tooltip>Après la dernière image, l&apos;animation reprendra du départ.</tooltip>
+																								<style>wxRB_GROUP</style>
 																								<handler function="OnBoucleOuiCheckSelect" entry="EVT_RADIOBUTTON" />
 																							</object>
 																							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

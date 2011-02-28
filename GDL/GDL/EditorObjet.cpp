@@ -140,7 +140,6 @@ ySelectionOffset(0)
     wxFlexGridSizer* FlexGridSizer16;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
-    wxMenu* MenuItem16;
     wxFlexGridSizer* FlexGridSizer9;
     wxFlexGridSizer* FlexGridSizer2;
     wxBoxSizer* BoxSizer2;
@@ -306,7 +305,7 @@ ySelectionOffset(0)
     FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticText1 = new wxStaticText(Core, ID_STATICTEXT4, _("Répéter les images :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
     FlexGridSizer11->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    BoucleOuiCheck = new wxRadioButton(Core, ID_RADIOBUTTON3, _("Oui"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON3"));
+    BoucleOuiCheck = new wxRadioButton(Core, ID_RADIOBUTTON3, _("Oui"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON3"));
     BoucleOuiCheck->SetToolTip(_("Après la dernière image, l\'animation reprendra du départ."));
     FlexGridSizer11->Add(BoucleOuiCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoucleNonCheck = new wxRadioButton(Core, ID_RADIOBUTTON4, _("Non"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON4"));

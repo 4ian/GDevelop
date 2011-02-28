@@ -26,6 +26,7 @@ namespace GDpriv
 
 /**
  * \brief Internal class managing static extensions.
+ *
  * ExtensionsManager manages static extensions, and provide useful things like :
  * - Functions for creating an object ( from another or from a type ).
  * - Functions for getting pointers to actions/conditions functions.

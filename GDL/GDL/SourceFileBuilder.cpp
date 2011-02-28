@@ -17,15 +17,18 @@
 #include "GDL/SourceFileBuilder.h"
 #include "GDL/CommonTools.h"
 #include "GDL/SourceFile.h"
+#include "GDL/ExtensionBase.h"
+#include "GDL/ExtensionsManager.h"
 
 namespace GDpriv
 {
 
-SourceFileBuilder::SourceFileBuilder(wxGauge * progressGauge_, wxStaticText * statusText_) :
+SourceFileBuilder::SourceFileBuilder(wxGauge * progressGauge_, wxStaticText * statusText_, bool buildForRuntime_) :
     currentBuildProcess(NULL),
     state(0),
     linkingNeed(false),
     lastBuildSuccessed(false),
+    buildForRuntime(buildForRuntime_),
     progressGauge(progressGauge_),
     currentTaskTxt(statusText_)
 {
@@ -34,7 +37,19 @@ SourceFileBuilder::SourceFileBuilder(wxGauge * progressGauge_, wxStaticText * st
     sfmlLibs = "-lsfml-audio -lsfml-graphics -lsfml-network -lsfml-window -lsfml-system";
     sfmlDefines = "SFML_DYNAMIC";
     boostDefines = "BOOST_DISABLE_ASSERTS";
-    gdlDefines = "GD_IDE_ONLY GD_DYNAMIC_EXTENSIONS GD_API=__declspec(dllimport) DEV NDEBUG PYSUPPORT";
+
+    gdlDefines = buildForRuntime ? "" : "GD_IDE_ONLY ";
+    gdlDefines += "GD_DYNAMIC_EXTENSIONS GD_API=__declspec(dllimport) GD_EXTENSION_API=__declspec(dllimport) ";
+    #if defined(RELEASE)
+    gdlDefines += "RELEASE NDEBUG ";
+    #elif defined(DEV)
+    gdlDefines += "DEV NDEBUG ";
+    #elif defined(DEBUG)
+    gdlDefines += "DEBUG ";
+    #else
+        #error No valid target setted.
+    #endif
+
     gdlLibs = "-lgdl.dll";
     osLibs = "-lkernel32 -luser32 -lopengl32 -limm32 -lcomctl32 -lglu32 -lws2_32 -lgdi32 -lwinmm -luuid -lshell32 -lole32 -lwinspool -ladvapi32 -lcomdlg32 -loleaut32 -lopengl32 -lglu32";
     osDefines = "WINDOWS";
@@ -42,6 +57,32 @@ SourceFileBuilder::SourceFileBuilder(wxGauge * progressGauge_, wxStaticText * st
     fileExtensionsToCompile.push_back("cpp");
     fileExtensionsToCompile.push_back("c");
     fileExtensionsToCompile.push_back("cc");
+}
+
+void SourceFileBuilder::UpdateExtensionsLibs()
+{
+    #if defined(WINDOWS)
+        std::string ext = "w";
+    #elif defined(LINUX)
+        std::string ext = "l";
+    #else
+        #error Unknown target system.
+    #endif
+    if ( !buildForRuntime ) ext += "e";
+
+    gdlLibs = "-lgdl.dll";
+    for (unsigned int i = 0;i<extensionsUsed.size();++i)
+    {
+        boost::shared_ptr<ExtensionBase> extension = ExtensionsManager::GetInstance()->GetExtension(extensionsUsed[i]);
+
+        //Builtin extensions does not have a namespace.
+        if ( extension != boost::shared_ptr<ExtensionBase>() &&
+            ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" )
+            && extension->GetName() != "BuiltinCommonInstructions" ) //Extension with a namespace but builtin
+        {
+            gdlLibs += " -l"+extension->GetName()+".xgd"+ext;
+        }
+    }
 }
 
 void BuildProcess::OnTerminate(int pid, int status)
@@ -172,7 +213,7 @@ void SourceFileBuilder::OnCurrentBuildProcessTerminated(bool success)
             {
                 wxFileName fileInfo(sourceFiles[i]->GetFileName());
                 if ( std::find(fileExtensionsToCompile.begin(), fileExtensionsToCompile.end(), string(fileInfo.GetExt().mb_str())) != fileExtensionsToCompile.end() )
-                    sourcesFilesToLink.push_back(string(fileInfo.GetPath().mb_str())+string(fileInfo.GetName().mb_str())+".o");
+                    sourcesFilesToLink.push_back(string(fileInfo.GetPath().mb_str())+"/"+string(fileInfo.GetName().mb_str())+".o");
             }
 
             if ( !LinkSourceFiles(sourcesFilesToLink) )
@@ -207,7 +248,9 @@ bool SourceFileBuilder::BuildSourceFile(std::string filename)
     wxFileName file(filename);
 
     std::string includesStr = " -I"+pathManager.gdlIncludeDir+" -I"+pathManager.wxwidgetsIncludeDir+" -I"+
-                              pathManager.wxwidgetsIncludeDir2+" -I"+pathManager.sfmlIncludeDir+" -I"+pathManager.boostIncludeDir;
+                              pathManager.wxwidgetsIncludeDir2+" -I"+pathManager.sfmlIncludeDir+" -I"+pathManager.boostIncludeDir
+                              +" -I\""+string(wxGetCwd().mb_str())+"/Extensions/\"" //Extensions headers can be in (GDdirectory)/Extensions
+                              +" -I\""+pathManager.gdlIncludeDir+"/Extensions/\"";  //or in (GDLdirectory)/Extensions
 
     std::string definesStr;
     {
@@ -236,7 +279,7 @@ bool SourceFileBuilder::BuildSourceFile(std::string filename)
             definesStr += " -D"+defines[i];
     }
 
-    std::string cmd = string(wxString(pathManager.gccCompilerExecutablePath+" -O2 -Wall -m32 "+definesStr+" "+includesStr+" -c \""+filename+"\" -o \""+file.GetPath()+file.GetName()+".o\"").mb_str());
+    std::string cmd = string(wxString(pathManager.gccCompilerExecutablePath+" -O2 -Wall -m32 "+definesStr+" "+includesStr+" -c \""+filename+"\" -o \""+file.GetPath()+"/"+file.GetName()+".o\"").mb_str());
     std::cout << "Compiling "<< filename<<"..." << std::endl;
     std::cout << cmd << std::endl;
 
@@ -259,15 +302,18 @@ bool SourceFileBuilder::BuildSourceFile(std::string filename)
 bool SourceFileBuilder::LinkSourceFiles(std::vector<std::string> files)
 {
     std::cout << "LinkSourceFiles";
-    std::string libsDirStr = " -L"+pathManager.gdlLibDir+" -L"+pathManager.wxwidgetsLibDir+" -L"+pathManager.sfmlLibDir;
+    std::string libsDirStr = " -L"+pathManager.gdlLibDir+" -L"+pathManager.wxwidgetsLibDir+" -L"+pathManager.sfmlLibDir+" -L\""
+                             +string(wxGetCwd().mb_str())+"/Extensions/\""; //Extensions libs have to be in (GDdirectory)/Extensions
     std::string libsStr = gdlLibs+" "+wxwidgetsLibs+" "+sfmlLibs+" "+osLibs;
 
     std::string filesStr;
     for (unsigned int i = 0;i<files.size();++i)
         filesStr += " \""+files[i]+"\"";
 
-    std::string cmd = pathManager.gccCompilerExecutablePath+" -shared -Wl,--dll "+libsDirStr +" " + filesStr +" -o dynext.dxgd -s " + libsStr + " ";
+    std::string ext = buildForRuntime ? "" : "e";
+    std::string cmd = pathManager.gccCompilerExecutablePath+" -shared -Wl,--dll "+libsDirStr +" " + filesStr +" -o dynext.dxgd"+ext+" -s " + libsStr + " ";
     std::cout << "Linking..." << std::endl;
+    std::cout << cmd << std::endl;
 
     BuildProcess * process = new BuildProcess(this);
     if ( !wxExecute(cmd, wxEXEC_ASYNC, process) )

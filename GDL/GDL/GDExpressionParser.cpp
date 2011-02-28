@@ -492,7 +492,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
                     instruction.function = &ExpToStr;
                     instruction.parameters = (implicitConversionParameters);
-                    callbacks.OnStaticFunction(functionName, instruction);
+                    callbacks.OnStaticFunction("ToString", instruction);
                 }
             }
 

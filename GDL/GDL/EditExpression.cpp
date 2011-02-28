@@ -828,7 +828,6 @@ void EditExpression::OnerrorTxtClick(wxCommandEvent& event)
     if ( lastErrorPos != std::string::npos )
         ExpressionEdit->GotoPos(lastErrorPos);
 }
-#endif
 
 void EditExpression::OnButton21Click(wxCommandEvent& event)
 {
@@ -889,3 +888,5 @@ void EditExpression::OnButton17Click(wxCommandEvent& event)
 {
 	ExpressionEdit->AddText("cosh(");
 }
+
+#endif

@@ -33,7 +33,7 @@ class GD_API SourceFileBuilder
     public:
         friend class BuildProcess;
 
-        SourceFileBuilder(wxGauge * progressGauge = NULL, wxStaticText * statusText = NULL);
+        SourceFileBuilder(wxGauge * progressGauge = NULL, wxStaticText * statusText = NULL, bool buildForRuntime = false);
         virtual ~SourceFileBuilder() {};
 
         /**
@@ -51,6 +51,11 @@ class GD_API SourceFileBuilder
          * Set files to compile
          */
         void SetFiles(std::vector < boost::shared_ptr<SourceFile> > sourceFiles_) { sourceFiles = sourceFiles_; };
+
+        /**
+         * Set static extensions which can be used
+         */
+        void SetExtensionsUsed(std::vector < std::string > extensionsUsed_) { extensionsUsed = extensionsUsed_; UpdateExtensionsLibs(); };
 
         /**
          * Return true if the IsBuilding is compiling sources files.
@@ -87,7 +92,10 @@ class GD_API SourceFileBuilder
         bool BuildSourceFile(std::string filename);
         bool LinkSourceFiles(std::vector<std::string> files);
 
+        void UpdateExtensionsLibs();
+
         std::vector < boost::shared_ptr<SourceFile> > sourceFiles;
+        std::vector < std::string > extensionsUsed;
 
         std::string wxwidgetsLibs;
         std::string wxwidgetsDefines;
@@ -107,6 +115,8 @@ class GD_API SourceFileBuilder
         bool abordBuild;
         bool linkingNeed;
         bool lastBuildSuccessed;
+
+        bool buildForRuntime;
 
         wxGauge * progressGauge;
         wxStaticText * currentTaskTxt;

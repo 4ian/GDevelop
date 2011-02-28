@@ -14,7 +14,8 @@ class Instruction;
 
 /**
  * \brief Provides tools to draw events.
- * Class providing default colors, fonts, infos and drawing functions so as to
+ *
+ * Class providing default colors, fonts and drawing functions so as to
  * render events.
  */
 class GD_API EventsRenderingHelper
@@ -78,6 +79,12 @@ class GD_API EventsRenderingHelper
         inline const wxHtmlDCRenderer & GetHTMLRenderer() const {return htmlRenderer;};
         inline wxHtmlDCRenderer & GetHTMLRenderer() {return htmlRenderer;};
 
+        /**
+         * Make sure a text will be correctly display by replacing specials characters
+         * and inserting tags like <br>.
+         */
+        std::string GetHTMLText(std::string text);
+
         wxColor eventGradient1;
         wxColor eventGradient2;
         wxColor eventGradient3;
@@ -92,7 +99,6 @@ class GD_API EventsRenderingHelper
         wxColor disabledColor;
         wxColor disabledColor2;
 
-    protected:
     private:
         EventsRenderingHelper();
         virtual ~EventsRenderingHelper() {};

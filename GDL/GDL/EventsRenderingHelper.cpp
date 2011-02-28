@@ -9,6 +9,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/TranslateAction.h"
 #include "GDL/TranslateCondition.h"
+#include "GDL/CommonTools.h"
 
 EventsRenderingHelper * EventsRenderingHelper::singleton = NULL;
 
@@ -443,4 +444,26 @@ void EventsRenderingHelper::DestroySingleton()
         singleton = NULL;
     }
 }
+
+std::string EventsRenderingHelper::GetHTMLText(std::string str)
+{
+    size_t pos = 0;
+    while ( str.find("&", pos) != string::npos)
+    {
+        str.replace( str.find( "&", pos), 1, "&amp;" );
+        pos = str.find( "&", pos)+1;
+    }
+
+    while ( str.find("<") != string::npos)
+        str.replace( str.find( "<" ), 1, "&lt;" );
+
+    while ( str.find(">") != string::npos)
+        str.replace( str.find( ">" ), 1, "&gt;" );
+
+    while ( str.find("\n") != string::npos)
+        str.replace( str.find( "\n" ), 1, "<br>" );
+
+    return str;
+}
+
 #endif

@@ -55,7 +55,7 @@ private:
     Game & game;
 
     void OpenDocument(TiXmlDocument & doc);
-    void OpenGameInformations( TiXmlElement * elem );
+    void OpenGameInformations( const TiXmlElement * elem );
     void OpenImages( const TiXmlElement * elem, TiXmlElement * dossierElem );
     void OpenObjects(vector < boost::shared_ptr<Object> > & objects, TiXmlElement * elem);
     void OpenPositions( vector < InitialPosition > & list, TiXmlElement * elem );

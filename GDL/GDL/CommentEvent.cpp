@@ -75,7 +75,6 @@ void CommentEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int wid
     std::string str1 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com1)+"</FONT>";
     std::string str2 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com2)+"</FONT>";
 
-        cout << str1;
     //Calculate space constraints
     const int sideSeparation = 3; //Spacing between text and borders
 
@@ -132,7 +131,6 @@ unsigned int CommentEvent::GetRenderedHeight(unsigned int width) const
 
         std::string str1 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com1)+"</FONT>";
         std::string str2 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com2)+"</FONT>";
-
 
         //Calculate space constraints
         const int sideSeparation = 3; //Spacing between text and borders

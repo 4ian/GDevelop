@@ -3,12 +3,13 @@
 #include "GDL/aMusic.h"
 #include "GDL/ResourcesMergingHelper.h"
 #include "GDL/Instruction.h"
+#include "GDL/SoundManager.h"
 #include <iostream>
 
 AudioExtension::AudioExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinAudio",
-                          _("Fonctionnalités audio"),
+                          _("Audio"),
                           _("Extension audio integrée en standard"),
                           "Compil Games",
                           "Freeware")
@@ -389,4 +390,45 @@ void AudioExtension::PrepareActionsResourcesForMerging(Instruction & action, Res
     if ( action.GetType() == "PlaySound" || action.GetType() == "PlaySoundCanal" || action.GetType() == "PlayMusic" || action.GetType() == "PlayMusicCanal" )
         action.SetParameter( 0, resourcesMergingHelper.GetNewFilename(action.GetParameter(0).GetPlainString()));
 }
+
+void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const
+{
+    if ( propertyNb < SoundManager::GetInstance()->sounds.size() )
+    {
+        sf::Sound::Status soundStatus = SoundManager::GetInstance()->sounds[propertyNb]->GetStatus();
+
+        if ( soundStatus == sf::Sound::Playing)
+            name = _("Son joué :");
+        else if ( soundStatus == sf::Sound::Stopped)
+            name = _("Son stoppé :");
+        else if ( soundStatus == sf::Sound::Paused)
+            name = _("Son en pause :");
+
+        value = SoundManager::GetInstance()->sounds[propertyNb]->file;
+    }
+    if ( propertyNb-SoundManager::GetInstance()->sounds.size() < SoundManager::GetInstance()->musics.size() )
+    {
+        sf::Sound::Status soundStatus = SoundManager::GetInstance()->musics[propertyNb-SoundManager::GetInstance()->sounds.size()]->GetStatus();
+
+        if ( soundStatus == sf::Sound::Playing)
+            name = _("Musique jouée :");
+        else if ( soundStatus == sf::Sound::Stopped)
+            name = _("Musique stoppée :");
+        else if ( soundStatus == sf::Sound::Paused)
+            name = _("Musique en pause :");
+
+        value = SoundManager::GetInstance()->musics[propertyNb-SoundManager::GetInstance()->sounds.size()]->file;
+    }
+}
+
+bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue)
+{
+    return false;
+}
+
+unsigned int AudioExtension::GetNumberOfProperties(RuntimeScene & scene) const
+{
+    return SoundManager::GetInstance()->musics.size()+SoundManager::GetInstance()->sounds.size();
+}
+
 #endif

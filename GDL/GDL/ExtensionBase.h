@@ -1103,6 +1103,26 @@ class GD_API ExtensionBase
     virtual void PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper) {};
     #endif
 
+    /**
+     * Must return true if the extension has something to display in debugger.
+     */
+    virtual bool HasDebuggingProperties() const { return false; };
+
+    /**
+     * Called by the debugger so as to get a property value and name
+     */
+    virtual void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const {};
+
+    /**
+     * Called by the debugger so as to update a property
+     */
+    virtual bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue) { return false; };
+
+    /**
+     * Must return the number of available properties for the debugger
+     */
+    virtual unsigned int GetNumberOfProperties(RuntimeScene & scene) const { return 0; };
+
     protected :
 
     /**

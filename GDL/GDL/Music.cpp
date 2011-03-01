@@ -22,6 +22,9 @@ Music::~Music()
 
 bool Music::OpenFromFile(const string & filename)
 {
+    #if defined(GDE)
+    file = filename;
+    #endif
     return music.OpenFromFile(filename);
 }
 

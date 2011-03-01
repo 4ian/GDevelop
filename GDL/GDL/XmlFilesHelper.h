@@ -87,6 +87,9 @@ class XmlFilesManager
 
         return file;
     }
+
+
+    static std::map<std::string, boost::shared_ptr<XmlFile> > GetOpenedFilesList() { return openedFiles; }
 };
 
 #endif // XMLFILESHELPER_H

@@ -7,11 +7,12 @@
 #include "GDL/cTime.h"
 #include "GDL/aTime.h"
 #include "GDL/eFreeFunctions.h"
+#include "GDL/RuntimeScene.h"
 
 TimeExtension::TimeExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinTime",
-                          _("Fonctionnalités sur le temps"),
+                          _("Temps"),
                           _("Extension proposant des actions et conditions sur le temps, integrée en standard"),
                           "Compil Games",
                           "Freeware")
@@ -129,4 +130,32 @@ TimeExtension::TimeExtension()
     DECLARE_EXPRESSION("Time", _("Temps actuel"), _("Temps actuel"), _("Temps"), "res/actions/time.png", &ExpTime)
         DECLARE_PARAMETER("", _("Valeur à récupérer :\n\nHeure : hour\nMinutes : min\nSecondes : sec\nJour du mois: mday\nMois depuis janvier : mon\nAnnées depuis 1900 : year\nJours depuis dimanche :wday\nJours depuis le 1er Janvier : yday"), false, "")
     DECLARE_END_EXPRESSION()
+}
+
+void TimeExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const
+{
+    if ( propertyNb < scene.timers.size() )
+    {
+        name = scene.timers[propertyNb].GetName();
+        value = ToString(scene.timers[propertyNb].GetTime())+"s";
+
+        return;
+    }
+}
+
+bool TimeExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue)
+{
+    if ( propertyNb < scene.timers.size() )
+    {
+        scene.timers[propertyNb].SetTime(ToFloat(newValue));
+
+        return true;
+    }
+
+    return false;
+}
+
+unsigned int TimeExtension::GetNumberOfProperties(RuntimeScene & scene) const
+{
+    return scene.timers.size();
 }

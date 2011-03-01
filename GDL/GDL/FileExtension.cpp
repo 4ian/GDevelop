@@ -1,11 +1,12 @@
 #include "GDL/FileExtension.h"
 #include "GDL/cFichier.h"
 #include "GDL/aFichier.h"
+#include "GDL/XmlFilesHelper.h"
 
 FileExtension::FileExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinFile",
-                          _("Fonctionnalités sur les fichiers"),
+                          _("Fichiers"),
                           _("Extension offrant des actions et conditions sur les fichiers, integrée en standard."),
                           "Compil Games",
                           "Freeware")
@@ -176,3 +177,35 @@ FileExtension::FileExtension()
 
     DECLARE_END_ACTION()
 }
+
+#if defined(GD_IDE_ONLY)
+void FileExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const
+{
+    const std::map < std::string, boost::shared_ptr<XmlFile> > & openedFiles = XmlFilesManager::GetOpenedFilesList();
+
+    unsigned int i;
+    std::map < std::string, boost::shared_ptr<XmlFile> >::const_iterator end = openedFiles.end();
+    for (std::map < std::string, boost::shared_ptr<XmlFile> >::const_iterator iter = openedFiles.begin();iter != end;++iter)
+    {
+        if ( propertyNb == i )
+        {
+            name = _("Fichier ouvert :");
+            value = iter->first;
+
+            return;
+        }
+
+        ++i;
+    }
+}
+
+bool FileExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue)
+{
+    return false;
+}
+
+unsigned int FileExtension::GetNumberOfProperties(RuntimeScene & scene) const
+{
+    return XmlFilesManager::GetOpenedFilesList().size();
+}
+#endif

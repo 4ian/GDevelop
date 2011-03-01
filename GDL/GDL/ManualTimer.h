@@ -38,6 +38,11 @@ class GD_API ManualTimer
         inline float GetTime() const { return time; };
 
         /**
+         * Change the time
+         */
+        inline void SetTime(float newTime) { time = newTime; };
+
+        /**
          * Get the paused state of the timer.
          * @return true if paused
          */

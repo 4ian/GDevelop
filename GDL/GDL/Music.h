@@ -88,6 +88,10 @@ class GD_API Music
          */
         void UpdateVolume();
 
+        #if defined(GD_IDE_ONLY)
+        std::string file; ///< Only useful for GD debugger
+        #endif
+
     private:
         float volume; ///< Music volume
 };

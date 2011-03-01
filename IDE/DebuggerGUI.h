@@ -78,6 +78,7 @@ class DebuggerGUI: public wxPanel, public BaseDebugger
         static const long ID_VARSCENEBT;
         static const long ID_VARGLOBALBT;
         static const long ID_ADDOBJBT;
+        static const long ID_EXTLIST;
 
 	private:
 
@@ -89,6 +90,7 @@ class DebuggerGUI: public wxPanel, public BaseDebugger
 		void OnBitmapButton1Click(wxCommandEvent& event);
 		void OndeleteBtClick(wxCommandEvent& event);
 		void OngeneralListItemActivated(wxListEvent& event);
+		void OnResize(wxSizeEvent& event);
 		//*)
 		void UpdateGUI();
         void OnPlayBtClick( wxCommandEvent & event );
@@ -98,6 +100,8 @@ class DebuggerGUI: public wxPanel, public BaseDebugger
         void OnAddVarSceneBtClick( wxCommandEvent & event );
         void OnAddVarGlobalBtClick( wxCommandEvent & event );
         void OnAddObjBtClick( wxCommandEvent & event );
+        void OnExtensionListItemActivated(wxListEvent& event);
+        void UpdateListCtrlColumnsWidth();
 
         void RecreateListForObject(const ObjSPtr & object);
 
@@ -106,6 +110,8 @@ class DebuggerGUI: public wxPanel, public BaseDebugger
 		map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> > objectsInTree;
 		map < string, wxTreeItemId > initialObjects;
 		bool mustRecreateTree;
+
+		std::vector<wxListCtrl*> extensionsListCtrls; ///< Contains wxListCtrl used to display properties of each extensions.
 
 		unsigned int baseItemCount;
 		unsigned int generalBaseItemCount;

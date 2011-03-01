@@ -46,6 +46,8 @@ const long DebuggerGUI::ID_CONSOLEBT = wxNewId();
 const long DebuggerGUI::ID_VARSCENEBT = wxNewId();
 const long DebuggerGUI::ID_VARGLOBALBT = wxNewId();
 const long DebuggerGUI::ID_ADDOBJBT = wxNewId();
+const long DebuggerGUI::ID_EXTLIST = wxNewId();
+
 
 BEGIN_EVENT_TABLE(DebuggerGUI,wxPanel)
 	//(*EventTable(DebuggerGUI)
@@ -124,6 +126,7 @@ objectChanged(true)
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&DebuggerGUI::OnobjectsTreeSelectionChanged);
 	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OndeleteBtClick);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&DebuggerGUI::OnobjectListItemActivated);
+	Connect(wxEVT_SIZE,(wxObjectEventFunction)&DebuggerGUI::OnResize);
 	//*)
     toolbar = new wxToolBar( toolbarPanel, -1, wxDefaultPosition, wxDefaultSize,
                                    wxTB_FLAT | wxTB_NODIVIDER );
@@ -149,13 +152,14 @@ objectChanged(true)
     Connect(ID_VARSCENEBT,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnAddVarSceneBtClick);
     Connect(ID_VARGLOBALBT,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnAddVarGlobalBtClick);
     Connect(ID_ADDOBJBT,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnAddObjBtClick);
+	Connect(ID_EXTLIST,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&DebuggerGUI::OnExtensionListItemActivated);
 
     font = *wxNORMAL_FONT;
     font.SetWeight(wxFONTWEIGHT_BOLD);
 
     generalList->InsertColumn(0, "Propriété");
     generalList->InsertColumn(1, "Valeur");
-    generalList->SetColumnWidth(0, 170);
+    generalList->SetColumnWidth(0, 225);
     generalList->SetColumnWidth(1, 165);
 
     generalList->InsertItem(0, _("Images par secondes ( FPS )"));
@@ -172,10 +176,36 @@ objectChanged(true)
 
     objectList->InsertColumn(0, "Propriété");
     objectList->InsertColumn(1, "Valeur");
-    objectList->SetColumnWidth(0, 100);
+    objectList->SetColumnWidth(0, 175);
     objectList->SetColumnWidth(1, 100);
 
     objectsTree->AddRoot(_("Objets"));
+
+    for (unsigned int i = 0;i<scene.game->extensionsUsed.size();++i)
+    {
+        boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::GetInstance()->GetExtension(scene.game->extensionsUsed[i]);
+
+        if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() )
+        {
+            wxPanel * extPanel = new wxPanel(Notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, extension->GetName());
+            wxFlexGridSizer * sizer = new wxFlexGridSizer(0, 3, 0, 0);
+            sizer->AddGrowableCol(0);
+            sizer->AddGrowableRow(0);
+            wxListCtrl * extList = new wxListCtrl(extPanel, ID_EXTLIST, wxDefaultPosition, wxSize(249,203), wxLC_REPORT, wxDefaultValidator, extension->GetName());
+            sizer->Add(extList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+            extPanel->SetSizer(sizer);
+            sizer->Fit(extPanel);
+            sizer->SetSizeHints(extPanel);
+
+            extList->InsertColumn(0, "Propriété");
+            extList->InsertColumn(1, "Valeur");
+            extList->SetColumnWidth(0, 175);
+            extList->SetColumnWidth(1, -1);
+
+            Notebook1->AddPage(extPanel, extension->GetFullName(), false);
+            extensionsListCtrls.push_back(extList);
+        }
+    }
 }
 
 DebuggerGUI::~DebuggerGUI()
@@ -245,7 +275,7 @@ void DebuggerGUI::UpdateGUI()
     if ( !doMAJ || !IsShown())
         return;
 
-    //Général
+    //General tab
     generalList->SetItem(0, 1, ToString(1/scene.GetElapsedTime())+_(" i/s"));
     generalList->SetItem(1, 1, ToString(scene.GetElapsedTime())+"s");
     generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
@@ -258,12 +288,11 @@ void DebuggerGUI::UpdateGUI()
     const vector < Variable > gameVariables = scene.game->variables.GetVariablesVector();
 
     //Suppression des lignes en trop pour les variables
-    while(generalList->GetItemCount() >
-            generalBaseItemCount + sceneVariables.size() + gameVariables.size()+2)
+    while(static_cast<unsigned int>(generalList->GetItemCount()) > generalBaseItemCount + sceneVariables.size() + gameVariables.size()+2)
         generalList->DeleteItem(generalBaseItemCount);
 
     //Rajout si au contraire il n'y en a pas assez
-    while(generalList->GetItemCount() < generalBaseItemCount + sceneVariables.size() + gameVariables.size()+2)
+    while(static_cast<unsigned int>(generalList->GetItemCount()) < generalBaseItemCount + sceneVariables.size() + gameVariables.size()+2)
         generalList->InsertItem(generalBaseItemCount, "");
 
     //Update scene variables
@@ -290,6 +319,33 @@ void DebuggerGUI::UpdateGUI()
         generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, gameVariables[i].GetName());
         generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, gameVariables[i].GetString());
         generalList->SetItemFont(generalBaseAndVariablesItemCount+i, *wxNORMAL_FONT);
+    }
+
+    //Extensions tab
+    unsigned int extListCtrlId = 0;
+    for (unsigned int i = 0;i<scene.game->extensionsUsed.size();++i)
+    {
+        boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::GetInstance()->GetExtension(scene.game->extensionsUsed[i]);
+
+        if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && extListCtrlId < extensionsListCtrls.size() )
+        {
+            //Update items count
+            while(static_cast<unsigned int>(extensionsListCtrls[extListCtrlId]->GetItemCount()) > extension->GetNumberOfProperties(scene))
+                extensionsListCtrls[extListCtrlId]->DeleteItem(0);
+            while(static_cast<unsigned int>(extensionsListCtrls[extListCtrlId]->GetItemCount()) < extension->GetNumberOfProperties(scene))
+                extensionsListCtrls[extListCtrlId]->InsertItem(0, "");
+
+            //Update properties
+            for (unsigned int propertyNb = 0;propertyNb<extension->GetNumberOfProperties(scene);++propertyNb)
+            {
+                std::string name, value;
+                extension->GetPropertyForDebugger(scene, propertyNb, name, value);
+                extensionsListCtrls[extListCtrlId]->SetItem(propertyNb, 0, name);
+                extensionsListCtrls[extListCtrlId]->SetItem(propertyNb, 1, value);
+            }
+
+            extListCtrlId++;
+        }
     }
 
     //Arbre des objets : Création des objets
@@ -538,7 +594,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
                                               +2+object->GetNumberOfProperties()
                                               +2);
 
-        if ( idVariable >= 0 && idVariable < objectVariables.size() )
+        if ( idVariable >= 0 && static_cast<unsigned int>(idVariable) < objectVariables.size() )
         {
             string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une variable"), objectVariables[idVariable].GetString()).mb_str());
 
@@ -559,7 +615,7 @@ void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
     if ( event.GetIndex() < (generalBaseItemCount + sceneVariables.size()))
     {
         int id = event.GetIndex() - ( generalBaseItemCount );
-        if (id < 0 || id > sceneVariables.size())
+        if (id < 0 || static_cast<unsigned int>(id) > sceneVariables.size())
             return;
 
         string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), sceneVariables[id].GetString()).mb_str());
@@ -568,11 +624,41 @@ void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
     else if ( event.GetIndex() < ( generalBaseAndVariablesItemCount + gameVariables.size()) )
     {
         int id = event.GetIndex() - ( generalBaseAndVariablesItemCount );
-        if (id < 0 || id > gameVariables.size())
+        if (id < 0 || static_cast<unsigned int>(id) > gameVariables.size())
             return;
 
         string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"),gameVariables[id].GetString()).mb_str());
         scene.game->variables.ObtainVariable(gameVariables[id].GetName()).SetString(newValue);
+    }
+}
+
+/**
+ * Edit property of an extension
+ */
+void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
+{
+    wxListCtrl * list = dynamic_cast<wxListCtrl*>(event.GetEventObject());
+    if ( !list )
+    {
+        cout << "Received an event for a bad Extension wxListCtrl in debugger." << endl;
+        return;
+    }
+
+    boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::GetInstance()->GetExtension(string(list->GetName().mb_str()));
+    if ( extension == boost::shared_ptr<ExtensionBase>() )
+    {
+        cout << "Unknown extension in debugger ( " << list->GetName() << " )" << endl;
+        return;
+    }
+
+    int propNb = event.GetIndex();
+    string uselessName, oldValue;
+    extension->GetPropertyForDebugger(scene, propNb, uselessName, oldValue);
+    string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), oldValue).mb_str());
+
+    if ( !extension->ChangeProperty(scene, propNb, newValue) )
+    {
+        wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entrée peut être incorrecte, ou la propriété en lecture seule."));
     }
 }
 
@@ -676,4 +762,18 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     scene.objectsInstances.AddObject(newObject);
 
     return;
+}
+
+void DebuggerGUI::OnResize(wxSizeEvent& event)
+{
+    Notebook1->SetSize(GetSize().GetWidth()-5, GetSize().GetHeight()-toolbarPanel->GetSize().GetHeight()-10);
+    UpdateListCtrlColumnsWidth();
+}
+
+void DebuggerGUI::UpdateListCtrlColumnsWidth()
+{
+    generalList->SetColumnWidth(1, generalList->GetSize().GetWidth()-generalList->GetColumnWidth(0)-15);
+    objectList->SetColumnWidth(1, objectList->GetSize().GetWidth()-objectList->GetColumnWidth(0)-15);
+    for (unsigned int i = 0;i<extensionsListCtrls.size();++i)
+        extensionsListCtrls[i]->SetColumnWidth(1, extensionsListCtrls[i]->GetSize().GetWidth()-extensionsListCtrls[i]->GetColumnWidth(0)-15);
 }

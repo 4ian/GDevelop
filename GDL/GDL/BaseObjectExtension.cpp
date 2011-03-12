@@ -489,8 +489,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        _("Renvoi vrai si l'automatisme spécifié est activé pour l'objet."),
                        _("L'automatisme _PARAM1_ de _PARAM0_ est activé"),
                        _("Automatismes"),
-                       "res/conditions/automatism24.png",
-                       "res/conditions/automatism16.png",
+                       "res/automatism24.png",
+                       "res/automatism16.png",
                        &Object::CondAutomatismActivated);
 
             DECLARE_PARAMETER("object", _("Objet"), true, "")
@@ -504,8 +504,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        _("Dés/active l'automatisme spécifié pour l'objet."),
                        _("Activer l'automatisme _PARAM1_ de _PARAM0_ : _PARAM2_"),
                        _("Automatismes"),
-                       "res/conditions/automatism24.png",
-                       "res/conditions/automatism16.png",
+                       "res/automatism24.png",
+                       "res/automatism16.png",
                        &Object::ActActivateAutomatism);
 
             DECLARE_PARAMETER("object", _("Objet"), true, "")

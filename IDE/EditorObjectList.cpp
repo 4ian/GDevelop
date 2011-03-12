@@ -1155,7 +1155,20 @@ void EditorObjectList::CreateSharedDatasIfNecessary(boost::shared_ptr<Automatism
 {
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
-    if ( scene != NULL && scene->automatismsInitialSharedDatas.find(automatism->GetAutomatismId()) == scene->automatismsInitialSharedDatas.end() )
+    if ( scene == NULL || objects != &scene->initialObjects ) //We're editing global objects : Add automatism data to all scenes.
+    {
+        for (unsigned int i = 0;i<game.scenes.size();++i)
+        {
+        	if ( game.scenes[i]->automatismsInitialSharedDatas.find(automatism->GetAutomatismId()) == game.scenes[i]->automatismsInitialSharedDatas.end() )
+            {
+                boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = extensionsManager->CreateAutomatismSharedDatas(automatism->GetTypeName());
+                automatismsSharedDatas->SetName(automatism->GetName());
+                game.scenes[i]->automatismsInitialSharedDatas[automatismsSharedDatas->GetAutomatismId()] = automatismsSharedDatas;
+            }
+        }
+    }
+    //We're editing an object from a scene : Add the data if necessary
+    else if ( scene->automatismsInitialSharedDatas.find(automatism->GetAutomatismId()) == scene->automatismsInitialSharedDatas.end() )
     {
         boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = extensionsManager->CreateAutomatismSharedDatas(automatism->GetTypeName());
         automatismsSharedDatas->SetName(automatism->GetName());

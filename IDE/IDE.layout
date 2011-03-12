@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
+	<ActiveTarget name="Release - Edittime" />
 	<File name="AutomatismTypeChoice.cpp" open="0" top="0" tabpos="23">
 		<Cursor position="9139" topLine="139" />
 	</File>
@@ -17,7 +17,7 @@
 		<Cursor position="551" topLine="9" />
 	</File>
 	<File name="BuildProgressPnl.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="2771" topLine="64" />
+		<Cursor position="2771" topLine="61" />
 	</File>
 	<File name="BuildProgressPnl.h" open="0" top="0" tabpos="2">
 		<Cursor position="701" topLine="11" />
@@ -131,10 +131,10 @@
 		<Cursor position="13017" topLine="186" />
 	</File>
 	<File name="DebuggerGUI.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="28870" topLine="635" />
+		<Cursor position="9768" topLine="175" />
 	</File>
-	<File name="DebuggerGUI.h" open="0" top="0" tabpos="2">
-		<Cursor position="2865" topLine="82" />
+	<File name="DebuggerGUI.h" open="1" top="0" tabpos="7">
+		<Cursor position="2799" topLine="83" />
 	</File>
 	<File name="Demarrage.cpp" open="0" top="0" tabpos="31">
 		<Cursor position="14973" topLine="391" />
@@ -145,8 +145,8 @@
 	<File name="DnDFileEditor.cpp" open="0" top="0" tabpos="13">
 		<Cursor position="322" topLine="0" />
 	</File>
-	<File name="DndTextObjectsEditor.cpp" open="0" top="0" tabpos="32">
-		<Cursor position="427" topLine="1" />
+	<File name="DndTextObjectsEditor.cpp" open="1" top="0" tabpos="29">
+		<Cursor position="294" topLine="0" />
 	</File>
 	<File name="DndTextSceneEditor.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="447" topLine="0" />
@@ -193,14 +193,14 @@
 	<File name="EditorLayers.h" open="0" top="0" tabpos="8">
 		<Cursor position="737" topLine="15" />
 	</File>
-	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="23330" topLine="418" />
+	<File name="EditorObjectList.cpp" open="1" top="0" tabpos="27">
+		<Cursor position="48736" topLine="1147" />
 	</File>
-	<File name="EditorObjectList.h" open="0" top="0" tabpos="13">
-		<Cursor position="1186" topLine="20" />
+	<File name="EditorObjectList.h" open="1" top="0" tabpos="28">
+		<Cursor position="707" topLine="20" />
 	</File>
 	<File name="EditorObjets.cpp" open="0" top="0" tabpos="16">
-		<Cursor position="4393" topLine="88" />
+		<Cursor position="4396" topLine="67" />
 	</File>
 	<File name="EditorObjets.h" open="0" top="0" tabpos="18">
 		<Cursor position="1496" topLine="38" />
@@ -265,8 +265,8 @@
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="3">
 		<Cursor position="760" topLine="0" />
 	</File>
-	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="30038" topLine="602" />
+	<File name="Game_Develop_EditorMain.cpp" open="1" top="1" tabpos="31">
+		<Cursor position="20954" topLine="323" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="68">
 		<Cursor position="3311" topLine="86" />
@@ -412,10 +412,10 @@
 	<File name="tinyxmlparser.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="8980" topLine="338" />
 	</File>
-	<File name="wxSFMLCanvas.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="2248" topLine="42" />
+	<File name="wxSFMLCanvas.cpp" open="1" top="0" tabpos="9">
+		<Cursor position="1056" topLine="3" />
 	</File>
-	<File name="wxSFMLCanvas.hpp" open="0" top="0" tabpos="10">
-		<Cursor position="240" topLine="6" />
+	<File name="wxSFMLCanvas.hpp" open="1" top="0" tabpos="8">
+		<Cursor position="240" topLine="18" />
 	</File>
 </CodeBlocks_layout_file>

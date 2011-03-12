@@ -267,18 +267,14 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     std::string winExecutableName = gameToCompile.winExecutableFilename.empty() ? "Game.exe" : gameToCompile.winExecutableFilename+".exe";
     std::string linuxExecutableName = gameToCompile.linuxExecutableFilename.empty() ? "GameLinux" : gameToCompile.linuxExecutableFilename;
 
-    destinationDirectory = "";
-    if ( TypeBox->GetSelection() == 0 )
+    wxDirDialog dialog(this, _("Choisissez un dossier, vierge de préférence, où créer le jeu."));
+    dialog.ShowModal();
+    if ( dialog.GetPath().empty() )
     {
-        wxDirDialog dialog(this, _("Choisissez un dossier, vierge de préférence, où créer le jeu."));
-        dialog.ShowModal();
-        if ( dialog.GetPath().empty() )
-        {
-            wxMessageBox(_("Vous devez choisir un répertoire où créer le jeu."), _("Compilation annulée"));
-            return;
-        }
-        destinationDirectory = dialog.GetPath();
+        wxMessageBox(_("Vous devez choisir un répertoire où créer le jeu."), _("Compilation annulée"));
+        return;
     }
+    destinationDirectory = dialog.GetPath();
 
     ClearDirectory(string(repTemp.mb_str()), report); //Préparation du répertoire
 

@@ -330,7 +330,7 @@ void SceneCanvas::SetOwnedDebugger(boost::shared_ptr<DebuggerGUI> debugger_)
     debugger = debugger_;
 
     if ( debugger )
-        scene.debugger = debugger.get();
+        scene.runtimeScene.debugger = debugger.get();
 }
 void SceneCanvas::SetOwnedExternalWindow(boost::shared_ptr<RenderDialog> externalWindow_)
 {
@@ -347,7 +347,7 @@ void SceneCanvas::SetOwnedProfileDialog(boost::shared_ptr<ProfileDlg> profileDia
         profileDialog->SetAssociatedSceneCanvas(this);
 
     if ( profileDialog )
-        scene.profiler = profileDialog.get();
+        scene.runtimeScene.profiler = profileDialog.get();
 }
 
 /**
@@ -388,7 +388,7 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
     mainEditorCommand.LockShortcuts(this);
 
     scene.editing = false;
-    scene.running = false;
+    scene.runtimeScene.running = false;
 
     scrollBar1->Show(false);
     scrollBar2->Show(false);
@@ -411,12 +411,12 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
     mainEditorCommand.UnLockShortcuts(this);
 
     scene.editing = true;
-    scene.running = false;
+    scene.runtimeScene.running = false;
 
     scrollBar1->Show(true);
     scrollBar2->Show(true);
     externalWindow->Show(false);
-    scene.ChangeRenderWindow(this);
+    scene.runtimeScene.ChangeRenderWindow(this);
     UpdateSize();
     UpdateScrollbars();
 
@@ -464,7 +464,7 @@ void SceneCanvas::OnProfilerBtClick( wxCommandEvent & event )
 void SceneCanvas::OnRefreshBtClick( wxCommandEvent & event )
 {
     scene.editing = false;
-    scene.running = false;
+    scene.runtimeScene.running = false;
 
     Reload();
 }
@@ -488,7 +488,7 @@ void SceneCanvas::OnOrigineBtClick(wxCommandEvent & event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnChoisirObjetBtClick( wxCommandEvent & event )
 {
-    ChooseObject Dialog( this, game, scene, false );
+    ChooseObject Dialog( this, game, scene.runtimeScene, false );
     if ( Dialog.ShowModal() == 1 )
     {
         scene.objectToAdd = Dialog.objectChosen;
@@ -546,11 +546,11 @@ void SceneCanvas::OnGridSetupBtClick( wxCommandEvent & event )
  */
 void SceneCanvas::OnPlayBtClick( wxCommandEvent & event )
 {
-    scene.running = true;
+    scene.runtimeScene.running = true;
     scene.editing = false;
 
     externalWindow->Show(false);
-    scene.ChangeRenderWindow(this);
+    scene.runtimeScene.ChangeRenderWindow(this);
 
 
     if ( debugger ) debugger->Play();
@@ -561,18 +561,18 @@ void SceneCanvas::OnPlayBtClick( wxCommandEvent & event )
  */
 void SceneCanvas::OnPlayWindowBtClick( wxCommandEvent & event )
 {
-    scene.running = true;
+    scene.runtimeScene.running = true;
     scene.editing = false;
 
     externalWindow->Show(true);
     externalWindow->renderCanvas->SetFramerateLimit( game.maxFPS );
     externalWindow->SetSize(GetWidth(), GetHeight());
-    scene.ChangeRenderWindow(externalWindow->renderCanvas);
+    scene.runtimeScene.ChangeRenderWindow(externalWindow->renderCanvas);
 
-    scene.RenderAndStep(1);  //FIXME : Hack to make sure OpenGL Rendering is correct
+    scene.runtimeScene.RenderAndStep(1);  //FIXME : Hack to make sure OpenGL Rendering is correct
 
     externalWindow->SetSize(GetWidth(), GetHeight());
-    scene.ChangeRenderWindow(externalWindow->renderCanvas);
+    scene.runtimeScene.ChangeRenderWindow(externalWindow->renderCanvas);
 
     if ( debugger ) debugger->Play();
 }
@@ -582,7 +582,7 @@ void SceneCanvas::OnPlayWindowBtClick( wxCommandEvent & event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnPauseBtClick( wxCommandEvent & event )
 {
-    scene.running = false;
+    scene.runtimeScene.running = false;
     scene.editing = false;
 
     if ( debugger ) debugger->Pause();
@@ -684,18 +684,15 @@ void SceneCanvas::Reload()
 void SceneCanvas::ReloadFirstPart()
 {
     isReloading = true;
-    bool oldEditingState = scene.editing;
 
     game = gameEdited;
     game.imageManager = gameEdited.imageManager; //Use same image manager.
 
-    scene.StopMusic();
+    scene.runtimeScene.StopMusic();
 
-    EdittimeScene newScene(this, &game);
-    scene = newScene;
-    scene.editing = oldEditingState;
-    if ( profileDialog )   scene.profiler = profileDialog.get();
-    if ( debugger ) scene.debugger = debugger.get();
+    RuntimeScene newScene(this, &game);
+    scene.runtimeScene = newScene;
+    scene.runtimeScene.running = false;
 
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( !scene.editing && gameEdited.useExternalSourceFiles )
@@ -738,7 +735,7 @@ void SceneCanvas::ReloadSecondPart()
     }
     #endif
 
-    scene.LoadFromScene( sceneEdited );
+    scene.runtimeScene.LoadFromScene( sceneEdited );
     sceneEdited.wasModified = false;
 
     UpdateSize();
@@ -777,7 +774,7 @@ void SceneCanvas::Refresh()
     }
     else
     {
-        if ( !scene.running || scene.editing )
+        if ( !scene.runtimeScene.running || scene.editing )
         {
             //Reload changed images.
             for (unsigned int i = 0;i<gameEdited.imagesChanged.size();++i)
@@ -793,9 +790,9 @@ void SceneCanvas::Refresh()
             if ( sceneEdited.wasModified )
                 Reload();
         }
-        if ( scene.running )
+        if ( scene.runtimeScene.running )
         {
-            int retourEvent = scene.RenderAndStep(1);
+            int retourEvent = scene.runtimeScene.RenderAndStep(1);
 
             if ( retourEvent == -2 )
             {
@@ -807,8 +804,8 @@ void SceneCanvas::Refresh()
             }
 
         }
-        else if ( !scene.running && !scene.editing )
-            scene.RenderWithoutStep();
+        else if ( !scene.runtimeScene.running && !scene.editing )
+            scene.runtimeScene.RenderWithoutStep();
         else
             scene.RenderEdittimeScene();
     }
@@ -862,9 +859,9 @@ void SceneCanvas::UpdateContextMenu()
     int lowestLayer = GetObjectsSelectedLowestLayer();
 
     contextMenu.FindItem(ID_LAYERUPMENU)->Enable(false);
-    if ( static_cast<unsigned>(lowestLayer+1) < scene.initialLayers.size() )
+    if ( static_cast<unsigned>(lowestLayer+1) < scene.runtimeScene.initialLayers.size() )
     {
-        string name = scene.initialLayers[lowestLayer+1].GetName();
+        string name = scene.runtimeScene.initialLayers[lowestLayer+1].GetName();
         if ( name == "" ) name = _("Calque de base");
         contextMenu.FindItem(ID_LAYERUPMENU)->Enable(true);
         contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(string(_("Passer le(s) objet(s) sur le calque \"")) + name +"\"");
@@ -876,7 +873,7 @@ void SceneCanvas::UpdateContextMenu()
     contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(false);
     if ( highestLayer-1 >= 0 )
     {
-        string name = scene.initialLayers[highestLayer-1].GetName();
+        string name = scene.runtimeScene.initialLayers[highestLayer-1].GetName();
         if ( name == "" ) name = _("Calque de base");
 
         contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(true);
@@ -902,11 +899,11 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
 
     ObjSPtr object = scene.FindSmallestObject();
 
-    int mouseX = ConvertCoords(scene.input->GetMouseX(), 0).x;
-    int mouseY = ConvertCoords(0, scene.input->GetMouseY()).y;
+    int mouseX = ConvertCoords(scene.runtimeScene.input->GetMouseX(), 0).x;
+    int mouseY = ConvertCoords(0, scene.runtimeScene.input->GetMouseY()).y;
 
     //Suppress selection
-    if ( (!scene.input->IsKeyDown(sf::Key::LShift) && !scene.input->IsKeyDown(sf::Key::RShift)) && //Check that shift is not pressed
+    if ( (!scene.runtimeScene.input->IsKeyDown(sf::Key::LShift) && !scene.runtimeScene.input->IsKeyDown(sf::Key::RShift)) && //Check that shift is not pressed
         ( object == boost::shared_ptr<Object> () || //If no object is clicked
          find(scene.objectsSelected.begin(), scene.objectsSelected.end(), object) == scene.objectsSelected.end()) ) //Or an object which is not currently selected.
     {
@@ -1023,7 +1020,7 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
         if ( scene.xEndRectangleSelection < scene.xRectangleSelection) std::swap(scene.xEndRectangleSelection, scene.xRectangleSelection);
         if ( scene.yEndRectangleSelection < scene.yRectangleSelection) std::swap(scene.yEndRectangleSelection, scene.yRectangleSelection);
 
-        ObjList allObjects = scene.objectsInstances.GetAllObjects();
+        ObjList allObjects = scene.runtimeScene.objectsInstances.GetAllObjects();
 
         for (unsigned int id = 0;id < allObjects.size();++id)
         {
@@ -1079,8 +1076,8 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
 
     if ( !scene.editing )
     {
-        mouseXInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(scene.input->GetMouseX(), 0, scene.GetLayer("").GetCamera(0).GetSFMLView()).x);
-        mouseYInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(0, scene.input->GetMouseY(), scene.GetLayer("").GetCamera(0).GetSFMLView()).y);
+        mouseXInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(scene.runtimeScene.input->GetMouseX(), 0, scene.runtimeScene.GetLayer("").GetCamera(0).GetSFMLView()).x);
+        mouseYInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(0, scene.runtimeScene.input->GetMouseY(), scene.runtimeScene.GetLayer("").GetCamera(0).GetSFMLView()).y);
         Xstr =ToString( mouseXInScene );
         Ystr =ToString( mouseYInScene );
 
@@ -1088,8 +1085,8 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
     }
     else
     {
-        mouseXInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(scene.input->GetMouseX(), 0).x);
-        mouseYInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(0, scene.input->GetMouseY()).y);
+        mouseXInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(scene.runtimeScene.input->GetMouseX(), 0).x);
+        mouseYInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(0, scene.runtimeScene.input->GetMouseY()).y);
 
         Xstr =ToString( mouseXInScene );
         Ystr =ToString( mouseYInScene );
@@ -1098,7 +1095,7 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
     }
 
     //Le reste concerne juste le mode édition
-    if ( scene.running )
+    if ( scene.runtimeScene.running )
         return;
 
     //Déplacement avec la souris
@@ -1204,7 +1201,7 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnLeftDClick( wxMouseEvent &event )
 {
-    AddObjetSelected(ConvertCoords(scene.input->GetMouseX(), 0).x, ConvertCoords(0, scene.input->GetMouseY()).y);
+    AddObjetSelected(ConvertCoords(scene.runtimeScene.input->GetMouseX(), 0).x, ConvertCoords(0, scene.runtimeScene.input->GetMouseY()).y);
 }
 
 ////////////////////////////////////////////////////////////
@@ -1212,7 +1209,7 @@ void SceneCanvas::OnLeftDClick( wxMouseEvent &event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnAddObjetSelected( wxCommandEvent & event )
 {
-    AddObjetSelected(ConvertCoords(scene.input->GetMouseX(), 0).x, ConvertCoords(0, scene.input->GetMouseY()).y);
+    AddObjetSelected(ConvertCoords(scene.runtimeScene.input->GetMouseX(), 0).x, ConvertCoords(0, scene.runtimeScene.input->GetMouseY()).y);
 }
 
 void SceneCanvas::AddObjetSelected(float x, float y)
@@ -1266,11 +1263,11 @@ void SceneCanvas::AddObjetSelected(float x, float y)
     newObject->SetLayer( pos.layer );
 
     newObject->InitializeFromInitialPosition(pos);
-    newObject->LoadRuntimeResources( scene, *game.imageManager );
+    newObject->LoadRuntimeResources( scene.runtimeScene, *game.imageManager );
 
-    scene.objectsInstances.AddObject(newObject);
+    scene.runtimeScene.objectsInstances.AddObject(newObject);
 
-    newObject->LoadResources(scene, *game.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
+    newObject->LoadResources(scene.runtimeScene, *game.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
 
     if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
     ChangesMade();
@@ -1288,7 +1285,7 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
 
     //Suppress selection if
     if ( object == boost::shared_ptr<Object> () || /*Not clicked on an object*/
-        (( !scene.input->IsKeyDown(sf::Key::LShift) && !scene.input->IsKeyDown(sf::Key::RShift) ) && /*Clicked without using shift*/
+        (( !scene.runtimeScene.input->IsKeyDown(sf::Key::LShift) && !scene.runtimeScene.input->IsKeyDown(sf::Key::RShift) ) && /*Clicked without using shift*/
          find(scene.objectsSelected.begin(), scene.objectsSelected.end(), object) == scene.objectsSelected.end() ))
     {
         scene.objectsSelected.clear();
@@ -1331,10 +1328,10 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
 void SceneCanvas::OnLayerUpSelected(wxCommandEvent & event)
 {
     int lowestLayer = GetObjectsSelectedLowestLayer();
-    if ( lowestLayer+1 < 0 || static_cast<unsigned>(lowestLayer+1) >= scene.initialLayers.size() )
+    if ( lowestLayer+1 < 0 || static_cast<unsigned>(lowestLayer+1) >= scene.runtimeScene.initialLayers.size() )
         return;
 
-    string layerName = scene.initialLayers.at(lowestLayer+1).GetName();
+    string layerName = scene.runtimeScene.initialLayers.at(lowestLayer+1).GetName();
 
     for (unsigned int i =0;i<scene.objectsSelected.size();++i)
     {
@@ -1360,8 +1357,8 @@ void SceneCanvas::OnCopySelected(wxCommandEvent & event)
         if ( posId != -1 )
         {
             copiedPositions.push_back(sceneEdited.initialObjectsPositions.at(posId));
-            copiedPositions.back().x -= ConvertCoords(scene.input->GetMouseX(), 0).x;
-            copiedPositions.back().y -= ConvertCoords(0, scene.input->GetMouseY()).y;
+            copiedPositions.back().x -= ConvertCoords(scene.runtimeScene.input->GetMouseX(), 0).x;
+            copiedPositions.back().y -= ConvertCoords(0, scene.runtimeScene.input->GetMouseY()).y;
         }
     }
 
@@ -1379,12 +1376,12 @@ void SceneCanvas::OnCutSelected(wxCommandEvent & event)
         {
             //Copy position
             copiedPositions.push_back(sceneEdited.initialObjectsPositions.at(posId));
-            copiedPositions.back().x -= ConvertCoords(scene.input->GetMouseX(), 0).x;
-            copiedPositions.back().y -= ConvertCoords(0, scene.input->GetMouseY()).y;
+            copiedPositions.back().x -= ConvertCoords(scene.runtimeScene.input->GetMouseX(), 0).x;
+            copiedPositions.back().y -= ConvertCoords(0, scene.runtimeScene.input->GetMouseY()).y;
 
             //Remove objects
             sceneEdited.initialObjectsPositions.erase(sceneEdited.initialObjectsPositions.begin() + posId);
-            scene.objectsInstances.RemoveObject(scene.objectsSelected[i]);
+            scene.runtimeScene.objectsInstances.RemoveObject(scene.objectsSelected[i]);
         }
     }
 
@@ -1407,8 +1404,8 @@ void SceneCanvas::OnPasteSelected(wxCommandEvent & event)
     for (unsigned int i =0;i<pastedPositions.size();++i)
     {
         sceneEdited.initialObjectsPositions.push_back(pastedPositions[i]);
-        sceneEdited.initialObjectsPositions.back().x += ConvertCoords(scene.input->GetMouseX(), 0).x;
-        sceneEdited.initialObjectsPositions.back().y += ConvertCoords(0, scene.input->GetMouseY()).y;
+        sceneEdited.initialObjectsPositions.back().x += ConvertCoords(scene.runtimeScene.input->GetMouseX(), 0).x;
+        sceneEdited.initialObjectsPositions.back().y += ConvertCoords(0, scene.runtimeScene.input->GetMouseY()).y;
     }
 
     if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
@@ -1421,10 +1418,10 @@ void SceneCanvas::OnPasteSelected(wxCommandEvent & event)
 void SceneCanvas::OnLayerDownSelected(wxCommandEvent & event)
 {
     int highestLayer = GetObjectsSelectedLowestLayer();
-    if ( highestLayer-1 < 0 || static_cast<unsigned>(highestLayer-1) >= scene.initialLayers.size() )
+    if ( highestLayer-1 < 0 || static_cast<unsigned>(highestLayer-1) >= scene.runtimeScene.initialLayers.size() )
         return;
 
-    string layerName = scene.initialLayers.at(highestLayer-1).GetName();
+    string layerName = scene.runtimeScene.initialLayers.at(highestLayer-1).GetName();
 
     for (unsigned int i =0;i<scene.objectsSelected.size();++i)
     {
@@ -1458,7 +1455,7 @@ void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
     bool hadAPersonalizedSize = sceneEdited.initialObjectsPositions.at( idPos ).personalizedSize;
 
     //Affichage des propriétés de l'objet sous la souris
-    EditOptionsPosition DialogPosition( this, gameEdited, scene, sceneEdited.initialObjectsPositions.at( idPos ) );
+    EditOptionsPosition DialogPosition( this, gameEdited, scene.runtimeScene, sceneEdited.initialObjectsPositions.at( idPos ) );
     if ( DialogPosition.ShowModal() == 1 )
     {
         sceneEdited.initialObjectsPositions.at( idPos ) = DialogPosition.position;
@@ -1511,7 +1508,7 @@ void SceneCanvas::OnDelObjetSelected(wxCommandEvent & event)
         if ( idPos != -1 )
         {
             sceneEdited.initialObjectsPositions.erase(sceneEdited.initialObjectsPositions.begin() + idPos);
-            scene.objectsInstances.RemoveObject(object);
+            scene.runtimeScene.objectsInstances.RemoveObject(object);
         }
     }
 
@@ -1534,8 +1531,8 @@ void SceneCanvas::OnMiddleDown( wxMouseEvent &event )
     if ( !scene.isMoving )
     {
         scene.isMoving = true;
-        scene.deplacementOX = ConvertCoords(scene.input->GetMouseX(), 0).x;
-        scene.deplacementOY = ConvertCoords(0, scene.input->GetMouseY()).y;
+        scene.deplacementOX = ConvertCoords(scene.runtimeScene.input->GetMouseX(), 0).x;
+        scene.deplacementOY = ConvertCoords(0, scene.runtimeScene.input->GetMouseY()).y;
         SetCursor( wxCursor( wxCURSOR_SIZING ) );
         return;
     }
@@ -1552,7 +1549,7 @@ void SceneCanvas::OnMiddleDown( wxMouseEvent &event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnMouseWheel( wxMouseEvent &event )
 {
-    if (scene.running)
+    if (scene.runtimeScene.running)
         return;
 
     //La rotation de la molette
@@ -1579,9 +1576,9 @@ int SceneCanvas::GetObjectsSelectedHighestLayer()
         {
             int layerObjId = 0;
             //On cherche le numéro du calque de l'objet
-            for (unsigned int layerId = 0;layerId<scene.initialLayers.size();++layerId)
+            for (unsigned int layerId = 0;layerId<scene.runtimeScene.initialLayers.size();++layerId)
             {
-                if ( scene.initialLayers[layerId].GetName() == sceneEdited.initialObjectsPositions.at(posId).layer )
+                if ( scene.runtimeScene.initialLayers[layerId].GetName() == sceneEdited.initialObjectsPositions.at(posId).layer )
                    layerObjId = layerId;
             }
 
@@ -1595,7 +1592,7 @@ int SceneCanvas::GetObjectsSelectedHighestLayer()
 
 int SceneCanvas::GetObjectsSelectedLowestLayer()
 {
-    int lowestLayer = scene.initialLayers.size()-1;
+    int lowestLayer = scene.runtimeScene.initialLayers.size()-1;
     for (unsigned int i =0;i<scene.objectsSelected.size();++i)
     {
         //Récupérons la position initiale
@@ -1604,9 +1601,9 @@ int SceneCanvas::GetObjectsSelectedLowestLayer()
         {
             int layerObjId = 0;
             //On cherche le numéro du calque de l'objet
-            for (unsigned int layerId = 0;layerId<scene.initialLayers.size();++layerId)
+            for (unsigned int layerId = 0;layerId<scene.runtimeScene.initialLayers.size();++layerId)
             {
-                if ( scene.initialLayers[layerId].GetName() == sceneEdited.initialObjectsPositions.at(posId).layer )
+                if ( scene.runtimeScene.initialLayers[layerId].GetName() == sceneEdited.initialObjectsPositions.at(posId).layer )
                    layerObjId = layerId;
             }
 
@@ -1640,7 +1637,7 @@ int SceneCanvas::GetInitialPositionFromObject(ObjSPtr object)
 
 ObjSPtr SceneCanvas::GetObjectFromInitialPosition(const InitialPosition & initialPosition)
 {
-    ObjList allObjects = scene.objectsInstances.GetAllObjects();
+    ObjList allObjects = scene.runtimeScene.objectsInstances.GetAllObjects();
 
     for (unsigned int id = 0;id < allObjects.size();++id)
     {

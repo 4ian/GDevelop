@@ -9,9 +9,9 @@
 #include <vector>
 
 EdittimeScene::EdittimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
-RuntimeScene(renderWindow_, game_),
+runtimeScene(renderWindow_, game_),
 editing(true),
-view( sf::FloatRect( 0.0f, 0.0f, game->windowWidth, game->windowHeight ) ),
+view( sf::FloatRect( 0.0f, 0.0f, runtimeScene.game->windowWidth, runtimeScene.game->windowHeight ) ),
 grid( false ),
 snap( false),
 gridWidth( 32 ),
@@ -35,8 +35,8 @@ deplacementOX( 0 ),
 deplacementOY( 0 )
 {
     //ctor
-    renderWindow->SetView(view);
-    running = false;
+    runtimeScene.renderWindow->SetView(view);
+    runtimeScene.running = false;
 }
 
 EdittimeScene::~EdittimeScene()
@@ -50,43 +50,43 @@ EdittimeScene::~EdittimeScene()
 ////////////////////////////////////////////////////////////
 void EdittimeScene::RenderEdittimeScene()
 {
-    ManageRenderTargetEvents();
+    runtimeScene.ManageRenderTargetEvents();
 
-    renderWindow->Clear( sf::Color( backgroundColorR, backgroundColorG, backgroundColorB ) );
-    renderWindow->SetView(view);
+    runtimeScene.renderWindow->Clear( sf::Color( runtimeScene.backgroundColorR, runtimeScene.backgroundColorG, runtimeScene.backgroundColorB ) );
+    runtimeScene.renderWindow->SetView(view);
 
     glClear(GL_DEPTH_BUFFER_BIT);
-    renderWindow->SaveGLStates(); //To allow using OpenGL to draw
+    runtimeScene.renderWindow->SaveGLStates(); //To allow using OpenGL to draw
 
     UpdateGUI();
 
     //On trie les objets par leurs plans
-    ObjList allObjects = objectsInstances.GetAllObjects();
-    OrderObjectsByZOrder( allObjects );
+    ObjList allObjects = runtimeScene.objectsInstances.GetAllObjects();
+    runtimeScene.OrderObjectsByZOrder( allObjects );
 
     std::vector < sf::Shape > GUIelements;
 
-    for (unsigned int layerIndex =0;layerIndex<layers.size();++layerIndex)
+    for (unsigned int layerIndex =0;layerIndex<runtimeScene.layers.size();++layerIndex)
     {
-        if ( layers.at(layerIndex).GetVisibility() )
+        if ( runtimeScene.layers.at(layerIndex).GetVisibility() )
         {
             //Prepare OpenGL rendering
-            renderWindow->RestoreGLStates();
+            runtimeScene.renderWindow->RestoreGLStates();
 
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            gluPerspective(oglFOV, static_cast<double>(renderWindow->GetWidth())/static_cast<double>(renderWindow->GetHeight()), oglZNear, oglZFar);
+            gluPerspective(runtimeScene.oglFOV, static_cast<double>(runtimeScene.renderWindow->GetWidth())/static_cast<double>(runtimeScene.renderWindow->GetHeight()), runtimeScene.oglZNear, runtimeScene.oglZFar);
 
-            glViewport(0,0, renderWindow->GetWidth(), renderWindow->GetHeight());
+            glViewport(0,0, runtimeScene.renderWindow->GetWidth(), runtimeScene.renderWindow->GetHeight());
 
-            renderWindow->SaveGLStates();
+            runtimeScene.renderWindow->SaveGLStates();
 
             //Render all objects
             for (unsigned int id = 0;id < allObjects.size();++id)
             {
-                if ( allObjects[id]->GetLayer() == layers.at(layerIndex).GetName())
+                if ( allObjects[id]->GetLayer() == runtimeScene.layers.at(layerIndex).GetName())
                 {
-                    allObjects[id]->DrawEdittime(*renderWindow);
+                    allObjects[id]->DrawEdittime(*runtimeScene.renderWindow);
 
                     //Selection rectangle
                     if ( find(objectsSelected.begin(), objectsSelected.end(), allObjects[id]) != objectsSelected.end() )
@@ -145,14 +145,14 @@ void EdittimeScene::RenderEdittimeScene()
 
     //Draw GUI Elements
     for (unsigned int i = 0;i<GUIelements.size();++i)
-    	renderWindow->Draw(GUIelements[i]);
+    	runtimeScene.renderWindow->Draw(GUIelements[i]);
 
     if ( isSelecting )
     {
         sf::Shape selection = sf::Shape::Rectangle(xRectangleSelection, yRectangleSelection,
                                                    xEndRectangleSelection-xRectangleSelection, yEndRectangleSelection-yRectangleSelection,
                                                    sf::Color( 0, 0, 200, 40 ), 1, sf::Color( 0, 0, 255, 128 ) );
-        renderWindow->Draw(selection);
+        runtimeScene.renderWindow->Draw(selection);
     }
 
     //Affichage de l'objet à insérer en semi transparent
@@ -162,10 +162,10 @@ void EdittimeScene::RenderEdittimeScene()
         {
             ObjSPtr object = boost::shared_ptr<Object>();
 
-            if ( Picker::PickOneObject( &initialObjects, objectToAdd ) != -1)
-                object = initialObjects[Picker::PickOneObject( &initialObjects, objectToAdd ) ];
-            else if ( Picker::PickOneObject( &game->globalObjects, objectToAdd ) != -1)
-                object = game->globalObjects[Picker::PickOneObject( &game->globalObjects, objectToAdd ) ];
+            if ( Picker::PickOneObject( &runtimeScene.initialObjects, objectToAdd ) != -1)
+                object = runtimeScene.initialObjects[Picker::PickOneObject( &runtimeScene.initialObjects, objectToAdd ) ];
+            else if ( Picker::PickOneObject( &runtimeScene.game->globalObjects, objectToAdd ) != -1)
+                object = runtimeScene.game->globalObjects[Picker::PickOneObject( &runtimeScene.game->globalObjects, objectToAdd ) ];
 
             if ( object != boost::shared_ptr<Object>() )
             {
@@ -174,16 +174,16 @@ void EdittimeScene::RenderEdittimeScene()
                 //to some coordinates just after their creations.
                 if ( grid && snap )
                 {
-                    object->SetX( static_cast<int>(renderWindow->ConvertCoords(input->GetMouseX(), 0).x/gridWidth)*gridWidth );
-                    object->SetY( static_cast<int>(renderWindow->ConvertCoords(0, input->GetMouseY()).y/gridHeight)*gridHeight );
+                    object->SetX( static_cast<int>(runtimeScene.renderWindow->ConvertCoords(runtimeScene.input->GetMouseX(), 0).x/gridWidth)*gridWidth );
+                    object->SetY( static_cast<int>(runtimeScene.renderWindow->ConvertCoords(0, runtimeScene.input->GetMouseY()).y/gridHeight)*gridHeight );
                 }
                 else
                 {
-                    object->SetX( renderWindow->ConvertCoords(input->GetMouseX(), 0).x );
-                    object->SetY( renderWindow->ConvertCoords(0, input->GetMouseY()).y );
+                    object->SetX( runtimeScene.renderWindow->ConvertCoords(runtimeScene.input->GetMouseX(), 0).x );
+                    object->SetY( runtimeScene.renderWindow->ConvertCoords(0, runtimeScene.input->GetMouseY()).y );
                 }
 
-                object->DrawEdittime( *renderWindow );
+                object->DrawEdittime( *runtimeScene.renderWindow );
             }
         }
         catch ( ... ) { }
@@ -192,15 +192,15 @@ void EdittimeScene::RenderEdittimeScene()
 
     if ( windowMask )
     {
-        sf::Shape windowMaskShape = sf::Shape::Rectangle(view.GetCenter().x-game->windowWidth/2, view.GetCenter().y-game->windowHeight/2,
-                                                         game->windowWidth, game->windowHeight, sf::Color( 0, 0, 0, 0 ), 1, sf::Color( 255, 255, 255, 128 ) );
+        sf::Shape windowMaskShape = sf::Shape::Rectangle(view.GetCenter().x-runtimeScene.game->windowWidth/2, view.GetCenter().y-runtimeScene.game->windowHeight/2,
+                                                         runtimeScene.game->windowWidth, runtimeScene.game->windowHeight, sf::Color( 0, 0, 0, 0 ), 1, sf::Color( 255, 255, 255, 128 ) );
 
-        renderWindow->Draw(windowMaskShape);
-        renderWindow->SetView(view);
+        runtimeScene.renderWindow->Draw(windowMaskShape);
+        runtimeScene.renderWindow->SetView(view);
     }
 
-    renderWindow->RestoreGLStates();
-    renderWindow->Display();
+    runtimeScene.renderWindow->RestoreGLStates();
+    runtimeScene.renderWindow->Display();
 }
 
 ////////////////////////////////////////////////////////////
@@ -219,14 +219,14 @@ void EdittimeScene::RenderGrid()
     {
         sf::Shape line = sf::Shape::Line( positionX, departY, positionX, (view.GetCenter().y+view.GetSize().y/2), 1, sf::Color( gridR, gridG, gridB ));
 
-        renderWindow->Draw( line );
+        runtimeScene.renderWindow->Draw( line );
     }
 
     for ( positionY = departY;positionY < (view.GetCenter().y+view.GetSize().y/2) ; positionY += gridHeight )
     {
         sf::Shape line = sf::Shape::Line( departX, positionY, (view.GetCenter().x+view.GetSize().x/2), positionY, 1, sf::Color( gridR, gridG, gridB ));
 
-        renderWindow->Draw( line );
+        runtimeScene.renderWindow->Draw( line );
     }
 }
 
@@ -235,7 +235,7 @@ void EdittimeScene::RenderGrid()
 ////////////////////////////////////////////////////////////
 void EdittimeScene::UpdateGUI()
 {
-    float elapsedTime = renderWindow->GetFrameTime();
+    float elapsedTime = runtimeScene.renderWindow->GetFrameTime();
     if ( colorPlus )
     {
         colorGUI += static_cast<int>(150 * elapsedTime);
@@ -265,10 +265,10 @@ void EdittimeScene::UpdateGUI()
 ObjSPtr EdittimeScene::FindSmallestObject()
 {
     ObjList potentialObjects;
-    int x = renderWindow->ConvertCoords(input->GetMouseX(), 0).x;
-    int y = renderWindow->ConvertCoords(0, input->GetMouseY()).y;
+    int x = runtimeScene.renderWindow->ConvertCoords(runtimeScene.input->GetMouseX(), 0).x;
+    int y = runtimeScene.renderWindow->ConvertCoords(0, runtimeScene.input->GetMouseY()).y;
 
-    ObjList allObjects = objectsInstances.GetAllObjects();
+    ObjList allObjects = runtimeScene.objectsInstances.GetAllObjects();
 
     for (unsigned int id = 0;id < allObjects.size();++id)
     {
@@ -276,7 +276,7 @@ ObjSPtr EdittimeScene::FindSmallestObject()
                 allObjects[id]->GetDrawableY() < y &&
                 allObjects[id]->GetDrawableX() + allObjects[id]->GetWidth() > x &&
                 allObjects[id]->GetDrawableY() + allObjects[id]->GetHeight() > y &&
-                GetLayer(allObjects[id]->GetLayer()).GetVisibility())
+                runtimeScene.GetLayer(allObjects[id]->GetLayer()).GetVisibility())
         {
             potentialObjects.push_back( allObjects[id] );
         }

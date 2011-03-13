@@ -432,10 +432,10 @@ void EditorLayers::OnlayersListItemActivated(wxListEvent& event)
         //Changes without reloading
         if ( sceneCanvas )
         {
-            for (unsigned int i = 0;i<sceneCanvas->scene.layers.size();++i)
+            for (unsigned int i = 0;i<sceneCanvas->scene.runtimeScene.layers.size();++i)
             {
-                if ( sceneCanvas->scene.layers[i].GetName() == selectedLayer->GetName() )
-                    sceneCanvas->scene.layers[i].SetVisibility(selectedLayer->GetVisibility());
+                if ( sceneCanvas->scene.runtimeScene.layers[i].GetName() == selectedLayer->GetName() )
+                    sceneCanvas->scene.runtimeScene.layers[i].SetVisibility(selectedLayer->GetVisibility());
             }
         }
         return;

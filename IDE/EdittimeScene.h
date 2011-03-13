@@ -17,12 +17,14 @@ using namespace std;
 /**
  * Used by a SceneCanvas to edit a scene
  */
-class EdittimeScene : public RuntimeScene
+class EdittimeScene
 {
     public:
         EdittimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_);
         virtual ~EdittimeScene();
         void RenderEdittimeScene();
+
+        RuntimeScene runtimeScene; ///< Base RuntimeScene
 
         bool editing; //Car une EdittimeScene peut aussi être jouée
 
@@ -76,7 +78,6 @@ class EdittimeScene : public RuntimeScene
 
         ObjSPtr FindSmallestObject();
 
-    protected:
     private:
         void UpdateGUI();
         void RenderGrid();

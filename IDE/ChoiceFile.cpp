@@ -78,7 +78,7 @@ ChoiceFile::~ChoiceFile()
 
 void ChoiceFile::OnadvancedBtClick(wxCommandEvent& event)
 {
-    EditTextDialog dialog(this, file, game, scene, canSelectGroup, mainObjectsName);
+    EditTextDialog dialog(this, file, game, scene);
     if ( dialog.ShowModal() == 1 )
     {
         file = dialog.returnedText;

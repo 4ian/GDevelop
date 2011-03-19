@@ -8776,11 +8776,12 @@
 	<wx/thread.h>
 	"GDL/SourceFileBuilder.h"
 
-1298407994 d:\florian\programmation\gamedevelop\gdl\gdl\sourcefilebuilder.h
+1300399150 d:\florian\programmation\gamedevelop\gdl\gdl\sourcefilebuilder.h
 	<wx/process.h>
 	<vector>
 	<string>
 	<boost/shared_ptr.hpp>
+	<iostream>
 	"GDL/CompilerToolchainPathManager.h"
 
 1253304918 c:\libs\wxwidgets\include\wx\process.h
@@ -9238,7 +9239,7 @@
 1264360534 source:d:\florian\programmation\gamedevelop\ide\tinyxmlerror.cpp
 	"tinyxml.h"
 
-1275820091 source:d:\florian\programmation\gamedevelop\ide\choicefile.cpp
+1300396958 source:d:\florian\programmation\gamedevelop\ide\choicefile.cpp
 	"ChoiceFile.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -9255,7 +9256,7 @@
 	<string>
 	<vector>
 
-1294508059 d:\florian\programmation\gamedevelop\gdl\gdl\edittextdialog.h
+1300396555 d:\florian\programmation\gamedevelop\gdl\gdl\edittextdialog.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -9286,7 +9287,7 @@
 	"wx/textentry.h"
 	"wx/textctrl.h"
 
-1275845532 source:d:\florian\programmation\gamedevelop\ide\choicejoyaxis.cpp
+1300396879 source:d:\florian\programmation\gamedevelop\ide\choicejoyaxis.cpp
 	"ChoiceJoyAxis.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -9304,7 +9305,7 @@
 	<string>
 	<vector>
 
-1298233726 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
+1300394813 source:d:\florian\programmation\gamedevelop\ide\choixaction.cpp
 	"ChoixAction.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -9344,7 +9345,7 @@
 	"GDL/ObjectListDialogsHelper.h"
 	<boost/algorithm/string.hpp>
 
-1297521505 d:\florian\programmation\gamedevelop\ide\choixaction.h
+1300141254 d:\florian\programmation\gamedevelop\ide\choixaction.h
 	<wx/treectrl.h>
 	<wx/notebook.h>
 	<wx/sizer.h>
@@ -9580,7 +9581,7 @@
 	<string>
 	<vector>
 
-1295802001 d:\florian\programmation\gamedevelop\gdl\gdl\editexpression.h
+1300396555 d:\florian\programmation\gamedevelop\gdl\gdl\editexpression.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -10423,7 +10424,7 @@
 	<vector>
 	<wx/msgdlg.h>
 
-1298233734 source:d:\florian\programmation\gamedevelop\ide\choixcondition.cpp
+1300394813 source:d:\florian\programmation\gamedevelop\ide\choixcondition.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"ChoixCondition.h"
@@ -12965,7 +12966,7 @@
 	"green.xpm"
 	"red.xpm"
 
-1297520132 source:d:\florian\programmation\gamedevelop\ide\newcppfiledlg.cpp
+1300394992 source:d:\florian\programmation\gamedevelop\ide\newcppfiledlg.cpp
 	"NewCppFileDlg.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -13125,7 +13126,7 @@
 	<wx/string.h>
 	<iostream>
 
-1300036575 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1300224885 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -13259,7 +13260,7 @@
 1294609130 source:d:\florian\programmation\gamedevelop\ide\resource.rc
 	"version.h"
 
-1300036575 d:\florian\programmation\gamedevelop\ide\version.h
+1300549441 d:\florian\programmation\gamedevelop\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

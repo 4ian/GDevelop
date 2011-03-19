@@ -693,6 +693,9 @@ void SceneCanvas::ReloadFirstPart()
     RuntimeScene newScene(this, &game);
     scene.runtimeScene = newScene;
     scene.runtimeScene.running = false;
+    if ( profileDialog )   scene.runtimeScene.profiler = profileDialog.get();
+    if ( debugger ) scene.runtimeScene.debugger = debugger.get();
+
 
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( !scene.editing && gameEdited.useExternalSourceFiles )

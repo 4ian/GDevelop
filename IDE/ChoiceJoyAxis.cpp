@@ -90,7 +90,7 @@ ChoiceJoyAxis::~ChoiceJoyAxis()
 
 void ChoiceJoyAxis::OnadvancedBtClick(wxCommandEvent& event)
 {
-    EditTextDialog dialog(this, joyaxis, game, scene, canSelectGroup, mainObjectsName);
+    EditTextDialog dialog(this, joyaxis, game, scene);
     if ( dialog.ShowModal() == 1 )
         joyaxis = dialog.returnedText;
 }

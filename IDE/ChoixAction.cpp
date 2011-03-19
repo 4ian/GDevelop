@@ -236,6 +236,7 @@ scene(scene_)
     BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
 
     //Pour chaque paramètres
+    /*
     for ( unsigned int i = 0;i < MaxPara;i++ )
     {
         const string num =ToString( i );
@@ -271,7 +272,7 @@ scene(scene_)
         GridSizer1->AddStretchSpacer(1);
         GridSizer1->Add( ParaEdit.at(i), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
         GridSizer1->Add( ParaBmpBt.at(i), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
-    }
+    }*/
     GridSizer1->Layout();
 
     imageList = new wxImageList( 16, 16 );
@@ -287,13 +288,13 @@ scene(scene_)
 }
 
 ChoixAction::~ChoixAction()
-{
+{/*
     for ( unsigned int i = 0;i < MaxPara;i++ )
     {
     	delete ParaText.at(i);
     	delete ParaEdit.at(i);
     	delete ParaBmpBt.at(i);
-    }
+    }*/
 
 	//(*Destroy(ChoixAction)
 	//*)
@@ -635,6 +636,7 @@ void ChoixAction::RefreshFromAction()
     else ActionImg->SetBitmap(BitmapGUIManager::GetInstance()->unknown24);
 
     //Update parameters values
+    /*
     for ( unsigned int i = 0;i < Param.size();i++ )
         ParaEdit.at(i)->ChangeValue( Param.at( i ).GetPlainString() );
 
@@ -644,10 +646,75 @@ void ChoixAction::RefreshFromAction()
         ParaText.at(i)->Show( false );
         ParaEdit.at(i)->Show( false );
         ParaBmpBt.at(i)->Show( false );
+    }*/
+    while ( ParaEdit.size() < instructionInfos.parameters.size() )
+    {
+        const string num =ToString( ParaEdit.size() );
+
+        //Bouton radio pour facultatif ou pas
+        ParaFac.push_back(new wxCheckBox( this, ID_CHECKARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, num ));
+
+        //Le texte du paramètre
+        ParaText.push_back(new wxStaticText( this, ID_TEXTARRAY, _( "Paramètre :" ), wxDefaultPosition, wxDefaultSize, 0, _T( "TxtPara" + num ) ));
+
+        //Une zone à éditer
+        ParaEdit.push_back( new wxTextCtrl( this, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T( "EditPara" + num ) ));
+
+        const long id = wxNewId();
+        //Un bitmap bouton
+        ParaBmpBt.push_back( new wxBitmapButton( this, id, BitmapGUIManager::GetInstance()->expressionBt, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, num ));
+
+        Connect( id, wxEVT_COMMAND_BUTTON_CLICKED,
+                 wxCommandEventHandler( ChoixAction::OnABtClick ) );
+        Connect( ID_CHECKARRAY, wxEVT_COMMAND_CHECKBOX_CLICKED,
+                 wxCommandEventHandler( ChoixAction::OnFacClicked ) );
+
+        //On ajoute le tout
+        GridSizer1->Add( ParaFac.back(), 1, wxALL | wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, 5 );
+        GridSizer1->Add( ParaText.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
+        ParaSpacer1.push_back(GridSizer1->AddStretchSpacer(1));
+        ParaSpacer2.push_back(GridSizer1->AddStretchSpacer(1));
+        GridSizer1->Add( ParaEdit.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
+        GridSizer1->Add( ParaBmpBt.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
+    }
+    while ( ParaEdit.size() > instructionInfos.parameters.size() )
+    {
+    	ParaText.back()->Destroy();
+    	ParaText.erase(ParaText.begin()+ParaText.size()-1);
+    	ParaEdit.back()->Destroy();
+    	ParaEdit.erase(ParaEdit.begin()+ParaEdit.size()-1);
+    	ParaBmpBt.back()->Destroy();
+    	ParaBmpBt.erase(ParaBmpBt.begin()+ParaBmpBt.size()-1);
+    	ParaFac.back()->Destroy();
+    	ParaFac.erase(ParaFac.begin()+ParaFac.size()-1);
     }
 
     for ( unsigned int i = 0;i < instructionInfos.parameters.size();i++ )
     {
+        ParaBmpBt.at(i)->SetBitmapLabel( TranslateAction::BitmapFromType(instructionInfos.parameters[i].type) );
+        ParaBmpBt.at(i)->SetToolTip( TranslateAction::LabelFromType(instructionInfos.parameters[i].type) );
+        ParaBmpBt.at(i)->Show( !instructionInfos.parameters[i].type.empty() );//Les boutons
+
+        ParaText.at(i)->SetLabel( instructionInfos.parameters[i].description + _(" :") );
+
+        if ( Param.size() > i ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
+
+        ParaFac.at(i)->Show(instructionInfos.parameters[i].optional);
+        ParaFac.at(i)->SetValue(!ParaEdit.at( i )->GetValue().empty());
+
+        if ( instructionInfos.parameters[i].optional && !ParaFac.at(i)->GetValue() )
+        {
+            //Affiche et désactive les autres controles
+            ParaBmpBt.at(i)->Enable(false);
+            ParaText.at(i)->Enable(false);
+            ParaEdit.at(i)->Enable(false);
+        }
+
+        if ( Param.size() <= i || Param[i].GetPlainString().empty() )
+        {
+            if ( instructionInfos.parameters[i].type == "expression" ) ParaEdit.at( i )->SetValue("0");
+        }
+        /*
         ParaFac.at(i)->SetValue(true);
         ParaBmpBt.at(i)->Enable(true);
         ParaText.at(i)->Enable(true);
@@ -688,7 +755,7 @@ void ChoixAction::RefreshFromAction()
                     ParaEdit.at(i)->Enable(true);
                 }
             }
-        }
+        }*/
     }
     Layout();
     GridSizer1->Layout();
@@ -744,7 +811,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         }
         else if ( instructionInfos.parameters[i].type == "expression" )
         {
-            EditExpression Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
+            EditExpression Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( Dialog.ShowModal() == 1 )
             {
                 ParaEdit.at(i)->ChangeValue(Dialog.expression);
@@ -753,7 +820,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         }
         else if ( instructionInfos.parameters[i].type == "text" )
         {
-            EditTextDialog Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
+            EditTextDialog Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( Dialog.ShowModal() == 1 )
             {
                 ParaEdit.at(i)->ChangeValue(Dialog.returnedText);

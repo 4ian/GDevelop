@@ -815,7 +815,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if (  instructionInfos.parameters[i].type == "expression" )
         {
-            EditExpression dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
+            EditExpression dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( dialog.ShowModal() == 1 )
             {
                 ParaEdit.at(i)->ChangeValue(dialog.expression);
@@ -850,7 +850,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionInfos.parameters[i].type == "text" )
         {
-            EditTextDialog dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
+            EditTextDialog dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( dialog.ShowModal() == 1 )
             {
                 ParaEdit.at(i)->ChangeValue(dialog.returnedText);

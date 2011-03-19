@@ -37,6 +37,7 @@
 #include "GDL/ResourcesMergingHelper.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/HelpFileAccess.h"
+#include "GDL/ExternalEvents.h"
 #include "Compilation.h"
 #include "ErrorCompilation.h"
 #include "ErrorCompilation.h"
@@ -303,6 +304,12 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 
         InventoryEventsResources(game, game.scenes[i]->events, resourcesMergingHelper);
     }
+    //Add external events resources
+    for ( unsigned int i = 0;i < game.externalEvents.size();i++ )
+    {
+        InventoryEventsResources(game, game.externalEvents[i]->events, resourcesMergingHelper);
+    }
+    //Add global objects resources
     for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
         game.globalObjects[j]->PrepareResourcesForMerging(resourcesMergingHelper);
 

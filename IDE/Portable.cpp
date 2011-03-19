@@ -14,6 +14,7 @@
 #include <wx/dirdlg.h>
 #include <wx/log.h>
 #include "GDL/ResourcesMergingHelper.h"
+#include "GDL/ExternalEvents.h"
 #include "Portable.h"
 #include "GDL/Game.h"
 #include "GDL/OpenSaveGame.h"
@@ -139,6 +140,11 @@ void Portable::OnButton1Click(wxCommandEvent& event)
 
         InventoryEventsResources(game, game.scenes[s]->events, resourcesMergingHelper);
         AvancementGauge->SetValue(s/game.scenes.size()*16.0f+33.0f);
+    }
+    //Add external events resources
+    for ( unsigned int s = 0;s < game.externalEvents.size();s++ )
+    {
+        InventoryEventsResources(game, game.externalEvents[s]->events, resourcesMergingHelper);
     }
     wxSafeYield();
     //Add global objects resources

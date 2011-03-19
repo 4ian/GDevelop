@@ -10643,7 +10643,7 @@
 	"wx/arrstr.h"
 	<stdarg.h>
 
-1299965472 source:d:\florian\programmation\gamedevelop\ide\compilation.cpp
+1300549441 source:d:\florian\programmation\gamedevelop\ide\compilation.cpp
 	<wx/bitmap.h>
 	<wx/settings.h>
 	<wx/intl.h>
@@ -10675,6 +10675,7 @@
 	"GDL/ResourcesMergingHelper.h"
 	"GDL/ExtensionsManager.h"
 	"GDL/HelpFileAccess.h"
+	"GDL/ExternalEvents.h"
 	"Compilation.h"
 	"ErrorCompilation.h"
 	"ErrorCompilation.h"
@@ -13260,7 +13261,7 @@
 1294609130 source:d:\florian\programmation\gamedevelop\ide\resource.rc
 	"version.h"
 
-1300549441 d:\florian\programmation\gamedevelop\ide\version.h
+1300550190 d:\florian\programmation\gamedevelop\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

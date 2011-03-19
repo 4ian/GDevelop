@@ -21,6 +21,7 @@
 #include "GDL/gdTreeItemStringData.h"
 #include "GDL/TreeItemStrExpressionInfoData.h"
 #include "GDL/ChooseAutomatismDlg.h"
+#include "GDL/AdvancedTextEntryDlg.h"
 
 //(*IdInit(EditTextDialog)
 const long EditTextDialog::ID_CUSTOM1 = wxNewId();
@@ -43,11 +44,9 @@ BEGIN_EVENT_TABLE(EditTextDialog,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditTextDialog::EditTextDialog(wxWindow* parent, string texte, Game & game_, Scene & scene_, bool canSelectGroup_, const vector < string > & mainObjectsName_) :
+EditTextDialog::EditTextDialog(wxWindow* parent, string texte, Game & game_, Scene & scene_) :
 game(game_),
 scene(scene_),
-canSelectGroup(canSelectGroup_),
-mainObjectsName(mainObjectsName_),
 lastErrorPos(std::string::npos)
 {
 	//(*Initialize(EditTextDialog)
@@ -395,12 +394,15 @@ void EditTextDialog::OnOkBtClick(wxCommandEvent& event)
 /**
  * Show a dialog for completing a parameter
  */
-string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, std::string objectNameAssociated)
+string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, bool & userCancelled, std::string objectNameAssociated)
 {
     if ( parameterInfo.type == "expression" )
     {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Paramètre"), "0", this));
-        return param;
+        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
+        if ( dialog.ShowModal() == wxOK )
+            return dialog.text;
+        else
+            userCancelled = true;
     }
     else if ( parameterInfo.type == "object" )
     {
@@ -411,8 +413,11 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
     }
     else if ( parameterInfo.type == "text" )
     {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Paramètre"), "\"\"", this));
-        return param;
+        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
+        if ( dialog.ShowModal() == wxOK )
+            return dialog.text;
+        else
+            userCancelled = true;
     }
     else if ( parameterInfo.type == "layer" )
     {
@@ -485,7 +490,7 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
  */
 void EditTextDialog::OnInsertBtClick(wxCommandEvent& event)
 {
-    EditExpression dialog(this, "", game, scene, true, mainObjectsName);
+    EditExpression dialog(this, "", game, scene);
     dialog.ShowModal();
 
     TexteEdit->AddText("ToString("+dialog.expression+")");
@@ -521,7 +526,9 @@ void EditTextDialog::OnAddPropBtClick(wxCommandEvent& event)
     {
         if ( infos->GetStrExpressionInfos().parameters.empty() ) return; //Not even a parameter for the object ?
 
-        string object = ShowParameterDialog(infos->GetStrExpressionInfos().parameters[0]);
+        bool cancelled = false;
+        string object = ShowParameterDialog(infos->GetStrExpressionInfos().parameters[0], cancelled);
+        if ( cancelled ) return;
 
         string parametersStr, automatismStr;
         for (unsigned int i = 1;i<infos->GetStrExpressionInfos().parameters.size();++i)
@@ -535,7 +542,8 @@ void EditTextDialog::OnAddPropBtClick(wxCommandEvent& event)
             else
             {
                 if ( i != 1 ) parametersStr += ",";
-                parametersStr += ShowParameterDialog(infos->GetStrExpressionInfos().parameters[i], object);
+                parametersStr += ShowParameterDialog(infos->GetStrExpressionInfos().parameters[i], cancelled, object);
+                if ( cancelled ) return;
             }
         }
 
@@ -563,12 +571,14 @@ void EditTextDialog::OnAddFunctionBtClick(wxCommandEvent& event)
     TreeItemStrExpressionInfoData * infos = dynamic_cast<TreeItemStrExpressionInfoData*>(ValList->GetItemData(itemVal));
     if ( infos != NULL )
     {
+        bool cancelled = false;
 
         string parametersStr;
         for (unsigned int i = 0;i<infos->GetStrExpressionInfos().parameters.size();++i)
         {
             if ( i != 0 ) parametersStr += ",";
-            parametersStr += ShowParameterDialog(infos->GetStrExpressionInfos().parameters[i]);
+            parametersStr += ShowParameterDialog(infos->GetStrExpressionInfos().parameters[i], cancelled);
+            if ( cancelled ) return;
         }
 
         TexteEdit->AddText(infos->GetName()+"("+parametersStr+")");

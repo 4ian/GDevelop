@@ -152,6 +152,9 @@ public:
      */
     bool StopMusic();
 
+    void ManageRenderTargetEvents();
+    bool OrderObjectsByZOrder( ObjList & objList );
+
 protected:
 
     void Init(const RuntimeScene & scene);
@@ -162,9 +165,7 @@ protected:
     void Render();
     void ManageObjectsBeforeEvents();
     void ManageObjectsAfterEvents();
-    void ManageRenderTargetEvents();
     void ManageSounds();
-    bool OrderObjectsByZOrder( ObjList & objList );
     bool UpdateTime();
 
     bool DisplayLegacyTexts(string layer = "");

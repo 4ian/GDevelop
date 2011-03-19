@@ -15,6 +15,7 @@ class wxStaticText;
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include <iostream>
 #include "GDL/CompilerToolchainPathManager.h"
 class Game;
 
@@ -136,6 +137,7 @@ public:
         wxProcess(NULL),
         m_parent(parent)
     {
+        std::cout << "BuildProcess created" << std::endl;
         Redirect();
     }
 

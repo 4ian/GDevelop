@@ -102,8 +102,7 @@ EditRepeatEvent::~EditRepeatEvent()
 
 void EditRepeatEvent::OnexpressionBtClick(wxCommandEvent& )
 {
-    vector < string > mainObjectsName;
-    EditExpression dialog(this, string( expressionEdit->GetValue().mb_str() ), game, scene, true, mainObjectsName);
+    EditExpression dialog(this, string( expressionEdit->GetValue().mb_str() ), game, scene);
     if ( dialog.ShowModal() == 1 )
         expressionEdit->ChangeValue(dialog.expression);
 

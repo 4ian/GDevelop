@@ -109,6 +109,26 @@ bool ActUnPauseTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     return true;
 }
 
+/**
+ * Remove a timer from memory
+ */
+bool ActRemoveTimer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    string timerName = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
+    if ( timerName == "" ) return false;
+
+    for ( unsigned int i = 0;i < scene.timers.size();i++ )
+    {
+        if ( scene.timers[i].GetName() == timerName )
+        {
+            scene.timers.erase(scene.timers.begin() + i);
+            return true;
+        }
+    }
+
+    return true;
+}
+
 ////////////////////////////////////////////////////////////
 /// Modifier l'échelle du temps
 ///

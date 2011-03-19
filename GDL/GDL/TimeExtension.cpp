@@ -97,6 +97,19 @@ TimeExtension::TimeExtension()
 
     DECLARE_END_ACTION()
 
+    DECLARE_ACTION("RemoveTimer",
+                   _("Supprimer un chronomètre"),
+                   _("Supprime un chronomètre de la mémoire."),
+                   _("Supprimer le chronomètre _PARAM0_ de la mémoire"),
+                   _("Temps et chronomètres"),
+                   "res/actions/time24.png",
+                   "res/actions/time.png",
+                   &ActRemoveTimer);
+
+        DECLARE_PARAMETER("text", _("Nom du chronomètre"), false, "");
+
+    DECLARE_END_ACTION()
+
     DECLARE_ACTION("ChangeTimeScale",
                    _("Changer l'échelle du temps"),
                    _("Change la vitesse du déroulement du jeu."),

@@ -28,7 +28,7 @@ class GD_API EditExpression: public wxDialog
 {
 	public:
 
-		EditExpression(wxWindow* parent, string pExpression, Game & game_, Scene & scene_, bool canSelectGroup, const vector < string > & mainObjectsName_);
+		EditExpression(wxWindow* parent, string pExpression, Game & game_, Scene & scene_);
 		virtual ~EditExpression();
 
 		//(*Declarations(EditExpression)
@@ -182,7 +182,7 @@ class GD_API EditExpression: public wxDialog
 		//*)
 		void TextModified(wxStyledTextEvent& event);
 		void UpdateTextCtrl(wxStyledTextEvent& event);
-		std::string ShowParameterDialog(const ParameterInfo & parameter);
+		std::string ShowParameterDialog(const ParameterInfo & parameter, bool & userCancelled);
 
 		wxImageList * imageListObj;
 		wxImageList * imageListVal;
@@ -191,8 +191,6 @@ class GD_API EditExpression: public wxDialog
         //( quand on souhaite accéder aux propriétés d'un objet )
 		Game & game;
 		Scene & scene;
-		bool canSelectGroup;
-		const vector < string > & mainObjectsName;
 
 		size_t lastErrorPos;
 

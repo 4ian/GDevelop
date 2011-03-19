@@ -644,6 +644,8 @@
 		</Unit>
 		<Unit filename="GDL\AdvancedExtension.cpp" />
 		<Unit filename="GDL\AdvancedExtension.h" />
+		<Unit filename="GDL\AdvancedTextEntryDlg.cpp" />
+		<Unit filename="GDL\AdvancedTextEntryDlg.h" />
 		<Unit filename="GDL\AjoutPlusImage.cpp" />
 		<Unit filename="GDL\AjoutPlusImage.h" />
 		<Unit filename="GDL\Animation.cpp" />
@@ -1047,6 +1049,7 @@
 					<wxDialog wxs="wxsmith/ChooseAutomatismDlg.wxs" src="GDL/ChooseAutomatismDlg.cpp" hdr="GDL/ChooseAutomatismDlg.h" fwddecl="0" i18n="1" name="ChooseAutomatismDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/PropImage.wxs" src="GDL/PropImage.cpp" hdr="GDL/PropImage.h" fwddecl="0" i18n="1" name="PropImage" language="CPP" />
 					<wxDialog wxs="wxsmith/EditDynamicExtensionCallerEvent.wxs" src="GDL/EditDynamicExtensionCallerEvent.cpp" hdr="GDL/EditDynamicExtensionCallerEvent.h" fwddecl="0" i18n="1" name="EditDynamicExtensionCallerEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/AdvancedTextEntryDlg.wxs" src="GDL/AdvancedTextEntryDlg.cpp" hdr="GDL/AdvancedTextEntryDlg.h" fwddecl="0" i18n="1" name="AdvancedTextEntryDlg" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

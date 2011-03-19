@@ -25,7 +25,7 @@ class GD_API EditTextDialog: public wxDialog
 {
 	public:
 
-		EditTextDialog(wxWindow* parent, string texte, Game & game_, Scene & scene_, bool canSelectGroup, const vector < string > & mainObjectsName_);
+		EditTextDialog(wxWindow* parent, string texte, Game & game_, Scene & scene_);
 		virtual ~EditTextDialog();
 
 		//(*Declarations(EditTextDialog)
@@ -84,7 +84,7 @@ class GD_API EditTextDialog: public wxDialog
 		void TextModified(wxStyledTextEvent& event);
 		void UpdateTextCtrl(wxStyledTextEvent& event);
 
-		string ShowParameterDialog(const ParameterInfo & parameterInfo, std::string object = "");
+		string ShowParameterDialog(const ParameterInfo & parameterInfo, bool & userCancelled, std::string object = "");
 
 		//Items selected
 		wxTreeItemId itemObj;
@@ -97,8 +97,6 @@ class GD_API EditTextDialog: public wxDialog
         //( quand on souhaite accéder aux propriétés d'un objet )
 		Game & game;
 		Scene & scene;
-		bool canSelectGroup;
-		const vector < string > & mainObjectsName;
 
 		size_t lastErrorPos;
 

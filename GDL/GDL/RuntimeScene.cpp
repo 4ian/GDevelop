@@ -206,6 +206,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         #if defined(GD_IDE_ONLY)
         if( profiler && profiler->profilingActivated )
         {
+            cout << "rtime :" <<profiler->renderingClock.getTimeMicroseconds() << endl;
             profiler->lastRenderingTime = profiler->renderingClock.getTimeMicroseconds();
             profiler->totalSceneTime += profiler->lastRenderingTime + profiler->lastEventsTime;
             profiler->totalEventsTime += profiler->lastEventsTime;
@@ -555,7 +556,6 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;
     backgroundColorB = scene.backgroundColorB;
-    title = scene.title;
     standardSortMethod = scene.standardSortMethod;
     title = scene.title;
     oglFOV = scene.oglFOV;

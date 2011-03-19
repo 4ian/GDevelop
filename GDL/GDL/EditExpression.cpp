@@ -30,6 +30,7 @@
 #include "GDL/ChooseObjectExpression.h"
 #include "GDL/ChooseVariableDialog.h"
 #include "GDL/ChooseAutomatismDlg.h"
+#include "GDL/AdvancedTextEntryDlg.h"
 
 #include <string>
 #include <vector>
@@ -87,11 +88,9 @@ BEGIN_EVENT_TABLE(EditExpression,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditExpression::EditExpression(wxWindow* parent, string pExpression, Game & game_, Scene & scene_, bool canSelectGroup_, const vector < string > & mainObjectsName_) :
+EditExpression::EditExpression(wxWindow* parent, string pExpression, Game & game_, Scene & scene_ ) :
 game(game_),
 scene(scene_),
-canSelectGroup(canSelectGroup_),
-mainObjectsName(mainObjectsName_),
 lastErrorPos(std::string::npos)
 {
 	//(*Initialize(EditExpression)
@@ -632,12 +631,23 @@ void EditExpression::OnSinBtClick(wxCommandEvent& event)
 /**
  * Show a dialog for completing a parameter
  */
-string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo)
+string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo, bool & userCancelled)
 {
     if ( parameterInfo.type == "expression" )
     {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Paramètre"), "0", this));
-        return param;
+        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
+        if ( dialog.ShowModal() == wxOK )
+            return dialog.text;
+        else
+            userCancelled = true;
+    }
+    else if ( parameterInfo.type == "text" )
+    {
+        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
+        if ( dialog.ShowModal() == wxOK )
+            return dialog.text;
+        else
+            userCancelled = true;
     }
     else if ( parameterInfo.type == "object" )
     {
@@ -645,11 +655,6 @@ string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo)
         if ( Dialog.ShowModal() == 0 ) return "";
 
         return Dialog.objectChosen;
-    }
-    else if ( parameterInfo.type == "text" )
-    {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Paramètre"), "\"\"", this));
-        return param;
     }
     else if ( parameterInfo.type == "layer" )
     {
@@ -695,7 +700,9 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
     {
         if ( infos->GetExpressionInfos().parameters.empty() ) return; //Not even a parameter for the object ?
 
-        string object = ShowParameterDialog(infos->GetExpressionInfos().parameters[0]);
+        bool cancelled = false;
+        string object = ShowParameterDialog(infos->GetExpressionInfos().parameters[0], cancelled);
+        if ( cancelled ) return;
 
         //Add parameters
         string parametersStr, automatismStr;
@@ -710,7 +717,8 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
             else
             {
                 if ( i != 1 ) parametersStr += ",";
-                parametersStr += ShowParameterDialog(infos->GetExpressionInfos().parameters[i]);
+                parametersStr += ShowParameterDialog(infos->GetExpressionInfos().parameters[i], cancelled);
+                if ( cancelled ) return;
             }
         }
 
@@ -730,7 +738,9 @@ void EditExpression::OnAddValBtClick(wxCommandEvent& event)
         for (unsigned int i = 0;i<infos->GetExpressionInfos().parameters.size();++i)
         {
             if ( i != 0 ) parametersStr += ",";
-            parametersStr += ShowParameterDialog(infos->GetExpressionInfos().parameters[i]);
+            bool userCancelled = false;
+            parametersStr += ShowParameterDialog(infos->GetExpressionInfos().parameters[i], userCancelled);
+            if ( userCancelled ) return;
         }
 
         ExpressionEdit->AddText(infos->GetName()+"("+parametersStr+")");

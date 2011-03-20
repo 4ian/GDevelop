@@ -113,9 +113,9 @@ class ChoixAction: public wxDialog
 	private:
 
 		vector < wxCheckBox * > ParaFac;
-		vector < wxSizerItem * > ParaSpacer1;
+		vector < wxPanel * > ParaSpacer1;
 		vector < wxStaticText * > ParaText;
-		vector < wxSizerItem * > ParaSpacer2;
+		vector < wxPanel * > ParaSpacer2;
 		vector < wxBitmapButton * > ParaBmpBt;
 		vector < wxTextCtrl * > ParaEdit;
 

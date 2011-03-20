@@ -155,7 +155,7 @@ void ProfileDlg::UpdateGUI()
 
     totalTimeTxt->SetLabel(_("Temps de rendu total ( Affichage + Evenements )  : ")+ToString((lastRenderingTime+lastEventsTime)/1000.0f)+("ms"));
 
-    unsigned int currentObjectCount = sceneCanvas->scene.runtimeScene.objectsInstances.GetAllObjects().size();
+    unsigned int currentObjectCount = sceneCanvas->edittimeRenderer.runtimeScene.objectsInstances.GetAllObjects().size();
     objectsCountTxt->SetLabel(_("Nombre d'objets : ")+ToString(currentObjectCount));
 
     //Update events data
@@ -263,7 +263,7 @@ void ProfileDlg::ParseProfileEvents()
 {
     if ( !sceneCanvas ) return;
 
-    ParseProfileEvents(sceneCanvas->scene.runtimeScene.events);
+    ParseProfileEvents(sceneCanvas->edittimeRenderer.runtimeScene.events);
 }
 
 void ProfileDlg::ParseProfileEvents(const std::vector < BaseEventSPtr > & events)

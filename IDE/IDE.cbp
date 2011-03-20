@@ -709,12 +709,6 @@
 		<Unit filename="EditorScene.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\" />
 		</Unit>
-		<Unit filename="EdittimeScene.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\" />
-		</Unit>
-		<Unit filename="EdittimeScene.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\" />
-		</Unit>
 		<Unit filename="ErrorCompilation.cpp">
 			<Option virtualFolder="Editeur principal\Fichier\" />
 		</Unit>
@@ -854,6 +848,8 @@
 		<Unit filename="SceneCanvas.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\" />
 		</Unit>
+		<Unit filename="SceneEdittimeRenderer.cpp" />
+		<Unit filename="SceneEdittimeRenderer.h" />
 		<Unit filename="SearchEvents.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
 		</Unit>

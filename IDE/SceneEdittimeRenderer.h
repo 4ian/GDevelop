@@ -3,8 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#ifndef EDITTIMESCENE_H
-#define EDITTIMESCENE_H
+#ifndef SceneEdittimeRenderer_H
+#define SceneEdittimeRenderer_H
 
 #include "GDL/RuntimeScene.h" // Must be placed first
 #include "GDL/Game.h"
@@ -17,16 +17,17 @@ using namespace std;
 /**
  * Used by a SceneCanvas to edit a scene
  */
-class EdittimeScene
+class SceneEdittimeRenderer
 {
     public:
-        EdittimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_);
-        virtual ~EdittimeScene();
-        void RenderEdittimeScene();
+        SceneEdittimeRenderer(sf::RenderWindow * renderWindow_, RuntimeGame * game_, Scene & sceneEdited_ );
+        virtual ~SceneEdittimeRenderer();
+        void RenderSceneEdittimeRenderer();
 
         RuntimeScene runtimeScene; ///< Base RuntimeScene
+        Scene & sceneEdited; ///< associated Edited scene
 
-        bool editing; //Car une EdittimeScene peut aussi être jouée
+        bool editing; //Car une SceneEdittimeRenderer peut aussi être jouée
 
         sf::View view; //Vue pour l'édition
         float zoom;
@@ -34,16 +35,6 @@ class EdittimeScene
         //Ajout d'objet
         string objectToAdd;
         string addOnLayer;
-
-        //Grille
-        bool grid;
-        bool snap;
-        int gridWidth;
-        int gridHeight;
-        int gridR;
-        int gridG;
-        int gridB;
-        bool windowMask;
 
         //Déplacement d'objets
         bool isMovingObject;
@@ -62,10 +53,6 @@ class EdittimeScene
         float xEndRectangleSelection;
         float yEndRectangleSelection;
 
-        //Affichage de rectangles autour des selections
-        int colorGUI;
-        bool colorPlus;
-
         //Remember cursor old position
         int oldMouseX;
         int oldMouseY;
@@ -79,8 +66,7 @@ class EdittimeScene
         ObjSPtr FindSmallestObject();
 
     private:
-        void UpdateGUI();
         void RenderGrid();
 };
 
-#endif // EDITTIMESCENE_H
+#endif // SceneEdittimeRenderer_H

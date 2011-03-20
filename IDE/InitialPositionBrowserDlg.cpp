@@ -75,12 +75,12 @@ void InitialPositionBrowserDlg::OninitialPositionsListItemActivated(wxListEvent&
 
     if ( id >= initialPositions.size() ) return;
 
-    sceneCanvas.scene.view.SetCenter( initialPositions[id].x,  initialPositions[id].y);
+    sceneCanvas.edittimeRenderer.view.SetCenter( initialPositions[id].x,  initialPositions[id].y);
 
     //Update scene canvas selection with list selection
-    sceneCanvas.scene.objectsSelected.clear();
-    sceneCanvas.scene.xObjectsSelected.clear();
-    sceneCanvas.scene.yObjectsSelected.clear();
+    sceneCanvas.edittimeRenderer.objectsSelected.clear();
+    sceneCanvas.edittimeRenderer.xObjectsSelected.clear();
+    sceneCanvas.edittimeRenderer.yObjectsSelected.clear();
 
     long itemIndex = -1;
     for (;;) { //Iterate over all controls
@@ -96,9 +96,9 @@ void InitialPositionBrowserDlg::OninitialPositionsListItemActivated(wxListEvent&
             ObjSPtr object = sceneCanvas.GetObjectFromInitialPosition(initialPositions[itemIndex]);
             if ( object )
             {
-                sceneCanvas.scene.objectsSelected.push_back(object);
-                sceneCanvas.scene.xObjectsSelected.push_back(object->GetX());
-                sceneCanvas.scene.yObjectsSelected.push_back(object->GetY());
+                sceneCanvas.edittimeRenderer.objectsSelected.push_back(object);
+                sceneCanvas.edittimeRenderer.xObjectsSelected.push_back(object->GetX());
+                sceneCanvas.edittimeRenderer.yObjectsSelected.push_back(object->GetY());
             }
         }
     }

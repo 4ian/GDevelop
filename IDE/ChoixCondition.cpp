@@ -279,51 +279,6 @@ scene(scene_)
     //*)
     moreBt->SetBitmap(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
 
-    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
-
-    //Pour chaque paramètres
-    for ( unsigned int i = 0;i < MaxPara;i++ )
-    {
-        //Un sizer
-
-        string num =ToString( i );
-
-        //Bouton radio pour facultatif ou pas
-        ParaFac.push_back(new wxCheckBox( this, ID_CHECKARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, num ));
-
-        //Un texte
-        ParaText.push_back(new wxStaticText( this, ID_TEXTARRAY, _( "Paramètre :" ), wxDefaultPosition, wxDefaultSize, 0, _T( "TxtPara" + num ) ));
-
-        //Une zone à éditer
-        ParaEdit.push_back( new wxTextCtrl( this, ID_EDITARRAY,  "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator,  num  ));
-
-        //Un bitmap bouton
-        const long id = wxNewId();
-        ParaBmpBt.push_back( new wxBitmapButton( this, id, bitmapGUIManager->unknownBt, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, /*_T(*/ num /*)*/ ));
-
-        Connect( id, wxEVT_COMMAND_BUTTON_CLICKED,
-                 wxCommandEventHandler( ChoixCondition::OnABtClick ) );
-        Connect( ID_BUTTONARRAY, wxEVT_COMMAND_BUTTON_CLICKED,
-                 wxCommandEventHandler( ChoixCondition::OnABtClick ) );
-        Connect( ID_CHECKARRAY, wxEVT_COMMAND_CHECKBOX_CLICKED,
-                 wxCommandEventHandler( ChoixCondition::OnFacClicked ) );
-
-        ParaFac.at(i)->Show( false );
-        ParaText.at(i)->Show( false );
-        ParaEdit.at(i)->Show( false );
-        ParaBmpBt.at(i)->Show( false );
-
-        //On ajoute le tout
-        GridSizer1->Add( ParaFac.at(i), 1, wxALL | wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, 5 );
-        GridSizer1->Add( ParaText.at(i), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
-        GridSizer1->AddStretchSpacer(1);
-        GridSizer1->AddStretchSpacer(1);
-        GridSizer1->Add( ParaEdit.at(i), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
-        GridSizer1->Add( ParaBmpBt.at(i), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
-    }
-    GridSizer1->Layout();
-
-
     imageList = new wxImageList( 16, 16 );
     imageList->Add(( wxBitmap( "res/conditions/unecond.png", wxBITMAP_TYPE_ANY ) ) );
     ConditionsTree->AssignImageList( imageList );
@@ -340,13 +295,6 @@ scene(scene_)
 ChoixCondition::~ChoixCondition()
 {
     MemTracer.DelObj(( long )this );
-
-    for ( unsigned int i = 0;i < MaxPara;i++ )
-    {
-    	delete ParaText.at(i);
-    	delete ParaEdit.at(i);
-    	delete ParaBmpBt.at(i);
-    }
     //(*Destroy(ChoixCondition)
     //*)
 }
@@ -674,77 +622,103 @@ void ChoixCondition::OnobjectConditionsTreeSelectionChanged(wxTreeEvent& event)
 ////////////////////////////////////////////////////////////
 void ChoixCondition::RefreshFromCondition()
 {
-    if ( Type == "" )
-        return;
+    if ( Type.empty() ) return;
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
-    const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(Type);
+    //Display action main properties
+    const InstructionInfos & instructionInfos =  GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(Type);
 
     NomConditionTxt->SetLabel( instructionInfos.fullname );
     ConditionTextTxt->SetLabel( instructionInfos.description );
     if ( instructionInfos.icon.IsOk() ) ConditionImg->SetBitmap( instructionInfos.icon );
     else ConditionImg->SetBitmap(BitmapGUIManager::GetInstance()->unknown24);
 
-    for ( unsigned int i = 0;i < MaxPara;i++ )
+    //Update controls count
+    while ( ParaEdit.size() < instructionInfos.parameters.size() )
     {
-        ParaFac.at(i)->Show( false );
-        ParaBmpBt.at(i)->Show( false );
-        ParaText.at(i)->Show( false );
-        ParaEdit.at(i)->Show( false );
+        const string num =ToString( ParaEdit.size() );
+        long id = wxNewId(); //Bitmap buttons want an unique id so as to be displayed properly
+
+        //Addings controls
+        ParaFac.push_back(new wxCheckBox( this, ID_CHECKARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, num ));
+        ParaText.push_back(new wxStaticText( this, ID_TEXTARRAY, _( "Paramètre :" ), wxDefaultPosition, wxDefaultSize, 0, _T( "TxtPara" + num ) ));
+        ParaSpacer1.push_back( new wxPanel(this) );
+        ParaSpacer2.push_back( new wxPanel(this) );
+        ParaEdit.push_back( new wxTextCtrl( this, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T( "EditPara" + num ) ));
+        ParaBmpBt.push_back( new wxBitmapButton( this, id, BitmapGUIManager::GetInstance()->expressionBt, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, num ));
+
+        //Connecting events
+        Connect( id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChoixCondition::OnABtClick ) );
+        Connect( ID_CHECKARRAY, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ChoixCondition::OnFacClicked ) );
+
+        //Placing controls
+        GridSizer1->Add( ParaFac.back(), 1, wxALL | wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, 5 );
+        GridSizer1->Add( ParaText.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
+        GridSizer1->Add( ParaSpacer1.back(), 0, 0 );
+        GridSizer1->Add( ParaSpacer2.back(), 0, 0 );
+        GridSizer1->Add( ParaEdit.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
+        GridSizer1->Add( ParaBmpBt.back(), 1, wxALL | wxALIGN_LEFT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5 );
+
+        ParaSpacer1.back()->Show(false);
+        ParaSpacer2.back()->Show(false);
+    }
+    while ( ParaEdit.size() > instructionInfos.parameters.size() )
+    {
+    	ParaFac.back()->Destroy();
+    	ParaFac.erase(ParaFac.begin()+ParaFac.size()-1);
+    	ParaText.back()->Destroy();
+    	ParaText.erase(ParaText.begin()+ParaText.size()-1);
+    	ParaSpacer1.back()->Destroy();
+    	ParaSpacer1.erase(ParaSpacer1.begin()+ParaSpacer1.size()-1);
+    	ParaSpacer2.back()->Destroy();
+    	ParaSpacer2.erase(ParaSpacer2.begin()+ParaSpacer2.size()-1);
+    	ParaEdit.back()->Destroy();
+    	ParaEdit.erase(ParaEdit.begin()+ParaEdit.size()-1);
+    	ParaBmpBt.back()->Destroy();
+    	ParaBmpBt.erase(ParaBmpBt.begin()+ParaBmpBt.size()-1);
     }
 
+    //Update parameters
     for ( unsigned int i = 0;i < instructionInfos.parameters.size();i++ )
     {
-        ParaFac.at(i)->SetValue(true);
-        ParaBmpBt.at(i)->Enable(true);
-        ParaText.at(i)->Enable(true);
-        ParaEdit.at(i)->Enable(true);
+        ParaFac.at(i)->Show(instructionInfos.parameters[i].optional);
+        ParaFac.at(i)->SetValue(!ParaEdit.at( i )->GetValue().empty());
 
-        //Attention à ce que la condition ne veuille pas afficher plus de paramètres que l'on ne peut
-        if ( i >= MaxPara )
+        ParaText.at(i)->SetLabel( instructionInfos.parameters[i].description + _(" :") );
+
+        if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
+
+        ParaBmpBt.at(i)->SetBitmapLabel( TranslateCondition::BitmapFromType(instructionInfos.parameters[i].type) );
+        ParaBmpBt.at(i)->SetToolTip( TranslateCondition::LabelFromType(instructionInfos.parameters[i].type) );
+        ParaBmpBt.at(i)->Show( !instructionInfos.parameters[i].type.empty() );
+
+        //De/activate widgets if parameter is optional
+        if ( instructionInfos.parameters[i].optional && !ParaFac.at(i)->GetValue() )
         {
-            wxLogWarning(_("La condition comporte trop de paramètres. Ceci peut être dû à un bug de Game Develop.\nConsultez vous à l'aide pour savoir comment nous reporter un bug."));
+            ParaBmpBt.at(i)->Enable(false);
+            ParaText.at(i)->Enable(false);
+            ParaEdit.at(i)->Enable(false);
         }
         else
         {
-            ParaFac.at(i)->Show(false);
-            ParaFac.at(i)->SetValue(false);
-            if ( instructionInfos.parameters[i].optional )
-            {
-                //Affiche et désactive les autres controles
-                ParaFac.at(i)->Show(true);
-                ParaBmpBt.at(i)->Enable(false);
-                ParaText.at(i)->Enable(false);
-                ParaEdit.at(i)->Enable(false);
+            ParaBmpBt.at(i)->Enable(true);
+            ParaText.at(i)->Enable(true);
+            ParaEdit.at(i)->Enable(true);
+        }
 
-                //Si il y a du texte, on laisse activé
-                if ( ParaEdit.at( i )->GetValue() != "" )
-                {
-                    ParaFac.at(i)->SetValue(true);
-                    ParaBmpBt.at(i)->Enable(true);
-                    ParaText.at(i)->Enable(true);
-                    ParaEdit.at(i)->Enable(true);
-                }
-            }
-
-            ParaBmpBt.at(i)->SetToolTip( TranslateCondition::LabelFromType(instructionInfos.parameters[i].type) );
-            ParaBmpBt.at(i)->SetBitmapLabel( TranslateCondition::BitmapFromType(instructionInfos.parameters[i].type) );
-            if ( instructionInfos.parameters[i].type != "" ) { ParaBmpBt.at(i)->Show( true ); }//Les boutons
-
-            ParaText.at(i)->Show( true ); //Textes
-            ParaText.at(i)->SetLabel( instructionInfos.parameters[i].description + " :" );
-            ParaEdit.at(i)->Show( true ); //Et zone d'édition
+        //Add defaults
+        if ( !instructionInfos.parameters[i].optional && (i >= Param.size() || Param[i].GetPlainString().empty())  )
+        {
+            if ( instructionInfos.parameters[i].type == "expression" ) ParaEdit.at( i )->SetValue("0");
+            else if ( instructionInfos.parameters[i].type == "text" ) ParaEdit.at( i )->SetValue("\"\"");
+            else if ( instructionInfos.parameters[i].type == "file" ) ParaEdit.at( i )->SetValue("\"\"");
         }
     }
     Layout();
     GridSizer1->Layout();
 
-    for ( unsigned int i = 0;i < Param.size();i++ )
-        ParaEdit.at(i)->ChangeValue( Param[i].GetPlainString() );
-
+    //Update localization
     LocaliseCheck->SetValue(Loc);
     GlobalCheck->SetValue(!Loc);
-
     ContraireCheck->SetValue(Contraire);
 
     Fit();
@@ -759,7 +733,7 @@ void ChoixCondition::OnFacClicked(wxCommandEvent& event)
     // On déduit le numéro du paramètre à partir du nom du bouton
     // ( Son nom, pas son label )
     string num = string(wxWindow::FindFocus()->GetName().mb_str());
-    unsigned int i = atoi( num.c_str() );
+    unsigned int i = ToInt( num );
 
     if ( ParaFac.at(i)->GetValue() )
     {

@@ -93,6 +93,8 @@ class ChoixCondition: public wxDialog
 		//*)
 		vector < wxCheckBox * > ParaFac;
 		vector < wxStaticText * > ParaText;
+		vector < wxPanel * > ParaSpacer1;
+		vector < wxPanel * > ParaSpacer2;
 		vector < wxBitmapButton * > ParaBmpBt;
 		vector < wxTextCtrl * > ParaEdit;
 

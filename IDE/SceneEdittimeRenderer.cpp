@@ -1,4 +1,4 @@
-#include "EdittimeScene.h" //Must be placed first
+#include "SceneEdittimeRenderer.h" //Must be placed first
 
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
@@ -8,18 +8,11 @@
 #include "GDL/Chercher.h"
 #include <vector>
 
-EdittimeScene::EdittimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
+SceneEdittimeRenderer::SceneEdittimeRenderer(sf::RenderWindow * renderWindow_, RuntimeGame * game_, Scene & sceneEdited_) :
 runtimeScene(renderWindow_, game_),
+sceneEdited(sceneEdited_),
 editing(true),
 view( sf::FloatRect( 0.0f, 0.0f, runtimeScene.game->windowWidth, runtimeScene.game->windowHeight ) ),
-grid( false ),
-snap( false),
-gridWidth( 32 ),
-gridHeight( 32 ),
-gridR( 158 ),
-gridG( 180 ),
-gridB( 255 ),
-windowMask(false),
 isMovingObject( false ),
 isResizingX( false ),
 isResizingY( false ),
@@ -27,8 +20,6 @@ xRectangleSelection(0),
 yRectangleSelection(0),
 xEndRectangleSelection(0),
 yEndRectangleSelection(0),
-colorGUI( 0 ),
-colorPlus( true ),
 isMoving( false ),
 isSelecting(false),
 deplacementOX( 0 ),
@@ -39,7 +30,7 @@ deplacementOY( 0 )
     runtimeScene.running = false;
 }
 
-EdittimeScene::~EdittimeScene()
+SceneEdittimeRenderer::~SceneEdittimeRenderer()
 {
     //dtor
 }
@@ -48,7 +39,7 @@ EdittimeScene::~EdittimeScene()
 ////////////////////////////////////////////////////////////
 /// Affichage de la scène en mode édition, à son départ.
 ////////////////////////////////////////////////////////////
-void EdittimeScene::RenderEdittimeScene()
+void SceneEdittimeRenderer::RenderSceneEdittimeRenderer()
 {
     runtimeScene.ManageRenderTargetEvents();
 
@@ -57,8 +48,6 @@ void EdittimeScene::RenderEdittimeScene()
 
     glClear(GL_DEPTH_BUFFER_BIT);
     runtimeScene.renderWindow->SaveGLStates(); //To allow using OpenGL to draw
-
-    UpdateGUI();
 
     //On trie les objets par leurs plans
     ObjList allObjects = runtimeScene.objectsInstances.GetAllObjects();
@@ -140,7 +129,7 @@ void EdittimeScene::RenderEdittimeScene()
     }
 
     //Affichage de la grille
-    if ( grid )
+    if ( sceneEdited.grid )
         RenderGrid();
 
     //Draw GUI Elements
@@ -158,45 +147,40 @@ void EdittimeScene::RenderEdittimeScene()
     //Affichage de l'objet à insérer en semi transparent
     if ( !objectToAdd.empty() )
     {
-        try
+        ObjSPtr object = boost::shared_ptr<Object>();
+
+        if ( Picker::PickOneObject( &runtimeScene.initialObjects, objectToAdd ) != -1)
+            object = runtimeScene.initialObjects[Picker::PickOneObject( &runtimeScene.initialObjects, objectToAdd ) ];
+        else if ( Picker::PickOneObject( &runtimeScene.game->globalObjects, objectToAdd ) != -1)
+            object = runtimeScene.game->globalObjects[Picker::PickOneObject( &runtimeScene.game->globalObjects, objectToAdd ) ];
+
+        if ( object != boost::shared_ptr<Object>() )
         {
-            ObjSPtr object = boost::shared_ptr<Object>();
-
-            if ( Picker::PickOneObject( &runtimeScene.initialObjects, objectToAdd ) != -1)
-                object = runtimeScene.initialObjects[Picker::PickOneObject( &runtimeScene.initialObjects, objectToAdd ) ];
-            else if ( Picker::PickOneObject( &runtimeScene.game->globalObjects, objectToAdd ) != -1)
-                object = runtimeScene.game->globalObjects[Picker::PickOneObject( &runtimeScene.game->globalObjects, objectToAdd ) ];
-
-            if ( object != boost::shared_ptr<Object>() )
+            //Changing an initial object position is not dangerous,
+            //as objects created from initial objects are always placed
+            //to some coordinates just after their creations.
+            if ( sceneEdited.grid && sceneEdited.snap )
             {
-                //Changing an initial object position is not dangerous,
-                //as objects created from initial objects are always placed
-                //to some coordinates just after their creations.
-                if ( grid && snap )
-                {
-                    object->SetX( static_cast<int>(runtimeScene.renderWindow->ConvertCoords(runtimeScene.input->GetMouseX(), 0).x/gridWidth)*gridWidth );
-                    object->SetY( static_cast<int>(runtimeScene.renderWindow->ConvertCoords(0, runtimeScene.input->GetMouseY()).y/gridHeight)*gridHeight );
-                }
-                else
-                {
-                    object->SetX( runtimeScene.renderWindow->ConvertCoords(runtimeScene.input->GetMouseX(), 0).x );
-                    object->SetY( runtimeScene.renderWindow->ConvertCoords(0, runtimeScene.input->GetMouseY()).y );
-                }
-
-                object->DrawEdittime( *runtimeScene.renderWindow );
+                object->SetX( static_cast<int>(runtimeScene.renderWindow->ConvertCoords(runtimeScene.input->GetMouseX(), 0).x/sceneEdited.gridWidth)*sceneEdited.gridWidth );
+                object->SetY( static_cast<int>(runtimeScene.renderWindow->ConvertCoords(0, runtimeScene.input->GetMouseY()).y/sceneEdited.gridHeight)*sceneEdited.gridHeight );
             }
+            else
+            {
+                object->SetX( runtimeScene.renderWindow->ConvertCoords(runtimeScene.input->GetMouseX(), 0).x );
+                object->SetY( runtimeScene.renderWindow->ConvertCoords(0, runtimeScene.input->GetMouseY()).y );
+            }
+
+            object->DrawEdittime( *runtimeScene.renderWindow );
         }
-        catch ( ... ) { }
     }
 
 
-    if ( windowMask )
+    if ( sceneEdited.windowMask )
     {
         sf::Shape windowMaskShape = sf::Shape::Rectangle(view.GetCenter().x-runtimeScene.game->windowWidth/2, view.GetCenter().y-runtimeScene.game->windowHeight/2,
                                                          runtimeScene.game->windowWidth, runtimeScene.game->windowHeight, sf::Color( 0, 0, 0, 0 ), 1, sf::Color( 255, 255, 255, 128 ) );
 
         runtimeScene.renderWindow->Draw(windowMaskShape);
-        runtimeScene.renderWindow->SetView(view);
     }
 
     runtimeScene.renderWindow->RestoreGLStates();
@@ -206,63 +190,34 @@ void EdittimeScene::RenderEdittimeScene()
 ////////////////////////////////////////////////////////////
 /// Affichage d'une grille
 ////////////////////////////////////////////////////////////
-void EdittimeScene::RenderGrid()
+void SceneEdittimeRenderer::RenderGrid()
 {
-    int departX = static_cast<int>((view.GetCenter().x-view.GetSize().x/2) / gridWidth)-gridWidth;
-    departX *= gridWidth;
+    int departX = static_cast<int>((view.GetCenter().x-view.GetSize().x/2) / sceneEdited.gridWidth)-sceneEdited.gridWidth;
+    departX *= sceneEdited.gridWidth;
     int positionX = departX;
-    int departY = static_cast<int>((view.GetCenter().y-view.GetSize().y/2) / gridHeight)-gridHeight;
-    departY *= gridHeight;
+    int departY = static_cast<int>((view.GetCenter().y-view.GetSize().y/2) / sceneEdited.gridHeight)-sceneEdited.gridHeight;
+    departY *= sceneEdited.gridHeight;
     int positionY = departY;
 
-    for ( positionX = departX;positionX < (view.GetCenter().x+view.GetSize().x/2) ; positionX += gridWidth )
+    for ( positionX = departX;positionX < (view.GetCenter().x+view.GetSize().x/2) ; positionX += sceneEdited.gridWidth )
     {
-        sf::Shape line = sf::Shape::Line( positionX, departY, positionX, (view.GetCenter().y+view.GetSize().y/2), 1, sf::Color( gridR, gridG, gridB ));
+        sf::Shape line = sf::Shape::Line( positionX, departY, positionX, (view.GetCenter().y+view.GetSize().y/2), 1, sf::Color( sceneEdited.gridR, sceneEdited.gridG, sceneEdited.gridB ));
 
         runtimeScene.renderWindow->Draw( line );
     }
 
-    for ( positionY = departY;positionY < (view.GetCenter().y+view.GetSize().y/2) ; positionY += gridHeight )
+    for ( positionY = departY;positionY < (view.GetCenter().y+view.GetSize().y/2) ; positionY += sceneEdited.gridHeight )
     {
-        sf::Shape line = sf::Shape::Line( departX, positionY, (view.GetCenter().x+view.GetSize().x/2), positionY, 1, sf::Color( gridR, gridG, gridB ));
+        sf::Shape line = sf::Shape::Line( departX, positionY, (view.GetCenter().x+view.GetSize().x/2), positionY, 1, sf::Color( sceneEdited.gridR, sceneEdited.gridG, sceneEdited.gridB ));
 
         runtimeScene.renderWindow->Draw( line );
     }
-}
-
-////////////////////////////////////////////////////////////
-/// Met à jour les couleurs de l'interface
-////////////////////////////////////////////////////////////
-void EdittimeScene::UpdateGUI()
-{
-    float elapsedTime = runtimeScene.renderWindow->GetFrameTime();
-    if ( colorPlus )
-    {
-        colorGUI += static_cast<int>(150 * elapsedTime);
-
-        if ( colorGUI > 255 )
-        {
-            colorGUI = 255;
-            colorPlus = false;
-        }
-    }
-    else
-    {
-        colorGUI -= static_cast<int>(150 * elapsedTime);
-
-        if ( colorGUI < 10 )
-        {
-            colorGUI = 10;
-            colorPlus = true;
-        }
-    }
-    return;
 }
 
 ////////////////////////////////////////////////////////////
 /// Cherche et renvoie l'ID du plus petit objet sous le curseur
 ////////////////////////////////////////////////////////////
-ObjSPtr EdittimeScene::FindSmallestObject()
+ObjSPtr SceneEdittimeRenderer::FindSmallestObject()
 {
     ObjList potentialObjects;
     int x = runtimeScene.renderWindow->ConvertCoords(runtimeScene.input->GetMouseX(), 0).x;

@@ -24,7 +24,7 @@
 #include "GDL/RuntimeGame.h"
 #include "GDL/MainEditorCommand.h"
 #include "MemTrace.h"
-#include "EdittimeScene.h"
+#include "SceneEdittimeRenderer.h"
 class RenderDialog;
 class EditorObjets;
 class EditorLayers;
@@ -99,7 +99,7 @@ public :
     Scene & sceneEdited; ///< Scene to edit
 
     RuntimeGame game; ///< Runtime game used during preview
-    EdittimeScene scene; ///< Edittime scene used for preview
+    SceneEdittimeRenderer edittimeRenderer; ///< Used to render the scene
 
     /**
      * Call this method when any changes are made so as to manage undo/redo.

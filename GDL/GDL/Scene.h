@@ -65,6 +65,15 @@ class GD_API Scene
 
         #if defined(GD_IDE_ONLY)
         bool wasModified;
+
+        bool grid; ///< True if grid activated in editor -- Edittime only
+        bool snap; ///< True if snap to grid activated in editor -- Edittime only
+        int gridWidth; ///< Grid width in editor -- Edittime only
+        int gridHeight; ///< Grid height in editor -- Edittime only
+        int gridR; ///< Grid red color in editor -- Edittime only
+        int gridG; ///< Grid green color in editor -- Edittime only
+        int gridB; ///< Grid blue color in editor -- Edittime only
+        bool windowMask; ///< True if window mask displayed in editor -- Edittime only
         #endif
 
     private:

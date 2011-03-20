@@ -18,7 +18,15 @@ oglZNear(1.0f),
 oglZFar(500.0f),
 stopSoundsOnStartup(true)
 #if defined(GD_IDE_ONLY)
-,wasModified(false)
+,wasModified(false),
+grid( false ),
+snap( false),
+gridWidth( 32 ),
+gridHeight( 32 ),
+gridR( 158 ),
+gridG( 180 ),
+gridB( 255 ),
+windowMask(false)
 #endif
 {
     //ctor
@@ -58,6 +66,17 @@ void Scene::Init(const Scene & scene)
     {
     	automatismsInitialSharedDatas[it->first] = it->second->Clone();
     }
+
+    #if defined(GD_IDE_ONLY)
+    grid = scene.grid;
+    snap = scene.snap ;
+    gridWidth = scene.gridWidth ;
+    gridHeight = scene.gridHeight ;
+    gridR = scene.gridR ;
+    gridG = scene.gridG ;
+    gridB = scene.gridB ;
+    windowMask = scene.windowMask ;
+    #endif
 }
 
 Scene::Scene(const Scene & scene)

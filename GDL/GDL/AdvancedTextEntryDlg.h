@@ -1,3 +1,5 @@
+#if defined(GD_IDE_ONLY)
+
 #ifndef ADVANCEDTEXTENTRYDLG_H
 #define ADVANCEDTEXTENTRYDLG_H
 
@@ -57,4 +59,5 @@ class AdvancedTextEntryDlg: public wxDialog
 		DECLARE_EVENT_TABLE()
 };
 
+#endif
 #endif

@@ -1,3 +1,5 @@
+#if defined(GD_IDE_ONLY)
+
 #include "AdvancedTextEntryDlg.h"
 #include "GDL/EditExpression.h"
 #include "GDL/EditTextDialog.h"
@@ -105,3 +107,4 @@ void AdvancedTextEntryDlg::OncancelBtClick(wxCommandEvent& event)
 
     EndModal(wxCANCEL);
 }
+#endif

@@ -206,7 +206,6 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         #if defined(GD_IDE_ONLY)
         if( profiler && profiler->profilingActivated )
         {
-            cout << "rtime :" <<profiler->renderingClock.getTimeMicroseconds() << endl;
             profiler->lastRenderingTime = profiler->renderingClock.getTimeMicroseconds();
             profiler->totalSceneTime += profiler->lastRenderingTime + profiler->lastEventsTime;
             profiler->totalEventsTime += profiler->lastEventsTime;

@@ -232,6 +232,16 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         if ( elem->Attribute( "oglZFar" ) != NULL ) { elem->QueryFloatAttribute("oglZFar", &newScene->oglZFar); }
         GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("standardSortMethod", newScene->standardSortMethod);
         GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("stopSoundsOnStartup", newScene->stopSoundsOnStartup);
+        #if defined(GD_IDE_ONLY)
+        if ( elem->Attribute( "grid" ) != NULL ) GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("grid", newScene->grid);
+        if ( elem->Attribute( "snap" ) != NULL ) GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("snap", newScene->snap);
+        if ( elem->Attribute( "windowMask" ) != NULL ) GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("windowMask", newScene->windowMask);
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridWidth", newScene->gridWidth);
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridHeight", newScene->gridHeight);
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridR", newScene->gridR);
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridG", newScene->gridG);
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridB", newScene->gridB);
+        #endif
 
         if ( elem->FirstChildElement( "GroupesObjets" ) != NULL )
             OpenGroupesObjets(newScene->objectGroups, elem->FirstChildElement( "GroupesObjets" ));
@@ -1826,6 +1836,17 @@ bool OpenSaveGame::SaveToFile(string file)
             scene->SetDoubleAttribute( "oglZFar", game.scenes[i]->oglZFar );
             if ( game.scenes[i]->standardSortMethod ) scene->SetAttribute( "standardSortMethod", "true" ); else scene->SetAttribute( "standardSortMethod", "false" );
             if ( game.scenes[i]->stopSoundsOnStartup ) scene->SetAttribute( "stopSoundsOnStartup", "true" ); else scene->SetAttribute( "stopSoundsOnStartup", "false" );
+            #if defined(GD_IDE_ONLY)
+            scene->SetDoubleAttribute( "gridWidth", game.scenes[i]->gridWidth );
+            if ( game.scenes[i]->grid ) scene->SetAttribute( "grid", "true" ); else scene->SetAttribute( "grid", "false" );
+            if ( game.scenes[i]->snap ) scene->SetAttribute( "snap", "true" ); else scene->SetAttribute( "snap", "false" );
+            scene->SetDoubleAttribute( "gridWidth", game.scenes[i]->gridWidth );
+            scene->SetDoubleAttribute( "gridHeight", game.scenes[i]->gridHeight );
+            scene->SetDoubleAttribute( "gridR", game.scenes[i]->gridR );
+            scene->SetDoubleAttribute( "gridG", game.scenes[i]->gridG );
+            scene->SetDoubleAttribute( "gridB", game.scenes[i]->gridB );
+            if ( game.scenes[i]->windowMask ) scene->SetAttribute( "windowMask", "true" ); else scene->SetAttribute( "windowMask", "false" );
+            #endif
 
             TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
             scene->LinkEndChild( grpsobjets );

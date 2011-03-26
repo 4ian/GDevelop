@@ -78,20 +78,13 @@ bool TextEntryObject::Draw( sf::RenderWindow& window )
     return true;
 }
 
-#if defined(GD_IDE_ONLY)
-/**
- * Does not render anything
- */
-bool TextEntryObject::DrawEdittime(sf::RenderWindow& renderWindow)
-{
-    return true;
-}
-
 /**
  * Used to update input
  */
 void TextEntryObject::UpdateTime(float)
 {
+    if (!activated) return;
+
     for (unsigned int i = 0;i<sceneTextEntered->size();++i)
     {
         //Add character only if it is correct
@@ -102,6 +95,15 @@ void TextEntryObject::UpdateTime(float)
         else if ( (*sceneTextEntered)[i] == 8 ) //Backspace
             if ( !text.empty() ) text.erase(text.end()-1);
     }
+}
+
+#if defined(GD_IDE_ONLY)
+/**
+ * Does not render anything
+ */
+bool TextEntryObject::DrawEdittime(sf::RenderWindow& renderWindow)
+{
+    return true;
 }
 
 void TextEntryObject::PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper)
@@ -117,8 +119,8 @@ bool TextEntryObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
 
 void TextEntryObject::EditObject( wxWindow* parent, Game & game, MainEditorCommand & mainEditorCommand )
 {
-    TextEntryObjectEditor dialog(parent, game, *this, mainEditorCommand);
-    dialog.ShowModal();
+    /*TextEntryObjectEditor dialog(parent, game, *this, mainEditorCommand);
+    dialog.ShowModal();*/
 }
 
 wxPanel * TextEntryObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )

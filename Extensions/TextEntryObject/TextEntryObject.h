@@ -24,8 +24,8 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef TEXTOBJECT_H
-#define TEXTOBJECT_H
+#ifndef TEXTENTRYOBJECT_H
+#define TEXTENTRYOBJECT_H
 
 #include "GDL/Object.h"
 #include <SFML/Graphics.hpp>
@@ -48,7 +48,7 @@ class ResourcesMergingHelper;
 /**
  * TextEntry Object
  */
-class TextEntryObject : public Object
+class GD_EXTENSION_API TextEntryObject : public Object
 {
     public :
 
@@ -113,4 +113,4 @@ class TextEntryObject : public Object
 void DestroyTextEntryObject(Object * object);
 Object * CreateTextEntryObject(std::string name);
 
-#endif // TEXTOBJECT_H
+#endif // TEXTENTRYOBJECT_H

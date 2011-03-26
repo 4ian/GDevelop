@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
-	<File name="Extension.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="1918" topLine="46" />
+	<ActiveTarget name="Release - Edittime" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="4367" topLine="89" />
 	</File>
-	<File name="TextEntryActions.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="1713" topLine="21" />
+	<File name="TextEntryActions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="1777" topLine="25" />
 	</File>
-	<File name="TextEntryConditions.cpp" open="1" top="0" tabpos="2">
+	<File name="TextEntryConditions.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="1934" topLine="21" />
 	</File>
 	<File name="TextEntryExpressions.cpp" open="0" top="0" tabpos="18">
 		<Cursor position="1345" topLine="1" />
 	</File>
-	<File name="TextEntryObject.cpp" open="1" top="1" tabpos="4">
-		<Cursor position="3263" topLine="126" />
+	<File name="TextEntryObject.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="1498" topLine="83" />
 	</File>
-	<File name="TextEntryObject.h" open="1" top="0" tabpos="3">
-		<Cursor position="1964" topLine="51" />
+	<File name="TextEntryObject.h" open="0" top="0" tabpos="1">
+		<Cursor position="3390" topLine="84" />
 	</File>
 	<File name="TextEntryObjectEditor.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="1775" topLine="53" />

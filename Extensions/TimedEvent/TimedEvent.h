@@ -44,7 +44,7 @@ class wxWindow;
 /**
  * Timed event
  */
-class TimedEvent : public BaseEvent
+class GD_EXTENSION_API TimedEvent : public BaseEvent
 {
     public:
         TimedEvent();
@@ -59,11 +59,24 @@ class TimedEvent : public BaseEvent
 
         virtual void Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
 
+        /**
+         * Get time elapsed
+         */
+        float GetTime() const { return timer.GetTime();};
+
+        /**
+         * Change time elapsed
+         */
+        void SetTime(float newTime) { timer.SetTime(newTime);};
+
+        /**
+         * Reset time elapsed on the event
+         */
+        void Reset() {timer.Reset();};
+
         static std::map < const Scene* , std::map < std::string, TimedEvent* > > timedEventsList; ///< Static map containing all functions, associated with their game, scene and name
         void UnreferenceEvent();
         void ReferenceEvent(Scene *);
-
-        void Reset() {timer.Reset();};
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};

@@ -140,8 +140,8 @@ TimedEventEditorDlg::~TimedEventEditorDlg()
 
 void TimedEventEditorDlg::OnokBtClick(wxCommandEvent& event)
 {
-    eventEdited.SetTimeoutExpression(timeoutEdit->GetValue().mb_str());
-    eventEdited.SetName(nameEdit->GetValue().mb_str());
+    eventEdited.SetTimeoutExpression(string(timeoutEdit->GetValue().mb_str()));
+    eventEdited.SetName(string(nameEdit->GetValue().mb_str()));
     EndModal(1);
 }
 

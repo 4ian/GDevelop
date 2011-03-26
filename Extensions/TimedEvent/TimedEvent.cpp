@@ -224,7 +224,7 @@ void TimedEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
                          bool & conditionsSelected, bool & instructionsSelected)
 {
     const int forEachTextHeight = 20;
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
 
     //Test selection for the name
     if ( y >= 0 && y <= forEachTextHeight )
@@ -301,7 +301,7 @@ void TimedEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
  */
 void TimedEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
     const int functionTextHeight = 20;
 
     //Draw event rectangle
@@ -340,7 +340,7 @@ unsigned int TimedEvent::GetRenderedHeight(unsigned int width) const
 {
     if ( eventHeightNeedUpdate )
     {
-        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::getInstance();
+        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
         const int functionTextHeight = 20;
 
         //Get maximum height needed

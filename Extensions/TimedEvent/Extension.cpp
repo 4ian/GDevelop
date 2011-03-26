@@ -29,6 +29,7 @@ freely, subject to the following restrictions:
 #include <boost/version.hpp>
 #include "TimedEvent.h"
 #include "TimedEventActions.h"
+#include "GDL/RuntimeScene.h"
 
 /**
  * This class declare information about the extension.
@@ -52,7 +53,7 @@ class Extension : public ExtensionBase
                           _("Evenement à retardement"),
                           _("Evenement qui ne se déclenche qu'au bout de l'accumulation d'un certain temps"),
                           "",
-                          "res/function.png",
+                          "Extensions/timedevent16.png",
                           TimedEvent)
 
             DECLARE_END_EVENT()
@@ -86,6 +87,53 @@ class Extension : public ExtensionBase
             CompleteCompilationInformation();
         };
         virtual ~Extension() {};
+
+        #if defined(GD_IDE_ONLY)
+        bool HasDebuggingProperties() const { return true; };
+
+        void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const
+        {
+            unsigned int i;
+            std::map < std::string, TimedEvent* >::const_iterator end = TimedEvent::timedEventsList[&scene].end();
+            for (std::map < std::string, TimedEvent* >::iterator iter = TimedEvent::timedEventsList[&scene].begin();iter != end;++iter)
+            {
+                if ( propertyNb == i )
+                {
+                    if ( !iter->second ) return;
+                    name = iter->second->GetName().empty() ? string(_("Sans nom").mb_str()) : iter->second->GetName();
+                    value = ToString(iter->second->GetTime())+"s";
+
+                    return;
+                }
+
+                ++i;
+            }
+        }
+
+        bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue)
+        {
+            unsigned int i;
+            std::map < std::string, TimedEvent* >::const_iterator end = TimedEvent::timedEventsList[&scene].end();
+            for (std::map < std::string, TimedEvent* >::iterator iter = TimedEvent::timedEventsList[&scene].begin();iter != end;++iter)
+            {
+                if ( propertyNb == i && iter->second)
+                {
+                    iter->second->SetTime(ToFloat(newValue));
+
+                    return true;
+                }
+
+                ++i;
+            }
+
+            return false;
+        }
+
+        unsigned int GetNumberOfProperties(RuntimeScene & scene) const
+        {
+            return TimedEvent::timedEventsList[&scene].size();
+        }
+        #endif
 
     protected:
     private:
@@ -132,7 +180,7 @@ class Extension : public ExtensionBase
  * Used by Game Develop to create the extension class
  * -- Do not need to be modified. --
  */
-extern "C" ExtensionBase * CreateGDExtension() {
+extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
 }
 
@@ -140,6 +188,6 @@ extern "C" ExtensionBase * CreateGDExtension() {
  * Used by Game Develop to destroy the extension class
  * -- Do not need to be modified. --
  */
-extern "C" void DestroyGDExtension(ExtensionBase * p) {
+extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }

@@ -4,8 +4,8 @@
 	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2ContactSolver.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="17243" topLine="565" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="4" topLine="0" />
+	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.cpp" open="0" top="0" tabpos="12">
+		<Cursor position="5231" topLine="182" />
 	</File>
 	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.h" open="0" top="0" tabpos="0">
 		<Cursor position="4" topLine="0" />
@@ -19,14 +19,14 @@
 	<File name="ContactListener.h" open="0" top="0" tabpos="4">
 		<Cursor position="238" topLine="0" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="30605" topLine="488" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="31474" topLine="521" />
 	</File>
 	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="6364" topLine="132" />
+		<Cursor position="4202" topLine="105" />
 	</File>
 	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="1">
-		<Cursor position="2003" topLine="28" />
+		<Cursor position="2461" topLine="56" />
 	</File>
 	<File name="PhysicsAutomatismActions.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="74" topLine="3" />

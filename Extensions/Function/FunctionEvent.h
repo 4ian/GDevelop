@@ -43,7 +43,7 @@ class wxWindow;
  * Function event is an event which is executed by an action ( This action can pass to the function parameters and objects concerned )
  * Functions are referenced in a (static) std::map so as to let action call them.
  */
-class FunctionEvent : public BaseEvent
+class GD_EXTENSION_API FunctionEvent : public BaseEvent
 {
     public:
         FunctionEvent();

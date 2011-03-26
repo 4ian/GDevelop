@@ -52,7 +52,7 @@ class Extension : public ExtensionBase
             DECLARE_ACTION("LaunchFunction",
                            _("Lancer une fonction"),
                            _("Lance une fonction"),
-                           _("Lancer _PARAM0_"),
+                           _("Lancer _PARAM0_ (_PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"),
                            _("Fonctions"),
                            "res/actions/function24.png",
                            "res/actions/function.png",
@@ -72,7 +72,7 @@ class Extension : public ExtensionBase
             DECLARE_ACTION("LaunchFunctionFromExpression",
                            _("Lancer une fonction grâce à une expression"),
                            _("Lance une fonction en retrouvant son nom depuis l'expression."),
-                           _("Lancer la fonction correspondant à _PARAM0_"),
+                           _("Lancer la fonction correspondant à _PARAM0_ (_PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"),
                            _("Fonctions"),
                            "res/actions/function24.png",
                            "res/actions/function.png",
@@ -158,7 +158,7 @@ class Extension : public ExtensionBase
  * Used by Game Develop to create the extension class
  * -- Do not need to be modified. --
  */
-extern "C" ExtensionBase * CreateGDExtension() {
+extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
 }
 
@@ -166,6 +166,6 @@ extern "C" ExtensionBase * CreateGDExtension() {
  * Used by Game Develop to destroy the extension class
  * -- Do not need to be modified. --
  */
-extern "C" void DestroyGDExtension(ExtensionBase * p) {
+extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }

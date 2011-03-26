@@ -48,7 +48,7 @@ class MainEditorCommand;
 /**
  * Text Object
  */
-class Box3DObject : public Object
+class GD_EXTENSION_API Box3DObject : public Object
 {
     public :
 

@@ -25,8 +25,8 @@ freely, subject to the following restrictions:
 */
 
 #if defined(GD_IDE_ONLY)
-#ifndef BOX3DINITIALPOSITIONPANEL_H
-#define BOX3DINITIALPOSITIONPANEL_H
+#ifndef PARTICLEEMITTERINITIALPOSITIONPANEL_H
+#define PARTICLEEMITTERINITIALPOSITIONPANEL_H
 
 //(*Headers(ParticleEmitterInitialPositionPanel)
 #include <wx/sizer.h>

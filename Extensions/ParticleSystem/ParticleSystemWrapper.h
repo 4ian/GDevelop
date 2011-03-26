@@ -38,7 +38,7 @@ class OpenGLTextureWrapper;
  * This class gives direct access to these stuff,
  * it only manages the destruction and automatize the copy behaviour.
  */
-class ParticleSystemWrapper
+class GD_EXTENSION_API ParticleSystemWrapper
 {
     public:
         ParticleSystemWrapper();

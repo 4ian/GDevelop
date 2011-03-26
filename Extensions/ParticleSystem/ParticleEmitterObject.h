@@ -24,8 +24,8 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef TEXTOBJECT_H
-#define TEXTOBJECT_H
+#ifndef PARTICLEEMITTEROBJECT_H
+#define PARTICLEEMITTEROBJECT_H
 
 #include "GDL/Object.h"
 #include <SFML/Graphics.hpp>
@@ -47,9 +47,9 @@ class ResourcesMergingHelper;
 #endif
 
 /**
- * Text Object
+ * \brief Particle Emitter Object
  */
-class ParticleEmitterObject : public Object
+class GD_EXTENSION_API ParticleEmitterObject : public Object
 {
     public :
 
@@ -404,4 +404,4 @@ class ParticleEmitterObject : public Object
 void DestroyParticleEmitterObject(Object * object);
 Object * CreateParticleEmitterObject(std::string name);
 
-#endif // TEXTOBJECT_H
+#endif // PARTICLEEMITTEROBJECT_H

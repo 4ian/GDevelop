@@ -302,7 +302,7 @@ class Extension : public ExtensionBase
  * Used by Game Develop to create the extension class
  * -- Do not need to be modified. --
  */
-extern "C" ExtensionBase * CreateGDExtension() {
+extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
 }
 
@@ -310,6 +310,6 @@ extern "C" ExtensionBase * CreateGDExtension() {
  * Used by Game Develop to destroy the extension class
  * -- Do not need to be modified. --
  */
-extern "C" void DestroyGDExtension(ExtensionBase * p) {
+extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }

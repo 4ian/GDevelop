@@ -47,7 +47,7 @@ class MainEditorCommand;
 /**
  * Drawer object can draw primitive shapes
  */
-class DrawerObject : public Object
+class GD_EXTENSION_API DrawerObject : public Object
 {
     public :
 

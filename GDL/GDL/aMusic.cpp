@@ -459,3 +459,51 @@ bool ActModPitchMusicChannel( RuntimeScene & scene, ObjectsConcerned & objectsCo
 
     return true;
 }
+
+/**
+ * Change the playing offset of the sound of a chnnel
+ */
+bool ActModPlayingOffsetSoundChannel( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
+
+    SoundManager * soundManager = SoundManager::GetInstance();
+
+    if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
+        soundManager->GetSoundOnChannel(canal)->SetPlayingOffset(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Add)
+        soundManager->GetSoundOnChannel(canal)->SetPlayingOffset(soundManager->GetSoundOnChannel(canal)->GetPlayingOffset() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Substract)
+        soundManager->GetSoundOnChannel(canal)->SetPlayingOffset(soundManager->GetSoundOnChannel(canal)->GetPlayingOffset() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Multiply)
+        soundManager->GetSoundOnChannel(canal)->SetPlayingOffset(soundManager->GetSoundOnChannel(canal)->GetPlayingOffset() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Divide)
+        soundManager->GetSoundOnChannel(canal)->SetPlayingOffset(soundManager->GetSoundOnChannel(canal)->GetPlayingOffset() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+
+    return true;
+}
+
+/**
+ * Change playing offset of the music of a chnnel
+ */
+bool ActModPlayingOffsetMusicChannel( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
+
+    SoundManager * soundManager = SoundManager::GetInstance();
+
+    if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
+        soundManager->GetMusicOnChannel(canal)->SetPlayingOffset(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Add)
+        soundManager->GetMusicOnChannel(canal)->SetPlayingOffset(soundManager->GetSoundOnChannel(canal)->GetPlayingOffset() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Substract)
+        soundManager->GetMusicOnChannel(canal)->SetPlayingOffset(soundManager->GetSoundOnChannel(canal)->GetPlayingOffset() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Multiply)
+        soundManager->GetMusicOnChannel(canal)->SetPlayingOffset(soundManager->GetSoundOnChannel(canal)->GetPlayingOffset() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Divide)
+        soundManager->GetMusicOnChannel(canal)->SetPlayingOffset(soundManager->GetSoundOnChannel(canal)->GetPlayingOffset() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
+
+    return true;
+}

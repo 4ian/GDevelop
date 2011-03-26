@@ -80,8 +80,25 @@ class GD_API Music
          */
         inline float GetVolume() const { return volume; }
 
+        /**
+         * Change the pitch.
+         */
         void SetPitch(float newPitch) { music.SetPitch(newPitch); };
+
+        /**
+         * Get music pitch.
+         */
         float GetPitch() const { return music.GetPitch(); };
+
+        /**
+         * Change the current playing position of the music.
+         */
+        void SetPlayingOffset(float timeOffset) { music.SetPlayingOffset(timeOffset); };
+
+        /**
+         * Change the current playing position of the music.
+         */
+        float GetPlayingOffset() const { return music.GetPlayingOffset(); };
 
         /**
          * Internal member functions to update music volume according to global volume.

@@ -15,22 +15,52 @@ class GD_API Son : sf::NonCopyable
         Son(const Son & copy);
         virtual ~Son();
 
+        /**
+         * Get Music SFML Status ( Paused, Playing, Stopped )
+         */
         inline sf::Sound::Status GetStatus() const { return sound.GetStatus(); }
 
+        /**
+         * Change sound volume
+         */
         void SetVolume(float volume_);
-        inline float GetVolume() const { return volume; }
-        void UpdateVolume();
 
+        /**
+         * Get sound volume
+         */
+        inline float GetVolume() const { return volume; }
+
+        /**
+         * Change the pitch of the sound
+         */
         void SetPitch(float newPitch) { sound.SetPitch(newPitch); };
+
+        /**
+         * Get the pitch of the sound
+         */
         float GetPitch() const { return sound.GetPitch(); };
 
-        //L'ordre de ceux deux là est important :
+        /**
+         * Change the current playing position of the sound.
+         */
+        void SetPlayingOffset(float timeOffset) { sound.SetPlayingOffset(timeOffset); };
+
+        /**
+         * Change the current playing position of the sound.
+         */
+        float GetPlayingOffset() const { return sound.GetPlayingOffset(); };
+
+        //Order is important :
         sf::SoundBuffer buffer;
         sf::Sound       sound;
 
         string file;
 
-    protected:
+        /**
+         * Internal member functions to update music volume according to global volume.
+         */
+        void UpdateVolume();
+
     private:
         float volume; ///< Volume is not directly stored in the sf::Sound as GD allows to change global volume.
 };

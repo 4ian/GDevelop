@@ -20,4 +20,7 @@ bool CondGlobalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
 bool CondSoundChannelPitch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 bool CondMusicChannelPitch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
+bool CondSoundChannelPlayingOffset( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+bool CondMusicChannelPlayingOffset( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+
 #endif // CMUSIC_H

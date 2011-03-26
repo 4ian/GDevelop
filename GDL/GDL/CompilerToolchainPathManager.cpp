@@ -6,6 +6,7 @@
 #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 #if defined(GD_IDE_ONLY)
 
+#include <iostream>
 #include <wx/config.h>
 #include <wx/filefn.h>
 #include <wx/intl.h>
@@ -116,7 +117,7 @@ bool CompilerToolchainPathManager::AllPathsAreValid(std::string & report) const
         report += _("Le chemin de la bibliothèque Game Develop Library n'existe pas.\n");
         ok = false;
     }
-    else if ( !wxDirExists(gdlLibDir+"/libgdl.dll.a") )
+    else if ( !wxFileExists(gdlLibDir+"/libgdl.dll.a") )
     {
         report += _("La bibliothèque Game Develop library semble être incorrecte.\n");
         ok = false;

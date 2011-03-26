@@ -211,3 +211,57 @@ bool CondSoundChannelPitch( RuntimeScene & scene, ObjectsConcerned & objectsConc
 
     return condition.IsInverted();
 }
+
+/**
+ * Test the playingOffset of a music
+ */
+bool CondMusicChannelPlayingOffset( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
+        return false;
+
+    SoundManager * soundManager = SoundManager::GetInstance();
+    float playingOffset = soundManager->GetMusicOnChannel(canal)->music.GetPlayingOffset();
+
+    //optimisation : le test de signe en premier
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && playingOffset == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && playingOffset < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && playingOffset > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && playingOffset <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && playingOffset >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && playingOffset != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) )
+       )
+    {
+        return !condition.IsInverted();
+    }
+
+    return condition.IsInverted();
+}
+
+/**
+ * Test the playingOffset of a music
+ */
+bool CondSoundChannelPlayingOffset( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    int canal = static_cast<int> ( condition.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )
+        return false;
+
+    SoundManager * soundManager = SoundManager::GetInstance();
+    float playingOffset = soundManager->GetSoundOnChannel(canal)->GetPlayingOffset();
+
+    //optimisation : le test de signe en premier
+    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && playingOffset == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && playingOffset < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && playingOffset > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && playingOffset <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && playingOffset >= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ||
+            ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Different && playingOffset != condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) )
+       )
+    {
+        return !condition.IsInverted();
+    }
+
+    return condition.IsInverted();
+}

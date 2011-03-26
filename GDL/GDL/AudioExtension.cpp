@@ -127,7 +127,7 @@ AudioExtension::AudioExtension()
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ModVolumeSoundCanal",
-                   _("Modifier le volume d'un son sur un canal"),
+                   _("Volume d'un son sur un canal"),
                    _("Cette action modifie le volume du son sur le canal spécifié. Le volume est compris entre 0 et 100."),
                    _("Faire _PARAM2__PARAM1_ au volume du son sur le canal  _PARAM0_"),
                    _("Volume sonore"),
@@ -142,7 +142,7 @@ AudioExtension::AudioExtension()
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ModVolumeMusicCanal",
-                   _("Modifier le volume de la musique d'un canal"),
+                   _("Volume de la musique d'un canal"),
                    _("Cette action modifie le volume de la musique sur le canal spécifié. Le volume est compris entre 0 et 100."),
                    _("Faire _PARAM2__PARAM1_ au volume de la musique du canal  _PARAM0_"),
                    _("Volume sonore"),
@@ -157,7 +157,7 @@ AudioExtension::AudioExtension()
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ModGlobalVolume",
-                   _("Modifier le volume global du jeu"),
+                   _("Volume global du jeu"),
                    _("Cette action modifie le volume sonore global du jeu. Le volume est compris entre 0 et 100."),
                    _("Faire _PARAM1__PARAM0_ au volume sonore global"),
                    _("Volume sonore"),
@@ -171,9 +171,9 @@ AudioExtension::AudioExtension()
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ModPitchSoundChannel",
-                   _("Modifier le pitch d'un son sur un canal"),
+                   _("Pitch d'un son sur un canal"),
                    _("Cette action modifie le pitch ( vitesse ) du son d'un canal.\nUn pitch de 1 indique une vitesse normale."),
-                   _("Faire _PARAM2__PARAM1_ au pitch du son sur le canal  _PARAM0_"),
+                   _("Faire _PARAM2__PARAM1_ au pitch du son sur le canal _PARAM0_"),
                    _("Sons"),
                    "res/actions/son24.png",
                    "res/actions/son.png",
@@ -186,13 +186,43 @@ AudioExtension::AudioExtension()
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ModPitchMusicChannel",
-                   _("Modifier le pitch de la musique d'un canal"),
+                   _("Pitch de la musique d'un canal"),
                    _("Cette action modifie le pitch de la musique sur un canal.\nUn pitch de 1 indique une vitesse normale."),
-                   _("Faire _PARAM2__PARAM1_ au pitch de la musique du canal  _PARAM0_"),
+                   _("Faire _PARAM2__PARAM1_ au pitch de la musique du canal _PARAM0_"),
                    _("Musiques"),
                    "res/actions/music24.png",
                    "res/actions/music.png",
                    &ActModPitchMusicChannel);
+
+        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), false, "")
+        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+
+    DECLARE_END_ACTION()
+
+    DECLARE_ACTION("ModPlayingOffsetSoundChannel",
+                   _("Position de lecture d'un son sur un canal"),
+                   _("Cette action modifie la position de lecture du son d'un canal."),
+                   _("Faire _PARAM2__PARAM1_s à la position de lecture du son sur le canal _PARAM0_"),
+                   _("Sons"),
+                   "res/actions/son24.png",
+                   "res/actions/son.png",
+                   &ActModPlayingOffsetSoundChannel);
+
+        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), false, "")
+        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+
+    DECLARE_END_ACTION()
+
+    DECLARE_ACTION("ModPlayingOffsetMusicChannel",
+                   _("Position de lecture de la musique d'un canal"),
+                   _("Cette action modifie la position de lecture de la musique sur un canal."),
+                   _("Faire _PARAM2__PARAM1_s à la position de lecture de la musique du canal _PARAM0_"),
+                   _("Musiques"),
+                   "res/actions/music24.png",
+                   "res/actions/music.png",
+                   &ActModPlayingOffsetMusicChannel);
 
         DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), false, "")
         DECLARE_PARAMETER("expression", _("Valeur"), false, "")
@@ -379,6 +409,36 @@ AudioExtension::AudioExtension()
 
         DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), false, "")
         DECLARE_PARAMETER("expression", _("Pitch à tester"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+
+    DECLARE_END_CONDITION()
+
+    DECLARE_CONDITION("SoundChannelPlayingOffset",
+                   _("Position de lecture du son d'un canal"),
+                   _("Teste la position de lecture du son sur le canal indiqué."),
+                   _("La position de lecture du son sur le canal _PARAM0_ est _PARAM2_ à _PARAM1_s"),
+                   _("Sons"),
+                   "res/conditions/sonVolume24.png",
+                   "res/conditions/sonVolume.png",
+                   &CondSoundChannelPlayingOffset);
+
+        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), false, "")
+        DECLARE_PARAMETER("expression", _("Position à tester ( en secondes )"), false, "")
+        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+
+    DECLARE_END_CONDITION()
+
+    DECLARE_CONDITION("MusicChannelPlayingOffset",
+                   _("Position de lecture de la musique d'un canal"),
+                   _("Teste la position de lecture de la musique sur le canal indiqué."),
+                   _("La position de lecture la musique sur le canal _PARAM0_ est _PARAM2_ à _PARAM1_s"),
+                   _("Musiques"),
+                   "res/conditions/musicVolume24.png",
+                   "res/conditions/musicVolume.png",
+                   &CondMusicChannelPlayingOffset);
+
+        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), false, "")
+        DECLARE_PARAMETER("expression", _("Position à tester ( en secondes )"), false, "")
         DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
 
     DECLARE_END_CONDITION()

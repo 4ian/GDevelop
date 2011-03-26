@@ -34,7 +34,6 @@ useExternalSourceFiles(false)
     extensionsUsed.push_back("BuiltinCamera");
     extensionsUsed.push_back("BuiltinWindow");
     extensionsUsed.push_back("BuiltinFile");
-    extensionsUsed.push_back("BuiltinInterface");
     extensionsUsed.push_back("BuiltinNetwork");
     extensionsUsed.push_back("BuiltinScene");
     extensionsUsed.push_back("BuiltinAdvanced");

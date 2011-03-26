@@ -292,7 +292,7 @@ ySelectionOffset(0)
     FlexGridSizer7->Add(thumbsSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer9 = new wxFlexGridSizer(0, 4, 0, 0);
-    CheckTempsEntreImg = new wxStaticBitmap(Core, ID_STATICBITMAP1, wxNullBitmap, wxDefaultPosition, wxSize(16,16), wxSIMPLE_BORDER, _T("ID_STATICBITMAP1"));
+    CheckTempsEntreImg = new wxStaticBitmap(Core, ID_STATICBITMAP1, wxNullBitmap, wxDefaultPosition, wxSize(16,16), 0, _T("ID_STATICBITMAP1"));
     FlexGridSizer9->Add(CheckTempsEntreImg, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText2 = new wxStaticText(Core, ID_STATICTEXT2, _("Temps entre chaque image :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     FlexGridSizer9->Add(StaticText2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
@@ -511,7 +511,7 @@ ySelectionOffset(0)
     editorImagesPnl->Refresh();
 
     m_mgr.AddPane( Core, wxAuiPaneInfo().Name( wxT( "Core" ) ).Center().CaptionVisible(false) );
-    m_mgr.AddPane( editorImagesPnl, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).MinSize(150, 100) );
+    m_mgr.AddPane( editorImagesPnl, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).MinSize(150, 100).Show(true) );
 
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );
@@ -521,6 +521,7 @@ ySelectionOffset(0)
     RefreshFromObjet();
     Core->Layout();
     SetSize(GetSize().GetWidth()+150, GetSize().GetHeight());
+    Center();
 }
 
 EditorObjet::~EditorObjet()

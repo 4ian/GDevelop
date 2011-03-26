@@ -398,6 +398,7 @@
 																						<object class="sizeritem">
 																							<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="CheckTempsEntreImg" member="yes">
 																								<size>16,16</size>
+																								<style>0</style>
 																							</object>
 																							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																							<border>5</border>

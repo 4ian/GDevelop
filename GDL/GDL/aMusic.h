@@ -24,4 +24,7 @@ bool ActModGlobalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcern
 bool ActModPitchSoundChannel( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 bool ActModPitchMusicChannel( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
+bool ActModPlayingOffsetSoundChannel( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+bool ActModPlayingOffsetMusicChannel( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+
 #endif // AMUSIC_H_INCLUDED

@@ -1,16 +1,3 @@
-/**
- *  Game Develop
- *      Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *  Main.cpp
- *
- *  Contient entre autre la boucle principale du jeu.
- */
-
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
@@ -25,11 +12,6 @@
 #include <unistd.h>
 #endif
 
-#ifdef PYSUPPORT
-#include <boost/python.hpp>
-using namespace boost::python;
-#endif
-
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/MemTrace.h"
@@ -42,7 +24,7 @@ using namespace boost::python;
 #include "GDL/ExtensionsManager.h"
 #include "GDL/SpriteExtension.h"
 #include "GDL/ExtensionsLoader.h"
-#include "GDL/Modules.h"
+#include "GDL/DynamicExtensionsManager.h"
 #include "CompilationChecker.h"
 #include "GDL/AES.h"
 
@@ -55,20 +37,10 @@ using namespace std;
 #ifndef RELEASE
 MemTrace MemTracer;
 #endif
-/*
-void MessageLoading( string message, float avancement )
-{
-    EcrireLog( "Chargement", message );
-}*/
 
 int main( int argc, char *p_argv[] )
 {
-
     InitLog();
-#ifdef PYSUPPORT
-    using namespace gdp;
-    InitializePythonModule();
-#endif
 
     // On définit le chemin d'execution du programme par rapport a la localisation de son executable
     // Utile surtout sous linux
@@ -87,11 +59,13 @@ int main( int argc, char *p_argv[] )
 
     CompilationChecker::EnsureCorrectGDLVersion();
 
-    ExtensionsLoader * extensionsLoader = ExtensionsLoader::getInstance();
+    GDpriv::ExtensionsLoader * extensionsLoader = GDpriv::ExtensionsLoader::GetInstance();
     extensionsLoader->SetExtensionsDir("./");
-    extensionsLoader->LoadAllExtensionsAvailable();
+    extensionsLoader->LoadAllStaticExtensionsAvailable();
 
-    RessourcesLoader * exeGD = RessourcesLoader::getInstance();
+    GDpriv::DynamicExtensionsManager::GetInstance()->LoadDynamicExtension("dynext.dxgd");
+
+    RessourcesLoader * exeGD = RessourcesLoader::GetInstance();
     exeGD->SetExeGD( "gam.egd" );
     string srcString = exeGD->LoadPlainText( "src" );
 
@@ -119,7 +93,7 @@ int main( int argc, char *p_argv[] )
     }
     if ( game.loadingScreen.texte )
     {
-        sf::Text Chargement( game.loadingScreen.texteChargement, *FontManager::getInstance()->GetFont("") );
+        sf::Text Chargement( game.loadingScreen.texteChargement, *FontManager::GetInstance()->GetFont("") );
         Chargement.SetPosition( game.loadingScreen.texteXPos, game.loadingScreen.texteYPos );
         loadingApp.Draw( Chargement );
     }
@@ -130,7 +104,7 @@ int main( int argc, char *p_argv[] )
 
     if ( srcString.empty() )
     {
-        cout << endl << "N'a pas pu charger src. Fermeture." << endl;
+        cout << endl << "Unable to initialize game." << endl;
         return EXIT_FAILURE;
     }
 
@@ -161,7 +135,8 @@ int main( int argc, char *p_argv[] )
 
 #else
     OpenSaveGame openGame( game );
-    openGame.OpenFromFile("D:/Florian/Programmation/Jeux Game Develop/SA4/Game.gdg" );
+    //openGame.OpenFromFile("D:/Florian/Programmation/Jeux Game Develop/SA4/Game.gdg" );
+    openGame.OpenFromFile("D:/Florian/Desktop/Temporaire/ResolutionTEst/Game.gdg" );
     //openGame.OpenFromFile("D:/Florian/Programmation/Jeux Game Develop/Ecce Deus/EcceDeus.gdg" );
     //openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/TestPhysicNew.gdg" );
     //openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/testTextFont.gdg" );
@@ -169,8 +144,7 @@ int main( int argc, char *p_argv[] )
 
 #endif
 
-    if ( game.scenes.empty() )
-        return EXIT_FAILURE;
+    if ( game.scenes.empty() ) return EXIT_FAILURE;
 
     //Initialize image manager and load always loaded images
     game.imageManager->SetGame( &game );
@@ -208,10 +182,8 @@ int main( int argc, char *p_argv[] )
             scenePlayed.running = false;
         else if ( retour != -1 ) //Changer de scènes
         {
-            scenePlayed.StopMusic();
-
-            RuntimeScene NewScenePlayed(&window, &game);
-            scenePlayed = NewScenePlayed; //On vide la scène
+            RuntimeScene newScenePlayed(&window, &game);
+            scenePlayed = newScenePlayed; //On vide la scène
             if ( !scenePlayed.LoadFromScene( *game.scenes.at( retour ) ) )
             {
                 EcrireLog( "Chargement", "Erreur lors du chargement" );
@@ -219,10 +191,10 @@ int main( int argc, char *p_argv[] )
         }
     }
 
-    SoundManager * soundManager = SoundManager::getInstance();
-    soundManager->kill();
-    FontManager * fontManager = FontManager::getInstance();
-    fontManager->kill();
+    SoundManager * soundManager = SoundManager::GetInstance();
+    soundManager->DestroySingleton();
+    FontManager * fontManager = FontManager::GetInstance();
+    fontManager->DestroySingleton();
 
     return EXIT_SUCCESS;
 }

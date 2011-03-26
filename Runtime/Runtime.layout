@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release" />
+	<ActiveTarget name="Development" />
 	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="472" topLine="0" />
 	</File>
@@ -8,6 +8,6 @@
 		<Cursor position="125" topLine="0" />
 	</File>
 	<File name="main.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="3514" topLine="102" />
+		<Cursor position="5808" topLine="169" />
 	</File>
 </CodeBlocks_layout_file>

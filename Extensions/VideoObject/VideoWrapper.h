@@ -5,7 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-class VideoWrapper
+class GD_EXTENSION_API VideoWrapper
 {
     public:
         VideoWrapper();

@@ -49,7 +49,7 @@ class ResourcesMergingHelper;
 /**
  * Video Object
  */
-class VideoObject : public Object
+class GD_EXTENSION_API VideoObject : public Object
 {
     public :
 

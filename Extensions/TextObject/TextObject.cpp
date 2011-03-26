@@ -350,7 +350,7 @@ void TextObject::SetFont(string fontName_)
 {
     fontName = fontName_;
 
-    FontManager * fontManager = FontManager::getInstance();
+    FontManager * fontManager = FontManager::GetInstance();
     text.SetFont(*fontManager->GetFont(fontName));
     text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2);
 }

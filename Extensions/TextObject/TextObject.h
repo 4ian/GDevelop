@@ -48,7 +48,7 @@ class ResourcesMergingHelper;
 /**
  * Text Object
  */
-class TextObject : public Object
+class GD_EXTENSION_API TextObject : public Object
 {
     public :
 

@@ -34,7 +34,7 @@ class SceneNetworkDatas;
 /**
  * Datas shared by Network Automatism at runtime ( i.e. Nothing )
  */
-class RuntimeSceneNetworkDatas : public AutomatismsRuntimeSharedDatas
+class GD_EXTENSION_API RuntimeSceneNetworkDatas : public AutomatismsRuntimeSharedDatas
 {
     public:
         RuntimeSceneNetworkDatas(const SceneNetworkDatas & automatismSharedDatas);

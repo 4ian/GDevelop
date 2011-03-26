@@ -4,11 +4,11 @@
 #include <string>
 #include <iostream>
 
-class ErrorManager
+class GD_EXTENSION_API ErrorManager
 {
     public:
 
-    static ErrorManager *getInstance()
+    static ErrorManager *GetInstance()
     {
         if ( !_singleton )
         {
@@ -18,7 +18,7 @@ class ErrorManager
         return ( static_cast<ErrorManager*>( _singleton ) );
     }
 
-    static void kill()
+    static void DestroySingleton()
     {
         if ( _singleton )
         {

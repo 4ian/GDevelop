@@ -28,7 +28,7 @@ void NetworkManager::ReceivePackets()
                 double number;
                 packet >> number;
 
-                ReceivedDataManager::getInstance()->values[title] = number;
+                ReceivedDataManager::GetInstance()->values[title] = number;
                 break;
             }
             case 1:
@@ -38,11 +38,11 @@ void NetworkManager::ReceivePackets()
                 std::string str;
                 packet >> str;
 
-                ReceivedDataManager::getInstance()->strings[title] = str;
+                ReceivedDataManager::GetInstance()->strings[title] = str;
                 break;
             }
             default:
-                ErrorManager::getInstance()->SetLastError("Received unknown data ( Type "+ToString(type)+" )\n");
+                ErrorManager::GetInstance()->SetLastError("Received unknown data ( Type "+ToString(type)+" )\n");
                 break;
             }
         }

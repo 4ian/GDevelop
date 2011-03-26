@@ -32,11 +32,11 @@ freely, subject to the following restrictions:
 /**
  * Singleton where is stocked receveid data from other peers.
  */
-class ReceivedDataManager
+class GD_EXTENSION_API ReceivedDataManager
 {
     public:
 
-    static ReceivedDataManager *getInstance()
+    static ReceivedDataManager *GetInstance()
     {
         if ( !_singleton )
         {
@@ -46,7 +46,7 @@ class ReceivedDataManager
         return ( static_cast<ReceivedDataManager*>( _singleton ) );
     }
 
-    static void kill()
+    static void DestroySingleton()
     {
         if ( _singleton )
         {

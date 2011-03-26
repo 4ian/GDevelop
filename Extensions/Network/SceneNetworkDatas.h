@@ -34,7 +34,7 @@ freely, subject to the following restrictions:
 /**
  * Datas shared by Network Automatism ( i.e. Nothing )
  */
-class SceneNetworkDatas : public AutomatismsSharedDatas
+class GD_EXTENSION_API SceneNetworkDatas : public AutomatismsSharedDatas
 {
     public:
         SceneNetworkDatas(std::string typeName) : AutomatismsSharedDatas(typeName)

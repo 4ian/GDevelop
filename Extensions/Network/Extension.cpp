@@ -30,7 +30,9 @@ freely, subject to the following restrictions:
 #include "NetworkAutomatismActions.h"
 #include "NetworkAutomatism.h"
 #include "NetworkExpressions.h"
+#include "NetworkManager.h"
 #include <boost/version.hpp>
+#include <SFML/Network.hpp>
 
 /**
  * This class declare information about the extension.
@@ -150,15 +152,22 @@ class Extension : public ExtensionBase
 
             DECLARE_END_ACTION()
 
-            DECLARE_STR_EXPRESSION("GetReceivedDataString", _("Obtenir le texte d'une donnée"), _("Obtenir le texte contenu dans une donnée"), _("Réseau : Reception"), "res/actions/scaleHeight.png", &ExpGetReceivedDataString)
+            DECLARE_STR_EXPRESSION("GetReceivedDataString", _("Obtenir le texte d'une donnée"), _("Obtenir le texte contenu dans une donnée"), _("Réseau : Reception"), "Extensions/networkicon.png", &ExpGetReceivedDataString)
                 DECLARE_PARAMETER("text", _("Nom de la donnée contenant le texte à récupérer"), false, "")
             DECLARE_END_STR_EXPRESSION()
 
-            DECLARE_EXPRESSION("GetReceivedDataValue", _("Obtenir la valeur d'une donnée"), _("Obtenir la valeur contenue dans une donnée"), _("Réseau : Reception"), "res/texteicon.png", &ExpGetReceivedDataValue)
+            DECLARE_EXPRESSION("GetReceivedDataValue", _("Obtenir la valeur d'une donnée"), _("Obtenir la valeur contenue dans une donnée"), _("Réseau : Reception"), "Extensions/networkicon.png", &ExpGetReceivedDataValue)
                 DECLARE_PARAMETER("text", _("Nom de la donnée contenant le texte à récupérer"), false, "")
             DECLARE_END_EXPRESSION()
 
             DECLARE_STR_EXPRESSION("GetLastError", _("Dernière erreur survenue"), _("Obtenir le texte décrivant la dernière erreur survenue."), _("Réseau : Erreurs"), "res/error.png", &ExpGetLastError)
+            DECLARE_END_STR_EXPRESSION()
+
+            DECLARE_STR_EXPRESSION("GetPublicAddress", _("Adresse IP"), _("Permet d'obtenir l'adresse de l'ordinateur sur internet."), _("Réseau"), "Extensions/networkicon.png", &ExpGetPublicAddress)
+                DECLARE_PARAMETER_OPTIONAL("expression", _("Temps au maximum à attendre afin d'obtenir l'adresse ( en secondes ) ( 0 = Pas de limite )"), false, "")
+            DECLARE_END_STR_EXPRESSION()
+
+            DECLARE_STR_EXPRESSION("GetLocalAdress", _("Adresse IP ( Locale/LAN )"), _("Permet d'obtenir l'adresse de l'ordinateur sur internet."), _("Réseau"), "Extensions/networkicon.png", &ExpGetLocalAddress)
             DECLARE_END_STR_EXPRESSION()
 
             DECLARE_AUTOMATISM("NetworkAutomatism",
@@ -242,7 +251,31 @@ class Extension : public ExtensionBase
         };
         virtual ~Extension() {};
 
-    protected:
+        #if defined(GD_IDE_ONLY)
+        bool HasDebuggingProperties() const { return true; };
+
+        void GetPropertyForDebugger(unsigned int propertyNb, std::string & name, std::string & value) const
+        {
+            if ( propertyNb == 0 )
+            {
+                name = _("Liste des destinataires");
+                const std::vector< std::pair<sf::IpAddress, short unsigned int> > & list = NetworkManager::GetInstance()->GetRecipientsList();
+                for (unsigned int i = 0;i<list.size();++i)
+                    value += list[i].first.ToString()+string(_(" Port : ").mb_str())+ToString(list[i].second)+"; ";
+            }
+        }
+
+        bool ChangeProperty(unsigned int propertyNb, std::string newValue)
+        {
+            if ( propertyNb == 0 ) return false;
+        }
+
+        unsigned int GetNumberOfProperties() const
+        {
+            return 1;
+        }
+        #endif
+
     private:
 
         /**
@@ -287,7 +320,7 @@ class Extension : public ExtensionBase
  * Used by Game Develop to create the extension class
  * -- Do not need to be modified. --
  */
-extern "C" ExtensionBase * CreateGDExtension() {
+extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
     return new Extension;
 }
 
@@ -295,6 +328,6 @@ extern "C" ExtensionBase * CreateGDExtension() {
  * Used by Game Develop to destroy the extension class
  * -- Do not need to be modified. --
  */
-extern "C" void DestroyGDExtension(ExtensionBase * p) {
+extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }

@@ -39,7 +39,7 @@ class TiXmlElement;
 class Scene;
 class NetworkAutomatismEditor;
 
-class NetworkAutomatism : public Automatism
+class GD_EXTENSION_API NetworkAutomatism : public Automatism
 {
     friend class NetworkAutomatismEditor;
 

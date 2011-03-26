@@ -24,6 +24,7 @@ freely, subject to the following restrictions:
 
 */
 
+#include <SFML/Network.hpp>
 #include "GDL/ExpressionInstruction.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
@@ -34,17 +35,27 @@ string ExpGetReceivedDataString( const RuntimeScene & scene, ObjectsConcerned & 
 {
     std::string title = exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned);
 
-    return ReceivedDataManager::getInstance()->strings[title];
+    return ReceivedDataManager::GetInstance()->strings[title];
 }
 
 double ExpGetReceivedDataValue( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     std::string title = exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned);
 
-    return ReceivedDataManager::getInstance()->values[title];
+    return ReceivedDataManager::GetInstance()->values[title];
 }
 
 string ExpGetLastError( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction )
 {
-    return ErrorManager::getInstance()->GetLastError();
+    return ErrorManager::GetInstance()->GetLastError();
+}
+
+string ExpGetPublicAddress( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction )
+{
+    return (exprInstruction.parameters.empty() ? sf::IpAddress::GetPublicAddress().ToString() : sf::IpAddress::GetPublicAddress(exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned))).ToString();
+}
+
+string ExpGetLocalAddress( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction )
+{
+    return sf::IpAddress::GetLocalAddress().ToString();
 }

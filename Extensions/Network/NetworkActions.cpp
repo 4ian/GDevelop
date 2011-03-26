@@ -38,15 +38,15 @@ freely, subject to the following restrictions:
 
 bool ActResetReceivedData( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    ReceivedDataManager::getInstance()->values.clear();
-    ReceivedDataManager::getInstance()->strings.clear();
+    ReceivedDataManager::GetInstance()->values.clear();
+    ReceivedDataManager::GetInstance()->strings.clear();
 
     return true;
 }
 
 bool ActStopListening( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    NetworkManager::getInstance()->StopListening();
+    NetworkManager::GetInstance()->StopListening();
 
     return true;
 }
@@ -58,14 +58,14 @@ bool ActAddRecipient( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
 
     if ( port == 0 ) port = 50001; //Default value
 
-    NetworkManager::getInstance()->AddRecipient(address, port);
+    NetworkManager::GetInstance()->AddRecipient(address, port);
 
     return true;
 }
 
 bool ActRemoveAllRecipients( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    NetworkManager::getInstance()->RemoveAllRecipients();
+    NetworkManager::GetInstance()->RemoveAllRecipients();
 
     return true;
 }
@@ -75,7 +75,7 @@ bool ActListenToPort( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     short unsigned int port = action.GetParameter(0).GetAsMathExpressionResult(scene, objectsConcerned);
     if ( port == 0 ) port = 50001;
 
-    NetworkManager::getInstance()->ListenToPort(port);
+    NetworkManager::GetInstance()->ListenToPort(port);
     return true;
 }
 
@@ -86,7 +86,7 @@ bool ActSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
             << action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)
             << static_cast<double>(action.GetParameter(1).GetAsMathExpressionResult(scene, objectsConcerned));
 
-    NetworkManager::getInstance()->Send(packet);
+    NetworkManager::GetInstance()->Send(packet);
 
     return true;
 }
@@ -98,14 +98,14 @@ bool ActSendString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
             << action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)
             << action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned);
 
-    NetworkManager::getInstance()->Send(packet);
+    NetworkManager::GetInstance()->Send(packet);
 
     return true;
 }
 
 bool ActReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    NetworkManager::getInstance()->ReceivePackets();
+    NetworkManager::GetInstance()->ReceivePackets();
 
     return true;
 }

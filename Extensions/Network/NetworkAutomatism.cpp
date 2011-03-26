@@ -66,11 +66,11 @@ void NetworkAutomatism::DoStepPreEvents(RuntimeScene & scene)
 {
     if ( !sending )
     {
-        if ( xPosition ) object->SetX(ReceivedDataManager::getInstance()->values[dataPrefix+ToString(objectNetworkId)+"/X"]);
-        if ( yPosition ) object->SetY(ReceivedDataManager::getInstance()->values[dataPrefix+ToString(objectNetworkId)+"/Y"]);
-        if ( angle ) object->SetAngle(ReceivedDataManager::getInstance()->values[dataPrefix+ToString(objectNetworkId)+"/Angle"]);
-        if ( width ) object->SetWidth(ReceivedDataManager::getInstance()->values[dataPrefix+ToString(objectNetworkId)+"/Width"]);
-        if ( height ) object->SetHeight(ReceivedDataManager::getInstance()->values[dataPrefix+ToString(objectNetworkId)+"/Height"]);
+        if ( xPosition ) object->SetX(ReceivedDataManager::GetInstance()->values[dataPrefix+ToString(objectNetworkId)+"/X"]);
+        if ( yPosition ) object->SetY(ReceivedDataManager::GetInstance()->values[dataPrefix+ToString(objectNetworkId)+"/Y"]);
+        if ( angle ) object->SetAngle(ReceivedDataManager::GetInstance()->values[dataPrefix+ToString(objectNetworkId)+"/Angle"]);
+        if ( width ) object->SetWidth(ReceivedDataManager::GetInstance()->values[dataPrefix+ToString(objectNetworkId)+"/Width"]);
+        if ( height ) object->SetHeight(ReceivedDataManager::GetInstance()->values[dataPrefix+ToString(objectNetworkId)+"/Height"]);
     }
 }
 
@@ -88,7 +88,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
                 << dataPrefix+ToString(objectNetworkId)+"/X"
                 << static_cast<double>(object->GetX());
 
-        NetworkManager::getInstance()->Send(packet);
+        NetworkManager::GetInstance()->Send(packet);
     }
     if ( yPosition )
     {
@@ -97,7 +97,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
                 << dataPrefix+ToString(objectNetworkId)+"/Y"
                 << static_cast<double>(object->GetY());
 
-        NetworkManager::getInstance()->Send(packet);
+        NetworkManager::GetInstance()->Send(packet);
     }
     if ( angle )
     {
@@ -106,7 +106,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
                 << dataPrefix+ToString(objectNetworkId)+"/Angle"
                 << static_cast<double>(object->GetAngle());
 
-        NetworkManager::getInstance()->Send(packet);
+        NetworkManager::GetInstance()->Send(packet);
     }
     if ( width )
     {
@@ -115,7 +115,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
                 << dataPrefix+ToString(objectNetworkId)+"/Width"
                 << static_cast<double>(object->GetWidth());
 
-        NetworkManager::getInstance()->Send(packet);
+        NetworkManager::GetInstance()->Send(packet);
     }
     if ( height )
     {
@@ -124,7 +124,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
                 << dataPrefix+ToString(objectNetworkId)+"/Height"
                 << static_cast<double>(object->GetHeight());
 
-        NetworkManager::getInstance()->Send(packet);
+        NetworkManager::GetInstance()->Send(packet);
     }
 }
 

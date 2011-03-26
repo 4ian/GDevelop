@@ -5,7 +5,7 @@
 /**
  * Manage network stuff.
  */
-class NetworkManager
+class GD_EXTENSION_API NetworkManager
 {
 public:
     /**
@@ -71,7 +71,12 @@ public:
         recipientsList.clear();
     }
 
-    static NetworkManager *getInstance()
+    /**
+     * Return the list of recipients
+     */
+    const std::vector< std::pair<sf::IpAddress, short unsigned int> > & GetRecipientsList() const { return recipientsList; };
+
+    static NetworkManager *GetInstance()
     {
         if ( !_singleton )
         {
@@ -81,7 +86,7 @@ public:
         return ( static_cast<NetworkManager*>( _singleton ) );
     }
 
-    static void kill()
+    static void DestroySingleton()
     {
         if ( _singleton )
         {

@@ -20,16 +20,16 @@
 		<Cursor position="238" topLine="0" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="31474" topLine="521" />
+		<Cursor position="29095" topLine="458" />
 	</File>
 	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="4202" topLine="105" />
 	</File>
 	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="1">
-		<Cursor position="2461" topLine="56" />
+		<Cursor position="2339" topLine="50" />
 	</File>
 	<File name="PhysicsAutomatismActions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="74" topLine="3" />
+		<Cursor position="640" topLine="266" />
 	</File>
 	<File name="PhysicsAutomatismConditions.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="74" topLine="3" />
@@ -41,7 +41,7 @@
 		<Cursor position="1008" topLine="3" />
 	</File>
 	<File name="PhysicsAutomatismExpressions.cpp" open="0" top="0" tabpos="17">
-		<Cursor position="74" topLine="3" />
+		<Cursor position="1138" topLine="18" />
 	</File>
 	<File name="RuntimeScenePhysicsDatas.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="74" topLine="3" />

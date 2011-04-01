@@ -3,6 +3,7 @@
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/ExpressionInstruction.h"
 #include "GDL/CommonTools.h"
+#include "GDL/SoundManager.h"
 #include <SFML/System.hpp>
 #include <vector>
 #include <string>
@@ -211,4 +212,52 @@ double ExpGetScreenColorDepth( const RuntimeScene & scene, ObjectsConcerned & ob
     sf::VideoMode videoMode = sf::VideoMode::GetDesktopMode();
 
     return videoMode.BitsPerPixel;
+}
+
+double ExpGetSoundChannelPlayingOffset( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return 0;
+
+    return SoundManager::GetInstance()->GetSoundOnChannel(canal)->GetPlayingOffset();
+}
+
+double ExpGetMusicChannelPlayingOffset( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return 0;
+
+    return SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetPlayingOffset();
+}
+
+double ExpGetSoundChannelPitch( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return 0;
+
+    return SoundManager::GetInstance()->GetSoundOnChannel(canal)->GetPitch();
+}
+
+double ExpGetMusicChannelPitch( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return 0;
+
+    return SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetPitch();
+}
+
+double ExpGetSoundChannelVolume( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return 0;
+
+    return SoundManager::GetInstance()->GetSoundOnChannel(canal)->GetVolume();
+}
+
+double ExpGetMusicChannelVolume( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( canal < 0 || canal > MAX_CANAUX_SON ) return 0;
+
+    return SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetVolume();
 }

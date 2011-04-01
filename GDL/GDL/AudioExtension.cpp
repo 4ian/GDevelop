@@ -4,6 +4,7 @@
 #include "GDL/ResourcesMergingHelper.h"
 #include "GDL/Instruction.h"
 #include "GDL/SoundManager.h"
+#include "GDL/eFreeFunctions.h"
 #include <iostream>
 
 AudioExtension::AudioExtension()
@@ -442,6 +443,25 @@ AudioExtension::AudioExtension()
         DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
 
     DECLARE_END_CONDITION()
+
+    DECLARE_EXPRESSION("SoundChannelPlayingOffset", _("Position de lecture d'un son"), _("Position de lecture d'un son"), _("Sons"), "res/actions/son.png", &ExpGetSoundChannelPlayingOffset)
+        DECLARE_PARAMETER("expression", _("Canal"), false, "")
+    DECLARE_END_EXPRESSION()
+    DECLARE_EXPRESSION("MusicChannelPlayingOffset", _("Position de lecture d'une musique"), _("Position de lecture d'une musique"), _("Musiques"), "res/actions/music.png", &ExpGetMusicChannelPlayingOffset)
+        DECLARE_PARAMETER("expression", _("Canal"), false, "")
+    DECLARE_END_EXPRESSION()
+    DECLARE_EXPRESSION("SoundChannelVolume", _("Volume d'un son"), _("Volume d'un son"), _("Sons"), "res/actions/son.png", &ExpGetSoundChannelVolume)
+        DECLARE_PARAMETER("expression", _("Canal"), false, "")
+    DECLARE_END_EXPRESSION()
+    DECLARE_EXPRESSION("MusicChannelVolume", _("Volume d'une musique"), _("Volume d'une musique"), _("Musiques"), "res/actions/music.png", &ExpGetMusicChannelVolume)
+        DECLARE_PARAMETER("expression", _("Canal"), false, "")
+    DECLARE_END_EXPRESSION()
+    DECLARE_EXPRESSION("SoundChannelPitch", _("Pitch d'un son"), _("Pitch d'un son"), _("Sons"), "res/actions/son.png", &ExpGetSoundChannelPitch)
+        DECLARE_PARAMETER("expression", _("Canal"), false, "")
+    DECLARE_END_EXPRESSION()
+    DECLARE_EXPRESSION("MusicChannelPitch", _("Pitch d'une musique"), _("Pitch d'une musique"), _("Musiques"), "res/actions/music.png", &ExpGetMusicChannelPitch)
+        DECLARE_PARAMETER("expression", _("Canal"), false, "")
+    DECLARE_END_EXPRESSION()
 }
 
 #if defined(GD_IDE_ONLY)

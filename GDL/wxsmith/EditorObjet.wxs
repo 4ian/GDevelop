@@ -672,6 +672,7 @@
 				<label>Options</label>
 				<object class="wxMenuItem" name="idMenuPosEverywhere" variable="posEverywhereMenuItem" member="yes">
 					<label>Positionner en même temps sur les autres images</label>
+					<checkable>1</checkable>
 				</object>
 			</object>
 			<object class="separator" />

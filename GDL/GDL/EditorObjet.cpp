@@ -405,7 +405,7 @@ ySelectionOffset(0)
     MenuItem28 = new wxMenuItem((&pointsContextMenu), ID_MENUITEM7, _("Positionner précisement"), wxEmptyString, wxITEM_NORMAL);
     pointsContextMenu.Append(MenuItem28);
     MenuItem29 = new wxMenu();
-    posEverywhereMenuItem = new wxMenuItem(MenuItem29, idMenuPosEverywhere, _("Positionner en même temps sur les autres images"), wxEmptyString, wxITEM_NORMAL);
+    posEverywhereMenuItem = new wxMenuItem(MenuItem29, idMenuPosEverywhere, _("Positionner en même temps sur les autres images"), wxEmptyString, wxITEM_CHECK);
     MenuItem29->Append(posEverywhereMenuItem);
     pointsContextMenu.Append(ID_MENUITEM14, _("Options"), MenuItem29, wxEmptyString);
     pointsContextMenu.AppendSeparator();

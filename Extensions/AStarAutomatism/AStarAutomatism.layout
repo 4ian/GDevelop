@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="AStarAutomatism.cpp" open="1" top="1" tabpos="5">
-		<Cursor position="1274" topLine="25" />
+	<File name="AStarAutomatism.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="7220" topLine="232" />
 	</File>
-	<File name="AStarAutomatism.h" open="1" top="0" tabpos="6">
-		<Cursor position="2417" topLine="41" />
+	<File name="AStarAutomatism.h" open="1" top="0" tabpos="2">
+		<Cursor position="6492" topLine="129" />
 	</File>
-	<File name="AStarAutomatismActions.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="1110" topLine="9" />
+	<File name="AStarAutomatismActions.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="5523" topLine="77" />
 	</File>
-	<File name="AStarAutomatismConditions.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="39" topLine="0" />
+	<File name="AStarAutomatismConditions.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="7583" topLine="57" />
 	</File>
-	<File name="AStarAutomatismEditor.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="13920" topLine="184" />
+	<File name="AStarAutomatismEditor.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="11515" topLine="176" />
 	</File>
-	<File name="AStarAutomatismEditor.h" open="0" top="0" tabpos="10">
-		<Cursor position="3979" topLine="100" />
+	<File name="AStarAutomatismEditor.h" open="1" top="0" tabpos="11">
+		<Cursor position="1874" topLine="39" />
 	</File>
-	<File name="AStarAutomatismExpressions.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="39" topLine="0" />
+	<File name="AStarAutomatismExpressions.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="2823" topLine="47" />
 	</File>
-	<File name="Extension.cpp" open="1" top="0" tabpos="9">
-		<Cursor position="2129" topLine="38" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="17526" topLine="244" />
 	</File>
-	<File name="MapSearchNode.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="44" topLine="0" />
+	<File name="MapSearchNode.cpp" open="1" top="1" tabpos="7">
+		<Cursor position="1330" topLine="0" />
 	</File>
-	<File name="MapSearchNode.h" open="1" top="0" tabpos="3">
-		<Cursor position="73" topLine="0" />
+	<File name="MapSearchNode.h" open="0" top="0" tabpos="11">
+		<Cursor position="80" topLine="5" />
 	</File>
-	<File name="RuntimeSceneAStarDatas.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="1224" topLine="3" />
+	<File name="RuntimeSceneAStarDatas.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="1314" topLine="9" />
 	</File>
-	<File name="RuntimeSceneAStarDatas.h" open="1" top="0" tabpos="1">
-		<Cursor position="1151" topLine="15" />
+	<File name="RuntimeSceneAStarDatas.h" open="1" top="0" tabpos="4">
+		<Cursor position="1839" topLine="25" />
 	</File>
-	<File name="SceneAStarDatas.cpp" open="1" top="0" tabpos="10">
-		<Cursor position="835" topLine="8" />
+	<File name="SceneAStarDatas.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="1398" topLine="15" />
 	</File>
-	<File name="SceneAStarDatas.h" open="1" top="0" tabpos="11">
-		<Cursor position="1266" topLine="26" />
+	<File name="SceneAStarDatas.h" open="1" top="0" tabpos="3">
+		<Cursor position="2094" topLine="28" />
 	</File>
-	<File name="stlastar.h" open="1" top="0" tabpos="12">
-		<Cursor position="2801" topLine="102" />
+	<File name="stlastar.h" open="1" top="0" tabpos="9">
+		<Cursor position="17286" topLine="733" />
 	</File>
 </CodeBlocks_layout_file>

@@ -107,3 +107,83 @@ bool AStarAutomatism::ActSetGridHeight( RuntimeScene & scene, ObjectsConcerned &
 
     return true;
 };
+
+bool AStarAutomatism::ActEnterSegment( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Set )
+        EnterSegment(action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()));
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Add )
+        EnterSegment(currentSegment+action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  ));
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Substract )
+        EnterSegment(currentSegment - action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  ));
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Multiply )
+        EnterSegment( currentSegment * action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  ));
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Divide )
+        EnterSegment( currentSegment / action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  ));
+
+    return true;
+};
+
+bool AStarAutomatism::ActSetLeftBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Set )
+        leftBorder = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Add )
+        leftBorder += action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Substract )
+        leftBorder -= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Multiply )
+        leftBorder *= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Divide )
+        leftBorder /= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+
+    return true;
+};
+
+bool AStarAutomatism::ActSetRightBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Set )
+        rightBorder = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Add )
+        rightBorder += action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Substract )
+        rightBorder -= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Multiply )
+        rightBorder *= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Divide )
+        rightBorder /= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+
+    return true;
+};
+
+bool AStarAutomatism::ActSetTopBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Set )
+        topBorder = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Add )
+        topBorder += action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Substract )
+        topBorder -= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Multiply )
+        topBorder *= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Divide )
+        topBorder /= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+
+    return true;
+};
+
+bool AStarAutomatism::ActSetBottomBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+{
+    if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Set )
+        bottomBorder = action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Add )
+        bottomBorder += action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Substract )
+        bottomBorder -= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Multiply )
+        bottomBorder *= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+    else if ( action.GetParameter( 3 ).GetAsModOperator() == GDExpression::Divide )
+        bottomBorder /= action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject()  );
+
+    return true;
+};

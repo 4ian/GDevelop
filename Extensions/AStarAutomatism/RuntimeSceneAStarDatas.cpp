@@ -29,9 +29,9 @@ freely, subject to the following restrictions:
 #include <iostream>
 
 RuntimeSceneAStarDatas::RuntimeSceneAStarDatas(const SceneAStarDatas & automatismSharedDatas) :
-gridWidth(20),
-gridHeight(20),
-diagonalMove(true)
+gridWidth(automatismSharedDatas.gridWidth),
+gridHeight(automatismSharedDatas.gridHeight),
+diagonalMove(automatismSharedDatas.diagonalMove)
 {
 }
 

@@ -76,3 +76,23 @@ double AStarAutomatism::ExpGridHeight( const RuntimeScene & scene, ObjectsConcer
 {
     return runtimeScenesAStarDatas ? runtimeScenesAStarDatas->gridHeight : 0;
 }
+
+double AStarAutomatism::ExpLeftBorder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    return leftBorder;
+}
+
+double AStarAutomatism::ExpRightBorder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    return rightBorder;
+}
+
+double AStarAutomatism::ExpTopBorder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    return topBorder;
+}
+
+double AStarAutomatism::ExpBottomBorder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    return bottomBorder;
+}

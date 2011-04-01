@@ -107,6 +107,7 @@ class GD_EXTENSION_API AStarAutomatism : public Automatism, public boost::enable
         bool CondSpeed( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool ActSetCost( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool CondCost( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActEnterSegment( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         bool CondPathFound( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action ) { return !path.empty(); };
         bool CondDestinationReached( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action ) { return currentSegment >= path.size(); };
 
@@ -126,6 +127,26 @@ class GD_EXTENSION_API AStarAutomatism : public Automatism, public boost::enable
         double ExpGridWidth( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
         double ExpGridHeight( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 
+        bool CondLeftBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActSetLeftBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        double ExpLeftBorder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+
+        bool CondRightBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActSetRightBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        double ExpRightBorder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+
+        bool CondBottomBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActSetBottomBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        double ExpBottomBorder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+
+        bool CondTopBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        bool ActSetTopBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        double ExpTopBorder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+
+        unsigned int leftBorder;
+        unsigned int rightBorder;
+        unsigned int topBorder;
+        unsigned int bottomBorder;
     private:
 
         virtual void DoStepPreEvents(RuntimeScene & scene);

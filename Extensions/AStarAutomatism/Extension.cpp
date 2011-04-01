@@ -226,6 +226,150 @@ class Extension : public ExtensionBase
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
+                    DECLARE_AUTOMATISM_ACTION("EnterSegment",
+                                   _("Changer la position sur le chemin"),
+                                   _("Change l'état d'avancement de l'objet sur le chemin calculé."),
+                                   _("Faire _PARAM3__PARAM2_ à l'état de l'avancement de l'objet sur le chemin calculé"),
+                                   _("Avancé"),
+                                   "Extensions/AStaricon24.png",
+                                   "Extensions/AStaricon16.png",
+                                   &AStarAutomatism::ActEnterSegment);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_CONDITION("LeftBorder",
+                                   _("Bordure gauche"),
+                                   _("Teste la taille, en cases virtuelles, de la bordure gauche de l'objet."),
+                                   _("La bordure gauche de _PARAM0_ est _PARAM3_ à _PARAM2_"),
+                                   _("Paramétrage"),
+                                   "Extensions/AStaricon24.png",
+                                   "Extensions/AStaricon16.png",
+                                   &AStarAutomatism::CondLeftBorder);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                        DECLARE_PARAMETER("expression", _("Largeur ( en cases virtuelles )"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_CONDITION("RightBorder",
+                                   _("Bordure droite"),
+                                   _("Teste la taille, en cases virtuelles, de la bordure droite de l'objet."),
+                                   _("La bordure droite de _PARAM0_ est _PARAM3_ à _PARAM2_"),
+                                   _("Paramétrage"),
+                                   "Extensions/AStaricon24.png",
+                                   "Extensions/AStaricon16.png",
+                                   &AStarAutomatism::CondRightBorder);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                        DECLARE_PARAMETER("expression", _("Largeur ( en cases virtuelles )"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_CONDITION("TopBorder",
+                                   _("Bordure haute"),
+                                   _("Teste la taille, en cases virtuelles, de la bordure haute de l'objet."),
+                                   _("La bordure haute de _PARAM0_ est _PARAM3_ à _PARAM2_"),
+                                   _("Paramétrage"),
+                                   "Extensions/AStaricon24.png",
+                                   "Extensions/AStaricon16.png",
+                                   &AStarAutomatism::CondTopBorder);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                        DECLARE_PARAMETER("expression", _("Largeur ( en cases virtuelles )"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_CONDITION("BottomBorder",
+                                   _("Bordure basse"),
+                                   _("Teste la taille, en cases virtuelles, de la bordure basse de l'objet."),
+                                   _("La bordure basse de _PARAM0_ est _PARAM3_ à _PARAM2_"),
+                                   _("Paramétrage"),
+                                   "Extensions/AStaricon24.png",
+                                   "Extensions/AStaricon16.png",
+                                   &AStarAutomatism::CondBottomBorder);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                        DECLARE_PARAMETER("expression", _("Largeur ( en cases virtuelles )"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetLeftBorder",
+                                   _("Bordure gauche"),
+                                   _("Change la taille, en cases virtuelles, de la bordure gauche de l'objet."),
+                                   _("Faire _PARAM3__PARAM2_ à taille de la bordure gauche de _PARAM0_"),
+                                   _("Paramétrage"),
+                                   "Extensions/AStaricon24.png",
+                                   "Extensions/AStaricon16.png",
+                                   &AStarAutomatism::ActSetLeftBorder);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                        DECLARE_PARAMETER("expression", _("Largeur ( Cases virtuelles )"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetRightBorder",
+                                   _("Bordure droite"),
+                                   _("Change la taille, en cases virtuelles, de la bordure droite de l'objet."),
+                                   _("Faire _PARAM3__PARAM2_ à taille de la bordure droite de _PARAM0_"),
+                                   _("Paramétrage"),
+                                   "Extensions/AStaricon24.png",
+                                   "Extensions/AStaricon16.png",
+                                   &AStarAutomatism::ActSetRightBorder);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                        DECLARE_PARAMETER("expression", _("Largeur ( Cases virtuelles )"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetTopBorder",
+                                   _("Bordure haute"),
+                                   _("Change la taille, en cases virtuelles, de la bordure haute de l'objet."),
+                                   _("Faire _PARAM3__PARAM2_ à taille de la bordure haute de _PARAM0_"),
+                                   _("Paramétrage"),
+                                   "Extensions/AStaricon24.png",
+                                   "Extensions/AStaricon16.png",
+                                   &AStarAutomatism::ActSetTopBorder);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                        DECLARE_PARAMETER("expression", _("Largeur ( Cases virtuelles )"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetBottomBorder",
+                                   _("Bordure basse"),
+                                   _("Change la taille, en cases virtuelles, de la bordure basse de l'objet."),
+                                   _("Faire _PARAM3__PARAM2_ à taille de la bordure basse de _PARAM0_"),
+                                   _("Paramétrage"),
+                                   "Extensions/AStaricon24.png",
+                                   "Extensions/AStaricon16.png",
+                                   &AStarAutomatism::ActSetBottomBorder);
+
+                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                        DECLARE_PARAMETER("expression", _("Largeur ( Cases virtuelles )"), false, "")
+                        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
                     DECLARE_AUTOMATISM_EXPRESSION("Speed", _("Vitesse de déplacement"), _("Vitesse de déplacement sur le chemin"), _("Déplacement"), "Extensions/AStaricon16.png", &AStarAutomatism::ExpSpeed)
                         DECLARE_PARAMETER("object", _("Objet"), false, "")
                         DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
@@ -272,6 +416,23 @@ class Extension : public ExtensionBase
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
                     DECLARE_AUTOMATISM_EXPRESSION("GridHeight", _("Hauteur de la grille virtuelle"), _("Hauteur de la grille virtuelle"), _("Paramétrage global"), "Extensions/AStaricon16.png", &AStarAutomatism::ExpGridHeight)
+                        DECLARE_PARAMETER("object", _("Objet"), false, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                    DECLARE_END_AUTOMATISM_EXPRESSION()
+
+                    DECLARE_AUTOMATISM_EXPRESSION("LeftBorder", _("Bordure gauche"), _("Bordure gauche"), _("Paramétrage"), "Extensions/AStaricon16.png", &AStarAutomatism::ExpLeftBorder)
+                        DECLARE_PARAMETER("object", _("Objet"), false, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                    DECLARE_END_AUTOMATISM_EXPRESSION()
+                    DECLARE_AUTOMATISM_EXPRESSION("RightBorder", _("Bordure droite"), _("Bordure droite"), _("Paramétrage"), "Extensions/AStaricon16.png", &AStarAutomatism::ExpRightBorder)
+                        DECLARE_PARAMETER("object", _("Objet"), false, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                    DECLARE_END_AUTOMATISM_EXPRESSION()
+                    DECLARE_AUTOMATISM_EXPRESSION("TopBorder", _("Bordure haute"), _("Bordure haute"), _("Paramétrage"), "Extensions/AStaricon16.png", &AStarAutomatism::ExpTopBorder)
+                        DECLARE_PARAMETER("object", _("Objet"), false, "")
+                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
+                    DECLARE_END_AUTOMATISM_EXPRESSION()
+                    DECLARE_AUTOMATISM_EXPRESSION("BottomBorder", _("Bordure basse"), _("Bordure basse"), _("Paramétrage"), "Extensions/AStaricon16.png", &AStarAutomatism::ExpBottomBorder)
                         DECLARE_PARAMETER("object", _("Objet"), false, "")
                         DECLARE_PARAMETER("automatism", _("Automatisme"), false, "AStarAutomatism")
                     DECLARE_END_AUTOMATISM_EXPRESSION()

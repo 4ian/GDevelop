@@ -1,3 +1,29 @@
+/**
+
+Game Develop - A Star Automatism Extension
+Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+    1. The origin of this software must not be misrepresented; you must not
+    claim that you wrote the original software. If you use this software
+    in a product, an acknowledgment in the product documentation would be
+    appreciated but is not required.
+
+    2. Altered source versions must be plainly marked as such, and must not be
+    misrepresented as being the original software.
+
+    3. This notice may not be removed or altered from any source
+    distribution.
+
+*/
+
 #include "MapSearchNode.h"
 #include <cmath>
 #include "RuntimeSceneAStarDatas.h"
@@ -13,10 +39,10 @@ int MapSearchNode::GetCellOfMapAt( int x, int y )
 
         if ( automatism )
         {
-            if ( x*context.gridWidth >= static_cast<int>(automatism->GetObject()->GetX()/context.gridWidth)*context.gridWidth &&
-                 x*context.gridWidth < static_cast<int>((automatism->GetObject()->GetX()+automatism->GetObject()->GetWidth())/context.gridWidth)*context.gridWidth+context.gridWidth &&
-                 y*context.gridHeight >= static_cast<int>(automatism->GetObject()->GetY()/context.gridHeight)*context.gridHeight &&
-                 y*context.gridHeight < static_cast<int>((automatism->GetObject()->GetY()+automatism->GetObject()->GetHeight())/context.gridHeight)*context.gridHeight+context.gridHeight )
+            if ( x*context.gridWidth  >= static_cast<int>(automatism->GetObject()->GetX()/context.gridWidth)*context.gridWidth - automatism->leftBorder*context.gridWidth &&
+                 x*context.gridWidth  <  static_cast<int>((automatism->GetObject()->GetX()+automatism->GetObject()->GetWidth())/context.gridWidth)*context.gridWidth+context.gridWidth + automatism->rightBorder*context.gridWidth &&
+                 y*context.gridHeight >= static_cast<int>(automatism->GetObject()->GetY()/context.gridHeight)*context.gridHeight - automatism->topBorder*context.gridWidth &&
+                 y*context.gridHeight <  static_cast<int>((automatism->GetObject()->GetY()+automatism->GetObject()->GetHeight())/context.gridHeight)*context.gridHeight+context.gridHeight + automatism->bottomBorder*context.gridWidth )
             {
                 if ( automatism->GetCost() == 9 ) return 9;
                 if ( automatism->GetCost() > maxCost ) maxCost = automatism->GetCost();

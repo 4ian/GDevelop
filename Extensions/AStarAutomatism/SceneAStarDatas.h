@@ -37,7 +37,7 @@ freely, subject to the following restrictions:
 class GD_EXTENSION_API SceneAStarDatas : public AutomatismsSharedDatas
 {
     public:
-        SceneAStarDatas(std::string typeName) : AutomatismsSharedDatas(typeName) {};
+        SceneAStarDatas(std::string typeName) : AutomatismsSharedDatas(typeName), gridWidth(20), gridHeight(20), diagonalMove(true) {};
         virtual ~SceneAStarDatas() {};
         virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() { return boost::shared_ptr<AutomatismsSharedDatas>(new SceneAStarDatas(*this));}
 
@@ -52,7 +52,9 @@ class GD_EXTENSION_API SceneAStarDatas : public AutomatismsSharedDatas
 
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-    private:
+        float gridWidth;
+        float gridHeight;
+        bool diagonalMove;
 };
 
 #endif // SCENEPHYSICSDATAS_H

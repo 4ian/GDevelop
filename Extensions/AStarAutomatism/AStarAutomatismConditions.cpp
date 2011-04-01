@@ -96,3 +96,65 @@ bool AStarAutomatism::CondGridHeight( RuntimeScene & scene, ObjectsConcerned & o
 
     return false;
 }
+
+bool AStarAutomatism::CondLeftBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && leftBorder == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && leftBorder < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && leftBorder > condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && leftBorder <= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && leftBorder >= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && leftBorder != condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) )
+       )
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool AStarAutomatism::CondRightBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && rightBorder == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && rightBorder < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && rightBorder > condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && rightBorder <= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && rightBorder >= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && rightBorder != condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) )
+       )
+    {
+        return true;
+    }
+
+    return false;
+}
+bool AStarAutomatism::CondBottomBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && bottomBorder == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && bottomBorder < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && bottomBorder > condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && bottomBorder <= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && bottomBorder >= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && bottomBorder != condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) )
+       )
+    {
+        return true;
+    }
+
+    return false;
+}
+bool AStarAutomatism::CondTopBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+{
+    if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && topBorder == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && topBorder < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Superior && topBorder > condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && topBorder <= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::SuperiorOrEqual && topBorder >= condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) ) ||
+            ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && topBorder != condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, object->Shared_ptrFromObject() ) )
+       )
+    {
+        return true;
+    }
+
+    return false;
+}

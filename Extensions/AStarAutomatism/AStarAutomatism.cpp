@@ -33,6 +33,10 @@ freely, subject to the following restrictions:
 
 AStarAutomatism::AStarAutomatism(std::string automatismTypeName) :
     Automatism(automatismTypeName),
+    leftBorder(0),
+    rightBorder(0),
+    topBorder(0),
+    bottomBorder(0),
     speed(150),
     timeOnSegment(0),
     totalSegmentTime(0),
@@ -58,7 +62,7 @@ void AStarAutomatism::EnterSegment(unsigned int segmentNumber)
     if ( !path.empty() && currentSegment < path.size()-1)
     {
         sf::Vector2f newPath = (path[currentSegment + 1] - path[currentSegment]);
-        totalSegmentTime = sqrtf(newPath.x*newPath.x+newPath.y*newPath.y)/speed;
+        totalSegmentTime = sqrtf(newPath.x*newPath.x+newPath.y*newPath.y);
         timeOnSegment = 0;
     }
 }
@@ -84,7 +88,7 @@ void AStarAutomatism::DoStepPreEvents(RuntimeScene & scene)
     }
 
     //  add to the current time along the path
-    timeOnSegment += scene.GetElapsedTime();
+    timeOnSegment += scene.GetElapsedTime() * speed;
 
     //  if I reached the end of this segment, move to a new segment
     if (timeOnSegment >= totalSegmentTime && currentSegment < path.size())
@@ -95,7 +99,7 @@ void AStarAutomatism::DoStepPreEvents(RuntimeScene & scene)
     if ( !path.empty() )
     {
         if ( currentSegment < path.size()-1 )
-            newPos = offset + path[currentSegment] + (path[currentSegment + 1] - path[currentSegment]) * (timeOnSegment / totalSegmentTime);
+            newPos = offset + path[currentSegment] + (path[currentSegment + 1] - path[currentSegment]) * (timeOnSegment / totalSegmentTime );
         else
             newPos = path.back();
 
@@ -221,9 +225,39 @@ void AStarAutomatism::ComputePath()
 #if defined(GD_IDE_ONLY)
 void AStarAutomatism::SaveToXml(TiXmlElement * elem) const
 {
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("cost", cost);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("leftBorder", leftBorder);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("rightBorder", rightBorder);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("topBorder", topBorder);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("bottomBorder", bottomBorder);
 }
 #endif
 
 void AStarAutomatism::LoadFromXml(const TiXmlElement * elem)
 {
+    {
+        int temp = 9;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("cost", temp);
+        cost = temp;
+    }
+    {
+        int temp = 0;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("leftBorder", temp);
+        leftBorder = temp;
+    }
+    {
+        int temp = 0;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("rightBorder", temp);
+        rightBorder = temp;
+    }
+    {
+        int temp = 0;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("topBorder", temp);
+        topBorder = temp;
+    }
+    {
+        int temp = 0;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("bottomBorder", temp);
+        bottomBorder = temp;
+    }
 }

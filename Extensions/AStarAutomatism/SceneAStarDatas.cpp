@@ -32,9 +32,15 @@ freely, subject to the following restrictions:
 #if defined(GD_IDE_ONLY)
 void SceneAStarDatas::SaveToXml(TiXmlElement * elem) const
 {
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("gridWidth", gridWidth);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("gridHeight", gridHeight);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("diagonalMove", diagonalMove);
 }
 #endif
 
 void SceneAStarDatas::LoadFromXml(const TiXmlElement * elem)
 {
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("gridWidth", gridWidth);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("gridHeight", gridHeight);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("diagonalMove", diagonalMove);
 }

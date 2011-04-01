@@ -34,7 +34,6 @@ freely, subject to the following restrictions:
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/statline.h>
-#include <wx/radiobut.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -53,35 +52,22 @@ class AStarAutomatismEditor: public wxDialog
 		virtual ~AStarAutomatismEditor();
 
 		//(*Declarations(AStarAutomatismEditor)
-		wxTextCtrl* scaleYEdit;
-		wxStaticText* StaticText10;
-		wxTextCtrl* gravityXEdit;
-		wxStaticText* StaticText9;
-		wxCheckBox* fixedRotationCheck;
-		wxTextCtrl* frictionEdit;
+		wxButton* OkBt;
 		wxStaticText* StaticText2;
-		wxTextCtrl* restitutionEdit;
-		wxStaticText* StaticText6;
-		wxStaticText* StaticText8;
-		wxStaticText* StaticText11;
-		wxTextCtrl* scaleXEdit;
+		wxTextCtrl* bottomBorderEdit;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
 		wxButton* cancelBt;
-		wxTextCtrl* linearDampingEdit;
+		wxTextCtrl* gridHeightEdit;
+		wxTextCtrl* topBorderEdit;
 		wxStaticText* StaticText5;
-		wxStaticText* StaticText7;
-		wxTextCtrl* angularDampingEdit;
-		wxTextCtrl* gravityYEdit;
 		wxStaticLine* StaticLine1;
-		wxTextCtrl* massDensityEdit;
-		wxRadioButton* rectCheck;
-		wxStaticText* StaticText12;
-		wxCheckBox* bulletCheck;
+		wxTextCtrl* rightBorderEdit;
+		wxTextCtrl* costEdit;
+		wxTextCtrl* gridWidthEdit;
+		wxTextCtrl* leftBorderEdit;
+		wxCheckBox* diagonalMoveCheck;
 		wxStaticText* StaticText4;
-		wxRadioButton* circleCheck;
-		wxButton* okBt;
-		wxCheckBox* staticCheck;
 		//*)
 
 		AStarAutomatism & automatism;
@@ -89,32 +75,19 @@ class AStarAutomatismEditor: public wxDialog
 	protected:
 
 		//(*Identifiers(AStarAutomatismEditor)
-		static const long ID_STATICTEXT11;
-		static const long ID_RADIOBUTTON1;
-		static const long ID_RADIOBUTTON2;
-		static const long ID_CHECKBOX1;
-		static const long ID_CHECKBOX3;
-		static const long ID_CHECKBOX2;
 		static const long ID_STATICTEXT1;
 		static const long ID_TEXTCTRL1;
 		static const long ID_STATICTEXT2;
-		static const long ID_TEXTCTRL2;
-		static const long ID_STATICTEXT12;
-		static const long ID_TEXTCTRL9;
-		static const long ID_STATICTEXT9;
-		static const long ID_TEXTCTRL7;
-		static const long ID_STATICTEXT10;
-		static const long ID_TEXTCTRL8;
-		static const long ID_STATICTEXT3;
-		static const long ID_TEXTCTRL3;
 		static const long ID_STATICTEXT4;
 		static const long ID_TEXTCTRL4;
-		static const long ID_STATICTEXT5;
-		static const long ID_STATICTEXT7;
 		static const long ID_TEXTCTRL5;
-		static const long ID_STATICTEXT6;
 		static const long ID_TEXTCTRL6;
-		static const long ID_STATICTEXT8;
+		static const long ID_TEXTCTRL7;
+		static const long ID_STATICTEXT3;
+		static const long ID_TEXTCTRL2;
+		static const long ID_STATICTEXT5;
+		static const long ID_TEXTCTRL3;
+		static const long ID_CHECKBOX1;
 		static const long ID_STATICLINE1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;

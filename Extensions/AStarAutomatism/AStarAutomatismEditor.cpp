@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 #include "AStarAutomatismEditor.h"
 
 //(*InternalHeaders(AStarAutomatismEditor)
+#include <wx/font.h>
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
@@ -38,32 +39,19 @@ freely, subject to the following restrictions:
 #include "GDL/Scene.h"
 
 //(*IdInit(AStarAutomatismEditor)
-const long AStarAutomatismEditor::ID_STATICTEXT11 = wxNewId();
-const long AStarAutomatismEditor::ID_RADIOBUTTON1 = wxNewId();
-const long AStarAutomatismEditor::ID_RADIOBUTTON2 = wxNewId();
-const long AStarAutomatismEditor::ID_CHECKBOX1 = wxNewId();
-const long AStarAutomatismEditor::ID_CHECKBOX3 = wxNewId();
-const long AStarAutomatismEditor::ID_CHECKBOX2 = wxNewId();
 const long AStarAutomatismEditor::ID_STATICTEXT1 = wxNewId();
 const long AStarAutomatismEditor::ID_TEXTCTRL1 = wxNewId();
 const long AStarAutomatismEditor::ID_STATICTEXT2 = wxNewId();
-const long AStarAutomatismEditor::ID_TEXTCTRL2 = wxNewId();
-const long AStarAutomatismEditor::ID_STATICTEXT12 = wxNewId();
-const long AStarAutomatismEditor::ID_TEXTCTRL9 = wxNewId();
-const long AStarAutomatismEditor::ID_STATICTEXT9 = wxNewId();
-const long AStarAutomatismEditor::ID_TEXTCTRL7 = wxNewId();
-const long AStarAutomatismEditor::ID_STATICTEXT10 = wxNewId();
-const long AStarAutomatismEditor::ID_TEXTCTRL8 = wxNewId();
-const long AStarAutomatismEditor::ID_STATICTEXT3 = wxNewId();
-const long AStarAutomatismEditor::ID_TEXTCTRL3 = wxNewId();
 const long AStarAutomatismEditor::ID_STATICTEXT4 = wxNewId();
 const long AStarAutomatismEditor::ID_TEXTCTRL4 = wxNewId();
-const long AStarAutomatismEditor::ID_STATICTEXT5 = wxNewId();
-const long AStarAutomatismEditor::ID_STATICTEXT7 = wxNewId();
 const long AStarAutomatismEditor::ID_TEXTCTRL5 = wxNewId();
-const long AStarAutomatismEditor::ID_STATICTEXT6 = wxNewId();
 const long AStarAutomatismEditor::ID_TEXTCTRL6 = wxNewId();
-const long AStarAutomatismEditor::ID_STATICTEXT8 = wxNewId();
+const long AStarAutomatismEditor::ID_TEXTCTRL7 = wxNewId();
+const long AStarAutomatismEditor::ID_STATICTEXT3 = wxNewId();
+const long AStarAutomatismEditor::ID_TEXTCTRL2 = wxNewId();
+const long AStarAutomatismEditor::ID_STATICTEXT5 = wxNewId();
+const long AStarAutomatismEditor::ID_TEXTCTRL3 = wxNewId();
+const long AStarAutomatismEditor::ID_CHECKBOX1 = wxNewId();
 const long AStarAutomatismEditor::ID_STATICLINE1 = wxNewId();
 const long AStarAutomatismEditor::ID_BUTTON1 = wxNewId();
 const long AStarAutomatismEditor::ID_BUTTON2 = wxNewId();
@@ -83,126 +71,93 @@ mainEditorCommand(mainEditorCommand_)
 	//(*Initialize(AStarAutomatismEditor)
 	wxStaticBoxSizer* StaticBoxSizer2;
 	wxFlexGridSizer* FlexGridSizer4;
-	wxFlexGridSizer* FlexGridSizer10;
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer5;
-	wxFlexGridSizer* FlexGridSizer9;
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
-	wxFlexGridSizer* FlexGridSizer8;
-	wxBoxSizer* BoxSizer1;
-	wxFlexGridSizer* FlexGridSizer12;
+	wxStaticBoxSizer* StaticBoxSizer3;
+	wxGridSizer* GridSizer1;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
-	wxFlexGridSizer* FlexGridSizer11;
 
-	Create(parent, wxID_ANY, _("Editer l\'automatisme"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Paramétrage de l\'automatisme"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Paramètres initiaux"));
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Paramétrage"));
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer2->AddGrowableCol(0);
-	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticText11 = new wxStaticText(this, ID_STATICTEXT11, _("Forme du masque de collision :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
-	FlexGridSizer5->Add(StaticText11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	rectCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("Rectangle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
-	rectCheck->SetValue(true);
-	FlexGridSizer5->Add(rectCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	circleCheck = new wxRadioButton(this, ID_RADIOBUTTON2, _("Cercle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
-	FlexGridSizer5->Add(circleCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
-	staticCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Objet statique"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
-	staticCheck->SetValue(false);
-	FlexGridSizer11->Add(staticCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	fixedRotationCheck = new wxCheckBox(this, ID_CHECKBOX3, _("Empecher la rotation"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
-	fixedRotationCheck->SetValue(false);
-	FlexGridSizer11->Add(fixedRotationCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(FlexGridSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	bulletCheck = new wxCheckBox(this, ID_CHECKBOX2, _("Assimilable à un projectile ( meilleure gestion de la collision, mais plus lent )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
-	bulletCheck->SetValue(false);
-	FlexGridSizer2->Add(bulletCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer7->AddGrowableCol(1);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Densité de masse :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-	FlexGridSizer7->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	massDensityEdit = new wxTextCtrl(this, ID_TEXTCTRL1, _("1"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-	FlexGridSizer7->Add(massDensityEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer8->AddGrowableCol(1);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Friction :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	FlexGridSizer8->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	frictionEdit = new wxTextCtrl(this, ID_TEXTCTRL2, _("0.8"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
-	FlexGridSizer8->Add(frictionEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer12->AddGrowableCol(1);
-	StaticText12 = new wxStaticText(this, ID_STATICTEXT12, _("Restitution ( Elasticité ) :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT12"));
-	FlexGridSizer12->Add(StaticText12, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	restitutionEdit = new wxTextCtrl(this, ID_TEXTCTRL9, _("0"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL9"));
-	FlexGridSizer12->Add(restitutionEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer9->AddGrowableCol(1);
-	StaticText9 = new wxStaticText(this, ID_STATICTEXT9, _("Amortissement linéaire :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
-	FlexGridSizer9->Add(StaticText9, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	linearDampingEdit = new wxTextCtrl(this, ID_TEXTCTRL7, _("0.1"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
-	FlexGridSizer9->Add(linearDampingEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer10 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer10->AddGrowableCol(1);
-	StaticText10 = new wxStaticText(this, ID_STATICTEXT10, _("Amortissement angulaire :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
-	FlexGridSizer10->Add(StaticText10, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	angularDampingEdit = new wxTextCtrl(this, ID_TEXTCTRL8, _("0.1"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
-	FlexGridSizer10->Add(angularDampingEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer3->AddGrowableCol(1);
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Coût de passage sur l\'objet :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	FlexGridSizer3->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	costEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	FlexGridSizer3->Add(costEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Plus le coût sera elevé, plus les chemins éviteront de passer dessus.\nUn coût de 9 empeche le passage sur l\'objet."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	StaticText2->SetFont(StaticText2Font);
+	FlexGridSizer2->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Bordures supplémentaires"));
+	FlexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer7->AddGrowableCol(0);
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Des cases virtuelles peuvent être rajoutées autour de l\'objet afin\nde mieux éviter celui ci. Entrez ici le nombre de case à rajouter\nsur le haut/bas/gauche/droite de l\'objet."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	FlexGridSizer7->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	GridSizer1 = new wxGridSizer(0, 3, 0, 0);
+	GridSizer1->Add(-1,-1,1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	topBorderEdit = new wxTextCtrl(this, ID_TEXTCTRL4, _("Text"), wxDefaultPosition, wxSize(23,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
+	GridSizer1->Add(topBorderEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	GridSizer1->Add(-1,-1,1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	leftBorderEdit = new wxTextCtrl(this, ID_TEXTCTRL5, _("Text"), wxDefaultPosition, wxSize(23,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
+	GridSizer1->Add(leftBorderEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	GridSizer1->Add(-1,-1,1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	rightBorderEdit = new wxTextCtrl(this, ID_TEXTCTRL6, _("Text"), wxDefaultPosition, wxSize(23,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
+	GridSizer1->Add(rightBorderEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	GridSizer1->Add(-1,-1,1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	bottomBorderEdit = new wxTextCtrl(this, ID_TEXTCTRL7, _("Text"), wxDefaultPosition, wxSize(23,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
+	GridSizer1->Add(bottomBorderEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer7->Add(GridSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer3->Add(FlexGridSizer7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer2->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Paramètres globaux du moteur physique"));
+	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Paramètres globaux de l\'automatisme"));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer4->AddGrowableCol(0);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Coordonnées du vecteur de gravité :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-	FlexGridSizer4->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
-	gravityXEdit = new wxTextCtrl(this, ID_TEXTCTRL3, _("0"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
-	BoxSizer1->Add(gravityXEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _(";"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
-	BoxSizer1->Add(StaticText4, 0, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	gravityYEdit = new wxTextCtrl(this, ID_TEXTCTRL4, _("0"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
-	BoxSizer1->Add(gravityYEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer4->Add(BoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Echelle de taille de la représentation :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
-	FlexGridSizer4->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer6 = new wxFlexGridSizer(0, 5, 0, 0);
-	StaticText7 = new wxStaticText(this, ID_STATICTEXT7, _("1m ="), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
-	FlexGridSizer6->Add(StaticText7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	scaleXEdit = new wxTextCtrl(this, ID_TEXTCTRL5, _("0"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
-	FlexGridSizer6->Add(scaleXEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText6 = new wxStaticText(this, ID_STATICTEXT6, _("en X;"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
-	FlexGridSizer6->Add(StaticText6, 1, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	scaleYEdit = new wxTextCtrl(this, ID_TEXTCTRL6, _("0"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
-	FlexGridSizer6->Add(scaleYEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText8 = new wxStaticText(this, ID_STATICTEXT8, _("en Y"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
-	FlexGridSizer6->Add(StaticText8, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer4->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer2->Add(FlexGridSizer4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer5 = new wxFlexGridSizer(0, 4, 0, 0);
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Taille de la grille virtuelle des chemins ( pixels ) :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	FlexGridSizer5->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	gridWidthEdit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(32,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+	FlexGridSizer5->Add(gridWidthEdit, 1, wxTOP|wxBOTTOM|wxLEFT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("x"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	FlexGridSizer5->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	gridHeightEdit = new wxTextCtrl(this, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxSize(32,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
+	FlexGridSizer5->Add(gridHeightEdit, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	diagonalMoveCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Autoriser les chemins en diagonale"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	diagonalMoveCheck->SetValue(false);
+	FlexGridSizer4->Add(diagonalMoveCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer2->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
-	okBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
-	FlexGridSizer3->Add(okBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cancelBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
-	FlexGridSizer3->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
+	cancelBt = new wxButton(this, ID_BUTTON1, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	FlexGridSizer6->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	OkBt = new wxButton(this, ID_BUTTON2, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	FlexGridSizer6->Add(OkBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
+	Center();
 
-	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&AStarAutomatismEditor::OnokBtClick);
-	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&AStarAutomatismEditor::OncancelBtClick);
+	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&AStarAutomatismEditor::OncancelBtClick);
+	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&AStarAutomatismEditor::OnokBtClick);
 	//*)
+
+	costEdit->SetValue(ToString(automatism.GetCost()));
+	topBorderEdit->SetValue(ToString(automatism.topBorder));
+	bottomBorderEdit->SetValue(ToString(automatism.bottomBorder));
+	rightBorderEdit->SetValue(ToString(automatism.rightBorder));
+	leftBorderEdit->SetValue(ToString(automatism.leftBorder));
 
     //Setup shared datas
 	if ( !scene || scene->automatismsInitialSharedDatas.find(automatism.GetAutomatismId()) == scene->automatismsInitialSharedDatas.end())
@@ -218,6 +173,10 @@ mainEditorCommand(mainEditorCommand_)
 	    wxLogError(_("Impossible d'accéder aux données partagées : Données de mauvais type"));
 	    return;
     }
+
+    gridWidthEdit->SetValue(ToString(sharedDatas->gridWidth));
+    gridHeightEdit->SetValue(ToString(sharedDatas->gridHeight));
+    diagonalMoveCheck->SetValue(sharedDatas->diagonalMove);
 }
 
 AStarAutomatismEditor::~AStarAutomatismEditor()
@@ -234,6 +193,19 @@ void AStarAutomatismEditor::OncancelBtClick(wxCommandEvent& event)
 
 void AStarAutomatismEditor::OnokBtClick(wxCommandEvent& event)
 {
+    automatism.SetCost(ToInt(string(costEdit->GetValue().mb_str())));
+    automatism.topBorder = (ToInt(string(topBorderEdit->GetValue().mb_str())));
+    automatism.bottomBorder = (ToInt(string(bottomBorderEdit->GetValue().mb_str())));
+    automatism.rightBorder = (ToInt(string(rightBorderEdit->GetValue().mb_str())));
+    automatism.leftBorder = (ToInt(string(leftBorderEdit->GetValue().mb_str())));
+
+    if ( sharedDatas )
+    {
+        sharedDatas->gridWidth = ToFloat(string(gridWidthEdit->GetValue().mb_str()));
+        sharedDatas->gridHeight = ToFloat(string(gridHeightEdit->GetValue().mb_str()));
+        sharedDatas->diagonalMove = diagonalMoveCheck->GetValue();
+    }
+
     EndModal(1);
 }
 #endif

@@ -183,7 +183,7 @@ void FileExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int pr
 {
     const std::map < std::string, boost::shared_ptr<XmlFile> > & openedFiles = XmlFilesManager::GetOpenedFilesList();
 
-    unsigned int i;
+    unsigned int i = 0;
     std::map < std::string, boost::shared_ptr<XmlFile> >::const_iterator end = openedFiles.end();
     for (std::map < std::string, boost::shared_ptr<XmlFile> >::const_iterator iter = openedFiles.begin();iter != end;++iter)
     {

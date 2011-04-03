@@ -153,7 +153,7 @@ int main( int argc, char *p_argv[] )
     //Fenêtre de jeu
     sf::RenderWindow window;
     window.SetFramerateLimit( game.maxFPS );
-    window.UseVerticalSync( game.verticalSync );
+    window.EnableVerticalSync( game.verticalSync );
 
     RuntimeScene scenePlayed(&window, &game);
     if ( !scenePlayed.LoadFromScene( *game.scenes[0] ) )

@@ -1,0 +1,26 @@
+/* XPM */
+static const char *print_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"16 15 5 1",
+"  c None",
+". c Black",
+"X c Gray100",
+"o c #808000",
+"O c Yellow",
+/* pixels */
+"                ",
+"     .........  ",
+"    .XXXXXXXX.  ",
+"    .X.....X.   ",
+"   .XXXXXXXX.   ",
+"   .X.....X.... ",
+"  .XXXXXXXX. . .",
+" .......... . ..",
+".          . . .",
+".............  .",
+".      ooo  . . ",
+".      OOO  ... ",
+"............. . ",
+" .         . .  ",
+"  ...........   "
+};

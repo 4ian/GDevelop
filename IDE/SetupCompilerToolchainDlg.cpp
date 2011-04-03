@@ -318,7 +318,13 @@ void SetupCompilerToolchainDlg::OnokBtClick(wxCommandEvent& event)
     wxConfigBase::Get()->Write("sfmlIncludeDir", sfmlDirEdit->GetValue()+"/include/");
     wxConfigBase::Get()->Write("boostIncludeDir", boostDirEdit->GetValue()+"/");
     wxConfigBase::Get()->Write("gdlIncludeDir", gdlDirEdit->GetValue()+"/GDL/");
-    wxConfigBase::Get()->Write("gdlLibDir", gdlDirEdit->GetValue()+"/IDE/bin/dev"); //TODO : Adapt
+    #if defined(RELEASE)
+    wxConfigBase::Get()->Write("gdlLibDir", gdlDirEdit->GetValue()+"/IDE/bin/release");
+    #elif defined(DEV)
+    wxConfigBase::Get()->Write("gdlLibDir", gdlDirEdit->GetValue()+"/IDE/bin/dev");
+    #elif defined(DEBUG)
+    wxConfigBase::Get()->Write("gdlLibDir", gdlDirEdit->GetValue()+"/IDE/bin/debug");
+    #endif
 
     std::string report;
     CompilerToolchainPathManager pathManager;

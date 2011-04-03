@@ -34,29 +34,29 @@
 	<File name="CheckMAJ.h" open="0" top="0" tabpos="16">
 		<Cursor position="300" topLine="0" />
 	</File>
-	<File name="ChoiceFile.cpp" open="1" top="0" tabpos="4">
+	<File name="ChoiceFile.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="4110" topLine="65" />
 	</File>
-	<File name="ChoiceFile.h" open="1" top="0" tabpos="3">
+	<File name="ChoiceFile.h" open="0" top="0" tabpos="3">
 		<Cursor position="1389" topLine="38" />
 	</File>
-	<File name="ChoiceJoyAxis.cpp" open="1" top="0" tabpos="2">
+	<File name="ChoiceJoyAxis.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="4080" topLine="77" />
 	</File>
-	<File name="ChoiceJoyAxis.h" open="1" top="0" tabpos="1">
+	<File name="ChoiceJoyAxis.h" open="0" top="0" tabpos="1">
 		<Cursor position="363" topLine="7" />
 	</File>
-	<File name="ChoixAction.cpp" open="0" top="0" tabpos="22">
-		<Cursor position="35344" topLine="655" />
+	<File name="ChoixAction.cpp" open="0" top="0" tabpos="18">
+		<Cursor position="31701" topLine="580" />
 	</File>
-	<File name="ChoixAction.h" open="1" top="1" tabpos="17">
-		<Cursor position="2938" topLine="93" />
+	<File name="ChoixAction.h" open="0" top="0" tabpos="17">
+		<Cursor position="2854" topLine="93" />
 	</File>
-	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="12">
-		<Cursor position="42898" topLine="823" />
+	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="19">
+		<Cursor position="38280" topLine="697" />
 	</File>
-	<File name="ChoixCondition.h" open="0" top="0" tabpos="0">
-		<Cursor position="692" topLine="17" />
+	<File name="ChoixCondition.h" open="0" top="0" tabpos="20">
+		<Cursor position="2144" topLine="71" />
 	</File>
 	<File name="ChoixTemplateEvent.cpp" open="0" top="0" tabpos="26">
 		<Cursor position="19130" topLine="353" />
@@ -70,14 +70,14 @@
 	<File name="Clipboard.h" open="0" top="0" tabpos="28">
 		<Cursor position="367" topLine="0" />
 	</File>
-	<File name="CodeEditor.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="13301" topLine="268" />
+	<File name="CodeEditor.cpp" open="1" top="1" tabpos="8">
+		<Cursor position="5587" topLine="110" />
 	</File>
-	<File name="CodeEditor.h" open="0" top="0" tabpos="11">
-		<Cursor position="2503" topLine="62" />
+	<File name="CodeEditor.h" open="1" top="0" tabpos="9">
+		<Cursor position="725" topLine="17" />
 	</File>
 	<File name="Compilation.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="20690" topLine="351" />
+		<Cursor position="25385" topLine="467" />
 	</File>
 	<File name="Compilation.h" open="0" top="0" tabpos="5">
 		<Cursor position="2981" topLine="92" />
@@ -148,7 +148,7 @@
 	<File name="DndTextObjectsEditor.cpp" open="0" top="0" tabpos="12">
 		<Cursor position="294" topLine="0" />
 	</File>
-	<File name="DndTextSceneEditor.cpp" open="1" top="0" tabpos="11">
+	<File name="DndTextSceneEditor.cpp" open="0" top="0" tabpos="11">
 		<Cursor position="431" topLine="0" />
 	</File>
 	<File name="EditLayer.cpp" open="0" top="0" tabpos="8">
@@ -187,7 +187,7 @@
 	<File name="EditorEventsConditions.cpp" open="0" top="0" tabpos="37">
 		<Cursor position="3119" topLine="60" />
 	</File>
-	<File name="EditorLayers.cpp" open="1" top="0" tabpos="12">
+	<File name="EditorLayers.cpp" open="0" top="0" tabpos="12">
 		<Cursor position="18347" topLine="472" />
 	</File>
 	<File name="EditorLayers.h" open="0" top="0" tabpos="8">
@@ -211,7 +211,7 @@
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1">
 		<Cursor position="248" topLine="0" />
 	</File>
-	<File name="EditorScene.cpp" open="1" top="0" tabpos="13">
+	<File name="EditorScene.cpp" open="0" top="0" tabpos="13">
 		<Cursor position="11179" topLine="200" />
 	</File>
 	<File name="EditorScene.h" open="0" top="0" tabpos="11">
@@ -229,8 +229,8 @@
 	<File name="ExecutableIconChanger.h" open="0" top="0" tabpos="2">
 		<Cursor position="210" topLine="0" />
 	</File>
-	<File name="Extensions.cpp" open="0" top="0" tabpos="22">
-		<Cursor position="11856" topLine="186" />
+	<File name="Extensions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="13578" topLine="241" />
 	</File>
 	<File name="Extensions.h" open="0" top="0" tabpos="2">
 		<Cursor position="593" topLine="0" />
@@ -277,7 +277,7 @@
 	<File name="ImportImage.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="29085" topLine="431" />
 	</File>
-	<File name="InitialPositionBrowserDlg.cpp" open="1" top="0" tabpos="14">
+	<File name="InitialPositionBrowserDlg.cpp" open="0" top="0" tabpos="14">
 		<Cursor position="3877" topLine="74" />
 	</File>
 	<File name="InitialPositionBrowserDlg.h" open="0" top="0" tabpos="13">
@@ -331,20 +331,20 @@
 	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="50">
 		<Cursor position="2663" topLine="83" />
 	</File>
-	<File name="Portable.cpp" open="1" top="0" tabpos="8">
+	<File name="Portable.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="6103" topLine="126" />
 	</File>
 	<File name="Preferences.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="51234" topLine="938" />
 	</File>
-	<File name="ProfileDlg.cpp" open="1" top="0" tabpos="6">
+	<File name="ProfileDlg.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="13732" topLine="234" />
 	</File>
-	<File name="ProfileDlg.h" open="1" top="0" tabpos="5">
+	<File name="ProfileDlg.h" open="0" top="0" tabpos="5">
 		<Cursor position="2427" topLine="65" />
 	</File>
 	<File name="ProjectManager.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="309" topLine="3" />
+		<Cursor position="22890" topLine="321" />
 	</File>
 	<File name="ProjectManager.h" open="0" top="0" tabpos="8">
 		<Cursor position="984" topLine="23" />
@@ -355,17 +355,17 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="510" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="9">
-		<Cursor position="35222" topLine="782" />
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="4631" topLine="103" />
 	</File>
-	<File name="SceneCanvas.h" open="1" top="0" tabpos="10">
+	<File name="SceneCanvas.h" open="0" top="0" tabpos="10">
 		<Cursor position="3692" topLine="88" />
 	</File>
-	<File name="SceneEdittimeRenderer.cpp" open="1" top="0" tabpos="16">
-		<Cursor position="9180" topLine="181" />
+	<File name="SceneEdittimeRenderer.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="627" topLine="7" />
 	</File>
-	<File name="SceneEdittimeRenderer.h" open="1" top="0" tabpos="15">
-		<Cursor position="1812" topLine="41" />
+	<File name="SceneEdittimeRenderer.h" open="1" top="0" tabpos="5">
+		<Cursor position="1793" topLine="40" />
 	</File>
 	<File name="SearchEvents.cpp" open="0" top="0" tabpos="53">
 		<Cursor position="16244" topLine="264" />
@@ -373,8 +373,8 @@
 	<File name="SearchEvents.h" open="0" top="0" tabpos="7">
 		<Cursor position="2675" topLine="22" />
 	</File>
-	<File name="SetupCompilerToolchainDlg.cpp" open="0" top="0" tabpos="12">
-		<Cursor position="24625" topLine="304" />
+	<File name="SetupCompilerToolchainDlg.cpp" open="0" top="0" tabpos="21">
+		<Cursor position="24673" topLine="312" />
 	</File>
 	<File name="SplashScreen.cpp" open="0" top="0" tabpos="19">
 		<Cursor position="1863" topLine="65" />
@@ -417,5 +417,26 @@
 	</File>
 	<File name="wxSFMLCanvas.hpp" open="0" top="0" tabpos="8">
 		<Cursor position="240" topLine="18" />
+	</File>
+	<File name="wxstedit\include\wx\stedit\stedefs.h" open="0" top="0" tabpos="0">
+		<Cursor position="14024" topLine="70" />
+	</File>
+	<File name="wxstedit\include\wx\stedit\stedlgs.h" open="1" top="0" tabpos="28">
+		<Cursor position="513" topLine="0" />
+	</File>
+	<File name="wxstedit\include\wx\stedit\steopts.h" open="1" top="0" tabpos="27">
+		<Cursor position="560" topLine="3" />
+	</File>
+	<File name="wxstedit\src\stedit.cpp" open="0" top="0" tabpos="28">
+		<Cursor position="97720" topLine="2846" />
+	</File>
+	<File name="wxstedit\src\stedlgs.cpp" open="0" top="0" tabpos="27">
+		<Cursor position="27009" topLine="637" />
+	</File>
+	<File name="wxstedit\src\steexprt.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="23713" topLine="566" />
+	</File>
+	<File name="wxstedit\src\stemenum.cpp" open="1" top="0" tabpos="29">
+		<Cursor position="39451" topLine="922" />
 	</File>
 </CodeBlocks_layout_file>

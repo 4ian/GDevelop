@@ -32,9 +32,6 @@ using namespace std;
 const long Demarrage::ID_STATICTEXT1 = wxNewId();
 const long Demarrage::ID_CHECKBOX1 = wxNewId();
 const long Demarrage::ID_STATICBITMAP3 = wxNewId();
-const long Demarrage::ID_STATICTEXT6 = wxNewId();
-const long Demarrage::ID_CHECKBOX2 = wxNewId();
-const long Demarrage::ID_STATICBITMAP4 = wxNewId();
 const long Demarrage::ID_BUTTON7 = wxNewId();
 const long Demarrage::ID_PANEL2 = wxNewId();
 const long Demarrage::ID_STATICTEXT7 = wxNewId();
@@ -74,7 +71,6 @@ Demarrage::Demarrage(wxWindow* parent)
 	wxFlexGridSizer* FlexGridSizer12;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
-	wxFlexGridSizer* FlexGridSizer11;
 
 	Create(parent, wxID_ANY, _("Premier démarrage de Game Develop"), wxDefaultPosition, wxDefaultSize, wxCAPTION|wxSYSTEM_MENU, _T("wxID_ANY"));
 	SetClientSize(wxSize(662,325));
@@ -130,15 +126,6 @@ Demarrage::Demarrage(wxWindow* parent)
 	FlexGridSizer9->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel2, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/maj.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP3"));
 	FlexGridSizer9->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer11 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticText6 = new wxStaticText(Panel2, ID_STATICTEXT6, _("Si vous débutez, en plus des guides et tutoriels ( voir page suivante ), vous pouvez\nactiver le mode simple. Celui ci désactive certaines options de Game Develop qui ne\nsont pas utiles au débutant, afin d\'éviter de vous perdre dans des fonctionnalités\nqui n\'ont pas d\'intêret à ce stade.\nVous pourrez désactiver ce mode en allant dans le menu Outils > Mode Simple."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
-	FlexGridSizer11->Add(StaticText6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	simpleCheck = new wxCheckBox(Panel2, ID_CHECKBOX2, _("Activer le mode Simple"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
-	simpleCheck->SetValue(false);
-	FlexGridSizer11->Add(simpleCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer9->Add(FlexGridSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBitmap4 = new wxStaticBitmap(Panel2, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/modesimple.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP4"));
-	FlexGridSizer9->Add(StaticBitmap4, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer8->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button2 = new wxButton(Panel2, ID_BUTTON7, _("Suivant"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
 	FlexGridSizer8->Add(Button2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);

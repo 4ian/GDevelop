@@ -27,12 +27,9 @@ class Demarrage: public wxDialog
 		wxStaticText* StaticText2;
 		wxButton* FermerBt;
 		wxButton* TutorielBt;
-		wxCheckBox* simpleCheck;
 		wxButton* Button1;
-		wxStaticText* StaticText6;
 		wxStaticBitmap* StaticBitmap1;
 		wxStaticText* StaticText8;
-		wxStaticBitmap* StaticBitmap4;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
@@ -62,9 +59,6 @@ class Demarrage: public wxDialog
 		static const long ID_STATICTEXT1;
 		static const long ID_CHECKBOX1;
 		static const long ID_STATICBITMAP3;
-		static const long ID_STATICTEXT6;
-		static const long ID_CHECKBOX2;
-		static const long ID_STATICBITMAP4;
 		static const long ID_BUTTON7;
 		static const long ID_PANEL2;
 		static const long ID_STATICTEXT7;

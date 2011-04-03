@@ -1,0 +1,952 @@
+EXPORTS
+    STE_DefaultFileExtensions @1 DATA
+    STE_DefaultFileName @2 DATA
+    _ZN10wxSTEditor10FindStringERK8wxStringiiiiPiS3_ @3
+    _ZN10wxSTEditor10GetOptionsEv @4
+    _ZN10wxSTEditor10OnSTEFocusER15wxSTEditorEvent @5
+    _ZN10wxSTEditor10OnSTEStateER15wxSTEditorEvent @6
+    _ZN10wxSTEditor10OnSetFocusER12wxFocusEvent @7
+    _ZN10wxSTEditor10SetOptionsERK17wxSTEditorOptions @8
+    _ZN10wxSTEditor11GetEOLCountEPiS0_S0_S0_ @9
+    _ZN10wxSTEditor11GetLineTextEi @10
+    _ZN10wxSTEditor11OnScrollWinER16wxScrollWinEvent @11
+    _ZN10wxSTEditor11SetFileNameERK8wxStringb @12
+    _ZN10wxSTEditor11SetLanguageERK8wxString @13
+    _ZN10wxSTEditor11SetLanguageEi @14
+    _ZN10wxSTEditor11SetLineTextEiRK8wxStringb @15
+    _ZN10wxSTEditor11UpdateCanDoEb @16
+    _ZN10wxSTEditor11UpdateItemsEP6wxMenuP9wxMenuBarP9wxToolBar @17
+    _ZN10wxSTEditor12DiscardEditsEv @18
+    _ZN10wxSTEditor12DoBraceMatchEv @19
+    _ZN10wxSTEditor12GetEOLStringEi @20
+    _ZN10wxSTEditor12GetWordCountEii20STE_TranslatePosType @21
+    _ZN10wxSTEditor12OnFindDialogER17wxFindDialogEvent @22
+    _ZN10wxSTEditor12OnMouseWheelER12wxMouseEvent @23
+    _ZN10wxSTEditor12PositionToXYElPlS0_ @24
+    _ZN10wxSTEditor12SetFindFlagsElb @25
+    _ZN10wxSTEditor12SetIndicatorEiii @26
+    _ZN10wxSTEditor12TranslatePosEiiPiS0_20STE_TranslatePosType @27
+    _ZN10wxSTEditor12ms_classInfoE @28 DATA
+    _ZN10wxSTEditor13CreateOptionsERK17wxSTEditorOptions @29
+    _ZN10wxSTEditor13GetLineLengthEi @30
+    _ZN10wxSTEditor13GetTargetTextEv @31
+    _ZN10wxSTEditor13OnSTCUpdateUIER17wxStyledTextEvent @32
+    _ZN10wxSTEditor13RegisterLangsERK15wxSTEditorLangs @33
+    _ZN10wxSTEditor13RegisterPrefsERK15wxSTEditorPrefs @34
+    _ZN10wxSTEditor13SetFindStringERK8wxStringb @35
+    _ZN10wxSTEditor13SetTreeItemIdERK12wxTreeItemId @36
+    _ZN10wxSTEditor13sm_eventTableE @37 DATA
+    _ZN10wxSTEditor14ClearIndicatorEii @38
+    _ZN10wxSTEditor14FindAllStringsERK8wxStringiP10wxArrayIntS4_ @39
+    _ZN10wxSTEditor14GetCaretInLineEv @40
+    _ZN10wxSTEditor14GetEditorLangsEv @41
+    _ZN10wxSTEditor14GetEditorPrefsEv @42
+    _ZN10wxSTEditor14OnSTCCharAddedER17wxStyledTextEvent @43
+    _ZN10wxSTEditor14RegisterStylesERK16wxSTEditorStyles @44
+    _ZN10wxSTEditor14SetIndentationEiii20STE_TranslatePosType @45
+    _ZN10wxSTEditor14TranslateLinesEiiPiS0_20STE_TranslatePosType @46
+    _ZN10wxSTEditor14UpdateAllItemsEv @47
+    _ZN10wxSTEditor14wxCreateObjectEv @48
+    _ZN10wxSTEditor15ClearIndicationEii @49
+    _ZN10wxSTEditor15GetEditorStylesEv @50
+    _ZN10wxSTEditor15HandleMenuEventER14wxCommandEvent @51
+    _ZN10wxSTEditor15InsertTextAtColEiRK8wxStringii @52
+    _ZN10wxSTEditor15IsAlteredOnDiskEb @53
+    _ZN10wxSTEditor15LoadInputStreamER13wxInputStreamRK8wxStringi @54
+    _ZN10wxSTEditor15ShowPrintDialogEv @55
+    _ZN10wxSTEditor16OnSTCMarginClickER17wxStyledTextEvent @56
+    _ZN10wxSTEditor16PasteRectangularERK8wxStringi @57
+    _ZN10wxSTEditor16PasteRectangularEv @58
+    _ZN10wxSTEditor16SetSendSTEEventsEb @59
+    _ZN10wxSTEditor16ShowExportDialogEv @60
+    _ZN10wxSTEditor16ToggleFoldAtLineEi @61
+    _ZN10wxSTEditor17AppendTextGotoEndERK8wxStringb @62
+    _ZN10wxSTEditor17GetWordArrayCountERK8wxStringRK13wxArrayStringR10wxArrayIntb @63
+    _ZN10wxSTEditor17OnSTCMarginDClickER17wxStyledTextEvent @64
+    _ZN10wxSTEditor17ReplaceAllStringsERK8wxStringS2_i @65
+    _ZN10wxSTEditor17ShowSetZoomDialogEv @66
+    _ZN10wxSTEditor17StartAutoCompleteEv @67
+    _ZN10wxSTEditor17sm_eventHashTableE @68 DATA
+    _ZN10wxSTEditor18ClearAllIndicatorsEi @69
+    _ZN10wxSTEditor18ExpandFoldsToLevelEib @70
+    _ZN10wxSTEditor18IndicateAllStringsERK8wxStringii @71
+    _ZN10wxSTEditor18ShowGotoLineDialogEv @72
+    _ZN10wxSTEditor19ConvertTabsToSpacesEbii20STE_TranslatePosType @73
+    _ZN10wxSTEditor19QuerySaveIfModifiedEbi @74
+    _ZN10wxSTEditor19ShowColumnizeDialogEv @75
+    _ZN10wxSTEditor20RemoveCharsAroundPosEiRK8wxString @76
+    _ZN10wxSTEditor20SetInsertionPointEndEv @77
+    _ZN10wxSTEditor20ShowInsertTextDialogEv @78
+    _ZN10wxSTEditor20ShowPrintSetupDialogEv @79
+    _ZN10wxSTEditor20ShowPropertiesDialogEv @80
+    _ZN10wxSTEditor20sm_eventTableEntriesE @81 DATA
+    _ZN10wxSTEditor21HandleFindDialogEventER17wxFindDialogEvent @82
+    _ZN10wxSTEditor21SelectionIsFindStringERK8wxStringi @83
+    _ZN10wxSTEditor21ShowFindReplaceDialogEbb @84
+    _ZN10wxSTEditor21StartAutoCompleteWordEbb @85
+    _ZN10wxSTEditor22ShowPrintOptionsDialogEv @86
+    _ZN10wxSTEditor22ShowPrintPreviewDialogEv @87
+    _ZN10wxSTEditor23GetAutoCompleteKeyWordsERK8wxString @88
+    _ZN10wxSTEditor23ResetLastAutoIndentLineEv @89
+    _ZN10wxSTEditor23SetFileModificationTimeERK10wxDateTime @90
+    _ZN10wxSTEditor24GetLongestLinePixelWidthEii @91
+    _ZN10wxSTEditor24RemoveTrailingWhitespaceEii @92
+    _ZN10wxSTEditor24ShowConvertEOLModeDialogEv @93
+    _ZN10wxSTEditor24ShowPrintPageSetupDialogEv @94
+    _ZN10wxSTEditor25DoGetAutoCompleteKeyWordsERK8wxStringR13wxArrayString @95
+    _ZN10wxSTEditor27DoFindMatchingBracePositionERiS0_b @96
+    _ZN10wxSTEditor27IsLinePreprocessorConditionERK8wxString @97
+    _ZN10wxSTEditor31FindMatchingPreprocCondPositionEbRiS0_ @98
+    _ZN10wxSTEditor33FindMatchingPreprocessorConditionERiiii @99
+    _ZN10wxSTEditor4InitEv @100
+    _ZN10wxSTEditor6CreateEP8wxWindowiRK7wxPointRK6wxSizelRK8wxString @101
+    _ZN10wxSTEditor6OnMenuER14wxCommandEvent @102
+    _ZN10wxSTEditor7DestroyEv @103
+    _ZN10wxSTEditor7NewFileERK8wxString @104
+    _ZN10wxSTEditor7OnKeyUpER10wxKeyEvent @105
+    _ZN10wxSTEditor8LoadFileERK8wxStringS2_ @106
+    _ZN10wxSTEditor8OnScrollER13wxScrollEvent @107
+    _ZN10wxSTEditor8SaveFileEbRK8wxString @108
+    _ZN10wxSTEditor9ColumnizeEiiRK8wxStringS2_S2_S2_ @109
+    _ZN10wxSTEditor9OnKeyDownER10wxKeyEvent @110
+    _ZN10wxSTEditor9OnRightUpER12wxMouseEvent @111
+    _ZN10wxSTEditor9RefEditorEPS_ @112
+    _ZN10wxSTEditor9SendEventEiilRK8wxString @113
+    _ZN10wxSTEditor9WriteTextERK8wxString @114
+    _ZN10wxSTEditorC1EP8wxWindowiRK7wxPointRK6wxSizelRK8wxString @115
+    _ZN10wxSTEditorC2EP8wxWindowiRK7wxPointRK6wxSizelRK8wxString @116
+    _ZN10wxSTEditorD0Ev @117
+    _ZN10wxSTEditorD1Ev @118
+    _ZN10wxSTEditorD2Ev @119
+    _ZN15wxSTEditorEvent12ms_classInfoE @120 DATA
+    _ZN15wxSTEditorEvent14wxCreateObjectEv @121
+    _ZN15wxSTEditorEventC1EiiP8wxObjectiiRK8wxString @122
+    _ZN15wxSTEditorEventC2EiiP8wxObjectiiRK8wxString @123
+    _ZN15wxSTEditorFrame10LoadConfigER12wxConfigBaseRK8wxString @124
+    _ZN15wxSTEditorFrame10OnMenuOpenER11wxMenuEvent @125
+    _ZN15wxSTEditorFrame10OnSTEStateER15wxSTEditorEvent @126
+    _ZN15wxSTEditorFrame10SaveConfigER12wxConfigBaseRK8wxString @127
+    _ZN15wxSTEditorFrame11UpdateItemsEP6wxMenuP9wxMenuBarP9wxToolBar @128
+    _ZN15wxSTEditorFrame12OnSTECreatedER14wxCommandEvent @129
+    _ZN15wxSTEditorFrame12ms_classInfoE @130 DATA
+    _ZN15wxSTEditorFrame13CreateOptionsERK17wxSTEditorOptions @131
+    _ZN15wxSTEditorFrame13OnSTCUpdateUIER17wxStyledTextEvent @132
+    _ZN15wxSTEditorFrame13sm_eventTableE @133 DATA
+    _ZN15wxSTEditorFrame14OnFileTreeCtrlER11wxTreeEvent @134
+    _ZN15wxSTEditorFrame14OnSTEPopupMenuER15wxSTEditorEvent @135
+    _ZN15wxSTEditorFrame14UpdateAllItemsEv @136
+    _ZN15wxSTEditorFrame14wxCreateObjectEv @137
+    _ZN15wxSTEditorFrame15HandleMenuEventER14wxCommandEvent @138
+    _ZN15wxSTEditorFrame15ShowAboutDialogEv @139
+    _ZN15wxSTEditorFrame16SetSendSTEEventsEb @140
+    _ZN15wxSTEditorFrame17sm_eventHashTableE @141 DATA
+    _ZN15wxSTEditorFrame18UpdateFileTreeCtrlEv @142
+    _ZN15wxSTEditorFrame20sm_eventTableEntriesE @143 DATA
+    _ZN15wxSTEditorFrame21OnNotebookPageChangedER15wxBookCtrlEvent @144
+    _ZN15wxSTEditorFrame4InitEv @145
+    _ZN15wxSTEditorFrame6CreateEP8wxWindowiRK8wxStringRK7wxPointRK6wxSizelS4_ @146
+    _ZN15wxSTEditorFrame6OnMenuER14wxCommandEvent @147
+    _ZN15wxSTEditorFrame7DestroyEv @148
+    _ZN15wxSTEditorFrame7OnCloseER12wxCloseEvent @149
+    _ZN15wxSTEditorFrameD0Ev @150
+    _ZN15wxSTEditorFrameD1Ev @151
+    _ZN15wxSTEditorFrameD2Ev @152
+    _ZN15wxSTEditorLangs10LoadConfigER12wxConfigBaseRK8wxString @153
+    _ZN15wxSTEditorLangs11AddLanguageEP12STE_Language @154
+    _ZN15wxSTEditorLangs11SetSTEStyleEjji @155
+    _ZN15wxSTEditorLangs12UpdateEditorEP10wxSTEditor @156
+    _ZN15wxSTEditorLangs12ms_classInfoE @157 DATA
+    _ZN15wxSTEditorLangs14wxCreateObjectEv @158
+    _ZN15wxSTEditorLangs15SetUserKeyWordsEjjRK8wxString @159
+    _ZN15wxSTEditorLangs15SetUserSTEStyleEjji @160
+    _ZN15wxSTEditorLangs18SetUserFilePatternEjRK8wxString @161
+    _ZN15wxSTEditorLangs20GetGlobalEditorLangsEv @162
+    _ZN15wxSTEditorLangs4CopyERKS_ @163
+    _ZN15wxSTEditorLangs5ResetEv @164
+    _ZN15wxSTEditorLangs6CreateERKS_ @165
+    _ZN15wxSTEditorLangs6CreateEv @166
+    _ZN15wxSTEditorLangsC1Eb @167
+    _ZN15wxSTEditorLangsD0Ev @168
+    _ZN15wxSTEditorLangsD1Ev @169
+    _ZN15wxSTEditorPrefs10LoadConfigER12wxConfigBaseRK8wxString @170
+    _ZN15wxSTEditorPrefs10SetPrefIntEjib @171
+    _ZN15wxSTEditorPrefs11SetPrefNameEjRK8wxString @172
+    _ZN15wxSTEditorPrefs12SetPrefFlagsEji @173
+    _ZN15wxSTEditorPrefs12UpdateEditorEP10wxSTEditor @174
+    _ZN15wxSTEditorPrefs12ms_classInfoE @175 DATA
+    _ZN15wxSTEditorPrefs14wxCreateObjectEv @176
+    _ZN15wxSTEditorPrefs19UpdateMenuToolItemsEP6wxMenuP9wxMenuBarP9wxToolBar @177
+    _ZN15wxSTEditorPrefs20GetGlobalEditorPrefsEv @178
+    _ZN15wxSTEditorPrefs4CopyERKS_ @179
+    _ZN15wxSTEditorPrefs4InitEv @180
+    _ZN15wxSTEditorPrefs5ResetEv @181
+    _ZN15wxSTEditorPrefs6CreateEP10wxSTEditor @182
+    _ZN15wxSTEditorPrefs6CreateERKS_ @183
+    _ZN15wxSTEditorPrefs6CreateEv @184
+    _ZN15wxSTEditorPrefs7SetPrefEjRK8wxStringb @185
+    _ZN15wxSTEditorPrefsC1Eb @186
+    _ZN15wxSTEditorPrefsD0Ev @187
+    _ZN15wxSTEditorPrefsD1Ev @188
+    _ZN15wxSTEditorShell10AppendTextERK8wxString @189
+    _ZN15wxSTEditorShell11CheckPromptEb @190
+    _ZN15wxSTEditorShell11SetMaxLinesEii @191
+    _ZN15wxSTEditorShell12EndWriteableEb @192
+    _ZN15wxSTEditorShell12ms_classInfoE @193 DATA
+    _ZN15wxSTEditorShell13CheckReadOnlyEb @194
+    _ZN15wxSTEditorShell13GetPromptLineEv @195
+    _ZN15wxSTEditorShell13GetPromptTextEv @196
+    _ZN15wxSTEditorShell13OnSTCUpdateUIER17wxStyledTextEvent @197
+    _ZN15wxSTEditorShell13SetPromptTextERK8wxString @198
+    _ZN15wxSTEditorShell13sm_eventTableE @199 DATA
+    _ZN15wxSTEditorShell14AddHistoryLineERK8wxStringb @200
+    _ZN15wxSTEditorShell14BeginWriteableEb @201
+    _ZN15wxSTEditorShell17CaretOnPromptLineE17STE_CaretPos_Type @202
+    _ZN15wxSTEditorShell17sm_eventHashTableE @203 DATA
+    _ZN15wxSTEditorShell18GetNextHistoryLineEbRK8wxString @204
+    _ZN15wxSTEditorShell18SetMaxHistoryLinesEi @205
+    _ZN15wxSTEditorShell20sm_eventTableEntriesE @206 DATA
+    _ZN15wxSTEditorShell4InitEv @207
+    _ZN15wxSTEditorShell6CreateEP8wxWindowiRK7wxPointRK6wxSizelRK8wxString @208
+    _ZN15wxSTEditorShell9OnKeyDownER10wxKeyEvent @209
+    _ZN15wxSTEditorShellD0Ev @210
+    _ZN15wxSTEditorShellD1Ev @211
+    _ZN15wxSTEditorShellD2Ev @212
+    _ZN15wxSTEditorStyleC1ERK8wxStringiiS2_iiii @213
+    _ZN16wxSTEditorStyles10LoadConfigER12wxConfigBaseRK8wxString @214
+    _ZN16wxSTEditorStyles11RemoveStyleEi @215
+    _ZN16wxSTEditorStyles11SetFaceNameEiRK8wxString @216
+    _ZN16wxSTEditorStyles11SetFontAttrEii @217
+    _ZN16wxSTEditorStyles12UpdateEditorEP10wxSTEditor @218
+    _ZN16wxSTEditorStyles12ms_classInfoE @219 DATA
+    _ZN16wxSTEditorStyles13SetUnderlinedEib @220
+    _ZN16wxSTEditorStyles13SetUseDefaultEiib @221
+    _ZN16wxSTEditorStyles14wxCreateObjectEv @222
+    _ZN16wxSTEditorStyles15ParseConfigLineERK8wxStringS2_ @223
+    _ZN16wxSTEditorStyles15SetMarkerSymbolEii @224
+    _ZN16wxSTEditorStyles17SetIndicatorStyleEii @225
+    _ZN16wxSTEditorStyles18SetFoldMarkerStyleEi @226
+    _ZN16wxSTEditorStyles19SetMarkerBackgroundEiRK8wxColour @227
+    _ZN16wxSTEditorStyles19SetMarkerForegroundEiRK8wxColour @228
+    _ZN16wxSTEditorStyles21AppendAddedInitStylesEv @229
+    _ZN16wxSTEditorStyles21GetGlobalEditorStylesEv @230
+    _ZN16wxSTEditorStyles22SetBackgroundColourIntEii @231
+    _ZN16wxSTEditorStyles22SetForegroundColourIntEii @232
+    _ZN16wxSTEditorStyles4CopyERKS_ @233
+    _ZN16wxSTEditorStyles4InitEv @234
+    _ZN16wxSTEditorStyles5ResetEv @235
+    _ZN16wxSTEditorStyles6CreateERKS_ @236
+    _ZN16wxSTEditorStyles6CreateEv @237
+    _ZN16wxSTEditorStyles7SetCaseEii @238
+    _ZN16wxSTEditorStyles7SetFontEiRK6wxFont @239
+    _ZN16wxSTEditorStyles7SetSizeEii @240
+    _ZN16wxSTEditorStyles8SetStyleEiRK15wxSTEditorStyle @241
+    _ZN16wxSTEditorStyles9SetMarkerEiiRK8wxColourS2_ @242
+    _ZN16wxSTEditorStylesC1Eb @243
+    _ZN16wxSTEditorStylesD0Ev @244
+    _ZN16wxSTEditorStylesD1Ev @245
+    _ZN17wxSTEditorOptions10LoadConfigER12wxConfigBase @246
+    _ZN17wxSTEditorOptions10SaveConfigER12wxConfigBase @247
+    _ZN17wxSTEditorOptions10SetMenuBarEP9wxMenuBar @248
+    _ZN17wxSTEditorOptions10SetToolBarEP9wxToolBar @249
+    _ZN17wxSTEditorOptions12SetOptionIntEji @250
+    _ZN17wxSTEditorOptions12SetStatusBarEP11wxStatusBar @251
+    _ZN17wxSTEditorOptions13FixConfigPathERK8wxStringb @252
+    _ZN17wxSTEditorOptions13SetClientDataEPv @253
+    _ZN17wxSTEditorOptions13SetOptionNameEjRK8wxString @254
+    _ZN17wxSTEditorOptions14LoadFileConfigER12wxConfigBase @255
+    _ZN17wxSTEditorOptions14SaveFileConfigER12wxConfigBase @256
+    _ZN17wxSTEditorOptions14SetEditorLangsERK15wxSTEditorLangs @257
+    _ZN17wxSTEditorOptions14SetEditorPrefsERK15wxSTEditorPrefs @258
+    _ZN17wxSTEditorOptions14SetFileHistoryEP13wxFileHistoryb @259
+    _ZN17wxSTEditorOptions14SetMenuManagerEP21wxSTEditorMenuManagerb @260
+    _ZN17wxSTEditorOptions15SetClientObjectEP12wxClientData @261
+    _ZN17wxSTEditorOptions15SetEditorStylesERK16wxSTEditorStyles @262
+    _ZN17wxSTEditorOptions18SetEditorPopupMenuEP6wxMenub @263
+    _ZN17wxSTEditorOptions18SetFindReplaceDataEP25wxSTEditorFindReplaceDatab @264
+    _ZN17wxSTEditorOptions20SetNotebookPopupMenuEP6wxMenub @265
+    _ZN17wxSTEditorOptions20SetSplitterPopupMenuEP6wxMenub @266
+    _ZN17wxSTEditorOptions28SetUseGlobalPrefsStylesLangsEv @267
+    _ZN17wxSTEditorOptions9AddOptionERK8wxStringS2_ @268
+    _ZN17wxSTEditorOptions9SetOptionEjRK8wxString @269
+    _ZN17wxSTEditorOptionsC1ElllllRK8wxStringS2_S2_ @270
+    _ZN17wxSTEditorOptionsC1Ev @271
+    _ZN17wxSTEditorOptionsC2ElllllRK8wxStringS2_S2_ @272
+    _ZN17wxSTEditorOptionsC2Ev @273
+    _ZN17wxSTEditorRefDataC1Ev @274
+    _ZN17wxSTEditorRefDataC2Ev @275
+    _ZN17wxSTEditorRefDataD0Ev @276
+    _ZN17wxSTEditorRefDataD1Ev @277
+    _ZN18wxSTEditorExporter10SaveToHTMLERK8wxString @278
+    _ZN18wxSTEditorExporter12ExportToFileEiRK8wxStringbb @279
+    _ZN18wxSTEditorExporter12GetExtensionEi @280
+    _ZN18wxSTEditorExporter12GetWildcardsEi @281
+    _ZN18wxSTEditorExporter12RenderAsHTMLEv @282
+    _ZN18wxSTEditorExporter13SaveToHTMLCSSERK8wxString @283
+    _ZN18wxSTEditorExporter9SaveToPDFERK8wxString @284
+    _ZN18wxSTEditorExporter9SaveToRTFERK8wxStringii @285
+    _ZN18wxSTEditorExporter9SaveToTEXERK8wxString @286
+    _ZN18wxSTEditorExporter9SaveToXMLERK8wxString @287
+    _ZN18wxSTEditorExporterC1EP10wxSTEditor @288
+    _ZN18wxSTEditorExporterC2EP10wxSTEditor @289
+    _ZN18wxSTEditorNotebook10CanSaveAllEv @290
+    _ZN18wxSTEditorNotebook10DeletePageEi @291
+    _ZN18wxSTEditorNotebook10FindStringERK8wxStringiii @292
+    _ZN18wxSTEditorNotebook10InsertPageEiP8wxWindowRK8wxStringbi @293
+    _ZN18wxSTEditorNotebook10OnMiddleUpER12wxMouseEvent @294
+    _ZN18wxSTEditorNotebook10OnSTEStateER15wxSTEditorEvent @295
+    _ZN18wxSTEditorNotebook10RemovePageEi @296
+    _ZN18wxSTEditorNotebook11UpdateItemsEP6wxMenuP9wxMenuBarP9wxToolBar @297
+    _ZN18wxSTEditorNotebook12OnFindDialogER17wxFindDialogEvent @298
+    _ZN18wxSTEditorNotebook12SaveAllFilesEv @299
+    _ZN18wxSTEditorNotebook12SetSelectionEi @300
+    _ZN18wxSTEditorNotebook12ms_classInfoE @301 DATA
+    _ZN18wxSTEditorNotebook13CloseAllPagesEb @302
+    _ZN18wxSTEditorNotebook13CreateOptionsERK17wxSTEditorOptions @303
+    _ZN18wxSTEditorNotebook13OnPageChangedER15wxBookCtrlEvent @304
+    _ZN18wxSTEditorNotebook13sm_eventTableE @305 DATA
+    _ZN18wxSTEditorNotebook14CreateSplitterEi @306
+    _ZN18wxSTEditorNotebook14DeleteAllPagesEv @307
+    _ZN18wxSTEditorNotebook14FindEditorPageEP10wxSTEditor @308
+    _ZN18wxSTEditorNotebook14UpdateAllItemsEv @309
+    _ZN18wxSTEditorNotebook14wxCreateObjectEv @310
+    _ZN18wxSTEditorNotebook15HandleMenuEventER14wxCommandEvent @311
+    _ZN18wxSTEditorNotebook15UpdatePageStateEv @312
+    _ZN18wxSTEditorNotebook16SetSendSTEEventsEb @313
+    _ZN18wxSTEditorNotebook17GetEditorSplitterEi @314
+    _ZN18wxSTEditorNotebook17ReplaceAllStringsERK8wxStringS2_iPi @315
+    _ZN18wxSTEditorNotebook17sm_eventHashTableE @316 DATA
+    _ZN18wxSTEditorNotebook18FindEditorPageByIdEi @317
+    _ZN18wxSTEditorNotebook19QuerySaveIfModifiedEi @318
+    _ZN18wxSTEditorNotebook19UpdateGotoCloseMenuEP6wxMenui @319
+    _ZN18wxSTEditorNotebook20InsertEditorSplitterEiP18wxSTEditorSplitterb @320
+    _ZN18wxSTEditorNotebook20InsertEditorSplitterEiiRK8wxStringb @321
+    _ZN18wxSTEditorNotebook20sm_eventTableEntriesE @322 DATA
+    _ZN18wxSTEditorNotebook24FindEditorPageByFileNameERK8wxString @323
+    _ZN18wxSTEditorNotebook4InitEv @324
+    _ZN18wxSTEditorNotebook6CreateEP8wxWindowiRK7wxPointRK6wxSizelRK8wxString @325
+    _ZN18wxSTEditorNotebook6OnMenuER14wxCommandEvent @326
+    _ZN18wxSTEditorNotebook7AddPageEP8wxWindowRK8wxStringbi @327
+    _ZN18wxSTEditorNotebook7DestroyEv @328
+    _ZN18wxSTEditorNotebook7NewPageERK8wxString @329
+    _ZN18wxSTEditorNotebook8LoadFileERK8wxStringS2_ @330
+    _ZN18wxSTEditorNotebook8SortTabsEi @331
+    _ZN18wxSTEditorNotebook9ClosePageEib @332
+    _ZN18wxSTEditorNotebook9GetEditorEi @333
+    _ZN18wxSTEditorNotebook9LoadFilesEP13wxArrayStringRK8wxString @334
+    _ZN18wxSTEditorNotebook9OnRightUpER12wxMouseEvent @335
+    _ZN18wxSTEditorNotebookD0Ev @336
+    _ZN18wxSTEditorNotebookD1Ev @337
+    _ZN18wxSTEditorNotebookD2Ev @338
+    _ZN18wxSTEditorPrefBase12RemoveEditorEP10wxSTEditor @339
+    _ZN18wxSTEditorPrefBase12ms_classInfoE @340 DATA
+    _ZN18wxSTEditorPrefBase14RegisterEditorEP10wxSTEditorb @341
+    _ZN18wxSTEditorPrefBase16UpdateAllEditorsEv @342
+    _ZN18wxSTEditorPrefBaseD0Ev @343
+    _ZN18wxSTEditorPrefBaseD1Ev @344
+    _ZN18wxSTEditorPrintout11GetPageInfoEPiS0_S0_S0_ @345
+    _ZN18wxSTEditorPrintout11OnPrintPageEi @346
+    _ZN18wxSTEditorPrintout12GetPrintDataEb @347
+    _ZN18wxSTEditorPrintout12PrintScalingEP4wxDC @348
+    _ZN18wxSTEditorPrintout12SetPrintDataEP11wxPrintDatab @349
+    _ZN18wxSTEditorPrintout12ms_classInfoE @350 DATA
+    _ZN18wxSTEditorPrintout13OnEndDocumentEv @351
+    _ZN18wxSTEditorPrintout15OnBeginDocumentEii @352
+    _ZN18wxSTEditorPrintout16GetPageSetupDataEb @353
+    _ZN18wxSTEditorPrintout16SetPageSetupDataEP21wxPageSetupDialogDatab @354
+    _ZN18wxSTEditorPrintout16sm_STE_printDataE @355 DATA
+    _ZN18wxSTEditorPrintout18GetPrintDataStaticEv @356
+    _ZN18wxSTEditorPrintout20sm_STE_pageSetupDataE @357 DATA
+    _ZN18wxSTEditorPrintout21sm_warn_on_font_scaleE @358 DATA
+    _ZN18wxSTEditorPrintout22GetPageSetupDataStaticEv @359
+    _ZN18wxSTEditorPrintout23sm_STE_printdata_staticE @360 DATA
+    _ZN18wxSTEditorPrintout27sm_STE_pagesetupdata_staticE @361 DATA
+    _ZN18wxSTEditorPrintout7HasPageEi @362
+    _ZN18wxSTEditorPrintoutC1EP10wxSTEditorRK8wxString @363
+    _ZN18wxSTEditorPrintoutC2EP10wxSTEditorRK8wxString @364
+    _ZN18wxSTEditorSplitter10InitializeEP10wxSTEditor @365
+    _ZN18wxSTEditorSplitter10OnSTEFocusER15wxSTEditorEvent @366
+    _ZN18wxSTEditorSplitter11SizeWindowsEv @367
+    _ZN18wxSTEditorSplitter11UpdateItemsEP6wxMenuP9wxMenuBarP9wxToolBar @368
+    _ZN18wxSTEditorSplitter12CreateEditorEi @369
+    _ZN18wxSTEditorSplitter12OnFindDialogER17wxFindDialogEvent @370
+    _ZN18wxSTEditorSplitter12OnSplitBeginER14wxCommandEvent @371
+    _ZN18wxSTEditorSplitter12ms_classInfoE @372 DATA
+    _ZN18wxSTEditorSplitter13CreateOptionsERK17wxSTEditorOptions @373
+    _ZN18wxSTEditorSplitter13sm_eventTableE @374 DATA
+    _ZN18wxSTEditorSplitter14UpdateAllItemsEv @375
+    _ZN18wxSTEditorSplitter14wxCreateObjectEv @376
+    _ZN18wxSTEditorSplitter15HandleMenuEventER14wxCommandEvent @377
+    _ZN18wxSTEditorSplitter15SplitVerticallyEi @378
+    _ZN18wxSTEditorSplitter16SetSendSTEEventsEb @379
+    _ZN18wxSTEditorSplitter17SplitHorizontallyEi @380
+    _ZN18wxSTEditorSplitter17sm_eventHashTableE @381 DATA
+    _ZN18wxSTEditorSplitter20sm_eventTableEntriesE @382 DATA
+    _ZN18wxSTEditorSplitter21OnSplitButtonLeftDownER12wxMouseEvent @383
+    _ZN18wxSTEditorSplitter21SetUseSplitScrollbarsEb @384
+    _ZN18wxSTEditorSplitter4InitEv @385
+    _ZN18wxSTEditorSplitter6CreateEP8wxWindowiRK7wxPointRK6wxSizelRK8wxString @386
+    _ZN18wxSTEditorSplitter6DoSizeEv @387
+    _ZN18wxSTEditorSplitter6OnMenuER14wxCommandEvent @388
+    _ZN18wxSTEditorSplitter6OnSizeER11wxSizeEvent @389
+    _ZN18wxSTEditorSplitter7DestroyEv @390
+    _ZN18wxSTEditorSplitter7DoPaintER4wxDC @391
+    _ZN18wxSTEditorSplitter7DoSplitE11wxSplitModei @392
+    _ZN18wxSTEditorSplitter7OnMouseER12wxMouseEvent @393
+    _ZN18wxSTEditorSplitter7OnPaintER12wxPaintEvent @394
+    _ZN18wxSTEditorSplitter7UnsplitEv @395
+    _ZN18wxSTEditorSplitter8OnScrollER13wxScrollEvent @396
+    _ZN18wxSTEditorSplitter9GetEditorEv @397
+    _ZN18wxSTEditorSplitter9OnRightUpER12wxMouseEvent @398
+    _ZN18wxSTEditorSplitter9OnUnsplitEP8wxWindow @399
+    _ZN18wxSTEditorSplitterD0Ev @400
+    _ZN18wxSTEditorSplitterD1Ev @401
+    _ZN18wxSTEditorSplitterD2Ev @402
+    _ZN19wxSTERecursionGuardD1Ev @403
+    _ZN19wxSTEditorScrollBar12SetScrollbarEiiiib @404
+    _ZN19wxSTEditorScrollBar16SetThumbPositionEi @405
+    _ZN19wxSTEditorScrollBar17HideOrShowOnRangeEv @406
+    _ZN19wxSTEditorScrollBarC1EP8wxWindowiRK7wxPointRK6wxSizelRK11wxValidatorRK8wxString @407
+    _ZN19wxSTEditorScrollBarC2EP8wxWindowiRK7wxPointRK6wxSizelRK11wxValidatorRK8wxString @408
+    _ZN20wxArraySTEditorStyle3AddERK15wxSTEditorStylej @409
+    _ZN20wxArraySTEditorStyle6DoCopyERKS_ @410
+    _ZN20wxArraySTEditorStyle6InsertERK15wxSTEditorStylejj @411
+    _ZN20wxArraySTEditorStyle7DoEmptyEv @412
+    _ZN20wxArraySTEditorStyle8RemoveAtEjj @413
+    _ZN20wxArraySTEditorStyleC1ERKS_ @414
+    _ZN20wxArraySTEditorStyleC2ERKS_ @415
+    _ZN20wxArraySTEditorStyleD1Ev @416
+    _ZN20wxArraySTEditorStyleD2Ev @417
+    _ZN20wxArraySTEditorStyleaSERKS_ @418
+    _ZN20wxSTEditorPrefDialog12ms_classInfoE @419 DATA
+    _ZN20wxSTEditorPrefDialog13sm_eventTableE @420 DATA
+    _ZN20wxSTEditorPrefDialog15OnUpdateUIApplyER15wxUpdateUIEvent @421
+    _ZN20wxSTEditorPrefDialog17sm_eventHashTableE @422 DATA
+    _ZN20wxSTEditorPrefDialog20sm_eventTableEntriesE @423 DATA
+    _ZN20wxSTEditorPrefDialog21OnNotebookPageChangedER15wxBookCtrlEvent @424
+    _ZN20wxSTEditorPrefDialog4InitEv @425
+    _ZN20wxSTEditorPrefDialog4OnOkER14wxCommandEvent @426
+    _ZN20wxSTEditorPrefDialog6CreateERK22wxSTEditorPrefPageDataP8wxWindowiRK8wxStringlS7_ @427
+    _ZN20wxSTEditorPrefDialog7OnApplyER14wxCommandEvent @428
+    _ZN20wxSTEditorPrefDialog7OnResetER14wxCommandEvent @429
+    _ZN20wxSTEditorPrefDialog8OnCancelER14wxCommandEvent @430
+    _ZN20wxSTEditorPrefDialogD0Ev @431
+    _ZN20wxSTEditorPrefDialogD1Ev @432
+    _ZN21wxSTEditorArtProvider12CreateBitmapERK8wxStringS2_RK6wxSize @433
+    _ZN21wxSTEditorMenuManager11DoCheckItemEP6wxMenuP9wxMenuBarP9wxToolBarib @434
+    _ZN21wxSTEditorMenuManager12DoEnableItemEP6wxMenuP9wxMenuBarP9wxToolBarib @435
+    _ZN21wxSTEditorMenuManager13DoSetTextItemEP6wxMenuP9wxMenuBariRK8wxString @436
+    _ZN21wxSTEditorMenuManager17CreateForNotebookEv @437
+    _ZN21wxSTEditorMenuManager17EnableEditorItemsEbP6wxMenuP9wxMenuBarP9wxToolBar @438
+    _ZN21wxSTEditorMenuManager19CreateForSinglePageEv @439
+    _ZN21wxSTEditorMenuManager21CreateInsertCharsMenuEP6wxMenui @440
+    _ZN21wxSTEditorMenuManager23CreateAcceleratorTableWEPK6wxMenuPK9wxMenuBar @441
+    _ZN21wxSTEditorMenuManager23CreateAcceleratorTableWER14wxArrayPtrVoid @442
+    _ZN21wxSTEditorMenuManager4InitEv @443
+    _ZN21wxSTEditorMenuManagerD0Ev @444
+    _ZN21wxSTEditorMenuManagerD1Ev @445
+    _ZN22wxSTEditorExportDialog11SetFileNameERK8wxString @446
+    _ZN22wxSTEditorExportDialog12ms_classInfoE @447 DATA
+    _ZN22wxSTEditorExportDialog12sm_fileNamesE @448 DATA
+    _ZN22wxSTEditorExportDialog13SetFileFormatEi @449
+    _ZN22wxSTEditorExportDialog13sm_eventTableE @450 DATA
+    _ZN22wxSTEditorExportDialog14sm_file_formatE @451 DATA
+    _ZN22wxSTEditorExportDialog17sm_eventHashTableE @452 DATA
+    _ZN22wxSTEditorExportDialog20sm_eventTableEntriesE @453 DATA
+    _ZN22wxSTEditorExportDialog4InitEv @454
+    _ZN22wxSTEditorExportDialog8OnButtonER14wxCommandEvent @455
+    _ZN22wxSTEditorExportDialog8OnChoiceER14wxCommandEvent @456
+    _ZN22wxSTEditorExportDialogC1EP8wxWindowRK8wxStringl @457
+    _ZN22wxSTEditorExportDialogC2EP8wxWindowRK8wxStringl @458
+    _ZN22wxSTEditorPrefPageData10SetOptionsEi @459
+    _ZN22wxSTEditorPrefPageData13SetLanguageIdEi @460
+    _ZN22wxSTEditorPrefPageData9SetEditorEP10wxSTEditor @461
+    _ZN22wxSTEditorPrefPageDataC1ERK15wxSTEditorPrefsRK16wxSTEditorStylesRK15wxSTEditorLangsiP10wxSTEditori @462
+    _ZN22wxSTEditorPrefPageDataC1ERKS_ @463
+    _ZN22wxSTEditorPrefPageDataC1Ev @464
+    _ZN22wxSTEditorPrefPageDataC2ERK15wxSTEditorPrefsRK16wxSTEditorStylesRK15wxSTEditorLangsiP10wxSTEditori @465
+    _ZN22wxSTEditorPrefPageDataC2Ev @466
+    _ZN23wxSTEPairArrayIntString16GetOrCreateValueERKi @467
+    _ZN23wxSTEPairArrayIntString3AddERKiRK8wxString @468
+    _ZN23wxSTEPairArrayIntString4CopyERKS_ @469
+    _ZN23wxSTEPairArrayIntString6RemoveERKi @470
+    _ZN23wxSTEPairArrayIntString6q_sortEii @471
+    _ZN23wxSTEPairArrayIntString8GetValueERKi @472
+    _ZN23wxSTEPairArrayIntString8RemoveAtEj @473
+    _ZN23wxSTEPairArrayIntString9UpdatePosEii @474
+    _ZN23wxSTEditorWindowsDialog12ms_classInfoE @475 DATA
+    _ZN23wxSTEditorWindowsDialog13UpdateButtonsEv @476
+    _ZN23wxSTEditorWindowsDialog13UpdateListBoxEv @477
+    _ZN23wxSTEditorWindowsDialog13sm_eventTableE @478 DATA
+    _ZN23wxSTEditorWindowsDialog17sm_eventHashTableE @479 DATA
+    _ZN23wxSTEditorWindowsDialog20sm_eventTableEntriesE @480 DATA
+    _ZN23wxSTEditorWindowsDialog8OnButtonER14wxCommandEvent @481
+    _ZN23wxSTEditorWindowsDialog9OnListBoxER14wxCommandEvent @482
+    _ZN23wxSTEditorWindowsDialogC1EP18wxSTEditorNotebookRK8wxStringl @483
+    _ZN23wxSTEditorWindowsDialogC2EP18wxSTEditorNotebookRK8wxStringl @484
+    _ZN25wxSTEPairArrayIntSTEStyle16GetOrCreateValueERKi @485
+    _ZN25wxSTEPairArrayIntSTEStyle3AddERKiRK15wxSTEditorStyle @486
+    _ZN25wxSTEPairArrayIntSTEStyle4CopyERKS_ @487
+    _ZN25wxSTEPairArrayIntSTEStyle6RemoveERKi @488
+    _ZN25wxSTEPairArrayIntSTEStyle6q_sortEii @489
+    _ZN25wxSTEPairArrayIntSTEStyle8GetValueERKi @490
+    _ZN25wxSTEPairArrayIntSTEStyle8RemoveAtEj @491
+    _ZN25wxSTEPairArrayIntSTEStyle9UpdatePosEii @492
+    _ZN25wxSTEPairArrayIntSTEStyleC1Ev @493
+    _ZN25wxSTEditorColumnizeDialog10FormatTextEv @494
+    _ZN25wxSTEditorColumnizeDialog12ms_classInfoE @495 DATA
+    _ZN25wxSTEditorColumnizeDialog13sm_eventTableE @496 DATA
+    _ZN25wxSTEditorColumnizeDialog14sm_ignoreArrayE @497 DATA
+    _ZN25wxSTEditorColumnizeDialog16sm_preserveArrayE @498 DATA
+    _ZN25wxSTEditorColumnizeDialog17sm_eventHashTableE @499 DATA
+    _ZN25wxSTEditorColumnizeDialog18sm_splitAfterArrayE @500 DATA
+    _ZN25wxSTEditorColumnizeDialog19sm_splitBeforeArrayE @501 DATA
+    _ZN25wxSTEditorColumnizeDialog20sm_eventTableEntriesE @502 DATA
+    _ZN25wxSTEditorColumnizeDialog4InitEv @503
+    _ZN25wxSTEditorColumnizeDialog6OnTextER14wxCommandEvent @504
+    _ZN25wxSTEditorColumnizeDialog7GetTextEv @505
+    _ZN25wxSTEditorColumnizeDialog7SetTextERK8wxString @506
+    _ZN25wxSTEditorColumnizeDialog8OnButtonER14wxCommandEvent @507
+    _ZN25wxSTEditorColumnizeDialogC1EP8wxWindowRK8wxStringl @508
+    _ZN25wxSTEditorColumnizeDialogC2EP8wxWindowRK8wxStringl @509
+    _ZN25wxSTEditorFindReplaceData10LoadConfigER12wxConfigBaseRK8wxString @510
+    _ZN25wxSTEditorFindReplaceData19STEToScintillaFlagsEi @511
+    _ZN25wxSTEditorFindReplaceData19ScintillaToSTEFlagsEi @512
+    _ZN25wxSTEditorFindReplaceDataD0Ev @513
+    _ZN25wxSTEditorFindReplaceDataD1Ev @514
+    _ZN26wxSTEditorFindReplacePanel10OnActivateER15wxActivateEvent @515
+    _ZN26wxSTEditorFindReplacePanel10OnCheckBoxER14wxCommandEvent @516
+    _ZN26wxSTEditorFindReplacePanel12ms_classInfoE @517 DATA
+    _ZN26wxSTEditorFindReplacePanel13OnMarginClickER17wxStyledTextEvent @518
+    _ZN26wxSTEditorFindReplacePanel13UpdateButtonsEv @519
+    _ZN26wxSTEditorFindReplacePanel13sm_eventTableE @520 DATA
+    _ZN26wxSTEditorFindReplacePanel14wxCreateObjectEv @521
+    _ZN26wxSTEditorFindReplacePanel15OnFindComboTextER14wxCommandEvent @522
+    _ZN26wxSTEditorFindReplacePanel15UpdateFindFlagsEv @523
+    _ZN26wxSTEditorFindReplacePanel16SelectFindStringEv @524
+    _ZN26wxSTEditorFindReplacePanel17sm_eventHashTableE @525 DATA
+    _ZN26wxSTEditorFindReplacePanel20sm_eventTableEntriesE @526 DATA
+    _ZN26wxSTEditorFindReplacePanel4InitEv @527
+    _ZN26wxSTEditorFindReplacePanel4SendER17wxFindDialogEvent @528
+    _ZN26wxSTEditorFindReplacePanel6CreateEP8wxWindowiP25wxSTEditorFindReplaceDataRK7wxPointRK6wxSizelRK8wxString @529
+    _ZN26wxSTEditorFindReplacePanel6OnIdleER11wxIdleEvent @530
+    _ZN26wxSTEditorFindReplacePanel6OnMenuER14wxCommandEvent @531
+    _ZN26wxSTEditorFindReplacePanel7SetDataEP25wxSTEditorFindReplaceData @532
+    _ZN26wxSTEditorFindReplacePanel8OnButtonER14wxCommandEvent @533
+    _ZN26wxSTEditorFindReplacePanel9SendEventERKi @534
+    _ZN26wxSTEditorFindReplacePanelD0Ev @535
+    _ZN26wxSTEditorFindReplacePanelD1Ev @536
+    _ZN26wxSTEditorFindReplacePanelD2Ev @537
+    _ZN26wxSTEditorInsertTextDialog10FormatTextEv @538
+    _ZN26wxSTEditorInsertTextDialog10sm_radioIDE @539 DATA
+    _ZN26wxSTEditorInsertTextDialog12ms_classInfoE @540 DATA
+    _ZN26wxSTEditorInsertTextDialog12sm_spinValueE @541 DATA
+    _ZN26wxSTEditorInsertTextDialog13OnRadioButtonER14wxCommandEvent @542
+    _ZN26wxSTEditorInsertTextDialog13sm_eventTableE @543 DATA
+    _ZN26wxSTEditorInsertTextDialog14UpdateControlsEv @544
+    _ZN26wxSTEditorInsertTextDialog15sm_appendValuesE @545 DATA
+    _ZN26wxSTEditorInsertTextDialog16sm_prependValuesE @546 DATA
+    _ZN26wxSTEditorInsertTextDialog17sm_eventHashTableE @547 DATA
+    _ZN26wxSTEditorInsertTextDialog20sm_eventTableEntriesE @548 DATA
+    _ZN26wxSTEditorInsertTextDialog4InitEv @549
+    _ZN26wxSTEditorInsertTextDialog6OnIdleER11wxIdleEvent @550
+    _ZN26wxSTEditorInsertTextDialog6OnMenuER14wxCommandEvent @551
+    _ZN26wxSTEditorInsertTextDialog6OnTextER14wxCommandEvent @552
+    _ZN26wxSTEditorInsertTextDialog7GetTextEv @553
+    _ZN26wxSTEditorInsertTextDialog7SetTextERK8wxString @554
+    _ZN26wxSTEditorInsertTextDialog8OnButtonER14wxCommandEvent @555
+    _ZN26wxSTEditorInsertTextDialogC1EP8wxWindowRK8wxStringl @556
+    _ZN26wxSTEditorInsertTextDialogC2EP8wxWindowRK8wxStringl @557
+    _ZN26wxSTEditorInsertTextDialogD0Ev @558
+    _ZN26wxSTEditorInsertTextDialogD1Ev @559
+    _ZN26wxSTEditorInsertTextDialogD2Ev @560
+    _ZN26wxSTEditorPrefBase_RefDataD0Ev @561
+    _ZN26wxSTEditorPrefBase_RefDataD1Ev @562
+    _ZN26wxSTEditorPrefBase_RefDataD2Ev @563
+    _ZN26wxSTEditorPropertiesDialog12ms_classInfoE @564 DATA
+    _ZN26wxSTEditorPropertiesDialogC1EP10wxSTEditorRK8wxStringl @565
+    _ZN26wxSTEditorPropertiesDialogC2EP10wxSTEditorRK8wxStringl @566
+    _ZN27wxSTEditorFindReplaceDialog10OnActivateER15wxActivateEvent @567
+    _ZN27wxSTEditorFindReplaceDialog12ms_classInfoE @568 DATA
+    _ZN27wxSTEditorFindReplaceDialog13OnCloseWindowER12wxCloseEvent @569
+    _ZN27wxSTEditorFindReplaceDialog13sm_eventTableE @570 DATA
+    _ZN27wxSTEditorFindReplaceDialog14wxCreateObjectEv @571
+    _ZN27wxSTEditorFindReplaceDialog17sm_eventHashTableE @572 DATA
+    _ZN27wxSTEditorFindReplaceDialog20sm_eventTableEntriesE @573 DATA
+    _ZN27wxSTEditorFindReplaceDialog4InitEv @574
+    _ZN27wxSTEditorFindReplaceDialog6CreateEP8wxWindowP25wxSTEditorFindReplaceDataRK8wxStringiS6_ @575
+    _ZN27wxSTEditorFindReplaceDialog6OnSizeER11wxSizeEvent @576
+    _ZN27wxSTEditorFindReplaceDialog8OnButtonER14wxCommandEvent @577
+    _ZN27wxSTEditorFindReplaceDialogD0Ev @578
+    _ZN27wxSTEditorFindReplaceDialogD1Ev @579
+    _ZN27wxSTEditorFindReplaceDialogD2Ev @580
+    _ZN28wxSTEditorPrefDialogPageBase10IsModifiedEv @581
+    _ZN28wxSTEditorPrefDialogPageBase12ms_classInfoE @582 DATA
+    _ZN28wxSTEditorPrefDialogPageBase13sm_eventTableE @583 DATA
+    _ZN28wxSTEditorPrefDialogPageBase17sm_eventHashTableE @584 DATA
+    _ZN28wxSTEditorPrefDialogPageBase20sm_eventTableEntriesE @585 DATA
+    _ZN28wxSTEditorPrefDialogPageBase7OnApplyER14wxCommandEvent @586
+    _ZN28wxSTEditorPrefDialogPageBase7OnResetER14wxCommandEvent @587
+    _ZN28wxSTEditorPrefDialogPageBaseD0Ev @588
+    _ZN28wxSTEditorPrefDialogPageBaseD1Ev @589
+    _ZN28wxSTEditorPrefDialogPageBaseD2Ev @590
+    _ZN28wxSTEditorPrintOptionsDialog12ms_classInfoE @591 DATA
+    _ZN28wxSTEditorPrintOptionsDialog16GetPrintWrapModeEv @592
+    _ZN28wxSTEditorPrintOptionsDialog16SetPrintWrapModeEb @593
+    _ZN28wxSTEditorPrintOptionsDialog18GetPrintColourModeEv @594
+    _ZN28wxSTEditorPrintOptionsDialog18SetPrintColourModeEi @595
+    _ZN28wxSTEditorPrintOptionsDialog19GetPrintLinenumbersEv @596
+    _ZN28wxSTEditorPrintOptionsDialog19SetPrintLinenumbersEi @597
+    _ZN28wxSTEditorPrintOptionsDialog21GetPrintMagnificationEv @598
+    _ZN28wxSTEditorPrintOptionsDialog21SetPrintMagnificationEi @599
+    _ZN28wxSTEditorPrintOptionsDialogC1EP8wxWindow @600
+    _ZN28wxSTEditorPrintOptionsDialogC2EP8wxWindow @601
+    _ZN29wxSTEditorFrameFileDropTarget11OnDropFilesEiiRK13wxArrayString @602
+    _ZN29wxSTEditorPrefDialogPageLangs10IsModifiedEv @603
+    _ZN29wxSTEditorPrefDialogPageLangs12ms_classInfoE @604 DATA
+    _ZN29wxSTEditorPrefDialogPageLangs13OnMarginClickER17wxStyledTextEvent @605
+    _ZN29wxSTEditorPrefDialogPageLangs13sm_eventTableE @606 DATA
+    _ZN29wxSTEditorPrefDialogPageLangs13sm_helpStringE @607 DATA
+    _ZN29wxSTEditorPrefDialogPageLangs15SetStylesChoiceEv @608
+    _ZN29wxSTEditorPrefDialogPageLangs16GetControlValuesEv @609
+    _ZN29wxSTEditorPrefDialogPageLangs16SetControlValuesEv @610
+    _ZN29wxSTEditorPrefDialogPageLangs17sm_eventHashTableE @611 DATA
+    _ZN29wxSTEditorPrefDialogPageLangs18SetKeywordTextCtrlEv @612
+    _ZN29wxSTEditorPrefDialogPageLangs20sm_eventTableEntriesE @613 DATA
+    _ZN29wxSTEditorPrefDialogPageLangs4InitEv @614
+    _ZN29wxSTEditorPrefDialogPageLangs5ApplyEv @615
+    _ZN29wxSTEditorPrefDialogPageLangs5ResetEv @616
+    _ZN29wxSTEditorPrefDialogPageLangs8OnChoiceER14wxCommandEvent @617
+    _ZN29wxSTEditorPrefDialogPageLangsC1ERK22wxSTEditorPrefPageDataS2_P8wxWindowi @618
+    _ZN29wxSTEditorPrefDialogPageLangsC2ERK22wxSTEditorPrefPageDataS2_P8wxWindowi @619
+    _ZN29wxSTEditorPrefDialogPageLangsD0Ev @620
+    _ZN29wxSTEditorPrefDialogPageLangsD1Ev @621
+    _ZN29wxSTEditorPrefDialogPagePrefs10IsModifiedEv @622
+    _ZN29wxSTEditorPrefDialogPagePrefs12ms_classInfoE @623 DATA
+    _ZN29wxSTEditorPrefDialogPagePrefs13sm_eventTableE @624 DATA
+    _ZN29wxSTEditorPrefDialogPagePrefs16GetControlValuesEv @625
+    _ZN29wxSTEditorPrefDialogPagePrefs16SetControlValuesEv @626
+    _ZN29wxSTEditorPrefDialogPagePrefs17sm_eventHashTableE @627 DATA
+    _ZN29wxSTEditorPrefDialogPagePrefs20sm_eventTableEntriesE @628 DATA
+    _ZN29wxSTEditorPrefDialogPagePrefs5ApplyEv @629
+    _ZN29wxSTEditorPrefDialogPagePrefs5ResetEv @630
+    _ZN29wxSTEditorPrefDialogPagePrefsC1ERK22wxSTEditorPrefPageDataS2_P8wxWindowi @631
+    _ZN29wxSTEditorPrefDialogPagePrefsC2ERK22wxSTEditorPrefPageDataS2_P8wxWindowi @632
+    _ZN29wxSTEditorPrefDialogPagePrefsD0Ev @633
+    _ZN29wxSTEditorPrefDialogPagePrefsD1Ev @634
+    _ZN30wxSTEditorPrefDialogPageStyles10IsModifiedEv @635
+    _ZN30wxSTEditorPrefDialogPageStyles11OnSpinEventER11wxSpinEvent @636
+    _ZN30wxSTEditorPrefDialogPageStyles11SetupEditorEP10wxSTEditor @637
+    _ZN30wxSTEditorPrefDialogPageStyles12UpdateEditorEP10wxSTEditorR10wxArrayInt @638
+    _ZN30wxSTEditorPrefDialogPageStyles12ms_classInfoE @639 DATA
+    _ZN30wxSTEditorPrefDialogPageStyles13OnMarginClickER17wxStyledTextEvent @640
+    _ZN30wxSTEditorPrefDialogPageStyles13OnPageChangedER15wxBookCtrlEvent @641
+    _ZN30wxSTEditorPrefDialogPageStyles13sm_eventTableE @642 DATA
+    _ZN30wxSTEditorPrefDialogPageStyles13sm_helpStringE @643 DATA
+    _ZN30wxSTEditorPrefDialogPageStyles15FillStyleEditorEP10wxSTEditor @644
+    _ZN30wxSTEditorPrefDialogPageStyles16GetControlValuesEv @645
+    _ZN30wxSTEditorPrefDialogPageStyles16SetControlValuesEv @646
+    _ZN30wxSTEditorPrefDialogPageStyles17sm_eventHashTableE @647 DATA
+    _ZN30wxSTEditorPrefDialogPageStyles20sm_eventTableEntriesE @648 DATA
+    _ZN30wxSTEditorPrefDialogPageStyles4InitEv @649
+    _ZN30wxSTEditorPrefDialogPageStyles5ApplyEv @650
+    _ZN30wxSTEditorPrefDialogPageStyles5ResetEv @651
+    _ZN30wxSTEditorPrefDialogPageStyles7OnEventER14wxCommandEvent @652
+    _ZN30wxSTEditorPrefDialogPageStylesC1ERK22wxSTEditorPrefPageDataS2_P8wxWindowi @653
+    _ZN30wxSTEditorPrefDialogPageStylesC2ERK22wxSTEditorPrefPageDataS2_P8wxWindowi @654
+    _ZN30wxSTEditorPrefDialogPageStylesD0Ev @655
+    _ZN30wxSTEditorPrefDialogPageStylesD1Ev @656
+    _ZN30wxSTEditorPrefDialogPageStylesD2Ev @657
+    _ZNK10wxSTEditor10GetOptionsEv @658
+    _ZNK10wxSTEditor11GetFileNameEv @659
+    _ZNK10wxSTEditor12GetClassInfoEv @660
+    _ZNK10wxSTEditor12GetFindFlagsEv @661
+    _ZNK10wxSTEditor12GetWordCountERK8wxString @662
+    _ZNK10wxSTEditor13GetEventTableEv @663
+    _ZNK10wxSTEditor13GetFindStringEv @664
+    _ZNK10wxSTEditor13GetLanguageIdEv @665
+    _ZNK10wxSTEditor13GetTreeItemIdEv @666
+    _ZNK10wxSTEditor14GetEditorLangsEv @667
+    _ZNK10wxSTEditor14GetEditorPrefsEv @668
+    _ZNK10wxSTEditor15GetEditorStylesEv @669
+    _ZNK10wxSTEditor16GetReplaceStringEv @670
+    _ZNK10wxSTEditor17GetEventHashTableEv @671
+    _ZNK10wxSTEditor18GetFindReplaceDataEv @672
+    _ZNK10wxSTEditor23GetFileModificationTimeEv @673
+    _ZNK10wxSTEditor5CloneEP8wxWindowiRK7wxPointRK6wxSizelRK8wxString @674
+    _ZNK15wxSTEditorEvent12GetClassInfoEv @675
+    _ZNK15wxSTEditorEvent5CloneEv @676
+    _ZNK15wxSTEditorFrame12GetClassInfoEv @677
+    _ZNK15wxSTEditorFrame13GetEventTableEv @678
+    _ZNK15wxSTEditorFrame15GetFileTreeCtrlEv @679
+    _ZNK15wxSTEditorFrame15GetMainSplitterEv @680
+    _ZNK15wxSTEditorFrame15GetSideNotebookEv @681
+    _ZNK15wxSTEditorFrame15GetSideSplitterEv @682
+    _ZNK15wxSTEditorFrame17GetEditorNotebookEv @683
+    _ZNK15wxSTEditorFrame17GetEditorSplitterEi @684
+    _ZNK15wxSTEditorFrame17GetEventHashTableEv @685
+    _ZNK15wxSTEditorFrame9GetEditorEi @686
+    _ZNK15wxSTEditorLangs10SaveConfigER12wxConfigBaseRK8wxStringi @687
+    _ZNK15wxSTEditorLangs11GetBlockEndEj @688
+    _ZNK15wxSTEditorLangs11GetKeyWordsEjjb @689
+    _ZNK15wxSTEditorLangs11GetLanguageEj @690
+    _ZNK15wxSTEditorLangs11GetSTEStyleEjjb @691
+    _ZNK15wxSTEditorLangs11GetSciStyleEjj @692
+    _ZNK15wxSTEditorLangs11HasCommentsEj @693
+    _ZNK15wxSTEditorLangs12GetClassInfoEv @694
+    _ZNK15wxSTEditorLangs13GetBlockStartEj @695
+    _ZNK15wxSTEditorLangs13GetFileFilterEj @696
+    _ZNK15wxSTEditorLangs13GetStyleCountEj @697
+    _ZNK15wxSTEditorLangs13SciToSTEStyleEji @698
+    _ZNK15wxSTEditorLangs14GetBracesStyleEj @699
+    _ZNK15wxSTEditorLangs14GetFilePatternEjb @700
+    _ZNK15wxSTEditorLangs15GetCommentBlockEj @701
+    _ZNK15wxSTEditorLangs15GetUserKeyWordsEjj @702
+    _ZNK15wxSTEditorLangs15GetUserSTEStyleEjj @703
+    _ZNK15wxSTEditorLangs15HasPreprocessorEj @704
+    _ZNK15wxSTEditorLangs16GetCommentBoxEndEj @705
+    _ZNK15wxSTEditorLangs16GetKeyWordsCountEj @706
+    _ZNK15wxSTEditorLangs18GetCommentBoxStartEj @707
+    _ZNK15wxSTEditorLangs18GetPreprocessorEndEj @708
+    _ZNK15wxSTEditorLangs18GetPreprocessorMidEj @709
+    _ZNK15wxSTEditorLangs18GetUserFilePatternEj @710
+    _ZNK15wxSTEditorLangs19GetBlockEndSTCStyleEj @711
+    _ZNK15wxSTEditorLangs19GetCommentBoxMiddleEj @712
+    _ZNK15wxSTEditorLangs19GetCommentStreamEndEj @713
+    _ZNK15wxSTEditorLangs19GetStyleDescriptionEjj @714
+    _ZNK15wxSTEditorLangs20GetPreprocessorStartEj @715
+    _ZNK15wxSTEditorLangs21GetBlockStartSTCStyleEj @716
+    _ZNK15wxSTEditorLangs21GetCommentStreamStartEj @717
+    _ZNK15wxSTEditorLangs21GetPreprocessorSymbolEj @718
+    _ZNK15wxSTEditorLangs22FindLanguageByFilenameERK8wxString @719
+    _ZNK15wxSTEditorLangs26GetCommentBlockAtLineStartEj @720
+    _ZNK15wxSTEditorLangs7GetNameEj @721
+    _ZNK15wxSTEditorLangs8GetCountEv @722
+    _ZNK15wxSTEditorLangs8GetFlagsEj @723
+    _ZNK15wxSTEditorLangs8GetFoldsEj @724
+    _ZNK15wxSTEditorLangs8GetLexerEj @725
+    _ZNK15wxSTEditorLangs8HasBlockEj @726
+    _ZNK15wxSTEditorLangs9IsEqualToERKS_ @727
+    _ZNK15wxSTEditorPrefs10GetPrefIntEj @728
+    _ZNK15wxSTEditorPrefs10SaveConfigER12wxConfigBaseRK8wxStringi @729
+    _ZNK15wxSTEditorPrefs11AddInitPrefERK8wxStringS2_i @730
+    _ZNK15wxSTEditorPrefs11AddInitPrefERK8wxStringii @731
+    _ZNK15wxSTEditorPrefs11GetPrefNameEj @732
+    _ZNK15wxSTEditorPrefs12GetClassInfoEv @733
+    _ZNK15wxSTEditorPrefs12GetPrefCountEv @734
+    _ZNK15wxSTEditorPrefs12GetPrefFlagsEj @735
+    _ZNK15wxSTEditorPrefs16GetInitPrefCountEv @736
+    _ZNK15wxSTEditorPrefs16GetInitPrefValueEj @737
+    _ZNK15wxSTEditorPrefs16SetInitPrefValueEjRK8wxString @738
+    _ZNK15wxSTEditorPrefs7GetPrefEj @739
+    _ZNK15wxSTEditorPrefs9IsEqualToERKS_ @740
+    _ZNK15wxSTEditorShell12GetClassInfoEv @741
+    _ZNK15wxSTEditorShell13GetEventTableEv @742
+    _ZNK15wxSTEditorShell17GetEventHashTableEv @743
+    _ZNK16wxSTEditorStyles10SaveConfigER12wxConfigBaseRK8wxStringi @744
+    _ZNK16wxSTEditorStyles11GetFaceNameEib @745
+    _ZNK16wxSTEditorStyles11GetFontAttrEib @746
+    _ZNK16wxSTEditorStyles12FindNthStyleEi @747
+    _ZNK16wxSTEditorStyles12GetClassInfoEv @748
+    _ZNK16wxSTEditorStyles12GetStyleNameEi @749
+    _ZNK16wxSTEditorStyles12SetInitStyleEiRK15wxSTEditorStyle @750
+    _ZNK16wxSTEditorStyles13GetStyleIndexERK8wxString @751
+    _ZNK16wxSTEditorStyles13GetStyleUsageEi @752
+    _ZNK16wxSTEditorStyles13GetUseDefaultEi @753
+    _ZNK16wxSTEditorStyles13IntTowxColourEi @754
+    _ZNK16wxSTEditorStyles13SetInitMarkerEiRK8wxStringiii @755
+    _ZNK16wxSTEditorStyles13wxColourToIntERK8wxColour @756
+    _ZNK16wxSTEditorStyles14GetStylesArrayEb @757
+    _ZNK16wxSTEditorStyles14SetEditorStyleEiiP10wxSTEditorb @758
+    _ZNK16wxSTEditorStyles15GetMarkerSymbolEi @759
+    _ZNK16wxSTEditorStyles15RemoveInitStyleEi @760
+    _ZNK16wxSTEditorStyles16CreateConfigLineEi @761
+    _ZNK16wxSTEditorStyles16GetIndicatorMaskEi @762
+    _ZNK16wxSTEditorStyles16SetInitIndicatorEiRK8wxStringii @763
+    _ZNK16wxSTEditorStyles17GetIndicatorStyleEi @764
+    _ZNK16wxSTEditorStyles17HasIndicatorStyleEi @765
+    _ZNK16wxSTEditorStyles18GetStyleUseDefaultEii @766
+    _ZNK16wxSTEditorStyles19GetBackgroundColourEib @767
+    _ZNK16wxSTEditorStyles19GetForegroundColourEib @768
+    _ZNK16wxSTEditorStyles19GetMarkerBackgroundEi @769
+    _ZNK16wxSTEditorStyles19GetMarkerForegroundEi @770
+    _ZNK16wxSTEditorStyles22GetBackgroundColourIntEib @771
+    _ZNK16wxSTEditorStyles22GetForegroundColourIntEib @772
+    _ZNK16wxSTEditorStyles22GetIndicatorForegroundEi @773
+    _ZNK16wxSTEditorStyles7GetCaseEib @774
+    _ZNK16wxSTEditorStyles7GetFontEib @775
+    _ZNK16wxSTEditorStyles7GetSizeEib @776
+    _ZNK16wxSTEditorStyles8GetStyleEi @777
+    _ZNK16wxSTEditorStyles9IsEqualToERKS_ @778
+    _ZNK17wxSTEditorOptions10GetMenuBarEv @779
+    _ZNK17wxSTEditorOptions10GetToolBarEv @780
+    _ZNK17wxSTEditorOptions12GetOptionIntEj @781
+    _ZNK17wxSTEditorOptions12GetStatusBarEv @782
+    _ZNK17wxSTEditorOptions13GetClientDataEv @783
+    _ZNK17wxSTEditorOptions13GetConfigPathEj @784
+    _ZNK17wxSTEditorOptions13GetOptionNameEj @785
+    _ZNK17wxSTEditorOptions14GetEditorLangsEv @786
+    _ZNK17wxSTEditorOptions14GetEditorPrefsEv @787
+    _ZNK17wxSTEditorOptions14GetFileHistoryEv @788
+    _ZNK17wxSTEditorOptions14GetMenuManagerEv @789
+    _ZNK17wxSTEditorOptions14GetOptionCountEv @790
+    _ZNK17wxSTEditorOptions15GetClientObjectEv @791
+    _ZNK17wxSTEditorOptions15GetEditorStylesEv @792
+    _ZNK17wxSTEditorOptions16FindOptionByNameERK8wxString @793
+    _ZNK17wxSTEditorOptions18GetEditorPopupMenuEv @794
+    _ZNK17wxSTEditorOptions18GetFindReplaceDataEv @795
+    _ZNK17wxSTEditorOptions18GetNotebookOptionsEv @796
+    _ZNK17wxSTEditorOptions20GetNotebookPopupMenuEv @797
+    _ZNK17wxSTEditorOptions20GetSplitterPopupMenuEv @798
+    _ZNK17wxSTEditorOptions9GetOptionEj @799
+    _ZNK18wxSTEditorExporter13SciToSTEStyleEi @800
+    _ZNK18wxSTEditorNotebook12GetClassInfoEv @801
+    _ZNK18wxSTEditorNotebook12GetSelectionEv @802
+    _ZNK18wxSTEditorNotebook13GetEventTableEv @803
+    _ZNK18wxSTEditorNotebook17FileNameToTabNameERK8wxString @804
+    _ZNK18wxSTEditorNotebook17GetEventHashTableEv @805
+    _ZNK18wxSTEditorPrefBase10FindEditorEP10wxSTEditor @806
+    _ZNK18wxSTEditorPrefBase12GetClassInfoEv @807
+    _ZNK18wxSTEditorPrefBase14GetEditorCountEv @808
+    _ZNK18wxSTEditorPrefBase9GetEditorEj @809
+    _ZNK18wxSTEditorPrintout12GetClassInfoEv @810
+    _ZNK18wxSTEditorSplitter12GetClassInfoEv @811
+    _ZNK18wxSTEditorSplitter13GetEventTableEv @812
+    _ZNK18wxSTEditorSplitter17GetEventHashTableEv @813
+    _ZNK20wxArraySTEditorStyle5IndexERK15wxSTEditorStyleb @814
+    _ZNK20wxSTEditorPrefDialog11GetPrefDataEv @815
+    _ZNK20wxSTEditorPrefDialog12GetClassInfoEv @816
+    _ZNK20wxSTEditorPrefDialog13GetEventTableEv @817
+    _ZNK20wxSTEditorPrefDialog17GetEditorPrefDataEv @818
+    _ZNK20wxSTEditorPrefDialog17GetEventHashTableEv @819
+    _ZNK21wxSTEditorMenuManager13CreateMenuBarEP9wxMenuBarb @820
+    _ZNK21wxSTEditorMenuManager13CreateToolBarEP9wxToolBar @821
+    _ZNK21wxSTEditorMenuManager14CreateEditMenuEP6wxMenu @822
+    _ZNK21wxSTEditorMenuManager14CreateFileMenuEP6wxMenu @823
+    _ZNK21wxSTEditorMenuManager14CreateHelpMenuEP6wxMenu @824
+    _ZNK21wxSTEditorMenuManager14CreateViewMenuEP6wxMenu @825
+    _ZNK21wxSTEditorMenuManager15CreateToolsMenuEP6wxMenu @826
+    _ZNK21wxSTEditorMenuManager15DestroyMenuItemEP6wxMenuib @827
+    _ZNK21wxSTEditorMenuManager16CreateWindowMenuEP6wxMenu @828
+    _ZNK21wxSTEditorMenuManager18CreateBookmarkMenuEP6wxMenu @829
+    _ZNK21wxSTEditorMenuManager20CreatePreferenceMenuEP6wxMenu @830
+    _ZNK21wxSTEditorMenuManager21CreateEditorPopupMenuEP6wxMenu @831
+    _ZNK21wxSTEditorMenuManager21GetAcceleratorEntriesEPK6wxMenuPK9wxMenuBarR14wxArrayPtrVoid @832
+    _ZNK21wxSTEditorMenuManager23CreateNotebookPopupMenuEP6wxMenu @833
+    _ZNK21wxSTEditorMenuManager23CreateSplitterPopupMenuEP6wxMenu @834
+    _ZNK21wxSTEditorMenuManager8MenuItemEP6wxMenuiRK8wxStringS4_10wxItemKindRK8wxBitmap @835
+    _ZNK22wxSTEditorExportDialog11GetFileNameEv @836
+    _ZNK22wxSTEditorExportDialog12GetClassInfoEv @837
+    _ZNK22wxSTEditorExportDialog13GetEventTableEv @838
+    _ZNK22wxSTEditorExportDialog13GetFileFormatEv @839
+    _ZNK22wxSTEditorExportDialog17FileNameExtChangeERK8wxStringi @840
+    _ZNK22wxSTEditorExportDialog17GetEventHashTableEv @841
+    _ZNK22wxSTEditorPrefPageData10GetOptionsEv @842
+    _ZNK22wxSTEditorPrefPageData13GetLanguageIdEv @843
+    _ZNK22wxSTEditorPrefPageData8GetLangsEv @844
+    _ZNK22wxSTEditorPrefPageData8GetPrefsEv @845
+    _ZNK22wxSTEditorPrefPageData9GetEditorEv @846
+    _ZNK22wxSTEditorPrefPageData9GetStylesEv @847
+    _ZNK23wxSTEPairArrayIntString14IndexForInsertERKi @848
+    _ZNK23wxSTEPairArrayIntString5IndexERKi @849
+    _ZNK23wxSTEPairArrayIntString8GetValueERKi @850
+    _ZNK23wxSTEPairArrayIntString9IsEqualToERKS_ @851
+    _ZNK23wxSTEditorWindowsDialog12GetClassInfoEv @852
+    _ZNK23wxSTEditorWindowsDialog13GetEventTableEv @853
+    _ZNK23wxSTEditorWindowsDialog17GetEventHashTableEv @854
+    _ZNK25wxSTEPairArrayIntSTEStyle14IndexForInsertERKi @855
+    _ZNK25wxSTEPairArrayIntSTEStyle5IndexERKi @856
+    _ZNK25wxSTEPairArrayIntSTEStyle8GetValueERKi @857
+    _ZNK25wxSTEPairArrayIntSTEStyle9IsEqualToERKS_ @858
+    _ZNK25wxSTEditorColumnizeDialog12GetClassInfoEv @859
+    _ZNK25wxSTEditorColumnizeDialog13GetEventTableEv @860
+    _ZNK25wxSTEditorColumnizeDialog17GetEventHashTableEv @861
+    _ZNK25wxSTEditorFindReplaceData10SaveConfigER12wxConfigBaseRK8wxString @862
+    _ZNK25wxSTEditorFindReplaceData9StringCmpERK8wxStringS2_i @863
+    _ZNK26wxSTEditorFindReplacePanel12GetClassInfoEv @864
+    _ZNK26wxSTEditorFindReplacePanel13GetEventTableEv @865
+    _ZNK26wxSTEditorFindReplacePanel15GetTargetWindowEv @866
+    _ZNK26wxSTEditorFindReplacePanel17GetEventHashTableEv @867
+    _ZNK26wxSTEditorFindReplacePanel9GetEditorEv @868
+    _ZNK26wxSTEditorInsertTextDialog12GetClassInfoEv @869
+    _ZNK26wxSTEditorInsertTextDialog13GetEventTableEv @870
+    _ZNK26wxSTEditorInsertTextDialog13RadioIdToTypeEi @871
+    _ZNK26wxSTEditorInsertTextDialog17GetEventHashTableEv @872
+    _ZNK26wxSTEditorInsertTextDialog18GetSelectedRadioIdEv @873
+    _ZNK26wxSTEditorPropertiesDialog12GetClassInfoEv @874
+    _ZNK27wxSTEditorFindReplaceDialog12GetClassInfoEv @875
+    _ZNK27wxSTEditorFindReplaceDialog13GetEventTableEv @876
+    _ZNK27wxSTEditorFindReplaceDialog17GetEventHashTableEv @877
+    _ZNK28wxSTEditorPrefDialogPageBase11GetPrefDataEv @878
+    _ZNK28wxSTEditorPrefDialogPageBase12GetClassInfoEv @879
+    _ZNK28wxSTEditorPrefDialogPageBase13GetEventTableEv @880
+    _ZNK28wxSTEditorPrefDialogPageBase17GetEventHashTableEv @881
+    _ZNK28wxSTEditorPrintOptionsDialog12GetClassInfoEv @882
+    _ZNK29wxSTEditorPrefDialogPageLangs12GetClassInfoEv @883
+    _ZNK29wxSTEditorPrefDialogPageLangs13GetEventTableEv @884
+    _ZNK29wxSTEditorPrefDialogPageLangs17GetEventHashTableEv @885
+    _ZNK29wxSTEditorPrefDialogPagePrefs12GetClassInfoEv @886
+    _ZNK29wxSTEditorPrefDialogPagePrefs13GetEventTableEv @887
+    _ZNK29wxSTEditorPrefDialogPagePrefs17GetEventHashTableEv @888
+    _ZNK30wxSTEditorPrefDialogPageStyles12GetClassInfoEv @889
+    _ZNK30wxSTEditorPrefDialogPageStyles13GetEventTableEv @890
+    _ZNK30wxSTEditorPrefDialogPageStyles17GetEventHashTableEv @891
+    _ZTV10wxSTEditor @892 DATA
+    _ZTV15wxSTEditorEvent @893 DATA
+    _ZTV15wxSTEditorFrame @894 DATA
+    _ZTV15wxSTEditorLangs @895 DATA
+    _ZTV15wxSTEditorPrefs @896 DATA
+    _ZTV15wxSTEditorShell @897 DATA
+    _ZTV16wxSTEditorStyles @898 DATA
+    _ZTV17wxSTEditorOptions @899 DATA
+    _ZTV17wxSTEditorRefData @900 DATA
+    _ZTV18wxSTEditorNotebook @901 DATA
+    _ZTV18wxSTEditorPrefBase @902 DATA
+    _ZTV18wxSTEditorPrintout @903 DATA
+    _ZTV18wxSTEditorSplitter @904 DATA
+    _ZTV19wxSTEditorScrollBar @905 DATA
+    _ZTV20wxSTEditorPrefDialog @906 DATA
+    _ZTV21wxSTEditorArtProvider @907 DATA
+    _ZTV21wxSTEditorMenuManager @908 DATA
+    _ZTV22wxSTEditorExportDialog @909 DATA
+    _ZTV22wxSTEditorPrefPageData @910 DATA
+    _ZTV23wxSTEditorWindowsDialog @911 DATA
+    _ZTV25wxSTEditorColumnizeDialog @912 DATA
+    _ZTV25wxSTEditorFindReplaceData @913 DATA
+    _ZTV26wxSTEditorFindReplacePanel @914 DATA
+    _ZTV26wxSTEditorInsertTextDialog @915 DATA
+    _ZTV26wxSTEditorPrefBase_RefData @916 DATA
+    _ZTV26wxSTEditorPropertiesDialog @917 DATA
+    _ZTV27wxSTEditorFindReplaceDialog @918 DATA
+    _ZTV28wxSTEditorPrefDialogPageBase @919 DATA
+    _ZTV28wxSTEditorPrintOptionsDialog @920 DATA
+    _ZTV29wxSTEditorFrameFileDropTarget @921 DATA
+    _ZTV29wxSTEditorPrefDialogPageLangs @922 DATA
+    _ZTV29wxSTEditorPrefDialogPagePrefs @923 DATA
+    _ZTV30wxSTEditorPrefDialogPageStyles @924 DATA
+    _ZTV30wxSTEditorPrefPageData_RefData @925 DATA
+    _ZThn356_N10wxSTEditor20SetInsertionPointEndEv @926
+    _ZThn356_N10wxSTEditor9WriteTextERK8wxString @927
+    _ZThn356_N10wxSTEditorD0Ev @928
+    _ZThn356_N10wxSTEditorD1Ev @929
+    _ZThn356_N15wxSTEditorShell10AppendTextERK8wxString @930
+    _ZThn356_N15wxSTEditorShellD0Ev @931
+    _ZThn356_N15wxSTEditorShellD1Ev @932
+    _ZThn368_N10wxSTEditor12DiscardEditsEv @933
+    _ZThn368_N10wxSTEditorD0Ev @934
+    _ZThn368_N10wxSTEditorD1Ev @935
+    _ZThn368_N15wxSTEditorShellD0Ev @936
+    _ZThn368_N15wxSTEditorShellD1Ev @937
+    s_wxSTEditor_FindData @938 DATA
+    wxEVT_STESHELL_ENTER @939 DATA
+    wxEVT_STE_CREATED @940 DATA
+    wxEVT_STE_MARGINDCLICK @941 DATA
+    wxEVT_STE_POPUPMENU @942 DATA
+    wxEVT_STE_SET_FOCUS @943 DATA
+    wxEVT_STE_STATE_CHANGED @944 DATA
+    wxEVT_STN_CREATED @945 DATA
+    wxEVT_STN_CREATE_SPLITTER @946 DATA
+    wxEVT_STN_PAGE_CHANGED @947 DATA
+    wxEVT_STS_CREATED @948 DATA
+    wxEVT_STS_CREATE_EDITOR @949 DATA
+    wxEVT_STS_SPLIT_BEGIN @950 DATA
+    wxSTEditorFindReplaceDialogNameStr @951 DATA

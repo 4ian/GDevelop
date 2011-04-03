@@ -1,0 +1,29 @@
+/* XPM */
+static const char *print_preview_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 7 1",
+"  c None",
+"a c Black",
+"b c #808000",
+"c c #C0C0C0",
+"d c #FFFF00",
+"f c #FFFFFF",
+"g c #808080",
+/* pixels */
+"                ",
+"     aaaaaaaaa  ",
+"    af  gaag a  ",
+"    af acffca   ",
+"   affgcffffcg  ",
+"   afaaffffffa  ",
+"  afffaffffffa  ",
+" aaaaagcffffcg  ",
+"a      acffcaa  ",
+"aaaaaaaagaagaaa ",
+"a        bb  aaa",
+"a        dd   aa",
+"aaaaaaaaaaaaaa a",
+" a         a a  ",
+"  aaaaaaaaaaa   ",
+"                "
+};

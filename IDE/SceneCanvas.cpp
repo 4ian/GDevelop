@@ -116,7 +116,7 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
 
     SetView( edittimeRenderer.view );
     SetFramerateLimit( gameEdited.maxFPS );
-    UseVerticalSync( gameEdited.verticalSync );
+    EnableVerticalSync(gameEdited.verticalSync );
     Clear( sf::Color( 125, 125, 125, 255 ) );
 
     Connect(ID_ADDOBJMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnAddObjetSelected);

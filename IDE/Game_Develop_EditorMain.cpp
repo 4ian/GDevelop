@@ -610,8 +610,13 @@ void Game_Develop_EditorFrame::LoadSkin(wxAuiManager * auiManager)
 
 void Game_Develop_EditorFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& event)
 {
-    if (  dynamic_cast<StartHerePage*>(editorsNotebook->GetPage(event.GetSelection())) != NULL )
+    if ( dynamic_cast<StartHerePage*>(editorsNotebook->GetPage(event.GetSelection())) != NULL )
         startPage = NULL;
+    else if ( CodeEditor * editor = dynamic_cast<CodeEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
+    {
+        if ( !editor->QueryClose() )
+            event.Veto();
+    }
 }
 
 /**

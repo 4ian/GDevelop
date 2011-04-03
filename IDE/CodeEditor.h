@@ -4,8 +4,8 @@
 //(*Headers(CodeEditor)
 #include <wx/sizer.h>
 #include <wx/menu.h>
+#include <wx/stedit/stedit.h>
 #include <wx/panel.h>
-#include <wx/stc/stc.h>
 //*)
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
@@ -24,17 +24,28 @@ class CodeEditor: public wxPanel
 		virtual ~CodeEditor();
 
 		//(*Declarations(CodeEditor)
+		wxMenuItem* MenuItem5;
 		wxMenuItem* MenuItem2;
 		wxMenuItem* MenuItem1;
+		wxMenuItem* MenuItem4;
 		wxMenuItem* MenuItem3;
 		wxMenu contextMenu;
-		wxStyledTextCtrl* textEditor;
+		wxSTEditor* textEditor;
 		//*)
 
 		std::string filename; ///< File being edited.
 		Game * game; ///< Game associated with the file. Can be NULL.
 
+        /**
+         * Change selected line
+         */
 		void SelectLine(size_t line);
+
+		/**
+		 * Ask the user for closing the editor, if needed.
+		 * @return true if editor must be closed
+		 */
+		bool QueryClose();
 
 		static void CreateRibbonPage(wxRibbonPage * page);
 		void ConnectEvents();
@@ -60,6 +71,9 @@ class CodeEditor: public wxPanel
 		static const long idRibbonPaste;
 		static const long idRibbonUndo;
 		static const long idRibbonRedo;
+		static const long idRibbonOptions;
+		static const long idRibbonFindReplace;
+        static const long idRibbonGotoLine;
 		static const long idRibbonDocGDL;
 		static const long idRibbonDocSFML;
 		static const long idRibbonDocWxWidgets;
@@ -79,10 +93,13 @@ class CodeEditor: public wxPanel
 		void OnSaveSelected(wxRibbonButtonBarEvent& evt);
 		void UpdateTextCtrl(wxStyledTextEvent& event);
 		void OnCharAdded (wxStyledTextEvent &event);
+		void OnOptionsSelected(wxRibbonButtonBarEvent &event);
+		void OnFindReplaceSelected(wxRibbonButtonBarEvent &event);
 		void OnDocGDLSelected(wxRibbonButtonBarEvent &event);
 		void OnDocSFMLSelected(wxRibbonButtonBarEvent &event);
 		void OnDocWxWidgetsSelected(wxRibbonButtonBarEvent &event);
 		void OnDocBoostSelected(wxRibbonButtonBarEvent &event);
+		void OnGotoLineSelected(wxRibbonButtonBarEvent &event);
 		void OpenLink(wxString link);
 
 		MainEditorCommand mainEditorCommand;

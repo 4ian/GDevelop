@@ -453,6 +453,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-DWXMAKINGDLL_STEDIT" />
 			<Add directory="..\GDL" />
 			<Add directory="c:\Libs\SFML\include" />
 			<Add directory="C:\Libs\CppUnitLite" />
@@ -460,6 +461,7 @@
 			<Add directory="C:\Libs\wxspellchecker\include" />
 			<Add directory="C:\Libs\wxspellchecker\" />
 			<Add directory="CppUnitLite\" />
+			<Add directory="wxstedit\include" />
 		</Compiler>
 		<Unit filename="AutomatismTypeChoice.cpp" />
 		<Unit filename="AutomatismTypeChoice.h" />
@@ -931,6 +933,41 @@
 		<Unit filename="wxSFMLCanvas.hpp">
 			<Option virtualFolder="wxSFML Canvas\" />
 		</Unit>
+		<Unit filename="wxstedit\include\wx\stedit\pairarr.h" />
+		<Unit filename="wxstedit\include\wx\stedit\setup.h" />
+		<Unit filename="wxstedit\include\wx\stedit\setup0.h" />
+		<Unit filename="wxstedit\include\wx\stedit\stedefs.h" />
+		<Unit filename="wxstedit\include\wx\stedit\stedit.h" />
+		<Unit filename="wxstedit\include\wx\stedit\stedlgs.h" />
+		<Unit filename="wxstedit\include\wx\stedit\steexprt.h" />
+		<Unit filename="wxstedit\include\wx\stedit\stefindr.h" />
+		<Unit filename="wxstedit\include\wx\stedit\steframe.h" />
+		<Unit filename="wxstedit\include\wx\stedit\stelangs.h" />
+		<Unit filename="wxstedit\include\wx\stedit\stemenum.h" />
+		<Unit filename="wxstedit\include\wx\stedit\stenoteb.h" />
+		<Unit filename="wxstedit\include\wx\stedit\steopts.h" />
+		<Unit filename="wxstedit\include\wx\stedit\steprefs.h" />
+		<Unit filename="wxstedit\include\wx\stedit\steprint.h" />
+		<Unit filename="wxstedit\include\wx\stedit\steshell.h" />
+		<Unit filename="wxstedit\include\wx\stedit\stesplit.h" />
+		<Unit filename="wxstedit\include\wx\stedit\stestyls.h" />
+		<Unit filename="wxstedit\include\wx\stedit\wx24defs.h" />
+		<Unit filename="wxstedit\src\stedit.cpp" />
+		<Unit filename="wxstedit\src\stedlgs.cpp" />
+		<Unit filename="wxstedit\src\stedlgs_wdr.cpp" />
+		<Unit filename="wxstedit\src\stedlgs_wdr.h" />
+		<Unit filename="wxstedit\src\steexprt.cpp" />
+		<Unit filename="wxstedit\src\stefindr.cpp" />
+		<Unit filename="wxstedit\src\steframe.cpp" />
+		<Unit filename="wxstedit\src\stelangs.cpp" />
+		<Unit filename="wxstedit\src\stemenum.cpp" />
+		<Unit filename="wxstedit\src\stenoteb.cpp" />
+		<Unit filename="wxstedit\src\steopts.cpp" />
+		<Unit filename="wxstedit\src\steprefs.cpp" />
+		<Unit filename="wxstedit\src\steprint.cpp" />
+		<Unit filename="wxstedit\src\steshell.cpp" />
+		<Unit filename="wxstedit\src\stesplit.cpp" />
+		<Unit filename="wxstedit\src\stestyls.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

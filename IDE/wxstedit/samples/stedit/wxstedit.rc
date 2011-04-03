@@ -1,0 +1,9 @@
+// This is for explorer to show the program's icon
+aaaaaaaa ICON "../../art/pencil.ico"
+// This is for the frame
+pencil16 ICON "../../art/pencil.ico"
+
+#define wxUSE_NO_MANIFEST 0
+
+#include "wx/msw/wx.rc"
+

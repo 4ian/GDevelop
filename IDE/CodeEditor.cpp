@@ -16,6 +16,7 @@
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/MainEditorCommand.h"
+#include <wx/fontdlg.h>
 
 //(*IdInit(CodeEditor)
 const long CodeEditor::ID_CUSTOM1 = wxNewId();
@@ -31,6 +32,9 @@ const long CodeEditor::idRibbonCut = wxNewId();
 const long CodeEditor::idRibbonPaste = wxNewId();
 const long CodeEditor::idRibbonUndo = wxNewId();
 const long CodeEditor::idRibbonRedo = wxNewId();
+const long CodeEditor::idRibbonOptions = wxNewId();
+const long CodeEditor::idRibbonFindReplace = wxNewId();
+const long CodeEditor::idRibbonGotoLine = wxNewId();
 const long CodeEditor::idRibbonDocGDL = wxNewId();
 const long CodeEditor::idRibbonDocSFML = wxNewId();
 const long CodeEditor::idRibbonDocWxWidgets = wxNewId();
@@ -47,13 +51,11 @@ game(game_),
 mainEditorCommand(mainEditorCommand_)
 {
 	//(*Initialize(CodeEditor)
-	wxMenuItem* MenuItem5;
-	wxMenuItem* MenuItem4;
 	wxFlexGridSizer* FlexGridSizer1;
 
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
-	textEditor = new wxStyledTextCtrl(this,ID_CUSTOM1,wxDefaultPosition,wxDefaultSize,0,_T("ID_CUSTOM1"));
+	textEditor = new wxSTEditor(this,ID_CUSTOM1,wxDefaultPosition,wxDefaultSize,0,_T("ID_CUSTOM1"));
 	FlexGridSizer1->Add(textEditor, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	MenuItem1 = new wxMenuItem((&contextMenu), ID_MENUITEM1, _("Copier"), wxEmptyString, wxITEM_NORMAL);
@@ -86,50 +88,24 @@ mainEditorCommand(mainEditorCommand_)
 	Connect(ID_CUSTOM1, wxEVT_STC_UPDATEUI, (wxObjectEventFunction)&CodeEditor::UpdateTextCtrl);
 	Connect(ID_CUSTOM1, wxEVT_STC_CHARADDED, (wxObjectEventFunction)&CodeEditor::OnCharAdded);
 
-    //Initialize syntax highlighting
-	textEditor->SetLexer(wxSTC_LEX_CPP);
-	textEditor->StyleSetForeground(1, wxColour(0,28,158)); //Keywords
-	textEditor->StyleSetForeground(2, wxColour(0,158,28)); //Keywords
-	textEditor->StyleSetForeground(3, wxColour(0,158,28)); //Keywords
-	textEditor->StyleSetForeground(4, *wxBLACK); //Numbers
-	textEditor->StyleSetForeground(10, *wxRED); //Operators
-	textEditor->StyleSetForeground(6, *wxBLUE); //String
-	textEditor->StyleSetForeground(5, wxColour(0,28,158)); //(Key)Word
-	textEditor->StyleSetBackground(34, wxColour(119, 255, 119)); //Brace
-	textEditor->StyleSetBackground(35, wxColour(255, 119, 119)); //Brace
-    wxFont font (10, wxMODERN, wxNORMAL, wxNORMAL);
-    textEditor->StyleSetFont (wxSTC_STYLE_DEFAULT, font);
-    textEditor->SetKeyWords(0, "asm auto bool break case catch char class const const_cast "
-    "continue default delete do double dynamic_cast else enum explicit "
-    "export extern false float for friend goto if inline int long "
-    "mutable namespace new operator private protected public register "
-    "reinterpret_cast return short signed sizeof static static_cast "
-    "struct switch template this throw true try typedef typeid "
-    "typename union unsigned using virtual void volatile wchar_t "
-    "while");
-    textEditor->SetKeyWords(1, "file");
-    textEditor->SetKeyWords(2, "a addindex addtogroup anchor arg attention author b brief bug c "
-    "class code date def defgroup deprecated dontinclude e em endcode "
-    "endhtmlonly endif endlatexonly endlink endverbatim enum example "
-    "exception f$ f[ f] file fn hideinitializer htmlinclude "
-    "htmlonly if image include ingroup internal invariant interface "
-    "latexonly li line link mainpage name namespace nosubgrouping note "
-    "overload p page par param post pre ref relates remarks return "
-    "retval sa section see showinitializer since skip skipline struct "
-    "subsection test throw todo typedef union until var verbatim "
-    "verbinclude version warning weakgroup $ @ \"\" & < > # { }");
-
-    //Setup margins
-    textEditor->SetMarginLeft(1);
-    textEditor->SetMarginWidth(0, textEditor->TextWidth (wxSTC_STYLE_LINENUMBER, wxT("_999999")));
-
+    textEditor->SetLanguage(STE_LANG_CPP);
 	textEditor->LoadFile(filename);
+
+    wxSTEditorOptions steOptions(STE_DEFAULT_OPTIONS);
+    //steOptions.GetEditorStyles().GetFont(w))
+    steOptions.LoadConfig(*wxConfigBase::Get());
+    textEditor->CreateOptions(steOptions);
 }
 
 CodeEditor::~CodeEditor()
 {
 	//(*Destroy(CodeEditor)
 	//*)
+}
+
+bool CodeEditor::QueryClose()
+{
+    return ( textEditor->QuerySaveIfModified(true) != wxCANCEL );
 }
 
 /**
@@ -159,6 +135,17 @@ void CodeEditor::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Refaire") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
     }
     {
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Outils"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        ribbonBar->AddButton(idRibbonFindReplace, !hideLabels ? _("Chercher / Remplacer") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonGotoLine, !hideLabels ? _("Aller à...") : "", wxBitmap("res/gotoline24.png", wxBITMAP_TYPE_ANY));
+    }
+    {
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Options"), wxBitmap("res/pref24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        ribbonBar->AddButton(idRibbonOptions, !hideLabels ? _("Options") : "", wxBitmap("res/pref24.png", wxBITMAP_TYPE_ANY));
+    }
+    {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonDocGDL, !hideLabels ? _("Doc. GDL") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
@@ -180,6 +167,9 @@ void CodeEditor::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonDocSFML, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocSFMLSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonDocWxWidgets, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocWxWidgetsSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonDocBoost, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocBoostSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonOptions, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnOptionsSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonFindReplace, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnFindReplaceSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonGotoLine, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnGotoLineSelected, NULL, this);
 }
 
 void CodeEditor::SelectLine(size_t line)
@@ -234,12 +224,38 @@ void CodeEditor::OnMenuPasteSelected(wxCommandEvent& event)
     textEditor->Paste();
 }
 
+void CodeEditor::OnFindReplaceSelected(wxRibbonButtonBarEvent& evt)
+{
+    textEditor->ShowFindReplaceDialog(true);
+}
+
+void CodeEditor::OnGotoLineSelected(wxRibbonButtonBarEvent& evt)
+{
+    textEditor->ShowGotoLineDialog();
+}
+
+void CodeEditor::OnOptionsSelected(wxRibbonButtonBarEvent& evt)
+{
+    wxSTEditorPrefPageData editorData(textEditor->GetEditorPrefs(),
+                                      textEditor->GetEditorStyles(),
+                                      textEditor->GetEditorLangs(),
+                                      textEditor->GetLanguageId(),
+                                      textEditor);
+
+    wxSTEditorPrefDialog prefDialog(editorData, this, wxID_ANY, _("Editor Preferences"),
+                                    wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+
+    prefDialog.ShowModal();
+
+    textEditor->GetOptions().SaveConfig(*wxConfigBase::Get());
+}
+
 /**
  * Save file
  */
 void CodeEditor::OnSaveSelected(wxRibbonButtonBarEvent& evt)
 {
-    textEditor->SaveFile(filename);
+    textEditor->SaveFile(false, filename);
 }
 
 void CodeEditor::OnResize(wxSizeEvent& event)

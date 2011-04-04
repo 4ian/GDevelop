@@ -13594,7 +13594,7 @@
 	"wx/fontenc.h"
 	"wx/arrstr.h"
 
-1147906509 source:d:\florian\programmation\gamedevelop\ide\wxstedit\src\stedlgs_wdr.cpp
+1301837872 source:d:\florian\programmation\gamedevelop\ide\wxstedit\src\stedlgs_wdr.cpp
 	"wx/wxprec.h"
 	"stedlgs_wdr.h"
 	<wx/intl.h>
@@ -13621,7 +13621,7 @@
 	"wx/defs.h"
 	"wx/string.h"
 
-1301836934 source:d:\florian\programmation\gamedevelop\ide\wxstedit\src\stefindr.cpp
+1301837872 source:d:\florian\programmation\gamedevelop\ide\wxstedit\src\stefindr.cpp
 	"wx/wxprec.h"
 	"wx/wx.h"
 	"wx/stedit/stefindr.h"

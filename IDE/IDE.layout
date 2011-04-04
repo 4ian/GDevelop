@@ -16,11 +16,11 @@
 	<File name="BuildMessagesPnl.h" open="0" top="0" tabpos="8">
 		<Cursor position="551" topLine="9" />
 	</File>
-	<File name="BuildProgressPnl.cpp" open="0" top="0" tabpos="5">
+	<File name="BuildProgressPnl.cpp" open="1" top="0" tabpos="28">
 		<Cursor position="2771" topLine="61" />
 	</File>
-	<File name="BuildProgressPnl.h" open="0" top="0" tabpos="2">
-		<Cursor position="701" topLine="11" />
+	<File name="BuildProgressPnl.h" open="1" top="1" tabpos="29">
+		<Cursor position="530" topLine="22" />
 	</File>
 	<File name="BuildToolsPnl.cpp" open="0" top="0" tabpos="14">
 		<Cursor position="1168" topLine="1" />
@@ -70,13 +70,13 @@
 	<File name="Clipboard.h" open="0" top="0" tabpos="28">
 		<Cursor position="367" topLine="0" />
 	</File>
-	<File name="CodeEditor.cpp" open="1" top="1" tabpos="8">
-		<Cursor position="5587" topLine="110" />
+	<File name="CodeEditor.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="11152" topLine="184" />
 	</File>
-	<File name="CodeEditor.h" open="1" top="0" tabpos="9">
-		<Cursor position="725" topLine="17" />
+	<File name="CodeEditor.h" open="1" top="0" tabpos="6">
+		<Cursor position="1105" topLine="10" />
 	</File>
-	<File name="Compilation.cpp" open="1" top="0" tabpos="7">
+	<File name="Compilation.cpp" open="1" top="0" tabpos="4">
 		<Cursor position="25385" topLine="467" />
 	</File>
 	<File name="Compilation.h" open="0" top="0" tabpos="5">
@@ -344,7 +344,7 @@
 		<Cursor position="2427" topLine="65" />
 	</File>
 	<File name="ProjectManager.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="22890" topLine="321" />
+		<Cursor position="38144" topLine="740" />
 	</File>
 	<File name="ProjectManager.h" open="0" top="0" tabpos="8">
 		<Cursor position="984" topLine="23" />
@@ -355,16 +355,16 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4">
 		<Cursor position="510" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="4">
+	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="1">
 		<Cursor position="4631" topLine="103" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="10">
 		<Cursor position="3692" topLine="88" />
 	</File>
-	<File name="SceneEdittimeRenderer.cpp" open="1" top="0" tabpos="6">
+	<File name="SceneEdittimeRenderer.cpp" open="1" top="0" tabpos="3">
 		<Cursor position="627" topLine="7" />
 	</File>
-	<File name="SceneEdittimeRenderer.h" open="1" top="0" tabpos="5">
+	<File name="SceneEdittimeRenderer.h" open="1" top="0" tabpos="2">
 		<Cursor position="1793" topLine="40" />
 	</File>
 	<File name="SearchEvents.cpp" open="0" top="0" tabpos="53">
@@ -421,10 +421,10 @@
 	<File name="wxstedit\include\wx\stedit\stedefs.h" open="0" top="0" tabpos="0">
 		<Cursor position="14024" topLine="70" />
 	</File>
-	<File name="wxstedit\include\wx\stedit\stedlgs.h" open="1" top="0" tabpos="28">
+	<File name="wxstedit\include\wx\stedit\stedlgs.h" open="1" top="0" tabpos="8">
 		<Cursor position="513" topLine="0" />
 	</File>
-	<File name="wxstedit\include\wx\stedit\steopts.h" open="1" top="0" tabpos="27">
+	<File name="wxstedit\include\wx\stedit\steopts.h" open="1" top="0" tabpos="7">
 		<Cursor position="560" topLine="3" />
 	</File>
 	<File name="wxstedit\src\stedit.cpp" open="0" top="0" tabpos="28">
@@ -436,7 +436,10 @@
 	<File name="wxstedit\src\steexprt.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="23713" topLine="566" />
 	</File>
-	<File name="wxstedit\src\stemenum.cpp" open="1" top="0" tabpos="29">
+	<File name="wxstedit\src\stemenum.cpp" open="1" top="0" tabpos="9">
 		<Cursor position="39451" topLine="922" />
+	</File>
+	<File name="wxstedit\src\stenoteb.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="19719" topLine="640" />
 	</File>
 </CodeBlocks_layout_file>

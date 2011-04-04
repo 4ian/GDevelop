@@ -40,7 +40,7 @@ sceneCanvas(sceneCanvas_)
 	initialPositionsList->InsertColumn(1, _("X"));
 	initialPositionsList->InsertColumn(2, _("Y"));
 	initialPositionsList->InsertColumn(3, _("Angle"));
-	initialPositionsList->InsertColumn(3, _("Plan"));
+	initialPositionsList->InsertColumn(4, _("Plan"));
 
 	Refresh();
 }

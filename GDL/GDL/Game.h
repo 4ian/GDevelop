@@ -72,6 +72,7 @@ class GD_API Game
         std::string winExecutableFilename; ///< Windows executable name
         std::string winExecutableIconFile; ///< Icon for Windows executable
         std::string linuxExecutableFilename;  ///< Linux executable name
+        std::string macExecutableFilename;  ///< Mac executable name
         #endif
 
     protected:

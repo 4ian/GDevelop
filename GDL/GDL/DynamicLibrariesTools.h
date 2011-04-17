@@ -9,7 +9,7 @@
 #if defined(WINDOWS)
     #include <windows.h>
     typedef HINSTANCE Handle;
-#elif defined(LINUX)
+#elif defined(LINUX) || defined (MAC)
     typedef void* Handle;
 #else
     #warning No system supported for dynamic libraries loading

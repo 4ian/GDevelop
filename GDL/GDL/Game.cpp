@@ -98,6 +98,7 @@ void Game::Init(const Game & game)
     winExecutableFilename = game.winExecutableFilename;
     winExecutableIconFile = game.winExecutableIconFile;
     linuxExecutableFilename = game.linuxExecutableFilename;
+    macExecutableFilename = game.macExecutableFilename;
     #endif
 }
 

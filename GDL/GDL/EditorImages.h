@@ -36,13 +36,17 @@ class GD_API EditorImages: public wxPanel
 		wxMenuItem* MenuItem8;
 		wxPanel* toolbarPanel;
 		wxMenuItem* MenuItem7;
+		wxMenu emptyMenu;
 		wxMenuItem* MenuItem5;
+		wxMenuItem* MenuItem2;
 		wxPanel* apercuPanel;
 		wxMenuItem* MenuItem4;
 		wxMenu ContextMenu;
 		wxMenuItem* MenuItem6;
 		wxTreeCtrl* BanqueImageList;
 		wxSplitterWindow* SplitterWindow1;
+		wxMenuItem* MenuItem9;
+		wxMenu folderMenu;
 		//*)
 
 		static void CreateRibbonPage(wxRibbonPage * page);
@@ -65,10 +69,16 @@ class GD_API EditorImages: public wxPanel
 		static const long idMenuModFile;
 		static const long idMenuAjouter;
 		static const long idMenuDel;
-		static const long idMenuAddDossier;
-		static const long idMenuRemoveDossier;
 		static const long idMoveUp;
 		static const long idMoveDown;
+		static const long ID_MENUITEM1;
+		static const long ID_MENUITEM2;
+		static const long ID_MENUITEM3;
+		static const long ID_MENUITEM5;
+		static const long ID_MENUITEM6;
+		static const long ID_MENUITEM4;
+		static const long ID_MENUITEM7;
+		static const long ID_MENUITEM8;
 		//*)
 		static const long ID_BITMAPBUTTON1;
 		static const long ID_BITMAPBUTTON5;
@@ -123,10 +133,20 @@ class GD_API EditorImages: public wxPanel
 		void OnMoveDownSelected(wxCommandEvent& event);
 		void OnSetFocus(wxFocusEvent& event);
 		void OnResize(wxSizeEvent& event);
+		void OnAddFolderSelected(wxCommandEvent& event);
+		void OnRemoveFolderSelected(wxCommandEvent& event);
 		//*)
         void OnMoreOptions( wxCommandEvent& event );
         void CreateToolbar();
         void ConnectEvents();
+
+        void RemoveImageFromTree(wxTreeItemId parent, std::string imageName);
+        void RenameInTree(wxTreeItemId parent, std::string oldName, std::string newName, std::string type);
+        wxTreeItemId GetSelectedFolderItem();
+        void ShiftUpElementOfTree();
+        void ShiftDownElementOfTree();
+
+        wxTreeItemId allImagesItem;
 
 #if defined(DESACTIVATED_FOR_WX290)
         ImageFilesWatcher filesWatcher;
@@ -135,11 +155,7 @@ class GD_API EditorImages: public wxPanel
 		MainEditorCommand mainEditorCommand;
 		bool useRibbon;
 
-        //Pour un changement de nom
-		string m_NomItem;
-
-		string dossierNom;
-		int dossierId;
+		string renamedItemOldName;
 
 		wxToolBar * toolbar;
 

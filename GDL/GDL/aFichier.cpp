@@ -24,10 +24,13 @@ bool ActLaunchFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
     string appel = "start \"\" \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+"\""; //quotes are important
 
     system(appel.c_str());
-#endif
-#ifdef LINUX
+#elif defined(LINUX)
     //Nécessite le paquet xdg-utils
     string appel = "xdg-open \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+"\"";
+
+    system(appel.c_str());
+#elif defined(MAC)
+    string appel = "open \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+"\"";
 
     system(appel.c_str());
 #endif

@@ -23,8 +23,8 @@ public:
 
     /**
      * Load all extensions located in the extensions directory.
-     * Extensions files must have extensions *.xgd(w|l)(e),
-     * w for Windows, l for Linux, e for Edittime extensions.
+     * Extensions files must have extensions *.xgd(w|l|m)(e),
+     * w for Windows, l for Linux, m for Mac e for Edittime extensions.
      */
     void LoadAllStaticExtensionsAvailable();
 

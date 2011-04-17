@@ -6,7 +6,7 @@
 #include "GDL/DynamicLibrariesTools.h"
 #if defined(WINDOWS)
     #include <windows.h>
-#elif defined(LINUX)
+#elif defined(LINUX) || defined (MAC)
     #include <dlfcn.h>
 #endif
 
@@ -17,7 +17,7 @@ namespace GDpriv
     Handle OpenLibrary(const char* path) {return LoadLibrary(path);}
     void* GetSymbol(Handle library, const char* name) { return (void*)GetProcAddress(library, name);}
     void CloseLibrary(Handle library) {FreeLibrary(library);}
-#elif defined(LINUX)
+#elif defined(LINUX) || defined (MAC)
     Handle OpenLibrary(const char* path) {return dlopen(path, RTLD_LAZY);}
     void* GetSymbol(Handle library, const char* name) { return dlsym(library, name);}
     void CloseLibrary(Handle library) {dlclose(library);}

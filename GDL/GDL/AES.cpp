@@ -105,7 +105,7 @@ bool tablesInitialized = false;
 #define RotByteL(a) _rotl(a,8)
 
 //Define remplacement functions for _rotr and _rotl which are windows specific
-#if defined(LINUX)
+#if defined(LINUX) || defined (MAC)
 unsigned int _rotr(unsigned int num, unsigned int numbits)
 {
     unsigned int lowbitmask=1;          // mask for 1st bit

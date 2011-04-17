@@ -7,6 +7,7 @@
 
 /**
  * \brief Internal class used by IDE.
+ *
  * This class can be used by wxTreeCtrl, to attach
  * information ( two strings ) to an item
  */
@@ -18,6 +19,8 @@ public:
 
     const std::string & GetString() const { return str; }
     const std::string & GetSecondString() const { return str2; }
+    void SetString(std::string str_) { str = str_; }
+    void SetSecondString(std::string str_) { str2 = str_; }
 
 private:
     std::string str;

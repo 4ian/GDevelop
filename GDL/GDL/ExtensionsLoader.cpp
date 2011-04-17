@@ -80,6 +80,8 @@ void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
         suffix += "w";
     #elif defined(LINUX)
         suffix += "l";
+    #elif defined(MAC)
+        suffix += "m";
     #else
         #error No target system defined.
     #endif

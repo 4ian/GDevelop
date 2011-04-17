@@ -44,7 +44,7 @@ bool ActEnvoiDataNet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
 
 #ifdef WINDOWS
     //Création de l'adresse internet à lancer
-    string appel = "start \"\" \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+
+    string call = "start \"\" \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+
                    "?data1="+data1+"&check1="+data1md5+
                    "&data2="+data2+"&check2="+data2md5+
                    "&data3="+data3+"&check3="+data3md5+
@@ -52,11 +52,10 @@ bool ActEnvoiDataNet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
                    "&data5="+data5+"&check5="+data5md5+
                    "&data6="+data6+"&check6="+data6md5+"\"";
 
-    system(appel.c_str());
-#endif
-#ifdef LINUX
+    system(call.c_str());
+#elif defined(LINUX)
     //Nécessite le paquet xdg-utils
-    string appel = "xdg-open \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+
+    string call = "xdg-open \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+
                    "?data1="+data1+"&check1="+data1md5+
                    "&data2="+data2+"&check2="+data2md5+
                    "&data3="+data3+"&check3="+data3md5+
@@ -64,7 +63,18 @@ bool ActEnvoiDataNet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
                    "&data5="+data5+"&check5="+data5md5+
                    "&data6="+data6+"&check6="+data6md5+"\"";
 
-    system(appel.c_str());
+    system(call.c_str());
+#elif defined(MAC)
+    //Nécessite le paquet xdg-utils
+    string call = "open \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+
+                   "?data1="+data1+"&check1="+data1md5+
+                   "&data2="+data2+"&check2="+data2md5+
+                   "&data3="+data3+"&check3="+data3md5+
+                   "&data4="+data4+"&check4="+data4md5+
+                   "&data5="+data5+"&check5="+data5md5+
+                   "&data6="+data6+"&check6="+data6md5+"\"";
+
+    system(call.c_str());
 #endif
 
     return true;

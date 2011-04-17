@@ -31,11 +31,12 @@ bool GD_API InitLog()
     string year = YEAR;
     string fulldate = "Built "+date+"/"+month+"/"+year+"\n";
 
-    #ifdef LINUX
+    #if defined(LINUX)
         string sys = "Target system : Linux, ";
-    #endif
-    #ifdef WINDOWS
+    #elif defined(WINDOWS)
         string sys = "Target system : Windows, ";
+    #elif defined(MAC)
+        string sys = "Target system : Mac, ";
     #endif
     if(sizeof(int*) == 4)
         sys += "32-bits\n";

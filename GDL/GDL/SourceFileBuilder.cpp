@@ -65,6 +65,8 @@ void SourceFileBuilder::UpdateExtensionsLibs()
         std::string ext = "w";
     #elif defined(LINUX)
         std::string ext = "l";
+    #elif defined(MAC)
+        std::string ext = "m";
     #else
         #error Unknown target system.
     #endif

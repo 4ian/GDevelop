@@ -55,7 +55,7 @@ mainEditorCommand(mainEditorCommand_)
 
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
-	textEditor = new wxSTEditor(this,ID_CUSTOM1,wxDefaultPosition,wxDefaultSize,,_T("ID_CUSTOM1"));
+	textEditor = new wxSTEditor(this,ID_CUSTOM1,wxDefaultPosition,wxDefaultSize,0,_T("ID_CUSTOM1"));
 	FlexGridSizer1->Add(textEditor, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	MenuItem1 = new wxMenuItem((&contextMenu), ID_MENUITEM1, _("Copier"), wxEmptyString, wxITEM_NORMAL);

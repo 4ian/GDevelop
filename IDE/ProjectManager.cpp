@@ -356,7 +356,9 @@ void ProjectManager::Refresh()
             for (unsigned int j = 0;j<mainEditor.games[i]->externalSourceFiles.size();++j)
             {
                 gdTreeItemGameData * sourceFileItem = new gdTreeItemGameData("SourceFile", mainEditor.games[i]->externalSourceFiles[j]->GetFileName(), mainEditor.games[i].get());
-                projectsTree->AppendItem(sourceFilesItem, mainEditor.games[i]->externalSourceFiles[j]->GetFileName(), 5 ,5, sourceFileItem);
+                wxFileName relativeFileName = wxFileName(mainEditor.games[i]->externalSourceFiles[j]->GetFileName());
+                relativeFileName.MakeRelativeTo(wxFileName(mainEditor.games[i]->gameFile).GetPath());
+                projectsTree->AppendItem(sourceFilesItem, relativeFileName.GetFullPath(), 5 ,5, sourceFileItem);
             }
         }
         #endif
@@ -529,7 +531,7 @@ void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t li
         wxString program;
         wxConfigBase::Get()->Read("/Code/ExternalEditor", &program);
 
-        wxExecute(program+" "+filename);
+        wxExecute(program+" \""+filename+"\"");
         return;
     }
     //Launch an internal code editor else

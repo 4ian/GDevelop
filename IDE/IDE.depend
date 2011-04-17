@@ -62,7 +62,7 @@
 
 1253308487 c:\libs\wxwidgets\include\wx\osx\config_xcode.h
 
-1253308462 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+1253308462 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
 
 1253308518 c:\libs\wxwidgets\include\wx\setup_gccxml.h
 
@@ -1753,7 +1753,7 @@
 1253308453 c:\libs\wxwidgets\include\wx\palmos\imaglist.h
 	"wx/bitmap.h"
 
-1298416164 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
+1302445484 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
 	<string>
 	<vector>
 	"GDL/Object.h"
@@ -8477,7 +8477,7 @@
 	<boost/shared_ptr.hpp>
 	"GDL/ObjectIdentifiersManager.h"
 
-1297529536 d:\florian\programmation\gamedevelop\gdl\gdl\gdtreeitemstringdata.h
+1302375203 d:\florian\programmation\gamedevelop\gdl\gdl\gdtreeitemstringdata.h
 	<string>
 	<wx/treectrl.h>
 
@@ -10772,7 +10772,7 @@
 	<string>
 	"GDL/Event.h"
 
-1301833464 source:d:\florian\programmation\gamedevelop\ide\codeeditor.cpp
+1302031230 source:d:\florian\programmation\gamedevelop\ide\codeeditor.cpp
 	"CodeEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -10836,7 +10836,7 @@
 	"wx/dialog.h"
 	"wx/cmndata.h"
 
-1301758269 source:d:\florian\programmation\gamedevelop\ide\compilation.cpp
+1302467138 source:d:\florian\programmation\gamedevelop\ide\compilation.cpp
 	<wx/bitmap.h>
 	<wx/settings.h>
 	<wx/intl.h>
@@ -10895,7 +10895,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1293716480 d:\florian\programmation\gamedevelop\ide\compilation.h
+1302464425 d:\florian\programmation\gamedevelop\ide\compilation.h
 	<wx/msw/winundef.h>
 	<wx/notebook.h>
 	<wx/sizer.h>
@@ -11277,7 +11277,7 @@
 	"GDL/CommonTools.h"
 	"RecentList.h"
 
-1294695491 d:\florian\programmation\gamedevelop\gdl\gdl\editorimages.h
+1302381487 d:\florian\programmation\gamedevelop\gdl\gdl\editorimages.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/menu.h>
@@ -11970,12 +11970,12 @@
 	"GDL/ExtensionsLoader.h"
 	"GDL/gdTreeItemStringData.h"
 
-1297528519 d:\florian\programmation\gamedevelop\gdl\gdl\extensionsloader.h
+1302445484 d:\florian\programmation\gamedevelop\gdl\gdl\extensionsloader.h
 	<string>
 	<vector>
 	"GDL/DynamicLibrariesTools.h"
 
-1297528737 d:\florian\programmation\gamedevelop\gdl\gdl\dynamiclibrariestools.h
+1302445484 d:\florian\programmation\gamedevelop\gdl\gdl\dynamiclibrariestools.h
 	<windows.h>
 
 1278093583 source:d:\florian\programmation\gamedevelop\ide\externaleventseditor.cpp
@@ -12925,7 +12925,7 @@
 1253308506 c:\libs\wxwidgets\include\wx\generic\animate.h
 	"wx/bitmap.h"
 
-1300559417 source:d:\florian\programmation\gamedevelop\ide\initialpositionbrowserdlg.cpp
+1301944442 source:d:\florian\programmation\gamedevelop\ide\initialpositionbrowserdlg.cpp
 	"InitialPositionBrowserDlg.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -13269,7 +13269,7 @@
 	"Event.h"
 	"GDL/profile.h"
 
-1297897000 source:d:\florian\programmation\gamedevelop\ide\projectmanager.cpp
+1302032211 source:d:\florian\programmation\gamedevelop\ide\projectmanager.cpp
 	"ProjectManager.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -13454,7 +13454,7 @@
 1294612730 source:d:\florian\programmation\gamedevelop\ide\resource.rc
 	"version.h"
 
-1301837872 d:\florian\programmation\gamedevelop\ide\version.h
+1302464459 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -13865,6 +13865,4 @@
 	"GDL/CommonTools.h"
 
 1300566575 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
-
-1253308462 c:\libs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
 

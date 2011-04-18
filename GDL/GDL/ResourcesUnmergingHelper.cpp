@@ -11,6 +11,8 @@
 
 std::string ResourcesUnmergingHelper::GetNewFilename(std::string resourceFilename)
 {
+    if ( resourceFilename.empty() ) return "";
+
     if ( resourcesNewFilename.find(resourceFilename) != resourcesNewFilename.end() )
         return resourcesNewFilename[resourceFilename];
 

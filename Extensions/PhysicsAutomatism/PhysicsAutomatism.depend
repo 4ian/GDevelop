@@ -14,7 +14,7 @@
 1279394603 d:\florian\programmation\gamedevelop\extensions\physicsautomatism\box2d\box2d\box2d\common\b2blockallocator.h
 	<Box2D/Common/b2Settings.h>
 
-1279394603 d:\florian\programmation\gamedevelop\extensions\physicsautomatism\box2d\box2d\box2d\common\b2settings.h
+1303072185 d:\florian\programmation\gamedevelop\extensions\physicsautomatism\box2d\box2d\box2d\common\b2settings.h
 	<cassert>
 	<cmath>
 
@@ -6294,7 +6294,7 @@
 	<boost/serialization/vector.hpp>
 	<boost/serialization/nvp.hpp>
 
-1289577063 c:\libs\sfml\include\sfml\system.hpp
+1301751274 c:\libs\sfml\include\sfml\system.hpp
 	<SFML/Config.hpp>
 	<SFML/System/Clock.hpp>
 	<SFML/System/Err.hpp>
@@ -6310,54 +6310,57 @@
 	<SFML/System/Vector2.hpp>
 	<SFML/System/Vector3.hpp>
 
-1289603036 c:\libs\sfml\include\sfml\config.hpp
+1301751274 c:\libs\sfml\include\sfml\config.hpp
 	<climits>
 
-1289577063 c:\libs\sfml\include\sfml\system\clock.hpp
+1301751274 c:\libs\sfml\include\sfml\system\clock.hpp
 	<SFML/Config.hpp>
 
-1289577063 c:\libs\sfml\include\sfml\system\err.hpp
+1301751274 c:\libs\sfml\include\sfml\system\err.hpp
 	<SFML/Config.hpp>
 	<ostream>
 
-1289577063 c:\libs\sfml\include\sfml\system\lock.hpp
+1301751274 c:\libs\sfml\include\sfml\system\lock.hpp
 	<SFML/System/NonCopyable.hpp>
 
-1289577063 c:\libs\sfml\include\sfml\system\noncopyable.hpp
+1301751274 c:\libs\sfml\include\sfml\system\noncopyable.hpp
 	<SFML/Config.hpp>
 
-1289603036 c:\libs\sfml\include\sfml\system\mutex.hpp
+1301751274 c:\libs\sfml\include\sfml\system\mutex.hpp
 	<SFML/Config.hpp>
 	<SFML/System/NonCopyable.hpp>
 
-1289577063 c:\libs\sfml\include\sfml\system\randomizer.hpp
+1301751274 c:\libs\sfml\include\sfml\system\randomizer.hpp
 	<SFML/Config.hpp>
 
-1289577063 c:\libs\sfml\include\sfml\system\sleep.hpp
+1301751274 c:\libs\sfml\include\sfml\system\sleep.hpp
 	<SFML/Config.hpp>
 
-1289577063 c:\libs\sfml\include\sfml\system\string.hpp
+1301751274 c:\libs\sfml\include\sfml\system\string.hpp
 	<SFML/Config.hpp>
 	<locale>
 	<string>
 
-1289577063 c:\libs\sfml\include\sfml\system\thread.hpp
+1301751274 c:\libs\sfml\include\sfml\system\thread.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<cstdlib>
+	<SFML/System/Thread.inl>
+
+1301751274 c:\libs\sfml\include\sfml\system\thread.inl
+
+1301751274 c:\libs\sfml\include\sfml\system\threadlocal.hpp
 	<SFML/Config.hpp>
 	<SFML/System/NonCopyable.hpp>
 	<cstdlib>
 
-1289577063 c:\libs\sfml\include\sfml\system\threadlocal.hpp
-	<SFML/Config.hpp>
-	<SFML/System/NonCopyable.hpp>
-	<cstdlib>
-
-1289577063 c:\libs\sfml\include\sfml\system\threadlocalptr.hpp
+1301751274 c:\libs\sfml\include\sfml\system\threadlocalptr.hpp
 	<SFML/System/ThreadLocal.hpp>
 	<SFML/System/ThreadLocalPtr.inl>
 
-1289577063 c:\libs\sfml\include\sfml\system\threadlocalptr.inl
+1301751274 c:\libs\sfml\include\sfml\system\threadlocalptr.inl
 
-1289577063 c:\libs\sfml\include\sfml\system\utf.hpp
+1301751274 c:\libs\sfml\include\sfml\system\utf.hpp
 	<SFML/Config.hpp>
 	<algorithm>
 	<locale>
@@ -6365,19 +6368,19 @@
 	<cstdlib>
 	<SFML/System/Utf.inl>
 
-1289603036 c:\libs\sfml\include\sfml\system\utf.inl
+1301751274 c:\libs\sfml\include\sfml\system\utf.inl
 
-1289603036 c:\libs\sfml\include\sfml\system\vector2.hpp
+1301751274 c:\libs\sfml\include\sfml\system\vector2.hpp
 	<SFML/System/Vector2.inl>
 
-1289577063 c:\libs\sfml\include\sfml\system\vector2.inl
+1301751274 c:\libs\sfml\include\sfml\system\vector2.inl
 
-1289603036 c:\libs\sfml\include\sfml\system\vector3.hpp
+1301751274 c:\libs\sfml\include\sfml\system\vector3.hpp
 	<SFML/System/Vector3.inl>
 
-1289577063 c:\libs\sfml\include\sfml\system\vector3.inl
+1301751274 c:\libs\sfml\include\sfml\system\vector3.inl
 
-1289577063 c:\libs\sfml\include\sfml\graphics.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
 	<SFML/Graphics/Color.hpp>
 	<SFML/Graphics/Font.hpp>
@@ -6392,7 +6395,7 @@
 	<SFML/Graphics/Text.hpp>
 	<SFML/Graphics/View.hpp>
 
-1289577063 c:\libs\sfml\include\sfml\window.hpp
+1301751274 c:\libs\sfml\include\sfml\window.hpp
 	<SFML/System.hpp>
 	<SFML/Window/Context.hpp>
 	<SFML/Window/ContextSettings.hpp>
@@ -6402,43 +6405,48 @@
 	<SFML/Window/Window.hpp>
 	<SFML/Window/WindowStyle.hpp>
 
-1289577063 c:\libs\sfml\include\sfml\window\context.hpp
+1301751274 c:\libs\sfml\include\sfml\window\context.hpp
 	<SFML/Config.hpp>
+	<SFML/Window/GlResource.hpp>
 	<SFML/System/NonCopyable.hpp>
 
-1289577063 c:\libs\sfml\include\sfml\window\contextsettings.hpp
-
-1289603036 c:\libs\sfml\include\sfml\window\event.hpp
+1301751274 c:\libs\sfml\include\sfml\window\glresource.hpp
 	<SFML/Config.hpp>
 
-1289577063 c:\libs\sfml\include\sfml\window\input.hpp
+1301751274 c:\libs\sfml\include\sfml\window\contextsettings.hpp
+
+1301751274 c:\libs\sfml\include\sfml\window\event.hpp
+	<SFML/Config.hpp>
+
+1301751274 c:\libs\sfml\include\sfml\window\input.hpp
 	<SFML/Config.hpp>
 	<SFML/System/NonCopyable.hpp>
 	<SFML/Window/Event.hpp>
 
-1289577063 c:\libs\sfml\include\sfml\window\videomode.hpp
+1301751274 c:\libs\sfml\include\sfml\window\videomode.hpp
 	<SFML/Config.hpp>
 	<vector>
 
-1289603036 c:\libs\sfml\include\sfml\window\window.hpp
+1301751274 c:\libs\sfml\include\sfml\window\window.hpp
 	<SFML/Window/ContextSettings.hpp>
 	<SFML/Window/Input.hpp>
 	<SFML/Window/VideoMode.hpp>
 	<SFML/Window/WindowHandle.hpp>
 	<SFML/Window/WindowStyle.hpp>
+	<SFML/Window/GlResource.hpp>
 	<SFML/System/Clock.hpp>
 	<SFML/System/NonCopyable.hpp>
 	<string>
 
-1289603036 c:\libs\sfml\include\sfml\window\windowhandle.hpp
+1301751274 c:\libs\sfml\include\sfml\window\windowhandle.hpp
 	<SFML/Config.hpp>
 
-1289577063 c:\libs\sfml\include\sfml\window\windowstyle.hpp
+1301751274 c:\libs\sfml\include\sfml\window\windowstyle.hpp
 
-1289577062 c:\libs\sfml\include\sfml\graphics\color.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\color.hpp
 	<SFML/Config.hpp>
 
-1289603036 c:\libs\sfml\include\sfml\graphics\font.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\font.hpp
 	<SFML/System/Resource.hpp>
 	<SFML/System/Vector2.hpp>
 	<SFML/System/String.hpp>
@@ -6449,98 +6457,102 @@
 	<string>
 	<vector>
 
-1289577063 c:\libs\sfml\include\sfml\system\resource.hpp
+1301751274 c:\libs\sfml\include\sfml\system\resource.hpp
 	<SFML/System/Lock.hpp>
 	<SFML/System/Mutex.hpp>
 	<set>
+	<cstddef>
 	<SFML/System/Resource.inl>
 	<SFML/System/ResourcePtr.inl>
 
-1289577063 c:\libs\sfml\include\sfml\system\resource.inl
+1301751274 c:\libs\sfml\include\sfml\system\resource.inl
 
-1289577063 c:\libs\sfml\include\sfml\system\resourceptr.inl
+1301751274 c:\libs\sfml\include\sfml\system\resourceptr.inl
 
-1289577062 c:\libs\sfml\include\sfml\graphics\glyph.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\glyph.hpp
 	<SFML/Config.hpp>
 	<SFML/Graphics/Rect.hpp>
 
-1289577062 c:\libs\sfml\include\sfml\graphics\rect.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\rect.hpp
 	<SFML/System/Vector2.hpp>
 	<algorithm>
 	<SFML/Graphics/Rect.inl>
 
-1289577062 c:\libs\sfml\include\sfml\graphics\rect.inl
+1301751274 c:\libs\sfml\include\sfml\graphics\rect.inl
 
-1289577062 c:\libs\sfml\include\sfml\graphics\image.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\image.hpp
 	<SFML/System/Resource.hpp>
+	<SFML/Window/GlResource.hpp>
 	<SFML/Graphics/Color.hpp>
 	<SFML/Graphics/Rect.hpp>
 	<string>
 	<vector>
 
-1289603036 c:\libs\sfml\include\sfml\graphics\renderer.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\renderer.hpp
 	<SFML/Config.hpp>
 	<SFML/System/NonCopyable.hpp>
+	<SFML/Window/GlResource.hpp>
 	<SFML/Graphics/Color.hpp>
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Graphics/Matrix3.hpp>
 
-1289577062 c:\libs\sfml\include\sfml\graphics\drawable.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\drawable.hpp
 	<SFML/System/Vector2.hpp>
 	<SFML/Graphics/Color.hpp>
 	<SFML/Graphics/Matrix3.hpp>
 
-1289577062 c:\libs\sfml\include\sfml\graphics\matrix3.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\matrix3.hpp
 	<SFML/Config.hpp>
 	<SFML/System/Vector2.hpp>
 	<SFML/Graphics/Rect.hpp>
 	<cmath>
 	<SFML/Graphics/Matrix3.inl>
 
-1289577062 c:\libs\sfml\include\sfml\graphics\matrix3.inl
+1301751274 c:\libs\sfml\include\sfml\graphics\matrix3.inl
 
-1289577062 c:\libs\sfml\include\sfml\graphics\renderimage.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\renderimage.hpp
 	<SFML/Graphics/Image.hpp>
 	<SFML/Graphics/RenderTarget.hpp>
 
-1289603036 c:\libs\sfml\include\sfml\graphics\rendertarget.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\rendertarget.hpp
 	<SFML/System/NonCopyable.hpp>
 	<SFML/Graphics/Color.hpp>
 	<SFML/Graphics/Rect.hpp>
 	<SFML/Graphics/Renderer.hpp>
 	<SFML/Graphics/View.hpp>
 
-1289577062 c:\libs\sfml\include\sfml\graphics\view.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\view.hpp
 	<SFML/Config.hpp>
 	<SFML/Graphics/Rect.hpp>
 	<SFML/Graphics/Matrix3.hpp>
 	<SFML/System/Vector2.hpp>
 
-1289577062 c:\libs\sfml\include\sfml\graphics\renderwindow.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\renderwindow.hpp
 	<SFML/Graphics/Image.hpp>
 	<SFML/Graphics/RenderTarget.hpp>
 	<SFML/Window/Window.hpp>
 	<string>
 
-1289577062 c:\libs\sfml\include\sfml\graphics\shader.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\shader.hpp
 	<SFML/Config.hpp>
 	<SFML/Graphics/Image.hpp>
+	<SFML/Window/GlResource.hpp>
 	<SFML/System/Vector2.hpp>
 	<SFML/System/Vector3.hpp>
 	<map>
 	<string>
 
-1289577062 c:\libs\sfml\include\sfml\graphics\shape.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\shape.hpp
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/System/Vector2.hpp>
 	<vector>
 
-1289577062 c:\libs\sfml\include\sfml\graphics\sprite.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\sprite.hpp
 	<SFML/System/Resource.hpp>
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Graphics/Rect.hpp>
 
-1289577062 c:\libs\sfml\include\sfml\graphics\text.hpp
+1301751274 c:\libs\sfml\include\sfml\graphics\text.hpp
 	<SFML/System/Resource.hpp>
 	<SFML/System/String.hpp>
 	<SFML/Graphics/Drawable.hpp>
@@ -8833,7 +8845,7 @@
 	"GDL/Game.h"
 	"GDL/ImageManager.h"
 
-1298416164 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
+1302445484 d:\florian\programmation\gamedevelop\gdl\gdl\game.h
 	<string>
 	<vector>
 	"GDL/Object.h"
@@ -8865,7 +8877,7 @@
 	<vector>
 	<string>
 
-1289577063 c:\libs\sfml\include\sfml\opengl.hpp
+1301751274 c:\libs\sfml\include\sfml\opengl.hpp
 	<SFML/Config.hpp>
 	<windows.h>
 	<GL/gl.h>
@@ -8888,7 +8900,7 @@
 	<string>
 	<vector>
 
-1289577063 c:\libs\sfml\include\sfml\audio.hpp
+1301751274 c:\libs\sfml\include\sfml\audio.hpp
 	<SFML/System.hpp>
 	<SFML/Audio/Listener.hpp>
 	<SFML/Audio/Music.hpp>
@@ -8898,43 +8910,43 @@
 	<SFML/Audio/SoundRecorder.hpp>
 	<SFML/Audio/SoundStream.hpp>
 
-1289577062 c:\libs\sfml\include\sfml\audio\listener.hpp
+1301751274 c:\libs\sfml\include\sfml\audio\listener.hpp
 	<SFML/Config.hpp>
 	<SFML/System/Vector3.hpp>
 
-1289577062 c:\libs\sfml\include\sfml\audio\music.hpp
+1301751274 c:\libs\sfml\include\sfml\audio\music.hpp
 	<SFML/Audio/SoundStream.hpp>
 	<SFML/System/Mutex.hpp>
 	<string>
 	<vector>
 
-1289603036 c:\libs\sfml\include\sfml\audio\soundstream.hpp
+1301751274 c:\libs\sfml\include\sfml\audio\soundstream.hpp
 	<SFML/Audio/SoundSource.hpp>
 	<SFML/System/Thread.hpp>
 	<cstdlib>
 
-1289577062 c:\libs\sfml\include\sfml\audio\soundsource.hpp
+1301751274 c:\libs\sfml\include\sfml\audio\soundsource.hpp
 	<SFML/Config.hpp>
 	<SFML/System/Vector3.hpp>
 
-1289603036 c:\libs\sfml\include\sfml\audio\sound.hpp
+1301751274 c:\libs\sfml\include\sfml\audio\sound.hpp
 	<SFML/Audio/SoundSource.hpp>
 	<SFML/System/Resource.hpp>
 	<cstdlib>
 
-1289577062 c:\libs\sfml\include\sfml\audio\soundbuffer.hpp
+1301751274 c:\libs\sfml\include\sfml\audio\soundbuffer.hpp
 	<SFML/Config.hpp>
 	<SFML/System/Resource.hpp>
 	<string>
 	<vector>
 	<set>
 
-1289577062 c:\libs\sfml\include\sfml\audio\soundbufferrecorder.hpp
+1301751274 c:\libs\sfml\include\sfml\audio\soundbufferrecorder.hpp
 	<SFML/Audio/SoundBuffer.hpp>
 	<SFML/Audio/SoundRecorder.hpp>
 	<vector>
 
-1289577062 c:\libs\sfml\include\sfml\audio\soundrecorder.hpp
+1301751274 c:\libs\sfml\include\sfml\audio\soundrecorder.hpp
 	<SFML/System/Thread.hpp>
 	<vector>
 
@@ -8972,13 +8984,59 @@
 	<string>
 	<map>
 
-1294511660 source:d:\florian\programmation\gamedevelop\extensions\physicsautomatism\physicsautomatism.cpp
+1301255169 source:d:\florian\programmation\gamedevelop\extensions\physicsautomatism\extension.cpp
+	"GDL/ExtensionBase.h"
+	"GDL/Version.h"
 	"PhysicsAutomatism.h"
+	<boost/version.hpp>
+
+1298918772 d:\florian\programmation\gamedevelop\gdl\gdl\extensionbase.h
+	<wx/bitmap.h>
+	<wx/file.h>
+	<wx/wx.h>
+	<wx/msw/winundef.h>
+	<string>
+	<vector>
+	<map>
+	<boost/shared_ptr.hpp>
+	"GDL/ObjectIdentifiersManager.h"
+
+1300566575 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+
+1272745771 c:\libs\boost_1_43_0\boost\version.hpp
+
+1293904241 source:d:\florian\programmation\gamedevelop\extensions\physicsautomatism\physicsautomatismactions.cpp
+	"PhysicsAutomatism.h"
+	"GDL/RuntimeScene.h"
+	"GDL/ObjectsConcerned.h"
+	"GDL/Instruction.h"
 	"Box2D/Box2D.h"
+
+1297530613 d:\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
+	"GDL/Object.h"
+	"GDL/ObjectGroup.h"
+	"GDL/ObjInstancesHolder.h"
+	<boost/shared_ptr.hpp>
+	<boost/interprocess/containers/flat_set.hpp>
+	<string>
+	<vector>
+
+1293904241 source:d:\florian\programmation\gamedevelop\extensions\physicsautomatism\physicsautomatismconditions.cpp
+	"PhysicsAutomatism.h"
+	"GDL/RuntimeScene.h"
+	"GDL/ObjectsConcerned.h"
+	"GDL/Instruction.h"
+	"Box2D/Box2D.h"
+
+1294511660 source:d:\florian\programmation\gamedevelop\extensions\physicsautomatism\physicsautomatismeditor.cpp
 	"PhysicsAutomatismEditor.h"
+	<wx/intl.h>
+	<wx/string.h>
+	"GDL/Game.h"
+	"PhysicsAutomatism.h"
+	"GDL/MainEditorCommand.h"
+	"GDL/CommonTools.h"
 	"GDL/Scene.h"
-	"GDL/tinyxml.h"
-	"GDL/XmlMacros.h"
 
 1294511660 d:\florian\programmation\gamedevelop\extensions\physicsautomatism\physicsautomatismeditor.h
 	<wx/sizer.h>
@@ -9020,56 +9078,6 @@
 1253308511 c:\libs\wxwidgets\include\wx\cocoa\statline.h
 
 1253308506 c:\libs\wxwidgets\include\wx\generic\statline.h
-
-1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\tinyxml.h
-	<ctype.h>
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
-	<assert.h>
-	<string>
-	<iostream>
-	<sstream>
-	"GDL/tinystr.h"
-
-1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\tinystr.h
-	<assert.h>
-	<string.h>
-
-1297523943 d:\florian\programmation\gamedevelop\gdl\gdl\xmlmacros.h
-
-1293904241 source:d:\florian\programmation\gamedevelop\extensions\physicsautomatism\physicsautomatismactions.cpp
-	"PhysicsAutomatism.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-	"Box2D/Box2D.h"
-
-1297530613 d:\florian\programmation\gamedevelop\gdl\gdl\objectsconcerned.h
-	"GDL/Object.h"
-	"GDL/ObjectGroup.h"
-	"GDL/ObjInstancesHolder.h"
-	<boost/shared_ptr.hpp>
-	<boost/interprocess/containers/flat_set.hpp>
-	<string>
-	<vector>
-
-1293904241 source:d:\florian\programmation\gamedevelop\extensions\physicsautomatism\physicsautomatismconditions.cpp
-	"PhysicsAutomatism.h"
-	"GDL/RuntimeScene.h"
-	"GDL/ObjectsConcerned.h"
-	"GDL/Instruction.h"
-	"Box2D/Box2D.h"
-
-1294511660 source:d:\florian\programmation\gamedevelop\extensions\physicsautomatism\physicsautomatismeditor.cpp
-	"PhysicsAutomatismEditor.h"
-	<wx/intl.h>
-	<wx/string.h>
-	"GDL/Game.h"
-	"PhysicsAutomatism.h"
-	"GDL/MainEditorCommand.h"
-	"GDL/CommonTools.h"
-	"GDL/Scene.h"
 
 1297531393 d:\florian\programmation\gamedevelop\gdl\gdl\maineditorcommand.h
 	<wx/ribbon/bar.h>
@@ -9132,6 +9140,23 @@
 	"GDL/tinyxml.h"
 	"GDL/XmlMacros.h"
 	<iostream>
+
+1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\tinyxml.h
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<string>
+	<iostream>
+	<sstream>
+	"GDL/tinystr.h"
+
+1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\tinystr.h
+	<assert.h>
+	<string.h>
+
+1297523943 d:\florian\programmation\gamedevelop\gdl\gdl\xmlmacros.h
 
 1264364232 source:d:\florian\programmation\gamedevelop\gdl\gdl\tinystr.cpp
 	"GDL/tinystr.h"

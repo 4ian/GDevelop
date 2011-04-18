@@ -102,7 +102,6 @@ void PhysicsAutomatism::DoStepPostEvents(RuntimeScene & scene)
 
     runtimeScenesPhysicsDatas->stepped = false; //Prepare for a new simulation
 
-    //Update Box2D position if necessary
     if ( objectOldX == object->GetX() && objectOldY == object->GetY() && objectOldAngle == object->GetAngle())
         return;
 
@@ -141,6 +140,7 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
         b2CircleShape circle;
         circle.m_radius = (object->GetWidth()*runtimeScenesPhysicsDatas->GetInvScaleX()+
                            object->GetHeight()*runtimeScenesPhysicsDatas->GetInvScaleY())/4; //Radius is based on the average of height and width
+        if ( circle.m_radius <= 0 ) circle.m_radius = 1;
         fixtureDef.shape = &circle;
         fixtureDef.density = massDensity;
         fixtureDef.friction = averageFriction;
@@ -153,7 +153,7 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
         b2FixtureDef fixtureDef;
 
         b2PolygonShape dynamicBox;
-        dynamicBox.SetAsBox(object->GetWidth()*runtimeScenesPhysicsDatas->GetInvScaleX()/2, object->GetHeight()*runtimeScenesPhysicsDatas->GetInvScaleY()/2);
+        dynamicBox.SetAsBox((object->GetWidth() > 0 ? object->GetWidth() : 1.0f)*runtimeScenesPhysicsDatas->GetInvScaleX()/2, (object->GetHeight() > 0 ? object->GetHeight() : 1.0f)*runtimeScenesPhysicsDatas->GetInvScaleY()/2);
         fixtureDef.shape = &dynamicBox;
         fixtureDef.density = massDensity;
         fixtureDef.friction = averageFriction;

@@ -471,6 +471,78 @@
 					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
 				</Linker>
 			</Target>
+			<Target title="Mac - Release">
+				<Option output="..\..\Runtime\bin\release\PhysicsAutomatism.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DMAC" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add directory="..\..\..\libs\boost_1_43_0" />
+					<Add directory="..\..\..\libs\sfml\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-framework OpenGL" />
+					<Add option="-dynamiclib" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add directory="..\..\Runtime\bin\release" />
+					<Add directory="..\..\..\libs\sfml\lib" />
+				</Linker>
+			</Target>
+			<Target title="Mac - Debug">
+				<Option output="..\..\Runtime\bin\debug\PhysicsAutomatism.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Debug\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DMAC" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="..\..\..\libs\boost_1_43_0" />
+					<Add directory="..\..\..\libs\sfml\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -g" />
+					<Add option="-lgdl" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
+					<Add option="-framework OpenGL" />
+					<Add option="-dynamiclib" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add directory="..\..\Runtime\bin\debug" />
+					<Add directory="..\..\..\libs\sfml\lib" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add directory="..\..\GDL" />

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Development - Edittime" />
+	<File name="Directional_light.cpp" open="0" top="0" tabpos="10">
+		<Cursor position="471" topLine="6" />
+	</File>
+	<File name="Directional_light.h" open="0" top="0" tabpos="11">
+		<Cursor position="413" topLine="0" />
+	</File>
+	<File name="Extension.cpp" open="0" top="0" tabpos="9">
+		<Cursor position="6459" topLine="115" />
+	</File>
+	<File name="Light.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="2267" topLine="62" />
+	</File>
+	<File name="Light.h" open="1" top="0" tabpos="3">
+		<Cursor position="144" topLine="0" />
+	</File>
+	<File name="LightActions.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="2203" topLine="55" />
+	</File>
+	<File name="LightConditions.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="2493" topLine="21" />
+	</File>
+	<File name="LightExpressions.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="1516" topLine="10" />
+	</File>
+	<File name="LightManager.h" open="0" top="0" tabpos="7">
+		<Cursor position="221" topLine="0" />
+	</File>
+	<File name="LightObject.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="4315" topLine="139" />
+	</File>
+	<File name="LightObject.h" open="0" top="0" tabpos="2">
+		<Cursor position="1709" topLine="99" />
+	</File>
+	<File name="LightObjectEditor.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="7055" topLine="109" />
+	</File>
+	<File name="LightObjectEditor.h" open="0" top="0" tabpos="7">
+		<Cursor position="2487" topLine="51" />
+	</File>
+	<File name="LightObstacleAutomatism.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="3618" topLine="77" />
+	</File>
+	<File name="LightObstacleAutomatism.h" open="1" top="0" tabpos="4">
+		<Cursor position="2849" topLine="73" />
+	</File>
+	<File name="LightObstacleAutomatismActions.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="37" topLine="0" />
+	</File>
+	<File name="LightObstacleAutomatismConditions.cpp" open="0" top="0" tabpos="12">
+		<Cursor position="37" topLine="0" />
+	</File>
+	<File name="LightObstacleAutomatismEditor.cpp" open="0" top="0" tabpos="13">
+		<Cursor position="37" topLine="2" />
+	</File>
+	<File name="LightObstacleAutomatismEditor.h" open="0" top="0" tabpos="14">
+		<Cursor position="37" topLine="2" />
+	</File>
+	<File name="LightObstacleAutomatismExpressions.cpp" open="0" top="0" tabpos="15">
+		<Cursor position="37" topLine="0" />
+	</File>
+	<File name="RuntimeSceneLightObstacleDatas.cpp" open="0" top="0" tabpos="16">
+		<Cursor position="37" topLine="2" />
+	</File>
+	<File name="RuntimeSceneLightObstacleDatas.h" open="0" top="0" tabpos="17">
+		<Cursor position="37" topLine="2" />
+	</File>
+	<File name="SceneLightObstacleDatas.cpp" open="0" top="0" tabpos="18">
+		<Cursor position="37" topLine="2" />
+	</File>
+	<File name="SceneLightObstacleDatas.h" open="0" top="0" tabpos="19">
+		<Cursor position="1088" topLine="18" />
+	</File>
+	<File name="..\..\GDL\GDL\tinystr.h" open="0" top="0" tabpos="0">
+		<Cursor position="7819" topLine="269" />
+	</File>
+</CodeBlocks_layout_file>

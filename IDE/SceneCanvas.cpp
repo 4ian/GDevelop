@@ -1465,6 +1465,7 @@ void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
 
         smallestObject->SetX( sceneEdited.initialObjectsPositions.at( idPos ).x );
         smallestObject->SetY( sceneEdited.initialObjectsPositions.at( idPos ).y );
+        smallestObject->SetAngle( sceneEdited.initialObjectsPositions.at( idPos ).angle );
         smallestObject->SetZOrder( sceneEdited.initialObjectsPositions.at( idPos ).zOrder );
         smallestObject->SetLayer( sceneEdited.initialObjectsPositions.at( idPos ).layer );
 

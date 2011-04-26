@@ -10772,7 +10772,7 @@
 	<string>
 	"GDL/Event.h"
 
-1302031230 source:d:\florian\programmation\gamedevelop\ide\codeeditor.cpp
+1303727093 source:d:\florian\programmation\gamedevelop\ide\codeeditor.cpp
 	"CodeEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -13311,7 +13311,7 @@
 	<wx/string.h>
 	<iostream>
 
-1301755607 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
+1303840241 source:d:\florian\programmation\gamedevelop\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -13454,7 +13454,7 @@
 1294612730 source:d:\florian\programmation\gamedevelop\ide\resource.rc
 	"version.h"
 
-1302464459 d:\florian\programmation\gamedevelop\ide\version.h
+1303840243 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"

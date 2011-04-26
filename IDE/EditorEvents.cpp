@@ -789,7 +789,11 @@ bool EditorEvents::ScrollToEvent(vector < BaseEventSPtr > & list, BaseEventSPtr 
 void EditorEvents::OnDelEventSelected( wxCommandEvent& event )
 {
     for (unsigned int i = 0;i<eventsSelected.size();++i)
-    	GetSelectedListOfEvents(i)->erase(GetSelectedListOfEvents(i)->begin() + boost::tuples::get<1>(eventsSelected[i]));
+    {
+        unsigned int indexInList = boost::tuples::get<1>(eventsSelected[i]);
+        if ( indexInList < GetSelectedListOfEvents(i)->size() )
+            GetSelectedListOfEvents(i)->erase(GetSelectedListOfEvents(i)->begin() + indexInList);
+    }
 
     eventsSelected.clear();
 

@@ -11277,7 +11277,7 @@
 	"GDL/CommonTools.h"
 	"RecentList.h"
 
-1302381487 d:\florian\programmation\gamedevelop\gdl\gdl\editorimages.h
+1303849283 d:\florian\programmation\gamedevelop\gdl\gdl\editorimages.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/menu.h>
@@ -11535,7 +11535,7 @@
 	<wx/dialog.h>
 	"GDL/Scene.h"
 
-1298831489 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
+1303855551 source:d:\florian\programmation\gamedevelop\ide\editorevents.cpp
 	"debugMem.h"
 	"CppUnitLite/TestHarness.h"
 	"EditorEvents.h"
@@ -13454,7 +13454,7 @@
 1294612730 source:d:\florian\programmation\gamedevelop\ide\resource.rc
 	"version.h"
 
-1303840243 d:\florian\programmation\gamedevelop\ide\version.h
+1303855551 d:\florian\programmation\gamedevelop\ide\version.h
 
 1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
 	"tinystr.h"
@@ -13865,4 +13865,6 @@
 	"GDL/CommonTools.h"
 
 1300566575 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
+
+1253308462 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 

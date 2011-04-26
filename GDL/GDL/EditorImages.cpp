@@ -373,6 +373,8 @@ wxTreeItemId EditorImages::GetSelectedFolderItem()
 {
     wxTreeItemId item = m_itemSelected;
 
+    if ( !item.IsOk() ) return BanqueImageList->GetRootItem();
+
     gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(BanqueImageList->GetItemData(item));
     while ( item.IsOk() && data && data->GetString() != "Folder" && data->GetString() != "BaseFolder" )
     {

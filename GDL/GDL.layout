@@ -136,10 +136,10 @@
 	<File name="GDL\ChooseVariableDialog.h" open="0" top="0" tabpos="7">
 		<Cursor position="399" topLine="2" />
 	</File>
-	<File name="GDL\Collisions.cpp" open="0" top="0" tabpos="238">
-		<Cursor position="166" topLine="2" />
+	<File name="GDL\Collisions.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="455" topLine="8" />
 	</File>
-	<File name="GDL\Collisions.h" open="0" top="0" tabpos="237">
+	<File name="GDL\Collisions.h" open="1" top="0" tabpos="3">
 		<Cursor position="397" topLine="0" />
 	</File>
 	<File name="GDL\CommentEvent.cpp" open="0" top="0" tabpos="8">
@@ -218,7 +218,7 @@
 		<Cursor position="148" topLine="0" />
 	</File>
 	<File name="GDL\DynamicExtensionCallerEvent.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="1679" topLine="45" />
+		<Cursor position="3620" topLine="84" />
 	</File>
 	<File name="GDL\DynamicExtensionCallerEvent.h" open="0" top="0" tabpos="228">
 		<Cursor position="461" topLine="10" />
@@ -362,7 +362,7 @@
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="GDL\ForEachEvent.cpp" open="0" top="0" tabpos="123">
-		<Cursor position="5774" topLine="146" />
+		<Cursor position="8800" topLine="231" />
 	</File>
 	<File name="GDL\ForEachEvent.h" open="0" top="0" tabpos="214">
 		<Cursor position="0" topLine="0" />
@@ -512,7 +512,7 @@
 		<Cursor position="3864" topLine="119" />
 	</File>
 	<File name="GDL\Object.h" open="0" top="0" tabpos="32">
-		<Cursor position="1690" topLine="45" />
+		<Cursor position="4966" topLine="160" />
 	</File>
 	<File name="GDL\ObjectGroup.cpp" open="0" top="0" tabpos="130">
 		<Cursor position="1126" topLine="29" />
@@ -544,11 +544,11 @@
 	<File name="GDL\ObjectsConcerned.h" open="0" top="0" tabpos="254">
 		<Cursor position="3777" topLine="104" />
 	</File>
-	<File name="GDL\OpenSaveGame.cpp" open="0" top="0" tabpos="13">
-		<Cursor position="81728" topLine="1705" />
+	<File name="GDL\OpenSaveGame.cpp" open="0" top="0" tabpos="20">
+		<Cursor position="101589" topLine="2191" />
 	</File>
-	<File name="GDL\OpenSaveGame.h" open="0" top="0" tabpos="11">
-		<Cursor position="2488" topLine="45" />
+	<File name="GDL\OpenSaveGame.h" open="0" top="0" tabpos="21">
+		<Cursor position="536" topLine="26" />
 	</File>
 	<File name="GDL\OpenSaveLoadingScreen.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="85" topLine="0" />
@@ -592,10 +592,10 @@
 	<File name="GDL\ResourcesMergingHelper.h" open="0" top="0" tabpos="2">
 		<Cursor position="109" topLine="0" />
 	</File>
-	<File name="GDL\ResourcesUnmergingHelper.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="109" topLine="0" />
+	<File name="GDL\ResourcesUnmergingHelper.cpp" open="0" top="0" tabpos="23">
+		<Cursor position="484" topLine="0" />
 	</File>
-	<File name="GDL\ResourcesUnmergingHelper.h" open="0" top="0" tabpos="0">
+	<File name="GDL\ResourcesUnmergingHelper.h" open="0" top="0" tabpos="22">
 		<Cursor position="109" topLine="0" />
 	</File>
 	<File name="GDL\RessourcesLoader.cpp" open="0" top="0" tabpos="20">
@@ -610,8 +610,8 @@
 	<File name="GDL\RotatedRectangle.h" open="0" top="0" tabpos="32">
 		<Cursor position="378" topLine="0" />
 	</File>
-	<File name="GDL\RotatedRectangleCollision.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="1797" topLine="49" />
+	<File name="GDL\RotatedRectangleCollision.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="571" topLine="39" />
 	</File>
 	<File name="GDL\RotatedRectangleCollision.h" open="0" top="0" tabpos="2">
 		<Cursor position="186" topLine="0" />
@@ -634,7 +634,7 @@
 	<File name="GDL\RuntimeLayer.h" open="0" top="0" tabpos="270">
 		<Cursor position="89" topLine="0" />
 	</File>
-	<File name="GDL\RuntimeScene.cpp" open="1" top="0" tabpos="3">
+	<File name="GDL\RuntimeScene.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="5855" topLine="199" />
 	</File>
 	<File name="GDL\RuntimeScene.h" open="0" top="0" tabpos="28">
@@ -698,7 +698,7 @@
 		<Cursor position="91" topLine="0" />
 	</File>
 	<File name="GDL\SpriteObject.cpp" open="0" top="0" tabpos="95">
-		<Cursor position="24171" topLine="428" />
+		<Cursor position="21085" topLine="505" />
 	</File>
 	<File name="GDL\SpriteObject.h" open="0" top="0" tabpos="94">
 		<Cursor position="91" topLine="0" />

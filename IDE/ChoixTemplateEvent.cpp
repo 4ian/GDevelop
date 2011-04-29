@@ -14,7 +14,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
 #include "TemplateEvents.h"

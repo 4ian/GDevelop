@@ -13,7 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include "SFML/Network.hpp"
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 #include "GDL/VersionWrapper.h"
 
 #ifdef DEBUG

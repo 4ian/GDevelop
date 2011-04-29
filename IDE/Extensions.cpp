@@ -36,6 +36,7 @@ const long Extensions::ID_STATICTEXT4 = wxNewId();
 const long Extensions::ID_STATICTEXT7 = wxNewId();
 const long Extensions::ID_STATICBITMAP2 = wxNewId();
 const long Extensions::ID_STATICBITMAP4 = wxNewId();
+const long Extensions::ID_STATICBITMAP1 = wxNewId();
 const long Extensions::ID_STATICTEXT2 = wxNewId();
 const long Extensions::ID_BUTTON3 = wxNewId();
 //*)
@@ -115,7 +116,7 @@ game(game_)
 	licenseTxt->SetFont(licenseTxtFont);
 	FlexGridSizer9->Add(licenseTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer10 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer10 = new wxFlexGridSizer(0, 4, 0, 0);
 	FlexGridSizer10->AddGrowableRow(0);
 	StaticText5 = new wxStaticText(this, ID_STATICTEXT7, _("Compatibilité :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
 	FlexGridSizer10->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -123,6 +124,8 @@ game(game_)
 	FlexGridSizer10->Add(wincompatibleBmp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	linuxcompatibleBmp = new wxStaticBitmap(this, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/linux-compatible.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP4"));
 	FlexGridSizer10->Add(linuxcompatibleBmp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	maccompatibleBmp = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/mac-compatible.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
+	FlexGridSizer10->Add(maccompatibleBmp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer2->Add(FlexGridSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -242,6 +245,14 @@ void Extensions::OnExtensionsListSelect(wxCommandEvent& event)
                     linuxcompatibleBmp->SetBitmap(wxBitmap(_T("res/linux-compatible.png"), wxBITMAP_TYPE_ANY));
                 else
                     linuxcompatibleBmp->SetBitmap(wxBitmap(_T("res/linux-notcompatible.png"), wxBITMAP_TYPE_ANY));
+            }
+
+            {
+                std::ifstream testFile( string("Extensions/"+extensionsInstalled[i]->GetName()+".xgdm").c_str() );
+                if ( testFile || ( extensionsInstalled[i]->GetNameSpace() == "" ) ) //Use namespace to check if it is a builtin extension
+                    maccompatibleBmp->SetBitmap(wxBitmap(_T("res/mac-compatible.png"), wxBITMAP_TYPE_ANY));
+                else
+                    maccompatibleBmp->SetBitmap(wxBitmap(_T("res/mac-notcompatible.png"), wxBITMAP_TYPE_ANY));
             }
 
             return;

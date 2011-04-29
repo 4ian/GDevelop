@@ -31,6 +31,7 @@ class Extensions: public wxDialog
 
 		//(*Declarations(Extensions)
 		wxStaticText* authorTxt;
+		wxStaticBitmap* maccompatibleBmp;
 		wxCheckListBox* ExtensionsList;
 		wxStaticText* StaticText2;
 		wxButton* FermerBt;
@@ -63,6 +64,7 @@ class Extensions: public wxDialog
 		static const long ID_STATICTEXT7;
 		static const long ID_STATICBITMAP2;
 		static const long ID_STATICBITMAP4;
+		static const long ID_STATICBITMAP1;
 		static const long ID_STATICTEXT2;
 		static const long ID_BUTTON3;
 		//*)

@@ -9,7 +9,7 @@
 #include <wx/log.h>
 
 #include "GDL/Game.h"
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 #include <wx/filedlg.h>
 
 using namespace std;

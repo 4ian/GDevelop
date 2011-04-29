@@ -5,7 +5,7 @@
 		<Option title="IDE" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Options\;Fichiers\;LIB TinyXml\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
+		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Options\;Fichiers\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
 		<Build>
 			<Target title="Debug - Edittime">
 				<Option platforms="Windows;" />
@@ -908,24 +908,6 @@
 		</Unit>
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
-		</Unit>
-		<Unit filename="tinystr.cpp">
-			<Option virtualFolder="LIB TinyXml\" />
-		</Unit>
-		<Unit filename="tinystr.h">
-			<Option virtualFolder="LIB TinyXml\" />
-		</Unit>
-		<Unit filename="tinyxml.cpp">
-			<Option virtualFolder="LIB TinyXml\" />
-		</Unit>
-		<Unit filename="tinyxml.h">
-			<Option virtualFolder="LIB TinyXml\" />
-		</Unit>
-		<Unit filename="tinyxmlerror.cpp">
-			<Option virtualFolder="LIB TinyXml\" />
-		</Unit>
-		<Unit filename="tinyxmlparser.cpp">
-			<Option virtualFolder="LIB TinyXml\" />
 		</Unit>
 		<Unit filename="wxSFMLCanvas.cpp">
 			<Option virtualFolder="wxSFML Canvas\" />

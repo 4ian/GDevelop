@@ -19,7 +19,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/VersionWrapper.h"
 #include "CheckMAJ.h"
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 #include "LocaleManager.h"
 
 //(*IdInit(MAJ)

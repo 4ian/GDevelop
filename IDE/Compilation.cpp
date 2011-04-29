@@ -247,8 +247,13 @@ Compilation::Compilation( wxWindow* parent, const Game & gameToCompile_ ) :
     {
         #if defined(WINDOWS)
             LinuxCheck->SetValue(false);LinuxCheck->Enable(false);
+            MacCheck->SetValue(false);MacCheck->Enable(false);
         #elif defined(LINUX)
-            WinCheck->SetValue(false);WinCheck->Enable(false);
+            WinCheck->SetValue(false);WinCheck->Enable(true);
+            MacCheck->SetValue(false);MacCheck->Enable(true);
+        #elif defined(MAC)
+            LinuxCheck->SetValue(false);LinuxCheck->Enable(true);
+            MacCheck->SetValue(false);MacCheck->Enable(true);
         #else
             #warning Unknown OS
         #endif
@@ -274,6 +279,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 
     std::string winExecutableName = gameToCompile.winExecutableFilename.empty() ? "Game.exe" : gameToCompile.winExecutableFilename+".exe";
     std::string linuxExecutableName = gameToCompile.linuxExecutableFilename.empty() ? "GameLinux" : gameToCompile.linuxExecutableFilename;
+    std::string macExecutableName = gameToCompile.macExecutableFilename.empty() ? "GameMac" : gameToCompile.macExecutableFilename;
 
     wxDirDialog dialog(this, _("Choisissez un dossier, vierge de préférence, où créer le jeu."));
     dialog.ShowModal();
@@ -299,7 +305,6 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         StaticText2->SetLabel( game.images[i].nom );
         game.images[i].file = resourcesMergingHelper.GetNewFilename(game.images[i].file);
     }
-    resourcesMergingHelper.GetNewFilename("vide.png");
     if ( !game.loadingScreen.imageFichier.empty() )
         game.loadingScreen.imageFichier = resourcesMergingHelper.GetNewFilename( game.loadingScreen.imageFichier );
 

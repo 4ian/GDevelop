@@ -8454,7 +8454,7 @@
 	<string>
 	<vector>
 
-1297523941 d:\florian\programmation\gamedevelop\gdl\gdl\automatism.h
+1304014037 d:\florian\programmation\gamedevelop\gdl\gdl\automatism.h
 	<boost/shared_ptr.hpp>
 	<string>
 
@@ -8511,7 +8511,7 @@
 	"wx/treebase.h"
 	"wx/hashmap.h"
 
-1293987629 d:\florian\programmation\gamedevelop\ide\extensions.h
+1304025101 d:\florian\programmation\gamedevelop\ide\extensions.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
@@ -9446,7 +9446,7 @@
 	<string>
 	<vector>
 
-1300400155 d:\florian\programmation\gamedevelop\gdl\gdl\edittextdialog.h
+1304002985 d:\florian\programmation\gamedevelop\gdl\gdl\edittextdialog.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -9726,7 +9726,7 @@
 	<string>
 	<vector>
 
-1300400155 d:\florian\programmation\gamedevelop\gdl\gdl\editexpression.h
+1304003466 d:\florian\programmation\gamedevelop\gdl\gdl\editexpression.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -10680,7 +10680,7 @@
 	<wx/button.h>
 	<wx/dialog.h>
 
-1297526733 source:d:\florian\programmation\gamedevelop\ide\choixtemplateevent.cpp
+1303908014 source:d:\florian\programmation\gamedevelop\ide\choixtemplateevent.cpp
 	"ChoixTemplateEvent.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -10692,13 +10692,13 @@
 	<stdio.h>
 	<sys/types.h>
 	<dirent.h>
-	"tinyxml.h"
+	"GDL/tinyxml.h"
 	"GDL/CommonTools.h"
 	"GDL/OpenSaveGame.h"
 	"TemplateEvents.h"
 	"GDL/HelpFileAccess.h"
 
-1275496717 d:\florian\programmation\gamedevelop\ide\choixtemplateevent.h
+1303908014 d:\florian\programmation\gamedevelop\ide\choixtemplateevent.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -10708,10 +10708,10 @@
 	<wx/statbmp.h>
 	<wx/button.h>
 	<wx/dialog.h>
-	"tinyxml.h"
+	"GDL/tinyxml.h"
 	"TemplateEvents.h"
 
-1264364132 d:\florian\programmation\gamedevelop\ide\tinyxml.h
+1303907668 d:\florian\programmation\gamedevelop\gdl\gdl\tinyxml.h
 	<ctype.h>
 	<stdio.h>
 	<stdlib.h>
@@ -10720,9 +10720,9 @@
 	<string>
 	<iostream>
 	<sstream>
-	"tinystr.h"
+	"GDL/tinystr.h"
 
-1264364136 d:\florian\programmation\gamedevelop\ide\tinystr.h
+1303907668 d:\florian\programmation\gamedevelop\gdl\gdl\tinystr.h
 	<assert.h>
 	<string.h>
 
@@ -10736,21 +10736,6 @@
 	<string>
 	"GDL/tinyxml.h"
 	"GDL/CommonTools.h"
-
-1264364232 d:\florian\programmation\gamedevelop\gdl\gdl\tinyxml.h
-	<ctype.h>
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
-	<assert.h>
-	<string>
-	<iostream>
-	<sstream>
-	"GDL/tinystr.h"
-
-1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\tinystr.h
-	<assert.h>
-	<string.h>
 
 1297526868 source:d:\florian\programmation\gamedevelop\ide\clipboard.cpp
 	<boost/shared_ptr.hpp>
@@ -10836,7 +10821,7 @@
 	"wx/dialog.h"
 	"wx/cmndata.h"
 
-1302467138 source:d:\florian\programmation\gamedevelop\ide\compilation.cpp
+1304084552 source:d:\florian\programmation\gamedevelop\ide\compilation.cpp
 	<wx/bitmap.h>
 	<wx/settings.h>
 	<wx/intl.h>
@@ -11078,7 +11063,7 @@
 
 1297545956 d:\florian\programmation\gamedevelop\ide\consolemanager.h
 
-1282491989 source:d:\florian\programmation\gamedevelop\ide\convertjrc.cpp
+1303908014 source:d:\florian\programmation\gamedevelop\ide\convertjrc.cpp
 	"ConvertJRC.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -11086,7 +11071,7 @@
 	<vector>
 	<wx/log.h>
 	"GDL/Game.h"
-	"tinyxml.h"
+	"GDL/tinyxml.h"
 	<wx/filedlg.h>
 
 1264364134 d:\florian\programmation\gamedevelop\ide\convertjrc.h
@@ -11140,7 +11125,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1297526733 source:d:\florian\programmation\gamedevelop\ide\createtemplate.cpp
+1303908014 source:d:\florian\programmation\gamedevelop\ide\createtemplate.cpp
 	"CreateTemplate.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -11151,7 +11136,7 @@
 	<wx/log.h>
 	<wx/filedlg.h>
 	"GDL/HelpFileAccess.h"
-	"tinyxml.h"
+	"GDL/tinyxml.h"
 	<string>
 	<vector>
 	"GDL/Game.h"
@@ -11950,7 +11935,7 @@
 	"ExecutableIconChanger.h"
 	<windows.h>
 
-1301181654 source:d:\florian\programmation\gamedevelop\ide\extensions.cpp
+1304025102 source:d:\florian\programmation\gamedevelop\ide\extensions.cpp
 	"Extensions.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -11975,7 +11960,8 @@
 	<vector>
 	"GDL/DynamicLibrariesTools.h"
 
-1302445484 d:\florian\programmation\gamedevelop\gdl\gdl\dynamiclibrariestools.h
+1303998070 d:\florian\programmation\gamedevelop\gdl\gdl\dynamiclibrariestools.h
+	<string>
 	<windows.h>
 
 1278093583 source:d:\florian\programmation\gamedevelop\ide\externaleventseditor.cpp
@@ -12951,7 +12937,7 @@
 	"LocaleManager.h"
 	<wx/log.h>
 
-1297526733 source:d:\florian\programmation\gamedevelop\ide\maj.cpp
+1303908014 source:d:\florian\programmation\gamedevelop\ide\maj.cpp
 	"MAJ.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -12970,7 +12956,7 @@
 	"GDL/CommonTools.h"
 	"GDL/VersionWrapper.h"
 	"CheckMAJ.h"
-	"tinyxml.h"
+	"GDL/tinyxml.h"
 	"LocaleManager.h"
 
 1253308518 c:\libs\wxwidgets\include\wx\wfstream.h
@@ -13454,24 +13440,7 @@
 1294612730 source:d:\florian\programmation\gamedevelop\ide\resource.rc
 	"version.h"
 
-1303855551 d:\florian\programmation\gamedevelop\ide\version.h
-
-1264364132 source:d:\florian\programmation\gamedevelop\ide\tinystr.cpp
-	"tinystr.h"
-
-1264364134 source:d:\florian\programmation\gamedevelop\ide\tinyxml.cpp
-	<ctype.h>
-	<sstream>
-	<iostream>
-	"tinyxml.h"
-
-1264364134 source:d:\florian\programmation\gamedevelop\ide\tinyxmlerror.cpp
-	"tinyxml.h"
-
-1264364130 source:d:\florian\programmation\gamedevelop\ide\tinyxmlparser.cpp
-	<ctype.h>
-	<stddef.h>
-	"tinyxml.h"
+1304025104 d:\florian\programmation\gamedevelop\ide\version.h
 
 1289489446 source:d:\florian\programmation\gamedevelop\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -13754,7 +13723,7 @@
 
 1253308524 c:\libs\wxwidgets\include\wx\arrimpl.cpp
 
-1293111845 source:d:\florian\programmation\gamedevelop\ide\checkmaj.cpp
+1303908014 source:d:\florian\programmation\gamedevelop\ide\checkmaj.cpp
 	"nommgr.h"
 	<wx/log.h>
 	<wx/wx.h>
@@ -13767,7 +13736,7 @@
 	<iostream>
 	<fstream>
 	"SFML/Network.hpp"
-	"tinyxml.h"
+	"GDL/tinyxml.h"
 	"GDL/VersionWrapper.h"
 	"CheckMAJ.h"
 	"MAJ.h"
@@ -13864,7 +13833,5 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1300566575 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
-
-1253308462 c:\libs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+1304087129 d:\florian\programmation\gamedevelop\gdl\gdl\version.h
 

@@ -34,6 +34,11 @@ distribution.
  * - added swap(), clear(), size(), capacity(), operator+().
  */
 
+/**
+ * Changes by Florian Rival :
+ * Added GD_API to integrate TinyXml to Game Develop Library.
+ */
+
 #ifndef TIXML_USE_STL
 
 #ifndef TIXML_STRING_INCLUDED
@@ -64,7 +69,7 @@ distribution.
    The buffer allocation is made by a simplistic power of 2 like mechanism : if we increase
    a string and there's no more room, we allocate a buffer twice as big as we need.
 */
-class TiXmlString
+class GD_API TiXmlString
 {
   public :
 	// The size type used
@@ -238,7 +243,7 @@ class TiXmlString
 			// to the normal allocation, although use an 'int' for systems
 			// that are overly picky about structure alignment.
 			const size_type bytesNeeded = sizeof(Rep) + cap;
-			const size_type intsNeeded = ( bytesNeeded + sizeof(int) - 1 ) / sizeof( int ); 
+			const size_type intsNeeded = ( bytesNeeded + sizeof(int) - 1 ) / sizeof( int );
 			rep_ = reinterpret_cast<Rep*>( new int[ intsNeeded ] );
 
 			rep_->str[ rep_->size = sz ] = '\0';
@@ -295,7 +300,7 @@ TiXmlString operator + (const char* a, const TiXmlString & b);
    TiXmlOutStream is an emulation of std::ostream. It is based on TiXmlString.
    Only the operators that we need for TinyXML have been developped.
 */
-class TiXmlOutStream : public TiXmlString
+class GD_API TiXmlOutStream : public TiXmlString
 {
 public :
 

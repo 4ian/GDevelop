@@ -6,7 +6,7 @@
 #include "CommentEvent.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/EventsRenderingHelper.h"
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 #include "GDL/XmlMacros.h"
 
 #if defined(GD_IDE_ONLY)

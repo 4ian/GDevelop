@@ -859,6 +859,7 @@
 		<Unit filename="GDL\ImageManager.h" />
 		<Unit filename="GDL\Instruction.cpp" />
 		<Unit filename="GDL\Instruction.h" />
+		<Unit filename="GDL\InvalidImage.h" />
 		<Unit filename="GDL\JoystickExtension.cpp" />
 		<Unit filename="GDL\JoystickExtension.h" />
 		<Unit filename="GDL\KeyboardExtension.cpp" />
@@ -1125,7 +1126,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="1.5.10139" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="1.5.10140" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

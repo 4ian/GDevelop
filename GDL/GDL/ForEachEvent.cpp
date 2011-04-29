@@ -3,7 +3,7 @@
 #include "ForEachEvent.h"
 #include "ObjectsConcerned.h"
 #include "RuntimeScene.h"
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"

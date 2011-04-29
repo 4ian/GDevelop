@@ -41,7 +41,12 @@ class GD_API EditorImages: public wxPanel
 		wxMenuItem* MenuItem2;
 		wxPanel* apercuPanel;
 		wxMenuItem* MenuItem4;
+		wxMenuItem* MenuItem14;
+		wxMenuItem* MenuItem11;
+		wxMenuItem* MenuItem13;
 		wxMenu ContextMenu;
+		wxMenuItem* MenuItem10;
+		wxMenuItem* MenuItem12;
 		wxMenuItem* MenuItem6;
 		wxTreeCtrl* BanqueImageList;
 		wxSplitterWindow* SplitterWindow1;
@@ -69,6 +74,7 @@ class GD_API EditorImages: public wxPanel
 		static const long idMenuModFile;
 		static const long idMenuAjouter;
 		static const long idMenuDel;
+		static const long ID_MENUITEM9;
 		static const long idMoveUp;
 		static const long idMoveDown;
 		static const long ID_MENUITEM1;
@@ -135,6 +141,7 @@ class GD_API EditorImages: public wxPanel
 		void OnResize(wxSizeEvent& event);
 		void OnAddFolderSelected(wxCommandEvent& event);
 		void OnRemoveFolderSelected(wxCommandEvent& event);
+		void OnremoveFolderOnlySelected(wxCommandEvent& event);
 		//*)
         void OnMoreOptions( wxCommandEvent& event );
         void CreateToolbar();

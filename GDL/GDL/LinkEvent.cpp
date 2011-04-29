@@ -8,7 +8,7 @@
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/ExternalEvents.h"
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 #include "RuntimeScene.h"
 #include "Game.h"
 #include "Event.h"

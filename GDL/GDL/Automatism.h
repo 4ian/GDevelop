@@ -72,13 +72,21 @@ class GD_API Automatism
         /**
          * De/Activate the automatism
          */
-        inline void Activate(bool enable = true) { activated = enable; };
+        inline void Activate(bool enable = true) { if ( !activated && enable ) { activated = true; OnActivate(); } else if ( activated && !enable ) { activated = false; OnDeActivate(); } };
 
         /**
          * Return true if the automatism is activated
          */
         inline bool Activated() const { return activated; };
 
+        /**
+         * Reimplement this method to do extra work when the automatism is activated
+         */
+        virtual void OnActivate() {};
+        /**
+         * Reimplement this method to do extra work when the automatism is deactivated
+         */
+        virtual void OnDeActivate() {};
 
         #if defined(GD_IDE_ONLY)
         /**

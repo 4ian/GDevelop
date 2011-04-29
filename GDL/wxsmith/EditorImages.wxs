@@ -89,6 +89,10 @@
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDelImageBtClick" entry="EVT_MENU" />
 			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM9" variable="MenuItem14" member="yes">
+				<label>Supprimer seulement du dossier</label>
+				<handler function="OnremoveFolderOnlySelected" entry="EVT_MENU" />
+			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMoveUp" variable="MenuItem7" member="yes">
 				<label>Déplacer vers le haut</label>

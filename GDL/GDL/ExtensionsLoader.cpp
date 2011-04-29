@@ -139,9 +139,12 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
     Handle extensionHdl = OpenLibrary(fullpath.c_str());
     if (extensionHdl == NULL)
     {
+        std::string error = DynamicLibraryLastError();
+
         cout << "Unable to load extension " << fullpath << "." << endl;
+        cout << "Error returned : \"" << error << "\"" << endl;
         #if defined(GD_IDE_ONLY)
-        wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" n'a pas pû être chargée.\nPrenez contact avec le développeur pour plus d'informations." ));
+        wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" n'a pas pû être chargée.\nPrenez contact avec le développeur pour plus d'informations.\n\nErreur détaillée :\n") + error);
         wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
         #endif
     }

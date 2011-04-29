@@ -35,6 +35,7 @@ class GD_API EditExpression: public wxDialog
 		wxButton* SinBt;
 		wxButton* OkBt;
 		wxButton* Button20;
+		wxButton* helpBt;
 		wxButton* Button4;
 		wxButton* DivBt;
 		wxStaticText* StaticText2;
@@ -90,6 +91,7 @@ class GD_API EditExpression: public wxDialog
 		static const long ID_CUSTOM1;
 		static const long ID_BUTTON1;
 		static const long ID_HYPERLINKCTRL1;
+		static const long ID_BUTTON34;
 		static const long ID_STATICTEXT1;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON3;
@@ -179,6 +181,7 @@ class GD_API EditExpression: public wxDialog
 		void OnButton16Click(wxCommandEvent& event);
 		void OnButton17Click(wxCommandEvent& event);
 		void OnButton21Click1(wxCommandEvent& event);
+		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 		void TextModified(wxStyledTextEvent& event);
 		void UpdateTextCtrl(wxStyledTextEvent& event);

@@ -6,7 +6,7 @@
 #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 #if defined(GD_IDE_ONLY)
 #include "GDL/SourceFile.h"
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 #include "GDL/XmlMacros.h"
 
 namespace GDpriv

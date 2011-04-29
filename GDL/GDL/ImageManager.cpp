@@ -5,6 +5,7 @@
 
 #include "GDL/ImageManager.h"
 #include "GDL/RessourcesLoader.h"
+#include "GDL/InvalidImage.h"
 
 #undef LoadImage //thx windows.h
 
@@ -16,8 +17,9 @@ void MessageLoading( string message, float avancement )
 ImageManager::ImageManager() :
 game(NULL)
 {
-    RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
-    badImage = boost::shared_ptr<sf::Image>(ressourcesLoader->LoadImage("vide.png"));
+    badImage = boost::shared_ptr<sf::Image>(new sf::Image());
+    badImage->LoadFromMemory(GDpriv::InvalidImageData, sizeof(GDpriv::InvalidImageData));
+    badImage->SetSmooth(false);
 }
 
 boost::shared_ptr<sf::Image> ImageManager::GetSFMLImage(std::string name) const

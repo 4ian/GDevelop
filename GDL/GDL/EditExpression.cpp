@@ -31,6 +31,7 @@
 #include "GDL/ChooseVariableDialog.h"
 #include "GDL/ChooseAutomatismDlg.h"
 #include "GDL/AdvancedTextEntryDlg.h"
+#include "GDL/HelpFileAccess.h"
 
 #include <string>
 #include <vector>
@@ -41,6 +42,7 @@ using namespace std;
 const long EditExpression::ID_CUSTOM1 = wxNewId();
 const long EditExpression::ID_BUTTON1 = wxNewId();
 const long EditExpression::ID_HYPERLINKCTRL1 = wxNewId();
+const long EditExpression::ID_BUTTON34 = wxNewId();
 const long EditExpression::ID_STATICTEXT1 = wxNewId();
 const long EditExpression::ID_BUTTON2 = wxNewId();
 const long EditExpression::ID_BUTTON3 = wxNewId();
@@ -100,6 +102,7 @@ lastErrorPos(std::string::npos)
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
 	wxGridSizer* GridSizer1;
+	wxFlexGridSizer* FlexGridSizer8;
 	wxBoxSizer* BoxSizer1;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
@@ -119,8 +122,11 @@ lastErrorPos(std::string::npos)
 	FlexGridSizer2->AddGrowableRow(0);
 	ExpressionEdit = new wxStyledTextCtrl(this,ID_CUSTOM1,wxDefaultPosition,wxSize(460,40),0,_T("ID_CUSTOM1"));
 	FlexGridSizer2->Add(ExpressionEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer8->AddGrowableCol(0);
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
-	FlexGridSizer2->Add(OkBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer8->Add(OkBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer7->AddGrowableCol(0);
 	FlexGridSizer7->AddGrowableRow(0);
@@ -128,6 +134,8 @@ lastErrorPos(std::string::npos)
 	errorTxt->SetToolTip(_("Cliquer pour positionner le curseur sur l\'erreur."));
 	FlexGridSizer7->Add(errorTxt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	helpBt = new wxButton(this, ID_BUTTON34, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON34"));
+	FlexGridSizer2->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Editer l\'expression"));
 	FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
@@ -283,6 +291,7 @@ lastErrorPos(std::string::npos)
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnOkBtClick);
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EditExpression::OnerrorTxtClick);
+	Connect(ID_BUTTON34,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnhelpBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnPlusBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnMinusBtClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpression::OnMultBtClick);
@@ -897,6 +906,11 @@ void EditExpression::OnButton16Click(wxCommandEvent& event)
 void EditExpression::OnButton17Click(wxCommandEvent& event)
 {
 	ExpressionEdit->AddText("cosh(");
+}
+
+void EditExpression::OnhelpBtClick(wxCommandEvent& event)
+{
+    HelpFileAccess::GetInstance()->DisplaySection(145);
 }
 
 #endif

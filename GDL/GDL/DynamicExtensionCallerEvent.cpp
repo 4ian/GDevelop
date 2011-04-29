@@ -11,7 +11,7 @@
 #include "GDL/ExternalEvents.h"
 #include "GDL/DynamicExtensionsManager.h"
 #include "GDL/EditDynamicExtensionCallerEvent.h"
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 #include "RuntimeScene.h"
 #include "Game.h"
 #include "Event.h"

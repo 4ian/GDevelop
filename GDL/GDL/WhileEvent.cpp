@@ -4,7 +4,7 @@
  */
 
 #include "WhileEvent.h"
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 #include "RuntimeScene.h"
 #include "ObjectsConcerned.h"
 #include "GDL/OpenSaveGame.h"

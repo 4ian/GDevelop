@@ -6,13 +6,14 @@
 #ifndef DYNAMICLIBRARIESTOOLS_H
 #define DYNAMICLIBRARIESTOOLS_H
 
+#include <string>
 #if defined(WINDOWS)
     #include <windows.h>
     typedef HINSTANCE Handle;
 #elif defined(LINUX) || defined (MAC)
     typedef void* Handle;
 #else
-    #warning No system supported for dynamic libraries loading
+    #warning system not supported for dynamic libraries loading
     typedef void* Handle;
 #endif
 
@@ -33,6 +34,11 @@ void* GetSymbol(Handle library, const char* name);
  * Close a raw C++ dynamic library
  */
 void CloseLibrary(Handle library);
+
+/**
+ * Get the last error occured when loading a dynamic library
+ */
+std::string DynamicLibraryLastError();
 
 };
 

@@ -12,7 +12,7 @@
 #include <wx/log.h>
 #include <wx/wx.h>
 #include <wx/bitmap.h>
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/BitmapGUIManager.h"
 #include "GDL/TranslateCondition.h"

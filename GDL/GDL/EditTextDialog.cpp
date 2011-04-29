@@ -22,12 +22,14 @@
 #include "GDL/TreeItemStrExpressionInfoData.h"
 #include "GDL/ChooseAutomatismDlg.h"
 #include "GDL/AdvancedTextEntryDlg.h"
+#include "GDL/HelpFileAccess.h"
 
 //(*IdInit(EditTextDialog)
 const long EditTextDialog::ID_CUSTOM1 = wxNewId();
 const long EditTextDialog::ID_HYPERLINKCTRL1 = wxNewId();
 const long EditTextDialog::ID_BUTTON2 = wxNewId();
 const long EditTextDialog::ID_BUTTON1 = wxNewId();
+const long EditTextDialog::ID_BUTTON4 = wxNewId();
 const long EditTextDialog::ID_STATICTEXT1 = wxNewId();
 const long EditTextDialog::ID_TREECTRL1 = wxNewId();
 const long EditTextDialog::ID_BUTTON10 = wxNewId();
@@ -87,6 +89,8 @@ lastErrorPos(std::string::npos)
 	FlexGridSizer8->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	AnnulerBt = new wxButton(this, ID_BUTTON1, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer8->Add(AnnulerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	helpBt = new wxButton(this, ID_BUTTON4, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	FlexGridSizer8->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -137,6 +141,7 @@ lastErrorPos(std::string::npos)
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EditTextDialog::OnerrorTxtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnOkBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnAnnulerBtClick);
+	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnhelpBtClick);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&EditTextDialog::OnObjListItemActivated);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&EditTextDialog::OnObjListSelectionChanged);
 	Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnAddPropBtClick);
@@ -602,6 +607,11 @@ void EditTextDialog::OnerrorTxtClick(wxCommandEvent& event)
 {
     if ( lastErrorPos != std::string::npos )
         TexteEdit->GotoPos(lastErrorPos);
+}
+
+void EditTextDialog::OnhelpBtClick(wxCommandEvent& event)
+{
+    HelpFileAccess::GetInstance()->DisplaySection(55);
 }
 
 #endif

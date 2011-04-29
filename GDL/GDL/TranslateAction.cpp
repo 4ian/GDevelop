@@ -13,7 +13,7 @@
 #include "GDL/BitmapGUIManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/TranslateAction.h"
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 #include <wx/wx.h>
 #include <wx/bitmap.h>
 #include <iostream>

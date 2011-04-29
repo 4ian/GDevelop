@@ -58,6 +58,7 @@ const long EditorImages::idMenuMod = wxNewId();
 const long EditorImages::idMenuModFile = wxNewId();
 const long EditorImages::idMenuAjouter = wxNewId();
 const long EditorImages::idMenuDel = wxNewId();
+const long EditorImages::ID_MENUITEM9 = wxNewId();
 const long EditorImages::idMoveUp = wxNewId();
 const long EditorImages::idMoveDown = wxNewId();
 const long EditorImages::ID_MENUITEM1 = wxNewId();
@@ -107,11 +108,7 @@ toolbar(NULL)
     //(*Initialize(EditorImages)
     wxFlexGridSizer* FlexGridSizer4;
     wxMenuItem* MenuItem1;
-    wxMenuItem* MenuItem11;
     wxFlexGridSizer* FlexGridSizer2;
-    wxMenuItem* MenuItem13;
-    wxMenuItem* MenuItem10;
-    wxMenuItem* MenuItem12;
     wxMenuItem* MenuItem3;
     wxMenuItem* editMenuItem;
     wxMenuItem* deleteImageItem;
@@ -162,6 +159,8 @@ toolbar(NULL)
     deleteImageItem = new wxMenuItem((&ContextMenu), idMenuDel, _("Supprimer l\'image"), wxEmptyString, wxITEM_NORMAL);
     deleteImageItem->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
     ContextMenu.Append(deleteImageItem);
+    MenuItem14 = new wxMenuItem((&ContextMenu), ID_MENUITEM9, _("Supprimer seulement du dossier"), wxEmptyString, wxITEM_NORMAL);
+    ContextMenu.Append(MenuItem14);
     ContextMenu.AppendSeparator();
     MenuItem7 = new wxMenuItem((&ContextMenu), idMoveUp, _("Déplacer vers le haut\tCtrl-P"), _("Déplacer l\'image vers le haut dans la liste"), wxITEM_NORMAL);
     MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
@@ -211,6 +210,7 @@ toolbar(NULL)
     Connect(idMenuModFile,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnModFileImage);
     Connect(idMenuAjouter,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnAddImageBtClick);
     Connect(idMenuDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnDelImageBtClick);
+    Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnremoveFolderOnlySelected);
     Connect(idMoveUp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnMoveUpSelected);
     Connect(idMoveDown,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnMoveDownSelected);
     Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnAddImageBtClick);
@@ -325,7 +325,7 @@ void EditorImages::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Dossiers"), wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonDirectories, !hideLabels ? _("Choisir") : "", wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDirectories, !hideLabels ? _("Ajouter un dossier") : "", wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonAddDossier, !hideLabels ? _("Ajouter au dossier") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonRemoveDossier, !hideLabels ? _("Enlever") : "", wxBitmap("res/remove24.png", wxBITMAP_TYPE_ANY));
     }
@@ -420,6 +420,7 @@ void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
         {
             wxLogStatus( _( "Ajout de l'image " ) + names[i] );
 
+            //Add to all images
             if ( FindImage(game.images, string(names[i])) == -1 )
             {
                 Image image;
@@ -428,25 +429,48 @@ void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
 
                 game.images.push_back(image);
                 game.imagesChanged.push_back(image.nom);
-                if ( currentFolder ) //Add image to folder if a folder is selected
-                {
-                    currentFolder->contenu.push_back(image.nom);
-                    BanqueImageList->AppendItem( currentFolderItem, names[i], -1, -1, new gdTreeItemStringData("Image", image.nom));
-                }
 
                 BanqueImageList->AppendItem( allImagesItem, names[i], -1, -1, new gdTreeItemStringData("Image", image.nom));
             }
             else
                 imageNonAjoutees += "\n"+string(names[i].mb_str());
 
+            //Add image to folder if a folder is selected
+            if ( currentFolder )
+            {
+                currentFolder->contenu.push_back(string(names[i].mb_str()));
+                BanqueImageList->AppendItem( currentFolderItem, names[i], -1, -1, new gdTreeItemStringData("Image", string(names[i].mb_str())));
+            }
         }
 
         if ( !imageNonAjoutees.empty() )
-            wxLogMessage(wxString(_("Des images portant le même nom sont déjà présentes, et n'ont pas été ajoutées :")+imageNonAjoutees));
+            wxLogMessage(wxString(_("Des images portant le même nom sont déjà présentes, et n'ont pas été ajoutées à la liste de toutes les images :")+imageNonAjoutees));
 
         wxLogStatus( _( "L'image a été correctement ajoutée à la banque d'image" ) );
     }
 
+}
+
+void EditorImages::OnremoveFolderOnlySelected(wxCommandEvent& event)
+{
+    gdTreeItemStringData * itemData = dynamic_cast<gdTreeItemStringData*>(BanqueImageList->GetItemData(m_itemSelected));
+
+    wxTreeItemId folderItem = GetSelectedFolderItem();
+    gdTreeItemStringData * folderData = dynamic_cast<gdTreeItemStringData*>(BanqueImageList->GetItemData(folderItem));
+
+    if ( itemData && folderItem.IsOk() && itemData->GetString() == "Image" && folderData && folderData->GetString() == "Folder" )
+    {
+        std::string folderName = folderData->GetSecondString();
+        for (unsigned int i = 0;i<game.imagesFolders.size();++i)
+        {
+            if ( game.imagesFolders[i].nom == folderName )
+                game.imagesFolders[i].contenu.erase(std::remove(game.imagesFolders[i].contenu.begin(), game.imagesFolders[i].contenu.end(), itemData->GetSecondString()), game.imagesFolders[i].contenu.end());
+        }
+
+        BanqueImageList->Delete(m_itemSelected);
+    }
+    else
+        wxLogStatus( _( "Aucune image sélectionnée" ) );
 }
 
 /**

@@ -30,6 +30,7 @@ class GD_API EditTextDialog: public wxDialog
 
 		//(*Declarations(EditTextDialog)
 		wxButton* OkBt;
+		wxButton* helpBt;
 		wxButton* AddFunctionBt;
 		wxStaticText* StaticText2;
 		wxTreeCtrl* ValList;
@@ -52,6 +53,7 @@ class GD_API EditTextDialog: public wxDialog
 		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON1;
+		static const long ID_BUTTON4;
 		static const long ID_STATICTEXT1;
 		static const long ID_TREECTRL1;
 		static const long ID_BUTTON10;
@@ -80,6 +82,7 @@ class GD_API EditTextDialog: public wxDialog
 		void OnObjListSelectionChanged(wxTreeEvent& event);
 		void OnTreeCtrl1SelectionChanged(wxTreeEvent& event);
 		void OnerrorTxtClick(wxCommandEvent& event);
+		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 		void TextModified(wxStyledTextEvent& event);
 		void UpdateTextCtrl(wxStyledTextEvent& event);

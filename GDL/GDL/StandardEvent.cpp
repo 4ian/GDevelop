@@ -5,7 +5,7 @@
 
 #include "StandardEvent.h"
 #include "ObjectsConcerned.h"
-#include "tinyxml.h"
+#include "GDL/tinyxml.h"
 #include "GDL/OpenSaveGame.h"
 
 #if defined(GD_IDE_ONLY)

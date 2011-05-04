@@ -38,7 +38,6 @@ class Compilation: public wxDialog
 		wxCheckBox* WinCheck;
 		wxStaticBitmap* StaticBitmap2;
 		wxPanel* Panel5;
-		wxButton* DistribuerBt;
 		wxButton* Button4;
 		wxNotebook* Notebook1;
 		wxStaticText* StaticText2;
@@ -60,7 +59,6 @@ class Compilation: public wxDialog
 		wxStaticText* StaticText7;
 		wxButton* OuvrirBt;
 		wxStaticLine* StaticLine1;
-		wxButton* CGShareBt;
 		wxPanel* Panel2;
 		wxStaticText* StaticText4;
 		wxCheckBox* LinuxCheck;
@@ -97,8 +95,6 @@ class Compilation: public wxDialog
 		static const long ID_PANEL3;
 		static const long ID_STATICTEXT7;
 		static const long ID_BUTTON3;
-		static const long ID_BUTTON7;
-		static const long ID_BUTTON5;
 		static const long ID_PANEL4;
 		static const long ID_NOTEBOOK1;
 		static const long ID_STATICLINE2;

@@ -20,7 +20,7 @@
 #include "GDL/VersionWrapper.h"
 #include "CheckMAJ.h"
 #include "GDL/tinyxml.h"
-#include "LocaleManager.h"
+#include "GDL/LocaleManager.h"
 
 //(*IdInit(MAJ)
 const long MAJ::ID_STATICBITMAP3 = wxNewId();
@@ -244,6 +244,6 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
         return;
     }
 
-    wxExecute(tempDir+"/newgd.exe /SILENT /LANG="+LocaleManager::GetInstance()->locale->GetLocale(), wxEXEC_ASYNC);
+    wxExecute(tempDir+"/newgd.exe /SILENT /LANG="+GDpriv::LocaleManager::GetInstance()->locale->GetLocale(), wxEXEC_ASYNC);
     EndModal(2);
 }

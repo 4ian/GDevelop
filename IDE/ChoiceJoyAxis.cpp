@@ -77,7 +77,7 @@ mainObjectsName(mainObjectsName_)
 	else if ( joyaxis == "\"AxisZ\"" ) axisRadio->SetSelection(2);
 	else if ( joyaxis == "\"AxisR\"" ) axisRadio->SetSelection(3);
 	else if ( joyaxis == "\"AxisU\"" ) axisRadio->SetSelection(4);
-	else if ( joyaxis == "\"AxisY\"" ) axisRadio->SetSelection(5);
+	else if ( joyaxis == "\"AxisPOV\"" ) axisRadio->SetSelection(5);
 	else joyaxis = "\"AxisX\"";
 }
 
@@ -102,7 +102,7 @@ void ChoiceJoyAxis::OnaxisRadioSelect(wxCommandEvent& event)
 	else if ( axisRadio->GetSelection() == 2 ) joyaxis = "\"AxisZ\"";
 	else if ( axisRadio->GetSelection() == 3 ) joyaxis = "\"AxisR\"";
 	else if ( axisRadio->GetSelection() == 4 ) joyaxis = "\"AxisU\"";
-	else if ( axisRadio->GetSelection() == 5 ) joyaxis = "\"AxisY\"";
+	else if ( axisRadio->GetSelection() == 5 ) joyaxis = "\"AxisPOV\"";
 }
 
 void ChoiceJoyAxis::OnokBtClick(wxCommandEvent& event)

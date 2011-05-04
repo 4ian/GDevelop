@@ -38,7 +38,6 @@
 #include <wx/filename.h>
 #include <SFML/System.hpp>
 #include "CppUnitLite/TestHarness.h"
-#include "LocaleManager.h"
 
 #include "Game_Develop_EditorMain.h"
 #include "Game_Develop_EditorApp.h"
@@ -64,6 +63,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/SpriteExtension.h"
 #include "GDL/ExtensionsLoader.h"
+#include "GDl/LocaleManager.h"
 
 // archives Boost
 #include <fstream>
@@ -176,7 +176,7 @@ bool Game_Develop_EditorApp::OnInit()
                 languageId = wxLocale::FindLanguageInfo(languagesAvailables[i])->Language;
         }
 
-        LocaleManager::GetInstance()->SetLanguage(languageId);
+        GDpriv::LocaleManager::GetInstance()->SetLanguage(languageId);
 
     }
     cout << "Language loaded" << endl;
@@ -208,9 +208,9 @@ bool Game_Develop_EditorApp::OnInit()
     //Set help file
     {
         HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
-        if ( LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_ENGLISH )
+        if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_ENGLISH )
             helpFileAccess->InitWithHelpFile("help.chm");
-        else if ( LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        else if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
             helpFileAccess->InitWithHelpFile("aide.chm");
     }
     cout << "Help file setted" << endl;

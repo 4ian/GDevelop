@@ -773,8 +773,6 @@
 		<Unit filename="InitialPositionBrowserDlg.h" />
 		<Unit filename="InitialVariablesDialog.cpp" />
 		<Unit filename="InitialVariablesDialog.h" />
-		<Unit filename="LocaleManager.cpp" />
-		<Unit filename="LocaleManager.h" />
 		<Unit filename="MAJ.cpp">
 			<Option virtualFolder="Editeur principal\Aide\" />
 		</Unit>

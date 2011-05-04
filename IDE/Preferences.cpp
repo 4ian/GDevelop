@@ -20,7 +20,7 @@
 #include <wx/log.h>
 #include "GDL/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
-#include "LocaleManager.h"
+#include "GDL/LocaleManager.h"
 #include <wx/listctrl.h>
 #include "SetupCompilerToolchainDlg.h"
 
@@ -585,7 +585,7 @@ changesNeedRestart(false)
             const wxLanguageInfo * language = wxLocale::FindLanguageInfo(languagesAvailables[i]);
             langChoice->Append(language->Description);
 
-            if (LocaleManager::GetInstance()->locale->GetLanguage() == language->Language)
+            if (GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == language->Language)
                 langChoice->SetSelection(i);
         }
     }
@@ -721,7 +721,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     const wxLanguageInfo * language = wxLocale::FindLanguageInfo(langChoice->GetString(langChoice->GetSelection()));
     pConfig->Write( _T( "/Lang" ), language->CanonicalName );
-    LocaleManager::GetInstance()->SetLanguage(language->Language);
+    GDpriv::LocaleManager::GetInstance()->SetLanguage(language->Language);
 
     if ( changesNeedRestart )
     {

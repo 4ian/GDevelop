@@ -71,8 +71,6 @@ const long Compilation::ID_STATICTEXT3 = wxNewId();
 const long Compilation::ID_PANEL3 = wxNewId();
 const long Compilation::ID_STATICTEXT7 = wxNewId();
 const long Compilation::ID_BUTTON3 = wxNewId();
-const long Compilation::ID_BUTTON7 = wxNewId();
-const long Compilation::ID_BUTTON5 = wxNewId();
 const long Compilation::ID_PANEL4 = wxNewId();
 const long Compilation::ID_NOTEBOOK1 = wxNewId();
 const long Compilation::ID_STATICLINE2 = wxNewId();
@@ -96,7 +94,6 @@ Compilation::Compilation( wxWindow* parent, const Game & gameToCompile_ ) :
     wxFlexGridSizer* FlexGridSizer9;
     wxFlexGridSizer* FlexGridSizer2;
     wxFlexGridSizer* FlexGridSizer7;
-    wxStaticBoxSizer* StaticBoxSizer3;
     wxFlexGridSizer* FlexGridSizer8;
     wxFlexGridSizer* FlexGridSizer6;
     wxStaticBoxSizer* StaticBoxSizer1;
@@ -165,7 +162,7 @@ Compilation::Compilation( wxWindow* parent, const Game & gameToCompile_ ) :
     StaticBitmap4 = new wxStaticBitmap(Panel2, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/mac-logo.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP4"));
     FlexGridSizer8->Add(StaticBitmap4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     MacCheck = new wxCheckBox(Panel2, ID_CHECKBOX3, _("Mac OS X ( Expérimental )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
-    MacCheck->SetValue(true);
+    MacCheck->SetValue(false);
     FlexGridSizer8->Add(MacCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer1->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer5->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -203,12 +200,6 @@ Compilation::Compilation( wxWindow* parent, const Game & gameToCompile_ ) :
     FlexGridSizer4->Add(StaticText7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     OuvrirBt = new wxButton(Panel4, ID_BUTTON3, _("Ouvrir le dossier contenant le jeu"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
     FlexGridSizer4->Add(OuvrirBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer3 = new wxStaticBoxSizer(wxVERTICAL, Panel4, _("Découvrez maintenant comment..."));
-    DistribuerBt = new wxButton(Panel4, ID_BUTTON7, _("Distribuer votre jeu"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
-    StaticBoxSizer3->Add(DistribuerBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    CGShareBt = new wxButton(Panel4, ID_BUTTON5, _("L\'inscrire sur Compil Games Share"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
-    StaticBoxSizer3->Add(CGShareBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer4->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel4->SetSizer(FlexGridSizer4);
     FlexGridSizer4->Fit(Panel4);
     FlexGridSizer4->SetSizeHints(Panel4);
@@ -235,8 +226,6 @@ Compilation::Compilation( wxWindow* parent, const Game & gameToCompile_ ) :
     Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnNext2Click);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnCompilBtClick);
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnOuvrirBtClick);
-    Connect(ID_BUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnDistribuerBtClick);
-    Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnCGShareBtClick);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnAideBtClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnFermerBtClick);
     //*)
@@ -249,14 +238,19 @@ Compilation::Compilation( wxWindow* parent, const Game & gameToCompile_ ) :
             LinuxCheck->SetValue(false);LinuxCheck->Enable(false);
             MacCheck->SetValue(false);MacCheck->Enable(false);
         #elif defined(LINUX)
-            WinCheck->SetValue(false);WinCheck->Enable(true);
-            MacCheck->SetValue(false);MacCheck->Enable(true);
+            WinCheck->SetValue(false);WinCheck->Enable(false);
+            MacCheck->SetValue(false);MacCheck->Enable(false);
         #elif defined(MAC)
-            LinuxCheck->SetValue(false);LinuxCheck->Enable(true);
-            MacCheck->SetValue(false);MacCheck->Enable(true);
+            LinuxCheck->SetValue(false);LinuxCheck->Enable(false);
+            WinCheck->SetValue(false);WinCheck->Enable(false);
         #else
             #warning Unknown OS
         #endif
+    }
+    if ( !wxDirExists("MacRuntime") )
+    {
+        MacCheck->Enable(false);
+        MacCheck->SetValue(false);
     }
 }
 
@@ -332,7 +326,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
     {
         if ( !it->first.empty() && wxCopyFile( it->first, repTemp + "/" + it->second, true ) == false )
-            report += _( "Impossible de copier \""+it->first+"\" dans le répertoire de compilation.\n" );
+            report += _( "Impossible de copier " )+it->first+_(" dans le répertoire de compilation.\n" );
 
         ++i;
         AvancementGauge->SetValue( i / static_cast<float>(resourcesNewFilename.size())*100.f / 3.f );
@@ -418,7 +412,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
             if ( filename.GetFullName() != "gam.egd" ) //On supprime tout sauf gam.egd
             {
                 if ( !wxRemoveFile( file ) )
-                    report += _( "Impossible de supprimer le fichier " + file + " situé dans le répertoire de compilation.\n" );
+                    report += _( "Impossible de supprimer le fichier " ) + file + _(" situé dans le répertoire de compilation.\n" );
             }
 
             file = wxFindNextFile();
@@ -444,29 +438,42 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
             if ( WinCheck->GetValue())
             {
                 if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdw", repTemp + "/" + game.extensionsUsed[i]+".xgdw", true ) == false )
-                    report += _( "Impossible de copier l'extension \""+game.extensionsUsed[i]+"\" pour Windows dans le répertoire de compilation.\n" );
+                    report += _( "Impossible de copier l'extension ")+game.extensionsUsed[i]+_(" pour Windows dans le répertoire de compilation.\n" );
 
                 const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
                 for (unsigned int i = 0;i<supplementaryFiles.size();++i)
                 {
                     if ( supplementaryFiles[i].first == "Windows"
                          && wxCopyFile( supplementaryFiles[i].second, repTemp + "/" + supplementaryFiles[i].second, true ) == false )
-                        report += _( "Impossible de copier \""+supplementaryFiles[i].second+"\" pour Windows dans le répertoire de compilation.\n" );
+                        report += _( "Impossible de copier ")+supplementaryFiles[i].second+_(" pour Windows dans le répertoire de compilation.\n" );
                 }
             }
-
 
             if ( LinuxCheck->GetValue() )
             {
                 if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdl", repTemp + "/"+game.extensionsUsed[i]+".xgdl", true ) == false )
-                    report += _( "Impossible de copier l'extension \""+game.extensionsUsed[i]+"\" pour Linux dans le répertoire de compilation.\n" );
+                    report += _( "Impossible de copier l'extension ")+game.extensionsUsed[i]+_(" pour Linux dans le répertoire de compilation.\n" );
 
                 const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
                 for (unsigned int i = 0;i<supplementaryFiles.size();++i)
                 {
                     if ( supplementaryFiles[i].first == "Linux"
                          && wxCopyFile( supplementaryFiles[i].second, repTemp + "/" + supplementaryFiles[i].second, true ) == false )
-                        report += _( "Impossible de copier \""+supplementaryFiles[i].second+"\" pour Linux dans le répertoire de compilation.\n" );
+                        report += _( "Impossible de copier ")+supplementaryFiles[i].second+_(" pour Linux dans le répertoire de compilation.\n" );
+                }
+            }
+
+            if ( MacCheck->GetValue() )
+            {
+                if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdm", repTemp + "/"+game.extensionsUsed[i]+".xgdm", true ) == false )
+                    report += _( "Impossible de copier l'extension ")+game.extensionsUsed[i]+_(" pour Mac OS dans le répertoire de compilation.\n" );
+
+                const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
+                for (unsigned int i = 0;i<supplementaryFiles.size();++i)
+                {
+                    if ( supplementaryFiles[i].first == "Mac"
+                         && wxCopyFile( supplementaryFiles[i].second, repTemp + "/" + supplementaryFiles[i].second, true ) == false )
+                        report += _( "Impossible de copier ")+supplementaryFiles[i].second+_(" pour Mac OS dans le répertoire de compilation.\n" );
                 }
             }
         }
@@ -484,80 +491,106 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         if ( WinCheck->GetValue() )
         {
             if ( wxCopyFile( "Runtime/PlayWin.exe", repTemp + "/" + winExecutableName, true ) == false )
-                report += _( "Impossible de créer l'executable Windows dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable Windows"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/gdl.dll", repTemp + "/gdl.dll", true ) == false )
-                report += _( "Impossible de créer l'executable gdl.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable gdl.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "sfml-audio-2.dll", repTemp + "/sfml-audio-2.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-audio-2.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable sfml-audio-2.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "sfml-graphics-2.dll", repTemp + "/sfml-graphics-2.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-graphics-2.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable sfml-graphics-2.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "sfml-network-2.dll", repTemp + "/sfml-network-2.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-network-2.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable sfml-network-2.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "sfml-system-2.dll", repTemp + "/sfml-system-2.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-system-2.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable sfml-system-2.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "sfml-window-2.dll", repTemp + "/sfml-window-2.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-window-2.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable sfml-window-2.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "libsndfile-1.dll", repTemp + "/libsndfile-1.dll", true ) == false )
-                report += _( "Impossible de copier libsndfile-1.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de copier ")+"libsndfile-1.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "openal32.dll", repTemp + "/openal32.dll", true ) == false )
-                report += _( "Impossible de copier openal32.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de copier ")+"openal32.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "mingwm10.dll", repTemp + "/mingwm10.dll", true ) == false )
-                report += _( "Impossible de copier mingwm10.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de copier ")+"mingwm10.dll"+_(" dans le répertoire de compilation.\n" );
 
         }
         //Fichiers pour linux
         if ( LinuxCheck->GetValue() )
         {
             if ( wxCopyFile( "Runtime/ExeLinux", repTemp + "/ExeLinux", true ) == false )
-                report += _( "Impossible de créer l'executable Linux dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable Linux"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/PlayLinux", repTemp + "/" + linuxExecutableName, true ) == false )
-                report += _( "Impossible de créer le script executable Linux dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"le script executable Linux"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libFLAC.so.7", repTemp + "/libFLAC.so.7", true ) == false )
-                report += _( "Impossible de créer libFLAC.so.7 dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"libFLAC.so.7"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libfreetype.so.6", repTemp + "/libfreetype.so.6", true ) == false )
-                report += _( "Impossible de créer libfreetype.so.6 dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"libfreetype.so.6"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libgdl.so", repTemp + "/libgdl.so", true ) == false )
-                report += _( "Impossible de créer libgdl.so dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"libgdl.so"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libopenal.so.0", repTemp + "/libopenal.so.0", true ) == false )
-                report += _( "Impossible de créer libopenal.so.0 dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"libopenal.so.0"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libsfml2-audio.so", repTemp + "/libsfml2-audio.so", true ) == false )
-                report += _( "Impossible de créer libsfml2-audio.so dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"libsfml2-audio.so"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libsfml2-graphics.so", repTemp + "/libsfml2-graphics.so", true ) == false )
-                report += _( "Impossible de créer libsfml2-graphics.so dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"libsfml2-graphics.so"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libsfml2-network.so", repTemp + "/libsfml2-network.so", true ) == false )
-                report += _( "Impossible de créer libsfml2-network.so dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"libsfml2-network.so"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libsfml2-system.so", repTemp + "/libsfml2-system.so", true ) == false )
-                report += _( "Impossible de créer libsfml2-system.so dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"libsfml2-system.so"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libsfml2-system.so", repTemp + "/libsfml2-system.so", true ) == false )
-                report += _( "Impossible de créer libsfml2-system.so dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"libsfml2-system.so"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libsfml2-window.so", repTemp + "/libsfml2-window.so", true ) == false )
-                report += _( "Impossible de créer libsfml2-window.so dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"libsfml2-window.so"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libsndfile.so.1", repTemp + "/libsndfile.so.1", true ) == false )
-                report += _( "Impossible de créer libsndfile.so.1 dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"libsndfile.so.1"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/libGLEW.so.1.3", repTemp + "/libGLEW.so.1.3", true ) == false )
-                report += _( "Impossible de créer libGLEW.so.1.3 dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"libGLEW.so.1.3"+_(" dans le répertoire de compilation.\n" );
+        }
+        if ( MacCheck->GetValue() )
+        {
+            if ( wxCopyFile( "MacRuntime/MacExe", repTemp + "/MacExe", true ) == false )
+                report += _( "Impossible de créer ")+"l'executable Mac OS"+_(" dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "MacRuntime/libgdl.dylib", repTemp + "/libgdl.dylib", true ) == false )
+                report += _( "Impossible de créer ")+"libgdl.dylib"+_(" dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "MacRuntime/libsfml-audio.2.0.dylib", repTemp + "/libsfml-audio.2.0.dylib", true ) == false )
+                report += _( "Impossible de créer ")+"libsfml-audio.2.0.dylib"+_(" dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "MacRuntime/libsfml-graphics.2.0.dylib", repTemp + "/libsfml-graphics.2.0.dylib", true ) == false )
+                report += _( "Impossible de créer ")+"libsfml-graphics.2.0.dylib"+_(" dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "MacRuntime/libsfml-network.2.0.dylib", repTemp + "/libsfml-network.2.0.dylib", true ) == false )
+                report += _( "Impossible de créer ")+"libsfml-network.2.0.dylib"+_(" dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "MacRuntime/libsfml-system.2.0.dylib", repTemp + "/libsfml-system.2.0.dylib", true ) == false )
+                report += _( "Impossible de créer ")+"libsfml-system.2.0.dylib"+_(" dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "MacRuntime/libsfml-window.2.0.dylib", repTemp + "/libsfml-window.2.0.dylib", true ) == false )
+                report += _( "Impossible de créer ")+"libsfml-window.2.0.dylib"+_(" dans le répertoire de compilation.\n" );
+
+            if ( wxCopyFile( "MacRuntime/sndfile", repTemp + "/sndfile", true ) == false )
+                report += _( "Impossible de créer ")+"sndfile"+_(" dans le répertoire de compilation.\n" );
         }
 
         //Copie du tout dans le répertoire final
@@ -576,49 +609,53 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         if ( WinCheck->GetValue() )
         {
             if ( wxCopyFile( "Runtime/PlayWin.exe", repTemp + "/setup.exe", true ) == false )
-                report += _( "Impossible de créer l'executable Windows dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable Windows"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "Runtime/gdl.dll", repTemp + "/gdl.dll", true ) == false )
-                report += _( "Impossible de créer l'executable gdl.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable gdl.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "sfml-audio-2.dll", repTemp + "/sfml-audio-2.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-audio-2.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable sfml-audio-2.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "sfml-graphics-2.dll", repTemp + "/sfml-graphics-2.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-graphics-2.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable sfml-graphics-2.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "sfml-network-2.dll", repTemp + "/sfml-network-2.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-network-2.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable sfml-network-2.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "sfml-system-2.dll", repTemp + "/sfml-system-2.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-system-2.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable sfml-system-2.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "sfml-window-2.dll", repTemp + "/sfml-window-2.dll", true ) == false )
-                report += _( "Impossible de créer l'executable sfml-window-2.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de créer ")+"l'executable sfml-window-2.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "libsndfile-1.dll", repTemp + "/libsndfile-1.dll", true ) == false )
-                report += _( "Impossible de copier libsndfile-1.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de copier ")+"libsndfile-1.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "openal32.dll", repTemp + "/openal32.dll", true ) == false )
-                report += _( "Impossible de copier openal32.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de copier ")+"openal32.dll"+_(" dans le répertoire de compilation.\n" );
 
             if ( wxCopyFile( "mingwm10.dll", repTemp + "/mingwm10.dll", true ) == false )
-                report += _( "Impossible de copier mingwm10.dll dans le répertoire de compilation.\n" );
+                report += _( "Impossible de copier ")+"mingwm10.dll"+_(" dans le répertoire de compilation.\n" );
 
             //Compression en un seul fichier
-            StaticText3->SetLabel( "Exportation du jeu... ( Compression )" );
+            StaticText3->SetLabel( _("Exportation du jeu... ( Compression )") );
             wxRemoveFile( "MonJeu.exe" );
             wxArrayString arrStdOut, arrStdErr;
             wxExecute( _T( "7za.exe a -sfx7zS.sfx \""+ repTemp +"/"+winExecutableName+"\" \"" + repTemp + "/*\"" ), arrStdOut, arrStdErr, wxEXEC_SYNC | wxEXEC_NOHIDE );
 
             //Copie du fichier
             if ( !wxCopyFile(repTemp +"/"+winExecutableName, destinationDirectory+"/"+winExecutableName) )
-                report += _( "Impossible de copier le fichier "+winExecutableName+" depuis le répertoire de compilation vers le répertoire final.\n" );
+                report += _( "Impossible de copier le fichier ")+winExecutableName+_(" depuis le répertoire de compilation vers le répertoire final.\n" );
 
         }
         if ( LinuxCheck->GetValue() )
         {
             wxMessageBox( _( "La création d'un executable seul n'est pas disponible pour GNU/linux." ), _( "Non disponible" ), wxOK );
+        }
+        if ( MacCheck->GetValue() )
+        {
+            wxMessageBox( _( "La création d'un executable seul n'est pas disponible pour Mac OS." ), _( "Non disponible" ), wxOK );
         }
     }
 
@@ -707,7 +744,7 @@ void Compilation::OnNext2Click(wxCommandEvent& event)
 void Compilation::ClearDirectory(std::string directory, string & report)
 {
     if ( !wxDirExists( directory ) && !wxMkdir( directory ) )
-            report += _( "Impossible de créer le répertoire : " + directory + "\n" );
+            report += _( "Impossible de créer le répertoire : " ) + directory + "\n";
 
     wxString file = wxFindFirstFile( directory + "/*" );
     while ( !file.empty() )

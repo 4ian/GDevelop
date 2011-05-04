@@ -282,8 +282,7 @@ void EditorImages::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonModProp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnModPropSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonMod, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnModNameImageBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonModFile, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnModFileImage, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonAddDossier, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnMenuItem5Selected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonRemoveDossier, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnMenuItem6Selected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonAddDossier, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnAddFolderSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonUp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnMoveUpSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonDown, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnMoveDownSelected, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonDirectories, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::DossierBt, NULL, this);
@@ -325,9 +324,7 @@ void EditorImages::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Dossiers"), wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonDirectories, !hideLabels ? _("Ajouter un dossier") : "", wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonAddDossier, !hideLabels ? _("Ajouter au dossier") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonRemoveDossier, !hideLabels ? _("Enlever") : "", wxBitmap("res/remove24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonAddDossier, !hideLabels ? _("Ajouter un dossier") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
     }
 
     {
@@ -797,21 +794,6 @@ void EditorImages::OnAideBtClick( wxCommandEvent& event )
 }
 
 void EditorImages::DossierBt( wxCommandEvent& event )
-{
-}
-
-
-/**
- * Add an image to the folder
- */
-void EditorImages::OnMenuItem5Selected(wxCommandEvent& event)
-{
-}
-
-/**
- * Suppress an image only from the current folder
- */
-void EditorImages::OnMenuItem6Selected(wxCommandEvent& event)
 {
 }
 

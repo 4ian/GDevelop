@@ -31,6 +31,7 @@
 #include "GDL/Version.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/DynamicExtensionBase.h"
+#include "GDL/LocaleManager.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/log.h>
@@ -224,6 +225,9 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
             }
 
             extensionsManager->AddExtension(extension);
+            #if defined(GD_IDE_ONLY)
+            GDpriv::LocaleManager::GetInstance()->AddCatalog(extension->GetName());
+            #endif
             return;
         }
     }

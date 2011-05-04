@@ -626,7 +626,7 @@
 			</Target>
 			<Target title="Mac - Release">
 				<Option platforms="Windows;Mac;" />
-				<Option output="..\Runtime\bin\release\libgdl.so" prefix_auto="0" extension_auto="0" />
+				<Option output="..\Runtime\bin\release\libgdl.dylib" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -659,10 +659,13 @@
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\libs\sfml\lib" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../Runtime/bin/release/libgdl.dylib" />
+				</ExtraCommands>
 			</Target>
 			<Target title="Mac - Debug">
 				<Option platforms="Windows;Unix;" />
-				<Option output="..\Runtime\bin\debug\libgdl.so" prefix_auto="0" extension_auto="0" />
+				<Option output="..\Runtime\bin\debug\libgdl.dylib" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -694,6 +697,9 @@
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\libs\sfml\lib" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../Runtime/bin/debug/libgdl.dylib" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
@@ -872,6 +878,8 @@
 		<Unit filename="GDL\ListVariable.h" />
 		<Unit filename="GDL\LoadingScreen.cpp" />
 		<Unit filename="GDL\LoadingScreen.h" />
+		<Unit filename="GDL\LocaleManager.cpp" />
+		<Unit filename="GDL\LocaleManager.h" />
 		<Unit filename="GDL\Log.cpp">
 			<Option weight="62" />
 		</Unit>
@@ -1126,7 +1134,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="1.5.10140" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="1.5.10151" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

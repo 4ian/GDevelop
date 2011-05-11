@@ -261,3 +261,22 @@ double ExpGetMusicChannelVolume( const RuntimeScene & scene, ObjectsConcerned & 
 
     return SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetVolume();
 }
+
+double ExpGetJoystickAxis( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
+{
+    //Obtain axis and joystick
+    unsigned int joystick = exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned);
+    string axisStr = exprInstruction.parameters[1].GetAsTextExpressionResult(scene, objectsConcerned);
+    sf::Joy::Axis axis;
+    if ( axisStr == "AxisX" ) axis = sf::Joy::AxisX;
+    else if ( axisStr == "AxisY" ) axis = sf::Joy::AxisY;
+    else if ( axisStr == "AxisZ" ) axis = sf::Joy::AxisZ;
+    else if ( axisStr == "AxisR" ) axis = sf::Joy::AxisR;
+    else if ( axisStr == "AxisU" ) axis = sf::Joy::AxisU;
+    else if ( axisStr == "AxisV" ) axis = sf::Joy::AxisV;
+    else if ( axisStr == "AxisPOV" ) axis = sf::Joy::AxisPOV;
+    else return 0;
+
+    //Update variable value
+    return scene.input->GetJoystickAxis(joystick, axis);
+}

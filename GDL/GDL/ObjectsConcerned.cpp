@@ -43,6 +43,7 @@ ObjList ObjectsConcerned::PickAndRemove(unsigned int oID, bool forceGlobal)
 {
     ObjList objectsToTest;
 
+    //Pick objects from groups
     vector < ObjectGroup >::iterator groupsIter = allGroups->begin();
     vector < ObjectGroup >::const_iterator groupsEnd = allGroups->end();
     for (;groupsIter!=groupsEnd;++groupsIter)
@@ -60,7 +61,22 @@ ObjList ObjectsConcerned::PickAndRemove(unsigned int oID, bool forceGlobal)
         }
     }
 
-    ObjList listObjects = PickOnlyObjects(oID, false, forceGlobal, true);
+    //Pick objects
+    ObjList listObjects;
+    {
+
+        //L'objet a il déjà été selectionné auparavant ?
+        if ( alreadyConcernedObjects.find(oID) != alreadyConcernedObjects.end() && !forceGlobal )
+        {
+            listObjects = objectsPicked.GetObjects(oID);
+
+            objectsPicked.RemoveObjects(oID);
+        }
+        else
+            listObjects = allObjects->GetObjects(oID);
+
+        alreadyConcernedObjects.insert(oID);
+    }
     copy(listObjects.begin(), listObjects.end(), back_inserter(objectsToTest));
 
     return objectsToTest;

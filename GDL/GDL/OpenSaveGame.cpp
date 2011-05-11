@@ -424,7 +424,7 @@ void OpenSaveGame::OpenImages(const TiXmlElement * imagesElem, TiXmlElement * do
 
         imageToAdd.alwaysLoaded = false;
         if ( imagesElem->Attribute( "alwaysLoaded" ) != NULL && string(imagesElem->Attribute( "alwaysLoaded" )) == "true")
-                imageToAdd.smooth = true;
+                imageToAdd.alwaysLoaded = true;
 
         game.images.push_back(imageToAdd);
         imagesElem = imagesElem->NextSiblingElement();

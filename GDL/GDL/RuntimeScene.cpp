@@ -8,6 +8,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include <sstream>
+#include <iomanip>
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/ImageManager.h"
@@ -150,6 +151,38 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
     gluPerspective(oglFOV, windowRatio, oglZNear, oglZFar);
 }
 
+#ifndef RELEASE
+void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, int x, int & y)
+{
+    FontManager * fontManager = FontManager::GetInstance();
+
+    y += 15;
+    while ( !iter->Is_Done() )
+    {
+        sf::Text text("", *fontManager->GetFont("consola.ttf"));
+        text.SetCharacterSize(12);
+        ostringstream texte;
+        if ( CProfileManager::Get_Frame_Count_Since_Reset() != 0 )
+            texte << fixed <<  iter->Get_Current_Name()   << " Calls/Frame:" << iter->Get_Current_Total_Calls()/CProfileManager::Get_Frame_Count_Since_Reset()
+                                                << " Time/Frame:" << iter->Get_Current_Total_Time()/CProfileManager::Get_Frame_Count_Since_Reset()
+                                                << " %Time/Parent " << iter->Get_Current_Total_Time()/iter->Get_Current_Parent_Total_Time()*100.0f;
+        text.SetString(texte.str());
+        text.SetPosition(x,y);
+        renderWindow->Draw(text);
+
+        //Childs
+        CProfileIterator * childIter = CProfileManager::Get_Iterator();
+        *childIter = *iter;
+        childIter->Enter_Child(0);
+        DisplayProfile(renderWindow, childIter, x+15, y);
+        CProfileManager::Release_Iterator(childIter);
+
+        y += 15;
+        iter->Next();
+    }
+}
+#endif
+
 ////////////////////////////////////////////////////////////
 /// Avancer l'état de la scène et la dessiner
 /// Appelé habituellement à chaque tour de boucle de jeu
@@ -158,7 +191,6 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
 {
     for (unsigned int step = 0;step<nbStep;++step)
     {
-
         //Gestion pré-évènements
         ManageRenderTargetEvents();
         UpdateTime();
@@ -212,6 +244,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
             profiler->Update();
         }
         #endif
+
 
         if ( firstLoop ) firstLoop = false; //The first frame is passed
     }
@@ -335,6 +368,19 @@ void RuntimeScene::Render()
             }
         }
     }
+
+        //Internal profiler
+        #ifndef RELEASE
+        if ( renderWindow->GetInput().IsKeyDown(sf::Key::F2))
+            CProfileManager::Reset();
+
+        renderWindow->SetView(sf::View(sf::FloatRect(0.0f,0.0f, game->windowWidth, game->windowHeight)));
+
+        CProfileIterator * iter = CProfileManager::Get_Iterator();
+        int y = 0;
+        DisplayProfile(renderWindow, iter, 0,y);
+        CProfileManager::Increment_Frame_Counter();
+        #endif
 
     // Display window contents on screen
     renderWindow->RestoreGLStates();

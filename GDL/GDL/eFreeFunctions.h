@@ -46,4 +46,5 @@ double ExpGetSoundChannelPitch( const RuntimeScene & scene, ObjectsConcerned & o
 double ExpGetMusicChannelPitch( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 double ExpGetSoundChannelVolume( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 double ExpGetMusicChannelVolume( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+double ExpGetJoystickAxis( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 #endif // EFREEFUNCTIONS_H

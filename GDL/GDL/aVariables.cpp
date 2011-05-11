@@ -14,6 +14,7 @@
 #include "GDL/ListVariable.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
+#include "GDL/profile.h"
 
 /**
  * Modify a variable of an object

@@ -16,6 +16,8 @@
 #include "GDL/TranslateCondition.h"
 #endif
 
+#include "GDL/profile.h" //Profiling
+
 /**
  * Check the conditions, and launch actions and subevents if necessary
  */

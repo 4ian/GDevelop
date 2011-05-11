@@ -39,7 +39,7 @@ bool ActGetJoystickAxis( RuntimeScene & scene, ObjectsConcerned & objectsConcern
     else return false;
 
     //Update variable value
-    scene.variables.ObtainVariable(action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned)) = scene.input->GetJoystickAxis(joystick, axis);
+    scene.variables.ObtainVariable(action.GetParameter(2).GetPlainString()) = scene.input->GetJoystickAxis(joystick, axis);
 
     return true;
 }

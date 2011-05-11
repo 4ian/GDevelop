@@ -11,6 +11,7 @@
 #include "GDL/Event.h"
 #include "GDL/CommonTools.h"
 #include "GDL/cVariables.h"
+#include "GDL/profile.h"
 
 #include <SFML/Window.hpp>
 #include "GDL/RuntimeScene.h"

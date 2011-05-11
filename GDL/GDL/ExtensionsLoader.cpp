@@ -2,6 +2,8 @@
 #include "GDL/ExtensionsLoader.h"
 #include <stdio.h>
 #include <sys/types.h>
+#include <stdlib.h>
+#include <signal.h>
 
 //Compiler specific include, for listing files of directory ( see below )
 #if defined(__GNUC__)
@@ -133,9 +135,27 @@ void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
 		#warning Compiler not supported ( but might support one style of directory listing, update defines if necessary ) for dynamic libraries loading
 	#endif
 }
+/*
+void SignalHandler(int signal)
+{
+    printf("Crash when loading an extension.\n");
+}*/
 
 void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
 {
+    /*typedef void (*SignalHandlerPointer)(int);
+
+    SignalHandlerPointer previousHandler;
+    previousHandler = signal(SIGSEGV, SignalHandler);*/
+
+    //Log file in IDE only
+    #if defined(GD_IDE_ONLY)
+    {
+        wxFile errorDetectFile("ExtensionBeingLoaded.log", wxFile::write);
+        errorDetectFile.Write(fullpath);
+    }
+    #endif
+
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     Handle extensionHdl = OpenLibrary(fullpath.c_str());
     if (extensionHdl == NULL)
@@ -176,33 +196,33 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
                 error += "Compilation information not filled.\n";
 
             #if defined(GD_IDE_ONLY)
-            if ( extensionPtr->compilationInfo.runtimeOnly )
+            else if ( extensionPtr->compilationInfo.runtimeOnly )
                 error += "Extension compiled for runtime only.\n";
 
-            if ( extensionPtr->compilationInfo.wxWidgetsMajorVersion != wxMAJOR_VERSION ||
+            else if ( extensionPtr->compilationInfo.wxWidgetsMajorVersion != wxMAJOR_VERSION ||
                       extensionPtr->compilationInfo.wxWidgetsMinorVersion != wxMINOR_VERSION ||
                       extensionPtr->compilationInfo.wxWidgetsReleaseNumber != wxRELEASE_NUMBER ||
                       extensionPtr->compilationInfo.wxWidgetsSubReleaseNumber != wxSUBRELEASE_NUMBER )
                 error += "Not the same wxWidgets version.\n";
             #endif
             #if defined(__GNUC__)
-            if ( extensionPtr->compilationInfo.gccMajorVersion != __GNUC__ ||
+            else if ( extensionPtr->compilationInfo.gccMajorVersion != __GNUC__ ||
                       extensionPtr->compilationInfo.gccMinorVersion != __GNUC_MINOR__ ||
                       extensionPtr->compilationInfo.gccPatchLevel != __GNUC_PATCHLEVEL__ )
                 error += "Not the same GNU Compiler version.\n";
 
             #endif
-            if ( extensionPtr->compilationInfo.sfmlMajorVersion != 2 ||
+            else if ( extensionPtr->compilationInfo.sfmlMajorVersion != 2 ||
                       extensionPtr->compilationInfo.sfmlMinorVersion != 0 )
                 error += "Not the same SFML version.\n";
 
-            if ( extensionPtr->compilationInfo.boostVersion != BOOST_VERSION )
+            else if ( extensionPtr->compilationInfo.boostVersion != BOOST_VERSION )
                 error += "Not the same Boost version.";
 
-            if ( extensionPtr->compilationInfo.gdlVersion != RC_FILEVERSION_STRING)
+            else if ( extensionPtr->compilationInfo.gdlVersion != RC_FILEVERSION_STRING)
                 error += "Not the same GDL version.\n";
 
-            if ( extensionPtr->compilationInfo.sizeOfpInt != sizeof(int*))
+            else if ( extensionPtr->compilationInfo.sizeOfpInt != sizeof(int*))
                 error += "Not the same architecture.\n";
 
             if ( !error.empty() )
@@ -212,22 +232,30 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
                 cout << "Bad extension " + fullpath + " loaded :\n" + error;
                 cout << "---------------" << endl;
 
-                #if defined(GD_IDE_ONLY)
+                #if defined(RELEASE)//Load extension despite errors in non release build
                 CloseLibrary(extensionHdl);
+                #endif
+                #if defined(GD_IDE_ONLY) && defined(RELEASE) //Show errors in IDE only
                 wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" présente des erreurs :\n")) + error + string(_("\nL'extension n'a pas été chargée. Prenez contact avec le développeur pour plus d'informations." ));
-                #if defined(RELEASE)
                 wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
                 #endif
+                #if defined(GD_IDE_ONLY)
+                wxRemoveFile("ExtensionBeingLoaded.log");
                 #endif
-                #if defined(RELEASE) //Load extension despite errors in non release build
+                #if defined(RELEASE)//Load extension despite errors in non release build
+                //signal(SIGSEGV, previousHandler);
                 return;
                 #endif
             }
 
             extensionsManager->AddExtension(extension);
-            #if defined(GD_IDE_ONLY)
+            #if defined(GD_IDE_ONLY) //In editor, load catalog associated with extension, if any.
             GDpriv::LocaleManager::GetInstance()->AddCatalog(extension->GetName());
             #endif
+            #if defined(GD_IDE_ONLY)
+            wxRemoveFile("ExtensionBeingLoaded.log");
+            #endif
+            //signal(SIGSEGV, previousHandler);
             return;
         }
     }

@@ -6,6 +6,7 @@
 #include "GDL/CommonInstructions.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
+#include "GDL/profile.h"
 
 /**
  * Common instruction for executing instruction on each object "Foo".
@@ -27,24 +28,20 @@ bool AutomatismActionForEachObject( RuntimeScene & scene, ObjectsConcerned & obj
  */
 bool AutomatismConditionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    //Need to copy the old objectsConcerned object to evaluate properly the arguments
-    ObjectsConcerned objectsConcernedForExpressions = objectsConcerned;
-
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
-    bool isTrue = false;
+    ObjList objectsConcernedByConditions;
 
 	ObjList::iterator obj = list.begin();
 	ObjList::const_iterator obj_end = list.end();
     for ( ; obj != obj_end; ++obj )
     {
-        if ( ((*obj)->GetAutomatism(condition.GetParameter( 1 ).GetAsObjectIdentifier()).get()->*condition.automatismFunction)(scene, objectsConcernedForExpressions, condition) ^ condition.IsInverted())
-        {
-            isTrue = true;
-            objectsConcerned.objectsPicked.AddObject( *obj );
-        }
+        if ( ((*obj)->GetAutomatism(condition.GetParameter( 1 ).GetAsObjectIdentifier()).get()->*condition.automatismFunction)(scene, objectsConcerned, condition) ^ condition.IsInverted())
+            objectsConcernedByConditions.push_back( *obj );
     }
 
-    return isTrue;
+    objectsConcerned.objectsPicked.AddListOfObjectsWithSameName( objectsConcernedByConditions );
+
+    return !objectsConcernedByConditions.empty();
 }
 
 /**
@@ -67,24 +64,18 @@ bool ActionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcer
  */
 bool ConditionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    //Need to copy the old objectsConcerned object to evaluate properly the arguments
-    ObjectsConcerned objectsConcernedForExpressions = objectsConcerned;
-
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
-    bool isTrue = false;
+    ObjList objectsConcernedByConditions;
 
-	ObjList::iterator obj = list.begin();
-	ObjList::const_iterator obj_end = list.end();
-    for ( ; obj != obj_end; ++obj )
+    for ( unsigned int i = 0; i<list.size(); ++i )
     {
-        if ( ((*obj).get()->*condition.objectFunction)(scene, objectsConcernedForExpressions, condition) ^ condition.IsInverted())
-        {
-            isTrue = true;
-            objectsConcerned.objectsPicked.AddObject( *obj );
-        }
+        if ( ((list[i]).get()->*condition.objectFunction)(scene, objectsConcerned, condition) ^ condition.IsInverted())
+            objectsConcernedByConditions.push_back((list[i]));
     }
 
-    return isTrue;
+    objectsConcerned.objectsPicked.AddListOfObjectsWithSameName( objectsConcernedByConditions );
+
+    return !objectsConcernedByConditions.empty();
 }
 
 /**

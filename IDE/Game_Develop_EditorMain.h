@@ -58,7 +58,12 @@ class Game_Develop_EditorFrame: public wxFrame
     friend class EditorImages;
     public:
 
-        Game_Develop_EditorFrame(wxWindow* parent, string FileToOpen);
+        /**
+         * Constructor.
+         * \param Parent window
+         * \param True to create an initial empty project
+         */
+        Game_Develop_EditorFrame(wxWindow* parent, bool createEmptyProject);
         virtual ~Game_Develop_EditorFrame();
 
         vector < boost::shared_ptr<RuntimeGame> > games; ///< All games opened

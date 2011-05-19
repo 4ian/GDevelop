@@ -101,7 +101,7 @@ END_EVENT_TABLE()
 /**
  * Constructor : Create window
  */
-Game_Develop_EditorFrame::Game_Develop_EditorFrame( wxWindow* parent, string FileToOpen) :
+Game_Develop_EditorFrame::Game_Develop_EditorFrame( wxWindow* parent, bool createEmptyProject) :
 gameCurrentlyEdited(0),
 m_ribbon(NULL),
 ribbonSceneEditorButtonBar(NULL),
@@ -366,9 +366,7 @@ buildToolsPnl(NULL)
     Center();
     Maximize(true);
 
-    if ( !FileToOpen.empty() )
-        Open(FileToOpen);
-    else
+    if ( createEmptyProject )
     {
         games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
         projectManager->Refresh();

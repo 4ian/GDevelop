@@ -233,6 +233,8 @@ scene(scene_)
 	//*)
     moreBt->SetBitmap(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
 
+    searchCtrl->SetFocus();
+
     imageList = new wxImageList( 16, 16 );
     imageList->Add(( wxBitmap( "res/actions/uneaction.png", wxBITMAP_TYPE_ANY ) ) );
     ActionsTree->AssignImageList( imageList );
@@ -645,17 +647,19 @@ void ChoixAction::RefreshFromAction()
         ParaBmpBt.at(i)->Show( !instructionInfos.parameters[i].type.empty() );
 
         //De/activate widgets if parameter is optional
-        if ( instructionInfos.parameters[i].optional && !ParaFac.at(i)->GetValue() )
+        if ( instructionInfos.parameters[i].optional && !ParaFac.at(i)->GetValue() && ParaEdit.at(i)->GetValue().empty() )
         {
             ParaBmpBt.at(i)->Enable(false);
             ParaText.at(i)->Enable(false);
             ParaEdit.at(i)->Enable(false);
+            ParaFac.at(i)->SetValue(false);
         }
         else
         {
             ParaBmpBt.at(i)->Enable(true);
             ParaText.at(i)->Enable(true);
             ParaEdit.at(i)->Enable(true);
+            ParaFac.at(i)->SetValue(true);
         }
 
         //Add defaults

@@ -721,6 +721,8 @@
 		<Unit filename="EventsRefactorer.h" />
 		<Unit filename="ExecutableIconChanger.cpp" />
 		<Unit filename="ExecutableIconChanger.h" />
+		<Unit filename="ExtensionBugReportDlg.cpp" />
+		<Unit filename="ExtensionBugReportDlg.h" />
 		<Unit filename="Extensions.cpp" />
 		<Unit filename="Extensions.h" />
 		<Unit filename="ExternalEventsEditor.cpp" />
@@ -1023,6 +1025,7 @@
 					<wxPanel wxs="wxsmith/BuildToolsPnl.wxs" src="BuildToolsPnl.cpp" hdr="BuildToolsPnl.h" fwddecl="0" i18n="1" name="BuildToolsPnl" language="CPP" />
 					<wxDialog wxs="wxsmith/SetupCompilerToolchainDlg.wxs" src="SetupCompilerToolchainDlg.cpp" hdr="SetupCompilerToolchainDlg.h" fwddecl="0" i18n="1" name="SetupCompilerToolchainDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/NewCppFileDlg.wxs" src="NewCppFileDlg.cpp" hdr="NewCppFileDlg.h" fwddecl="0" i18n="1" name="NewCppFileDlg" language="CPP" />
+					<wxDialog wxs="wxsmith/ExtensionBugReportDlg.wxs" src="ExtensionBugReportDlg.cpp" hdr="ExtensionBugReportDlg.h" fwddecl="0" i18n="1" name="ExtensionBugReportDlg" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

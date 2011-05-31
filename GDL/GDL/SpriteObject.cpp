@@ -456,16 +456,16 @@ void SpriteObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositi
 
 void SpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Animation");     value = ToString(GetCurrentAnimation());}
-    else if ( propertyNb == 1 ) {name = _("Direction");     value = ToString(GetCurrentDirection());}
-    else if ( propertyNb == 2 ) {name = _("Image");         value = ToString(GetSpriteNb());}
-    else if ( propertyNb == 3 ) {name = _("Opacité");       value = ToString(GetOpacity());}
-    else if ( propertyNb == 4 ) {name = _("Méthode d'affichage");   if ( blendMode == 0) value = "0 (Alpha)";
+    if      ( propertyNb == 0 ) {name = _T("Animation");     value = ToString(GetCurrentAnimation());}
+    else if ( propertyNb == 1 ) {name = _T("Direction");     value = ToString(GetCurrentDirection());}
+    else if ( propertyNb == 2 ) {name = _T("Image");         value = ToString(GetSpriteNb());}
+    else if ( propertyNb == 3 ) {name = _T("Opacité");       value = ToString(GetOpacity());}
+    else if ( propertyNb == 4 ) {name = _T("Méthode d'affichage");   if ( blendMode == 0) value = "0 (Alpha)";
                                                                     else if ( blendMode == 1) value = "1 (Add)";
                                                                     else if ( blendMode == 2) value = "2 (Multiply)";
                                                                     else if ( blendMode == 3) value = "3 (None)";}
-    else if ( propertyNb == 5 ) {name = _("Echelle X de la taille");       value = ToString(GetScaleX());}
-    else if ( propertyNb == 6 ) {name = _("Echelle Y de la taille");       value = ToString(GetScaleY());}
+    else if ( propertyNb == 5 ) {name = _T("Echelle X de la taille");       value = ToString(GetScaleX());}
+    else if ( propertyNb == 6 ) {name = _T("Echelle Y de la taille");       value = ToString(GetScaleY());}
 }
 
 bool SpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)

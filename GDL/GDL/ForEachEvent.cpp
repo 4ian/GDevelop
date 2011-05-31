@@ -261,7 +261,7 @@ void ForEachEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int wid
 
     //For Each text
     dc.SetFont( renderingHelper->GetBoldFont() );
-    dc.DrawText( _("Pour chaque objet") + " " + objectsToPick.GetPlainString() + _(", répéter :"), x + 2, y + 1 );
+    dc.DrawText( _T("Pour chaque objet") + " " + objectsToPick.GetPlainString() + _T(", répéter :"), x + 2, y + 1 );
 
     //Draw actions and conditions
     renderingHelper->DrawConditionsList(conditions, dc, x, y+forEachTextHeight, renderingHelper->GetConditionsColumnWidth(), IsDisabled());

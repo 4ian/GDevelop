@@ -117,9 +117,6 @@ class GD_API ObjectsConcerned
 
         ObjInstancesHolder objectsPicked; ///< Objects already picked
 
-    protected:
-    private:
-
         ObjInstancesHolder * allObjects; ///< Reference to all objects list
         vector < ObjectGroup > * allGroups; ///< Reference to groups
 

@@ -261,7 +261,7 @@ void RepeatEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int widt
 
     //Repeat text
     dc.SetFont( renderingHelper->GetBoldFont() );
-    dc.DrawText( _("Répéter") + " " + repeatNumberExpression.GetPlainString() + " " + _("fois :"), x + 2, y + 1 );
+    dc.DrawText( _T("Répéter") + " " + repeatNumberExpression.GetPlainString() + " " + _T("fois :"), x + 2, y + 1 );
 
     //Draw actions and conditions
     renderingHelper->DrawConditionsList(conditions, dc, x, y+repeatTextHeight, renderingHelper->GetConditionsColumnWidth(), IsDisabled());

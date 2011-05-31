@@ -17,7 +17,7 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     bool searching = searchText.empty() ? false : true;
 
     sceneObjectsList->DeleteAllItems();
-    sceneObjectsList->AddRoot( _( "Tous les objets de la scène" ) );
+    sceneObjectsList->AddRoot( _T( "Tous les objets de la scène" ) );
 
     //Search the typeId we are allowed to pick
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
@@ -38,7 +38,7 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     sceneObjectsList->ExpandAll();
 
     sceneGroupsList->DeleteAllItems();
-    sceneGroupsList->AddRoot( _( "Tous les groupes de la scène" ) );
+    sceneGroupsList->AddRoot( _T( "Tous les groupes de la scène" ) );
 
     for ( unsigned int i = 0;i < scene.objectGroups.size();i++ )
     {
@@ -55,7 +55,7 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     sceneGroupsList->ExpandAll();
 
     globalObjectsList->DeleteAllItems();
-    globalObjectsList->AddRoot( _( "Tous les objets globaux" ) );
+    globalObjectsList->AddRoot( _T( "Tous les objets globaux" ) );
 
     for ( unsigned int i = 0;i < game.globalObjects.size();i++ )
     {
@@ -72,7 +72,7 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     globalObjectsList->ExpandAll();
 
     globalGroupsList->DeleteAllItems();
-    globalGroupsList->AddRoot( _( "Tous les groupes globaux" ) );
+    globalGroupsList->AddRoot( _T( "Tous les groupes globaux" ) );
 
     for ( unsigned int i = 0;i < game.objectGroups.size();i++ )
     {

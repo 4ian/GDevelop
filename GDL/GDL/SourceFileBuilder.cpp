@@ -151,7 +151,7 @@ void SourceFileBuilder::OnCurrentBuildProcessTerminated(bool success)
 
     if ( !success || abordBuild )
     {
-        if ( currentTaskTxt ) currentTaskTxt->SetLabel(_("Compilation arrêtée."));
+        if ( currentTaskTxt ) currentTaskTxt->SetLabel(_T("Compilation arrêtée."));
         state = 0;
         return; //Stop build if it failed
     }
@@ -181,13 +181,13 @@ void SourceFileBuilder::OnCurrentBuildProcessTerminated(bool success)
 
         if ( currentFileBuilded < sourceFiles.size() ) //Continue building...
         {
-            if ( currentTaskTxt ) currentTaskTxt->SetLabel(_("Compilation de "+sourceFiles[currentFileBuilded]->GetFileName()));
+            if ( currentTaskTxt ) currentTaskTxt->SetLabel(_T("Compilation de "+sourceFiles[currentFileBuilded]->GetFileName()));
             if ( progressGauge ) progressGauge->SetValue(static_cast<float>(currentFileBuilded)/static_cast<float>(sourceFiles.size())*90.0f);
             linkingNeed = true;
 
             if ( !wxFileExists(sourceFiles[currentFileBuilded]->GetFileName()) ) //Stop building if file does not exists
             {
-                currentTaskTxt->SetLabel(_("Compilation arrêté, ")+sourceFiles[currentFileBuilded]->GetFileName()+_(" est introuvable."));
+                currentTaskTxt->SetLabel(_T("Compilation arrêté, ")+sourceFiles[currentFileBuilded]->GetFileName()+_T(" est introuvable."));
                 state = 0;
                 return;
             }
@@ -207,7 +207,7 @@ void SourceFileBuilder::OnCurrentBuildProcessTerminated(bool success)
     {
         if ( linkingNeed )
         {
-            if ( currentTaskTxt ) currentTaskTxt->SetLabel(_("Edition des liens"));
+            if ( currentTaskTxt ) currentTaskTxt->SetLabel(_T("Edition des liens"));
             if ( progressGauge ) progressGauge->SetValue(90);
 
             std::vector<std::string> sourcesFilesToLink;
@@ -233,7 +233,7 @@ void SourceFileBuilder::OnCurrentBuildProcessTerminated(bool success)
     //Go back to idle state when linking is over.
     if (state == 4)
     {
-        if ( currentTaskTxt ) currentTaskTxt->SetLabel(_("Compilation terminée avec succès."));
+        if ( currentTaskTxt ) currentTaskTxt->SetLabel(_T("Compilation terminée avec succès."));
         if ( progressGauge ) progressGauge->SetValue(100);
 
         lastBuildSuccessed = true;

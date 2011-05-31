@@ -15,7 +15,6 @@
 					<object class="sizeritem">
 						<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
 							<label>Couleur du commentaire</label>
-							<orient>wxVERTICAL</orient>
 							<object class="sizeritem">
 								<object class="wxButton" name="ID_BUTTON1" variable="ColorBt" member="yes">
 									<label>Arrière plan - Cliquez pour choisir</label>
@@ -48,7 +47,7 @@
 					<label>Textes du commentaire</label>
 					<object class="sizeritem">
 						<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="Com1Edit" member="yes">
-							<size>180,120</size>
+							<size>332,173</size>
 							<style>wxTE_MULTILINE</style>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

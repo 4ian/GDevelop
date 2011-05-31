@@ -43,7 +43,7 @@ scene(scene_)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
 
-	Create(parent, wxID_ANY, _("Edition de l\'évènement Répéter"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _T("Edition de l\'évènement Répéter"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17->AddGrowableCol(0);
@@ -52,7 +52,7 @@ scene(scene_)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/repeat.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Les conditions et actions seront répétées le nombre de fois indiquées."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _T("Les conditions et actions seront répétées le nombre de fois indiquées."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT3"));
 	FlexGridSizer6->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);
@@ -62,7 +62,7 @@ scene(scene_)
 	FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Nombre de répétitions :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _T("Nombre de répétitions :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
@@ -76,9 +76,9 @@ scene(scene_)
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
-	okBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	okBt = new wxButton(this, ID_BUTTON1, _T("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer3->Add(okBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cancelBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	cancelBt = new wxButton(this, ID_BUTTON2, _T("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer3->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);

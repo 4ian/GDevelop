@@ -165,8 +165,8 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
         cout << "Unable to load extension " << fullpath << "." << endl;
         cout << "Error returned : \"" << error << "\"" << endl;
         #if defined(GD_IDE_ONLY)
-        wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" n'a pas pû être chargée.\nPrenez contact avec le développeur pour plus d'informations.\n\nErreur détaillée :\n") + error);
-        wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
+        wxString userMsg = string(_T("L'extension "))+ fullpath + string(_T(" n'a pas pû être chargée.\nPrenez contact avec le développeur pour plus d'informations.\n\nErreur détaillée :\n") + error);
+        wxMessageBox(userMsg, _T("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
         #endif
     }
     else
@@ -180,8 +180,8 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
 
             #if defined(GD_IDE_ONLY)
             CloseLibrary(extensionHdl);
-            wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" n'a pas pû être chargée.\nPrenez contact avec le développeur pour plus d'informations." ));
-            wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
+            wxString userMsg = string(_T("L'extension "))+ fullpath + string(_T(" n'a pas pû être chargée.\nPrenez contact avec le développeur pour plus d'informations." ));
+            wxMessageBox(userMsg, _T("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
             #endif
         }
         else
@@ -236,8 +236,8 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
                 CloseLibrary(extensionHdl);
                 #endif
                 #if defined(GD_IDE_ONLY) && defined(RELEASE) //Show errors in IDE only
-                wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" présente des erreurs :\n")) + error + string(_("\nL'extension n'a pas été chargée. Prenez contact avec le développeur pour plus d'informations." ));
-                wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
+                wxString userMsg = string(_T("L'extension "))+ fullpath + string(_T(" présente des erreurs :\n")) + error + string(_T("\nL'extension n'a pas été chargée. Prenez contact avec le développeur pour plus d'informations." ));
+                wxMessageBox(userMsg, _T("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
                 #endif
                 #if defined(GD_IDE_ONLY)
                 wxRemoveFile("ExtensionBeingLoaded.log");

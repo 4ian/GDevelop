@@ -56,6 +56,7 @@
 				<object class="wxListBox" name="ID_LISTBOX1" variable="automatismsList" member="yes">
 					<default>-1</default>
 					<size>255,128</size>
+					<handler function="OnChoisirBtClick" entry="EVT_LISTBOX_DCLICK" />
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>

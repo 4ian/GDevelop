@@ -80,46 +80,46 @@ bool CompilerToolchainPathManager::AllPathsAreValid(std::string & report) const
     bool ok = true;
     if ( !wxFileExists(gccCompilerExecutablePath) )
     {
-        report += _("Le compilateur GCC est incorrectement configuré.\n");
+        report += _T("Le compilateur GCC est incorrectement configuré.\n");
         ok = false;
     }
 
     if ( !wxDirExists(wxwidgetsLibDir) )
     {
-        report += _("Le chemin de la bibliothèque wxWidgets n'existe pas.\n");
+        report += _T("Le chemin de la bibliothèque wxWidgets n'existe pas.\n");
         ok = false;
     }
     else if ( !wxFileExists(wxwidgetsLibDir+"/libwxbase29.a") )
     {
-        report += _("La bibliothèque wxWidgets semble être incorrecte.\n");
+        report += _T("La bibliothèque wxWidgets semble être incorrecte.\n");
         ok = false;
     }
 
     if ( !wxDirExists(sfmlLibDir) )
     {
-        report += _("Le chemin de la bibliothèque SFML n'existe pas.\n");
+        report += _T("Le chemin de la bibliothèque SFML n'existe pas.\n");
         ok = false;
     }
     else if ( !wxFileExists(sfmlLibDir+"/libsfml-graphics.a") )
     {
-        report += _("La bibliothèque SFML semble être incorrecte.\n");
+        report += _T("La bibliothèque SFML semble être incorrecte.\n");
         ok = false;
     }
 
     if ( !wxDirExists(boostIncludeDir) )
     {
-        report += _("Le chemin de la bibliothèque Boost n'existe pas.\n");
+        report += _T("Le chemin de la bibliothèque Boost n'existe pas.\n");
         ok = false;
     }
 
     if ( !wxDirExists(gdlLibDir) )
     {
-        report += _("Le chemin de la bibliothèque Game Develop Library n'existe pas.\n");
+        report += _T("Le chemin de la bibliothèque Game Develop Library n'existe pas.\n");
         ok = false;
     }
     else if ( !wxFileExists(gdlLibDir+"/libgdl.dll.a") )
     {
-        report += _("La bibliothèque Game Develop library semble être incorrecte.\n");
+        report += _T("La bibliothèque Game Develop library semble être incorrecte.\n");
         ok = false;
     }
 

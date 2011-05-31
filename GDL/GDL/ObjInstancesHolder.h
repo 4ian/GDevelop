@@ -5,6 +5,8 @@
 #include <string>
 #include <map>
 
+#include "GDL/profile.h" //Temp profile
+
 /**
  * \brief Hold lists of objects classified by the name of the objects.
  */
@@ -19,14 +21,16 @@ public:
      */
     inline void AddObject(ObjSPtr object)
     {
+        //BT_PROFILE("ObjInstancesHolder::AddObject");
         objectsInstances[object->GetObjectIdentifier()].push_back(object);
     }
 
     /**
      * Add a entire list of objects with the same identifier
      */
-    inline void AddListOfObjectsWithSameName(ObjList objects)
+    inline void AddListOfObjectsWithSameName(const ObjList & objects)
     {
+        //BT_PROFILE("ObjInstancesHolder::AddListOfObjectsWithSameName");
         if ( objects.empty() ) return;
 
         ObjList & objList = objectsInstances[objects[0]->GetObjectIdentifier()];
@@ -38,6 +42,7 @@ public:
      */
     inline const ObjList & GetObjects(unsigned int oId)
     {
+        //BT_PROFILE("ObjInstancesHolder::GetObjects");
         return objectsInstances[oId];
     }
 
@@ -53,6 +58,10 @@ public:
 
         return objList;
     }
+    /**
+     * Get a list of all objects
+     */
+    std::vector<Object*> GetAllObjectsRawPointers();
 
     /**
      * Remove an object
@@ -65,6 +74,7 @@ public:
      */
     inline void RemoveObject(const ObjSPtr & object)
     {
+        //BT_PROFILE("ObjInstancesHolder::RemoveObject");
         for (map<unsigned int, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
         {
             ObjList & associatedList = it->second;
@@ -77,6 +87,7 @@ public:
      */
     inline void RemoveObjects(unsigned int oId)
     {
+        //BT_PROFILE("ObjInstancesHolder::RemoveObjects");
         objectsInstances[oId].clear();
     }
 

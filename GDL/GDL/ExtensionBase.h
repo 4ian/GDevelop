@@ -684,8 +684,8 @@ typedef Object * (*CreateFunPtr)(std::string name);
 #define DECLARE_CAN_HAVE_SUB_ACTION()
 
 //Emulate wxWidgets internationalization macro
-#ifndef _
-#define _(x) x // "Emule" la macro de WxWidgets
+#ifndef _T
+#define _T(x) x // "Emule" la macro de WxWidgets
 #endif
 #ifndef _
 #define wxT(x) x // "Emule" la macro de WxWidgets

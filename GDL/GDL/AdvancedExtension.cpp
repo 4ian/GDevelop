@@ -5,16 +5,16 @@
 AdvancedExtension::AdvancedExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinAdvanced",
-                          _("Fonctionnalités de contrôle avancé"),
-                          _("Extension offrant des fonctionnalités de contrôle avancé, integrée en standard"),
+                          _T("Fonctionnalités de contrôle avancé"),
+                          _T("Extension offrant des fonctionnalités de contrôle avancé, integrée en standard"),
                           "Compil Games",
                           "Freeware")
 
     DECLARE_CONDITION("Toujours",
-                   _("Toujours"),
-                   _("Cette condition renvoie toujours vrai."),
-                   _("Toujours"),
-                   _("Autre"),
+                   _T("Toujours"),
+                   _T("Cette condition renvoie toujours vrai."),
+                   _T("Toujours"),
+                   _T("Autre"),
                    "res/conditions/toujours24.png",
                    "res/conditions/toujours.png",
                    &CondAlways);

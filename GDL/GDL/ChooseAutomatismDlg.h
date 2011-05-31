@@ -57,6 +57,7 @@ class GD_API ChooseAutomatismDlg: public wxDialog
 		void OnChoisirBtClick(wxCommandEvent& event);
 		void OnCancelBtClick(wxCommandEvent& event);
 		void OnsearchCtrlText(wxCommandEvent& event);
+		void OnsearchCtrlTextEnter(wxCommandEvent& event);
 		//*)
 
         void RefreshList();

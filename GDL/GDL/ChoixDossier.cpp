@@ -45,7 +45,7 @@ ChoixDossier::ChoixDossier( wxWindow* parent, vector < Dossier > * pDossiers )
     wxFlexGridSizer* FlexGridSizer1;
     wxFlexGridSizer* FlexGridSizer17;
 
-    Create(parent, wxID_ANY, _("Choisissez un dossier à afficher"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _T("Choisissez un dossier à afficher"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer17->AddGrowableCol(0);
@@ -54,7 +54,7 @@ ChoixDossier::ChoixDossier( wxWindow* parent, vector < Dossier > * pDossiers )
     FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/dossier48.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP3"));
     FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Les dossiers permettent de regrouper\nles images suivant vos critères."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+    StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _T("Les dossiers permettent de regrouper\nles images suivant vos critères."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
     FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel1->SetSizer(FlexGridSizer6);
     FlexGridSizer6->SetSizeHints(Panel1);
@@ -63,21 +63,21 @@ ChoixDossier::ChoixDossier( wxWindow* parent, vector < Dossier > * pDossiers )
     FlexGridSizer17->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     TreeCtrl1 = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxSize(157,175), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
-    TreeCtrl1->SetToolTip(_("Choisissez un dossier, ou ajoutez en un avec le clic droit."));
+    TreeCtrl1->SetToolTip(_T("Choisissez un dossier, ou ajoutez en un avec le clic droit."));
     FlexGridSizer1->Add(TreeCtrl1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
     FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
-    ToutesImagesBt = new wxButton(this, ID_BUTTON2, _("Toutes les images"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+    ToutesImagesBt = new wxButton(this, ID_BUTTON2, _T("Toutes les images"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     FlexGridSizer2->Add(ToutesImagesBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    ChoisirBt = new wxButton(this, ID_BUTTON1, _("Choisir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    ChoisirBt = new wxButton(this, ID_BUTTON1, _T("Choisir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     FlexGridSizer2->Add(ChoisirBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer1);
-    MenuItem1 = new wxMenuItem((&ContextMenu), idMenuAdd, _("Ajouter un dossier"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem1 = new wxMenuItem((&ContextMenu), idMenuAdd, _T("Ajouter un dossier"), wxEmptyString, wxITEM_NORMAL);
     MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
     ContextMenu.Append(MenuItem1);
-    MenuItem2 = new wxMenuItem((&ContextMenu), idMenuDel, _("Supprimer le dossier"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem2 = new wxMenuItem((&ContextMenu), idMenuDel, _T("Supprimer le dossier"), wxEmptyString, wxITEM_NORMAL);
     MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/remove.png"))));
     ContextMenu.Append(MenuItem2);
     FlexGridSizer1->Fit(this);
@@ -104,7 +104,7 @@ ChoixDossier::~ChoixDossier()
 void ChoixDossier::Refresh()
 {
     TreeCtrl1->DeleteAllItems();
-    TreeCtrl1->AddRoot( _( "Tous les dossiers" ) );
+    TreeCtrl1->AddRoot( _T( "Tous les dossiers" ) );
 
     for ( unsigned int i = 0;i < dossiers->size() ;i++ )
     {
@@ -116,9 +116,9 @@ void ChoixDossier::Refresh()
 
 void ChoixDossier::OnChoisirBtClick( wxCommandEvent& event )
 {
-    if ( dossierNom == _("Tous les dossiers") )
+    if ( dossierNom == _T("Tous les dossiers") )
     {
-        wxLogWarning(_("Vous n'avez pas selectionné de dossier.\nPour afficher toutes les images, cliquez sur le bouton \"Toutes les images\"."));
+        wxLogWarning(_T("Vous n'avez pas selectionné de dossier.\nPour afficher toutes les images, cliquez sur le bouton \"Toutes les images\"."));
         return;
     }
     EndModal( 1 );
@@ -141,13 +141,13 @@ void ChoixDossier::OnToutesImagesBtClick( wxCommandEvent& event )
 
 void ChoixDossier::OnAddDossierBtClick( wxCommandEvent& event )
 {
-    string nom = static_cast<string>( wxGetTextFromUser( _( "Nom du nouveau dossier" ), _( "Ajout de dossier" ) ) );
+    string nom = static_cast<string>( wxGetTextFromUser( _T( "Nom du nouveau dossier" ), _T( "Ajout de dossier" ) ) );
 
     for (unsigned int i = 0;i<dossiers->size() ;i++ )
     {
     	if ( dossiers->at(i).nom == nom )
     	{
-            wxLogWarning(_("Un dossier porte déjà ce nom !"));
+            wxLogWarning(_T("Un dossier porte déjà ce nom !"));
             return;
     	}
     }
@@ -172,7 +172,7 @@ void ChoixDossier::OnDelDossierSelected(wxCommandEvent& event)
             return;
     	}
     }
-    wxLogWarning(_("Impossible de trouver le dossier à supprimer."));
+    wxLogWarning(_T("Impossible de trouver le dossier à supprimer."));
 }
 
 void ChoixDossier::OnTreeCtrl1ItemRightClick(wxTreeEvent& event)

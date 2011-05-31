@@ -55,7 +55,7 @@ variables(variables_)
 	wxFlexGridSizer* FlexGridSizer12;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Choisir une variable"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _T("Choisir une variable"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(3);
@@ -68,7 +68,7 @@ variables(variables_)
 	FlexGridSizer12->AddGrowableCol(1);
 	StaticBitmap1 = new wxStaticBitmap(Panel2, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/var64.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	FlexGridSizer12->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText4 = new wxStaticText(Panel2, ID_STATICTEXT6, _("Choisissez la variable à utiliser.\nNotez qu\'il n\'est pas obligatoire de déclarer une variable\ndans le tableau pour l\'utiliser. Déclarer une variable dans\nle tableau permet de lui affecter une valeur initiale, et de\npouvoir la retrouver facilement."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT6"));
+	StaticText4 = new wxStaticText(Panel2, ID_STATICTEXT6, _T("Choisissez la variable à utiliser.\nNotez qu\'il n\'est pas obligatoire de déclarer une variable\ndans le tableau pour l\'utiliser. Déclarer une variable dans\nle tableau permet de lui affecter une valeur initiale, et de\npouvoir la retrouver facilement."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT6"));
 	FlexGridSizer12->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel2->SetSizer(FlexGridSizer12);
 	FlexGridSizer12->Fit(Panel2);
@@ -85,11 +85,11 @@ variables(variables_)
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
-	okBt = new wxButton(this, ID_BUTTON1, _("Choisir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	okBt = new wxButton(this, ID_BUTTON1, _T("Choisir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(okBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	cancelBt = new wxButton(this, ID_BUTTON3, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	cancelBt = new wxButton(this, ID_BUTTON3, _T("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer2->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	helpBt = new wxButton(this, ID_BUTTON2, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	helpBt = new wxButton(this, ID_BUTTON2, _T("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer2->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -111,8 +111,8 @@ variables(variables_)
 	Connect(idMoveDownVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ChooseVariableDialog::OnMoveDownVarSelected);
 	Connect(ID_Help,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ChooseVariableDialog::OnhelpBtClick);
 
-	variablesList->InsertColumn(0, _("Variable"));
-	variablesList->InsertColumn(1, _("Valeur initiale"));;
+	variablesList->InsertColumn(0, _T("Variable"));
+	variablesList->InsertColumn(1, _T("Valeur initiale"));;
 	variablesList->SetColumnWidth(0, 150);
 	variablesList->SetColumnWidth(1, 130);
 
@@ -120,15 +120,15 @@ variables(variables_)
                                    wxTB_FLAT | wxTB_NODIVIDER );
 
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( idAddVar, wxT( "Ajouter une variable" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter une variable") );
-    toolbar->AddTool( idEditVar, wxT( "Editer la valeur initiale de la variable" ), wxBitmap( wxImage( "res/editicon.png" ) ), _("Editer la valeur initiale de la variable") );
-    toolbar->AddTool( idRenameVar, wxT( "Renommer la variable" ), wxBitmap( wxImage( "res/editnom.png" ) ), _("Renommer la variable") );
-    toolbar->AddTool( idDelVar, wxT( "Supprimer la variable selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer la variable selectionnée") );
+    toolbar->AddTool( idAddVar, wxT( "Ajouter une variable" ), wxBitmap( wxImage( "res/addicon.png" ) ), _T("Ajouter une variable") );
+    toolbar->AddTool( idEditVar, wxT( "Editer la valeur initiale de la variable" ), wxBitmap( wxImage( "res/editicon.png" ) ), _T("Editer la valeur initiale de la variable") );
+    toolbar->AddTool( idRenameVar, wxT( "Renommer la variable" ), wxBitmap( wxImage( "res/editnom.png" ) ), _T("Renommer la variable") );
+    toolbar->AddTool( idDelVar, wxT( "Supprimer la variable selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _T("Supprimer la variable selectionnée") );
     toolbar->AddSeparator();
-    toolbar->AddTool( idMoveUpVar, wxT( "Déplacer vers le haut" ), wxBitmap( wxImage( "res/up.png" ) ), _("Déplacer vers le haut") );
-    toolbar->AddTool( idMoveDownVar, wxT( "Déplacer vers le bas" ), wxBitmap( wxImage( "res/down.png" ) ), _("Déplacer vers le bas") );
+    toolbar->AddTool( idMoveUpVar, wxT( "Déplacer vers le haut" ), wxBitmap( wxImage( "res/up.png" ) ), _T("Déplacer vers le haut") );
+    toolbar->AddTool( idMoveDownVar, wxT( "Déplacer vers le bas" ), wxBitmap( wxImage( "res/down.png" ) ), _T("Déplacer vers le bas") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_Help, wxT( "Aide sur les variables initiales" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide sur les variables initiales") );
+    toolbar->AddTool( ID_Help, wxT( "Aide sur les variables initiales" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _T("Aide sur les variables initiales") );
     toolbar->Realize();
 
     //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
@@ -191,7 +191,7 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
 
     if ( variables.HasVariable(variableName) )
     {
-        wxLogMessage(_("Une variable portant ce nom existe déjà."));
+        wxLogMessage(_T("Une variable portant ce nom existe déjà."));
         return;
     }
 
@@ -206,7 +206,7 @@ void ChooseVariableDialog::OnDelVarSelected(wxCommandEvent& event)
 {
     if ( !variables.HasVariable(selectedVariable) )
     {
-        wxLogMessage(_("Impossible de trouver la variable à supprimer"));
+        wxLogMessage(_T("Impossible de trouver la variable à supprimer"));
         return;
     }
 
@@ -226,7 +226,7 @@ void ChooseVariableDialog::OnRenameVarSelected(wxCommandEvent& event)
 
     if ( variables.HasVariable(newName) )
     {
-        wxLogMessage(_("Une variable porte déjà ce nom."));
+        wxLogMessage(_T("Une variable porte déjà ce nom."));
         return;
     }
 

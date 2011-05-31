@@ -18,6 +18,36 @@
 #include <boost/weak_ptr.hpp>
 #include <boost/interprocess/containers/flat_map.hpp>
 
+#include "llvm/LLVMContext.h"
+#include "llvm/Module.h"
+#include "llvm/Config/config.h"
+#include "llvm/ADT/OwningPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/ExecutionEngine/JIT.h"
+#include "llvm/Support/ManagedStatic.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/TypeBuilder.h"
+#include "llvm/GlobalVariable.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/FileSystem.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/PrettyStackTrace.h"
+#include "llvm/Support/Regex.h"
+#include "llvm/Support/Timer.h"
+#include "llvm/Support/Host.h"
+#include "llvm/Support/Path.h"
+#include "llvm/Support/Program.h"
+#include "llvm/Support/Signals.h"
+#include "llvm/Support/system_error.h"
+#include "llvm/Target/TargetRegistry.h"
+#include "llvm/Target/TargetSelect.h"
+#include "llvm/ADT/Statistic.h"
+#include "llvm/Support/DynamicLibrary.h" // Important
+#include "llvm/Bitcode/ReaderWriter.h" // Important
+
 #include "GDL/RuntimeGame.h"
 #include "GDL/Object.h"
 #include "GDL/Event.h"
@@ -76,6 +106,12 @@ public:
     int                                     backgroundColorG; ///< Background color Green component
     int                                     backgroundColorB; ///< Background color Blue component
     boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas. Note the use of flat_map for better performance.
+
+    llvm::Function * eventsEntryFunction;
+    llvm::Module *Module;
+    llvm::OwningPtr<llvm::ExecutionEngine> EE;
+    llvm::OwningPtr<llvm::MemoryBuffer> eventsBuffer;
+    llvm::LLVMContext llvmContext;
 
     /**
      * Set up the Runtime Scene using a Scene

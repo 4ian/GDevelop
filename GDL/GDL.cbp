@@ -12,7 +12,7 @@
 				<Option output="..\Runtime\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -24,6 +24,8 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\include" />
+					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -41,9 +43,74 @@
 					<Add option="-lsfml-network-d" />
 					<Add option="-lsfml-system-d" />
 					<Add option="-lgmon" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add option="-lLLVMJIT" />
+					<Add option="-lLLVMInterpreter" />
+					<Add option="-lLLVMX86CodeGen" />
+					<Add option="-lLLVMAsmParser" />
+					<Add option="-lLLVMBitReader" />
+					<Add option="-lLLVMBitWriter" />
+					<Add option="-lLLVMipo" />
+					<Add option="-lLLVMExecutionEngine" />
+					<Add option="-lLLVMAsmPrinter" />
+					<Add option="-lLLVMSelectionDAG" />
+					<Add option="-lLLVMX86AsmPrinter" />
+					<Add option="-lLLVMX86Info" />
+					<Add option="-lLLVMMCParser" />
+					<Add option="-lLLVMCodeGen" />
+					<Add option="-lLLVMX86Utils" />
+					<Add option="-lLLVMScalarOpts" />
+					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMTransformUtils" />
+					<Add option="-lLLVMipa" />
+					<Add option="-lLLVMAnalysis" />
+					<Add option="-lLLVMTarget" />
+					<Add option="-lLLVMCore" />
+					<Add option="-lLLVMMC" />
+					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
+					<Add option="-lLLVMInstrumentation" />
+					<Add option="-lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
+					<Add option="-lLLVMAlphaCodeGen" />
+					<Add option="-lLLVMARMAsmParser" />
+					<Add option="-lLLVMARMDisassembler" />
+					<Add option="-lLLVMBlackfinCodeGen" />
+					<Add option="-lLLVMCBackend" />
+					<Add option="-lLLVMCellSPUCodeGen" />
+					<Add option="-lLLVMCppBackend" />
+					<Add option="-lLLVMMipsCodeGen" />
+					<Add option="-lLLVMMBlazeAsmParser" />
+					<Add option="-lLLVMMBlazeDisassembler" />
+					<Add option="-lLLVMMSP430CodeGen" />
+					<Add option="-lLLVMPowerPCCodeGen" />
+					<Add option="-lLLVMPTXCodeGen" />
+					<Add option="-lLLVMSparcCodeGen" />
+					<Add option="-lLLVMSystemZCodeGen" />
+					<Add option="-lLLVMX86AsmParser" />
+					<Add option="-lLLVMX86Disassembler" />
+					<Add option="-lLLVMXCoreCodeGen" />
+					<Add option="-lLLVMAlphaInfo" />
+					<Add option="-lLLVMARMCodeGen" />
+					<Add option="-lLLVMBlackfinInfo" />
+					<Add option="-lLLVMCBackendInfo" />
+					<Add option="-lLLVMCellSPUInfo" />
+					<Add option="-lLLVMCppBackendInfo" />
+					<Add option="-lLLVMMipsInfo" />
+					<Add option="-lLLVMMBlazeCodeGen" />
+					<Add option="-lLLVMMSP430AsmPrinter" />
+					<Add option="-lLLVMMSP430Info" />
+					<Add option="-lLLVMPowerPCAsmPrinter" />
+					<Add option="-lLLVMPowerPCInfo" />
+					<Add option="-lLLVMPTXInfo" />
+					<Add option="-lLLVMSparcInfo" />
+					<Add option="-lLLVMSystemZInfo" />
+					<Add option="-lLLVMXCoreInfo" />
+					<Add option="-lLLVMARMAsmPrinter" />
+					<Add option="-lLLVMARMInfo" />
+					<Add option="-lLLVMMBlazeAsmPrinter" />
+					<Add option="-lLLVMMBlazeInfo" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
@@ -51,7 +118,7 @@
 				<Option output="..\IDE\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -70,8 +137,8 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-D__WXDEBUG__" />
 					<Add option="-DWXUSINGDLL" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
-					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -113,11 +180,11 @@
 					<Add option="-ladvapi32" />
 					<Add option="-lcomdlg32" />
 					<Add option="-loleaut32" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -125,7 +192,7 @@
 				<Option output="..\Runtime\bin\release\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -153,9 +220,9 @@
 					<Add option="-lsfml-window" />
 					<Add option="-lsfml-network" />
 					<Add option="-lsfml-system" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
@@ -163,7 +230,7 @@
 				<Option output="..\IDE\bin\release\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -179,8 +246,8 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="C:\Python26\include" />
 				</Compiler>
 				<Linker>
@@ -223,11 +290,11 @@
 					<Add option="-ladvapi32" />
 					<Add option="-lcomdlg32" />
 					<Add option="-loleaut32" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
 			<Target title="Development">
@@ -235,7 +302,7 @@
 				<Option output="..\Runtime\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -247,6 +314,8 @@
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
+					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -263,9 +332,74 @@
 					<Add option="-lsfml-window" />
 					<Add option="-lsfml-network" />
 					<Add option="-lsfml-system" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add option="-lLLVMJIT" />
+					<Add option="-lLLVMInterpreter" />
+					<Add option="-lLLVMX86CodeGen" />
+					<Add option="-lLLVMAsmParser" />
+					<Add option="-lLLVMBitReader" />
+					<Add option="-lLLVMBitWriter" />
+					<Add option="-lLLVMipo" />
+					<Add option="-lLLVMExecutionEngine" />
+					<Add option="-lLLVMAsmPrinter" />
+					<Add option="-lLLVMSelectionDAG" />
+					<Add option="-lLLVMX86AsmPrinter" />
+					<Add option="-lLLVMX86Info" />
+					<Add option="-lLLVMMCParser" />
+					<Add option="-lLLVMCodeGen" />
+					<Add option="-lLLVMX86Utils" />
+					<Add option="-lLLVMScalarOpts" />
+					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMTransformUtils" />
+					<Add option="-lLLVMipa" />
+					<Add option="-lLLVMAnalysis" />
+					<Add option="-lLLVMTarget" />
+					<Add option="-lLLVMCore" />
+					<Add option="-lLLVMMC" />
+					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
+					<Add option="-lLLVMInstrumentation" />
+					<Add option="-lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
+					<Add option="-lLLVMAlphaCodeGen" />
+					<Add option="-lLLVMARMAsmParser" />
+					<Add option="-lLLVMARMDisassembler" />
+					<Add option="-lLLVMBlackfinCodeGen" />
+					<Add option="-lLLVMCBackend" />
+					<Add option="-lLLVMCellSPUCodeGen" />
+					<Add option="-lLLVMCppBackend" />
+					<Add option="-lLLVMMipsCodeGen" />
+					<Add option="-lLLVMMBlazeAsmParser" />
+					<Add option="-lLLVMMBlazeDisassembler" />
+					<Add option="-lLLVMMSP430CodeGen" />
+					<Add option="-lLLVMPowerPCCodeGen" />
+					<Add option="-lLLVMPTXCodeGen" />
+					<Add option="-lLLVMSparcCodeGen" />
+					<Add option="-lLLVMSystemZCodeGen" />
+					<Add option="-lLLVMX86AsmParser" />
+					<Add option="-lLLVMX86Disassembler" />
+					<Add option="-lLLVMXCoreCodeGen" />
+					<Add option="-lLLVMAlphaInfo" />
+					<Add option="-lLLVMARMCodeGen" />
+					<Add option="-lLLVMBlackfinInfo" />
+					<Add option="-lLLVMCBackendInfo" />
+					<Add option="-lLLVMCellSPUInfo" />
+					<Add option="-lLLVMCppBackendInfo" />
+					<Add option="-lLLVMMipsInfo" />
+					<Add option="-lLLVMMBlazeCodeGen" />
+					<Add option="-lLLVMMSP430AsmPrinter" />
+					<Add option="-lLLVMMSP430Info" />
+					<Add option="-lLLVMPowerPCAsmPrinter" />
+					<Add option="-lLLVMPowerPCInfo" />
+					<Add option="-lLLVMPTXInfo" />
+					<Add option="-lLLVMSparcInfo" />
+					<Add option="-lLLVMSystemZInfo" />
+					<Add option="-lLLVMXCoreInfo" />
+					<Add option="-lLLVMARMAsmPrinter" />
+					<Add option="-lLLVMARMInfo" />
+					<Add option="-lLLVMMBlazeAsmPrinter" />
+					<Add option="-lLLVMMBlazeInfo" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
@@ -273,7 +407,7 @@
 				<Option output="..\IDE\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -290,9 +424,8 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\include" />
-					<Add directory="C:\Python26\include" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -334,11 +467,11 @@
 					<Add option="-ladvapi32" />
 					<Add option="-lcomdlg32" />
 					<Add option="-loleaut32" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
@@ -546,9 +679,9 @@
 					<Add option="-lsfml-network-d" />
 					<Add option="-lsfml-system-d" />
 					<Add option="-lgmon" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime - wx291">
@@ -556,7 +689,7 @@
 				<Option output="..\IDE\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Dev Edittime wx291\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -574,8 +707,8 @@
 					<Add option="-DwxUSE_UNICODE" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswu" />
-					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
+					<Add directory="..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -617,11 +750,11 @@
 					<Add option="-ladvapi32" />
 					<Add option="-lcomdlg32" />
 					<Add option="-loleaut32" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswu" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
@@ -705,13 +838,12 @@
 		<Compiler>
 			<Add directory="..\GDL\" />
 			<Add directory="..\GDL\GDL\fparser" />
-			<Add directory="C:\Libs\boost_1_43_0" />
-			<Add directory="C:\Python26\include" />
-			<Add directory="C:\Libs\SFML\include" />
+			<Add directory="..\ExtLibs\boost" />
+			<Add directory="..\ExtLibs\SFML\include" />
 		</Compiler>
 		<Linker>
-			<Add directory="C:\Libs\SFML\bin-mingw-debug\lib" />
-			<Add directory="C:\Libs\SFML\bin-mingw-release\lib" />
+			<Add directory="..\ExtLibs\SFML\build-mingw-debug\lib" />
+			<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
 		</Linker>
 		<Unit filename="GDL\AES.cpp">
 			<Option virtualFolder="AES\" />
@@ -719,16 +851,10 @@
 		<Unit filename="GDL\AES.h">
 			<Option virtualFolder="AES\" />
 		</Unit>
-		<Unit filename="GDL\AdvancedExtension.cpp" />
-		<Unit filename="GDL\AdvancedExtension.h" />
 		<Unit filename="GDL\AdvancedTextEntryDlg.cpp" />
 		<Unit filename="GDL\AdvancedTextEntryDlg.h" />
 		<Unit filename="GDL\AjoutPlusImage.cpp" />
 		<Unit filename="GDL\AjoutPlusImage.h" />
-		<Unit filename="GDL\Animation.cpp" />
-		<Unit filename="GDL\Animation.h" />
-		<Unit filename="GDL\AudioExtension.cpp" />
-		<Unit filename="GDL\AudioExtension.h" />
 		<Unit filename="GDL\Automatism.cpp" />
 		<Unit filename="GDL\Automatism.h" />
 		<Unit filename="GDL\AutomatismsRuntimeSharedDatas.cpp" />
@@ -746,8 +872,6 @@
 		<Unit filename="GDL\BitmapGUIManager.h" />
 		<Unit filename="GDL\Camera.cpp" />
 		<Unit filename="GDL\Camera.h" />
-		<Unit filename="GDL\CameraExtension.cpp" />
-		<Unit filename="GDL\CameraExtension.h" />
 		<Unit filename="GDL\Chercher.cpp" />
 		<Unit filename="GDL\Chercher.h" />
 		<Unit filename="GDL\ChoixDossier.cpp" />
@@ -762,18 +886,10 @@
 		<Unit filename="GDL\ChooseObjectExpression.h" />
 		<Unit filename="GDL\ChooseVariableDialog.cpp" />
 		<Unit filename="GDL\ChooseVariableDialog.h" />
-		<Unit filename="GDL\Collisions.cpp" />
-		<Unit filename="GDL\Collisions.h" />
-		<Unit filename="GDL\CommentEvent.cpp" />
-		<Unit filename="GDL\CommentEvent.h" />
 		<Unit filename="GDL\CommonConversions.cpp" />
 		<Unit filename="GDL\CommonConversions.h" />
-		<Unit filename="GDL\CommonConversionsExtension.cpp" />
-		<Unit filename="GDL\CommonConversionsExtension.h" />
 		<Unit filename="GDL\CommonInstructions.cpp" />
 		<Unit filename="GDL\CommonInstructions.h" />
-		<Unit filename="GDL\CommonInstructionsExtension.cpp" />
-		<Unit filename="GDL\CommonInstructionsExtension.h" />
 		<Unit filename="GDL\CommonTools.cpp" />
 		<Unit filename="GDL\CommonTools.h" />
 		<Unit filename="GDL\CompilerMessagesParser.cpp" />
@@ -782,39 +898,21 @@
 		<Unit filename="GDL\CompilerToolchainPathManager.h" />
 		<Unit filename="GDL\DatFile.cpp" />
 		<Unit filename="GDL\DatFile.h" />
-		<Unit filename="GDL\Direction.cpp" />
-		<Unit filename="GDL\Direction.h" />
 		<Unit filename="GDL\DocMainPage.h" />
 		<Unit filename="GDL\Dossier.cpp" />
 		<Unit filename="GDL\Dossier.h" />
 		<Unit filename="GDL\DynamicExtensionBase.cpp" />
 		<Unit filename="GDL\DynamicExtensionBase.h" />
-		<Unit filename="GDL\DynamicExtensionCallerEvent.cpp" />
-		<Unit filename="GDL\DynamicExtensionCallerEvent.h" />
 		<Unit filename="GDL\DynamicExtensionsManager.cpp" />
 		<Unit filename="GDL\DynamicExtensionsManager.h" />
 		<Unit filename="GDL\DynamicLibrariesTools.cpp" />
 		<Unit filename="GDL\DynamicLibrariesTools.h" />
-		<Unit filename="GDL\EditComment.cpp" />
-		<Unit filename="GDL\EditComment.h" />
-		<Unit filename="GDL\EditDynamicExtensionCallerEvent.cpp" />
-		<Unit filename="GDL\EditDynamicExtensionCallerEvent.h" />
 		<Unit filename="GDL\EditExpression.cpp" />
 		<Unit filename="GDL\EditExpression.h" />
-		<Unit filename="GDL\EditForEachEvent.cpp" />
-		<Unit filename="GDL\EditForEachEvent.h" />
-		<Unit filename="GDL\EditLink.cpp" />
-		<Unit filename="GDL\EditLink.h" />
-		<Unit filename="GDL\EditRepeatEvent.cpp" />
-		<Unit filename="GDL\EditRepeatEvent.h" />
 		<Unit filename="GDL\EditTextDialog.cpp" />
 		<Unit filename="GDL\EditTextDialog.h" />
 		<Unit filename="GDL\EditorImages.cpp" />
 		<Unit filename="GDL\EditorImages.h" />
-		<Unit filename="GDL\EditorObjet.cpp" />
-		<Unit filename="GDL\EditorObjet.h" />
-		<Unit filename="GDL\EmptyEvent.cpp" />
-		<Unit filename="GDL\EmptyEvent.h" />
 		<Unit filename="GDL\ErrorReport.cpp" />
 		<Unit filename="GDL\ErrorReport.h" />
 		<Unit filename="GDL\Event.cpp" />
@@ -835,12 +933,8 @@
 		<Unit filename="GDL\ExtensionsManager.h" />
 		<Unit filename="GDL\ExternalEvents.cpp" />
 		<Unit filename="GDL\ExternalEvents.h" />
-		<Unit filename="GDL\FileExtension.cpp" />
-		<Unit filename="GDL\FileExtension.h" />
 		<Unit filename="GDL\FontManager.cpp" />
 		<Unit filename="GDL\FontManager.h" />
-		<Unit filename="GDL\ForEachEvent.cpp" />
-		<Unit filename="GDL\ForEachEvent.h" />
 		<Unit filename="GDL\Force.cpp" />
 		<Unit filename="GDL\Force.h" />
 		<Unit filename="GDL\GDExpression.cpp" />
@@ -863,17 +957,17 @@
 		<Unit filename="GDL\ImageFilesWatcher.h" />
 		<Unit filename="GDL\ImageManager.cpp" />
 		<Unit filename="GDL\ImageManager.h" />
+		<Unit filename="GDL\Implementation.cpp" />
+		<Unit filename="GDL\Implementation.h" />
+		<Unit filename="GDL\ImplementationGame.cpp" />
+		<Unit filename="GDL\ImplementationGame.h" />
+		<Unit filename="GDL\ImplementationScene.cpp" />
+		<Unit filename="GDL\ImplementationScene.h" />
 		<Unit filename="GDL\Instruction.cpp" />
 		<Unit filename="GDL\Instruction.h" />
 		<Unit filename="GDL\InvalidImage.h" />
-		<Unit filename="GDL\JoystickExtension.cpp" />
-		<Unit filename="GDL\JoystickExtension.h" />
-		<Unit filename="GDL\KeyboardExtension.cpp" />
-		<Unit filename="GDL\KeyboardExtension.h" />
 		<Unit filename="GDL\Layer.cpp" />
 		<Unit filename="GDL\Layer.h" />
-		<Unit filename="GDL\LinkEvent.cpp" />
-		<Unit filename="GDL\LinkEvent.h" />
 		<Unit filename="GDL\ListVariable.cpp" />
 		<Unit filename="GDL\ListVariable.h" />
 		<Unit filename="GDL\LoadingScreen.cpp" />
@@ -890,12 +984,8 @@
 		<Unit filename="GDL\ManualTimer.h" />
 		<Unit filename="GDL\MemTrace.cpp" />
 		<Unit filename="GDL\MemTrace.h" />
-		<Unit filename="GDL\MouseExtension.cpp" />
-		<Unit filename="GDL\MouseExtension.h" />
 		<Unit filename="GDL\Music.cpp" />
 		<Unit filename="GDL\Music.h" />
-		<Unit filename="GDL\NetworkExtension.cpp" />
-		<Unit filename="GDL\NetworkExtension.h" />
 		<Unit filename="GDL\ObjInstancesHolder.cpp" />
 		<Unit filename="GDL\ObjInstancesHolder.h" />
 		<Unit filename="GDL\Object.cpp" />
@@ -908,8 +998,6 @@
 		<Unit filename="GDL\ObjectIdentifiersManager.h" />
 		<Unit filename="GDL\ObjectListDialogsHelper.cpp" />
 		<Unit filename="GDL\ObjectListDialogsHelper.h" />
-		<Unit filename="GDL\ObjectsConcerned.cpp" />
-		<Unit filename="GDL\ObjectsConcerned.h" />
 		<Unit filename="GDL\OpenSaveGame.cpp" />
 		<Unit filename="GDL\OpenSaveGame.h" />
 		<Unit filename="GDL\OpenSaveLoadingScreen.cpp" />
@@ -918,12 +1006,8 @@
 		<Unit filename="GDL\Point.h" />
 		<Unit filename="GDL\Position.cpp" />
 		<Unit filename="GDL\Position.h" />
-		<Unit filename="GDL\ProfileEvent.cpp" />
-		<Unit filename="GDL\ProfileEvent.h" />
 		<Unit filename="GDL\PropImage.cpp" />
 		<Unit filename="GDL\PropImage.h" />
-		<Unit filename="GDL\RepeatEvent.cpp" />
-		<Unit filename="GDL\RepeatEvent.h" />
 		<Unit filename="GDL\ResourcesMergingHelper.cpp" />
 		<Unit filename="GDL\ResourcesMergingHelper.h" />
 		<Unit filename="GDL\ResourcesUnmergingHelper.cpp" />
@@ -944,8 +1028,6 @@
 		<Unit filename="GDL\RuntimeScene.h" />
 		<Unit filename="GDL\Scene.cpp" />
 		<Unit filename="GDL\Scene.h" />
-		<Unit filename="GDL\SceneExtension.cpp" />
-		<Unit filename="GDL\SceneExtension.h" />
 		<Unit filename="GDL\Son.cpp" />
 		<Unit filename="GDL\Son.h" />
 		<Unit filename="GDL\SoundManager.cpp" />
@@ -954,28 +1036,12 @@
 		<Unit filename="GDL\SourceFile.h" />
 		<Unit filename="GDL\SourceFileBuilder.cpp" />
 		<Unit filename="GDL\SourceFileBuilder.h" />
-		<Unit filename="GDL\Sprite.cpp" />
-		<Unit filename="GDL\Sprite.h" />
-		<Unit filename="GDL\SpriteActionsAutomatisms.cpp" />
-		<Unit filename="GDL\SpriteConditionsAutomatisms.cpp" />
-		<Unit filename="GDL\SpriteExtension.cpp" />
-		<Unit filename="GDL\SpriteExtension.h" />
-		<Unit filename="GDL\SpriteInitialPositionPanel.cpp" />
-		<Unit filename="GDL\SpriteInitialPositionPanel.h" />
-		<Unit filename="GDL\SpriteObject.cpp" />
-		<Unit filename="GDL\SpriteObject.h" />
 		<Unit filename="GDL\StandardEvent.cpp" />
 		<Unit filename="GDL\StandardEvent.h" />
 		<Unit filename="GDL\StrExpressionInstruction.cpp" />
 		<Unit filename="GDL\StrExpressionInstruction.h" />
-		<Unit filename="GDL\StringExpressions.cpp" />
-		<Unit filename="GDL\StringExpressions.h" />
-		<Unit filename="GDL\StringInstructionsExtension.cpp" />
-		<Unit filename="GDL\StringInstructionsExtension.h" />
 		<Unit filename="GDL\Text.cpp" />
 		<Unit filename="GDL\Text.h" />
-		<Unit filename="GDL\TimeExtension.cpp" />
-		<Unit filename="GDL\TimeExtension.h" />
 		<Unit filename="GDL\TranslateAction.cpp" />
 		<Unit filename="GDL\TranslateAction.h" />
 		<Unit filename="GDL\TranslateCondition.cpp" />
@@ -992,85 +1058,13 @@
 		<Unit filename="GDL\VersionWrapper.cpp">
 			<Option weight="64" />
 		</Unit>
-		<Unit filename="GDL\WhileEvent.cpp" />
-		<Unit filename="GDL\WhileEvent.h" />
 		<Unit filename="GDL\WindowExtension.cpp" />
 		<Unit filename="GDL\WindowExtension.h" />
 		<Unit filename="GDL\XmlFilesHelper.cpp" />
 		<Unit filename="GDL\XmlFilesHelper.h" />
 		<Unit filename="GDL\XmlMacros.h" />
-		<Unit filename="GDL\aADS.cpp" />
-		<Unit filename="GDL\aAdvanced.cpp" />
-		<Unit filename="GDL\aCamera.cpp" />
-		<Unit filename="GDL\aCamera.h" />
-		<Unit filename="GDL\aEffects.cpp" />
-		<Unit filename="GDL\aFichier.cpp" />
-		<Unit filename="GDL\aFichier.h" />
-		<Unit filename="GDL\aJoystick.cpp" />
-		<Unit filename="GDL\aJoystick.h" />
-		<Unit filename="GDL\aLayer.cpp" />
-		<Unit filename="GDL\aLayer.h" />
-		<Unit filename="GDL\aMove.cpp" />
-		<Unit filename="GDL\aMusic.cpp" />
-		<Unit filename="GDL\aMusic.h" />
-		<Unit filename="GDL\aNet.cpp" />
-		<Unit filename="GDL\aNet.h" />
-		<Unit filename="GDL\aObjet.cpp" />
-		<Unit filename="GDL\aPlans.cpp" />
-		<Unit filename="GDL\aPosition.cpp" />
-		<Unit filename="GDL\aScale.cpp" />
-		<Unit filename="GDL\aScene.cpp" />
-		<Unit filename="GDL\aScene.h" />
-		<Unit filename="GDL\aSouris.cpp" />
-		<Unit filename="GDL\aSouris.h" />
-		<Unit filename="GDL\aTexte.cpp" />
-		<Unit filename="GDL\aTexte.h" />
-		<Unit filename="GDL\aTime.cpp" />
-		<Unit filename="GDL\aTime.h" />
-		<Unit filename="GDL\aVariables.cpp" />
-		<Unit filename="GDL\aVariables.h" />
-		<Unit filename="GDL\aVisibilite.cpp" />
-		<Unit filename="GDL\aWindow.cpp" />
-		<Unit filename="GDL\aWindow.h" />
-		<Unit filename="GDL\actions.cpp" />
-		<Unit filename="GDL\actions.h" />
 		<Unit filename="GDL\btAlignedAllocator.h" />
 		<Unit filename="GDL\btScalar.h" />
-		<Unit filename="GDL\cADS.cpp" />
-		<Unit filename="GDL\cCamera.cpp" />
-		<Unit filename="GDL\cCamera.h" />
-		<Unit filename="GDL\cClavier.cpp" />
-		<Unit filename="GDL\cClavier.h" />
-		<Unit filename="GDL\cCollisions.cpp" />
-		<Unit filename="GDL\cEffects.cpp" />
-		<Unit filename="GDL\cFichier.cpp" />
-		<Unit filename="GDL\cFichier.h" />
-		<Unit filename="GDL\cJoystick.cpp" />
-		<Unit filename="GDL\cJoystick.h" />
-		<Unit filename="GDL\cLayer.cpp" />
-		<Unit filename="GDL\cLayer.h" />
-		<Unit filename="GDL\cMove.cpp" />
-		<Unit filename="GDL\cMusic.cpp" />
-		<Unit filename="GDL\cMusic.h" />
-		<Unit filename="GDL\cObjet.cpp" />
-		<Unit filename="GDL\cPlans.cpp" />
-		<Unit filename="GDL\cPos.cpp" />
-		<Unit filename="GDL\cScale.cpp" />
-		<Unit filename="GDL\cScene.cpp" />
-		<Unit filename="GDL\cScene.h" />
-		<Unit filename="GDL\cSouris.cpp" />
-		<Unit filename="GDL\cSouris.h" />
-		<Unit filename="GDL\cTime.cpp" />
-		<Unit filename="GDL\cTime.h" />
-		<Unit filename="GDL\cVariables.cpp" />
-		<Unit filename="GDL\cVariables.h" />
-		<Unit filename="GDL\cVisibilite.cpp" />
-		<Unit filename="GDL\conditions.cpp" />
-		<Unit filename="GDL\conditions.h" />
-		<Unit filename="GDL\constantes.h" />
-		<Unit filename="GDL\eFreeFunctions.cpp" />
-		<Unit filename="GDL\eFreeFunctions.h" />
-		<Unit filename="GDL\eObjectFunctions.cpp" />
 		<Unit filename="GDL\fparser\fparser.cc">
 			<Option virtualFolder="Math parser\LIB fparser\" />
 		</Unit>
@@ -1109,7 +1103,7 @@
 			<lib_finder disable_auto="1" />
 			<AutoVersioning>
 				<Scheme minor_max="1" build_max="0" rev_max="0" rev_rand_max="9" build_times_to_increment_minor="1" />
-				<Settings autoincrement="0" date_declarations="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="GDL/Version.h" />
+				<Settings autoincrement="0" date_declarations="1" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="GDL/Version.h" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
 				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>

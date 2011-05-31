@@ -98,6 +98,7 @@ bool CondVarSceneTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
 ////////////////////////////////////////////////////////////
 bool CondVarSceneDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
+    BT_PROFILE("CondVarSceneDef");
     return scene.variables.HasVariable( condition.GetParameter( 0 ).GetPlainString() ) ^ condition.IsInverted();
 }
 

@@ -134,7 +134,7 @@ toolbar(NULL)
     SplitterWindow1->SetMinSize(wxSize(10,10));
     SplitterWindow1->SetMinimumPaneSize(10);
     BanqueImageList = new wxTreeCtrl(SplitterWindow1, ID_TREECTRL1, wxDefaultPosition, wxSize(200,170), wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
-    BanqueImageList->SetToolTip(_("Clic droit sur une image pour accéder aux options"));
+    BanqueImageList->SetToolTip(_T("Clic droit sur une image pour accéder aux options"));
     apercuPanel = new wxPanel(SplitterWindow1, ID_PANEL3, wxDefaultPosition, wxSize(200,120), wxSUNKEN_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
     SplitterWindow1->SplitVertically(BanqueImageList, apercuPanel);
     FlexGridSizer4->Add(SplitterWindow1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -143,56 +143,56 @@ toolbar(NULL)
     FlexGridSizer4->SetSizeHints(Core);
     FlexGridSizer2->Add(Core, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer2);
-    editMenuItem = new wxMenuItem((&ContextMenu), idMenuModProp, _("Modifier les propriétés de l\'image"), wxEmptyString, wxITEM_NORMAL);
+    editMenuItem = new wxMenuItem((&ContextMenu), idMenuModProp, _T("Modifier les propriétés de l\'image"), wxEmptyString, wxITEM_NORMAL);
     editMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editpropicon.png"))));
     ContextMenu.Append(editMenuItem);
-    MenuItem3 = new wxMenuItem((&ContextMenu), idMenuMod, _("Modifier le nom de l\'image"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem3 = new wxMenuItem((&ContextMenu), idMenuMod, _T("Modifier le nom de l\'image"), wxEmptyString, wxITEM_NORMAL);
     MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
     ContextMenu.Append(MenuItem3);
-    MenuItem4 = new wxMenuItem((&ContextMenu), idMenuModFile, _("Modifier le fichier de l\'image"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem4 = new wxMenuItem((&ContextMenu), idMenuModFile, _T("Modifier le fichier de l\'image"), wxEmptyString, wxITEM_NORMAL);
     MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/openicon.png"))));
     ContextMenu.Append(MenuItem4);
     ContextMenu.AppendSeparator();
-    MenuItem1 = new wxMenuItem((&ContextMenu), idMenuAjouter, _("Ajouter une image"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem1 = new wxMenuItem((&ContextMenu), idMenuAjouter, _T("Ajouter une image"), wxEmptyString, wxITEM_NORMAL);
     MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
     ContextMenu.Append(MenuItem1);
-    deleteImageItem = new wxMenuItem((&ContextMenu), idMenuDel, _("Supprimer l\'image"), wxEmptyString, wxITEM_NORMAL);
+    deleteImageItem = new wxMenuItem((&ContextMenu), idMenuDel, _T("Supprimer l\'image"), wxEmptyString, wxITEM_NORMAL);
     deleteImageItem->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
     ContextMenu.Append(deleteImageItem);
-    MenuItem14 = new wxMenuItem((&ContextMenu), ID_MENUITEM9, _("Supprimer seulement du dossier"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem14 = new wxMenuItem((&ContextMenu), ID_MENUITEM9, _T("Supprimer seulement du dossier"), wxEmptyString, wxITEM_NORMAL);
     ContextMenu.Append(MenuItem14);
     ContextMenu.AppendSeparator();
-    MenuItem7 = new wxMenuItem((&ContextMenu), idMoveUp, _("Déplacer vers le haut\tCtrl-P"), _("Déplacer l\'image vers le haut dans la liste"), wxITEM_NORMAL);
+    MenuItem7 = new wxMenuItem((&ContextMenu), idMoveUp, _T("Déplacer vers le haut\tCtrl-P"), _T("Déplacer l\'image vers le haut dans la liste"), wxITEM_NORMAL);
     MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
     ContextMenu.Append(MenuItem7);
-    MenuItem8 = new wxMenuItem((&ContextMenu), idMoveDown, _("Déplacer vers le bas"), _("Déplacer l\'image vers le bas dans la liste"), wxITEM_NORMAL);
+    MenuItem8 = new wxMenuItem((&ContextMenu), idMoveDown, _T("Déplacer vers le bas"), _T("Déplacer l\'image vers le bas dans la liste"), wxITEM_NORMAL);
     MenuItem8->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
     ContextMenu.Append(MenuItem8);
-    MenuItem2 = new wxMenuItem((&emptyMenu), ID_MENUITEM1, _("Ajouter une image"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem2 = new wxMenuItem((&emptyMenu), ID_MENUITEM1, _T("Ajouter une image"), wxEmptyString, wxITEM_NORMAL);
     MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
     emptyMenu.Append(MenuItem2);
     emptyMenu.AppendSeparator();
-    MenuItem6 = new wxMenuItem((&emptyMenu), ID_MENUITEM2, _("Ajouter un dossier"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem6 = new wxMenuItem((&emptyMenu), ID_MENUITEM2, _T("Ajouter un dossier"), wxEmptyString, wxITEM_NORMAL);
     MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/dossier.png"))));
     emptyMenu.Append(MenuItem6);
-    MenuItem9 = new wxMenuItem((&folderMenu), ID_MENUITEM3, _("Renommer"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem9 = new wxMenuItem((&folderMenu), ID_MENUITEM3, _T("Renommer"), wxEmptyString, wxITEM_NORMAL);
     MenuItem9->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
     folderMenu.Append(MenuItem9);
-    MenuItem13 = new wxMenuItem((&folderMenu), ID_MENUITEM5, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem13 = new wxMenuItem((&folderMenu), ID_MENUITEM5, _T("Supprimer"), wxEmptyString, wxITEM_NORMAL);
     MenuItem13->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
     folderMenu.Append(MenuItem13);
     folderMenu.AppendSeparator();
-    MenuItem10 = new wxMenuItem((&folderMenu), ID_MENUITEM6, _("Ajouter une image"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem10 = new wxMenuItem((&folderMenu), ID_MENUITEM6, _T("Ajouter une image"), wxEmptyString, wxITEM_NORMAL);
     MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
     folderMenu.Append(MenuItem10);
     folderMenu.AppendSeparator();
-    MenuItem5 = new wxMenuItem((&folderMenu), ID_MENUITEM4, _("Ajouter un dossier"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem5 = new wxMenuItem((&folderMenu), ID_MENUITEM4, _T("Ajouter un dossier"), wxEmptyString, wxITEM_NORMAL);
     folderMenu.Append(MenuItem5);
     folderMenu.AppendSeparator();
-    MenuItem11 = new wxMenuItem((&folderMenu), ID_MENUITEM7, _("Déplacer vers le haut"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem11 = new wxMenuItem((&folderMenu), ID_MENUITEM7, _T("Déplacer vers le haut"), wxEmptyString, wxITEM_NORMAL);
     MenuItem11->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
     folderMenu.Append(MenuItem11);
-    MenuItem12 = new wxMenuItem((&folderMenu), ID_MENUITEM8, _("Déplacer vers le bas"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem12 = new wxMenuItem((&folderMenu), ID_MENUITEM8, _T("Déplacer vers le bas"), wxEmptyString, wxITEM_NORMAL);
     MenuItem12->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
     folderMenu.Append(MenuItem12);
     FlexGridSizer2->Fit(this);
@@ -302,35 +302,35 @@ void EditorImages::CreateRibbonPage(wxRibbonPage * page)
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Liste d'images"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _T("Liste d'images"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Ajouter une image") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Supprimer") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("Déplacer vers le haut") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("Déplacer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonSearch, !hideLabels ? _("Rechercher") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonRefresh, !hideLabels ? _("Rafraichir") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _T("Ajouter une image") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDel, !hideLabels ? _T("Supprimer") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _T("Déplacer vers le haut") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _T("Déplacer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonSearch, !hideLabels ? _T("Rechercher") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonRefresh, !hideLabels ? _T("Rafraichir") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
     }
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Image sélectionnée"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _T("Image sélectionnée"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonMod, !hideLabels ? _("Nom") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonModFile, !hideLabels ? _("Modifier le fichier") : "", wxBitmap("res/openicon24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Propriétés") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonPaintProgram, !hideLabels ? _("Editer") : "", wxBitmap("res/paint24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonMod, !hideLabels ? _T("Nom") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonModFile, !hideLabels ? _T("Modifier le fichier") : "", wxBitmap("res/openicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonModProp, !hideLabels ? _T("Propriétés") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonPaintProgram, !hideLabels ? _T("Editer") : "", wxBitmap("res/paint24.png", wxBITMAP_TYPE_ANY));
     }
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Dossiers"), wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _T("Dossiers"), wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonAddDossier, !hideLabels ? _("Ajouter un dossier") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonAddDossier, !hideLabels ? _T("Ajouter un dossier") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
     }
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _T("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _T("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
     }
 
 }
@@ -345,18 +345,18 @@ void EditorImages::CreateToolbar()
                                     wxTB_FLAT /*| wxTB_NODIVIDER*/ );
 
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( ID_BITMAPBUTTON1, wxT( "Rafraichir" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Rafraichir la liste d'images") );
+    toolbar->AddTool( ID_BITMAPBUTTON1, wxT( "Rafraichir" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _T("Rafraichir la liste d'images") );
     toolbar->AddSeparator();
-    toolbar->AddTool( idMenuAjouter, wxT( "Ajouter une image" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter une image") );
-    toolbar->AddTool( idMenuDel, wxT( "Supprimer l'image selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer l'image selectionnée") );
-    toolbar->AddTool( idMenuModProp, wxT( "Modifier les propriétés de l'image" ), wxBitmap( wxImage( "res/editpropicon.png" ) ), _("Modifier les propriétés de l'image") );
-    toolbar->AddTool( ID_BITMAPBUTTON6, wxT( "Plus d'options d'édition ( clic droit sur la liste )" ), wxBitmap( wxImage( "res/moreicon.png" ) ), _("Plus d'options d'édition ( clic droit sur la liste )") );
+    toolbar->AddTool( idMenuAjouter, wxT( "Ajouter une image" ), wxBitmap( wxImage( "res/addicon.png" ) ), _T("Ajouter une image") );
+    toolbar->AddTool( idMenuDel, wxT( "Supprimer l'image selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _T("Supprimer l'image selectionnée") );
+    toolbar->AddTool( idMenuModProp, wxT( "Modifier les propriétés de l'image" ), wxBitmap( wxImage( "res/editpropicon.png" ) ), _T("Modifier les propriétés de l'image") );
+    toolbar->AddTool( ID_BITMAPBUTTON6, wxT( "Plus d'options d'édition ( clic droit sur la liste )" ), wxBitmap( wxImage( "res/moreicon.png" ) ), _T("Plus d'options d'édition ( clic droit sur la liste )") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_BITMAPBUTTON5, wxT( "Ouvrir l'image avec un éditeur" ), wxBitmap( wxImage( "res/paint.png" ) ), _("Ouvrir l'image avec un éditeur") );
-    toolbar->AddTool( ID_BITMAPBUTTON4, wxT( "Naviguer dans les dossiers" ), wxBitmap( wxImage( "res/dossier.png" ) ), _("Naviguer dans les dossiers") );
-    toolbar->AddTool( ID_BITMAPBUTTON2, wxT( "Rechercher une image" ), wxBitmap( wxImage( "res/searchicon.png" ) ), _("Rechercher une image") );
+    toolbar->AddTool( ID_BITMAPBUTTON5, wxT( "Ouvrir l'image avec un éditeur" ), wxBitmap( wxImage( "res/paint.png" ) ), _T("Ouvrir l'image avec un éditeur") );
+    toolbar->AddTool( ID_BITMAPBUTTON4, wxT( "Naviguer dans les dossiers" ), wxBitmap( wxImage( "res/dossier.png" ) ), _T("Naviguer dans les dossiers") );
+    toolbar->AddTool( ID_BITMAPBUTTON2, wxT( "Rechercher une image" ), wxBitmap( wxImage( "res/searchicon.png" ) ), _T("Rechercher une image") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_BITMAPBUTTON3, wxT( "Aide de l'éditeur de la banque d'images" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur de la banque d'images") );
+    toolbar->AddTool( ID_BITMAPBUTTON3, wxT( "Aide de l'éditeur de la banque d'images" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _T("Aide de l'éditeur de la banque d'images") );
     toolbar->Realize();
 
     //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
@@ -387,11 +387,11 @@ wxTreeItemId EditorImages::GetSelectedFolderItem()
  */
 void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
 {
-    wxFileDialog FileDialog( this, _("Choisissez une ou plusieurs images à ajouter"), "", "", _("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_MULTIPLE );
+    wxFileDialog FileDialog( this, _T("Choisissez une ou plusieurs images à ajouter"), "", "", _T("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_MULTIPLE );
 
     if ( FileDialog.ShowModal() == wxID_OK )
     {
-        wxLogStatus( _( "Ajout des images" ) );
+        wxLogStatus( _T( "Ajout des images" ) );
 
         wxArrayString files;
         wxArrayString names;
@@ -415,7 +415,7 @@ void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
         //Add each image to images list and to folder if any
         for ( unsigned int i = 0; i < files.GetCount();++i )
         {
-            wxLogStatus( _( "Ajout de l'image " ) + names[i] );
+            wxLogStatus( _T( "Ajout de l'image " ) + names[i] );
 
             //Add to all images
             if ( FindImage(game.images, string(names[i])) == -1 )
@@ -441,9 +441,9 @@ void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
         }
 
         if ( !imageNonAjoutees.empty() )
-            wxLogMessage(wxString(_("Des images portant le même nom sont déjà présentes, et n'ont pas été ajoutées à la liste de toutes les images :")+imageNonAjoutees));
+            wxLogMessage(wxString(_T("Des images portant le même nom sont déjà présentes, et n'ont pas été ajoutées à la liste de toutes les images :")+imageNonAjoutees));
 
-        wxLogStatus( _( "L'image a été correctement ajoutée à la banque d'image" ) );
+        wxLogStatus( _T( "L'image a été correctement ajoutée à la banque d'image" ) );
     }
 
 }
@@ -467,7 +467,7 @@ void EditorImages::OnremoveFolderOnlySelected(wxCommandEvent& event)
         BanqueImageList->Delete(m_itemSelected);
     }
     else
-        wxLogStatus( _( "Aucune image sélectionnée" ) );
+        wxLogStatus( _T( "Aucune image sélectionnée" ) );
 }
 
 /**
@@ -521,7 +521,7 @@ void EditorImages::OnDelImageBtClick( wxCommandEvent& event )
     }
     else
     {
-        wxLogStatus( _( "Aucune image sélectionnée" ) );
+        wxLogStatus( _T( "Aucune image sélectionnée" ) );
     }
 }
 
@@ -538,7 +538,7 @@ void EditorImages::OnModNameImageBtClick( wxCommandEvent& event )
     }
     else
     {
-        wxLogStatus( _( "Aucune image sélectionnée" ) );
+        wxLogStatus( _T( "Aucune image sélectionnée" ) );
     }
 }
 
@@ -647,7 +647,7 @@ void EditorImages::OnBanqueImageListEndLabelEdit( wxTreeEvent& event )
             {
                 if ( newName == game.imagesFolders[i].nom )
                 {
-                    wxLogWarning( _( "Impossible de renommer le dossier : un autre dossier porte déjà ce nom." ) );
+                    wxLogWarning( _T( "Impossible de renommer le dossier : un autre dossier porte déjà ce nom." ) );
                     event.Veto();
                     return;
                 }
@@ -664,7 +664,7 @@ void EditorImages::OnBanqueImageListEndLabelEdit( wxTreeEvent& event )
         {
             if ( FindImage( game.images, newName ) != -1 )
             {
-                wxLogWarning( _( "Impossible de renommer l'image : une autre image porte déjà ce nom." ) );
+                wxLogWarning( _T( "Impossible de renommer l'image : une autre image porte déjà ce nom." ) );
                 Refresh();
                 return;
             }
@@ -719,7 +719,7 @@ void EditorImages::Refresh()
     }
 
     //All images
-    allImagesItem = BanqueImageList->AppendItem( BanqueImageList->GetRootItem(), _("Toutes les images"), -1,-1, new gdTreeItemStringData("BaseFolder", "" ));
+    allImagesItem = BanqueImageList->AppendItem( BanqueImageList->GetRootItem(), _T("Toutes les images"), -1,-1, new gdTreeItemStringData("BaseFolder", "" ));
     for ( unsigned int i = 0;i < game.images.size();i++ )
         BanqueImageList->AppendItem( allImagesItem, game.images[i].nom, -1, -1, new gdTreeItemStringData("Image", game.images[i].nom ));
 
@@ -743,15 +743,15 @@ void EditorImages::OnModFileImage( wxCommandEvent& event )
     int i = FindImage( game.images, data->GetSecondString() );
     if ( i == -1 )
     {
-        wxLogStatus( _( "L'image à modifier n'a pas été trouvée." ) );
+        wxLogStatus( _T( "L'image à modifier n'a pas été trouvée." ) );
         return;
     }
 
     //Boite de dialogue d'ajout d'une image
-    wxFileDialog FileDialog( this, _( "Choisissez le fichier de l'image" ), "", "", _("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_OPEN );
+    wxFileDialog FileDialog( this, _T( "Choisissez le fichier de l'image" ), "", "", _T("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_OPEN );
     if ( FileDialog.ShowModal() == wxID_OK )
     {
-        wxLogStatus( _( "Changement du fichier de l'image..." ) );
+        wxLogStatus( _T( "Changement du fichier de l'image..." ) );
 
         string newFile = string(FileDialog.GetPath().mb_str());
 
@@ -759,14 +759,14 @@ void EditorImages::OnModFileImage( wxCommandEvent& event )
         //Ne concerne pas les dossiers
 
         game.imagesChanged.push_back(game.images.at( i ).nom);
-        wxLogStatus( _( "Changement du fichier de l'image effectué" ) );
+        wxLogStatus( _T( "Changement du fichier de l'image effectué" ) );
     }
 
 }
 
 void EditorImages::OnChercherBtClick( wxCommandEvent& event )
 {
-    string name = static_cast<string>( wxGetTextFromUser( _( "Entrez le nom de l'image à rechercher" ), _( "Chercher une image" ) ) );
+    string name = static_cast<string>( wxGetTextFromUser( _T( "Entrez le nom de l'image à rechercher" ), _T( "Chercher une image" ) ) );
     if ( name == "" ) return;
 
     int i = FindImage( game.images, name );
@@ -808,7 +808,7 @@ void EditorImages::OnModPropSelected(wxCommandEvent& event)
     int i = FindImage( game.images, data->GetSecondString() );
     if ( i == -1 )
     {
-        wxLogStatus( _( "L'image à modifier n'a pas été trouvée." ) );
+        wxLogStatus( _T( "L'image à modifier n'a pas été trouvée." ) );
         return;
     }
 
@@ -836,7 +836,7 @@ void EditorImages::OnOpenPaintProgramClick(wxCommandEvent& event)
 
     if ( result.empty() )
     {
-        wxFileDialog dialog(this, _("Choisissez le programme d'édition d'images ( fichier exe )"), "", "", _("Programmes (*.exe)|*.exe"));
+        wxFileDialog dialog(this, _T("Choisissez le programme d'édition d'images ( fichier exe )"), "", "", _T("Programmes (*.exe)|*.exe"));
         dialog.ShowModal();
 
         pConfig->Write( _T( "/EditeursExternes/Image" ), dialog.GetPath() );
@@ -933,7 +933,7 @@ void EditorImages::OnMoveUpSelected(wxCommandEvent& event)
             int i = FindImage( game.images, name );
             if ( i == -1 )
             {
-                wxLogStatus( _( "L'image à déplacer n'a pas été trouvée." ) );
+                wxLogStatus( _T( "L'image à déplacer n'a pas été trouvée." ) );
                 return;
             }
             else if ( i > 0 )
@@ -1017,7 +1017,7 @@ void EditorImages::OnMoveDownSelected(wxCommandEvent& event)
             int i = FindImage( game.images, name );
             if ( i == -1 )
             {
-                wxLogStatus( _( "L'image à déplacer n'a pas été trouvée." ) );
+                wxLogStatus( _T( "L'image à déplacer n'a pas été trouvée." ) );
                 return;
             }
             else if ( i+1 < game.images.size() )
@@ -1099,10 +1099,10 @@ void EditorImages::ForceRefreshRibbonAndConnect()
 
 void EditorImages::OnAddFolderSelected(wxCommandEvent& event)
 {
-    wxTreeItemId newFolderItem = BanqueImageList->AppendItem(BanqueImageList->GetRootItem(), _("Nouveau dossier"), -1, -1, new gdTreeItemStringData("Folder", string(_("Nouveau dossier").mb_str())));
+    wxTreeItemId newFolderItem = BanqueImageList->AppendItem(BanqueImageList->GetRootItem(), _T("Nouveau dossier"), -1, -1, new gdTreeItemStringData("Folder", string(_T("Nouveau dossier").mb_str())));
 
     Dossier newFolder;
-    newFolder.nom = _("Nouveau dossier");
+    newFolder.nom = _T("Nouveau dossier");
     game.imagesFolders.push_back(newFolder);
 
     BanqueImageList->EditLabel(newFolderItem);

@@ -15,12 +15,50 @@
 #include "GDL/SpriteObject.h"
 #include "GDL/RotatedRectangleCollision.h"
 #include "GDL/Collisions.h"
+#include "GDL/profile.h"
 
 /**
  * Test a collision between two sprites objects
  */
 bool CondCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
+    BT_PROFILE("CondCollision");
+    bool isTrue = false;
+
+    ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
+    ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());
+    if ( condition.GetParameter( 1 ).GetAsObjectIdentifier() == condition.GetParameter( 0 ).GetAsObjectIdentifier())
+        list2 = list;
+
+    //Pour chaque objet, on retient son ID, et la liste des objets avec lesquels il est en collision.
+    ObjList ObjetsEnCollisions;
+
+	ObjList::iterator obj = list.begin();
+	ObjList::const_iterator obj_end = list.end();
+
+	ObjList::iterator obj2 = list2.begin();
+	ObjList::const_iterator obj2_end = list2.end();
+
+    //On teste la collision entre chaque objets
+    for ( obj = list.begin(); obj != obj_end; ++obj )
+    {
+        for (obj2 = list2.begin(); obj2 != obj2_end; ++obj2 )
+        {
+            //On vérifie que ce n'est pas le même objet
+            if ( *obj != *obj2 &&
+                CheckCollision( boost::static_pointer_cast<SpriteObject>(*obj), boost::static_pointer_cast<SpriteObject>(*obj2) ) ^ condition.IsInverted() )
+            {
+                objectsConcerned.objectsPicked.AddObject( *obj );
+                objectsConcerned.objectsPicked.AddObject( *obj2 );
+                isTrue = true;
+            }
+        }
+    }
+
+    return isTrue;
+}
+
+/*BT_PROFILE("CondCollision");
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());
     if ( condition.GetParameter( 1 ).GetAsObjectIdentifier() == condition.GetParameter( 0 ).GetAsObjectIdentifier())
@@ -94,13 +132,14 @@ bool CondCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
         return true;
 
     return false;
-}
+*/
 
 /**
  * Test a collision between two objects using their hitboxes
  */
 bool CondHBCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
+    BT_PROFILE("CondHBCollision");
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());
     if ( condition.GetParameter( 1 ).GetAsObjectIdentifier() == condition.GetParameter( 0 ).GetAsObjectIdentifier())

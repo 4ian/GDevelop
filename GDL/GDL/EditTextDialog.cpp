@@ -64,7 +64,7 @@ lastErrorPos(std::string::npos)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
 
-	Create(parent, wxID_ANY, _("Editer le texte"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _T("Editer le texte"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	wxIcon FrameIcon;
 	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/texteicon.png"))));
 	SetIcon(FrameIcon);
@@ -79,23 +79,23 @@ lastErrorPos(std::string::npos)
 	FlexGridSizer3->AddGrowableRow(0);
 	TexteEdit = new wxStyledTextCtrl(this,ID_CUSTOM1,wxDefaultPosition,wxSize(460,110),0,_T("ID_CUSTOM1"));
 	FlexGridSizer3->Add(TexteEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	errorTxt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Pas d\'erreurs."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
-	errorTxt->SetToolTip(_("Cliquer pour positionner le curseur sur l\'erreur."));
+	errorTxt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _T("Pas d\'erreurs."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	errorTxt->SetToolTip(_T("Cliquer pour positionner le curseur sur l\'erreur."));
 	FlexGridSizer3->Add(errorTxt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer8->AddGrowableCol(0);
-	OkBt = new wxButton(this, ID_BUTTON2, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	OkBt = new wxButton(this, ID_BUTTON2, _T("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer8->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	AnnulerBt = new wxButton(this, ID_BUTTON1, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	AnnulerBt = new wxButton(this, ID_BUTTON1, _T("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer8->Add(AnnulerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	helpBt = new wxButton(this, ID_BUTTON4, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	helpBt = new wxButton(this, ID_BUTTON4, _T("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer8->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Editer le texte"));
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _T("Editer le texte"));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer4->AddGrowableRow(0);
@@ -103,29 +103,29 @@ lastErrorPos(std::string::npos)
 	FlexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer7->AddGrowableCol(0);
 	FlexGridSizer7->AddGrowableRow(1);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Propriétés des objets"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _T("Propriétés des objets"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer7->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ObjList = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer7->Add(ObjList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	AddPropBt = new wxButton(this, ID_BUTTON10, _("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
+	AddPropBt = new wxButton(this, ID_BUTTON10, _T("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
 	FlexGridSizer7->Add(AddPropBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer1->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer10 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer10->AddGrowableCol(0);
 	FlexGridSizer10->AddGrowableRow(1);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Valeurs spéciales"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _T("Valeurs spéciales"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer10->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ValList = new wxTreeCtrl(this, ID_TREECTRL2, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL2"));
 	FlexGridSizer10->Add(ValList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	AddFunctionBt = new wxButton(this, ID_BUTTON7, _("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
+	AddFunctionBt = new wxButton(this, ID_BUTTON7, _T("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
 	FlexGridSizer10->Add(AddFunctionBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer1->Add(FlexGridSizer10, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4->Add(BoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Expression numérique :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _T("Expression numérique :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer11->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	InsertBt = new wxButton(this, ID_BUTTON3, _("Insérer une expression numérique"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
-	InsertBt->SetToolTip(_("Permet d\'insérer un calcul, ou la valeur d\'une variable"));
+	InsertBt = new wxButton(this, ID_BUTTON3, _T("Insérer une expression numérique"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	InsertBt->SetToolTip(_T("Permet d\'insérer un calcul, ou la valeur d\'une variable"));
 	FlexGridSizer11->Add(InsertBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4->Add(FlexGridSizer11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -164,10 +164,10 @@ lastErrorPos(std::string::npos)
 
     //Prepare lists
     ObjList->DeleteAllItems();
-    ObjList->AddRoot( _( "Toutes les proprietés" ), 0 );
+    ObjList->AddRoot( _T( "Toutes les proprietés" ), 0 );
 
     ValList->DeleteAllItems();
-    ValList->AddRoot( _( "Toutes les valeurs spéciales" ), 0 );
+    ValList->AddRoot( _T( "Toutes les valeurs spéciales" ), 0 );
 
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
@@ -189,8 +189,8 @@ lastErrorPos(std::string::npos)
 	    for(unsigned int j = 0;j<objectsTypes.size();++j)
 	    {
             wxTreeItemId objectTypeItem =   objectsTypes[j] == "" ?
-                                            ObjList->AppendItem(extensionItem, _("Tous les objets"), 0) :
-                                            ObjList->AppendItem(extensionItem, _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectsTypes[j]).fullname,0) ;
+                                            ObjList->AppendItem(extensionItem, _T("Tous les objets"), 0) :
+                                            ObjList->AppendItem(extensionItem, _T("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectsTypes[j]).fullname,0) ;
 
             //Add each object expression
             std::map<string, StrExpressionInfos > allObjExpr = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
@@ -224,8 +224,8 @@ lastErrorPos(std::string::npos)
 	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
 	    {
             wxTreeItemId automatismTypeItem =   automatismsTypes[j] == "" ?
-                                            ObjList->AppendItem(extensionItem, _("Tous les objets"), 0) :
-                                            ObjList->AppendItem(extensionItem, _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismsTypes[j]).fullname,0) ;
+                                            ObjList->AppendItem(extensionItem, _T("Tous les objets"), 0) :
+                                            ObjList->AppendItem(extensionItem, _T("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismsTypes[j]).fullname,0) ;
 
             //Add each automatism expression
             std::map<string, StrExpressionInfos > allAutoExpr = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
@@ -389,7 +389,7 @@ void EditTextDialog::OnOkBtClick(wxCommandEvent& event)
     GDExpression expressionTest(returnedText);
     if ( !expressionTest.PrepareForTextEvaluationOnly(game, scene) )
     {
-        if ( wxMessageBox(_("L'expression est mal formulée. Êtes vous sûr de vouloir valider cette expression ?"), _("L'expression contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(_T("L'expression est mal formulée. Êtes vous sûr de vouloir valider cette expression ?"), _T("L'expression contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 
@@ -403,7 +403,7 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
 {
     if ( parameterInfo.type == "expression" )
     {
-        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
+        AdvancedTextEntryDlg dialog(this, string(_T("Paramètre").mb_str()), parameterInfo.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -418,7 +418,7 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
     }
     else if ( parameterInfo.type == "text" )
     {
-        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
+        AdvancedTextEntryDlg dialog(this, string(_T("Paramètre").mb_str()), parameterInfo.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -465,7 +465,7 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
         else if ( IDglobalObject != -1)
             object = game.globalObjects[IDglobalObject];
         else
-            return string(wxGetTextFromUser(parameterInfo.description, _("Variable"), "", this).mb_str());
+            return string(wxGetTextFromUser(parameterInfo.description, _T("Variable"), "", this).mb_str());
 
         ChooseVariableDialog dialog(this, object->variablesObjet);
         if ( dialog.ShowModal() == 1 )
@@ -478,12 +478,12 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
     }
     else if ( parameterInfo.type == "camera" )
     {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Numéro de la caméra"), "0", this));
+        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _T("Numéro de la caméra"), "0", this));
         return param;
     }
     else if ( parameterInfo.type == "" )
     {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Paramètre"), "", this));
+        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _T("Paramètre"), "", this));
         return param;
     }
 
@@ -516,7 +516,7 @@ void EditTextDialog::TextModified(wxStyledTextEvent& event)
     }
     else
     {
-        errorTxt->SetLabel(_("Pas d'erreurs."));
+        errorTxt->SetLabel(_T("Pas d'erreurs."));
         lastErrorPos = std::string::npos;
     }
     errorTxt->Refresh(); //Need to call manually update.

@@ -174,7 +174,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                     if(parametersEnd == expression.length() || expression[parametersEnd] != ')')
                     {
                         #if defined(GD_IDE_ONLY)
-                        firstErrorStr = _("Parenthèses non fermées");
+                        firstErrorStr = _T("Parenthèses non fermées");
                         firstErrorPos = parametersEnd-1;
                         #endif
                         return false;
@@ -185,9 +185,9 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                     {
                         #if defined(GD_IDE_ONLY)
                         firstErrorPos = functionNameEnd;
-                        firstErrorStr = _("Nombre de paramètre incorrect.");
+                        firstErrorStr = _T("Nombre de paramètre incorrect.");
                         firstErrorStr += " ";
-                        firstErrorStr += _("Attendu ( au maximum ) :");
+                        firstErrorStr += _T("Attendu ( au maximum ) :");
                         firstErrorStr += ToString(instructionInfos.parameters.size());
                         #endif
                         return false;
@@ -197,7 +197,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
-                    firstErrorStr = _("Parenthèses des paramètres manquantes");
+                    firstErrorStr = _T("Parenthèses des paramètres manquantes");
                     #endif
 
                     return false;
@@ -258,7 +258,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
     {
         #if defined(GD_IDE_ONLY)
         firstErrorPos = 0;
-        firstErrorStr = _("L'expression est invalide ou vide. Entrez un texte ( entouré de guillemets ) ou une fonction.");
+        firstErrorStr = _T("L'expression est invalide ou vide. Entrez un texte ( entouré de guillemets ) ou une fonction.");
         #endif
         return false;
     }
@@ -278,7 +278,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorPos = firstQuotePos;
-                firstErrorStr = _("Guillemets non fermés.");
+                firstErrorStr = _T("Guillemets non fermés.");
                 #endif
                 return false;
             }
@@ -363,7 +363,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorPos = parametersEnd-1;
-                firstErrorStr = _("Parenthèses non fermées");
+                firstErrorStr = _T("Parenthèses non fermées");
                 #endif
                 return false;
             }
@@ -384,7 +384,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
-                    firstErrorStr = _("Nombre de paramètres incorrect.");
+                    firstErrorStr = _T("Nombre de paramètres incorrect.");
                     #endif
                     return false;
                 }
@@ -411,7 +411,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
-                    firstErrorStr = _("Nombre de paramètres incorrect.");
+                    firstErrorStr = _T("Nombre de paramètres incorrect.");
                     #endif
                     return false;
                 }
@@ -462,7 +462,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                             {
                                 #if defined(GD_IDE_ONLY)
                                 firstErrorPos = functionNameEnd;
-                                firstErrorStr = _("Nombre de paramètres incorrect.");
+                                firstErrorStr = _T("Nombre de paramètres incorrect.");
                                 #endif
                                 return false;
                             }
@@ -500,7 +500,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorPos = nameStart;
-                firstErrorStr = _("Fonction non reconnue.");
+                firstErrorStr = _T("Fonction non reconnue.");
                 #endif
                 return false;
             }
@@ -525,7 +525,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorPos = nextTokenPos;
-                firstErrorStr = _("+ manquant entre deux chaines.");
+                firstErrorStr = _T("+ manquant entre deux chaines.");
                 #endif
                 return false;
             }
@@ -533,7 +533,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorPos = firstPlusPos;
-                firstErrorStr = _("Symbole manquant entre deux +.");
+                firstErrorStr = _T("Symbole manquant entre deux +.");
                 #endif
                 return false;
             }
@@ -544,7 +544,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
     {
         #if defined(GD_IDE_ONLY)
         firstErrorPos = parsePosition;
-        firstErrorStr = _("Symbole erroné en fin d'expression.");
+        firstErrorStr = _T("Symbole erroné en fin d'expression.");
         #endif
         return false;
     }
@@ -558,7 +558,7 @@ bool GDExpressionParser::AddParameterToList(const Game & game, const Scene & sce
     if ( parameters.size()-1 >= parametersInfos.size() )
     {
         #if defined(GD_IDE_ONLY)
-        firstErrorStr = _("Trop de paramètre lors de l'appel à une fonction");
+        firstErrorStr = _T("Trop de paramètre lors de l'appel à une fonction");
         firstErrorPos = positionInExpression;
 
         return false;

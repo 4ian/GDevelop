@@ -22,6 +22,9 @@
 #include "GDL/FontManager.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/AutomatismsSharedDatas.h"
+
+#include "llvm/ExecutionEngine/GenericValue.h"
+
 #if defined(GD_IDE_ONLY)
 #include "GDL/ProfileEvent.h"
 #include "GDL/BaseProfiler.h"
@@ -189,6 +192,7 @@ void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, in
 ////////////////////////////////////////////////////////////
 int RuntimeScene::RenderAndStep(unsigned int nbStep)
 {
+    BT_PROFILE("RenderAndStep");
     for (unsigned int step = 0;step<nbStep;++step)
     {
         //Gestion pré-évènements
@@ -205,15 +209,8 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         }
         #endif
 
-        //Gestions des évènements
-        ObjectsConcerned objectsConcerned(&objectsInstances, &objectGroups);
-        for (unsigned int i = 0;i<events.size();++i)
-        {
-            ObjectsConcerned objectsConcernedForEvent;
-            objectsConcernedForEvent.InheritsFrom(&objectsConcerned);
-
-            events[i]->Execute(*this, objectsConcernedForEvent);
-        }
+        const std::vector< llvm::GenericValue > args;
+        EE->runFunction(eventsEntryFunction, args);
 
         #if defined(GD_IDE_ONLY)
         if( profiler && profiler->profilingActivated )
@@ -570,6 +567,8 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
     specialAction = scene;
 }
 
+RuntimeScene * tempRSpointer;
+
 ////////////////////////////////////////////////////////////
 /// Ouvre un jeu, et stocke dans les tableaux passés en paramétres.
 ////////////////////////////////////////////////////////////
@@ -666,9 +665,40 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
     //Preprocess events
     MessageLoading( "Preprocessing events", 80 );
-    PreprocessEventList( *game, events );
-    EventsPreprocessor::DeleteUselessEvents(events);
-    EventsPreprocessor::PreprocessEvents(*this, events);
+    std::string error;
+    llvm::sys::DynamicLibrary::LoadLibraryPermanently("libstdc++-6.dll", &error);
+    cout << error;
+    llvm::InitializeNativeTarget();
+    llvm::MemoryBuffer::getFile("mybitcode.txt", eventsBuffer);
+    std::string parseError;
+    Module = ParseBitcodeFile(eventsBuffer.get(), llvmContext, &parseError);
+
+    if (!Module)
+    {
+        cout << "Module creation failed";
+        return -1;
+    }
+
+    std::string Error;
+    EE.reset( llvm::ExecutionEngine::createJIT(Module, &Error));
+    if (!EE)
+    {
+        cout << "unable to make execution engine: " << Error << "\n";
+    }
+
+    eventsEntryFunction = Module->getFunction("main");
+    if (!eventsEntryFunction)
+        cout << "'main' function not found in module.\n";
+
+    {
+        tempRSpointer = this;
+        llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(Module->getOrInsertGlobal("pointerToRuntimeScene", llvm::TypeBuilder<void*, false>::get(Module->getContext())));
+        EE->addGlobalMapping(globalValue, &tempRSpointer);
+    }
+
+        const std::vector< llvm::GenericValue > args;
+        EE->runFunction(eventsEntryFunction, args);
+        EE->runFunction(eventsEntryFunction, args);
 
     //Automatisms datas
     automatismsSharedDatas.clear();
@@ -684,51 +714,4 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     MessageLoading( "Loading finished", 100 );
 
     return true;
-}
-
-/**
- * Call preprocession method of each event
- */
-void RuntimeScene::PreprocessEventList( const Game & game, vector < BaseEventSPtr > & listEvent )
-{
-    #if defined(GD_IDE_ONLY)
-    boost::shared_ptr<ProfileEvent> previousProfileEvent;
-    boost::shared_ptr<btClock> clock = boost::shared_ptr<btClock>(new btClock);
-    #endif
-
-    for ( unsigned int i = 0;i < listEvent.size();++i )
-    {
-        listEvent[i]->Preprocess(game, *this, listEvent, i);
-        if ( listEvent[i]->CanHaveSubEvents() )
-            PreprocessEventList( game, listEvent[i]->GetSubEvents());
-
-        #if defined(GD_IDE_ONLY)
-        if ( profiler && profiler->profilingActivated && listEvent[i]->IsExecutable() )
-        {
-            //Define a new profile event
-            boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
-            profileEvent->SetClock(clock);
-            profileEvent->originalEvent = listEvent[i]->originalEvent;
-            profileEvent->SetPreviousProfileEvent(previousProfileEvent);
-
-            //Add it before the event to profile
-            listEvent.insert(listEvent.begin()+i, profileEvent);
-
-            previousProfileEvent = profileEvent;
-            ++i; //Don't preprocess the newly added profile event
-        }
-        #endif
-    }
-    #if defined(GD_IDE_ONLY)
-    if ( profiler && profiler->profilingActivated )
-    {
-        //Define a new profile event
-        boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
-        profileEvent->SetClock(clock);
-        profileEvent->SetPreviousProfileEvent(previousProfileEvent);
-
-        //Add it before the event to profile
-        listEvent.push_back(profileEvent);
-    }
-    #endif
 }

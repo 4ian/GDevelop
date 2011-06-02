@@ -23,7 +23,6 @@
  */
 void WhileEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
 {
-    BT_PROFILE("WhileEvent");
     while (ExecuteWhileConditions( scene, objectsConcerned))
     {
         ObjectsConcerned objectsConcernedForEvent;
@@ -282,14 +281,14 @@ void WhileEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width
 
     //While text
     dc.SetFont( renderingHelper->GetBoldFont() );
-    dc.DrawText( _T("Tant que :"), x+2, y+1 );
+    dc.DrawText( _("Tant que :"), x+2, y+1 );
 
     //Draw "while conditions"
     whileConditionsHeight = 2;
     whileConditionsHeight += renderingHelper->DrawConditionsList(whileConditions, dc, x+80, y+2, width-80, IsDisabled());
 
     dc.SetFont( renderingHelper->GetBoldFont() );
-    dc.DrawText( _T("Répéter :"), x+2, y+whileConditionsHeight);
+    dc.DrawText( _("Répéter :"), x+2, y+whileConditionsHeight);
 
     renderingHelper->DrawConditionsList(conditions, dc, x, y+whileConditionsHeight+repeatHeight, renderingHelper->GetConditionsColumnWidth(), IsDisabled());
     renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+whileConditionsHeight+repeatHeight, width-renderingHelper->GetConditionsColumnWidth(), IsDisabled());

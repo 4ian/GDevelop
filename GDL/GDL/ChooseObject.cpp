@@ -62,7 +62,7 @@ onlyObjectOfType(onlyObjectOfType_)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
 
-	Create(parent, wxID_ANY, _T("Choisir un objet"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Choisir un objet"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX, _T("wxID_ANY"));
 	wxIcon FrameIcon;
 	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/objeticon.png"))));
 	SetIcon(FrameIcon);
@@ -76,7 +76,7 @@ onlyObjectOfType(onlyObjectOfType_)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/objeticon64.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _T("Choisissez un des objets de la scène. Pour ajouter ou\n modifier des objets, utilisez l\'éditeur des objets."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Choisissez un des objets de la scène. Pour ajouter ou\n modifier des objets, utilisez l\'éditeur des objets."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
 	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);
@@ -86,17 +86,17 @@ onlyObjectOfType(onlyObjectOfType_)
 	FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(413,227), 0, _T("ID_NOTEBOOK1"));
 	ObjetsList = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
-	ObjetsList->SetToolTip(_T("Choisissez un objet dans la liste"));
+	ObjetsList->SetToolTip(_("Choisissez un objet dans la liste"));
 	GroupesList = new wxTreeCtrl(Notebook1, ID_TREECTRL2, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL2"));
-	GroupesList->SetToolTip(_T("Choisissez un objet dans la liste"));
+	GroupesList->SetToolTip(_("Choisissez un objet dans la liste"));
 	globalObjectsList = new wxTreeCtrl(Notebook1, ID_TREECTRL3, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL3"));
-	globalObjectsList->SetToolTip(_T("Choisissez un objet dans la liste"));
+	globalObjectsList->SetToolTip(_("Choisissez un objet dans la liste"));
 	globalObjectGroups = new wxTreeCtrl(Notebook1, ID_TREECTRL4, wxPoint(-71,-11), wxSize(281,190), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL4"));
-	globalObjectGroups->SetToolTip(_T("Choisissez un objet dans la liste"));
-	Notebook1->AddPage(ObjetsList, _T("Objets"), false);
-	Notebook1->AddPage(GroupesList, _T("Groupes d\'objets"), false);
-	Notebook1->AddPage(globalObjectsList, _T("Objets globaux"), false);
-	Notebook1->AddPage(globalObjectGroups, _T("Groupes globaux"), false);
+	globalObjectGroups->SetToolTip(_("Choisissez un objet dans la liste"));
+	Notebook1->AddPage(ObjetsList, _("Objets"), false);
+	Notebook1->AddPage(GroupesList, _("Groupes d\'objets"), false);
+	Notebook1->AddPage(globalObjectsList, _("Objets globaux"), false);
+	Notebook1->AddPage(globalObjectGroups, _("Groupes globaux"), false);
 	FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	searchCtrl->SetFocus();
@@ -104,15 +104,15 @@ onlyObjectOfType(onlyObjectOfType_)
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
-	ChoisirBt = new wxButton(this, ID_BUTTON1, _T("Choisir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	ChoisirBt = new wxButton(this, ID_BUTTON1, _("Choisir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(ChoisirBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	AnnulerBt = new wxButton(this, ID_BUTTON2, _T("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	AnnulerBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer2->Add(AnnulerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	AucunBt = new wxButton(this, ID_BUTTON3, _T("Aucun"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	AucunBt = new wxButton(this, ID_BUTTON3, _("Aucun"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer2->Add(AucunBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
-	editMenuItem = new wxMenuItem((&Menu1), ID_MENUITEM2, _T("Choisir cet objet"), wxEmptyString, wxITEM_NORMAL);
+	editMenuItem = new wxMenuItem((&Menu1), ID_MENUITEM2, _("Choisir cet objet"), wxEmptyString, wxITEM_NORMAL);
 	Menu1.Append(editMenuItem);
 	#ifdef __WXMSW__
 	    Menu1.Remove(editMenuItem);
@@ -121,9 +121,9 @@ onlyObjectOfType(onlyObjectOfType_)
 	    Menu1.Append(editMenuItem);
 	#endif
 	Menu1.AppendSeparator();
-	MenuItem1 = new wxMenuItem((&Menu1), ID_MENUITEM1, _T("Pour ajouter des objets, utilisez l\'éditeur d\'objets"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem1 = new wxMenuItem((&Menu1), ID_MENUITEM1, _("Pour ajouter des objets, utilisez l\'éditeur d\'objets"), wxEmptyString, wxITEM_NORMAL);
 	Menu1.Append(MenuItem1);
-	editGroupMenuItem = new wxMenuItem((&Menu2), ID_MENUITEM3, _T("Choisir ce groupe"), wxEmptyString, wxITEM_NORMAL);
+	editGroupMenuItem = new wxMenuItem((&Menu2), ID_MENUITEM3, _("Choisir ce groupe"), wxEmptyString, wxITEM_NORMAL);
 	Menu2.Append(editGroupMenuItem);
 	#ifdef __WXMSW__
 	    Menu2.Remove(editGroupMenuItem);
@@ -132,7 +132,7 @@ onlyObjectOfType(onlyObjectOfType_)
 	    Menu2.Append(editGroupMenuItem);
 	#endif
 	Menu2.AppendSeparator();
-	MenuItem4 = new wxMenuItem((&Menu2), ID_MENUITEM4, _T("Pour ajouter des groupes, utilisez l\'éditeur de groupes d\'objets"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem4 = new wxMenuItem((&Menu2), ID_MENUITEM4, _("Pour ajouter des groupes, utilisez l\'éditeur de groupes d\'objets"), wxEmptyString, wxITEM_NORMAL);
 	Menu2.Append(MenuItem4);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);

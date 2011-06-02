@@ -156,7 +156,7 @@ ySelectionOffset(0)
     wxFlexGridSizer* FlexGridSizer11;
     wxFlexGridSizer* FlexGridSizer17;
 
-    Create(parent, wxID_ANY, _T("Editer l\'objet"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _("Editer l\'objet"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(356,215));
     wxIcon FrameIcon;
     FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/objeticon.png"))));
@@ -175,9 +175,9 @@ ySelectionOffset(0)
     Panel2 = new wxPanel(Core, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
     Panel2->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
     FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
-    StaticText4 = new wxStaticText(Panel2, ID_STATICTEXT6, _T("Objet :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+    StaticText4 = new wxStaticText(Panel2, ID_STATICTEXT6, _("Objet :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
     FlexGridSizer12->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    NomObjetTxt = new wxStaticText(Panel2, ID_STATICTEXT1, _T("Sans nom"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    NomObjetTxt = new wxStaticText(Panel2, ID_STATICTEXT1, _("Sans nom"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
     wxFont NomObjetTxtFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     NomObjetTxt->SetFont(NomObjetTxtFont);
     FlexGridSizer12->Add(NomObjetTxt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -191,16 +191,16 @@ ySelectionOffset(0)
     FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer4->AddGrowableCol(0);
     FlexGridSizer4->AddGrowableRow(1);
-    animationSizer = new wxStaticBoxSizer(wxHORIZONTAL, Core, _T("Animation"));
+    animationSizer = new wxStaticBoxSizer(wxHORIZONTAL, Core, _("Animation"));
     FlexGridSizer5 = new wxFlexGridSizer(1, 3, 0, 0);
     AnimationsBox = new wxChoice(Core, ID_CHOICE1, wxDefaultPosition, wxSize(139,21), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
-    AnimationsBox->Append(_T("Pas d\'animations"));
+    AnimationsBox->Append(_("Pas d\'animations"));
     FlexGridSizer5->Add(AnimationsBox, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    AddAnimBt = new wxButton(Core, ID_BUTTON1, _T("Ajouter une animation"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
-    AddAnimBt->SetToolTip(_T("Ajoutez des animations à l\'objet avec ce bouton."));
+    AddAnimBt = new wxButton(Core, ID_BUTTON1, _("Ajouter une animation"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    AddAnimBt->SetToolTip(_("Ajoutez des animations à l\'objet avec ce bouton."));
     FlexGridSizer5->Add(AddAnimBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    DelAnimBt = new wxButton(Core, ID_BUTTON2, _T("Supprimer l\'animation"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
-    DelAnimBt->SetToolTip(_T("Supprime l\'animation actuelle."));
+    DelAnimBt = new wxButton(Core, ID_BUTTON2, _("Supprimer l\'animation"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+    DelAnimBt->SetToolTip(_("Supprime l\'animation actuelle."));
     FlexGridSizer5->Add(DelAnimBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     animationSizer->Add(FlexGridSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer4->Add(animationSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -210,40 +210,40 @@ ySelectionOffset(0)
     animAndDirecSizer = new wxFlexGridSizer(0, 2, 0, 0);
     animAndDirecSizer->AddGrowableCol(1);
     animAndDirecSizer->AddGrowableRow(0);
-    directionSizer = new wxStaticBoxSizer(wxHORIZONTAL, Core, _T("Direction"));
+    directionSizer = new wxStaticBoxSizer(wxHORIZONTAL, Core, _("Direction"));
     FlexGridSizer6 = new wxFlexGridSizer(0, 1, 0, 0);
-    NormalCheck = new wxCheckBox(Core, ID_CHECKBOX1, _T("Normal"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+    NormalCheck = new wxCheckBox(Core, ID_CHECKBOX1, _("Normal"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
     NormalCheck->SetValue(false);
-    NormalCheck->SetToolTip(_T("En mode normal, 8 directions sont disponibles.\nVous pouvez changer la direction de l\'objet en cours de jeu grâce aux actions du thème \"Direction\"."));
+    NormalCheck->SetToolTip(_("En mode normal, 8 directions sont disponibles.\nVous pouvez changer la direction de l\'objet en cours de jeu grâce aux actions du thème \"Direction\"."));
     FlexGridSizer6->Add(NormalCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     GridSizer3 = new wxGridSizer(3, 3, 0, 0);
-    Bt5 = new wxToggleButton(Core, ID_TOGGLEBUTTON8, _T("5"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON8"));
+    Bt5 = new wxToggleButton(Core, ID_TOGGLEBUTTON8, _("5"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON8"));
     GridSizer3->Add(Bt5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    Bt6 = new wxToggleButton(Core, ID_TOGGLEBUTTON7, _T("6"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON7"));
+    Bt6 = new wxToggleButton(Core, ID_TOGGLEBUTTON7, _("6"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON7"));
     GridSizer3->Add(Bt6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    Bt7 = new wxToggleButton(Core, ID_TOGGLEBUTTON6, _T("7"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON6"));
+    Bt7 = new wxToggleButton(Core, ID_TOGGLEBUTTON6, _("7"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON6"));
     GridSizer3->Add(Bt7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Bt4 = new wxToggleButton(Core, ID_TOGGLEBUTTON5, _T("4"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON5"));
+    Bt4 = new wxToggleButton(Core, ID_TOGGLEBUTTON5, _("4"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON5"));
     GridSizer3->Add(Bt4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     StaticBitmap1 = new wxStaticBitmap(Core, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/direction.png")).Rescale(wxSize(25,25).GetWidth(),wxSize(25,25).GetHeight())), wxDefaultPosition, wxSize(25,25), wxNO_BORDER, _T("ID_STATICBITMAP2"));
     GridSizer3->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    Bt0 = new wxToggleButton(Core, ID_TOGGLEBUTTON1, _T("0"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON1"));
+    Bt0 = new wxToggleButton(Core, ID_TOGGLEBUTTON1, _("0"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON1"));
     Bt0->SetValue(true);
     GridSizer3->Add(Bt0, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    Bt3 = new wxToggleButton(Core, ID_TOGGLEBUTTON2, _T("3"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON2"));
+    Bt3 = new wxToggleButton(Core, ID_TOGGLEBUTTON2, _("3"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON2"));
     GridSizer3->Add(Bt3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    Bt2 = new wxToggleButton(Core, ID_TOGGLEBUTTON3, _T("2"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON3"));
+    Bt2 = new wxToggleButton(Core, ID_TOGGLEBUTTON3, _("2"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON3"));
     GridSizer3->Add(Bt2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    Bt1 = new wxToggleButton(Core, ID_TOGGLEBUTTON4, _T("1"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON4"));
+    Bt1 = new wxToggleButton(Core, ID_TOGGLEBUTTON4, _("1"), wxDefaultPosition, wxSize(26,23), 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON4"));
     GridSizer3->Add(Bt1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer6->Add(GridSizer3, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
-    RotationCheck = new wxCheckBox(Core, ID_CHECKBOX2, _T("Rotation automatique"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+    RotationCheck = new wxCheckBox(Core, ID_CHECKBOX2, _("Rotation automatique"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
     RotationCheck->SetValue(false);
-    RotationCheck->SetToolTip(_T("En mode Rotation automatique, Game Develop fera tourner l\'objet suivant sa direction, de 0 à 360.\nVous pouvez changer la direction de l\'objet en cours de jeu grâce aux actions du thème \"Direction\"."));
+    RotationCheck->SetToolTip(_("En mode Rotation automatique, Game Develop fera tourner l\'objet suivant sa direction, de 0 à 360.\nVous pouvez changer la direction de l\'objet en cours de jeu grâce aux actions du thème \"Direction\"."));
     FlexGridSizer6->Add(RotationCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     directionSizer->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     animAndDirecSizer->Add(directionSizer, 1, wxALL|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL, 5);
-    imagesSizer = new wxStaticBoxSizer(wxHORIZONTAL, Core, _T("Images"));
+    imagesSizer = new wxStaticBoxSizer(wxHORIZONTAL, Core, _("Images"));
     FlexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer7->AddGrowableCol(0);
     FlexGridSizer7->AddGrowableRow(2);
@@ -263,7 +263,7 @@ ySelectionOffset(0)
     FlexGridSizer17->AddGrowableRow(0);
     imagePanel = new wxPanel(Core, ID_PANEL3, wxDefaultPosition, wxSize(307,160), wxSUNKEN_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
     imagePanel->SetBackgroundColour(wxColour(128,128,128));
-    imagePanel->SetToolTip(_T("Aperçu de l\'image"));
+    imagePanel->SetToolTip(_("Aperçu de l\'image"));
     FlexGridSizer17->Add(imagePanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     scrollHeight = new wxScrollBar(Core, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
     scrollHeight->SetScrollbar(0, 1, 10, 1);
@@ -280,7 +280,7 @@ ySelectionOffset(0)
     FlexGridSizer16->AddGrowableCol(0);
     thumbsPanel = new wxPanel(Panel1, ID_PANEL4, wxDefaultPosition, wxSize(296,54), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL4"));
     thumbsPanel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWFRAME));
-    thumbsPanel->SetToolTip(_T("Liste des images de la direction.\nUtilisez le clic droit ou la barre d\'outils pour modifier les images."));
+    thumbsPanel->SetToolTip(_("Liste des images de la direction.\nUtilisez le clic droit ou la barre d\'outils pour modifier les images."));
     FlexGridSizer16->Add(thumbsPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     thumbsScroll = new wxScrollBar(Panel1, ID_SCROLLBAR2, wxDefaultPosition, wxSize(296,17), wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR2"));
     thumbsScroll->SetScrollbar(0, 1, 10, 1);
@@ -294,23 +294,23 @@ ySelectionOffset(0)
     FlexGridSizer9 = new wxFlexGridSizer(0, 4, 0, 0);
     CheckTempsEntreImg = new wxStaticBitmap(Core, ID_STATICBITMAP1, wxNullBitmap, wxDefaultPosition, wxSize(16,16), 0, _T("ID_STATICBITMAP1"));
     FlexGridSizer9->Add(CheckTempsEntreImg, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText2 = new wxStaticText(Core, ID_STATICTEXT2, _T("Temps entre chaque image :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    StaticText2 = new wxStaticText(Core, ID_STATICTEXT2, _("Temps entre chaque image :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     FlexGridSizer9->Add(StaticText2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    TempsEdit = new wxTextCtrl(Core, ID_TEXTCTRL2, _T("1"), wxDefaultPosition, wxSize(68,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
-    TempsEdit->SetToolTip(_T("Utilisez le point ( . ) pour entrer des valeurs intermédiaires :\n0.35, 1.75..."));
+    TempsEdit = new wxTextCtrl(Core, ID_TEXTCTRL2, _("1"), wxDefaultPosition, wxSize(68,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+    TempsEdit->SetToolTip(_("Utilisez le point ( . ) pour entrer des valeurs intermédiaires :\n0.35, 1.75..."));
     FlexGridSizer9->Add(TempsEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText3 = new wxStaticText(Core, ID_STATICTEXT3, _T("secondes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    StaticText3 = new wxStaticText(Core, ID_STATICTEXT3, _("secondes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     FlexGridSizer9->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8->Add(FlexGridSizer9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
-    StaticText1 = new wxStaticText(Core, ID_STATICTEXT4, _T("Répéter les images :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+    StaticText1 = new wxStaticText(Core, ID_STATICTEXT4, _("Répéter les images :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
     FlexGridSizer11->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    BoucleOuiCheck = new wxRadioButton(Core, ID_RADIOBUTTON3, _T("Oui"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON3"));
-    BoucleOuiCheck->SetToolTip(_T("Après la dernière image, l\'animation reprendra du départ."));
+    BoucleOuiCheck = new wxRadioButton(Core, ID_RADIOBUTTON3, _("Oui"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON3"));
+    BoucleOuiCheck->SetToolTip(_("Après la dernière image, l\'animation reprendra du départ."));
     FlexGridSizer11->Add(BoucleOuiCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    BoucleNonCheck = new wxRadioButton(Core, ID_RADIOBUTTON4, _T("Non"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON4"));
+    BoucleNonCheck = new wxRadioButton(Core, ID_RADIOBUTTON4, _("Non"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON4"));
     BoucleNonCheck->SetValue(true);
-    BoucleNonCheck->SetToolTip(_T("Une fois l\'animation arrivée à la dernière image, elle s\'arrêtera à celle ci."));
+    BoucleNonCheck->SetToolTip(_("Une fois l\'animation arrivée à la dernière image, elle s\'arrêtera à celle ci."));
     FlexGridSizer11->Add(BoucleNonCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8->Add(FlexGridSizer11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer7->Add(FlexGridSizer8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -323,12 +323,12 @@ ySelectionOffset(0)
     BoxSizer2->Add(StaticLine2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer14 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer14->AddGrowableCol(0);
-    ListImageBt = new wxButton(Core, ID_BUTTON3, _T("Afficher la banque d\'images"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
-    ListImageBt->SetToolTip(_T("Consulter et/ou éditer la banque d\'image."));
+    ListImageBt = new wxButton(Core, ID_BUTTON3, _("Afficher la banque d\'images"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+    ListImageBt->SetToolTip(_("Consulter et/ou éditer la banque d\'image."));
     FlexGridSizer14->Add(ListImageBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    OkBt = new wxButton(Core, ID_BUTTON5, _T("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
+    OkBt = new wxButton(Core, ID_BUTTON5, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
     FlexGridSizer14->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    AideBt = new wxButton(Core, ID_BUTTON4, _T("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+    AideBt = new wxButton(Core, ID_BUTTON4, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
     FlexGridSizer14->Add(AideBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer2->Add(FlexGridSizer14, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer2->Add(BoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -338,80 +338,80 @@ ySelectionOffset(0)
     FlexGridSizer1->Add(Core, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer1);
     MenuItem6 = new wxMenu();
-    MenuItem11 = new wxMenuItem(MenuItem6, idMenuAddFromEnd, _T("...à la fin"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem11 = new wxMenuItem(MenuItem6, idMenuAddFromEnd, _("...à la fin"), wxEmptyString, wxITEM_NORMAL);
     MenuItem11->SetBitmap(wxBitmap(wxImage(_T("res/2rightarrow.png"))));
     MenuItem6->Append(MenuItem11);
-    MenuItem12 = new wxMenuItem(MenuItem6, idMenuAddFromAfter, _T("...après celle-ci"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem12 = new wxMenuItem(MenuItem6, idMenuAddFromAfter, _("...après celle-ci"), wxEmptyString, wxITEM_NORMAL);
     MenuItem12->SetBitmap(wxBitmap(wxImage(_T("res/1rightarrow.png"))));
     MenuItem6->Append(MenuItem12);
-    MenuItem13 = new wxMenuItem(MenuItem6, idMenuAddFromBefore, _T("...avant celle-ci"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem13 = new wxMenuItem(MenuItem6, idMenuAddFromBefore, _("...avant celle-ci"), wxEmptyString, wxITEM_NORMAL);
     MenuItem13->SetBitmap(wxBitmap(wxImage(_T("res/1leftarrow.png"))));
     MenuItem6->Append(MenuItem13);
-    contextMenu.Append(ID_MENUITEM1, _T("Ajouter l\'image selectionnée dans la banque d\'image"), MenuItem6, wxEmptyString);
+    contextMenu.Append(ID_MENUITEM1, _("Ajouter l\'image selectionnée dans la banque d\'image"), MenuItem6, wxEmptyString);
     MenuItem5 = new wxMenu();
-    MenuItem8 = new wxMenuItem(MenuItem5, idMenuAddMoreEnd, _T("...à la fin"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem8 = new wxMenuItem(MenuItem5, idMenuAddMoreEnd, _("...à la fin"), wxEmptyString, wxITEM_NORMAL);
     MenuItem8->SetBitmap(wxBitmap(wxImage(_T("res/2rightarrow.png"))));
     MenuItem5->Append(MenuItem8);
-    MenuItem9 = new wxMenuItem(MenuItem5, idMenuAddMoreAfter, _T("...après celle-ci"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem9 = new wxMenuItem(MenuItem5, idMenuAddMoreAfter, _("...après celle-ci"), wxEmptyString, wxITEM_NORMAL);
     MenuItem9->SetBitmap(wxBitmap(wxImage(_T("res/1rightarrow.png"))));
     MenuItem5->Append(MenuItem9);
-    MenuItem10 = new wxMenuItem(MenuItem5, idMenuAddMoreBefore, _T("...avant celle-ci"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem10 = new wxMenuItem(MenuItem5, idMenuAddMoreBefore, _("...avant celle-ci"), wxEmptyString, wxITEM_NORMAL);
     MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/1leftarrow.png"))));
     MenuItem5->Append(MenuItem10);
-    contextMenu.Append(idMenuAddMulti, _T("Ajouter plusieurs images"), MenuItem5, wxEmptyString);
+    contextMenu.Append(idMenuAddMulti, _("Ajouter plusieurs images"), MenuItem5, wxEmptyString);
     contextMenu.AppendSeparator();
-    MenuItem7 = new wxMenuItem((&contextMenu), idMenuDel, _T("Supprimer l\'image"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem7 = new wxMenuItem((&contextMenu), idMenuDel, _("Supprimer l\'image"), wxEmptyString, wxITEM_NORMAL);
     MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
     contextMenu.Append(MenuItem7);
-    MenuItem14 = new wxMenuItem((&contextMenu), idMenuDelAll, _T("Supprimer toutes les images"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem14 = new wxMenuItem((&contextMenu), idMenuDelAll, _("Supprimer toutes les images"), wxEmptyString, wxITEM_NORMAL);
     contextMenu.Append(MenuItem14);
     contextMenu.AppendSeparator();
-    MenuItem15 = new wxMenuItem((&contextMenu), idMenuCopyFrom, _T("Copier toutes les images depuis..."), wxEmptyString, wxITEM_NORMAL);
+    MenuItem15 = new wxMenuItem((&contextMenu), idMenuCopyFrom, _("Copier toutes les images depuis..."), wxEmptyString, wxITEM_NORMAL);
     MenuItem15->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
     contextMenu.Append(MenuItem15);
-    MenuItem1 = new wxMenuItem((&imageContextMenu), idPosPoint, _T("Editer les points"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem1 = new wxMenuItem((&imageContextMenu), idPosPoint, _("Editer les points"), wxEmptyString, wxITEM_NORMAL);
     MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/pointmod.png"))));
     imageContextMenu.Append(MenuItem1);
-    MenuItem2 = new wxMenuItem((&imageContextMenu), ID_MENUITEM3, _T("Editer le masque de collision"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem2 = new wxMenuItem((&imageContextMenu), ID_MENUITEM3, _("Editer le masque de collision"), wxEmptyString, wxITEM_NORMAL);
     MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/maskEdit16.png"))));
     imageContextMenu.Append(MenuItem2);
-    MenuItem3 = new wxMenuItem((&maskContextMenu), ID_MENUITEM5, _T("Arrêter l\'édition du masque"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem3 = new wxMenuItem((&maskContextMenu), ID_MENUITEM5, _("Arrêter l\'édition du masque"), wxEmptyString, wxITEM_NORMAL);
     maskContextMenu.Append(MenuItem3);
     maskContextMenu.AppendSeparator();
-    MenuItem4 = new wxMenuItem((&maskContextMenu), ID_MENUITEM8, _T("Ajouter un rectangle de collision"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem4 = new wxMenuItem((&maskContextMenu), ID_MENUITEM8, _("Ajouter un rectangle de collision"), wxEmptyString, wxITEM_NORMAL);
     MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/maskAdd16.png"))));
     maskContextMenu.Append(MenuItem4);
     MenuItem22 = new wxMenu();
-    MenuItem23 = new wxMenuItem(MenuItem22, ID_MENUITEM9, _T("Supprimer"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem23 = new wxMenuItem(MenuItem22, ID_MENUITEM9, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
     MenuItem23->SetBitmap(wxBitmap(wxImage(_T("res/maskRemove16.png"))));
     MenuItem22->Append(MenuItem23);
-    MenuItem20 = new wxMenuItem(MenuItem22, ID_MENUITEM6, _T("Modifier"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem20 = new wxMenuItem(MenuItem22, ID_MENUITEM6, _("Modifier"), wxEmptyString, wxITEM_NORMAL);
     MenuItem22->Append(MenuItem20);
-    MenuItem25 = new wxMenuItem(MenuItem22, idMenuPosEverywhere2, _T("Positionner précisement"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem25 = new wxMenuItem(MenuItem22, idMenuPosEverywhere2, _("Positionner précisement"), wxEmptyString, wxITEM_NORMAL);
     MenuItem22->Append(MenuItem25);
-    maskContextMenu.Append(ID_MENUITEM4, _T("Rectangle sélectionné"), MenuItem22, wxEmptyString);
+    maskContextMenu.Append(ID_MENUITEM4, _("Rectangle sélectionné"), MenuItem22, wxEmptyString);
     MenuItem16 = new wxMenu();
-    applyMaskToAllDirectionSprites = new wxMenuItem(MenuItem16, ID_MENUITEM13, _T("Appliquer à toutes les images de la direction"), wxEmptyString, wxITEM_CHECK);
+    applyMaskToAllDirectionSprites = new wxMenuItem(MenuItem16, ID_MENUITEM13, _("Appliquer à toutes les images de la direction"), wxEmptyString, wxITEM_CHECK);
     MenuItem16->Append(applyMaskToAllDirectionSprites);
-    maskContextMenu.Append(ID_MENUITEM12, _T("Options"), MenuItem16, wxEmptyString);
+    maskContextMenu.Append(ID_MENUITEM12, _("Options"), MenuItem16, wxEmptyString);
     maskContextMenu.AppendSeparator();
-    MenuItem24 = new wxMenuItem((&maskContextMenu), ID_MENUITEM10, _T("Retourner au masque par défaut"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem24 = new wxMenuItem((&maskContextMenu), ID_MENUITEM10, _("Retourner au masque par défaut"), wxEmptyString, wxITEM_NORMAL);
     maskContextMenu.Append(MenuItem24);
-    MenuItem26 = new wxMenuItem((&pointsContextMenu), ID_MENUITEM11, _T("Arrêter de positionner les points"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem26 = new wxMenuItem((&pointsContextMenu), ID_MENUITEM11, _("Arrêter de positionner les points"), wxEmptyString, wxITEM_NORMAL);
     pointsContextMenu.Append(MenuItem26);
     pointsContextMenu.AppendSeparator();
-    MenuItem27 = new wxMenuItem((&pointsContextMenu), ID_MENUITEM2, _T("Choisir le point"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem27 = new wxMenuItem((&pointsContextMenu), ID_MENUITEM2, _("Choisir le point"), wxEmptyString, wxITEM_NORMAL);
     pointsContextMenu.Append(MenuItem27);
-    MenuItem28 = new wxMenuItem((&pointsContextMenu), ID_MENUITEM7, _T("Positionner précisement"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem28 = new wxMenuItem((&pointsContextMenu), ID_MENUITEM7, _("Positionner précisement"), wxEmptyString, wxITEM_NORMAL);
     pointsContextMenu.Append(MenuItem28);
     MenuItem29 = new wxMenu();
-    posEverywhereMenuItem = new wxMenuItem(MenuItem29, idMenuPosEverywhere, _T("Positionner en même temps sur les autres images"), wxEmptyString, wxITEM_CHECK);
+    posEverywhereMenuItem = new wxMenuItem(MenuItem29, idMenuPosEverywhere, _("Positionner en même temps sur les autres images"), wxEmptyString, wxITEM_CHECK);
     MenuItem29->Append(posEverywhereMenuItem);
-    pointsContextMenu.Append(ID_MENUITEM14, _T("Options"), MenuItem29, wxEmptyString);
+    pointsContextMenu.Append(ID_MENUITEM14, _("Options"), MenuItem29, wxEmptyString);
     pointsContextMenu.AppendSeparator();
-    MenuItem31 = new wxMenuItem((&pointsContextMenu), idAddPoint, _T("Ajouter un point"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem31 = new wxMenuItem((&pointsContextMenu), idAddPoint, _("Ajouter un point"), wxEmptyString, wxITEM_NORMAL);
     pointsContextMenu.Append(MenuItem31);
-    MenuItem32 = new wxMenuItem((&pointsContextMenu), idDelPoint, _T("Supprimer un point"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem32 = new wxMenuItem((&pointsContextMenu), idDelPoint, _("Supprimer un point"), wxEmptyString, wxITEM_NORMAL);
     pointsContextMenu.Append(MenuItem32);
     FlexGridSizer1->SetSizeHints(this);
     Center();
@@ -479,17 +479,17 @@ ySelectionOffset(0)
 
     toolbar->ClearTools();
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( idMenuAddFromEnd, wxT( "Ajouter l'image à la fin" ), wxBitmap( wxImage( "res/addfromimagebanque.png" ) ), _T( "Ajouter une image à la fin depuis la banque d'image" ) );
-    toolbar->AddTool( idMenuDel, wxT( "Supprimer l'image selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _T( "Supprimer l'image selectionnée" ) );
-    toolbar->AddTool( idMenuCopyFrom, wxT( "Copier les images depuis une animation/direction" ), wxBitmap( wxImage( "res/copyicon.png" ) ), _T( "Copier les images depuis une animation/direction" ) );
+    toolbar->AddTool( idMenuAddFromEnd, wxT( "Ajouter l'image à la fin" ), wxBitmap( wxImage( "res/addfromimagebanque.png" ) ), _( "Ajouter une image à la fin depuis la banque d'image" ) );
+    toolbar->AddTool( idMenuDel, wxT( "Supprimer l'image selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _( "Supprimer l'image selectionnée" ) );
+    toolbar->AddTool( idMenuCopyFrom, wxT( "Copier les images depuis une animation/direction" ), wxBitmap( wxImage( "res/copyicon.png" ) ), _( "Copier les images depuis une animation/direction" ) );
     toolbar->AddSeparator();
-    toolbar->AddTool( idPosPoint, wxT( "Positionner un point" ), wxBitmap( wxImage( "res/pointmod.png" ) ), _T( "Positionner un point" ) );
-    toolbar->AddTool( idAddPoint, wxT( "Ajouter un point" ), wxBitmap( wxImage( "res/pointadd.png" ) ), _T( "Ajouter un point" ) );
-    toolbar->AddTool( idDelPoint, wxT( "Supprimer un point" ), wxBitmap( wxImage( "res/pointdel.png" ) ), _T( "Supprimer un point" ) );
+    toolbar->AddTool( idPosPoint, wxT( "Positionner un point" ), wxBitmap( wxImage( "res/pointmod.png" ) ), _( "Positionner un point" ) );
+    toolbar->AddTool( idAddPoint, wxT( "Ajouter un point" ), wxBitmap( wxImage( "res/pointadd.png" ) ), _( "Ajouter un point" ) );
+    toolbar->AddTool( idDelPoint, wxT( "Supprimer un point" ), wxBitmap( wxImage( "res/pointdel.png" ) ), _( "Supprimer un point" ) );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_MENUITEM3, wxT( "Editer le masque de collision" ), wxBitmap( wxImage( "res/maskEdit16.png" ) ), _T( "Editer le masque de collision" ) );
-    toolbar->AddTool( ID_MENUITEM8, wxT( "Ajouter un rectangle au masque" ), wxBitmap( wxImage( "res/maskAdd16.png" ) ), _T( "Ajouter un rectangle au masque" ) );
-    toolbar->AddTool( ID_MENUITEM9, wxT( "Supprimer le rectangle selectionné du masque" ), wxBitmap( wxImage( "res/maskRemove16.png" ) ), _T( "Supprimer le rectangle selectionné du masque" ) );
+    toolbar->AddTool( ID_MENUITEM3, wxT( "Editer le masque de collision" ), wxBitmap( wxImage( "res/maskEdit16.png" ) ), _( "Editer le masque de collision" ) );
+    toolbar->AddTool( ID_MENUITEM8, wxT( "Ajouter un rectangle au masque" ), wxBitmap( wxImage( "res/maskAdd16.png" ) ), _( "Ajouter un rectangle au masque" ) );
+    toolbar->AddTool( ID_MENUITEM9, wxT( "Supprimer le rectangle selectionné du masque" ), wxBitmap( wxImage( "res/maskRemove16.png" ) ), _( "Supprimer le rectangle selectionné du masque" ) );
     toolbar->Realize();
 
     toolbar->EnableTool(idAddPoint, false);
@@ -511,7 +511,7 @@ ySelectionOffset(0)
     editorImagesPnl->Refresh();
 
     m_mgr.AddPane( Core, wxAuiPaneInfo().Name( wxT( "Core" ) ).Center().CaptionVisible(false) );
-    m_mgr.AddPane( editorImagesPnl, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _T( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).MinSize(150, 100).Show(true) );
+    m_mgr.AddPane( editorImagesPnl, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).MinSize(150, 100).Show(true) );
 
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );
@@ -1020,7 +1020,7 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
     if ( directionToDisplay.HasNoSprites() )
     {
         dc.SetFont(*wxNORMAL_FONT);
-        dc.DrawLabel(_T("Pas d'images. \nUtilisez le clic droit ou la barre d'outils pour ajouter des images."), wxRect(thumbsPanel->GetSize()),  wxALIGN_LEFT | wxALIGN_CENTER);
+        dc.DrawLabel(_("Pas d'images. \nUtilisez le clic droit ou la barre d'outils pour ajouter des images."), wxRect(thumbsPanel->GetSize()),  wxALIGN_LEFT | wxALIGN_CENTER);
     }
 
     //Rafraichissement de la scrollbar
@@ -1232,13 +1232,13 @@ void EditorObjet::OnAddFromEndSelected(wxCommandEvent& event)
 
     if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
     {
-        wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
     if ( !editorImagesPnl->m_itemSelected.IsOk() || editorImagesPnl->m_itemSelected == editorImagesPnl->BanqueImageList->GetRootItem())
     {
-        wxLogMessage(_T("Choisissez une image dans la banque d'image."));
+        wxLogMessage(_("Choisissez une image dans la banque d'image."));
         return;
     }
 
@@ -1256,13 +1256,13 @@ void EditorObjet::OnAddFromAfterSelected(wxCommandEvent& event)
 
     if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
     {
-        wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
     if ( !editorImagesPnl->m_itemSelected.IsOk() || editorImagesPnl->m_itemSelected == editorImagesPnl->BanqueImageList->GetRootItem())
     {
-        wxLogMessage(_T("Choisissez une image dans la banque d'image."));
+        wxLogMessage(_("Choisissez une image dans la banque d'image."));
         return;
     }
 
@@ -1290,13 +1290,13 @@ void EditorObjet::OnAddFromBeforeSelected(wxCommandEvent& event)
 
     if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
     {
-        wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
     if ( !editorImagesPnl->m_itemSelected.IsOk() || editorImagesPnl->m_itemSelected == editorImagesPnl->BanqueImageList->GetRootItem())
     {
-        wxLogMessage(_T("Choisissez une image dans la banque d'image."));
+        wxLogMessage(_("Choisissez une image dans la banque d'image."));
         return;
     }
 
@@ -1430,12 +1430,12 @@ void EditorObjet::OnModPointSelected(wxCommandEvent& event)
     for (unsigned int i =0;i<sprite.GetAllNonDefaultPoints().size();++i)
         points.Add(sprite.GetAllNonDefaultPoints().at(i).GetName());
 
-    string name = static_cast<string>(wxGetSingleChoice(_T("Choisissez le point à éditer.\nVous pourrez ensuite le placer en faisant un clic gauche sur l'image."), _T("Choisir le point à positionner"), points));
+    string name = static_cast<string>(wxGetSingleChoice(_("Choisissez le point à éditer.\nVous pourrez ensuite le placer en faisant un clic gauche sur l'image."), _("Choisir le point à positionner"), points));
     if ( name == "" ) return;
     if ( name == "Centre" )
     {
-        if (wxMessageBox(_T("Le point centre peut être positionné automatiquement par Game Develop au centre (comportement par défaut).\nVoulez vous modifier ce point ?\nCliquez sur oui pour le modifier, cliquez sur non pour que Game Develop le place automatiquement."),
-                       _T("Position du point \"Centre\""), wxYES_NO ) == wxNO)
+        if (wxMessageBox(_("Le point centre peut être positionné automatiquement par Game Develop au centre (comportement par défaut).\nVoulez vous modifier ce point ?\nCliquez sur oui pour le modifier, cliquez sur non pour que Game Develop le place automatiquement."),
+                       _("Position du point \"Centre\""), wxYES_NO ) == wxNO)
         {
             sprite.SetCentreAutomatic(true);
 
@@ -1476,12 +1476,12 @@ void EditorObjet::OnModPointPrecisSelected(wxCommandEvent& event)
     for (unsigned int i =0;i<sprite.GetAllNonDefaultPoints().size();++i)
         points.Add(sprite.GetAllNonDefaultPoints().at(i).GetName());
 
-    string name = static_cast<string>(wxGetSingleChoice(_T("Choisissez le point à éditer.\nVous pourrez ensuite le placer en faisant un clic gauche sur l'image."), _T("Choisir le point à positionner"), points));
+    string name = static_cast<string>(wxGetSingleChoice(_("Choisissez le point à éditer.\nVous pourrez ensuite le placer en faisant un clic gauche sur l'image."), _("Choisir le point à positionner"), points));
     if ( name == "" ) return;
     if ( name == "Centre" )
     {
-        if (wxMessageBox(_T("Le point centre peut être positionné automatiquement par Game Develop au centre (comportement par défaut).\nVoulez vous modifier ce point ?\nCliquez sur oui pour le modifier, cliquez sur non pour que Game Develop le place automatiquement."),
-                       _T("Position du point \"Centre\""), wxYES_NO ) == wxNO)
+        if (wxMessageBox(_("Le point centre peut être positionné automatiquement par Game Develop au centre (comportement par défaut).\nVoulez vous modifier ce point ?\nCliquez sur oui pour le modifier, cliquez sur non pour que Game Develop le place automatiquement."),
+                       _("Position du point \"Centre\""), wxYES_NO ) == wxNO)
         {
             sprite.SetCentreAutomatic(true);
 
@@ -1495,8 +1495,8 @@ void EditorObjet::OnModPointPrecisSelected(wxCommandEvent& event)
 
     selectedPoint = name;
 
-    string x_str = static_cast<string>(wxGetTextFromUser(_T("Entrez la position X du point par rapport à l'image"), "Position X du point",ToString(sprite.GetPoint(name).GetX())));
-    string y_str = static_cast<string>(wxGetTextFromUser(_T("Entrez la position Y du point par rapport à l'image"), "Position Y du point",ToString(sprite.GetPoint(name).GetY())));
+    string x_str = static_cast<string>(wxGetTextFromUser(_("Entrez la position X du point par rapport à l'image"), "Position X du point",ToString(sprite.GetPoint(name).GetX())));
+    string y_str = static_cast<string>(wxGetTextFromUser(_("Entrez la position Y du point par rapport à l'image"), "Position Y du point",ToString(sprite.GetPoint(name).GetY())));
 
     MovePoint(sprite, name, ToInt(x_str), ToInt(y_str));
 
@@ -1535,17 +1535,17 @@ void EditorObjet::OnAddPointSelected(wxCommandEvent& event)
 
     Sprite & sprite = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
 
-    string name = static_cast<string>(wxGetTextFromUser(_T("Entrez le nom du nouveau point"), _T("Création d'un point")));
+    string name = static_cast<string>(wxGetTextFromUser(_("Entrez le nom du nouveau point"), _("Création d'un point")));
     if ( name == "" ) return;
     if ( sprite.HasPoint(name) )
     {
-        wxLogMessage(_T("Un point ayant ce nom existe déjà !"));
+        wxLogMessage(_("Un point ayant ce nom existe déjà !"));
         return;
     }
 
     sprite.AddPoint(name);
-    if (wxMessageBox(_T("Voulez vous ajouter ce point à toutes les images de la direction ?"),
-                   _T("Ajouter ce point à toutes les images"), wxYES_NO ) == wxYES)
+    if (wxMessageBox(_("Voulez vous ajouter ce point à toutes les images de la direction ?"),
+                   _("Ajouter ce point à toutes les images"), wxYES_NO ) == wxYES)
     {
         for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
         {
@@ -1570,17 +1570,17 @@ void EditorObjet::OnDelPointSelected(wxCommandEvent& event)
 
     if ( points.IsEmpty() )
     {
-        wxLogMessage(_T("Aucun point à éditer. Ajoutez un point avant de pouvoir le positionner."));
+        wxLogMessage(_("Aucun point à éditer. Ajoutez un point avant de pouvoir le positionner."));
         return;
     }
 
-    string name = static_cast<string>(wxGetSingleChoice(_T("Choisissez le point à éditer."), _T("Choisir le point à positionner"), points));
+    string name = static_cast<string>(wxGetSingleChoice(_("Choisissez le point à éditer."), _("Choisir le point à positionner"), points));
     if ( name == "" ) return;
 
     sprite.DelPoint(name);
 
-    if (wxMessageBox(_T("Voulez vous supprimer ce point de toutes les images de la direction ?"),
-                   _T("Supprimer ce point de toutes les images"), wxYES_NO ) == wxYES)
+    if (wxMessageBox(_("Voulez vous supprimer ce point de toutes les images de la direction ?"),
+                   _("Supprimer ce point de toutes les images"), wxYES_NO ) == wxYES)
     {
         for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
         {
@@ -1682,9 +1682,9 @@ void EditorObjet::OnAddMaskRectangleSelected(wxCommandEvent& event)
         std::vector<RotatedRectangle> boxes = GetEditedSprite().GetCollisionMask();
 
         RotatedRectangle newRectangle;
-        newRectangle.halfSize.x = ToFloat(string(wxGetTextFromUser(_T("Entrez la largeur du rectangle"), _T("Nouveau rectangle"), "32").mb_str()))/2.0f;
-        newRectangle.halfSize.y = ToFloat(string(wxGetTextFromUser(_T("Entrez la hauteur du rectangle"), _T("Nouveau rectangle"), "32").mb_str()))/2.0f;
-        newRectangle.angle = 0;//ToFloat(string(wxGetTextFromUser(_T("Angle du rectangle, en degrés."), _T("Nouveau rectangle"), "0").mb_str()))/180.0f*3.14159f;
+        newRectangle.halfSize.x = ToFloat(string(wxGetTextFromUser(_("Entrez la largeur du rectangle"), _("Nouveau rectangle"), "32").mb_str()))/2.0f;
+        newRectangle.halfSize.y = ToFloat(string(wxGetTextFromUser(_("Entrez la hauteur du rectangle"), _("Nouveau rectangle"), "32").mb_str()))/2.0f;
+        newRectangle.angle = 0;//ToFloat(string(wxGetTextFromUser(_("Angle du rectangle, en degrés."), _("Nouveau rectangle"), "0").mb_str()))/180.0f*3.14159f;
         boxes.push_back(newRectangle);
 
         GetEditedSprite().SetCollisionMaskAutomatic(false);
@@ -1734,9 +1734,9 @@ void EditorObjet::OnModifyMaskRectangleSelected(wxCommandEvent& event)
         std::vector<RotatedRectangle> boxes = GetEditedSprite().GetCollisionMask();
         if ( selectedBox < boxes.size())
         {
-            boxes[selectedBox].halfSize.x = ToFloat(string(wxGetTextFromUser(_T("Entrez la largeur du rectangle"), _T("Edition d'un rectangle"), ToString(boxes[selectedBox].halfSize.x*2.0f)).mb_str()))/2.0f;
-            boxes[selectedBox].halfSize.y = ToFloat(string(wxGetTextFromUser(_T("Entrez la hauteur du rectangle"), _T("Edition d'un rectangle"), ToString(boxes[selectedBox].halfSize.y*2.0f)).mb_str()))/2.0f;
-            //boxes[selectedBox].angle = ToFloat(string(wxGetTextFromUser(_T("Angle du rectangle, en degrés."), _T("Edition d'un rectangle"), ToString(boxes[selectedBox].angle/3.14159f*180.0f)).mb_str()))/180.0f*3.14159f;
+            boxes[selectedBox].halfSize.x = ToFloat(string(wxGetTextFromUser(_("Entrez la largeur du rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].halfSize.x*2.0f)).mb_str()))/2.0f;
+            boxes[selectedBox].halfSize.y = ToFloat(string(wxGetTextFromUser(_("Entrez la hauteur du rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].halfSize.y*2.0f)).mb_str()))/2.0f;
+            //boxes[selectedBox].angle = ToFloat(string(wxGetTextFromUser(_("Angle du rectangle, en degrés."), _("Edition d'un rectangle"), ToString(boxes[selectedBox].angle/3.14159f*180.0f)).mb_str()))/180.0f*3.14159f;
         }
         GetEditedSprite().SetCollisionMaskAutomatic(false);
         GetEditedSprite().SetCustomCollisionMask(boxes);
@@ -1763,8 +1763,8 @@ void EditorObjet::OnEnterMaskRectanglePositionSelected(wxCommandEvent& event)
         std::vector<RotatedRectangle> boxes = GetEditedSprite().GetCollisionMask();
         if ( selectedBox < boxes.size())
         {
-            boxes[selectedBox].center.x = ToFloat(string(wxGetTextFromUser(_T("Entrez la position X rectangle"), _T("Edition d'un rectangle"), ToString(boxes[selectedBox].center.x)).mb_str()));
-            boxes[selectedBox].center.y = ToFloat(string(wxGetTextFromUser(_T("Entrez la position Y rectangle"), _T("Edition d'un rectangle"), ToString(boxes[selectedBox].center.y)).mb_str()));
+            boxes[selectedBox].center.x = ToFloat(string(wxGetTextFromUser(_("Entrez la position X rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].center.x)).mb_str()));
+            boxes[selectedBox].center.y = ToFloat(string(wxGetTextFromUser(_("Entrez la position Y rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].center.y)).mb_str()));
         }
         GetEditedSprite().SetCollisionMaskAutomatic(false);
         GetEditedSprite().SetCustomCollisionMask(boxes);

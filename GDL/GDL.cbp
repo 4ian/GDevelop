@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="Game Develop Library" />
+		<Option title="Game Develop C++ Implementation" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Option virtualFolders="Math parser\LIB fparser\;Math parser\;AES\;md5\;" />
@@ -111,6 +111,7 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
+					<Add directory="..\ExtLibs\SFML\build-mingw-debug\lib" />
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
@@ -139,6 +140,8 @@
 					<Add option="-DWXUSINGDLL" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\include" />
+					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -185,6 +188,8 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
+					<Add directory="..\ExtLibs\SFML\build-mingw-debug\lib" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -204,6 +209,8 @@
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
+					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -223,6 +230,8 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
+					<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
@@ -248,7 +257,8 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
-					<Add directory="C:\Python26\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
+					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -295,6 +305,8 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
+					<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Development">
@@ -400,6 +412,7 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
+					<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
@@ -426,6 +439,8 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
+					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -467,11 +482,14 @@
 					<Add option="-ladvapi32" />
 					<Add option="-lcomdlg32" />
 					<Add option="-loleaut32" />
+					<Add option="-lclangFrontend  -lclangSerialization  -lclangDriver  -lclangCodeGen  -lclangSema  -lclangStaticAnalyzerFrontend  -lclangStaticAnalyzerCheckers  -lclangStaticAnalyzerCore  -lclangIndex  -lclangAnalysis  -lclangRewrite  -lclangAST  -lclangParse  -lclangLex  -lclangBasic  -lLLVMJIT  -lLLVMInterpreter  -lLLVMX86CodeGen  -lLLVMAsmParser  -lLLVMBitReader  -lLLVMBitWriter  -lLLVMipo  -lLLVMExecutionEngine  -lLLVMAsmPrinter  -lLLVMSelectionDAG  -lLLVMX86AsmPrinter  -lLLVMX86Info  -lLLVMMCParser  -lLLVMCodeGen  -lLLVMX86Utils  -lLLVMScalarOpts  -lLLVMInstCombine  -lLLVMTransformUtils  -lLLVMipa  -lLLVMAnalysis  -lLLVMTarget  -lLLVMCore  -lLLVMMC  -lLLVMSupport -limagehlp -lpsapi  -lLLVMInstrumentation  -lclangFrontend  -lclangSerialization  -lclangDriver  -lclangParse  -lclangSema  -lclangAnalysis  -lclangIndex  -lclangAST  -lclangLex  -lclangBasic  -lLLVMMC  -lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
+					<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
@@ -841,10 +859,6 @@
 			<Add directory="..\ExtLibs\boost" />
 			<Add directory="..\ExtLibs\SFML\include" />
 		</Compiler>
-		<Linker>
-			<Add directory="..\ExtLibs\SFML\build-mingw-debug\lib" />
-			<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
-		</Linker>
 		<Unit filename="GDL\AES.cpp">
 			<Option virtualFolder="AES\" />
 		</Unit>
@@ -865,7 +879,6 @@
 		<Unit filename="GDL\BaseDebugger.h" />
 		<Unit filename="GDL\BaseObjectExtension.cpp" />
 		<Unit filename="GDL\BaseObjectExtension.h" />
-		<Unit filename="GDL\BaseObjectExtension2.cpp" />
 		<Unit filename="GDL\BaseProfiler.cpp" />
 		<Unit filename="GDL\BaseProfiler.h" />
 		<Unit filename="GDL\BitmapGUIManager.cpp" />
@@ -888,7 +901,6 @@
 		<Unit filename="GDL\ChooseVariableDialog.h" />
 		<Unit filename="GDL\CommonConversions.cpp" />
 		<Unit filename="GDL\CommonConversions.h" />
-		<Unit filename="GDL\CommonInstructions.cpp" />
 		<Unit filename="GDL\CommonInstructions.h" />
 		<Unit filename="GDL\CommonTools.cpp" />
 		<Unit filename="GDL\CommonTools.h" />
@@ -957,12 +969,6 @@
 		<Unit filename="GDL\ImageFilesWatcher.h" />
 		<Unit filename="GDL\ImageManager.cpp" />
 		<Unit filename="GDL\ImageManager.h" />
-		<Unit filename="GDL\Implementation.cpp" />
-		<Unit filename="GDL\Implementation.h" />
-		<Unit filename="GDL\ImplementationGame.cpp" />
-		<Unit filename="GDL\ImplementationGame.h" />
-		<Unit filename="GDL\ImplementationScene.cpp" />
-		<Unit filename="GDL\ImplementationScene.h" />
 		<Unit filename="GDL\Instruction.cpp" />
 		<Unit filename="GDL\Instruction.h" />
 		<Unit filename="GDL\InvalidImage.h" />
@@ -1052,14 +1058,10 @@
 		<Unit filename="GDL\TreeItemStrExpressionInfoData.h" />
 		<Unit filename="GDL\Variable.cpp" />
 		<Unit filename="GDL\Variable.h" />
-		<Unit filename="GDL\VariablesExtension.cpp" />
-		<Unit filename="GDL\VariablesExtension.h" />
 		<Unit filename="GDL\Version.h" />
 		<Unit filename="GDL\VersionWrapper.cpp">
 			<Option weight="64" />
 		</Unit>
-		<Unit filename="GDL\WindowExtension.cpp" />
-		<Unit filename="GDL\WindowExtension.h" />
 		<Unit filename="GDL\XmlFilesHelper.cpp" />
 		<Unit filename="GDL\XmlFilesHelper.h" />
 		<Unit filename="GDL\XmlMacros.h" />

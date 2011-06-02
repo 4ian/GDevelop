@@ -36,7 +36,7 @@ AdvancedTextEntryDlg::AdvancedTextEntryDlg(wxWindow* parent, std::string caption
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	descriptionTxt = new wxStaticText(this, ID_STATICTEXT1, _T("Label"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	descriptionTxt = new wxStaticText(this, ID_STATICTEXT1, _("Label"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer1->Add(descriptionTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	textEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer1->Add(textEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -47,9 +47,9 @@ AdvancedTextEntryDlg::AdvancedTextEntryDlg(wxWindow* parent, std::string caption
 	FlexGridSizer2->AddGrowableRow(0);
 	moreBt = new wxButton(this, ID_BUTTON1, wxEmptyString, wxDefaultPosition, wxSize(199,23), 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(moreBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cancelBt = new wxButton(this, ID_BUTTON2, _T("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	cancelBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer2->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	okBt = new wxButton(this, ID_BUTTON3, _T("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	okBt = new wxButton(this, ID_BUTTON3, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	okBt->SetDefault();
 	FlexGridSizer2->Add(okBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -68,9 +68,9 @@ AdvancedTextEntryDlg::AdvancedTextEntryDlg(wxWindow* parent, std::string caption
 	if ( moreButtonType == None )
         moreBt->Show(false);
     else if ( moreButtonType == MathExpression )
-        moreBt->SetLabel(_T("Ouvrir un éditeur d'expression"));
+        moreBt->SetLabel(_("Ouvrir un éditeur d'expression"));
     else if ( moreButtonType == TextExpression )
-        moreBt->SetLabel(_T("Ouvrir un éditeur de texte"));
+        moreBt->SetLabel(_("Ouvrir un éditeur de texte"));
 }
 
 AdvancedTextEntryDlg::~AdvancedTextEntryDlg()

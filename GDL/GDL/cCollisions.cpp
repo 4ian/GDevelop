@@ -22,7 +22,6 @@
  */
 bool CondCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    BT_PROFILE("CondCollision");
     bool isTrue = false;
 
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
@@ -139,7 +138,6 @@ bool CondCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
  */
 bool CondHBCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    BT_PROFILE("CondHBCollision");
     ObjList list = objectsConcerned.PickAndRemove(condition.GetParameter( 0 ).GetAsObjectIdentifier(), condition.IsGlobal());
     ObjList list2 = objectsConcerned.PickAndRemove(condition.GetParameter( 1 ).GetAsObjectIdentifier(), condition.IsGlobal());
     if ( condition.GetParameter( 1 ).GetAsObjectIdentifier() == condition.GetParameter( 0 ).GetAsObjectIdentifier())

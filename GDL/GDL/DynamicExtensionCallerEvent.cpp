@@ -53,7 +53,7 @@ void DynamicExtensionCallerEvent::Preprocess(const Game & game, RuntimeScene & s
     if ( !game.useExternalSourceFiles )
     {
         #if defined(GD_IDE_ONLY)
-        wxLogWarning(_T("L'évènement C++ nommé")+" \""+dynamicExtensionEventName+"\" "+_T("ne sera pas executé car le jeu n'utilise pas de sources C++."));
+        wxLogWarning(_("L'évènement C++ nommé")+" \""+dynamicExtensionEventName+"\" "+_("ne sera pas executé car le jeu n'utilise pas de sources C++."));
         #endif
         std::cout << "C++ event \"" << dynamicExtensionEventName << "\" won't be executed.";
         return;
@@ -64,7 +64,7 @@ void DynamicExtensionCallerEvent::Preprocess(const Game & game, RuntimeScene & s
     else
     {
         #if defined(GD_IDE_ONLY)
-        wxLogStatus(_T("L'évènement C++ nommé")+" \""+dynamicExtensionEventName+"\" "+_T("n'a pas été trouvé.\nAssurez vous de l'avoir declaré dans le fichier de déclaration."));
+        wxLogStatus(_("L'évènement C++ nommé")+" \""+dynamicExtensionEventName+"\" "+_("n'a pas été trouvé.\nAssurez vous de l'avoir declaré dans le fichier de déclaration."));
         #endif
         std::cout << "C++ event \"" << dynamicExtensionEventName << "\" was not found.";
     }
@@ -108,8 +108,8 @@ void DynamicExtensionCallerEvent::Render(wxBufferedPaintDC & dc, int x, int y, u
     dc.SetTextForeground( wxColour( 0, 0, 0 ) );
     dc.SetTextBackground( wxColour( 255, 255, 255 ) );
     dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    dc.DrawText( _T("Appeler ")+dynamicExtensionEventName, x+56, y + 16 );
-    wxRect lien = dc.GetTextExtent(_T("Appeler ")+dynamicExtensionEventName);
+    dc.DrawText( _("Appeler ")+dynamicExtensionEventName, x+56, y + 16 );
+    wxRect lien = dc.GetTextExtent(_("Appeler ")+dynamicExtensionEventName);
 }
 
 /**
@@ -124,7 +124,7 @@ unsigned int DynamicExtensionCallerEvent::GetRenderedHeight(unsigned int width) 
         dc.SelectObject(fakeBmp);
 
         dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-        wxRect lien = dc.GetTextExtent(_T("Appeler "));
+        wxRect lien = dc.GetTextExtent(_("Appeler "));
 
         renderedHeight = lien.GetHeight()+32;
         eventHeightNeedUpdate = false;

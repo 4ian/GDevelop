@@ -24,8 +24,8 @@ bool DynamicExtensionsManager::LoadDynamicExtension(std::string fullpath)
     {
         cout << "Unable to load dynamic extension " << fullpath << "." << endl;
         #if defined(GD_IDE_ONLY)
-        wxString userMsg = string(_T("Impossible de charger le code : Vérifiez que la compilation se soit deroulée avec succès." ));
-        wxMessageBox(userMsg, _T("Impossible de charger le code C++."), wxOK | wxICON_ERROR);
+        wxString userMsg = string(_("Impossible de charger le code : Vérifiez que la compilation se soit deroulée avec succès." ));
+        wxMessageBox(userMsg, _("Impossible de charger le code C++."), wxOK | wxICON_ERROR);
         #endif
     }
     else
@@ -39,8 +39,8 @@ bool DynamicExtensionsManager::LoadDynamicExtension(std::string fullpath)
 
             #if defined(GD_IDE_ONLY)
             CloseLibrary(extensionHdl);
-            wxString userMsg = string(_T("Aucun fichier de déclaration n'a été trouvé pour le code C++ : Insérez en un au projet à l'aide de la fenêtre de création de fichiers sources." ));
-            wxMessageBox(userMsg, _T("Code C++ manquant."), wxOK | wxICON_ERROR);
+            wxString userMsg = string(_("Aucun fichier de déclaration n'a été trouvé pour le code C++ : Insérez en un au projet à l'aide de la fenêtre de création de fichiers sources." ));
+            wxMessageBox(userMsg, _("Code C++ manquant."), wxOK | wxICON_ERROR);
             #endif
         }
         else

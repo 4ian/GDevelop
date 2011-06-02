@@ -23,7 +23,19 @@
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/AutomatismsSharedDatas.h"
 
-#include "llvm/ExecutionEngine/GenericValue.h"
+#include <llvm/ExecutionEngine/GenericValue.h>
+#include <llvm/ExecutionEngine/ExecutionEngine.h>
+#include <llvm/ExecutionEngine/JIT.h>
+#include <llvm/Support/DynamicLibrary.h>
+#include <llvm/Config/config.h>
+#include <llvm/Module.h>
+#include <llvm/Target/TargetRegistry.h>
+#include <llvm/Target/TargetSelect.h>
+#include <llvm/Bitcode/ReaderWriter.h>
+#include <llvm/Support/MemoryBuffer.h>
+#include <llvm/Support/TypeBuilder.h>
+#undef _
+#include <llvm/Support/system_error.h>
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/ProfileEvent.h"
@@ -665,40 +677,61 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
     //Preprocess events
     MessageLoading( "Preprocessing events", 80 );
-    std::string error;
-    llvm::sys::DynamicLibrary::LoadLibraryPermanently("libstdc++-6.dll", &error);
-    cout << error;
+
+    //TODO : Only once
+    {
+        cout << "Loading libstdc++..." << std::endl;
+        std::string error;
+        llvm::sys::DynamicLibrary::LoadLibraryPermanently("libstdc++-6.dll", &error);
+        cout << error;
+    }
+
     llvm::InitializeNativeTarget();
-    llvm::MemoryBuffer::getFile("mybitcode.txt", eventsBuffer);
-    std::string parseError;
-    Module = ParseBitcodeFile(eventsBuffer.get(), llvmContext, &parseError);
+
+    {
+        llvm::error_code err = llvm::MemoryBuffer::getFile("mybitcode.txt", eventsBuffer);
+        if ( err.value() != 0 )
+            std::cout << "Failed to load mybitcode.txt: " << err.message() << std::endl;
+        else
+        {
+            std::string parseError;
+            Module = ParseBitcodeFile(eventsBuffer.get(), llvmContext, &parseError);
+            std::cout << parseError;
+        }
+    }
 
     if (!Module)
     {
         cout << "Module creation failed";
-        return -1;
     }
-
-    std::string Error;
-    EE.reset( llvm::ExecutionEngine::createJIT(Module, &Error));
-    if (!EE)
+    else
     {
-        cout << "unable to make execution engine: " << Error << "\n";
+        std::string error;
+        EE.reset( llvm::ExecutionEngine::createJIT(Module, &error));
+        if (!EE)
+        {
+            cout << "unable to make execution engine: " << error << "\n";
+        }
+        else
+        {
+            eventsEntryFunction = Module->getFunction("main");
+            if (!eventsEntryFunction)
+                cout << "'main' function not found in module.\n";
+
+            cout << "Mapping objects";
+            {
+                tempRSpointer = this;
+                llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(Module->getOrInsertGlobal("pointerToRuntimeScene", llvm::TypeBuilder<void*, false>::get(Module->getContext())));
+                EE->addGlobalMapping(globalValue, &tempRSpointer);
+            }
+
+            cout << "About to run";
+
+            const std::vector< llvm::GenericValue > args;
+            EE->runFunction(eventsEntryFunction, args);
+            EE->runFunction(eventsEntryFunction, args);
+        }
     }
-
-    eventsEntryFunction = Module->getFunction("main");
-    if (!eventsEntryFunction)
-        cout << "'main' function not found in module.\n";
-
-    {
-        tempRSpointer = this;
-        llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(Module->getOrInsertGlobal("pointerToRuntimeScene", llvm::TypeBuilder<void*, false>::get(Module->getContext())));
-        EE->addGlobalMapping(globalValue, &tempRSpointer);
-    }
-
-        const std::vector< llvm::GenericValue > args;
-        EE->runFunction(eventsEntryFunction, args);
-        EE->runFunction(eventsEntryFunction, args);
 
     //Automatisms datas
     automatismsSharedDatas.clear();

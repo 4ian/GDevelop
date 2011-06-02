@@ -9,19 +9,6 @@
 
 #include "GDL/ExtensionsManager.h"
 #include "GDL/BaseObjectExtension.h"
-#include "GDL/AudioExtension.h"
-#include "GDL/MouseExtension.h"
-#include "GDL/KeyboardExtension.h"
-#include "GDL/JoystickExtension.h"
-#include "GDL/TimeExtension.h"
-#include "GDL/FileExtension.h"
-#include "GDL/VariablesExtension.h"
-#include "GDL/CameraExtension.h"
-#include "GDL/WindowExtension.h"
-#include "GDL/NetworkExtension.h"
-#include "GDL/SpriteExtension.h"
-#include "GDL/SceneExtension.h"
-#include "GDL/AdvancedExtension.h"
 #include "GDL/CommonInstructionsExtension.h"
 #include "GDL/CommonConversionsExtension.h"
 #include "GDL/StringInstructionsExtension.h"
@@ -49,22 +36,6 @@ ExtensionsManager::ExtensionsManager()
 {
     //Load all extensions
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new CommonInstructionsExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new CommonConversionsExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new StringInstructionsExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new ExtensionSprite()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new VariablesExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new TimeExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new AudioExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new MouseExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new KeyboardExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new JoystickExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new CameraExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new WindowExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new FileExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new NetworkExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new SceneExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
 
 #if defined(GD_IDE_ONLY)
     badInstructionInfos.fullname = _T("Instruction inconnue");

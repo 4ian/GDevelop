@@ -17,7 +17,7 @@
  * Check the validity of objects type passed to parameters
  */
 void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector < Instruction > & conditions, bool & eventHasToBeDeleted)
-{
+{/*
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     for (unsigned int cId =0;cId < conditions.size();++cId)
@@ -99,7 +99,7 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
         //Preprocess subconditions
         if ( !conditions[cId].GetSubInstructions().empty() )
             PreprocessConditions(scene, conditions[cId].GetSubInstructions(), eventHasToBeDeleted);
-    }
+    }*/
 }
 
 /**
@@ -107,7 +107,7 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
  * Check the validity of objects type passed to parameters
  */
 void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < Instruction > & actions)
-{
+{/*
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     for (unsigned int aId =0;aId < actions.size();++aId)
@@ -186,7 +186,7 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
             PreprocessActions(scene, actions[aId].GetSubInstructions());
 
         //Note that if an action is invalid, the entire event is _not_ invalid
-    }
+    }*/
 }
 
 /**
@@ -194,7 +194,7 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
  * Check the validity of objects type passed to parameters
  */
 void EventsPreprocessor::PreprocessEvents(const RuntimeScene & scene, vector < BaseEventSPtr > & events)
-{
+{/*
     for ( unsigned int eId = 0; eId < events.size();++eId )
     {
         bool eventInvalid = false;
@@ -222,7 +222,7 @@ void EventsPreprocessor::PreprocessEvents(const RuntimeScene & scene, vector < B
             events.erase(events.begin()+eId);
             eId--;
         }
-    }
+    }*/
 }
 
 /**

@@ -109,7 +109,7 @@ lastErrorPos(std::string::npos)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxGridSizer* GridSizer2;
 
-	Create(parent, wxID_ANY, _T("Editer l\'expression"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Editer l\'expression"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	SetClientSize(wxSize(583,314));
 	wxIcon FrameIcon;
 	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/expressionicon.png"))));
@@ -124,141 +124,141 @@ lastErrorPos(std::string::npos)
 	FlexGridSizer2->Add(ExpressionEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer8->AddGrowableCol(0);
-	OkBt = new wxButton(this, ID_BUTTON1, _T("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer8->Add(OkBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer7->AddGrowableCol(0);
 	FlexGridSizer7->AddGrowableRow(0);
-	errorTxt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _T("Pas d\'erreurs."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
-	errorTxt->SetToolTip(_T("Cliquer pour positionner le curseur sur l\'erreur."));
+	errorTxt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Pas d\'erreurs."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	errorTxt->SetToolTip(_("Cliquer pour positionner le curseur sur l\'erreur."));
 	FlexGridSizer7->Add(errorTxt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	helpBt = new wxButton(this, ID_BUTTON34, _T("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON34"));
+	helpBt = new wxButton(this, ID_BUTTON34, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON34"));
 	FlexGridSizer2->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _T("Editer l\'expression"));
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Editer l\'expression"));
 	FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer6->AddGrowableCol(1);
 	FlexGridSizer6->AddGrowableRow(0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _T("Opérations courantes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Opérations courantes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer3->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
-	PlusBt = new wxButton(this, ID_BUTTON2, _T("+"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	PlusBt = new wxButton(this, ID_BUTTON2, _("+"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	BoxSizer1->Add(PlusBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	MinusBt = new wxButton(this, ID_BUTTON3, _T("-"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	MinusBt = new wxButton(this, ID_BUTTON3, _("-"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	BoxSizer1->Add(MinusBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	MultBt = new wxButton(this, ID_BUTTON4, _T("*"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	MultBt = new wxButton(this, ID_BUTTON4, _("*"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	BoxSizer1->Add(MultBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	DivBt = new wxButton(this, ID_BUTTON5, _T("/"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON5"));
+	DivBt = new wxButton(this, ID_BUTTON5, _("/"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON5"));
 	BoxSizer1->Add(DivBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(BoxSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _T("Opérations complexes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Opérations complexes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	GridSizer2 = new wxGridSizer(0, 4, 0, 0);
-	POBt = new wxButton(this, ID_BUTTON6, _T("("), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON6"));
+	POBt = new wxButton(this, ID_BUTTON6, _("("), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON6"));
 	GridSizer2->Add(POBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	PFBt = new wxButton(this, ID_BUTTON7, _T(")"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON7"));
+	PFBt = new wxButton(this, ID_BUTTON7, _(")"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON7"));
 	GridSizer2->Add(PFBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button2 = new wxButton(this, ID_BUTTON13, _T("^"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON13"));
-	Button2->SetToolTip(_T("x^n éleve x à la puissance n"));
+	Button2 = new wxButton(this, ID_BUTTON13, _("^"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON13"));
+	Button2->SetToolTip(_("x^n éleve x à la puissance n"));
 	GridSizer2->Add(Button2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button3 = new wxButton(this, ID_BUTTON14, _T("E10"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON14"));
+	Button3 = new wxButton(this, ID_BUTTON14, _("E10"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON14"));
 	GridSizer2->Add(Button3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BitmapButton2 = new wxBitmapButton(this, ID_BITMAPBUTTON2, wxBitmap(wxImage(_T("res/sqrt.png"))), wxDefaultPosition, wxSize(25,23), wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON2"));
-	BitmapButton2->SetToolTip(_T("sqrt(x) calcule la racine carrée de x."));
+	BitmapButton2->SetToolTip(_("sqrt(x) calcule la racine carrée de x."));
 	GridSizer2->Add(BitmapButton2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BitmapButton1 = new wxBitmapButton(this, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/nth root.png"))), wxDefaultPosition, wxSize(25,23), wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
-	BitmapButton1->SetToolTip(_T("Racine n-ième. nthroot(27, 3) donnera 3"));
+	BitmapButton1->SetToolTip(_("Racine n-ième. nthroot(27, 3) donnera 3"));
 	GridSizer2->Add(BitmapButton1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button4 = new wxButton(this, ID_BUTTON15, _T("exp"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON15"));
-	Button4->SetToolTip(_T("Exponentielle"));
+	Button4 = new wxButton(this, ID_BUTTON15, _("exp"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON15"));
+	Button4->SetToolTip(_("Exponentielle"));
 	GridSizer2->Add(Button4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button1 = new wxButton(this, ID_BUTTON12, _T("log"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON12"));
-	Button1->SetToolTip(_T("Logarithme népérien"));
+	Button1 = new wxButton(this, ID_BUTTON12, _("log"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON12"));
+	Button1->SetToolTip(_("Logarithme népérien"));
 	GridSizer2->Add(Button1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	CosBt = new wxButton(this, ID_BUTTON8, _T("cos"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON8"));
-	CosBt->SetToolTip(_T("Cosinus"));
+	CosBt = new wxButton(this, ID_BUTTON8, _("cos"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON8"));
+	CosBt->SetToolTip(_("Cosinus"));
 	GridSizer2->Add(CosBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	SinBt = new wxButton(this, ID_BUTTON9, _T("sin"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON9"));
-	SinBt->SetToolTip(_T("Sinus"));
+	SinBt = new wxButton(this, ID_BUTTON9, _("sin"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON9"));
+	SinBt->SetToolTip(_("Sinus"));
 	GridSizer2->Add(SinBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button5 = new wxButton(this, ID_BUTTON16, _T("tan"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON16"));
-	Button5->SetToolTip(_T("Tangente"));
+	Button5 = new wxButton(this, ID_BUTTON16, _("tan"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON16"));
+	Button5->SetToolTip(_("Tangente"));
 	GridSizer2->Add(Button5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button21 = new wxButton(this, ID_BUTTON33, _T("log10"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON33"));
+	Button21 = new wxButton(this, ID_BUTTON33, _("log10"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON33"));
 	wxFont Button21Font(6,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button21->SetFont(Button21Font);
-	Button21->SetToolTip(_T("Logarithme en base 10."));
+	Button21->SetToolTip(_("Logarithme en base 10."));
 	GridSizer2->Add(Button21, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button17 = new wxButton(this, ID_BUTTON29, _T("cosh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON29"));
+	Button17 = new wxButton(this, ID_BUTTON29, _("cosh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON29"));
 	wxFont Button17Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button17->SetFont(Button17Font);
-	Button17->SetToolTip(_T("Cosinus hyperbolique"));
+	Button17->SetToolTip(_("Cosinus hyperbolique"));
 	GridSizer2->Add(Button17, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button16 = new wxButton(this, ID_BUTTON28, _T("sinh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON28"));
+	Button16 = new wxButton(this, ID_BUTTON28, _("sinh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON28"));
 	wxFont Button16Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button16->SetFont(Button16Font);
-	Button16->SetToolTip(_T("Sinus hyperbolique"));
+	Button16->SetToolTip(_("Sinus hyperbolique"));
 	GridSizer2->Add(Button16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button15 = new wxButton(this, ID_BUTTON27, _T("tanh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON27"));
+	Button15 = new wxButton(this, ID_BUTTON27, _("tanh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON27"));
 	wxFont Button15Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button15->SetFont(Button15Font);
-	Button15->SetToolTip(_T("Tangente hyperbolique"));
+	Button15->SetToolTip(_("Tangente hyperbolique"));
 	GridSizer2->Add(Button15, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button14 = new wxButton(this, ID_BUTTON26, _T("floor"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON26"));
+	Button14 = new wxButton(this, ID_BUTTON26, _("floor"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON26"));
 	wxFont Button14Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button14->SetFont(Button14Font);
-	Button14->SetToolTip(_T("Arrondi à l\'entier le plus petit."));
+	Button14->SetToolTip(_("Arrondi à l\'entier le plus petit."));
 	GridSizer2->Add(Button14, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button7 = new wxButton(this, ID_BUTTON18, _T("acos"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON18"));
+	Button7 = new wxButton(this, ID_BUTTON18, _("acos"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON18"));
 	wxFont Button7Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button7->SetFont(Button7Font);
 	GridSizer2->Add(Button7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button8 = new wxButton(this, ID_BUTTON19, _T("asin"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON19"));
+	Button8 = new wxButton(this, ID_BUTTON19, _("asin"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON19"));
 	wxFont Button8Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button8->SetFont(Button8Font);
 	GridSizer2->Add(Button8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button9 = new wxButton(this, ID_BUTTON20, _T("atan"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON20"));
+	Button9 = new wxButton(this, ID_BUTTON20, _("atan"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON20"));
 	wxFont Button9Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button9->SetFont(Button9Font);
 	GridSizer2->Add(Button9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	ceilBt = new wxButton(this, ID_BUTTON21, _T("ceil"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON21"));
-	ceilBt->SetToolTip(_T("Arrondi à l\'entier le plus grand."));
+	ceilBt = new wxButton(this, ID_BUTTON21, _("ceil"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON21"));
+	ceilBt->SetToolTip(_("Arrondi à l\'entier le plus grand."));
 	GridSizer2->Add(ceilBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button10 = new wxButton(this, ID_BUTTON22, _T("a\ncosh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON22"));
+	Button10 = new wxButton(this, ID_BUTTON22, _("a\ncosh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON22"));
 	wxFont Button10Font(6,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button10->SetFont(Button10Font);
 	GridSizer2->Add(Button10, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button11 = new wxButton(this, ID_BUTTON23, _T("a\nsinh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON23"));
+	Button11 = new wxButton(this, ID_BUTTON23, _("a\nsinh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON23"));
 	wxFont Button11Font(6,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button11->SetFont(Button11Font);
 	GridSizer2->Add(Button11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button12 = new wxButton(this, ID_BUTTON24, _T("a\ntanh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON24"));
+	Button12 = new wxButton(this, ID_BUTTON24, _("a\ntanh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON24"));
 	wxFont Button12Font(6,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button12->SetFont(Button12Font);
 	GridSizer2->Add(Button12, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	intBt = new wxButton(this, ID_BUTTON25, _T("int"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON25"));
-	intBt->SetToolTip(_T("int(x) convertit x en un entier."));
+	intBt = new wxButton(this, ID_BUTTON25, _("int"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON25"));
+	intBt->SetToolTip(_("int(x) convertit x en un entier."));
 	GridSizer2->Add(intBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button18 = new wxButton(this, ID_BUTTON30, _T("sec"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON30"));
+	Button18 = new wxButton(this, ID_BUTTON30, _("sec"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON30"));
 	wxFont Button18Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button18->SetFont(Button18Font);
-	Button18->SetToolTip(_T("Sécante ( 1/cos(x) )"));
+	Button18->SetToolTip(_("Sécante ( 1/cos(x) )"));
 	GridSizer2->Add(Button18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button19 = new wxButton(this, ID_BUTTON31, _T("csc"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON31"));
+	Button19 = new wxButton(this, ID_BUTTON31, _("csc"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON31"));
 	wxFont Button19Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button19->SetFont(Button19Font);
-	Button19->SetToolTip(_T("Cosécante ( 1/sin(x) )"));
+	Button19->SetToolTip(_("Cosécante ( 1/sin(x) )"));
 	GridSizer2->Add(Button19, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button20 = new wxButton(this, ID_BUTTON32, _T("cot"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON32"));
+	Button20 = new wxButton(this, ID_BUTTON32, _("cot"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON32"));
 	wxFont Button20Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button20->SetFont(Button20Font);
-	Button20->SetToolTip(_T("Cotangente ( 1/tan(x) )"));
+	Button20->SetToolTip(_("Cotangente ( 1/tan(x) )"));
 	GridSizer2->Add(Button20, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button6 = new wxButton(this, ID_BUTTON17, _T("abs"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON17"));
-	Button6->SetToolTip(_T("abs(x) renvoie la valeur absolue de x."));
+	Button6 = new wxButton(this, ID_BUTTON17, _("abs"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON17"));
+	Button6->SetToolTip(_("abs(x) renvoie la valeur absolue de x."));
 	GridSizer2->Add(Button6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(GridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -266,21 +266,21 @@ lastErrorPos(std::string::npos)
 	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer4->AddGrowableRow(1);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _T("Propriétés des objets"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Propriétés des objets"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer4->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ObjList = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer4->Add(ObjList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	AddPropBt = new wxButton(this, ID_BUTTON10, _T("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
+	AddPropBt = new wxButton(this, ID_BUTTON10, _("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
 	FlexGridSizer4->Add(AddPropBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	GridSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer5->AddGrowableCol(0);
 	FlexGridSizer5->AddGrowableRow(1);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _T("Valeurs spéciales"), wxDefaultPosition, wxSize(95,13), wxALIGN_CENTRE, _T("ID_STATICTEXT4"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Valeurs spéciales"), wxDefaultPosition, wxSize(95,13), wxALIGN_CENTRE, _T("ID_STATICTEXT4"));
 	FlexGridSizer5->Add(StaticText4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ValList = new wxTreeCtrl(this, ID_TREECTRL2, wxDefaultPosition, wxSize(178,147), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL2"));
 	FlexGridSizer5->Add(ValList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	AddValBt = new wxButton(this, ID_BUTTON11, _T("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON11"));
+	AddValBt = new wxButton(this, ID_BUTTON11, _("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON11"));
 	FlexGridSizer5->Add(AddValBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	GridSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer6->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -448,7 +448,7 @@ void EditExpression::TextModified(wxStyledTextEvent& event)
     }
     else
     {
-        errorTxt->SetLabel(_T("Pas d'erreurs."));
+        errorTxt->SetLabel(_("Pas d'erreurs."));
         lastErrorPos = std::string::npos;
     }
 
@@ -460,7 +460,7 @@ void EditExpression::OnOkBtClick(wxCommandEvent& event)
     GDExpression expressionTest(expression);
     if ( !expressionTest.PrepareForMathEvaluationOnly(game, scene) )
     {
-        if ( wxMessageBox(_T("L'expression est mal formulée. Êtes vous sûr de vouloir valider cette expression ?"), _T("L'expression contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(_("L'expression est mal formulée. Êtes vous sûr de vouloir valider cette expression ?"), _("L'expression contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 
@@ -470,10 +470,10 @@ void EditExpression::OnOkBtClick(wxCommandEvent& event)
 void EditExpression::RefreshLists()
 {
     ObjList->DeleteAllItems();
-    ObjList->AddRoot( _T( "Toutes les proprietés" ), 0 );
+    ObjList->AddRoot( _( "Toutes les proprietés" ), 0 );
 
     ValList->DeleteAllItems();
-    ValList->AddRoot( _T( "Toutes les valeurs spéciales" ), 0 );
+    ValList->AddRoot( _( "Toutes les valeurs spéciales" ), 0 );
 
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
@@ -495,8 +495,8 @@ void EditExpression::RefreshLists()
 	    for(unsigned int j = 0;j<objectsTypes.size();++j)
 	    {
             wxTreeItemId objectTypeItem =   objectsTypes[j] == "" ?
-                                            ObjList->AppendItem(extensionItem, _T("Tous les objets"), 0) :
-                                            ObjList->AppendItem(extensionItem, _T("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectsTypes[j]).fullname,0) ;
+                                            ObjList->AppendItem(extensionItem, _("Tous les objets"), 0) :
+                                            ObjList->AppendItem(extensionItem, _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectsTypes[j]).fullname,0) ;
 
             //Add each object expression
             std::map<string, ExpressionInfos > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
@@ -530,8 +530,8 @@ void EditExpression::RefreshLists()
 	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
 	    {
             wxTreeItemId automatismTypeItem =   automatismsTypes[j] == "" ?
-                                            ObjList->AppendItem(extensionItem, _T("Tous les objets"), 0) :
-                                            ObjList->AppendItem(extensionItem, _T("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismsTypes[j]).fullname,0) ;
+                                            ObjList->AppendItem(extensionItem, _("Tous les objets"), 0) :
+                                            ObjList->AppendItem(extensionItem, _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismsTypes[j]).fullname,0) ;
 
             //Add each automatism expression
             std::map<string, ExpressionInfos > allAutoExpr = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
@@ -644,7 +644,7 @@ string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo, 
 {
     if ( parameterInfo.type == "expression" )
     {
-        AdvancedTextEntryDlg dialog(this, string(_T("Paramètre").mb_str()), parameterInfo.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
+        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -652,7 +652,7 @@ string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo, 
     }
     else if ( parameterInfo.type == "text" )
     {
-        AdvancedTextEntryDlg dialog(this, string(_T("Paramètre").mb_str()), parameterInfo.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
+        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -688,12 +688,12 @@ string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo, 
     }
     else if ( parameterInfo.type == "camera" )
     {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _T("Numéro de la caméra"), "0", this));
+        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Numéro de la caméra"), "0", this));
         return param;
     }
     else
     {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _T("Paramètre"), "", this));
+        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Paramètre"), "", this));
         return param;
     }
 

@@ -73,39 +73,39 @@ string TranslateAction::LabelFromType(string type)
     if ( type == "" )
         return "";
     else if ( type == "expression" )
-        return static_cast<string>(_T("Expression"));
+        return static_cast<string>(_("Expression"));
     else if ( type == "object" )
-        return static_cast<string>(_T("Choisir l'objet"));
+        return static_cast<string>(_("Choisir l'objet"));
     else if ( type == "automatism" )
-        return static_cast<string>(_T("Choisir l'automatisme"));
+        return static_cast<string>(_("Choisir l'automatisme"));
     else if ( type == "signe" )
-        return static_cast<string>(_T("Choisir le signe"));
+        return static_cast<string>(_("Choisir le signe"));
     else if ( type == "file" )
-        return static_cast<string>(_T("Choisir le fichier"));
+        return static_cast<string>(_("Choisir le fichier"));
     else if ( type == "yesorno" )
-        return static_cast<string>(_T("Oui ou non"));
+        return static_cast<string>(_("Oui ou non"));
     else if ( type == "police" )
-        return static_cast<string>(_T("Choisir la police"));
+        return static_cast<string>(_("Choisir la police"));
     else if ( type == "color" )
-        return static_cast<string>(_T("Choisir la couleur"));
+        return static_cast<string>(_("Choisir la couleur"));
     else if ( type == "text" )
-        return static_cast<string>(_T("Editer le texte"));
+        return static_cast<string>(_("Editer le texte"));
     else if ( type == "musicfile" )
-        return static_cast<string>(_T("Choisir la musique"));
+        return static_cast<string>(_("Choisir la musique"));
     else if ( type == "soundfile" )
-        return static_cast<string>(_T("Choisir le son"));
+        return static_cast<string>(_("Choisir le son"));
     else if ( type == "password" )
-        return static_cast<string>(_T("Créer un mot de passe"));
+        return static_cast<string>(_("Créer un mot de passe"));
     else if ( type == "layer" )
-        return static_cast<string>(_T("Choisir le calque"));
+        return static_cast<string>(_("Choisir le calque"));
     else if ( type == "joyaxis" )
-        return static_cast<string>(_T("Choisir l'axe"));
+        return static_cast<string>(_("Choisir l'axe"));
     else if ( type == "objectvar" )
-        return static_cast<string>(_T("Choisir la variable de l'objet"));
+        return static_cast<string>(_("Choisir la variable de l'objet"));
     else if ( type == "scenevar" )
-        return static_cast<string>(_T("Choisir la variable de la scène"));
+        return static_cast<string>(_("Choisir la variable de la scène"));
     else if ( type == "globalvar" )
-        return static_cast<string>(_T("Choisir la variable globale"));
+        return static_cast<string>(_("Choisir la variable globale"));
 
     wxLogWarning("Game Develop n'a pas pu trouver le nom d'un bouton suivant le type du paramètre");
     return "undefined";

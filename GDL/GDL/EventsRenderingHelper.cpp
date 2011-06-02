@@ -93,7 +93,7 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
     if ( conditions.empty() )
     {
         dc.SetFont( GetItalicFont() );
-        dc.DrawText( _T("Pas de conditions"), x + 2, y + 1 );
+        dc.DrawText( _("Pas de conditions"), x + 2, y + 1 );
 
         return 18;
     }
@@ -158,7 +158,7 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
         else if ( instructionInfos.canHaveSubInstructions )
         {
             dc.SetFont( GetItalicFont() );
-            dc.DrawText( _T("Pas de sous conditions"), x + sideSeparation + leftIconsWidth + iconWidth + 18, yCondition );
+            dc.DrawText( _("Pas de sous conditions"), x + sideSeparation + leftIconsWidth + iconWidth + 18, yCondition );
             yCondition += 18;
         }
     }
@@ -177,7 +177,7 @@ int EventsRenderingHelper::DrawActionsList(const vector < Instruction > & action
     if ( actions.empty() )
     {
         dc.SetFont( GetItalicFont() );
-        dc.DrawText( _T("Pas d'actions"), x+ 2, y + 1 );
+        dc.DrawText( _("Pas d'actions"), x+ 2, y + 1 );
         return 18;
     }
 

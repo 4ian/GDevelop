@@ -220,16 +220,16 @@ void Object::RemoveAutomatism(unsigned int type)
 #if defined(GD_IDE_ONLY)
 void Object::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _T("Position");      value = ToString(GetX())+";"+ToString(GetY());}
-    else if ( propertyNb == 1 ) {name = _T("Angle");         value = ToString(GetAngle())+"°";}
-    else if ( propertyNb == 2 ) {name = _T("Taille");        value = ToString(GetWidth())+";"+ToString(GetHeight());}
-    else if ( propertyNb == 3 ) {name = _T("Visibilité");    value = hidden ? _T("Masqué") : _T("Affiché");}
-    else if ( propertyNb == 4 ) {name = _T("Calque");        value = layer;}
-    else if ( propertyNb == 5 ) {name = _T("Plan");          value = ToString(zOrder);}
-    else if ( propertyNb == 6 ) {name = _T("Vitesse");       value = ToString(TotalForceLength());}
-    else if ( propertyNb == 7 ) {name = _T("Angle de déplacement"); value = ToString(TotalForceAngle());}
-    else if ( propertyNb == 8 ) {name = _T("Déplacement en X");     value = ToString(TotalForceX());}
-    else if ( propertyNb == 9 ) {name = _T("Déplacement en Y"); value = ToString(TotalForceY());}
+    if      ( propertyNb == 0 ) {name = _("Position");      value = ToString(GetX())+";"+ToString(GetY());}
+    else if ( propertyNb == 1 ) {name = _("Angle");         value = ToString(GetAngle())+"°";}
+    else if ( propertyNb == 2 ) {name = _("Taille");        value = ToString(GetWidth())+";"+ToString(GetHeight());}
+    else if ( propertyNb == 3 ) {name = _("Visibilité");    value = hidden ? _("Masqué") : _("Affiché");}
+    else if ( propertyNb == 4 ) {name = _("Calque");        value = layer;}
+    else if ( propertyNb == 5 ) {name = _("Plan");          value = ToString(zOrder);}
+    else if ( propertyNb == 6 ) {name = _("Vitesse");       value = ToString(TotalForceLength());}
+    else if ( propertyNb == 7 ) {name = _("Angle de déplacement"); value = ToString(TotalForceAngle());}
+    else if ( propertyNb == 8 ) {name = _("Déplacement en X");     value = ToString(TotalForceX());}
+    else if ( propertyNb == 9 ) {name = _("Déplacement en Y"); value = ToString(TotalForceY());}
 }
 
 bool Object::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -251,7 +251,7 @@ bool Object::ChangeProperty(unsigned int propertyNb, string newValue)
     else if ( propertyNb == 2 ) {return false;}
     else if ( propertyNb == 3 )
     {
-        if ( newValue == _T("Masqué") )
+        if ( newValue == _("Masqué") )
         {
             SetHidden();
         }

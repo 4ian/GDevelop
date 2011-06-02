@@ -23,7 +23,6 @@ ObjInstancesHolder ObjInstancesHolder::CopyAndCloneAllObjects() const
 
 void ObjInstancesHolder::Merge(ObjInstancesHolder & second)
 {
-    //BT_PROFILE("ObjInstancesHolder::Merge");
     //Get the objects of the two holders
     ObjList thisList = GetAllObjects();
     ObjList secondList = second.GetAllObjects();
@@ -35,6 +34,7 @@ void ObjInstancesHolder::Merge(ObjInstancesHolder & second)
             AddObject(*it);
     }
 }
+
 std::vector<Object*> ObjInstancesHolder::GetAllObjectsRawPointers()
 {
     std::vector<Object*> objList;

@@ -33,7 +33,7 @@ std::string ReplaceTildesBySpaces(std::string text)
 
 bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks)
 {
-
+/*
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     string expression = expressionPlainString;
 
@@ -233,13 +233,14 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
 
     if ( parsePosition < expression.length() )
         callbacks.OnConstantToken(expression.substr(parsePosition, expression.length()));
-
+*/
     return true;
 }
 
 
 bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks)
 {
+/*
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     string expression = expressionPlainString;
 
@@ -548,7 +549,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
         #endif
         return false;
     }
-
+*/
     return true;
 }
 

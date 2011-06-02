@@ -149,14 +149,14 @@ void LinkEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width)
     dc.SetTextForeground( wxColour( 0, 0, 0 ) );
     dc.SetTextBackground( wxColour( 255, 255, 255 ) );
     dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    dc.DrawText( _T("Lien vers ")+sceneLinked, x+56, y + 16 );
-    wxRect lien = dc.GetTextExtent(_T("Lien vers ")+sceneLinked);
+    dc.DrawText( _("Lien vers ")+sceneLinked, x+56, y + 16 );
+    wxRect lien = dc.GetTextExtent(_("Lien vers ")+sceneLinked);
 
     dc.SetFont( wxFont( 10, wxDEFAULT, wxNORMAL, wxNORMAL ) );
     if ( start == -1 && end == -1 )
-        dc.DrawText( _T("Inclure tous les évènements"), x+lien.GetWidth()+56+10, y + 18 );
+        dc.DrawText( _("Inclure tous les évènements"), x+lien.GetWidth()+56+10, y + 18 );
     else
-        dc.DrawText( _T("Inclure les évènements ")+ToString(start)+_T(" à ")+ToString(end), x+lien.GetWidth()+56+10, y + 18 );
+        dc.DrawText( _("Inclure les évènements ")+ToString(start)+_(" à ")+ToString(end), x+lien.GetWidth()+56+10, y + 18 );
 }
 
 /**
@@ -171,7 +171,7 @@ unsigned int LinkEvent::GetRenderedHeight(unsigned int width) const
         dc.SelectObject(fakeBmp);
 
         dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-        wxRect lien = dc.GetTextExtent(_T("Lien vers "));
+        wxRect lien = dc.GetTextExtent(_("Lien vers "));
 
         renderedHeight = lien.GetHeight()+32;
         eventHeightNeedUpdate = false;

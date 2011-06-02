@@ -6,14 +6,14 @@
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
-#elif !defined(_T)
-#define _T(x) x
+#elif !defined(_)
+#define _(x) x
 #endif
 
 using namespace GDpriv;
 
 Game::Game() :
-name(_T("Projet")),
+name(_("Projet")),
 windowWidth(800),
 windowHeight(600),
 maxFPS(60),

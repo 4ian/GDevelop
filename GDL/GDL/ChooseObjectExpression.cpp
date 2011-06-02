@@ -50,7 +50,7 @@ mainObjectsName(mainObjectsName_)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
 
-	Create(parent, wxID_ANY, _T("sd"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("sd"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	wxIcon FrameIcon;
 	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/objeticon.png"))));
 	SetIcon(FrameIcon);
@@ -62,38 +62,38 @@ mainObjectsName(mainObjectsName_)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/objeticon64.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _T("Vous souhaitez accéder à une propriété\nd\'un objet. Choisissez l\'objet auquel accéder."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Vous souhaitez accéder à une propriété\nd\'un objet. Choisissez l\'objet auquel accéder."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
 	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);
 	FlexGridSizer17->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer17->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Obj1Check = new wxRadioButton(this, ID_RADIOBUTTON1, _T("L\'objet principal ("), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
+	Obj1Check = new wxRadioButton(this, ID_RADIOBUTTON1, _("L\'objet principal ("), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
 	Obj1Check->SetValue(true);
 	FlexGridSizer17->Add(Obj1Check, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	Obj2Check = new wxRadioButton(this, ID_RADIOBUTTON2, _T("L\'objet secondaire ("), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
+	Obj2Check = new wxRadioButton(this, ID_RADIOBUTTON2, _("L\'objet secondaire ("), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
 	FlexGridSizer17->Add(Obj2Check, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	AutreCheck = new wxRadioButton(this, ID_RADIOBUTTON3, _T("Un autre objet de la scène :"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON3"));
+	AutreCheck = new wxRadioButton(this, ID_RADIOBUTTON3, _("Un autre objet de la scène :"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON3"));
 	FlexGridSizer17->Add(AutreCheck, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(263,216), 0, _T("ID_NOTEBOOK1"));
 	ObjetsList = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxPoint(-71,-11), wxSize(179,170), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
-	ObjetsList->SetToolTip(_T("Choisissez un objet dans la liste"));
+	ObjetsList->SetToolTip(_("Choisissez un objet dans la liste"));
 	GroupesList = new wxTreeCtrl(Notebook1, ID_TREECTRL2, wxPoint(-71,-11), wxSize(179,170), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL2"));
-	GroupesList->SetToolTip(_T("Choisissez un objet dans la liste"));
+	GroupesList->SetToolTip(_("Choisissez un objet dans la liste"));
 	globalObjectsList = new wxTreeCtrl(Notebook1, ID_TREECTRL3, wxPoint(-71,-11), wxSize(179,170), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL3"));
-	globalObjectsList->SetToolTip(_T("Choisissez un objet dans la liste"));
-	Notebook1->AddPage(ObjetsList, _T("Objets"), false);
-	Notebook1->AddPage(GroupesList, _T("Groupes d\'objets"), false);
-	Notebook1->AddPage(globalObjectsList, _T("Objets globaux"), false);
+	globalObjectsList->SetToolTip(_("Choisissez un objet dans la liste"));
+	Notebook1->AddPage(ObjetsList, _("Objets"), false);
+	Notebook1->AddPage(GroupesList, _("Groupes d\'objets"), false);
+	Notebook1->AddPage(globalObjectsList, _("Objets globaux"), false);
 	FlexGridSizer17->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer17->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
-	ChoisirBt = new wxButton(this, ID_BUTTON1, _T("Choisir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	ChoisirBt = new wxButton(this, ID_BUTTON1, _("Choisir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(ChoisirBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	AnnulerBt = new wxButton(this, ID_BUTTON2, _T("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	AnnulerBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer2->Add(AnnulerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer17->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -114,8 +114,8 @@ mainObjectsName(mainObjectsName_)
 	string nomObjet1 = !mainObjectsName.empty() ? mainObjectsName[0] : "";
 	string nomObjet2 = mainObjectsName.size() > 1 ? mainObjectsName[1] : "";
 
-	Obj1Check->SetLabel(_T("L'objet principal (") + nomObjet1 + _T(")"));
-	Obj2Check->SetLabel(_T("L'objet secondaire (") + nomObjet2 + _T(")"));
+	Obj1Check->SetLabel(_("L'objet principal (") + nomObjet1 + _(")"));
+	Obj2Check->SetLabel(_("L'objet secondaire (") + nomObjet2 + _(")"));
     if ( mainObjectsName.size() < 2 )
         Obj2Check->Enable(false);
     if ( mainObjectsName.empty() )
@@ -146,7 +146,7 @@ ChooseObjectExpression::~ChooseObjectExpression()
 void ChooseObjectExpression::Refresh()
 {
     ObjetsList->DeleteAllItems();
-    ObjetsList->AddRoot( _T( "Tous les objets de la scène" ) );
+    ObjetsList->AddRoot( _( "Tous les objets de la scène" ) );
 
     for ( unsigned int i = 0;i < scene.initialObjects.size();i++ )
         ObjetsList->AppendItem( ObjetsList->GetRootItem(), scene.initialObjects[i]->GetName());
@@ -155,7 +155,7 @@ void ChooseObjectExpression::Refresh()
 
 
     GroupesList->DeleteAllItems();
-    GroupesList->AddRoot( _T( "Tous les groupes de la scène" ) );
+    GroupesList->AddRoot( _( "Tous les groupes de la scène" ) );
 
     for ( unsigned int i = 0;i < scene.objectGroups.size();i++ )
         GroupesList->AppendItem( GroupesList->GetRootItem(), scene.objectGroups.at( i ).GetName() );
@@ -163,7 +163,7 @@ void ChooseObjectExpression::Refresh()
     GroupesList->ExpandAll();
 
     globalObjectsList->DeleteAllItems();
-    globalObjectsList->AddRoot( _T( "Tous les groupes de la scène" ) );
+    globalObjectsList->AddRoot( _( "Tous les groupes de la scène" ) );
 
     for ( unsigned int i = 0;i < game.globalObjects.size();i++ )
         globalObjectsList->AppendItem( globalObjectsList->GetRootItem(), game.globalObjects[i]->GetName() );
@@ -184,12 +184,12 @@ void ChooseObjectExpression::OnChoisirBtClick(wxCommandEvent& event)
 
     if ( AutreCheck->GetValue() )
     {
-        if ( Notebook1->GetSelection() == 0 && ObjetsList->GetItemText( item ) != _T( "Tous les objets de la scène" ) )
+        if ( Notebook1->GetSelection() == 0 && ObjetsList->GetItemText( item ) != _( "Tous les objets de la scène" ) )
         {
             objet = static_cast<string>(ObjetsList->GetItemText( item ));
             EndModal(1);
         }
-        else if ( GroupesList->IsEnabled() && Notebook1->GetSelection() == 1 && GroupesList->GetItemText( itemGroups ) != _T( "Tous les groupes de la scène" ) )
+        else if ( GroupesList->IsEnabled() && Notebook1->GetSelection() == 1 && GroupesList->GetItemText( itemGroups ) != _( "Tous les groupes de la scène" ) )
         {
             objet = static_cast<string>(GroupesList->GetItemText( itemGroups ));
             EndModal(1);

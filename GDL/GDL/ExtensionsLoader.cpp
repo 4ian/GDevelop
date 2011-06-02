@@ -62,21 +62,6 @@ void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
 {
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
-    //Built-in extensions
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new ExtensionSprite()) );
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new AudioExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new MouseExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new KeyboardExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new JoystickExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new TimeExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new FileExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new VariablesExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new CameraExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new WindowExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new NetworkExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new SceneExtension()));
-    extensionsManager->AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
-
     string suffix = "";
 
     #if defined(WINDOWS)

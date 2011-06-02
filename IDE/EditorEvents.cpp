@@ -900,15 +900,21 @@ void EditorEvents::OnMenuItem7Selected( wxCommandEvent& event )
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Comment");
-    eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
 
-    //Adding event
-    if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
-        GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
+    if ( eventToAdd != boost::shared_ptr<BaseEvent>() )
+    {
+        eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
+
+        //Adding event
+        if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
+            GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
+        else
+            GetLastSelectedListOfEvents()->push_back( eventToAdd );
+
+        ChangesMadeOnEvents();
+    }
     else
-        GetLastSelectedListOfEvents()->push_back( eventToAdd );
-
-    ChangesMadeOnEvents();
+        wxLogError(_("Impossible de créer un évènement commentaire standard."));
 }
 
 
@@ -923,15 +929,20 @@ void EditorEvents::OnInsertEventSelected( wxCommandEvent& event )
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Standard");
-    eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
+    if ( eventToAdd != boost::shared_ptr<BaseEvent>() )
+    {
+        eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
 
-    //Adding event
-    if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
-        GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
+        //Adding event
+        if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
+            GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
+        else
+            GetLastSelectedListOfEvents()->push_back( eventToAdd );
+
+        ChangesMadeOnEvents();
+    }
     else
-        GetLastSelectedListOfEvents()->push_back( eventToAdd );
-
-    ChangesMadeOnEvents();
+        wxLogError(_("Impossible de créer un évènement standard"));
 }
 
 
@@ -950,10 +961,14 @@ void EditorEvents::OnSubEventMenuItemSelected(wxCommandEvent& event)
     //Creating the event
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Standard");
+    if ( eventToAdd != boost::shared_ptr<BaseEvent>() )
+    {
+        GetLastSelectedEvent()->GetSubEvents().push_back(eventToAdd);
 
-    GetLastSelectedEvent()->GetSubEvents().push_back(eventToAdd);
-
-    ChangesMadeOnEvents();
+        ChangesMadeOnEvents();
+    }
+    else
+        wxLogError(_("Impossible de créer un évènement standard"));
 }
 
 
@@ -969,15 +984,20 @@ void EditorEvents::OnAddLienSelected( wxCommandEvent& event )
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     BaseEventSPtr eventToAdd = extensionsManager->CreateEvent("BuiltinCommonInstructions::Link");
 
-    eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
+    if ( eventToAdd != boost::shared_ptr<BaseEvent>() )
+    {
+        eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
 
-    //Adding event
-    if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
-        GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
+        //Adding event
+        if ( boost::tuples::get<1>(eventsSelected[0]) < GetLastSelectedListOfEvents()->size() )
+            GetLastSelectedListOfEvents()->insert( GetLastSelectedListOfEvents()->begin() + boost::tuples::get<1>(eventsSelected[0]), eventToAdd );
+        else
+            GetLastSelectedListOfEvents()->push_back( eventToAdd );
+
+        ChangesMadeOnEvents();
+    }
     else
-        GetLastSelectedListOfEvents()->push_back( eventToAdd );
-
-    ChangesMadeOnEvents();
+        wxLogError(_("Impossible de créer un évènement lien standard"));
 }
 
 

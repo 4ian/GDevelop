@@ -202,7 +202,7 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     FPSmax = new wxSpinCtrl(Panel2, ID_SPINCTRL1, _T("60"), wxDefaultPosition, wxSize(58,21), 0, 0, 1000, 60, _T("ID_SPINCTRL1"));
     FPSmax->SetValue(_T("60"));
     FlexGridSizer19->Add(FPSmax, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    SyncCheck = new wxCheckBox(Panel2, ID_CHECKBOX6, _("Sychronisation verticale"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
+    SyncCheck = new wxCheckBox(Panel2, ID_CHECKBOX6, _("Synchronisation verticale"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
     SyncCheck->SetValue(false);
     FlexGridSizer19->Add(SyncCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer19, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);

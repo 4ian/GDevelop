@@ -152,6 +152,8 @@ void Game_Develop_EditorFrame::OnMenuSaveSelected( wxCommandEvent& event )
         else
             wxLogStatus(_("Enregistrement du fichier terminé."));
 
+        m_recentlist.SetLastUsed( GetCurrentGame()->gameFile );
+
         return;
     }
 }
@@ -188,6 +190,7 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
                 OpenSaveGame saveGame( *games[i] );
 
                 if ( !saveGame.SaveToFile(games[i]->gameFile) ) {wxLogError( "L'enregistrement a échoué." );}
+                m_recentlist.SetLastUsed( games[i]->gameFile );
 
                 if ( games[i] == GetCurrentGame() )
                 {
@@ -237,6 +240,8 @@ void Game_Develop_EditorFrame::SaveAs()
         {
             wxLogError( "L'enregistrement a échoué" );
         }
+
+        m_recentlist.SetLastUsed( GetCurrentGame()->gameFile );
 
         wxString GD = "Game Develop";
         wxString Fichier = GetCurrentGame()->gameFile;

@@ -3,12 +3,12 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
-
 #include "StandardEvent.h"
 #include "ObjectsConcerned.h"
 #include "GDL/tinyxml.h"
 #include "GDL/OpenSaveGame.h"
+#include "GDL/CommonTools.h"
+#include "GDL/EventsPreprocessor.h"
 
 #if defined(GD_IDE_ONLY)
 #include "EventsRenderingHelper.h"
@@ -19,69 +19,24 @@ BaseEvent()
 {
 }
 
-/**
- * Check the conditions, and launch actions and subevents if necessary
- */
-void StandardEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
+std::string StandardEvent::GenerateEventCode(const RuntimeScene & scene)
 {
-    if ( ExecuteConditions( scene, objectsConcerned) == true )
-    {
-        ExecuteActions( scene, objectsConcerned);
+    std::string outputCode;
 
-        for (unsigned int i = 0;i<events.size();++i)
-        {
-            ObjectsConcerned objectsConcernedForSubEvent;
-            objectsConcernedForSubEvent.InheritsFrom(&objectsConcerned);
+    outputCode += EventsPreprocessor::GenerateConditionsListCode(scene, conditions);
 
-            events[i]->Execute(scene, objectsConcernedForSubEvent);
-        }
-    }
+    std::string ifPredicat = "true";
+    for (unsigned int i = 0;i<conditions.size();++i)
+        ifPredicat += " && condition"+ToString(i)+"IsTrue";
+
+    outputCode += "if (" +ifPredicat+ ")\n";
+    outputCode += "{\n";
+    outputCode += EventsPreprocessor::GenerateActionsListCode(scene, actions);
+    outputCode += "}\n";
+
+    return outputCode;
 }
 
-/**
- * Check if all conditions are true
- */
-bool StandardEvent::ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
-{
-    for ( unsigned int k = 0; k < conditions.size(); ++k )
-    {
-        if ( conditions[k].function != NULL &&
-             !conditions[k].function( scene, objectsConcerned, conditions[k]) )
-            return false; //Return false as soon as a condition is false
-    }
-
-    return true;
-}
-
-/**
- * Run actions of the event
- */
-void StandardEvent::ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
-{
-    for ( unsigned int k = 0; k < actions.size();k++ )
-    {
-        if ( actions[k].function != NULL )
-            actions[k].function( scene, objectsConcerned, actions[k]);
-    }
-
-    return;
-}
-
-vector < vector<Instruction>* > StandardEvent::GetAllConditionsVectors()
-{
-    vector < vector<Instruction>* > allConditions;
-    allConditions.push_back(&conditions);
-
-    return allConditions;
-}
-
-vector < vector<Instruction>* > StandardEvent::GetAllActionsVectors()
-{
-    vector < vector<Instruction>* > allActions;
-    allActions.push_back(&actions);
-
-    return allActions;
-}
 #if defined(GD_IDE_ONLY)
 void StandardEvent::SaveToXml(TiXmlElement * eventElem) const
 {
@@ -247,7 +202,7 @@ void StandardEvent::Init(const StandardEvent & event)
 }
 
 /**
- * Custom copy operator
+ * Custom copy constructor
  */
 StandardEvent::StandardEvent(const StandardEvent & event) :
 BaseEvent(event)
@@ -268,4 +223,3 @@ StandardEvent& StandardEvent::operator=(const StandardEvent & event)
 
     return *this;
 }
-#endif

@@ -6,11 +6,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-#if defined(GD_IDE_ONLY)
-
 #include <string>
 #include <vector>
-#include "GDIL/ImplementationGame.h"
 #include "GDL/Object.h"
 #include "GDL/Scene.h"
 #include "GDL/ListVariable.h"
@@ -29,7 +26,7 @@ class SourceFile;
  * \brief Represent a game.
  * Game contains all data of a game, from scenes to properties like game's name.
  */
-class GD_API Game : public gd::ImplementationGame
+class GD_API Game
 {
     public:
         Game();
@@ -61,11 +58,14 @@ class GD_API Game : public gd::ImplementationGame
         std::vector < ObjectGroup >                          objectGroups; ///< Global objects groups
         #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
         bool useExternalSourceFiles; ///< True if game used external source files, and thus dynamic extensions.
+        #if defined(GD_IDE_ONLY)
         std::vector < boost::shared_ptr<GDpriv::SourceFile> >        externalSourceFiles; ///< List of C++ source files used.
+        #endif
         #endif
 
         ListVariable variables; ///< Initial global variables
 
+        #if defined(GD_IDE_ONLY)
         std::string gameFile; ///< File of the game
         std::vector < string > imagesChanged; ///< Images that have been changed and which have to be reloaded
 
@@ -73,7 +73,9 @@ class GD_API Game : public gd::ImplementationGame
         std::string winExecutableIconFile; ///< Icon for Windows executable
         std::string linuxExecutableFilename;  ///< Linux executable name
         std::string macExecutableFilename;  ///< Mac executable name
+        #endif
 
+    protected:
     private:
 
         /**
@@ -82,7 +84,5 @@ class GD_API Game : public gd::ImplementationGame
          */
         void Init(const Game & game);
 };
-
-#endif
 
 #endif // GAME_H

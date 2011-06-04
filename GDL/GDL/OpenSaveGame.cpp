@@ -4,11 +4,19 @@
  */
 
 #if defined(GD_IDE_ONLY)
+    #include <wx/wx.h>
+    #include "GDL/CommonTools.h"
+    #define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
+    #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
+    #define ToString(x)ToString(x) // Méthode de conversion int vers string
+#else
+    #define MSG(x) EcrireLog("Chargement", x); //Macro pour rapporter des erreurs
+    #define MSGERR(x) EcrireLog("Chargement, erreur", x);
 
-#include <wx/wx.h>
-#include "GDL/CommonTools.h"
-#define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
-#define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
+    #ifndef _T
+    #define _T(x) x // "Emule" la macro de WxWidgets
+    #endif
+#endif
 
 #include <string>
 #include <cctype>
@@ -205,6 +213,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     elem = hdl.FirstChildElement().FirstChildElement( "Scenes" ).FirstChildElement().Element();
     while ( elem )
     {
+        cout << "Scene";
         //Scene vide
         boost::shared_ptr<Scene> newScene = boost::shared_ptr<Scene>(new Scene());
 
@@ -435,6 +444,7 @@ void OpenSaveGame::OpenImages(const TiXmlElement * imagesElem, TiXmlElement * do
 
 void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, TiXmlElement * elem)
 {
+    cout << "OpenObjects";
     TiXmlElement * elemScene = elem->FirstChildElement("Objet");
 
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
@@ -454,33 +464,36 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, T
         boost::shared_ptr<Object> newObject = extensionsManager->CreateObject(extensionsManager->GetTypeIdFromString(type),
                                                                                 name);
 
-        if ( elemScene->FirstChildElement( "Variables" ) != NULL ) { OpenVariablesList(newObject->variablesObjet, elemScene->FirstChildElement( "Variables" )); }
-
-        //Spécifique à l'objet
-        newObject->LoadFromXml(elemScene);
-
-        if ( elemScene->FirstChildElement( "Automatism" ) != NULL )
+        if ( newObject != boost::shared_ptr<Object>() )
         {
-            TiXmlElement * elemAutomatism = elemScene->FirstChildElement( "Automatism" );
-            while ( elemAutomatism )
+            if ( elemScene->FirstChildElement( "Variables" ) != NULL ) { OpenVariablesList(newObject->variablesObjet, elemScene->FirstChildElement( "Variables" )); }
+
+            //Spécifique à l'objet
+            newObject->LoadFromXml(elemScene);
+
+            if ( elemScene->FirstChildElement( "Automatism" ) != NULL )
             {
-                boost::shared_ptr<Automatism> newAutomatism = extensionsManager->CreateAutomatism(elemAutomatism->Attribute("Type") != NULL ? elemAutomatism->Attribute("Type") : "");
-                if ( newAutomatism != boost::shared_ptr<Automatism>() )
+                TiXmlElement * elemAutomatism = elemScene->FirstChildElement( "Automatism" );
+                while ( elemAutomatism )
                 {
-                    newAutomatism->SetName(elemAutomatism->Attribute("Name") != NULL ? elemAutomatism->Attribute("Name") : "");
-                    newAutomatism->LoadFromXml(elemAutomatism);
+                    boost::shared_ptr<Automatism> newAutomatism = extensionsManager->CreateAutomatism(elemAutomatism->Attribute("Type") != NULL ? elemAutomatism->Attribute("Type") : "");
+                    if ( newAutomatism != boost::shared_ptr<Automatism>() )
+                    {
+                        newAutomatism->SetName(elemAutomatism->Attribute("Name") != NULL ? elemAutomatism->Attribute("Name") : "");
+                        newAutomatism->LoadFromXml(elemAutomatism);
 
-                    newObject->AddAutomatism(newAutomatism);
+                        newObject->AddAutomatism(newAutomatism);
+                    }
+                    else
+                        cout << "Unknown automatism" << elemAutomatism->Attribute("Type") << endl;
+
+                    elemAutomatism = elemAutomatism->NextSiblingElement("Automatism");
                 }
-                else
-                    cout << "Unknown automatism" << elemAutomatism->Attribute("Type") << endl;
-
-                elemAutomatism = elemAutomatism->NextSiblingElement("Automatism");
             }
-        }
 
-        //Ajout de l'objet
-        objects.push_back( newObject );
+            //Ajout de l'objet
+            objects.push_back( newObject );
+        }
 
         elemScene = elemScene->NextSiblingElement();
     }
@@ -488,6 +501,7 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, T
 
 void OpenSaveGame::OpenGroupesObjets(vector < ObjectGroup > & list, TiXmlElement * elem)
 {
+    cout << "OpenGroupesObjets";
     TiXmlElement * elemScene = elem->FirstChildElement("Groupe");
 
     //Passage en revue des positions initiales
@@ -517,6 +531,7 @@ void OpenSaveGame::OpenGroupesObjets(vector < ObjectGroup > & list, TiXmlElement
 
 void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement * elem)
 {
+    cout << "OpenPositions";
     TiXmlElement * elemScene = elem->FirstChildElement();
 
     //Passage en revue des positions initiales
@@ -605,6 +620,7 @@ void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement
 
 void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElement * elem)
 {
+    cout << "Events";
     const TiXmlElement * elemScene = elem->FirstChildElement();
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
@@ -617,18 +633,17 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
         else { MSG( "Les informations concernant le type d'un évènement manquent." ); }
 
         BaseEventSPtr event = extensionsManager->CreateEvent(type);
-        if ( elemScene->Attribute( "disabled" ) != NULL ) { if ( string(elemScene->Attribute( "disabled" )) == "true" ) event->SetDisabled(); }
-
         if ( event != boost::shared_ptr<BaseEvent>())
         {
             event->LoadFromXml(elemScene);
-
         }
         else
         {
             cout << "Unknown event of type " << type << endl;
             event = boost::shared_ptr<BaseEvent>(new EmptyEvent);
         }
+
+        if ( elemScene->Attribute( "disabled" ) != NULL ) { if ( string(elemScene->Attribute( "disabled" )) == "true" ) event->SetDisabled(); }
 
         list.push_back( event );
 
@@ -1382,5 +1397,3 @@ void OpenSaveGame::RecreatePaths(string file)
         game.globalObjects[j]->PrepareResourcesForMerging(resourcesUnmergingHelper);
 #endif //GDE
 }
-
-#endif

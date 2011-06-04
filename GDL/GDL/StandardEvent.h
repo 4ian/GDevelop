@@ -3,8 +3,6 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
-
 #ifndef STANDARDEVENT_H
 #define STANDARDEVENT_H
 #if defined(GD_IDE_ONLY)
@@ -33,7 +31,7 @@ class GD_API StandardEvent : public BaseEvent
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new StandardEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual void Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
+        virtual std::string GenerateEventCode(const RuntimeScene & scene);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};
@@ -46,9 +44,6 @@ class GD_API StandardEvent : public BaseEvent
         const vector < Instruction > & GetActions() const { return actions; };
         vector < Instruction > & GetActions() { return actions; };
         void SetActions(vector < Instruction > & actions_) { actions = actions_; };
-
-        virtual vector < vector<Instruction>* > GetAllConditionsVectors();
-        virtual vector < vector<Instruction>* > GetAllActionsVectors();
 
         #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
@@ -75,8 +70,6 @@ class GD_API StandardEvent : public BaseEvent
 
     private:
         void Init(const StandardEvent & event);
-        bool ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
-        void ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
 
         vector < Instruction > conditions;
         vector < Instruction > actions;
@@ -85,4 +78,3 @@ class GD_API StandardEvent : public BaseEvent
 
 
 #endif // STANDARDEVENT_H
-#endif

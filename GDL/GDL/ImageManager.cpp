@@ -3,8 +3,6 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include <boost/weak_ptr.hpp>
-#include "SFML/Graphics.hpp"
 #include "GDL/ImageManager.h"
 #include "GDL/RessourcesLoader.h"
 #include "GDL/InvalidImage.h"

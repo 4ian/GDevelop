@@ -23,7 +23,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                           _("Extension apportant des types d'évènements de base, intégrée en standard."),
                           "Compil Games",
                           "Freeware")
-
+/*
     DECLARE_CONDITION("Or",
                    _("Ou"),
                    _("Renvoie vraie si une seule des sous conditions est vraie"),
@@ -61,7 +61,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         DECLARE_CAN_HAVE_SUB_CONDITION();
 
-    DECLARE_END_CONDITION()
+    DECLARE_END_CONDITION()*/
 
     DECLARE_EVENT("Standard",
                   _("Évènement standard"),
@@ -71,7 +71,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   StandardEvent)
 
     DECLARE_END_EVENT()
-
+/*
     DECLARE_EVENT("Link",
                   _("Lien"),
                   "Lien vers des évènements d'une autre scène",
@@ -126,5 +126,5 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   DynamicExtensionCallerEvent)
 
     DECLARE_END_EVENT()
-    #endif
+    #endif*/
 }

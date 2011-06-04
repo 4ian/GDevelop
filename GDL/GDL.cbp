@@ -132,6 +132,7 @@
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_DYNAMIC_EXTENSIONS" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DGDIL_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -142,11 +143,9 @@
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\GDIL" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdil" />
 					<Add option="-lmingw32" />
 					<Add option="-lopengl32" />
 					<Add option="-limm32" />
@@ -251,6 +250,7 @@
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DGDIL_API=__declspec(dllimport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -261,11 +261,9 @@
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\GDIL" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdil" />
 					<Add option="-lmingw32" />
 					<Add option="-lopengl32" />
 					<Add option="-limm32" />
@@ -435,6 +433,7 @@
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DGDIL_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -445,11 +444,9 @@
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\GDIL" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdil" />
 					<Add option="-lmingw32" />
 					<Add option="-lopengl32" />
 					<Add option="-limm32" />
@@ -496,6 +493,7 @@
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
 					<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
+					<Add directory="..\IDE\bin\dev" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
@@ -1136,7 +1134,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="1.5.10204" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="1.5.10151" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

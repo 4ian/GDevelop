@@ -14,9 +14,9 @@ using namespace std;
 class GD_API EventsPreprocessor
 {
     public:
-        static void PreprocessEvents(const RuntimeScene & scene, vector < BaseEventSPtr > & events);
-        static void PreprocessConditions(const RuntimeScene & scene, vector < Instruction > & conditions, bool & eventHasToBeDeleted);
-        static void PreprocessActions(const RuntimeScene & scene, vector < Instruction > & actions);
+        static void GenerateEventsCode(const RuntimeScene & scene, vector < BaseEventSPtr > & events, std::string & output);
+        static std::string GenerateConditionsListCode(const RuntimeScene & scene, vector < Instruction > & conditions);
+        static std::string GenerateActionsListCode(const RuntimeScene & scene, vector < Instruction > & actions);
 
         static void DeleteUselessEvents(vector < BaseEventSPtr > & events);
 

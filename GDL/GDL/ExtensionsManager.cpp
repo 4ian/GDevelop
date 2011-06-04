@@ -36,6 +36,7 @@ ExtensionsManager::ExtensionsManager()
 {
     //Load all extensions
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new CommonInstructionsExtension()));
 
 #if defined(GD_IDE_ONLY)
     badInstructionInfos.fullname = _T("Instruction inconnue");

@@ -16,26 +16,42 @@
  * Link each condition to its function.
  * Check the validity of objects type passed to parameters
  */
-void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector < Instruction > & conditions, bool & eventHasToBeDeleted)
-{/*
+std::string EventsPreprocessor::GenerateConditionsListCode(const RuntimeScene & scene, vector < Instruction > & conditions)
+{
+    std::string outputCode;
+
+    for (unsigned int i = 0;i<conditions.size();++i)
+        outputCode += "bool condition"+ToString(i)+"IsTrue = false;\n";
+
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     for (unsigned int cId =0;cId < conditions.size();++cId)
     {
-        //Affection en premier à une fonction statique si possible
-        if ( extensionsManager->HasCondition(conditions[cId].GetType()))
-            conditions[cId].function = extensionsManager->GetConditionFunctionPtr(conditions[cId].GetType());
+        outputCode += "{\n";
+        std::string conditionCode;
 
-        //Affection à une fonction membre d'un objet si trouvé
+        //Generate static condition if available
+        if ( extensionsManager->HasCondition(conditions[cId].GetType()))
+            conditionCode += conditions[cId].GetType()+";\n";
+
+        //Generate object condition if available
         string objectName = conditions[cId].GetParameters().empty() ? "" : conditions[cId].GetParameter(0).GetPlainString();
         unsigned int objectTypeId = GetTypeIdOfObject(*scene.game, scene, objectName);
 
-        if ( extensionsManager->HasObjectCondition(objectTypeId,
-                                                conditions[cId].GetType()))
+        if ( !objectName.empty() && extensionsManager->HasObjectCondition(objectTypeId, conditions[cId].GetType()))
         {
-            conditions[cId].function = &ConditionForEachObject;
-            conditions[cId].objectFunction = extensionsManager->GetObjectConditionFunctionPtr(objectTypeId,
-                                                                                                    conditions[cId].GetType());
+            conditionCode += "std::vector<Object*> "+objectName+"objects = runtimeScene->objectsInstances.GetAllObjectsRawPointers();\n";
+            conditionCode += "for(unsigned int i = 0;i < "+objectName+"objects.size();)\n";
+            conditionCode += "{\n";
+            conditionCode += "    if ( objects[i] ?? )\n";
+            conditionCode += "    {\n";
+            conditionCode += "        condition"+ToString(cId)+"IsTrue = true;\n";
+            conditionCode += "        ++i;\n";
+            conditionCode += "    }\n";
+            conditionCode += "    else\n";
+            conditionCode += "    {\n";
+            conditionCode += "        "+objectName+"objects.erase("+objectName+"objects.begin()+i);";
+            conditionCode += "    }\n";
         }
 
         //Affection to an automatism member function if found
@@ -45,7 +61,7 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
         if (extensionsManager->HasAutomatismCondition(automatismTypeId,
                                                    conditions[cId].GetType()))
         {
-            conditions[cId].function = &AutomatismConditionForEachObject;
+            /*conditions[cId].function = &AutomatismConditionForEachObject;
             conditions[cId].automatismFunction = extensionsManager->GetAutomatismConditionFunctionPtr(automatismTypeId,
                                                                                                     conditions[cId].GetType());
 
@@ -56,17 +72,10 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
             {
                 cout << "Bad automatism requested" << endl;
                 conditions[cId].SetType("");
-            }
+            }*/
         }
 
-        //Be sure there is no lack of parameter.
         InstructionInfos instrInfos = extensionsManager->GetConditionInfos(conditions[cId].GetType());
-        while(conditions[cId].GetParameters().size() < instrInfos.parameters.size())
-        {
-            vector < GDExpression > parameters = conditions[cId].GetParameters();
-            parameters.push_back(GDExpression(""));
-            conditions[cId].SetParameters(parameters);
-        }
 
         //Verify that there are not mismatch between object type in parameters
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
@@ -89,32 +98,36 @@ void EventsPreprocessor::PreprocessConditions(const RuntimeScene & scene, vector
         }
 
 
-        //Preprocessing expressions
-        for( unsigned int instrId=0;instrId<conditions[cId].GetParameters().size();++instrId)
-            conditions[cId].GetParameter(instrId).PrepareForEvaluation(*scene.game, scene);
-
-        if (conditions[cId].GetType() == "")
-            eventHasToBeDeleted = true;
+        if ( !conditions[cId].GetType().empty() ) outputCode += conditionCode;
 
         //Preprocess subconditions
-        if ( !conditions[cId].GetSubInstructions().empty() )
-            PreprocessConditions(scene, conditions[cId].GetSubInstructions(), eventHasToBeDeleted);
-    }*/
+        /*if ( !conditions[cId].GetSubInstructions().empty() )
+            PreprocessConditions(scene, conditions[cId].GetSubInstructions(), eventHasToBeDeleted);*/
+
+        outputCode += "}\n";
+    }
+
+    return outputCode;
 }
 
 /**
  * Link each action to its function.
  * Check the validity of objects type passed to parameters
  */
-void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < Instruction > & actions)
-{/*
+std::string EventsPreprocessor::GenerateActionsListCode(const RuntimeScene & scene, vector < Instruction > & actions)
+{
+    std::string outputCode;
+
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     for (unsigned int aId =0;aId < actions.size();++aId)
     {
+        outputCode += "{\n";
+        std::string actionCode;
+
         //Affection en premier à une fonction statique si possible
         if ( extensionsManager->HasAction(actions[aId].GetType()))
-            actions[aId].function = extensionsManager->GetActionFunctionPtr(actions[aId].GetType());
+            actionCode += actions[aId].GetType()+";\n";
 
         //Affection à une fonction membre d'un objet si trouvé
         string objectName = actions[aId].GetParameters().empty() ? "" : actions[aId].GetParameter(0).GetPlainString();
@@ -123,9 +136,10 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
         if ( extensionsManager->HasObjectAction(objectTypeId,
                                                 actions[aId].GetType()))
         {
-            actions[aId].function = &ActionForEachObject;
-            actions[aId].objectFunction = extensionsManager->GetObjectActionFunctionPtr(objectTypeId,
-                                                                                                    actions[aId].GetType());
+            actionCode += "for(unsigned int i = 0;i < "+objectName+"objects.size();)\n";
+            actionCode += "{\n";
+            actionCode += "    objects[i]."+actions[aId].GetType()+";\n";
+            actionCode += "}\n";
         }
 
         //Affection to an automatism member function if found
@@ -135,7 +149,7 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
         if (extensionsManager->HasAutomatismAction(automatismTypeId,
                                                    actions[aId].GetType()))
         {
-            actions[aId].function = &AutomatismActionForEachObject;
+            /*actions[aId].function = &AutomatismActionForEachObject;
             actions[aId].automatismFunction = extensionsManager->GetAutomatismActionFunctionPtr(automatismTypeId,
                                                                                                     actions[aId].GetType());
 
@@ -146,17 +160,10 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
             {
                 cout << "Bad automatism requested" << endl;
                 actions[aId].SetType("");
-            }
+            }*/
         }
 
-        //Be sure there is no lack of parameter.
         InstructionInfos instrInfos = extensionsManager->GetActionInfos(actions[aId].GetType());
-        while(actions[aId].GetParameters().size() < instrInfos.parameters.size())
-        {
-            vector < GDExpression > parameters = actions[aId].GetParameters();
-            parameters.push_back(GDExpression(""));
-            actions[aId].SetParameters(parameters);
-        }
 
         //Verify that there are not mismatch between object type in parameters
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
@@ -178,51 +185,42 @@ void EventsPreprocessor::PreprocessActions(const RuntimeScene & scene, vector < 
         }
 
         //Preprocessing expressions
-        for( unsigned int instrId=0;instrId<actions[aId].GetParameters().size();++instrId)
-            actions[aId].GetParameter(instrId).PrepareForEvaluation(*scene.game, scene);
+        /*for( unsigned int instrId=0;instrId<actions[aId].GetParameters().size();++instrId)
+            actions[aId].GetParameter(instrId).PrepareForEvaluation(*scene.game, scene);*/
+
 
         //Preprocess subactions
-        if ( !actions[aId].GetSubInstructions().empty() )
-            PreprocessActions(scene, actions[aId].GetSubInstructions());
+        /*if ( !actions[aId].GetSubInstructions().empty() )
+            PreprocessActions(scene, actions[aId].GetSubInstructions());*/
 
-        //Note that if an action is invalid, the entire event is _not_ invalid
-    }*/
+        if ( !actions[aId].GetType().empty() ) outputCode += actionCode;
+
+        outputCode += "}\n";
+    }
+
+    return outputCode;
 }
 
 /**
  * Link each actions/conditions to its function.
  * Check the validity of objects type passed to parameters
  */
-void EventsPreprocessor::PreprocessEvents(const RuntimeScene & scene, vector < BaseEventSPtr > & events)
-{/*
+void EventsPreprocessor::GenerateEventsCode(const RuntimeScene & scene, vector < BaseEventSPtr > & events, std::string & output)
+{
     for ( unsigned int eId = 0; eId < events.size();++eId )
     {
+        std::string eventCode = "\n{\n";
         bool eventInvalid = false;
 
-        //Preprocess actions and conditions
-        vector < vector<Instruction>* > allConditionsVectors = events[eId]->GetAllConditionsVectors();
-        for (unsigned int i = 0;i<allConditionsVectors.size();++i)
-            PreprocessConditions(scene, *allConditionsVectors[i], eventInvalid);
-
-        vector < vector<Instruction>* > allActionsVectors = events[eId]->GetAllActionsVectors();
-        for (unsigned int i = 0;i<allActionsVectors.size();++i)
-            PreprocessActions(scene, *allActionsVectors[i]);
-
-        //Preprocess internal expressions used by the event
-        vector < GDExpression* > allExpressions = events[eId]->GetAllExpressions();
-        for (unsigned int i = 0;i<allExpressions.size();++i)
-            allExpressions[i]->PrepareForEvaluation(*scene.game, scene);
+        eventCode += events[eId]->GenerateEventCode(scene);
 
         //Preprocess Sub events
         if ( events[eId]->CanHaveSubEvents() )
-            PreprocessEvents(scene, events[eId]->GetSubEvents());
+            GenerateEventsCode(scene, events[eId]->GetSubEvents(), output);
 
-        if ( eventInvalid ) //If the event is invalid, we need to delete it.
-        {
-            events.erase(events.begin()+eId);
-            eId--;
-        }
-    }*/
+        eventCode += "\n}\n";
+        output += eventCode;
+    }
 }
 
 /**

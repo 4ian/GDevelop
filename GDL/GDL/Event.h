@@ -45,9 +45,9 @@ class GD_API BaseEvent
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new BaseEvent(*this));}
 
         /**
-         * Call when the event has to be executed. Redefined by derived class.
+         * Generate event's code.
          */
-        virtual void Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned ) {return;};
+        virtual std::string GenerateEventCode(const RuntimeScene & scene) {return "";};
 
         /**
          * Derived class have to redefine this function, so as to return true, if they are executable.
@@ -108,11 +108,6 @@ class GD_API BaseEvent
          * Load event from XML
          */
         virtual void LoadFromXml(const TiXmlElement * eventElem) {}
-
-        /**
-         * Called when a scene is loaded.
-         */
-        virtual void Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList) {};
 
         std::string GetType() const { return type; };
         void SetType(std::string type_) { type = type_; };

@@ -6,6 +6,8 @@
 #ifndef OPENSAVEGAME_H
 #define OPENSAVEGAME_H
 
+#if defined(GD_IDE_ONLY)
+
 #include "GDL/Game.h"
 #include <string>
 #include "GDL/tinyxml.h"
@@ -36,19 +38,6 @@ public:
     static void SaveActions(const vector < Instruction > & list, TiXmlElement * elem);
     #endif
 
-    //Compatibility code --- with Game Develop 1.3.8892 and inferior
-    static void AdaptEventsFromGD138892(vector < BaseEventSPtr > & list);
-    //End of Compatibility code --- with Game Develop 1.3.8892 and inferior
-    //Compatibility code --- with Game Develop 1.3.9262 and inferior
-    static void AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list, Game & game, Scene & scene);
-    //End of Compatibility code --- with Game Develop 1.3.9262 and inferior
-    //Compatibility code --- with Game Develop 1.4.9552 and inferior
-    static void AdaptExpressionsFromGD149552(vector < BaseEventSPtr > & list, Game & game, Scene & scene);
-    //End of Compatibility code --- with Game Develop 1.4.9552 and inferior
-    //Compatibility code --- with Game Develop 1.4.9587 and inferior
-    static void AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list, Game & game, Scene & scene);
-    //End of Compatibility code --- with Game Develop 1.4.9587 and inferior
-
 protected:
 private:
 
@@ -73,5 +62,7 @@ private:
     static void SaveVariablesList(const ListVariable & list, TiXmlElement * elem);
     #endif
 };
+
+#endif
 
 #endif // OPENSAVEGAME_H

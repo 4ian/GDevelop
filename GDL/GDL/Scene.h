@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef SCENE_H
 #define SCENE_H
 
@@ -115,3 +117,4 @@ vector < unsigned int > GD_API GetAutomatismsOfObject(const Game & game, const S
 
 
 #endif // SCENE_H
+#endif

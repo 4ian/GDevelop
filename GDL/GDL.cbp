@@ -142,9 +142,11 @@
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="..\GDIL" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
+					<Add option="-lgdil" />
 					<Add option="-lmingw32" />
 					<Add option="-lopengl32" />
 					<Add option="-limm32" />
@@ -259,9 +261,11 @@
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="..\GDIL" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lgdil" />
 					<Add option="-lmingw32" />
 					<Add option="-lopengl32" />
 					<Add option="-limm32" />
@@ -441,9 +445,11 @@
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="..\GDIL" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lgdil" />
 					<Add option="-lmingw32" />
 					<Add option="-lopengl32" />
 					<Add option="-limm32" />
@@ -1130,7 +1136,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="1.5.10151" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="1.5.10204" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

@@ -1,10 +1,11 @@
 #ifndef ImageManager_H
 #define ImageManager_H
 
-#include "GDL/Game.h" //This include file must be placed first
+#include "GDL/RuntimeGame.h" //This include file must be placed first
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
+#include <boost/weak_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 #include <vector>
@@ -25,7 +26,7 @@ class GD_API ImageManager
     public:
         ImageManager();
         virtual ~ImageManager() {};
-        void SetGame(Game * game_) { game = game_; }
+        void SetGame(RuntimeGame * game_) { game = game_; }
 
         void LoadPermanentImages();
 
@@ -43,7 +44,7 @@ class GD_API ImageManager
         mutable map < string, boost::weak_ptr<OpenGLTextureWrapper> > alreadyLoadedOpenGLTextures;
         mutable boost::shared_ptr<OpenGLTextureWrapper> badOpenGLTexture;
 
-        Game * game;
+        RuntimeGame * game;
 };
 
 /**

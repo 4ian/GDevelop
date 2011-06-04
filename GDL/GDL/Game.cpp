@@ -1,14 +1,11 @@
+#if defined(GD_IDE_ONLY)
+
 #include "GDL/Game.h"
 #include "GDL/MemTrace.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/SourceFile.h"
-
-#if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
-#elif !defined(_)
-#define _(x) x
-#endif
 
 using namespace GDpriv;
 
@@ -81,17 +78,14 @@ void Game::Init(const Game & game)
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     useExternalSourceFiles = game.useExternalSourceFiles;
 
-    #if defined(GD_IDE_ONLY)
     externalSourceFiles.clear();
     for (unsigned int i =0;i<game.externalSourceFiles.size();++i)
     	externalSourceFiles.push_back( boost::shared_ptr<GDpriv::SourceFile>(new GDpriv::SourceFile(*game.externalSourceFiles[i])) );
-    #endif
     #endif
 
     variables = game.variables;
     objectGroups = game.objectGroups;
 
-    #if defined(GD_IDE_ONLY)
     gameFile = game.gameFile;
     imagesChanged = game.imagesChanged;
 
@@ -99,7 +93,6 @@ void Game::Init(const Game & game)
     winExecutableIconFile = game.winExecutableIconFile;
     linuxExecutableFilename = game.linuxExecutableFilename;
     macExecutableFilename = game.macExecutableFilename;
-    #endif
 }
 
 Game::Game(const Game & game)
@@ -114,3 +107,5 @@ Game& Game::operator=(const Game & game)
 
     return *this;
 }
+
+#endif

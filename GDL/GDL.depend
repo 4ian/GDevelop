@@ -12906,9 +12906,10 @@
 	<string>
 	<vector>
 
-1302445484 d:\florian\programmation\gamedevelop2\gdl\\gdl\game.h
+1307044640 d:\florian\programmation\gamedevelop2\gdl\\gdl\game.h
 	<string>
 	<vector>
+	"GDIL/ImplementationGame.h"
 	"GDL/Object.h"
 	"GDL/Scene.h"
 	"GDL/ListVariable.h"
@@ -13014,7 +13015,7 @@
 
 1297544188 d:\florian\programmation\gamedevelop2\gdl\\gdl\rotatedrectangle.h
 
-1300556610 d:\florian\programmation\gamedevelop2\gdl\\gdl\scene.h
+1307046205 d:\florian\programmation\gamedevelop2\gdl\\gdl\scene.h
 	"GDL/Event.h"
 	<vector>
 	<map>
@@ -13552,7 +13553,7 @@
 	"GDL/Log.h"
 	"GDL/Instruction.h"
 
-1298135945 d:\florian\programmation\gamedevelop2\gdl\\gdl\opensavegame.h
+1307045265 d:\florian\programmation\gamedevelop2\gdl\\gdl\opensavegame.h
 	"GDL/Game.h"
 	<string>
 	"GDL/tinyxml.h"
@@ -13610,7 +13611,7 @@
 	<string>
 	<boost/shared_ptr.hpp>
 
-1306956041 d:\florian\programmation\gamedevelop2\gdl\\gdl\runtimescene.h
+1307046348 d:\florian\programmation\gamedevelop2\gdl\\gdl\runtimescene.h
 	"GDL/Scene.h"
 	"GDL/MemTrace.h"
 	<iostream>
@@ -13623,7 +13624,6 @@
 	<boost/interprocess/containers/flat_map.hpp>
 	<llvm/ADT/OwningPtr.h>
 	<llvm/LLVMContext.h>
-	"GDL/RuntimeGame.h"
 	"GDL/Object.h"
 	"GDL/Event.h"
 	"GDL/CommonTools.h"
@@ -13636,17 +13636,19 @@
 	"GDL/Layer.h"
 	"GDL/ManualTimer.h"
 	"GDL/ObjInstancesHolder.h"
+	"GDL/ObjectGroup.h"
 
-1297543007 d:\florian\programmation\gamedevelop2\gdl\\gdl\runtimegame.h
+1307045224 d:\florian\programmation\gamedevelop2\gdl\\gdl\runtimegame.h
 	<boost/shared_ptr.hpp>
-	"GDL/Game.h"
-	"GDL/ImageManager.h"
+	"GDL/ListVariable.h"
+	"GDL/Image.h"
 
-1297528174 d:\florian\programmation\gamedevelop2\gdl\\gdl\imagemanager.h
-	"GDL/Game.h"
+1307045135 d:\florian\programmation\gamedevelop2\gdl\\gdl\imagemanager.h
+	"GDL/RuntimeGame.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
+	<boost/weak_ptr.hpp>
 	<boost/shared_ptr.hpp>
 	<iostream>
 	<vector>
@@ -13715,7 +13717,7 @@
 1297545243 d:\florian\programmation\gamedevelop2\gdl\\gdl\commoninstructionsextension.h
 	"GDL/ExtensionBase.h"
 
-1297523943 d:\florian\programmation\gamedevelop2\gdl\\gdl\standardevent.h
+1307045518 d:\florian\programmation\gamedevelop2\gdl\\gdl\standardevent.h
 	<wx/bitmap.h>
 	<wx/dcbuffer.h>
 	<wx/html/htmprint.h>
@@ -13899,9 +13901,10 @@
 	"GDL/ManualTimer.h"
 	"GDL/ObjInstancesHolder.h"
 
-1302445484 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
+1307044640 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
 	<string>
 	<vector>
+	"GDIL/ImplementationGame.h"
 	"GDL/Object.h"
 	"GDL/Scene.h"
 	"GDL/ListVariable.h"
@@ -14167,14 +14170,14 @@
 	"GDL/gdTreeItemStringData.h"
 	<gtk/gtk.h>
 
-1303849283 d:\florian\programmation\gamedevelop2\gdl\\gdl\editorimages.h
+1307102861 d:\florian\programmation\gamedevelop2\gdl\\gdl\editorimages.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/menu.h>
 	<wx/splitter.h>
 	<wx/panel.h>
 	<wx/aui/aui.h>
-	"GDL/RuntimeGame.h"
+	"GDL/Game.h"
 	"GDL/ImageManager.h"
 	"GDL/MainEditorCommand.h"
 	"GDL/ImageFilesWatcher.h"
@@ -14515,7 +14518,7 @@
 	"GDL/GDMathParser.h"
 	<iostream>
 
-1302445484 source:d:\florian\programmation\gamedevelop2\gdl\gdl\game.cpp
+1307044640 source:d:\florian\programmation\gamedevelop2\gdl\gdl\game.cpp
 	"GDL/Game.h"
 	"GDL/MemTrace.h"
 	"GDL/ExtensionsManager.h"
@@ -14540,7 +14543,9 @@
 	"GDL/Game.h"
 	"GDL/ImageFilesWatcher.h"
 
-1304087733 source:d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.cpp
+1307045135 source:d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.cpp
+	<boost/weak_ptr.hpp>
+	"SFML/Graphics.hpp"
 	"GDL/ImageManager.h"
 	"GDL/RessourcesLoader.h"
 	"GDL/InvalidImage.h"
@@ -14711,7 +14716,7 @@
 	"GDL/ObjectGroup.h"
 	"GDL/profile.h"
 
-1306874256 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
+1307045402 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
 	<wx/wx.h>
 	"GDL/CommonTools.h"
 	<string>
@@ -14874,8 +14879,12 @@
 1268858366 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimecamera.h
 	"GDL/Camera.h"
 
-1282511400 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimegame.cpp
+1307045619 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimegame.cpp
 	"GDL/RuntimeGame.h"
+	"GDL/ImageManager.h"
+	"GDL/Object.h"
+	"GDL/ObjectGroup.h"
+	"GDL/RuntimeScene.h"
 
 1297544188 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimelayer.cpp
 	"RuntimeLayer.h"
@@ -14885,7 +14894,7 @@
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
 
-1306960200 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
+1307103069 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
 	"GDL/RuntimeScene.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -14932,7 +14941,7 @@
 	<SFML/System.hpp>
 	"GDL/profile.h"
 
-1300556610 source:d:\florian\programmation\gamedevelop2\gdl\gdl\scene.cpp
+1307045451 source:d:\florian\programmation\gamedevelop2\gdl\gdl\scene.cpp
 	"GDL/Scene.h"
 	"GDL/MemTrace.h"
 	"GDL/ExtensionsManager.h"
@@ -15069,14 +15078,14 @@
 	"GDL/EditorObjet.h"
 	"GDL/SpriteInitialPositionPanel.h"
 
-1303908014 source:d:\florian\programmation\gamedevelop2\gdl\gdl\standardevent.cpp
+1307045602 source:d:\florian\programmation\gamedevelop2\gdl\gdl\standardevent.cpp
 	"StandardEvent.h"
 	"ObjectsConcerned.h"
 	"GDL/tinyxml.h"
 	"GDL/OpenSaveGame.h"
 	"EventsRenderingHelper.h"
 
-1297523943 d:\florian\programmation\gamedevelop2\gdl\gdl\standardevent.h
+1307045518 d:\florian\programmation\gamedevelop2\gdl\gdl\standardevent.h
 	<wx/bitmap.h>
 	<wx/dcbuffer.h>
 	<wx/html/htmprint.h>
@@ -15933,7 +15942,7 @@
 	<wx/log.h>
 	<wx/msgdlg.h>
 
-1306952807 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1307103069 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1304162683 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -32215,4 +32224,8 @@
 1253308523 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\txtstrm.h
 	"wx/stream.h"
 	"wx/convauto.h"
+
+1307103200 d:\florian\programmation\gamedevelop2\gdil\gdil\implementationgame.h
+	<vector>
+	<boost/shared_ptr.hpp>
 

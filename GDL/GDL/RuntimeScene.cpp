@@ -124,9 +124,28 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     {
     	automatismsSharedDatas[it->first] = it->second->Clone();
     }
+
+    name = scene.name;
+
+    backgroundColorR = scene.backgroundColorR;
+    backgroundColorG = scene.backgroundColorG;
+    backgroundColorB = scene.backgroundColorB;
+    standardSortMethod = scene.standardSortMethod;
+    title = scene.title;
+    oglFOV = scene.oglFOV;
+    oglZNear = scene.oglZNear;
+    oglZFar = scene.oglZFar;
+    stopSoundsOnStartup = scene.stopSoundsOnStartup;
+
+    initialObjects.clear();
+    for (unsigned int i =0;i<scene.initialObjects.size();++i)
+    	initialObjects.push_back( scene.initialObjects[i]->Clone() );
+
+    objectGroups = scene.objectGroups;
+    initialLayers = scene.initialLayers;
 }
 
-RuntimeScene::RuntimeScene(const RuntimeScene & scene) : Scene(scene)
+RuntimeScene::RuntimeScene(const RuntimeScene & scene)
 {
     Init(scene);
 }
@@ -134,10 +153,7 @@ RuntimeScene::RuntimeScene(const RuntimeScene & scene) : Scene(scene)
 RuntimeScene& RuntimeScene::operator=(const RuntimeScene & scene)
 {
     if( (this) != &scene )
-    {
-        Scene::operator=(scene);
         Init(scene);
-    }
 
     return *this;
 }
@@ -581,9 +597,7 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
 
 RuntimeScene * tempRSpointer;
 
-////////////////////////////////////////////////////////////
-/// Ouvre un jeu, et stocke dans les tableaux passés en paramétres.
-////////////////////////////////////////////////////////////
+#if defined(GD_IDE_ONLY)
 bool RuntimeScene::LoadFromScene( const Scene & scene )
 {
     MessageLoading( "Loading scene", 10 );
@@ -606,8 +620,6 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     objectGroups = scene.objectGroups;
     initialLayers = scene.initialLayers;
     variables = scene.variables;
-
-    events = CloneVectorOfEvents(scene.events);
 
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;
@@ -748,3 +760,4 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
     return true;
 }
+#endif

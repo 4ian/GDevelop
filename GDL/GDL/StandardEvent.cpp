@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #include "StandardEvent.h"
 #include "ObjectsConcerned.h"
 #include "GDL/tinyxml.h"
@@ -266,3 +268,4 @@ StandardEvent& StandardEvent::operator=(const StandardEvent & event)
 
     return *this;
 }
+#endif

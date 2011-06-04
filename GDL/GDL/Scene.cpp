@@ -1,3 +1,5 @@
+#if defined(GD_IDE_ONLY)
+
 #include "GDL/Scene.h"
 #include "GDL/MemTrace.h"
 #include "GDL/ExtensionsManager.h"
@@ -275,3 +277,4 @@ vector < unsigned int > GD_API GetAutomatismsOfObject(const Game & game, const S
 
     return automatims;
 }
+#endif

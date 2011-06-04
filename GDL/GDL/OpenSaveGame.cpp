@@ -4,19 +4,11 @@
  */
 
 #if defined(GD_IDE_ONLY)
-    #include <wx/wx.h>
-    #include "GDL/CommonTools.h"
-    #define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
-    #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
-    #define ToString(x)ToString(x) // Méthode de conversion int vers string
-#else
-    #define MSG(x) EcrireLog("Chargement", x); //Macro pour rapporter des erreurs
-    #define MSGERR(x) EcrireLog("Chargement, erreur", x);
 
-    #ifndef _T
-    #define _T(x) x // "Emule" la macro de WxWidgets
-    #endif
-#endif
+#include <wx/wx.h>
+#include "GDL/CommonTools.h"
+#define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
+#define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
 
 #include <string>
 #include <cctype>
@@ -1390,3 +1382,5 @@ void OpenSaveGame::RecreatePaths(string file)
         game.globalObjects[j]->PrepareResourcesForMerging(resourcesUnmergingHelper);
 #endif //GDE
 }
+
+#endif

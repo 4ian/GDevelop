@@ -11,7 +11,7 @@
 #include <wx/panel.h>
 //*)
 #include <wx/aui/aui.h>
-#include "GDL/RuntimeGame.h"
+#include "GDL/Game.h"
 #include "GDL/ImageManager.h"
 #include "GDL/MainEditorCommand.h"
 #include "GDL/ImageFilesWatcher.h"

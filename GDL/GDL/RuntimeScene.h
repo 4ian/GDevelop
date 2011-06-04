@@ -28,7 +28,7 @@ namespace llvm
     class MemoryBuffer;
 }
 
-#include "GDL/RuntimeGame.h"
+class RuntimeGame;
 #include "GDL/Object.h"
 #include "GDL/Event.h"
 #include "GDL/CommonTools.h"
@@ -41,6 +41,7 @@ namespace llvm
 #include "GDL/Layer.h"
 #include "GDL/ManualTimer.h"
 #include "GDL/ObjInstancesHolder.h"
+#include "GDL/ObjectGroup.h"
 class AutomatismsRuntimeSharedDatas;
 
 #if defined(GD_IDE_ONLY)
@@ -55,7 +56,7 @@ class BaseProfiler;
  * It contains everything a scene provide, but also specific
  * functions and members for runtime ( Render functions, objects instances, variables... )
  */
-class GD_API RuntimeScene : public Scene
+class GD_API RuntimeScene
 {
 public:
     RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_);
@@ -63,6 +64,31 @@ public:
 
     RuntimeScene& operator=(const RuntimeScene & scene);
     RuntimeScene(const RuntimeScene & scene);
+
+    /**
+     * Get scene name
+     */
+    inline string GetName() const {return name;};
+
+    /**
+     * Change scene name
+     */
+    inline void SetName(string name_) {name = name_;};
+
+    unsigned int backgroundColorR; ///< Background color Red component
+    unsigned int backgroundColorG; ///< Background color Green component
+    unsigned int backgroundColorB; ///< Background color Blue component
+    bool standardSortMethod; ///< True to sort objects using standard sort.
+    string title; ///< Title displayed in the window
+    float oglFOV; ///< OpenGL Field Of View value
+    float oglZNear; ///< OpenGL Near Z position
+    float oglZFar; ///< OpenGL Far Z position
+    bool stopSoundsOnStartup; ///< True to make the scene stop all sounds at startup.
+
+    vector < boost::shared_ptr<Object> >    initialObjects; ///< Objects availables.
+    vector < ObjectGroup >                  objectGroups; ///< Objects groups availables.
+    vector < Layer >                        initialLayers; ///< Initial layers
+
 
     sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display
     const sf::Input *                       input; ///< Pointer to the SFML class used to get user input
@@ -82,9 +108,6 @@ public:
     vector < ManualTimer >                  timers; ///<List of the timer currently used.
     bool                                    running; ///< True if the scene is being played
     float                                   pauseTime; ///<Time that has been spent during the frame but which must not be taken in account in elpased time.
-    int                                     backgroundColorR; ///< Background color Red component
-    int                                     backgroundColorG; ///< Background color Green component
-    int                                     backgroundColorB; ///< Background color Blue component
     boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas. Note the use of flat_map for better performance.
 
     llvm::Function * eventsEntryFunction;
@@ -93,10 +116,12 @@ public:
     llvm::OwningPtr<llvm::MemoryBuffer> eventsBuffer;
     llvm::LLVMContext llvmContext;
 
+    #if defined(GD_IDE_ONLY)
     /**
      * Set up the Runtime Scene using a Scene
      */
     bool LoadFromScene( const Scene & scene );
+    #endif
 
     /**
      * Change the window used for rendering the scene
@@ -175,6 +200,7 @@ protected:
 
     void Init(const RuntimeScene & scene);
 
+
     /**
      * Render a frame in the window
      */
@@ -187,6 +213,7 @@ protected:
     bool DisplayLegacyTexts(string layer = "");
     void PreprocessEventList( const Game & Jeu, vector < BaseEventSPtr > & listEvent );
 
+    std::string name;
     bool firstLoop; ///<true if the scene was just rendered once.
     bool isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
     float realElapsedTime; ///< Elpased time since last frame, in seconds, without taking time scale in account.

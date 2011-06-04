@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef STANDARDEVENT_H
 #define STANDARDEVENT_H
 #if defined(GD_IDE_ONLY)
@@ -83,3 +85,4 @@ class GD_API StandardEvent : public BaseEvent
 
 
 #endif // STANDARDEVENT_H
+#endif

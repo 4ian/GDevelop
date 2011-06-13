@@ -12,6 +12,7 @@
 #include "GDL/CommonInstructionsExtension.h"
 #include "GDL/CommonConversionsExtension.h"
 #include "GDL/StringInstructionsExtension.h"
+#include "GDL/VariablesExtension.h"
 #include "GDL/Object.h"
 
 #if defined(GD_IDE_ONLY)
@@ -37,6 +38,7 @@ ExtensionsManager::ExtensionsManager()
     //Load all extensions
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new CommonInstructionsExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new VariablesExtension()));
 
 #if defined(GD_IDE_ONLY)
     badInstructionInfos.fullname = _T("Instruction inconnue");
@@ -351,29 +353,19 @@ const StrExpressionInfos & ExtensionsManager::GetStrExpressionInfos(string exprT
 
 bool ExtensionsManager::HasAction(string name) const
 {
-    return (GetActionFunctionPtr(name) != NULL);
-}
-
-InstructionFunPtr ExtensionsManager::GetActionFunctionPtr(string name) const
-{
     //We can afford performing a search each time this function is called,
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        if ( extensionsLoaded[i]->GetActionFunctionPtr(name) != NULL )
-            return extensionsLoaded[i]->GetActionFunctionPtr(name);
+        const std::map<std::string, InstructionInfos > & actions = extensionsLoaded[i]->GetAllActions();
+        if ( actions.find(name) != actions.end() )
+            return true;
     }
 
-    return NULL;
+    return false;
 }
-
 
 bool ExtensionsManager::HasObjectAction(unsigned int objectTypeId, string name) const
-{
-    return (GetObjectActionFunctionPtr(objectTypeId, name) != NULL);
-}
-
-InstructionObjectFunPtr ExtensionsManager::GetObjectActionFunctionPtr(unsigned int objectTypeId, string name) const
 {
     //Need to find the name of the type associated with the typeId as
     //extensions are not aware of the typeId of the objects they provide.
@@ -385,28 +377,26 @@ InstructionObjectFunPtr ExtensionsManager::GetObjectActionFunctionPtr(unsigned i
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        if ( extensionsLoaded[i]->GetObjectActionFunctionPtr(objectType, name) != NULL )
-            return extensionsLoaded[i]->GetObjectActionFunctionPtr(objectType, name);
+        const std::map<std::string, InstructionInfos > & actions = extensionsLoaded[i]->GetAllActionsForObject(objectType);
+        if ( actions.find(name) != actions.end() )
+            return true;
     }
 
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        //All objects inherits from base object.
-        if ( extensionsLoaded[i]->GetObjectActionFunctionPtr("", name) != NULL )
-            return extensionsLoaded[i]->GetObjectActionFunctionPtr("", name);
+        const std::map<std::string, InstructionInfos > & actions = extensionsLoaded[i]->GetAllActionsForObject("");
+        if ( actions.find(name) != actions.end() )
+            return true;
     }
 
-    return NULL;
+    return false;
 }
 
 bool ExtensionsManager::HasAutomatismAction(unsigned int automatismTypeId, string name) const
 {
-    return (GetAutomatismActionFunctionPtr(automatismTypeId, name) != NULL);
-}
-
-InstructionAutomatismFunPtr ExtensionsManager::GetAutomatismActionFunctionPtr(unsigned int automatismTypeId, string name) const
-{
+    //Need to find the name of the type associated with the typeId as
+    //extensions are not aware of the typeId of the objects they provide.
     ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
     std::string automatismType = objectIdentifiersManager->GetNamefromOID(automatismTypeId);
 
@@ -414,46 +404,38 @@ InstructionAutomatismFunPtr ExtensionsManager::GetAutomatismActionFunctionPtr(un
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        if ( extensionsLoaded[i]->GetAutomatismActionFunctionPtr(automatismType, name) != NULL )
-            return extensionsLoaded[i]->GetAutomatismActionFunctionPtr(automatismType, name);
+        const std::map<std::string, InstructionInfos > & actions = extensionsLoaded[i]->GetAllActionsForAutomatism(automatismType);
+        if ( actions.find(name) != actions.end() )
+            return true;
     }
 
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        //All automatisms inherits from base automatism.
-        if ( extensionsLoaded[i]->GetAutomatismActionFunctionPtr("", name) != NULL )
-            return extensionsLoaded[i]->GetAutomatismActionFunctionPtr("", name);
+        const std::map<std::string, InstructionInfos > & actions = extensionsLoaded[i]->GetAllActionsForAutomatism("");
+        if ( actions.find(name) != actions.end() )
+            return true;
     }
 
-    return NULL;
+    return false;
 }
+
 
 bool ExtensionsManager::HasCondition(string name) const
-{
-    return (GetConditionFunctionPtr(name) != NULL);
-}
-
-InstructionFunPtr ExtensionsManager::GetConditionFunctionPtr(string name) const
 {
     //We can afford performing a search each time this function is called,
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        if ( extensionsLoaded[i]->GetConditionFunctionPtr(name) != NULL )
-            return extensionsLoaded[i]->GetConditionFunctionPtr(name);
+        const std::map<std::string, InstructionInfos > & conditions = extensionsLoaded[i]->GetAllConditions();
+        if ( conditions.find(name) != conditions.end() )
+            return true;
     }
 
-    return NULL;
+    return false;
 }
-
 
 bool ExtensionsManager::HasObjectCondition(unsigned int objectTypeId, string name) const
-{
-    return (GetObjectConditionFunctionPtr(objectTypeId, name) != NULL);
-}
-
-InstructionObjectFunPtr ExtensionsManager::GetObjectConditionFunctionPtr(unsigned int objectTypeId, string name) const
 {
     //Need to find the name of the type associated with the typeId as
     //extensions are not aware of the typeId of the objects they provide.
@@ -465,28 +447,26 @@ InstructionObjectFunPtr ExtensionsManager::GetObjectConditionFunctionPtr(unsigne
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        if ( extensionsLoaded[i]->GetObjectConditionFunctionPtr(objectType, name) != NULL )
-            return extensionsLoaded[i]->GetObjectConditionFunctionPtr(objectType, name);
+        const std::map<std::string, InstructionInfos > & conditions = extensionsLoaded[i]->GetAllConditionsForObject(objectType);
+        if ( conditions.find(name) != conditions.end() )
+            return true;
     }
 
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        //All objects inherits from base object
-        if ( extensionsLoaded[i]->GetObjectConditionFunctionPtr("", name) != NULL )
-            return extensionsLoaded[i]->GetObjectConditionFunctionPtr("", name);
+        const std::map<std::string, InstructionInfos > & conditions = extensionsLoaded[i]->GetAllConditionsForObject("");
+        if ( conditions.find(name) != conditions.end() )
+            return true;
     }
 
-    return NULL;
+    return false;
 }
 
 bool ExtensionsManager::HasAutomatismCondition(unsigned int automatismTypeId, string name) const
 {
-    return (GetAutomatismConditionFunctionPtr(automatismTypeId, name) != NULL);
-}
-
-InstructionAutomatismFunPtr ExtensionsManager::GetAutomatismConditionFunctionPtr(unsigned int automatismTypeId, string name) const
-{
+    //Need to find the name of the type associated with the typeId as
+    //extensions are not aware of the typeId of the objects they provide.
     ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
     std::string automatismType = objectIdentifiersManager->GetNamefromOID(automatismTypeId);
 
@@ -494,46 +474,35 @@ InstructionAutomatismFunPtr ExtensionsManager::GetAutomatismConditionFunctionPtr
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        if ( extensionsLoaded[i]->GetAutomatismConditionFunctionPtr(automatismType, name) != NULL )
-            return extensionsLoaded[i]->GetAutomatismConditionFunctionPtr(automatismType, name);
+        const std::map<std::string, InstructionInfos > & conditions = extensionsLoaded[i]->GetAllConditionsForAutomatism(automatismType);
+        if ( conditions.find(name) != conditions.end() )
+            return true;
     }
 
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        //All automatisms inherits from base automatism
-        if ( extensionsLoaded[i]->GetAutomatismConditionFunctionPtr("", name) != NULL )
-            return extensionsLoaded[i]->GetAutomatismConditionFunctionPtr("", name);
+        const std::map<std::string, InstructionInfos > & conditions = extensionsLoaded[i]->GetAllConditionsForAutomatism("");
+        if ( conditions.find(name) != conditions.end() )
+            return true;
     }
 
-    return NULL;
+    return false;
 }
 
 bool ExtensionsManager::HasExpression(string name) const
 {
-    return (GetExpressionFunctionPtr(name) != NULL);
-}
-
-ExpressionFunPtr ExtensionsManager::GetExpressionFunctionPtr(string name) const
-{
-    //We can afford performing a search each time this function is called,
-    //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        if ( extensionsLoaded[i]->GetExpressionFunctionPtr(name) != NULL )
-            return extensionsLoaded[i]->GetExpressionFunctionPtr(name);
+        const std::map<std::string, ExpressionInfos > & expressions = extensionsLoaded[i]->GetAllExpressions();
+        if ( expressions.find(name) != expressions.end() )
+            return true;
     }
 
-    return NULL;
+    return false;
 }
-
 
 bool ExtensionsManager::HasObjectExpression(unsigned int objectTypeId, string name) const
-{
-    return (GetObjectExpressionFunctionPtr(objectTypeId, name) != NULL);
-}
-
-ExpressionObjectFunPtr ExtensionsManager::GetObjectExpressionFunctionPtr(unsigned int objectTypeId, string name) const
 {
     //Need to find the name of the type associated with the typeId as
     //extensions are not aware of the typeId of the objects they provide.
@@ -542,79 +511,66 @@ ExpressionObjectFunPtr ExtensionsManager::GetObjectExpressionFunctionPtr(unsigne
         objectType = extObjectNameToTypeId.right.find(objectTypeId)->second;
 
     //We can afford performing a search each time this function is called,
-    //as the function ptr will be stocked in a map and attributed to expressions
+    //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        //Check first extensions that really provide the object
-        if ( extensionsLoaded[i]->GetObjectExpressionFunctionPtr(objectType, name) != NULL )
-            return extensionsLoaded[i]->GetObjectExpressionFunctionPtr(objectType, name);
+        const std::map<std::string, ExpressionInfos > & expressions = extensionsLoaded[i]->GetAllExpressionsForObject(objectType);
+        if ( expressions.find(name) != expressions.end() )
+            return true;
     }
 
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        //All objects inherit from base object
-        if ( extensionsLoaded[i]->GetObjectExpressionFunctionPtr("", name) != NULL )
-            return extensionsLoaded[i]->GetObjectExpressionFunctionPtr("", name);
+        const std::map<std::string, ExpressionInfos > & expressions = extensionsLoaded[i]->GetAllExpressionsForObject("");
+        if ( expressions.find(name) != expressions.end() )
+            return true;
     }
 
-    return NULL;
+    return false;
 }
 
 bool ExtensionsManager::HasAutomatismExpression(unsigned int automatismTypeId, string name) const
 {
-    return (GetAutomatismExpressionFunctionPtr(automatismTypeId, name) != NULL);
-}
-
-ExpressionAutomatismFunPtr ExtensionsManager::GetAutomatismExpressionFunctionPtr(unsigned int automatismTypeId, string name) const
-{
+    //Need to find the name of the type associated with the typeId as
+    //extensions are not aware of the typeId of the objects they provide.
     ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
     std::string automatismType = objectIdentifiersManager->GetNamefromOID(automatismTypeId);
 
     //We can afford performing a search each time this function is called,
-    //as the function ptr will be stocked in a map and attributed to expressions
+    //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        //Check first extensions that really provide the automatism
-        if ( extensionsLoaded[i]->GetAutomatismExpressionFunctionPtr(automatismType, name) != NULL )
-            return extensionsLoaded[i]->GetAutomatismExpressionFunctionPtr(automatismType, name);
+        const std::map<std::string, ExpressionInfos > & expressions = extensionsLoaded[i]->GetAllExpressionsForAutomatism(automatismType);
+        if ( expressions.find(name) != expressions.end() )
+            return true;
     }
 
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        //All automatisms inherit from base automatism
-        if ( extensionsLoaded[i]->GetAutomatismExpressionFunctionPtr("", name) != NULL )
-            return extensionsLoaded[i]->GetAutomatismExpressionFunctionPtr("", name);
+        const std::map<std::string, ExpressionInfos > & expressions = extensionsLoaded[i]->GetAllExpressionsForAutomatism("");
+        if ( expressions.find(name) != expressions.end() )
+            return true;
     }
 
-    return NULL;
+    return false;
 }
+
 
 bool ExtensionsManager::HasStrExpression(string name) const
 {
-    return (GetStrExpressionFunctionPtr(name) != NULL);
-}
-
-StrExpressionFunPtr ExtensionsManager::GetStrExpressionFunctionPtr(string name) const
-{
-    //We can afford performing a search each time this function is called,
-    //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        if ( extensionsLoaded[i]->GetStrExpressionFunctionPtr(name) != NULL )
-            return extensionsLoaded[i]->GetStrExpressionFunctionPtr(name);
+        const std::map<std::string, StrExpressionInfos > & expressions = extensionsLoaded[i]->GetAllStrExpressions();
+        if ( expressions.find(name) != expressions.end() )
+            return true;
     }
 
-    return NULL;
+    return false;
 }
 
 bool ExtensionsManager::HasObjectStrExpression(unsigned int objectTypeId, string name) const
-{
-    return (GetObjectStrExpressionFunctionPtr(objectTypeId, name) != NULL);
-}
-
-StrExpressionObjectFunPtr ExtensionsManager::GetObjectStrExpressionFunctionPtr(unsigned int objectTypeId, string name) const
 {
     //Need to find the name of the type associated with the typeId as
     //extensions are not aware of the typeId of the objects they provide.
@@ -623,53 +579,50 @@ StrExpressionObjectFunPtr ExtensionsManager::GetObjectStrExpressionFunctionPtr(u
         objectType = extObjectNameToTypeId.right.find(objectTypeId)->second;
 
     //We can afford performing a search each time this function is called,
-    //as the function ptr will be stocked in a map and attributed to expressions
+    //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        //Check first extensions that really provide the object
-        if ( extensionsLoaded[i]->GetObjectStrExpressionFunctionPtr(objectType, name) != NULL )
-            return extensionsLoaded[i]->GetObjectStrExpressionFunctionPtr(objectType, name);
+        const std::map<std::string, StrExpressionInfos > & expressions = extensionsLoaded[i]->GetAllStrExpressionsForObject(objectType);
+        if ( expressions.find(name) != expressions.end() )
+            return true;
     }
 
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        //All objects inherit from base object
-        if ( extensionsLoaded[i]->GetObjectStrExpressionFunctionPtr("", name) != NULL )
-            return extensionsLoaded[i]->GetObjectStrExpressionFunctionPtr("", name);
+        const std::map<std::string, StrExpressionInfos > & expressions = extensionsLoaded[i]->GetAllStrExpressionsForObject("");
+        if ( expressions.find(name) != expressions.end() )
+            return true;
     }
 
-    return NULL;
+    return false;
 }
 
 bool ExtensionsManager::HasAutomatismStrExpression(unsigned int automatismTypeId, string name) const
 {
-    return (GetAutomatismStrExpressionFunctionPtr(automatismTypeId, name) != NULL);
-}
-
-StrExpressionAutomatismFunPtr ExtensionsManager::GetAutomatismStrExpressionFunctionPtr(unsigned int automatismTypeId, string name) const
-{
+    //Need to find the name of the type associated with the typeId as
+    //extensions are not aware of the typeId of the objects they provide.
     ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
     std::string automatismType = objectIdentifiersManager->GetNamefromOID(automatismTypeId);
 
     //We can afford performing a search each time this function is called,
-    //as the function ptr will be stocked in a map and attributed to expressions
+    //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        //Check first extensions that really provide the automatism
-        if ( extensionsLoaded[i]->GetAutomatismStrExpressionFunctionPtr(automatismType, name) != NULL )
-            return extensionsLoaded[i]->GetAutomatismStrExpressionFunctionPtr(automatismType, name);
+        const std::map<std::string, StrExpressionInfos > & expressions = extensionsLoaded[i]->GetAllStrExpressionsForAutomatism(automatismType);
+        if ( expressions.find(name) != expressions.end() )
+            return true;
     }
 
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        //All automatisms inherit from base automatism
-        if ( extensionsLoaded[i]->GetAutomatismStrExpressionFunctionPtr("", name) != NULL )
-            return extensionsLoaded[i]->GetAutomatismStrExpressionFunctionPtr("", name);
+        const std::map<std::string, StrExpressionInfos > & expressions = extensionsLoaded[i]->GetAllStrExpressionsForAutomatism("");
+        if ( expressions.find(name) != expressions.end() )
+            return true;
     }
 
-    return NULL;
+    return false;
 }
 
 boost::shared_ptr<Object> ExtensionsManager::CreateObject(unsigned int typeId, std::string name)

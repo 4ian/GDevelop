@@ -65,34 +65,16 @@ class GD_API ExtensionsManager
         bool HasCondition(string name) const;
 
         /**
-         * Get a pointer to a ( static ) condition
-         * @return Pointer to the condition, NULL if this latter does not exist.
-         */
-        InstructionFunPtr GetConditionFunctionPtr(string name) const;
-
-        /**
          * Verifying if a ( object ) condition exists
          * @return true if the ( object ) condition exists
          */
         bool HasObjectCondition(unsigned int objectTypeId, string name) const;
 
         /**
-         * Get a pointer to a ( object ) condition
-         * @return Pointer to the condition, NULL if this latter does not exist.
-         */
-        InstructionObjectFunPtr GetObjectConditionFunctionPtr(unsigned int objectTypeId, string name) const;
-
-        /**
          * Verifying if a ( automatism ) condition exists
          * @return true if the ( automatism ) condition exists
          */
         bool HasAutomatismCondition(unsigned int automatismTypeId, string name) const;
-
-        /**
-         * Get a pointer to a ( automatism ) condition
-         * @return Pointer to the condition, NULL if this latter does not exist.
-         */
-        InstructionAutomatismFunPtr GetAutomatismConditionFunctionPtr(unsigned int automatismTypeId, string name) const;
 
         /**
          * Verifying if a ( static ) action exists
@@ -149,22 +131,10 @@ class GD_API ExtensionsManager
         const StrExpressionInfos & GetAutomatismStrExpressionInfos(string autoType, string exprType) const;
 
         /**
-         * Get a pointer to a ( static ) action
-         * @return Pointer to the action, NULL if this latter does not exist.
-         */
-        InstructionFunPtr GetActionFunctionPtr(string name) const;
-
-        /**
          * Verifying if a ( object ) action exists
          * @return true if the ( object ) action exists
          */
         bool HasObjectAction(unsigned int objectTypeId, string name) const;
-
-        /**
-         * Get a pointer to a ( object ) action
-         * @return Pointer to the action, NULL if this latter does not exist.
-         */
-        InstructionObjectFunPtr GetObjectActionFunctionPtr(unsigned int objectTypeId, string name) const;
 
         /**
          * Verifying if a ( Automatism ) action exists
@@ -173,22 +143,10 @@ class GD_API ExtensionsManager
         bool HasAutomatismAction(unsigned int automatismTypeId, string name) const;
 
         /**
-         * Get a pointer to a ( Automatism ) action
-         * @return Pointer to the action, NULL if this latter does not exist.
-         */
-        InstructionAutomatismFunPtr GetAutomatismActionFunctionPtr(unsigned int automatismTypeId, string name) const;
-
-        /**
          * Verifying if a ( static ) expression exists
          * @return true if the ( static ) expression exists
          */
         bool HasExpression(string name) const;
-
-        /**
-         * Get a pointer to a ( static ) expression
-         * @return Pointer to the expression, NULL if this latter does not exist.
-         */
-        ExpressionFunPtr GetExpressionFunctionPtr(string name) const;
 
         /**
          * Verifying if a ( object ) expression exists
@@ -197,22 +155,10 @@ class GD_API ExtensionsManager
         bool HasObjectExpression(unsigned int objectTypeId, string name) const;
 
         /**
-         * Get a pointer to a ( object ) expression
-         * @return Pointer to the expression, NULL if this latter does not exist.
-         */
-        ExpressionObjectFunPtr GetObjectExpressionFunctionPtr(unsigned int objectTypeId, string name) const;
-
-        /**
          * Verifying if a ( automatism ) expression exists
          * @return true if the ( automatism ) expression exists
          */
         bool HasAutomatismExpression(unsigned int automatismTypeId, string name) const;
-
-        /**
-         * Get a pointer to a ( automatism ) expression
-         * @return Pointer to the expression, NULL if this latter does not exist.
-         */
-        ExpressionAutomatismFunPtr GetAutomatismExpressionFunctionPtr(unsigned int automatismTypeId, string name) const;
 
         /**
          * Verifying if a ( static ) string expression exists
@@ -221,34 +167,16 @@ class GD_API ExtensionsManager
         bool HasStrExpression(string name) const;
 
         /**
-         * Get a pointer to a ( static ) string expression
-         * @return Pointer to the string expression, NULL if this latter does not exist.
-         */
-        StrExpressionFunPtr GetStrExpressionFunctionPtr(string name) const;
-
-        /**
          * Verifying if a ( object ) string expression exists
          * @return true if the ( object ) string expression exists
          */
         bool HasObjectStrExpression(unsigned int objectTypeId, string name) const;
 
         /**
-         * Get a pointer to a ( object ) string expression
-         * @return Pointer to the string expression, NULL if this latter does not exist.
-         */
-        StrExpressionObjectFunPtr GetObjectStrExpressionFunctionPtr(unsigned int objectTypeId, string name) const;
-
-        /**
          * Verifying if a ( object ) string expression exists
          * @return true if the ( object ) string expression exists
          */
         bool HasAutomatismStrExpression(unsigned int automatismTypeId, string name) const;
-
-        /**
-         * Get a pointer to a ( automatism ) string expression
-         * @return Pointer to the string expression, NULL if this latter does not exist.
-         */
-        StrExpressionAutomatismFunPtr GetAutomatismStrExpressionFunctionPtr(unsigned int automatismTypeId, string name) const;
 
         /**
          * Return a shared_ptr to a new object.

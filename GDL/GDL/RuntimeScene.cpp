@@ -16,13 +16,15 @@
 #include "GDL/Chercher.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Layer.h"
-#include "GDL/EventsPreprocessor.h"
+#include "GDL/EventsCodeGenerator.h"
 #include "GDL/profile.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Position.h"
 #include "GDL/FontManager.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/AutomatismsSharedDatas.h"
+#include "GDL/EventsCodeGenerationContext.h"
+#include "GDL/EventsCodeCompiler.h"
 
 #include <llvm/ExecutionEngine/GenericValue.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
@@ -679,14 +681,15 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     //Preprocess events
     MessageLoading( "Preprocessing events", 80 );
 
-    std::string eventsOutput;
-    EventsPreprocessor::DeleteUselessEvents(events);
-    EventsPreprocessor::GenerateEventsCode(*this, events, eventsOutput);
+    EventsCodeGenerator::DeleteUselessEvents(events);
+    std::string eventsOutput = EventsCodeGenerator::GenerateEventsCompleteCode(*this, events);
     std::ofstream myfile;
     myfile.open ("eventsOutput.cpp");
     myfile << eventsOutput;
     myfile.close();
 
+    MessageLoading( "Compiling events", 85 );
+    EventsCodeCompiler::CompileEventsFileToBitCode("eventsOutput.cpp", "eventsBitcode.txt");
 
     MessageLoading( "Creation execution engine", 90 );
 
@@ -701,9 +704,9 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     llvm::InitializeNativeTarget();
 
     {
-        llvm::error_code err = llvm::MemoryBuffer::getFile("mybitcode.txt", eventsBuffer);
+        llvm::error_code err = llvm::MemoryBuffer::getFile("eventsBitcode.txt", eventsBuffer);
         if ( err.value() != 0 )
-            std::cout << "Failed to load mybitcode.txt: " << err.message() << std::endl;
+            std::cout << "Failed to load eventsBitcode.txt: " << err.message() << std::endl;
         else
         {
             std::string parseError;

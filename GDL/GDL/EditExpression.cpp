@@ -441,7 +441,8 @@ void EditExpression::TextModified(wxStyledTextEvent& event)
     expression = string( ExpressionEdit->GetText().mb_str() );
 
     GDExpression expressionTest(expression);
-    if ( !expressionTest.PrepareForMathEvaluationOnly(game, scene) )
+    //TODO : Reimplement me
+    /*if ( !expressionTest.PrepareForMathEvaluationOnly(game, scene) )
     {
         errorTxt->SetLabel(expressionTest.GetFirstErrorDuringPreprocessingText());
         lastErrorPos = expressionTest.GetFirstErrorDuringPreprocessingPosition();
@@ -450,7 +451,7 @@ void EditExpression::TextModified(wxStyledTextEvent& event)
     {
         errorTxt->SetLabel(_("Pas d'erreurs."));
         lastErrorPos = std::string::npos;
-    }
+    }*/
 
     errorTxt->Refresh(); //Need to call manually update.
 }
@@ -458,11 +459,13 @@ void EditExpression::TextModified(wxStyledTextEvent& event)
 void EditExpression::OnOkBtClick(wxCommandEvent& event)
 {
     GDExpression expressionTest(expression);
-    if ( !expressionTest.PrepareForMathEvaluationOnly(game, scene) )
+
+    //TODO : Reimplement me
+    /*if ( !expressionTest.PrepareForMathEvaluationOnly(game, scene) )
     {
         if ( wxMessageBox(_("L'expression est mal formulée. Êtes vous sûr de vouloir valider cette expression ?"), _("L'expression contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
-    }
+    }*/
 
     EndModal(1);
 }

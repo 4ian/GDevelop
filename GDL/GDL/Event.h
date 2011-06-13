@@ -29,6 +29,7 @@ class Instruction;
 class Evaluateur;
 class TiXmlElement;
 class Game;
+class EventsCodeGenerationContext;
 
 class BaseEvent;
 typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
@@ -47,7 +48,7 @@ class GD_API BaseEvent
         /**
          * Generate event's code.
          */
-        virtual std::string GenerateEventCode(const RuntimeScene & scene) {return "";};
+        virtual std::string GenerateEventCode(const RuntimeScene & scene, EventsCodeGenerationContext & context) {return "";};
 
         /**
          * Derived class have to redefine this function, so as to return true, if they are executable.

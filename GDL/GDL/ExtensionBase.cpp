@@ -28,28 +28,22 @@ createFunPtr(NULL)
 
 ExpressionInfos::ExpressionInfos() :
 #if defined(GD_IDE_ONLY)
-shown(true),
+shown(true)
 #endif
-expressionFunPtr(NULL),
-expressionObjectFunPtr(NULL)
 {
 }
 
 StrExpressionInfos::StrExpressionInfos() :
 #if defined(GD_IDE_ONLY)
-shown(true),
+shown(true)
 #endif
-strExpressionFunPtr(NULL),
-strExpressionObjectFunPtr(NULL)
 {
 }
 
 InstructionInfos::InstructionInfos() :
 #if defined(GD_IDE_ONLY)
-canHaveSubInstructions(false),
+canHaveSubInstructions(false)
 #endif
-instructionFunPtr(NULL),
-instructionObjectFunPtr(NULL)
 {
 }
 
@@ -233,126 +227,6 @@ const AutomatismInfo & ExtensionBase::GetAutomatismInfo(std::string objectType) 
         return automatismsInfo.find(objectType)->second;
 
     return badAutomatismsInfo[""];
-}
-
-InstructionFunPtr       ExtensionBase::GetConditionFunctionPtr(std::string conditionName) const
-{
-    if ( conditionsInfos.find(conditionName) != conditionsInfos.end())
-        return conditionsInfos.find(conditionName)->second.instructionFunPtr;
-
-    return NULL;
-}
-
-InstructionObjectFunPtr ExtensionBase::GetObjectConditionFunctionPtr(std::string objectType, std::string conditionName) const
-{
-    if ( objectsInfos.find(objectType) != objectsInfos.end())
-    {
-        if ( objectsInfos.find(objectType)->second.conditionsInfos.find(conditionName) != objectsInfos.find(objectType)->second.conditionsInfos.end())
-            return objectsInfos.find(objectType)->second.conditionsInfos.find(conditionName)->second.instructionObjectFunPtr;
-    }
-
-    return NULL;
-}
-
-InstructionAutomatismFunPtr ExtensionBase::GetAutomatismConditionFunctionPtr(std::string autoType, std::string conditionName) const
-{
-    if ( automatismsInfo.find(autoType) != automatismsInfo.end())
-    {
-        if ( automatismsInfo.find(autoType)->second.conditionsInfos.find(conditionName) != automatismsInfo.find(autoType)->second.conditionsInfos.end())
-            return automatismsInfo.find(autoType)->second.conditionsInfos.find(conditionName)->second.instructionAutomatismFunPtr;
-    }
-
-    return NULL;
-}
-
-InstructionFunPtr ExtensionBase::GetActionFunctionPtr(std::string actionName) const
-{
-    if ( actionsInfos.find(actionName) != actionsInfos.end())
-        return actionsInfos.find(actionName)->second.instructionFunPtr;
-
-    return NULL;
-}
-
-InstructionObjectFunPtr ExtensionBase::GetObjectActionFunctionPtr(std::string objectType, std::string actionName) const
-{
-    if ( objectsInfos.find(objectType) != objectsInfos.end())
-    {
-        if ( objectsInfos.find(objectType)->second.actionsInfos.find(actionName) != objectsInfos.find(objectType)->second.actionsInfos.end())
-            return objectsInfos.find(objectType)->second.actionsInfos.find(actionName)->second.instructionObjectFunPtr;
-    }
-
-    return NULL;
-}
-
-InstructionAutomatismFunPtr ExtensionBase::GetAutomatismActionFunctionPtr(std::string automatismType, std::string actionName) const
-{
-    if ( automatismsInfo.find(automatismType) != automatismsInfo.end())
-    {
-        if ( automatismsInfo.find(automatismType)->second.actionsInfos.find(actionName) != automatismsInfo.find(automatismType)->second.actionsInfos.end())
-            return automatismsInfo.find(automatismType)->second.actionsInfos.find(actionName)->second.instructionAutomatismFunPtr;
-    }
-
-    return NULL;
-}
-
-ExpressionFunPtr        ExtensionBase::GetExpressionFunctionPtr(std::string expressionName) const
-{
-    if ( expressionsInfos.find(expressionName) != expressionsInfos.end())
-        return expressionsInfos.find(expressionName)->second.expressionFunPtr;
-
-    return NULL;
-}
-
-ExpressionObjectFunPtr  ExtensionBase::GetObjectExpressionFunctionPtr(std::string objectType, std::string expressionName) const
-{
-    if ( objectsInfos.find(objectType) != objectsInfos.end())
-    {
-        if ( objectsInfos.find(objectType)->second.expressionsInfos.find(expressionName) != objectsInfos.find(objectType)->second.expressionsInfos.end())
-            return objectsInfos.find(objectType)->second.expressionsInfos.find(expressionName)->second.expressionObjectFunPtr;
-    }
-
-    return NULL;
-}
-
-ExpressionAutomatismFunPtr  ExtensionBase::GetAutomatismExpressionFunctionPtr(std::string automatismType, std::string expressionName) const
-{
-    if ( automatismsInfo.find(automatismType) != automatismsInfo.end())
-    {
-        if ( automatismsInfo.find(automatismType)->second.expressionsInfos.find(expressionName) != automatismsInfo.find(automatismType)->second.expressionsInfos.end())
-            return automatismsInfo.find(automatismType)->second.expressionsInfos.find(expressionName)->second.expressionAutomatismFunPtr;
-    }
-
-    return NULL;
-}
-
-StrExpressionFunPtr        ExtensionBase::GetStrExpressionFunctionPtr(std::string expressionName) const
-{
-    if ( strExpressionsInfos.find(expressionName) != strExpressionsInfos.end())
-        return strExpressionsInfos.find(expressionName)->second.strExpressionFunPtr;
-
-    return NULL;
-}
-
-StrExpressionObjectFunPtr  ExtensionBase::GetObjectStrExpressionFunctionPtr(std::string objectType, std::string expressionName) const
-{
-    if ( objectsInfos.find(objectType) != objectsInfos.end())
-    {
-        if ( objectsInfos.find(objectType)->second.strExpressionsInfos.find(expressionName) != objectsInfos.find(objectType)->second.strExpressionsInfos.end())
-            return objectsInfos.find(objectType)->second.strExpressionsInfos.find(expressionName)->second.strExpressionObjectFunPtr;
-    }
-
-    return NULL;
-}
-
-StrExpressionAutomatismFunPtr  ExtensionBase::GetAutomatismStrExpressionFunctionPtr(std::string automatismType, std::string expressionName) const
-{
-    if ( automatismsInfo.find(automatismType) != automatismsInfo.end())
-    {
-        if ( automatismsInfo.find(automatismType)->second.strExpressionsInfos.find(expressionName) != automatismsInfo.find(automatismType)->second.strExpressionsInfos.end())
-            return automatismsInfo.find(automatismType)->second.strExpressionsInfos.find(expressionName)->second.strExpressionAutomatismFunPtr;
-    }
-
-    return NULL;
 }
 
 CreateFunPtr ExtensionBase::GetObjectCreationFunctionPtr(std::string objectType) const

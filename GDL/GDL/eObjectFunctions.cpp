@@ -23,7 +23,7 @@ double Object::ExpGetObjectY( const RuntimeScene & scene, ObjectsConcerned & obj
 {
     return GetY();
 }
-
+/*
 double SpriteObject::ExpGetObjectX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     if ( exprInstruction.parameters.size() > 1 )
@@ -73,7 +73,7 @@ double SpriteObject::ExpGetObjectAnimationNb( const RuntimeScene & scene, Object
 {
     return GetCurrentAnimation();
 }
-
+*/
 double Object::ExpGetObjectTotalForceX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return TotalForceX();
@@ -103,7 +103,7 @@ double Object::ExpGetObjectHeight( const RuntimeScene & scene, ObjectsConcerned 
 {
     return GetHeight();
 }
-
+/*
 double SpriteObject::ExpGetObjectScaleX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return GetScaleX();
@@ -113,7 +113,7 @@ double SpriteObject::ExpGetObjectScaleY( const RuntimeScene & scene, ObjectsConc
 {
     return GetScaleY();
 }
-
+*/
 double Object::ExpGetObjectZOrder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     return GetZOrder();
@@ -130,7 +130,7 @@ string Object::ExpGetObjectVariableString( const RuntimeScene & scene, ObjectsCo
 }
 
 double Object::ExpGetDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
-{
+{/*
     ObjSPtr object2;
     ObjList list2 = objectsConcerned.Pick( exprInstruction.parameters[1].GetAsObjectIdentifier() );
 
@@ -158,11 +158,11 @@ double Object::ExpGetDistanceBetweenObjects( const RuntimeScene & scene, Objects
 
         return sqrt(X*X+Y*Y);
     }
-    return 0;
+    return 0;*/
 }
 
 double Object::ExpGetSqDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
-{
+{/*
     ObjSPtr object2;
     ObjList list2 = objectsConcerned.Pick( exprInstruction.parameters[1].GetAsObjectIdentifier() );
 
@@ -190,5 +190,5 @@ double Object::ExpGetSqDistanceBetweenObjects( const RuntimeScene & scene, Objec
 
         return X*X+Y*Y; // No Square root
     }
-    return 0;
+    return 0;*/
 }

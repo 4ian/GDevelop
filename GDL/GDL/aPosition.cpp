@@ -15,13 +15,14 @@
 #include "GDL/ObjectsConcerned.h"
 
 
+//TODO : Rewrite most of the actions in a beautiful, plain, simple C++ code.
 
 /**
  * Change the X position of an object
  */
 bool Object::ActMettreX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
-    if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
+    /*if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Set )
         SetX( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) );
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Add )
         SetX( GetX() +action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) );
@@ -30,7 +31,9 @@ bool Object::ActMettreX( RuntimeScene & scene, ObjectsConcerned & objectsConcern
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Multiply )
         SetX( GetX() *action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) );
     else if ( action.GetParameter( 2 ).GetAsModOperator() == GDExpression::Divide )
-        SetX( GetX() /action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) );
+        SetX( GetX() /action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) );*/
+
+    std::cout << "Object::ActMettreX called" << std::endl;
 
     return true;
 }
@@ -38,6 +41,7 @@ bool Object::ActMettreX( RuntimeScene & scene, ObjectsConcerned & objectsConcern
 /**
  * Change the Y position of an object
  */
+ /*
 bool Object::ActMettreY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //On modifie la position Y
@@ -53,12 +57,13 @@ bool Object::ActMettreY( RuntimeScene & scene, ObjectsConcerned & objectsConcern
         SetY( GetY() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()  ) );
 
     return true;
-}
+}*/
 
 
 /**
  * Change the X and Y position of an object
  */
+ /*
 bool Object::ActMettreXY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     //On modifie la position X
@@ -86,7 +91,7 @@ bool Object::ActMettreXY( RuntimeScene & scene, ObjectsConcerned & objectsConcer
         SetY( GetY() / action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this()  ) );
 
     return true;
-}
+}*/
 
 
 ////////////////////////////////////////////////////////////
@@ -98,6 +103,7 @@ bool Object::ActMettreXY( RuntimeScene & scene, ObjectsConcerned & objectsConcer
 /// Paramètre 3 : Distance
 /// Paramètre 4 : Angle
 ////////////////////////////////////////////////////////////
+/*
 bool ActMettreAutour( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     ObjList list = objectsConcerned.Pick(action.GetParameter( 0 ).GetAsObjectIdentifier(), action.IsGlobal());
@@ -124,7 +130,7 @@ bool ActMettreAutour( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
 
     return true;
 }
-
+*/
 
 ////////////////////////////////////////////////////////////
 /// Mettre un objet autour d'une position
@@ -136,6 +142,7 @@ bool ActMettreAutour( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
 /// Paramètre 4 : Distance
 /// Paramètre 5 : Angle
 ////////////////////////////////////////////////////////////
+/*
 bool Object::ActMettreAutourPos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
 {
     double angle = action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() )/180.0f*3.14159;
@@ -151,3 +158,4 @@ bool Object::ActMettreAutourPos( RuntimeScene & scene, ObjectsConcerned & object
 
     return true;
 }
+*/

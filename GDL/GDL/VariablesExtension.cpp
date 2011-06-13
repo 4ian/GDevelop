@@ -23,7 +23,7 @@ VariablesExtension::VariablesExtension()
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png",
-                   &CondVarScene);
+                   "ActModVarScene");
 
         DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
         DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
@@ -38,7 +38,7 @@ VariablesExtension::VariablesExtension()
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png",
-                   &CondVarSceneTxt);
+                   "CondVarSceneTxt");
 
         DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
         DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
@@ -53,7 +53,7 @@ VariablesExtension::VariablesExtension()
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png",
-                   &CondVarSceneDef);
+                   "CondVarSceneDef");
 
         DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
 
@@ -66,7 +66,7 @@ VariablesExtension::VariablesExtension()
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png",
-                   &CondVarGlobal);
+                   "CondVarGlobal");
 
         DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
         DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
@@ -81,7 +81,7 @@ VariablesExtension::VariablesExtension()
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png",
-                   &CondVarGlobalTxt);
+                   "CondVarGlobalTxt");
 
         DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
         DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
@@ -96,7 +96,7 @@ VariablesExtension::VariablesExtension()
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png",
-                   &CondVarGlobalDef);
+                   "CondVarGlobalDef");
 
         DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
 
@@ -109,7 +109,7 @@ VariablesExtension::VariablesExtension()
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png",
-                   &ActModVarScene);
+                   "ActModVarScene");
 
         DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
         DECLARE_PARAMETER("expression", _("Valeur"), false, "")
@@ -124,7 +124,7 @@ VariablesExtension::VariablesExtension()
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png",
-                   &ActModVarSceneTxt);
+                   "ActModVarSceneTxt");
 
         DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
         DECLARE_PARAMETER("text", _("Texte"), false, "")
@@ -139,7 +139,7 @@ VariablesExtension::VariablesExtension()
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png",
-                   &ActModVarGlobal);
+                   "ActModVarGlobal");
 
         DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
         DECLARE_PARAMETER("expression", _("Valeur"), false, "")
@@ -154,7 +154,7 @@ VariablesExtension::VariablesExtension()
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png",
-                   &ActModVarGlobalTxt);
+                   "ActModVarGlobalTxt");
 
         DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
         DECLARE_PARAMETER("text", _("Texte"), false, "")
@@ -162,19 +162,19 @@ VariablesExtension::VariablesExtension()
 
     DECLARE_END_ACTION()
 
-    DECLARE_EXPRESSION("Variable", _("Variable de la scène"), _("Variable de la scène"), _("Variables"), "res/actions/var.png", &ExpGetVariableValue)
+    DECLARE_EXPRESSION("Variable", _("Variable de la scène"), _("Variable de la scène"), _("Variables"), "res/actions/var.png", "ExpGetVariableValue")
         DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
     DECLARE_END_EXPRESSION()
 
-    DECLARE_STR_EXPRESSION("VariableString", _("Variable de la scène"), _("Texte d'une variable de la scène"), _("Variables"), "res/actions/var.png", &ExpGetVariableString)
+    DECLARE_STR_EXPRESSION("VariableString", _("Variable de la scène"), _("Texte d'une variable de la scène"), _("Variables"), "res/actions/var.png", "ExpGetVariableString")
         DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
     DECLARE_END_STR_EXPRESSION()
 
-    DECLARE_EXPRESSION("GlobalVariable", _("Variable globale"), _("Variable globale"), _("Variables"), "res/actions/var.png", &ExpGetGlobalVariableValue)
+    DECLARE_EXPRESSION("GlobalVariable", _("Variable globale"), _("Variable globale"), _("Variables"), "res/actions/var.png", "ExpGetGlobalVariableValue")
         DECLARE_PARAMETER("globalvar", _("Nom de la variable globale"), false, "")
     DECLARE_END_EXPRESSION()
 
-    DECLARE_STR_EXPRESSION("GlobalVariableString", _("Variable globale"), _("Texte d'une variable globale"), _("Variables"), "res/actions/var.png", &ExpGetGlobalVariableString)
+    DECLARE_STR_EXPRESSION("GlobalVariableString", _("Variable globale"), _("Texte d'une variable globale"), _("Variables"), "res/actions/var.png", "ExpGetGlobalVariableString")
         DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
     DECLARE_END_STR_EXPRESSION()
 }

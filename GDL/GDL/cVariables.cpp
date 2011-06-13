@@ -18,12 +18,14 @@
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/Instruction.h"
 
+//TODO : Rewrite most of the conditions using plain, clean, beautiful C++ functions, and make them available to the new GD Runtime.
+
 /**
  * Test a variable of an object
  */
 bool Object::CondVarObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    double varValue = variablesObjet.GetVariableValue(condition.GetParameter( 1 ).GetPlainString());
+    /*double varValue = variablesObjet.GetVariableValue(condition.GetParameter( 1 ).GetPlainString());
 
     if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && varValue == condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
             ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Inferior && varValue < condition.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -35,7 +37,7 @@ bool Object::CondVarObjet( RuntimeScene & scene, ObjectsConcerned & objectsConce
     {
         return true;
     }
-
+*/
     return false;
 }
 
@@ -44,14 +46,14 @@ bool Object::CondVarObjet( RuntimeScene & scene, ObjectsConcerned & objectsConce
  */
 bool Object::CondVarObjetTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    const string & varValue = variablesObjet.GetVariableString(condition.GetParameter( 1 ).GetPlainString());
+    /*const string & varValue = variablesObjet.GetVariableString(condition.GetParameter( 1 ).GetPlainString());
 
     if (( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Equal && varValue == condition.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
         ( condition.GetParameter( 3 ).GetAsCompOperator() == GDExpression::Different && varValue != condition.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this() ) )
        )
     {
         return true;
-    }
+    }*/
 
     return false;
 }
@@ -61,7 +63,7 @@ bool Object::CondVarObjetTxt( RuntimeScene & scene, ObjectsConcerned & objectsCo
  */
 bool Object::CondVarObjetDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    return variablesObjet.HasVariable(condition.GetParameter( 1 ).GetPlainString());
+    //return variablesObjet.HasVariable(condition.GetParameter( 1 ).GetPlainString());
 }
 
 ////////////////////////////////////////////////////////////
@@ -74,7 +76,7 @@ bool Object::CondVarObjetDef( RuntimeScene & scene, ObjectsConcerned & objectsCo
 ////////////////////////////////////////////////////////////
 bool CondVarScene( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    return CondVar(scene.variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
+    //return CondVar(scene.variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////
@@ -87,7 +89,7 @@ bool CondVarScene( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
 ////////////////////////////////////////////////////////////
 bool CondVarSceneTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    return CondVarTxt(scene.variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
+    //return CondVarTxt(scene.variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////
@@ -96,9 +98,10 @@ bool CondVarSceneTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
 /// Type : VarGlobalDef
 /// Paramètre 1 : Nom Variable
 ////////////////////////////////////////////////////////////
-bool CondVarSceneDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
+bool CondVarSceneDef( std::string variable )
 {
-    return scene.variables.HasVariable( condition.GetParameter( 0 ).GetPlainString() ) ^ condition.IsInverted();
+    cout << "hello";
+    //return scene.variables.HasVariable( condition.GetParameter( 0 ).GetPlainString() ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////
@@ -111,7 +114,7 @@ bool CondVarSceneDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
 ////////////////////////////////////////////////////////////
 bool CondVarGlobal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    return CondVar(scene.game->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
+    //return CondVar(scene.game->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////
@@ -124,7 +127,7 @@ bool CondVarGlobal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, c
 ////////////////////////////////////////////////////////////
 bool CondVarGlobalTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    return CondVarTxt(scene.game->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
+    //return CondVarTxt(scene.game->variables, condition.GetParameter( 0 ).GetPlainString(), condition.GetParameter( 2 ).GetAsCompOperator(), condition.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) ) ^ condition.IsInverted();
 }
 
 ////////////////////////////////////////////////////////////
@@ -135,5 +138,5 @@ bool CondVarGlobalTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
 ////////////////////////////////////////////////////////////
 bool CondVarGlobalDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
-    return scene.game->variables.HasVariable( condition.GetParameter( 0 ).GetPlainString() ) ^ condition.IsInverted();
+    //return scene.game->variables.HasVariable( condition.GetParameter( 0 ).GetPlainString() ) ^ condition.IsInverted();
 }

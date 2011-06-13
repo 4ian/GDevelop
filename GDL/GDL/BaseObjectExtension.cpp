@@ -27,7 +27,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                    "res/objeticon24.png",
                    &CreateBaseObject,
                    &DestroyBaseObject);
-/*
+
         DECLARE_OBJECT_CONDITION("PosX",
                        _("Tester la position X d'un objet"),
                        _("Teste si la position X de l'objet correspond au test effectué."),
@@ -35,15 +35,15 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        _("Position"),
                        "res/conditions/position24.png",
                        "res/conditions/position.png",
-                       &Object::CondPosX);
+                       "GetX");
 
             DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Position X"), false, "")
             DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
             MAIN_OBJECTS_IN_PARAMETER(0)
 
-        DECLARE_END_OBJECT_CONDITION()*/
-/*
+        DECLARE_END_OBJECT_CONDITION()
+
         DECLARE_OBJECT_ACTION("MettreX",
                        _("Position X d'un objet"),
                        _("Change la position x d'un objet."),
@@ -51,7 +51,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        _("Position"),
                        "res/actions/position24.png",
                        "res/actions/position.png",
-                       &Object::ActMettreX);
+                       "SetX");
 
             DECLARE_PARAMETER("object", _("Objet"), true, "")
             DECLARE_PARAMETER("expression", _("Valeur"), false, "")
@@ -59,11 +59,11 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             MAIN_OBJECTS_IN_PARAMETER(0)
 
         DECLARE_END_OBJECT_ACTION()
-*/
-    /*
-        DECLARE_OBJECT_EXPRESSION("X", _("Position X"), _("Position X de l'objet"), _("Position"), "res/actions/position.png", &Object::ExpGetObjectX)
+
+
+        DECLARE_OBJECT_EXPRESSION("X", _("Position X"), _("Position X de l'objet"), _("Position"), "res/actions/position.png", "GetX")
             DECLARE_PARAMETER("object", _("Objet"), true, "")
         DECLARE_END_OBJECT_EXPRESSION()
-*/
+
     DECLARE_END_OBJECT()
 }

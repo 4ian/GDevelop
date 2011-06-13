@@ -41,11 +41,23 @@ std::vector<Object*> ObjInstancesHolder::GetAllObjectsRawPointers()
 
     for (map<unsigned int, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
     {
-        ObjList associatedList = it->second;
+        const ObjList & associatedList = it->second;
         for (unsigned int i = 0;i<associatedList.size();++i)
         {
             objList.push_back(associatedList[i].get());
         }
+    }
+
+    return objList;
+}
+std::vector<Object*> ObjInstancesHolder::GetObjectsRawPointers(unsigned int oId)
+{
+    std::vector<Object*> objList;
+
+    const ObjList & associatedList = objectsInstances[oId];
+    for (unsigned int i = 0;i<associatedList.size();++i)
+    {
+        objList.push_back(associatedList[i].get());
     }
 
     return objList;

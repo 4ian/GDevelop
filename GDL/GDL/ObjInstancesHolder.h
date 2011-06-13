@@ -5,8 +5,6 @@
 #include <string>
 #include <map>
 
-#include "GDL/profile.h" //Temp profile
-
 /**
  * \brief Hold lists of objects classified by the name of the objects.
  */
@@ -19,22 +17,9 @@ public:
     /**
      * Add a new object to the lists
      */
-    inline void AddObject(ObjSPtr object)
+    inline void AddObject(const ObjSPtr & object)
     {
-        //BT_PROFILE("ObjInstancesHolder::AddObject");
         objectsInstances[object->GetObjectIdentifier()].push_back(object);
-    }
-
-    /**
-     * Add a entire list of objects with the same identifier
-     */
-    inline void AddListOfObjectsWithSameName(const ObjList & objects)
-    {
-        //BT_PROFILE("ObjInstancesHolder::AddListOfObjectsWithSameName");
-        if ( objects.empty() ) return;
-
-        ObjList & objList = objectsInstances[objects[0]->GetObjectIdentifier()];
-        copy(objects.begin(), objects.end(), back_inserter(objList));
     }
 
     /**
@@ -42,9 +27,12 @@ public:
      */
     inline const ObjList & GetObjects(unsigned int oId)
     {
-        //BT_PROFILE("ObjInstancesHolder::GetObjects");
         return objectsInstances[oId];
     }
+    /**
+     * Get a "raw pointers" list to objects
+     */
+    std::vector<Object*> GetObjectsRawPointers(unsigned int oId);
 
     /**
      * Get a list of all objects
@@ -60,7 +48,7 @@ public:
     }
 
     /**
-     * Get a list of all objects
+     * Get a "raw pointers" list to all objects
      */
     std::vector<Object*> GetAllObjectsRawPointers();
 

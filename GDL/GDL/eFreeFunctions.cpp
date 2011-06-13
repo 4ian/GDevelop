@@ -12,12 +12,14 @@
 
 using namespace std;
 
+//TODO : Rewrite most of the expressions using plain, clean, beautiful C++ functions, and make them available to the new GD Runtime.
+
 double ExpRandom( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    double max = exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned, obj1, obj2);
+    /*double max = exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned, obj1, obj2);
     if ( max < 0 ) return 0;
 
-    return sf::Randomizer::Random(0, max);
+    return sf::Randomizer::Random(0, max);*/
 }
 
 double ExpTimeDelta( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
@@ -37,21 +39,21 @@ double ExpTimeScale( const RuntimeScene & scene, ObjectsConcerned & objectsConce
 
 double ExpMouseX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned); //Compatibility with Game Develop < 1.3.9262
+    /*string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned); //Compatibility with Game Develop < 1.3.9262
     unsigned int camera = exprInstruction.parameters.size() > 1 ? exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned) : 0; //Compatibility with Game Develop < 1.2.8699
 
     const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
-    return scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), view).x;
+    return scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), view).x;*/
 }
 
 double ExpMouseY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned); //Compatibility with Game Develop < 1.3.9262
+    /*string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned); //Compatibility with Game Develop < 1.3.9262
     unsigned int camera = exprInstruction.parameters.size() > 1 ? exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned) : 0; //Compatibility with Game Develop < 1.2.8699
 
     const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
-    return scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), view).y;
+    return scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), view).y;*/
 }
 
 double ExpMouseWheelDelta( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
@@ -61,83 +63,83 @@ double ExpMouseWheelDelta( const RuntimeScene & scene, ObjectsConcerned & object
 
 double ExpCameraWidth( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
+    /*unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
 
     return scene.GetLayer(
                             exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned)
-                            ).GetCamera(camera).GetCameraInfo().size.x;
+                            ).GetCamera(camera).GetCameraInfo().size.x;*/
 }
 
 double ExpCameraHeight( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
+    /*unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
 
     return scene.GetLayer(
                             exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned)
-                            ).GetCamera(camera).GetCameraInfo().size.y;
+                            ).GetCamera(camera).GetCameraInfo().size.y;*/
 }
 
 double ExpCameraViewportLeft( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
+    /*unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
 
     return scene.GetLayer(
                             exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned)
-                            ).GetCamera(camera).GetCameraInfo().viewport.Left;
+                            ).GetCamera(camera).GetCameraInfo().viewport.Left;*/
 }
 
 double ExpCameraViewportTop( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
+    /*unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
 
     return scene.GetLayer(
                             exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned)
-                            ).GetCamera(camera).GetCameraInfo().viewport.Top;
+                            ).GetCamera(camera).GetCameraInfo().viewport.Top;*/
 }
 
 double ExpCameraViewportRight( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
+    /*unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
     const sf::FloatRect & sfmlViewport = scene.GetLayer( exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned)
                                                     ).GetCamera(camera).GetCameraInfo().viewport;
 
 
-    return sfmlViewport.Left+sfmlViewport.Width;
+    return sfmlViewport.Left+sfmlViewport.Width;*/
 }
 
 double ExpCameraViewportBottom( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
+    /*unsigned int camera = exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned);
     const sf::FloatRect & sfmlViewport = scene.GetLayer( exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned)
                                                     ).GetCamera(camera).GetCameraInfo().viewport;
 
-    return sfmlViewport.Top+sfmlViewport.Height;
+    return sfmlViewport.Top+sfmlViewport.Height;*/
 }
 
 double ExpCameraX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned); //Compatibility with Game Develop < 1.3.9262
+    /*string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned); //Compatibility with Game Develop < 1.3.9262
     unsigned int camera = exprInstruction.parameters.size() > 1 ? exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned) : 0; //Compatibility with Game Develop < 1.2.8699
 
     const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
-    return view.GetCenter().x-view.GetSize().x/2;
+    return view.GetCenter().x-view.GetSize().x/2;*/
 }
 
 double ExpCameraY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned); //Compatibility with Game Develop < 1.3.9262
+    /*string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned); //Compatibility with Game Develop < 1.3.9262
     unsigned int camera = exprInstruction.parameters.size() > 1 ? exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned) : 0; //Compatibility with Game Develop < 1.2.8699
 
     const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
-    return view.GetCenter().y-view.GetSize().y/2;
+    return view.GetCenter().y-view.GetSize().y/2;*/
 }
 
 double ExpCameraRotation( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned); //Compatibility with Game Develop < 1.3.9262
+    /*string layer = exprInstruction.parameters.empty() ? "" : exprInstruction.parameters[0].GetAsTextExpressionResult(scene, objectsConcerned); //Compatibility with Game Develop < 1.3.9262
     unsigned int camera = exprInstruction.parameters.size() > 1 ? exprInstruction.parameters[1].GetAsMathExpressionResult(scene, objectsConcerned) : 0; //Compatibility with Game Develop < 1.2.8699
 
-    return scene.GetLayer(layer).GetCamera(camera).GetSFMLView().GetRotation();
+    return scene.GetLayer(layer).GetCamera(camera).GetSFMLView().GetRotation();*/
 }
 
 double ExpTime( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
@@ -189,7 +191,7 @@ std::string ExpGetGlobalVariableString( const RuntimeScene & scene, ObjectsConce
 
 double ExpGetObjectCount( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    return objectsConcerned.Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() ).size();
+    //return objectsConcerned.Pick( exprInstruction.parameters[0].GetAsObjectIdentifier() ).size();
 }
 
 double ExpGetScreenWidth( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
@@ -216,56 +218,56 @@ double ExpGetScreenColorDepth( const RuntimeScene & scene, ObjectsConcerned & ob
 
 double ExpGetSoundChannelPlayingOffset( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
+    /*int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return 0;
 
-    return SoundManager::GetInstance()->GetSoundOnChannel(canal)->GetPlayingOffset();
+    return SoundManager::GetInstance()->GetSoundOnChannel(canal)->GetPlayingOffset();*/
 }
 
 double ExpGetMusicChannelPlayingOffset( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
+    /*int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return 0;
 
-    return SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetPlayingOffset();
+    return SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetPlayingOffset();*/
 }
 
 double ExpGetSoundChannelPitch( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
+    /*int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return 0;
 
-    return SoundManager::GetInstance()->GetSoundOnChannel(canal)->GetPitch();
+    return SoundManager::GetInstance()->GetSoundOnChannel(canal)->GetPitch();*/
 }
 
 double ExpGetMusicChannelPitch( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
+    /*int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return 0;
 
-    return SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetPitch();
+    return SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetPitch();*/
 }
 
 double ExpGetSoundChannelVolume( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
+    /*int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return 0;
 
-    return SoundManager::GetInstance()->GetSoundOnChannel(canal)->GetVolume();
+    return SoundManager::GetInstance()->GetSoundOnChannel(canal)->GetVolume();*/
 }
 
 double ExpGetMusicChannelVolume( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
-    int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
+    /*int canal = static_cast<int> (exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned));
     if ( canal < 0 || canal > MAX_CANAUX_SON ) return 0;
 
-    return SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetVolume();
+    return SoundManager::GetInstance()->GetMusicOnChannel(canal)->GetVolume();*/
 }
 
 double ExpGetJoystickAxis( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
 {
     //Obtain axis and joystick
-    unsigned int joystick = exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned);
+    /*unsigned int joystick = exprInstruction.parameters[0].GetAsMathExpressionResult(scene, objectsConcerned);
     string axisStr = exprInstruction.parameters[1].GetAsTextExpressionResult(scene, objectsConcerned);
     sf::Joy::Axis axis;
     if ( axisStr == "AxisX" ) axis = sf::Joy::AxisX;
@@ -278,5 +280,5 @@ double ExpGetJoystickAxis( const RuntimeScene & scene, ObjectsConcerned & object
     else return 0;
 
     //Update variable value
-    return scene.input->GetJoystickAxis(joystick, axis);
+    return scene.input->GetJoystickAxis(joystick, axis);*/
 }

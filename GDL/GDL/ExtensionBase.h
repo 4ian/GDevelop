@@ -69,10 +69,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Start declaring a condition, and some information about it.
  * DECLARE_END_CONDITION need to be used after having declared parameter ( DECLARE_PARAMETER ).
  */
-#define DECLARE_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, ptr_) { \
+#define DECLARE_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, cppCallingName_) { \
             InstructionInfos instrInfo; \
             std::string currentConditionDeclarationName = name_; \
-            instrInfo.instructionFunPtr = ptr_; \
+            instrInfo.cppCallingName = cppCallingName_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
@@ -90,10 +90,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Start declaring an action, and some information about it.
  * DECLARE_END_ACTION need to be used after having declared parameter ( DECLARE_PARAMETER ).
  */
-#define DECLARE_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, ptr_) { \
+#define DECLARE_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, cppCallingName_) { \
             InstructionInfos instrInfo; \
             std::string currentActionDeclarationName = name_; \
-            instrInfo.instructionFunPtr = ptr_; \
+            instrInfo.cppCallingName = cppCallingName_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
@@ -111,10 +111,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Start declaring a condition for an object, and some information about it.
  * DECLARE_END_OBJECT_CONDITION need to be used after having declared parameter ( DECLARE_PARAMETER ).
  */
-#define DECLARE_OBJECT_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, ptr_) { \
+#define DECLARE_OBJECT_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, cppCallingName_) { \
             InstructionInfos instrInfo; \
             std::string currentObjConditionDeclarationName = name_; \
-            instrInfo.instructionObjectFunPtr = (InstructionObjectFunPtr)ptr_; \
+            instrInfo.cppCallingName = cppCallingName_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
@@ -131,10 +131,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Start declaring an action for an object, and some information about it.
  * DECLARE_END_OBJECT_ACTION need to be used after having declared parameter ( DECLARE_PARAMETER ).
  */
-#define DECLARE_OBJECT_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, ptr_) { \
+#define DECLARE_OBJECT_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, cppCallingName_) { \
             InstructionInfos instrInfo; \
             std::string currentObjActionDeclarationName = name_; \
-            instrInfo.instructionObjectFunPtr = (InstructionObjectFunPtr)ptr_; \
+            instrInfo.cppCallingName = cppCallingName_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
@@ -153,10 +153,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Start declaring a condition for an object, and some information about it.
  * DECLARE_END_AUTOMATISM_CONDITION need to be used after having declared parameter ( DECLARE_PARAMETER ).
  */
-#define DECLARE_AUTOMATISM_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, ptr_) { \
+#define DECLARE_AUTOMATISM_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, cppCallingName_) { \
             InstructionInfos instrInfo; \
             std::string currentAutoConditionDeclarationName = name_; \
-            instrInfo.instructionAutomatismFunPtr = (InstructionAutomatismFunPtr)ptr_; \
+            instrInfo.cppCallingName = callingName_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
@@ -173,10 +173,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Start declaring an action for an object, and some information about it.
  * DECLARE_END_AUTOMATISM_ACTION need to be used after having declared parameter ( DECLARE_PARAMETER ).
  */
-#define DECLARE_AUTOMATISM_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, ptr_) { \
+#define DECLARE_AUTOMATISM_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, callingName_) { \
             InstructionInfos instrInfo; \
             std::string currentAutoActionDeclarationName = name_; \
-            instrInfo.instructionAutomatismFunPtr = (InstructionAutomatismFunPtr)ptr_; \
+            instrInfo.cppCallingName = callingName_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
@@ -245,10 +245,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+#define DECLARE_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.expressionFunPtr = ptr;\
+            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -266,10 +266,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_OBJECT_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+#define DECLARE_OBJECT_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.expressionObjectFunPtr = (ExpressionObjectFunPtr)ptr;\
+            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -287,10 +287,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_AUTOMATISM_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+#define DECLARE_AUTOMATISM_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.expressionAutomatismFunPtr = (ExpressionAutomatismFunPtr)ptr;\
+            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -308,10 +308,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_HIDDEN_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+#define DECLARE_HIDDEN_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.expressionFunPtr = ptr;\
+            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -330,10 +330,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_OBJECT_HIDDEN_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+#define DECLARE_OBJECT_HIDDEN_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.expressionObjectFunPtr = (ExpressionObjectFunPtr)ptr;\
+            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -352,10 +352,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_AUTOMATISM_HIDDEN_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+#define DECLARE_AUTOMATISM_HIDDEN_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.expressionAutomatismFunPtr = (ExpressionAutomatismFunPtr)ptr;\
+            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -374,10 +374,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+#define DECLARE_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
             StrExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.strExpressionFunPtr = ptr;\
+            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -395,10 +395,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+#define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
             StrExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.strExpressionObjectFunPtr = (StrExpressionObjectFunPtr)ptr;\
+            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -416,10 +416,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_AUTOMATISM_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+#define DECLARE_AUTOMATISM_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
             StrExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.strExpressionAutomatismFunPtr = (StrExpressionAutomatismFunPtr)ptr;\
+            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -437,10 +437,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_HIDDEN_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+#define DECLARE_HIDDEN_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
             StrExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.strExpressionFunPtr = ptr;\
+            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -459,10 +459,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_OBJECT_HIDDEN_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+#define DECLARE_OBJECT_HIDDEN_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
             StrExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.strExpressionObjectFunPtr = (StrExpressionObjectFunPtr)ptr;\
+            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -481,10 +481,10 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_AUTOMATISM_HIDDEN_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, ptr) { \
+#define DECLARE_AUTOMATISM_HIDDEN_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
             StrExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.strExpressionAutomatismFunPtr = (StrExpressionAutomatismFunPtr)ptr;\
+            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -553,33 +553,27 @@ typedef Object * (*CreateFunPtr)(std::string name);
 
 #define DECLARE_CONDITION(name, fullname, description, sentence, group_, icon, smallicon, ptr) { \
             InstructionInfos instrInfo; \
-            std::string currentConditionDeclarationName = name; \
-            instrInfo.instructionFunPtr = ptr;
+            std::string currentConditionDeclarationName = name;
 
 #define DECLARE_ACTION(name, fullname, description, sentence, group_, icon, smallicon, ptr) { \
             InstructionInfos instrInfo; \
-            std::string currentActionDeclarationName = name; \
-            instrInfo.instructionFunPtr = ptr;
+            std::string currentActionDeclarationName = name;
 
 #define DECLARE_OBJECT_CONDITION(name, fullname, description, sentence, group_, icon, smallicon, ptr) { \
             InstructionInfos instrInfo; \
-            std::string currentObjConditionDeclarationName = name; \
-            instrInfo.instructionObjectFunPtr = (InstructionObjectFunPtr)ptr;
+            std::string currentObjConditionDeclarationName = name;
 
 #define DECLARE_OBJECT_ACTION(name, fullname, description, sentence, icon, group_, smallicon, ptr) { \
             InstructionInfos instrInfo; \
-            std::string currentObjActionDeclarationName = name; \
-            instrInfo.instructionObjectFunPtr = (InstructionObjectFunPtr)ptr;
+            std::string currentObjActionDeclarationName = name;
 
 #define DECLARE_AUTOMATISM_CONDITION(name, fullname, description, sentence, group_, icon, smallicon, ptr) { \
             InstructionInfos instrInfo; \
-            std::string currentAutoConditionDeclarationName = name; \
-            instrInfo.instructionAutomatismFunPtr = (InstructionAutomatismFunPtr)ptr;
+            std::string currentAutoConditionDeclarationName = name;
 
 #define DECLARE_AUTOMATISM_ACTION(name, fullname, description, sentence, icon, group_, smallicon, ptr) { \
             InstructionInfos instrInfo; \
-            std::string currentAutoActionDeclarationName = name; \
-            instrInfo.instructionAutomatismFunPtr = (InstructionAutomatismFunPtr)ptr;
+            std::string currentAutoActionDeclarationName = name;
 
 #define DECLARE_OBJECT(name_, fullname, informations, icon, createFunPtrP, destroyFunPtrP) { \
             ExtensionObjectInfos objInfos; \
@@ -589,63 +583,51 @@ typedef Object * (*CreateFunPtr)(std::string name);
 
 #define DECLARE_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
             ExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.expressionFunPtr = ptr;
+            std::string currentExprDeclarationName = name_;
 
 #define DECLARE_OBJECT_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
             ExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.expressionObjectFunPtr = (ExpressionObjectFunPtr)ptr;
+            std::string currentExprDeclarationName = name_;
 
 #define DECLARE_AUTOMATISM_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
             ExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.expressionAutomatismFunPtr = (ExpressionAutomatismFunPtr)ptr;
+            std::string currentExprDeclarationName = name_;
 
 #define DECLARE_HIDDEN_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
             ExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.expressionFunPtr = ptr;
+            std::string currentExprDeclarationName = name_;
 
 #define DECLARE_OBJECT_HIDDEN_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
             ExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.expressionObjectFunPtr = (ExpressionObjectFunPtr)ptr;
+            std::string currentExprDeclarationName = name_;
 
 #define DECLARE_AUTOMATISM_HIDDEN_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
             ExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.expressionAutomatismFunPtr = (ExpressionAutomatismFunPtr)ptr;
+            std::string currentExprDeclarationName = name_;
 
 #define DECLARE_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
             StrExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.strExpressionFunPtr = ptr;
+            std::string currentExprDeclarationName = name_;
 
 #define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
             StrExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.strExpressionObjectFunPtr = (StrExpressionObjectFunPtr)ptr;
+            std::string currentExprDeclarationName = name_;
 
 #define DECLARE_AUTOMATISM_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
             StrExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.strExpressionAutomatismFunPtr = (StrExpressionAutomatismFunPtr)ptr;
+            std::string currentExprDeclarationName = name_;
 
 #define DECLARE_HIDDEN_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
             StrExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.strExpressionFunPtr = ptr;
+            std::string currentExprDeclarationName = name_;
 
 #define DECLARE_OBJECT_HIDDEN_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
             StrExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.strExpressionObjectFunPtr = (StrExpressionObjectFunPtr)ptr;
+            std::string currentExprDeclarationName = name_;
 
 #define DECLARE_AUTOMATISM_HIDDEN_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
             StrExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.strExpressionAutomatismFunPtr = (StrExpressionAutomatismFunPtr)ptr;
+            std::string currentExprDeclarationName = name_;
 
 #define DECLARE_EVENT(name_, fullname_, description_, group_, smallicon_, className_) { \
             EventInfos eventInfo; \
@@ -822,9 +804,8 @@ class GD_API InstructionInfos
     bool canHaveSubInstructions;
 #endif
     std::vector < ParameterInfo > parameters;
-    InstructionFunPtr       instructionFunPtr;
-    InstructionObjectFunPtr instructionObjectFunPtr;
-    InstructionAutomatismFunPtr instructionAutomatismFunPtr;
+
+    std::string cppCallingName;
 };
 
 /**
@@ -846,9 +827,8 @@ class GD_API ExpressionInfos
 #endif
 
     std::vector < ParameterInfo > parameters;
-    ExpressionFunPtr       expressionFunPtr;
-    ExpressionObjectFunPtr expressionObjectFunPtr;
-    ExpressionAutomatismFunPtr expressionAutomatismFunPtr;
+
+    std::string cppCallingName;
 };
 
 /**
@@ -870,9 +850,8 @@ class GD_API StrExpressionInfos
 #endif
 
     std::vector < ParameterInfo > parameters;
-    StrExpressionFunPtr       strExpressionFunPtr;
-    StrExpressionObjectFunPtr strExpressionObjectFunPtr;
-    StrExpressionAutomatismFunPtr strExpressionAutomatismFunPtr;
+
+    std::string cppCallingName;
 };
 
 /**
@@ -1011,22 +990,6 @@ class GD_API ExtensionBase
     inline std::string GetFullName() const { return fullname; }
     const std::vector < std::pair<std::string, std::string> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
     #endif
-
-    InstructionFunPtr       GetConditionFunctionPtr(std::string conditionName) const;
-    InstructionObjectFunPtr GetObjectConditionFunctionPtr(std::string objectType, std::string conditionName) const;
-    InstructionAutomatismFunPtr GetAutomatismConditionFunctionPtr(std::string autoType, std::string conditionName) const;
-
-    InstructionFunPtr       GetActionFunctionPtr(std::string actionName) const;
-    InstructionObjectFunPtr GetObjectActionFunctionPtr(std::string objectType, std::string actionName) const;
-    InstructionAutomatismFunPtr GetAutomatismActionFunctionPtr(std::string autoType, std::string actionName) const;
-
-    ExpressionFunPtr        GetExpressionFunctionPtr(std::string expressionName) const;
-    ExpressionObjectFunPtr  GetObjectExpressionFunctionPtr(std::string objectType, std::string expressionName) const;
-    ExpressionAutomatismFunPtr GetAutomatismExpressionFunctionPtr(std::string autoType, std::string expressionName) const;
-
-    StrExpressionFunPtr        GetStrExpressionFunctionPtr(std::string expressionName) const;
-    StrExpressionObjectFunPtr  GetObjectStrExpressionFunctionPtr(std::string objectType, std::string expressionName) const;
-    StrExpressionAutomatismFunPtr GetAutomatismStrExpressionFunctionPtr(std::string autoType, std::string expressionName) const;
 
     /**
      * Get objects types provided by the extension

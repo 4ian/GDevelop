@@ -8,7 +8,8 @@
 #include "GDL/tinyxml.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/CommonTools.h"
-#include "GDL/EventsPreprocessor.h"
+#include "GDL/EventsCodeGenerator.h"
+#include "GDL/EventsCodeGenerationContext.h"
 
 #if defined(GD_IDE_ONLY)
 #include "EventsRenderingHelper.h"
@@ -19,11 +20,11 @@ BaseEvent()
 {
 }
 
-std::string StandardEvent::GenerateEventCode(const RuntimeScene & scene)
+std::string StandardEvent::GenerateEventCode(const RuntimeScene & scene, EventsCodeGenerationContext & context)
 {
     std::string outputCode;
 
-    outputCode += EventsPreprocessor::GenerateConditionsListCode(scene, conditions);
+    outputCode += EventsCodeGenerator::GenerateConditionsListCode(scene, conditions, context);
 
     std::string ifPredicat = "true";
     for (unsigned int i = 0;i<conditions.size();++i)
@@ -31,7 +32,10 @@ std::string StandardEvent::GenerateEventCode(const RuntimeScene & scene)
 
     outputCode += "if (" +ifPredicat+ ")\n";
     outputCode += "{\n";
-    outputCode += EventsPreprocessor::GenerateActionsListCode(scene, actions);
+    outputCode += EventsCodeGenerator::GenerateActionsListCode(scene, actions, context);
+    outputCode += "\n{ //Subevents: \n";
+    outputCode += EventsCodeGenerator::GenerateEventsListCode(scene, events, context);
+    outputCode += "} //Subevents end.\n";
     outputCode += "}\n";
 
     return outputCode;

@@ -17,13 +17,15 @@
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/Instruction.h"
 
+//TODO : Rewrite most of the actions in a beautiful, plain, simple C++ code.
+
 /**
  * Test X position of an object
  */
 bool Object::CondPosX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
-    if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetX() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
+    /*if (( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Equal && GetX() == condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Inferior && GetX() < condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::Superior && GetX() > condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
             ( condition.GetParameter( 2 ).GetAsCompOperator() == GDExpression::InferiorOrEqual && GetX() <= condition.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned, shared_from_this() ) ) ||
@@ -32,14 +34,17 @@ bool Object::CondPosX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
        )
     {
         return true;
-    }
+    }*/
 
-    return false;
+    std::cout << "Object::CondPosX called ( Return true )" << std::endl;
+
+    return true;
 }
 
 /**
  * Test Y position of an object
  */
+ /*
 bool Object::CondPosY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     //optimisation : le test de signe en premier
@@ -55,7 +60,7 @@ bool Object::CondPosY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
     }
 
     return false;
-}
+}*/
 
 ////////////////////////////////////////////////////////////
 /// Test la distance d'un objet à un autre
@@ -66,6 +71,7 @@ bool Object::CondPosY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
 /// Paramètre 3 : Valeur
 /// Paramètre 4 : Signe du test
 ////////////////////////////////////////////////////////////
+/*
 bool CondDistance( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition )
 {
     ObjectsConcerned objectsConcernedForExpressions = objectsConcerned;
@@ -120,3 +126,4 @@ bool CondDistance( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, co
 
     return isTrue;
 }
+*/

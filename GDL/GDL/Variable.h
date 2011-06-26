@@ -47,26 +47,20 @@ class GD_API Variable
          */
         void SetValue(double val);
 
-        /**
-         * Changing value using = operator
-         */
+        //Operators are overloaded to allow accessing to variable using a simple int-like semantic.
+
         void operator=(double val)  {SetValue(val);};
-        /**
-         * Changing value using += operator
-         */
         void operator+=(double val) {SetValue(val+GetValue());}
-        /**
-         * Changing value using -= operator
-         */
         void operator-=(double val) {SetValue(GetValue()-val);}
-        /**
-         * Changing value using *= operator
-         */
         void operator*=(double val) {SetValue(val*GetValue());}
-        /**
-         * Changing value using /= operator
-         */
         void operator/=(double val) {SetValue(GetValue()/val);}
+
+        bool operator<=(double val) const { return GetValue() <= val;};
+        bool operator>=(double val) const { return GetValue() >= val;};
+        bool operator<(double val) const { return GetValue() < val;};
+        bool operator>(double val) const { return GetValue() > val;};
+        bool operator==(double val) const { return GetValue() == val;};
+        bool operator!=(double val) const { return GetValue() != val;};
 
         /**
          * Get value as a string
@@ -77,14 +71,14 @@ class GD_API Variable
          * Change string of the variable
          */
         void SetString(const std::string & val);
-        /**
-         * Change string of the variable
-         */
+
+        //Operators are overloaded to allow accessing to variable using a simple string-like semantic.
+
         void operator=(const std::string & val)  {SetString(val);};
-        /**
-         * Append a string to the string of the variable
-         */
         void operator+=(const std::string & val) {SetString(GetString()+val);}
+
+        bool operator==(const std::string & val) const { return GetString() == val;};
+        bool operator!=(const std::string & val) const { return GetString() != val;};
 
     private:
         std::string name;

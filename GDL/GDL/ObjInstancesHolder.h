@@ -19,20 +19,20 @@ public:
      */
     inline void AddObject(const ObjSPtr & object)
     {
-        objectsInstances[object->GetObjectIdentifier()].push_back(object);
+        objectsInstances[object->GetName()].push_back(object);
     }
 
     /**
-     * Get all objects with the same identifier
+     * Get all objects with a specific name
      */
-    inline const ObjList & GetObjects(unsigned int oId)
+    inline const ObjList & GetObjects(const std::string & name)
     {
-        return objectsInstances[oId];
+        return objectsInstances[name];
     }
     /**
-     * Get a "raw pointers" list to objects
+     * Get a "raw pointers" list to objects with a specific name
      */
-    std::vector<Object*> GetObjectsRawPointers(unsigned int oId);
+    std::vector<Object*> GetObjectsRawPointers(const std::string & name);
 
     /**
      * Get a list of all objects
@@ -41,7 +41,7 @@ public:
     {
         ObjList objList;
 
-        for (map<unsigned int, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        for (map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
             copy(it->second.begin(), it->second.end(), back_inserter(objList));
 
         return objList;
@@ -63,8 +63,7 @@ public:
      */
     inline void RemoveObject(const ObjSPtr & object)
     {
-        //BT_PROFILE("ObjInstancesHolder::RemoveObject");
-        for (map<unsigned int, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        for (map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
         {
             ObjList & associatedList = it->second;
             associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());
@@ -74,10 +73,9 @@ public:
     /**
      * Remove an entire list of object of the given identifier
      */
-    inline void RemoveObjects(unsigned int oId)
+    inline void RemoveObjects(const std::string & name)
     {
-        //BT_PROFILE("ObjInstancesHolder::RemoveObjects");
-        objectsInstances[oId].clear();
+        objectsInstances[name].clear();
     }
 
     /**
@@ -111,7 +109,7 @@ public:
 protected:
 private:
 
-    std::map<unsigned int, ObjList> objectsInstances;
+    std::map<std::string, ObjList> objectsInstances;
 };
 
 #endif // OBJINSTANCESHOLDER_H

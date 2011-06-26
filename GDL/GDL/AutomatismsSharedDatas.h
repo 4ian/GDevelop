@@ -34,19 +34,9 @@ class GD_API AutomatismsSharedDatas
         std::string GetName() { return name; }
 
         /**
-         * Return the identifier identifying the automatism
-         */
-        unsigned int GetAutomatismId() { return automatismId; }
-
-        /**
          * Return the name identifying the type of the automatism
          */
         std::string GetTypeName() { return type; }
-
-        /**
-         * Return the identifier identifying the type of the automatism
-         */
-        unsigned int GetTypeId() { return typeId; }
 
         /**
          * Create Runtime equivalent of the shared datas.
@@ -72,10 +62,7 @@ class GD_API AutomatismsSharedDatas
 
     private:
         std::string name;
-        unsigned int automatismId;
-
         std::string type; ///< The type indicate of which type is the automatism.
-        unsigned int typeId; /// The typeId is the "unsigned-int-equivalent" of the type.
 };
 
 #endif // AUTOMATISMSSHAREDDATAS_H

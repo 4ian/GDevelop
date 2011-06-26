@@ -11,7 +11,6 @@
 #include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include <boost/interprocess/containers/flat_map.hpp>
 
 class Game;
 #include "GDL/Object.h"
@@ -61,7 +60,7 @@ class GD_API Scene
         vector < InitialPosition >              initialObjectsPositions; ///< List of all objects to be put on the scene at the beginning
         vector < Layer >                        initialLayers; ///< Initial layers
         ListVariable                            variables; ///< Variables list
-        boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
+        std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
 
         #if defined(GD_IDE_ONLY)
         bool wasModified;
@@ -96,22 +95,22 @@ struct SceneHasName : public std::binary_function<boost::shared_ptr<Scene>, stri
 };
 
 /**
- * Get a type id from an object/group name
- * @return typeId ( or 0 ).
+ * Get a type from an object/group name
+ * @return type of the object/group.
  */
-unsigned int GD_API GetTypeIdOfObject(const Game & game, const Scene & scene, std::string objectName, bool searchInGroups = true);
+std::string GD_API GetTypeOfObject(const Game & game, const Scene & scene, std::string objectName, bool searchInGroups = true);
 
 /**
- * Get a type id from an automatism name
- * @return typeId ( or 0 ).
+ * Get a type from an automatism name
+ * @return type of the automatism.
  */
-unsigned int GD_API GetTypeIdOfAutomatism(const Game & game, const Scene & scene, std::string automatismName, bool searchInGroups = true);
+std::string GD_API GetTypeOfAutomatism(const Game & game, const Scene & scene, std::string automatismName, bool searchInGroups = true);
 
 /**
  * Get automatisms of an object/group
  * @return vector containing names of automatisms
  */
-vector < unsigned int > GD_API GetAutomatismsOfObject(const Game & game, const Scene & scene, std::string objectName, bool searchInGroups = true);
+vector < std::string > GD_API GetAutomatismsOfObject(const Game & game, const Scene & scene, std::string objectName, bool searchInGroups = true);
 
 
 #endif // SCENE_H

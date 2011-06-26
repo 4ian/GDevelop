@@ -15,7 +15,6 @@
 #include <wx/textdlg.h>
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-#include "GDL/Chercher.h"
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/gdTreeItemStringData.h"
@@ -412,12 +411,12 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
     }
     else if ( parameterInfo.type == "object" )
     {
-        ChooseObject Dialog(this, game, scene, true, parameterInfo.objectType);
+        ChooseObject Dialog(this, game, scene, true, parameterInfo.supplementaryInformation);
         if ( Dialog.ShowModal() == 0 ) return "";
 
         return Dialog.objectChosen;
     }
-    else if ( parameterInfo.type == "text" )
+    else if ( parameterInfo.type == "string" )
     {
         AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
@@ -456,15 +455,15 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
     }
     else if ( parameterInfo.type == "objectvar" )
     {
-        int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, objectNameAssociated );
-        int IDglobalObject = Picker::PickOneObject( &game.globalObjects, objectNameAssociated );
+        std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), objectNameAssociated));
+        std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), objectNameAssociated));
 
         ObjSPtr object = boost::shared_ptr<Object> ();
 
-        if ( IDsceneObject != -1)
-            object = scene.initialObjects[IDsceneObject];
-        else if ( IDglobalObject != -1)
-            object = game.globalObjects[IDglobalObject];
+        if ( sceneObject != scene.initialObjects.end() )
+            object = *sceneObject;
+        else if ( globalObject != game.globalObjects.end() )
+            object = *globalObject;
         else
             return string(wxGetTextFromUser(parameterInfo.description, _("Variable"), "", this).mb_str());
 
@@ -544,7 +543,7 @@ void EditTextDialog::OnAddPropBtClick(wxCommandEvent& event)
         {
             if ( i == 1 && infos->GetStrExpressionInfos().parameters[i].type == "automatism")
             {
-                ChooseAutomatismDlg dialog(this, game, scene, object, infos->GetStrExpressionInfos().parameters[i].objectType);
+                ChooseAutomatismDlg dialog(this, game, scene, object, infos->GetStrExpressionInfos().parameters[i].supplementaryInformation);
                 if ( dialog.ShowModal() == 1 )
                     automatismStr = dialog.automatismChosen+"::";
             }

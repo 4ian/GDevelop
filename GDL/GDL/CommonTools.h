@@ -12,13 +12,11 @@
 #include <vector>
 #include "GDL/Image.h"
 #include <cmath>
+#if defined(GD_IDE_ONLY)
+#include <wx/string.h>
+#endif
 
 using namespace std;
-
-/**
- * Find an image in a list
- */
-int GD_API FindImage( const vector < Image > & vector, const string & name );
 
 #ifdef __GNUC__
 /**
@@ -95,6 +93,15 @@ std::string ToString( const T & value )
     oss << value;
     return oss.str();
 }
+
+#if defined(GD_IDE_ONLY)
+/**
+ * Specialization for converting wxString to a std::string
+ * \ingroup CommonProgrammingTools
+ */
+template<>
+std::string GD_API ToString( const wxString & value );
+#endif
 
 /**
  * Replace all spaces by tildes in a string

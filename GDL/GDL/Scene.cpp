@@ -1,7 +1,5 @@
 #include "GDL/Scene.h"
-#include "GDL/MemTrace.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/Chercher.h"
 #include "GDL/Game.h"
 #include "GDL/Position.h"
 #include "GDL/Automatism.h"
@@ -61,7 +59,7 @@ void Scene::Init(const Scene & scene)
     variables = scene.variables;
 
     automatismsInitialSharedDatas.clear();
-    for (boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
+    for (std::map< std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
          it != scene.automatismsInitialSharedDatas.end();++it)
     {
     	automatismsInitialSharedDatas[it->first] = it->second->Clone();
@@ -92,18 +90,18 @@ Scene& Scene::operator=(const Scene & scene)
     return *this;
 }
 
-unsigned int GD_API GetTypeIdOfObject(const Game & game, const Scene & scene, std::string name, bool searchInGroups)
+std::string GD_API GetTypeOfObject(const Game & game, const Scene & scene, std::string name, bool searchInGroups)
 {
-    unsigned int objectTypeId = 0;
+    std::string type;
 
     //Search in objects
-    int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, name );
-    int IDglobalObject = Picker::PickOneObject( &game.globalObjects, name );
+    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), name));
+    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), name));
 
-    if ( IDsceneObject != -1 )
-        objectTypeId = scene.initialObjects[IDsceneObject]->GetTypeId();
-    else if ( IDglobalObject != -1 )
-        objectTypeId = game.globalObjects[IDglobalObject]->GetTypeId();
+    if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
+        type = (*sceneObject)->GetType();
+    else if ( globalObject != game.globalObjects.end() ) //Then the global object list
+        type = (*globalObject)->GetType();
 
     //Search in groups
     if ( searchInGroups )
@@ -113,22 +111,22 @@ unsigned int GD_API GetTypeIdOfObject(const Game & game, const Scene & scene, st
             if ( scene.objectGroups[i].GetName() == name )
             {
                 //A group has the name searched
-                //Verifying now that all objects have the same typeId.
+                //Verifying now that all objects have the same type.
 
                 vector < string > groupsObjects = scene.objectGroups[i].GetAllObjectsNames();
-                unsigned int previousTypeId = groupsObjects.empty() ? 0 : GetTypeIdOfObject(game, scene, groupsObjects[0], false);
+                std::string previousType = groupsObjects.empty() ? "" : GetTypeOfObject(game, scene, groupsObjects[0], false);
 
                 for (unsigned int j = 0;j<groupsObjects.size();++j)
                 {
-                    if ( GetTypeIdOfObject(game, scene, groupsObjects[j], false) != previousTypeId )
-                        return 0; //The group has more than one type.
+                    if ( GetTypeOfObject(game, scene, groupsObjects[j], false) != previousType )
+                        return ""; //The group has more than one type.
 
                 }
 
-                if ( objectTypeId != 0 && previousTypeId != objectTypeId )
-                    return 0; //The group has not the same type has an object
+                if ( !type.empty() && previousType != type )
+                    return ""; //The group has not the same type has an object
 
-                objectTypeId = previousTypeId;
+                type = previousType;
             }
         }
         for (unsigned int i = 0;i<game.objectGroups.size();++i)
@@ -136,72 +134,72 @@ unsigned int GD_API GetTypeIdOfObject(const Game & game, const Scene & scene, st
             if ( game.objectGroups[i].GetName() == name )
             {
                 //A group has the name searched
-                //Verifying now that all objects have the same typeId.
+                //Verifying now that all objects have the same type.
 
                 vector < string > groupsObjects = game.objectGroups[i].GetAllObjectsNames();
-                unsigned int previousTypeId = groupsObjects.empty() ? 0 : GetTypeIdOfObject(game, scene, groupsObjects[0], false);
+                std::string previousType = groupsObjects.empty() ? "" : GetTypeOfObject(game, scene, groupsObjects[0], false);
 
                 for (unsigned int j = 0;j<groupsObjects.size();++j)
                 {
-                    if ( GetTypeIdOfObject(game, scene, groupsObjects[j], false) != previousTypeId )
-                        return 0; //The group has more than one type.
+                    if ( GetTypeOfObject(game, scene, groupsObjects[j], false) != previousType )
+                        return ""; //The group has more than one type.
 
                 }
 
-                if ( objectTypeId != 0 && previousTypeId != objectTypeId )
-                    return 0; //The group has not the same type has an object
+                if ( !type.empty() && previousType != type )
+                    return ""; //The group has not the same type has an object
 
-                objectTypeId = previousTypeId;
+                type = previousType;
             }
         }
     }
 
-    return objectTypeId;
+    return type;
 }
 
-unsigned int GD_API GetTypeIdOfAutomatism(const Game & game, const Scene & scene, std::string name, bool searchInGroups)
+std::string GD_API GetTypeOfAutomatism(const Game & game, const Scene & scene, std::string name, bool searchInGroups)
 {
     for (unsigned int i = 0;i<scene.initialObjects.size();++i)
     {
-        vector < unsigned int > automatisms = scene.initialObjects[i]->GetAllAutomatismsNameIdentifiers();
+        vector < std::string > automatisms = scene.initialObjects[i]->GetAllAutomatismNames();
         for (unsigned int j = 0;j<automatisms.size();++j)
         {
             if ( scene.initialObjects[i]->GetAutomatism(automatisms[j])->GetName() == name )
-                return scene.initialObjects[i]->GetAutomatism(automatisms[j])->GetTypeId();
+                return scene.initialObjects[i]->GetAutomatism(automatisms[j])->GetTypeName();
         }
     }
 
     for (unsigned int i = 0;i<game.globalObjects.size();++i)
     {
-        vector < unsigned int > automatisms = game.globalObjects[i]->GetAllAutomatismsNameIdentifiers();
+        vector < std::string > automatisms = game.globalObjects[i]->GetAllAutomatismNames();
         for (unsigned int j = 0;j<automatisms.size();++j)
         {
             if ( game.globalObjects[i]->GetAutomatism(automatisms[j])->GetName() == name )
-                return game.globalObjects[i]->GetAutomatism(automatisms[j])->GetTypeId();
+                return game.globalObjects[i]->GetAutomatism(automatisms[j])->GetTypeName();
         }
     }
 
-    return 0;
+    return "";
 }
 
-vector < unsigned int > GD_API GetAutomatismsOfObject(const Game & game, const Scene & scene, std::string name, bool searchInGroups)
+vector < std::string > GD_API GetAutomatismsOfObject(const Game & game, const Scene & scene, std::string name, bool searchInGroups)
 {
     bool automatismsAlreadyInserted = false;
-    vector < unsigned int > automatims;
+    vector < std::string > automatims;
 
     //Search in objects
-    int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, name );
-    int IDglobalObject = Picker::PickOneObject( &game.globalObjects, name );
+    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), name));
+    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), name));
 
-    if ( IDsceneObject != -1 )
+    if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
     {
-        vector < unsigned int > objectAutomatisms = scene.initialObjects[IDsceneObject]->GetAllAutomatismsNameIdentifiers();
+        vector < std::string > objectAutomatisms = (*sceneObject)->GetAllAutomatismNames();
         copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatims));
         automatismsAlreadyInserted = true;
     }
-    else if ( IDglobalObject != -1 )
+    else if ( globalObject != game.globalObjects.end() ) //Then the global object list
     {
-        vector < unsigned int > objectAutomatisms = game.globalObjects[IDglobalObject]->GetAllAutomatismsNameIdentifiers();
+        vector < std::string > objectAutomatisms = (*globalObject)->GetAllAutomatismNames();
         copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatims));
         automatismsAlreadyInserted = true;
     }
@@ -220,7 +218,7 @@ vector < unsigned int > GD_API GetAutomatismsOfObject(const Game & game, const S
                 for (unsigned int j = 0;j<groupsObjects.size();++j)
                 {
                     //Get automatisms of the object of the group and delete automatism which are not in commons.
-                	vector < unsigned int > objectAutomatisms = GetAutomatismsOfObject(game, scene, groupsObjects[j], false);
+                	vector < std::string > objectAutomatisms = GetAutomatismsOfObject(game, scene, groupsObjects[j], false);
                 	if (!automatismsAlreadyInserted)
                 	{
                 	    automatismsAlreadyInserted = true;
@@ -251,7 +249,7 @@ vector < unsigned int > GD_API GetAutomatismsOfObject(const Game & game, const S
                 for (unsigned int j = 0;j<groupsObjects.size();++j)
                 {
                     //Get automatisms of the object of the group and delete automatism which are not in commons.
-                	vector < unsigned int > objectAutomatisms = GetAutomatismsOfObject(game, scene, groupsObjects[j], false);
+                	vector < std::string > objectAutomatisms = GetAutomatismsOfObject(game, scene, groupsObjects[j], false);
                 	if (!automatismsAlreadyInserted)
                 	{
                 	    automatismsAlreadyInserted = true;

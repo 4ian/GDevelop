@@ -24,15 +24,15 @@ BEGIN_EVENT_TABLE(AdvancedTextEntryDlg,wxDialog)
 END_EVENT_TABLE()
 
 AdvancedTextEntryDlg::AdvancedTextEntryDlg(wxWindow* parent, std::string caption, std::string description, std::string defaultText, MoreButtonType moreButtonType_, Game * game_, Scene * scene_ ):
+    moreButtonType(moreButtonType_),
     game(game_),
-    scene(scene_),
-    moreButtonType(moreButtonType_)
+    scene(scene_)
 {
 	//(*Initialize(AdvancedTextEntryDlg)
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);

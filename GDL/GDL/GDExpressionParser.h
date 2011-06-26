@@ -21,7 +21,7 @@ class StrExpressionInfos;
 class GD_API GDExpressionParser
 {
     public:
-        GDExpressionParser(const std::string & expressionPlainString_) : expressionPlainString(expressionPlainString_) {};
+        GDExpressionParser(const std::string & expressionPlainString_);
         virtual ~GDExpressionParser() {};
 
         /**
@@ -54,6 +54,8 @@ class GD_API GDExpressionParser
         bool PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks &, GDExpression & parameter, const ParameterInfo & parametersInfo, const size_t positionInExpression);
 
         std::string expressionPlainString;
+        static std::string parserSeparators;
+        static std::vector < std::string > parserMathFunctions;
 };
 
 /** \brief Callbacks called by parser during parsing

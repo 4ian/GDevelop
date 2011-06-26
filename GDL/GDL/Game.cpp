@@ -1,5 +1,4 @@
 #include "GDL/Game.h"
-#include "GDL/MemTrace.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/SourceFile.h"

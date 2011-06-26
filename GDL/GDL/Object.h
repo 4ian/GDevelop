@@ -16,7 +16,6 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include <boost/interprocess/containers/flat_map.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "GDL/ListVariable.h"
 #include "GDL/ObjectHelpers.h"
@@ -25,6 +24,7 @@
 class RuntimeScene;
 class Object;
 class ExpressionInstruction;
+class StrExpressionInstruction;
 class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
@@ -215,29 +215,22 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
          */
         bool ClearForce();
 
-        /**
-         * Change name ( and object identifier )
+        /** Change name
          */
-        void SetName(std::string name_);
+        void SetName(const std::string & name_) {name = name_;};
 
-        /**
-         * Get string representing object's name.
+        /** Get string representing object's name.
          */
-        inline std::string GetName() { return name; }
-
-        /**
-         * Get object identifier ( number representing the object name )
-         */
-        inline unsigned int GetObjectIdentifier() {return objectId;};
+        inline const std::string & GetName() { return name; }
 
         /** Return the type indentifier of the object.
          */
-        inline unsigned int GetTypeId() const { return typeId; }
+        inline const std::string & GetType() const { return type; }
 
         /**
          * Set the type indentifier of the object.
          */
-        inline void SetTypeId(unsigned int typeId_) { typeId = typeId_; }
+        inline void SetType(const std::string & type_) { type = type_; }
 
         /**
          * Query the Z order of the object
@@ -255,6 +248,11 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         inline bool IsHidden() const {return hidden;};
 
         /**
+         * Return if the object is visible ( not hidden )
+         */
+        inline bool IsVisible() const {return !hidden;};
+
+        /**
          * Hide/Show the object
          */
         inline void SetHidden(bool hide = true) {hidden = hide;};
@@ -262,12 +260,12 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Change the layer of the object
          */
-        inline void SetLayer(std::string layer_) { layer = layer_;}
+        inline void SetLayer(const std::string & layer_) { layer = layer_;}
 
         /**
          * Get the layer of the object
          */
-        inline std::string GetLayer() const { return layer; }
+        inline const std::string & GetLayer() const { return layer; }
 
         /**
          * Get object hit box(es)
@@ -285,14 +283,14 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         void DoAutomatismsPostEvents(RuntimeScene & scene);
 
         /**
-         * Get automatism from type
+         * Get automatism from name
          */
-        inline boost::shared_ptr<Automatism> & GetAutomatism(unsigned int type) { return automatisms.find(type)->second; }
+        inline boost::shared_ptr<Automatism> & GetAutomatism(const std::string & name) { return automatisms.find(name)->second; }
 
         /**
-         * Get (const) automatism from type
+         * Get (const) automatism from name
          */
-        inline const boost::shared_ptr<Automatism> & GetAutomatism(unsigned int type) const { return automatisms.find(type)->second; }
+        inline const boost::shared_ptr<Automatism> & GetAutomatism(const std::string & name) const { return automatisms.find(name)->second; }
 
         /**
          * Add an automatism
@@ -302,18 +300,18 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Get all types of automatisms used by the object
          */
-        std::vector < unsigned int > GetAllAutomatismsNameIdentifiers();
+        std::vector < std::string > GetAllAutomatismNames();
 
         /**
          * Test if object has an automaism
          */
-        bool HasAutomatism(unsigned int type) { return automatisms.find(type) != automatisms.end(); };
+        bool HasAutomatism(const std::string & name) { return automatisms.find(name) != automatisms.end(); };
 
         #if defined(GD_IDE_ONLY)
         /**
          * Remove an automatism
          */
-        void RemoveAutomatism(unsigned int type);
+        void RemoveAutomatism(const std::string & name);
         #endif
 
         /**
@@ -379,70 +377,38 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         virtual unsigned int GetNumberOfProperties() const;
         #endif
 
-        //Actions
-        bool ActMettreX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActMettreY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActMettreXY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActMettreAutourPos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        void PutAroundAPosition( float positionX, float positionY, float distance, float angleInDegrees );
         bool ActChangeLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActAddForceXY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActAddForceAL( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActAddForceVersPos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActArreter( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActAddForceTournePos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActDelete( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActChangeZOrder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActModVarObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActModVarObjetTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActCacheObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActMontreObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActDuplicate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActActivateAutomatism( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        void AddForce( float x, float y, float clearing );
+        void AddForceUsingPolarCoordinates( float angle, float length, float clearing );
+        void AddForceTowardPosition( float positionX, float positionY, float length, float clearing );
+        void AddForceToMoveAround( float positionX, float positionY, float angularVelocity, float distance, float clearing );
 
-        //Conditions
-        bool CondLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondArret( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondAngleOfDisplacement( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondVitesse( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondZOrder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondPosX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondPosY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondVarObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondVarObjetTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondVarObjetDef( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondInvisibleObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondVisibleObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondAutomatismActivated( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        void Duplicate( RuntimeScene & scene, std::vector<Object*>& );
+        void ActivateAutomatism( const std::string & automatismName, bool activate = true );
+        bool AutomatismActivated( const std::string & automatismName );
 
-        //Expressions
-        double ExpGetObjectX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectTotalForceX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectTotalForceY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectTotalForceAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectTotalForceLength( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectWidth( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectHeight( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectZOrder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectVariableValue( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        std::string ExpGetObjectVariableString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction );
-        double ExpGetSqDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetDistanceBetweenObjects( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        bool IsStopped();
+        bool TestAngleOfDisplacement( float angle, float tolerance );
+
+        double GetSqDistanceWithObject( Object * other );
+        double GetDistanceWithObject( Object * other );
 
         ListVariable variablesObjet; ///<List of the variables of the object
+        double GetVariableValue( const std::string & variable ); /** Only used internally by GD events generated code. */
+        const std::string & GetVariableString( const std::string & variable ); /** Only used internally by GD events generated code. */
 
     protected:
 
         std::string name; ///< The full name of the object
-        unsigned int objectId; ///< The ObjectId, associated with the name, is used ( instead of the name ) by the runtime to identify objects.
-        unsigned int typeId; ///< The TypeId indicate of which type is the object. ( To test if we can do something reserved to some objects with it )
+        std::string type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )
 
         float X; ///<X position on the scene
         float Y; ///<Y position on the scene
         int zOrder; ///<Z order on the scene, to choose if an object is displayed before another object.
         bool hidden; ///<True to prevent the object from being rendered.
         std::string layer; ///<Name of the layer on which the object is.
-        boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> > automatisms; ///<Contains all automatisms of the object. Note the use of flat_map for better performance.
+        std::map<std::string, boost::shared_ptr<Automatism> > automatisms; ///<Contains all automatisms of the object.
 
         /**
          * Initialize object using another object. Used by copy-ctor and assign-op.
@@ -490,7 +456,7 @@ bool GD_API MustBeDeleted ( boost::shared_ptr<Object> object );
  * Functor testing object name
  */
 struct ObjectHasName : public std::binary_function<boost::shared_ptr<Object>, string, bool> {
-    bool operator()(const boost::shared_ptr<Object> & object, string name) const { return object->GetName() == name; }
+    bool operator()(const boost::shared_ptr<Object> & object, const std::string & name) const { return object->GetName() == name; }
 };
 
 /**

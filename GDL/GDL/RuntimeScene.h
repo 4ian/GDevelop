@@ -7,16 +7,12 @@
 #define SCENEIG_H
 
 #include "GDL/Scene.h" //This include must be placed first
-#include "GDL/MemTrace.h"
-
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include <string>
 #include <map>
 #include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
-#include <boost/interprocess/containers/flat_map.hpp>
 
 #include <llvm/ADT/OwningPtr.h>
 #include <llvm/LLVMContext.h>
@@ -85,7 +81,7 @@ public:
     int                                     backgroundColorR; ///< Background color Red component
     int                                     backgroundColorG; ///< Background color Green component
     int                                     backgroundColorB; ///< Background color Blue component
-    boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas. Note the use of flat_map for better performance.
+    std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas. Note the use of flat_map for better performance.
 
     llvm::Function * eventsEntryFunction;
     llvm::Module *Module;

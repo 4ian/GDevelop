@@ -653,7 +653,7 @@ string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo, 
         else
             userCancelled = true;
     }
-    else if ( parameterInfo.type == "text" )
+    else if ( parameterInfo.type == "string" )
     {
         AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
@@ -663,7 +663,7 @@ string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo, 
     }
     else if ( parameterInfo.type == "object" )
     {
-        ChooseObject Dialog(this, game, scene, true, parameterInfo.objectType);
+        ChooseObject Dialog(this, game, scene, true, parameterInfo.supplementaryInformation);
         if ( Dialog.ShowModal() == 0 ) return "";
 
         return Dialog.objectChosen;
@@ -722,7 +722,7 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
         {
             if ( i == 1 && infos->GetExpressionInfos().parameters[i].type == "automatism" )
             {
-                ChooseAutomatismDlg dialog(this, game, scene, object, infos->GetExpressionInfos().parameters[i].objectType);
+                ChooseAutomatismDlg dialog(this, game, scene, object, infos->GetExpressionInfos().parameters[i].supplementaryInformation);
                 if ( dialog.ShowModal() == 1 )
                     automatismStr = dialog.automatismChosen+"::";
             }

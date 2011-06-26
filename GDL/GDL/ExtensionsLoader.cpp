@@ -60,8 +60,6 @@ ExtensionsLoader *ExtensionsLoader::_singleton = NULL;
 
 void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
-
     string suffix = "";
 
     #if defined(WINDOWS)

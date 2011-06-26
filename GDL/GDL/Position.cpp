@@ -4,7 +4,6 @@
  */
 
 #include "GDL/Position.h"
-#include "GDL/MemTrace.h"
 
 #include <string>
 

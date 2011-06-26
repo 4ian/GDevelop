@@ -13,7 +13,6 @@
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/ImageManager.h"
-#include "GDL/Chercher.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Layer.h"
 #include "GDL/EventsCodeGenerator.h"
@@ -25,6 +24,11 @@
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/EventsCodeGenerationContext.h"
 #include "GDL/EventsCodeCompiler.h"
+#if defined(GD_IDE_ONLY)
+#include "GDL/ProfileEvent.h"
+#include "GDL/BaseProfiler.h"
+#include "GDL/BaseDebugger.h"
+#endif
 
 #include <llvm/ExecutionEngine/GenericValue.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
@@ -39,12 +43,6 @@
 #include <llvm/Support/TypeBuilder.h>
 #undef _
 #include <llvm/Support/system_error.h>
-
-#if defined(GD_IDE_ONLY)
-#include "GDL/ProfileEvent.h"
-#include "GDL/BaseProfiler.h"
-#include "GDL/BaseDebugger.h"
-#endif
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
@@ -122,7 +120,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     specialAction = scene.specialAction;
 
     automatismsSharedDatas.clear();
-    for (boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsRuntimeSharedDatas> >::const_iterator it = scene.automatismsSharedDatas.begin();
+    for (std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> >::const_iterator it = scene.automatismsSharedDatas.begin();
          it != scene.automatismsSharedDatas.end();++it)
     {
     	automatismsSharedDatas[it->first] = it->second->Clone();
@@ -224,8 +222,11 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         }
         #endif
 
-        const std::vector< llvm::GenericValue > args;
-        EE->runFunction(eventsEntryFunction, args);
+        {
+            BT_PROFILE("Events");
+            const std::vector< llvm::GenericValue > args;
+            EE->runFunction(eventsEntryFunction, args);
+        }
 
         #if defined(GD_IDE_ONLY)
         if( profiler && profiler->profilingActivated )
@@ -550,9 +551,8 @@ void RuntimeScene::ManageObjectsAfterEvents()
     ObjList allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
     {
-    	if ( allObjects[id]->GetObjectIdentifier() == 0 ) //0 stand always for object without name, to delete.
+    	if ( allObjects[id]->GetName().empty() )
             objectsInstances.RemoveObject(allObjects[id]); //Remove from objects Instances, not from the temporary list !
-
     }
 
     allObjects = objectsInstances.GetAllObjects();
@@ -645,15 +645,15 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     MessageLoading( "Adding objects to their initial position", 66 );
     for(unsigned int i = 0;i < scene.initialObjectsPositions.size();++i)
     {
-        int IDsceneObject = Picker::PickOneObject( &initialObjects, scene.initialObjectsPositions[i].objectName );
-        int IDglobalObject = Picker::PickOneObject( &game->globalObjects, scene.initialObjectsPositions[i].objectName );
+        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), scene.initialObjectsPositions[i].objectName));
+        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game->globalObjects.begin(), game->globalObjects.end(), std::bind2nd(ObjectHasName(), scene.initialObjectsPositions[i].objectName));
 
         ObjSPtr newObject = boost::shared_ptr<Object> ();
 
-        if ( IDsceneObject != -1 ) //We check first scene's objects' list.
-            newObject = initialObjects[IDsceneObject]->Clone();
-        else if ( IDglobalObject != -1 ) //Then the global object list
-            newObject = game->globalObjects.at( IDglobalObject )->Clone();
+        if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
+            newObject = (*sceneObject)->Clone();
+        else if ( globalObject != game->globalObjects.end() ) //Then the global object list
+            newObject = (*globalObject)->Clone();
 
         if ( newObject != boost::shared_ptr<Object> () )
         {
@@ -699,6 +699,12 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
         std::string error;
         llvm::sys::DynamicLibrary::LoadLibraryPermanently("libstdc++-6.dll", &error);
         cout << error;
+        /*cout << "Loading mingwm10.dll..." << std::endl;
+        llvm::sys::DynamicLibrary::LoadLibraryPermanently("mingwm10.dll", &error);
+        cout << error;
+        cout << "Loading libgcc_s_sjlj-1.dll..." << std::endl;
+        llvm::sys::DynamicLibrary::LoadLibraryPermanently("libgcc_s_sjlj-1.dll", &error);
+        cout << error;*/
     }
 
     llvm::InitializeNativeTarget();
@@ -735,22 +741,23 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
             cout << "Mapping objects";
             {
-                tempRSpointer = this;
+
+                backgroundColorR = 173; //TODO : Suppress this. It is just a check to make sure events access to the scene correctly.
+                tempRSpointer = this; //TODO Replace this temp RS pointer
                 llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(Module->getOrInsertGlobal("pointerToRuntimeScene", llvm::TypeBuilder<void*, false>::get(Module->getContext())));
                 EE->addGlobalMapping(globalValue, &tempRSpointer);
             }
 
-            cout << "About to run";
+            cout << "About to run..";
 
             const std::vector< llvm::GenericValue > args;
-            EE->runFunction(eventsEntryFunction, args);
             EE->runFunction(eventsEntryFunction, args);
         }
     }
 
     //Automatisms datas
     automatismsSharedDatas.clear();
-    for(boost::interprocess::flat_map < unsigned int, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
+    for(std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
         it != scene.automatismsInitialSharedDatas.end();
         ++it)
     {

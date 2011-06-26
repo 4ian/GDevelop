@@ -48,9 +48,9 @@ canHaveSubInstructions(false)
 }
 
 ParameterInfo::ParameterInfo() :
-useObject(false)
 #if defined(GD_IDE_ONLY)
-,optional(false)
+optional(false),
+codeOnly(false)
 #endif
 {
 }

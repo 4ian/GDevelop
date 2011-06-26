@@ -5,7 +5,7 @@
 		<Option title="Game Develop C++ Implementation" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Math parser\LIB fparser\;Math parser\;AES\;md5\;" />
+		<Option virtualFolders="AES\;md5\;" />
 		<Build>
 			<Target title="Debug">
 				<Option platforms="Windows;" />
@@ -504,13 +504,16 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\tools\clang\include" />
+					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<Linker>
-					<Add option="-s" />
 					<Add option="-lmingw32" />
 					<Add option="-lopengl32" />
 					<Add option="-limm32" />
@@ -550,6 +553,37 @@
 					<Add option="-lcomdlg32" />
 					<Add option="-loleaut32" />
 					<Add option="-lclangFrontend  -lclangSerialization  -lclangDriver  -lclangCodeGen  -lclangSema  -lclangStaticAnalyzerFrontend  -lclangStaticAnalyzerCheckers  -lclangStaticAnalyzerCore  -lclangIndex  -lclangAnalysis  -lclangRewrite  -lclangAST  -lclangParse  -lclangLex  -lclangBasic  -lLLVMJIT  -lLLVMInterpreter  -lLLVMX86CodeGen  -lLLVMAsmParser  -lLLVMBitReader  -lLLVMBitWriter  -lLLVMipo  -lLLVMExecutionEngine  -lLLVMAsmPrinter  -lLLVMSelectionDAG  -lLLVMX86AsmPrinter  -lLLVMX86Info  -lLLVMMCParser  -lLLVMCodeGen  -lLLVMX86Utils  -lLLVMScalarOpts  -lLLVMInstCombine  -lLLVMTransformUtils  -lLLVMipa  -lLLVMAnalysis  -lLLVMTarget  -lLLVMCore  -lLLVMMC  -lLLVMSupport -limagehlp -lpsapi  -lLLVMInstrumentation  -lclangFrontend  -lclangSerialization  -lclangDriver  -lclangParse  -lclangSema  -lclangAnalysis  -lclangIndex  -lclangAST  -lclangLex  -lclangBasic  -lLLVMMC  -lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
+					<Add option="-lLLVMJIT" />
+					<Add option="-lLLVMInterpreter" />
+					<Add option="-lLLVMX86CodeGen" />
+					<Add option="-lLLVMAsmParser" />
+					<Add option="-lLLVMBitReader" />
+					<Add option="-lLLVMBitWriter" />
+					<Add option="-lLLVMipo" />
+					<Add option="-lLLVMExecutionEngine" />
+					<Add option="-lLLVMAsmPrinter" />
+					<Add option="-lLLVMSelectionDAG" />
+					<Add option="-lLLVMX86AsmPrinter" />
+					<Add option="-lLLVMX86Info" />
+					<Add option="-lLLVMMCParser" />
+					<Add option="-lLLVMCodeGen" />
+					<Add option="-lLLVMX86Utils" />
+					<Add option="-lLLVMScalarOpts" />
+					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMTransformUtils" />
+					<Add option="-lLLVMipa" />
+					<Add option="-lLLVMAnalysis" />
+					<Add option="-lLLVMTarget" />
+					<Add option="-lLLVMCore" />
+					<Add option="-lLLVMMC" />
+					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
+					<Add option="-lLLVMInstrumentation" />
+					<Add option="-lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
+					<Add option="-lLLVMCBackend" />
+					<Add option="-lLLVMCppBackend" />
+					<Add option="-lLLVMX86AsmParser" />
+					<Add option="-lLLVMX86Disassembler" />
+					<Add option="-lLLVMCBackendInfo" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
@@ -953,8 +987,6 @@
 		<Unit filename="GDL\BitmapGUIManager.h" />
 		<Unit filename="GDL\Camera.cpp" />
 		<Unit filename="GDL\Camera.h" />
-		<Unit filename="GDL\Chercher.cpp" />
-		<Unit filename="GDL\Chercher.h" />
 		<Unit filename="GDL\ChoixDossier.cpp" />
 		<Unit filename="GDL\ChoixDossier.h" />
 		<Unit filename="GDL\ChooseAutomatismDlg.cpp" />
@@ -996,8 +1028,12 @@
 		<Unit filename="GDL\ErrorReport.h" />
 		<Unit filename="GDL\Event.cpp" />
 		<Unit filename="GDL\Event.h" />
-		<Unit filename="GDL\EventsPreprocessor.cpp" />
-		<Unit filename="GDL\EventsPreprocessor.h" />
+		<Unit filename="GDL\EventsCodeCompiler.cpp" />
+		<Unit filename="GDL\EventsCodeCompiler.h" />
+		<Unit filename="GDL\EventsCodeGenerationContext.cpp" />
+		<Unit filename="GDL\EventsCodeGenerationContext.h" />
+		<Unit filename="GDL\EventsCodeGenerator.cpp" />
+		<Unit filename="GDL\EventsCodeGenerator.h" />
 		<Unit filename="GDL\EventsRenderingHelper.cpp" />
 		<Unit filename="GDL\EventsRenderingHelper.h" />
 		<Unit filename="GDL\ExpressionInstruction.cpp" />
@@ -1020,12 +1056,6 @@
 		<Unit filename="GDL\GDExpression.h" />
 		<Unit filename="GDL\GDExpressionParser.cpp" />
 		<Unit filename="GDL\GDExpressionParser.h" />
-		<Unit filename="GDL\GDMathParser.cpp">
-			<Option virtualFolder="Math parser\" />
-		</Unit>
-		<Unit filename="GDL\GDMathParser.h">
-			<Option virtualFolder="Math parser\" />
-		</Unit>
 		<Unit filename="GDL\Game.cpp" />
 		<Unit filename="GDL\Game.h" />
 		<Unit filename="GDL\HelpFileAccess.cpp" />
@@ -1055,8 +1085,6 @@
 		<Unit filename="GDL\MainEditorCommand.h" />
 		<Unit filename="GDL\ManualTimer.cpp" />
 		<Unit filename="GDL\ManualTimer.h" />
-		<Unit filename="GDL\MemTrace.cpp" />
-		<Unit filename="GDL\MemTrace.h" />
 		<Unit filename="GDL\Music.cpp" />
 		<Unit filename="GDL\Music.h" />
 		<Unit filename="GDL\ObjInstancesHolder.cpp" />
@@ -1067,8 +1095,6 @@
 		<Unit filename="GDL\ObjectGroup.h" />
 		<Unit filename="GDL\ObjectHelpers.cpp" />
 		<Unit filename="GDL\ObjectHelpers.h" />
-		<Unit filename="GDL\ObjectIdentifiersManager.cpp" />
-		<Unit filename="GDL\ObjectIdentifiersManager.h" />
 		<Unit filename="GDL\ObjectListDialogsHelper.cpp" />
 		<Unit filename="GDL\ObjectListDialogsHelper.h" />
 		<Unit filename="GDL\OpenSaveGame.cpp" />
@@ -1134,31 +1160,18 @@
 		<Unit filename="GDL\XmlFilesHelper.cpp" />
 		<Unit filename="GDL\XmlFilesHelper.h" />
 		<Unit filename="GDL\XmlMacros.h" />
+		<Unit filename="GDL\aPosition.cpp" />
 		<Unit filename="GDL\aVariables.cpp" />
 		<Unit filename="GDL\aVariables.h" />
 		<Unit filename="GDL\btAlignedAllocator.h" />
 		<Unit filename="GDL\btScalar.h" />
+		<Unit filename="GDL\cPos.cpp" />
 		<Unit filename="GDL\cVariables.cpp" />
 		<Unit filename="GDL\cVariables.h" />
 		<Unit filename="GDL\eFreeFunctions.cpp" />
 		<Unit filename="GDL\eFreeFunctions.h" />
 		<Unit filename="GDL\eObjectFunctions.cpp" />
 		<Unit filename="GDL\eObjectFunctions.h" />
-		<Unit filename="GDL\fparser\fparser.cc">
-			<Option virtualFolder="Math parser\LIB fparser\" />
-		</Unit>
-		<Unit filename="GDL\fparser\fparser.hh">
-			<Option virtualFolder="Math parser\LIB fparser\" />
-		</Unit>
-		<Unit filename="GDL\fparser\fpconfig.hh">
-			<Option virtualFolder="Math parser\LIB fparser\" />
-		</Unit>
-		<Unit filename="GDL\fparser\fpoptimizer.cc">
-			<Option virtualFolder="Math parser\LIB fparser\" />
-		</Unit>
-		<Unit filename="GDL\fparser\fptypes.hh">
-			<Option virtualFolder="Math parser\LIB fparser\" />
-		</Unit>
 		<Unit filename="GDL\gdTreeItemStringData.cpp" />
 		<Unit filename="GDL\gdTreeItemStringData.h" />
 		<Unit filename="GDL\md5.cpp">

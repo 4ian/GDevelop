@@ -30,7 +30,6 @@ namespace GDpriv
  * ExtensionsManager manages static extensions, and provide useful things like :
  * - Functions for creating an object ( from another or from a type ).
  * - Functions for getting pointers to actions/conditions functions.
- * - Convert typeId to type name and vice-versa.
  */
 class GD_API ExtensionsManager
 {
@@ -68,13 +67,13 @@ class GD_API ExtensionsManager
          * Verifying if a ( object ) condition exists
          * @return true if the ( object ) condition exists
          */
-        bool HasObjectCondition(unsigned int objectTypeId, string name) const;
+        bool HasObjectCondition(std::string objectType, string name) const;
 
         /**
          * Verifying if a ( automatism ) condition exists
          * @return true if the ( automatism ) condition exists
          */
-        bool HasAutomatismCondition(unsigned int automatismTypeId, string name) const;
+        bool HasAutomatismCondition(std::string automatismType, string name) const;
 
         /**
          * Verifying if a ( static ) action exists
@@ -134,13 +133,13 @@ class GD_API ExtensionsManager
          * Verifying if a ( object ) action exists
          * @return true if the ( object ) action exists
          */
-        bool HasObjectAction(unsigned int objectTypeId, string name) const;
+        bool HasObjectAction(std::string objectType, string name) const;
 
         /**
          * Verifying if a ( Automatism ) action exists
          * @return true if the ( Automatism ) action exists
          */
-        bool HasAutomatismAction(unsigned int automatismTypeId, string name) const;
+        bool HasAutomatismAction(std::string automatismType, string name) const;
 
         /**
          * Verifying if a ( static ) expression exists
@@ -152,13 +151,13 @@ class GD_API ExtensionsManager
          * Verifying if a ( object ) expression exists
          * @return true if the ( object ) expression exists
          */
-        bool HasObjectExpression(unsigned int objectTypeId, string name) const;
+        bool HasObjectExpression(std::string objectType, string name) const;
 
         /**
          * Verifying if a ( automatism ) expression exists
          * @return true if the ( automatism ) expression exists
          */
-        bool HasAutomatismExpression(unsigned int automatismTypeId, string name) const;
+        bool HasAutomatismExpression(std::string automatismType, string name) const;
 
         /**
          * Verifying if a ( static ) string expression exists
@@ -170,23 +169,30 @@ class GD_API ExtensionsManager
          * Verifying if a ( object ) string expression exists
          * @return true if the ( object ) string expression exists
          */
-        bool HasObjectStrExpression(unsigned int objectTypeId, string name) const;
+        bool HasObjectStrExpression(std::string objectType, string name) const;
 
         /**
          * Verifying if a ( object ) string expression exists
          * @return true if the ( object ) string expression exists
          */
-        bool HasAutomatismStrExpression(unsigned int automatismTypeId, string name) const;
+        bool HasAutomatismStrExpression(std::string automatismType, string name) const;
 
         /**
          * Return a shared_ptr to a new object.
          */
-        boost::shared_ptr<Object> CreateObject(unsigned int typeId, std::string name);
+        boost::shared_ptr<Object> CreateObject(std::string type, std::string name);
+
+        #if defined(GD_IDE_ONLY)
+        /**
+         * Get information about an object
+         */
+        const ExtensionObjectInfos & GetObjectInfo(std::string type);
+        #endif
 
         /**
          * Check if an event type is available
          */
-        bool HasEventType(std::string evenType) const;
+        bool HasEventType(std::string eventType) const;
 
         /**
          * Create a new event of given type
@@ -213,30 +219,6 @@ class GD_API ExtensionsManager
          */
         boost::shared_ptr<AutomatismsSharedDatas> CreateAutomatismSharedDatas(std::string automatismType) const;
 
-        /**
-         * Get the typeId associated with a name
-         * @return typeId ( 0 if not found )
-         */
-        inline unsigned int GetTypeIdFromString(std::string name)
-        {
-            if ( extObjectNameToTypeId.left.find(name) != extObjectNameToTypeId.left.end())
-                return extObjectNameToTypeId.left.at(name);
-
-            return 0;
-        }
-
-        /**
-         * Get the name associated with a typeId
-         * @return name ( "" if not found )
-         */
-        inline std::string GetStringFromTypeId(unsigned int typeId)
-        {
-            if ( extObjectNameToTypeId.right.find(typeId) != extObjectNameToTypeId.right.end())
-                return extObjectNameToTypeId.right.at(typeId);
-
-            return "";
-        }
-
         static ExtensionsManager *GetInstance()
         {
             if ( NULL == _singleton )
@@ -261,16 +243,14 @@ class GD_API ExtensionsManager
         virtual ~ExtensionsManager() {};
 
         vector < boost::shared_ptr<ExtensionBase> > extensionsLoaded;
-        vector < CreateFunPtr >             creationFunctionTable;
-        vector < DestroyFunPtr >            destroyFunctionTable;
-
-        typedef boost::bimaps::bimap < string, unsigned int > StringToTypeIdBiMap;
-        StringToTypeIdBiMap                 extObjectNameToTypeId;
+        map < std::string, CreateFunPtr >             creationFunctionTable;
+        map < std::string, DestroyFunPtr >            destroyFunctionTable;
 
         static InstructionInfos badInstructionInfos;
         static ExpressionInfos badExpressionInfos;
         static StrExpressionInfos badStrExpressionInfos;
         static AutomatismInfo badAutomatismInfo;
+        static ExtensionObjectInfos badObjectInfo;
 
         static ExtensionsManager *_singleton;
 };

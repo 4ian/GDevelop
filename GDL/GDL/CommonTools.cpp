@@ -10,6 +10,17 @@
 #include <vector>
 #include "GDL/CommonTools.h"
 #include "GDL/Image.h"
+#if defined(GD_IDE_ONLY)
+#include <wx/string.h>
+#endif
+
+#if defined(GD_IDE_ONLY)
+template<>
+std::string GD_API ToString( const wxString & value )
+{
+    return string(value.mb_str());
+}
+#endif
 
 std::string ReplaceSpacesByTildes(std::string text)
 {
@@ -21,16 +32,6 @@ std::string ReplaceSpacesByTildes(std::string text)
     }
 
     return text;
-}
-
-int GD_API FindImage( const vector < Image > & list, const string & chaine )
-{
-    for ( unsigned int i = 0;i < list.size();i++ )
-    {
-        if ( list[i].nom == chaine )
-            return i;
-    }
-    return -1;
 }
 
 //Découpage en fonction d'un séparateur

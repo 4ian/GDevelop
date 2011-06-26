@@ -2,6 +2,7 @@
 <wxsmith>
 	<object class="wxDialog" name="AdvancedTextEntryDlg">
 		<id_arg>0</id_arg>
+		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<growablecols>0</growablecols>

@@ -4,39 +4,28 @@
  */
 
 #include "GDL/Object.h"
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <boost/shared_ptr.hpp>
-
-#include "GDL/ObjectIdentifiersManager.h"
-#include "GDL/Log.h"
-#include "GDL/Force.h"
-#include "GDL/constantes.h"
 #include <string>
 #include <list>
 #include <sstream>
-#include "GDL/MemTrace.h"
+#include <boost/shared_ptr.hpp>
+#include "GDL/Log.h"
+#include "GDL/Force.h"
 #include "GDL/CommonTools.h"
+#include "GDL/RuntimeScene.h"
 #include "GDL/Automatism.h"
-#include <typeinfo>
 
 using namespace std;
 
 Object::Object(string name_) :
         name( name_ ),
-        objectId(0),
-        typeId(0), //0 is the default typeId for an object
         X( 0 ),
         Y( 0 ),
         zOrder( 0 ),
         hidden( false )
 {
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
-    objectId = objectIdentifiersManager->GetOIDfromName(name_);
-
     this->ClearForce();
 }
 
@@ -54,8 +43,7 @@ void Object::Init(const Object & object)
     variablesObjet = object.variablesObjet;
 
     name = object.name;
-    objectId = object.objectId;
-    typeId = object.typeId;
+    type = object.type;
 
     X = object.X;
     Y = object.Y;
@@ -64,24 +52,11 @@ void Object::Init(const Object & object)
     layer = object.layer;
 
     automatisms.clear();
-    for (boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
+    for (std::map<std::string, boost::shared_ptr<Automatism> >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
     {
     	automatisms[it->first] = it->second->Clone();
     	automatisms[it->first]->SetOwner(this);
     }
-}
-
-/**
- * Change object's name, and so identifier.
- * Remember to notify classes that can hold the object ( e.g. ObjectInstancesHolder )
- * that the object's name has changed.
- */
-void Object::SetName(string name_)
-{
-    name = name_;
-
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
-    objectId = objectIdentifiersManager->GetOIDfromName(name_);
 }
 
 ////////////////////////////////////////////////////////////
@@ -185,21 +160,21 @@ float Object::TotalForceLength() const
 
 void Object::DoAutomatismsPreEvents(RuntimeScene & scene)
 {
-    for (boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<std::string, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
         it->second->StepPreEvents(scene);
 }
 
 void Object::DoAutomatismsPostEvents(RuntimeScene & scene)
 {
-    for (boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<std::string, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
         it->second->StepPostEvents(scene);
 }
 
-vector < unsigned int > Object::GetAllAutomatismsNameIdentifiers()
+std::vector < std::string > Object::GetAllAutomatismNames()
 {
-    vector < unsigned int > allNameIdentifiers;
+    std::vector < std::string > allNameIdentifiers;
 
-    for (boost::interprocess::flat_map<unsigned int, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<std::string, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
     	allNameIdentifiers.push_back(it->first);
 
     return allNameIdentifiers;
@@ -207,15 +182,25 @@ vector < unsigned int > Object::GetAllAutomatismsNameIdentifiers()
 
 void Object::AddAutomatism(boost::shared_ptr<Automatism> automatism)
 {
-    automatisms[automatism->GetAutomatismId()] = automatism;
-    automatisms[automatism->GetAutomatismId()]->SetOwner(this);
+    automatisms[automatism->GetName()] = automatism;
+    automatisms[automatism->GetName()]->SetOwner(this);
 }
 #if defined(GD_IDE_ONLY)
-void Object::RemoveAutomatism(unsigned int type)
+void Object::RemoveAutomatism(const std::string & name)
 {
-    automatisms.erase(type);
+    automatisms.erase(name);
 }
 #endif
+
+double Object::GetVariableValue( const std::string & variable )
+{
+    return variablesObjet.GetVariableValue(variable);
+}
+
+const std::string & Object::GetVariableString( const std::string & variable )
+{
+    return variablesObjet.GetVariableString(variable);
+}
 
 #if defined(GD_IDE_ONLY)
 void Object::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
@@ -244,8 +229,8 @@ bool Object::ChangeProperty(unsigned int propertyNb, string newValue)
         string xValue = newValue.substr(0, separationPos);
         string yValue = newValue.substr(separationPos+1, newValue.length());
 
-        SetX(ToInt(xValue));
-        SetY(ToInt(yValue));
+        SetX(ToFloat(xValue));
+        SetY(ToFloat(yValue));
     }
     else if ( propertyNb == 1 ) {return SetAngle(ToFloat(newValue));}
     else if ( propertyNb == 2 ) {return false;}
@@ -275,6 +260,132 @@ unsigned int Object::GetNumberOfProperties() const
 }
 #endif
 
+void Object::PutAroundAPosition( float positionX, float positionY, float distance, float angleInDegrees )
+{
+    double angle = angleInDegrees/180.0f*3.14159;
+
+    SetX( positionX + cos(angle)*distance - GetCenterX() );
+    SetY( positionY + sin(angle)*distance - GetCenterY() );
+}
+
+void Object::AddForce( float x, float y, float clearing )
+{
+    Force forceToAdd;
+    forceToAdd.SetX( x ); forceToAdd.SetY( y ); forceToAdd.SetClearing( clearing );
+    Forces.push_back( forceToAdd );
+}
+
+void Object::AddForceUsingPolarCoordinates( float angle, float length, float clearing )
+{
+    Force forceToAdd;
+    forceToAdd.SetAngle( angle );
+    forceToAdd.SetLength( length );
+    forceToAdd.SetClearing( clearing );
+    Forces.push_back( forceToAdd );
+}
+
+/**
+ * Add a force toward a position
+ */
+void Object::AddForceTowardPosition( float positionX, float positionY, float length, float clearing )
+{
+    Force forceToAdd;
+    forceToAdd.SetLength( length );
+    forceToAdd.SetClearing( clearing );
+
+	//Workaround Visual C++ internal error (!) by using temporary doubles.
+	double y = positionY - (GetDrawableY()+GetCenterY());
+	double x = positionX - (GetDrawableX()+GetCenterX());
+    forceToAdd.SetAngle( atan2(y,x) * 180 / 3.14159 );
+
+    Forces.push_back( forceToAdd );
+}
+
+
+void Object::AddForceToMoveAround( float positionX, float positionY, float angularVelocity, float distance, float clearing )
+{
+    //Angle en degré entre les deux objets
+
+	//Workaround Visual C++ internal error (!) by using temporary doubles.
+	double y = ( GetDrawableY() + GetCenterY()) - positionY;
+	double x = ( GetDrawableX() + GetCenterX() ) - positionX;
+    float angle = atan2(y,x) * 180 / 3.14159f;
+    float newangle = angle + angularVelocity;
+
+    //position actuelle de l'objet 1 par rapport à l'objet centre
+    int oldX = ( GetDrawableX() + GetCenterX() ) - positionX;
+    int oldY = ( GetDrawableY() + GetCenterY() ) - positionY;
+
+    //nouvelle position à atteindre
+    int newX = cos(newangle/180.f*3.14159f) * distance;
+    int newY = sin(newangle/180.f*3.14159f) * distance;
+
+    Force forceToAdd;
+    forceToAdd.SetX( newX-oldX );
+    forceToAdd.SetY( newY-oldY );
+    forceToAdd.SetClearing( clearing );
+
+    Forces.push_back( forceToAdd );
+}
+
+void Object::Duplicate(RuntimeScene & scene, std::vector<Object*> & concernedObjects)
+{
+    ObjSPtr newObject = Clone();
+
+    scene.objectsInstances.AddObject(newObject);
+
+    if ( std::find(concernedObjects.begin(), concernedObjects.end(), newObject.get()) == concernedObjects.end() )
+        concernedObjects.push_back(newObject.get()); //Object is concerned for future actions
+}
+
+bool Object::IsStopped()
+{
+    return TotalForceLength() == 0;
+}
+
+bool Object::TestAngleOfDisplacement(float angle, float tolerance)
+{
+    if ( TotalForceLength() == 0) return false;
+
+    float objectAngle = TotalForceAngle();
+
+    //Compute difference between two angles
+    float diff = objectAngle - angle;
+    while ( diff>180 )
+		diff -= 360;
+	while ( diff<-180 )
+		diff += 360;
+
+    if ( fabs(diff) <= tolerance/2 )
+        return true;
+
+    return false;
+}
+
+void Object::ActivateAutomatism( const std::string & automatismName, bool activate )
+{
+    GetAutomatism(automatismName)->Activate(activate);
+}
+
+bool Object::AutomatismActivated( const std::string & automatismName )
+{
+    return GetAutomatism(automatismName)->Activated();
+}
+
+double Object::GetSqDistanceWithObject( Object * other )
+{
+    if ( other == NULL ) return 0;
+
+    float x = GetDrawableX()+GetCenterX() - (other->GetDrawableX()+other->GetCenterX());
+    float y = GetDrawableY()+GetCenterY() - (other->GetDrawableY()+other->GetCenterY());
+
+    return x*x+y*y; // No square root here
+}
+
+double Object::GetDistanceWithObject( Object * other )
+{
+    return sqrt(GetSqDistanceWithObject(other));
+}
 
 bool GD_API MustBeDeleted ( boost::shared_ptr<Object> object )
 {

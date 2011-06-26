@@ -5,11 +5,10 @@
 
 #include "GDL/Son.h"
 #include <SFML/Audio.hpp>
-#include "GDL/MemTrace.h"
-#include "GDL/RessourcesLoader.h"
 #include <string>
 #include <vector>
 #include <iostream>
+#include "GDL/RessourcesLoader.h"
 #include "GDL/SoundManager.h"
 
 using namespace std;

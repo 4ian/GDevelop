@@ -4,9 +4,6 @@
  */
 
 #include "GDL/VariablesExtension.h"
-#include "GDL/cVariables.h"
-#include "GDL/aVariables.h"
-#include "GDL/eFreeFunctions.h"
 
 VariablesExtension::VariablesExtension()
 {
@@ -22,12 +19,14 @@ VariablesExtension::VariablesExtension()
                    _("La variable _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Variables"),
                    "res/conditions/var24.png",
-                   "res/conditions/var.png",
-                   "ActModVarScene");
+                   "res/conditions/var.png");
 
-        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), "", false)
+        DECLARE_PARAMETER("expression", _("Valeur à tester"), "", false)
+        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "", false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetSceneVariable").SetTypeManipulated("number").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -37,12 +36,14 @@ VariablesExtension::VariablesExtension()
                    _("Le texte de la variable _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Variables"),
                    "res/conditions/var24.png",
-                   "res/conditions/var.png",
-                   "CondVarSceneTxt");
+                   "res/conditions/var.png");
 
-        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
-        DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), "", false)
+        DECLARE_PARAMETER("string", _("Texte à tester"), "", false)
+        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "", false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetSceneVariable").SetTypeManipulated("string").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -52,10 +53,12 @@ VariablesExtension::VariablesExtension()
                    _("La variable _PARAM0_ est définie"),
                    _("Variables"),
                    "res/conditions/var24.png",
-                   "res/conditions/var.png",
-                   "CondVarSceneDef");
+                   "res/conditions/var.png");
 
-        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), "", false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("SceneVariableDefined").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -65,12 +68,14 @@ VariablesExtension::VariablesExtension()
                    _("La variable globale _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Variables"),
                    "res/conditions/var24.png",
-                   "res/conditions/var.png",
-                   "CondVarGlobal");
+                   "res/conditions/var.png");
 
-        DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("globalvar", _("Nom de la variable"), "", false)
+        DECLARE_PARAMETER("expression", _("Valeur à tester"), "", false)
+        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "", false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariable").SetTypeManipulated("number").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -80,12 +85,14 @@ VariablesExtension::VariablesExtension()
                    _("Le texte de la variable globale _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Variables"),
                    "res/conditions/var24.png",
-                   "res/conditions/var.png",
-                   "CondVarGlobalTxt");
+                   "res/conditions/var.png");
 
-        DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
-        DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("globalvar", _("Nom de la variable"), "", false)
+        DECLARE_PARAMETER("string", _("Texte à tester"), "", false)
+        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "", false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariable").SetTypeManipulated("string").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -95,10 +102,12 @@ VariablesExtension::VariablesExtension()
                    _("La variable globale _PARAM0_ est définie"),
                    _("Variables"),
                    "res/conditions/var24.png",
-                   "res/conditions/var.png",
-                   "CondVarGlobalDef");
+                   "res/conditions/var.png");
 
-        DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("globalvar", _("Nom de la variable"), "", false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("GlobalVariableDefined").SetTypeManipulated("string").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -108,12 +117,14 @@ VariablesExtension::VariablesExtension()
                    _("Faire _PARAM2__PARAM1_ à la variable _PARAM0_"),
                    _("Variables"),
                    "res/actions/var24.png",
-                   "res/actions/var.png",
-                   "ActModVarScene");
+                   "res/actions/var.png");
 
-        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), "", false)
+        DECLARE_PARAMETER("expression", _("Valeur"), "", false)
+        DECLARE_PARAMETER("operator", _("Signe de la modification"), "", false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetSceneVariable").SetTypeManipulated("number").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
@@ -123,12 +134,14 @@ VariablesExtension::VariablesExtension()
                    _("Faire _PARAM2__PARAM1_ au texte de la variable _PARAM0_"),
                    _("Variables"),
                    "res/actions/var24.png",
-                   "res/actions/var.png",
-                   "ActModVarSceneTxt");
+                   "res/actions/var.png");
 
-        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
-        DECLARE_PARAMETER("text", _("Texte"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), "", false)
+        DECLARE_PARAMETER("string", _("Texte"), "", false)
+        DECLARE_PARAMETER("operator", _("Signe de la modification"), "", false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetSceneVariable").SetTypeManipulated("string").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
@@ -138,12 +151,14 @@ VariablesExtension::VariablesExtension()
                    _("Faire _PARAM2__PARAM1_ à la variable globale _PARAM0_"),
                    _("Variables"),
                    "res/actions/var24.png",
-                   "res/actions/var.png",
-                   "ActModVarGlobal");
+                   "res/actions/var.png");
 
-        DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("globalvar", _("Nom de la variable"), "", false)
+        DECLARE_PARAMETER("expression", _("Valeur"), "", false)
+        DECLARE_PARAMETER("operator", _("Signe de la modification"), "", false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariable").SetTypeManipulated("number").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
@@ -153,28 +168,34 @@ VariablesExtension::VariablesExtension()
                    _("Faire _PARAM2__PARAM1_ au texte de la variable globale _PARAM0_"),
                    _("Variables"),
                    "res/actions/var24.png",
-                   "res/actions/var.png",
-                   "ActModVarGlobalTxt");
+                   "res/actions/var.png");
 
-        DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
-        DECLARE_PARAMETER("text", _("Texte"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("globalvar", _("Nom de la variable"), "", false)
+        DECLARE_PARAMETER("string", _("Texte"), "", false)
+        DECLARE_PARAMETER("operator", _("Signe de la modification"), "", false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariable").SetTypeManipulated("string").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
-    DECLARE_EXPRESSION("Variable", _("Variable de la scène"), _("Variable de la scène"), _("Variables"), "res/actions/var.png", "ExpGetVariableValue")
-        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
+    DECLARE_EXPRESSION("Variable", _("Variable de la scène"), _("Variable de la scène"), _("Variables"), "res/actions/var.png", "GetSceneVariableValue")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), "", false)
     DECLARE_END_EXPRESSION()
 
-    DECLARE_STR_EXPRESSION("VariableString", _("Variable de la scène"), _("Texte d'une variable de la scène"), _("Variables"), "res/actions/var.png", "ExpGetVariableString")
-        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), false, "")
+    DECLARE_STR_EXPRESSION("VariableString", _("Variable de la scène"), _("Texte d'une variable de la scène"), _("Variables"), "res/actions/var.png", "GetSceneVariableString")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("scenevar", _("Nom de la variable"), "", false)
     DECLARE_END_STR_EXPRESSION()
 
-    DECLARE_EXPRESSION("GlobalVariable", _("Variable globale"), _("Variable globale"), _("Variables"), "res/actions/var.png", "ExpGetGlobalVariableValue")
-        DECLARE_PARAMETER("globalvar", _("Nom de la variable globale"), false, "")
+    DECLARE_EXPRESSION("GlobalVariable", _("Variable globale"), _("Variable globale"), _("Variables"), "res/actions/var.png", "GetGlobalVariableValue")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("globalvar", _("Nom de la variable globale"), "", false)
     DECLARE_END_EXPRESSION()
 
-    DECLARE_STR_EXPRESSION("GlobalVariableString", _("Variable globale"), _("Texte d'une variable globale"), _("Variables"), "res/actions/var.png", "ExpGetGlobalVariableString")
-        DECLARE_PARAMETER("globalvar", _("Nom de la variable"), false, "")
+    DECLARE_STR_EXPRESSION("GlobalVariableString", _("Variable globale"), _("Texte d'une variable globale"), _("Variables"), "res/actions/var.png", "GetGlobalVariableString")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("globalvar", _("Nom de la variable"), "", false)
     DECLARE_END_STR_EXPRESSION()
 }

@@ -9,8 +9,6 @@
 #include <string>
 #include <set>
 #include <utility>
-#include "GDL/ObjectIdentifiersManager.h"
-#include <boost/interprocess/containers/flat_set.hpp>
 
 /**
  * \brief Represents an object group.
@@ -40,47 +38,25 @@ class GD_API ObjectGroup
          */
         void RemoveObject(std::string name);
 
+        /** Get group name
+         */
         inline std::string GetName() const { return name; };
-        inline unsigned int GetIdentifier() const { return id; }
-        inline void SetName(std::string name_)
-        {
-            name = name_;
 
-            ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
-            id = objectIdentifiersManager->GetOIDfromName(name_);
-        };
+        /** Change group name
+         */
+        inline void SetName(std::string name_) {name = name_;};
 
         /**
-         * Get a vector with only objects names.
+         * Get a vector with objects names.
          */
-        inline std::vector < std::string > GetAllObjectsNames() const
-        {
-            std::vector < std::string > objectsNames;
-            for (unsigned int i = 0 ;i<memberObjects.size();++i)
-            {
-            	objectsNames.push_back(memberObjects[i].first);
-            }
-
-            return objectsNames;
-        }
-
-        /**
-         * Get a vector of pair containing all objects name as well as their objects identifier.
-         */
-        inline const std::vector < std::pair<std::string, unsigned int> > & GetAllObjectsWithOID() const
+        inline const std::vector < std::string > & GetAllObjectsNames() const
         {
             return memberObjects;
         }
 
-        /**
-         * True if there at least one similar object between the group and the list.
-         */
-        bool HasAnIdenticalValue( const boost::interprocess::flat_set < unsigned int > & list );
-
     private:
-        std::vector < std::pair<std::string, unsigned int> > memberObjects; ///<For performance, objects are associated with their objects Id
+        std::vector < std::string > memberObjects;
         std::string name; ///< Group name
-        unsigned int id; ///<As objects, groups must be able to be identifed during runtime with a unique identifier.
 };
 
 struct HasTheSameName : public std::binary_function<ObjectGroup, std::string, bool>

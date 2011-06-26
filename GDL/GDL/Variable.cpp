@@ -13,8 +13,9 @@ void Variable::SetValue(double val)
 {
     value = val;
 
-    stringstream s; s << (val);
-    str = s.str();
+    //TODO : Performance KILLER.
+    /*stringstream s; s << (val);
+    str = s.str();*/
 }
 
 void Variable::SetString(const string & val)

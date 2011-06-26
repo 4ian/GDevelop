@@ -40,19 +40,9 @@ class GD_API Automatism
         std::string GetName() { return name; }
 
         /**
-         * Return the identifier identifying the automatism
-         */
-        unsigned int GetAutomatismId() { return automatismId; }
-
-        /**
          * Return the name identifying the type of the automatism
          */
         std::string GetTypeName() { return type; }
-
-        /**
-         * Return the identifier identifying the type of the automatism
-         */
-        unsigned int GetTypeId() { return typeId; }
 
         /**
          * Set the object owning this automatism
@@ -128,10 +118,7 @@ class GD_API Automatism
         bool activated; ///< True if automatism is running
 
         std::string name; ///< Name of the automatism
-        unsigned int automatismId; ///< The automatismId is the "unsigned-int-equivalent" of the name.
-
         std::string type; ///< The type indicate of which type is the automatism. ( To test if we can do something, like actions, reserved to specific automatism with it )
-        unsigned int typeId; /// The typeId is the "unsigned-int-equivalent" of the type.
 };
 
 #endif // AUTOMATISM_H

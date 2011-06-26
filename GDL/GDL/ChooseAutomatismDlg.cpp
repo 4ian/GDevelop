@@ -95,15 +95,14 @@ void ChooseAutomatismDlg::RefreshList()
     std::string search = string(searchCtrl->GetValue().mb_str());
     bool searching = search.empty() ? false : true;
 
-	vector <unsigned int> automatisms = GetAutomatismsOfObject(game, scene, parentObject);
-	ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
+	vector <std::string> automatisms = GetAutomatismsOfObject(game, scene, parentObject);
 
 	automatismsList->Clear();
 	for (unsigned int i = 0;i<automatisms.size();++i)
 	{
-	    std::string automatismName = objectIdentifiersManager->GetNamefromOID(automatisms[i]);
+	    std::string automatismName = automatisms[i];
 
-		if ( (automatismTypeAllowed.empty() || automatismTypeAllowed == objectIdentifiersManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, automatismName))) &&
+		if ( (automatismTypeAllowed.empty() || automatismTypeAllowed == GetTypeOfAutomatism(game, scene, automatismName)) &&
              (!searching || (searching && boost::to_upper_copy(automatismName).find(boost::to_upper_copy(search)) != std::string::npos) ))
             automatismsList->Append(automatismName);
 	}

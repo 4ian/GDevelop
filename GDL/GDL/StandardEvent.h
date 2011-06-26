@@ -46,6 +46,9 @@ class GD_API StandardEvent : public BaseEvent
         vector < Instruction > & GetActions() { return actions; };
         void SetActions(vector < Instruction > & actions_) { actions = actions_; };
 
+        virtual vector < vector<Instruction>* > GetAllConditionsVectors();
+        virtual vector < vector<Instruction>* > GetAllActionsVectors();
+
         #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         #endif

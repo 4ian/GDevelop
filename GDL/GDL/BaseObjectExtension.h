@@ -14,7 +14,7 @@ class GD_API BaseObjectExtension : public ExtensionBase
     protected:
     private:
 
-        //Put all in a single file result in a compilation
+        //Put all in a single file would result in a compilation
         //which requires large memory.
         void DeclareExtensionFirstPart();
         void DeclareExtensionSecondPart();

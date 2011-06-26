@@ -5,7 +5,6 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/eFreeFunctions.h"
-#include "GDL/ObjectIdentifiersManager.h"
 #include "GDL/CommonInstructions.h"
 #include "GDL/GDExpressionParser.h"
 #include <string>
@@ -40,7 +39,4 @@ GDExpression::GDExpression(std::string plainString_) : plainString(plainString_)
     else modOperator = UndefinedModification;
 
     if (plainString == "yes" || plainString == "oui") boolEquivalent = true;
-
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
-    oID = objectIdentifiersManager->GetOIDfromName(plainString);
 }

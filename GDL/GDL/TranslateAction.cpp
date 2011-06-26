@@ -78,7 +78,7 @@ string TranslateAction::LabelFromType(string type)
         return static_cast<string>(_("Choisir l'objet"));
     else if ( type == "automatism" )
         return static_cast<string>(_("Choisir l'automatisme"));
-    else if ( type == "signe" )
+    else if ( type == "operator" )
         return static_cast<string>(_("Choisir le signe"));
     else if ( type == "file" )
         return static_cast<string>(_("Choisir le fichier"));
@@ -88,7 +88,7 @@ string TranslateAction::LabelFromType(string type)
         return static_cast<string>(_("Choisir la police"));
     else if ( type == "color" )
         return static_cast<string>(_("Choisir la couleur"));
-    else if ( type == "text" )
+    else if ( type == "string" )
         return static_cast<string>(_("Editer le texte"));
     else if ( type == "musicfile" )
         return static_cast<string>(_("Choisir la musique"));
@@ -126,7 +126,7 @@ wxBitmap TranslateAction::BitmapFromType(string type)
         return bitmapGUIManager->objectBt;
     else if ( type == "automatism" )
         return bitmapGUIManager->automatismBt;
-    else if ( type == "signe" )
+    else if ( type == "operator" )
         return bitmapGUIManager->signeBt;
     else if ( type == "file" )
         return bitmapGUIManager->fileBt;
@@ -136,7 +136,7 @@ wxBitmap TranslateAction::BitmapFromType(string type)
         return bitmapGUIManager->policeBt;
     else if ( type == "color" )
         return bitmapGUIManager->colorBt;
-    else if ( type == "text" )
+    else if ( type == "string" )
         return bitmapGUIManager->texteBt;
     else if ( type == "musicfile" )
         return bitmapGUIManager->musicBt;
@@ -168,7 +168,7 @@ string TranslateAction::AddHTMLToParameter(string & parameter, string type)
         parameter = "<i>"+parameter+"</i>";
     else if ( type == "object" )
         parameter = "<b>"+parameter+"</b>";
-    else if ( type == "signe" )
+    else if ( type == "operator" )
         parameter = "<b>"+parameter+"</b>";
     else if ( type == "file" )
         parameter = "<i>"+parameter+"</i>";

@@ -2,6 +2,7 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/ExpressionInstruction.h"
+#include "GDL/StrExpressionInstruction.h"
 #include "GDL/CommonTools.h"
 #include "GDL/SoundManager.h"
 #include <SFML/System.hpp>
@@ -167,26 +168,6 @@ double ExpTime( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
         return timeinfo->tm_yday;
 
     return 0;
-}
-
-double ExpGetVariableValue( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
-{
-    return scene.variables.GetVariableValue( exprInstruction.parameters[0].GetPlainString() );
-}
-
-std::string ExpGetVariableString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction )
-{
-    return scene.variables.GetVariableString( exprInstruction.parameters[0].GetPlainString() );
-}
-
-double ExpGetGlobalVariableValue( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )
-{
-    return scene.game->variables.GetVariableValue( exprInstruction.parameters[0].GetPlainString() );
-}
-
-std::string ExpGetGlobalVariableString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction )
-{
-    return scene.game->variables.GetVariableString( exprInstruction.parameters[0].GetPlainString() );
 }
 
 double ExpGetObjectCount( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction )

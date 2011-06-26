@@ -3,10 +3,62 @@
 #include "GDL/Game.h"
 #include "GDL/GDExpression.h"
 #include "GDL/ExpressionInstruction.h"
+#include "GDL/StrExpressionInstruction.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/CommonInstructions.h"
 #include "GDL/CommonTools.h"
+
+std::string GDExpressionParser::parserSeparators = " ,+-*/%.<>=&|;()#^![]{}";
+std::vector< std::string > GDExpressionParser:: parserMathFunctions;
+
+GDExpressionParser::GDExpressionParser(const std::string & expressionPlainString_) :
+expressionPlainString(expressionPlainString_)
+{
+    if ( parserMathFunctions.empty() )
+    {
+        parserMathFunctions.push_back("abs");
+        parserMathFunctions.push_back("acos");
+        parserMathFunctions.push_back("acosh");
+        parserMathFunctions.push_back("asin");
+        parserMathFunctions.push_back("asinh");
+        parserMathFunctions.push_back("atan");
+        parserMathFunctions.push_back("atan2");
+        parserMathFunctions.push_back("atanh");
+        parserMathFunctions.push_back("avg");
+        parserMathFunctions.push_back("cbrt");
+        parserMathFunctions.push_back("ceil");
+        parserMathFunctions.push_back("cos");
+        parserMathFunctions.push_back("cosh");
+        parserMathFunctions.push_back("cot");
+        parserMathFunctions.push_back("csc");
+        parserMathFunctions.push_back("eval");
+        parserMathFunctions.push_back("exp");
+        parserMathFunctions.push_back("floor");
+        parserMathFunctions.push_back("if");
+        parserMathFunctions.push_back("else");
+        parserMathFunctions.push_back("then");
+        parserMathFunctions.push_back("int");
+        parserMathFunctions.push_back("log");
+        parserMathFunctions.push_back("log2");
+        parserMathFunctions.push_back("log10");
+        parserMathFunctions.push_back("ln");
+        parserMathFunctions.push_back("max");
+        parserMathFunctions.push_back("min");
+        parserMathFunctions.push_back("nthroot");
+        parserMathFunctions.push_back("pow");
+        parserMathFunctions.push_back("rint");
+        parserMathFunctions.push_back("sec");
+        parserMathFunctions.push_back("sign");
+        parserMathFunctions.push_back("sin");
+        parserMathFunctions.push_back("sinh");
+        parserMathFunctions.push_back("sqrt");
+        parserMathFunctions.push_back("sum");
+        parserMathFunctions.push_back("tan");
+        parserMathFunctions.push_back("tanh");
+        parserMathFunctions.push_back("trunc");
+    }
+}
 
 size_t GetMinimalParametersNumber(const std::vector < ParameterInfo > & parametersInfos)
 {
@@ -36,10 +88,6 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     string expression = expressionPlainString;
 
-    //Constants
-    vector < string > mathFunctions = GDMathParser::GetAllMathFunctions();
-    const string possibleSeparator = GDMathParser::GetAllMathSeparator();
-
     size_t parsePosition = 0;
 
     size_t firstPointPos = expression.find(".");
@@ -49,7 +97,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
     {
         //Identify name
         size_t nameEnd = firstPointPos < firstParPos ? firstPointPos : firstParPos;
-        size_t nameStart = expression.find_last_of(possibleSeparator, nameEnd-1);
+        size_t nameStart = expression.find_last_of(parserSeparators, nameEnd-1);
         nameStart++;
 
         string nameBefore = expression.substr(nameStart, nameEnd-nameStart);
@@ -78,9 +126,9 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
         ExpressionInfos instructionInfos;
 
         //Verify if we are not with a math expression.
-        if ( functionName.substr(0, functionName.length()-1).find_first_of(possibleSeparator) == string::npos )
+        if ( functionName.substr(0, functionName.length()-1).find_first_of(parserSeparators) == string::npos )
         {
-            bool isMathFunction = find(mathFunctions.begin(), mathFunctions.end(), functionName) != mathFunctions.end();
+            bool isMathFunction = find(parserMathFunctions.begin(), parserMathFunctions.end(), functionName) != parserMathFunctions.end();
             bool functionFound = false;
             bool staticFunctionFound = false;
             bool objectFunctionFound = false;
@@ -95,10 +143,10 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                     instructionInfos = extensionsManager->GetExpressionInfos(functionName);
                 }
                 //Then search in object expression
-                else if ( !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
+                else if ( !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeOfObject(game, scene, objectName), functionName) )
                 {
                     functionFound = true; objectFunctionFound = true;
-                    instructionInfos = extensionsManager->GetObjectExpressionInfos(extensionsManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, objectName)), functionName);
+                    instructionInfos = extensionsManager->GetObjectExpressionInfos(GetTypeOfObject(game, scene, objectName), functionName);
                 }
                 //And in automatisms expressions
                 else if ( !nameIsFunction )
@@ -112,18 +160,16 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                         else
                             functionName = "";
 
-                        if ( extensionsManager->HasAutomatismExpression(GetTypeIdOfAutomatism(game, scene, autoName), functionName) )
+                        if ( extensionsManager->HasAutomatismExpression(GetTypeOfAutomatism(game, scene, autoName), functionName) )
                         {
                             parameters.push_back(GDExpression(autoName));
                             functionFound = true; automatismFunctionFound = true;
 
-                            ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
-                            instructionInfos = extensionsManager->GetAutomatismExpressionInfos(objectIdentifiersManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, autoName)), functionName);
+                            instructionInfos = extensionsManager->GetAutomatismExpressionInfos(GetTypeOfAutomatism(game, scene, autoName), functionName);
 
                             //Verify that object has automatism.
-                            unsigned int automatismNameId = objectIdentifiersManager->GetOIDfromName(autoName);
-                            vector < unsigned int > automatisms = GetAutomatismsOfObject(game, scene, objectName);
-                            if ( find(automatisms.begin(), automatisms.end(), automatismNameId) == automatisms.end() )
+                            vector < std::string > automatisms = GetAutomatismsOfObject(game, scene, objectName);
+                            if ( find(automatisms.begin(), automatisms.end(), autoName) == automatisms.end() )
                             {
                                 cout << "Bad automatism requested" << endl;
                                 functionFound = false;
@@ -239,15 +285,10 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
     return true;
 }
 
-
 bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks)
 {
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     string expression = expressionPlainString;
-
-    //Constants
-    vector < string > mathFunctions = GDMathParser::GetAllMathFunctions();
-    const string possibleSeparator = GDMathParser::GetAllMathSeparator();
 
     size_t parsePosition = 0;
 
@@ -311,7 +352,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
         {
             //Identify name
             size_t nameEnd = firstPointPos < firstParPos ? firstPointPos : firstParPos;
-            size_t nameStart = expression.find_last_of(possibleSeparator, nameEnd-1);
+            size_t nameStart = expression.find_last_of(parserSeparators, nameEnd-1);
             nameStart++;
 
             callbacks.OnConstantToken(expression.substr(parsePosition, nameStart-parsePosition));
@@ -403,10 +444,10 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 callbacks.OnStaticFunction(functionName, instruction, expressionInfo);
             }
             //Then an object member expression
-            else if ( !nameIsFunction && extensionsManager->HasObjectStrExpression(GetTypeIdOfObject(game, scene, objectName), functionName) )
+            else if ( !nameIsFunction && extensionsManager->HasObjectStrExpression(GetTypeOfObject(game, scene, objectName), functionName) )
             {
                 functionFound = true;
-                const StrExpressionInfos & expressionInfo = extensionsManager->GetObjectStrExpressionInfos(extensionsManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, nameBefore)), functionName);
+                const StrExpressionInfos & expressionInfo = extensionsManager->GetObjectStrExpressionInfos(GetTypeOfObject(game, scene, nameBefore), functionName);
 
                 //Testing the number of parameters
                 if ( expressionInfo.parameters.size() > parameters.size() || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
@@ -440,18 +481,16 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                     else
                         functionName = "";
 
-                    if ( extensionsManager->HasAutomatismStrExpression(GetTypeIdOfAutomatism(game, scene, autoName), functionName) )
+                    if ( extensionsManager->HasAutomatismStrExpression(GetTypeOfAutomatism(game, scene, autoName), functionName) )
                     {
                         parameters.push_back(GDExpression(autoName));
                         functionFound = true;
 
-                        ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
-                        const StrExpressionInfos & expressionInfo = extensionsManager->GetAutomatismStrExpressionInfos(objectIdentifiersManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, autoName)), functionName);
+                        const StrExpressionInfos & expressionInfo = extensionsManager->GetAutomatismStrExpressionInfos(GetTypeOfAutomatism(game, scene, autoName), functionName);
 
                         //Verify that object has automatism.
-                        unsigned int automatismNameId = objectIdentifiersManager->GetOIDfromName(autoName);
-                        vector < unsigned int > automatisms = GetAutomatismsOfObject(game, scene, objectName);
-                        if ( find(automatisms.begin(), automatisms.end(), automatismNameId) == automatisms.end() )
+                        vector < std::string > automatisms = GetAutomatismsOfObject(game, scene, objectName);
+                        if ( find(automatisms.begin(), automatisms.end(), autoName) == automatisms.end() )
                         {
                             cout << "Bad automatism requested" << endl;
                             functionFound = false;
@@ -572,7 +611,7 @@ bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene
             return false;
         }
     }
-    else if ( parametersInfo.type == "text" || parametersInfo.type == "layer" || parametersInfo.type == "color" || parametersInfo.type == "file" || parametersInfo.type == "joyaxis" )
+    else if ( parametersInfo.type == "string" || parametersInfo.type == "layer" || parametersInfo.type == "color" || parametersInfo.type == "file" || parametersInfo.type == "joyaxis" )
     {
         if ( !callbacks.OnSubTextExpression(game, scene, parameter) )
         {

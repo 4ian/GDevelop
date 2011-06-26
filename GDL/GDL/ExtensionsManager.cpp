@@ -29,6 +29,7 @@ InstructionInfos ExtensionsManager::badInstructionInfos;
 ExpressionInfos ExtensionsManager::badExpressionInfos;
 StrExpressionInfos ExtensionsManager::badStrExpressionInfos;
 AutomatismInfo ExtensionsManager::badAutomatismInfo;
+ExtensionObjectInfos ExtensionsManager::badObjectInfo;
 
 /**
  * Initializing Extension Manager
@@ -63,13 +64,9 @@ bool ExtensionsManager::AddExtension(boost::shared_ptr<ExtensionBase> extension)
     vector < string > objectsTypes = extension->GetExtensionObjectsTypes();
     for ( unsigned int i = 0; i < objectsTypes.size();++i)
     {
-        //Adding object type
-        unsigned int lastId = extObjectNameToTypeId.size(); //Needed for using correct size value
-        extObjectNameToTypeId.insert( StringToTypeIdBiMap::value_type(objectsTypes[i], lastId) );
-
         //Adding creations and destruction functions
-        creationFunctionTable.push_back( extension->GetObjectCreationFunctionPtr(objectsTypes[i]) );
-        destroyFunctionTable.push_back( extension->GetDestroyObjectFunction(objectsTypes[i]) );
+        creationFunctionTable[objectsTypes[i]] = extension->GetObjectCreationFunctionPtr(objectsTypes[i]);
+        destroyFunctionTable[objectsTypes[i]] = extension->GetDestroyObjectFunction(objectsTypes[i]);
     }
 
     extensionsLoaded.push_back(extension);
@@ -365,14 +362,8 @@ bool ExtensionsManager::HasAction(string name) const
     return false;
 }
 
-bool ExtensionsManager::HasObjectAction(unsigned int objectTypeId, string name) const
+bool ExtensionsManager::HasObjectAction(std::string objectType, string name) const
 {
-    //Need to find the name of the type associated with the typeId as
-    //extensions are not aware of the typeId of the objects they provide.
-    string objectType;
-    if ( extObjectNameToTypeId.right.find(objectTypeId) != extObjectNameToTypeId.right.end() )
-        objectType = extObjectNameToTypeId.right.find(objectTypeId)->second;
-
     //We can afford performing a search each time this function is called,
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
@@ -393,13 +384,8 @@ bool ExtensionsManager::HasObjectAction(unsigned int objectTypeId, string name) 
     return false;
 }
 
-bool ExtensionsManager::HasAutomatismAction(unsigned int automatismTypeId, string name) const
+bool ExtensionsManager::HasAutomatismAction(std::string automatismType, string name) const
 {
-    //Need to find the name of the type associated with the typeId as
-    //extensions are not aware of the typeId of the objects they provide.
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
-    std::string automatismType = objectIdentifiersManager->GetNamefromOID(automatismTypeId);
-
     //We can afford performing a search each time this function is called,
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
@@ -435,14 +421,8 @@ bool ExtensionsManager::HasCondition(string name) const
     return false;
 }
 
-bool ExtensionsManager::HasObjectCondition(unsigned int objectTypeId, string name) const
+bool ExtensionsManager::HasObjectCondition(std::string objectType, string name) const
 {
-    //Need to find the name of the type associated with the typeId as
-    //extensions are not aware of the typeId of the objects they provide.
-    string objectType;
-    if ( extObjectNameToTypeId.right.find(objectTypeId) != extObjectNameToTypeId.right.end() )
-        objectType = extObjectNameToTypeId.right.find(objectTypeId)->second;
-
     //We can afford performing a search each time this function is called,
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
@@ -463,13 +443,8 @@ bool ExtensionsManager::HasObjectCondition(unsigned int objectTypeId, string nam
     return false;
 }
 
-bool ExtensionsManager::HasAutomatismCondition(unsigned int automatismTypeId, string name) const
+bool ExtensionsManager::HasAutomatismCondition(std::string automatismType, string name) const
 {
-    //Need to find the name of the type associated with the typeId as
-    //extensions are not aware of the typeId of the objects they provide.
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
-    std::string automatismType = objectIdentifiersManager->GetNamefromOID(automatismTypeId);
-
     //We can afford performing a search each time this function is called,
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
@@ -502,14 +477,8 @@ bool ExtensionsManager::HasExpression(string name) const
     return false;
 }
 
-bool ExtensionsManager::HasObjectExpression(unsigned int objectTypeId, string name) const
+bool ExtensionsManager::HasObjectExpression(std::string objectType, string name) const
 {
-    //Need to find the name of the type associated with the typeId as
-    //extensions are not aware of the typeId of the objects they provide.
-    string objectType;
-    if ( extObjectNameToTypeId.right.find(objectTypeId) != extObjectNameToTypeId.right.end() )
-        objectType = extObjectNameToTypeId.right.find(objectTypeId)->second;
-
     //We can afford performing a search each time this function is called,
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
@@ -530,13 +499,8 @@ bool ExtensionsManager::HasObjectExpression(unsigned int objectTypeId, string na
     return false;
 }
 
-bool ExtensionsManager::HasAutomatismExpression(unsigned int automatismTypeId, string name) const
+bool ExtensionsManager::HasAutomatismExpression(std::string automatismType, string name) const
 {
-    //Need to find the name of the type associated with the typeId as
-    //extensions are not aware of the typeId of the objects they provide.
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
-    std::string automatismType = objectIdentifiersManager->GetNamefromOID(automatismTypeId);
-
     //We can afford performing a search each time this function is called,
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
@@ -570,14 +534,8 @@ bool ExtensionsManager::HasStrExpression(string name) const
     return false;
 }
 
-bool ExtensionsManager::HasObjectStrExpression(unsigned int objectTypeId, string name) const
+bool ExtensionsManager::HasObjectStrExpression(std::string objectType, string name) const
 {
-    //Need to find the name of the type associated with the typeId as
-    //extensions are not aware of the typeId of the objects they provide.
-    string objectType;
-    if ( extObjectNameToTypeId.right.find(objectTypeId) != extObjectNameToTypeId.right.end() )
-        objectType = extObjectNameToTypeId.right.find(objectTypeId)->second;
-
     //We can afford performing a search each time this function is called,
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
@@ -598,13 +556,8 @@ bool ExtensionsManager::HasObjectStrExpression(unsigned int objectTypeId, string
     return false;
 }
 
-bool ExtensionsManager::HasAutomatismStrExpression(unsigned int automatismTypeId, string name) const
+bool ExtensionsManager::HasAutomatismStrExpression(std::string automatismType, string name) const
 {
-    //Need to find the name of the type associated with the typeId as
-    //extensions are not aware of the typeId of the objects they provide.
-    ObjectIdentifiersManager * objectIdentifiersManager = ObjectIdentifiersManager::GetInstance();
-    std::string automatismType = objectIdentifiersManager->GetNamefromOID(automatismTypeId);
-
     //We can afford performing a search each time this function is called,
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
@@ -625,19 +578,40 @@ bool ExtensionsManager::HasAutomatismStrExpression(unsigned int automatismTypeId
     return false;
 }
 
-boost::shared_ptr<Object> ExtensionsManager::CreateObject(unsigned int typeId, std::string name)
+boost::shared_ptr<Object> ExtensionsManager::CreateObject(std::string type, std::string name)
 {
-    if ( typeId >= creationFunctionTable.size() )
+    if ( creationFunctionTable.find(type) == creationFunctionTable.end() )
     {
-        cout << "Tried to create an object with a bad typeId ( " << typeId << " )." << endl;
-        typeId = 0;
+        std::cout << "Tried to create an object with an unknown type: " << type << std::endl;
+        type = "";
     }
 
     //Create a new object with the type we want.
-    Object * object = creationFunctionTable[typeId](name);
-    object->SetTypeId(typeId);
+    Object * object = creationFunctionTable[type](name);
+    object->SetType(type);
 
-    return boost::shared_ptr<Object> (object, destroyFunctionTable[typeId]);
+    return boost::shared_ptr<Object> (object, destroyFunctionTable[type]);
 }
 
+#if defined(GD_IDE_ONLY)
+/**
+ * Get information about an object
+ */
+const ExtensionObjectInfos & ExtensionsManager::GetObjectInfo(std::string objectType)
+{
+	for (unsigned int i = 0;i<extensionsLoaded.size();++i)
+	{
+	    vector<string> objectsTypes = extensionsLoaded[i]->GetExtensionObjectsTypes();
+	    for(unsigned int j = 0;j<objectsTypes.size();++j)
+	    {
+	        if ( objectsTypes[j] == objectType )
+                return extensionsLoaded[i]->GetObjectInfo(objectType);
+	    }
+	}
+
+	return badObjectInfo;
 }
+#endif
+
+}
+

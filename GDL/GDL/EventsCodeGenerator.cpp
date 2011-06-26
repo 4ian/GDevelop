@@ -8,19 +8,175 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
+#include "GDL/StrExpressionInstruction.h"
+#include "GDL/ExpressionInstruction.h"
 #include "GDL/CommonInstructions.h"
 #include "GDL/CommonTools.h"
-#include "GDL/ObjectIdentifiersManager.h"
 #include "GDL/GDExpressionParser.h"
 #include "GDL/EventsCodeGenerationContext.h"
 
+using namespace std;
+
 /**
- * Link each condition to its function.
- * Check the validity of objects type passed to parameters
+ * Generate call using a relational operator.
+ * Relational operator position is deduced from parameters type.
+ * Rhs hand side expression is assumed to be placed just before the relational operator.
+ *
+ * \param Information about the instruction
+ * \param Arguments, in their C++ form.
+ * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Get
+ * \param Generation context. Used for example to report error.
+ * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-std::string EventsCodeGenerator::GenerateConditionsListCode(const RuntimeScene & scene, vector < Instruction > & conditions, EventsCodeGenerationContext & context)
+string GenerateRelationalOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, EventsCodeGenerationContext & context, unsigned int startFromArgument = 0)
 {
-    std::string outputCode;
+    unsigned int relationalOperatorIndex = 0;
+    for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
+    {
+        if ( instrInfos.parameters[i].type == "relationalOperator" )
+            relationalOperatorIndex = i;
+    }
+    if ( relationalOperatorIndex == 0 )
+    {
+        context.errorOccured = true;
+        return "";
+    }
+
+    string relationalOperator = arguments[relationalOperatorIndex];
+    string rhs = arguments[relationalOperatorIndex-1];
+    string argumentsStr;
+    for (unsigned int i = startFromArgument;i<arguments.size();++i)
+    {
+        if ( i != relationalOperatorIndex && i != relationalOperatorIndex-1)
+        {
+            if ( !argumentsStr.empty() ) argumentsStr += ", ";
+            argumentsStr += arguments[i];
+        }
+    }
+
+    return callStartString+"("+argumentsStr+") "+relationalOperator+" "+rhs;
+}
+
+/**
+ * Generate call using an operator ( =,+,-,*,/ ).
+ * Operator position is deduced from parameters type.
+ * Expression is assumed to be placed just before the operator.
+ *
+ * \param Information about the instruction
+ * \param Arguments, in their C++ form.
+ * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Set
+ * \param String to be placed at the start of the call of the getter ( the "getter" function to be called typically ). Example : MyObject->Get
+ * \param Generation context. Used for example to report error.
+ * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
+ */
+string GenerateOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, const string & getterStartString, EventsCodeGenerationContext & context, unsigned int startFromArgument = 0)
+{
+    unsigned int operatorIndex = 0;
+    for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
+    {
+        if ( instrInfos.parameters[i].type == "operator" )
+            operatorIndex = i;
+    }
+
+    if ( operatorIndex == 0 )
+    {
+        context.errorOccured = true;
+        return "";
+    }
+
+    string operatorStr = arguments[operatorIndex];
+    string rhs = arguments[operatorIndex-1];
+
+    //Generate arguments for calling the "getter" function
+    string getterArgumentsStr;
+    for (unsigned int i = startFromArgument;i<arguments.size();++i)
+    {
+        if ( i != operatorIndex && i != operatorIndex-1)
+        {
+            if ( !getterArgumentsStr.empty() ) getterArgumentsStr += ", ";
+            getterArgumentsStr += arguments[i];
+        }
+    }
+
+    //Generate arguments for calling the function ("setter")
+    string argumentsStr;
+    for (unsigned int i = startFromArgument;i<arguments.size();++i)
+    {
+        if ( i != operatorIndex && i != operatorIndex-1) //Generate classic arguments
+        {
+            if ( !argumentsStr.empty() ) argumentsStr += ", ";
+            argumentsStr += arguments[i];
+        }
+        if ( i == operatorIndex-1 )
+        {
+            if ( !argumentsStr.empty() ) argumentsStr += ", ";
+            if ( operatorStr != "=" )
+                argumentsStr += getterStartString+"("+getterArgumentsStr+") "+operatorStr+" ("+rhs+")";
+            else
+                argumentsStr += rhs;
+        }
+    }
+
+    return callStartString+"("+argumentsStr+")";
+}
+
+
+/**
+ * Generate call using an compound assignment operators ( =,+=,-=,*=,/= ).
+ * Operator position is deduced from parameters type.
+ * Expression is assumed to be placed just before the operator.
+ *
+ * \param Information about the instruction
+ * \param Arguments, in their C++ form.
+ * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Set
+ * \param Generation context. Used for example to report error.
+ * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
+ */
+string GenerateCompoundOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, EventsCodeGenerationContext & context, unsigned int startFromArgument = 0)
+{
+    unsigned int operatorIndex = 0;
+    for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
+    {
+        if ( instrInfos.parameters[i].type == "operator" )
+            operatorIndex = i;
+    }
+
+    if ( operatorIndex == 0 )
+    {
+        context.errorOccured = true;
+        return "";
+    }
+
+    string operatorStr = arguments[operatorIndex];
+    string rhs = arguments[operatorIndex-1];
+
+    //Generate real operator string.
+    if ( operatorStr == "+" ) operatorStr = "+=";
+    else if ( operatorStr == "-" ) operatorStr = "-=";
+    else if ( operatorStr == "/" ) operatorStr = "/=";
+    else if ( operatorStr == "*" ) operatorStr = "*=";
+
+    //Generate arguments for calling the function ("setter")
+    string argumentsStr;
+    for (unsigned int i = startFromArgument;i<arguments.size();++i)
+    {
+        if ( i != operatorIndex && i != operatorIndex-1) //Generate classic arguments
+        {
+            if ( !argumentsStr.empty() ) argumentsStr += ", ";
+            argumentsStr += arguments[i];
+        }
+    }
+
+    return callStartString+"("+argumentsStr+") "+operatorStr+" ("+rhs+")";
+}
+
+/**
+ * Generate conditions code.
+ * Bools containing conditions results are named conditionXIsTrue.
+ */
+string EventsCodeGenerator::GenerateConditionsListCode(const RuntimeScene & scene, vector < Instruction > & conditions, EventsCodeGenerationContext & context)
+{
+    string outputCode;
 
     for (unsigned int i = 0;i<conditions.size();++i)
         outputCode += "bool condition"+ToString(i)+"IsTrue = false;\n";
@@ -30,10 +186,14 @@ std::string EventsCodeGenerator::GenerateConditionsListCode(const RuntimeScene &
     for (unsigned int cId =0;cId < conditions.size();++cId)
     {
         outputCode += "{\n";
-        std::string conditionCode;
+        string conditionCode;
 
-        //Be sure there is no lack of parameter.
         InstructionInfos instrInfos = extensionsManager->GetConditionInfos(conditions[cId].GetType());
+
+        if ( !instrInfos.cppCallingInformation.optionalIncludeFile.empty() )
+            context.AddIncludeFile(instrInfos.cppCallingInformation.optionalIncludeFile);
+
+        //Insert code only parameters and be sure there is no lack of parameter.
         while(conditions[cId].GetParameters().size() < instrInfos.parameters.size())
         {
             vector < GDExpression > parameters = conditions[cId].GetParameters();
@@ -44,16 +204,15 @@ std::string EventsCodeGenerator::GenerateConditionsListCode(const RuntimeScene &
         //Verify that there are not mismatch between object type in parameters
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
-            if ( instrInfos.parameters[pNb].useObject && instrInfos.parameters[pNb].objectType != "" )
+            if ( instrInfos.parameters[pNb].type == "object" && instrInfos.parameters[pNb].supplementaryInformation != "" )
             {
                 string objectInParameter = conditions[cId].GetParameter(pNb).GetPlainString();
-                if (GetTypeIdOfObject(*scene.game, scene, objectInParameter) !=
-                    extensionsManager->GetTypeIdFromString(instrInfos.parameters[pNb].objectType) )
+                if (GetTypeOfObject(*scene.game, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
                 {
                     cout << "Bad object type in a parameter of a condition " << conditions[cId].GetType() << endl;
-                    cout << "Condition wanted " << instrInfos.parameters[pNb].objectType << endl;
-                    cout << "Condition wanted " << instrInfos.parameters[pNb].objectType << " of typeId " << extensionsManager->GetTypeIdFromString(instrInfos.parameters[pNb].objectType) << endl;
-                    cout << "Condition has received " << objectInParameter << " of typeId " << GetTypeIdOfObject(*scene.game, scene, objectInParameter) << endl;
+                    cout << "Condition wanted " << instrInfos.parameters[pNb].supplementaryInformation << endl;
+                    cout << "Condition wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;
+                    cout << "Condition has received " << objectInParameter << " of type " << GetTypeOfObject(*scene.game, scene, objectInParameter) << endl;
 
                     conditions[cId].SetParameter(pNb, GDExpression(""));
                     conditions[cId].SetType("");
@@ -64,71 +223,128 @@ std::string EventsCodeGenerator::GenerateConditionsListCode(const RuntimeScene &
         //Generate static condition if available
         if ( extensionsManager->HasCondition(conditions[cId].GetType()))
         {
-            std::vector<std::string> arguments = GenerateParametersCodes(*scene.game, scene, conditions[cId].GetParameters(), instrInfos.parameters, context);
-            std::string argumentsStr;
-            for (unsigned int i = 0;i<arguments.size();++i)
+            //Prepare arguments
+            vector<string> arguments = GenerateParametersCodes(*scene.game, scene, conditions[cId].GetParameters(), instrInfos.parameters, context);
+
+            //Generate call
+            string predicat;
+            if ( instrInfos.cppCallingInformation.type == "number")
             {
-                if ( i != 0 ) argumentsStr += ", ";
-                argumentsStr += arguments[i];
+                predicat = GenerateRelationalOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName, context);
+            }
+            else
+            {
+                string argumentsStr;
+                for (unsigned int i = 0;i<arguments.size();++i)
+                {
+                    if ( i != 0 ) argumentsStr += ", ";
+                    argumentsStr += arguments[i];
+                }
+
+                predicat = instrInfos.cppCallingInformation.cppCallingName+"("+argumentsStr+")";
             }
 
-            conditionCode += "condition"+ToString(cId)+"IsTrue = "+ instrInfos.cppCallingName+"("+argumentsStr+");\n";
+            //Generate condition code
+            conditionCode += "condition"+ToString(cId)+"IsTrue = "+predicat+";\n";
         }
 
         //Generate object condition if available
         string objectName = conditions[cId].GetParameters().empty() ? "" : conditions[cId].GetParameter(0).GetPlainString();
-        unsigned int objectTypeId = GetTypeIdOfObject(*scene.game, scene, objectName);
+        string objectType = GetTypeOfObject(*scene.game, scene, objectName);
 
-        if ( !objectName.empty() && extensionsManager->HasObjectCondition(objectTypeId, conditions[cId].GetType()))
+        if ( !objectName.empty() && extensionsManager->HasObjectCondition(objectType, conditions[cId].GetType()))
         {
+            const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
+
             context.currentObject = objectName;
             context.ObjectNeeded(objectName);
 
-            std::vector<std::string> arguments = GenerateParametersCodes(*scene.game, scene, conditions[cId].GetParameters(), instrInfos.parameters, context);
-            std::string argumentsStr;
-            for (unsigned int i = 1;i<arguments.size();++i)
+            //Prepare arguments
+            vector<string> arguments = GenerateParametersCodes(*scene.game, scene, conditions[cId].GetParameters(), instrInfos.parameters, context);
+
+            //Add a static_cast if necessary
+            string objectFunctionCallNamePart =
+            ( !objInfo.cppClassName.empty() ) ?
+                "static_cast<"+objInfo.cppClassName+"*>("+objectName+"objects[i])->"+instrInfos.cppCallingInformation.cppCallingName
+            :   objectName+"objects[i]->"+instrInfos.cppCallingInformation.cppCallingName;
+
+            //Create call
+            string predicat;
+            if ( instrInfos.cppCallingInformation.type == "number" && arguments.size() >= 3)
             {
-                if ( i != 1 ) argumentsStr += ", ";
-                argumentsStr += arguments[i];
+                predicat = GenerateRelationalOperatorCall(instrInfos, arguments, objectFunctionCallNamePart, context, 1);
+            }
+            else
+            {
+                string argumentsStr;
+                for (unsigned int i = 1;i<arguments.size();++i)
+                {
+                    if ( i != 1 ) argumentsStr += ", ";
+                    argumentsStr += arguments[i];
+                }
+
+                predicat = objectFunctionCallNamePart+"("+argumentsStr+")";
             }
 
+            //Generate whole condition code
             conditionCode += "for(unsigned int i = 0;i < "+objectName+"objects.size();)\n";
             conditionCode += "{\n";
-            conditionCode += "    if ( objects[i]->"+instrInfos.cppCallingName+"("+argumentsStr+") )\n";
+            conditionCode += "    if ( "+predicat+" )\n";
             conditionCode += "    {\n";
             conditionCode += "        condition"+ToString(cId)+"IsTrue = true;\n";
             conditionCode += "        ++i;\n";
             conditionCode += "    }\n";
             conditionCode += "    else\n";
             conditionCode += "    {\n";
-            conditionCode += "        "+objectName+"objects.erase("+objectName+"objects.begin()+i);";
+            conditionCode += "        "+objectName+"objects.erase("+objectName+"objects.begin()+i);\n";
             conditionCode += "    }\n";
+            conditionCode += "}\n";
 
             context.currentObject = "";
         }
 
         //Affection to an automatism member function if found
-        unsigned int automatismTypeId = GetTypeIdOfAutomatism(*scene.game, scene,
+        string automatismType = GetTypeOfAutomatism(*scene.game, scene,
                                                               conditions[cId].GetParameters().size() < 2 ? "" : conditions[cId].GetParameter(1).GetPlainString());
 
-        if (extensionsManager->HasAutomatismCondition(automatismTypeId,
+        if (extensionsManager->HasAutomatismCondition(automatismType,
                                                    conditions[cId].GetType()))
         {
+            const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
+
             context.currentObject = objectName;
             context.ObjectNeeded(objectName);
 
-            std::vector<std::string> arguments = GenerateParametersCodes(*scene.game, scene, conditions[cId].GetParameters(), instrInfos.parameters, context);
-            std::string argumentsStr;
-            for (unsigned int i = 2;i<arguments.size();++i)
+            //Prepare arguments
+            vector<string> arguments = GenerateParametersCodes(*scene.game, scene, conditions[cId].GetParameters(), instrInfos.parameters, context);
+
+            //Add a static_cast if necessary
+            string objectFunctionCallNamePart =
+            ( !objInfo.cppClassName.empty() ) ?
+                "static_cast<"+objInfo.cppClassName+"*>("+objectName+"objects[i])->GetAutomatism(\""+conditions[cId].GetParameter(1).GetPlainString()+"\")->"+instrInfos.cppCallingInformation.cppCallingName
+            :   objectName+"objects[i]->GetAutomatism(\""+conditions[cId].GetParameter(1).GetPlainString()+"\")->"+instrInfos.cppCallingInformation.cppCallingName;
+
+            //Create call
+            string predicat;
+            if ( instrInfos.cppCallingInformation.type == "number" && arguments.size() >= 3)
             {
-                if ( i != 2 ) argumentsStr += ", ";
-                argumentsStr += arguments[i];
+                predicat = GenerateRelationalOperatorCall(instrInfos, arguments, objectFunctionCallNamePart, context, 2);
+            }
+            else
+            {
+                string argumentsStr;
+                for (unsigned int i = 2;i<arguments.size();++i)
+                {
+                    if ( i != 2 ) argumentsStr += ", ";
+                    argumentsStr += arguments[i];
+                }
+
+                predicat = objectFunctionCallNamePart+"("+argumentsStr+")";
             }
 
             //Verify that object has automatism.
-            unsigned int automatismNameId = conditions[cId].GetParameter(1).GetAsObjectIdentifier();
-            vector < unsigned int > automatisms = GetAutomatismsOfObject(*scene.game, scene, objectName);
-            if ( find(automatisms.begin(), automatisms.end(), automatismNameId) == automatisms.end() )
+            vector < string > automatisms = GetAutomatismsOfObject(*scene.game, scene, objectName);
+            if ( find(automatisms.begin(), automatisms.end(), conditions[cId].GetParameter(1).GetPlainString()) == automatisms.end() )
             {
                 cout << "Bad automatism requested" << endl;
                 conditions[cId].SetType("");
@@ -137,15 +353,16 @@ std::string EventsCodeGenerator::GenerateConditionsListCode(const RuntimeScene &
             {
                 conditionCode += "for(unsigned int i = 0;i < "+objectName+"objects.size();)\n";
                 conditionCode += "{\n";
-                conditionCode += "    if ( objects[i]->GetAutomatism("+ToString(conditions[cId].GetParameter(1).GetAsObjectIdentifier())+")->"+instrInfos.cppCallingName+"("+argumentsStr+") )\n";
+                conditionCode += "    if ( "+predicat+" )\n";
                 conditionCode += "    {\n";
                 conditionCode += "        condition"+ToString(cId)+"IsTrue = true;\n";
                 conditionCode += "        ++i;\n";
                 conditionCode += "    }\n";
                 conditionCode += "    else\n";
                 conditionCode += "    {\n";
-                conditionCode += "        "+objectName+"objects.erase("+objectName+"objects.begin()+i);";
+                conditionCode += "        "+objectName+"objects.erase("+objectName+"objects.begin()+i);\n";
                 conditionCode += "    }\n";
+                conditionCode += "}";
             }
 
             context.currentObject = "";
@@ -164,21 +381,25 @@ std::string EventsCodeGenerator::GenerateConditionsListCode(const RuntimeScene &
 }
 
 /**
- * Generate code for actions list
+ * Generate actions code.
  */
-std::string EventsCodeGenerator::GenerateActionsListCode(const RuntimeScene & scene, vector < Instruction > & actions, EventsCodeGenerationContext & context)
+string EventsCodeGenerator::GenerateActionsListCode(const RuntimeScene & scene, vector < Instruction > & actions, EventsCodeGenerationContext & context)
 {
-    std::string outputCode;
+    string outputCode;
 
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     for (unsigned int aId =0;aId < actions.size();++aId)
     {
         outputCode += "{\n";
-        std::string actionCode;
+        string actionCode;
+
+        InstructionInfos instrInfos = extensionsManager->GetActionInfos(actions[aId].GetType());
+
+        if ( !instrInfos.cppCallingInformation.optionalIncludeFile.empty() )
+            context.AddIncludeFile(instrInfos.cppCallingInformation.optionalIncludeFile);
 
         //Be sure there is no lack of parameter.
-        InstructionInfos instrInfos = extensionsManager->GetActionInfos(actions[aId].GetType());
         while(actions[aId].GetParameters().size() < instrInfos.parameters.size())
         {
             vector < GDExpression > parameters = actions[aId].GetParameters();
@@ -189,15 +410,14 @@ std::string EventsCodeGenerator::GenerateActionsListCode(const RuntimeScene & sc
         //Verify that there are not mismatch between object type in parameters
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
-            if ( instrInfos.parameters[pNb].useObject && instrInfos.parameters[pNb].objectType != "" )
+            if ( instrInfos.parameters[pNb].type == "object" && instrInfos.parameters[pNb].supplementaryInformation != "" )
             {
                 string objectInParameter = actions[aId].GetParameter(pNb).GetPlainString();
-                if (GetTypeIdOfObject(*scene.game, scene, objectInParameter) !=
-                    extensionsManager->GetTypeIdFromString(instrInfos.parameters[pNb].objectType) )
+                if (GetTypeOfObject(*scene.game, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
                 {
                     cout << "Bad object type in parameter "+ToString(pNb)+" of an action " << actions[aId].GetType() << endl;
-                    cout << "Action wanted " << instrInfos.parameters[pNb].objectType << " of typeId " << extensionsManager->GetTypeIdFromString(instrInfos.parameters[pNb].objectType) << endl;
-                    cout << "Action has received " << objectInParameter << " of typeId " << GetTypeIdOfObject(*scene.game, scene, objectInParameter) << endl;
+                    cout << "Action wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;
+                    cout << "Action has received " << objectInParameter << " of type " << GetTypeOfObject(*scene.game, scene, objectInParameter) << endl;
 
                     actions[aId].SetParameter(pNb, GDExpression(""));
                     actions[aId].SetType("");
@@ -205,71 +425,125 @@ std::string EventsCodeGenerator::GenerateActionsListCode(const RuntimeScene & sc
             }
         }
 
-        //Preprocessing parameters
-        std::vector<std::string> arguments = GenerateParametersCodes(*scene.game, scene, actions[aId].GetParameters(), instrInfos.parameters, context);
-
         //Call static function first if available
         if ( extensionsManager->HasAction(actions[aId].GetType()))
         {
-            std::vector<std::string> arguments = GenerateParametersCodes(*scene.game, scene, actions[aId].GetParameters(), instrInfos.parameters, context);
-            std::string argumentsStr;
-            for (unsigned int i = 0;i<arguments.size();++i)
+            vector<string> arguments = GenerateParametersCodes(*scene.game, scene, actions[aId].GetParameters(), instrInfos.parameters, context);
+
+            //Generate call
+            string call;
+            if ( instrInfos.cppCallingInformation.type == "number")
             {
-                if ( i != 0 ) argumentsStr += ", ";
-                argumentsStr += arguments[i];
+                if ( instrInfos.cppCallingInformation.accessType == InstructionInfos::CppCallingInformation::MutatorAndOrAccessor )
+                    call = GenerateOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName, instrInfos.cppCallingInformation.optionalAssociatedInstruction, context);
+                else
+                    call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName, context);
+            }
+            else
+            {
+                string argumentsStr;
+                for (unsigned int i = 0;i<arguments.size();++i)
+                {
+                    if ( i != 0 ) argumentsStr += ", ";
+                    argumentsStr += arguments[i];
+                }
+
+                call = instrInfos.cppCallingInformation.cppCallingName+"("+argumentsStr+")";
             }
 
-            actionCode += instrInfos.cppCallingName+"("+argumentsStr+");\n";
+            actionCode += call+";\n";
         }
 
-        //ACall object function if available
+        //Call object function if available
         string objectName = actions[aId].GetParameters().empty() ? "" : actions[aId].GetParameter(0).GetPlainString();
-        unsigned int objectTypeId = GetTypeIdOfObject(*scene.game, scene, objectName);
+        string objectType = GetTypeOfObject(*scene.game, scene, objectName);
 
-        if ( extensionsManager->HasObjectAction(objectTypeId,
+        if ( extensionsManager->HasObjectAction(objectType,
                                                 actions[aId].GetType()))
         {
+            const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
+
             context.currentObject = objectName;
             context.ObjectNeeded(objectName);
 
-            std::vector<std::string> arguments = GenerateParametersCodes(*scene.game, scene, actions[aId].GetParameters(), instrInfos.parameters, context);
-            std::string argumentsStr;
-            for (unsigned int i = 1;i<arguments.size();++i)
+            vector<string> arguments = GenerateParametersCodes(*scene.game, scene, actions[aId].GetParameters(), instrInfos.parameters, context);
+
+            //Add a static_cast if necessary
+            string objectPart =
+            ( !objInfo.cppClassName.empty() ) ? "static_cast<"+objInfo.cppClassName+"*>("+objectName+"objects[i])->" : objectName+"objects[i]->" ;
+
+            //Create call
+            string call;
+            if ( instrInfos.cppCallingInformation.type == "number")
             {
-                if ( i != 1 ) argumentsStr += ", ";
-                argumentsStr += arguments[i];
+                if ( instrInfos.cppCallingInformation.accessType == InstructionInfos::CppCallingInformation::MutatorAndOrAccessor )
+                    call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, objectPart+instrInfos.cppCallingInformation.optionalAssociatedInstruction, context,1);
+                else
+                    call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, context,1);
+            }
+            else
+            {
+                string argumentsStr;
+                for (unsigned int i = 1;i<arguments.size();++i)
+                {
+                    if ( i != 1 ) argumentsStr += ", ";
+                    argumentsStr += arguments[i];
+                }
+
+                call = objectPart+instrInfos.cppCallingInformation.cppCallingName+"("+argumentsStr+")";
             }
 
             actionCode += "for(unsigned int i = 0;i < "+objectName+"objects.size();++i)\n";
             actionCode += "{\n";
-            actionCode += "    "+objectName+"objects[i]->"+instrInfos.cppCallingName+"("+argumentsStr+");\n";
+            actionCode += "    "+call+";\n";
             actionCode += "}\n";
 
             context.currentObject = "";
         }
 
         //Affection to an automatism member function if found
-        unsigned int automatismTypeId = GetTypeIdOfAutomatism(*scene.game, scene,
+        string automatismType = GetTypeOfAutomatism(*scene.game, scene,
                                                               actions[aId].GetParameters().size() < 2 ? "" : actions[aId].GetParameter(1).GetPlainString());
 
-        if (extensionsManager->HasAutomatismAction(automatismTypeId,
-                                                   actions[aId].GetType()))
+        if (extensionsManager->HasAutomatismAction(automatismType, actions[aId].GetType()))
         {
+            const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
+
             context.currentObject = objectName;
             context.ObjectNeeded(objectName);
 
-            std::vector<std::string> arguments = GenerateParametersCodes(*scene.game, scene, actions[aId].GetParameters(), instrInfos.parameters, context);
-            std::string argumentsStr;
-            for (unsigned int i = 2;i<arguments.size();++i)
+            vector<string> arguments = GenerateParametersCodes(*scene.game, scene, actions[aId].GetParameters(), instrInfos.parameters, context);
+
+            //Add a static_cast if necessary
+            string objectPart =
+            ( !objInfo.cppClassName.empty() ) ?
+                "static_cast<"+objInfo.cppClassName+"*>("+objectName+"objects[i])->GetAutomatism(\""+actions[aId].GetParameter(1).GetPlainString()+"\")->"
+            :   objectName+"objects[i]->GetAutomatism(\""+actions[aId].GetParameter(1).GetPlainString()+"\")->";
+
+            //Create call
+            string call;
+            if ( instrInfos.cppCallingInformation.type == "number" && arguments.size() >= 4)
             {
-                if ( i != 2 ) argumentsStr += ", ";
-                argumentsStr += arguments[i];
+                if ( instrInfos.cppCallingInformation.accessType == InstructionInfos::CppCallingInformation::MutatorAndOrAccessor )
+                    call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, objectPart+instrInfos.cppCallingInformation.optionalAssociatedInstruction, context,2);
+                else
+                    call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, context,2);
+            }
+            else
+            {
+                string argumentsStr;
+                for (unsigned int i = 2;i<arguments.size();++i)
+                {
+                    if ( i != 2 ) argumentsStr += ", ";
+                    argumentsStr += arguments[i];
+                }
+
+                call = objectPart+instrInfos.cppCallingInformation.cppCallingName+"("+argumentsStr+")";
             }
 
             //Verify that object has automatism.
-            unsigned int automatismNameId = actions[aId].GetParameter(1).GetAsObjectIdentifier();
-            vector < unsigned int > automatisms = GetAutomatismsOfObject(*scene.game, scene, objectName);
-            if ( find(automatisms.begin(), automatisms.end(), automatismNameId) == automatisms.end() )
+            vector < string > automatisms = GetAutomatismsOfObject(*scene.game, scene, objectName);
+            if ( find(automatisms.begin(), automatisms.end(), actions[aId].GetParameter(1).GetPlainString()) == automatisms.end() )
             {
                 cout << "Bad automatism requested" << endl;
                 actions[aId].SetType("");
@@ -278,8 +552,7 @@ std::string EventsCodeGenerator::GenerateActionsListCode(const RuntimeScene & sc
             {
                 actionCode += "for(unsigned int i = 0;i < "+objectName+"objects.size();++i)\n";
                 actionCode += "{\n";
-                //TODO : Using GetAsObjIdentifier is not appropriate here.
-                actionCode += "    "+objectName+"objects[i]->GetAutomatism("+ToString(actions[aId].GetParameter(1).GetAsObjectIdentifier())+")->"+instrInfos.cppCallingName+"("+argumentsStr+");\n";
+                actionCode += "    "+call+";\n";
                 actionCode += "}\n";
             }
 
@@ -299,11 +572,14 @@ std::string EventsCodeGenerator::GenerateActionsListCode(const RuntimeScene & sc
     return outputCode;
 }
 
+/**
+ * Generate C++ code from expressions.
+ */
 class CallbacksForGeneratingExpressionCode : public ParserCallbacks
 {
     public:
 
-    CallbacksForGeneratingExpressionCode(std::string & plainExpression_, const Game & game_, const Scene & scene_, EventsCodeGenerationContext & context_) :
+    CallbacksForGeneratingExpressionCode(string & plainExpression_, const Game & game_, const Scene & scene_, EventsCodeGenerationContext & context_) :
     plainExpression(plainExpression_),
     game(game_),
     scene(scene_),
@@ -311,16 +587,16 @@ class CallbacksForGeneratingExpressionCode : public ParserCallbacks
     {};
     virtual ~CallbacksForGeneratingExpressionCode() {};
 
-    virtual void OnConstantToken(std::string text)
+    virtual void OnConstantToken(string text)
     {
         plainExpression += text;
     };
 
-    virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
+    virtual void OnStaticFunction(string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
     {
-        std::vector<std::string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context );
+        vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context );
 
-        std::string parametersStr;
+        string parametersStr;
         for (unsigned int i = 0;i<parameters.size();++i)
         {
             if ( i != 0 ) parametersStr += ", ";
@@ -330,7 +606,7 @@ class CallbacksForGeneratingExpressionCode : public ParserCallbacks
         plainExpression += expressionInfo.cppCallingName+"("+parametersStr+")";
     };
 
-    virtual void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
+    virtual void OnStaticFunction(string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
     {
         //TODO : A bit of hack here..
         //Special case : Function without name is a litteral string.
@@ -343,8 +619,8 @@ class CallbacksForGeneratingExpressionCode : public ParserCallbacks
         }
 
         //Prepare parameters
-        std::vector<std::string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
-        std::string parametersStr;
+        vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
+        string parametersStr;
         for (unsigned int i = 0;i<parameters.size();++i)
         {
             if ( i != 0 ) parametersStr += ", ";
@@ -354,13 +630,13 @@ class CallbacksForGeneratingExpressionCode : public ParserCallbacks
         plainExpression += expressionInfo.cppCallingName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
+    virtual void OnObjectFunction(string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
     {
         if ( instruction.parameters.empty() ) return;
 
         //Prepare parameters
-        std::vector<std::string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
-        std::string parametersStr;
+        vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
+        string parametersStr;
         for (unsigned int i = 1;i<parameters.size();++i)
         {
             if ( i != 1 ) parametersStr += ", ";
@@ -370,22 +646,29 @@ class CallbacksForGeneratingExpressionCode : public ParserCallbacks
         context.ObjectNeeded(instruction.parameters[0].GetPlainString());
 
         //Access to the object
-        std::string objectStr;
+        string objectStr;
         if ( context.currentObject == instruction.parameters[0].GetPlainString() )
             objectStr = ""+instruction.parameters[0].GetPlainString()+"objects[i]";
         else
             objectStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 :"+ instruction.parameters[0].GetPlainString()+"objects[0]";
 
-        plainExpression += objectStr+"->"+expressionInfo.cppCallingName+"("+parametersStr+")";
+        //Cast the object if needed
+        string objectType = GetTypeOfObject(game, scene, instruction.parameters[0].GetPlainString());
+        const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
+
+        if ( !objInfo.cppClassName.empty() )
+            plainExpression += "static_cast<"+objInfo.cppClassName+"*>("+objectStr+")->"+expressionInfo.cppCallingName+"("+parametersStr+")";
+        else
+            plainExpression += objectStr+"->"+expressionInfo.cppCallingName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
+    virtual void OnObjectFunction(string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
     {
         if ( instruction.parameters.empty() ) return;
 
         //Prepare parameters
-        std::vector<std::string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
-        std::string parametersStr;
+        vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
+        string parametersStr;
         for (unsigned int i = 1;i<parameters.size();++i)
         {
             if ( i != 1 ) parametersStr += ", ";
@@ -395,22 +678,29 @@ class CallbacksForGeneratingExpressionCode : public ParserCallbacks
         context.ObjectNeeded(instruction.parameters[0].GetPlainString());
 
         //Access to the object
-        std::string objectStr;
+        string objectStr;
         if ( context.currentObject == instruction.parameters[0].GetPlainString() )
             objectStr = ""+instruction.parameters[0].GetPlainString()+"objects[i]";
         else
             objectStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? \"\" :"+ instruction.parameters[0].GetPlainString()+"objects[0]";
 
-        plainExpression += objectStr+"->"+expressionInfo.cppCallingName+"("+parametersStr+")";
+        //Cast the object if needed
+        string objectType = GetTypeOfObject(game, scene, instruction.parameters[0].GetPlainString());
+        const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
+
+        if ( !objInfo.cppClassName.empty() )
+            plainExpression += "static_cast<"+objInfo.cppClassName+"*>("+objectStr+")->"+expressionInfo.cppCallingName+"("+parametersStr+")";
+        else
+            plainExpression += objectStr+"->"+expressionInfo.cppCallingName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
+    virtual void OnObjectAutomatismFunction(string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
     {
         if ( instruction.parameters.size() < 2 ) return;
 
         //Prepare parameters
-        std::vector<std::string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
-        std::string parametersStr;
+        vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
+        string parametersStr;
         for (unsigned int i = 2;i<parameters.size();++i)
         {
             if ( i != 2 ) parametersStr += ", ";
@@ -420,23 +710,30 @@ class CallbacksForGeneratingExpressionCode : public ParserCallbacks
         context.ObjectNeeded(instruction.parameters[0].GetPlainString());
 
         //Access to the object
-        std::string objectStr;
+        string objectStr;
         if ( context.currentObject == instruction.parameters[0].GetPlainString() )
             objectStr = ""+instruction.parameters[0].GetPlainString()+"objects[i]";
         else
             objectStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 :"+ instruction.parameters[0].GetPlainString()+"objects[0]";
 
+        //Cast the object if needed
+        string objectType = GetTypeOfObject(game, scene, instruction.parameters[0].GetPlainString());
+        const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
 
-        plainExpression += objectStr+"->"+instruction.parameters[1].GetPlainString()+"::"+expressionInfo.cppCallingName+"("+parametersStr+")";
+        if ( !objInfo.cppClassName.empty() )
+            plainExpression += "static_cast<"+objInfo.cppClassName+"*>("+objectStr+")->"+instruction.parameters[1].GetPlainString()+"::"+expressionInfo.cppCallingName+"("+parametersStr+")";
+        else
+            plainExpression += objectStr+"->"+instruction.parameters[1].GetPlainString()+"::"+expressionInfo.cppCallingName+"("+parametersStr+")";
+
     };
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
+    virtual void OnObjectAutomatismFunction(string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
     {
         if ( instruction.parameters.size() < 2 ) return;
 
         //Prepare parameters
-        std::vector<std::string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
-        std::string parametersStr;
+        vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
+        string parametersStr;
         for (unsigned int i = 2;i<parameters.size();++i)
         {
             if ( i != 2 ) parametersStr += ", ";
@@ -446,18 +743,25 @@ class CallbacksForGeneratingExpressionCode : public ParserCallbacks
         context.ObjectNeeded(instruction.parameters[0].GetPlainString());
 
         //Access to the object
-        std::string objectStr;
+        string objectStr;
         if ( context.currentObject == instruction.parameters[0].GetPlainString() )
             objectStr = ""+instruction.parameters[0].GetPlainString()+"objects[i]";
         else
             objectStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? \"\" :"+ instruction.parameters[0].GetPlainString()+"objects[0]";
 
-        plainExpression += objectStr+"->"+instruction.parameters[1].GetPlainString()+"::"+expressionInfo.cppCallingName+"("+parametersStr+")";
+        //Cast the object if needed
+        string objectType = GetTypeOfObject(game, scene, instruction.parameters[0].GetPlainString());
+        const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
+
+        if ( !objInfo.cppClassName.empty() )
+            plainExpression += "static_cast<"+objInfo.cppClassName+"*>("+objectStr+")->"+instruction.parameters[1].GetPlainString()+"::"+expressionInfo.cppCallingName+"("+parametersStr+")";
+        else
+            plainExpression += objectStr+"->"+instruction.parameters[1].GetPlainString()+"::"+expressionInfo.cppCallingName+"("+parametersStr+")";
     };
 
     virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression)
     {
-        std::string newExpression;
+        string newExpression;
 
         CallbacksForGeneratingExpressionCode callbacks(newExpression, game, scene, context);
 
@@ -471,7 +775,7 @@ class CallbacksForGeneratingExpressionCode : public ParserCallbacks
 
     virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression)
     {
-        std::string newExpression;
+        string newExpression;
 
         CallbacksForGeneratingExpressionCode callbacks(newExpression, game, scene, context);
 
@@ -485,21 +789,21 @@ class CallbacksForGeneratingExpressionCode : public ParserCallbacks
 
 
     private :
-        std::string & plainExpression;
+        string & plainExpression;
         const Game & game;
         const Scene & scene;
         EventsCodeGenerationContext & context;
 };
 
 
-std::vector<std::string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, const Scene & scene, const vector < GDExpression > & parameters, const std::vector < ParameterInfo > & parametersInfo, EventsCodeGenerationContext & context)
+vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, const Scene & scene, const vector < GDExpression > & parameters, const vector < ParameterInfo > & parametersInfo, EventsCodeGenerationContext & context)
 {
-    std::vector<std::string> arguments;
+    vector<string> arguments;
 
     //TODO : Handle bad parameters size ?
     for (unsigned int pNb = 0;pNb < parametersInfo.size() && parameters.size();++pNb)
     {
-        std::string argOutput;
+        string argOutput;
 
         if ( parametersInfo[pNb].type == "expression" )
         {
@@ -508,18 +812,63 @@ std::vector<std::string> EventsCodeGenerator::GenerateParametersCodes(const Game
             GDExpressionParser parser(parameters[pNb].GetPlainString());
             parser.ParseMathExpression(game, scene, callbacks);
         }
-        else if ( parametersInfo[pNb].type == "text" )
+        else if ( parametersInfo[pNb].type == "string" )
         {
             CallbacksForGeneratingExpressionCode callbacks(argOutput, game, scene, context);
 
             GDExpressionParser parser(parameters[pNb].GetPlainString());
             parser.ParseTextExpression(game, scene, callbacks);
         }
+        else if ( parametersInfo[pNb].type == "relationalOperator" )
+        {
+            argOutput += parameters[pNb].GetPlainString() == "=" ? "==" :parameters[pNb].GetPlainString();
+            if ( argOutput != "==" && argOutput != "<" && argOutput != ">" && argOutput != "<=" && argOutput != ">=" && argOutput != "!=")
+                cout << "Warning: Bad relational operator." << endl;
+        }
+        else if ( parametersInfo[pNb].type == "operator" )
+        {
+            argOutput += parameters[pNb].GetPlainString();
+            if ( argOutput != "=" && argOutput != "+" && argOutput != "-" && argOutput != "/" && argOutput != "*")
+                cout << "Warning: Bad operator." << endl;
+        }
+        else if ( parametersInfo[pNb].type == "object" )
+        {
+            context.ObjectNeeded(parameters[pNb].GetPlainString());
+
+            if ( context.currentObject == parameters[pNb].GetPlainString() )
+                argOutput = ""+parameters[pNb].GetPlainString()+"objects[i]";
+            else
+                argOutput = "( "+parameters[pNb].GetPlainString()+"objects.empty() ) ? NULL :"+ parameters[pNb].GetPlainString()+"objects[0]";
+        }
+        //Code only parameter type
+        else if ( parametersInfo[pNb].type == "currentScene" )
+        {
+            argOutput += "*runtimeScene";
+        }
+        //Code only parameter type
+        else if ( parametersInfo[pNb].type == "inlineCode" )
+        {
+            argOutput += parametersInfo[pNb].supplementaryInformation;
+        }
+        //Code only parameter type
+        else if ( parametersInfo[pNb].type == "objectsOfParameter" )
+        {
+            unsigned int i = ToInt(parametersInfo[pNb].supplementaryInformation);
+            if ( i < parameters.size() )
+                argOutput += parameters[i].GetPlainString()+"objects";
+            else
+            {
+                context.errorOccured = true;
+                cout << "Error: Could not get objects for a parameter" << endl;
+            }
+        }
         else
         {
-            cout << "Warning: Unknown type of parameter" << parametersInfo[pNb].type;
+            cout << "Warning: Unknown type of parameter \"" << parametersInfo[pNb].type << "\".";
             argOutput += "\""+parameters[pNb].GetPlainString()+"\"";
         }
+
+
 
         arguments.push_back(argOutput);
     }
@@ -529,20 +878,21 @@ std::vector<std::string> EventsCodeGenerator::GenerateParametersCodes(const Game
 /**
  * Generate events list code.
  */
-std::string EventsCodeGenerator::GenerateEventsListCode(const RuntimeScene & scene, vector < BaseEventSPtr > & events, EventsCodeGenerationContext /*&*/ context)
+string EventsCodeGenerator::GenerateEventsListCode(const RuntimeScene & scene, vector < BaseEventSPtr > & events, const EventsCodeGenerationContext & parentContext)
 {
-    std::string output;
+    string output;
 
     for ( unsigned int eId = 0; eId < events.size();++eId )
     {
-        std::string eventCoreCode = events[eId]->GenerateEventCode(scene, context);
-        std::string declarationsCode;
-        for ( std::set<std::string>::iterator it = context.objectsToBeDeclared.begin() ; it != context.objectsToBeDeclared.end(); ++it )
+        EventsCodeGenerationContext context = parentContext;
+
+        string eventCoreCode = events[eId]->GenerateEventCode(scene, context);
+        string declarationsCode;
+        for ( set<string>::iterator it = context.objectsToBeDeclared.begin() ; it != context.objectsToBeDeclared.end(); ++it )
         {
             if ( context.objectsAlreadyDeclared.find(*it) == context.objectsAlreadyDeclared.end() )
             {
-                //TODO : Object identifier is not appropriate here.
-                declarationsCode += "std::vector<Object*> "+*it+"objects = runtimeScene->objectsInstances.GetObjectsRawPointers("+ToString(ObjectIdentifiersManager::GetInstance()->GetOIDfromName(*it))+");\n";
+                declarationsCode += "vector<Object*> "+*it+"objects = runtimeScene->objectsInstances.GetObjectsRawPointers(\""+*it+"\");\n";
                 context.objectsAlreadyDeclared.insert(*it);
             }
         }
@@ -554,26 +904,29 @@ std::string EventsCodeGenerator::GenerateEventsListCode(const RuntimeScene & sce
     return output;
 }
 
-std::string EventsCodeGenerator::GenerateEventsCompleteCode(const RuntimeScene & scene, std::vector < BaseEventSPtr > & events)
+string EventsCodeGenerator::GenerateEventsCompleteCode(const RuntimeScene & scene, vector < BaseEventSPtr > & events)
 {
-    std::string output;
+    string output;
+
+    EventsCodeGenerationContext context;
+    context.includeFiles = boost::shared_ptr< set<string> >(new set<string>);
+    string wholeEventsCode = EventsCodeGenerator::GenerateEventsListCode(scene, events, context);
 
     output +=
+    "#include <stdio.h>\n"
     "#include <iostream>\n"
     "#include <vector>\n"
-    "#include \"GDL/RuntimeScene.h\"\n"
-    "#include \"GDL/cVariables.h\"\n"
+    "#include \"GDL/RuntimeScene.h\"\n";
+    for ( set<string>::iterator include = context.includeFiles->begin() ; include != context.includeFiles->end(); ++include )
+        output += "#include \""+*include+"\"\n";
 
-    "extern void * pointerToRuntimeScene;\n\n"
+    output +=
+    "extern void * pointerToRuntimeScene;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n"
 
     "int main()\n"
     "{\n"
-	"RuntimeScene * runtimeScene = static_cast< RuntimeScene *> (pointerToRuntimeScene);\n";
-
-    EventsCodeGenerationContext context;
-    output += EventsCodeGenerator::GenerateEventsListCode(scene, events, context);
-
-    output +=
+	"RuntimeScene * runtimeScene = static_cast< RuntimeScene *> (pointerToRuntimeScene);"
+    +wholeEventsCode+
     "return 0;\n"
     "}\n";
 

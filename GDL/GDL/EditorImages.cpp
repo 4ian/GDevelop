@@ -37,8 +37,6 @@
 
 #include "GDL/Game.h"
 #include "GDL/CommonTools.h"
-#include "GDL/MemTrace.h"
-#include "GDL/ChoixDossier.h"
 #include "GDL/PropImage.h"
 #include "GDL/BitmapGUIManager.h"
 #include "GDL/gdTreeItemStringData.h"
@@ -418,7 +416,7 @@ void EditorImages::OnAddImageBtClick( wxCommandEvent& event )
             wxLogStatus( _( "Ajout de l'image " ) + names[i] );
 
             //Add to all images
-            if ( FindImage(game.images, string(names[i])) == -1 )
+            if ( std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), ToString(names[i]))) == game.images.end() )
             {
                 Image image;
                 image.file = string(files[i].mb_str());
@@ -504,13 +502,13 @@ void EditorImages::OnDelImageBtClick( wxCommandEvent& event )
     gdTreeItemStringData * itemData = dynamic_cast<gdTreeItemStringData*>(BanqueImageList->GetItemData(m_itemSelected));
     if ( itemData && itemData->GetString() == "Image" )
     {
-        std::string imageName = ( string ) BanqueImageList->GetItemText( m_itemSelected );
+        std::string imageName = ToString(BanqueImageList->GetItemText( m_itemSelected ));
 
-        int i = FindImage( game.images, imageName );
-        if ( i != -1 )
+        std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), imageName));
+        if ( image != game.images.end() )
         {
-            game.imagesChanged.push_back(game.images[i].nom);
-            game.images.erase( game.images.begin() + i );
+            game.imagesChanged.push_back((*image).nom);
+            game.images.erase( image );
             Dossier::RemoveImage(&game.imagesFolders, imageName );
         }
 
@@ -587,7 +585,7 @@ void EditorImages::OnBanqueImageListSelectionChanged( wxTreeEvent& event )
     wxFocusEvent unusedEvent;
     OnSetFocus(unusedEvent);
 
-    string nom = ( string ) BanqueImageList->GetItemText( event.GetItem() );
+    string name = ToString(BanqueImageList->GetItemText( event.GetItem() ));
     //Changement de l'item sélectionné
     m_itemSelected = event.GetItem();
 
@@ -595,10 +593,10 @@ void EditorImages::OnBanqueImageListSelectionChanged( wxTreeEvent& event )
     if ( data && data->GetString() == "Image" )
     {
         //Zone d'aperçu de l'image
-        int i = FindImage( game.images, nom );
-        if ( i != -1 )
+        std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), name));
+        if ( image != game.images.end() )
         {
-            fileImageSelected = game.images.at( i ).file;
+            fileImageSelected = (*image).file;
             apercuPanel->Refresh();
             apercuPanel->Update();
         }
@@ -662,20 +660,20 @@ void EditorImages::OnBanqueImageListEndLabelEdit( wxTreeEvent& event )
         }
         else if ( data->GetString() == "Image" )
         {
-            if ( FindImage( game.images, newName ) != -1 )
+            if ( std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), newName)) != game.images.end() )
             {
                 wxLogWarning( _( "Impossible de renommer l'image : une autre image porte déjà ce nom." ) );
                 Refresh();
                 return;
             }
 
-            int i = FindImage( game.images, renamedItemOldName );
-            if ( i != -1 )
+            std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), renamedItemOldName));
+            if ( image != game.images.end() )
             {
-                game.imagesChanged.push_back(game.images.at( i ).nom);
+                game.imagesChanged.push_back((*image).nom);
                 game.imagesChanged.push_back(newName);
 
-                game.images.at( i ).nom = newName;
+                (*image).nom = newName;
                 Dossier::ReplaceNomImage(&game.imagesFolders, renamedItemOldName, newName);
 
                 RenameInTree(BanqueImageList->GetRootItem(), renamedItemOldName, newName, "Image");
@@ -740,8 +738,8 @@ void EditorImages::OnModFileImage( wxCommandEvent& event )
     gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(BanqueImageList->GetItemData(m_itemSelected));
     if ( !data || data->GetString() != "Image" ) return;
 
-    int i = FindImage( game.images, data->GetSecondString() );
-    if ( i == -1 )
+    std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), data->GetSecondString()));
+    if ( image == game.images.end() )
     {
         wxLogStatus( _( "L'image à modifier n'a pas été trouvée." ) );
         return;
@@ -753,12 +751,9 @@ void EditorImages::OnModFileImage( wxCommandEvent& event )
     {
         wxLogStatus( _( "Changement du fichier de l'image..." ) );
 
-        string newFile = string(FileDialog.GetPath().mb_str());
+        (*image).file = ToString(FileDialog.GetPath());
+        game.imagesChanged.push_back((*image).nom);
 
-        game.images.at( i ).file = newFile;
-        //Ne concerne pas les dossiers
-
-        game.imagesChanged.push_back(game.images.at( i ).nom);
         wxLogStatus( _( "Changement du fichier de l'image effectué" ) );
     }
 
@@ -766,11 +761,11 @@ void EditorImages::OnModFileImage( wxCommandEvent& event )
 
 void EditorImages::OnChercherBtClick( wxCommandEvent& event )
 {
-    string name = static_cast<string>( wxGetTextFromUser( _( "Entrez le nom de l'image à rechercher" ), _( "Chercher une image" ) ) );
-    if ( name == "" ) return;
+    string name = ToString( wxGetTextFromUser( _( "Entrez le nom de l'image à rechercher" ), _( "Chercher une image" ) ) );
+    if ( name.empty() ) return;
 
-    int i = FindImage( game.images, name );
-    if ( i != -1 )
+    std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), name));
+    if ( image != game.images.end() )
     {
         //On en a trouvé un, on le sélectionne.
         void * rien;
@@ -805,16 +800,16 @@ void EditorImages::OnModPropSelected(wxCommandEvent& event)
     gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(BanqueImageList->GetItemData(m_itemSelected));
     if ( !data || data->GetString() != "Image" ) return;
 
-    int i = FindImage( game.images, data->GetSecondString() );
-    if ( i == -1 )
+    std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), data->GetSecondString()));
+    if ( image == game.images.end() )
     {
         wxLogStatus( _( "L'image à modifier n'a pas été trouvée." ) );
         return;
     }
 
-    PropImage dialog(this, game.images.at(i));
+    PropImage dialog(this, *image);
     if ( dialog.ShowModal() == 1 )
-        game.imagesChanged.push_back(game.images.at(i).nom);
+        game.imagesChanged.push_back((*image).nom);
 }
 void EditorImages::OnBanqueImageListItemActivated1(wxTreeEvent& event)
 {
@@ -848,14 +843,14 @@ void EditorImages::OnOpenPaintProgramClick(wxCommandEvent& event)
         gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(BanqueImageList->GetItemData(m_itemSelected));
         if ( !data || data->GetString() != "Image" ) return;
 
-        int i = FindImage( game.images, data->GetSecondString() );
-        if ( i == -1 )
+        std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), data->GetSecondString()));
+        if ( image == game.images.end() )
         {
             wxExecute(result);
             return;
         }
 
-        wxExecute(result+" \""+game.images.at(i).file+"\"");
+        wxExecute(result+" \""+(*image).file+"\"");
     }
 }
 
@@ -930,15 +925,24 @@ void EditorImages::OnMoveUpSelected(wxCommandEvent& event)
         //Move image from base folder
         if ( !parentFolderData || parentFolderData->GetString() == "BaseFolder" )
         {
-            int i = FindImage( game.images, name );
-            if ( i == -1 )
+            int index = -1;
+            for (unsigned int i = 0;i<game.images.size();++i)
+            {
+                if ( game.images[i].nom == name)
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            if ( index == -1 )
             {
                 wxLogStatus( _( "L'image à déplacer n'a pas été trouvée." ) );
                 return;
             }
-            else if ( i > 0 )
+            else if ( index > 0 )
             {
-                swap (game.images[i], game.images[i-1]);
+                swap (game.images[index], game.images[index-1]);
                 ShiftUpElementOfTree();
             }
         }
@@ -1014,15 +1018,24 @@ void EditorImages::OnMoveDownSelected(wxCommandEvent& event)
         //Move image from base folder
         if ( !parentFolderData || parentFolderData->GetString() == "BaseFolder" )
         {
-            int i = FindImage( game.images, name );
-            if ( i == -1 )
+            int index = -1;
+            for (unsigned int i = 0;i<game.images.size();++i)
+            {
+                if ( game.images[i].nom == name)
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            if ( index == -1 )
             {
                 wxLogStatus( _( "L'image à déplacer n'a pas été trouvée." ) );
                 return;
             }
-            else if ( i+1 < game.images.size() )
+            else if ( index+1 < game.images.size() )
             {
-                swap (game.images[i], game.images[i+1]);
+                swap (game.images[index], game.images[index+1]);
                 ShiftDownElementOfTree();
 
                 return;

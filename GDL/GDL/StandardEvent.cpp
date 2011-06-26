@@ -41,6 +41,22 @@ std::string StandardEvent::GenerateEventCode(const RuntimeScene & scene, EventsC
     return outputCode;
 }
 
+vector < vector<Instruction>* > StandardEvent::GetAllConditionsVectors()
+{
+    vector < vector<Instruction>* > allConditions;
+    allConditions.push_back(&conditions);
+
+    return allConditions;
+}
+
+vector < vector<Instruction>* > StandardEvent::GetAllActionsVectors()
+{
+    vector < vector<Instruction>* > allActions;
+    allActions.push_back(&actions);
+
+    return allActions;
+}
+
 #if defined(GD_IDE_ONLY)
 void StandardEvent::SaveToXml(TiXmlElement * eventElem) const
 {

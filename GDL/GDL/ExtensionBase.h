@@ -20,11 +20,9 @@ class MainEditorCommand;
 #include <vector>
 #include <map>
 #include <boost/shared_ptr.hpp>
-#include "GDL/ObjectIdentifiersManager.h"
 class RuntimeScene;
 class ObjectsConcerned;
 class Instruction;
-class Evaluateur;
 class Automatism;
 class Object;
 class ExtensionBase;
@@ -69,10 +67,9 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Start declaring a condition, and some information about it.
  * DECLARE_END_CONDITION need to be used after having declared parameter ( DECLARE_PARAMETER ).
  */
-#define DECLARE_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, cppCallingName_) { \
+#define DECLARE_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
             InstructionInfos instrInfo; \
             std::string currentConditionDeclarationName = name_; \
-            instrInfo.cppCallingName = cppCallingName_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
@@ -90,10 +87,9 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Start declaring an action, and some information about it.
  * DECLARE_END_ACTION need to be used after having declared parameter ( DECLARE_PARAMETER ).
  */
-#define DECLARE_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, cppCallingName_) { \
+#define DECLARE_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
             InstructionInfos instrInfo; \
             std::string currentActionDeclarationName = name_; \
-            instrInfo.cppCallingName = cppCallingName_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
@@ -111,10 +107,9 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Start declaring a condition for an object, and some information about it.
  * DECLARE_END_OBJECT_CONDITION need to be used after having declared parameter ( DECLARE_PARAMETER ).
  */
-#define DECLARE_OBJECT_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, cppCallingName_) { \
+#define DECLARE_OBJECT_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
             InstructionInfos instrInfo; \
             std::string currentObjConditionDeclarationName = name_; \
-            instrInfo.cppCallingName = cppCallingName_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
@@ -131,10 +126,9 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Start declaring an action for an object, and some information about it.
  * DECLARE_END_OBJECT_ACTION need to be used after having declared parameter ( DECLARE_PARAMETER ).
  */
-#define DECLARE_OBJECT_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, cppCallingName_) { \
+#define DECLARE_OBJECT_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
             InstructionInfos instrInfo; \
             std::string currentObjActionDeclarationName = name_; \
-            instrInfo.cppCallingName = cppCallingName_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
@@ -153,10 +147,9 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Start declaring a condition for an object, and some information about it.
  * DECLARE_END_AUTOMATISM_CONDITION need to be used after having declared parameter ( DECLARE_PARAMETER ).
  */
-#define DECLARE_AUTOMATISM_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, cppCallingName_) { \
+#define DECLARE_AUTOMATISM_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
             InstructionInfos instrInfo; \
             std::string currentAutoConditionDeclarationName = name_; \
-            instrInfo.cppCallingName = callingName_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
@@ -173,10 +166,9 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Start declaring an action for an object, and some information about it.
  * DECLARE_END_AUTOMATISM_ACTION need to be used after having declared parameter ( DECLARE_PARAMETER ).
  */
-#define DECLARE_AUTOMATISM_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_, callingName_) { \
+#define DECLARE_AUTOMATISM_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
             InstructionInfos instrInfo; \
             std::string currentAutoActionDeclarationName = name_; \
-            instrInfo.cppCallingName = callingName_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
             instrInfo.sentence = std::string(sentence_.mb_str()); \
@@ -197,23 +189,20 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Set true if the parameter is an object
  * @param Set the type of the object, so as to verify a bad object type is not passed to the action/condition.
  */
-#define DECLARE_PARAMETER(type_, desc_, useObj_, objType_) { \
+#define DECLARE_PARAMETER(type_, desc_, objType_, optional_) { \
                 ParameterInfo parameter; \
-                parameter.useObject = useObj_; \
-                if ( !std::string(objType_).empty() ) parameter.objectType = GetNameSpace()+objType_; \
+                if ( !std::string(objType_).empty() ) parameter.supplementaryInformation = GetNameSpace()+objType_; \
                 parameter.type = type_; \
-                parameter.optional = false; \
+                parameter.optional = optional_; \
                 parameter.description = std::string(desc_.mb_str()); \
                 instrInfo.parameters.push_back(parameter); \
                 }
 
-#define DECLARE_PARAMETER_OPTIONAL(type_, desc_, useObj_, objType_) { \
+#define DECLARE_CODEONLY_PARAMETER(type_, more_) { \
                 ParameterInfo parameter; \
-                parameter.useObject = useObj_; \
-                if ( !std::string(objType_).empty() ) parameter.objectType = GetNameSpace()+objType_; \
                 parameter.type = type_; \
-                parameter.optional = true; \
-                parameter.description = std::string(desc_.mb_str()); \
+                parameter.codeOnly = true; \
+                parameter.supplementaryInformation = more_; \
                 instrInfo.parameters.push_back(parameter); \
                 }
 
@@ -227,14 +216,15 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function for creation from another object
  * @param Function for destroying the object
  */
-#define DECLARE_OBJECT(name_, fullname_, informations_, icon24x24_, createFunPtrP, destroyFunPtrP) { \
+#define DECLARE_OBJECT(name_, fullname_, informations_, icon24x24_, createFunPtrP, destroyFunPtrP, cppClassName_) { \
             ExtensionObjectInfos objInfos; \
             std::string currentObjectDeclarationName = name_; \
             objInfos.fullname = std::string(fullname_.mb_str());\
             objInfos.informations = std::string(informations_.mb_str());\
             objInfos.icon = wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY); \
             objInfos.createFunPtr = createFunPtrP;\
-            objInfos.destroyFunPtr = destroyFunPtrP;
+            objInfos.destroyFunPtr = destroyFunPtrP;\
+            objInfos.cppClassName = cppClassName_;
 
 /**
  * Declare an expression
@@ -551,31 +541,31 @@ typedef Object * (*CreateFunPtr)(std::string name);
 #define DECLARE_THE_EXTENSION(name_, fullname_, description_, author_, license_) name = name_; \
                                                                                 SetNameSpace(name_);
 
-#define DECLARE_CONDITION(name, fullname, description, sentence, group_, icon, smallicon, ptr) { \
+#define DECLARE_CONDITION(name, fullname, description, sentence, group_, icon, smallicon) { \
             InstructionInfos instrInfo; \
             std::string currentConditionDeclarationName = name;
 
-#define DECLARE_ACTION(name, fullname, description, sentence, group_, icon, smallicon, ptr) { \
+#define DECLARE_ACTION(name, fullname, description, sentence, group_, icon, smallicon) { \
             InstructionInfos instrInfo; \
             std::string currentActionDeclarationName = name;
 
-#define DECLARE_OBJECT_CONDITION(name, fullname, description, sentence, group_, icon, smallicon, ptr) { \
+#define DECLARE_OBJECT_CONDITION(name, fullname, description, sentence, group_, icon, smallicon) { \
             InstructionInfos instrInfo; \
             std::string currentObjConditionDeclarationName = name;
 
-#define DECLARE_OBJECT_ACTION(name, fullname, description, sentence, icon, group_, smallicon, ptr) { \
+#define DECLARE_OBJECT_ACTION(name, fullname, description, sentence, icon, group_, smallicon) { \
             InstructionInfos instrInfo; \
             std::string currentObjActionDeclarationName = name;
 
-#define DECLARE_AUTOMATISM_CONDITION(name, fullname, description, sentence, group_, icon, smallicon, ptr) { \
+#define DECLARE_AUTOMATISM_CONDITION(name, fullname, description, sentence, group_, icon, smallicon) { \
             InstructionInfos instrInfo; \
             std::string currentAutoConditionDeclarationName = name;
 
-#define DECLARE_AUTOMATISM_ACTION(name, fullname, description, sentence, icon, group_, smallicon, ptr) { \
+#define DECLARE_AUTOMATISM_ACTION(name, fullname, description, sentence, icon, group_, smallicon) { \
             InstructionInfos instrInfo; \
             std::string currentAutoActionDeclarationName = name;
 
-#define DECLARE_OBJECT(name_, fullname, informations, icon, createFunPtrP, destroyFunPtrP) { \
+#define DECLARE_OBJECT(name_, fullname, informations, icon, createFunPtrP, destroyFunPtrP, cppClassName_) { \
             ExtensionObjectInfos objInfos; \
             std::string currentObjectDeclarationName = name_; \
             objInfos.createFunPtr = createFunPtrP;\
@@ -641,21 +631,19 @@ typedef Object * (*CreateFunPtr)(std::string name);
             automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName)); \
             automatismInfo.sharedDatasInstance = boost::shared_ptr<AutomatismsSharedDatas>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
 
-#define DECLARE_PARAMETER(type_, desc, useObj, objType) { \
+#define DECLARE_PARAMETER(type_, desc, objType, optional) { \
                 ParameterInfo parameter; \
                 parameter.type = type_; \
-                parameter.useObject = useObj; \
-                parameter.optional = false; \
-                if ( !std::string(objType).empty() ) parameter.objectType = GetNameSpace()+objType; \
+                parameter.optional = optional; \
+                if ( !std::string(objType).empty() ) parameter.supplementaryInformation = GetNameSpace()+objType; \
                 instrInfo.parameters.push_back(parameter); \
                 }
 
-#define DECLARE_PARAMETER_OPTIONAL(type_, desc, useObj, objType) { \
+#define DECLARE_CODEONLY_PARAMETER(type_, more_) { \
                 ParameterInfo parameter; \
                 parameter.type = type_; \
-                parameter.useObject = useObj; \
-                parameter.optional = true; \
-                 if ( !std::string(objType).empty() ) parameter.objectType = GetNameSpace()+objType; \
+                parameter.codeOnly = true; \
+                parameter.supplementaryInformation = more_; \
                 instrInfo.parameters.push_back(parameter); \
                 }
 
@@ -773,13 +761,13 @@ class GD_API ParameterInfo
     ParameterInfo();
     virtual ~ParameterInfo() {};
 
-    bool useObject;
-    std::string objectType;
-    std::string type;
-    bool optional;
+    std::string type; ///< Parameter type
+    std::string supplementaryInformation; ///< Used if needed
+    bool optional; ///< True if the parameter is optional
 
 #if defined(GD_IDE_ONLY)
-    std::string description;
+    std::string description; ///< Description shown in editor
+    bool codeOnly; ///< True if parameter is relative to code generation only, i.e. must not be shown in editor
 #endif
 };
 
@@ -805,7 +793,44 @@ class GD_API InstructionInfos
 #endif
     std::vector < ParameterInfo > parameters;
 
-    std::string cppCallingName;
+    class CppCallingInformation
+    {
+    public:
+        enum AccessType {Reference, MutatorAndOrAccessor};
+        CppCallingInformation() : accessType(Reference) {};
+
+        CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
+        {
+            cppCallingName = cppCallingName_;
+            return *this;
+        }
+
+        CppCallingInformation & SetTypeManipulated(const std::string & type_)
+        {
+            type = type_;
+            return *this;
+        }
+
+        CppCallingInformation & SetAssociatedGetter(const std::string & getter)
+        {
+            optionalAssociatedInstruction = getter;
+            accessType = MutatorAndOrAccessor;
+            return *this;
+        }
+
+        CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
+        {
+            optionalIncludeFile = optionalIncludeFile_;
+            return *this;
+        }
+
+        std::string cppCallingName;
+        std::string type;
+        AccessType accessType;
+        std::string optionalAssociatedInstruction;
+        std::string optionalIncludeFile;
+    };
+    CppCallingInformation cppCallingInformation;
 };
 
 /**
@@ -924,6 +949,8 @@ class GD_API ExtensionObjectInfos
     std::map<std::string, InstructionInfos > actionsInfos;
     std::map<std::string, ExpressionInfos > expressionsInfos;
     std::map<std::string, StrExpressionInfos > strExpressionsInfos;
+
+    std::string cppClassName;
 };
 
 /**
@@ -967,8 +994,7 @@ class GD_API CompilationInfos
  *
  *  - Static functions ( e.g. GetActionFunctionPtr ).
  *  - Objects functions ( e.g. GetObjectActionFunctionPtr )
- *  - New objects, which have a type. This type is associated
- *   with a typeId at runtime by ExtensionsManager. The new
+ *  - New objects, which have a type. The new
  *   objects creations/destructions functions are provided
  *   by the extension.
  *  - Information at edittime

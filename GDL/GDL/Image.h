@@ -27,4 +27,11 @@ class GD_API Image
         bool alwaysLoaded; ///< True if the image must always be loaded in memory.
 };
 
+/**
+ * Functor testing image name
+ */
+struct ImageHasName : public std::binary_function<Image, string, bool> {
+    bool operator()(const Image & image, string name) const { return image.nom == name; }
+};
+
 #endif // IMAGE_H

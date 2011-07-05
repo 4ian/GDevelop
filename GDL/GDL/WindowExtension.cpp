@@ -23,13 +23,13 @@ WindowExtension::WindowExtension()
                    "res/actions/texte.png",
                    &ActEcrireTexte);
 
-        DECLARE_PARAMETER("text", _("Texte"), false, "")
-        DECLARE_PARAMETER("expression", _("Position X"), false, "")
-        DECLARE_PARAMETER("expression", _("Position Y"), false, "")
-        DECLARE_PARAMETER("color", _("Couleur"), false, "")
-        DECLARE_PARAMETER("expression", _("Taille"), false, "")
-        DECLARE_PARAMETER_OPTIONAL("police", _("Police"), false, "")
-        DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( Calque de base si vide )"), false, "")
+        DECLARE_PARAMETER("string", _("Texte"), "",false)
+        DECLARE_PARAMETER("expression", _("Position X"), "",false)
+        DECLARE_PARAMETER("expression", _("Position Y"), "",false)
+        DECLARE_PARAMETER("color", _("Couleur"), "",false)
+        DECLARE_PARAMETER("expression", _("Taille"), "",false)
+        DECLARE_PARAMETER_OPTIONAL("police", _("Police"), "",false)
+        DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( Calque de base si vide )"), "",false)
 
     DECLARE_END_ACTION()
 
@@ -42,7 +42,7 @@ WindowExtension::WindowExtension()
                    "res/actions/fullscreen.png",
                    &ActSetFullScreen);
 
-        DECLARE_PARAMETER("yesorno", _("Activer le plein écran"), false, "")
+        DECLARE_PARAMETER("yesorno", _("Activer le plein écran"), "",false)
 
     DECLARE_END_ACTION()
 
@@ -55,9 +55,9 @@ WindowExtension::WindowExtension()
                    "res/actions/window.png",
                    &ActSetWindowSize);
 
-        DECLARE_PARAMETER("expression", _("Largeur"), false, "")
-        DECLARE_PARAMETER("expression", _("Hauteur"), false, "")
-        DECLARE_PARAMETER("yesorno", _("Utiliser cette taille pour la taille par défaut des caméras des scènes ?"), false, "")
+        DECLARE_PARAMETER("expression", _("Largeur"), "",false)
+        DECLARE_PARAMETER("expression", _("Hauteur"), "",false)
+        DECLARE_PARAMETER("yesorno", _("Utiliser cette taille pour la taille par défaut des caméras des scènes ?"), "",false)
 
     DECLARE_END_ACTION()
 

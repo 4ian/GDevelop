@@ -1,5 +1,4 @@
 #include "GDL/CommonConversionsExtension.h"
-#include "GDL/CommonConversions.h"
 
 CommonConversionsExtension::CommonConversionsExtension()
 {
@@ -14,10 +13,11 @@ CommonConversionsExtension::CommonConversionsExtension()
                        _("Convertir en un nombre"),
                        _("Converti le texte en un nombre"),
                        _("Conversion"),
-                       "res/conditions/toujours24.png",
-                       &ExpToNumber)
+                       "res/conditions/toujours24.png")
 
-        DECLARE_PARAMETER("text", _("Texte à convertir en nombre"), false, "")
+        DECLARE_PARAMETER("string", _("Texte à convertir en nombre"), "",false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("ToDouble").SetIncludeFile("GDL/CommonTools.h");
 
     DECLARE_END_EXPRESSION()
 
@@ -25,10 +25,11 @@ CommonConversionsExtension::CommonConversionsExtension()
                        _("Convertir en un texte"),
                        _("Converti le résultat de l'expression en un texte"),
                        _("Conversion"),
-                       "res/conditions/toujours24.png",
-                       &ExpToStr)
+                       "res/conditions/toujours24.png")
 
-        DECLARE_PARAMETER("expression", _("Expression à convertir en texte"), false, "")
+        DECLARE_PARAMETER("expression", _("Expression à convertir en texte"), "",false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("ToString").SetIncludeFile("GDL/CommonTools.h");
 
     DECLARE_END_STR_EXPRESSION()
 }

@@ -11,16 +11,6 @@
 #include "GDL/ObjectsConcerned.h"
 
 /**
- * Change the layer of an object
- */
-bool Object::ActChangeLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
-{
-    SetLayer(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned, shared_from_this()));
-
-    return true;
-}
-
-/**
  * Show a layer
  */
 bool ActShowLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )

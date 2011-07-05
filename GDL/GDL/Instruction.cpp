@@ -10,9 +10,6 @@ using namespace std;
 GDExpression Instruction::badExpression("");
 
 Instruction::Instruction(string type_) :
-function(NULL),
-objectFunction(NULL),
-automatismFunction(NULL),
 #if defined(GD_IDE_ONLY)
 renderedHeightNeedUpdate(true),
 renderedHeight(0),
@@ -27,9 +24,6 @@ inverted(false)
 }
 
 Instruction::Instruction(string type_, const vector <GDExpression> & parameters_, bool isLocal_, bool inverted_) :
-function(NULL),
-objectFunction(NULL),
-automatismFunction(NULL),
 #if defined(GD_IDE_ONLY)
 renderedHeightNeedUpdate(true),
 renderedHeight(0),

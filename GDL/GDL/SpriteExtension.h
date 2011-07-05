@@ -5,16 +5,17 @@
 
 #ifndef SPRITEEXTENSION_H
 #define SPRITEEXTENSION_H
+#include "GDL/ExtensionBase.h"
 
 /**
  * Internal built-in extension providing Sprite objects.
  */
-class ExtensionSprite : public ExtensionBase
+class SpriteExtension : public ExtensionBase
 {
     public :
 
-    ExtensionSprite();
-    virtual ~ExtensionSprite() {};
+    SpriteExtension();
+    virtual ~SpriteExtension() {};
 };
 
 #endif // SPRITEEXTENSION_H

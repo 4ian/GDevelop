@@ -1,9 +1,11 @@
 
-#include "GDL/OpenSaveGame.h"
 #include "ForEachEvent.h"
-#include "ObjectsConcerned.h"
-#include "RuntimeScene.h"
+#include "GDL/RuntimeScene.h"
+#include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml.h"
+#include "GDL/EventsCodeGenerator.h"
+#include "GDL/ExpressionsCodeGeneration.h"
+#include "GDL/EventsCodeGenerationContext.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
@@ -18,64 +20,45 @@ objectsToPick("")
 #endif
 {
 }
-/**
- * Check the conditions, and launch actions and subevents if necessary
- */
-void ForEachEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
+
+std::string ForEachEvent::GenerateEventCode(const RuntimeScene & scene, EventsCodeGenerationContext & parentContext)
 {
-    ObjList list = objectsConcerned.PickAndRemove(objectsToPick.GetAsObjectIdentifier(), false);
+    std::string outputCode;
 
-    ObjList::iterator obj = list.begin();
-    ObjList::const_iterator obj_end = list.end();
-    for ( ; obj != obj_end; ++obj )
-    {
-        ObjectsConcerned objectsConcernedForEvent;
-        objectsConcernedForEvent.InheritsFrom(&objectsConcerned);
-        objectsConcernedForEvent.objectsPicked.AddObject(*obj);
+    //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
+    EventsCodeGenerationContext context;
+    context.InheritsFrom(parentContext);
 
-        if ( ExecuteConditions( scene, objectsConcernedForEvent) == true )
-        {
-            ExecuteActions( scene, objectsConcernedForEvent);
+    //Prepare conditions/actions codes
+    std::string conditionsCode = EventsCodeGenerator::GenerateConditionsListCode(scene, conditions, context);
+    std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(scene, actions, context);
+    std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
-            for (unsigned int i = 0;i<events.size();++i)
-            {
-                ObjectsConcerned objectsConcernedForSubEvent;
-                objectsConcernedForSubEvent.InheritsFrom(&objectsConcernedForEvent);
+    context.ObjectNotNeeded(objectsToPick.GetPlainString());
 
-                events[i]->Execute(scene, objectsConcernedForSubEvent);
-            }
-        }
-    }
+    //Write final code
+    outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < "+objectsToPick.GetPlainString()+"objects.size();++forEachIndex)\n";
+    outputCode += "{\n";
+
+    outputCode += "std::vector<Object*> newObjectList; newObjectList.push_back("+objectsToPick.GetPlainString()+"objects[forEachIndex]);";
+    outputCode += "std::vector<Object*> "+objectsToPick.GetPlainString()+"objects = newObjectList;\n";
+    outputCode += context.GenerateObjectsDeclarationCode()+"\n";
+    outputCode += conditionsCode;
+    outputCode += "if (" +ifPredicat+ ")\n";
+    outputCode += "{\n";
+    outputCode += actionsCode;
+    outputCode += "\n{ //Subevents: \n";
+    outputCode += EventsCodeGenerator::GenerateEventsListCode(scene, events, context);
+    outputCode += "} //Subevents end.\n";
+    outputCode += "}\n";
+
+    outputCode += "}\n";
+
+    parentContext.ObjectNeeded(objectsToPick.GetPlainString());
+
+    return outputCode;
 }
 
-/**
- * Check if all conditions are true
- */
-bool ForEachEvent::ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
-{
-    for ( unsigned int k = 0; k < conditions.size(); ++k )
-    {
-        if ( conditions[k].function != NULL &&
-             !conditions[k].function( scene, objectsConcerned, conditions[k]) )
-            return false; //Return false as soon as a condition is false
-    }
-
-    return true;
-}
-
-/**
- * Run actions of the event
- */
-void ForEachEvent::ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
-{
-    for ( unsigned int k = 0; k < actions.size();k++ )
-    {
-        if ( actions[k].function != NULL )
-            actions[k].function( scene, objectsConcerned, actions[k]);
-    }
-
-    return;
-}
 
 vector < vector<Instruction>* > ForEachEvent::GetAllConditionsVectors()
 {

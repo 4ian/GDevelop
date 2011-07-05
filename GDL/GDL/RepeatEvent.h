@@ -26,7 +26,7 @@ class RepeatEvent : public BaseEvent
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new RepeatEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual void Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
+        virtual std::string GenerateEventCode(const RuntimeScene & scene, EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};
@@ -79,8 +79,6 @@ class RepeatEvent : public BaseEvent
 
     private:
         void Init(const RepeatEvent & event);
-        bool ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
-        void ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
 
         GDExpression repeatNumberExpression;
         vector < Instruction > conditions;

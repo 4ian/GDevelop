@@ -20,8 +20,8 @@ JoystickExtension::JoystickExtension()
                    "res/conditions/joystick.png",
                    &CondJoystickButtonDown);
 
-        DECLARE_PARAMETER("expression", _("Numéro du joystick ( Premier joystick : 0 )"), false, "");
-        DECLARE_PARAMETER("expression", _("Numéro du bouton"), false, "");
+        DECLARE_PARAMETER("expression", _("Numéro du joystick ( Premier joystick : 0 )"), "",false);
+        DECLARE_PARAMETER("expression", _("Numéro du bouton"), "",false);
 
     DECLARE_END_CONDITION()
 
@@ -34,10 +34,10 @@ JoystickExtension::JoystickExtension()
                    "res/conditions/joystick.png",
                    &CondJoystickAxis);
 
-        DECLARE_PARAMETER("expression", _("Numéro du joystick ( Premier joystick : 0 )"), false, "");
-        DECLARE_PARAMETER("joyaxis", _("Axe"), false, "");
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "");
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "");
+        DECLARE_PARAMETER("expression", _("Numéro du joystick ( Premier joystick : 0 )"), "",false);
+        DECLARE_PARAMETER("joyaxis", _("Axe"), "",false);
+        DECLARE_PARAMETER("expression", _("Valeur à tester"), "",false);
+        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "",false);
 
     DECLARE_END_CONDITION()
 
@@ -50,9 +50,9 @@ JoystickExtension::JoystickExtension()
                    "res/actions/joystick.png",
                    &ActGetJoystickAxis);
 
-        DECLARE_PARAMETER("expression", _("Numéro du joystick ( Premier joystick : 0 )"), false, "");
-        DECLARE_PARAMETER("joyaxis", _("Axe"), false, "");
-        DECLARE_PARAMETER("scenevar", _("Variable de la scène où enregistrer la valeur"), false, "");
+        DECLARE_PARAMETER("expression", _("Numéro du joystick ( Premier joystick : 0 )"), "",false);
+        DECLARE_PARAMETER("joyaxis", _("Axe"), "",false);
+        DECLARE_PARAMETER("scenevar", _("Variable de la scène où enregistrer la valeur"), "",false);
 
     DECLARE_END_ACTION()
 
@@ -63,8 +63,8 @@ JoystickExtension::JoystickExtension()
                    "res/conditions/joystick.png",
                    &ExpGetJoystickAxis)
 
-        DECLARE_PARAMETER("expression", _("Numéro du jostick ( Premier joystick : 0 )"), false, "")
-        DECLARE_PARAMETER("text", _("Texte à chercher"), false, "")
+        DECLARE_PARAMETER("expression", _("Numéro du jostick ( Premier joystick : 0 )"), "",false)
+        DECLARE_PARAMETER("string", _("Texte à chercher"), "",false)
 
     DECLARE_END_EXPRESSION()
 }

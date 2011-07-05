@@ -12,60 +12,23 @@
 std::string GDExpressionParser::parserSeparators = " ,+-*/%.<>=&|;()#^![]{}";
 std::vector< std::string > GDExpressionParser:: parserMathFunctions;
 
-GDExpressionParser::GDExpressionParser(const std::string & expressionPlainString_) :
-expressionPlainString(expressionPlainString_)
-{
-    if ( parserMathFunctions.empty() )
-    {
-        parserMathFunctions.push_back("abs");
-        parserMathFunctions.push_back("acos");
-        parserMathFunctions.push_back("acosh");
-        parserMathFunctions.push_back("asin");
-        parserMathFunctions.push_back("asinh");
-        parserMathFunctions.push_back("atan");
-        parserMathFunctions.push_back("atan2");
-        parserMathFunctions.push_back("atanh");
-        parserMathFunctions.push_back("avg");
-        parserMathFunctions.push_back("cbrt");
-        parserMathFunctions.push_back("ceil");
-        parserMathFunctions.push_back("cos");
-        parserMathFunctions.push_back("cosh");
-        parserMathFunctions.push_back("cot");
-        parserMathFunctions.push_back("csc");
-        parserMathFunctions.push_back("eval");
-        parserMathFunctions.push_back("exp");
-        parserMathFunctions.push_back("floor");
-        parserMathFunctions.push_back("if");
-        parserMathFunctions.push_back("else");
-        parserMathFunctions.push_back("then");
-        parserMathFunctions.push_back("int");
-        parserMathFunctions.push_back("log");
-        parserMathFunctions.push_back("log2");
-        parserMathFunctions.push_back("log10");
-        parserMathFunctions.push_back("ln");
-        parserMathFunctions.push_back("max");
-        parserMathFunctions.push_back("min");
-        parserMathFunctions.push_back("nthroot");
-        parserMathFunctions.push_back("pow");
-        parserMathFunctions.push_back("rint");
-        parserMathFunctions.push_back("sec");
-        parserMathFunctions.push_back("sign");
-        parserMathFunctions.push_back("sin");
-        parserMathFunctions.push_back("sinh");
-        parserMathFunctions.push_back("sqrt");
-        parserMathFunctions.push_back("sum");
-        parserMathFunctions.push_back("tan");
-        parserMathFunctions.push_back("tanh");
-        parserMathFunctions.push_back("trunc");
-    }
-}
-
 size_t GetMinimalParametersNumber(const std::vector < ParameterInfo > & parametersInfos)
 {
     size_t nb = 0;
     for (unsigned int i = 0;i<parametersInfos.size();++i)
     {
-    	if ( !parametersInfos[i].optional ) nb++;
+    	if ( !parametersInfos[i].optional && !parametersInfos[i].codeOnly ) nb++;
+    }
+
+    return nb;
+}
+
+size_t GetMaximalParametersNumber(const std::vector < ParameterInfo > & parametersInfos)
+{
+    size_t nb = 0;
+    for (unsigned int i = 0;i<parametersInfos.size();++i)
+    {
+    	if ( !parametersInfos[i].codeOnly ) nb++;
     }
 
     return nb;
@@ -229,7 +192,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                     }
 
                     //Testing the number of parameters
-                    if ( parameters.size() > instructionInfos.parameters.size() || parameters.size() < GetMinimalParametersNumber(instructionInfos.parameters) )
+                    if ( parameters.size() > GetMaximalParametersNumber(instructionInfos.parameters) || parameters.size() < GetMinimalParametersNumber(instructionInfos.parameters) )
                     {
                         #if defined(GD_IDE_ONLY)
                         firstErrorPos = functionNameEnd;
@@ -424,7 +387,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 const StrExpressionInfos & expressionInfo = extensionsManager->GetStrExpressionInfos(functionName);
 
                 //Testing the number of parameters
-                if ( expressionInfo.parameters.size() > parameters.size() || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
+                if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
@@ -450,7 +413,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 const StrExpressionInfos & expressionInfo = extensionsManager->GetObjectStrExpressionInfos(GetTypeOfObject(game, scene, nameBefore), functionName);
 
                 //Testing the number of parameters
-                if ( expressionInfo.parameters.size() > parameters.size() || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
+                if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
@@ -498,7 +461,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                         else
                         {
                             //Testing the number of parameters
-                            if ( expressionInfo.parameters.size() > parameters.size() || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
+                            if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
                             {
                                 #if defined(GD_IDE_ONLY)
                                 firstErrorPos = functionNameEnd;
@@ -624,4 +587,50 @@ bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene
     }
 
     return true;
+}
+
+GDExpressionParser::GDExpressionParser(const std::string & expressionPlainString_) :
+expressionPlainString(expressionPlainString_)
+{
+    if ( parserMathFunctions.empty() )
+    {
+        parserMathFunctions.push_back("abs");
+        parserMathFunctions.push_back("acos");
+        parserMathFunctions.push_back("acosh");
+        parserMathFunctions.push_back("asin");
+        parserMathFunctions.push_back("asinh");
+        parserMathFunctions.push_back("atan");
+        parserMathFunctions.push_back("atan2");
+        parserMathFunctions.push_back("atanh");
+        parserMathFunctions.push_back("avg");
+        parserMathFunctions.push_back("cbrt");
+        parserMathFunctions.push_back("ceil");
+        parserMathFunctions.push_back("cos");
+        parserMathFunctions.push_back("cosh");
+        parserMathFunctions.push_back("cot");
+        parserMathFunctions.push_back("csc");
+        parserMathFunctions.push_back("eval");
+        parserMathFunctions.push_back("exp");
+        parserMathFunctions.push_back("floor");
+        parserMathFunctions.push_back("if");
+        parserMathFunctions.push_back("else");
+        parserMathFunctions.push_back("then");
+        parserMathFunctions.push_back("int");
+        parserMathFunctions.push_back("log");
+        parserMathFunctions.push_back("log2");
+        parserMathFunctions.push_back("log10");
+        parserMathFunctions.push_back("ln");
+        parserMathFunctions.push_back("nthroot");
+        parserMathFunctions.push_back("pow");
+        parserMathFunctions.push_back("rint");
+        parserMathFunctions.push_back("sec");
+        parserMathFunctions.push_back("sign");
+        parserMathFunctions.push_back("sin");
+        parserMathFunctions.push_back("sinh");
+        parserMathFunctions.push_back("sqrt");
+        parserMathFunctions.push_back("sum");
+        parserMathFunctions.push_back("tan");
+        parserMathFunctions.push_back("tanh");
+        parserMathFunctions.push_back("trunc");
+    }
 }

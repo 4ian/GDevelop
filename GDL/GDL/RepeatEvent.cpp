@@ -3,9 +3,11 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "RepeatEvent.h"
-#include "RuntimeScene.h"
-#include "ObjectsConcerned.h"
+#include "GDL/RuntimeScene.h"
 #include "GDL/OpenSaveGame.h"
+#include "GDL/EventsCodeGenerator.h"
+#include "GDL/ExpressionsCodeGeneration.h"
+#include "GDL/EventsCodeGenerationContext.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
@@ -21,60 +23,43 @@ repeatNumberExpression("")
 {
 }
 
-/**
- * Check the conditions, and launch actions and subevents if necessary
- */
-void RepeatEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
+std::string RepeatEvent::GenerateEventCode(const RuntimeScene & scene, EventsCodeGenerationContext & parentContext)
 {
-    int nbRepeat = repeatNumberExpression.GetAsMathExpressionResult(scene, objectsConcerned);
+    std::string outputCode;
 
-    for (unsigned int r = 0;r<static_cast<unsigned>(nbRepeat);++r)
-    {
-        ObjectsConcerned objectsConcernedForEvent;
-        objectsConcernedForEvent.InheritsFrom(&objectsConcerned);
+    //Prepare expression containing how many times event must be repeated
+    std::string repeatCountCode;
+    CallbacksForGeneratingExpressionCode callbacks(repeatCountCode, *scene.game, scene, parentContext);
+    GDExpressionParser parser(repeatNumberExpression.GetPlainString());
+    parser.ParseMathExpression(*scene.game, scene, callbacks);
+    if (repeatCountCode.empty()) repeatCountCode = "0";
 
-        if ( ExecuteConditions( scene, objectsConcernedForEvent) == true )
-        {
-            ExecuteActions( scene, objectsConcernedForEvent);
+    //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
+    EventsCodeGenerationContext context;
+    context.InheritsFrom(parentContext);
 
-            for (unsigned int i = 0;i<events.size();++i)
-            {
-                ObjectsConcerned objectsConcernedForSubEvent;
-                objectsConcernedForSubEvent.InheritsFrom(&objectsConcernedForEvent);
+    //Prepare conditions/actions codes
+    std::string conditionsCode = EventsCodeGenerator::GenerateConditionsListCode(scene, conditions, context);
+    std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(scene, actions, context);
+    std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
-                events[i]->Execute(scene, objectsConcernedForSubEvent);
-            }
-        }
-    }
-}
+    //Write final code
+    outputCode += "int repeatCount = "+repeatCountCode+";\n";
+    outputCode += "for(unsigned int repeatIndex = 0;repeatIndex < repeatCount;++repeatIndex)\n";
+    outputCode += "{\n";
+    outputCode += context.GenerateObjectsDeclarationCode()+"\n";
+    outputCode += conditionsCode;
+    outputCode += "if (" +ifPredicat+ ")\n";
+    outputCode += "{\n";
+    outputCode += actionsCode;
+    outputCode += "\n{ //Subevents: \n";
+    outputCode += EventsCodeGenerator::GenerateEventsListCode(scene, events, context);
+    outputCode += "} //Subevents end.\n";
+    outputCode += "}\n";
 
-/**
- * Check if all conditions are true
- */
-bool RepeatEvent::ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
-{
-    for ( unsigned int k = 0; k < conditions.size(); ++k )
-    {
-        if ( conditions[k].function != NULL &&
-             !conditions[k].function( scene, objectsConcerned, conditions[k]) )
-            return false; //Return false as soon as a condition is false
-    }
+    outputCode += "}\n";
 
-    return true;
-}
-
-/**
- * Run actions of the event
- */
-void RepeatEvent::ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
-{
-    for ( unsigned int k = 0; k < actions.size();k++ )
-    {
-        if ( actions[k].function != NULL )
-            actions[k].function( scene, objectsConcerned, actions[k]);
-    }
-
-    return;
+    return outputCode;
 }
 
 vector < vector<Instruction>* > RepeatEvent::GetAllConditionsVectors()

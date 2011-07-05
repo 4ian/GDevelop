@@ -12,6 +12,6 @@
 #include "GDL/SpriteObject.h"
 #include <cmath>
 
-bool GD_API CheckCollision( const boost::shared_ptr<const SpriteObject> objet1, const boost::shared_ptr<const SpriteObject> objet2);
+bool GD_API CheckCollision( const SpriteObject* const objet1, const SpriteObject* const objet2);
 
 #endif // COLLISIONS_H_INCLUDED

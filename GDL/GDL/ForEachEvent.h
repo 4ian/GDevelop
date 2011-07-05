@@ -32,7 +32,7 @@ class ForEachEvent : public BaseEvent
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new ForEachEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual void Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
+        virtual std::string GenerateEventCode(const RuntimeScene & scene, EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};
@@ -85,8 +85,6 @@ class ForEachEvent : public BaseEvent
 
     private:
         void Init(const ForEachEvent & event);
-        bool ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
-        void ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
 
         GDExpression objectsToPick;
         vector < Instruction > conditions;

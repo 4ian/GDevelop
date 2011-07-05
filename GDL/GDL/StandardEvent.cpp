@@ -4,7 +4,6 @@
  */
 
 #include "StandardEvent.h"
-#include "ObjectsConcerned.h"
 #include "GDL/tinyxml.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/CommonTools.h"

@@ -1,6 +1,10 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/KeyboardExtension.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/cClavier.h"
 
 KeyboardExtension::KeyboardExtension()
 {
@@ -10,17 +14,18 @@ KeyboardExtension::KeyboardExtension()
                           "Compil Games",
                           "Freeware")
 
-
     DECLARE_CONDITION("KeyPressed",
                    _("Une touche est appuyée"),
                    _("Teste si une touche du clavier est appuyée."),
                    _("La touche _PARAM0_ est appuyée"),
                    _("Clavier"),
                    "res/conditions/keyboard24.png",
-                   "res/conditions/keyboard.png",
-                   &CondKeyPressed);
+                   "res/conditions/keyboard.png");
 
-        DECLARE_PARAMETER("key", _("Touche à tester"), false, "");
+        DECLARE_CODEONLY_PARAMETER("currentScene", "");
+        DECLARE_PARAMETER("key", _("Touche à tester"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("IsKeyPressed").SetIncludeFile("GDL/KeyboardTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -30,10 +35,12 @@ KeyboardExtension::KeyboardExtension()
                    _("La touche _PARAM0_ est appuyée"),
                    _("Clavier"),
                    "res/conditions/keyboard24.png",
-                   "res/conditions/keyboard.png",
-                   &CondKeyFromTextPressed);
+                   "res/conditions/keyboard.png");
 
-        DECLARE_PARAMETER("text", _("Expression générant la touche à tester"), false, "");
+        DECLARE_CODEONLY_PARAMETER("currentScene", "");
+        DECLARE_PARAMETER("string", _("Expression générant la touche à tester"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("IsKeyPressed").SetIncludeFile("GDL/KeyboardTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -43,8 +50,11 @@ KeyboardExtension::KeyboardExtension()
                    _("Une touche du clavier est appuyée"),
                    _("Clavier"),
                    "res/conditions/keyboard24.png",
-                   "res/conditions/keyboard.png",
-                   &CondAnyKeyPressed);
+                   "res/conditions/keyboard.png");
+
+        DECLARE_CODEONLY_PARAMETER("currentScene", "");
+
+        instrInfo.cppCallingInformation.SetFunctionName("AnyKeyIsPressed").SetIncludeFile("GDL/KeyboardTools.h");
 
     DECLARE_END_CONDITION()
 }

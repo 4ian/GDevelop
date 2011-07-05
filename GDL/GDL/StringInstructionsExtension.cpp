@@ -30,9 +30,9 @@ StringInstructionsExtension::StringInstructionsExtension()
                    "res/conditions/toujours24.png",
                    &ExpSubStr)
 
-        DECLARE_PARAMETER("text", _("Texte"), false, "")
-        DECLARE_PARAMETER("expression", _("Position de départ de la portion ( La première lettre est à la position 0 )"), false, "")
-        DECLARE_PARAMETER("expression", _("Longueur de la portion"), false, "")
+        DECLARE_PARAMETER("string", _("Texte"), "",false)
+        DECLARE_PARAMETER("expression", _("Position de départ de la portion ( La première lettre est à la position 0 )"), "",false)
+        DECLARE_PARAMETER("expression", _("Longueur de la portion"), "",false)
 
     DECLARE_END_STR_EXPRESSION()
 
@@ -43,8 +43,8 @@ StringInstructionsExtension::StringInstructionsExtension()
                    "res/conditions/toujours24.png",
                    &ExpStrAt)
 
-        DECLARE_PARAMETER("text", _("Texte"), false, "")
-        DECLARE_PARAMETER("expression", _("Position du caractère à prélever ( Premier caractère : 0 )"), false, "")
+        DECLARE_PARAMETER("string", _("Texte"), "",false)
+        DECLARE_PARAMETER("expression", _("Position du caractère à prélever ( Premier caractère : 0 )"), "",false)
 
     DECLARE_END_STR_EXPRESSION()
 
@@ -55,7 +55,7 @@ StringInstructionsExtension::StringInstructionsExtension()
                    "res/conditions/toujours24.png",
                    &ExpStrLen)
 
-        DECLARE_PARAMETER("text", _("Texte"), false, "")
+        DECLARE_PARAMETER("string", _("Texte"), "",false)
 
     DECLARE_END_EXPRESSION()
 
@@ -66,8 +66,8 @@ StringInstructionsExtension::StringInstructionsExtension()
                    "res/conditions/toujours24.png",
                    &ExpStrFind)
 
-        DECLARE_PARAMETER("text", _("Texte"), false, "")
-        DECLARE_PARAMETER("text", _("Texte à chercher"), false, "")
+        DECLARE_PARAMETER("string", _("Texte"), "",false)
+        DECLARE_PARAMETER("string", _("Texte à chercher"), "",false)
 
     DECLARE_END_EXPRESSION()
 
@@ -78,8 +78,8 @@ StringInstructionsExtension::StringInstructionsExtension()
                    "res/conditions/toujours24.png",
                    &ExpStrRFind)
 
-        DECLARE_PARAMETER("text", _("Texte"), false, "")
-        DECLARE_PARAMETER("text", _("Texte à chercher"), false, "")
+        DECLARE_PARAMETER("string", _("Texte"), "",false)
+        DECLARE_PARAMETER("string", _("Texte à chercher"), "",false)
 
     DECLARE_END_EXPRESSION()
 
@@ -90,9 +90,9 @@ StringInstructionsExtension::StringInstructionsExtension()
                    "res/conditions/toujours24.png",
                    &ExpStrFindFrom)
 
-        DECLARE_PARAMETER("text", _("Texte"), false, "")
-        DECLARE_PARAMETER("text", _("Texte à chercher"), false, "")
-        DECLARE_PARAMETER("expression", _("Position à partir de laquelle chercher le texte"), false, "")
+        DECLARE_PARAMETER("string", _("Texte"), "",false)
+        DECLARE_PARAMETER("string", _("Texte à chercher"), "",false)
+        DECLARE_PARAMETER("expression", _("Position à partir de laquelle chercher le texte"), "",false)
 
     DECLARE_END_EXPRESSION()
 
@@ -103,9 +103,9 @@ StringInstructionsExtension::StringInstructionsExtension()
                    "res/conditions/toujours24.png",
                    &ExpStrRFindFrom)
 
-        DECLARE_PARAMETER("text", _("Texte"), false, "")
-        DECLARE_PARAMETER("text", _("Texte à chercher"), false, "")
-        DECLARE_PARAMETER("expression", _("Position à partir de laquelle chercher le texte"), false, "")
+        DECLARE_PARAMETER("string", _("Texte"), "",false)
+        DECLARE_PARAMETER("string", _("Texte à chercher"), "",false)
+        DECLARE_PARAMETER("expression", _("Position à partir de laquelle chercher le texte"), "",false)
 
     DECLARE_END_EXPRESSION()
 }

@@ -11,8 +11,16 @@
 #include "GDL/BaseObjectExtension.h"
 #include "GDL/CommonInstructionsExtension.h"
 #include "GDL/CommonConversionsExtension.h"
+#include "GDL/SceneExtension.h"
 #include "GDL/StringInstructionsExtension.h"
+#include "GDL/MouseExtension.h"
+#include "GDL/TimeExtension.h"
 #include "GDL/VariablesExtension.h"
+#include "GDL/SpriteExtension.h"
+#include "GDL/MathematicalToolsExtension.h"
+#include "GDL/AdvancedExtension.h"
+#include "GDL/KeyboardExtension.h"
+#include "GDL/CameraExtension.h"
 #include "GDL/Object.h"
 
 #if defined(GD_IDE_ONLY)
@@ -39,7 +47,16 @@ ExtensionsManager::ExtensionsManager()
     //Load all extensions
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new CommonInstructionsExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new CommonConversionsExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new VariablesExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new MouseExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new SceneExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new TimeExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new SpriteExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new MathematicalToolsExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new CameraExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new KeyboardExtension()));
 
 #if defined(GD_IDE_ONLY)
     badInstructionInfos.fullname = _T("Instruction inconnue");

@@ -36,20 +36,9 @@ public:
     static void SaveActions(const vector < Instruction > & list, TiXmlElement * elem);
     #endif
 
-    //Compatibility code --- with Game Develop 1.3.8892 and inferior
-    static void AdaptEventsFromGD138892(vector < BaseEventSPtr > & list);
-    //End of Compatibility code --- with Game Develop 1.3.8892 and inferior
-    //Compatibility code --- with Game Develop 1.3.9262 and inferior
-    static void AdaptExpressionsFromGD139262(vector < BaseEventSPtr > & list, Game & game, Scene & scene);
-    //End of Compatibility code --- with Game Develop 1.3.9262 and inferior
-    //Compatibility code --- with Game Develop 1.4.9552 and inferior
-    static void AdaptExpressionsFromGD149552(vector < BaseEventSPtr > & list, Game & game, Scene & scene);
-    //End of Compatibility code --- with Game Develop 1.4.9552 and inferior
-    //Compatibility code --- with Game Develop 1.4.9587 and inferior
-    static void AdaptExpressionsFromGD149587(vector < BaseEventSPtr > & list, Game & game, Scene & scene);
-    //End of Compatibility code --- with Game Develop 1.4.9587 and inferior
+    //Compatibility code --- with Game Develop 1
+    static void AdaptEventsFromGD1x(vector < BaseEventSPtr > & list);
 
-protected:
 private:
 
     Game & game;
@@ -72,6 +61,8 @@ private:
     void SaveExternalEvents( const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * layers );
     static void SaveVariablesList(const ListVariable & list, TiXmlElement * elem);
     #endif
+
+    bool updateEventsFromGD1x;
 };
 
 #endif // OPENSAVEGAME_H

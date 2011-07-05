@@ -33,11 +33,29 @@ shown(true)
 {
 }
 
+ExpressionInfos & ExpressionInfos::SetHidden()
+{
+    #if defined(GD_IDE_ONLY)
+    shown = false;
+    #endif
+
+    return *this;
+}
+
 StrExpressionInfos::StrExpressionInfos() :
 #if defined(GD_IDE_ONLY)
 shown(true)
 #endif
 {
+}
+
+StrExpressionInfos & StrExpressionInfos::SetHidden()
+{
+    #if defined(GD_IDE_ONLY)
+    shown = false;
+    #endif
+
+    return *this;
 }
 
 InstructionInfos::InstructionInfos() :
@@ -86,6 +104,7 @@ void ExtensionBase::SetNameSpace(std::string nameSpace_)
         name == "BuiltinAdvanced" ||
         name == "BuiltinCommonConversions" ||
         name == "BuiltinStringInstructions" ||
+        name == "BuiltinMathematicalTools" ||
         name == "CommonDialogs") //New name for BuiltinInterface
     {
         nameSpace = "";

@@ -5,6 +5,7 @@
 
 #ifndef ROTATEDRECTANGLE_H
 #define ROTATEDRECTANGLE_H
+#include <SFML/System.hpp>
 
 /**
  * \brief Defines a rotated rectangle. Mainly used to define hit boxes.

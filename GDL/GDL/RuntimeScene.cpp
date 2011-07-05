@@ -24,6 +24,7 @@
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/EventsCodeGenerationContext.h"
 #include "GDL/EventsCodeCompiler.h"
+#include "GDL/RuntimeContext.h"
 #if defined(GD_IDE_ONLY)
 #include "GDL/ProfileEvent.h"
 #include "GDL/BaseProfiler.h"
@@ -582,7 +583,7 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
     specialAction = scene;
 }
 
-RuntimeScene * tempRSpointer;
+RuntimeContext * tempRCpointer;
 
 ////////////////////////////////////////////////////////////
 /// Ouvre un jeu, et stocke dans les tableaux passés en paramétres.
@@ -689,7 +690,10 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     myfile.close();
 
     MessageLoading( "Compiling events", 85 );
+
+    sf::Clock compilationTimer;
     EventsCodeCompiler::CompileEventsFileToBitCode("eventsOutput.cpp", "eventsBitcode.txt");
+    cout << "Compilation duration: " << compilationTimer.GetElapsedTime()<<"s"<<endl;
 
     MessageLoading( "Creation execution engine", 90 );
 
@@ -699,12 +703,6 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
         std::string error;
         llvm::sys::DynamicLibrary::LoadLibraryPermanently("libstdc++-6.dll", &error);
         cout << error;
-        /*cout << "Loading mingwm10.dll..." << std::endl;
-        llvm::sys::DynamicLibrary::LoadLibraryPermanently("mingwm10.dll", &error);
-        cout << error;
-        cout << "Loading libgcc_s_sjlj-1.dll..." << std::endl;
-        llvm::sys::DynamicLibrary::LoadLibraryPermanently("libgcc_s_sjlj-1.dll", &error);
-        cout << error;*/
     }
 
     llvm::InitializeNativeTarget();
@@ -728,7 +726,10 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     else
     {
         std::string error;
-        EE.reset( llvm::ExecutionEngine::createJIT(Module, &error));
+        EE.reset( llvm::ExecutionEngine::createJIT(Module,
+                                                   &error,
+                                                   0,
+                                                   llvm::CodeGenOpt::None)); //No optimisation during machine code generation
         if (!EE)
         {
             cout << "unable to make execution engine: " << error << "\n";
@@ -743,17 +744,21 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
             {
 
                 backgroundColorR = 173; //TODO : Suppress this. It is just a check to make sure events access to the scene correctly.
-                tempRSpointer = this; //TODO Replace this temp RS pointer
-                llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(Module->getOrInsertGlobal("pointerToRuntimeScene", llvm::TypeBuilder<void*, false>::get(Module->getContext())));
-                EE->addGlobalMapping(globalValue, &tempRSpointer);
+                tempRCpointer = new RuntimeContext(this); //TODO Replace this temp RC pointer
+                llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(Module->getOrInsertGlobal("pointerToRuntimeContext", llvm::TypeBuilder<void*, false>::get(Module->getContext())));
+                EE->addGlobalMapping(globalValue, &tempRCpointer);
             }
 
+            cout << "Get pointer to compiled function...";
+            sf::Clock jitTimer;
+            void * fPtr = EE->getPointerToFunction(eventsEntryFunction);
+            cout << "JIT Compilation duration: " << jitTimer.GetElapsedTime()<<"s"<<endl;
             cout << "About to run..";
-
-            const std::vector< llvm::GenericValue > args;
-            EE->runFunction(eventsEntryFunction, args);
+            ((int(*)())(intptr_t)fPtr)();
+            cout << "..Ok";
         }
     }
+    cout << "Total duration: " << compilationTimer.GetElapsedTime()<<"s"<<endl;
 
     //Automatisms datas
     automatismsSharedDatas.clear();

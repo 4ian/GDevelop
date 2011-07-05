@@ -1000,14 +1000,14 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
         dc.DrawRectangle(wxRect(2+i*48+i*3-decalage,2,50,50));
 
         //On cherche l'ID de l'image à afficher
-        int j = FindImage( game.images, directionToDisplay.GetSprite(i).GetImageName() );
-        if ( j != -1 )
+        std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), directionToDisplay.GetSprite(i).GetImageName()));
+        if ( image != game.images.end() )
         {
-            wxBitmap bmp( game.images.at( j ).file, wxBITMAP_TYPE_ANY);
+            wxBitmap bmp( (*image).file, wxBITMAP_TYPE_ANY);
             if ( bmp.GetWidth() != 48 || bmp.GetHeight() != 48 )
             {
-                wxImage image = bmp.ConvertToImage();
-                bmp = wxBitmap(image.Scale(48, 48));
+                wxImage bmpImage = bmp.ConvertToImage();
+                bmp = wxBitmap(bmpImage.Scale(48, 48));
             }
 
             if ( bmp.IsOk() ) dc.DrawBitmap(bmp, 2+i*48+i*3+1-decalage, 3, true);
@@ -1075,22 +1075,15 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
     if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirection( direction ).GetSpritesNumber() )
     {
         const Sprite & sprite = object.GetAnimation( animation ).GetDirection( direction ).GetSprite(selectedImage);
-        int j = FindImage( game.images, sprite.GetImageName() );
-        if ( j != -1 )
+        std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), sprite.GetImageName()));
+        if ( image != game.images.end() )
         {
             //Chargement de l'image
-            wxBitmap bmp( game.images.at( j ).file, wxBITMAP_TYPE_ANY);
+            wxBitmap bmp( (*image).file, wxBITMAP_TYPE_ANY);
             wxBitmap point( bitmapGUIManager->point );
 
-            scrollWidth->SetScrollbar(scrollWidth->GetThumbPosition(),
-                                       size.GetWidth(),
-                                       bmp.GetWidth(),
-                                       size.GetWidth());
-
-            scrollHeight->SetScrollbar(scrollHeight->GetThumbPosition(),
-                                       size.GetHeight(),
-                                       bmp.GetHeight(),
-                                       size.GetHeight());
+            scrollWidth->SetScrollbar(scrollWidth->GetThumbPosition(),size.GetWidth(), bmp.GetWidth(),size.GetWidth());
+            scrollHeight->SetScrollbar(scrollHeight->GetThumbPosition(), size.GetHeight(), bmp.GetHeight(), size.GetHeight());
 
             spritePosX = (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2;
             spritePosY = (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2;
@@ -1121,7 +1114,6 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
                                      boxes[i].halfSize.x*2,
                                      boxes[i].halfSize.y*2);
                 }
-                //dc.SetLogicalFunction(wxCOPY);
             }
         }
     }
@@ -1388,12 +1380,12 @@ void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
         movingBox = false;
     else if ( placingPoint )
     {
-        int j = FindImage( game.images, GetEditedSprite().GetImageName() );
-        if ( j == -1 ) return;
+        std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), GetEditedSprite().GetImageName()));
+        if ( image == game.images.end() ) return;
 
         //Tailles nécessaire pour placer le point
         wxSize size = imagePanel->GetSize();
-        wxBitmap bmp( game.images.at( j ).file, wxBITMAP_TYPE_ANY);
+        wxBitmap bmp( (*image).file, wxBITMAP_TYPE_ANY);
 
         int SpritePosX = (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2;
         int SpritePosY = (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2;

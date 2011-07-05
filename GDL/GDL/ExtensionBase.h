@@ -16,12 +16,12 @@ class MainEditorCommand;
 #include <wx/msw/winundef.h>
 #endif
 #endif
+
 #include <string>
 #include <vector>
 #include <map>
 #include <boost/shared_ptr.hpp>
 class RuntimeScene;
-class ObjectsConcerned;
 class Instruction;
 class Automatism;
 class Object;
@@ -31,21 +31,8 @@ class StrExpressionInstruction;
 class BaseEvent;
 class AutomatismsSharedDatas;
 class ResourcesMergingHelper;
+class EventsCodeGenerationContext;
 #undef CreateEvent
-
-typedef boost::shared_ptr<Object> ObjSPtr;
-typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
-
-//Declare typedefs for static/objects functions and expressions
-typedef bool (*InstructionFunPtr)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & );
-typedef bool (Object::*InstructionObjectFunPtr)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & );
-typedef bool (Automatism::*InstructionAutomatismFunPtr)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & );
-typedef double (*ExpressionFunPtr)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & expression );
-typedef double (Object::*ExpressionObjectFunPtr)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & expression );
-typedef double (Automatism::*ExpressionAutomatismFunPtr)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & expression );
-typedef std::string (*StrExpressionFunPtr)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & expression );
-typedef std::string (Object::*StrExpressionObjectFunPtr)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & expression );
-typedef std::string (Automatism::*StrExpressionAutomatismFunPtr)( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & expression );
 
 //Declare typedefs for objects creations/destructions functions
 typedef void (*DestroyFunPtr)(Object*);
@@ -235,10 +222,9 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
+#define DECLARE_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -256,10 +242,9 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_OBJECT_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
+#define DECLARE_OBJECT_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -277,10 +262,9 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_AUTOMATISM_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
+#define DECLARE_AUTOMATISM_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -290,84 +274,16 @@ typedef Object * (*CreateFunPtr)(std::string name);
             } else { instrInfo.smallicon = wxBitmap(16,16);}
 
 /**
- * Declare an hidden expression ( not displayed in editor )
- * @param name
- * @param fullname displayed in editor
- * @param description displayed in editor
- * @param group displayed in editor
- * @param filename for a small icon displayed in editor ( 16*16 )
- * @param Function
- */
-#define DECLARE_HIDDEN_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
-            ExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.cppCallingName = cppCallingName_;\
-            instrInfo.fullname = fullname_; \
-            instrInfo.description = description_; \
-            instrInfo.group = group_; \
-            if ( wxFile::Exists(smallicon_) )\
-            {\
-                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
-            } else { instrInfo.smallicon = wxBitmap(16,16);}\
-            instrInfo.shown = false;
-
-/**
- * Declare an hidden object expression ( not displayed in editor )
- * @param name
- * @param fullname displayed in editor
- * @param description displayed in editor
- * @param group displayed in editor
- * @param filename for a small icon displayed in editor ( 16*16 )
- * @param Function
- */
-#define DECLARE_OBJECT_HIDDEN_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
-            ExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.cppCallingName = cppCallingName_;\
-            instrInfo.fullname = fullname_; \
-            instrInfo.description = description_; \
-            instrInfo.group = group_; \
-            if ( wxFile::Exists(smallicon_) )\
-            {\
-                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
-            } else { instrInfo.smallicon = wxBitmap(16,16);}\
-            instrInfo.shown = false;
-
-/**
- * Declare an hidden automatism expression ( not displayed in editor )
- * @param name
- * @param fullname displayed in editor
- * @param description displayed in editor
- * @param group displayed in editor
- * @param filename for a small icon displayed in editor ( 16*16 )
- * @param Function
- */
-#define DECLARE_AUTOMATISM_HIDDEN_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
-            ExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.cppCallingName = cppCallingName_;\
-            instrInfo.fullname = fullname_; \
-            instrInfo.description = description_; \
-            instrInfo.group = group_; \
-            if ( wxFile::Exists(smallicon_) )\
-            {\
-                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
-            } else { instrInfo.smallicon = wxBitmap(16,16);}\
-            instrInfo.shown = false;
-
-/**
  * Declare a string expression
  * @param name
  * @param fullname displayed in editor
  * @param description displayed in editor
  * @param group displayed in editor
  * @param filename for a small icon displayed in editor ( 16*16 )
- * @param Function
  */
-#define DECLARE_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
+#define DECLARE_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
             StrExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -385,10 +301,9 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
+#define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
             StrExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -406,10 +321,9 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  * @param Function
  */
-#define DECLARE_AUTOMATISM_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
+#define DECLARE_AUTOMATISM_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
             StrExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;\
-            instrInfo.cppCallingName = cppCallingName_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
             instrInfo.group = group_; \
@@ -417,72 +331,6 @@ typedef Object * (*CreateFunPtr)(std::string name);
             {\
                 instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
             } else { instrInfo.smallicon = wxBitmap(16,16);}
-
-/**
- * Declare an hidden string expression ( not displayed in editor )
- * @param name
- * @param fullname displayed in editor
- * @param description displayed in editor
- * @param group displayed in editor
- * @param filename for a small icon displayed in editor ( 16*16 )
- * @param Function
- */
-#define DECLARE_HIDDEN_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
-            StrExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.cppCallingName = cppCallingName_;\
-            instrInfo.fullname = fullname_; \
-            instrInfo.description = description_; \
-            instrInfo.group = group_; \
-            if ( wxFile::Exists(smallicon_) )\
-            {\
-                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
-            } else { instrInfo.smallicon = wxBitmap(16,16);}\
-            instrInfo.shown = false;
-
-/**
- * Declare an hidden object string expression ( not displayed in editor )
- * @param name
- * @param fullname displayed in editor
- * @param description displayed in editor
- * @param group displayed in editor
- * @param filename for a small icon displayed in editor ( 16*16 )
- * @param Function
- */
-#define DECLARE_OBJECT_HIDDEN_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
-            StrExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.cppCallingName = cppCallingName_;\
-            instrInfo.fullname = fullname_; \
-            instrInfo.description = description_; \
-            instrInfo.group = group_; \
-            if ( wxFile::Exists(smallicon_) )\
-            {\
-                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
-            } else { instrInfo.smallicon = wxBitmap(16,16);}\
-            instrInfo.shown = false;
-
-/**
- * Declare an hidden automatism string expression ( not displayed in editor )
- * @param name
- * @param fullname displayed in editor
- * @param description displayed in editor
- * @param group displayed in editor
- * @param filename for a small icon displayed in editor ( 16*16 )
- * @param Function
- */
-#define DECLARE_AUTOMATISM_HIDDEN_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_, cppCallingName_) { \
-            StrExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;\
-            instrInfo.cppCallingName = cppCallingName_;\
-            instrInfo.fullname = fullname_; \
-            instrInfo.description = description_; \
-            instrInfo.group = group_; \
-            if ( wxFile::Exists(smallicon_) )\
-            {\
-                instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
-            } else { instrInfo.smallicon = wxBitmap(16,16);}\
-            instrInfo.shown = false;
 
 /**
  * Declare a custom event
@@ -571,51 +419,27 @@ typedef Object * (*CreateFunPtr)(std::string name);
             objInfos.createFunPtr = createFunPtrP;\
             objInfos.destroyFunPtr = destroyFunPtrP;
 
-#define DECLARE_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
+#define DECLARE_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;
 
-#define DECLARE_OBJECT_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
+#define DECLARE_OBJECT_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;
 
-#define DECLARE_AUTOMATISM_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
+#define DECLARE_AUTOMATISM_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
             ExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;
 
-#define DECLARE_HIDDEN_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
-            ExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;
-
-#define DECLARE_OBJECT_HIDDEN_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
-            ExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;
-
-#define DECLARE_AUTOMATISM_HIDDEN_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
-            ExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;
-
-#define DECLARE_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
+#define DECLARE_STR_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
             StrExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;
 
-#define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
+#define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
             StrExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;
 
-#define DECLARE_AUTOMATISM_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
-            StrExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;
-
-#define DECLARE_HIDDEN_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
-            StrExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;
-
-#define DECLARE_OBJECT_HIDDEN_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
-            StrExpressionInfos instrInfo; \
-            std::string currentExprDeclarationName = name_;
-
-#define DECLARE_AUTOMATISM_HIDDEN_STR_EXPRESSION(name_, fullname, description, group_, smallicon_, ptr) { \
+#define DECLARE_AUTOMATISM_STR_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
             StrExpressionInfos instrInfo; \
             std::string currentExprDeclarationName = name_;
 
@@ -805,7 +629,7 @@ class GD_API InstructionInfos
             return *this;
         }
 
-        CppCallingInformation & SetTypeManipulated(const std::string & type_)
+        CppCallingInformation & SetManipulatedType(const std::string & type_)
         {
             type = type_;
             return *this;
@@ -824,11 +648,26 @@ class GD_API InstructionInfos
             return *this;
         }
 
+        /** \brief Class used to redefine instruction code generation
+         */
+        class CustomCodeGenerator
+        {
+        public:
+            virtual std::string GenerateCode(const RuntimeScene & scene, Instruction & instruction, EventsCodeGenerationContext & context) {return "";};
+        };
+
+        CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+        {
+            optionalCustomCodeGenerator = codeGenerator;
+            return *this;
+        }
+
         std::string cppCallingName;
         std::string type;
         AccessType accessType;
         std::string optionalAssociatedInstruction;
         std::string optionalIncludeFile;
+        boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
     CppCallingInformation cppCallingInformation;
 };
@@ -843,6 +682,8 @@ class GD_API ExpressionInfos
     ExpressionInfos();
     virtual ~ExpressionInfos() {};
 
+    ExpressionInfos & SetHidden();
+
 #if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string description;
@@ -853,7 +694,25 @@ class GD_API ExpressionInfos
 
     std::vector < ParameterInfo > parameters;
 
-    std::string cppCallingName;
+    class CppCallingInformation
+    {
+    public:
+        CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
+        {
+            cppCallingName = cppCallingName_;
+            return *this;
+        }
+
+        CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
+        {
+            optionalIncludeFile = optionalIncludeFile_;
+            return *this;
+        }
+
+        std::string cppCallingName;
+        std::string optionalIncludeFile;
+    };
+    CppCallingInformation cppCallingInformation;
 };
 
 /**
@@ -866,6 +725,8 @@ class GD_API StrExpressionInfos
     StrExpressionInfos();
     virtual ~StrExpressionInfos() {};
 
+    StrExpressionInfos & SetHidden();
+
 #if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string description;
@@ -876,7 +737,25 @@ class GD_API StrExpressionInfos
 
     std::vector < ParameterInfo > parameters;
 
-    std::string cppCallingName;
+    class CppCallingInformation
+    {
+    public:
+        CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
+        {
+            cppCallingName = cppCallingName_;
+            return *this;
+        }
+
+        CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
+        {
+            optionalIncludeFile = optionalIncludeFile_;
+            return *this;
+        }
+
+        std::string cppCallingName;
+        std::string optionalIncludeFile;
+    };
+    CppCallingInformation cppCallingInformation;
 };
 
 /**
@@ -896,7 +775,7 @@ class GD_API EventInfos
     wxBitmap smallicon;
 #endif
 
-    BaseEventSPtr instance;
+    boost::shared_ptr<BaseEvent> instance;
 };
 
 /**
@@ -1061,7 +940,7 @@ class GD_API ExtensionBase
      * Create an custom event.
      * Return NULL if eventType is not provided by the extension.
      */
-    BaseEventSPtr CreateEvent(std::string eventType) const;
+    boost::shared_ptr<BaseEvent> CreateEvent(std::string eventType) const;
 
     /**
      * Create an automatism

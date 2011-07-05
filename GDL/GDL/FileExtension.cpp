@@ -20,7 +20,7 @@ FileExtension::FileExtension()
                    "res/conditions/fichier.png",
                    &CondFileExists);
 
-        DECLARE_PARAMETER("file", _("Nom du fichier"), false, "");
+        DECLARE_PARAMETER("file", _("Nom du fichier"), "",false);
 
     DECLARE_END_CONDITION()
 
@@ -33,8 +33,8 @@ FileExtension::FileExtension()
                    "res/conditions/fichier.png",
                    &CondGroupExists);
 
-        DECLARE_PARAMETER("file", _("Nom du fichier"), false, "");
-        DECLARE_PARAMETER("text", _("Groupe"), false, "");
+        DECLARE_PARAMETER("file", _("Nom du fichier"), "",false);
+        DECLARE_PARAMETER("string", _("Groupe"), "",false);
 
     DECLARE_END_CONDITION()
 
@@ -47,7 +47,7 @@ FileExtension::FileExtension()
                    "res/actions/fichier.png",
                    &ActLoadFile);
 
-        DECLARE_PARAMETER("file", _("Fichier"), false, "");
+        DECLARE_PARAMETER("file", _("Fichier"), "",false);
 
     DECLARE_END_ACTION()
 
@@ -60,7 +60,7 @@ FileExtension::FileExtension()
                    "res/actions/fichier.png",
                    &ActUnloadFile);
 
-        DECLARE_PARAMETER("file", _("Fichier"), false, "");
+        DECLARE_PARAMETER("file", _("Fichier"), "",false);
 
     DECLARE_END_ACTION()
 
@@ -73,9 +73,9 @@ FileExtension::FileExtension()
                    "res/actions/fichier.png",
                    &ActEcrireFichierExp);
 
-        DECLARE_PARAMETER("file", _("Fichier"), false, "");
-        DECLARE_PARAMETER("text", _("Groupe"), false, "");
-        DECLARE_PARAMETER("expression", _("Expression"), false, "");
+        DECLARE_PARAMETER("file", _("Fichier"), "",false);
+        DECLARE_PARAMETER("string", _("Groupe"), "",false);
+        DECLARE_PARAMETER("expression", _("Expression"), "",false);
 
     DECLARE_END_ACTION()
 
@@ -88,9 +88,9 @@ FileExtension::FileExtension()
                    "res/actions/fichier.png",
                    &ActEcrireFichierTxt);
 
-        DECLARE_PARAMETER("file", _("Fichier"), false, "");
-        DECLARE_PARAMETER("text", _("Groupe"), false, "");
-        DECLARE_PARAMETER("text", _("Texte"), false, "");
+        DECLARE_PARAMETER("file", _("Fichier"), "",false);
+        DECLARE_PARAMETER("string", _("Groupe"), "",false);
+        DECLARE_PARAMETER("string", _("Texte"), "",false);
 
     DECLARE_END_ACTION()
 
@@ -103,9 +103,9 @@ FileExtension::FileExtension()
                    "res/actions/fichier.png",
                    &ActLireFichierExp);
 
-        DECLARE_PARAMETER("file", _("Fichier"), false, "");
-        DECLARE_PARAMETER("text", _("Groupe"), false, "");
-        DECLARE_PARAMETER("scenevar", _("Variable de la scène"), false, "");
+        DECLARE_PARAMETER("file", _("Fichier"), "",false);
+        DECLARE_PARAMETER("string", _("Groupe"), "",false);
+        DECLARE_PARAMETER("scenevar", _("Variable de la scène"), "",false);
 
     DECLARE_END_ACTION()
 
@@ -118,9 +118,9 @@ FileExtension::FileExtension()
                    "res/actions/fichier.png",
                    &ActLireFichierTxt);
 
-        DECLARE_PARAMETER("file", _("Fichier"), false, "");
-        DECLARE_PARAMETER("text", _("Groupe"), false, "");
-        DECLARE_PARAMETER("scenevar", _("Variable de la scène"), false, "");
+        DECLARE_PARAMETER("file", _("Fichier"), "",false);
+        DECLARE_PARAMETER("string", _("Groupe"), "",false);
+        DECLARE_PARAMETER("scenevar", _("Variable de la scène"), "",false);
 
     DECLARE_END_ACTION()
 
@@ -133,7 +133,7 @@ FileExtension::FileExtension()
                    "res/actions/delete.png",
                    &ActDeleteFichier);
 
-        DECLARE_PARAMETER("file", _("Nom du fichier"), false, "");
+        DECLARE_PARAMETER("file", _("Nom du fichier"), "",false);
 
     DECLARE_END_ACTION()
 
@@ -146,8 +146,8 @@ FileExtension::FileExtension()
                    "res/actions/delete.png",
                    &ActDeleteGroupFichier);
 
-        DECLARE_PARAMETER("file", _("Nom du fichier"), false, "");
-        DECLARE_PARAMETER("text", _("Groupe"), false, "");
+        DECLARE_PARAMETER("file", _("Nom du fichier"), "",false);
+        DECLARE_PARAMETER("string", _("Groupe"), "",false);
 
     DECLARE_END_ACTION()
 
@@ -160,7 +160,7 @@ FileExtension::FileExtension()
                    "res/actions/launchFile.png",
                    &ActLaunchFile);
 
-        DECLARE_PARAMETER("file", _("Nom du fichier"), false, "");
+        DECLARE_PARAMETER("file", _("Nom du fichier"), "",false);
 
     DECLARE_END_ACTION()
 
@@ -173,7 +173,7 @@ FileExtension::FileExtension()
                    "res/actions/launchFile.png",
                    &ActExecuteCmd);
 
-        DECLARE_PARAMETER("text", _("Commande"), false, "");
+        DECLARE_PARAMETER("string", _("Commande"), "",false);
 
     DECLARE_END_ACTION()
 }

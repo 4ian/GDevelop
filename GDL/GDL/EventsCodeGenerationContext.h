@@ -15,6 +15,12 @@ class EventsCodeGenerationContext
         EventsCodeGenerationContext() : errorOccured(false) {};
         virtual ~EventsCodeGenerationContext() {};
 
+        /**
+         * Call this method to make an EventsCodeGenerationContext as a "child" of another one.
+         * The child will then for example not declare again objects already declared by its parent.
+         */
+        void InheritsFrom(const EventsCodeGenerationContext & parent);
+
         std::string currentObject; ///< Instruction have to set this to an object name, if they use one.
 
         bool errorOccured; ///< True if error occured during code generation.
@@ -22,17 +28,33 @@ class EventsCodeGenerationContext
         /**
          * Call this when an instruction in the event need an object list.
          */
-        void ObjectNeeded(std::string objectName) {objectsToBeDeclared.insert(objectName);};
+        void ObjectNeeded(std::string objectName) {if (objectsListsToBeDeclaredEmpty.find(objectName) == objectsListsToBeDeclaredEmpty.end()) objectsToBeDeclared.insert(objectName);};
+
+        /**
+         * Call this when an instruction in the event need an object list.
+         */
+        void EmptyObjectsListNeeded(std::string objectName) {if (objectsToBeDeclared.find(objectName) == objectsToBeDeclared.end()) objectsListsToBeDeclaredEmpty.insert(objectName);};
+
+        /**
+         * Delete an object from objects to be declared list. Can be used by an event which manages itself some objects ( e.g ForEach events )
+         */
+        void ObjectNotNeeded(std::string objectName) {objectsToBeDeclared.erase(objectName);};
+
+        /**
+         * Generate code for getting needed object lists from scene. Also clear objectsToBeDeclared.
+         * Usually used by an event.
+         */
+        std::string GenerateObjectsDeclarationCode();
 
         /**
          * Declare an include file to be added
          */
-        void AddIncludeFile(std::string file) { if ( includeFiles != boost::shared_ptr<std::set<std::string> >() ) includeFiles->insert(file); };
+        void AddIncludeFile(std::string file) { if ( !file.empty() && includeFiles != boost::shared_ptr<std::set<std::string> >() ) includeFiles->insert(file); };
 
+        boost::shared_ptr< std::set<std::string> > includeFiles; ///< List of headers files used by instructions. A (shared) pointer is used so as context created from another one can share the same list.
         std::set<std::string> objectsAlreadyDeclared;
         std::set<std::string> objectsToBeDeclared;
-
-        boost::shared_ptr< std::set<std::string> > includeFiles;
+        std::set<std::string> objectsListsToBeDeclaredEmpty;
 
     private:
 };

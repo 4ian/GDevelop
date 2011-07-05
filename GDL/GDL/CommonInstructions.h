@@ -9,28 +9,25 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 class RuntimeScene;
-class ObjectsConcerned;
-class Instruction;
 class Object;
-class StrExpressionInstruction;
-class ExpressionInstruction;
-typedef boost::shared_ptr<Object> ObjSPtr;
 
-bool ActionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ConditionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+/**
+ * Use sf::Randomizer to generate a random number between 0 and max
+ */
+double GD_API Random(unsigned int max);
 
-bool AutomatismActionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool AutomatismConditionForEachObject( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+/**
+ * \param Right hand side double
+ * \param Left hand side double
+ * \param Relation operator : =, <, >, <=, >= or !=. Empty string is considered as =.
+ * \return rhs relationalOperator lhs
+ */
+bool GD_API RelationTest(double rhs, float lhs, std::string relationalOperator);
 
-bool ConditionOr( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-bool ConditionAnd( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-bool ConditionNot( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-
-std::string ExpConstantText(const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction);
-double ExpObjectFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction);
-double ExpAutomatismFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction);
-
-std::string ExpObjectStrFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction);
-std::string ExpAutomatismStrFunction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction);
+/**
+ * Logical negation
+ * \return !param
+ */
+bool GD_API LogicalNegation(bool param);
 
 #endif // COMMONINSTRUCTIONS_H

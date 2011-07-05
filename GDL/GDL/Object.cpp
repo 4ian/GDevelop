@@ -372,19 +372,44 @@ bool Object::AutomatismActivated( const std::string & automatismName )
     return GetAutomatism(automatismName)->Activated();
 }
 
-double Object::GetSqDistanceWithObject( Object * other )
+double Object::GetSqDistanceWithObject( const std::string &, std::vector<Object*> & other  )
 {
-    if ( other == NULL ) return 0;
+    if ( other.empty() ) return 0;
 
-    float x = GetDrawableX()+GetCenterX() - (other->GetDrawableX()+other->GetCenterX());
-    float y = GetDrawableY()+GetCenterY() - (other->GetDrawableY()+other->GetCenterY());
+    float x = GetDrawableX()+GetCenterX() - (other[0]->GetDrawableX()+other[0]->GetCenterX());
+    float y = GetDrawableY()+GetCenterY() - (other[0]->GetDrawableY()+other[0]->GetCenterY());
 
     return x*x+y*y; // No square root here
 }
 
-double Object::GetDistanceWithObject( Object * other )
+double Object::GetDistanceWithObject( const std::string & unused, std::vector<Object*> & other )
 {
-    return sqrt(GetSqDistanceWithObject(other));
+    return sqrt(GetSqDistanceWithObject(unused, other));
+}
+
+void Object::SetXY( float xValue, const char* xOperator, float yValue, const char* yOperator )
+{
+    if ( strcmp(xOperator, "") == 0 || strcmp(xOperator, "=") == 0)
+        SetX( xValue );
+    else if ( strcmp(xOperator, "+") == 0 )
+        SetX( GetX() + xValue );
+    else if ( strcmp(xOperator, "-") == 0 )
+        SetX( GetX() - xValue );
+    else if ( strcmp(xOperator, "*") == 0 )
+        SetX( GetX() * xValue );
+    else if ( strcmp(xOperator, "/") == 0 )
+        SetX( GetX() / xValue );
+
+    if ( strcmp(yOperator, "") == 0 || strcmp(yOperator, "=") == 0)
+        SetY( yValue );
+    else if ( strcmp(yOperator, "+") == 0 )
+        SetY( GetY() + yValue );
+    else if ( strcmp(yOperator, "-") == 0 )
+        SetY( GetY() - yValue );
+    else if ( strcmp(yOperator, "*") == 0 )
+        SetY( GetY() * yValue );
+    else if ( strcmp(yOperator, "/") == 0 )
+        SetY( GetY() / yValue );
 }
 
 bool GD_API MustBeDeleted ( boost::shared_ptr<Object> object )

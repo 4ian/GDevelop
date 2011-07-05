@@ -18,14 +18,14 @@ NetworkExtension::NetworkExtension()
                    "res/actions/net.png",
                    &ActEnvoiDataNet);
 
-        DECLARE_PARAMETER("text", _("Adresse de la page .php ( N'oubliez pas le protocole http:// )"), false, "")
-        DECLARE_PARAMETER("password", _("Mot de passe de sécurité"), false, "")
-        DECLARE_PARAMETER("text", _("Donnée 1"), false, "")
-        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 2"), false, "")
-        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 3"), false, "")
-        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 4"), false, "")
-        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 5"), false, "")
-        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 6"), false, "")
+        DECLARE_PARAMETER("string", _("Adresse de la page .php ( N'oubliez pas le protocole http:// )"), "",false)
+        DECLARE_PARAMETER("password", _("Mot de passe de sécurité"), "",false)
+        DECLARE_PARAMETER("string", _("Donnée 1"), "",false)
+        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 2"), "",false)
+        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 3"), "",false)
+        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 4"), "",false)
+        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 5"), "",false)
+        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 6"), "",false)
 
     DECLARE_END_ACTION()
 
@@ -38,9 +38,9 @@ NetworkExtension::NetworkExtension()
                    "res/actions/net.png",
                    &ActDownloadFile);
 
-        DECLARE_PARAMETER("text", _("Site web ( Par exemple : http://www.monsite.com )"), false, "")
-        DECLARE_PARAMETER("text", _("Chemin du fichier ( Par exemple : /dossier/fichier.txt )"), false, "")
-        DECLARE_PARAMETER("text", _("Enregistrer le fichier sous le nom"), false, "")
+        DECLARE_PARAMETER("string", _("Site web ( Par exemple : http://www.monsite.com )"), "",false)
+        DECLARE_PARAMETER("string", _("Chemin du fichier ( Par exemple : /dossier/fichier.txt )"), "",false)
+        DECLARE_PARAMETER("string", _("Enregistrer le fichier sous le nom"), "",false)
 
     DECLARE_END_ACTION()
 }

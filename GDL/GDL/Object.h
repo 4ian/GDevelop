@@ -383,6 +383,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         void AddForceUsingPolarCoordinates( float angle, float length, float clearing );
         void AddForceTowardPosition( float positionX, float positionY, float length, float clearing );
         void AddForceToMoveAround( float positionX, float positionY, float angularVelocity, float distance, float clearing );
+        void SetXY( float xValue, const char* xOperator, float yValue, const char* yOperator );
 
         void Duplicate( RuntimeScene & scene, std::vector<Object*>& );
         void ActivateAutomatism( const std::string & automatismName, bool activate = true );
@@ -391,8 +392,8 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         bool IsStopped();
         bool TestAngleOfDisplacement( float angle, float tolerance );
 
-        double GetSqDistanceWithObject( Object * other );
-        double GetDistanceWithObject( Object * other );
+        double GetSqDistanceWithObject( const std::string &, std::vector<Object*> & other );
+        double GetDistanceWithObject( const std::string &, std::vector<Object*> & other );
 
         ListVariable variablesObjet; ///<List of the variables of the object
         double GetVariableValue( const std::string & variable ); /** Only used internally by GD events generated code. */
@@ -416,26 +417,6 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
          */
         void Init(const Object & object);
 };
-
-//Actions
-bool ActCreate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActCreateByName( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActMettreAutour( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActAjoutObjConcern( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActAjoutHasard( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActRebondir( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActEcarter( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActAddForceVers( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActAddForceTourne( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActMoveObjects( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-
-//Conditions
-bool CondSeDirige( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-bool CondDistance( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-bool CondNbObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-bool CondAjoutObjConcern( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-bool CondAjoutHasard( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-bool CondHBCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
 
 /**
  * As extensions, a function used to delete the object. ( Simply a "delete object;" )

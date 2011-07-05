@@ -28,7 +28,7 @@ class MainEditorCommand;
  * \brief Internal built-in Sprite object.
  * Sprite object is an object composed of animations, containing directions with images.
  */
-class SpriteObject : public Object
+class GD_API SpriteObject : public Object
 {
     public :
 
@@ -74,6 +74,9 @@ class SpriteObject : public Object
 
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
+
+        float GetPointX(const std::string & point) const;
+        float GetPointY(const std::string & point) const;
 
         void UpdateCurrentSprite() const;
         const sf::Sprite & GetCurrentSFMLSprite() const;
@@ -139,42 +142,30 @@ class SpriteObject : public Object
 
         virtual std::vector<RotatedRectangle> GetHitBoxes() const;
 
-        //Conditions
-        bool CondAnim( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondAnimStopped( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondScaleWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondScaleHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondOpacityObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondBlendMode( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        void FlipX(bool flip = true) { isFlippedX = flip; };
+        void FlipY(bool flip = true) { isFlippedY = flip; };
+        bool IsFlippedX() const { return isFlippedX; };
+        bool IsFlippedY() const { return isFlippedY; };
 
-        //Actions
-        bool ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActBlendMode( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActChangeAnimation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActChangeDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActChangeSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActPauseAnimation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActPlayAnimation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActTourneVersPos( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActChangeScale( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActChangeScaleWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActChangeScaleHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActCopyImageOnImageOfSprite( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActCreateMaskFromColorOnActualImage( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActFlipX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActFlipY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        void TurnTowardPosition(float Xposition, float Yposition);
 
-        //Expressions
-        double ExpGetObjectX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectDirection( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectSpriteNb( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectAnimationNb( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectScaleX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetObjectScaleY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        /**
+         * Only used internally by GD events generated code: Prefer using (Get/Set)Scale(X/Y).
+         */
+        void ChangeScale(double newValue, const std::string & operatorStr);
+
+        /**
+         * Only used internally by GD events generated code: Prefer using original SetBlendMode.
+         */
+        void SetBlendMode(int blendModeAsInt);
+
+        /**
+         * Only used internally by GD events generated code: Prefer using original SetColor.
+         */
+        void SetColor(const std::string & colorStr);
+
+        void CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const std::string & imageName, float xPosition, float yPosition, bool useTransparency);
+        void MakeColorTransparent( const std::string & colorStr );
 
     private:
 

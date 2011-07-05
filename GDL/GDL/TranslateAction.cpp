@@ -73,41 +73,40 @@ string TranslateAction::LabelFromType(string type)
     if ( type == "" )
         return "";
     else if ( type == "expression" )
-        return static_cast<string>(_("Expression"));
+        return ToString(_("Expression"));
     else if ( type == "object" )
-        return static_cast<string>(_("Choisir l'objet"));
+        return ToString(_("Choisir l'objet"));
     else if ( type == "automatism" )
-        return static_cast<string>(_("Choisir l'automatisme"));
+        return ToString(_("Choisir l'automatisme"));
     else if ( type == "operator" )
-        return static_cast<string>(_("Choisir le signe"));
+        return ToString(_("Choisir le signe"));
     else if ( type == "file" )
-        return static_cast<string>(_("Choisir le fichier"));
+        return ToString(_("Choisir le fichier"));
     else if ( type == "yesorno" )
-        return static_cast<string>(_("Oui ou non"));
+        return ToString(_("Oui ou non"));
     else if ( type == "police" )
-        return static_cast<string>(_("Choisir la police"));
+        return ToString(_("Choisir la police"));
     else if ( type == "color" )
-        return static_cast<string>(_("Choisir la couleur"));
+        return ToString(_("Choisir la couleur"));
     else if ( type == "string" )
-        return static_cast<string>(_("Editer le texte"));
+        return ToString(_("Editer le texte"));
     else if ( type == "musicfile" )
-        return static_cast<string>(_("Choisir la musique"));
+        return ToString(_("Choisir la musique"));
     else if ( type == "soundfile" )
-        return static_cast<string>(_("Choisir le son"));
+        return ToString(_("Choisir le son"));
     else if ( type == "password" )
-        return static_cast<string>(_("Créer un mot de passe"));
+        return ToString(_("Créer un mot de passe"));
     else if ( type == "layer" )
-        return static_cast<string>(_("Choisir le calque"));
+        return ToString(_("Choisir le calque"));
     else if ( type == "joyaxis" )
-        return static_cast<string>(_("Choisir l'axe"));
+        return ToString(_("Choisir l'axe"));
     else if ( type == "objectvar" )
-        return static_cast<string>(_("Choisir la variable de l'objet"));
+        return ToString(_("Choisir la variable de l'objet"));
     else if ( type == "scenevar" )
-        return static_cast<string>(_("Choisir la variable de la scène"));
+        return ToString(_("Choisir la variable de la scène"));
     else if ( type == "globalvar" )
-        return static_cast<string>(_("Choisir la variable globale"));
+        return ToString(_("Choisir la variable globale"));
 
-    wxLogWarning("Game Develop n'a pas pu trouver le nom d'un bouton suivant le type du paramètre");
     return "undefined";
 }
 
@@ -155,7 +154,6 @@ wxBitmap TranslateAction::BitmapFromType(string type)
     else if ( type == "globalvar" )
         return bitmapGUIManager->varBt;
 
-    wxLogWarning("Game Develop n'a pas pu trouver le bitmap d'un bouton suivant le type du paramètre");
     return bitmapGUIManager->unknownBt;
 }
 
@@ -165,11 +163,11 @@ wxBitmap TranslateAction::BitmapFromType(string type)
 string TranslateAction::AddHTMLToParameter(string & parameter, string type)
 {
     if ( type == "expression" )
-        parameter = "<i>"+parameter+"</i>";
+        parameter = "<FONT color=#CC2222>"+parameter+"</FONT>";
     else if ( type == "object" )
-        parameter = "<b>"+parameter+"</b>";
+        parameter = "<FONT color=#29780E><b>"+parameter+"</b></FONT>";
     else if ( type == "operator" )
-        parameter = "<b>"+parameter+"</b>";
+        parameter = "<FONT color=##0404B4><b>"+parameter+"</b></FONT>";
     else if ( type == "file" )
         parameter = "<i>"+parameter+"</i>";
     else if ( type == "yesorno" )

@@ -53,7 +53,8 @@
 using namespace std;
 
 OpenSaveGame::OpenSaveGame( Game & game_ ) :
-game(game_)
+game(game_),
+updateEventsFromGD1x(false)
 {
 }
 
@@ -132,49 +133,20 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     }
     else
     {
-        if ( build > GDLVersionWrapper::Build() || minor > GDLVersionWrapper::Minor() || revision > GDLVersionWrapper::Revision() )
+        if ( major == GDLVersionWrapper::Major() && (build > GDLVersionWrapper::Build() || minor > GDLVersionWrapper::Minor() || revision > GDLVersionWrapper::Revision()) )
         {
             MSG( _T( "La version de l'éditeur utilisé pour créer ce jeu semble être supérieure.\nLe jeu peut donc ne pas s'ouvrir, ou des données peuvent manquer.\nVous devriez vérifier si une nouvelle version de Game Develop est disponible." ) );
         }
     }
 
+
     //Compatibility code
-    game.extensionsUsed.clear();
-    if ( major <= 1 && minor <= 2 && build <= 7630 && revision <= 38327)
+    if ( major <= 1 )
     {
-        game.extensionsUsed.push_back("BuiltinObject");
-        game.extensionsUsed.push_back("BuiltinAudio");
-        game.extensionsUsed.push_back("Sprite");
-        game.extensionsUsed.push_back("BuiltinScene");
-        game.extensionsUsed.push_back("BuiltinVariables");
-        game.extensionsUsed.push_back("BuiltinCamera");
-        game.extensionsUsed.push_back("BuiltinAdvanced");
-        game.extensionsUsed.push_back("BuiltinFile");
-        game.extensionsUsed.push_back("CommonDialogs");
-        game.extensionsUsed.push_back("BuiltinJoystick");
-        game.extensionsUsed.push_back("BuiltinKeyboard");
-        game.extensionsUsed.push_back("BuiltinMouse");
-        game.extensionsUsed.push_back("BuiltinNetwork");
-        game.extensionsUsed.push_back("BuiltinWindow");
-        game.extensionsUsed.push_back("BuiltinTime");
+        updateEventsFromGD1x = true;
+        game.extensionsUsed.push_back("BuiltinMathematicalTools");
     }
     //End of Compatibility code
-    //Compatibility code --- with Game Develop 1.3.8892 and inferior
-    if ( major <= 1 && minor <= 3 && build <= 8892 && revision <= 44771)
-    {
-        game.extensionsUsed.push_back("BuiltinCommonInstructions");
-    }
-    //End of Compatibility code --- with Game Develop 1.3.8892 and inferior
-
-    //Compatibility code --- with Game Develop 1.3.9262 and inferior
-    if ( major <= 1 && minor <= 3 && build <= 9262 && revision <= 46622)
-    {
-        game.extensionsUsed.push_back("BuiltinCommonConversions");
-        game.extensionsUsed.push_back("BuiltinStringInstructions");
-
-        notBackwardCompatible = true;
-    }
-    //End of Compatibility code --- with Game Develop 1.3.9262 and inferior
 
     elem = hdl.FirstChildElement().FirstChildElement( "Info" ).Element();
     if ( elem )
@@ -212,7 +184,6 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     elem = hdl.FirstChildElement().FirstChildElement( "Scenes" ).FirstChildElement().Element();
     while ( elem )
     {
-        cout << "Scene";
         //Scene vide
         boost::shared_ptr<Scene> newScene = boost::shared_ptr<Scene>(new Scene());
 
@@ -233,9 +204,9 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("standardSortMethod", newScene->standardSortMethod);
         GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("stopSoundsOnStartup", newScene->stopSoundsOnStartup);
         #if defined(GD_IDE_ONLY)
-        if ( elem->Attribute( "grid" ) != NULL ) GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("grid", newScene->grid);
-        if ( elem->Attribute( "snap" ) != NULL ) GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("snap", newScene->snap);
-        if ( elem->Attribute( "windowMask" ) != NULL ) GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("windowMask", newScene->windowMask);
+        if ( elem->Attribute( "grid" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("grid", newScene->grid); }
+        if ( elem->Attribute( "snap" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("snap", newScene->snap); }
+        if ( elem->Attribute( "windowMask" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("windowMask", newScene->windowMask); }
         GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridWidth", newScene->gridWidth);
         GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridHeight", newScene->gridHeight);
         GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridR", newScene->gridR);
@@ -257,6 +228,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 
         if ( elem->FirstChildElement( "Events" ) != NULL )
             OpenEvents(newScene->events, elem->FirstChildElement( "Events" ));
+        if ( updateEventsFromGD1x ) AdaptEventsFromGD1x(newScene->events);
 
         if ( elem->FirstChildElement( "Variables" ) != NULL )
             OpenVariablesList(newScene->variables, elem->FirstChildElement( "Variables" ));
@@ -370,7 +342,9 @@ void OpenSaveGame::OpenGameInformations(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("macExecutableFilename", game.macExecutableFilename);
     #endif
     if ( elem->Attribute( "useExternalSourceFiles" )  != NULL )
+    {
         GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("useExternalSourceFiles", game.useExternalSourceFiles);
+    }
 
     return;
 }
@@ -820,6 +794,7 @@ void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents
 
         if ( elemScene->FirstChildElement("Events") != NULL )
             OpenEvents(externalEvents->events, elemScene->FirstChildElement("Events"));
+        if ( updateEventsFromGD1x ) AdaptEventsFromGD1x(externalEvents->events);
 
         list.push_back(externalEvents);
         elemScene = elemScene->NextSiblingElement();
@@ -1392,4 +1367,53 @@ void OpenSaveGame::RecreatePaths(string file)
     for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
         game.globalObjects[j]->PrepareResourcesForMerging(resourcesUnmergingHelper);
 #endif //GDE
+}
+
+void OpenSaveGame::AdaptEventsFromGD1x(vector < BaseEventSPtr > & list)
+{
+    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+
+    for (unsigned int eId = 0;eId<list.size();++eId)
+    {
+        vector < vector<Instruction>* > conditions = list[eId]->GetAllConditionsVectors();
+        for (unsigned cV = 0;cV<conditions.size();++cV)
+        {
+            for (unsigned int cId = 0;cId<conditions[cV]->size();++cId)
+            {
+                Instruction & instruction = (*conditions[cV])[cId];
+                const InstructionInfos & instrInfos = extensionManager->GetConditionInfos(instruction.GetType());
+
+                vector < GDExpression > newParameters = instruction.GetParameters();
+                for (unsigned int i = 0;i<instrInfos.parameters.size() && i<newParameters.size();++i)
+                {
+                    if ( instrInfos.parameters[i].codeOnly )
+                        newParameters.insert(newParameters.begin()+i, GDExpression(""));
+                }
+
+                instruction.SetParameters(newParameters);
+            }
+        }
+
+        vector < vector<Instruction>* > actions = list[eId]->GetAllActionsVectors();
+        for (unsigned aV = 0;aV<actions.size();++aV)
+        {
+            for (unsigned int aId = 0;aId<actions[aV]->size();++aId)
+            {
+                Instruction & instruction = (*actions[aV])[aId];
+                const InstructionInfos & instrInfos = extensionManager->GetActionInfos(instruction.GetType());
+
+                vector < GDExpression > newParameters = instruction.GetParameters();
+                for (unsigned int i = 0;i<instrInfos.parameters.size() && i<newParameters.size();++i)
+                {
+                    if ( instrInfos.parameters[i].codeOnly )
+                        newParameters.insert(newParameters.begin()+i, GDExpression());
+                }
+
+                instruction.SetParameters(newParameters);
+            }
+        }
+
+        if ( list[eId]->CanHaveSubEvents() )
+            AdaptEventsFromGD1x(list[eId]->GetSubEvents());
+    }
 }

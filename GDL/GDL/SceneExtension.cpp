@@ -1,9 +1,9 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/SceneExtension.h"
-#include "GDL/aWindow.h"
-#include "GDL/actions.h"
-#include "GDL/conditions.h"
-#include "GDL/cScene.h"
-#include "GDL/aScene.h"
 #include "GDL/ExtensionBase.h"
 
 SceneExtension::SceneExtension()
@@ -14,14 +14,23 @@ SceneExtension::SceneExtension()
                           "Compil Games",
                           "Freeware")
 
+    DECLARE_EXPRESSION("Random", _("Valeur aléatoire"), _("Valeur aléatoire"), _("Aléatoire"), "res/actions/position.png")
+        DECLARE_PARAMETER("expression", _("Valeur maximale"), "", false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("Random").SetIncludeFile("GDL/CommonInstructions.h");
+    DECLARE_END_EXPRESSION()
+
     DECLARE_CONDITION("DepartScene",
                    _("Au lancement de la scène"),
                    _("Est vrai uniquement quand la scène vient juste d'être lancée."),
                    _("Au lancement de la scène"),
                    _("Scène"),
                    "res/conditions/depart24.png",
-                   "res/conditions/depart.png",
-                   &CondSceneBegins);
+                   "res/conditions/depart.png");
+
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+
+        instrInfo.cppCallingInformation.SetFunctionName("SceneJustBegins").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -31,12 +40,13 @@ SceneExtension::SceneExtension()
                    _("_PARAM0_ _PARAM2_ _PARAM1_"),
                    _("Autre"),
                    "res/conditions/egal24.png",
-                   "res/conditions/egal.png",
-                   &CondEgal);
+                   "res/conditions/egal.png");
 
-        DECLARE_PARAMETER("expression", _("Expression 1"), false, "")
-        DECLARE_PARAMETER("expression", _("Expression 2"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
+        DECLARE_PARAMETER("expression", _("Expression 1"), "",false)
+        DECLARE_PARAMETER("expression", _("Expression 2"), "",false)
+        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "",false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("RelationTest").SetIncludeFile("GDL/CommonInstructions.h");
 
     DECLARE_END_CONDITION()
 
@@ -46,10 +56,12 @@ SceneExtension::SceneExtension()
                    _("Aller à la scène _PARAM0_"),
                    _("Scène"),
                    "res/actions/goscene24.png",
-                   "res/actions/goscene.png",
-                   &ActScene);
+                   "res/actions/goscene.png");
 
-        DECLARE_PARAMETER("text", _("Nom de la scène"), false, "")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("string", _("Nom de la scène"), "",false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("ChangeScene").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
@@ -59,8 +71,11 @@ SceneExtension::SceneExtension()
                    _("Quitter le jeu"),
                    _("Scène"),
                    "res/actions/quit24.png",
-                   "res/actions/quit.png",
-                   &ActQuit);
+                   "res/actions/quit.png");
+
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+
+        instrInfo.cppCallingInformation.SetFunctionName("StopGame").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
@@ -70,10 +85,12 @@ SceneExtension::SceneExtension()
                    _("Remplacer la couleur d'arrière plan par _PARAM0_"),
                    _("Scène"),
                    "res/actions/background24.png",
-                   "res/actions/background.png",
-                   &ActSceneBackground);
+                   "res/actions/background.png");
 
-        DECLARE_PARAMETER("color", _("Couleur"), false, "")
+        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        DECLARE_PARAMETER("color", _("Couleur"), "",false)
+
+        instrInfo.cppCallingInformation.SetFunctionName("ChangeSceneBackground").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 }

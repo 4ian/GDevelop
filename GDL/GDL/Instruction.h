@@ -30,15 +30,6 @@ class GD_API Instruction
         Instruction(string type_, const vector <GDExpression> & parameters_, bool isLocal = true , bool pContraire = false);
         virtual ~Instruction();
 
-        typedef bool (*ptrFunction)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction );
-        ptrFunction function; ///<Main function to be called.
-
-        typedef bool (Object::*ptrObjectFunction)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction );
-        ptrObjectFunction objectFunction; ///<Function to call on each object, if the instruction need one.
-
-        typedef bool (Automatism::*ptrAutomatismFunction)( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & instruction );
-        ptrAutomatismFunction automatismFunction; ///<Function to call on each object automatism, if the instruction need one.
-
         /** Access type
          * \return The type of the instruction
          */

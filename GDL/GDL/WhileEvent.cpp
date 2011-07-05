@@ -5,86 +5,52 @@
 
 #include "WhileEvent.h"
 #include "GDL/tinyxml.h"
-#include "RuntimeScene.h"
-#include "ObjectsConcerned.h"
+#include "GDL/RuntimeScene.h"
 #include "GDL/OpenSaveGame.h"
+#include "GDL/EventsCodeGenerator.h"
+#include "GDL/ExpressionsCodeGeneration.h"
+#include "GDL/EventsCodeGenerationContext.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/TranslateAction.h"
-#include "GDL/TranslateCondition.h"
 #endif
 
-#include "GDL/profile.h" //Profiling
-
-/**
- * Check the conditions, and launch actions and subevents if necessary
- */
-void WhileEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
+std::string WhileEvent::GenerateEventCode(const RuntimeScene & scene, EventsCodeGenerationContext & parentContext)
 {
-    while (ExecuteWhileConditions( scene, objectsConcerned))
-    {
-        ObjectsConcerned objectsConcernedForEvent;
-        objectsConcernedForEvent.InheritsFrom(&objectsConcerned);
+    std::string outputCode;
 
-        if ( ExecuteConditions( scene, objectsConcernedForEvent) == true )
-        {
-            ExecuteActions( scene, objectsConcernedForEvent);
+    //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
+    EventsCodeGenerationContext context;
+    context.InheritsFrom(parentContext);
 
-            for (unsigned int i = 0;i<events.size();++i)
-            {
-                ObjectsConcerned objectsConcernedForSubEvent;
-                objectsConcernedForSubEvent.InheritsFrom(&objectsConcernedForEvent);
+    //Prepare codes
+    std::string whileConditionsStr = EventsCodeGenerator::GenerateConditionsListCode(scene, whileConditions, parentContext);
+    std::string whileIfPredicat = "true"; for (unsigned int i = 0;i<whileConditions.size();++i) whileIfPredicat += " && condition"+ToString(i)+"IsTrue";
+    std::string conditionsCode = EventsCodeGenerator::GenerateConditionsListCode(scene, conditions, context);
+    std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(scene, actions, context);
+    std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
-                events[i]->Execute(scene, objectsConcernedForSubEvent);
-            }
-        }
-    }
-}
+    //Write final code
+    outputCode += "bool stopDoWhile = false;";
+    outputCode += "do";
+    outputCode += "{\n";
+    outputCode +=  whileConditionsStr;
+    outputCode += "if ("+whileIfPredicat+")\n";
+    outputCode += "{\n";
+    outputCode += conditionsCode;
+    outputCode += "if (" +ifPredicat+ ")\n";
+    outputCode += "{\n";
+    outputCode += actionsCode;
+    outputCode += "\n{ //Subevents: \n";
+    outputCode += EventsCodeGenerator::GenerateEventsListCode(scene, events, context);
+    outputCode += "} //Subevents end.\n";
+    outputCode += "}\n";
+    outputCode += "} else stopDoWhile = true; \n";
 
-/**
- * Check if all conditions are true
- */
-bool WhileEvent::ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
-{
-    for ( unsigned int k = 0; k < conditions.size(); ++k )
-    {
-        if ( conditions[k].function != NULL &&
-             !conditions[k].function( scene, objectsConcerned, conditions[k]) )
-            return false; //Return false as soon as a condition is false
-    }
+    outputCode += "} while ( !stopDoWhile );\n";
 
-    return true;
-}
-
-/**
- * Check if "while conditions" are true
- */
-bool WhileEvent::ExecuteWhileConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
-{
-    for ( unsigned int k = 0; k < whileConditions.size(); ++k )
-    {
-        if ( whileConditions[k].function != NULL &&
-             !whileConditions[k].function( scene, objectsConcerned, whileConditions[k]) )
-            return false; //Return false as soon as a condition is false
-    }
-
-    return true;
-}
-
-/**
- * Run actions of the event
- */
-void WhileEvent::ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
-{
-    for ( unsigned int k = 0; k < actions.size();k++ )
-    {
-        if ( actions[k].function != NULL )
-            actions[k].function( scene, objectsConcerned, actions[k]);
-    }
-
-    return;
+    return outputCode;
 }
 
 vector < vector<Instruction>* > WhileEvent::GetAllConditionsVectors()

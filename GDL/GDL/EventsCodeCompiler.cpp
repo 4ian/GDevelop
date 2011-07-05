@@ -87,11 +87,11 @@ bool EventsCodeCompiler::CompileEventsFileToBitCode(std::string eventsFile, std:
     llvm::SmallVector<const char *, 128> Args;
     Args.push_back("GDEditor.exe");
     Args.push_back("-include-pch");
-    Args.push_back("Headers/GDL/GDL/RuntimeScene.h.pch");
+    Args.push_back("Headers/GDL/GDL/RuntimePrecompiledHeader.h.pch");
     Args.push_back(eventsFile.c_str());
     Args.push_back("-fsyntax-only");
     Args.push_back("-w");
-    Args.push_back("-O3");
+    //Args.push_back("-O3");
     Args.push_back("-IHeaders/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include");
     Args.push_back("-IHeaders/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++");
     Args.push_back("-IHeaders/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32");

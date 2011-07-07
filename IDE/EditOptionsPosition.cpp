@@ -9,7 +9,6 @@
 #include "GDL/Position.h"
 #include "GDL/Object.h"
 #include "GDL/Animation.h"
-#include "GDL/Chercher.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
@@ -239,12 +238,15 @@ scene(scene_)
     //Create the object-specific panel, if it has one.
     wxPanel * returnedPanel = NULL;
 
-    int objetId = Picker::PickOneObject(&scene.initialObjects, position.objectName);
-    int objetGlobalId = Picker::PickOneObject(&game.globalObjects, position.objectName);
-    if ( objetId != -1 )
-        returnedPanel = scene.initialObjects[objetId]->CreateInitialPositionPanel(this, game, scene, position);
-    else if  (objetGlobalId != -1)
-        returnedPanel = game.globalObjects[objetGlobalId]->CreateInitialPositionPanel(this, game, scene, position);
+    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), position.objectName));
+    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), position.objectName));
+
+    ObjSPtr object = boost::shared_ptr<Object> ();
+
+    if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
+        returnedPanel = (*sceneObject)->CreateInitialPositionPanel(this, game, scene, position);
+    else if ( globalObject != game.globalObjects.end() ) //Then the global object list
+        returnedPanel = (*globalObject)->CreateInitialPositionPanel(this, game, scene, position);
 
     if ( returnedPanel )
     {
@@ -314,12 +316,15 @@ void EditOptionsPosition::OnOkBtClick(wxCommandEvent& event)
     if ( layerChoice->GetStringSelection() == _("Calque de base"))
         position.layer = "";
 
-    int objetId = Picker::PickOneObject(&scene.initialObjects, position.objectName);
-    int objetGlobalId = Picker::PickOneObject(&game.globalObjects, position.objectName);
-    if ( objetId != -1 )
-        scene.initialObjects[objetId]->UpdateInitialPositionFromPanel(customPanel, position);
-    else if  (objetGlobalId != -1)
-        game.globalObjects[objetGlobalId]->UpdateInitialPositionFromPanel(customPanel, position);
+    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), position.objectName));
+    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), position.objectName));
+
+    ObjSPtr object = boost::shared_ptr<Object> ();
+
+    if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
+        (*sceneObject)->UpdateInitialPositionFromPanel(customPanel, position);
+    else if ( globalObject != game.globalObjects.end() ) //Then the global object list
+        (*globalObject)->UpdateInitialPositionFromPanel(customPanel, position);
 
     EndModal(1);
 }

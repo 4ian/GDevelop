@@ -11,6 +11,7 @@
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
 #include <wx/imaglist.h>
+#include <wx/busyinfo.h>
 #include "Clipboard.h"
 #include "Game_Develop_EditorMain.h"
 #include "gdTreeItemGameData.h"
@@ -105,12 +106,6 @@ mainEditor(mainEditor_)
 	editSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuEditScene, _("Editer cette scène"), wxEmptyString, wxITEM_NORMAL);
 	editSceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
 	sceneContextMenu.Append(editSceneMenuItem);
-	#ifdef __WXMSW__
-	sceneContextMenu.Remove(editSceneMenuItem);
-	wxFont boldFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
-	editSceneMenuItem->SetFont(boldFont);
-	sceneContextMenu.Append(editSceneMenuItem);
-	#endif
 	editScenePropMenuItem = new wxMenuItem((&sceneContextMenu), idMenuEditPropScene, _("Modifier les propriétés"), wxEmptyString, wxITEM_NORMAL);
 	editScenePropMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editpropicon.png"))));
 	sceneContextMenu.Append(editScenePropMenuItem);
@@ -919,6 +914,14 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     //Updating tree
     projectsTree->Delete(selectedItem);
 
+    //Ensure we're not destroying a scene with events being built
+    wxBusyInfo * waitDialog = (*scene)->eventsBeingCompiled ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de supprimer la scène...") : NULL;
+    while ((*scene)->eventsBeingCompiled)
+    {
+        wxYield();
+    }
+    if ( waitDialog ) delete waitDialog;
+
     game->scenes.erase(scene);
 }
 
@@ -981,6 +984,14 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
 
     //Updating tree
     projectsTree->Delete(selectedItem);
+
+    //Ensure we're not destroying a scene with events being built
+    wxBusyInfo * waitDialog = (*scene)->eventsBeingCompiled ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de continuer...") : NULL;
+    while ((*scene)->eventsBeingCompiled)
+    {
+        wxYield();
+    }
+    if ( waitDialog ) delete waitDialog;
 
     game->scenes.erase(scene);
 }

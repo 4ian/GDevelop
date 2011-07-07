@@ -1,20 +1,7 @@
-/**
- * Game Develop
- *    ( Nom)
- *
- *  Par Florian "4ian" Rival
- *
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
-/**
- *
- *
- *  Choisir et paramétrer une condition
- */
-
-#ifndef RELEASE
-#define _MEMORY_TRACKER
-#include "debugMem.h" //suivi mémoire
-#endif
 
 #include "CppUnitLite/TestHarness.h"
 
@@ -27,6 +14,8 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <string>
+#include <vector>
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/bitmap.h>
@@ -40,6 +29,11 @@
 #include "GDL/EditExpression.h"
 #include "GDL/EditTextDialog.h"
 #include "GDL/ChooseObject.h"
+#include "GDL/CommonTools.h"
+#include "GDL/Scene.h"
+#include "GDL/Game.h"
+#include "GDL/ExtensionsManager.h"
+#include "GDL/ChooseAutomatismDlg.h"
 #include "ChoixBouton.h"
 #include "ChoixClavier.h"
 #include "GDL/BitmapGUIManager.h"
@@ -50,21 +44,10 @@
 #include "GDL/ChooseVariableDialog.h"
 #include "GDL/ObjectListDialogsHelper.h"
 #include "Extensions.h"
-
-#include <string>
-#include <vector>
-#include "GDL/CommonTools.h"
-#include "MemTrace.h"
-#include "GDL/Scene.h"
-#include "GDL/Game.h"
-#include "GDL/Chercher.h"
-#include "GDL/ExtensionsManager.h"
-#include "GDL/ChooseAutomatismDlg.h"
-#include <wx/help.h>
 #include "SigneTest.h"
-#include <boost/algorithm/string.hpp>
 
-extern MemTrace MemTracer;
+#include <wx/help.h>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
@@ -115,7 +98,6 @@ ChoixCondition::ChoixCondition( wxWindow* parent, Game & game_, Scene & scene_) 
 game(game_),
 scene(scene_)
 {
-    MemTracer.AddObj( "Fenetre choix condition", ( long )this );
     //(*Initialize(ChoixCondition)
     wxBoxSizer* BoxSizer4;
     wxStaticBoxSizer* StaticBoxSizer2;
@@ -296,7 +278,6 @@ scene(scene_)
 
 ChoixCondition::~ChoixCondition()
 {
-    MemTracer.DelObj(( long )this );
     //(*Destroy(ChoixCondition)
     //*)
 }
@@ -476,7 +457,7 @@ void ChoixCondition::RefreshObjectConditionsList()
 
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
-    std::string selectedObjectType = extensionManager->GetStringFromTypeId(GetTypeIdOfObject(game, scene, selectedObject));
+    std::string selectedObjectType = GetTypeOfObject(game, scene, selectedObject);
 
     //Insert extension objects conditions
 	for (unsigned int i = 0;i<extensions.size();++i)
@@ -535,12 +516,11 @@ void ChoixCondition::RefreshObjectConditionsList()
         }
 
 	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
-	    vector<unsigned int> objectAutomatisms = GetAutomatismsOfObject(game, scene, selectedObject);
+	    vector<std::string> objectAutomatisms = GetAutomatismsOfObject(game, scene, selectedObject);
 
 	    for(unsigned int j = 0;j<objectAutomatisms.size();++j)
 	    {
-	        ObjectIdentifiersManager * objectIdentifierManager = ObjectIdentifiersManager::GetInstance();
-	        std::string automatismType = objectIdentifierManager->GetNamefromOID(GetTypeIdOfAutomatism(game, scene, objectIdentifierManager->GetNamefromOID(objectAutomatisms[j])));
+	        std::string automatismType = GetTypeOfAutomatism(game, scene, objectAutomatisms[j]);
 
 	        if ( find(automatismsTypes.begin(), automatismsTypes.end(), automatismType) == automatismsTypes.end() )
                 continue;
@@ -682,39 +662,51 @@ void ChoixCondition::RefreshFromCondition()
     //Update parameters
     for ( unsigned int i = 0;i < instructionInfos.parameters.size();i++ )
     {
-        ParaFac.at(i)->Show(instructionInfos.parameters[i].optional);
-        ParaFac.at(i)->SetValue(!ParaEdit.at( i )->GetValue().empty());
-
-        ParaText.at(i)->SetLabel( instructionInfos.parameters[i].description + _(" :") );
-
-        if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
-
-        ParaBmpBt.at(i)->SetBitmapLabel( TranslateCondition::BitmapFromType(instructionInfos.parameters[i].type) );
-        ParaBmpBt.at(i)->SetToolTip( TranslateCondition::LabelFromType(instructionInfos.parameters[i].type) );
-        ParaBmpBt.at(i)->Show( !instructionInfos.parameters[i].type.empty() );
-
-        //De/activate widgets if parameter is optional
-        if ( instructionInfos.parameters[i].optional && !ParaFac.at(i)->GetValue() && ParaEdit.at(i)->GetValue().empty() )
+        if (instructionInfos.parameters[i].codeOnly)
         {
-            ParaBmpBt.at(i)->Enable(false);
-            ParaText.at(i)->Enable(false);
-            ParaEdit.at(i)->Enable(false);
-            ParaFac.at(i)->SetValue(false);
+            ParaFac.at(i)->Show(false);
+            ParaText.at(i)->Show(false);
+            ParaBmpBt.at(i)->Show(false);
+            ParaEdit.at(i)->Show(false);
         }
         else
         {
-            ParaBmpBt.at(i)->Enable(true);
-            ParaText.at(i)->Enable(true);
-            ParaEdit.at(i)->Enable(true);
-            ParaFac.at(i)->SetValue(true);
-        }
+            ParaFac.at(i)->Show(instructionInfos.parameters[i].optional);
+            ParaFac.at(i)->SetValue(!ParaEdit.at( i )->GetValue().empty());
 
-        //Add defaults
-        if ( !instructionInfos.parameters[i].optional && (i >= Param.size() || Param[i].GetPlainString().empty())  )
-        {
-            if ( instructionInfos.parameters[i].type == "expression" ) ParaEdit.at( i )->SetValue("0");
-            else if ( instructionInfos.parameters[i].type == "text" ) ParaEdit.at( i )->SetValue("\"\"");
-            else if ( instructionInfos.parameters[i].type == "file" ) ParaEdit.at( i )->SetValue("\"\"");
+            ParaText.at(i)->SetLabel( instructionInfos.parameters[i].description + _(" :") );
+            ParaText.at( i )->Show();
+
+            if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
+            ParaEdit.at( i )->Show();
+
+            ParaBmpBt.at(i)->SetBitmapLabel( TranslateCondition::BitmapFromType(instructionInfos.parameters[i].type) );
+            ParaBmpBt.at(i)->SetToolTip( TranslateCondition::LabelFromType(instructionInfos.parameters[i].type) );
+            ParaBmpBt.at(i)->Show( !instructionInfos.parameters[i].type.empty() );
+
+            //De/activate widgets if parameter is optional
+            if ( instructionInfos.parameters[i].optional && !ParaFac.at(i)->GetValue() && ParaEdit.at(i)->GetValue().empty() )
+            {
+                ParaBmpBt.at(i)->Enable(false);
+                ParaText.at(i)->Enable(false);
+                ParaEdit.at(i)->Enable(false);
+                ParaFac.at(i)->SetValue(false);
+            }
+            else
+            {
+                ParaBmpBt.at(i)->Enable(true);
+                ParaText.at(i)->Enable(true);
+                ParaEdit.at(i)->Enable(true);
+                ParaFac.at(i)->SetValue(true);
+            }
+
+            //Add defaults
+            if ( !instructionInfos.parameters[i].optional && (i >= Param.size() || Param[i].GetPlainString().empty())  )
+            {
+                if ( instructionInfos.parameters[i].type == "expression" ) ParaEdit.at( i )->SetValue("0");
+                else if ( instructionInfos.parameters[i].type == "string" ) ParaEdit.at( i )->SetValue("\"\"");
+                else if ( instructionInfos.parameters[i].type == "file" ) ParaEdit.at( i )->SetValue("\"\"");
+            }
         }
     }
     Layout();
@@ -775,7 +767,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
     {
         if ( instructionInfos.parameters[i].type == "object" )
         {
-            ChooseObject dialog(this, game, scene, true, instructionInfos.parameters[i].objectType);
+            ChooseObject dialog(this, game, scene, true, instructionInfos.parameters[i].supplementaryInformation);
             if ( dialog.ShowModal() == 1 )
             {
                 ParaEdit.at(i)->ChangeValue(dialog.objectChosen);
@@ -785,7 +777,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         else if ( instructionInfos.parameters[i].type == "automatism" )
         {
             std::string object = ParaEdit.empty() ? "" : ParaEdit[0]->GetValue().mb_str();
-            ChooseAutomatismDlg dialog(this, game, scene, object, instructionInfos.parameters[i].objectType);
+            ChooseAutomatismDlg dialog(this, game, scene, object, instructionInfos.parameters[i].supplementaryInformation);
             if ( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.automatismChosen);
 
@@ -826,7 +818,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
 
             return;
         }
-        else if ( instructionInfos.parameters[i].type == "text" )
+        else if ( instructionInfos.parameters[i].type == "string" )
         {
             EditTextDialog dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( dialog.ShowModal() == 1 )
@@ -835,7 +827,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             }
             return;
         }
-        else if ( instructionInfos.parameters[i].type == "signe" )
+        else if ( instructionInfos.parameters[i].type == "relationalOperator" )
         {
             SigneTest dialog(this);
             int retour = dialog.ShowModal();
@@ -893,15 +885,15 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             if ( ParaEdit.empty() ) return;
 
             string objectWanted = string(ParaEdit[0]->GetValue().mb_str());
-            int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, objectWanted );
-            int IDglobalObject = Picker::PickOneObject( &game.globalObjects, objectWanted );
+            std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
+            std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
 
             ObjSPtr object = boost::shared_ptr<Object> ();
 
-            if ( IDsceneObject != -1)
-                object = scene.initialObjects[IDsceneObject];
-            else if ( IDglobalObject != -1)
-                object = game.globalObjects[IDglobalObject];
+            if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
+                object = *sceneObject;
+            else if ( globalObject != game.globalObjects.end() ) //Then the global object list
+                object = *globalObject;
             else
                 return;
 
@@ -964,7 +956,9 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
         {
             GDExpression parameterExpression(string(ParaEdit.at(i)->GetValue().mb_str())) ;
 
-            if (  (instructionInfos.parameters[i].type == "text" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
+//TODO :Reimplement me
+/*
+            if (  (instructionInfos.parameters[i].type == "string" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
                 ||(instructionInfos.parameters[i].type == "file" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
                 ||(instructionInfos.parameters[i].type == "color" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
                 ||(instructionInfos.parameters[i].type == "joyaxis" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
@@ -981,7 +975,7 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
                 ParaEdit[i]->SetBackgroundColour(wxColour(255, 194, 191));
             }
             else
-                ParaEdit[i]->SetBackgroundColour(wxColour(255, 255, 255));
+                ParaEdit[i]->SetBackgroundColour(wxColour(255, 255, 255));*/
         }
     }
 

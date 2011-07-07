@@ -16,17 +16,17 @@
 #include "GDL/Event.h"
 class Game;
 class Scene;
-class EditorEvents;
+class OldEventsEditor;
 
 /**
  * Search/Replace dialogs for events.
- * Intented to be only used by EditorEvents
+ * Intented to be only used by OldEventsEditor
  */
 class SearchEvents: public wxDialog
 {
 	public:
 
-		SearchEvents(EditorEvents * parent_, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_);
+		SearchEvents(OldEventsEditor * parent_, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_);
 		virtual ~SearchEvents();
 
 		//(*Declarations(SearchEvents)
@@ -94,7 +94,7 @@ class SearchEvents: public wxDialog
 		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 
-        EditorEvents * parent;
+        OldEventsEditor * parent;
 		Game & game;
 		Scene & scene;
 

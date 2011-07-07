@@ -16,7 +16,6 @@
 #endif
 
 #include "GDL/ExtensionsManager.h"
-#include "GDL/Chercher.h"
 #include "GDL/ChooseObject.h"
 #include "ConsoleManager.h"
 #include "GDL/ChooseLayer.h"
@@ -732,16 +731,16 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     if ( dialog.ShowModal() != 1 ) return;
 
     string objectWanted = dialog.objectChosen;
-    int IDsceneObject = Picker::PickOneObject( &scene.initialObjects, objectWanted );
-    int IDglobalObject = Picker::PickOneObject( &scene.game->globalObjects, objectWanted );
+    std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
+    std::vector<ObjSPtr>::iterator globalObject = std::find_if(scene.game->globalObjects.begin(), scene.game->globalObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
 
     ObjSPtr newObject = boost::shared_ptr<Object> ();
 
     //Creation of the object
-    if ( IDsceneObject != -1)
-        newObject = scene.initialObjects[IDsceneObject]->Clone();
-    else if ( IDglobalObject != -1)
-        newObject = scene.game->globalObjects[IDglobalObject]->Clone();
+    if ( sceneObject != scene.initialObjects.end() )
+        newObject = (*sceneObject)->Clone();
+    else if ( globalObject != scene.game->globalObjects.end() )
+        newObject = (*globalObject)->Clone();
     else
     {
         wxLogWarning(_("Impossible de créer l'objet."));

@@ -1,11 +1,11 @@
-#include "EditorEvents.h"
+#include "OldEventsEditor.h"
 #include "ChoixAction.h"
 #include "Clipboard.h"
 
 /**
  * Edit an action
  */
-void EditorEvents::OnEditActionMenuSelected(wxCommandEvent& event)
+void OldEventsEditor::OnEditActionMenuSelected(wxCommandEvent& event)
 {
     if ( !instructionsSelected ) return;
 
@@ -29,7 +29,7 @@ void EditorEvents::OnEditActionMenuSelected(wxCommandEvent& event)
     }
 }
 
-void EditorEvents::OnAddActionMenuSelected(wxCommandEvent& event)
+void OldEventsEditor::OnAddActionMenuSelected(wxCommandEvent& event)
 {
     if ( !instructionsSelected ) return;
 
@@ -48,7 +48,7 @@ void EditorEvents::OnAddActionMenuSelected(wxCommandEvent& event)
     }
 }
 
-void EditorEvents::OnDelActionMenuSelected(wxCommandEvent& event)
+void OldEventsEditor::OnDelActionMenuSelected(wxCommandEvent& event)
 {
     if ( !instructionsSelected || boost::tuples::get<3>(eventsSelected[0]) >= GetLastSelectedListOfInstructions()->size() ) return;
 
@@ -58,7 +58,7 @@ void EditorEvents::OnDelActionMenuSelected(wxCommandEvent& event)
     ChangesMadeOnEvents();
 }
 
-void EditorEvents::OnCopyActionMenuSelected(wxCommandEvent& event)
+void OldEventsEditor::OnCopyActionMenuSelected(wxCommandEvent& event)
 {
     if (!instructionsSelected ||
         boost::tuples::get<3>(eventsSelected[0]) >= GetLastSelectedListOfInstructions()->size() ||
@@ -68,7 +68,7 @@ void EditorEvents::OnCopyActionMenuSelected(wxCommandEvent& event)
     clipboard->SetAction(GetLastSelectedInstruction());
 }
 
-void EditorEvents::OnCutActionMenuSelected(wxCommandEvent& event)
+void OldEventsEditor::OnCutActionMenuSelected(wxCommandEvent& event)
 {
     if (!instructionsSelected ||
         boost::tuples::get<3>(eventsSelected[0]) >= GetLastSelectedListOfInstructions()->size() ||
@@ -83,7 +83,7 @@ void EditorEvents::OnCutActionMenuSelected(wxCommandEvent& event)
     ChangesMadeOnEvents();
 }
 
-void EditorEvents::OnPasteActionMenuSelected(wxCommandEvent& event)
+void OldEventsEditor::OnPasteActionMenuSelected(wxCommandEvent& event)
 {
     if ( !instructionsSelected || conditionsSelected) return;
 

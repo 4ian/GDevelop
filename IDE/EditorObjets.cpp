@@ -1,10 +1,10 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
-#endif
-
-#ifndef RELEASE
-#define _MEMORY_TRACKER
-#include "debugMem.h" //suivi mémoire
 #endif
 
 #include "EditorObjets.h"
@@ -23,9 +23,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
-#include "GDL/Chercher.h"
 #include "GDL/CommonTools.h"
-#include "MemTrace.h"
 #include "Clipboard.h"
 #include <algorithm>
 #include <numeric>
@@ -35,8 +33,6 @@
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
 #endif
-
-extern MemTrace MemTracer;
 
 //(*IdInit(EditorObjets)
 const long EditorObjets::ID_CUSTOM3 = wxNewId();
@@ -63,7 +59,6 @@ game(game_),
 scene(scene_),
 mainEditorCommand(mainEditorCommand_)
 {
-    MemTracer.AddObj( "Editeur d'objets", ( long )this );
     //(*Initialize(EditorObjets)
     Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
     Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(128,168), 0, _T("ID_NOTEBOOK1"));
@@ -108,15 +103,13 @@ mainEditorCommand(mainEditorCommand_)
 
 EditorObjets::~EditorObjets()
 {
-    MemTracer.DelObj(( long )this );
     //(*Destroy(EditorObjets)
     //*)
 }
-////////////////////////////////////////////////////////////
-/// Redimensionement de l'éditeur
-///
-/// Le notebook ne s'adapte pas automatiquement
-////////////////////////////////////////////////////////////
+
+/**
+ * Need to resize manually notebook
+ */
 void EditorObjets::OnResize(wxSizeEvent& event)
 {
     Notebook1->SetSize(GetSize());

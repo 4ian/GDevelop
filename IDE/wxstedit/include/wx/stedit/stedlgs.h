@@ -14,6 +14,7 @@
 #include "wx/stedit/stedefs.h"
 #include "wx/stedit/stedit.h"
 #include <wx/wx.h>
+#include <wx/colourdata.h>
 
 class WXDLLEXPORT wxComboBox;
 class WXDLLEXPORT wxSpinCtrl;

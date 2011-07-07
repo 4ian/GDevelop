@@ -20,6 +20,9 @@ public:
     void SetSelectedFont(const wxFont& font);
     void SetMeasuringFont(const wxFont& font);
 
+    virtual void SetColour(const wxColour& colour) {}; //TODO : These two functions were added, but are not implemented... Useless ?
+    virtual void SetActiveColour(const wxColour& colour) {};
+
     void DrawBackground(
                  wxDC& dc,
                  wxWindow* wnd,

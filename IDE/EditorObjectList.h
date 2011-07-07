@@ -131,7 +131,7 @@ class EditorObjectList: public wxPanel
 		void DisableAll();
 		void EnableAll();
 		void CreateToolbar();
-		void RemoveSharedDatasIfNecessary(unsigned int automatismType);
+		void RemoveSharedDatasIfNecessary(std::string automatismType);
 		void CreateSharedDatasIfNecessary(boost::shared_ptr<Automatism> automatism);
 		bool CheckObjectName(std::string name);
 
@@ -144,7 +144,7 @@ class EditorObjectList: public wxPanel
 
 		MainEditorCommand & mainEditorCommand;
 
-        vector < std::pair<long, unsigned int> > idForAutomatism;
+        vector < std::pair<long, std::string> > idForAutomatism;
 
         wxTreeItemId item; ///< Selected item in the list
         string ancienNom;

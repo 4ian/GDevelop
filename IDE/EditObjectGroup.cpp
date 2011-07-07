@@ -56,8 +56,8 @@ scene(scene_)
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
-	
-	Create(parent, wxID_ANY, _("Editer le groupe d\'objets"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+
+	Create(parent, wxID_ANY, _("Editer le groupe d\'objets"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17->AddGrowableCol(0);
@@ -95,7 +95,7 @@ scene(scene_)
 	ContextMenu.Append(MenuItem2);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Panel2->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditObjectGroup::OnPanel2Resize,0,this);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT,(wxObjectEventFunction)&EditObjectGroup::OnObjetsListBeginLabelEdit);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_END_LABEL_EDIT,(wxObjectEventFunction)&EditObjectGroup::OnObjetsListEndLabelEdit);

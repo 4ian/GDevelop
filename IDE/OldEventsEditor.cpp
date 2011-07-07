@@ -3,15 +3,10 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#ifdef DEBUG
-#define _MEMORY_TRACKER
-#include "debugMem.h" //suivi mémoire
-#endif
-
 #include "CppUnitLite/TestHarness.h"
-#include "EditorEvents.h"
+#include "OldEventsEditor.h"
 
-//(*InternalHeaders(EditorEvents)
+//(*InternalHeaders(OldEventsEditor)
 #include <wx/bitmap.h>
 #include <wx/intl.h>
 #include <wx/image.h>
@@ -34,6 +29,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/BaseProfiler.h"
 #include "GDL/HelpFileAccess.h"
+#include "GDL/EventsCodeCompiler.h"
 #include "SearchEvents.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -49,82 +45,80 @@
 #include <gtk/gtk.h>
 #endif
 
-extern MemTrace MemTracer;
-
-//(*IdInit(EditorEvents)
-const long EditorEvents::ID_PANEL2 = wxNewId();
-const long EditorEvents::ID_SCROLLBAR1 = wxNewId();
-const long EditorEvents::ID_SCROLLBAR2 = wxNewId();
-const long EditorEvents::idEventInsert = wxNewId();
-const long EditorEvents::idMenuCom = wxNewId();
-const long EditorEvents::idMenuSubEvent = wxNewId();
-const long EditorEvents::ID_MENUITEM1 = wxNewId();
-const long EditorEvents::idMenuEventDel = wxNewId();
-const long EditorEvents::ID_MENUITEM15 = wxNewId();
-const long EditorEvents::idMenuUndo = wxNewId();
-const long EditorEvents::idMenuRedo = wxNewId();
-const long EditorEvents::idMenuClearHistory = wxNewId();
-const long EditorEvents::idMenuCopy = wxNewId();
-const long EditorEvents::idMenuCut = wxNewId();
-const long EditorEvents::idMenuPastAvant = wxNewId();
-const long EditorEvents::idMenuPasteApres = wxNewId();
-const long EditorEvents::idMenuPasteSubEvent = wxNewId();
-const long EditorEvents::idMenuPaste = wxNewId();
-const long EditorEvents::idMenuEdit = wxNewId();
-const long EditorEvents::idMenuAdd = wxNewId();
-const long EditorEvents::idMenuDel = wxNewId();
-const long EditorEvents::ID_MENUITEM2 = wxNewId();
-const long EditorEvents::ID_MENUITEM17 = wxNewId();
-const long EditorEvents::ID_MENUITEM21 = wxNewId();
-const long EditorEvents::ID_MENUITEM3 = wxNewId();
-const long EditorEvents::idMenuCouper = wxNewId();
-const long EditorEvents::ID_MENUITEM4 = wxNewId();
-const long EditorEvents::ID_MENUITEM5 = wxNewId();
-const long EditorEvents::ID_MENUITEM6 = wxNewId();
-const long EditorEvents::ID_MENUITEM7 = wxNewId();
-const long EditorEvents::ID_MENUITEM18 = wxNewId();
-const long EditorEvents::ID_MENUITEM19 = wxNewId();
-const long EditorEvents::ID_MENUITEM20 = wxNewId();
-const long EditorEvents::ID_MENUITEM8 = wxNewId();
-const long EditorEvents::ID_MENUITEM9 = wxNewId();
-const long EditorEvents::ID_MENUITEM10 = wxNewId();
-const long EditorEvents::ID_MENUITEM11 = wxNewId();
-const long EditorEvents::ID_MENUITEM13 = wxNewId();
-const long EditorEvents::ID_MENUITEM12 = wxNewId();
-const long EditorEvents::ID_MENUITEM14 = wxNewId();
+//(*IdInit(OldEventsEditor)
+const long OldEventsEditor::ID_PANEL2 = wxNewId();
+const long OldEventsEditor::ID_SCROLLBAR1 = wxNewId();
+const long OldEventsEditor::ID_SCROLLBAR2 = wxNewId();
+const long OldEventsEditor::idEventInsert = wxNewId();
+const long OldEventsEditor::idMenuCom = wxNewId();
+const long OldEventsEditor::idMenuSubEvent = wxNewId();
+const long OldEventsEditor::ID_MENUITEM1 = wxNewId();
+const long OldEventsEditor::idMenuEventDel = wxNewId();
+const long OldEventsEditor::ID_MENUITEM15 = wxNewId();
+const long OldEventsEditor::idMenuUndo = wxNewId();
+const long OldEventsEditor::idMenuRedo = wxNewId();
+const long OldEventsEditor::idMenuClearHistory = wxNewId();
+const long OldEventsEditor::idMenuCopy = wxNewId();
+const long OldEventsEditor::idMenuCut = wxNewId();
+const long OldEventsEditor::idMenuPastAvant = wxNewId();
+const long OldEventsEditor::idMenuPasteApres = wxNewId();
+const long OldEventsEditor::idMenuPasteSubEvent = wxNewId();
+const long OldEventsEditor::idMenuPaste = wxNewId();
+const long OldEventsEditor::idMenuEdit = wxNewId();
+const long OldEventsEditor::idMenuAdd = wxNewId();
+const long OldEventsEditor::idMenuDel = wxNewId();
+const long OldEventsEditor::ID_MENUITEM2 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM17 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM21 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM3 = wxNewId();
+const long OldEventsEditor::idMenuCouper = wxNewId();
+const long OldEventsEditor::ID_MENUITEM4 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM5 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM6 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM7 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM18 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM19 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM20 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM8 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM9 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM10 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM11 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM13 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM12 = wxNewId();
+const long OldEventsEditor::ID_MENUITEM14 = wxNewId();
 //*)
-const long EditorEvents::ID_TEMPLATEBUTTON = wxNewId();
-const long EditorEvents::ID_CREATETEMPLATEBUTTON = wxNewId();
-const long EditorEvents::ID_HELPBUTTON = wxNewId();
-const long EditorEvents::ID_SEARCHBUTTON = wxNewId();
+const long OldEventsEditor::ID_TEMPLATEBUTTON = wxNewId();
+const long OldEventsEditor::ID_CREATETEMPLATEBUTTON = wxNewId();
+const long OldEventsEditor::ID_HELPBUTTON = wxNewId();
+const long OldEventsEditor::ID_SEARCHBUTTON = wxNewId();
 
-const long EditorEvents::idRibbonEvent = wxNewId();
-const long EditorEvents::idRibbonCom = wxNewId();
-const long EditorEvents::idRibbonSubEvent = wxNewId();
-const long EditorEvents::idRibbonSomeEvent = wxNewId();
-const long EditorEvents::idRibbonDelEvent = wxNewId();
-const long EditorEvents::idRibbonUndo = wxNewId();
-const long EditorEvents::idRibbonRedo = wxNewId();
-const long EditorEvents::idRibbonCopy = wxNewId();
-const long EditorEvents::idRibbonCut = wxNewId();
-const long EditorEvents::idRibbonPaste = wxNewId();
-const long EditorEvents::idRibbonTemplate = wxNewId();
-const long EditorEvents::idRibbonCreateTemplate = wxNewId();
-const long EditorEvents::idRibbonHelp = wxNewId();
-const long EditorEvents::idRibbonProfiling = wxNewId();
-const long EditorEvents::idSearchReplace = wxNewId();
+const long OldEventsEditor::idRibbonEvent = wxNewId();
+const long OldEventsEditor::idRibbonCom = wxNewId();
+const long OldEventsEditor::idRibbonSubEvent = wxNewId();
+const long OldEventsEditor::idRibbonSomeEvent = wxNewId();
+const long OldEventsEditor::idRibbonDelEvent = wxNewId();
+const long OldEventsEditor::idRibbonUndo = wxNewId();
+const long OldEventsEditor::idRibbonRedo = wxNewId();
+const long OldEventsEditor::idRibbonCopy = wxNewId();
+const long OldEventsEditor::idRibbonCut = wxNewId();
+const long OldEventsEditor::idRibbonPaste = wxNewId();
+const long OldEventsEditor::idRibbonTemplate = wxNewId();
+const long OldEventsEditor::idRibbonCreateTemplate = wxNewId();
+const long OldEventsEditor::idRibbonHelp = wxNewId();
+const long OldEventsEditor::idRibbonProfiling = wxNewId();
+const long OldEventsEditor::idSearchReplace = wxNewId();
 
-vector < std::pair<long, std::string> > EditorEvents::idForEventTypesMenu;
+vector < std::pair<long, std::string> > OldEventsEditor::idForEventTypesMenu;
 
-BEGIN_EVENT_TABLE( EditorEvents, wxPanel )
-    //(*EventTable(EditorEvents)
+BEGIN_EVENT_TABLE( OldEventsEditor, wxPanel )
+    //(*EventTable(OldEventsEditor)
     //*)
 END_EVENT_TABLE()
 
-BaseEventSPtr EditorEvents::badEvent(new BaseEvent);
-Instruction EditorEvents::badInstruction;
+BaseEventSPtr OldEventsEditor::badEvent(new BaseEvent);
+Instruction OldEventsEditor::badInstruction;
 
-EditorEvents::EditorEvents( wxWindow* parent, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ ) :
+OldEventsEditor::OldEventsEditor( wxWindow* parent, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ ) :
 searchDialog(NULL),
 profilingActivated(false),
 game(game_),
@@ -136,8 +130,7 @@ conditionsColumnWidth(350),
 ctrlPressed(false),
 isResizingColumns(false)
 {
-    MemTracer.AddObj( "Editeur d'evenements", ( long )this );
-    //(*Initialize(EditorEvents)
+    //(*Initialize(OldEventsEditor)
     wxMenuItem* MenuItem26;
     wxFlexGridSizer* FlexGridSizer3;
     wxMenuItem* MenuItem11;
@@ -283,63 +276,63 @@ isResizingColumns(false)
     noActionsMenu.AppendSeparator();
     FlexGridSizer3->SetSizeHints(this);
 
-    EventsPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EditorEvents::OnEventsPanelPaint,0,this);
-    EventsPanel->Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&EditorEvents::OnEventsPanelKeyUp,0,this);
-    EventsPanel->Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorEvents::OnEventsPanelSetFocus,0,this);
-    EventsPanel->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&EditorEvents::OnEventsPanelLeftDown,0,this);
-    EventsPanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&EditorEvents::OnEventsPanelLeftUp,0,this);
-    EventsPanel->Connect(wxEVT_LEFT_DCLICK,(wxObjectEventFunction)&EditorEvents::OnEventsPanelLeftDClick,0,this);
-    EventsPanel->Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&EditorEvents::OnEventsPanelRightUp,0,this);
-    EventsPanel->Connect(wxEVT_MOTION,(wxObjectEventFunction)&EditorEvents::OnEventsPanelMouseMove,0,this);
-    EventsPanel->Connect(wxEVT_MOUSEWHEEL,(wxObjectEventFunction)&EditorEvents::OnEventsPanelMouseWheel,0,this);
-    EventsPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorEvents::OnEventsPanelResize,0,this);
-    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorEvents::OnScrollBar1ScrollChanged);
-    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_LINEUP,(wxObjectEventFunction)&EditorEvents::OnScrollBar1ScrollChanged);
-    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_LINEDOWN,(wxObjectEventFunction)&EditorEvents::OnScrollBar1ScrollChanged);
-    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&EditorEvents::OnScrollBar1ScrollChanged);
-    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorEvents::OnScrollBar1ScrollChanged);
-    Connect(ID_SCROLLBAR2,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorEvents::OnhorizontalScrollbarScroll);
-    Connect(ID_SCROLLBAR2,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorEvents::OnhorizontalScrollbarScroll);
-    Connect(idEventInsert,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnInsertEventSelected);
-    Connect(idMenuCom,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnMenuItem7Selected);
-    Connect(idMenuSubEvent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnSubEventMenuItemSelected);
-    Connect(idMenuEventDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelEventSelected);
-    Connect(ID_MENUITEM15,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnToggleEventSelected);
-    Connect(idMenuUndo,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnUndoSelected);
-    Connect(idMenuRedo,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnRedoSelected);
-    Connect(idMenuClearHistory,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnClearHistorySelected);
-    Connect(idMenuCopy,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnMenuCopySelected);
-    Connect(idMenuCut,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnCutSelected);
-    Connect(idMenuPastAvant,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnMenuPasteSelected);
-    Connect(idMenuPasteApres,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnMenuPasteAfterSelected);
-    Connect(idMenuPasteSubEvent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnPasteAsASubEventSelected);
-    Connect(idMenuEdit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OneEditConditionMenuSelected);
-    Connect(idMenuAdd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnAddConditionMenuSelected);
-    Connect(idMenuDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelConditionMenuSelected);
-    Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelConditionsSelected);
-    Connect(ID_MENUITEM17,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelSubEventsSelected);
-    Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnCopyConditionMenuSelected);
-    Connect(idMenuCouper,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnCutConditionMenuSelected);
-    Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnPasteConditionMenuSelected);
-    Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnEditActionMenuSelected);
-    Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnAddActionMenuSelected);
-    Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelActionMenuSelected);
-    Connect(ID_MENUITEM18,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelActionsSelected);
-    Connect(ID_MENUITEM19,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnDelSubEventsSelected);
-    Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnCopyActionMenuSelected);
-    Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnCutActionMenuSelected);
-    Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnPasteActionMenuSelected);
-    Connect(ID_MENUITEM11,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnAddConditionMenuSelected);
-    Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnPasteConditionMenuSelected);
-    Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnAddActionMenuSelected);
-    Connect(ID_MENUITEM14,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnPasteActionMenuSelected);
-    Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&EditorEvents::OnEventsPanelKeyUp);
-    Connect(wxEVT_MOUSEWHEEL,(wxObjectEventFunction)&EditorEvents::OnEventsPanelMouseWheel);
+    EventsPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&OldEventsEditor::OnEventsPanelPaint,0,this);
+    EventsPanel->Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&OldEventsEditor::OnEventsPanelKeyUp,0,this);
+    EventsPanel->Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&OldEventsEditor::OnEventsPanelSetFocus,0,this);
+    EventsPanel->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&OldEventsEditor::OnEventsPanelLeftDown,0,this);
+    EventsPanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&OldEventsEditor::OnEventsPanelLeftUp,0,this);
+    EventsPanel->Connect(wxEVT_LEFT_DCLICK,(wxObjectEventFunction)&OldEventsEditor::OnEventsPanelLeftDClick,0,this);
+    EventsPanel->Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&OldEventsEditor::OnEventsPanelRightUp,0,this);
+    EventsPanel->Connect(wxEVT_MOTION,(wxObjectEventFunction)&OldEventsEditor::OnEventsPanelMouseMove,0,this);
+    EventsPanel->Connect(wxEVT_MOUSEWHEEL,(wxObjectEventFunction)&OldEventsEditor::OnEventsPanelMouseWheel,0,this);
+    EventsPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&OldEventsEditor::OnEventsPanelResize,0,this);
+    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&OldEventsEditor::OnScrollBar1ScrollChanged);
+    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_LINEUP,(wxObjectEventFunction)&OldEventsEditor::OnScrollBar1ScrollChanged);
+    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_LINEDOWN,(wxObjectEventFunction)&OldEventsEditor::OnScrollBar1ScrollChanged);
+    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&OldEventsEditor::OnScrollBar1ScrollChanged);
+    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&OldEventsEditor::OnScrollBar1ScrollChanged);
+    Connect(ID_SCROLLBAR2,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&OldEventsEditor::OnhorizontalScrollbarScroll);
+    Connect(ID_SCROLLBAR2,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&OldEventsEditor::OnhorizontalScrollbarScroll);
+    Connect(idEventInsert,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnInsertEventSelected);
+    Connect(idMenuCom,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnMenuItem7Selected);
+    Connect(idMenuSubEvent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnSubEventMenuItemSelected);
+    Connect(idMenuEventDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnDelEventSelected);
+    Connect(ID_MENUITEM15,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnToggleEventSelected);
+    Connect(idMenuUndo,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnUndoSelected);
+    Connect(idMenuRedo,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnRedoSelected);
+    Connect(idMenuClearHistory,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnClearHistorySelected);
+    Connect(idMenuCopy,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnMenuCopySelected);
+    Connect(idMenuCut,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnCutSelected);
+    Connect(idMenuPastAvant,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnMenuPasteSelected);
+    Connect(idMenuPasteApres,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnMenuPasteAfterSelected);
+    Connect(idMenuPasteSubEvent,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnPasteAsASubEventSelected);
+    Connect(idMenuEdit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OneEditConditionMenuSelected);
+    Connect(idMenuAdd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnAddConditionMenuSelected);
+    Connect(idMenuDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnDelConditionMenuSelected);
+    Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnDelConditionsSelected);
+    Connect(ID_MENUITEM17,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnDelSubEventsSelected);
+    Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnCopyConditionMenuSelected);
+    Connect(idMenuCouper,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnCutConditionMenuSelected);
+    Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnPasteConditionMenuSelected);
+    Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnEditActionMenuSelected);
+    Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnAddActionMenuSelected);
+    Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnDelActionMenuSelected);
+    Connect(ID_MENUITEM18,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnDelActionsSelected);
+    Connect(ID_MENUITEM19,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnDelSubEventsSelected);
+    Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnCopyActionMenuSelected);
+    Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnCutActionMenuSelected);
+    Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnPasteActionMenuSelected);
+    Connect(ID_MENUITEM11,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnAddConditionMenuSelected);
+    Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnPasteConditionMenuSelected);
+    Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnAddActionMenuSelected);
+    Connect(ID_MENUITEM14,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnPasteActionMenuSelected);
+    Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&OldEventsEditor::OnEventsPanelKeyUp);
+    Connect(wxEVT_MOUSEWHEEL,(wxObjectEventFunction)&OldEventsEditor::OnEventsPanelMouseWheel);
     //*)
-    Connect( ID_TEMPLATEBUTTON, wxEVT_COMMAND_TOOL_CLICKED, ( wxObjectEventFunction )&EditorEvents::OnTemplateBtClick );
-    Connect( ID_CREATETEMPLATEBUTTON, wxEVT_COMMAND_TOOL_CLICKED, ( wxObjectEventFunction )&EditorEvents::OnCreateTemplateBtClick );
-    Connect( ID_SEARCHBUTTON, wxEVT_COMMAND_TOOL_CLICKED, ( wxObjectEventFunction )&EditorEvents::OnSearchBtClick );
-    Connect( ID_HELPBUTTON, wxEVT_COMMAND_TOOL_CLICKED, ( wxObjectEventFunction )&EditorEvents::OnAideBtClick );
+    Connect( ID_TEMPLATEBUTTON, wxEVT_COMMAND_TOOL_CLICKED, ( wxObjectEventFunction )&OldEventsEditor::OnTemplateBtClick );
+    Connect( ID_CREATETEMPLATEBUTTON, wxEVT_COMMAND_TOOL_CLICKED, ( wxObjectEventFunction )&OldEventsEditor::OnCreateTemplateBtClick );
+    Connect( ID_SEARCHBUTTON, wxEVT_COMMAND_TOOL_CLICKED, ( wxObjectEventFunction )&OldEventsEditor::OnSearchBtClick );
+    Connect( ID_HELPBUTTON, wxEVT_COMMAND_TOOL_CLICKED, ( wxObjectEventFunction )&OldEventsEditor::OnAideBtClick );
 
     //Adding events types
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
@@ -376,8 +369,8 @@ isResizingColumns(false)
             wxMenuItem * menuItem = new wxMenuItem(eventTypesMenu, id, it->second.fullname, it->second.description);
             menuItem->SetBitmap(it->second.smallicon);
             eventTypesMenu->Append(menuItem);
-            Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorEvents::OnInsertSomeEventSelected);
-            mainEditorCommand.GetMainEditor()->Connect(id, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&EditorEvents::OnInsertSomeEventSelected, NULL, this);
+            Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldEventsEditor::OnInsertSomeEventSelected);
+            mainEditorCommand.GetMainEditor()->Connect(id, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&OldEventsEditor::OnInsertSomeEventSelected, NULL, this);
         }
 	}
 
@@ -387,7 +380,7 @@ isResizingColumns(false)
 /**
  * Static method for creating ribbon for events editors.
  */
-void EditorEvents::CreateRibbonPage(wxRibbonPage * page)
+void OldEventsEditor::CreateRibbonPage(wxRibbonPage * page)
 {
     wxConfigBase *pConfig = wxConfigBase::Get();
     bool hideLabels = false;
@@ -442,29 +435,27 @@ void EditorEvents::CreateRibbonPage(wxRibbonPage * page)
     }
 }
 
-void EditorEvents::ConnectEvents()
+void OldEventsEditor::ConnectEvents()
 {
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnInsertEventSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonCom, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnMenuItem7Selected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonSomeEvent, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&EditorEvents::OnAddSomeEventSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonSubEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnSubEventMenuItemSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDelEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnDelEventSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnUndoSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnRedoSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonCopy, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnMenuCopySelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonCut, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnCutSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonPaste, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnMenuPasteSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnTemplateBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonCreateTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnCreateTemplateBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idSearchReplace, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnSearchBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonProfiling, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnProfilingBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorEvents::OnAideBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnInsertEventSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonCom, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnMenuItem7Selected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonSomeEvent, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnAddSomeEventSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonSubEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnSubEventMenuItemSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonDelEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnDelEventSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnUndoSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnRedoSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonCopy, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnMenuCopySelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonCut, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnCutSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonPaste, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnMenuPasteSelected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnTemplateBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonCreateTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnCreateTemplateBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idSearchReplace, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnSearchBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonProfiling, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnProfilingBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&OldEventsEditor::OnAideBtClick, NULL, this);
 }
 
-EditorEvents::~EditorEvents()
+OldEventsEditor::~OldEventsEditor()
 {
-    MemTracer.DelObj(( long )this );
-
     delete searchDialog;
 
     //Be careful to remove ( not delete ) the common sub menu, so as to prevent its multiple deletion.
@@ -472,11 +463,11 @@ EditorEvents::~EditorEvents()
     if ( conditionsMenu.FindItem(_("Evènement")) != wxNOT_FOUND ) conditionsMenu.Remove(conditionsMenu.FindItem(_("Evènement")));
     if ( noActionsMenu.FindItem(_("Evènement")) != wxNOT_FOUND ) noActionsMenu.Remove(noActionsMenu.FindItem(_("Evènement")));
     if ( noConditionsMenu.FindItem(_("Evènement")) != wxNOT_FOUND ) noConditionsMenu.Remove(noConditionsMenu.FindItem(_("Evènement")));
-    //(*Destroy(EditorEvents)
+    //(*Destroy(OldEventsEditor)
     //*)
 }
 
-void EditorEvents::ForceRefresh()
+void OldEventsEditor::ForceRefresh()
 {
     EventsPanel->Refresh();
     EventsPanel->Update();
@@ -485,11 +476,11 @@ void EditorEvents::ForceRefresh()
 ////////////////////////////////////////////////////////////
 /// Rafraichissement à chaque changement de la scrollbar
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnScrollBar1ScrollChanged( wxScrollEvent& event )
+void OldEventsEditor::OnScrollBar1ScrollChanged( wxScrollEvent& event )
 {
     ForceRefresh();
 }
-void EditorEvents::OnhorizontalScrollbarScroll(wxScrollEvent& event)
+void OldEventsEditor::OnhorizontalScrollbarScroll(wxScrollEvent& event)
 {
     ForceRefresh();
 }
@@ -497,7 +488,7 @@ void EditorEvents::OnhorizontalScrollbarScroll(wxScrollEvent& event)
 ////////////////////////////////////////////////////////////
 /// Rafraichissement en cas de changement de taille
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnEventsPanelResize( wxSizeEvent& event )
+void OldEventsEditor::OnEventsPanelResize( wxSizeEvent& event )
 {
     SetEventsNeedUpdate(*events);
 
@@ -507,7 +498,7 @@ void EditorEvents::OnEventsPanelResize( wxSizeEvent& event )
 /**
  * Mark all events as must be redraw
  */
-void EditorEvents::SetEventsNeedUpdate(vector < BaseEventSPtr > & eventsToRefresh)
+void OldEventsEditor::SetEventsNeedUpdate(vector < BaseEventSPtr > & eventsToRefresh)
 {
     vector<BaseEventSPtr>::iterator e = eventsToRefresh.begin();
     vector<BaseEventSPtr>::const_iterator end = eventsToRefresh.end();
@@ -524,24 +515,27 @@ void EditorEvents::SetEventsNeedUpdate(vector < BaseEventSPtr > & eventsToRefres
 ////////////////////////////////////////////////////////////
 /// Appelé à chaque changements dans les évènements
 ////////////////////////////////////////////////////////////
-void EditorEvents::ChangesMadeOnEvents()
+void OldEventsEditor::ChangesMadeOnEvents()
 {
     //Mise à jour de l'historique d'annulation
     history.push_back(CloneVectorOfEvents(*events));
     redoHistory.clear();
 
     scene.wasModified = true;
+    scene.eventsModified = true;
+    std::cout << "ChanesMadeOnevents\n";
+    EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(game, scene);
 
     //Rafraichissement
     ForceRefresh();
 }
 
-Instruction & EditorEvents::GetLastSelectedInstruction()
+Instruction & OldEventsEditor::GetLastSelectedInstruction()
 {
     return GetSelectedInstruction(eventsSelected.size()-1);
 }
 
-Instruction & EditorEvents::GetSelectedInstruction(unsigned int nb)
+Instruction & OldEventsEditor::GetSelectedInstruction(unsigned int nb)
 {
     if ( nb >= eventsSelected.size() || boost::tuples::get<3>(eventsSelected[nb]) >= boost::tuples::get<2>(eventsSelected[nb])->size())
         return badInstruction;
@@ -549,12 +543,12 @@ Instruction & EditorEvents::GetSelectedInstruction(unsigned int nb)
     return boost::tuples::get<2>(eventsSelected[nb])->at(boost::tuples::get<3>(eventsSelected[nb]));
 }
 
-vector < Instruction > * EditorEvents::GetLastSelectedListOfInstructions()
+vector < Instruction > * OldEventsEditor::GetLastSelectedListOfInstructions()
 {
     return GetSelectedListOfInstructions(eventsSelected.size()-1);
 }
 
-vector < Instruction > * EditorEvents::GetSelectedListOfInstructions(unsigned int nb)
+vector < Instruction > * OldEventsEditor::GetSelectedListOfInstructions(unsigned int nb)
 {
     if ( nb >= eventsSelected.size() )
         return NULL;
@@ -562,12 +556,12 @@ vector < Instruction > * EditorEvents::GetSelectedListOfInstructions(unsigned in
     return boost::tuples::get<2>(eventsSelected[nb]);
 }
 
-BaseEventSPtr EditorEvents::GetLastSelectedEvent()
+BaseEventSPtr OldEventsEditor::GetLastSelectedEvent()
 {
     return GetSelectedEvent(eventsSelected.size()-1);
 }
 
-BaseEventSPtr EditorEvents::GetSelectedEvent(unsigned int nb)
+BaseEventSPtr OldEventsEditor::GetSelectedEvent(unsigned int nb)
 {
     if ( nb >= eventsSelected.size() || boost::tuples::get<1>(eventsSelected[nb]) >= boost::tuples::get<0>(eventsSelected[nb])->size() )
         return badEvent;
@@ -575,12 +569,12 @@ BaseEventSPtr EditorEvents::GetSelectedEvent(unsigned int nb)
     return boost::tuples::get<0>(eventsSelected[nb])->at(boost::tuples::get<1>(eventsSelected[nb]));
 }
 
-vector < BaseEventSPtr > * EditorEvents::GetLastSelectedListOfEvents()
+vector < BaseEventSPtr > * OldEventsEditor::GetLastSelectedListOfEvents()
 {
     return GetSelectedListOfEvents(eventsSelected.size()-1);
 }
 
-vector < BaseEventSPtr > * EditorEvents::GetSelectedListOfEvents(unsigned int nb)
+vector < BaseEventSPtr > * OldEventsEditor::GetSelectedListOfEvents(unsigned int nb)
 {
     if ( nb >= eventsSelected.size() )
         return NULL;
@@ -591,7 +585,7 @@ vector < BaseEventSPtr > * EditorEvents::GetSelectedListOfEvents(unsigned int nb
 ////////////////////////////////////////////////////////////
 /// Affichage des évènements de la scène
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
+void OldEventsEditor::OnEventsPanelPaint( wxPaintEvent& event )
 {
     EventsRenderingHelper * eventsRenderingHelper = EventsRenderingHelper::GetInstance();
 
@@ -645,7 +639,7 @@ void EditorEvents::OnEventsPanelPaint( wxPaintEvent& event )
 /// Cette fonction est récursive en cas de sous évènements.
 /// Met aussi à jour eventTreeSelected avec l'évènement selectionné.
 ////////////////////////////////////////////////////////////
-void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & parentMaximalWidth, bool draw)
+void OldEventsEditor::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & parentMaximalWidth, bool draw)
 {
     EventsRenderingHelper * eventsRenderingHelper = EventsRenderingHelper::GetInstance();
 
@@ -728,7 +722,7 @@ void EditorEvents::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC
         parentMaximalWidth = initialXposition + maximalWidth;
 }
 
-void EditorEvents::ScrollToEvent(BaseEventSPtr eventToScrollTo)
+void OldEventsEditor::ScrollToEvent(BaseEventSPtr eventToScrollTo)
 {
     wxClientDC dc( EventsPanel );
     dc.SetFont( wxFont( 8, wxDEFAULT, wxNORMAL, wxNORMAL ) );
@@ -740,7 +734,7 @@ void EditorEvents::ScrollToEvent(BaseEventSPtr eventToScrollTo)
         ForceRefresh();
 }
 
-bool EditorEvents::ScrollToEvent(vector < BaseEventSPtr > & list, BaseEventSPtr eventToScrollTo, int & YPosition, int initialXposition)
+bool OldEventsEditor::ScrollToEvent(vector < BaseEventSPtr > & list, BaseEventSPtr eventToScrollTo, int & YPosition, int initialXposition)
 {
     const int separation = 3;
 
@@ -786,7 +780,7 @@ bool EditorEvents::ScrollToEvent(vector < BaseEventSPtr > & list, BaseEventSPtr 
 ////////////////////////////////////////////////////////////
 /// Suppression de l'évènement entier
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnDelEventSelected( wxCommandEvent& event )
+void OldEventsEditor::OnDelEventSelected( wxCommandEvent& event )
 {
     for (unsigned int i = 0;i<eventsSelected.size();++i)
     {
@@ -803,7 +797,7 @@ void EditorEvents::OnDelEventSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Suppression des conditions
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnDelConditionsSelected( wxCommandEvent& event )
+void OldEventsEditor::OnDelConditionsSelected( wxCommandEvent& event )
 {
     if ( !instructionsSelected || !conditionsSelected) return;
 
@@ -816,7 +810,7 @@ void EditorEvents::OnDelConditionsSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Suppression des actions
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnDelActionsSelected( wxCommandEvent& event )
+void OldEventsEditor::OnDelActionsSelected( wxCommandEvent& event )
 {
     if ( !instructionsSelected || conditionsSelected) return;
 
@@ -829,7 +823,7 @@ void EditorEvents::OnDelActionsSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Ouvrir la fenêtre des modèles d'évènements
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnTemplateBtClick( wxCommandEvent& event )
+void OldEventsEditor::OnTemplateBtClick( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() )
     {
@@ -852,7 +846,7 @@ void EditorEvents::OnTemplateBtClick( wxCommandEvent& event )
 /**
  * Click on "Add..." in ribbon
  */
-void EditorEvents::OnAddSomeEventSelected(wxRibbonButtonBarEvent& evt)
+void OldEventsEditor::OnAddSomeEventSelected(wxRibbonButtonBarEvent& evt)
 {
     evt.PopupMenu(eventTypesMenu);
 }
@@ -860,7 +854,7 @@ void EditorEvents::OnAddSomeEventSelected(wxRibbonButtonBarEvent& evt)
 /**
  * Add a custom event by clicking on it in the event type menu
  */
-void EditorEvents::OnInsertSomeEventSelected( wxCommandEvent& event )
+void OldEventsEditor::OnInsertSomeEventSelected( wxCommandEvent& event )
 {
     //Retrieve event type
     string eventType;
@@ -892,7 +886,7 @@ void EditorEvents::OnInsertSomeEventSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Insertion d'un commentaire
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnMenuItem7Selected( wxCommandEvent& event )
+void OldEventsEditor::OnMenuItem7Selected( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
@@ -921,7 +915,7 @@ void EditorEvents::OnMenuItem7Selected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Insertion d'un évènement
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnInsertEventSelected( wxCommandEvent& event )
+void OldEventsEditor::OnInsertEventSelected( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
@@ -949,7 +943,7 @@ void EditorEvents::OnInsertEventSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Insertion d'un sous évènement
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnSubEventMenuItemSelected(wxCommandEvent& event)
+void OldEventsEditor::OnSubEventMenuItemSelected(wxCommandEvent& event)
 {
     if ( eventsSelected.empty() )
     {
@@ -975,7 +969,7 @@ void EditorEvents::OnSubEventMenuItemSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Insertion d'un lien
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnAddLienSelected( wxCommandEvent& event )
+void OldEventsEditor::OnAddLienSelected( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
@@ -1004,7 +998,7 @@ void EditorEvents::OnAddLienSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Copier un évènement
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnMenuCopySelected( wxCommandEvent& event )
+void OldEventsEditor::OnMenuCopySelected( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() ) return;
 
@@ -1015,7 +1009,7 @@ void EditorEvents::OnMenuCopySelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Couper un évènement
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnCutSelected( wxCommandEvent& event )
+void OldEventsEditor::OnCutSelected( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() ) return;
 
@@ -1031,7 +1025,7 @@ void EditorEvents::OnCutSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Coller un évènement avant l'évènement choisi
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnMenuPasteSelected( wxCommandEvent& event )
+void OldEventsEditor::OnMenuPasteSelected( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
@@ -1050,7 +1044,7 @@ void EditorEvents::OnMenuPasteSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Coller après l'évènement choisi
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnMenuPasteAfterSelected( wxCommandEvent& event )
+void OldEventsEditor::OnMenuPasteAfterSelected( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
@@ -1069,7 +1063,7 @@ void EditorEvents::OnMenuPasteAfterSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Coller en tant que sous évènement
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnPasteAsASubEventSelected(wxCommandEvent& event)
+void OldEventsEditor::OnPasteAsASubEventSelected(wxCommandEvent& event)
 {
     if ( eventsSelected.empty() || !GetLastSelectedEvent()->CanHaveSubEvents() ) return;
 
@@ -1084,7 +1078,7 @@ void EditorEvents::OnPasteAsASubEventSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Supprimer les sous évènements de l'évènement
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnDelSubEventsSelected(wxCommandEvent& event)
+void OldEventsEditor::OnDelSubEventsSelected(wxCommandEvent& event)
 {
     if ( eventsSelected.empty() || !GetLastSelectedEvent()->CanHaveSubEvents()  ) return;
 
@@ -1096,7 +1090,7 @@ void EditorEvents::OnDelSubEventsSelected(wxCommandEvent& event)
 /**
  * De/activate an event
  */
-void EditorEvents::OnToggleEventSelected(wxCommandEvent& event)
+void OldEventsEditor::OnToggleEventSelected(wxCommandEvent& event)
 {
     if ( eventsSelected.empty() ) return;
 
@@ -1112,7 +1106,7 @@ void EditorEvents::OnToggleEventSelected(wxCommandEvent& event)
 }
 
 
-void EditorEvents::OnAideBtClick( wxCommandEvent& event )
+void OldEventsEditor::OnAideBtClick( wxCommandEvent& event )
 {
     HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(11);
@@ -1122,7 +1116,7 @@ void EditorEvents::OnAideBtClick( wxCommandEvent& event )
 /// Création d'un modèle d'évènement
 /// à partir des évènements du jeu
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnCreateTemplateBtClick( wxCommandEvent& event )
+void OldEventsEditor::OnCreateTemplateBtClick( wxCommandEvent& event )
 {
     if ( eventsSelected.empty() )
         eventsSelected.push_back(boost::tuples::make_tuple(events, events->size(), (vector <Instruction>*)NULL, 0));
@@ -1134,7 +1128,7 @@ void EditorEvents::OnCreateTemplateBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Double clic gauche : Edition d'un évènement
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnEventsPanelLeftDClick( wxMouseEvent& event )
+void OldEventsEditor::OnEventsPanelLeftDClick( wxMouseEvent& event )
 {
     if ( eventsSelected.empty() ) return;
 
@@ -1169,16 +1163,18 @@ void EditorEvents::OnEventsPanelLeftDClick( wxMouseEvent& event )
     }
     //Menu for events
     else
+    {
         eventSelected->EditEvent(this, game, scene, mainEditorCommand);
+        ChangesMadeOnEvents();
+    }
 
     eventSelected->eventHeightNeedUpdate = true;
-    ChangesMadeOnEvents();
 }
 
 ////////////////////////////////////////////////////////////
 /// Clic gauche : selection
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnEventsPanelLeftUp(wxMouseEvent& event)
+void OldEventsEditor::OnEventsPanelLeftUp(wxMouseEvent& event)
 {
     SetFocus();
     wxFocusEvent unusedEvent;
@@ -1211,7 +1207,7 @@ void EditorEvents::OnEventsPanelLeftUp(wxMouseEvent& event)
 ////////////////////////////////////////////////////////////
 /// Clic droit : menu contextuel
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnEventsPanelRightUp( wxMouseEvent& event )
+void OldEventsEditor::OnEventsPanelRightUp( wxMouseEvent& event )
 {
     wxFocusEvent unusedEvent;
     OnEventsPanelSetFocus(unusedEvent);
@@ -1277,7 +1273,7 @@ void EditorEvents::OnEventsPanelRightUp( wxMouseEvent& event )
 ////////////////////////////////////////////////////////////
 /// Scroll avec la molette
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnEventsPanelMouseWheel(wxMouseEvent& event)
+void OldEventsEditor::OnEventsPanelMouseWheel(wxMouseEvent& event)
 {
     ScrollBar1->SetScrollbar(ScrollBar1->GetThumbPosition()-event.GetWheelRotation(), ScrollBar1->GetThumbSize(), ScrollBar1->GetRange(), ScrollBar1->GetPageSize());
     ForceRefresh();
@@ -1286,7 +1282,7 @@ void EditorEvents::OnEventsPanelMouseWheel(wxMouseEvent& event)
 /**
  * De/activate profiling
  */
-void EditorEvents::OnProfilingBtClick(wxCommandEvent& event)
+void OldEventsEditor::OnProfilingBtClick(wxCommandEvent& event)
 {
     if ( !profilingActivated && sceneCanvas && sceneCanvas->GetOwnedProfileDialog() != boost::shared_ptr<ProfileDlg>() && !sceneCanvas->GetOwnedProfileDialog()->profilingActivated)
     {
@@ -1301,7 +1297,7 @@ void EditorEvents::OnProfilingBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Afficher la fenêtre de recherche
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnSearchBtClick(wxCommandEvent& event)
+void OldEventsEditor::OnSearchBtClick(wxCommandEvent& event)
 {
     if ( searchDialog )
         searchDialog->Show();
@@ -1310,7 +1306,7 @@ void EditorEvents::OnSearchBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Suppression de l'historique des changements
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnClearHistorySelected(wxCommandEvent& event)
+void OldEventsEditor::OnClearHistorySelected(wxCommandEvent& event)
 {
     history.clear();
     redoHistory.clear();
@@ -1319,7 +1315,7 @@ void EditorEvents::OnClearHistorySelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Annuler le dernier changement
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnUndoSelected(wxCommandEvent& event)
+void OldEventsEditor::OnUndoSelected(wxCommandEvent& event)
 {
     if ( history.size() < 2 )
         return;
@@ -1336,7 +1332,7 @@ void EditorEvents::OnUndoSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Rétablir le dernier changement
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnRedoSelected(wxCommandEvent& event)
+void OldEventsEditor::OnRedoSelected(wxCommandEvent& event)
 {
     if ( redoHistory.empty() )
         return;
@@ -1353,7 +1349,7 @@ void EditorEvents::OnRedoSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Déplacement de la souris : Changement de curseur si besoin
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnEventsPanelMouseMove(wxMouseEvent& event)
+void OldEventsEditor::OnEventsPanelMouseMove(wxMouseEvent& event)
 {
     if (    (event.GetX() >= conditionsColumnWidth-2 && event.GetX() <= conditionsColumnWidth+2)
         ||  isResizingColumns)
@@ -1362,13 +1358,13 @@ void EditorEvents::OnEventsPanelMouseMove(wxMouseEvent& event)
         SetCursor(wxNullCursor);
 }
 
-void EditorEvents::OnEventsPanelLeftDown(wxMouseEvent& event)
+void OldEventsEditor::OnEventsPanelLeftDown(wxMouseEvent& event)
 {
     if ( event.GetX() >= conditionsColumnWidth-2 && event.GetX() <= conditionsColumnWidth+2  )
         isResizingColumns = true;
 }
 
-void EditorEvents::DeselectAllEvents(vector < BaseEventSPtr > & eventsToUnselected)
+void OldEventsEditor::DeselectAllEvents(vector < BaseEventSPtr > & eventsToUnselected)
 {
     eventsSelected.clear();
 
@@ -1385,7 +1381,7 @@ void EditorEvents::DeselectAllEvents(vector < BaseEventSPtr > & eventsToUnselect
     }
 }
 
-void EditorEvents::DeselectAllActions(vector < BaseEventSPtr > & eventsToUnselected)
+void OldEventsEditor::DeselectAllActions(vector < BaseEventSPtr > & eventsToUnselected)
 {
     eventsSelected.clear();
 
@@ -1400,7 +1396,7 @@ void EditorEvents::DeselectAllActions(vector < BaseEventSPtr > & eventsToUnselec
     }
 }
 
-void EditorEvents::DeselectAllConditions(vector < BaseEventSPtr > & eventsToUnselected)
+void OldEventsEditor::DeselectAllConditions(vector < BaseEventSPtr > & eventsToUnselected)
 {
     eventsSelected.clear();
 
@@ -1415,7 +1411,7 @@ void EditorEvents::DeselectAllConditions(vector < BaseEventSPtr > & eventsToUnse
     }
 }
 
-void EditorEvents::DeselectAllInstructions(BaseEventSPtr parentEvent, vector<Instruction> & instrsToUnselected)
+void OldEventsEditor::DeselectAllInstructions(BaseEventSPtr parentEvent, vector<Instruction> & instrsToUnselected)
 {
     for (unsigned int j = 0;j<instrsToUnselected.size();++j)
     {
@@ -1432,7 +1428,7 @@ void EditorEvents::DeselectAllInstructions(BaseEventSPtr parentEvent, vector<Ins
 ////////////////////////////////////////////////////////////
 /// Raccourcis clavier, renvoyant aux fonctions déjà existantes
 ////////////////////////////////////////////////////////////
-void EditorEvents::OnEventsPanelKeyUp(wxKeyEvent& event)
+void OldEventsEditor::OnEventsPanelKeyUp(wxKeyEvent& event)
 {
     ctrlPressed = event.GetModifiers() == wxMOD_CMD ? true : false;
 
@@ -1535,7 +1531,7 @@ void EditorEvents::OnEventsPanelKeyUp(wxKeyEvent& event)
 /**
  * Display ribbon and connect events when get focus
  */
-void EditorEvents::OnEventsPanelSetFocus(wxFocusEvent& event)
+void OldEventsEditor::OnEventsPanelSetFocus(wxFocusEvent& event)
 {
     mainEditorCommand.GetRibbon()->SetActivePage(4);
     ConnectEvents();

@@ -311,8 +311,8 @@ void GDAuiTabArt::DrawBackground(wxDC& dc,
 
    if (m_flags &wxAUI_NB_BOTTOM)
        r = wxRect(rect.x, rect.y, rect.width+2, rect.height);
-   // TODO: else if (m_flags &wxAUI_NB_LEFT) {}
-   // TODO: else if (m_flags &wxAUI_NB_RIGHT) {}
+   //  else if (m_flags &wxAUI_NB_LEFT) {}
+   //  else if (m_flags &wxAUI_NB_RIGHT) {}
    else //for wxAUI_NB_TOP
        r = wxRect(rect.x, rect.y, rect.width+2, rect.height-3);
 
@@ -336,8 +336,8 @@ void GDAuiTabArt::DrawBackground(wxDC& dc,
        dc.SetBrush(*wxWHITE_BRUSH);
        dc.DrawRectangle(-1, 0, w+2, 4);
    }
-   // TODO: else if (m_flags &wxAUI_NB_LEFT) {}
-   // TODO: else if (m_flags &wxAUI_NB_RIGHT) {}
+   //  else if (m_flags &wxAUI_NB_LEFT) {}
+   //  else if (m_flags &wxAUI_NB_RIGHT) {}
    else //for wxAUI_NB_TOP
    {
        //Game Develop use a white background
@@ -458,8 +458,8 @@ void GDAuiTabArt::DrawTab(wxDC& dc,
         border_points[4] = wxPoint(tab_x+tab_width,   tab_y+2);
         border_points[5] = wxPoint(tab_x+tab_width,   tab_y+tab_height-4);
     }
-    // TODO: else if (m_flags &wxAUI_NB_LEFT) {}
-    // TODO: else if (m_flags &wxAUI_NB_RIGHT) {}
+    //  else if (m_flags &wxAUI_NB_LEFT) {}
+    //  else if (m_flags &wxAUI_NB_RIGHT) {}
 
     int drawn_tab_yoff = border_points[1].y;
     int drawn_tab_height = border_points[0].y - border_points[1].y;
@@ -537,8 +537,8 @@ void GDAuiTabArt::DrawTab(wxDC& dc,
     {
         if (m_flags &wxAUI_NB_BOTTOM)
             dc.SetPen(wxPen(wxColour(gdAuiStepColour(m_base_colour, 170))));
-        // TODO: else if (m_flags &wxAUI_NB_LEFT) {}
-        // TODO: else if (m_flags &wxAUI_NB_RIGHT) {}
+        //  else if (m_flags &wxAUI_NB_LEFT) {}
+        //  else if (m_flags &wxAUI_NB_RIGHT) {}
         else //for wxAUI_NB_TOP
             dc.SetPen(m_base_colour_pen);
 

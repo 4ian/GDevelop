@@ -136,7 +136,7 @@ void wxSTEditorNotebook::OnPageChanged(wxNotebookEvent &event)
 
 #ifdef __WXMSW__
     // let the msw notebook really change the page first
-    wxNotebook::OnSelChange(event);
+    //Florian Rival - 06/13/2011 : OnSelChange no more used
     event.Skip(false);
 #else
     event.Skip();

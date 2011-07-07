@@ -2,6 +2,8 @@
 #include "GDL/Event.h"
 #include "GDL/GDExpressionParser.h"
 #include "GDL/ExtensionBase.h"
+#include "GDL/ExpressionInstruction.h"
+#include "GDL/StrExpressionInstruction.h"
 #include "GDL/ExtensionsManager.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/weak_ptr.hpp>
@@ -22,7 +24,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
         plainExpression += text;
     };
 
-    virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction)
+    virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
     {
         std::string parametersStr;
         for (unsigned int i = 0;i<instruction.parameters.size();++i)
@@ -33,7 +35,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
         plainExpression += functionName+"("+parametersStr+")";
     };
 
-    virtual void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction)
+    virtual void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
     {
         //Special case : Function without name is a litteral string.
         if ( functionName.empty() )
@@ -53,7 +55,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
         plainExpression += functionName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectFunction(std::string functionName, const ExpressionInstruction & instruction)
+    virtual void OnObjectFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
     {
         if ( instruction.parameters.empty() ) return;
 
@@ -67,7 +69,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
                                +"."+functionName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectFunction(std::string functionName, const StrExpressionInstruction & instruction)
+    virtual void OnObjectFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
     {
         if ( instruction.parameters.empty() ) return;
 
@@ -81,7 +83,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
                                +"."+functionName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const ExpressionInstruction & instruction)
+    virtual void OnObjectAutomatismFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
     {
         if ( instruction.parameters.size() < 2 ) return;
 
@@ -95,7 +97,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
                                +"."+instruction.parameters[1].GetPlainString()+"::"+functionName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const StrExpressionInstruction & instruction)
+    virtual void OnObjectAutomatismFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
     {
         if ( instruction.parameters.size() < 2 ) return;
 
@@ -160,39 +162,36 @@ class CallbacksForRemovingObject : public ParserCallbacks
     {
     };
 
-    virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction)
+    virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
     {
     };
 
-    virtual void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction)
+    virtual void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
     {
-        //Special case : Function without name is a litteral string.
-        if ( functionName.empty() )
-            return;
     };
 
-    virtual void OnObjectFunction(std::string functionName, const ExpressionInstruction & instruction)
+    virtual void OnObjectFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
     {
         if ( instruction.parameters.empty() ) return;
 
         if ( instruction.parameters[0].GetPlainString() == name ) objectPresent = true;
     };
 
-    virtual void OnObjectFunction(std::string functionName, const StrExpressionInstruction & instruction)
+    virtual void OnObjectFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
     {
         if ( instruction.parameters.empty() ) return;
 
         if ( instruction.parameters[0].GetPlainString() == name ) objectPresent = true;
     };
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const ExpressionInstruction & instruction)
+    virtual void OnObjectAutomatismFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
     {
         if ( instruction.parameters.empty() ) return;
 
         if ( instruction.parameters[0].GetPlainString() == name ) objectPresent = true;
     };
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const StrExpressionInstruction & instruction)
+    virtual void OnObjectAutomatismFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
     {
         if ( instruction.parameters.empty() ) return;
 
@@ -256,7 +255,7 @@ bool EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
                 }
             }
             //Replace object's name in text expressions
-            else if (instrInfos.parameters[pNb].type == "text"||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
+            else if (instrInfos.parameters[pNb].type == "string"||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
                 std::string newExpression;
                 std::string oldExpression = actions[aId].GetParameterSafely(pNb).GetPlainString();
@@ -307,7 +306,7 @@ bool EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vect
                 }
             }
             //Replace object's name in text expressions
-            else if (instrInfos.parameters[pNb].type == "text" ||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
+            else if (instrInfos.parameters[pNb].type == "string" ||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
                 std::string newExpression;
                 std::string oldExpression = conditions[cId].GetParameterSafely(pNb).GetPlainString();
@@ -386,7 +385,7 @@ bool EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector 
                 }
             }
             //Replace object's name in text expressions
-            else if (instrInfos.parameters[pNb].type == "text"||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
+            else if (instrInfos.parameters[pNb].type == "string"||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
                 CallbacksForRemovingObject callbacks(name);
 
@@ -441,7 +440,7 @@ bool EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vect
                 }
             }
             //Replace object's name in text expressions
-            else if (instrInfos.parameters[pNb].type == "text"||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
+            else if (instrInfos.parameters[pNb].type == "string"||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
                 CallbacksForRemovingObject callbacks(name);
 

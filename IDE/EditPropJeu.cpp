@@ -145,10 +145,10 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     wxFlexGridSizer* FlexGridSizer28;
     wxFlexGridSizer* FlexGridSizer26;
 
-    Create(parent, wxID_ANY, _("Editer les propriétés du jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _("Editer les propriétés du jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer1->AddGrowableCol(0);
-    FlexGridSizer1->AddGrowableRow(0);
+    FlexGridSizer1->AddGrowableRow(2);
     FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
     Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
@@ -202,7 +202,7 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     FPSmax = new wxSpinCtrl(Panel2, ID_SPINCTRL1, _T("60"), wxDefaultPosition, wxSize(58,21), 0, 0, 1000, 60, _T("ID_SPINCTRL1"));
     FPSmax->SetValue(_T("60"));
     FlexGridSizer19->Add(FPSmax, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    SyncCheck = new wxCheckBox(Panel2, ID_CHECKBOX6, _("Synchronisation verticale"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
+    SyncCheck = new wxCheckBox(Panel2, ID_CHECKBOX6, _("Sychronisation verticale"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
     SyncCheck->SetValue(false);
     FlexGridSizer19->Add(SyncCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer19, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);

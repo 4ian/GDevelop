@@ -141,14 +141,15 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
     {
         for(unsigned int i = 0;i<secondGame.images.size();i++)
         {
-            if ( FindImage( game.images, secondGame.images.at(i).nom ) != -1)
+            std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), secondGame.images.at(i).nom));
+            if ( image != game.images.end() )
             {
                 wxString depart = _("Une image nommé \"");
                 wxString fin = _("\" est déjà présente dans le jeu. Voulez vous la remplacer ?");
                 if (wxMessageBox(depart+secondGame.images.at(i).nom+fin, "Une image de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
-                    game.images.erase(game.images.begin() + FindImage( game.images, secondGame.images.at(i).nom ));
+                    game.images.erase(image);
                     game.images.push_back(secondGame.images.at(i));
                 }
 

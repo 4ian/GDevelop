@@ -19,14 +19,12 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include "GDL/RuntimeScene.h"
-#include "GDL/Chercher.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ImageManager.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/Object.h"
 #include "GDL/Collisions.h"
 #include "GDL/Event.h"
-#include "GDL/Chercher.h"
 #include "GDL/CommonTools.h"
 #include "GDL/HelpFileAccess.h"
 #include "GDL/ChooseLayer.h"
@@ -34,6 +32,8 @@
 #include "GDL/DynamicExtensionsManager.h"
 #include "GDL/SourceFileBuilder.h"
 #include "GDL/CompilerMessagesParser.h"
+#include "GDL/EventsCodeCompiler.h"
+#include "GDL/SoundManager.h"
 #include "BuildMessagesPnl.h"
 #include "BuildProgressPnl.h"
 #include "BuildToolsPnl.h"
@@ -107,11 +107,10 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
         scrollBar1(NULL),
         scrollBar2(NULL)
 {
-    MemTracer.AddObj( "Editeur de scène", ( long )this );
     reloadingIconImage.LoadFromFile("res/compile128.png");
     reloadingIconSprite.SetImage(reloadingIconImage);
-    reloadingText.SetColor(sf::Color(0,0,0));
-    reloadingText.SetString(string(_("Compilation en cours des sources C++").mb_str()));
+    reloadingText.SetColor(sf::Color(0,0,0,128));
+    reloadingText.SetString(string(_("Compilation en cours...").mb_str()));
     reloadingText.SetCharacterSize(40);
 
     SetView( edittimeRenderer.view );
@@ -194,7 +193,6 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
 
 SceneCanvas::~SceneCanvas()
 {
-    MemTracer.DelObj((long)this); //Old memory tracking tool
     mainEditorCommand.UnLockShortcuts(this);  //Make sure shortcuts are not locked.
 }
 
@@ -383,6 +381,7 @@ void SceneCanvas::UpdateSize()
  */
 void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
 {
+    cout << "OnPreviewBtClick: " << endl;
     if ( !edittimeRenderer.editing ) return;
 
     mainEditorCommand.LockShortcuts(this);
@@ -394,6 +393,7 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
     scrollBar2->Show(false);
     UpdateSize();
 
+    cout << "StartReload: " << endl;
     Reload();
 
     if ( debugger ) debugger->Play();
@@ -678,17 +678,19 @@ void SceneCanvas::OnKey( wxKeyEvent& evt )
 
 void SceneCanvas::Reload()
 {
+    cout << "Reload: " << endl;
     ReloadFirstPart();
 }
 
 void SceneCanvas::ReloadFirstPart()
 {
+    cout << "ReloadFirstPart: " << endl;
     isReloading = true;
 
     game = gameEdited;
     game.imageManager = gameEdited.imageManager; //Use same image manager.
 
-    edittimeRenderer.runtimeScene.StopMusic();
+    SoundManager::GetInstance()->ClearAllSoundsAndMusics();
 
     RuntimeScene newScene(this, &game);
     edittimeRenderer.runtimeScene = newScene;
@@ -696,6 +698,10 @@ void SceneCanvas::ReloadFirstPart()
     if ( profileDialog )   edittimeRenderer.runtimeScene.profiler = profileDialog.get();
     if ( debugger ) edittimeRenderer.runtimeScene.debugger = debugger.get();
 
+    //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
+    //Useful when opening a scene for the first time for example.
+    if ( sceneEdited.eventsModified && !sceneEdited.eventsBeingCompiled )
+        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(gameEdited, sceneEdited);
 
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( !edittimeRenderer.editing && gameEdited.useExternalSourceFiles )
@@ -708,13 +714,14 @@ void SceneCanvas::ReloadFirstPart()
             wxLogWarning(_("Game Develop est entrain de compiler les sources C++ et ne pourra lancer un aperçu qu'une fois ce processus terminé."));
         }
 
-        //Wait dynamic extensions for being compiled when previewing.
+        //Wait dynamic extensions to be compiled when previewing.
+        return;
     }
-    else
     #endif
-    {
-        ReloadSecondPart(); //Finalize immediatly reloading when editing.
-    }
+    if ( !edittimeRenderer.editing && sceneEdited.eventsBeingCompiled )
+        return; //Wait events to be compiled when previewing
+
+    ReloadSecondPart();
 }
 
 void SceneCanvas::ReloadSecondPart()
@@ -750,50 +757,69 @@ void SceneCanvas::ReloadSecondPart()
 
 void SceneCanvas::Refresh()
 {
-    if ( isReloading && gameEdited.useExternalSourceFiles )
+   /* cout << "scene.eventsBeingCompiled = " << sceneEdited.eventsBeingCompiled << endl;
+    cout << "isReloading = " << isReloading << endl;*/
+
+    if ( isReloading )
     {
-        //Wait extensions to be compiled
-        if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->IsBuilding() )
+        bool wait = false;
+        if (gameEdited.useExternalSourceFiles) //Ensure we're not compiling C++ external sources
+        {
+            if ( mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->IsBuilding() )
+                wait = true;
+        }
+        if ( !edittimeRenderer.editing && sceneEdited.eventsBeingCompiled) //Ensure events are not being compiled.
+            wait =true;
+
+        if ( wait ) //We're still waiting for something to finish
+        {
+            //Display a message when compiling
+            sf::Event event;
+            while ( GetEvent( event ) )
+                ;
+
+            Clear(sf::Color(255,255,255));
+
+            SaveGLStates();
+            SetView(sf::View(sf::Vector2f(GetWidth()/2,GetHeight()/2), sf::Vector2f(GetWidth(),GetHeight())));
+
+            reloadingIconSprite.SetImage(reloadingIconImage);
+            reloadingIconSprite.SetColor(sf::Color(255,255,255,128));
+            reloadingIconSprite.SetPosition(GetWidth()/2-reloadingIconSprite.GetSize().x/2, GetHeight()/2-reloadingIconSprite.GetSize().y/2);
+            reloadingText.SetPosition(GetWidth()/2-reloadingText.GetRect().Width/2, reloadingIconSprite.GetPosition().y+reloadingIconSprite.GetSize().y+10);
+
+            Draw(reloadingIconSprite);
+            Draw(reloadingText);
+
+            RestoreGLStates();
+            Display();
+            return;
+        }
+        else //Everything is finished, reloading is complete!
             ReloadSecondPart();
-
-        //Display a message when compiling
-        sf::Event event;
-        while ( GetEvent( event ) )
-            ;
-
-        SaveGLStates();
-        Clear(sf::Color(255,255,255));
-        SetView(sf::View(sf::Vector2f(GetWidth()/2,GetHeight()/2), sf::Vector2f(GetWidth(),GetHeight())));
-
-        reloadingIconSprite.SetImage(reloadingIconImage);
-        reloadingIconSprite.SetPosition(GetWidth()/2-reloadingIconSprite.GetSize().x/2, GetHeight()/2-reloadingIconSprite.GetSize().y/2);
-        reloadingText.SetPosition(GetWidth()/2-reloadingText.GetRect().Width/2, reloadingIconSprite.GetPosition().y+reloadingIconSprite.GetSize().y+10);
-
-        Draw(reloadingIconSprite);
-        Draw(reloadingText);
-
-        RestoreGLStates();
-        Display();
     }
-    else
+    else //We're displaying the scene
     {
+        //First ensure scene does not need to be reloaded
         if ( !edittimeRenderer.runtimeScene.running || edittimeRenderer.editing )
         {
             //Reload changed images.
-            for (unsigned int i = 0;i<gameEdited.imagesChanged.size();++i)
-                game.imageManager->ReloadImage(gameEdited.imagesChanged[i]);
-
             if ( !gameEdited.imagesChanged.empty() )
             {
+                for (unsigned int i = 0;i<gameEdited.imagesChanged.size();++i)
+                    game.imageManager->ReloadImage(gameEdited.imagesChanged[i]);
+
                 gameEdited.imageManager->LoadPermanentImages();
                 gameEdited.imagesChanged.clear();
                 sceneEdited.wasModified = true;
             }
 
-            if ( sceneEdited.wasModified )
+            if ( sceneEdited.wasModified ) //Reload scene if necessary
                 Reload();
         }
-        if ( edittimeRenderer.runtimeScene.running )
+
+        //Then display the scene
+        if ( edittimeRenderer.runtimeScene.running ) //At runtime
         {
             int retourEvent = edittimeRenderer.runtimeScene.RenderAndStep(1);
 
@@ -807,9 +833,9 @@ void SceneCanvas::Refresh()
             }
 
         }
-        else if ( !edittimeRenderer.runtimeScene.running && !edittimeRenderer.editing )
+        else if ( !edittimeRenderer.runtimeScene.running && !edittimeRenderer.editing ) //Runtime paused
             edittimeRenderer.runtimeScene.RenderWithoutStep();
-        else
+        else //Edittime
             edittimeRenderer.RenderSceneEdittimeRenderer();
     }
 }
@@ -1225,15 +1251,15 @@ void SceneCanvas::AddObjetSelected(float x, float y)
 
     if ( edittimeRenderer.objectToAdd.empty() ) { wxLogMessage( _( "Vous n'avez selectionné aucun objet à ajouter.\nSélectionnez en un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils." ) ); return;}
 
-    int IDsceneObject = Picker::PickOneObject( &sceneEdited.initialObjects, edittimeRenderer.objectToAdd );
-    int IDglobalObject = Picker::PickOneObject( &gameEdited.globalObjects, edittimeRenderer.objectToAdd );
+    std::vector<ObjSPtr>::iterator sceneObject = std::find_if(sceneEdited.initialObjects.begin(), sceneEdited.initialObjects.end(), std::bind2nd(ObjectHasName(), edittimeRenderer.objectToAdd));
+    std::vector<ObjSPtr>::iterator globalObject = std::find_if(gameEdited.globalObjects.begin(), gameEdited.globalObjects.end(), std::bind2nd(ObjectHasName(), edittimeRenderer.objectToAdd));
 
     ObjSPtr newObject = boost::shared_ptr<Object> ();
 
-    if ( IDsceneObject != -1 ) //We check first scene's objects' list.
-        newObject = sceneEdited.initialObjects[IDsceneObject]->Clone();
-    else if ( IDglobalObject != -1 ) //Then the global object list
-        newObject = gameEdited.globalObjects[IDglobalObject]->Clone();
+    if ( sceneObject != sceneEdited.initialObjects.end() ) //We check first scene's objects' list.
+        newObject = (*sceneObject)->Clone();
+    else if ( globalObject != gameEdited.globalObjects.end() ) //Then the global object list
+        newObject = (*globalObject)->Clone();
 
     if ( newObject == boost::shared_ptr<Object> () )
     {

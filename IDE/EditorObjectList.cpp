@@ -26,10 +26,8 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
-#include "GDL/Chercher.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/CommonTools.h"
-#include "MemTrace.h"
 #include "Clipboard.h"
 #include <algorithm>
 #include <numeric>
@@ -371,12 +369,12 @@ void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
     else
     {
         //Find object so as to update automatisms list
-        string name = static_cast<string>(objectsList->GetItemText( item ));
-        int i = Picker::PickOneObject( objects, name );
-        if ( i == -1 ) return;
+        string name = ToString(objectsList->GetItemText( item ));
+        std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
+        if ( object == objects->end() ) return;
 
         //Remove already present automatisms from menu
-        for (vector < std::pair<long, unsigned int> >::iterator idIter = idForAutomatism.begin();
+        for (vector < std::pair<long, std::string> >::iterator idIter = idForAutomatism.begin();
              idIter != idForAutomatism.end();
              ++idIter)
         {
@@ -385,7 +383,7 @@ void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
         idForAutomatism.clear();
 
         //Add each automatism of the object
-        vector < unsigned int > allObjectAutomatisms = objects->at(i)->GetAllAutomatismsNameIdentifiers();
+        vector < std::string > allObjectAutomatisms = (*object)->GetAllAutomatismNames();
         for(unsigned int j = 0;j<allObjectAutomatisms.size();++j)
         {
             //Find an identifier for the menu item
@@ -393,7 +391,7 @@ void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
 
             idForAutomatism.push_back(std::make_pair(id, allObjectAutomatisms[j]));
             wxMenuItem * menuItem = new wxMenuItem(automatismsMenu, id,
-                                                   objects->at(i)->GetAutomatism(allObjectAutomatisms[j])->GetName());
+                                                   (*object)->GetAutomatism(allObjectAutomatisms[j])->GetName());
             automatismsMenu->Insert(0, menuItem);
             Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnAutomatismSelected);
         }
@@ -463,48 +461,43 @@ void EditorObjectList::OnRefreshBtClick( wxCommandEvent& event )
 
 void EditorObjectList::OnAutomatismSelected(wxCommandEvent & event)
 {
-    string name = static_cast<string>(objectsList->GetItemText( item ));
-    int i = Picker::PickOneObject( objects, name );
-    if ( i == -1 ) return;
+    string name = ToString(objectsList->GetItemText( item ));
+    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
+    if ( object == objects->end() ) return;
 
-    unsigned int autoType = 0;
+    std::string autoType;
     for (unsigned int i = 0;i<idForAutomatism.size();++i)
     {
     	if ( idForAutomatism[i].first == event.GetId() )
             autoType = idForAutomatism[i].second;
     }
 
-    objects->at(i)->GetAutomatism(autoType)->EditAutomatism(this, game, scene, mainEditorCommand);
+    (*object)->GetAutomatism(autoType)->EditAutomatism(this, game, scene, mainEditorCommand);
     if ( scene ) scene->wasModified = true;
 }
 
-////////////////////////////////////////////////////////////
-/// Editer un objet
-////////////////////////////////////////////////////////////
+/**
+ * Edit an object
+ */
 void EditorObjectList::OneditMenuISelected(wxCommandEvent& event)
 {
-    string name = static_cast<string>(objectsList->GetItemText( item ));
-    int i = Picker::PickOneObject( objects, name );
-    if ( i != -1 )
-    {
-        objects->at(i)->EditObject(this, game, mainEditorCommand);
-        if ( scene ) scene->wasModified = true;
+    string name = ToString(objectsList->GetItemText( item ));
+    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
+    if ( object == objects->end() ) return;
 
-        //Reload thumbnail
-        int thumbnailID = -1;
-        wxBitmap thumbnail;
-        if ( objects->at(i)->GenerateThumbnail(game, thumbnail) )
-        {
-            objectsImagesList->Add(thumbnail);
-            thumbnailID = objectsImagesList->GetImageCount()-1;
-        }
+    (*object)->EditObject(this, game, mainEditorCommand);
+    if ( scene ) scene->wasModified = true;
 
-        objectsList->SetItemImage( item, thumbnailID );
-    }
-    else
+    //Reload thumbnail
+    int thumbnailID = -1;
+    wxBitmap thumbnail;
+    if ( (*object)->GenerateThumbnail(game, thumbnail) )
     {
-        wxLogWarning( _( "L'objet à éditer n'a pas été trouvé." ) );
+        objectsImagesList->Add(thumbnail);
+        thumbnailID = objectsImagesList->GetImageCount()-1;
     }
+
+    objectsList->SetItemImage( item, thumbnailID );
 }
 
 ////////////////////////////////////////////////////////////
@@ -549,23 +542,19 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     if ( chooseTypeDialog.ShowModal() == 0 )
         return;
 
-    wxString name =  _("Nouvel_objet");
-    int i = 0;
+    std::string name = ToString(_("Nouvel_objet"));
 
     //Tant qu'un objet avec le même nom existe, on ajoute un chiffre
-    while ( Picker::PickOneObject( objects, ( string ) name ) != -1 )
+    unsigned int i = 0;
+    while ( std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name)) != objects->end() )
     {
-        i++;
-        name =  _("Nouvel_objet")+wxString("_");
-        wxString Num =ToString( i );
-
-        name += Num;
+        ++i;
+        name =  _("Nouvel_objet")+"_"+ToString(i);
     }
 
     //Add a new object of selected type to objects list
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
-    objects->push_back( extensionsManager->CreateObject(extensionsManager->GetTypeIdFromString(chooseTypeDialog.selectedObjectType),
-                                                        string(name.mb_str())));
+    objects->push_back( extensionsManager->CreateObject(chooseTypeDialog.selectedObjectType, ToString(name)));
 
     //And to the TreeCtrl
     wxTreeItemId rootId = objectsList->GetRootItem();
@@ -610,13 +599,13 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
 
         if ( selection[i].IsOk() && objectsList->GetRootItem() != selection[i] )
         {
-            int id = Picker::PickOneObject( objects, objectName );
-            if ( id != -1 )
+            std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), objectName));
+            if ( object != objects->end() )
             {
-                vector <unsigned int> automatisms = objects->at(id)->GetAllAutomatismsNameIdentifiers();
+                vector <std::string> automatisms = (*object)->GetAllAutomatismNames();
 
                 //Remove objects
-                objects->erase( objects->begin() + id );
+                objects->erase( object );
 
                 if ( scene )
                 {
@@ -684,7 +673,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     string newName = string(event.GetLabel().mb_str());
 
     //Be sure there is not already another object with this name
-    if ( Picker::PickOneObject( objects, newName ) != -1 )
+    if ( std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), newName)) != objects->end() )
     {
         wxLogWarning( _( "Impossible de renommer l'objet : un autre objet porte déjà ce nom." ) );
         Refresh();
@@ -700,10 +689,10 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         return;
     }
 
-    int i = Picker::PickOneObject( objects, ancienNom );
-    if ( i == -1 ) return;
+    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), ancienNom));
+    if ( object == objects->end() ) return;
 
-    objects->at( i )->SetName( newName );
+    (*object)->SetName( newName );
 
     if ( scene ) //Change the object name in the scene.
     {
@@ -771,10 +760,10 @@ bool EditorObjectList::CheckObjectName(std::string name)
 void EditorObjectList::OnChercherBtClick( wxCommandEvent& event )
 {
     string name = static_cast<string> (wxGetTextFromUser( _( "Entrez l'objet à rechercher" ), _( "Chercher un objet" ) ));
-    if ( name == "" ) return;
+    if ( name.empty() ) return;
 
-    int i = Picker::PickOneObject( objects, name );
-    if ( i != -1 )
+    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
+    if ( object != objects->end() )
     {
         //On en a trouvé un, on le sélectionne.
         void * rien;
@@ -805,31 +794,26 @@ void EditorObjectList::OnAideBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorObjectList::OnCopySelected(wxCommandEvent& event)
 {
-    Clipboard * clipboard = Clipboard::GetInstance();
-
-    int i = Picker::PickOneObject( objects, static_cast<string>(objectsList->GetItemText( item )) );
-    if ( i == -1 )
+    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), ToString(objectsList->GetItemText( item ))));
+    if ( object == objects->end() )
     {
         wxLogWarning(_("Impossible de trouver l'objet à copier"));
         return;
     }
 
-    clipboard->SetObject(objects->at(i));
+    Clipboard::GetInstance()->SetObject(*object);
 }
 
-////////////////////////////////////////////////////////////
-/// Couper
-////////////////////////////////////////////////////////////
+/**
+ * Cut
+ */
 void EditorObjectList::OnCutSelected(wxCommandEvent& event)
 {
-    wxTreeItemId ItemNul = NULL;
-    if ( item == ItemNul || objectsList->GetItemText( item ) == _( "Tous les objets de la scène" ) )
+    if ( !item.IsOk() || objectsList->GetRootItem() == item )
         return;
 
-    Clipboard * clipboard = Clipboard::GetInstance();
-
-    int i = Picker::PickOneObject( objects, string(objectsList->GetItemText( item ).mb_str()) );
-    if ( i == -1 )
+    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), ToString(objectsList->GetItemText( item ))));
+    if ( object == objects->end() )
     {
         wxLogWarning(_("Impossible de trouver l'objet à couper"));
         return;
@@ -838,13 +822,13 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
     objectsList->Delete( item );
     if ( scene ) scene->wasModified = true;
 
-    clipboard->SetObject(objects->at(i));
+    Clipboard::GetInstance()->SetObject(*object);
 
-    //Remove automatisms shared datas if necessary
-    vector <unsigned int> automatisms = objects->at(i)->GetAllAutomatismsNameIdentifiers();
+    //Remove automatisms shared datas if necessary. /!\ Be careful, order is important here : Do not delete the object before getting its automatisms
+    vector <std::string> automatisms = (*object)->GetAllAutomatismNames();
 
     //Remove object
-    objects->erase(objects->begin() + i);
+    objects->erase(object);
 
     for (unsigned int j = 0;j<automatisms.size();++j)
         RemoveSharedDatasIfNecessary(automatisms[j]);
@@ -867,28 +851,24 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     ObjSPtr object = clipboard->GetObject()->Clone();
 
     wxString name =  _( "Copie de " ) + object->GetName();
-    int i = 0;
 
-    //Tant qu'un objet avec le même nom existe, on ajoute un chiffre
-    while ( Picker::PickOneObject( objects, ( string ) name ) != -1 )
+    //Add a number to the new name if necessary
+    unsigned int i = 0;
+    while ( std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), ToString(objectsList->GetItemText( item )))) != objects->end() )
     {
         i++;
-        name =  _( "Copie de " ) + object->GetName();
-        wxString Num =ToString( i );
-
-        name += Num;
-
+        name =  _( "Copie de " ) + object->GetName()+ToString(i);
     }
 
-    //On donne un nom à l'objet
-    object->SetName( static_cast<string>(name) );
+    //Name the object
+    object->SetName( ToString(name) );
 
-    //On l'ajoute
+    //Add it to the list
     objects->push_back( object );
     objectsList->AppendItem( objectsList->GetRootItem(), name );
 
     //Add object's automatism's shared datas to scene if necessary
-    vector <unsigned int> automatisms = object->GetAllAutomatismsNameIdentifiers();
+    vector <std::string> automatisms = object->GetAllAutomatismNames();
     for (unsigned int j = 0;j<automatisms.size();++j)
         CreateSharedDatasIfNecessary(object->GetAutomatism(automatisms[j]));
 
@@ -901,20 +881,29 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjectList::OnMoveUpSelected(wxCommandEvent& event)
 {
-    string name = static_cast< string > ( objectsList->GetItemText( item ));
-    int i = Picker::PickOneObject( objects, name );
-    if ( i == -1 )
+    string name = ToString( objectsList->GetItemText( item ));
+    int index = -1;
+    for (unsigned int i = 0;i<objects->size();++i)
+    {
+        if ( objects->at(i)->GetName() == name )
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if ( index == -1 )
     {
         wxLogStatus( _( "L'objet à déplacer n'a pas été trouvé." ) );
         return;
     }
 
-    if ( i-1 >= 0 )
+    if ( index-1 >= 0 )
     {
         //On déplace l'image
-        boost::shared_ptr<Object> object = objects->at(i);
-        objects->erase(objects->begin() + i );
-        objects->insert(objects->begin()+i-1, object);
+        boost::shared_ptr<Object> object = objects->at(index);
+        objects->erase(objects->begin() + index );
+        objects->insert(objects->begin()+index-1, object);
 
         Refresh();
         if ( scene ) scene->wasModified = true;
@@ -940,19 +929,28 @@ void EditorObjectList::OnMoveUpSelected(wxCommandEvent& event)
 void EditorObjectList::OnMoveDownSelected(wxCommandEvent& event)
 {
     string name = static_cast< string > ( objectsList->GetItemText( item ));
-    int i = Picker::PickOneObject( objects, name );
-    if ( i == -1 )
+    int index = -1;
+    for (unsigned int i = 0;i<objects->size();++i)
+    {
+        if ( objects->at(i)->GetName() == name )
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if ( index == -1 )
     {
         wxLogStatus( _( "L'objet à déplacer n'a pas été trouvé." ) );
         return;
     }
 
-    if ( static_cast<unsigned>(i+1) < objects->size() )
+    if ( static_cast<unsigned>(index+1) < objects->size() )
     {
         //On déplace l'image
-        boost::shared_ptr<Object> object = objects->at(i);
-        objects->erase(objects->begin() + i );
-        objects->insert(objects->begin()+i+1, object);
+        boost::shared_ptr<Object> object = objects->at(index);
+        objects->erase(objects->begin() + index );
+        objects->insert(objects->begin()+index+1, object);
 
         Refresh();
         if ( scene ) scene->wasModified = true;
@@ -1000,18 +998,18 @@ void EditorObjectList::OnSetFocus(wxFocusEvent& event)
  */
 void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
 {
-    string name = static_cast< string > ( objectsList->GetItemText( item ));
-    int i = Picker::PickOneObject( objects, name );
-    if ( i == -1 )
+    string name = ToString( objectsList->GetItemText( item ));
+    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
+    if ( object == objects->end() )
     {
         wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
         return;
     }
 
-    InitialVariablesDialog dialog(this, objects->at(i)->variablesObjet);
+    InitialVariablesDialog dialog(this, (*object)->variablesObjet);
     if ( dialog.ShowModal() == 1 )
     {
-        objects->at(i)->variablesObjet = dialog.variables;
+        (*object)->variablesObjet = dialog.variables;
         if ( scene ) scene->wasModified = true;
     }
 }
@@ -1021,9 +1019,9 @@ void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
  */
 void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
 {
-    string name = static_cast< string > ( objectsList->GetItemText( item ));
-    int i = Picker::PickOneObject( objects, name );
-    if ( i == -1 )
+    string name = ToString( objectsList->GetItemText( item ));
+    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
+    if ( object == objects->end() )
     {
         wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
         return;
@@ -1045,10 +1043,10 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
 
         //Add automatism to object
         automatism->SetName(infos.defaultName);
-        for (unsigned int j = 0;objects->at(i)->HasAutomatism(automatism->GetAutomatismId());++j)
+        for (unsigned int j = 0;(*object)->HasAutomatism(automatism->GetName());++j)
             automatism->SetName(infos.defaultName+ToString(j));
 
-        objects->at(i)->AddAutomatism(automatism);
+        (*object)->AddAutomatism(automatism);
 
         //Add shared datas to scene if necessary
         CreateSharedDatasIfNecessary(automatism);
@@ -1059,9 +1057,9 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
 
 void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
 {
-    string name = static_cast< string > ( objectsList->GetItemText( item ));
-    int id = Picker::PickOneObject( objects, name );
-    if ( id == -1 )
+    string name = ToString( objectsList->GetItemText( item ));
+    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
+    if ( object == objects->end() )
     {
         wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
         return;
@@ -1071,14 +1069,14 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
     wxArrayString automatismsStr;
 
     //Fill array
-    vector <unsigned int> automatisms = objects->at(id)->GetAllAutomatismsNameIdentifiers();
+    vector <std::string> automatisms = (*object)->GetAllAutomatismNames();
     for (unsigned int i = 0;i<automatisms.size();++i)
-        automatismsStr.Add(objects->at(id)->GetAutomatism(automatisms[i])->GetName());
+        automatismsStr.Add((*object)->GetAutomatism(automatisms[i])->GetName());
 
     int selection = wxGetSingleChoiceIndex(_("Choisissez l'automatisme à supprimer"), _("Choisir l'automatisme à supprimer"), automatismsStr);
     if ( selection == -1 ) return;
 
-    objects->at(id)->RemoveAutomatism(automatisms[selection]);
+    (*object)->RemoveAutomatism(automatisms[selection]);
 
     //Remove shared datas if necessary
     RemoveSharedDatasIfNecessary(automatisms[selection]);
@@ -1091,9 +1089,9 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
  */
 void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
 {
-    string name = string(objectsList->GetItemText( item ).mb_str());
-    int id = Picker::PickOneObject( objects, name );
-    if ( id == -1 )
+    string name = ToString(objectsList->GetItemText( item ));
+    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
+    if ( object == objects->end() )
     {
         wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
         return;
@@ -1103,20 +1101,20 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
     wxArrayString automatismsStr;
 
     //Fill array
-    vector <unsigned int> automatisms = objects->at(id)->GetAllAutomatismsNameIdentifiers();
+    vector <std::string> automatisms = (*object)->GetAllAutomatismNames();
     for (unsigned int i = 0;i<automatisms.size();++i)
-        automatismsStr.Add(objects->at(id)->GetAutomatism(automatisms[i])->GetName());
+        automatismsStr.Add((*object)->GetAutomatism(automatisms[i])->GetName());
 
     int selection = wxGetSingleChoiceIndex(_("Choisissez l'automatisme à renommer"), _("Choisir l'automatisme à renommer"), automatismsStr);
     if ( selection == -1 ) return;
 
-    boost::shared_ptr<Automatism> automatism = objects->at(id)->GetAutomatism(automatisms[selection]);
+    boost::shared_ptr<Automatism> automatism = (*object)->GetAutomatism(automatisms[selection]);
 
     std::string newName = string(wxGetTextFromUser("Entrez le nouveau nom de l'automatisme", "Renommer un automatisme", automatism->GetName()).mb_str());
     if ( newName == automatism->GetName() || newName.empty() ) return;
 
     //Remove shared datas if necessary
-    RemoveSharedDatasIfNecessary(automatism->GetAutomatismId());
+    RemoveSharedDatasIfNecessary(automatism->GetName());
 
     automatism->SetName(newName);
     CreateSharedDatasIfNecessary(automatism);
@@ -1128,23 +1126,23 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
 /**
  * Remove shared datas of an automatism if this automatism is not used anymore
  */
-void EditorObjectList::RemoveSharedDatasIfNecessary(unsigned int automatismId)
+void EditorObjectList::RemoveSharedDatasIfNecessary(std::string name)
 {
-    if ( scene != NULL && scene->automatismsInitialSharedDatas.find(automatismId) != scene->automatismsInitialSharedDatas.end() )
+    if ( scene != NULL && scene->automatismsInitialSharedDatas.find(name) != scene->automatismsInitialSharedDatas.end() )
     {
         //Check no object use this automatism anymore
         for (unsigned int i = 0;i<scene->initialObjects.size();++i)
         {
-        	if (scene->initialObjects[i]->HasAutomatism(automatismId))
+        	if (scene->initialObjects[i]->HasAutomatism(name))
                 return;
         }
         for (unsigned int i = 0;i<game.globalObjects.size();++i)
         {
-        	if (game.globalObjects[i]->HasAutomatism(automatismId))
+        	if (game.globalObjects[i]->HasAutomatism(name))
                 return;
         }
 
-        scene->automatismsInitialSharedDatas.erase(automatismId);
+        scene->automatismsInitialSharedDatas.erase(name);
     }
 }
 
@@ -1159,20 +1157,20 @@ void EditorObjectList::CreateSharedDatasIfNecessary(boost::shared_ptr<Automatism
     {
         for (unsigned int i = 0;i<game.scenes.size();++i)
         {
-        	if ( game.scenes[i]->automatismsInitialSharedDatas.find(automatism->GetAutomatismId()) == game.scenes[i]->automatismsInitialSharedDatas.end() )
+        	if ( game.scenes[i]->automatismsInitialSharedDatas.find(automatism->GetName()) == game.scenes[i]->automatismsInitialSharedDatas.end() )
             {
                 boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = extensionsManager->CreateAutomatismSharedDatas(automatism->GetTypeName());
                 automatismsSharedDatas->SetName(automatism->GetName());
-                game.scenes[i]->automatismsInitialSharedDatas[automatismsSharedDatas->GetAutomatismId()] = automatismsSharedDatas;
+                game.scenes[i]->automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
             }
         }
     }
     //We're editing an object from a scene : Add the data if necessary
-    else if ( scene->automatismsInitialSharedDatas.find(automatism->GetAutomatismId()) == scene->automatismsInitialSharedDatas.end() )
+    else if ( scene->automatismsInitialSharedDatas.find(automatism->GetName()) == scene->automatismsInitialSharedDatas.end() )
     {
         boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = extensionsManager->CreateAutomatismSharedDatas(automatism->GetTypeName());
         automatismsSharedDatas->SetName(automatism->GetName());
-        scene->automatismsInitialSharedDatas[automatismsSharedDatas->GetAutomatismId()] = automatismsSharedDatas;
+        scene->automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
     }
 }
 

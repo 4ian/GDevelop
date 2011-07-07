@@ -1,13 +1,5 @@
-#ifdef DEBUG
-#define _MEMORY_TRACKER
-#include "debugMem.h" //suivi mémoire
-#endif
-#include "MemTrace.h"
-extern MemTrace MemTracer;
-
 #include "Game_Develop_EditorMain.h"
 #include "mp3ogg.h"
-#include "ConvertJRC.h"
 #include "ImportImage.h"
 
 ////////////////////////////////////////////////////////////

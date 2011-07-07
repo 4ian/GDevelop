@@ -1,10 +1,7 @@
-#ifndef RELEASE
-#define _MEMORY_TRACKER
-#include "debugMem.h" //suivi mémoire
-#endif
-
-#include "MemTrace.h"
-extern MemTrace MemTracer;
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
 
 #include "Game_Develop_EditorMain.h"
 #include <wx/string.h>
@@ -13,27 +10,27 @@ extern MemTrace MemTracer;
 #include "Credits.h"
 #include "MAJ.h"
 
-////////////////////////////////////////////////////////////
-/// Afficher l'aide
-////////////////////////////////////////////////////////////
+/**
+ * Display help
+ */
 void Game_Develop_EditorFrame::OnMenuAideSelected( wxCommandEvent& event )
 {
     HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DisplayContents();
 }
 
-////////////////////////////////////////////////////////////
-/// A propos
-////////////////////////////////////////////////////////////
+/**
+ * Display about dialogs
+ */
 void Game_Develop_EditorFrame::OnAbout( wxCommandEvent& event )
 {
     Credits Dialog( this );
     Dialog.ShowModal();
 }
 
-////////////////////////////////////////////////////////////
-/// Accéder au forum
-////////////////////////////////////////////////////////////
+/**
+ * Access forum
+ */
 void Game_Develop_EditorFrame::OnMenuForumSelected(wxCommandEvent& event)
 {
     wxString link = "http://www.forum.compilgames.net";
@@ -60,9 +57,9 @@ void Game_Develop_EditorFrame::OnMenuForumSelected(wxCommandEvent& event)
 
 }
 
-////////////////////////////////////////////////////////////
-/// Accéder au site web
-////////////////////////////////////////////////////////////
+/**
+ * Access official web site
+ */
 void Game_Develop_EditorFrame::OnMenuSiteSelected(wxCommandEvent& event)
 {
     wxString link = "http://www.compilgames.net";
@@ -88,9 +85,9 @@ void Game_Develop_EditorFrame::OnMenuSiteSelected(wxCommandEvent& event)
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Mise à jour
-////////////////////////////////////////////////////////////
+/**
+ * Open update dialog
+ */
 void Game_Develop_EditorFrame::OnMenuItem36Selected(wxCommandEvent& event)
 {
     MAJ dialog(this);
@@ -101,9 +98,9 @@ void Game_Develop_EditorFrame::OnMenuItem36Selected(wxCommandEvent& event)
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Tutoriel
-////////////////////////////////////////////////////////////
+/**
+ * Display tutorial
+ */
 void Game_Develop_EditorFrame::OnMenuTutoSelected(wxCommandEvent& event)
 {
     wxString link = wxGetCwd() + "/Tutorial/"+_("Tutoriel.pdf");
@@ -119,9 +116,9 @@ void Game_Develop_EditorFrame::OnMenuTutoSelected(wxCommandEvent& event)
     }
 }
 
-////////////////////////////////////////////////////////////
-///Wiki
-////////////////////////////////////////////////////////////
+/**
+ * Access wiki
+ */
 void Game_Develop_EditorFrame::OnMenuWikiSelected(wxCommandEvent& event)
 {
     wxString link = "http://www.wiki.compilgames.net";

@@ -22,7 +22,7 @@ class RuntimeGame;
 #include <wx/msw/winundef.h>
 #endif
 #include "SceneCanvas.h"
-class EditorEvents;
+class OldEventsEditor;
 #include "RenderDialog.h"
 #include <string>
 #include <vector>
@@ -44,7 +44,7 @@ class EditorScene: public wxPanel
 		wxScrollBar* scrollBar2;
 		SceneCanvas* sceneCanvas;
 		wxPanel* scenePanel;
-		EditorEvents* eventsEditor;
+		OldEventsEditor* eventsEditor;
 		wxPanel* eventsPanel;
 		wxAuiNotebook* notebook;
 		//*)

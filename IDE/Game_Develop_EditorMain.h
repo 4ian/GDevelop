@@ -21,27 +21,23 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
-
-#include "GDL/EditorImages.h"
-#include "EditorScene.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-
-#include "wxSFMLCanvas.hpp"
 #include <iostream>
 #include <string>
 #include <list>
 #include <sstream>
 #include <wx/fileconf.h>
 #include <wx/artprov.h>
+#include <wx/log.h>
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
+#include "GDL/EditorImages.h"
 #include "GDL/Game.h"
-#include "GDL/OpenSaveGame.h"
-#include <wx/log.h>
 #include "GDL/CommonTools.h"
+#include "EditorScene.h"
 #include "RecentList.h"
 class RuntimeGame;
 class ProjectManager;

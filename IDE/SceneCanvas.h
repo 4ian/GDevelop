@@ -17,13 +17,11 @@
 #include "GDL/Object.h"
 #include "GDL/Collisions.h"
 #include "GDL/Event.h"
-#include "GDL/Chercher.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/MainEditorCommand.h"
-#include "MemTrace.h"
 #include "SceneEdittimeRenderer.h"
 class RenderDialog;
 class EditorObjets;
@@ -31,8 +29,6 @@ class EditorLayers;
 class DebuggerGUI;
 class ProfileDlg;
 class InitialPositionBrowserDlg;
-
-extern MemTrace MemTracer;
 
 /**
  * Canvas for display, edit and preview a scene.

@@ -3,9 +3,6 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "MemTrace.h"
-extern MemTrace MemTracer;
-
 //(*InternalHeaders(Game_Develop_EditorFrame)
 #include <wx/bitmap.h>
 #include <wx/icon.h>
@@ -46,7 +43,7 @@ extern MemTrace MemTracer;
 #include "GDL/ChooseObject.h"
 #include "MyStatusBar.h"
 #include "EditorObjets.h"
-#include "EditorEvents.h"
+#include "OldEventsEditor.h"
 #include "EditorScene.h"
 #include "CodeEditor.h"
 #include "EditorObjectList.h"
@@ -306,7 +303,7 @@ buildToolsPnl(NULL)
     }
     {
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Evènements"));
-        EditorEvents::CreateRibbonPage(ribbonEditorPage);
+        OldEventsEditor::CreateRibbonPage(ribbonEditorPage);
     }
     {
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Objets"));
@@ -342,7 +339,7 @@ buildToolsPnl(NULL)
 
     m_mgr.AddPane( projectManager, wxAuiPaneInfo().Name( wxT( "PM" ) ).Caption( _( "Gestionnaire de projets" ) ).Left().MaximizeButton( true ).MinimizeButton( false ).MinSize(170,100) );
     m_mgr.AddPane( Panel1, wxAuiPaneInfo().Name( wxT( "EP" ) ).Caption( _( "Editeur principal" ) ).Center().CaptionVisible(false).CloseButton( false ).MaximizeButton( true ).MinimizeButton( false ) );
-    m_mgr.AddPane( ribbonPanel, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ruban" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).MinSize(1, 107).Resizable(false) );
+    m_mgr.AddPane( ribbonPanel, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ruban" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).Resizable(false) );
     m_mgr.AddPane( buildToolsPnl, wxAuiPaneInfo().Name( wxT( "CT" ) ).Caption( _( "Outils de compilations" ) ).Bottom().MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(120,130));
 
     wxString result;
@@ -351,9 +348,9 @@ buildToolsPnl(NULL)
         m_mgr.LoadPerspective( result , true );
 
     if ( !hideLabels )
-        m_mgr.GetPane(ribbonPanel).MinSize(1, 107);
+        m_mgr.GetPane(ribbonPanel).MinSize(1, 109);
     else
-        m_mgr.GetPane(ribbonPanel).MinSize(1, 100);
+        m_mgr.GetPane(ribbonPanel).MinSize(1, 108);
 
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );

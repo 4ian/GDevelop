@@ -6,7 +6,7 @@
 #ifndef EDITOREVENTS_H
 #define EDITOREVENTS_H
 
-//(*Headers(EditorEvents)
+//(*Headers(OldEventsEditor)
 #include <wx/sizer.h>
 #include <wx/menu.h>
 #include <wx/panel.h>
@@ -22,14 +22,14 @@
 class SearchEvents;
 class SceneCanvas;
 
-class EditorEvents: public wxPanel
+class OldEventsEditor: public wxPanel
 {
-    friend class EditorEventsDialoguesTest;
+    friend class OldEventsEditorDialoguesTest;
 	public:
 
 
-        EditorEvents(wxWindow* parent, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ );
-		virtual ~EditorEvents();
+        OldEventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ );
+		virtual ~OldEventsEditor();
 
 		static void CreateRibbonPage(wxRibbonPage * page);
 		void ConnectEvents();
@@ -58,7 +58,7 @@ class EditorEvents: public wxPanel
          */
         void ScrollToEvent(BaseEventSPtr event);
 
-		//(*Declarations(EditorEvents)
+		//(*Declarations(OldEventsEditor)
 		wxMenuItem* MenuItem31;
 		wxScrollBar* horizontalScrollbar;
 		wxMenuItem* MenuItem8;
@@ -97,7 +97,7 @@ class EditorEvents: public wxPanel
 
 	protected:
 
-		//(*Identifiers(EditorEvents)
+		//(*Identifiers(OldEventsEditor)
 		static const long ID_PANEL2;
 		static const long ID_SCROLLBAR1;
 		static const long ID_SCROLLBAR2;
@@ -163,7 +163,7 @@ class EditorEvents: public wxPanel
 
 	private:
 
-		//(*Handlers(EditorEvents)
+		//(*Handlers(OldEventsEditor)
 		void OnDelEventSelected(wxCommandEvent& event);
 		void OnMenuItem2Selected(wxCommandEvent& event);
 		void OnDelConditionsSelected(wxCommandEvent& event);

@@ -1,23 +1,10 @@
-/**
- * Game Develop
- *    Player
- *
- *  Par Florian "4ian" Rival
- *
- */
-/**
- *
- * Permet de choisir une condition
- *
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef CHOIXCONDITION_H
 #define CHOIXCONDITION_H
-
-#ifdef DEBUG
-#define _MEMORY_TRACKER
-#include "debugMem.h" //suivi mémoire
-#endif
 
 //(*Headers(ChoixCondition)
 #include <wx/treectrl.h>

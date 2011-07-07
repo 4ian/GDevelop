@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef EDITOROBJETS_H
 #define EDITOROBJETS_H
 
@@ -16,6 +21,9 @@
 #endif
 #include "EditorObjetsGroups.h"
 
+/**
+ * Editor composed of 4 sub editors allowing to edit objects and groups of the scene and of the game.
+ */
 class EditorObjets: public wxPanel
 {
 	public:

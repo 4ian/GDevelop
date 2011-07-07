@@ -1,11 +1,11 @@
-#include "EditorEvents.h"
+#include "OldEventsEditor.h"
 #include "ChoixCondition.h"
 #include "Clipboard.h"
 
 /**
  * Edit a condition
  */
-void EditorEvents::OneEditConditionMenuSelected(wxCommandEvent& event)
+void OldEventsEditor::OneEditConditionMenuSelected(wxCommandEvent& event)
 {
     if ( !instructionsSelected ) return;
 
@@ -31,7 +31,7 @@ void EditorEvents::OneEditConditionMenuSelected(wxCommandEvent& event)
     }
 }
 
-void EditorEvents::OnAddConditionMenuSelected(wxCommandEvent& event)
+void OldEventsEditor::OnAddConditionMenuSelected(wxCommandEvent& event)
 {
     if ( !instructionsSelected ) return;
 
@@ -51,7 +51,7 @@ void EditorEvents::OnAddConditionMenuSelected(wxCommandEvent& event)
     }
 }
 
-void EditorEvents::OnDelConditionMenuSelected(wxCommandEvent& event)
+void OldEventsEditor::OnDelConditionMenuSelected(wxCommandEvent& event)
 {
     if ( !instructionsSelected || boost::tuples::get<3>(eventsSelected[0]) >= GetLastSelectedListOfInstructions()->size() ) return;
 
@@ -62,7 +62,7 @@ void EditorEvents::OnDelConditionMenuSelected(wxCommandEvent& event)
 }
 
 
-void EditorEvents::OnCopyConditionMenuSelected(wxCommandEvent& event)
+void OldEventsEditor::OnCopyConditionMenuSelected(wxCommandEvent& event)
 {
     if (!instructionsSelected ||
         boost::tuples::get<3>(eventsSelected[0]) >= GetLastSelectedListOfInstructions()->size() ||
@@ -72,7 +72,7 @@ void EditorEvents::OnCopyConditionMenuSelected(wxCommandEvent& event)
     clipboard->SetCondition(GetLastSelectedInstruction());
 }
 
-void EditorEvents::OnCutConditionMenuSelected(wxCommandEvent& event)
+void OldEventsEditor::OnCutConditionMenuSelected(wxCommandEvent& event)
 {
     if (!instructionsSelected ||
         boost::tuples::get<3>(eventsSelected[0]) >= GetLastSelectedListOfInstructions()->size() ||
@@ -87,7 +87,7 @@ void EditorEvents::OnCutConditionMenuSelected(wxCommandEvent& event)
     ChangesMadeOnEvents();
 }
 
-void EditorEvents::OnPasteConditionMenuSelected(wxCommandEvent& event)
+void OldEventsEditor::OnPasteConditionMenuSelected(wxCommandEvent& event)
 {
     if ( !instructionsSelected || !conditionsSelected) return;
 

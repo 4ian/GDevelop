@@ -34,6 +34,7 @@
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DWXUSINGDLL" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\include" />
@@ -69,6 +70,71 @@
 					<Add option="-lsfml-network-d" />
 					<Add option="-lsfml-window-d" />
 					<Add option="-lsfml-system-d" />
+					<Add option="-lclangFrontend  -lclangSerialization  -lclangDriver  -lclangCodeGen  -lclangSema  -lclangStaticAnalyzerFrontend  -lclangStaticAnalyzerCheckers  -lclangStaticAnalyzerCore  -lclangIndex  -lclangAnalysis  -lclangRewrite  -lclangAST  -lclangParse  -lclangLex  -lclangBasic  -lLLVMJIT  -lLLVMInterpreter  -lLLVMX86CodeGen  -lLLVMAsmParser  -lLLVMBitReader  -lLLVMBitWriter  -lLLVMipo  -lLLVMExecutionEngine  -lLLVMAsmPrinter  -lLLVMSelectionDAG  -lLLVMX86AsmPrinter  -lLLVMX86Info  -lLLVMMCParser  -lLLVMCodeGen  -lLLVMX86Utils  -lLLVMScalarOpts  -lLLVMInstCombine  -lLLVMTransformUtils  -lLLVMipa  -lLLVMAnalysis  -lLLVMTarget  -lLLVMCore  -lLLVMMC  -lLLVMSupport -limagehlp -lpsapi  -lLLVMInstrumentation  -lclangFrontend  -lclangSerialization  -lclangDriver  -lclangParse  -lclangSema  -lclangAnalysis  -lclangIndex  -lclangAST  -lclangLex  -lclangBasic  -lLLVMMC  -lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
+					<Add option="-lLLVMJIT" />
+					<Add option="-lLLVMInterpreter" />
+					<Add option="-lLLVMX86CodeGen" />
+					<Add option="-lLLVMAsmParser" />
+					<Add option="-lLLVMBitReader" />
+					<Add option="-lLLVMBitWriter" />
+					<Add option="-lLLVMipo" />
+					<Add option="-lLLVMExecutionEngine" />
+					<Add option="-lLLVMAsmPrinter" />
+					<Add option="-lLLVMSelectionDAG" />
+					<Add option="-lLLVMX86AsmPrinter" />
+					<Add option="-lLLVMX86Info" />
+					<Add option="-lLLVMMCParser" />
+					<Add option="-lLLVMCodeGen" />
+					<Add option="-lLLVMX86Utils" />
+					<Add option="-lLLVMScalarOpts" />
+					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMTransformUtils" />
+					<Add option="-lLLVMipa" />
+					<Add option="-lLLVMAnalysis" />
+					<Add option="-lLLVMTarget" />
+					<Add option="-lLLVMCore" />
+					<Add option="-lLLVMMC" />
+					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
+					<Add option="-lLLVMInstrumentation" />
+					<Add option="-lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
+					<Add option="-lLLVMAlphaCodeGen" />
+					<Add option="-lLLVMARMAsmParser" />
+					<Add option="-lLLVMARMDisassembler" />
+					<Add option="-lLLVMBlackfinCodeGen" />
+					<Add option="-lLLVMCBackend" />
+					<Add option="-lLLVMCellSPUCodeGen" />
+					<Add option="-lLLVMCppBackend" />
+					<Add option="-lLLVMMipsCodeGen" />
+					<Add option="-lLLVMMBlazeAsmParser" />
+					<Add option="-lLLVMMBlazeDisassembler" />
+					<Add option="-lLLVMMSP430CodeGen" />
+					<Add option="-lLLVMPowerPCCodeGen" />
+					<Add option="-lLLVMPTXCodeGen" />
+					<Add option="-lLLVMSparcCodeGen" />
+					<Add option="-lLLVMSystemZCodeGen" />
+					<Add option="-lLLVMX86AsmParser" />
+					<Add option="-lLLVMX86Disassembler" />
+					<Add option="-lLLVMXCoreCodeGen" />
+					<Add option="-lLLVMAlphaInfo" />
+					<Add option="-lLLVMARMCodeGen" />
+					<Add option="-lLLVMBlackfinInfo" />
+					<Add option="-lLLVMCBackendInfo" />
+					<Add option="-lLLVMCellSPUInfo" />
+					<Add option="-lLLVMCppBackendInfo" />
+					<Add option="-lLLVMMipsInfo" />
+					<Add option="-lLLVMMBlazeCodeGen" />
+					<Add option="-lLLVMMSP430AsmPrinter" />
+					<Add option="-lLLVMMSP430Info" />
+					<Add option="-lLLVMPowerPCAsmPrinter" />
+					<Add option="-lLLVMPowerPCInfo" />
+					<Add option="-lLLVMPTXInfo" />
+					<Add option="-lLLVMSparcInfo" />
+					<Add option="-lLLVMSystemZInfo" />
+					<Add option="-lLLVMXCoreInfo" />
+					<Add option="-lLLVMARMAsmPrinter" />
+					<Add option="-lLLVMARMInfo" />
+					<Add option="-lLLVMMBlazeAsmPrinter" />
+					<Add option="-lLLVMMBlazeInfo" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="libkernel32.a" />
@@ -220,7 +286,6 @@
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
 				</ResourceCompiler>
 				<Linker>
-					<Add option="-s" />
 					<Add option="-lopenal32" />
 					<Add option="-lsndfile" />
 					<Add option="-lfreetype" />
@@ -273,44 +338,11 @@
 					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
 					<Add option="-lLLVMInstrumentation" />
 					<Add option="-lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
-					<Add option="-lLLVMAlphaCodeGen" />
-					<Add option="-lLLVMARMAsmParser" />
-					<Add option="-lLLVMARMDisassembler" />
-					<Add option="-lLLVMBlackfinCodeGen" />
 					<Add option="-lLLVMCBackend" />
-					<Add option="-lLLVMCellSPUCodeGen" />
 					<Add option="-lLLVMCppBackend" />
-					<Add option="-lLLVMMipsCodeGen" />
-					<Add option="-lLLVMMBlazeAsmParser" />
-					<Add option="-lLLVMMBlazeDisassembler" />
-					<Add option="-lLLVMMSP430CodeGen" />
-					<Add option="-lLLVMPowerPCCodeGen" />
-					<Add option="-lLLVMPTXCodeGen" />
-					<Add option="-lLLVMSparcCodeGen" />
-					<Add option="-lLLVMSystemZCodeGen" />
 					<Add option="-lLLVMX86AsmParser" />
 					<Add option="-lLLVMX86Disassembler" />
-					<Add option="-lLLVMXCoreCodeGen" />
-					<Add option="-lLLVMAlphaInfo" />
-					<Add option="-lLLVMARMCodeGen" />
-					<Add option="-lLLVMBlackfinInfo" />
 					<Add option="-lLLVMCBackendInfo" />
-					<Add option="-lLLVMCellSPUInfo" />
-					<Add option="-lLLVMCppBackendInfo" />
-					<Add option="-lLLVMMipsInfo" />
-					<Add option="-lLLVMMBlazeCodeGen" />
-					<Add option="-lLLVMMSP430AsmPrinter" />
-					<Add option="-lLLVMMSP430Info" />
-					<Add option="-lLLVMPowerPCAsmPrinter" />
-					<Add option="-lLLVMPowerPCInfo" />
-					<Add option="-lLLVMPTXInfo" />
-					<Add option="-lLLVMSparcInfo" />
-					<Add option="-lLLVMSystemZInfo" />
-					<Add option="-lLLVMXCoreInfo" />
-					<Add option="-lLLVMARMAsmPrinter" />
-					<Add option="-lLLVMARMInfo" />
-					<Add option="-lLLVMMBlazeAsmPrinter" />
-					<Add option="-lLLVMMBlazeInfo" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="libkernel32.a" />
@@ -628,12 +660,6 @@
 		<Unit filename="ConsoleManager.h">
 			<Option virtualFolder="Log et Memoire\" />
 		</Unit>
-		<Unit filename="ConvertJRC.cpp">
-			<Option virtualFolder="Editeur principal\Outils\" />
-		</Unit>
-		<Unit filename="ConvertJRC.h">
-			<Option virtualFolder="Editeur principal\Outils\" />
-		</Unit>
 		<Unit filename="CppUnitLite\CppUnitLite\Failure.cpp">
 			<Option virtualFolder="LIB CppUnitLite\" />
 		</Unit>
@@ -739,12 +765,6 @@
 		</Unit>
 		<Unit filename="EditPropScene.h">
 			<Option virtualFolder="Editeur principal\Autres\" />
-		</Unit>
-		<Unit filename="EditorEvents.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
-		</Unit>
-		<Unit filename="EditorEvents.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
 		</Unit>
 		<Unit filename="EditorEventsActions.cpp" />
 		<Unit filename="EditorEventsConditions.cpp" />
@@ -890,6 +910,12 @@
 		<Unit filename="ObjectsOnBadLayerBox.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\Editeur calques\" />
 		</Unit>
+		<Unit filename="OldEventsEditor.cpp">
+			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
+		</Unit>
+		<Unit filename="OldEventsEditor.h">
+			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
+		</Unit>
 		<Unit filename="PlayerUnitTests.cpp" />
 		<Unit filename="Portable.cpp">
 			<Option virtualFolder="Fichiers\" />
@@ -1030,7 +1056,7 @@
 				<resources>
 					<wxFrame wxs="wxsmith/Game_Develop_Editorframe.wxs" src="Game_Develop_EditorMain.cpp" hdr="Game_Develop_EditorMain.h" fwddecl="0" i18n="1" name="Game_Develop_EditorFrame" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorObjets.wxs" src="EditorObjets.cpp" hdr="EditorObjets.h" fwddecl="0" i18n="1" name="EditorObjets" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorEvents.wxs" src="EditorEvents.cpp" hdr="EditorEvents.h" fwddecl="0" i18n="1" name="EditorEvents" language="CPP" />
+					<wxPanel wxs="wxsmith/OldEventsEditor.wxs" src="OldEventsEditor.cpp" hdr="OldEventsEditor.h" fwddecl="0" i18n="1" name="OldEventsEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixCondition.wxs" src="ChoixCondition.cpp" hdr="ChoixCondition.h" fwddecl="0" i18n="1" name="ChoixCondition" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixAction.wxs" src="ChoixAction.cpp" hdr="ChoixAction.h" fwddecl="0" i18n="1" name="ChoixAction" language="CPP" />
 					<wxDialog wxs="wxsmith/EditorObjet.wxs" src="EditorObjet.cpp" hdr="EditorObjet.h" fwddecl="0" i18n="1" name="EditorObjet" language="CPP" />
@@ -1041,12 +1067,9 @@
 					<wxDialog wxs="wxsmith/Preferences.wxs" src="Preferences.cpp" hdr="Preferences.h" fwddecl="0" i18n="1" name="Preferences" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixTemplateEvent.wxs" src="ChoixTemplateEvent.cpp" hdr="ChoixTemplateEvent.h" fwddecl="0" i18n="1" name="ChoixTemplateEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/Credits.wxs" src="Credits.cpp" hdr="Credits.h" fwddecl="0" i18n="1" name="Credits" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoixDossier.wxs" src="ChoixDossier.cpp" hdr="ChoixDossier.h" fwddecl="0" i18n="1" name="ChoixDossier" language="CPP" />
-					<wxDialog wxs="wxsmith/EditDossier.wxs" src="EditDossier.cpp" hdr="EditDossier.h" fwddecl="0" i18n="1" name="EditDossier" language="CPP" />
 					<wxDialog wxs="wxsmith/MessagePlus.wxs" src="MessagePlus.cpp" hdr="MessagePlus.h" fwddecl="0" i18n="1" name="MessagePlus" language="CPP" />
 					<wxDialog wxs="wxsmith/Compilation.wxs" src="Compilation.cpp" hdr="Compilation.h" fwddecl="0" i18n="1" name="Compilation" language="CPP" />
 					<wxDialog wxs="wxsmith/Demarrage.wxs" src="Demarrage.cpp" hdr="Demarrage.h" fwddecl="0" i18n="1" name="Demarrage" language="CPP" />
-					<wxDialog wxs="wxsmith/ConvertJRC.wxs" src="ConvertJRC.cpp" hdr="ConvertJRC.h" fwddecl="0" i18n="1" name="ConvertJRC" language="CPP" />
 					<wxDialog wxs="wxsmith/Portable.wxs" src="Portable.cpp" hdr="Portable.h" fwddecl="0" i18n="1" name="Portable" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixClavier.wxs" src="ChoixClavier.cpp" hdr="ChoixClavier.h" fwddecl="0" i18n="1" name="ChoixClavier" language="CPP" />
 					<wxDialog wxs="wxsmith/mp3ogg.wxs" src="mp3ogg.cpp" hdr="mp3ogg.h" fwddecl="0" i18n="1" name="mp3ogg" language="CPP" />
@@ -1063,7 +1086,6 @@
 					<wxPanel wxs="wxsmith/EditorJeu.wxs" src="EditorJeu.cpp" hdr="EditorJeu.h" fwddecl="0" i18n="1" name="EditorJeu" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorObjetsGroups.wxs" src="EditorObjetsGroups.cpp" hdr="EditorObjetsGroups.h" fwddecl="0" i18n="1" name="EditorObjetsGroups" language="CPP" />
 					<wxDialog wxs="wxsmith/EditObjectGroup.wxs" src="EditObjectGroup.cpp" hdr="EditObjectGroup.h" fwddecl="0" i18n="1" name="EditObjectGroup" language="CPP" />
-					<wxDialog wxs="wxsmith/ChoixObjetExpression.wxs" src="ChoixObjetExpression.cpp" hdr="ChoixObjetExpression.h" fwddecl="0" i18n="1" name="ChoixObjetExpression" language="CPP" />
 					<wxDialog wxs="wxsmith/ImportImage.wxs" src="ImportImage.cpp" hdr="ImportImage.h" fwddecl="0" i18n="1" name="ImportImage" language="CPP" />
 					<wxFrame wxs="wxsmith/ImageEditor.wxs" src="ImageEditor.cpp" hdr="ImageEditor.h" fwddecl="0" i18n="1" name="ImageEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/TrueOrFalse.wxs" src="TrueOrFalse.cpp" hdr="TrueOrFalse.h" fwddecl="0" i18n="1" name="TrueOrFalse" language="CPP" />
@@ -1101,7 +1123,7 @@
 			</wxsmith>
 			<AutoVersioning>
 				<Scheme minor_max="1" build_max="0" rev_max="0" rev_rand_max="9" build_times_to_increment_minor="1" />
-				<Settings autoincrement="0" date_declarations="1" update_manifest="6" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="C:\Users\Florian\Programmation\Game Develop SVN\conf" header_path="version.h" />
+				<Settings autoincrement="0" date_declarations="1" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="C:\Users\Florian\Programmation\Game Develop SVN\conf" header_path="version.h" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
 				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>

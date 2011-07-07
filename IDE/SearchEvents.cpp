@@ -10,7 +10,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "EventsRefactorer.h"
-#include "EditorEvents.h"
+#include "OldEventsEditor.h"
 #include "GDL/HelpFileAccess.h"
 
 using namespace std;
@@ -46,7 +46,7 @@ BEGIN_EVENT_TABLE(SearchEvents,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-SearchEvents::SearchEvents(EditorEvents * parent_, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_) :
+SearchEvents::SearchEvents(OldEventsEditor * parent_, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_) :
 parent(parent_),
 game(game_),
 scene(scene_),

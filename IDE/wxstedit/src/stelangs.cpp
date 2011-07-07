@@ -4115,9 +4115,9 @@ static STE_LexerStyles STE_LexerStyles_STE_LANG_ERLANG[STE_LexerStyles_STE_LANG_
     { STE_STYLE_CHARACTER,  wxSTC_ERLANG_CHARACTER,     "Character" }, // 9
     { STE_STYLE_SCRIPT,     wxSTC_ERLANG_MACRO,         "Macro" }, // 10
     { STE_STYLE_LABEL,      wxSTC_ERLANG_RECORD,        "Record" }, // 11
-    { STE_STYLE_DELIMITER,  wxSTC_ERLANG_SEPARATOR,     "Separator" }, // 12
+    /*{ STE_STYLE_DELIMITER,  wxSTC_ERLANG_SEPARATOR,     "Separator" }, // 12 Florian Rival : Commented  to compile
     { STE_STYLE_LABEL,      wxSTC_ERLANG_NODE_NAME,     "Node name" }, // 13
-    { STE_STYLE_UNDEFINED,  wxSTC_ERLANG_UNKNOWN,       "Parse error" }, // 31
+    { STE_STYLE_UNDEFINED,  wxSTC_ERLANG_UNKNOWN,       "Parse error" }, // 31*/
 };
 
 #define STE_LexerStyles_STE_LANG_OCTAVE_COUNT STE_LexerStyles_STE_LANG_MATLAB_COUNT

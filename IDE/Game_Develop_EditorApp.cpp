@@ -1,16 +1,9 @@
-/***************************************************************
- * Name:      Game_Develop_EditorApp.cpp
- * Purpose:   Code for Application Class
- * Author:    Florian "4ian" Rival ()
- * Created:   2008-03-01
- * Copyright: Florian "4ian" Rival ()
- * License:
- **************************************************************/
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
 
-#ifndef RELEASE
-#define _MEMORY_TRACKER
-#include "debugMem.h" //suivi mémoire
-#endif
+//This file was created 2008-03-01
 
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -40,10 +33,12 @@
 #include <SFML/System.hpp>
 #include "CppUnitLite/TestHarness.h"
 
+#include "GDL/EventsExecutionEngine.h"
+#include <llvm/Support/DynamicLibrary.h>
+
 #include "Game_Develop_EditorMain.h"
 #include "Game_Develop_EditorApp.h"
 #include "Log.h"
-#include "MemTrace.h"
 #include "Demarrage.h"
 #include "CheckMAJ.h"
 #include "MAJ.h"
@@ -71,8 +66,6 @@
 #include <boost/shared_ptr.hpp>
 
 IMPLEMENT_APP(Game_Develop_EditorApp)
-
-MemTrace MemTracer;
 
 void MessageLoading( string message, float avancement )
 {
@@ -243,11 +236,13 @@ bool Game_Develop_EditorApp::OnInit()
     //Test si le programme n'aurait pas planté la dernière fois
     //En vérifiant si un fichier existe toujours
     bool openRecupFiles = false;
+    #if defined(RELEASE)
     if ( !parser.Found( wxT("noCrashCheck") ) && wxFileExists("GameDevelopRunning.log") && !wxFileExists("ExtensionBeingLoaded.log") )
     {
         BugReport dialog(NULL);
         if ( dialog.ShowModal() == 1 ) openRecupFiles = true;
     }
+    #endif
     cout << "Crash management ended" << endl;
 
     //Creating the console Manager
@@ -272,10 +267,20 @@ bool Game_Develop_EditorApp::OnInit()
     InitLog(); // Log sous forme de fichier détaillé
     logChain = new wxLogChain( log );
 
+    //LLVM stuff
+    cout << "Initializing LLVM/Clang..." << endl;
+    EventsExecutionEngine::EnsureLLVMTargetsInitialization();
+
+    cout << "Loading libstdc++..." << std::endl;
+    std::string error;
+    llvm::sys::DynamicLibrary::LoadLibraryPermanently("libstdc++-6.dll", &error);
+    cout << error;
+
     //Load extensions
     cout << "Loading extensions" << endl;
     bool loadExtensions = true;
 
+    #if defined(RELEASE)
     if ( !parser.Found( wxT("noCrashCheck") ) && wxFileExists("ExtensionBeingLoaded.log") )
     {
         int whattodo = 0;
@@ -291,6 +296,7 @@ bool Game_Develop_EditorApp::OnInit()
         if ( whattodo == 0 ) return false;
         else if ( whattodo == 1 ) loadExtensions = false;
     }
+    #endif
 
     GDpriv::ExtensionsLoader * extensionsLoader = GDpriv::ExtensionsLoader::GetInstance();
     extensionsLoader->SetExtensionsDir("./Extensions/");
@@ -392,10 +398,6 @@ int Game_Develop_EditorApp::OnExit()
     fontManager->DestroySingleton();
     HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DestroySingleton();
-
-#ifndef RELEASE
-    MemTracer.Rapport();
-#endif
 
     wxRemoveFile("GameDevelopRunning.log");
 

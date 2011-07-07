@@ -1,14 +1,9 @@
 #include <boost/shared_ptr.hpp>
 #include "Clipboard.h"
-#include "MemTrace.h"
 #include "GDL/Object.h"
 #include "GDL/Event.h"
 #include "GDL/Instruction.h"
 #include "GDL/ExtensionsManager.h"
-
-#ifndef RELEASE
-extern MemTrace MemTracer;
-#endif
 
 //Une macro a été définie quelque part ( windows.h ),
 //transformant GetObject en GetObjectA.
@@ -27,17 +22,11 @@ hasScene(false),
 hasObjectGroup(false),
 hasPositionsSelection(false)
 {
-#ifndef RELEASE
-    MemTracer.AddObj( "Clipboard", ( long )this );
-#endif
     //ctor
 }
 
 Clipboard::~Clipboard()
 {
-#ifndef RELEASE
-    MemTracer.DelObj( ( long )this );
-#endif
     //dtor
 }
 

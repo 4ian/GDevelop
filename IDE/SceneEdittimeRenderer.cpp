@@ -5,7 +5,6 @@
 
 #include "GDL/RuntimeScene.h"
 #include "GDL/Game.h"
-#include "GDL/Chercher.h"
 #include <vector>
 
 SceneEdittimeRenderer::SceneEdittimeRenderer(sf::RenderWindow * renderWindow_, RuntimeGame * game_, Scene & sceneEdited_) :
@@ -147,12 +146,15 @@ void SceneEdittimeRenderer::RenderSceneEdittimeRenderer()
     //Affichage de l'objet à insérer en semi transparent
     if ( !objectToAdd.empty() )
     {
-        ObjSPtr object = boost::shared_ptr<Object>();
+        std::vector<ObjSPtr>::iterator sceneObject = std::find_if(runtimeScene.initialObjects.begin(), runtimeScene.initialObjects.end(), std::bind2nd(ObjectHasName(), objectToAdd));
+        std::vector<ObjSPtr>::iterator globalObject = std::find_if(runtimeScene.game->globalObjects.begin(), runtimeScene.game->globalObjects.end(), std::bind2nd(ObjectHasName(), objectToAdd));
 
-        if ( Picker::PickOneObject( &runtimeScene.initialObjects, objectToAdd ) != -1)
-            object = runtimeScene.initialObjects[Picker::PickOneObject( &runtimeScene.initialObjects, objectToAdd ) ];
-        else if ( Picker::PickOneObject( &runtimeScene.game->globalObjects, objectToAdd ) != -1)
-            object = runtimeScene.game->globalObjects[Picker::PickOneObject( &runtimeScene.game->globalObjects, objectToAdd ) ];
+        ObjSPtr object = boost::shared_ptr<Object> ();
+
+        if ( sceneObject != runtimeScene.initialObjects.end() ) //We check first scene's objects' list.
+            object = *sceneObject;
+        else if ( globalObject != runtimeScene.game->globalObjects.end() ) //Then the global object list
+            object = *globalObject;
 
         if ( object != boost::shared_ptr<Object>() )
         {

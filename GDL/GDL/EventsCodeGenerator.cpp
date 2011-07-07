@@ -5,9 +5,9 @@
 
 #include <utility>
 #include "GDL/EventsCodeGenerator.h"
-#include "GDL/conditions.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/RuntimeScene.h"
+#include "GDL/Scene.h"
+#include "GDL/Game.h"
 #include "GDL/CommonInstructions.h"
 #include "GDL/CommonTools.h"
 #include "GDL/GDExpressionParser.h"
@@ -178,7 +178,7 @@ string GenerateCompoundOperatorCall(const InstructionInfos & instrInfos, vector<
 /**
  * Generate code for a condition. Result of condition is stored in conditionXIsTrue, with X = conditionIndexInList
  */
-std::string EventsCodeGenerator::GenerateConditionCode(const RuntimeScene & scene, Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context)
+std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const Scene & scene, Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context)
 {
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
@@ -192,7 +192,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const RuntimeScene & scen
     if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>() )
     {
         conditionCode += "bool & conditionTrue = "+returnBoolean+";\n";
-        conditionCode += instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(scene, condition, context);
+        conditionCode += instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, condition, context);
 
         return conditionCode;
     }
@@ -211,12 +211,12 @@ std::string EventsCodeGenerator::GenerateConditionCode(const RuntimeScene & scen
         if ( instrInfos.parameters[pNb].type == "object" && instrInfos.parameters[pNb].supplementaryInformation != "" )
         {
             string objectInParameter = condition.GetParameter(pNb).GetPlainString();
-            if (GetTypeOfObject(*scene.game, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
+            if (GetTypeOfObject(game, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
             {
                 cout << "Bad object type in a parameter of a condition " << condition.GetType() << endl;
                 cout << "Condition wanted " << instrInfos.parameters[pNb].supplementaryInformation << endl;
                 cout << "Condition wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;
-                cout << "Condition has received " << objectInParameter << " of type " << GetTypeOfObject(*scene.game, scene, objectInParameter) << endl;
+                cout << "Condition has received " << objectInParameter << " of type " << GetTypeOfObject(game, scene, objectInParameter) << endl;
 
                 condition.SetParameter(pNb, GDExpression(""));
                 condition.SetType("");
@@ -230,7 +230,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const RuntimeScene & scen
         //Prepare arguments
         std::vector < std::pair<std::string, std::string> > supplementaryParametersTypes;
         supplementaryParametersTypes.push_back(std::make_pair("conditionInverted", condition.IsInverted() ? "true" : "false"));
-        vector<string> arguments = GenerateParametersCodes(*scene.game, scene, condition.GetParameters(), instrInfos.parameters, context, &supplementaryParametersTypes);
+        vector<string> arguments = GenerateParametersCodes(game, scene, condition.GetParameters(), instrInfos.parameters, context, &supplementaryParametersTypes);
 
         //Generate call
         string predicat;
@@ -265,7 +265,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const RuntimeScene & scen
 
     //Generate object condition if available
     string objectName = condition.GetParameters().empty() ? "" : condition.GetParameter(0).GetPlainString();
-    string objectType = GetTypeOfObject(*scene.game, scene, objectName);
+    string objectType = GetTypeOfObject(game, scene, objectName);
 
     if ( !objectName.empty() && extensionsManager->HasObjectCondition(objectType, condition.GetType()))
     {
@@ -275,7 +275,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const RuntimeScene & scen
         context.ObjectNeeded(objectName);
 
         //Prepare arguments
-        vector<string> arguments = GenerateParametersCodes(*scene.game, scene, condition.GetParameters(), instrInfos.parameters, context);
+        vector<string> arguments = GenerateParametersCodes(game, scene, condition.GetParameters(), instrInfos.parameters, context);
 
         //Add a static_cast if necessary
         string objectFunctionCallNamePart =
@@ -320,7 +320,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const RuntimeScene & scen
     }
 
     //Affection to an automatism member function if found
-    string automatismType = GetTypeOfAutomatism(*scene.game, scene, condition.GetParameters().size() < 2 ? "" : condition.GetParameter(1).GetPlainString());
+    string automatismType = GetTypeOfAutomatism(game, scene, condition.GetParameters().size() < 2 ? "" : condition.GetParameter(1).GetPlainString());
 
     if (extensionsManager->HasAutomatismCondition(automatismType, condition.GetType()))
     {
@@ -330,7 +330,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const RuntimeScene & scen
         context.ObjectNeeded(objectName);
 
         //Prepare arguments
-        vector<string> arguments = GenerateParametersCodes(*scene.game, scene, condition.GetParameters(), instrInfos.parameters, context);
+        vector<string> arguments = GenerateParametersCodes(game, scene, condition.GetParameters(), instrInfos.parameters, context);
 
         //Add a static_cast if necessary
         string objectFunctionCallNamePart =
@@ -358,7 +358,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const RuntimeScene & scen
         if ( condition.IsInverted() ) predicat = "!("+predicat+")";
 
         //Verify that object has automatism.
-        vector < string > automatisms = GetAutomatismsOfObject(*scene.game, scene, objectName);
+        vector < string > automatisms = GetAutomatismsOfObject(game, scene, objectName);
         if ( find(automatisms.begin(), automatisms.end(), condition.GetParameter(1).GetPlainString()) == automatisms.end() )
         {
             cout << "Bad automatism requested" << endl;
@@ -390,7 +390,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const RuntimeScene & scen
  * Generate code for a list of conditions.
  * Bools containing conditions results are named conditionXIsTrue.
  */
-string EventsCodeGenerator::GenerateConditionsListCode(const RuntimeScene & scene, vector < Instruction > & conditions, EventsCodeGenerationContext & context)
+string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const Scene & scene, vector < Instruction > & conditions, EventsCodeGenerationContext & context)
 {
     string outputCode;
 
@@ -399,7 +399,7 @@ string EventsCodeGenerator::GenerateConditionsListCode(const RuntimeScene & scen
 
     for (unsigned int cId =0;cId < conditions.size();++cId)
     {
-        string conditionCode = GenerateConditionCode(scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
+        string conditionCode = GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
 
         for (unsigned int i = 0;i<cId;++i) //Skip conditions if one condition is false. //TODO : Can be optimized
         {
@@ -418,7 +418,7 @@ string EventsCodeGenerator::GenerateConditionsListCode(const RuntimeScene & scen
 /**
  * Generate code for an action.
  */
-std::string EventsCodeGenerator::GenerateActionCode(const RuntimeScene & scene, Instruction & action, EventsCodeGenerationContext & context)
+std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Scene & scene, Instruction & action, EventsCodeGenerationContext & context)
 {
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
@@ -431,7 +431,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const RuntimeScene & scene, 
 
     if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>() )
     {
-        return instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(scene, action, context);
+        return instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, action, context);
     }
 
     //Be sure there is no lack of parameter.
@@ -448,11 +448,11 @@ std::string EventsCodeGenerator::GenerateActionCode(const RuntimeScene & scene, 
         if ( instrInfos.parameters[pNb].type == "object" && instrInfos.parameters[pNb].supplementaryInformation != "" )
         {
             string objectInParameter = action.GetParameter(pNb).GetPlainString();
-            if (GetTypeOfObject(*scene.game, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
+            if (GetTypeOfObject(game, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
             {
                 cout << "Bad object type in parameter "+ToString(pNb)+" of an action " << action.GetType() << endl;
                 cout << "Action wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;
-                cout << "Action has received " << objectInParameter << " of type " << GetTypeOfObject(*scene.game, scene, objectInParameter) << endl;
+                cout << "Action has received " << objectInParameter << " of type " << GetTypeOfObject(game, scene, objectInParameter) << endl;
 
                 action.SetParameter(pNb, GDExpression(""));
                 action.SetType("");
@@ -463,7 +463,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const RuntimeScene & scene, 
     //Call static function first if available
     if ( extensionsManager->HasAction(action.GetType()))
     {
-        vector<string> arguments = GenerateParametersCodes(*scene.game, scene, action.GetParameters(), instrInfos.parameters, context);
+        vector<string> arguments = GenerateParametersCodes(game, scene, action.GetParameters(), instrInfos.parameters, context);
 
         //Generate call
         string call;
@@ -491,7 +491,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const RuntimeScene & scene, 
 
     //Call object function if available
     string objectName = action.GetParameters().empty() ? "" : action.GetParameter(0).GetPlainString();
-    string objectType = GetTypeOfObject(*scene.game, scene, objectName);
+    string objectType = GetTypeOfObject(game, scene, objectName);
 
     if ( extensionsManager->HasObjectAction(objectType,
                                             action.GetType()))
@@ -501,7 +501,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const RuntimeScene & scene, 
         context.currentObject = objectName;
         context.ObjectNeeded(objectName);
 
-        vector<string> arguments = GenerateParametersCodes(*scene.game, scene, action.GetParameters(), instrInfos.parameters, context);
+        vector<string> arguments = GenerateParametersCodes(game, scene, action.GetParameters(), instrInfos.parameters, context);
 
         //Add a static_cast if necessary
         string objectPart =
@@ -537,7 +537,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const RuntimeScene & scene, 
     }
 
     //Affection to an automatism member function if found
-    string automatismType = GetTypeOfAutomatism(*scene.game, scene, action.GetParameters().size() < 2 ? "" : action.GetParameter(1).GetPlainString());
+    string automatismType = GetTypeOfAutomatism(game, scene, action.GetParameters().size() < 2 ? "" : action.GetParameter(1).GetPlainString());
 
     if (extensionsManager->HasAutomatismAction(automatismType, action.GetType()))
     {
@@ -546,7 +546,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const RuntimeScene & scene, 
         context.currentObject = objectName;
         context.ObjectNeeded(objectName);
 
-        vector<string> arguments = GenerateParametersCodes(*scene.game, scene, action.GetParameters(), instrInfos.parameters, context);
+        vector<string> arguments = GenerateParametersCodes(game, scene, action.GetParameters(), instrInfos.parameters, context);
 
         //Add a static_cast if necessary
         string objectPart =
@@ -576,7 +576,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const RuntimeScene & scene, 
         }
 
         //Verify that object has automatism.
-        vector < string > automatisms = GetAutomatismsOfObject(*scene.game, scene, objectName);
+        vector < string > automatisms = GetAutomatismsOfObject(game, scene, objectName);
         if ( find(automatisms.begin(), automatisms.end(), action.GetParameter(1).GetPlainString()) == automatisms.end() )
         {
             cout << "Bad automatism requested" << endl;
@@ -599,12 +599,12 @@ std::string EventsCodeGenerator::GenerateActionCode(const RuntimeScene & scene, 
 /**
  * Generate actions code.
  */
-string EventsCodeGenerator::GenerateActionsListCode(const RuntimeScene & scene, vector < Instruction > & actions, EventsCodeGenerationContext & context)
+string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Scene & scene, vector < Instruction > & actions, EventsCodeGenerationContext & context)
 {
     string outputCode;
     for (unsigned int aId =0;aId < actions.size();++aId)
     {
-        string actionCode = GenerateActionCode(scene, actions[aId], context);
+        string actionCode = GenerateActionCode(game, scene, actions[aId], context);
 
         outputCode += "{\n";
         if ( !actions[aId].GetType().empty() ) outputCode += actionCode;
@@ -624,6 +624,9 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
     for (unsigned int pNb = 0;pNb < parametersInfo.size() && pNb < parameters.size();++pNb)
     {
         string argOutput;
+
+        if ( parameters[pNb].GetPlainString().empty() && parametersInfo[pNb].optional  )
+            parameters[pNb] = GDExpression(parametersInfo[pNb].defaultValue);
 
         if ( parametersInfo[pNb].type == "expression" || parametersInfo[pNb].type == "camera" )
         {
@@ -665,7 +668,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
         }
         else if ( parametersInfo[pNb].type == "objectvar" || parametersInfo[pNb].type == "scenevar" || parametersInfo[pNb].type == "globalvar" )
         {
-            argOutput = "\""+parameters[pNb].GetPlainString()+"\"";
+            argOutput = "\""+ConvertToCppString(parameters[pNb].GetPlainString())+"\"";
         }
         else if ( parametersInfo[pNb].type == "mouse" )
         {
@@ -738,7 +741,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
             if (argOutput.empty())
             {
                 if ( !parametersInfo[pNb].type.empty() ) cout << "Warning: Unknown type of parameter \"" << parametersInfo[pNb].type << "\".";
-                argOutput += "\""+parameters[pNb].GetPlainString()+"\"";
+                argOutput += "\""+ConvertToCppString(parameters[pNb].GetPlainString())+"\"";
             }
         }
 
@@ -751,7 +754,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
 /**
  * Generate events list code.
  */
-string EventsCodeGenerator::GenerateEventsListCode(const RuntimeScene & scene, vector < BaseEventSPtr > & events, const EventsCodeGenerationContext & parentContext)
+string EventsCodeGenerator::GenerateEventsListCode(const Game & game, const Scene & scene, vector < BaseEventSPtr > & events, const EventsCodeGenerationContext & parentContext)
 {
     string output;
 
@@ -761,7 +764,7 @@ string EventsCodeGenerator::GenerateEventsListCode(const RuntimeScene & scene, v
         EventsCodeGenerationContext context;
         context.InheritsFrom(parentContext); //Events in the same "level" share the same context as their parent.
 
-        string eventCoreCode = events[eId]->GenerateEventCode(scene, context);
+        string eventCoreCode = events[eId]->GenerateEventCode(game, scene, context);
         string declarationsCode = context.GenerateObjectsDeclarationCode();
 
         output += "\n{\n" + declarationsCode + "\n" + eventCoreCode + "\n}\n";
@@ -770,7 +773,7 @@ string EventsCodeGenerator::GenerateEventsListCode(const RuntimeScene & scene, v
     return output;
 }
 
-string EventsCodeGenerator::GenerateEventsCompleteCode(const RuntimeScene & scene, vector < BaseEventSPtr > & events)
+string EventsCodeGenerator::GenerateEventsCompleteCode(const Game & game, const Scene & scene, vector < BaseEventSPtr > & events)
 {
     string output;
 
@@ -779,7 +782,7 @@ string EventsCodeGenerator::GenerateEventsCompleteCode(const RuntimeScene & scen
     context.includeFiles = boost::shared_ptr< set<string> >(new set<string>);
 
     //Generate whole events code
-    string wholeEventsCode = EventsCodeGenerator::GenerateEventsListCode(scene, events, context);
+    string wholeEventsCode = EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
 
     //Generate default code around events
     for ( set<string>::iterator include = context.includeFiles->begin() ; include != context.includeFiles->end(); ++include )
@@ -796,6 +799,40 @@ string EventsCodeGenerator::GenerateEventsCompleteCode(const RuntimeScene & scen
     "}\n";
 
     return output;
+}
+std::string EventsCodeGenerator::ConvertToCppString(std::string plainString)
+{
+    for (size_t i = 0;i<plainString.length();++i)
+    {
+        if ( plainString[i] == '\n')
+        {
+            plainString.erase(plainString.begin()+i);
+
+            if ( i < plainString.length() )
+                plainString.insert(i, "\\n");
+            else
+                plainString += ("\\n");
+        }
+        else if ( plainString[i] == '\\' )
+        {
+            if ( i+1 >= plainString.length() || plainString[i+1] != '\"' )
+            {
+                if ( i+1 < plainString.length() )
+                    plainString.insert(i+1, "\\");
+                else
+                    plainString += ("\\");
+
+                ++i;
+            }
+        }
+        else if ( plainString[i] == '"' )
+        {
+            plainString.insert(i, "\\");
+            ++i;
+        }
+    }
+
+    return plainString;
 }
 
 /**

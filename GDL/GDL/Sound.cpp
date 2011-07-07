@@ -3,7 +3,7 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "GDL/Son.h"
+#include "GDL/Sound.h"
 #include <SFML/Audio.hpp>
 #include <string>
 #include <vector>
@@ -14,7 +14,7 @@
 using namespace std;
 
 
-Son::Son(string pFile) :
+Sound::Sound(string pFile) :
 file(pFile),
 volume(100)
 {
@@ -24,18 +24,18 @@ volume(100)
     sound.SetBuffer(buffer);
 }
 
-Son::Son() :
+Sound::Sound() :
 volume(100)
 {
     sound.SetBuffer(buffer);
 }
 
-Son::~Son()
+Sound::~Sound()
 {
     //dtor
 }
 
-Son::Son(const Son & copy) :
+Sound::Sound(const Sound & copy) :
 file(copy.file)
 {
     RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
@@ -47,7 +47,7 @@ file(copy.file)
 ////////////////////////////////////////////////////////////
 /// Mise à jour du volume fictif du son
 ////////////////////////////////////////////////////////////
-void Son::SetVolume(float volume_)
+void Sound::SetVolume(float volume_)
 {
     volume = volume_;
     if ( volume < 0 ) volume = 0;
@@ -60,7 +60,7 @@ void Son::SetVolume(float volume_)
 /// Mise à jour du volume réel du son en fonction du volume
 /// global et du son.
 ////////////////////////////////////////////////////////////
-void Son::UpdateVolume()
+void Sound::UpdateVolume()
 {
     SoundManager * soundManager = SoundManager::GetInstance();
 

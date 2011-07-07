@@ -10,6 +10,8 @@
 #include <string>
 #include "GDL/tinyxml.h"
 #include "GDL/CommonTools.h"
+class Instruction;
+class InstructionInfos;
 
 using namespace std;
 
@@ -61,6 +63,9 @@ private:
     void SaveExternalEvents( const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * layers );
     static void SaveVariablesList(const ListVariable & list, TiXmlElement * elem);
     #endif
+
+    static void AdaptConditionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos);
+    static void AdaptActionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos);
 
     bool updateEventsFromGD1x;
 };

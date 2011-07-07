@@ -13,30 +13,17 @@
 #include <string>
 #include <map>
 #include <boost/shared_ptr.hpp>
-
-#include <llvm/ADT/OwningPtr.h>
-#include <llvm/LLVMContext.h>
-namespace llvm
-{
-    class Function;
-    class Module;
-    class ExecutionEngine;
-    class MemoryBuffer;
-}
-
 #include "GDL/RuntimeGame.h"
-#include "GDL/Object.h"
 #include "GDL/Event.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Son.h"
-#include "GDL/Music.h"
-#include "GDL/constantes.h"
 #include "GDL/RuntimeLayer.h"
 #include "GDL/Text.h"
-#include "GDL/SoundManager.h"
 #include "GDL/Layer.h"
 #include "GDL/ManualTimer.h"
 #include "GDL/ObjInstancesHolder.h"
+class EventsExecutionEngine;
+class Object;
+class SoundManager;
 class AutomatismsRuntimeSharedDatas;
 
 #if defined(GD_IDE_ONLY)
@@ -82,12 +69,6 @@ public:
     int                                     backgroundColorG; ///< Background color Green component
     int                                     backgroundColorB; ///< Background color Blue component
     std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas. Note the use of flat_map for better performance.
-
-    llvm::Function * eventsEntryFunction;
-    llvm::Module *Module;
-    llvm::OwningPtr<llvm::ExecutionEngine> EE;
-    llvm::OwningPtr<llvm::MemoryBuffer> eventsBuffer;
-    llvm::LLVMContext llvmContext;
 
     /**
      * Set up the Runtime Scene using a Scene
@@ -159,11 +140,6 @@ public:
      */
     inline bool IsFirstLoop() const { return firstLoop; };
 
-    /**
-     * Helper function to stop all musics played in the soundManager.
-     */
-    bool StopMusic();
-
     void ManageRenderTargetEvents();
     bool OrderObjectsByZOrder( ObjList & objList );
 
@@ -177,7 +153,6 @@ protected:
     void Render();
     void ManageObjectsBeforeEvents();
     void ManageObjectsAfterEvents();
-    void ManageSounds();
     bool UpdateTime();
 
     bool DisplayLegacyTexts(string layer = "");

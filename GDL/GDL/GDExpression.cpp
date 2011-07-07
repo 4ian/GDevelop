@@ -1,10 +1,8 @@
 #include "GDL/GDExpression.h"
 #include "GDL/ExpressionInstruction.h"
 #include "GDL/StrExpressionInstruction.h"
-#include "GDL/ObjectsConcerned.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/eFreeFunctions.h"
 #include "GDL/CommonInstructions.h"
 #include "GDL/GDExpressionParser.h"
 #include <string>

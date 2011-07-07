@@ -29,7 +29,6 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
-#include "GDL/constantes.h"
 #include "GDL/Animation.h"
 #include "GDL/Position.h"
 #include "GDL/Event.h"
@@ -1369,6 +1368,47 @@ void OpenSaveGame::RecreatePaths(string file)
 #endif //GDE
 }
 
+void OpenSaveGame::AdaptConditionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos)
+{
+    vector < GDExpression > newParameters = instruction.GetParameters();
+    for (unsigned int i = 0;i<instrInfos.parameters.size() && i<newParameters.size();++i)
+    {
+        if ( instrInfos.parameters[i].codeOnly )
+            newParameters.insert(newParameters.begin()+i, GDExpression(""));
+    }
+
+    instruction.SetParameters(newParameters);
+
+    if ( instrInfos.canHaveSubInstructions )
+    {
+        GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+
+        vector < Instruction > & subInstructions = instruction.GetSubInstructions();
+        for (unsigned int i = 0;i<subInstructions.size();++i)
+            AdaptConditionFromGD1x(subInstructions[i], extensionManager->GetConditionInfos(subInstructions[i].GetType()));
+    }
+}
+void OpenSaveGame::AdaptActionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos)
+{
+    vector < GDExpression > newParameters = instruction.GetParameters();
+    for (unsigned int i = 0;i<instrInfos.parameters.size() && i<newParameters.size();++i)
+    {
+        if ( instrInfos.parameters[i].codeOnly )
+            newParameters.insert(newParameters.begin()+i, GDExpression(""));
+    }
+
+    instruction.SetParameters(newParameters);
+
+    if ( instrInfos.canHaveSubInstructions )
+    {
+        GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+
+        vector < Instruction > & subInstructions = instruction.GetSubInstructions();
+        for (unsigned int i = 0;i<subInstructions.size();++i)
+            AdaptActionFromGD1x(subInstructions[i], extensionManager->GetActionInfos(subInstructions[i].GetType()));
+    }
+}
+
 void OpenSaveGame::AdaptEventsFromGD1x(vector < BaseEventSPtr > & list)
 {
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
@@ -1380,17 +1420,7 @@ void OpenSaveGame::AdaptEventsFromGD1x(vector < BaseEventSPtr > & list)
         {
             for (unsigned int cId = 0;cId<conditions[cV]->size();++cId)
             {
-                Instruction & instruction = (*conditions[cV])[cId];
-                const InstructionInfos & instrInfos = extensionManager->GetConditionInfos(instruction.GetType());
-
-                vector < GDExpression > newParameters = instruction.GetParameters();
-                for (unsigned int i = 0;i<instrInfos.parameters.size() && i<newParameters.size();++i)
-                {
-                    if ( instrInfos.parameters[i].codeOnly )
-                        newParameters.insert(newParameters.begin()+i, GDExpression(""));
-                }
-
-                instruction.SetParameters(newParameters);
+                AdaptConditionFromGD1x((*conditions[cV])[cId], extensionManager->GetConditionInfos((*conditions[cV])[cId].GetType()));
             }
         }
 
@@ -1399,17 +1429,7 @@ void OpenSaveGame::AdaptEventsFromGD1x(vector < BaseEventSPtr > & list)
         {
             for (unsigned int aId = 0;aId<actions[aV]->size();++aId)
             {
-                Instruction & instruction = (*actions[aV])[aId];
-                const InstructionInfos & instrInfos = extensionManager->GetActionInfos(instruction.GetType());
-
-                vector < GDExpression > newParameters = instruction.GetParameters();
-                for (unsigned int i = 0;i<instrInfos.parameters.size() && i<newParameters.size();++i)
-                {
-                    if ( instrInfos.parameters[i].codeOnly )
-                        newParameters.insert(newParameters.begin()+i, GDExpression());
-                }
-
-                instruction.SetParameters(newParameters);
+                AdaptActionFromGD1x( (*actions[aV])[aId], extensionManager->GetActionInfos((*actions[aV])[aId].GetType()));
             }
         }
 

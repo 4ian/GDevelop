@@ -22,7 +22,7 @@ MouseExtension::MouseExtension()
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("CenterCursorHorizontally").SetIncludeFile("GDL/MouseTools.h");
 
@@ -36,7 +36,7 @@ MouseExtension::MouseExtension()
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("CenterCursorVertically").SetIncludeFile("GDL/MouseTools.h");
 
@@ -50,7 +50,7 @@ MouseExtension::MouseExtension()
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("HideCursor").SetIncludeFile("GDL/MouseTools.h");
 
@@ -64,7 +64,7 @@ MouseExtension::MouseExtension()
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("ShowCursor").SetIncludeFile("GDL/MouseTools.h");
 
@@ -78,9 +78,9 @@ MouseExtension::MouseExtension()
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Position X"), "", false);
-        DECLARE_PARAMETER("expression", _("Position Y"), "", false);
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Position X"), "", false);
+        instrInfo.AddParameter("expression", _("Position Y"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetMousePosition").SetIncludeFile("GDL/MouseTools.h");
 
@@ -94,7 +94,7 @@ MouseExtension::MouseExtension()
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("CenterCursor").SetIncludeFile("GDL/MouseTools.h");
 
@@ -109,11 +109,11 @@ MouseExtension::MouseExtension()
                    "res/conditions/mouse24.png",
                    "res/conditions/mouse.png")
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Position X"), "", false);
-        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "", false);
-        DECLARE_PARAMETER("layer", _("Calque ( Calque de base si vide )"), "", true);
-        DECLARE_PARAMETER("camera", _("Numéro de la caméra ( Caméra 0 si vide )"), "", true);
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Position X"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "", true);
+        instrInfo.AddParameter("camera", _("Numéro de la caméra ( Caméra 0 si vide )"), "", true);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorXPosition").SetManipulatedType("number").SetIncludeFile("GDL/MouseTools.h");
 
@@ -127,11 +127,11 @@ MouseExtension::MouseExtension()
                    "res/conditions/mouse24.png",
                    "res/conditions/mouse.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Position Y"), "", false);
-        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "", false);
-        DECLARE_PARAMETER("layer", _("Calque ( Calque de base si vide )"), "", true);
-        DECLARE_PARAMETER("camera", _("Numéro de la caméra ( Caméra 0 si vide )"), "", true);
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Position Y"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "", true);
+        instrInfo.AddParameter("camera", _("Numéro de la caméra ( Caméra 0 si vide )"), "", true);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorYPosition").SetManipulatedType("number").SetIncludeFile("GDL/MouseTools.h");
 
@@ -145,49 +145,49 @@ MouseExtension::MouseExtension()
                    "res/conditions/mouse24.png",
                    "res/conditions/mouse.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("mouse", _("Bouton à tester"), "", false);
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("mouse", _("Bouton à tester"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("MouseButtonPressed").SetIncludeFile("GDL/MouseTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_EXPRESSION("MouseX", _("Position X de la souris"), _("Position X de la souris"), _("Souris"), "res/actions/mouse.png")
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("layer", _("Calque"), "", true)
-        DECLARE_PARAMETER("camera", _("Caméra"), "", true)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("layer", _("Calque"), "", true);
+        instrInfo.AddParameter("camera", _("Caméra"), "", true);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorXPosition").SetIncludeFile("GDL/MouseTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("SourisX", _("Position X de la souris"), _("Position X de la souris"), _("Souris"), "res/actions/mouse.png")
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("layer", _("Calque"), "", true)
-        DECLARE_PARAMETER("camera", _("Caméra"), "", true)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("layer", _("Calque"), "", true);
+        instrInfo.AddParameter("camera", _("Caméra"), "", true);
 
         instrInfo.SetHidden();
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorXPosition").SetIncludeFile("GDL/MouseTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("MouseY", _("Position Y de la souris"), _("Position Y de la souris"), _("Souris"), "res/actions/mouse.png")
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("layer", _("Calque"), "", true)
-        DECLARE_PARAMETER("camera", _("Caméra"), "", true)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("layer", _("Calque"), "", true);
+        instrInfo.AddParameter("camera", _("Caméra"), "", true);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorYPosition").SetIncludeFile("GDL/MouseTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("SourisY", _("Position Y de la souris"), _("Position Y de la souris"), _("Souris"), "res/actions/mouse.png")
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("layer", _("Calque"), "", true)
-        DECLARE_PARAMETER("camera", _("Caméra"), "", true)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("layer", _("Calque"), "", true);
+        instrInfo.AddParameter("camera", _("Caméra"), "", true);
 
         instrInfo.SetHidden();
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorYPosition").SetIncludeFile("GDL/MouseTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("MouseWheelDelta", _("Roulette : Déplacement"), _("Déplacement de la roulette de la souris"), _("Souris"), "res/actions/mouse.png")
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMouseWheelDelta").SetIncludeFile("GDL/MouseTools.h");
     DECLARE_END_EXPRESSION()

@@ -20,6 +20,7 @@
 #include "GDL/MathematicalToolsExtension.h"
 #include "GDL/AdvancedExtension.h"
 #include "GDL/KeyboardExtension.h"
+#include "GDL/AudioExtension.h"
 #include "GDL/CameraExtension.h"
 #include "GDL/Object.h"
 
@@ -57,6 +58,7 @@ ExtensionsManager::ExtensionsManager()
     AddExtension(boost::shared_ptr<ExtensionBase>(new CameraExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new KeyboardExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new AudioExtension()));
 
 #if defined(GD_IDE_ONLY)
     badInstructionInfos.fullname = _T("Instruction inconnue");

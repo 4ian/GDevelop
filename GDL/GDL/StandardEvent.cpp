@@ -19,11 +19,11 @@ BaseEvent()
 {
 }
 
-std::string StandardEvent::GenerateEventCode(const RuntimeScene & scene, EventsCodeGenerationContext & context)
+std::string StandardEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & context)
 {
     std::string outputCode;
 
-    outputCode += EventsCodeGenerator::GenerateConditionsListCode(scene, conditions, context);
+    outputCode += EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
 
     std::string ifPredicat = "true";
     for (unsigned int i = 0;i<conditions.size();++i)
@@ -31,9 +31,9 @@ std::string StandardEvent::GenerateEventCode(const RuntimeScene & scene, EventsC
 
     outputCode += "if (" +ifPredicat+ ")\n";
     outputCode += "{\n";
-    outputCode += EventsCodeGenerator::GenerateActionsListCode(scene, actions, context);
+    outputCode += EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
     outputCode += "\n{ //Subevents: \n";
-    outputCode += EventsCodeGenerator::GenerateEventsListCode(scene, events, context);
+    outputCode += EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
     outputCode += "} //Subevents end.\n";
     outputCode += "}\n";
 

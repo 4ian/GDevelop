@@ -5,7 +5,6 @@
 
 #include "GDL/AdvancedExtension.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/cScene.h"
 
 AdvancedExtension::AdvancedExtension()
 {
@@ -23,7 +22,7 @@ AdvancedExtension::AdvancedExtension()
                    "res/conditions/toujours24.png",
                    "res/conditions/toujours.png");
 
-        DECLARE_CODEONLY_PARAMETER("conditionInverted", "")
+        instrInfo.AddCodeOnlyParameter("conditionInverted", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("LogicalNegation").SetIncludeFile("GDL/CommonInstructions.h");
 

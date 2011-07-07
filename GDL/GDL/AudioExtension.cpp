@@ -6,6 +6,7 @@
 #include "GDL/AudioExtension.h"
 #include "GDL/ResourcesMergingHelper.h"
 #include "GDL/SoundManager.h"
+#include "GDL/Instruction.h"
 #include <iostream>
 
 AudioExtension::AudioExtension()
@@ -24,12 +25,12 @@ AudioExtension::AudioExtension()
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("soundfile", _("Fichier audio"), "",false)
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("yesorno", _("Boucler le son ?"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("expression", _("Volume ( De 0 à 100, 100 par défaut )"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("soundfile", _("Fichier audio"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("yesorno", _("Boucler le son ?"), "",true).SetDefaultValue("no");
+        instrInfo.AddParameter("expression", _("Volume ( De 0 à 100, 100 par défaut )"), "",true).SetDefaultValue("100");
+        instrInfo.AddParameter("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), "",true).SetDefaultValue("1");
 
         instrInfo.cppCallingInformation.SetFunctionName("PlaySoundOnChannel").SetIncludeFile("GDL/AudioTools.h");
 
@@ -43,8 +44,8 @@ AudioExtension::AudioExtension()
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("StopSoundOnChannel").SetIncludeFile("GDL/AudioTools.h");
 
@@ -58,8 +59,8 @@ AudioExtension::AudioExtension()
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PauseSoundOnChannel").SetIncludeFile("GDL/AudioTools.h");
 
@@ -73,8 +74,8 @@ AudioExtension::AudioExtension()
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("RePlaySoundOnChannel").SetIncludeFile("GDL/AudioTools.h");
 
@@ -88,12 +89,12 @@ AudioExtension::AudioExtension()
                    "res/actions/music24.png",
                    "res/actions/music.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("musicfile", _("Fichier audio"), "",false)
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("yesorno", _("Boucler le son ?"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("expression", _("Volume ( De 0 à 100, 100 par défaut )"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("musicfile", _("Fichier audio"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("yesorno", _("Boucler le son ?"), "",true).SetDefaultValue("no");
+        instrInfo.AddParameter("expression", _("Volume ( De 0 à 100, 100 par défaut )"), "",true).SetDefaultValue("100");
+        instrInfo.AddParameter("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), "",true).SetDefaultValue("1");
 
         instrInfo.cppCallingInformation.SetFunctionName("PlayMusicOnChannel").SetIncludeFile("GDL/AudioTools.h");
 
@@ -107,8 +108,8 @@ AudioExtension::AudioExtension()
                    "res/actions/music24.png",
                    "res/actions/music.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("StopMusicOnChannel").SetIncludeFile("GDL/AudioTools.h");
 
@@ -120,10 +121,10 @@ AudioExtension::AudioExtension()
                    _("Mettre en pause la musique du canal _PARAM0_"),
                    _("Musiques"),
                    "res/actions/music24.png",
-                   "res/actions/music.png",);
+                   "res/actions/music.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PauseMusicOnChannel").SetIncludeFile("GDL/AudioTools.h");
 
@@ -137,8 +138,8 @@ AudioExtension::AudioExtension()
                    "res/actions/music24.png",
                    "res/actions/music.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("RePlayMusicOnChannel").SetIncludeFile("GDL/AudioTools.h");
 
@@ -152,10 +153,10 @@ AudioExtension::AudioExtension()
                    "res/actions/sonVolume24.png",
                    "res/actions/sonVolume.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Valeur"), "",false)
-        DECLARE_PARAMETER("operator", _("Signe de la modification"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Valeur"), "",false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -169,10 +170,10 @@ AudioExtension::AudioExtension()
                    "res/actions/sonVolume24.png",
                    "res/actions/sonVolume.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Valeur"), "",false)
-        DECLARE_PARAMETER("operator", _("Signe de la modification"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Valeur"), "",false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -186,9 +187,9 @@ AudioExtension::AudioExtension()
                    "res/actions/volume24.png",
                    "res/actions/volume.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Valeur"), "",false)
-        DECLARE_PARAMETER("operator", _("Signe de la modification"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Valeur"), "",false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetGlobalVolume").SetAssociatedGetter("GetGlobalVolume").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -202,10 +203,10 @@ AudioExtension::AudioExtension()
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Valeur"), "",false)
-        DECLARE_PARAMETER("operator", _("Signe de la modification"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Valeur"), "",false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetSoundPitchOnChannel").SetAssociatedGetter("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -220,10 +221,10 @@ AudioExtension::AudioExtension()
                    "res/actions/music24.png",
                    "res/actions/music.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Valeur"), "",false)
-        DECLARE_PARAMETER("operator", _("Signe de la modification"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Valeur"), "",false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetMusicPitchOnChannel").SetAssociatedGetter("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -238,10 +239,10 @@ AudioExtension::AudioExtension()
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Valeur"), "",false)
-        DECLARE_PARAMETER("operator", _("Signe de la modification"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Valeur"), "",false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetSoundPlayingOffsetOnChannel").SetAssociatedGetter("GetSoundPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -253,12 +254,12 @@ AudioExtension::AudioExtension()
                    _("Faire _PARAM2__PARAM1_s à la position de lecture de la musique du canal _PARAM0_"),
                    _("Musiques"),
                    "res/actions/music24.png",
-                   "res/actions/music.png",);
+                   "res/actions/music.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Valeur"), "",false)
-        DECLARE_PARAMETER("operator", _("Signe de la modification"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Valeur"), "",false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetMusicPlayingOffsetOnChannel").SetAssociatedGetter("GetMusicPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -272,11 +273,11 @@ AudioExtension::AudioExtension()
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("soundfile", _("Fichier audio"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("yesorno", _("Boucler le son ?"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("expression", _("Volume ( De 0 à 100, 100 par défaut )"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("soundfile", _("Fichier audio"), "",false);
+        instrInfo.AddParameter("yesorno", _("Boucler le son ?"), "",true).SetDefaultValue("no");
+        instrInfo.AddParameter("expression", _("Volume ( De 0 à 100, 100 par défaut )"), "",true).SetDefaultValue("100");
+        instrInfo.AddParameter("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), "",true).SetDefaultValue("1");
 
         instrInfo.cppCallingInformation.SetFunctionName("PlaySound").SetIncludeFile("GDL/AudioTools.h");
 
@@ -290,11 +291,11 @@ AudioExtension::AudioExtension()
                    "res/actions/music24.png",
                    "res/actions/music.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("musicfile", _("Fichier audio"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("yesorno", _("Boucler le son ?"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("expression", _("Volume ( De 0 à 100, 100 par défaut )"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("musicfile", _("Fichier audio"), "",false);
+        instrInfo.AddParameter("yesorno", _("Boucler le son ?"), "",true).SetDefaultValue("no");
+        instrInfo.AddParameter("expression", _("Volume ( De 0 à 100, 100 par défaut )"), "",true).SetDefaultValue("100");
+        instrInfo.AddParameter("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), "",true).SetDefaultValue("1");
 
         instrInfo.cppCallingInformation.SetFunctionName("PlayMusic").SetIncludeFile("GDL/AudioTools.h");
 
@@ -308,8 +309,8 @@ AudioExtension::AudioExtension()
                    "res/conditions/musicplaying24.png",
                    "res/conditions/musicplaying.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("MusicPlaying").SetIncludeFile("GDL/AudioTools.h");
 
@@ -323,8 +324,8 @@ AudioExtension::AudioExtension()
                    "res/conditions/musicpaused24.png",
                    "res/conditions/musicpaused.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("MusicPaused").SetIncludeFile("GDL/AudioTools.h");
 
@@ -338,8 +339,8 @@ AudioExtension::AudioExtension()
                    "res/conditions/musicstopped24.png",
                    "res/conditions/musicstopped.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("MusicStopped").SetIncludeFile("GDL/AudioTools.h");
 
@@ -352,8 +353,8 @@ AudioExtension::AudioExtension()
                    "res/conditions/sonplaying24.png",
                    "res/conditions/sonplaying.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SoundPlaying").SetIncludeFile("GDL/AudioTools.h");
 
@@ -367,8 +368,8 @@ AudioExtension::AudioExtension()
                    "res/conditions/sonpaused24.png",
                    "res/conditions/sonpaused.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SoundPaused").SetIncludeFile("GDL/AudioTools.h");
 
@@ -382,8 +383,8 @@ AudioExtension::AudioExtension()
                    "res/conditions/sonstopped24.png",
                    "res/conditions/sonstopped.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SoundStopped").SetIncludeFile("GDL/AudioTools.h");
 
@@ -397,10 +398,10 @@ AudioExtension::AudioExtension()
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Volume à tester"), "",false)
-        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Volume à tester"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -414,10 +415,10 @@ AudioExtension::AudioExtension()
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Volume à tester"), "",false)
-        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Volume à tester"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -431,9 +432,9 @@ AudioExtension::AudioExtension()
                    "res/conditions/volume24.png",
                    "res/conditions/volume.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Volume à tester"), "",false)
-        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Volume à tester"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVolume").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -447,10 +448,10 @@ AudioExtension::AudioExtension()
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Pitch à tester"), "",false)
-        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Pitch à tester"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -464,10 +465,10 @@ AudioExtension::AudioExtension()
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Pitch à tester"), "",false)
-        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Pitch à tester"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -481,10 +482,10 @@ AudioExtension::AudioExtension()
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Position à tester ( en secondes )"), "",false)
-        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Position à tester ( en secondes )"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
@@ -498,48 +499,48 @@ AudioExtension::AudioExtension()
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal ( 0 à 15 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Position à tester ( en secondes )"), "",false)
-        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Position à tester ( en secondes )"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
-    DECLARE_EXPRESSION("SoundChannelPlayingOffset", _("Position de lecture d'un son"), _("Position de lecture d'un son"), _("Sons"), "res/actions/son.png", &ExpGetSoundChannelPlayingOffset)
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal"), "",false)
+    DECLARE_EXPRESSION("SoundChannelPlayingOffset", _("Position de lecture d'un son"), _("Position de lecture d'un son"), _("Sons"), "res/actions/son.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundPlayingOffsetOnChannel").SetIncludeFile("GDL/AudioTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("MusicChannelPlayingOffset", _("Position de lecture d'une musique"), _("Position de lecture d'une musique"), _("Musiques"), "res/actions/music.png", &ExpGetMusicChannelPlayingOffset)
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal"), "",false)
+    DECLARE_EXPRESSION("MusicChannelPlayingOffset", _("Position de lecture d'une musique"), _("Position de lecture d'une musique"), _("Musiques"), "res/actions/music.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicPlayingOffsetOnChannel").SetIncludeFile("GDL/AudioTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("SoundChannelVolume", _("Volume d'un son"), _("Volume d'un son"), _("Sons"), "res/actions/son.png", &ExpGetSoundChannelVolume)
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal"), "",false)
+    DECLARE_EXPRESSION("SoundChannelVolume", _("Volume d'un son"), _("Volume d'un son"), _("Sons"), "res/actions/son.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundVolumeOnChannel").SetIncludeFile("GDL/AudioTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("MusicChannelVolume", _("Volume d'une musique"), _("Volume d'une musique"), _("Musiques"), "res/actions/music.png", &ExpGetMusicChannelVolume)
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal"), "",false)
+    DECLARE_EXPRESSION("MusicChannelVolume", _("Volume d'une musique"), _("Volume d'une musique"), _("Musiques"), "res/actions/music.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicVolumeOnChannel").SetIncludeFile("GDL/AudioTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("SoundChannelPitch", _("Pitch d'un son"), _("Pitch d'un son"), _("Sons"), "res/actions/son.png", &ExpGetSoundChannelPitch)
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal"), "",false)
+    DECLARE_EXPRESSION("SoundChannelPitch", _("Pitch d'un son"), _("Pitch d'un son"), _("Sons"), "res/actions/son.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundPitchOnChannel").SetIncludeFile("GDL/AudioTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("MusicChannelPitch", _("Pitch d'une musique"), _("Pitch d'une musique"), _("Musiques"), "res/actions/music.png", &ExpGetMusicChannelPitch)
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("expression", _("Canal"), "",false)
+    DECLARE_EXPRESSION("MusicChannelPitch", _("Pitch d'une musique"), _("Pitch d'une musique"), _("Musiques"), "res/actions/music.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Canal"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicPitchOnChannel").SetIncludeFile("GDL/AudioTools.h");
     DECLARE_END_EXPRESSION()

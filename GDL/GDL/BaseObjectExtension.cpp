@@ -33,9 +33,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/position24.png",
                        "res/conditions/position.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Position X"), "", false)
-            DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Position X"), "", false);
+            instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("GetX").SetManipulatedType("number");
@@ -50,9 +50,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/position24.png",
                        "res/actions/position.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Valeur"), "", false)
-            DECLARE_PARAMETER("operator", _("Signe de la modification"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Valeur"), "", false);
+            instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("SetX").SetManipulatedType("number").SetAssociatedGetter("GetX");
@@ -67,9 +67,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/position24.png",
                        "res/conditions/position.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Position Y"), "", false)
-            DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Position Y"), "", false);
+            instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("GetY").SetManipulatedType("number");
@@ -84,9 +84,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/position24.png",
                        "res/actions/position.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Valeur"), "", false)
-            DECLARE_PARAMETER("operator", _("Signe de la modification"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Valeur"), "", false);
+            instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("SetY").SetManipulatedType("number").SetAssociatedGetter("GetY");
@@ -101,11 +101,11 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/position24.png",
                        "res/actions/position.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Position X"), "", false)
-            DECLARE_PARAMETER("operator", _("Signe de la modification"), "", false)
-            DECLARE_PARAMETER("expression", _("Position Y"), "", false)
-            DECLARE_PARAMETER("operator", _("Signe de la modification"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Position X"), "", false);
+            instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+            instrInfo.AddParameter("expression", _("Position Y"), "", false);
+            instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("SetXY");
@@ -120,11 +120,11 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/positionAutour24.png",
                        "res/actions/positionAutour.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Position X"), "", false)
-            DECLARE_PARAMETER("expression", _("Position Y"), "", false)
-            DECLARE_PARAMETER("expression", _("Distance"), "", false)
-            DECLARE_PARAMETER("expression", _("Angle en degré"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Position X"), "", false);
+            instrInfo.AddParameter("expression", _("Position Y"), "", false);
+            instrInfo.AddParameter("expression", _("Distance"), "", false);
+            instrInfo.AddParameter("expression", _("Angle en degré"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("PutAroundAPosition");
@@ -139,10 +139,10 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/force24.png",
                        "res/actions/force.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Déplacement en X"), "", false)
-            DECLARE_PARAMETER("expression", _("Déplacement en Y"), "", false)
-            DECLARE_PARAMETER("expression", _("Dissipation ( 0 par défaut )"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Déplacement en X"), "", false);
+            instrInfo.AddParameter("expression", _("Déplacement en Y"), "", false);
+            instrInfo.AddParameter("expression", _("Dissipation ( 0 par défaut )"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("AddForce");
@@ -156,10 +156,10 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/force24.png",
                        "res/actions/force.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Angle"), "", false)
-            DECLARE_PARAMETER("expression", _("Longueur ( en pixels )"), "", false)
-            DECLARE_PARAMETER("expression", _("Dissipation ( 0 par défaut )"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Angle"), "", false);
+            instrInfo.AddParameter("expression", _("Longueur ( en pixels )"), "", false);
+            instrInfo.AddParameter("expression", _("Dissipation ( 0 par défaut )"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("AddForceUsingPolarCoordinates");
@@ -174,11 +174,11 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/force24.png",
                        "res/actions/force.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Position X"), "", false)
-            DECLARE_PARAMETER("expression", _("Position Y"), "", false)
-            DECLARE_PARAMETER("expression", _("Longueur ( en pixels )"), "", false)
-            DECLARE_PARAMETER("expression", _("Dissipation ( 0 par défaut )"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Position X"), "", false);
+            instrInfo.AddParameter("expression", _("Position Y"), "", false);
+            instrInfo.AddParameter("expression", _("Longueur ( en pixels )"), "", false);
+            instrInfo.AddParameter("expression", _("Dissipation ( 0 par défaut )"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("AddForceTowardPosition");
 
@@ -192,12 +192,12 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/forceTourne24.png",
                        "res/actions/forceTourne.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Position X du point autour duquel tourner"), "", false)
-            DECLARE_PARAMETER("expression", _("Position Y du point autour duquel tourner"), "", false)
-            DECLARE_PARAMETER("expression", _("Vitesse ( en Degrés par secondes )"), "", false)
-            DECLARE_PARAMETER("expression", _("Distance ( en pixels )"), "", false)
-            DECLARE_PARAMETER("expression", _("Dissipation ( 0 par défaut )"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Position X du point autour duquel tourner"), "", false);
+            instrInfo.AddParameter("expression", _("Position Y du point autour duquel tourner"), "", false);
+            instrInfo.AddParameter("expression", _("Vitesse ( en Degrés par secondes )"), "", false);
+            instrInfo.AddParameter("expression", _("Distance ( en pixels )"), "", false);
+            instrInfo.AddParameter("expression", _("Dissipation ( 0 par défaut )"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("AddForceToMoveAround");
 
@@ -211,7 +211,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/arreter24.png",
                        "res/actions/arreter.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("ClearForce");
 
@@ -225,8 +225,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/delete24.png",
                        "res/actions/delete.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_CODEONLY_PARAMETER("inlineCode", "\"\"")
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddCodeOnlyParameter("inlineCode", "\"\"");
 
             instrInfo.cppCallingInformation.SetFunctionName("SetName");
 
@@ -240,9 +240,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/duplicate24.png",
                        "res/actions/duplicate.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_CODEONLY_PARAMETER("currentScene", "")
-            DECLARE_CODEONLY_PARAMETER("listOfObjectsOfParameter", "0")
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddCodeOnlyParameter("currentScene", "");
+            instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
 
             instrInfo.cppCallingInformation.SetFunctionName("Duplicate");
 
@@ -256,9 +256,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/planicon24.png",
                        "res/actions/planicon.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Valeur"), "", false)
-            DECLARE_PARAMETER("operator", _("Signe de la modification"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Valeur"), "", false);
+            instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("SetZOrder").SetAssociatedGetter("GetZOrder").SetManipulatedType("number");
 
@@ -272,8 +272,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/layer24.png",
                        "res/actions/layer.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("layer", _("Mettre sur le calque ( calque de base si vide )"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("layer", _("Mettre sur le calque ( calque de base si vide )"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("SetLayer").SetAssociatedGetter("GetLayer").SetManipulatedType("string");
 
@@ -287,10 +287,10 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/var24.png",
                        "res/actions/var.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("objectvar", _("Nom de la variable"), "", false)
-            DECLARE_PARAMETER("expression", _("Valeur"), "", false)
-            DECLARE_PARAMETER("operator", _("Signe de la modification"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
+            instrInfo.AddParameter("expression", _("Valeur"), "", false);
+            instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.ObtainVariable").SetManipulatedType("number");
@@ -305,10 +305,10 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/var24.png",
                        "res/actions/var.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("objectvar", _("Nom de la variable"), "", false)
-            DECLARE_PARAMETER("string", _("Texte"), "", false)
-            DECLARE_PARAMETER("operator", _("Signe de la modification"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
+            instrInfo.AddParameter("string", _("Texte"), "", false);
+            instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.ObtainVariable").SetManipulatedType("string");
@@ -324,7 +324,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/visibilite24.png",
                        "res/actions/visibilite.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("SetHidden");
 
@@ -338,8 +338,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/visibilite24.png",
                        "res/actions/visibilite.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_CODEONLY_PARAMETER("inlineCode", "false")
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddCodeOnlyParameter("inlineCode", "false");
 
             instrInfo.cppCallingInformation.SetFunctionName("SetHidden");
 
@@ -353,9 +353,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/planicon.png",
                        "res/conditions/planicon.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Plan"), "", false)
-            DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Plan"), "", false);
+            instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("GetZOrder").SetManipulatedType("number");
 
@@ -369,8 +369,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/layer24.png",
                        "res/conditions/layer.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("layer", _("Calque"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("layer", _("Calque"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("GetLayer").SetManipulatedType("string");
 
@@ -384,7 +384,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/visibilite24.png",
                        "res/conditions/visibilite.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("IsVisible");
 
@@ -398,7 +398,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/visibilite24.png",
                        "res/conditions/visibilite.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("IsHidden");
 
@@ -412,7 +412,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/arret24.png",
                        "res/conditions/arret.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("IsStopped");
 
@@ -426,9 +426,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/vitesse24.png",
                        "res/conditions/vitesse.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Vitesse"), "", false)
-            DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Vitesse"), "", false);
+            instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("TotalForceLength").SetManipulatedType("number");
 
@@ -442,9 +442,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/vitesse24.png",
                        "res/conditions/vitesse.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("expression", _("Angle ( en degrés )"), "", false)
-            DECLARE_PARAMETER("expression", _("Tolérance"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("expression", _("Angle ( en degrés )"), "", false);
+            instrInfo.AddParameter("expression", _("Tolérance"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("TestAngleOfDisplacement");
 
@@ -458,10 +458,10 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/var24.png",
                        "res/conditions/var.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("objectvar", _("Nom de la variable"), "", false)
-            DECLARE_PARAMETER("expression", _("Valeur à tester"), "", false)
-            DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
+            instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+            instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.ObtainVariable").SetManipulatedType("number");
@@ -476,10 +476,10 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/var24.png",
                        "res/conditions/var.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("objectvar", _("Nom de la variable"), "", false)
-            DECLARE_PARAMETER("text", _("Texte à tester"), "", false)
-            DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
+            instrInfo.AddParameter("text", _("Texte à tester"), "", false);
+            instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.ObtainVariable").SetManipulatedType("string");
@@ -494,8 +494,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/var24.png",
                        "res/conditions/var.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("objectvar", _("Nom de la variable"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
             MAIN_OBJECTS_IN_PARAMETER(0)
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.HasVariable");
@@ -510,8 +510,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/automatism24.png",
                        "res/automatism16.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("automatism", _("Automatisme"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("automatism", _("Automatisme"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("AutomatismActivated");
 
@@ -525,59 +525,59 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/automatism24.png",
                        "res/automatism16.png");
 
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("automatism", _("Automatisme"), "", false)
-            DECLARE_PARAMETER("yesorno", _("Activer ?"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("automatism", _("Automatisme"), "", false);
+            instrInfo.AddParameter("yesorno", _("Activer ?"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("ActivateAutomatism");
 
         DECLARE_END_OBJECT_ACTION()
 
         DECLARE_OBJECT_EXPRESSION("X", _("Position X"), _("Position X de l'objet"), _("Position"), "res/actions/position.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("GetX");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("Y", _("Position Y"), _("Position Y de l'objet"), _("Position"), "res/actions/position.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("GetY");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("ForceX", _("Force moyenne en X"), _("Force moyenne en X"), _("Déplacement"), "res/actions/force.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("TotalForceX");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("ForceY", _("Force moyenne en Y"), _("Force moyenne en Y"), _("Déplacement"), "res/actions/force.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("TotalForceY");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("ForceAngle", _("Angle moyen des forces"), _("Angle moyen des forces"), _("Déplacement"), "res/actions/force.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("TotalForceAngle");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("Angle", _("Angle moyen des forces"), _("Angle moyen des forces"), _("Déplacement"), "res/actions/force.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.SetHidden();
             instrInfo.cppCallingInformation.SetFunctionName("TotalForceAngle");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("ForceLength", _("Longueur moyenne des forces"), _("Longueur moyenne des forces"), _("Déplacement"), "res/actions/force.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("TotalForceLength");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("Longueur", _("Longueur moyenne des forces"), _("Longueur moyenne des forces"), _("Déplacement"), "res/actions/force.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.SetHidden();
             instrInfo.cppCallingInformation.SetFunctionName("TotalForceLength");
@@ -585,70 +585,70 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
 
         DECLARE_OBJECT_EXPRESSION("Width", _("Largeur d'un objet"), _("Largeur d'un objet"), _("Taille"), "res/actions/scaleWidth.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("GetWidth");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("Largeur", _("Largeur d'un objet"), _("Largeur d'un objet"), _("Taille"), "res/actions/scaleWidth.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.SetHidden();
             instrInfo.cppCallingInformation.SetFunctionName("GetWidth");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("Height", _("Hauteur d'un objet"), _("Hauteur d'un objet"), _("Taille"), "res/actions/scaleHeight.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("GetHeight");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("Hauteur", _("Hauteur d'un objet"), _("Hauteur d'un objet"), _("Taille"), "res/actions/scaleHeight.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.SetHidden();
             instrInfo.cppCallingInformation.SetFunctionName("GetHeight");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("ZOrder", _("Plan d'un objet"), _("Plan d'un objet"), _("Visibilité"), "res/actions/planicon.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("GetZOrder");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("Plan", _("Plan d'un objet"), _("Plan d'un objet"), _("Visibilité"), "res/actions/planicon.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
 
             instrInfo.SetHidden();
             instrInfo.cppCallingInformation.SetFunctionName("GetZOrder");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("Distance", _("Distance entre deux objets"), _("Distance entre deux objets"), _("Position"), "res/conditions/distance.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_CODEONLY_PARAMETER("listOfObjectsOfParameter", "0")
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
 
             instrInfo.cppCallingInformation.SetFunctionName("GetDistanceWithObject");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("SqDistance", _("Distance au carré entre deux objets"), _("Distance au carré entre deux objets"), _("Position"), "res/conditions/distance.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_CODEONLY_PARAMETER("listOfObjectsOfParameter", "0")
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
 
             instrInfo.cppCallingInformation.SetFunctionName("GetSqDistanceWithObject");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("Variable", _("Variable d'un objet"), _("Variable d'un objet"), _("Variables"), "res/actions/var.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("objectvar", _("Nom de la variable"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.GetVariableValue");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_STR_EXPRESSION("VariableString", _("Variable d'un objet"), _("Texte d'une variable d'un objet"), _("Variables"), "res/actions/var.png")
-            DECLARE_PARAMETER("object", _("Objet"), "", false)
-            DECLARE_PARAMETER("objectvar", _("Nom de la variable"), "", false)
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.GetVariableString");
         DECLARE_END_OBJECT_STR_EXPRESSION()

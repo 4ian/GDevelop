@@ -24,6 +24,7 @@ class MainEditorCommand;
 class RuntimeScene;
 class Instruction;
 class Automatism;
+class Scene;
 class Object;
 class ExtensionBase;
 class ExpressionInstruction;
@@ -52,7 +53,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
 
 /**
  * Start declaring a condition, and some information about it.
- * DECLARE_END_CONDITION need to be used after having declared parameter ( DECLARE_PARAMETER ).
+ * DECLARE_END_CONDITION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
             InstructionInfos instrInfo; \
@@ -72,7 +73,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
 
 /**
  * Start declaring an action, and some information about it.
- * DECLARE_END_ACTION need to be used after having declared parameter ( DECLARE_PARAMETER ).
+ * DECLARE_END_ACTION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
             InstructionInfos instrInfo; \
@@ -92,7 +93,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
 
 /**
  * Start declaring a condition for an object, and some information about it.
- * DECLARE_END_OBJECT_CONDITION need to be used after having declared parameter ( DECLARE_PARAMETER ).
+ * DECLARE_END_OBJECT_CONDITION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_OBJECT_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
             InstructionInfos instrInfo; \
@@ -111,7 +112,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
             } else { instrInfo.smallicon = wxBitmap(16,16);}
 /**
  * Start declaring an action for an object, and some information about it.
- * DECLARE_END_OBJECT_ACTION need to be used after having declared parameter ( DECLARE_PARAMETER ).
+ * DECLARE_END_OBJECT_ACTION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_OBJECT_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
             InstructionInfos instrInfo; \
@@ -132,7 +133,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
 
 /**
  * Start declaring a condition for an object, and some information about it.
- * DECLARE_END_AUTOMATISM_CONDITION need to be used after having declared parameter ( DECLARE_PARAMETER ).
+ * DECLARE_END_AUTOMATISM_CONDITION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_AUTOMATISM_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
             InstructionInfos instrInfo; \
@@ -151,7 +152,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
             } else { instrInfo.smallicon = wxBitmap(16,16);}
 /**
  * Start declaring an action for an object, and some information about it.
- * DECLARE_END_AUTOMATISM_ACTION need to be used after having declared parameter ( DECLARE_PARAMETER ).
+ * DECLARE_END_AUTOMATISM_ACTION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_AUTOMATISM_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
             InstructionInfos instrInfo; \
@@ -168,30 +169,6 @@ typedef Object * (*CreateFunPtr)(std::string name);
             {\
                 instrInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
             } else { instrInfo.smallicon = wxBitmap(16,16);}
-
-/**
- * Start declaring a parameter of a action or condition.
- * @param Type ( objet, expression... )
- * @param Description shown in editor
- * @param Set true if the parameter is an object
- * @param Set the type of the object, so as to verify a bad object type is not passed to the action/condition.
- */
-#define DECLARE_PARAMETER(type_, desc_, objType_, optional_) { \
-                ParameterInfo parameter; \
-                if ( !std::string(objType_).empty() ) parameter.supplementaryInformation = GetNameSpace()+objType_; \
-                parameter.type = type_; \
-                parameter.optional = optional_; \
-                parameter.description = std::string(desc_.mb_str()); \
-                instrInfo.parameters.push_back(parameter); \
-                }
-
-#define DECLARE_CODEONLY_PARAMETER(type_, more_) { \
-                ParameterInfo parameter; \
-                parameter.type = type_; \
-                parameter.codeOnly = true; \
-                parameter.supplementaryInformation = more_; \
-                instrInfo.parameters.push_back(parameter); \
-                }
 
 /**
  * Start declaring an object.
@@ -381,9 +358,6 @@ typedef Object * (*CreateFunPtr)(std::string name);
 #define MAIN_OBJECTS_IN_PARAMETER(x) instrInfo.mainObjects.push_back(x);
 #define MAIN_OBJECTS_IN_PARAMETERS(x, y) instrInfo.mainObjects.push_back(x); instrInfo.mainObjects.push_back(y);
 
-#define DECLARE_CAN_HAVE_SUB_CONDITION() instrInfo.canHaveSubInstructions = true;
-#define DECLARE_CAN_HAVE_SUB_ACTION() instrInfo.canHaveSubInstructions = true;
-
 #else //Condition, actions and expressions declare less thing in runtime only
 
 #define DECLARE_THE_EXTENSION(name_, fullname_, description_, author_, license_) name = name_; \
@@ -455,27 +429,8 @@ typedef Object * (*CreateFunPtr)(std::string name);
             automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName)); \
             automatismInfo.sharedDatasInstance = boost::shared_ptr<AutomatismsSharedDatas>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
 
-#define DECLARE_PARAMETER(type_, desc, objType, optional) { \
-                ParameterInfo parameter; \
-                parameter.type = type_; \
-                parameter.optional = optional; \
-                if ( !std::string(objType).empty() ) parameter.supplementaryInformation = GetNameSpace()+objType; \
-                instrInfo.parameters.push_back(parameter); \
-                }
-
-#define DECLARE_CODEONLY_PARAMETER(type_, more_) { \
-                ParameterInfo parameter; \
-                parameter.type = type_; \
-                parameter.codeOnly = true; \
-                parameter.supplementaryInformation = more_; \
-                instrInfo.parameters.push_back(parameter); \
-                }
-
 #define MAIN_OBJECTS_IN_PARAMETER(x)
 #define MAIN_OBJECTS_IN_PARAMETERS(x, y)
-
-#define DECLARE_CAN_HAVE_SUB_CONDITION()
-#define DECLARE_CAN_HAVE_SUB_ACTION()
 
 //Emulate wxWidgets internationalization macro
 #ifndef _
@@ -592,6 +547,12 @@ class GD_API ParameterInfo
 #if defined(GD_IDE_ONLY)
     std::string description; ///< Description shown in editor
     bool codeOnly; ///< True if parameter is relative to code generation only, i.e. must not be shown in editor
+    std::string defaultValue; ///< Used as a default value in editor or if an optional parameter is empty.
+
+    /**
+     * Set the default value used in editor or if an optional parameter is empty during code generation.
+     */
+    ParameterInfo & SetDefaultValue(std::string defaultValue_) { defaultValue = defaultValue_; return *this; };
 #endif
 };
 
@@ -617,6 +578,17 @@ class GD_API InstructionInfos
 #endif
     std::vector < ParameterInfo > parameters;
 
+    #if !defined(GD_IDE_ONLY)
+    ParameterInfo & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    #else //This is exactly the same function, but wxString need to be used in IDE
+    ParameterInfo & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    #endif
+
+    ParameterInfo & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+
+    /**
+     * \brief Defines information about how generate C++ code for an instruction
+     */
     class CppCallingInformation
     {
     public:
@@ -653,7 +625,7 @@ class GD_API InstructionInfos
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const RuntimeScene & scene, Instruction & instruction, EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & context) {return "";};
         };
 
         CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
@@ -669,7 +641,7 @@ class GD_API InstructionInfos
         std::string optionalIncludeFile;
         boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
-    CppCallingInformation cppCallingInformation;
+    CppCallingInformation cppCallingInformation; ///< Information about how generate C++ code for the instruction
 };
 
 /**
@@ -691,9 +663,19 @@ class GD_API ExpressionInfos
     bool shown;
     wxBitmap smallicon;
 #endif
-
     std::vector < ParameterInfo > parameters;
 
+    #if !defined(GD_IDE_ONLY)
+    ParameterInfo & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    #else //This is exactly the same function, but wxString need to be used in IDE
+    ParameterInfo & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    #endif
+
+    ParameterInfo & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+
+    /**
+     * \brief Defines information about how generate C++ code for an instruction
+     */
     class CppCallingInformation
     {
     public:
@@ -734,9 +716,19 @@ class GD_API StrExpressionInfos
     bool shown;
     wxBitmap smallicon;
 #endif
-
     std::vector < ParameterInfo > parameters;
 
+    #if !defined(GD_IDE_ONLY)
+    ParameterInfo & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    #else //This is exactly the same function, but wxString need to be used in IDE
+    ParameterInfo & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    #endif
+
+    ParameterInfo & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+
+    /**
+     * \brief Defines information about how generate C++ code for an instruction
+     */
     class CppCallingInformation
     {
     public:

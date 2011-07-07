@@ -17,6 +17,7 @@ class Game;
 #include "GDL/ObjectGroup.h"
 #include "GDL/Position.h"
 #include "GDL/Layer.h"
+class EventsExecutionEngine;
 class AutomatismsSharedDatas;
 
 /**
@@ -30,7 +31,7 @@ class GD_API Scene
     public:
         Scene();
         Scene(const Scene&);
-        virtual ~Scene() {};
+        virtual ~Scene();
 
         Scene& operator=(const Scene & rhs);
 
@@ -62,8 +63,11 @@ class GD_API Scene
         ListVariable                            variables; ///< Variables list
         std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
 
+        boost::shared_ptr<EventsExecutionEngine> compiledEventsExecutionEngine;
         #if defined(GD_IDE_ONLY)
         bool wasModified;
+        bool eventsModified;
+        bool eventsBeingCompiled;
 
         bool grid; ///< True if grid activated in editor -- Edittime only
         bool snap; ///< True if snap to grid activated in editor -- Edittime only

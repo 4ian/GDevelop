@@ -15,7 +15,7 @@ SceneExtension::SceneExtension()
                           "Freeware")
 
     DECLARE_EXPRESSION("Random", _("Valeur aléatoire"), _("Valeur aléatoire"), _("Aléatoire"), "res/actions/position.png")
-        DECLARE_PARAMETER("expression", _("Valeur maximale"), "", false)
+        instrInfo.AddParameter("expression", _("Valeur maximale"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("Random").SetIncludeFile("GDL/CommonInstructions.h");
     DECLARE_END_EXPRESSION()
@@ -28,7 +28,7 @@ SceneExtension::SceneExtension()
                    "res/conditions/depart24.png",
                    "res/conditions/depart.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("SceneJustBegins").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
@@ -42,9 +42,9 @@ SceneExtension::SceneExtension()
                    "res/conditions/egal24.png",
                    "res/conditions/egal.png");
 
-        DECLARE_PARAMETER("expression", _("Expression 1"), "",false)
-        DECLARE_PARAMETER("expression", _("Expression 2"), "",false)
-        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "",false)
+        instrInfo.AddParameter("expression", _("Expression 1"), "",false);
+        instrInfo.AddParameter("expression", _("Expression 2"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("RelationTest").SetIncludeFile("GDL/CommonInstructions.h");
 
@@ -58,8 +58,8 @@ SceneExtension::SceneExtension()
                    "res/actions/goscene24.png",
                    "res/actions/goscene.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("string", _("Nom de la scène"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("string", _("Nom de la scène"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("ChangeScene").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
@@ -73,7 +73,7 @@ SceneExtension::SceneExtension()
                    "res/actions/quit24.png",
                    "res/actions/quit.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("StopGame").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
@@ -87,8 +87,8 @@ SceneExtension::SceneExtension()
                    "res/actions/background24.png",
                    "res/actions/background.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "")
-        DECLARE_PARAMETER("color", _("Couleur"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("color", _("Couleur"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("ChangeSceneBackground").SetIncludeFile("GDL/RuntimeSceneTools.h");
 

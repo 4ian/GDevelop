@@ -7,11 +7,12 @@
 #define SOUNDMANAGER_H
 
 #include <SFML/Audio.hpp>
-#include "GDL/constantes.h"
-#include "GDL/Son.h"
+#include "GDL/Sound.h"
 #include "GDL/Music.h"
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -21,28 +22,28 @@ using namespace std;
 class GD_API SoundManager
 {
 public:
-    vector < Music * >  musics;
-    vector < Son * >    sounds;
+    vector < boost::shared_ptr<Music> >  musics;
+    vector < boost::shared_ptr<Sound> >  sounds;
 
     /**
      * Return pointer to a music on a channel
      */
-    Music * GetMusicOnChannel(int channel);
+    boost::shared_ptr<Music> & GetMusicOnChannel(int channel);
 
     /**
      * Change music on a channel. Automatically destroy the old music.
      */
-    void SetMusicOnChannel(int channel, Music * music);
+    void SetMusicOnChannel(int channel, boost::shared_ptr<Music> music);
 
     /**
      * Return pointer to a sound on a channel
      */
-    Son * GetSoundOnChannel(int channel);
+    boost::shared_ptr<Sound> & GetSoundOnChannel(int channel);
 
     /**
      * Change sound on a channel. Automatically destroy the old sound.
      */
-    void SetSoundOnChannel(int channel, Son * son);
+    void SetSoundOnChannel(int channel, boost::shared_ptr<Sound> sound);
 
     /**
      * Get global game sound volume.
@@ -61,6 +62,22 @@ public:
      * \endcode
      */
     void SetGlobalVolume(float volume);
+
+    /**
+     * Destroy all sounds and musics
+     */
+    void ClearAllSoundsAndMusics()
+    {
+        musicsChannel.clear();
+        soundsChannel.clear();
+        sounds.clear();
+        musics.clear();
+    }
+
+    /**
+     * Ensure sounds and musics without channels and stopped are destroyed.
+     */
+    void ManageGarbage();
 
     static SoundManager *GetInstance()
     {
@@ -83,8 +100,8 @@ public:
 
 private:
 
-    vector < Son *>    soundsChannel;
-    vector < Music *>  musicsChannel;
+    std::map<unsigned int, boost::shared_ptr<Sound> >  soundsChannel;
+    std::map<unsigned int, boost::shared_ptr<Music> >  musicsChannel;
 
     float globalVolume;
 

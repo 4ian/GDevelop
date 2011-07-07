@@ -7,13 +7,13 @@
 
 using namespace std;
 
-class GD_API Son : sf::NonCopyable
+class GD_API Sound : sf::NonCopyable
 {
     public:
-        Son();
-        Son(string file);
-        Son(const Son & copy);
-        virtual ~Son();
+        Sound();
+        Sound(string file);
+        Sound(const Sound & copy);
+        virtual ~Sound();
 
         /**
          * Get Music SFML Status ( Paused, Playing, Stopped )

@@ -170,22 +170,25 @@ void GD_API AddCamera( RuntimeScene & scene, const std::string & layerName, floa
 
     Camera cameraInfo;
 
-    //Set the size of the camera //TODO : Optional parameters ?..
-    //if ( !action.GetParameter(1).GetPlainString().empty() || !action.GetParameter(2).GetPlainString().empty() )
+    if ( width == 0 && height == 0)
+        cameraInfo.defaultSize = true;
+    else
+    {
         cameraInfo.defaultSize = false;
+        cameraInfo.size.x = width;
+        cameraInfo.size.y = height;
+    }
 
-    cameraInfo.size.x = width;
-    cameraInfo.size.y = height;
-
-    //Set the viewport
-    /*if ( !action.GetParameter(3).GetPlainString().empty() || !action.GetParameter(4).GetPlainString().empty() ||
-         !action.GetParameter(5).GetPlainString().empty() || !action.GetParameter(6).GetPlainString().empty())*/
+    if ( viewportBottom == 0 && viewportLeft == 0 && viewportRight == 0 && viewportTop == 0)
+        cameraInfo.defaultViewport = true;
+    else
+    {
         cameraInfo.defaultViewport = false;
-
-    cameraInfo.viewport.Left = viewportLeft;
-    cameraInfo.viewport.Top = viewportTop;
-    cameraInfo.viewport.Width = viewportRight - cameraInfo.viewport.Left;
-    cameraInfo.viewport.Height = viewportBottom - cameraInfo.viewport.Top;
+        cameraInfo.viewport.Left = viewportLeft;
+        cameraInfo.viewport.Top = viewportTop;
+        cameraInfo.viewport.Width = viewportRight - cameraInfo.viewport.Left;
+        cameraInfo.viewport.Height = viewportBottom - cameraInfo.viewport.Top;
+    }
 
     //Create a runtime camera from the camera
     const sf::RenderWindow * window = scene.renderWindow;

@@ -13,37 +13,22 @@
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/ImageManager.h"
+#include "GDL/SoundManager.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Layer.h"
-#include "GDL/EventsCodeGenerator.h"
 #include "GDL/profile.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Position.h"
 #include "GDL/FontManager.h"
-#include "GDL/ObjectsConcerned.h"
 #include "GDL/AutomatismsSharedDatas.h"
-#include "GDL/EventsCodeGenerationContext.h"
-#include "GDL/EventsCodeCompiler.h"
 #include "GDL/RuntimeContext.h"
+
+#include "GDL/EventsExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
 #include "GDL/ProfileEvent.h"
 #include "GDL/BaseProfiler.h"
 #include "GDL/BaseDebugger.h"
 #endif
-
-#include <llvm/ExecutionEngine/GenericValue.h>
-#include <llvm/ExecutionEngine/ExecutionEngine.h>
-#include <llvm/ExecutionEngine/JIT.h>
-#include <llvm/Support/DynamicLibrary.h>
-#include <llvm/Config/config.h>
-#include <llvm/Module.h>
-#include <llvm/Target/TargetRegistry.h>
-#include <llvm/Target/TargetSelect.h>
-#include <llvm/Bitcode/ReaderWriter.h>
-#include <llvm/Support/MemoryBuffer.h>
-#include <llvm/Support/TypeBuilder.h>
-#undef _
-#include <llvm/Support/system_error.h>
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
@@ -72,8 +57,6 @@ timeScale(1),
 timeFromStart(0),
 specialAction(-1)
 {
-    //ctor
-    soundManager = SoundManager::GetInstance();
     renderWindow->ShowMouseCursor( true );
 
     //Calque par défaut
@@ -111,6 +94,8 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;
     backgroundColorB = scene.backgroundColorB;
+
+    compiledEventsExecutionEngine = scene.compiledEventsExecutionEngine;
 
     firstLoop = scene.firstLoop;
     isFullScreen = scene.isFullScreen;
@@ -213,7 +198,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         ManageRenderTargetEvents();
         UpdateTime();
         ManageObjectsBeforeEvents();
-        ManageSounds();
+        SoundManager::GetInstance()->ManageGarbage();
 
         #if defined(GD_IDE_ONLY)
         if( profiler )
@@ -225,8 +210,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
 
         {
             BT_PROFILE("Events");
-            const std::vector< llvm::GenericValue > args;
-            EE->runFunction(eventsEntryFunction, args);
+            compiledEventsExecutionEngine->Execute();
         }
 
         #if defined(GD_IDE_ONLY)
@@ -258,7 +242,6 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
             profiler->Update();
         }
         #endif
-
 
         if ( firstLoop ) firstLoop = false; //The first frame is passed
     }
@@ -482,68 +465,6 @@ bool RuntimeScene::DisplayLegacyTexts(string layer)
     return true;
 }
 
-////////////////////////////////////////////////////////////
-/// Stoppe toutes les musiques de la scène
-////////////////////////////////////////////////////////////
-bool RuntimeScene::StopMusic()
-{
-    SoundManager * soundManager = SoundManager::GetInstance();
-
-    //Arrêt des musiques : simples musiques
-    for ( unsigned int i = 0;i < soundManager->musics.size();i++ )
-    {
-        soundManager->musics.at( i )->Stop();
-    }
-    soundManager->musics.clear();
-
-    //Arrêt des musiques : musiques sur channels
-    for ( unsigned int i = 0;i < MAX_CANAUX_MUSIC;i++ )
-    {
-        soundManager->GetMusicOnChannel(i)->Stop();
-    }
-
-    //Arrêt des sons
-    for ( unsigned int i = 0;i < soundManager->sounds.size();i++ )
-    {
-        soundManager->sounds.at( i )->sound.Stop();
-    }
-    soundManager->sounds.clear();
-
-    //Arrêt des sons : sons sur channels
-    for ( unsigned int i = 0;i < MAX_CANAUX_SON;i++ )
-    {
-        soundManager->GetSoundOnChannel(i)->sound.Stop();
-    }
-
-    return true;
-}
-
-////////////////////////////////////////////////////////////
-/// Efface les musiques et sons terminés
-////////////////////////////////////////////////////////////
-void RuntimeScene::ManageSounds()
-{
-    //Bruitages sans canaux. On les détruits si besoin est.
-    for ( int i = soundManager->sounds.size() - 1;i >= 0;i-- )
-    {
-        if ( soundManager->sounds.at( i )->sound.GetStatus() == sf::Sound::Stopped )
-        {
-            delete soundManager->sounds.at( i ); //Les sounds sont gerés par pointeurs
-            soundManager->sounds.erase( soundManager->sounds.begin() + i );
-        }
-    }
-
-
-    //Musiques sans canaux.
-    for ( unsigned int i = 0;i < soundManager->musics.size();i++ )
-    {
-        if ( soundManager->musics.at( i )->GetStatus() == sf::Music::Stopped )
-        {
-            soundManager->musics.erase( soundManager->musics.begin() + i );
-        }
-    }
-}
-
 /**
  * Delete objects, updates time and launch automatisms
  */
@@ -612,6 +533,8 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     variables = scene.variables;
 
     events = CloneVectorOfEvents(scene.events);
+    compiledEventsExecutionEngine = scene.compiledEventsExecutionEngine;
+    compiledEventsExecutionEngine->llvmRuntimeContext->scene = this;
 
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;
@@ -679,87 +602,6 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
             std::cout << "Could not find and put object " << scene.initialObjectsPositions[i].objectName << std::endl;
     }
 
-    //Preprocess events
-    MessageLoading( "Preprocessing events", 80 );
-
-    EventsCodeGenerator::DeleteUselessEvents(events);
-    std::string eventsOutput = EventsCodeGenerator::GenerateEventsCompleteCode(*this, events);
-    std::ofstream myfile;
-    myfile.open ("eventsOutput.cpp");
-    myfile << eventsOutput;
-    myfile.close();
-
-    MessageLoading( "Compiling events", 85 );
-
-    sf::Clock compilationTimer;
-    EventsCodeCompiler::CompileEventsFileToBitCode("eventsOutput.cpp", "eventsBitcode.txt");
-    cout << "Compilation duration: " << compilationTimer.GetElapsedTime()<<"s"<<endl;
-
-    MessageLoading( "Creation execution engine", 90 );
-
-    //TODO : Only once
-    {
-        cout << "Loading libstdc++..." << std::endl;
-        std::string error;
-        llvm::sys::DynamicLibrary::LoadLibraryPermanently("libstdc++-6.dll", &error);
-        cout << error;
-    }
-
-    llvm::InitializeNativeTarget();
-
-    {
-        llvm::error_code err = llvm::MemoryBuffer::getFile("eventsBitcode.txt", eventsBuffer);
-        if ( err.value() != 0 )
-            std::cout << "Failed to load eventsBitcode.txt: " << err.message() << std::endl;
-        else
-        {
-            std::string parseError;
-            Module = ParseBitcodeFile(eventsBuffer.get(), llvmContext, &parseError);
-            std::cout << parseError;
-        }
-    }
-
-    if (!Module)
-    {
-        cout << "Module creation failed";
-    }
-    else
-    {
-        std::string error;
-        EE.reset( llvm::ExecutionEngine::createJIT(Module,
-                                                   &error,
-                                                   0,
-                                                   llvm::CodeGenOpt::None)); //No optimisation during machine code generation
-        if (!EE)
-        {
-            cout << "unable to make execution engine: " << error << "\n";
-        }
-        else
-        {
-            eventsEntryFunction = Module->getFunction("main");
-            if (!eventsEntryFunction)
-                cout << "'main' function not found in module.\n";
-
-            cout << "Mapping objects";
-            {
-
-                backgroundColorR = 173; //TODO : Suppress this. It is just a check to make sure events access to the scene correctly.
-                tempRCpointer = new RuntimeContext(this); //TODO Replace this temp RC pointer
-                llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(Module->getOrInsertGlobal("pointerToRuntimeContext", llvm::TypeBuilder<void*, false>::get(Module->getContext())));
-                EE->addGlobalMapping(globalValue, &tempRCpointer);
-            }
-
-            cout << "Get pointer to compiled function...";
-            sf::Clock jitTimer;
-            void * fPtr = EE->getPointerToFunction(eventsEntryFunction);
-            cout << "JIT Compilation duration: " << jitTimer.GetElapsedTime()<<"s"<<endl;
-            cout << "About to run..";
-            ((int(*)())(intptr_t)fPtr)();
-            cout << "..Ok";
-        }
-    }
-    cout << "Total duration: " << compilationTimer.GetElapsedTime()<<"s"<<endl;
-
     //Automatisms datas
     automatismsSharedDatas.clear();
     for(std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
@@ -769,7 +611,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
         automatismsSharedDatas[it->first] = it->second->CreateRuntimeSharedDatas();
     }
 
-    if ( stopSoundsOnStartup ) StopMusic();
+    if ( stopSoundsOnStartup ) SoundManager::GetInstance()->ClearAllSoundsAndMusics();
 
     MessageLoading( "Loading finished", 100 );
 

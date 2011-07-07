@@ -15,7 +15,7 @@ CommonConversionsExtension::CommonConversionsExtension()
                        _("Conversion"),
                        "res/conditions/toujours24.png")
 
-        DECLARE_PARAMETER("string", _("Texte à convertir en nombre"), "",false)
+        instrInfo.AddParameter("string", _("Texte à convertir en nombre"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("ToDouble").SetIncludeFile("GDL/CommonTools.h");
 
@@ -27,7 +27,7 @@ CommonConversionsExtension::CommonConversionsExtension()
                        _("Conversion"),
                        "res/conditions/toujours24.png")
 
-        DECLARE_PARAMETER("expression", _("Expression à convertir en texte"), "",false)
+        instrInfo.AddParameter("expression", _("Expression à convertir en texte"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("ToString").SetIncludeFile("GDL/CommonTools.h");
 

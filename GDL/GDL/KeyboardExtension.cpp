@@ -22,8 +22,8 @@ KeyboardExtension::KeyboardExtension()
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "");
-        DECLARE_PARAMETER("key", _("Touche à tester"), "",false);
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("key", _("Touche à tester"), "",false);;
 
         instrInfo.cppCallingInformation.SetFunctionName("IsKeyPressed").SetIncludeFile("GDL/KeyboardTools.h");
 
@@ -37,8 +37,8 @@ KeyboardExtension::KeyboardExtension()
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "");
-        DECLARE_PARAMETER("string", _("Expression générant la touche à tester"), "",false);
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("string", _("Expression générant la touche à tester"), "",false);;
 
         instrInfo.cppCallingInformation.SetFunctionName("IsKeyPressed").SetIncludeFile("GDL/KeyboardTools.h");
 
@@ -52,7 +52,7 @@ KeyboardExtension::KeyboardExtension()
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png");
 
-        DECLARE_CODEONLY_PARAMETER("currentScene", "");
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("AnyKeyIsPressed").SetIncludeFile("GDL/KeyboardTools.h");
 

@@ -4,6 +4,10 @@
 #include "GDL/Position.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedDatas.h"
+#include "GDL/EventsExecutionEngine.h"
+#if defined(GD_IDE_ONLY)
+#include "GDL/EventsCodeCompiler.h"
+#endif
 #include <iostream>
 
 Scene::Scene() :
@@ -14,9 +18,12 @@ standardSortMethod(true),
 oglFOV(90.0f),
 oglZNear(1.0f),
 oglZFar(500.0f),
-stopSoundsOnStartup(true)
+stopSoundsOnStartup(true),
+compiledEventsExecutionEngine(boost::shared_ptr<EventsExecutionEngine>(new EventsExecutionEngine))
 #if defined(GD_IDE_ONLY)
 ,wasModified(false),
+eventsModified(true),
+eventsBeingCompiled(false),
 grid( false ),
 snap( false),
 gridWidth( 32 ),
@@ -31,6 +38,13 @@ windowMask(false)
     Layer layer;
     layer.SetCamerasNumber(1);
     initialLayers.push_back(layer);
+}
+
+Scene::~Scene()
+{
+    #if defined(GD_IDE_ONLY) //Make sure a compilation is not being run on this scene.
+    EventsCodeCompiler::GetInstance()->NotifyASceneIsDestroyed(*this);
+    #endif
 }
 
 void Scene::Init(const Scene & scene)
@@ -48,6 +62,8 @@ void Scene::Init(const Scene & scene)
     stopSoundsOnStartup = scene.stopSoundsOnStartup;
 
     events = CloneVectorOfEvents(scene.events);
+
+    compiledEventsExecutionEngine = boost::shared_ptr<EventsExecutionEngine>(new EventsExecutionEngine);
 
     initialObjects.clear();
     for (unsigned int i =0;i<scene.initialObjects.size();++i)

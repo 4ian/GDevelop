@@ -23,15 +23,15 @@ repeatNumberExpression("")
 {
 }
 
-std::string RepeatEvent::GenerateEventCode(const RuntimeScene & scene, EventsCodeGenerationContext & parentContext)
+std::string RepeatEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & parentContext)
 {
     std::string outputCode;
 
     //Prepare expression containing how many times event must be repeated
     std::string repeatCountCode;
-    CallbacksForGeneratingExpressionCode callbacks(repeatCountCode, *scene.game, scene, parentContext);
+    CallbacksForGeneratingExpressionCode callbacks(repeatCountCode, game, scene, parentContext);
     GDExpressionParser parser(repeatNumberExpression.GetPlainString());
-    parser.ParseMathExpression(*scene.game, scene, callbacks);
+    parser.ParseMathExpression(game, scene, callbacks);
     if (repeatCountCode.empty()) repeatCountCode = "0";
 
     //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
@@ -39,8 +39,8 @@ std::string RepeatEvent::GenerateEventCode(const RuntimeScene & scene, EventsCod
     context.InheritsFrom(parentContext);
 
     //Prepare conditions/actions codes
-    std::string conditionsCode = EventsCodeGenerator::GenerateConditionsListCode(scene, conditions, context);
-    std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(scene, actions, context);
+    std::string conditionsCode = EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
+    std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
     std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
     //Write final code
@@ -53,7 +53,7 @@ std::string RepeatEvent::GenerateEventCode(const RuntimeScene & scene, EventsCod
     outputCode += "{\n";
     outputCode += actionsCode;
     outputCode += "\n{ //Subevents: \n";
-    outputCode += EventsCodeGenerator::GenerateEventsListCode(scene, events, context);
+    outputCode += EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
     outputCode += "} //Subevents end.\n";
     outputCode += "}\n";
 

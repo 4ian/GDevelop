@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <utility>
-class RuntimeScene;
+class Scene;
 class ParameterInfo;
 class EventsCodeGenerationContext;
 
@@ -22,11 +22,11 @@ class EventsCodeGenerationContext;
 class GD_API EventsCodeGenerator
 {
     public:
-        static std::string GenerateEventsCompleteCode(const RuntimeScene & scene, std::vector < BaseEventSPtr > & events);
+        static std::string GenerateEventsCompleteCode(const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & events);
 
-        static std::string GenerateEventsListCode(const RuntimeScene & scene, std::vector < BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
-        static std::string GenerateConditionsListCode(const RuntimeScene & scene, std::vector < Instruction > & conditions, EventsCodeGenerationContext & context);
-        static std::string GenerateActionsListCode(const RuntimeScene & scene, std::vector < Instruction > & actions, EventsCodeGenerationContext & context);
+        static std::string GenerateEventsListCode(const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
+        static std::string GenerateConditionsListCode(const Game & game, const Scene & scene, std::vector < Instruction > & conditions, EventsCodeGenerationContext & context);
+        static std::string GenerateActionsListCode(const Game & game, const Scene & scene, std::vector < Instruction > & actions, EventsCodeGenerationContext & context);
 
         /**
          * Generate the code for a parameter of an action/condition/expression.
@@ -40,10 +40,15 @@ class GD_API EventsCodeGenerator
          */
         static std::vector<std::string> GenerateParametersCodes( const Game & game, const Scene & scene, std::vector < GDExpression > parameters, const std::vector < ParameterInfo > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
 
-        static std::string GenerateConditionCode(const RuntimeScene & scene, Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context);
-        static std::string GenerateActionCode(const RuntimeScene & scene, Instruction & action, EventsCodeGenerationContext & context);
+        static std::string GenerateConditionCode(const Game & game, const Scene & scene, Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context);
+        static std::string GenerateActionCode(const Game & game, const Scene & scene, Instruction & action, EventsCodeGenerationContext & context);
 
         static void DeleteUselessEvents(std::vector < BaseEventSPtr > & events);
+
+        /**
+         * Convert a plain string ( with line feed, quotes ) to a C++ string ( adding backslash ).
+         */
+        static std::string ConvertToCppString(std::string plainString);
 
     private:
         EventsCodeGenerator() {};

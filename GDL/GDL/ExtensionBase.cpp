@@ -7,6 +7,7 @@
 #include "GDL/Event.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedDatas.h"
+#include "GDL/CommonTools.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -135,6 +136,102 @@ vector < std::string > ExtensionBase::GetAutomatismsTypes() const
         automatisms.push_back(it->first);
 
     return automatisms;
+}
+
+#if !defined(GD_IDE_ONLY)
+ParameterInfo & InstructionInfos::AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional)
+#else //This is exactly the same function, but wxString need to be used in IDE
+ParameterInfo & InstructionInfos::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
+#endif
+{
+    ParameterInfo info;
+    info.type = type;
+    #if defined(GD_IDE_ONLY)
+    info.description = ToString(description);
+    info.codeOnly = false;
+    #endif
+    info.optional = parameterIsOptional;
+    info.supplementaryInformation = optionalObjectType;
+
+    parameters.push_back(info);
+    return parameters.back();
+}
+
+ParameterInfo & InstructionInfos::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
+{
+    ParameterInfo info;
+    info.type = type;
+    #if defined(GD_IDE_ONLY)
+    info.codeOnly = true;
+    #endif
+    info.supplementaryInformation = supplementaryInformation;
+
+    parameters.push_back(info);
+    return parameters.back();
+}
+
+#if !defined(GD_IDE_ONLY)
+ParameterInfo & ExpressionInfos::AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional)
+#else //This is exactly the same function, but wxString need to be used in IDE
+ParameterInfo & ExpressionInfos::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
+#endif
+{
+    ParameterInfo info;
+    info.type = type;
+    #if defined(GD_IDE_ONLY)
+    info.description = ToString(description);
+    info.codeOnly = false;
+    #endif
+    info.optional = parameterIsOptional;
+    info.supplementaryInformation = optionalObjectType;
+
+    parameters.push_back(info);
+    return parameters.back();
+}
+
+ParameterInfo & ExpressionInfos::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
+{
+    ParameterInfo info;
+    info.type = type;
+    #if defined(GD_IDE_ONLY)
+    info.codeOnly = true;
+    #endif
+    info.supplementaryInformation = supplementaryInformation;
+
+    parameters.push_back(info);
+    return parameters.back();
+}
+
+#if !defined(GD_IDE_ONLY)
+ParameterInfo & StrExpressionInfos::AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional)
+#else //This is exactly the same function, but wxString need to be used in IDE
+ParameterInfo & StrExpressionInfos::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
+#endif
+{
+    ParameterInfo info;
+    info.type = type;
+    #if defined(GD_IDE_ONLY)
+    info.description = ToString(description);
+    info.codeOnly = false;
+    #endif
+    info.optional = parameterIsOptional;
+    info.supplementaryInformation = optionalObjectType;
+
+    parameters.push_back(info);
+    return parameters.back();
+}
+
+ParameterInfo & StrExpressionInfos::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
+{
+    ParameterInfo info;
+    info.type = type;
+    #if defined(GD_IDE_ONLY)
+    info.codeOnly = true;
+    #endif
+    info.supplementaryInformation = supplementaryInformation;
+
+    parameters.push_back(info);
+    return parameters.back();
 }
 
 const std::map<std::string, InstructionInfos > & ExtensionBase::GetAllActions() const

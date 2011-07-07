@@ -1037,6 +1037,8 @@
 		<Unit filename="GDL\EventsCodeGenerationContext.h" />
 		<Unit filename="GDL\EventsCodeGenerator.cpp" />
 		<Unit filename="GDL\EventsCodeGenerator.h" />
+		<Unit filename="GDL\EventsExecutionEngine.cpp" />
+		<Unit filename="GDL\EventsExecutionEngine.h" />
 		<Unit filename="GDL\EventsRenderingHelper.cpp" />
 		<Unit filename="GDL\EventsRenderingHelper.h" />
 		<Unit filename="GDL\ExpressionInstruction.cpp" />
@@ -1158,8 +1160,8 @@
 		<Unit filename="GDL\Scene.h" />
 		<Unit filename="GDL\SceneExtension.cpp" />
 		<Unit filename="GDL\SceneExtension.h" />
-		<Unit filename="GDL\Son.cpp" />
-		<Unit filename="GDL\Son.h" />
+		<Unit filename="GDL\Sound.cpp" />
+		<Unit filename="GDL\Sound.h" />
 		<Unit filename="GDL\SoundManager.cpp" />
 		<Unit filename="GDL\SoundManager.h" />
 		<Unit filename="GDL\SourceFile.cpp" />
@@ -1209,11 +1211,6 @@
 		<Unit filename="GDL\XmlMacros.h" />
 		<Unit filename="GDL\btAlignedAllocator.h" />
 		<Unit filename="GDL\btScalar.h" />
-		<Unit filename="GDL\cPos.cpp" />
-		<Unit filename="GDL\eFreeFunctions.cpp" />
-		<Unit filename="GDL\eFreeFunctions.h" />
-		<Unit filename="GDL\eObjectFunctions.cpp" />
-		<Unit filename="GDL\eObjectFunctions.h" />
 		<Unit filename="GDL\gdTreeItemStringData.cpp" />
 		<Unit filename="GDL\gdTreeItemStringData.h" />
 		<Unit filename="GDL\md5.cpp">

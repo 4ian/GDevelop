@@ -38,7 +38,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const RuntimeScene & scene, Instruction & instruction, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & parentContext)
             {
                 //Conditions code
                 std::string conditionsCode;
@@ -50,7 +50,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     EventsCodeGenerationContext context;
                     context.InheritsFrom(parentContext);
 
-                    string conditionCode = EventsCodeGenerator::GenerateConditionCode(scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
+                    string conditionCode = EventsCodeGenerator::GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
 
                     conditionsCode += "{\n";
 
@@ -120,17 +120,17 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const RuntimeScene & scene, Instruction & instruction, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & parentContext)
             {
                 string outputCode;
 
-                outputCode += EventsCodeGenerator::GenerateConditionsListCode(scene, instruction.GetSubInstructions(), parentContext);
+                outputCode += EventsCodeGenerator::GenerateConditionsListCode(game, scene, instruction.GetSubInstructions(), parentContext);
 
                 std::string ifPredicat = "true";
                 for (unsigned int i = 0;i<instruction.GetSubInstructions().size();++i)
                     ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
-                outputCode += "conditionTrue = (" +ifPredicat+ ")\n";
+                outputCode += "conditionTrue = (" +ifPredicat+ ");\n";
 
                 return outputCode;
             };
@@ -152,7 +152,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const RuntimeScene & scene, Instruction & instruction, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & parentContext)
             {
                 std::vector<Instruction> & conditions = instruction.GetSubInstructions();
                 string outputCode;
@@ -162,7 +162,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 for (unsigned int cId =0;cId < conditions.size();++cId)
                 {
-                    string conditionCode = EventsCodeGenerator::GenerateConditionCode(scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", parentContext);
+                    string conditionCode = EventsCodeGenerator::GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", parentContext);
 
                     outputCode += "{\n";
                     if ( !conditions[cId].GetType().empty() ) outputCode += conditionCode;
@@ -173,7 +173,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 for (unsigned int i = 0;i<conditions.size();++i)
                     ifPredicat += " && !condition"+ToString(i)+"IsTrue";
 
-                outputCode += "conditionTrue = (" +ifPredicat+ ")\n";
+                outputCode += "conditionTrue = (" +ifPredicat+ ");\n";
 
                 return outputCode;
             };

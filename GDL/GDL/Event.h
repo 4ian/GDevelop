@@ -23,7 +23,7 @@ class wxWindow;
 #include <boost/tuple/tuple.hpp>
 #include "GDL/Log.h"
 #include "GDL/Instruction.h"
-class RuntimeScene;
+class Scene;
 class ObjectsConcerned;
 class Instruction;
 class Evaluateur;
@@ -48,7 +48,7 @@ class GD_API BaseEvent
         /**
          * Generate event's code.
          */
-        virtual std::string GenerateEventCode(const RuntimeScene & scene, EventsCodeGenerationContext & context) {return "";};
+        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & context) {return "";};
 
         /**
          * Derived class have to redefine this function, so as to return true, if they are executable.

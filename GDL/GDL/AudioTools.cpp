@@ -6,456 +6,261 @@
 #include "AudioTools.h"
 #include <string>
 #include "GDL/RuntimeScene.h"
+#include "GDL/SoundManager.h"
+#include "GDL/RessourcesLoader.h"
 
-struct est_fini
+/**
+ * Test if a music is played
+ */
+bool GD_API MusicPlaying( RuntimeScene & scene, unsigned int channel )
 {
-    bool operator ()( sf::Sound &a ) const
-    {
-        if (a.GetStatus() == sf::Sound::Stopped )
-        {
-            return true;
-        }
+    if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return false;
 
-        return false;
-    }
-};
-
-////////////////////////////////////////////////////////////
-/// Joue simplement un son
-///
-/// Type : PlaySound
-/// Paramètre 1 : Fichier son
-/// Paramètre 2 : Bouclage ( facultatif )
-/// Paramètre 3 : Volume ( facultatif )
-////////////////////////////////////////////////////////////
-bool ActPlaySound( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
-{
-    sf::Clock Latence;
-
-    SoundManager * soundManager;
-    soundManager = SoundManager::GetInstance();
-
-    Son * son = new Son(action.GetParameter(0).GetPlainString());
-    soundManager->sounds.push_back(son);
-    soundManager->sounds.back()->sound.Play();
-
-    //Compatibilité avec Game Develop 1.0.1979 et inférieur
-    //On verifie si l'argument 2 ( Bouclage ) existe
-    if ( action.GetParameters().size() > 1 )
-    {
-        soundManager->sounds.back()->sound.SetLoop(action.GetParameter(1).GetAsBool());
-    }
-
-    //Compatibilité avec Game Develop 1.1.5429 et inférieur
-    //On verifie si l'argument 3 ( Volume ) existe
-    if ( action.GetParameters().size() > 2 )
-    {
-        if ( !action.GetParameter(2).GetPlainString().empty() )
-            soundManager->sounds.back()->SetVolume(action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
-        else
-            soundManager->sounds.back()->SetVolume(100);
-    }
-
-    //Compatibility with Game Develop 1.5.9980 and below
-    if ( action.GetParameters().size() > 3 )
-    {
-        if ( !action.GetParameter(3).GetPlainString().empty() )
-            soundManager->sounds.back()->SetPitch(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned));
-        else
-            soundManager->sounds.back()->SetPitch(1);
-    }
-
-    scene.pauseTime += Latence.GetElapsedTime();
-
-    return true;
+    return (SoundManager::GetInstance()->GetMusicOnChannel(channel)->GetStatus() == sf::Music::Playing);
 }
 
-////////////////////////////////////////////////////////////
-/// Joue un son sur un canal
-///
-/// Type : PlaySoundCanal
-/// Paramètre 1 : Fichier son
-/// Paramètre 2 : Canal
-/// Paramètre 3 : Bouclage ( fac )
-/// Paramètre 4 : Volume ( fac )
-////////////////////////////////////////////////////////////
-bool ActPlaySoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+/**
+ * Test if a music is paused
+ */
+bool GD_API MusicPaused( RuntimeScene & scene, unsigned int channel )
 {
-    int canal = static_cast<int> ( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned) );
-    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
+    if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return false;
 
+    return (SoundManager::GetInstance()->GetMusicOnChannel(channel)->GetStatus() == sf::Music::Paused);
+}
+
+/**
+ * Test if a music is stopped
+ */
+bool GD_API MusicStopped( RuntimeScene & scene, unsigned int channel )
+{
+    if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return false;
+
+    return (SoundManager::GetInstance()->GetMusicOnChannel(channel)->GetStatus() == sf::Music::Stopped);
+}
+
+
+/**
+ * Test if a sound is stopped
+ */
+bool GD_API SoundPlaying( RuntimeScene & scene, unsigned int channel )
+{
+    if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return false;
+
+    return (SoundManager::GetInstance()->GetSoundOnChannel(channel)->GetStatus() == sf::Sound::Playing);
+}
+
+/**
+ * Test if a sound is stopped
+ */
+bool GD_API SoundPaused( RuntimeScene & scene, unsigned int channel )
+{
+    if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return false;
+
+    return (SoundManager::GetInstance()->GetSoundOnChannel(channel)->GetStatus() == sf::Sound::Paused);
+}
+
+/**
+ * Test if a sound is stopped
+ */
+bool GD_API SoundStopped( RuntimeScene & scene, unsigned int channel )
+{
+    if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return false;
+
+    return (SoundManager::GetInstance()->GetSoundOnChannel(channel)->GetStatus() == sf::Sound::Stopped);
+}
+
+void GD_API PlaySound( RuntimeScene & scene, const std::string & file, bool repeat, float volume, float pitch )
+{
+    sf::Clock latency;
+
+    SoundManager * soundManager = SoundManager::GetInstance();
+    soundManager->sounds.push_back(boost::shared_ptr<Sound>(new Sound(file)));
+    soundManager->sounds.back()->sound.Play();
+    soundManager->sounds.back()->sound.SetLoop(repeat);
+    soundManager->sounds.back()->SetVolume(volume);
+    soundManager->sounds.back()->SetPitch(pitch);
+
+    scene.pauseTime += latency.GetElapsedTime();
+}
+
+void GD_API PlaySoundOnChannel( RuntimeScene & scene, const std::string & file, unsigned int channel, bool repeat, float volume, float pitch )
+{
     //Chargement
-    SoundManager * soundManager;
-    soundManager = SoundManager::GetInstance();
+    SoundManager * soundManager = SoundManager::GetInstance();
 
     //Son à jouer
-    Son * son = new Son(action.GetParameter(0).GetPlainString());
-    son->sound.Play();
+    boost::shared_ptr<Sound> sound = boost::shared_ptr<Sound>(new Sound(file));
+    sound->sound.Play();
 
-    soundManager->SetSoundOnChannel(canal, son);
-
-    //Compatibilité avec Game Develop 1.0.1979 et inférieur
-    //On verifie si l'argument 3 ( Bouclage ) existe
-    if ( action.GetParameters().size() > 2 )
-    {
-        soundManager->GetSoundOnChannel(canal)->sound.SetLoop(action.GetParameter(2).GetAsBool());
-    }
-
-    //Compatibilité avec Game Develop 1.1.5429 et inférieur
-    //On verifie si l'argument 4 ( Volume ) existe
-    if ( action.GetParameters().size() > 3 )
-    {
-        if ( !action.GetParameter(3).GetPlainString().empty() )
-            soundManager->GetSoundOnChannel(canal)->SetVolume(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned));
-        else
-            soundManager->GetSoundOnChannel(canal)->SetVolume(100);
-    }
-
-    //Compatibility with Game Develop 1.5.9980 and below
-    if ( action.GetParameters().size() > 4 )
-    {
-        if ( !action.GetParameter(4).GetPlainString().empty() )
-            soundManager->GetSoundOnChannel(canal)->SetPitch(action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned));
-        else
-            soundManager->GetSoundOnChannel(canal)->SetPitch(1);
-    }
-
-    return true;
+    soundManager->SetSoundOnChannel(channel, sound);
+    soundManager->GetSoundOnChannel(channel)->sound.SetLoop(repeat);
+    soundManager->GetSoundOnChannel(channel)->SetVolume(volume);
+    soundManager->GetSoundOnChannel(channel)->SetPitch(pitch);
 }
 
-
-////////////////////////////////////////////////////////////
-/// Stoppe un son sur un canal
-///
-/// Type : StopSoundCanal
-/// Paramètre 1 : Canal
-////////////////////////////////////////////////////////////
-bool ActStopSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API StopSoundOnChannel( RuntimeScene & scene, unsigned int channel )
 {
-    int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
+    if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
 
-    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
-
-    SoundManager::GetInstance()->GetSoundOnChannel(canal)->sound.Stop();
-
-    return true;
+    SoundManager::GetInstance()->GetSoundOnChannel(channel)->sound.Stop();
 }
 
-////////////////////////////////////////////////////////////
-/// Met en pause un son sur un canal
-///
-/// Type : PauseSoundCanal
-/// Paramètre 1 : Canal
-////////////////////////////////////////////////////////////
-bool ActPauseSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API PauseSoundOnChannel( RuntimeScene & scene, unsigned int channel )
 {
-    int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
+    if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
 
-    SoundManager::GetInstance()->GetSoundOnChannel(canal)->sound.Pause();
-
-    return true;
+    SoundManager::GetInstance()->GetSoundOnChannel(channel)->sound.Pause();
 }
 
-////////////////////////////////////////////////////////////
-/// Re(joute) un son sur un canal
-///
-/// Type : RePlaySoundCanal
-/// Paramètre 1 : Canal
-////////////////////////////////////////////////////////////
-bool ActRePlaySoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API RePlaySoundOnChannel( RuntimeScene & scene, unsigned int channel )
 {
-    int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    if ( canal < 0 || canal > MAX_CANAUX_SON )  return false;
+    if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
 
-    SoundManager::GetInstance()->GetSoundOnChannel(canal)->sound.Play();
-
-    return true;
+    SoundManager::GetInstance()->GetSoundOnChannel(channel)->sound.Play();
 }
 
-////////////////////////////////////////////////////////////
-/// Joue simplement une musique
-///
-/// Type : PlayMusic
-/// Paramètre 1 : Fichier
-/// Paramètre 2 : Bouclage ( facultatif )
-/// Paramètre 3 : Volume ( facultatif )
-////////////////////////////////////////////////////////////
-bool ActPlayMusic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API PlayMusic( RuntimeScene & scene, const std::string & file, bool repeat, float volume, float pitch )
 {
     SoundManager * soundManager = SoundManager::GetInstance();
     RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
 
-    Music * music = ressourcesLoader->LoadMusic(action.GetParameter(0).GetPlainString()); //Chargement
+    boost::shared_ptr<Music> music = boost::shared_ptr<Music>(ressourcesLoader->LoadMusic(file)); //Chargement
 
     soundManager->musics.push_back(music); //Ajout aux soundManager qui prend en charge la musique
     soundManager->musics.back()->Play();
 
-    //Compatibilité avec Game Develop 1.0.1979 et inférieur
-    //On verifie si l'argument 2 ( Bouclage ) existe
-    if ( action.GetParameters().size() > 1 )
-    {
-        music->SetLoop(action.GetParameter(1).GetAsBool());
-    }
-
-    //Compatibilité avec Game Develop 1.1.5429 et inférieur
-    //On verifie si l'argument 3 ( Volume ) existe
-    if ( action.GetParameters().size() > 2 )
-    {
-        if ( !action.GetParameter(2).GetPlainString().empty() )
-            music->SetVolume(action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
-        else
-            music->SetVolume(100);
-    }
-
-    //Compatibility with Game Develop 1.5.9980 and below
-    if ( action.GetParameters().size() > 3 )
-    {
-        if ( !action.GetParameter(3).GetPlainString().empty() )
-            music->SetPitch(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned));
-        else
-            music->SetPitch(1);
-    }
-
-    return true;
+    music->SetLoop(repeat);
+    music->SetVolume(volume);
+    music->SetPitch(pitch);
 }
 
-
-////////////////////////////////////////////////////////////
-/// Joue une musique sur un canal
-///
-/// Type : PlayMusicCanal
-/// Paramètre 1 : Fichier
-/// Paramètre 2 : Canal
-/// Paramètre 3 : Bouclage ( facultatif )
-////////////////////////////////////////////////////////////
-bool ActPlayMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API PlayMusicOnChannel( RuntimeScene & scene, const std::string & file, unsigned int channel , bool repeat, float volume, float pitch )
 {
-    int canal = static_cast<int> ( action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
-
     SoundManager * soundManager = SoundManager::GetInstance();
     RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
 
-    Music * music = ressourcesLoader->LoadMusic(action.GetParameter(0).GetPlainString()); //Chargement
+    boost::shared_ptr<Music> music = boost::shared_ptr<Music>(ressourcesLoader->LoadMusic(file)); //Chargement
     music->Play();
 
-    soundManager->SetMusicOnChannel(canal, music); //Ajout au soundManager qui prend en charge la music
-
-    //Compatibilité avec Game Develop 1.0.1979 et inférieur
-    //On verifie si l'argument 3 ( Bouclage ) existe
-    if ( action.GetParameters().size() > 2 )
-    {
-        music->SetLoop(action.GetParameter(2).GetAsBool());
-    }
-
-    //Compatibilité avec Game Develop 1.1.5429 et inférieur
-    //On verifie si l'argument 4 ( Volume ) existe
-    if ( action.GetParameters().size() > 3 )
-    {
-        if ( !action.GetParameter(3).GetPlainString().empty() )
-            music->SetVolume(action.GetParameter( 3 ).GetAsMathExpressionResult(scene, objectsConcerned));
-        else
-            music->SetVolume(100);
-    }
-
-    //Compatibility with Game Develop 1.5.9980 and below
-    if ( action.GetParameters().size() > 4 )
-    {
-        if ( !action.GetParameter(4).GetPlainString().empty() )
-            music->SetPitch(action.GetParameter( 4 ).GetAsMathExpressionResult(scene, objectsConcerned));
-        else
-            music->SetPitch(1);
-    }
-
-    return true;
+    soundManager->SetMusicOnChannel(channel, music); //Ajout au soundManager qui prend en charge la music
+    music->SetLoop(repeat);
+    music->SetVolume(volume);
+    music->SetPitch(pitch);
 }
 
-////////////////////////////////////////////////////////////
-/// Stoppe une musique sur un canal
-///
-/// Type : StopMusicCanal
-/// Paramètre 1 : Canal
-////////////////////////////////////////////////////////////
-bool ActStopMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API StopMusicOnChannel( RuntimeScene & scene, unsigned int channel )
 {
-    int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
+    if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
 
-    SoundManager::GetInstance()->GetMusicOnChannel(canal)->Stop();
-
-    return true;
+    SoundManager::GetInstance()->GetMusicOnChannel(channel)->Stop();
 }
 
-////////////////////////////////////////////////////////////
-/// Met en pause une musique sur un canal
-///
-/// Type : PauseMusicCanal
-/// Paramètre 1 : Canal
-////////////////////////////////////////////////////////////
-bool ActPauseMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API PauseMusicOnChannel( RuntimeScene & scene, unsigned int channel )
 {
-    int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC ) return false;
+    if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
 
-    SoundManager::GetInstance()->GetMusicOnChannel(canal)->Pause();
-
-    return true;
+    SoundManager::GetInstance()->GetMusicOnChannel(channel)->Pause();
 }
 
-////////////////////////////////////////////////////////////
-/// Re(joute) une musique sur un canal
-///
-/// Type : RePlayMusicCanal
-/// Paramètre 1 : Canal
-////////////////////////////////////////////////////////////
-bool ActRePlayMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API RePlayMusicOnChannel( RuntimeScene & scene, unsigned int channel )
 {
-    int canal = static_cast<int> ( action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )  return false;
+    if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
 
-    SoundManager::GetInstance()->GetMusicOnChannel(canal)->Play();
-
-    return true;
+    SoundManager::GetInstance()->GetMusicOnChannel(channel)->Play();
 }
 
-////////////////////////////////////////////////////////////
-/// Modifier le volume du son sur le canal
-///
-/// Type : ModVolumeSoundCanal
-/// Paramètre 1 : Canal
-/// Paramètre 2 : Volume
-/// Paramètre 3 : Signe ( facultatif )
-////////////////////////////////////////////////////////////
-bool ActModVolumeSoundCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API SetSoundVolumeOnChannel( RuntimeScene & scene, unsigned int channel, float volume )
 {
-    int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    if ( canal < 0 || canal > MAX_CANAUX_SON ) return false;
+    if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
 
-    SoundManager * soundManager = SoundManager::GetInstance();
-
-    if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
-        soundManager->GetSoundOnChannel(canal)->SetVolume(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Add)
-        soundManager->GetSoundOnChannel(canal)->SetVolume(soundManager->GetSoundOnChannel(canal)->GetVolume() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Substract)
-        soundManager->GetSoundOnChannel(canal)->SetVolume(soundManager->GetSoundOnChannel(canal)->GetVolume() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Multiply)
-        soundManager->GetSoundOnChannel(canal)->SetVolume(soundManager->GetSoundOnChannel(canal)->GetVolume() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Divide)
-        soundManager->GetSoundOnChannel(canal)->SetVolume(soundManager->GetSoundOnChannel(canal)->GetVolume() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
-
-    return true;
+    SoundManager::GetInstance()->GetSoundOnChannel(channel)->SetVolume(volume);
 }
 
-
-////////////////////////////////////////////////////////////
-/// Modifier le volume d'une musique sur le canal
-///
-/// Type : ModVolumeMusicCanal
-/// Paramètre 1 : Canal
-/// Paramètre 2 : Volume
-/// Paramètre 3 : Signe ( facultatif )
-////////////////////////////////////////////////////////////
-bool ActModVolumeMusicCanal( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API SetMusicVolumeOnChannel( RuntimeScene & scene, unsigned int channel, float volume )
 {
-    int canal = static_cast<int> (action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    if ( canal < 0 || canal > MAX_CANAUX_MUSIC )  return false;
+    if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
 
-    SoundManager * soundManager = SoundManager::GetInstance();
-
-    if (action.GetParameter(2).GetPlainString().empty() || action.GetParameter(2).GetAsModOperator() == GDExpression::Set)
-        soundManager->GetMusicOnChannel(canal)->SetVolume(action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Add)
-        soundManager->GetMusicOnChannel(canal)->SetVolume(soundManager->GetMusicOnChannel(canal)->GetVolume() + action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Substract)
-        soundManager->GetMusicOnChannel(canal)->SetVolume(soundManager->GetMusicOnChannel(canal)->GetVolume() - action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Multiply)
-        soundManager->GetMusicOnChannel(canal)->SetVolume(soundManager->GetMusicOnChannel(canal)->GetVolume() * action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    else if (action.GetParameter(2).GetAsModOperator() == GDExpression::Divide)
-        soundManager->GetMusicOnChannel(canal)->SetVolume(soundManager->GetMusicOnChannel(canal)->GetVolume() / action.GetParameter( 1 ).GetAsMathExpressionResult(scene, objectsConcerned));
-
-    return true;
+    SoundManager::GetInstance()->GetMusicOnChannel(channel)->SetVolume(volume);
 }
 
-////////////////////////////////////////////////////////////
-/// Modifier le volume global du jeu
-///
-/// Type : ModGlobalVolume
-/// Paramètre 2 : Volume
-/// Paramètre 3 : Signe ( facultatif )
-////////////////////////////////////////////////////////////
-bool ActModGlobalVolume( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+double GD_API GetSoundVolumeOnChannel( RuntimeScene & scene, unsigned int channel)
 {
-    SoundManager * soundManager = SoundManager::GetInstance();
+    if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return 0;
 
-    if (action.GetParameter(1).GetPlainString().empty() || action.GetParameter(1).GetAsModOperator() == GDExpression::Set)
-        soundManager->SetGlobalVolume(action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    else if (action.GetParameter(1).GetAsModOperator() == GDExpression::Add)
-        soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() + action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    else if (action.GetParameter(1).GetAsModOperator() == GDExpression::Substract)
-        soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() - action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    else if (action.GetParameter(1).GetAsModOperator() == GDExpression::Multiply)
-        soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() * action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-    else if (action.GetParameter(1).GetAsModOperator() == GDExpression::Divide)
-        soundManager->SetGlobalVolume(soundManager->GetGlobalVolume() / action.GetParameter( 0 ).GetAsMathExpressionResult(scene, objectsConcerned));
-
-    return true;
+    return SoundManager::GetInstance()->GetSoundOnChannel(channel)->GetVolume();
 }
 
+double GD_API GetMusicVolumeOnChannel( RuntimeScene & scene, unsigned int channel)
+{
+    if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return 0;
+
+    return SoundManager::GetInstance()->GetMusicOnChannel(channel)->GetVolume();
+}
+
+void GD_API SetGlobalVolume( RuntimeScene & scene, float volume )
+{
+    SoundManager::GetInstance()->SetGlobalVolume(volume);
+}
+
+
+double GD_API GetGlobalVolume( RuntimeScene & scene )
+{
+    return SoundManager::GetInstance()->GetGlobalVolume();
+}
 
 void GD_API SetSoundPitchOnChannel( RuntimeScene & scene, unsigned int channel, float pitch )
 {
-    if ( channel > MAX_CANAUX_SON ) return;
+    if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
 
-    soundManager->GetSoundOnChannel(channel)->SetPitch(playingOffset);
+    SoundManager::GetInstance()->GetSoundOnChannel(channel)->SetPitch(pitch);
 }
 
-void GD_API SetMusicPitchOnChannel( RuntimeScene & scene, unsigned int channel, float playingOffset )
+void GD_API SetMusicPitchOnChannel( RuntimeScene & scene, unsigned int channel, float pitch )
 {
-    if ( channel > MAX_CANAUX_SON ) return;
+    if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
 
-    soundManager->GetMusicOnChannel(channel)->SetPitch(playingOffset);
+    SoundManager::GetInstance()->GetMusicOnChannel(channel)->SetPitch(pitch);
 }
 
 double GD_API GetSoundPitchOnChannel( RuntimeScene & scene, unsigned int channel)
 {
-    if ( channel > MAX_CANAUX_SON ) return;
+    if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return 0;
 
-    return soundManager->GetSoundOnChannel(channel)->GetPitch(playingOffset);
+    return SoundManager::GetInstance()->GetSoundOnChannel(channel)->GetPitch();
 }
 
 double GD_API GetMusicPitchOnChannel( RuntimeScene & scene, unsigned int channel)
 {
-    if ( channel > MAX_CANAUX_SON ) return;
+    if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return 0;
 
-    return soundManager->GetMusicOnChannel(channel)->GetPitch(playingOffset);
+    return SoundManager::GetInstance()->GetMusicOnChannel(channel)->GetPitch();
 }
 
 void GD_API SetSoundPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel, float playingOffset )
 {
-    if ( channel > MAX_CANAUX_SON ) return;
+    if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
 
-    soundManager->GetSoundOnChannel(channel)->SetPlayingOffset(playingOffset);
+    SoundManager::GetInstance()->GetSoundOnChannel(channel)->SetPlayingOffset(playingOffset);
 }
 
 void GD_API SetMusicPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel, float playingOffset )
 {
-    if ( channel > MAX_CANAUX_SON ) return;
+    if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
 
-    soundManager->GetMusicOnChannel(channel)->SetPlayingOffset(playingOffset);
+    SoundManager::GetInstance()->GetMusicOnChannel(channel)->SetPlayingOffset(playingOffset);
 }
 
 double GD_API GetSoundPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel)
 {
-    if ( channel > MAX_CANAUX_SON ) return;
+    if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return 0;
 
-    return soundManager->GetSoundOnChannel(channel)->GetPlayingOffset(playingOffset);
+    return SoundManager::GetInstance()->GetSoundOnChannel(channel)->GetPlayingOffset();
 }
 
 double GD_API GetMusicPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel)
 {
-    if ( channel > MAX_CANAUX_SON ) return;
+    if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return 0;
 
-    return soundManager->GetMusicOnChannel(channel)->GetPlayingOffset(playingOffset);
+    return SoundManager::GetInstance()->GetMusicOnChannel(channel)->GetPlayingOffset();
 }

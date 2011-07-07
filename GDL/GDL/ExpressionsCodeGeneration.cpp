@@ -76,7 +76,7 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
     if ( functionName.empty() )
     {
         if ( instruction.parameters.empty() ) return;
-        plainExpression += "\""+instruction.parameters[0].GetPlainString()+"\"";
+        plainExpression += "\""+EventsCodeGenerator::ConvertToCppString(instruction.parameters[0].GetPlainString())+"\"";
 
         return;
     }

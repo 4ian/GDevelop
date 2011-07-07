@@ -5,7 +5,7 @@
 
 #include "GDL/SoundManager.h"
 #include "GDL/Music.h"
-#include "GDL/Son.h"
+#include "GDL/Sound.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -17,77 +17,47 @@ SoundManager *SoundManager::_singleton = NULL;
 SoundManager::SoundManager() :
 globalVolume(100)
 {
-    //Initialize sounds and musics
-    for (unsigned int i = 0;i<MAX_CANAUX_SON;++i)
-    {
-        Son * son = new Son;
-        soundsChannel.push_back(son);
-    }
-    for (unsigned int i = 0;i<MAX_CANAUX_SON;++i)
-    {
-        Music * music = new Music;
-        musicsChannel.push_back(music);
-    }
 }
 
 SoundManager::~SoundManager()
 {
-    //Delete sounds and musics owned by the manager
-    for (unsigned int channel = 0;channel<MAX_CANAUX_SON;++channel)
-    {
-        if ( soundsChannel.at(channel) != NULL )
-            delete soundsChannel.at(channel);
-    }
-    for (unsigned int channel = 0;channel<MAX_CANAUX_SON;++channel)
-    {
-        if ( musicsChannel.at(channel) != NULL )
-            delete musicsChannel.at(channel);
-    }
 }
 
-Music * SoundManager::GetMusicOnChannel(int channel)
+void SoundManager::ManageGarbage()
 {
-    if ( channel >= 0 && static_cast<unsigned>(channel) < musicsChannel.size())
-        return musicsChannel.at(channel);
-
-    cout << "return null";
-    return NULL;
-}
-
-void SoundManager::SetMusicOnChannel(int channel, Music * music)
-{
-    if ( channel >= 0 && static_cast<unsigned>(channel) < musicsChannel.size())
+    for ( unsigned int i = 0;i < sounds.size();i++ )
     {
-        //On supprime l'ancien son
-        if ( musicsChannel.at(channel) != NULL )
-            delete musicsChannel.at(channel);
+        if ( sounds[i]->sound.GetStatus() == sf::Sound::Stopped )
+            sounds.erase( sounds.begin() + i );
+    }
 
-        //On assigne le nouveau
-        musicsChannel.at(channel) = music;
+    for ( unsigned int i = 0;i < musics.size();i++ )
+    {
+        if ( musics[i]->GetStatus() == sf::Music::Stopped )
+            musics.erase( musics.begin() + i );
     }
 }
 
-void SoundManager::SetSoundOnChannel(int channel, Son * son)
+boost::shared_ptr<Music> & SoundManager::GetMusicOnChannel(int channel)
 {
-    if ( channel >= 0 && static_cast<unsigned>(channel) < soundsChannel.size())
-    {
-        //On supprime l'ancien son
-        if ( soundsChannel.at(channel) != NULL )
-            delete soundsChannel.at(channel);
-
-        //On assigne le nouveau
-        soundsChannel.at(channel) = son;
-    }
+    return musicsChannel[channel];
 }
 
-Son * SoundManager::GetSoundOnChannel(int channel)
+void SoundManager::SetMusicOnChannel(int channel, boost::shared_ptr<Music> music)
 {
-    if ( channel >= 0 && static_cast<unsigned>(channel) < soundsChannel.size())
-        return soundsChannel.at(channel);
-
-    cout << "return null";
-    return NULL;
+    musicsChannel[channel] = music;
 }
+
+void SoundManager::SetSoundOnChannel(int channel, boost::shared_ptr<Sound> sound)
+{
+    soundsChannel[channel] = sound;
+}
+
+boost::shared_ptr<Sound> & SoundManager::GetSoundOnChannel(int channel)
+{
+    return soundsChannel[channel];
+}
+
 
 void SoundManager::SetGlobalVolume(float volume)
 {
@@ -100,26 +70,20 @@ void SoundManager::SetGlobalVolume(float volume)
         globalVolume = 100.0;
 
     //Mise à jour des volumes des sons
-    for (unsigned int i =0;i<soundsChannel.size();++i)
+    for (std::map<unsigned int, boost::shared_ptr<Sound> >::iterator it = soundsChannel.begin();it != soundsChannel.end();++it)
     {
-        if ( soundsChannel[i] != NULL )
-            soundsChannel[i]->UpdateVolume();
+        if ( it->second != boost::shared_ptr<Sound>() ) (it->second)->UpdateVolume();
     }
-    for (unsigned int i =0;i<musicsChannel.size();++i)
+    for (std::map<unsigned int, boost::shared_ptr<Music> >::iterator it = musicsChannel.begin();it != musicsChannel.end();++it)
     {
-        if ( musicsChannel[i] != NULL )
-            musicsChannel[i]->UpdateVolume();
+        if ( it->second != boost::shared_ptr<Music>() ) it->second->UpdateVolume();
     }
     for (unsigned int i =0;i<sounds.size();++i)
     {
-        if ( sounds[i] != NULL )
-            sounds[i]->UpdateVolume();
+        if ( sounds[i] != boost::shared_ptr<Sound>() ) sounds[i]->UpdateVolume();
     }
     for (unsigned int i =0;i<musics.size();++i)
     {
-        if ( musics[i] != NULL )
-            musics[i]->UpdateVolume();
+        if ( musics[i] != boost::shared_ptr<Music>() ) musics[i]->UpdateVolume();
     }
 }
-
-//TODO : Try Timitidy for MID

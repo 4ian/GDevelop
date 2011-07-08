@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <SFML/System.hpp>
 class EventsExecutionEngine;
@@ -20,6 +21,25 @@ public:
     void EventsCompilationNeeded(Game & game, Scene & scene);
 
     void NotifyASceneIsDestroyed(const Scene & scene);
+
+    /**
+     * Tell the compiler the events of the scene can be compiled:
+     * ( Compiler can launch at this moment a pending task )
+     */
+    void EnableCompilation(Scene & scene);
+
+    /**
+     * Tell the compiler to not attempt to compile anything.
+     * However, if a compilation is currently run, it will not stop:
+     * That is why the scene has to wait until SceneEventsBeingCompiled return false.
+     */
+    void DisableCompilation(Scene & scene);
+
+    /**
+     * Return true if a thread is compiling scene's events.
+     * -> In this case, scene must not try to launch a runtime scene.
+     */
+    bool SceneEventsBeingCompiled(Scene & scene);
 
     static EventsCodeCompiler * GetInstance()
     {
@@ -70,9 +90,13 @@ private:
      */
     static bool CompileEventsCppFileToBitCode(std::string eventsFile, std::string bitCodeFile);
 
-    std::map <Scene*, boost::shared_ptr<Worker> > currentTasks;
+    void AddPendingTask(Game & game, Scene & scene);
 
-    static sf::Mutex mutexPreventingSceneDestruction;
+    std::map <Scene*, boost::shared_ptr<Worker> > currentTasks; ///< Compilation currently made.
+    std::vector <std::pair<Scene*, Game*> > pendingTasks; ///< Compilation task waiting to be launched.
+    std::vector < Scene* > compilationDisallowed; ///< List of scenes which disallow their events to be compiled. (However, if a compilation is being made, it will not be stopped)
+
+    static sf::Mutex mutex;
 
     friend class Worker;
     EventsCodeCompiler();

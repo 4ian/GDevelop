@@ -262,7 +262,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
         instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("PickedObjectsCount").SetManipulatedType("number").SetIncludeFile("GDL/RuntimeSceneTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("PickedObjectsCount").SetManipulatedType("number").SetIncludeFile("GDL/ObjectTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -288,6 +288,6 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         instrInfo.AddParameter("object", _("Objet"), "", false);
         instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/RuntimeSceneTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/ObjectTools.h");
     DECLARE_END_EXPRESSION()
 }

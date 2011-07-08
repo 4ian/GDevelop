@@ -23,7 +23,7 @@ compiledEventsExecutionEngine(boost::shared_ptr<EventsExecutionEngine>(new Event
 #if defined(GD_IDE_ONLY)
 ,wasModified(false),
 eventsModified(true),
-eventsBeingCompiled(false),
+eventsBeingCompiled(false), //TODO : Delete this variable
 grid( false ),
 snap( false),
 gridWidth( 32 ),

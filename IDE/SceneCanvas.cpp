@@ -33,6 +33,7 @@
 #include "GDL/SourceFileBuilder.h"
 #include "GDL/CompilerMessagesParser.h"
 #include "GDL/EventsCodeCompiler.h"
+#include "GDL/EventsExecutionEngine.h"
 #include "GDL/SoundManager.h"
 #include "BuildMessagesPnl.h"
 #include "BuildProgressPnl.h"
@@ -384,6 +385,8 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
     cout << "OnPreviewBtClick: " << endl;
     if ( !edittimeRenderer.editing ) return;
 
+    EventsCodeCompiler::GetInstance()->DisableCompilation(sceneEdited);
+
     mainEditorCommand.LockShortcuts(this);
 
     edittimeRenderer.editing = false;
@@ -408,10 +411,12 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 {
     if ( edittimeRenderer.editing ) return;
 
-    mainEditorCommand.UnLockShortcuts(this);
+    EventsCodeCompiler::GetInstance()->EnableCompilation(sceneEdited);
 
     edittimeRenderer.editing = true;
     edittimeRenderer.runtimeScene.running = false;
+
+    mainEditorCommand.UnLockShortcuts(this);
 
     scrollBar1->Show(true);
     scrollBar2->Show(true);
@@ -551,7 +556,6 @@ void SceneCanvas::OnPlayBtClick( wxCommandEvent & event )
 
     externalWindow->Show(false);
     edittimeRenderer.runtimeScene.ChangeRenderWindow(this);
-
 
     if ( debugger ) debugger->Play();
 }
@@ -700,7 +704,7 @@ void SceneCanvas::ReloadFirstPart()
 
     //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
     //Useful when opening a scene for the first time for example.
-    if ( sceneEdited.eventsModified && !sceneEdited.eventsBeingCompiled )
+    if ( sceneEdited.eventsModified && !EventsCodeCompiler::GetInstance()->SceneEventsBeingCompiled(sceneEdited) )
         EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(gameEdited, sceneEdited);
 
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
@@ -713,19 +717,15 @@ void SceneCanvas::ReloadFirstPart()
         {
             wxLogWarning(_("Game Develop est entrain de compiler les sources C++ et ne pourra lancer un aperçu qu'une fois ce processus terminé."));
         }
-
-        //Wait dynamic extensions to be compiled when previewing.
-        return;
     }
     #endif
-    if ( !edittimeRenderer.editing && sceneEdited.eventsBeingCompiled )
-        return; //Wait events to be compiled when previewing
 
-    ReloadSecondPart();
+    return; //Reload second par will be called by Refresh when appropriate
 }
 
 void SceneCanvas::ReloadSecondPart()
 {
+    cout << "ReloadSecondPart" << endl;
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( !edittimeRenderer.editing && gameEdited.useExternalSourceFiles )
     {
@@ -757,9 +757,6 @@ void SceneCanvas::ReloadSecondPart()
 
 void SceneCanvas::Refresh()
 {
-   /* cout << "scene.eventsBeingCompiled = " << sceneEdited.eventsBeingCompiled << endl;
-    cout << "isReloading = " << isReloading << endl;*/
-
     if ( isReloading )
     {
         bool wait = false;
@@ -768,7 +765,7 @@ void SceneCanvas::Refresh()
             if ( mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->IsBuilding() )
                 wait = true;
         }
-        if ( !edittimeRenderer.editing && sceneEdited.eventsBeingCompiled) //Ensure events are not being compiled.
+        if ( !edittimeRenderer.editing && EventsCodeCompiler::GetInstance()->SceneEventsBeingCompiled(sceneEdited)) //Ensure events are not being compiled.
             wait =true;
 
         if ( wait ) //We're still waiting for something to finish

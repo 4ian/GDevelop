@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 class RuntimeScene;
 class Variable;
 class Object;
@@ -45,21 +46,26 @@ void GD_API MoveObjects( RuntimeScene & scene );
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API CreateObjectOnScene(RuntimeScene & scene, std::vector<Object*> & pickedObjects, const std::string & objectName, float positionX, float positionY, const std::string & layer);
+void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, const std::string & objectName, float positionX, float positionY, const std::string & layer);
 
 /**
  * Only used internally by GD events generated code.
  *
  * \return true ( always )
  */
-bool GD_API PickAllObjects(RuntimeScene & scene, std::vector<Object*> & pickedObjects, const std::string & objectName);
+bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, const std::string & objectName);
 
 /**
  * Only used internally by GD events generated code.
  *
  * \return true ( always )
  */
-bool GD_API PickRandomObject(RuntimeScene & scene, std::vector<Object*> & pickedObjects, const std::string & objectName);
+bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, const std::string & objectName);
+
+/**
+ * Only used internally by GD events generated code.
+ */
+void GD_API ChangeSceneBackground( RuntimeScene & scene, std::string newColor );
 
 /**
  * Only used internally by GD events generated code.
@@ -108,5 +114,27 @@ double GD_API GetGlobalVariableValue( const RuntimeScene & scene, const std::str
  * \return String of a global variable
  */
 const std::string & GD_API GetGlobalVariableString( const RuntimeScene & scene, const std::string & variableName);
+
+void GD_API SetFullScreen(RuntimeScene & scene, bool fullscreen);
+void GD_API SetWindowSize(RuntimeScene & scene, int width, int height, bool useTheNewSizeForCameraDefaultSize);
+
+/**
+ * Only used internally by GD events generated code.
+ */
+unsigned int GD_API GetSceneWindowWidth(RuntimeScene & scene);
+
+/**
+ * Only used internally by GD events generated code.
+ */
+unsigned int GD_API GetSceneWindowHeight(RuntimeScene & scene);
+
+unsigned int GD_API GetScreenWidth();
+unsigned int GD_API GetScreenHeight();
+unsigned int GD_API GetScreenColorDepth();
+
+/**
+ * Only used internally by GD events generated code.
+ */
+void GD_API DisplayLegacyTextOnScene( RuntimeScene & scene, const std::string & str, float x, float y, const std::string & color, float characterSize, const std::string & fontName, const std::string & layer);
 
 #endif // RUNTIMESCENETOOLS_H

@@ -17,7 +17,6 @@ class wxWindow;
 #include <iostream>
 #include <vector>
 #include <string>
-#include <cmath>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -81,6 +80,12 @@ class GD_API BaseEvent
         bool IsDisabled() const { return disabled; }
 
         /**
+         * Called before events are compiled
+         */
+        virtual void Preprocess(const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList) {};
+
+
+        /**
          * Event must be able to return all conditions vector they have.
          * Used to preprocess the conditions.
          */
@@ -117,7 +122,7 @@ class GD_API BaseEvent
         /**
          * Called by event editor to draw the event.
          */
-        virtual void Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const {return;}
+        virtual void Render(wxDC & dc, int x, int y, unsigned int width) const {return;}
 
         /**
          * Must return the height of the event when rendered

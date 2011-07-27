@@ -35,6 +35,7 @@ std::string WhileEvent::GenerateEventCode(const Game & game, const Scene & scene
     outputCode += "bool stopDoWhile = false;";
     outputCode += "do";
     outputCode += "{\n";
+    outputCode += context.GenerateObjectsDeclarationCode();
     outputCode +=  whileConditionsStr;
     outputCode += "if ("+whileIfPredicat+")\n";
     outputCode += "{\n";
@@ -229,21 +230,14 @@ void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Bas
 /**
  * Render the event in the bitmap
  */
-void WhileEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
+void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width) const
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
     const int repeatHeight = 20;
 
     //Draw event rectangle
-    dc.SetPen(*wxTRANSPARENT_PEN);
-    dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
     wxRect rect(x, y, width, GetRenderedHeight(width));
-    wxColor color1 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient1);
-    wxColor color2 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient2;
-    wxColor color3 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient3;
-    wxColor color4 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient4);
-
-    renderingHelper->DrawNiceRectangle(dc, rect, color1, color2, color3, color4, renderingHelper->eventBorderColor);
+    renderingHelper->DrawNiceRectangle(dc, rect);
 
     //While text
     dc.SetFont( renderingHelper->GetBoldFont() );

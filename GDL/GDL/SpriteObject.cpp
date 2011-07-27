@@ -675,6 +675,46 @@ void SpriteObject::SetColor( unsigned int r, unsigned int v, unsigned int b )
     needUpdateCurrentSprite = true;
 }
 
+bool SpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
+{
+    for (unsigned int layerIndex = 0;layerIndex < scene.layers.size();++layerIndex)
+    {
+        for (unsigned int cameraIndex = 0;cameraIndex < scene.layers[layerIndex].GetCamerasNumber();++cameraIndex)
+        {
+            int mouseXInTheLayer = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), scene.layers[layerIndex].GetCamera(cameraIndex).GetSFMLView()).x;
+            int mouseYInTheLayer = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), scene.layers[layerIndex].GetCamera(cameraIndex).GetSFMLView()).y;
+
+            if  ( GetDrawableX() < mouseXInTheLayer &&
+                ( GetDrawableX() + GetWidth() ) > mouseXInTheLayer &&
+                  GetDrawableY() < mouseYInTheLayer &&
+                ( GetDrawableY() + GetHeight() ) > mouseYInTheLayer )
+            {
+                int ClicX = static_cast<int>( mouseXInTheLayer - GetDrawableX() );
+                int ClicY = static_cast<int>( mouseYInTheLayer - GetDrawableY() );
+
+                return ( !accurate || GetCurrentSFMLSprite().GetPixel( ClicX , ClicY ).a != 0 );
+            }
+            else
+                return false;
+        }
+    }
+}
+
+void SpriteObject::TurnTowardObject( std::string, Object * object )
+{
+    if (object == NULL) return;
+
+    //On se dirige vers le centre
+    float angle = atan2(
+    (object->GetDrawableY() + object->GetCenterY()) - (GetDrawableY()+GetCenterY()),
+    (object->GetDrawableX() + object->GetCenterX()) - (GetDrawableX()+GetCenterX())
+    ) * 180 / 3.14159;
+
+    SetAngle(angle);
+    return;
+}
+
+
 void OpenPoint(Point & point, const TiXmlElement * elemPoint)
 {
     if ( elemPoint->Attribute( "nom" ) != NULL ) { point.SetName(elemPoint->Attribute( "nom" ));}

@@ -242,7 +242,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddCodeOnlyParameter("currentScene", "");
-            instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
+            instrInfo.AddCodeOnlyParameter("listsOfObjectsOfParameter", "0");
 
             instrInfo.cppCallingInformation.SetFunctionName("Duplicate");
 
@@ -273,7 +273,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/layer.png");
 
             instrInfo.AddParameter("object", _("Objet"), "", false);
-            instrInfo.AddParameter("layer", _("Mettre sur le calque ( calque de base si vide )"), "", false);
+            instrInfo.AddParameter("layer", _("Mettre sur le calque ( calque de base si vide )"), "", false).SetDefaultValue("\"\"");
 
             instrInfo.cppCallingInformation.SetFunctionName("SetLayer").SetAssociatedGetter("GetLayer").SetManipulatedType("string");
 
@@ -533,6 +533,93 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         DECLARE_END_OBJECT_ACTION()
 
+        DECLARE_OBJECT_ACTION("AddForceVers",
+                       _("Ajouter une force dirigée vers un objet"),
+                       _("Ajoute une force à un objet pour qu'il se dirige vers un autre. L'objet bougera ensuite en fonction de\ntoutes les forces qui s'exercent sur lui."),
+                       _("Diriger _PARAM0_ vers _PARAM1_ avec une force de longueur _PARAM2_ pixels"),
+                       _("Déplacement"),
+                       "res/actions/forceVers24.png",
+                       "res/actions/forceVers.png");
+
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("object", _("Objet vers lequel se diriger"), "", false);
+            instrInfo.AddParameter("expression", _("Longueur en pixel"), "", false);
+            instrInfo.AddParameter("expression", _("Dissipation ( 0 par défaut )"), "", false);
+            instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
+
+            instrInfo.cppCallingInformation.SetFunctionName("AddForceTowardObject").SetIncludeFile("GDL/ObjectTools.h");
+
+        DECLARE_END_OBJECT_ACTION()
+
+        DECLARE_OBJECT_ACTION("AddForceTourne",
+                       _("Ajouter une force pour tourner autour d'un objet"),
+                       _("Ajoute une force à un objet pour qu'il tourne autour d'un autre.\nNotez que le déplacement n'est pas forcément précis, notamment si la vitesse est élevée.\nPour positionner de façon parfaite un objet autour d'un autre, utilisez les actions de la catégorie Position."),
+                       _("Faire tourner _PARAM0_ autour de _PARAM1_ à _PARAM2_°/sec et à _PARAM3_ pixels de distance"),
+                       _("Déplacement"),
+                       "res/actions/forceTourne24.png",
+                       "res/actions/forceTourne.png");
+
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("object", _("Objet autour duquel tourner"), "", false);
+            instrInfo.AddParameter("expression", _("Vitesse ( Degrés par secondes )"), "", false);
+            instrInfo.AddParameter("expression", _("Distance ( en pixel )"), "", false);
+            instrInfo.AddParameter("expression", _("Dissipation ( 0 par défaut )"), "", false);
+            instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
+
+            instrInfo.cppCallingInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDL/ObjectTools.h");
+
+        DECLARE_END_OBJECT_ACTION()
+
+        DECLARE_OBJECT_ACTION("MettreAutour",
+                       _("Mettre un objet autour d'un autre"),
+                       _("Positionne un objet autour d'un autre, avec l'angle et la distance indiquée."),
+                       _("Mettre _PARAM0_ autour de _PARAM1_ à _PARAM3_° et à _PARAM2_ pixels de distance"),
+                       _("Position"),
+                       "res/actions/positionAutour24.png",
+                       "res/actions/positionAutour.png");
+
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("object", _("Objet autour duquel positionner le premier"), "", false);
+            instrInfo.AddParameter("expression", _("Distance"), "", false);
+            instrInfo.AddParameter("expression", _("Angle en degré"), "", false);
+            instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
+
+            instrInfo.cppCallingInformation.SetFunctionName("PutAroundObject").SetIncludeFile("GDL/ObjectTools.h");
+
+        DECLARE_END_OBJECT_ACTION()
+
+    DECLARE_OBJECT_ACTION("Rebondir",
+                   _("Ecarter un objet d'un autre"),
+                   _("Ecarte un objet d'un autre, en utilisant les forces."),
+                   _("Ecarter _PARAM0_ de _PARAM2_ ( seul _PARAM0_ bougera )"),
+                   _("Déplacement"),
+                   "res/actions/ecarter24.png",
+                   "res/actions/ecarter.png");
+
+        instrInfo.AddParameter("object", _("Objet"), "", false);
+        instrInfo.AddParameter("object", _("Objet 2 ( Ne bougera pas )"), "", false);
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
+
+        instrInfo.cppCallingInformation.SetFunctionName("SeparateObjectsWithForces").SetIncludeFile("GDL/ObjectTools.h");
+
+    DECLARE_END_OBJECT_ACTION()
+
+    DECLARE_OBJECT_ACTION("Ecarter",
+                   _("Ecarter un objet d'un autre"),
+                   _("Ecarte un objet d'un autre sans utiliser les forces."),
+                   _("Ecarter _PARAM0_ de _PARAM2_ ( seul _PARAM0_ bougera )"),
+                   _("Position"),
+                   "res/actions/ecarter24.png",
+                   "res/actions/ecarter.png");
+
+        instrInfo.AddParameter("object", _("Objet"), "", false);
+        instrInfo.AddParameter("object", _("Objet 2 ( Ne bougera pas )"), "", false);
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
+
+        instrInfo.cppCallingInformation.SetFunctionName("SeparateObjectsWithoutForces").SetIncludeFile("GDL/ObjectTools.h");
+
+    DECLARE_END_OBJECT_ACTION()
+
         DECLARE_OBJECT_EXPRESSION("X", _("Position X"), _("Position X de l'objet"), _("Position"), "res/actions/position.png")
             instrInfo.AddParameter("object", _("Objet"), "", false);
 
@@ -626,7 +713,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         DECLARE_OBJECT_EXPRESSION("Distance", _("Distance entre deux objets"), _("Distance entre deux objets"), _("Position"), "res/conditions/distance.png")
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddParameter("object", _("Objet"), "", false);
-            instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
+            instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
 
             instrInfo.cppCallingInformation.SetFunctionName("GetDistanceWithObject");
         DECLARE_END_OBJECT_EXPRESSION()
@@ -634,7 +721,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         DECLARE_OBJECT_EXPRESSION("SqDistance", _("Distance au carré entre deux objets"), _("Distance au carré entre deux objets"), _("Position"), "res/conditions/distance.png")
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddParameter("object", _("Objet"), "", false);
-            instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
+            instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
 
             instrInfo.cppCallingInformation.SetFunctionName("GetSqDistanceWithObject");
         DECLARE_END_OBJECT_EXPRESSION()

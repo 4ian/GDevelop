@@ -18,8 +18,8 @@ double GD_API GetCameraViewportTop(RuntimeScene & scene, const std::string & lay
 double GD_API GetCameraViewportRight(RuntimeScene & scene, const std::string & layer, unsigned int camera);
 double GD_API GetCameraViewportBottom(RuntimeScene & scene, const std::string & layer, unsigned int camera);
 void GD_API SetCameraSize( RuntimeScene & scene, const std::string & layer, unsigned int cameraNb, float width, float height);
-void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, const std::string &, std::vector<Object*> & objects, float left, float top, float right, float bottom, bool anticipateObjectMove, const std::string & layer, unsigned int camera);
-void GD_API CenterCameraOnObject(RuntimeScene & scene, const std::string &, std::vector<Object*> & objects,  bool anticipateObjectMove, const std::string & layer, unsigned int camera);
+void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, const std::string &, Object * object, float left, float top, float right, float bottom, bool anticipateObjectMove, const std::string & layer, unsigned int camera);
+void GD_API CenterCameraOnObject(RuntimeScene & scene, const std::string &, Object * object, bool anticipateObjectMove, const std::string & layer, unsigned int camera);
 void GD_API ActDeleteCamera(RuntimeScene & scene, const std::string & layer, unsigned int camera);
 void GD_API AddCamera( RuntimeScene & scene, const std::string & layer, float width, float height, float viewportLeft, float viewportTop, float viewportRight, float viewportBottom );
 void GD_API SetCameraViewport( RuntimeScene & scene,  const std::string & layer, unsigned int cameraNb, float viewportLeft, float viewportTop, float viewportRight, float viewportBottom );

@@ -38,6 +38,7 @@
 #if defined(GD_IDE_ONLY)
 #include <wx/log.h>
 #include <wx/msgdlg.h>
+#include "GDL/EventsCodeCompiler.h"
 #endif
 
 typedef ExtensionBase* (*createExtension)();
@@ -232,8 +233,8 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
             }
 
             extensionsManager->AddExtension(extension);
-            #if defined(GD_IDE_ONLY) //In editor, load catalog associated with extension, if any.
-            GDpriv::LocaleManager::GetInstance()->AddCatalog(extension->GetName());
+            #if defined(GD_IDE_ONLY)
+            GDpriv::LocaleManager::GetInstance()->AddCatalog(extension->GetName()); //In editor, load catalog associated with extension, if any.
             #endif
             #if defined(GD_IDE_ONLY)
             wxRemoveFile("ExtensionBeingLoaded.log");

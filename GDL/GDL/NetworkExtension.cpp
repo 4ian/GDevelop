@@ -1,5 +1,9 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/NetworkExtension.h"
-#include "GDL/aNet.h"
 
 NetworkExtension::NetworkExtension()
 {
@@ -15,17 +19,18 @@ NetworkExtension::NetworkExtension()
                    _("Envoyer à _PARAM0_ les données : _PARAM2_, _PARAM3_,_PARAM4_,_PARAM5_,_PARAM6_,_PARAM7_"),
                    _("Réseau"),
                    "res/actions/net24.png",
-                   "res/actions/net.png",
-                   &ActEnvoiDataNet);
+                   "res/actions/net.png");
 
-        DECLARE_PARAMETER("string", _("Adresse de la page .php ( N'oubliez pas le protocole http:// )"), "",false)
-        DECLARE_PARAMETER("password", _("Mot de passe de sécurité"), "",false)
-        DECLARE_PARAMETER("string", _("Donnée 1"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 2"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 3"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 4"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 5"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("text", _("Donnée 6"), "",false)
+        instrInfo.AddParameter("string", _("Adresse de la page .php ( N'oubliez pas le protocole http:// )"), "",false);
+        instrInfo.AddParameter("password", _("Mot de passe de sécurité"), "",false);
+        instrInfo.AddParameter("string", _("Donnée 1"), "",false);
+        instrInfo.AddParameter("string", _("Donnée 2"), "",true);
+        instrInfo.AddParameter("string", _("Donnée 3"), "",true);
+        instrInfo.AddParameter("string", _("Donnée 4"), "",true);
+        instrInfo.AddParameter("string", _("Donnée 5"), "",true);
+        instrInfo.AddParameter("string", _("Donnée 6"), "",true);
+
+        instrInfo.cppCallingInformation.SetFunctionName("SendDataToPhpWebPage").SetIncludeFile("GDL/NetworkTools.h");
 
     DECLARE_END_ACTION()
 
@@ -35,12 +40,13 @@ NetworkExtension::NetworkExtension()
                    _("Télécharger le fichier _PARAM1_ depuis _PARAM0_ sous le nom de _PARAM2_"),
                    _("Réseau"),
                    "res/actions/net24.png",
-                   "res/actions/net.png",
-                   &ActDownloadFile);
+                   "res/actions/net.png");
 
-        DECLARE_PARAMETER("string", _("Site web ( Par exemple : http://www.monsite.com )"), "",false)
-        DECLARE_PARAMETER("string", _("Chemin du fichier ( Par exemple : /dossier/fichier.txt )"), "",false)
-        DECLARE_PARAMETER("string", _("Enregistrer le fichier sous le nom"), "",false)
+        instrInfo.AddParameter("string", _("Site web ( Par exemple : http://www.monsite.com )"), "",false);
+        instrInfo.AddParameter("string", _("Chemin du fichier ( Par exemple : /dossier/fichier.txt )"), "",false);
+        instrInfo.AddParameter("string", _("Enregistrer le fichier sous le nom"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("DownloadFile").SetIncludeFile("GDL/NetworkTools.h");
 
     DECLARE_END_ACTION()
 }

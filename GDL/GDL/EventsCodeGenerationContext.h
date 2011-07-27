@@ -4,6 +4,8 @@
 #include <string>
 #include <set>
 #include <boost/shared_ptr.hpp>
+class Game;
+class Scene;
 
 /**
  * Used to manage the context ( objects concerned, objects being modified by an action... )
@@ -12,7 +14,7 @@
 class EventsCodeGenerationContext
 {
     public:
-        EventsCodeGenerationContext() : errorOccured(false) {};
+        EventsCodeGenerationContext() : errorOccured(false), allObjectsMapNeeded(false) {};
         virtual ~EventsCodeGenerationContext() {};
 
         /**
@@ -28,7 +30,7 @@ class EventsCodeGenerationContext
         /**
          * Call this when an instruction in the event need an object list.
          */
-        void ObjectNeeded(std::string objectName) {if (objectsListsToBeDeclaredEmpty.find(objectName) == objectsListsToBeDeclaredEmpty.end()) objectsToBeDeclared.insert(objectName);};
+        void ObjectNeeded(std::string objectName) {objectsToBeDeclared.insert(objectName);objectsListsToBeDeclaredEmpty.erase(objectName);};
 
         /**
          * Call this when an instruction in the event need an object list.
@@ -38,7 +40,12 @@ class EventsCodeGenerationContext
         /**
          * Delete an object from objects to be declared list. Can be used by an event which manages itself some objects ( e.g ForEach events )
          */
-        void ObjectNotNeeded(std::string objectName) {objectsToBeDeclared.erase(objectName);};
+        void ObjectNotNeeded(std::string objectName) {objectsToBeDeclared.erase(objectName); objectsListsToBeDeclaredEmpty.erase(objectName);};
+
+        /**
+         * Request a map of all objects
+         */
+        void MapOfAllObjectsNeeded(const Game & game, const Scene & scene);
 
         /**
          * Generate code for getting needed object lists from scene. Also clear objectsToBeDeclared.
@@ -55,6 +62,8 @@ class EventsCodeGenerationContext
         std::set<std::string> objectsAlreadyDeclared;
         std::set<std::string> objectsToBeDeclared;
         std::set<std::string> objectsListsToBeDeclaredEmpty;
+
+        bool allObjectsMapNeeded;
 
     private:
 };

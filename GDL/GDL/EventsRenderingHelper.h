@@ -24,7 +24,7 @@ class GD_API EventsRenderingHelper
         static EventsRenderingHelper * GetInstance();
         static void DestroySingleton();
 
-        void DrawNiceRectangle(wxDC & dc, const wxRect & rect, const wxColor & color1, const wxColor & color2,const wxColor & color3,const wxColor & color4,const wxColor & color5) const;
+        void DrawNiceRectangle(wxDC & dc, const wxRect & rect) const;
 
         int DrawConditionsList(const std::vector < Instruction > & conditions, wxDC & dc, const int x, const int y, const int width, bool disabled);
         int DrawActionsList(const std::vector < Instruction > & actions, wxDC & dc, int x, int y, int width, bool disabled);
@@ -49,18 +49,6 @@ class GD_API EventsRenderingHelper
         inline unsigned int GetConditionsColumnWidth() const {return conditionsColumnWidth;};
         inline void SetConditionsColumnWidth(unsigned int conditionsColumnWidth_) { conditionsColumnWidth = conditionsColumnWidth_; };
 
-        inline const wxPen & GetRectangleOutlinePen() const {return rectangleOutline;};
-        inline void SetRectangleOutlinePen(wxPen & outlinePen_) { rectangleOutline = outlinePen_; };
-
-        inline const wxBrush & GetRectangleFillBrush() const {return rectangleFill;};
-        inline void SetRectangleFillBrush(wxBrush & brush_) { rectangleFill = brush_; };
-
-        inline const wxPen & GetSelectedRectangleOutlinePen() const {return selectedRectangleOutline;};
-        inline void SetSelectedRectangleOutlinePen(wxPen & outlinePen_) { selectedRectangleOutline = outlinePen_; };
-
-        inline const wxBrush & GetSelectedRectangleFillBrush() const {return selectedRectangleFill;};
-        inline void SetSelectedRectangleFillBrush(wxBrush & brush_) { selectedRectangleFill = brush_; };
-
         inline const wxFont & GetBigFont() const {return bigFont;};
         inline wxFont & GetBigFont() {return bigFont;};
 
@@ -78,6 +66,12 @@ class GD_API EventsRenderingHelper
 
         inline const wxHtmlDCRenderer & GetHTMLRenderer() const {return htmlRenderer;};
         inline wxHtmlDCRenderer & GetHTMLRenderer() {return htmlRenderer;};
+
+        const wxBrush & GetSelectedRectangleFillBrush() const { return selectionRectangleFill; }
+        wxBrush & GetSelectedRectangleFillBrush() { return selectionRectangleFill; }
+
+        const wxPen & GetSelectedRectangleOutlinePen() const { return selectionRectangleOutline; }
+        wxPen & GetSelectedRectangleOutlineBrush() { return selectionRectangleOutline; }
 
         /**
          * Make sure a text will be correctly display by replacing specials characters
@@ -99,17 +93,25 @@ class GD_API EventsRenderingHelper
         wxColor disabledColor;
         wxColor disabledColor2;
 
+        int instructionsListBorder;
+
     private:
         EventsRenderingHelper();
         virtual ~EventsRenderingHelper() {};
 
         unsigned int conditionsColumnWidth;
 
-        wxPen rectangleOutline;
-        wxBrush rectangleFill;
+        wxPen selectionRectangleOutline;
+        wxBrush selectionRectangleFill;
+
+        wxPen niceRectangleOutline;
+        wxColour niceRectangleFill1;
+        wxColour niceRectangleFill2;
+
+        wxPen actionsRectangleOutline;
+        wxPen conditionsRectangleOutline;
+        wxBrush actionsRectangleFill;
         wxBrush conditionsRectangleFill;
-        wxPen selectedRectangleOutline;
-        wxBrush selectedRectangleFill;
         wxFont font;
         wxFont bigFont;
         wxFont boldFont;

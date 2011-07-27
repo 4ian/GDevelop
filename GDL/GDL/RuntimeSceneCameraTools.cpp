@@ -86,9 +86,9 @@ void GD_API SetCameraSize( RuntimeScene & scene, const std::string & layer, unsi
     camera.GetSFMLView().SetSize(camera.GetCameraInfo().size);
 }
 
-void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, const std::string &, std::vector<Object*> & objects, float left, float top, float right, float bottom, bool anticipateObjectMove, const std::string & layer, unsigned int camera)
+void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, const std::string &, Object* object, float left, float top, float right, float bottom, bool anticipateObjectMove, const std::string & layer, unsigned int camera)
 {
-    if ( objects.empty() ) return;
+    if ( object == NULL ) return;
 
     sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
@@ -98,43 +98,43 @@ void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, const std::stri
     //Prise en compte des déplacements de l'objet
     if ( anticipateObjectMove )
     {
-        decalementX = ( objects[0]->TotalForceX() * scene.GetElapsedTime() );
-        decalementY = ( objects[0]->TotalForceY() * scene.GetElapsedTime() );
+        decalementX = ( object->TotalForceX() * scene.GetElapsedTime() );
+        decalementY = ( object->TotalForceY() * scene.GetElapsedTime() );
     }
 
     //Si on est dans le cadre
-    if ( objects[0]->GetX() > left
-        && objects[0]->GetX() < right
-        && objects[0]->GetY() > top
-        && objects[0]->GetY() < bottom
+    if ( object->GetX() > left
+        && object->GetX() < right
+        && object->GetY() > top
+        && object->GetY() < bottom
         )
     {
-        view.SetCenter(objects[0]->GetX() + decalementX, objects[0]->GetY() + decalementY);
+        view.SetCenter(object->GetX() + decalementX, object->GetY() + decalementY);
     }
 
     //Si on n'est pas dedans.
-    if ( ( objects[0]->GetX() < left
-        || objects[0]->GetX() > right )
-        && objects[0]->GetY() > top
-        && objects[0]->GetY() < bottom )
+    if ( ( object->GetX() < left
+        || object->GetX() > right )
+        && object->GetY() > top
+        && object->GetY() < bottom )
 
     {
-        view.SetCenter(view.GetCenter().x, objects[0]->GetY() + decalementY);
+        view.SetCenter(view.GetCenter().x, object->GetY() + decalementY);
     }
-    if ( ( objects[0]->GetY() < top
-        || objects[0]->GetY() > bottom )
-        && objects[0]->GetX() > left
-        && objects[0]->GetX() < right)
+    if ( ( object->GetY() < top
+        || object->GetY() > bottom )
+        && object->GetX() > left
+        && object->GetX() < right)
     {
-        view.SetCenter(objects[0]->GetX() + decalementX, view.GetCenter().y);
+        view.SetCenter(object->GetX() + decalementX, view.GetCenter().y);
     }
 
     return;
 }
 
-void GD_API CenterCameraOnObject(RuntimeScene & scene, const std::string &, std::vector<Object*> & objects,  bool anticipateObjectMove, const std::string & layer, unsigned int camera)
+void GD_API CenterCameraOnObject(RuntimeScene & scene, const std::string &, Object * object,  bool anticipateObjectMove, const std::string & layer, unsigned int camera)
 {
-    if ( objects.empty() ) return;
+    if ( object == NULL ) return;
 
     sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
 
@@ -144,11 +144,11 @@ void GD_API CenterCameraOnObject(RuntimeScene & scene, const std::string &, std:
     //Prise en compte des déplacements de l'objet
     if ( anticipateObjectMove )
     {
-        decalementX = ( objects[0]->TotalForceX() * scene.GetElapsedTime() );
-        decalementY = ( objects[0]->TotalForceY() * scene.GetElapsedTime() );
+        decalementX = ( object->TotalForceX() * scene.GetElapsedTime() );
+        decalementY = ( object->TotalForceY() * scene.GetElapsedTime() );
     }
 
-    view.SetCenter(objects[0]->GetX() + decalementX, objects[0]->GetY() + decalementY);
+    view.SetCenter(object->GetX() + decalementX, object->GetY() + decalementY);
 
     return;
 }

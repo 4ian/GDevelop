@@ -13,6 +13,40 @@
 
 EventsRenderingHelper * EventsRenderingHelper::singleton = NULL;
 
+unsigned int DrawTextInArea(wxString text, wxDC & dc, wxPoint point, unsigned int widthAvailable)
+{
+    if ( text.empty() || widthAvailable == 0) return 0;
+
+    wxSize textSize = dc.GetTextExtent(text);
+    int cutCount = ceil(static_cast<double>(textSize.GetWidth())/static_cast<double>(widthAvailable));
+    int charactersInALine = static_cast<double>(widthAvailable)/static_cast<double>(textSize.GetWidth())*static_cast<double>(text.length());
+
+    if ( cutCount == 0 ) cutCount = 1;
+    if ( charactersInALine == 0) charactersInALine = 1;
+
+    size_t lastCutPosition = 0;
+    for (unsigned int i = 0;i<cutCount;++i)
+    {
+        wxString displayedText = text.Mid(lastCutPosition, charactersInALine);
+
+        dc.DrawText(displayedText, point);
+
+        lastCutPosition += charactersInALine;
+        point.y += 15;
+    }
+
+    return cutCount*15;
+}
+
+unsigned int GetTextHeightInArea(wxString text, wxDC & dc, unsigned int widthAvailable)
+{
+    if ( text.empty() || widthAvailable == 0) return 0;
+
+    int cutCount = ceil(static_cast<double>(dc.GetTextExtent(text).GetWidth())/static_cast<double>(widthAvailable));
+
+    return cutCount*15;
+}
+
 EventsRenderingHelper::EventsRenderingHelper() :
 eventGradient1(wxColour(209, 217, 255)),
 eventGradient2(wxColour(196, 207, 255)),
@@ -27,12 +61,17 @@ eventConditionsBorderColor(wxColour(185, 185, 247)),
 selectionColor(wxColour(255,230,156)),
 disabledColor(wxColour(245,245,254)),
 disabledColor2(wxColour(245,245,245)),
+instructionsListBorder(5),
 conditionsColumnWidth(200),
-rectangleOutline(wxPen(wxColour(242/2,242/2,242/2), 1)),
-rectangleFill(wxBrush(wxColour(242,242,242))),
-conditionsRectangleFill(wxBrush(wxColour(230,235,239))),
-selectedRectangleOutline(wxPen(wxColour(255, 85, 17), 1)),
-selectedRectangleFill(wxBrush(wxColour(255,230,156))),
+selectionRectangleOutline(wxPen(wxColour(255,230,156), 1)),
+selectionRectangleFill(wxBrush(wxColour(255/2,230/2,156/2))),
+niceRectangleFill1(wxColour(205,205,246)),
+niceRectangleFill2(wxColour(198,198,246)),
+niceRectangleOutline(wxPen(wxColour(185,185,247), 1)),
+actionsRectangleOutline(wxPen(wxColour(185,185,247), 1)),
+conditionsRectangleOutline(wxPen(wxColour(185,185,247), 1)),
+actionsRectangleFill(wxBrush(wxColour(255,255,255))),
+conditionsRectangleFill(wxBrush(wxColour(255,255,255))),
 font( 8, wxDEFAULT, wxNORMAL, wxNORMAL ),
 bigFont(12, wxDEFAULT, wxNORMAL, wxNORMAL ),
 boldFont(8, wxDEFAULT, wxNORMAL, wxBOLD ),
@@ -42,44 +81,68 @@ italicSmallFont( 5, wxDEFAULT, wxFONTSTYLE_ITALIC, wxNORMAL )
     fakeBmp.Create(10,10,-1);
 }
 
-void EventsRenderingHelper::DrawNiceRectangle(wxDC & dc, const wxRect & rect, const wxColor & color1, const wxColor & color2,const wxColor & color3,const wxColor & color4,const wxColor & color5) const
+void EventsRenderingHelper::DrawNiceRectangle(wxDC & dc, const wxRect & rect) const
 {
+    const int shadowWidth = 3;
     {
         wxRect background(rect);
-        background.x += 2;
-        background.width -= 4;
+
+        background.x += shadowWidth;
+        background.y += shadowWidth;
+        background.width -= shadowWidth*2;
+        background.height -= shadowWidth*2;
+        dc.SetPen(niceRectangleOutline);
+        dc.DrawRectangle(background);
+
+        background.x += 1;
+        background.y += 1;
+        background.width -= 2;
         background.height -= 2;
-
-        background.height = 3;
-        dc.GradientFillLinear(background, color1, color2, wxSOUTH);
-
-        background.y += background.height;
-        background.height = rect.height - 2 - background.height;
-        dc.GradientFillLinear(background, color3, color4, wxSOUTH);
+        dc.GradientFillLinear(background, niceRectangleFill1, niceRectangleFill2, wxSOUTH);
     }
     {
-        wxPoint border_points[8];
-        border_points[0] = wxPoint(2, 0);
-        border_points[1] = wxPoint(1, 1);
-        border_points[2] = wxPoint(1, rect.height - 4);
-        border_points[3] = wxPoint(3, rect.height - 2);
-        border_points[4] = wxPoint(rect.width - 4, rect.height - 2);
-        border_points[5] = wxPoint(rect.width - 2, rect.height - 4);
-        border_points[6] = wxPoint(rect.width - 2, 1);
-        border_points[7] = wxPoint(rect.width - 4, -1);
+        wxRect shadowRect(rect);
+        shadowRect.y += 1;
+        shadowRect.height -= 2;
+        shadowRect.width = shadowWidth;
 
-        dc.SetPen(wxPen(color5));
-        dc.DrawLines(sizeof(border_points)/sizeof(wxPoint), border_points, rect.x, rect.y);
+        dc.GradientFillLinear(shadowRect, wxColour(190,190,190), wxColour(240,240,240,0), wxLEFT);
+    }
+    {
+        wxRect shadowRect(rect);
+        shadowRect.x += shadowRect.width-shadowWidth;
+        shadowRect.y += 1;
+        shadowRect.height -= 2;
+        shadowRect.width = shadowWidth;
+
+        dc.GradientFillLinear(shadowRect, wxColour(190,190,190), wxColour(240,240,240,0), wxRIGHT);
+    }
+    {
+        wxRect shadowRect(rect);
+        shadowRect.x += 1;
+        shadowRect.width -= 2;
+        shadowRect.height = shadowWidth;
+
+        dc.GradientFillLinear(shadowRect, wxColour(190,190,190), wxColour(230,230,230,0), wxNORTH);
+    }
+    {
+        wxRect shadowRect(rect);
+        shadowRect.y += shadowRect.height-shadowWidth;
+        shadowRect.x += 1;
+        shadowRect.width -= 2;
+        shadowRect.height = shadowWidth;
+
+        dc.GradientFillLinear(shadowRect, wxColour(190,190,190), wxColour(230,230,230,0), wxSOUTH);
     }
 }
 
 int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & conditions, wxDC & dc, const int x, const int y, const int width, bool disabled)
 {
+    dc.SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas"));
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const int iconWidth = 18;
     const int separation = 1;
     const int sideSeparation = 1;
-    const int conditionsHeight = GetRenderedConditionsListHeight(conditions, width);
 
     const wxColor & color1 = disabled ? disabledColor2 : eventGradient1;
     const wxColor & color2 = disabled ? disabledColor : eventGradient2;
@@ -87,8 +150,15 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
     const wxColor & color4 = disabled ? disabledColor2 : eventGradient4;
 
     //Draw Conditions rectangle
-    wxRect rect(x, y, width, conditions.empty() ? 18 : conditionsHeight);
-    DrawNiceRectangle(dc, rect, color1, color2, color3, color4, eventConditionsBorderColor);
+    const int conditionsRectangleSeparation = 2;
+    const int conditionsHeight = GetRenderedConditionsListHeight(conditions, width);
+    wxRect rect(x+conditionsRectangleSeparation,
+                y+conditionsRectangleSeparation,
+                width-conditionsRectangleSeparation,
+                conditions.empty() ? 18-conditionsRectangleSeparation : conditionsHeight-conditionsRectangleSeparation);
+    dc.SetPen(conditionsRectangleOutline);
+    dc.SetBrush(conditionsRectangleFill);
+    dc.DrawRectangle(rect);
 
     if ( conditions.empty() )
     {
@@ -105,8 +175,8 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
         const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(conditions[j].GetType());
 
         //Prepare html renderer. Need to be do for each conditions as dc can have been changed by sub conditions.
-        GetHTMLRenderer().SetDC(&dc);
-        GetHTMLRenderer().SetStandardFonts( 8 );
+        /*GetHTMLRenderer().SetDC(&dc);
+        GetHTMLRenderer().SetStandardFonts( 8 );*/
 
         //Draw needed icons
         int leftIconsWidth = 0;
@@ -143,14 +213,14 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
             dc.DrawBitmap( instructionInfos.smallicon, x + sideSeparation + leftIconsWidth, yCondition, true );
 
         //Draw the condition text
-        std::string beginTag = disabled ? "<FONT color=#BDBDBD>" : "";
-        std::string endTag = disabled ? "</FONT>" : "";
-        string TexteFinal = beginTag+TranslateCondition::Translate(conditions[j], instructionInfos)+endTag;
-        GetHTMLRenderer().SetHtmlText(TexteFinal);
+        //std::string beginTag = disabled ? "<FONT color=#BDBDBD>" : "";
+        //std::string endTag = disabled ? "</FONT>" : "";
+        //string TexteFinal = beginTag+TranslateCondition::Translate(conditions[j], instructionInfos)+endTag;
+        //GetHTMLRenderer().SetHtmlText(TexteFinal);
         wxArrayInt neededArray;
-        GetHTMLRenderer().Render(x + sideSeparation + leftIconsWidth + iconWidth, yCondition, neededArray);
+        //GetHTMLRenderer().Render(x + sideSeparation + leftIconsWidth + iconWidth, yCondition, neededArray);
 
-        yCondition += GetHTMLRenderer().GetTotalHeight()+separation+1;
+        yCondition += DrawTextInArea(TranslateCondition::Translate(conditions[j], instructionInfos),dc, wxPoint(x + sideSeparation + leftIconsWidth + iconWidth, yCondition), freeWidth)+separation+1;//GetHTMLRenderer().GetTotalHeight()+separation+1;
 
         //Draw sub conditions
         if ( !conditions[j].GetSubInstructions().empty() )
@@ -169,10 +239,23 @@ int EventsRenderingHelper::DrawConditionsList(const vector < Instruction > & con
 
 int EventsRenderingHelper::DrawActionsList(const vector < Instruction > & actions, wxDC & dc, const int x, const int y, const int width, bool disabled)
 {
+    dc.SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas"));
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const int iconWidth = 18;
     const int separation = 1;
     const int sideSeparation = 1;
+
+    //Draw Conditions rectangle
+    const int actionsRectangleSeparation = 2;
+    const int actionsHeight = GetRenderedActionsListHeight(actions, width);
+    wxRect rect(x+actionsRectangleSeparation,
+                y+actionsRectangleSeparation,
+                width-actionsRectangleSeparation,
+                actions.empty() ? 18-actionsRectangleSeparation : actionsHeight-actionsRectangleSeparation);
+    dc.SetPen(actionsRectangleOutline);
+    dc.SetBrush(actionsRectangleFill);
+    dc.DrawRectangle(rect);
+
 
     if ( actions.empty() )
     {
@@ -221,13 +304,13 @@ int EventsRenderingHelper::DrawActionsList(const vector < Instruction > & action
             dc.DrawBitmap( instructionInfos.smallicon, x + sideSeparation + leftIconsWidth, yAction, true );
 
         //Draw the action text
-        std::string beginTag = disabled ? "<FONT color=#BDBDBD>" : "";
-        std::string endTag = disabled ? "</FONT>" : "";
-        GetHTMLRenderer().SetHtmlText(beginTag+TranslateAction::Translate( actions[j], instructionInfos )+endTag);
+        //std::string beginTag = disabled ? "<FONT color=#BDBDBD>" : "";
+        //std::string endTag = disabled ? "</FONT>" : "";
+        //GetHTMLRenderer().SetHtmlText(beginTag+TranslateAction::Translate( actions[j], instructionInfos )+endTag);
         wxArrayInt neededArray;
-        GetHTMLRenderer().Render(x + leftIconsWidth + iconWidth + sideSeparation, yAction, neededArray);
+        //GetHTMLRenderer().Render(x + leftIconsWidth + iconWidth + sideSeparation, yAction, neededArray);
 
-        yAction += GetHTMLRenderer().GetTotalHeight()+separation+1;
+        yAction += DrawTextInArea(TranslateAction::Translate( actions[j], instructionInfos ),dc, wxPoint(x + sideSeparation + leftIconsWidth + iconWidth+sideSeparation, yAction), freeWidth)+separation+1; //GetHTMLRenderer().GetTotalHeight()+separation+1;
     }
     yAction += 3;
 
@@ -247,6 +330,7 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
 
     wxMemoryDC dc;
     dc.SelectObject(fakeBmp);
+    dc.SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas"));
 
 
     int yCondition = 1;
@@ -274,10 +358,11 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
         yCondition += separation;
 
         //Calcul de la hauteur prise par le texte
-        GetHTMLRenderer().SetHtmlText(TranslateCondition::Translate(conditions[j], instructionInfos));
-        yCondition += GetHTMLRenderer().GetTotalHeight()+separation+1;
+        //GetHTMLRenderer().SetHtmlText(TranslateCondition::Translate(conditions[j], instructionInfos));
+        unsigned int textTotalHeight = GetTextHeightInArea(TranslateCondition::Translate(conditions[j], instructionInfos),dc, freeWidth);//GetHTMLRenderer().GetTotalHeight();
+        yCondition += textTotalHeight+separation+1;
 
-        conditions[j].renderedHeight = GetHTMLRenderer().GetTotalHeight();
+        conditions[j].renderedHeight = textTotalHeight;
         conditions[j].renderedHeightNeedUpdate = false;
 
         if ( !conditions[j].GetSubInstructions().empty() )
@@ -302,6 +387,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
 
     wxMemoryDC dc;
     dc.SelectObject(fakeBmp);
+    dc.SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas"));
 
     //La classe de rendu de HTML
 
@@ -327,10 +413,11 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
         yAction += separation;
 
         //Calcul de la hauteur prise par le texte
-        GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( actions[j], instructionInfos ));
-        yAction += GetHTMLRenderer().GetTotalHeight()+separation+1;
+        //GetHTMLRenderer().SetHtmlText(TranslateAction::Translate( actions[j], instructionInfos ));
+        unsigned int textTotalHeight = GetTextHeightInArea(TranslateAction::Translate( actions[j], instructionInfos ),dc, freeWidth);//GetHTMLRenderer().GetTotalHeight();
+        yAction += textTotalHeight+separation+1;
 
-        actions[j].renderedHeight = GetHTMLRenderer().GetTotalHeight();
+        actions[j].renderedHeight = textTotalHeight;
         actions[j].renderedHeightNeedUpdate = false;
     }
     yAction += 3;

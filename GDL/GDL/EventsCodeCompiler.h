@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <set>
 #include <boost/shared_ptr.hpp>
 #include <SFML/System.hpp>
 class EventsExecutionEngine;
@@ -36,10 +37,20 @@ public:
     void DisableCompilation(Scene & scene);
 
     /**
-     * Return true if a thread is compiling scene's events.
-     * -> In this case, scene must not try to launch a runtime scene.
+     * Return true if thread is compiling a scene's events.
+     * -> In this case, scenes must not try to launch runtime scenes.
      */
-    bool SceneEventsBeingCompiled(Scene & scene);
+    bool EventsBeingCompiled();
+
+    /**
+     * Return true if thread is ( or is going to ) compiling scene's events.
+     */
+    bool SceneEventsBeingCompiled(const Scene & scene);
+
+    /**
+     * A directory where headers can be found
+     */
+    void AddHeaderDirectory(std::string dir) { headersDirectories.insert(dir); }
 
     static EventsCodeCompiler * GetInstance()
     {
@@ -62,7 +73,7 @@ private:
     class Worker
     {
     public:
-        Worker(Game & game_, Scene & scene_) :
+        Worker(Game * game_, Scene * scene_) :
             abort(false),
             workEnded(false),
             game(game_),
@@ -73,14 +84,14 @@ private:
         virtual ~Worker() {};
 
         void Launch() { thread.Launch(); }
-        const Scene& GetScene() { return scene; }
+        const Scene* GetScene() { return scene; }
 
         bool abort;
         bool workEnded;
 
     private:
-        Game & game;
-        Scene & scene;
+        Game * game;
+        Scene * scene;
         sf::Thread thread;
         void DoCompleteCompilation();
     };
@@ -92,9 +103,11 @@ private:
 
     void AddPendingTask(Game & game, Scene & scene);
 
-    std::map <Scene*, boost::shared_ptr<Worker> > currentTasks; ///< Compilation currently made.
+    boost::shared_ptr<Worker> currentTask; ///< Compilation currently made.
     std::vector <std::pair<Scene*, Game*> > pendingTasks; ///< Compilation task waiting to be launched.
     std::vector < Scene* > compilationDisallowed; ///< List of scenes which disallow their events to be compiled. (However, if a compilation is being made, it will not be stopped)
+
+    static std::set<std::string> headersDirectories;
 
     static sf::Mutex mutex;
 

@@ -112,8 +112,8 @@ MouseExtension::MouseExtension()
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddParameter("expression", _("Position X"), "", false);
         instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "", true);
-        instrInfo.AddParameter("camera", _("Numéro de la caméra ( Caméra 0 si vide )"), "", true);
+        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "", true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("camera", _("Numéro de la caméra ( Caméra 0 si vide )"), "", true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorXPosition").SetManipulatedType("number").SetIncludeFile("GDL/MouseTools.h");
 
@@ -130,8 +130,8 @@ MouseExtension::MouseExtension()
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddParameter("expression", _("Position Y"), "", false);
         instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "", true);
-        instrInfo.AddParameter("camera", _("Numéro de la caméra ( Caméra 0 si vide )"), "", true);
+        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "", true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("camera", _("Numéro de la caméra ( Caméra 0 si vide )"), "", true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorYPosition").SetManipulatedType("number").SetIncludeFile("GDL/MouseTools.h");
 
@@ -154,16 +154,16 @@ MouseExtension::MouseExtension()
 
     DECLARE_EXPRESSION("MouseX", _("Position X de la souris"), _("Position X de la souris"), _("Souris"), "res/actions/mouse.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "", true);
-        instrInfo.AddParameter("camera", _("Caméra"), "", true);
+        instrInfo.AddParameter("layer", _("Calque"), "", true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("camera", _("Caméra"), "", true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorXPosition").SetIncludeFile("GDL/MouseTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("SourisX", _("Position X de la souris"), _("Position X de la souris"), _("Souris"), "res/actions/mouse.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "", true);
-        instrInfo.AddParameter("camera", _("Caméra"), "", true);
+        instrInfo.AddParameter("layer", _("Calque"), "", true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("camera", _("Caméra"), "", true).SetDefaultValue("0");
 
         instrInfo.SetHidden();
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorXPosition").SetIncludeFile("GDL/MouseTools.h");
@@ -171,16 +171,16 @@ MouseExtension::MouseExtension()
 
     DECLARE_EXPRESSION("MouseY", _("Position Y de la souris"), _("Position Y de la souris"), _("Souris"), "res/actions/mouse.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "", true);
-        instrInfo.AddParameter("camera", _("Caméra"), "", true);
+        instrInfo.AddParameter("layer", _("Calque"), "", true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("camera", _("Caméra"), "", true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorYPosition").SetIncludeFile("GDL/MouseTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("SourisY", _("Position Y de la souris"), _("Position Y de la souris"), _("Souris"), "res/actions/mouse.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "", true);
-        instrInfo.AddParameter("camera", _("Caméra"), "", true);
+        instrInfo.AddParameter("layer", _("Calque"), "", true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("camera", _("Caméra"), "", true).SetDefaultValue("0");
 
         instrInfo.SetHidden();
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorYPosition").SetIncludeFile("GDL/MouseTools.h");

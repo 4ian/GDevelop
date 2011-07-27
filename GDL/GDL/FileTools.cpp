@@ -3,95 +3,120 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "GDL/tinyxml.h"
-#include "GDL/RuntimeScene.h"
-#include "GDL/ObjectsConcerned.h"
-#include <vector>
+#include "FileTools.h"
+#include <boost/shared_ptr.hpp>
 #include <string>
+#include "GDL/RuntimeScene.h"
 #include "GDL/CommonTools.h"
 #include "GDL/XmlFilesHelper.h"
-#include <stdio.h>
 
-using namespace std;
+bool GD_API FileExists( const std::string & file )
+{
+    TiXmlDocument doc;
+    if ( !doc.LoadFile(file.c_str()) && doc.ErrorId() == 2)
+        return false;
+
+    return true ;
+}
+
+bool GD_API GroupExists( const std::string & filename, const std::string & group )
+{
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
+    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
+
+    //Découpage des groupes
+    istringstream groupsStr( group );
+    string Str;
+    vector < string > groups;
+    while ( std::getline( groupsStr, Str, '/' ) )
+        groups.push_back(Str);
+
+    groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
+
+    //On avance petit à petit dans le fichier
+    for (unsigned int i =0;i<groups.size();i++)
+    {
+        if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
+            return false;
+
+        hdl = hdl.FirstChildElement(groups.at(i).c_str());
+    }
+
+    return true;
+}
+
 
 /**
  * Launch a file
  */
-bool ActLaunchFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API LaunchFile( const std::string & file )
 {
 #ifdef WINDOWS
     //Création de l'adresse internet à lancer
-    string appel = "start \"\" \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+"\""; //quotes are important
+    string appel = "start \"\" \""+file+"\""; //quotes are important
 
     system(appel.c_str());
 #elif defined(LINUX)
     //Nécessite le paquet xdg-utils
-    string appel = "xdg-open \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+"\"";
+    string appel = "xdg-open \""+file+"\"";
 
     system(appel.c_str());
 #elif defined(MAC)
-    string appel = "open \""+action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)+"\"";
+    string appel = "open \""+file+"\"";
 
     system(appel.c_str());
 #endif
 
-    return true;
+    return;
 }
 
 /**
  * Execute a system-specific command
  */
-bool ActExecuteCmd( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API ExecuteCmd( const std::string & cmd )
 {
-    system(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str());
+    system(cmd.c_str());
 
-    return true;
+    return;
 }
 
 /**
  * Delete a file
  */
-bool ActDeleteFichier( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API GDDeleteFile( const std::string & filename )
 {
-    remove(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str());
+    remove(filename.c_str());
 
-    return true;
+    return;
 }
 
 /**
  * Load a file in memory
  */
-bool ActLoadFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API LoadFileInMemory( const std::string & filename )
 {
-    XmlFilesManager::LoadFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    XmlFilesManager::LoadFile(filename);
 
-    return true;
+    return;
 }
 
 /**
  * Unload a file from memory
  */
-bool ActUnloadFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API UnloadFileFromMemory( const std::string & filename )
 {
-    XmlFilesManager::UnloadFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    XmlFilesManager::UnloadFile(filename);
 
-    return true;
+    return;
 }
 
-////////////////////////////////////////////////////////////
-/// Supprimer un groupe d'un fichier
-///
-/// Type : EcrireFichierExp
-/// Paramètre 1 : Nom du fichier
-/// Paramètre 2 : Groupe
-////////////////////////////////////////////////////////////
-bool ActDeleteGroupFichier( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API DeleteGroupFromFile( const std::string & filename, const std::string & group )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
-    istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
+    istringstream groupsStr( group );
     string Str;
     vector < string > groups;
     while ( std::getline( groupsStr, Str, '/' ) )
@@ -101,7 +126,7 @@ bool ActDeleteGroupFichier( RuntimeScene & scene, ObjectsConcerned & objectsConc
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
     if ( groups.empty() )
-        return false;
+        return;
     groups.push_back("");
 
     //Création si besoin est de la racine
@@ -112,37 +137,29 @@ bool ActDeleteGroupFichier( RuntimeScene & scene, ObjectsConcerned & objectsConc
     for (unsigned int i =0;i<groups.size();i++)
     {
         if ( hdl.FirstChildElement(groups.at(i).c_str()).Element() == NULL )
-            return false;
+            return;
 
         //Si on arrive au groupe parent du groupe
         //à supprimer
         if ( i >= (groups.size()-1)-1 )
         {
             hdl.ToNode()->RemoveChild(hdl.FirstChildElement(groups.at(i).c_str()).ToNode());
-            return true;
+            return;
         }
 
         hdl = hdl.FirstChildElement(groups.at(i).c_str());
     }
 
-    return false;
+    return;
 }
 
-////////////////////////////////////////////////////////////
-/// Ecrit une expression dans un fichier
-///
-/// Type : EcrireFichierExp
-/// Paramètre 1 : Nom du fichier
-/// Paramètre 2 : Groupe
-/// Paramètre 3 : Expression à écrire
-////////////////////////////////////////////////////////////
-bool ActEcrireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API WriteValueInFile( const std::string & filename, const std::string & group, double value )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
-    istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
+    istringstream groupsStr( group );
     string Str;
     vector < string > groups;
     while ( std::getline( groupsStr, Str, '/' ) )
@@ -152,7 +169,7 @@ bool ActEcrireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcer
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
     if ( groups.empty() )
-        return false;
+        return;
 
     //Insertion de la déclaration
     TiXmlDeclaration decl( "1.0", "ISO-8859-1", "" );
@@ -187,26 +204,18 @@ bool ActEcrireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcer
 
     //Ecriture dans le groupe
     if ( hdl.Element() != NULL )
-        hdl.Element()->SetDoubleAttribute("value", action.GetParameter( 2 ).GetAsMathExpressionResult(scene, objectsConcerned));
+        hdl.Element()->SetDoubleAttribute("value", value);
 
-    return true;
+    return;
 }
 
-////////////////////////////////////////////////////////////
-/// Ecrit une expression dans un fichier
-///
-/// Type : EcrireFichierTxt
-/// Paramètre 1 : Nom du fichier
-/// Paramètre 2 : Groupe
-/// Paramètre 3 : Expression texte à écrire
-////////////////////////////////////////////////////////////
-bool ActEcrireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API WriteStringInFile( const std::string & filename, const std::string & group, const std::string & str )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
-    istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
+    istringstream groupsStr( group );
     string Str;
     vector < string > groups;
     while ( std::getline( groupsStr, Str, '/' ) )
@@ -216,7 +225,7 @@ bool ActEcrireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcer
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
     if ( groups.empty() )
-        return false;
+        return;
 
     //Insertion de la déclaration
     TiXmlDeclaration decl( "1.0", "ISO-8859-1", "" );
@@ -250,26 +259,18 @@ bool ActEcrireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcer
     }
 
     //Ecriture dans le groupe
-    if ( hdl.Element() != NULL ) hdl.Element()->SetAttribute("texte", action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned).c_str());
+    if ( hdl.Element() != NULL ) hdl.Element()->SetAttribute("texte", str.c_str());
 
-    return true;
+    return;
 }
 
-////////////////////////////////////////////////////////////
-/// Charger une expression depuis un fichier
-///
-/// Type : LireFichierExp
-/// Paramètre 1 : Nom du fichier
-/// Paramètre 2 : Groupe
-/// Paramètre 3 : Variable ( de la scène ) dans laquelle stocker la valeur
-////////////////////////////////////////////////////////////
-bool ActLireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API ReadValueFromFile( const std::string & filename, const std::string & group, RuntimeScene & scene, const std::string & sceneVariable )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned), false);
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename, false);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
-    istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
+    istringstream groupsStr( group );
     string Str;
     vector < string > groups;
     while ( std::getline( groupsStr, Str, '/' ) )
@@ -283,38 +284,29 @@ bool ActLireFichierExp( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
         {
-            return false;
+            return;
         }
         hdl = hdl.FirstChildElement(groups.at(i).c_str());
     }
 
     //On stocke la valeur
-    if ( hdl.ToElement()->Attribute("value") == NULL ) return false;
+    if ( hdl.ToElement()->Attribute("value") == NULL ) return;
     double value;
     hdl.ToElement()->Attribute("value", &value);
 
     //Update variable value
-    scene.variables.ObtainVariable(action.GetParameter( 2 ).GetPlainString()) = value;
+    scene.variables.ObtainVariable(sceneVariable) = value;
 
-    return true;
+    return;
 }
 
-
-////////////////////////////////////////////////////////////
-/// Charger une expression depuis un fichier
-///
-/// Type : LireFichierTxt
-/// Paramètre 1 : Nom du fichier
-/// Paramètre 2 : Groupe
-/// Paramètre 3 : Variable ( de la scène ) dans laquelle stocker la valeur
-////////////////////////////////////////////////////////////
-bool ActLireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API ReadStringFromFile( const std::string & filename, const std::string & group, RuntimeScene & scene, const std::string & sceneVariable )
 {
-    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned), false);
+    boost::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename, false);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
     //Découpage des groupes
-    istringstream groupsStr( action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned) );
+    istringstream groupsStr( group );
     string Str;
     vector < string > groups;
     while ( std::getline( groupsStr, Str, '/' ) )
@@ -328,16 +320,16 @@ bool ActLireFichierTxt( RuntimeScene & scene, ObjectsConcerned & objectsConcerne
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
         {
-            return false;
+            return;
         }
         hdl = hdl.FirstChildElement(groups.at(i).c_str());
     }
 
     //On stocke la valeur
-    if ( hdl.ToElement()->Attribute("texte") == NULL ) return false;
+    if ( hdl.ToElement()->Attribute("texte") == NULL ) return;
 
     //Update variable texte
-    scene.variables.ObtainVariable( action.GetParameter( 2 ).GetPlainString() ) = hdl.ToElement()->Attribute("texte");
+    scene.variables.ObtainVariable( sceneVariable ) = hdl.ToElement()->Attribute("texte");
 
-    return true;
+    return;
 }

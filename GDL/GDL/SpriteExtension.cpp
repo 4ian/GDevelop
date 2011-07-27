@@ -23,6 +23,8 @@ SpriteExtension::SpriteExtension()
                    &DestroySpriteObject,
                    "SpriteObject");
 
+        objInfos.SetIncludeFile("GDL/SpriteObject.h");
+
         DECLARE_OBJECT_ACTION("Opacity",
                        _("Régler l'opacité d'un objet"),
                        _("Modifie la transparence d'un objet."),
@@ -425,6 +427,38 @@ SpriteExtension::SpriteExtension()
 
         DECLARE_END_OBJECT_ACTION()
 
+        DECLARE_OBJECT_ACTION("TourneVers",
+                       _("Tourner un objet vers un autre"),
+                       _("Tourne un objet vers un autre.\n( Si la direction est normale, l'objet prendra la direction la plus appropriée.\nSi c'est une rotation automatique, il sera tourné vers l'objet. )"),
+                       _("Tourner _PARAM0_ vers _PARAM1_"),
+                       _("Direction"),
+                       "res/actions/direction24.png",
+                       "res/actions/direction.png");
+
+            instrInfo.AddParameter("object", _("Objet à tourner"), "Sprite", false);
+            instrInfo.AddParameter("object", _("Objet vers lequel se tourner"), "", false);
+            instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
+
+            instrInfo.cppCallingInformation.SetFunctionName("TurnTowardObject").SetIncludeFile("GDL/SpriteTools.h");
+
+        DECLARE_END_OBJECT_ACTION()
+
+        DECLARE_OBJECT_CONDITION("SourisSurObjet",
+                       _("Le curseur est sur un objet"),
+                       _("Teste si le curseur survole un objet. Le test est précis par défaut ( vérifie que le curseur n'est pas sur une zone transparente )."),
+                       _("Le curseur est sur _PARAM0_"),
+                       _("Souris"),
+                       "res/conditions/surObjet24.png",
+                       "res/conditions/surObjet.png");
+
+            instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
+            instrInfo.AddCodeOnlyParameter("currentScene", "");
+            instrInfo.AddParameter("yesorno", _("Test précis ? ( oui par défaut )"), "", true).SetDefaultValue("yes");
+
+            instrInfo.cppCallingInformation.SetFunctionName("CursorOnObject").SetIncludeFile("GDL/SpriteTools.h");
+
+        DECLARE_END_OBJECT_CONDITION()
+
         DECLARE_OBJECT_EXPRESSION("X", _("Position X d'un point"), _("Position X d'un point"), _("Position"), "res/actions/position.png")
 
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
@@ -510,25 +544,8 @@ SpriteExtension::SpriteExtension()
     DECLARE_END_OBJECT()
 
     //Declaration of all conditions available
-    DECLARE_CONDITION("SourisSurObjet",
-                   _("Le curseur est sur un objet"),
-                   _("Teste si le curseur survole un objet. Le test est précis par défaut ( vérifie que le curseur n'est pas sur une zone transparente )."),
-                   _("Le curseur est sur _PARAM0_"),
-                   _("Souris"),
-                   "res/conditions/surObjet24.png",
-                   "res/conditions/surObjet.png");
 
-        instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "1");
-        instrInfo.AddParameter("yesorno", _("Test précis ? ( oui par défaut )"), "", true).SetDefaultValue("yes");
-        instrInfo.AddCodeOnlyParameter("conditionInverted", "");
-
-        instrInfo.cppCallingInformation.SetFunctionName("CursorOnSpriteObject").SetIncludeFile("GDL/SpriteTools.h");
-
-    DECLARE_END_CONDITION()
-
-    DECLARE_CONDITION("EstTourne",
+    /*DECLARE_OBJECT_CONDITION("EstTourne", //CONVERT TO OBJECT INSTRUCTION //TODO Par ici
                       _("Un objet est tourné vers un autre"),
                       _("Teste si un objet est tourné vers un autre"),
                       _("L'objet _PARAM0_ est tourné vers _PARAM1_"),
@@ -538,15 +555,14 @@ SpriteExtension::SpriteExtension()
 
         instrInfo.AddParameter("object", _("Nom de l'objet"), "Sprite", false);
         instrInfo.AddParameter("object", _("Nom du second objet"), "", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "1");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
         instrInfo.AddParameter("expression", _("Angle de tolérance ( 0 : tolérance minimale )"), "",false);
         instrInfo.AddCodeOnlyParameter("conditionInverted", "");
         MAIN_OBJECTS_IN_PARAMETERS(0,1)
 
-        instrInfo.cppCallingInformation.SetFunctionName("SpriteTurnedToward").SetIncludeFile("GDL/SpriteTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("IsTurnedToward").SetIncludeFile("GDL/SpriteTools.h");
 
-    DECLARE_END_CONDITION()
+    DECLARE_END_OBJECT_CONDITION()*/
     DECLARE_CONDITION("Collision",
                       _("Collision"),
                       _("La condition est vraie si il y a collision entre les deux objets donnés.\nLa collision est faite au pixel près.\nAttention ! Cette condition est couteuse pour l'ordinateur en terme de perfomance."),
@@ -557,28 +573,11 @@ SpriteExtension::SpriteExtension()
 
         instrInfo.AddParameter("object", _("Objet 1"), "Sprite", false);
         instrInfo.AddParameter("object", _("Objet 2"), "Sprite", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "1");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
         instrInfo.AddCodeOnlyParameter("conditionInverted", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("SpriteCollision").SetIncludeFile("GDL/SpriteTools.h");
 
     DECLARE_END_CONDITION()
-
-    DECLARE_ACTION("TourneVers",
-                   _("Tourner un objet vers un autre"),
-                   _("Tourne un objet vers un autre.\n( Si la direction est normale, l'objet prendra la direction la plus appropriée.\nSi c'est une rotation automatique, il sera tourné vers l'objet. )"),
-                   _("Tourner _PARAM0_ vers _PARAM1_"),
-                   _("Direction"),
-                   "res/actions/direction24.png",
-                   "res/actions/direction.png");
-
-        instrInfo.AddParameter("object", _("Objet à tourner"), "Sprite", false);
-        instrInfo.AddParameter("object", _("Objet vers lequel se tourner"), "", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "1");
-
-        instrInfo.cppCallingInformation.SetFunctionName("TurnSpriteToward").SetIncludeFile("GDL/SpriteTools.h");
-
-    DECLARE_END_ACTION()
 }

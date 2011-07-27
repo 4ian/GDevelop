@@ -1,6 +1,4 @@
 #include "GDL/FileExtension.h"
-#include "GDL/cFichier.h"
-#include "GDL/aFichier.h"
 #include "GDL/XmlFilesHelper.h"
 
 FileExtension::FileExtension()
@@ -17,10 +15,11 @@ FileExtension::FileExtension()
                    _("Le fichier _PARAM0_ existe"),
                    _("Fichiers"),
                    "res/conditions/fichier24.png",
-                   "res/conditions/fichier.png",
-                   &CondFileExists);
+                   "res/conditions/fichier.png");
 
-        DECLARE_PARAMETER("file", _("Nom du fichier"), "",false);
+        instrInfo.AddParameter("file", _("Nom du fichier"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("FileExists").SetIncludeFile("GDL/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -30,11 +29,12 @@ FileExtension::FileExtension()
                    _("Le groupe _PARAM1_ existe dans le fichier _PARAM0_"),
                    _("Fichiers XML"),
                    "res/conditions/fichier24.png",
-                   "res/conditions/fichier.png",
-                   &CondGroupExists);
+                   "res/conditions/fichier.png");
 
-        DECLARE_PARAMETER("file", _("Nom du fichier"), "",false);
-        DECLARE_PARAMETER("string", _("Groupe"), "",false);
+        instrInfo.AddParameter("file", _("Nom du fichier"), "",false);
+        instrInfo.AddParameter("string", _("Groupe"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GroupExists").SetIncludeFile("GDL/FileTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -44,10 +44,11 @@ FileExtension::FileExtension()
                    _("Charger le fichier XML _PARAM0_ en mémoire"),
                    _("Fichiers XML"),
                    "res/actions/fichier24.png",
-                   "res/actions/fichier.png",
-                   &ActLoadFile);
+                   "res/actions/fichier.png");
 
-        DECLARE_PARAMETER("file", _("Fichier"), "",false);
+        instrInfo.AddParameter("file", _("Fichier"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("LoadFileInMemory").SetIncludeFile("GDL/FileTools.h");
 
     DECLARE_END_ACTION()
 
@@ -57,10 +58,11 @@ FileExtension::FileExtension()
                    _("Fermer le fichier XML _PARAM0_ chargé en mémoire"),
                    _("Fichiers XML"),
                    "res/actions/fichier24.png",
-                   "res/actions/fichier.png",
-                   &ActUnloadFile);
+                   "res/actions/fichier.png");
 
-        DECLARE_PARAMETER("file", _("Fichier"), "",false);
+        instrInfo.AddParameter("file", _("Fichier"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("UnloadFileFromMemory").SetIncludeFile("GDL/FileTools.h");
 
     DECLARE_END_ACTION()
 
@@ -70,12 +72,13 @@ FileExtension::FileExtension()
                    _("Ecrire _PARAM2_ dans _PARAM1_ du fichier _PARAM0_"),
                    _("Fichiers XML"),
                    "res/actions/fichier24.png",
-                   "res/actions/fichier.png",
-                   &ActEcrireFichierExp);
+                   "res/actions/fichier.png");
 
-        DECLARE_PARAMETER("file", _("Fichier"), "",false);
-        DECLARE_PARAMETER("string", _("Groupe"), "",false);
-        DECLARE_PARAMETER("expression", _("Expression"), "",false);
+        instrInfo.AddParameter("file", _("Fichier"), "",false);
+        instrInfo.AddParameter("string", _("Groupe"), "",false);
+        instrInfo.AddParameter("expression", _("Expression"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("WriteValueInFile").SetIncludeFile("GDL/FileTools.h");
 
     DECLARE_END_ACTION()
 
@@ -85,12 +88,13 @@ FileExtension::FileExtension()
                    _("Ecrire _PARAM2_ dans _PARAM1_ du fichier _PARAM0_"),
                    _("Fichiers XML"),
                    "res/actions/fichier24.png",
-                   "res/actions/fichier.png",
-                   &ActEcrireFichierTxt);
+                   "res/actions/fichier.png");
 
-        DECLARE_PARAMETER("file", _("Fichier"), "",false);
-        DECLARE_PARAMETER("string", _("Groupe"), "",false);
-        DECLARE_PARAMETER("string", _("Texte"), "",false);
+        instrInfo.AddParameter("file", _("Fichier"), "",false);
+        instrInfo.AddParameter("string", _("Groupe"), "",false);
+        instrInfo.AddParameter("string", _("Texte"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("WriteStringInFile").SetIncludeFile("GDL/FileTools.h");
 
     DECLARE_END_ACTION()
 
@@ -100,12 +104,14 @@ FileExtension::FileExtension()
                    _("Lire le groupe _PARAM1_ du fichier _PARAM0_ et stocker la valeur dans _PARAM2_"),
                    _("Fichiers XML"),
                    "res/actions/fichier24.png",
-                   "res/actions/fichier.png",
-                   &ActLireFichierExp);
+                   "res/actions/fichier.png");
 
-        DECLARE_PARAMETER("file", _("Fichier"), "",false);
-        DECLARE_PARAMETER("string", _("Groupe"), "",false);
-        DECLARE_PARAMETER("scenevar", _("Variable de la scène"), "",false);
+        instrInfo.AddParameter("file", _("Fichier"), "",false);
+        instrInfo.AddParameter("string", _("Groupe"), "",false);
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("scenevar", _("Variable de la scène"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("ReadValueFromFile").SetIncludeFile("GDL/FileTools.h");
 
     DECLARE_END_ACTION()
 
@@ -115,12 +121,14 @@ FileExtension::FileExtension()
                    _("Lire le groupe _PARAM1_ du fichier _PARAM0_ et stocker le texte dans _PARAM2_"),
                    _("Fichiers XML"),
                    "res/actions/fichier24.png",
-                   "res/actions/fichier.png",
-                   &ActLireFichierTxt);
+                   "res/actions/fichier.png");
 
-        DECLARE_PARAMETER("file", _("Fichier"), "",false);
-        DECLARE_PARAMETER("string", _("Groupe"), "",false);
-        DECLARE_PARAMETER("scenevar", _("Variable de la scène"), "",false);
+        instrInfo.AddParameter("file", _("Fichier"), "",false);
+        instrInfo.AddParameter("string", _("Groupe"), "",false);
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("scenevar", _("Variable de la scène"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("ReadStringFromFile").SetIncludeFile("GDL/FileTools.h");
 
     DECLARE_END_ACTION()
 
@@ -130,10 +138,11 @@ FileExtension::FileExtension()
                    _("Supprimer le fichier _PARAM0_"),
                    _("Fichiers"),
                    "res/actions/delete24.png",
-                   "res/actions/delete.png",
-                   &ActDeleteFichier);
+                   "res/actions/delete.png");
 
-        DECLARE_PARAMETER("file", _("Nom du fichier"), "",false);
+        instrInfo.AddParameter("file", _("Nom du fichier"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDDeleteFile").SetIncludeFile("GDL/FileTools.h");
 
     DECLARE_END_ACTION()
 
@@ -143,11 +152,12 @@ FileExtension::FileExtension()
                    _("Supprimer le groupe _PARAM1_ du fichier _PARAM0_"),
                    _("Fichiers XML"),
                    "res/actions/delete24.png",
-                   "res/actions/delete.png",
-                   &ActDeleteGroupFichier);
+                   "res/actions/delete.png");
 
-        DECLARE_PARAMETER("file", _("Nom du fichier"), "",false);
-        DECLARE_PARAMETER("string", _("Groupe"), "",false);
+        instrInfo.AddParameter("file", _("Nom du fichier"), "",false);
+        instrInfo.AddParameter("string", _("Groupe"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("DeleteGroupFromFile").SetIncludeFile("GDL/FileTools.h");
 
     DECLARE_END_ACTION()
 
@@ -157,10 +167,11 @@ FileExtension::FileExtension()
                    _("Lancer le fichier _PARAM0_"),
                    _("Fichiers"),
                    "res/actions/launchFile24.png",
-                   "res/actions/launchFile.png",
-                   &ActLaunchFile);
+                   "res/actions/launchFile.png");
 
-        DECLARE_PARAMETER("file", _("Nom du fichier"), "",false);
+        instrInfo.AddParameter("file", _("Nom du fichier"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("LaunchFile").SetIncludeFile("GDL/FileTools.h");
 
     DECLARE_END_ACTION()
 
@@ -170,10 +181,11 @@ FileExtension::FileExtension()
                    _("Executer _PARAM0_"),
                    _("Fichiers"),
                    "res/actions/launchFile24.png",
-                   "res/actions/launchFile.png",
-                   &ActExecuteCmd);
+                   "res/actions/launchFile.png");
 
-        DECLARE_PARAMETER("string", _("Commande"), "",false);
+        instrInfo.AddParameter("string", _("Commande"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("ExecuteCmd").SetIncludeFile("GDL/FileTools.h");
 
     DECLARE_END_ACTION()
 }

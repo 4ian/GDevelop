@@ -22,6 +22,11 @@
 #include "GDL/KeyboardExtension.h"
 #include "GDL/AudioExtension.h"
 #include "GDL/CameraExtension.h"
+#include "GDL/JoystickExtension.h"
+#include "GDL/FileExtension.h"
+#include "GDL/NetworkExtension.h"
+#include "GDL/WindowExtension.h"
+#include "GDL/StringInstructionsExtension.h"
 #include "GDL/Object.h"
 
 #if defined(GD_IDE_ONLY)
@@ -59,6 +64,11 @@ ExtensionsManager::ExtensionsManager()
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new KeyboardExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new AudioExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new FileExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new JoystickExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new NetworkExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new WindowExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new StringInstructionsExtension()));
 
 #if defined(GD_IDE_ONLY)
     badInstructionInfos.fullname = _T("Instruction inconnue");

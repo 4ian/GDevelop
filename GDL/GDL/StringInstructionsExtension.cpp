@@ -4,15 +4,6 @@
  */
 
 #include "GDL/StringInstructionsExtension.h"
-#include "GDL/StringExpressions.h"
-#include "GDL/CommentEvent.h"
-#include "GDL/StandardEvent.h"
-#include "GDL/LinkEvent.h"
-#include "GDL/WhileEvent.h"
-#include "GDL/RepeatEvent.h"
-#include "GDL/ForEachEvent.h"
-#include "GDL/Event.h"
-
 #include "GDL/ExtensionBase.h"
 
 StringInstructionsExtension::StringInstructionsExtension()
@@ -27,12 +18,13 @@ StringInstructionsExtension::StringInstructionsExtension()
                    _("Obtenir une portion de texte depuis un texte"),
                    _("Obtenir une portion de texte depuis un texte"),
                    _("Manipulation sur le texte"),
-                   "res/conditions/toujours24.png",
-                   &ExpSubStr)
+                   "res/conditions/toujours24.png")
 
-        DECLARE_PARAMETER("string", _("Texte"), "",false)
-        DECLARE_PARAMETER("expression", _("Position de départ de la portion ( La première lettre est à la position 0 )"), "",false)
-        DECLARE_PARAMETER("expression", _("Longueur de la portion"), "",false)
+        instrInfo.AddParameter("string", _("Texte"), "",false);
+        instrInfo.AddParameter("expression", _("Position de départ de la portion ( La première lettre est à la position 0 )"), "",false);
+        instrInfo.AddParameter("expression", _("Longueur de la portion"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDSubStr").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_STR_EXPRESSION()
 
@@ -40,11 +32,12 @@ StringInstructionsExtension::StringInstructionsExtension()
                    _("Obtenir un caractère depuis un texte"),
                    _("Obtenir un caractère depuis un texte"),
                    _("Manipulation sur le texte"),
-                   "res/conditions/toujours24.png",
-                   &ExpStrAt)
+                   "res/conditions/toujours24.png")
 
-        DECLARE_PARAMETER("string", _("Texte"), "",false)
-        DECLARE_PARAMETER("expression", _("Position du caractère à prélever ( Premier caractère : 0 )"), "",false)
+        instrInfo.AddParameter("string", _("Texte"), "",false);
+        instrInfo.AddParameter("expression", _("Position du caractère à prélever ( Premier caractère : 0 )"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDStrAt").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_STR_EXPRESSION()
 
@@ -52,10 +45,11 @@ StringInstructionsExtension::StringInstructionsExtension()
                    _("Longueur d'un texte"),
                    _("Longueur d'un texte"),
                    _("Manipulation sur le texte"),
-                   "res/conditions/toujours24.png",
-                   &ExpStrLen)
+                   "res/conditions/toujours24.png")
 
-        DECLARE_PARAMETER("string", _("Texte"), "",false)
+        instrInfo.AddParameter("string", _("Texte"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDStrLen").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_EXPRESSION()
 
@@ -63,11 +57,12 @@ StringInstructionsExtension::StringInstructionsExtension()
                    _("Chercher dans un texte"),
                    _("Chercher dans un texte ( Retourne la position du résultat ou -1 si non trouvé )"),
                    _("Manipulation sur le texte"),
-                   "res/conditions/toujours24.png",
-                   &ExpStrFind)
+                   "res/conditions/toujours24.png")
 
-        DECLARE_PARAMETER("string", _("Texte"), "",false)
-        DECLARE_PARAMETER("string", _("Texte à chercher"), "",false)
+        instrInfo.AddParameter("string", _("Texte"), "",false);
+        instrInfo.AddParameter("string", _("Texte à chercher"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDStrFind").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_EXPRESSION()
 
@@ -75,11 +70,12 @@ StringInstructionsExtension::StringInstructionsExtension()
                    _("Chercher dans un texte depuis la fin"),
                    _("Chercher dans un texte depuis la fin ( Retourne la position du résultat ou -1 si non trouvé )"),
                    _("Manipulation sur le texte"),
-                   "res/conditions/toujours24.png",
-                   &ExpStrRFind)
+                   "res/conditions/toujours24.png")
 
-        DECLARE_PARAMETER("string", _("Texte"), "",false)
-        DECLARE_PARAMETER("string", _("Texte à chercher"), "",false)
+        instrInfo.AddParameter("string", _("Texte"), "",false);
+        instrInfo.AddParameter("string", _("Texte à chercher"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDStrRFind").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_EXPRESSION()
 
@@ -87,12 +83,13 @@ StringInstructionsExtension::StringInstructionsExtension()
                    _("Chercher dans un texte à partir d'une position"),
                    _("Chercher dans un texte à partir d'une position ( Retourne la position du résultat ou -1 si non trouvé )"),
                    _("Manipulation sur le texte"),
-                   "res/conditions/toujours24.png",
-                   &ExpStrFindFrom)
+                   "res/conditions/toujours24.png")
 
-        DECLARE_PARAMETER("string", _("Texte"), "",false)
-        DECLARE_PARAMETER("string", _("Texte à chercher"), "",false)
-        DECLARE_PARAMETER("expression", _("Position à partir de laquelle chercher le texte"), "",false)
+        instrInfo.AddParameter("string", _("Texte"), "",false);
+        instrInfo.AddParameter("string", _("Texte à chercher"), "",false);
+        instrInfo.AddParameter("expression", _("Position à partir de laquelle chercher le texte"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDStrFindFrom").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_EXPRESSION()
 
@@ -100,12 +97,13 @@ StringInstructionsExtension::StringInstructionsExtension()
                    _("Chercher dans un texte depuis la fin à partir d'une position"),
                    _("Chercher dans un texte depuis la fin à partir d'une position ( Retourne la position du résultat ou -1 si non trouvé )"),
                    _("Manipulation sur le texte"),
-                   "res/conditions/toujours24.png",
-                   &ExpStrRFindFrom)
+                   "res/conditions/toujours24.png")
 
-        DECLARE_PARAMETER("string", _("Texte"), "",false)
-        DECLARE_PARAMETER("string", _("Texte à chercher"), "",false)
-        DECLARE_PARAMETER("expression", _("Position à partir de laquelle chercher le texte"), "",false)
+        instrInfo.AddParameter("string", _("Texte"), "",false);
+        instrInfo.AddParameter("string", _("Texte à chercher"), "",false);
+        instrInfo.AddParameter("expression", _("Position à partir de laquelle chercher le texte"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDStrRFindFrom").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_EXPRESSION()
 }

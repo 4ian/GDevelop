@@ -44,6 +44,7 @@ class GD_API EventsCodeGenerator
         static std::string GenerateActionCode(const Game & game, const Scene & scene, Instruction & action, EventsCodeGenerationContext & context);
 
         static void DeleteUselessEvents(std::vector < BaseEventSPtr > & events);
+        static void PreprocessEventList( const Game & game, const Scene & scene, vector < BaseEventSPtr > & listEvent );
 
         /**
          * Convert a plain string ( with line feed, quotes ) to a C++ string ( adding backslash ).

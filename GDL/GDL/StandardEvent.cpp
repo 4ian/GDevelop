@@ -104,25 +104,16 @@ void StandardEvent::LoadFromXml(const TiXmlElement * eventElem)
 /**
  * Render the event in the bitmap
  */
-void StandardEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
+void StandardEvent::Render(wxDC & dc, int x, int y, unsigned int width) const
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
 
     //Draw event rectangle
-    dc.SetPen(*wxTRANSPARENT_PEN);
-    dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
-    {
-        wxRect rect(x, y, width, GetRenderedHeight(width));
-        wxColor color1 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient1);
-        wxColor color2 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient2;
-        wxColor color3 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient3;
-        wxColor color4 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient4);
+    wxRect rect(x, y, width, GetRenderedHeight(width));
+    renderingHelper->DrawNiceRectangle(dc, rect);
 
-        renderingHelper->DrawNiceRectangle(dc, rect, color1, color2, color3, color4, renderingHelper->eventBorderColor);
-    }
-
-    renderingHelper->DrawConditionsList(conditions, dc, x, y, renderingHelper->GetConditionsColumnWidth(), IsDisabled());
-    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y, width-renderingHelper->GetConditionsColumnWidth(), IsDisabled());
+    renderingHelper->DrawConditionsList(conditions, dc, x+renderingHelper->instructionsListBorder, y+renderingHelper->instructionsListBorder, renderingHelper->GetConditionsColumnWidth()-renderingHelper->instructionsListBorder*2, IsDisabled());
+    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth()+renderingHelper->instructionsListBorder, y+renderingHelper->instructionsListBorder, width-renderingHelper->GetConditionsColumnWidth()-renderingHelper->instructionsListBorder*2, IsDisabled());
 }
 
 unsigned int StandardEvent::GetRenderedHeight(unsigned int width) const
@@ -135,7 +126,7 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width) const
         int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
         int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth());
 
-        renderedHeight = (conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight);
+        renderedHeight = (conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight)+renderingHelper->instructionsListBorder*2;
         eventHeightNeedUpdate = false;
     }
 
@@ -154,7 +145,7 @@ void StandardEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
         vector < Instruction > * conditionsListSelected = NULL;
         unsigned int conditionIdInList = 0;
 
-        bool found = renderingHelper->GetConditionAt(conditions, x-0, y-0, conditionsListSelected, conditionIdInList);
+        bool found = renderingHelper->GetConditionAt(conditions, x-renderingHelper->instructionsListBorder, y-renderingHelper->instructionsListBorder, conditionsListSelected, conditionIdInList);
 
         if ( found )
         {
@@ -185,7 +176,7 @@ void StandardEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < 
         vector < Instruction > * actionsListSelected = NULL;
         unsigned int actionIdInList = 0;
 
-        bool found = renderingHelper->GetActionAt(actions, x-0, y-0, actionsListSelected, actionIdInList);
+        bool found = renderingHelper->GetActionAt(actions, x-renderingHelper->instructionsListBorder, y-renderingHelper->instructionsListBorder, actionsListSelected, actionIdInList);
 
         if ( found )
         {

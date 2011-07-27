@@ -9,11 +9,10 @@
 		<Build>
 			<Target title="Debug">
 				<Option platforms="Windows;" />
-				<Option output="..\Runtime\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="..\Runtime\bin\debug\gdl.dll" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
-				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -24,7 +23,7 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
 				<Linker>
@@ -116,11 +115,10 @@
 			</Target>
 			<Target title="Debug - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="..\IDE\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="..\IDE\bin\debug\gdl.dll" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
-				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -142,9 +140,9 @@
 					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\tools\clang\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\tools\clang\include" />
 					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<Linker>
@@ -224,17 +222,16 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\lib" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
 					<Add directory="..\ExtLibs\SFML\build-mingw-debug\lib" />
 				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option platforms="Windows;" />
-				<Option output="..\Runtime\bin\release\gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="..\Runtime\bin\release\gdl.dll" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
-				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -272,7 +269,7 @@
 			</Target>
 			<Target title="Release - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="..\IDE\bin\release\gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="..\IDE\bin\release\gdl.dll" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -352,11 +349,10 @@
 			</Target>
 			<Target title="Development">
 				<Option platforms="Windows;" />
-				<Option output="..\Runtime\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="..\Runtime\bin\dev\gdl.dll" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
-				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -458,11 +454,10 @@
 			</Target>
 			<Target title="Development - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="..\IDE\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="..\IDE\bin\dev\gdl.dll" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
-				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -1019,6 +1014,8 @@
 		<Unit filename="GDL\EditExpression.h" />
 		<Unit filename="GDL\EditForEachEvent.cpp" />
 		<Unit filename="GDL\EditForEachEvent.h" />
+		<Unit filename="GDL\EditLink.cpp" />
+		<Unit filename="GDL\EditLink.h" />
 		<Unit filename="GDL\EditRepeatEvent.cpp" />
 		<Unit filename="GDL\EditRepeatEvent.h" />
 		<Unit filename="GDL\EditTextDialog.cpp" />
@@ -1055,6 +1052,10 @@
 		<Unit filename="GDL\ExtensionsManager.h" />
 		<Unit filename="GDL\ExternalEvents.cpp" />
 		<Unit filename="GDL\ExternalEvents.h" />
+		<Unit filename="GDL\FileExtension.cpp" />
+		<Unit filename="GDL\FileExtension.h" />
+		<Unit filename="GDL\FileTools.cpp" />
+		<Unit filename="GDL\FileTools.h" />
 		<Unit filename="GDL\FontManager.cpp" />
 		<Unit filename="GDL\FontManager.h" />
 		<Unit filename="GDL\ForEachEvent.cpp" />
@@ -1078,12 +1079,18 @@
 		<Unit filename="GDL\Instruction.cpp" />
 		<Unit filename="GDL\Instruction.h" />
 		<Unit filename="GDL\InvalidImage.h" />
+		<Unit filename="GDL\JoystickExtension.cpp" />
+		<Unit filename="GDL\JoystickExtension.h" />
+		<Unit filename="GDL\JoystickTools.cpp" />
+		<Unit filename="GDL\JoystickTools.h" />
 		<Unit filename="GDL\KeyboardExtension.cpp" />
 		<Unit filename="GDL\KeyboardExtension.h" />
 		<Unit filename="GDL\KeyboardTools.cpp" />
 		<Unit filename="GDL\KeyboardTools.h" />
 		<Unit filename="GDL\Layer.cpp" />
 		<Unit filename="GDL\Layer.h" />
+		<Unit filename="GDL\LinkEvent.cpp" />
+		<Unit filename="GDL\LinkEvent.h" />
 		<Unit filename="GDL\ListVariable.cpp" />
 		<Unit filename="GDL\ListVariable.h" />
 		<Unit filename="GDL\LoadingScreen.cpp" />
@@ -1108,6 +1115,10 @@
 		<Unit filename="GDL\MouseTools.h" />
 		<Unit filename="GDL\Music.cpp" />
 		<Unit filename="GDL\Music.h" />
+		<Unit filename="GDL\NetworkExtension.cpp" />
+		<Unit filename="GDL\NetworkExtension.h" />
+		<Unit filename="GDL\NetworkTools.cpp" />
+		<Unit filename="GDL\NetworkTools.h" />
 		<Unit filename="GDL\ObjInstancesHolder.cpp" />
 		<Unit filename="GDL\ObjInstancesHolder.h" />
 		<Unit filename="GDL\Object.cpp" />
@@ -1182,6 +1193,10 @@
 		<Unit filename="GDL\StandardEvent.h" />
 		<Unit filename="GDL\StrExpressionInstruction.cpp" />
 		<Unit filename="GDL\StrExpressionInstruction.h" />
+		<Unit filename="GDL\StringInstructionsExtension.cpp" />
+		<Unit filename="GDL\StringInstructionsExtension.h" />
+		<Unit filename="GDL\StringTools.cpp" />
+		<Unit filename="GDL\StringTools.h" />
 		<Unit filename="GDL\Text.cpp" />
 		<Unit filename="GDL\Text.h" />
 		<Unit filename="GDL\TimeExtension.cpp" />
@@ -1206,6 +1221,8 @@
 		</Unit>
 		<Unit filename="GDL\WhileEvent.cpp" />
 		<Unit filename="GDL\WhileEvent.h" />
+		<Unit filename="GDL\WindowExtension.cpp" />
+		<Unit filename="GDL\WindowExtension.h" />
 		<Unit filename="GDL\XmlFilesHelper.cpp" />
 		<Unit filename="GDL\XmlFilesHelper.h" />
 		<Unit filename="GDL\XmlMacros.h" />

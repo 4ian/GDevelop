@@ -115,6 +115,8 @@ class GD_API SpriteObject : public Object
         inline void RemoveAllAnimation() { animations.clear(); cacheAnimationSizeNeedUpdate = true;}
         inline bool HasNoAnimations() { return animations.empty(); }
 
+        bool CursorOnObject( RuntimeScene & scene, bool accurate );
+
         virtual bool SetAngle(float newAngle);
         virtual float GetAngle() const;
 
@@ -148,6 +150,7 @@ class GD_API SpriteObject : public Object
         bool IsFlippedY() const { return isFlippedY; };
 
         void TurnTowardPosition(float Xposition, float Yposition);
+        void TurnTowardObject( std::string, Object * object );
 
         /**
          * Only used internally by GD events generated code: Prefer using (Get/Set)Scale(X/Y).

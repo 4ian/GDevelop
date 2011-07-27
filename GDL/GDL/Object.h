@@ -293,6 +293,16 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         inline const boost::shared_ptr<Automatism> & GetAutomatism(const std::string & name) const { return automatisms.find(name)->second; }
 
         /**
+         * Only used by GD events generated code
+         */
+        Automatism* GetAutomatismRawPointer(const std::string & name);
+
+        /**
+         * Only used by GD events generated code
+         */
+        Automatism* GetAutomatismRawPointer(const std::string & name) const;
+
+        /**
          * Add an automatism
          */
         void AddAutomatism(boost::shared_ptr<Automatism> automatism);
@@ -383,6 +393,10 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         void AddForceUsingPolarCoordinates( float angle, float length, float clearing );
         void AddForceTowardPosition( float positionX, float positionY, float length, float clearing );
         void AddForceToMoveAround( float positionX, float positionY, float angularVelocity, float distance, float clearing );
+        void AddForceTowardObject( std::string , float length, float clearing, Object * object );
+        void AddForceToMoveAroundObject( std::string , float velocity, float length, float clearing, Object * object );
+        void PutAroundObject( std::string , float length, float angleInDegrees, Object * object );
+
         void SetXY( float xValue, const char* xOperator, float yValue, const char* yOperator );
 
         void Duplicate( RuntimeScene & scene, std::vector<Object*>& );
@@ -392,13 +406,20 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         bool IsStopped();
         bool TestAngleOfDisplacement( float angle, float tolerance );
 
-        double GetSqDistanceWithObject( const std::string &, std::vector<Object*> & other );
-        double GetDistanceWithObject( const std::string &, std::vector<Object*> & other );
+        double GetSqDistanceWithObject( const std::string &, Object * other );
+        double GetDistanceWithObject( const std::string &, Object * other );
 
         ListVariable variablesObjet; ///<List of the variables of the object
         double GetVariableValue( const std::string & variable ); /** Only used internally by GD events generated code. */
         const std::string & GetVariableString( const std::string & variable ); /** Only used internally by GD events generated code. */
 
+        /** To be deprecated
+         */
+        void SeparateObjectsWithoutForces( const string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists);
+
+        /** To be deprecated
+         */
+        void SeparateObjectsWithForces( const string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists);
     protected:
 
         std::string name; ///< The full name of the object

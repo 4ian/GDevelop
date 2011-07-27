@@ -31,7 +31,7 @@ class LinkEvent : public BaseEvent
         #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-        virtual void Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
+        virtual void Preprocess(const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
 
         string sceneLinked;
         int start;

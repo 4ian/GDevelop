@@ -11,17 +11,17 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/create.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameterWithoutPickingThem", "2");
+        instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
         instrInfo.AddParameter("object", _("Objet à créer"), "", false);
         instrInfo.AddParameter("expression", _("Position X"), "", false);
         instrInfo.AddParameter("expression", _("Position Y"), "", false);
-        instrInfo.AddParameter("layer", _("Calque ( calque de base si vide )"), "", true);
+        instrInfo.AddParameter("layer", _("Calque ( calque de base si vide )"), "", true).SetDefaultValue("\"\"");
 
         instrInfo.cppCallingInformation.SetFunctionName("CreateObjectOnScene").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
-    DECLARE_ACTION("CreateByName", //TODO
+    DECLARE_ACTION("CreateByName",
                    _("Créer un objet de partir son nom"),
                    _("Créer un objet à la position spécifiée"),
                    _("Créer l'objet ayant le nom _PARAM0_ à la position _PARAM1_;_PARAM2_"),
@@ -30,11 +30,11 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/create.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameterWithoutPickingThem", "0");
+        instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
         instrInfo.AddParameter("string", _("Texte représentant le nom de l'objet à créer"), "", false);
         instrInfo.AddParameter("expression", _("Position X"), "", false);
         instrInfo.AddParameter("expression", _("Position Y"), "", false);
-        instrInfo.AddParameter("layer", _("Calque ( calque de base si vide )"), "", true);
+        instrInfo.AddParameter("layer", _("Calque ( calque de base si vide )"), "", true).SetDefaultValue("\"\"");
 
         instrInfo.cppCallingInformation.SetFunctionName("CreateObjectOnScene").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
@@ -49,7 +49,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/add.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "2");
+        instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/RuntimeSceneTools.h");
@@ -65,102 +65,10 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/ajouthasard.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "2");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "2");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/RuntimeSceneTools.h");
-
-    DECLARE_END_ACTION()
-
-    DECLARE_ACTION("Rebondir",
-                   _("Ecarter un objet d'un autre"),
-                   _("Ecarte un objet d'un autre, en utilisant les forces."),
-                   _("Ecarter _PARAM0_ de _PARAM1_ ( seul _PARAM0_ bougera )"),
-                   _("Déplacement"),
-                   "res/actions/ecarter24.png",
-                   "res/actions/ecarter.png");
-
-        instrInfo.AddParameter("object", _("Objet"), "", false);
-        instrInfo.AddParameter("object", _("Objet 2 ( Ne bougera pas )"), "", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "1");
-
-        instrInfo.cppCallingInformation.SetFunctionName("SeparateObjectsWithForces").SetIncludeFile("GDL/ObjectTools.h");
-
-    DECLARE_END_ACTION()
-
-    DECLARE_ACTION("Ecarter",
-                   _("Ecarter un objet d'un autre"),
-                   _("Ecarte un objet d'un autre sans utiliser les forces."),
-                   _("Ecarter _PARAM0_ de _PARAM1_ ( seul _PARAM0_ bougera )"),
-                   _("Position"),
-                   "res/actions/ecarter24.png",
-                   "res/actions/ecarter.png");
-
-        instrInfo.AddParameter("object", _("Objet"), "", false);
-        instrInfo.AddParameter("object", _("Objet 2 ( Ne bougera pas )"), "", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "1");
-
-        instrInfo.cppCallingInformation.SetFunctionName("SeparateObjectsWithoutForces").SetIncludeFile("GDL/ObjectTools.h");
-
-    DECLARE_END_ACTION()
-
-    DECLARE_ACTION("AddForceVers",
-                   _("Ajouter une force dirigée vers un objet"),
-                   _("Ajoute une force à un objet pour qu'il se dirige vers un autre. L'objet bougera ensuite en fonction de\ntoutes les forces qui s'exercent sur lui."),
-                   _("Diriger _PARAM0_ vers _PARAM1_ avec une force de longueur _PARAM2_ pixels"),
-                   _("Déplacement"),
-                   "res/actions/forceVers24.png",
-                   "res/actions/forceVers.png");
-
-        instrInfo.AddParameter("object", _("Objet"), "", false);
-        instrInfo.AddParameter("object", _("Objet vers lequel se diriger"), "", false);
-        instrInfo.AddParameter("expression", _("Longueur en pixel"), "", false);
-        instrInfo.AddParameter("expression", _("Dissipation ( 0 par défaut )"), "", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "1");
-
-        instrInfo.cppCallingInformation.SetFunctionName("AddForceTowardObject").SetIncludeFile("GDL/ObjectTools.h");
-
-    DECLARE_END_ACTION()
-
-    DECLARE_ACTION("AddForceTourne",
-                   _("Ajouter une force pour tourner autour d'un objet"),
-                   _("Ajoute une force à un objet pour qu'il tourne autour d'un autre.\nNotez que le déplacement n'est pas forcément précis, notamment si la vitesse est élevée.\nPour positionner de façon parfaite un objet autour d'un autre, utilisez les actions de la catégorie Position."),
-                   _("Faire tourner _PARAM0_ autour de _PARAM1_ à _PARAM2_°/sec et à _PARAM3_ pixels de distance"),
-                   _("Déplacement"),
-                   "res/actions/forceTourne24.png",
-                   "res/actions/forceTourne.png");
-
-        instrInfo.AddParameter("object", _("Objet"), "", false);
-        instrInfo.AddParameter("object", _("Objet autour duquel tourner"), "", false);
-        instrInfo.AddParameter("expression", _("Vitesse ( Degrés par secondes )"), "", false);
-        instrInfo.AddParameter("expression", _("Distance ( en pixel )"), "", false);
-        instrInfo.AddParameter("expression", _("Dissipation ( 0 par défaut )"), "", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "1");
-
-        instrInfo.cppCallingInformation.SetFunctionName("AddForceToMoveAround").SetIncludeFile("GDL/ObjectTools.h");
-
-    DECLARE_END_ACTION()
-
-    DECLARE_ACTION("MettreAutour",
-                   _("Mettre un objet autour d'un autre"),
-                   _("Positionne un objet autour d'un autre, avec l'angle et la distance indiquée."),
-                   _("Mettre _PARAM0_ autour de _PARAM1_ à _PARAM3_° et à _PARAM2_ pixels de distance"),
-                   _("Position"),
-                   "res/actions/positionAutour24.png",
-                   "res/actions/positionAutour.png");
-
-        instrInfo.AddParameter("object", _("Objet"), "", false);
-        instrInfo.AddParameter("object", _("Objet autour duquel positionner le premier"), "", false);
-        instrInfo.AddParameter("expression", _("Distance"), "", false);
-        instrInfo.AddParameter("expression", _("Angle en degré"), "", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "1");
-
-        instrInfo.cppCallingInformation.SetFunctionName("PutAround").SetIncludeFile("GDL/ObjectTools.h");
 
     DECLARE_END_ACTION()
 
@@ -188,8 +96,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
         instrInfo.AddParameter("object", _("Objet"), "", false);
         instrInfo.AddParameter("object", _("Objet 2"), "", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "1");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
         instrInfo.AddParameter("expression", _("Angle de tolérance"), "", false);
         instrInfo.AddCodeOnlyParameter("conditionInverted", "");
 
@@ -207,8 +115,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
         instrInfo.AddParameter("object", _("Objet"), "", false);
         instrInfo.AddParameter("object", _("Objet 2"), "", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "1");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
         instrInfo.AddParameter("expression", _("Distance"), "", false);
         instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
         instrInfo.AddCodeOnlyParameter("conditionInverted", "");
@@ -226,7 +134,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/conditions/add.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "2");
+        instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/RuntimeSceneTools.h");
@@ -242,7 +150,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/conditions/ajouthasard.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "2");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "2");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/RuntimeSceneTools.h");
@@ -258,7 +166,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/conditions/nbObjet.png");
 
         instrInfo.AddParameter("object", _("Objet"), "", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
         instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
         instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
@@ -276,8 +184,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
         instrInfo.AddParameter("object", _("Objet"), "", false);
         instrInfo.AddParameter("object", _("Objet"), "", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "1");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
         instrInfo.AddCodeOnlyParameter("conditionInverted", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("HitBoxesCollision").SetIncludeFile("GDL/ObjectTools.h");
@@ -286,7 +194,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
     DECLARE_EXPRESSION("Count", _("Nombre d'objets"), _("Compte le nombre d'objets indiqué actuellement concernés"), _("Objets"), "res/conditions/nbObjet.png")
         instrInfo.AddParameter("object", _("Objet"), "", false);
-        instrInfo.AddCodeOnlyParameter("listOfObjectsOfParameter", "0");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
 
         instrInfo.cppCallingInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/ObjectTools.h");
     DECLARE_END_EXPRESSION()

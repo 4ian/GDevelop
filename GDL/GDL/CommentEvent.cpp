@@ -65,7 +65,7 @@ void CommentEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, Ma
 /**
  * Render the event
  */
-void CommentEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
+void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width) const
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
     renderingHelper->GetHTMLRenderer().SetDC(&dc);
@@ -92,11 +92,6 @@ void CommentEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int wid
     {
         dc.SetBrush(wxBrush(wxColour(r, v, b)));
         dc.SetPen(wxPen(wxColour(r/2, v/2, b/2), 1));
-    }
-    else
-    {
-        dc.SetPen(renderingHelper->GetSelectedRectangleOutlinePen());
-        dc.SetBrush(renderingHelper->GetSelectedRectangleFillBrush());
     }
 
     //Draw the background

@@ -348,6 +348,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
             automatismInfo.description = description_; \
             automatismInfo.defaultName = defaultName_;\
             automatismInfo.group = group_; \
+            automatismInfo.cppClassName = #className_;\
             if ( wxFile::Exists(icon24x24_) )\
             {\
                 automatismInfo.icon = wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY); \
@@ -780,6 +781,8 @@ class GD_API AutomatismInfo
     AutomatismInfo();
     virtual ~AutomatismInfo() {};
 
+    AutomatismInfo & SetIncludeFile(const std::string & includeFile) { optionalIncludeFile = includeFile; return *this; }
+
 #if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string defaultName;
@@ -795,6 +798,9 @@ class GD_API AutomatismInfo
 
     boost::shared_ptr<Automatism> instance;
     boost::shared_ptr<AutomatismsSharedDatas> sharedDatasInstance;
+
+    std::string optionalIncludeFile;
+    std::string cppClassName;
 };
 
 /**
@@ -806,6 +812,8 @@ class GD_API ExtensionObjectInfos
 
     ExtensionObjectInfos();
     virtual ~ExtensionObjectInfos() {};
+
+    ExtensionObjectInfos & SetIncludeFile(const std::string & includeFile) { optionalIncludeFile = includeFile; return *this; }
 
 #if defined(GD_IDE_ONLY)
     std::string fullname;
@@ -821,6 +829,7 @@ class GD_API ExtensionObjectInfos
     std::map<std::string, ExpressionInfos > expressionsInfos;
     std::map<std::string, StrExpressionInfos > strExpressionsInfos;
 
+    std::string optionalIncludeFile;
     std::string cppClassName;
 };
 

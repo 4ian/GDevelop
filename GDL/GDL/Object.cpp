@@ -372,20 +372,163 @@ bool Object::AutomatismActivated( const std::string & automatismName )
     return GetAutomatism(automatismName)->Activated();
 }
 
-double Object::GetSqDistanceWithObject( const std::string &, std::vector<Object*> & other  )
+double Object::GetSqDistanceWithObject( const std::string &, Object * object )
 {
-    if ( other.empty() ) return 0;
+    if ( object == NULL ) return 0;
 
-    float x = GetDrawableX()+GetCenterX() - (other[0]->GetDrawableX()+other[0]->GetCenterX());
-    float y = GetDrawableY()+GetCenterY() - (other[0]->GetDrawableY()+other[0]->GetCenterY());
+    float x = GetDrawableX()+GetCenterX() - (object->GetDrawableX()+object->GetCenterX());
+    float y = GetDrawableY()+GetCenterY() - (object->GetDrawableY()+object->GetCenterY());
 
     return x*x+y*y; // No square root here
 }
 
-double Object::GetDistanceWithObject( const std::string & unused, std::vector<Object*> & other )
+double Object::GetDistanceWithObject( const std::string & unused, Object * other )
 {
     return sqrt(GetSqDistanceWithObject(unused, other));
 }
+
+void Object::SeparateObjectsWithoutForces( const string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists)
+{
+    std::vector<Object*> objects2;
+    std::map <std::string, std::vector<Object*> *>::const_iterator it = pickedObjectLists.begin();
+    for (;it!=pickedObjectLists.end();++it)
+    {
+        if ( it->second == NULL ) break;
+
+        std::vector<Object*> & list = *(it->second);
+        for (unsigned int i = 0;i<list.size();++i) objects2.push_back(list[i]);
+    }
+
+    for (unsigned int j = 0;j<objects2.size(); ++j)
+    {
+        if ( objects2[j] != this )
+        {
+            float Left1 = GetDrawableX();
+            float Left2 = objects2[j]->GetDrawableX();
+            float Right1 = GetDrawableX() + GetWidth();
+            float Right2 = objects2[j]->GetDrawableX() + objects2[j]->GetWidth();
+            float Top1 = GetDrawableY();
+            float Top2 = objects2[j]->GetDrawableY();
+            float Bottom1 = GetDrawableY() + GetHeight();
+            float Bottom2 = objects2[j]->GetDrawableY() + objects2[j]->GetHeight();
+
+            if ( Left1 < Left2 )
+            {
+                SetX( Left2 - GetWidth() );
+            }
+            else if ( Right1 > Right2 )
+            {
+                SetX( Right2 );
+            }
+
+            if ( Top1 < Top2 )
+            {
+                SetY( Top2 - GetHeight() );
+            }
+            else if ( Bottom1 > Bottom2 )
+            {
+                SetY( Bottom2 );
+            }
+        }
+    }
+}
+
+void Object::SeparateObjectsWithForces( const string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists)
+{
+    std::vector<Object*> objects2;
+    std::map <std::string, std::vector<Object*> *>::const_iterator it = pickedObjectLists.begin();
+    for (;it!=pickedObjectLists.end();++it)
+    {
+        if ( it->second == NULL ) break;
+
+        std::vector<Object*> & list = *(it->second);
+        for (unsigned int i = 0;i<list.size();++i) objects2.push_back(list[i]);
+    }
+
+    for (unsigned int j = 0;j<objects2.size(); ++j)
+    {
+        if ( objects2[j] != this )
+        {
+            float Xobj1 = GetDrawableX()+(GetCenterX()) ;
+            float Yobj1 = GetDrawableY()+(GetCenterY()) ;
+            float Xobj2 = objects2[j]->GetDrawableX()+(objects2[j]->GetCenterX()) ;
+            float Yobj2 = objects2[j]->GetDrawableY()+(objects2[j]->GetCenterY()) ;
+
+            if ( Xobj1 < Xobj2 )
+            {
+                if ( Force5.GetX() == 0 )
+                    Force5.SetX( -( TotalForceX() ) - 10 );
+            }
+            else
+            {
+                if ( Force5.GetX() == 0 )
+                    Force5.SetX( -( TotalForceX() ) + 10 );
+            }
+
+            if ( Yobj1 < Yobj2 )
+            {
+                if ( Force5.GetY() == 0 )
+                    Force5.SetY( -( TotalForceY() ) - 10 );
+            }
+            else
+            {
+                if ( Force5.GetY() == 0 )
+                    Force5.SetY( -( TotalForceY() ) + 10 );
+            }
+        }
+    }
+}
+
+void Object::AddForceTowardObject(string , float length, float clearing, Object * object )
+{
+    if ( object == NULL ) return;
+
+    Force forceToAdd;
+    forceToAdd.SetLength( length );
+    forceToAdd.SetClearing( clearing );
+    forceToAdd.SetAngle( atan2(( object->GetDrawableY() + object->GetCenterY() ) - ( GetDrawableY() + GetCenterY() ),
+                             ( object->GetDrawableX() + object->GetCenterX() ) - ( GetDrawableX() + GetCenterX() ) )
+                             * 180 / 3.14159 );
+
+    Forces.push_back( forceToAdd );
+}
+
+void Object::AddForceToMoveAroundObject( string , float velocity, float length, float clearing, Object * object )
+{
+    if ( object == NULL ) return;
+
+    //Angle en degré entre les deux objets
+    float angle = atan2(( GetDrawableY() + GetCenterY()) - ( object->GetDrawableY() + object->GetCenterY() ),
+                        ( GetDrawableX() + GetCenterX() ) - ( object->GetDrawableX() + object->GetCenterX() ) )
+                         * 180 / 3.14159f;
+    float newangle = angle + velocity;
+
+    //position actuelle de l'objet 1 par rapport à l'objet centre
+    int oldX = ( GetDrawableX() + GetCenterX() ) - ( object->GetDrawableX() + object->GetCenterX() );
+    int oldY = ( GetDrawableY() + GetCenterY()) - ( object->GetDrawableY() + object->GetCenterY());
+
+    //nouvelle position à atteindre
+    int newX = cos(newangle/180.f*3.14159f) * length;
+    int newY = sin(newangle/180.f*3.14159f) * length;
+
+    Force forceToAdd;
+    forceToAdd.SetX( newX-oldX );
+    forceToAdd.SetY( newY-oldY );
+    forceToAdd.SetClearing( clearing );
+
+    Forces.push_back( forceToAdd );
+}
+
+void Object::PutAroundObject( string , float length, float angleInDegrees, Object * object )
+{
+    if ( object == NULL ) return;
+
+    double angle = angleInDegrees/180*3.14159;
+
+    SetX( object->GetDrawableX()+object->GetCenterX() + cos(angle)*length- GetCenterX() );
+    SetY( object->GetDrawableY()+object->GetCenterY() + sin(angle)*length - GetCenterY() );
+}
+
 
 void Object::SetXY( float xValue, const char* xOperator, float yValue, const char* yOperator )
 {
@@ -415,6 +558,16 @@ void Object::SetXY( float xValue, const char* xOperator, float yValue, const cha
 bool GD_API MustBeDeleted ( boost::shared_ptr<Object> object )
 {
     return object->GetName().empty();
+}
+
+Automatism* Object::GetAutomatismRawPointer(const std::string & name)
+{
+    return automatisms.find(name)->second.get();
+}
+
+Automatism* Object::GetAutomatismRawPointer(const std::string & name) const
+{
+    return automatisms.find(name)->second.get();
 }
 
 void DestroyBaseObject(Object * object)

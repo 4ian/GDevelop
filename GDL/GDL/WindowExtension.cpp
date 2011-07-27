@@ -1,8 +1,9 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/WindowExtension.h"
-#include "GDL/aTexte.h"
-#include "GDL/aWindow.h"
-#include "GDL/eFreeFunctions.h"
-#include "GDL/actions.h"
 #include "GDL/ResourcesMergingHelper.h"
 #include "GDL/Instruction.h"
 
@@ -20,16 +21,18 @@ WindowExtension::WindowExtension()
                    _("Afficher _PARAM0_ en _PARAM1_;_PARAM2_ ( couleur : _PARAM3_ , taille : _PARAM4_, police : _PARAM5_ )"),
                    _("Scène"),
                    "res/actions/texte24.png",
-                   "res/actions/texte.png",
-                   &ActEcrireTexte);
+                   "res/actions/texte.png");
 
-        DECLARE_PARAMETER("string", _("Texte"), "",false)
-        DECLARE_PARAMETER("expression", _("Position X"), "",false)
-        DECLARE_PARAMETER("expression", _("Position Y"), "",false)
-        DECLARE_PARAMETER("color", _("Couleur"), "",false)
-        DECLARE_PARAMETER("expression", _("Taille"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("police", _("Police"), "",false)
-        DECLARE_PARAMETER_OPTIONAL("layer", _("Calque ( Calque de base si vide )"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("string", _("Texte"), "",false);
+        instrInfo.AddParameter("expression", _("Position X"), "",false);
+        instrInfo.AddParameter("expression", _("Position Y"), "",false);
+        instrInfo.AddParameter("color", _("Couleur"), "",false);
+        instrInfo.AddParameter("expression", _("Taille"), "",false);
+        instrInfo.AddParameter("police", _("Police"), "",true);
+        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
+
+        instrInfo.cppCallingInformation.SetFunctionName("DisplayLegacyTextOnScene").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
@@ -39,10 +42,12 @@ WindowExtension::WindowExtension()
                    _("Activer le plein écran :  _PARAM0_"),
                    _("Fenêtre de jeu"),
                    "res/actions/fullscreen24.png",
-                   "res/actions/fullscreen.png",
-                   &ActSetFullScreen);
+                   "res/actions/fullscreen.png");
 
-        DECLARE_PARAMETER("yesorno", _("Activer le plein écran"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("yesorno", _("Activer le plein écran"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetFullscreen").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
@@ -52,27 +57,43 @@ WindowExtension::WindowExtension()
                    _("Changer la taille de la fenêtre de jeu en _PARAM0_x_PARAM1_"),
                    _("Fenêtre de jeu"),
                    "res/actions/window24.png",
-                   "res/actions/window.png",
-                   &ActSetWindowSize);
+                   "res/actions/window.png");
 
-        DECLARE_PARAMETER("expression", _("Largeur"), "",false)
-        DECLARE_PARAMETER("expression", _("Hauteur"), "",false)
-        DECLARE_PARAMETER("yesorno", _("Utiliser cette taille pour la taille par défaut des caméras des scènes ?"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Largeur"), "",false);
+        instrInfo.AddParameter("expression", _("Hauteur"), "",false);
+        instrInfo.AddParameter("yesorno", _("Utiliser cette taille pour la taille par défaut des caméras des scènes ?"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetWindowSize").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
-    DECLARE_EXPRESSION("ScreenWidth", "Largeur de la résolution actuelle", "Largeur de la résolution actuelle", "Ecran", "res/display16.png", &ExpGetScreenWidth)
+    DECLARE_EXPRESSION("SceneWindowWidth", "Largeur de la fenêtre de la scène", "Largeur de la fenêtre de la scène", "Ecran", "res/display16.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetSceneWindowWidth").SetIncludeFile("GDL/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("ScreenHeight", "Hauteur de la résolution actuelle", "Hauteur de la résolution actuelle", "Ecran", "res/display16.png", &ExpGetScreenHeight)
+    DECLARE_EXPRESSION("SceneWindowHeight", "Hauteur de la fenêtre de la scène", "Hauteur de la fenêtre de la scène", "Ecran", "res/display16.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetSceneWindowHeight").SetIncludeFile("GDL/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("ColorDepth", "Profondeur de couleur de la résolution actuelle", "Profondeur de couleur de la résolution actuelle", "Ecran", "res/display16.png", &ExpGetScreenColorDepth)
+
+    DECLARE_EXPRESSION("ScreenWidth", "Largeur de la résolution actuelle", "Largeur de la résolution actuelle", "Ecran", "res/display16.png")
+        instrInfo.cppCallingInformation.SetFunctionName("GetScreenWidth").SetIncludeFile("GDL/RuntimeSceneTools.h");
+    DECLARE_END_EXPRESSION()
+    DECLARE_EXPRESSION("ScreenHeight", "Hauteur de la résolution actuelle", "Hauteur de la résolution actuelle", "Ecran", "res/display16.png")
+        instrInfo.cppCallingInformation.SetFunctionName("GetScreenHeight").SetIncludeFile("GDL/RuntimeSceneTools.h");
+    DECLARE_END_EXPRESSION()
+    DECLARE_EXPRESSION("ColorDepth", "Profondeur de couleur de la résolution actuelle", "Profondeur de couleur de la résolution actuelle", "Ecran", "res/display16.png")
+        instrInfo.cppCallingInformation.SetFunctionName("GetColorDepth").SetIncludeFile("GDL/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
 }
 
 #if defined(GD_IDE_ONLY)
 void WindowExtension::PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper)
 {
-    if ( action.GetType() == "EcrireTexte" && !action.GetParameterSafely( 5 ).GetPlainString().empty() )
-        action.SetParameter( 5, resourcesMergingHelper.GetNewFilename( action.GetParameterSafely( 5 ).GetPlainString() ) );
+    if ( action.GetType() == "EcrireTexte" && !action.GetParameterSafely( 6 ).GetPlainString().empty() )
+        action.SetParameter( 6, resourcesMergingHelper.GetNewFilename( action.GetParameterSafely( 6 ).GetPlainString() ) );
 }
 #endif

@@ -218,23 +218,14 @@ void RepeatEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < Ba
 /**
  * Render the event in the bitmap
  */
-void RepeatEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
+void RepeatEvent::Render(wxDC & dc, int x, int y, unsigned int width) const
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
     const int repeatTextHeight = 20;
 
     //Draw event rectangle
-    dc.SetPen(*wxTRANSPARENT_PEN);
-    dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
-    {
-        wxRect rect(x, y, width, GetRenderedHeight(width));
-        wxColor color1 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient1);
-        wxColor color2 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient2;
-        wxColor color3 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient3;
-        wxColor color4 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient4);
-
-        renderingHelper->DrawNiceRectangle(dc, rect, color1, color2, color3, color4, renderingHelper->eventBorderColor);
-    }
+    wxRect rect(x, y, width, GetRenderedHeight(width));
+    renderingHelper->DrawNiceRectangle(dc, rect);
 
     //"Repeat" text selection
     if ( selected && repeatNumberExpressionSelected )

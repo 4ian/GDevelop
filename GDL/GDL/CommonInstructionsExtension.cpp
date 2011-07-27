@@ -10,6 +10,7 @@
 #include "GDL/ForEachEvent.h"
 #include "GDL/WhileEvent.h"
 #include "GDL/RepeatEvent.h"
+#include "GDL/LinkEvent.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Event.h"
 #include "GDL/DynamicExtensionCallerEvent.h"
@@ -193,7 +194,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   StandardEvent)
 
     DECLARE_END_EVENT()
-/*
+
     DECLARE_EVENT("Link",
                   _("Lien"),
                   "Lien vers des évènements d'une autre scène",
@@ -201,7 +202,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   "res/lienaddicon.png",
                   LinkEvent)
 
-    DECLARE_END_EVENT()*/
+    DECLARE_END_EVENT()
 
     DECLARE_EVENT("Comment",
                   _("Commentaire"),

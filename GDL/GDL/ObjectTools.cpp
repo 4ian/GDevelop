@@ -5,15 +5,39 @@
 
 using namespace std;
 
-double GD_API PickedObjectsCount( string , vector<Object*> & pickedObjects )
+double GD_API PickedObjectsCount( string , std::map <std::string, std::vector<Object*> *> objectsLists )
 {
+    vector<Object*> pickedObjects;
+    std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists.begin();
+    for (;it!=objectsLists.end();++it)
+    {
+        if ( it->second == NULL ) break;
+
+        std::vector<Object*> & list = *(it->second);
+        for (unsigned int i = 0;i<list.size();++i) pickedObjects.push_back(list[i]);
+    }
+
     return pickedObjects.size();
 }
 
-bool GD_API HitBoxesCollision( string, string, vector<Object*> & objects1, vector<Object*> & objects2, bool conditionInverted )
+bool GD_API HitBoxesCollision( string, string, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, bool conditionInverted )
 {
-    vector<Object*> newObject1list;
-    vector<Object*> newObject2list;
+    vector<Object*> objects1;
+    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
+    {
+        if ( it->second == NULL ) break;
+
+        std::vector<Object*> & list = *(it->second);
+        for (unsigned int i = 0;i<list.size();++i) objects1.push_back(list[i]);
+    }
+    vector<Object*> objects2;
+    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
+    {
+        if ( it->second == NULL ) break;
+
+        std::vector<Object*> & list = *(it->second);
+        for (unsigned int i = 0;i<list.size();++i) objects2.push_back(list[i]);
+    }
 
     bool isTrue = false;
 
@@ -45,8 +69,11 @@ bool GD_API HitBoxesCollision( string, string, vector<Object*> & objects1, vecto
                     if ( !conditionInverted )
                     {
                         isTrue = true;
-                        newObject1list.push_back( objects1[i] );
-                        newObject2list.push_back( objects2[j] );
+                        if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
+                            objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
+
+                        if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
+                            objectsLists1[objects2[j]->GetName()]->push_back(objects2[j]);
                     }
                     AuMoinsUnObjet = true;
                 }
@@ -56,20 +83,32 @@ bool GD_API HitBoxesCollision( string, string, vector<Object*> & objects1, vecto
         if ( AuMoinsUnObjet == false && conditionInverted)
         {
             isTrue = true;
-            newObject1list.push_back( objects1[i] );
+            if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
+                objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
         }
     }
-
-    objects1 = newObject1list;
-    objects2 = newObject2list;
 
     return isTrue;
 }
 
-float GD_API DistanceBetweenObjects( string, string, vector<Object*> & objects1, vector<Object*> & objects2, float length, string relationalOperator, bool conditionInverted)
+float GD_API DistanceBetweenObjects( string, string, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float length, string relationalOperator, bool conditionInverted)
 {
-    vector<Object*> newObject1list;
-    vector<Object*> newObject2list;
+    vector<Object*> objects1;
+    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
+    {
+        if ( it->second == NULL ) break;
+
+        std::vector<Object*> & list = *(it->second);
+        for (unsigned int i = 0;i<list.size();++i) objects1.push_back(list[i]);
+    }
+    vector<Object*> objects2;
+    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
+    {
+        if ( it->second == NULL ) break;
+
+        std::vector<Object*> & list = *(it->second);
+        for (unsigned int i = 0;i<list.size();++i) objects2.push_back(list[i]);
+    }
 
     bool isTrue = false;
 
@@ -94,8 +133,11 @@ float GD_API DistanceBetweenObjects( string, string, vector<Object*> & objects1,
                     if ( !conditionInverted )
                     {
                         isTrue = true;
-                        newObject1list.push_back( objects1[i] );
-                        newObject2list.push_back( objects2[j] );
+                        if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
+                            objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
+
+                        if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
+                            objectsLists1[objects2[j]->GetName()]->push_back(objects2[j]);
                     }
                 }
                 else
@@ -103,24 +145,38 @@ float GD_API DistanceBetweenObjects( string, string, vector<Object*> & objects1,
                     if ( conditionInverted )
                     {
                         isTrue = true;
-                        newObject1list.push_back( objects1[i] );
-                        newObject2list.push_back( objects2[j] );
+                        if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
+                            objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
+
+                        if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
+                            objectsLists1[objects2[j]->GetName()]->push_back(objects2[j]);
                     }
                 }
             }
         }
     }
 
-    objects1 = newObject1list;
-    objects2 = newObject2list;
-
     return isTrue;
 }
 
-bool GD_API MovesToward( string, string, vector<Object*> & objects1, vector<Object*> & objects2, float tolerance, bool conditionInverted )
+bool GD_API MovesToward( string, string, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
-    vector<Object*> newObject1list;
-    vector<Object*> newObject2list;
+    vector<Object*> objects1;
+    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
+    {
+        if ( it->second == NULL ) break;
+
+        std::vector<Object*> & list = *(it->second);
+        for (unsigned int i = 0;i<list.size();++i) objects1.push_back(list[i]);
+    }
+    vector<Object*> objects2;
+    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
+    {
+        if ( it->second == NULL ) break;
+
+        std::vector<Object*> & list = *(it->second);
+        for (unsigned int i = 0;i<list.size();++i) objects2.push_back(list[i]);
+    }
 
     bool isTrue = false;
 
@@ -154,8 +210,12 @@ bool GD_API MovesToward( string, string, vector<Object*> & objects1, vector<Obje
                         if ( !conditionInverted )
                         {
                             isTrue = true;
-                            newObject1list.push_back( objects1[i] ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
-                            newObject2list.push_back( objects2[j] ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+
+                            if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
+                                objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
+
+                            if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
+                                objectsLists1[objects2[j]->GetName()]->push_back(objects2[j]);
                         }
                     }
                     else
@@ -163,8 +223,12 @@ bool GD_API MovesToward( string, string, vector<Object*> & objects1, vector<Obje
                         if ( conditionInverted )
                         {
                             isTrue = true;
-                            newObject1list.push_back( objects1[i] ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
-                            newObject2list.push_back( objects2[j] ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+
+                            if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
+                                objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
+
+                            if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
+                                objectsLists1[objects2[j]->GetName()]->push_back(objects2[j]);
                         }
                     }
                 }
@@ -175,155 +239,12 @@ bool GD_API MovesToward( string, string, vector<Object*> & objects1, vector<Obje
             if ( conditionInverted )
             {
                 isTrue = true;
-                newObject1list.push_back( objects1[i] ); //L'objet est ajouté aux objets concernés ( Il n'y est pas déjà )
+
+                if ( find(objectsLists1[objects1[i]->GetName()]->begin(), objectsLists1[objects1[i]->GetName()]->end(), objects1[i]) == objectsLists1[objects1[i]->GetName()]->end() )
+                    objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
             }
         }
     }
-
-    objects1 = newObject1list;
-    objects2 = newObject2list;
 
     return isTrue;
-}
-
-void GD_API AddForceTowardObject( string , string , float length, float clearing, vector<Object*> & objects1, vector<Object*> & objects2 )
-{
-    if ( objects2.empty() ) return;
-
-    for (unsigned int i = 0;i<objects1.size();++i )
-    {
-        Force forceToAdd;
-        forceToAdd.SetLength( length );
-        forceToAdd.SetClearing( clearing );
-        forceToAdd.SetAngle( atan2(( objects2[0]->GetDrawableY() + objects2[0]->GetCenterY() ) - ( objects1[i]->GetDrawableY() + objects1[i]->GetCenterY() ),
-                                 ( objects2[0]->GetDrawableX() + objects2[0]->GetCenterX() ) - ( objects1[i]->GetDrawableX() + objects1[i]->GetCenterX() ) )
-                                 * 180 / 3.14159 );
-
-        objects1[i]->Forces.push_back( forceToAdd );
-    }
-}
-
-void GD_API AddForceToMoveAround( string , string , float velocity, float length, float clearing, vector<Object*> & objects1, vector<Object*> & objects2 )
-{
-    if ( objects2.empty() ) return;
-
-    for (unsigned int i = 0;i<objects1.size();++i )
-    {
-        //Angle en degré entre les deux objets
-        float angle = atan2(( objects1[i]->GetDrawableY() + objects1[i]->GetCenterY()) - ( objects2[0]->GetDrawableY() + objects2[0]->GetCenterY() ),
-                            ( objects1[i]->GetDrawableX() + objects1[i]->GetCenterX() ) - ( objects2[0]->GetDrawableX() + objects2[0]->GetCenterX() ) )
-                             * 180 / 3.14159f;
-        float newangle = angle + velocity;
-
-        //position actuelle de l'objet 1 par rapport à l'objet centre
-        int oldX = ( objects1[i]->GetDrawableX() + objects1[i]->GetCenterX() ) - ( objects2[0]->GetDrawableX() + objects2[0]->GetCenterX() );
-        int oldY = ( objects1[i]->GetDrawableY() + objects1[i]->GetCenterY()) - ( objects2[0]->GetDrawableY() + objects2[0]->GetCenterY());
-
-        //nouvelle position à atteindre
-        int newX = cos(newangle/180.f*3.14159f) * length;
-        int newY = sin(newangle/180.f*3.14159f) * length;
-
-        Force forceToAdd;
-        forceToAdd.SetX( newX-oldX );
-        forceToAdd.SetY( newY-oldY );
-        forceToAdd.SetClearing( clearing );
-
-        objects1[i]->Forces.push_back( forceToAdd );
-    }
-}
-
-void GD_API PutAround( string , string , float length, float angleInDegrees, vector<Object*> & objects1, vector<Object*> & objects2 )
-{
-    if ( objects2.empty() ) return;
-
-    for (unsigned int i = 0;i<objects1.size();++i )
-    {
-        double angle = angleInDegrees/180*3.14159;
-
-        objects1[i]->SetX( objects2[0]->GetDrawableX()+objects2[0]->GetCenterX()
-                                               + cos(angle)*length
-                                               - objects1[i]->GetCenterX() );
-
-        objects1[i]->SetY( objects2[0]->GetDrawableY()+objects2[0]->GetCenterY()
-                                               + sin(angle)*length
-                                               - objects1[i]->GetCenterY() );
-    }
-}
-
-void GD_API SeparateObjectsWithoutForces( string , string, vector<Object*> & objects1, vector<Object*> & objects2 )
-{
-    for (unsigned int i = 0;i<objects1.size();++i )
-    {
-        for (unsigned int j = 0;j<objects2.size(); ++j)
-        {
-            if ( objects2 != objects1 )
-            {
-                float Left1 = objects1[i]->GetDrawableX();
-                float Left2 = objects2[j]->GetDrawableX();
-                float Right1 = objects1[i]->GetDrawableX() + objects1[i]->GetWidth();
-                float Right2 = objects2[j]->GetDrawableX() + objects2[j]->GetWidth();
-                float Top1 = objects1[i]->GetDrawableY();
-                float Top2 = objects2[j]->GetDrawableY();
-                float Bottom1 = objects1[i]->GetDrawableY() + objects1[i]->GetHeight();
-                float Bottom2 = objects2[j]->GetDrawableY() + objects2[j]->GetHeight();
-
-                if (( Left1 < Left2 ) )
-                {
-                    objects1[i]->SetX( Left2 - objects1[i]->GetWidth() );
-                }
-                else if (( Right1 > Right2 ) )
-                {
-                    objects1[i]->SetX( Right2 );
-                }
-
-                if (( Top1 < Top2 ) )
-                {
-                    objects1[i]->SetY( Top2 - objects1[i]->GetHeight() );
-                }
-                else if ( Bottom1 > Bottom2 )
-                {
-                    objects1[i]->SetY( Bottom2 );
-                }
-            }
-        }
-    }
-}
-
-void GD_API SeparateObjectsWithForces( string , string, vector<Object*> & objects1, vector<Object*> & objects2 )
-{
-    for (unsigned int i = 0;i<objects1.size();++i )
-    {
-        for (unsigned int j = 0;j<objects2.size(); ++j)
-        {
-            if ( objects2 != objects1 )
-            {
-                float Xobj1 = objects1[i]->GetDrawableX()+(objects1[i]->GetCenterX()) ;
-                float Yobj1 = objects1[i]->GetDrawableY()+(objects1[i]->GetCenterY()) ;
-                float Xobj2 = objects2[j]->GetDrawableX()+(objects2[j]->GetCenterX()) ;
-                float Yobj2 = objects2[j]->GetDrawableY()+(objects2[j]->GetCenterY()) ;
-
-                if ( Xobj1 < Xobj2 )
-                {
-                    if ( objects1[i]->Force5.GetX() == 0 )
-                        objects1[i]->Force5.SetX( -( objects1[i]->TotalForceX() ) - 10 );
-                }
-                else
-                {
-                    if ( objects1[i]->Force5.GetX() == 0 )
-                        objects1[i]->Force5.SetX( -( objects1[i]->TotalForceX() ) + 10 );
-                }
-
-                if ( Yobj1 < Yobj2 )
-                {
-                    if ( objects1[i]->Force5.GetY() == 0 )
-                        objects1[i]->Force5.SetY( -( objects1[i]->TotalForceY() ) - 10 );
-                }
-                else
-                {
-                    if ( objects1[i]->Force5.GetY() == 0 )
-                        objects1[i]->Force5.SetY( -( objects1[i]->TotalForceY() ) + 10 );
-                }
-            }
-        }
-    }
 }

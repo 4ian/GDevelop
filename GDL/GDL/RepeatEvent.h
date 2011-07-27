@@ -58,7 +58,7 @@ class RepeatEvent : public BaseEvent
         /**
          * Called by event editor to draw the event.
          */
-        virtual void Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const;
+        virtual void Render(wxDC & dc, int x, int y, unsigned int width) const;
 
         /**
          * Must return the height of the event when rendered

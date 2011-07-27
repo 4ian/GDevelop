@@ -30,13 +30,6 @@ class CallbacksForGeneratingExpressionCode : public ParserCallbacks
     CallbacksForGeneratingExpressionCode(std::string & plainExpression_, const Game & game_, const Scene & scene_, EventsCodeGenerationContext & context_);
     virtual ~CallbacksForGeneratingExpressionCode() {};
 
-    /**
-     * Add blank parameters when code-only parameters are excepted.
-     * \param Parameters information
-     * \param vector of parameters without code only parameters.
-     */
-    std::vector<GDExpression> CompleteParameters(const std::vector < ParameterInfo > & parametersInfo, const std::vector < GDExpression > & parameters);
-
     void OnConstantToken(std::string text);
     void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo);
     void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo);

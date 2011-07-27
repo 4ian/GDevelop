@@ -1,7 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "GDL/JoystickExtension.h"
-#include "GDL/cJoystick.h"
-#include "GDL/aJoystick.h"
-#include "GDL/eFreeFunctions.h"
 
 JoystickExtension::JoystickExtension()
 {
@@ -17,11 +18,13 @@ JoystickExtension::JoystickExtension()
                    _("Le bouton _PARAM1_ du joystick _PARAM0_ est appuyé"),
                    _("Joystick"),
                    "res/conditions/joystick24.png",
-                   "res/conditions/joystick.png",
-                   &CondJoystickButtonDown);
+                   "res/conditions/joystick.png");
 
-        DECLARE_PARAMETER("expression", _("Numéro du joystick ( Premier joystick : 0 )"), "",false);
-        DECLARE_PARAMETER("expression", _("Numéro du bouton"), "",false);
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Numéro du joystick ( Premier joystick : 0 )"), "",false);
+        instrInfo.AddParameter("expression", _("Numéro du bouton"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("JoystickButtonDown").SetIncludeFile("GDL/JoystickTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -31,13 +34,15 @@ JoystickExtension::JoystickExtension()
                    _("La valeur de l'axe _PARAM1_ du joystick _PARAM0_ est _PARAM3_ à _PARAM2_"),
                    _("Joystick"),
                    "res/conditions/joystick24.png",
-                   "res/conditions/joystick.png",
-                   &CondJoystickAxis);
+                   "res/conditions/joystick.png");
 
-        DECLARE_PARAMETER("expression", _("Numéro du joystick ( Premier joystick : 0 )"), "",false);
-        DECLARE_PARAMETER("joyaxis", _("Axe"), "",false);
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), "",false);
-        DECLARE_PARAMETER("relationalOperator", _("Signe du test"), "",false);
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Numéro du joystick ( Premier joystick : 0 )"), "",false);
+        instrInfo.AddParameter("joyaxis", _("Axe"), "",false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetJoystickAxisValue").SetManipulatedType("number").SetIncludeFile("GDL/JoystickTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -47,12 +52,14 @@ JoystickExtension::JoystickExtension()
                    _("Enregistrer dans _PARAM2_ la valeur de l'axe _PARAM1_ du joystick _PARAM0_"),
                    _("Joystick"),
                    "res/actions/joystick24.png",
-                   "res/actions/joystick.png",
-                   &ActGetJoystickAxis);
+                   "res/actions/joystick.png");
 
-        DECLARE_PARAMETER("expression", _("Numéro du joystick ( Premier joystick : 0 )"), "",false);
-        DECLARE_PARAMETER("joyaxis", _("Axe"), "",false);
-        DECLARE_PARAMETER("scenevar", _("Variable de la scène où enregistrer la valeur"), "",false);
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Numéro du joystick ( Premier joystick : 0 )"), "",false);
+        instrInfo.AddParameter("joyaxis", _("Axe"), "",false);
+        instrInfo.AddParameter("scenevar", _("Variable de la scène où enregistrer la valeur"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("JoystickAxisValueToVariable").SetManipulatedType("number").SetIncludeFile("GDL/JoystickTools.h");
 
     DECLARE_END_ACTION()
 
@@ -60,11 +67,13 @@ JoystickExtension::JoystickExtension()
                    _("Axe d'un joystick"),
                    _("Valeur de l'axe d'un joystick"),
                    _("Joystick"),
-                   "res/conditions/joystick.png",
-                   &ExpGetJoystickAxis)
+                   "res/conditions/joystick.png")
 
-        DECLARE_PARAMETER("expression", _("Numéro du jostick ( Premier joystick : 0 )"), "",false)
-        DECLARE_PARAMETER("string", _("Texte à chercher"), "",false)
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Numéro du joystick ( Premier joystick : 0 )"), "",false);
+        instrInfo.AddParameter("joyaxis", _("Axe"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetJoystickAxisValue").SetIncludeFile("GDL/JoystickTools.h");
 
     DECLARE_END_EXPRESSION()
 }

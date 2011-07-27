@@ -24,28 +24,6 @@ CallbacksForGeneratingExpressionCode::CallbacksForGeneratingExpressionCode(strin
 
 }
 
-std::vector<GDExpression> CallbacksForGeneratingExpressionCode::CompleteParameters(const std::vector < ParameterInfo > & parametersInfo, const std::vector < GDExpression > & parameters)
-{
-    std::vector<GDExpression> completeParameters = parameters;
-    for (unsigned int i = 0;i<parametersInfo.size();++i) //Code only parameters are not included in expressions parameters.
-    {
-        if ( parametersInfo[i].codeOnly)
-        {
-            if ( i > completeParameters.size() )
-            {
-                context.errorOccured = true;
-                cout << "Bad parameter count in expression.";
-            }
-
-            if ( i == completeParameters.size() )
-                completeParameters.push_back(GDExpression(""));
-            else
-                completeParameters.insert(completeParameters.begin()+i, GDExpression(""));
-        }
-    }
-    return completeParameters;
-};
-
 void CallbacksForGeneratingExpressionCode::OnConstantToken(string text)
 {
     plainExpression += text;
@@ -54,8 +32,7 @@ void CallbacksForGeneratingExpressionCode::OnConstantToken(string text)
 void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
 {
     context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
-    std::vector<GDExpression> completeParameters = CompleteParameters(expressionInfo.parameters, instruction.parameters);
-    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, completeParameters, expressionInfo.parameters, context);
+    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
 
     string parametersStr;
     for (unsigned int i = 0;i<parameters.size();++i)
@@ -82,8 +59,7 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
     }
 
     //Prepare parameters
-    std::vector<GDExpression> completeParameters = CompleteParameters(expressionInfo.parameters, instruction.parameters);
-    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, completeParameters, expressionInfo.parameters, context);
+    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
     string parametersStr;
     for (unsigned int i = 0;i<parameters.size();++i)
     {
@@ -100,8 +76,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     if ( instruction.parameters.empty() ) return;
 
     //Prepare parameters
-    std::vector<GDExpression> completeParameters = CompleteParameters(expressionInfo.parameters, instruction.parameters);
-    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, completeParameters, expressionInfo.parameters, context);
+    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
     string parametersStr;
     for (unsigned int i = 1;i<parameters.size();++i)
     {
@@ -117,6 +92,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     bool castNeeded = !objInfo.cppClassName.empty();
 
     //Build string to access the object
+    context.AddIncludeFile(objInfo.optionalIncludeFile);
     string objectStr;
     if ( context.currentObject == instruction.parameters[0].GetPlainString() )
     {
@@ -142,8 +118,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     if ( instruction.parameters.empty() ) return;
 
     //Prepare parameters
-    std::vector<GDExpression> completeParameters = CompleteParameters(expressionInfo.parameters, instruction.parameters);
-    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, completeParameters, expressionInfo.parameters, context);
+    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
     string parametersStr;
     for (unsigned int i = 1;i<parameters.size();++i)
     {
@@ -159,6 +134,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     bool castNeeded = !objInfo.cppClassName.empty();
 
     //Build string to access the object
+    context.AddIncludeFile(objInfo.optionalIncludeFile);
     string objectStr;
     if ( context.currentObject == instruction.parameters[0].GetPlainString() )
     {
@@ -184,8 +160,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     if ( instruction.parameters.size() < 2 ) return;
 
     //Prepare parameters
-    std::vector<GDExpression> completeParameters = CompleteParameters(expressionInfo.parameters, instruction.parameters);
-    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, completeParameters, expressionInfo.parameters, context);
+    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
     string parametersStr;
     for (unsigned int i = 2;i<parameters.size();++i)
     {
@@ -201,6 +176,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     bool castNeeded = !objInfo.cppClassName.empty();
 
     //Build string to access the object
+    context.AddIncludeFile(objInfo.optionalIncludeFile);
     string objectStr;
     if ( context.currentObject == instruction.parameters[0].GetPlainString() )
     {
@@ -226,8 +202,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     if ( instruction.parameters.size() < 2 ) return;
 
     //Prepare parameters
-    std::vector<GDExpression> completeParameters = CompleteParameters(expressionInfo.parameters, instruction.parameters);
-    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, completeParameters, expressionInfo.parameters, context);
+    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
     string parametersStr;
     for (unsigned int i = 2;i<parameters.size();++i)
     {
@@ -243,6 +218,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     bool castNeeded = !objInfo.cppClassName.empty();
 
     //Build string to access the object
+    context.AddIncludeFile(objInfo.optionalIncludeFile);
     string objectStr;
     if ( context.currentObject == instruction.parameters[0].GetPlainString() )
     {
@@ -270,7 +246,13 @@ bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const Game & game
 
     GDExpressionParser parser(expression.GetPlainString());
     if ( !parser.ParseMathExpression(game, scene, callbacks) )
+    {
+        #if defined(GD_IDE_ONLY)
+        firstErrorStr = callbacks.firstErrorStr;
+        firstErrorPos = callbacks.firstErrorPos;
+        #endif
         return false;
+    }
 
     expression = GDExpression(newExpression);
     return true;
@@ -284,7 +266,14 @@ bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(const Game & game
 
     GDExpressionParser parser(expression.GetPlainString());
     if ( !parser.ParseTextExpression(game, scene, callbacks) )
+    {
+        cout << expression.GetPlainString() << endl;
+        #if defined(GD_IDE_ONLY)
+        firstErrorStr = callbacks.firstErrorStr;
+        firstErrorPos = callbacks.firstErrorPos;
+        #endif
         return false;
+    }
 
     expression = GDExpression(newExpression);
     return true;

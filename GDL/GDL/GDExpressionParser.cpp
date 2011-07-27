@@ -46,6 +46,39 @@ std::string ReplaceTildesBySpaces(std::string text)
     return text;
 }
 
+/**
+ * Add blank parameters when code-only parameters are excepted.
+ * \param Parameters information
+ * \param vector of parameters without code only parameters.
+ */
+std::vector<GDExpression> CompleteParameters(const std::vector < ParameterInfo > & parametersInfo, const std::vector < GDExpression > & parameters)
+{
+    std::vector<GDExpression> completeParameters = parameters;
+    for (unsigned int i = 0;i<parametersInfo.size();++i) //Code only parameters are not included in expressions parameters.
+    {
+        if ( parametersInfo[i].codeOnly)
+        {
+            if ( i > completeParameters.size() )
+            {
+                cout << "Bad parameter count in expression.";
+            }
+
+            if ( i >= completeParameters.size() )
+                completeParameters.push_back(GDExpression(""));
+            else
+                completeParameters.insert(completeParameters.begin()+i, GDExpression(""));
+        }
+        else
+        {
+            if ( i >= completeParameters.size() )
+            {
+                completeParameters.push_back(GDExpression(""));
+            }
+        }
+    }
+    return completeParameters;
+}
+
 bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks)
 {
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
@@ -91,58 +124,54 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
         //Verify if we are not with a math expression.
         if ( functionName.substr(0, functionName.length()-1).find_first_of(parserSeparators) == string::npos )
         {
-            bool isMathFunction = find(parserMathFunctions.begin(), parserMathFunctions.end(), functionName) != parserMathFunctions.end();
             bool functionFound = false;
             bool staticFunctionFound = false;
             bool objectFunctionFound = false;
             bool automatismFunctionFound = false;
 
-            if ( !isMathFunction )
+            //First try to bind to a static expression
+            if ( nameIsFunction && extensionsManager->HasExpression(functionName) )
             {
-                //First try to bind to a static expression
-                if ( nameIsFunction && extensionsManager->HasExpression(functionName) )
+                functionFound = true; staticFunctionFound = true;
+                instructionInfos = extensionsManager->GetExpressionInfos(functionName);
+            }
+            //Then search in object expression
+            else if ( !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeOfObject(game, scene, objectName), functionName) )
+            {
+                functionFound = true; objectFunctionFound = true;
+                instructionInfos = extensionsManager->GetObjectExpressionInfos(GetTypeOfObject(game, scene, objectName), functionName);
+            }
+            //And in automatisms expressions
+            else if ( !nameIsFunction )
+            {
+                size_t firstDoublePoints = functionName.find("::");
+                if ( firstDoublePoints != string::npos )
                 {
-                    functionFound = true; staticFunctionFound = true;
-                    instructionInfos = extensionsManager->GetExpressionInfos(functionName);
-                }
-                //Then search in object expression
-                else if ( !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeOfObject(game, scene, objectName), functionName) )
-                {
-                    functionFound = true; objectFunctionFound = true;
-                    instructionInfos = extensionsManager->GetObjectExpressionInfos(GetTypeOfObject(game, scene, objectName), functionName);
-                }
-                //And in automatisms expressions
-                else if ( !nameIsFunction )
-                {
-                    size_t firstDoublePoints = functionName.find("::");
-                    if ( firstDoublePoints != string::npos )
+                    std::string autoName = functionName.substr(0, firstDoublePoints);
+                    if ( firstDoublePoints+2 < functionName.length() )
+                        functionName = functionName.substr(firstDoublePoints+2, functionName.length());
+                    else
+                        functionName = "";
+
+                    if ( extensionsManager->HasAutomatismExpression(GetTypeOfAutomatism(game, scene, autoName), functionName) )
                     {
-                        std::string autoName = functionName.substr(0, firstDoublePoints);
-                        if ( firstDoublePoints+2 < functionName.length() )
-                            functionName = functionName.substr(firstDoublePoints+2, functionName.length());
-                        else
-                            functionName = "";
+                        parameters.push_back(GDExpression(autoName));
+                        functionFound = true; automatismFunctionFound = true;
 
-                        if ( extensionsManager->HasAutomatismExpression(GetTypeOfAutomatism(game, scene, autoName), functionName) )
+                        instructionInfos = extensionsManager->GetAutomatismExpressionInfos(GetTypeOfAutomatism(game, scene, autoName), functionName);
+
+                        //Verify that object has automatism.
+                        vector < std::string > automatisms = GetAutomatismsOfObject(game, scene, objectName);
+                        if ( find(automatisms.begin(), automatisms.end(), autoName) == automatisms.end() )
                         {
-                            parameters.push_back(GDExpression(autoName));
-                            functionFound = true; automatismFunctionFound = true;
-
-                            instructionInfos = extensionsManager->GetAutomatismExpressionInfos(GetTypeOfAutomatism(game, scene, autoName), functionName);
-
-                            //Verify that object has automatism.
-                            vector < std::string > automatisms = GetAutomatismsOfObject(game, scene, objectName);
-                            if ( find(automatisms.begin(), automatisms.end(), autoName) == automatisms.end() )
-                            {
-                                cout << "Bad automatism requested" << endl;
-                                functionFound = false;
-                            }
+                            cout << "Bad automatism requested" << endl;
+                            functionFound = false;
                         }
                     }
                 }
             }
 
-            if( !isMathFunction && functionFound ) //Add the function
+            if( functionFound ) //Add the function
             {
                 //Identify parameters
                 size_t parametersEnd = expression.find_first_of("(", functionNameEnd);
@@ -166,9 +195,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                         //Add the character to the current parameter or terminate the latter
                         if ( (expression[parametersEnd] == ',' && level == 0) && takeSymbolsInAccount )
                         {
-                            if ( !AddParameterToList(game, scene, callbacks, parameters, currentParameterStr, instructionInfos.parameters, parametersEnd) )
-                                return false;
-
+                            parameters.push_back(currentParameterStr);
                             currentParameterStr.clear();
                         }
                         else currentParameterStr += expression[parametersEnd];
@@ -178,14 +205,14 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                     }
                     if ( currentParameterStr.find_first_not_of(" ") != string::npos ) //Add last parameter if needed
                     {
-                        if ( !AddParameterToList(game, scene, callbacks, parameters, currentParameterStr, instructionInfos.parameters, parametersEnd) )
-                            return false;
+                        parameters.push_back(currentParameterStr);
                     }
 
+                    //Testing function call is properly closed
                     if(parametersEnd == expression.length() || expression[parametersEnd] != ')')
                     {
                         #if defined(GD_IDE_ONLY)
-                        firstErrorStr = _T("Parenthèses non fermées");
+                        firstErrorStr = _("Parenthèses non fermées");
                         firstErrorPos = parametersEnd-1;
                         #endif
                         return false;
@@ -196,21 +223,28 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                     {
                         #if defined(GD_IDE_ONLY)
                         firstErrorPos = functionNameEnd;
-                        firstErrorStr = _T("Nombre de paramètre incorrect.");
+                        firstErrorStr = _("Nombre de paramètre incorrect.");
                         firstErrorStr += " ";
-                        firstErrorStr += _T("Attendu ( au maximum ) :");
+                        firstErrorStr += _("Attendu ( au maximum ) :");
                         firstErrorStr += ToString(instructionInfos.parameters.size());
                         #endif
                         return false;
+                    }
+
+                    //Preparing parameters
+                    parameters = CompleteParameters(instructionInfos.parameters, parameters);
+                    for (unsigned int i = 0;i<instructionInfos.parameters.size();++i)
+                    {
+                        if ( !PrepareParameter(game, scene, callbacks, parameters[i], instructionInfos.parameters[i], functionNameEnd) )
+                            return false; //TODO : Boarf, paramètres optionels sont rajoutés et évalués : Problème avec les calques par exemple ( Au minimum, il faut "" )
                     }
                 }
                 else
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
-                    firstErrorStr = _T("Parenthèses des paramètres manquantes");
+                    firstErrorStr = _("Parenthèses des paramètres manquantes");
                     #endif
-
                     return false;
                 }
 
@@ -264,7 +298,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
     {
         #if defined(GD_IDE_ONLY)
         firstErrorPos = 0;
-        firstErrorStr = _T("L'expression est invalide ou vide. Entrez un texte ( entouré de guillemets ) ou une fonction.");
+        firstErrorStr = _("L'expression est invalide ou vide. Entrez un texte ( entouré de guillemets ) ou une fonction.");
         #endif
         return false;
     }
@@ -284,7 +318,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorPos = firstQuotePos;
-                firstErrorStr = _T("Guillemets non fermés.");
+                firstErrorStr = _("Guillemets non fermés.");
                 #endif
                 return false;
             }
@@ -369,7 +403,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorPos = parametersEnd-1;
-                firstErrorStr = _T("Parenthèses non fermées");
+                firstErrorStr = _("Parenthèses non fermées");
                 #endif
                 return false;
             }
@@ -391,12 +425,13 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
-                    firstErrorStr = _T("Nombre de paramètres incorrect.");
+                    firstErrorStr = _("Nombre de paramètres incorrect.");
                     #endif
                     return false;
                 }
 
                 //Preparing parameters
+                parameters = CompleteParameters(expressionInfo.parameters, parameters);
                 for (unsigned int i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
                 {
                     if ( !PrepareParameter(game, scene, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
@@ -417,12 +452,13 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
-                    firstErrorStr = _T("Nombre de paramètres incorrect.");
+                    firstErrorStr = _("Nombre de paramètres incorrect.");
                     #endif
                     return false;
                 }
 
                 //Preparing parameters
+                parameters = CompleteParameters(expressionInfo.parameters, parameters);
                 for (unsigned int i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
                 {
                     if ( !PrepareParameter(game, scene, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
@@ -465,12 +501,13 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                             {
                                 #if defined(GD_IDE_ONLY)
                                 firstErrorPos = functionNameEnd;
-                                firstErrorStr = _T("Nombre de paramètres incorrect.");
+                                firstErrorStr = _("Nombre de paramètres incorrect.");
                                 #endif
                                 return false;
                             }
 
                             //Preparing parameters
+                            parameters = CompleteParameters(expressionInfo.parameters, parameters);
                             for (unsigned int i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
                             {
                                 if ( !PrepareParameter(game, scene, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
@@ -490,7 +527,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorPos = nameStart;
-                firstErrorStr = _T("Fonction non reconnue.");
+                firstErrorStr = _("Fonction non reconnue.");
                 #endif
                 return false;
             }
@@ -515,7 +552,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorPos = nextTokenPos;
-                firstErrorStr = _T("+ manquant entre deux chaines.");
+                firstErrorStr = _("+ manquant entre deux chaines.");
                 #endif
                 return false;
             }
@@ -523,7 +560,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorPos = firstPlusPos;
-                firstErrorStr = _T("Symbole manquant entre deux +.");
+                firstErrorStr = _("Symbole manquant entre deux +.");
                 #endif
                 return false;
             }
@@ -534,37 +571,21 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
     {
         #if defined(GD_IDE_ONLY)
         firstErrorPos = parsePosition;
-        firstErrorStr = _T("Symbole erroné en fin d'expression.");
+        firstErrorStr = _("Symbole erroné en fin d'expression.");
         #endif
         return false;
     }
-
-    return true;
-}
-
-bool GDExpressionParser::AddParameterToList(const Game & game, const Scene & scene, ParserCallbacks & callbacks, std::vector < GDExpression > & parameters, string parameterStr, std::vector < ParameterInfo > parametersInfos, const size_t positionInExpression)
-{
-    parameters.push_back(GDExpression(parameterStr));
-    if ( parameters.size()-1 >= parametersInfos.size() )
-    {
-        #if defined(GD_IDE_ONLY)
-        firstErrorStr = _T("Trop de paramètre lors de l'appel à une fonction");
-        firstErrorPos = positionInExpression;
-
-        return false;
-        #endif
-    }
-
-    if ( !PrepareParameter(game, scene, callbacks, parameters.back(), parametersInfos[parameters.size()-1], positionInExpression) )
-        return false;
 
     return true;
 }
 
 bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks & callbacks, GDExpression & parameter, const ParameterInfo & parametersInfo, const size_t positionInExpression)
 {
-    if ( parametersInfo.type == "expression" )
+    if ( parametersInfo.type == "expression" || parametersInfo.type == "camera" )
     {
+        if (parametersInfo.optional && parameter.GetPlainString().empty())
+            parameter = parametersInfo.defaultValue.empty() ? GDExpression("0") : GDExpression(parametersInfo.defaultValue);
+
         if ( !callbacks.OnSubMathExpression(game, scene, parameter) )
         {
             #if defined(GD_IDE_ONLY)
@@ -576,6 +597,9 @@ bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene
     }
     else if ( parametersInfo.type == "string" || parametersInfo.type == "layer" || parametersInfo.type == "color" || parametersInfo.type == "file" || parametersInfo.type == "joyaxis" )
     {
+        if (parametersInfo.optional && parameter.GetPlainString().empty())
+            parameter = parametersInfo.defaultValue.empty() ? GDExpression("\"\"") : GDExpression(parametersInfo.defaultValue);
+
         if ( !callbacks.OnSubTextExpression(game, scene, parameter) )
         {
             #if defined(GD_IDE_ONLY)

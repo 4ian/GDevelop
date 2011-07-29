@@ -32,9 +32,13 @@ std::string StandardEvent::GenerateEventCode(const Game & game, const Scene & sc
     outputCode += "if (" +ifPredicat+ ")\n";
     outputCode += "{\n";
     outputCode += EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
-    outputCode += "\n{ //Subevents: \n";
-    outputCode += EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
-    outputCode += "} //Subevents end.\n";
+    if ( !events.empty() ) //Sub events
+    {
+        outputCode += "\n{\n";
+        outputCode += EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
+        outputCode += "}\n";
+    }
+
     outputCode += "}\n";
 
     return outputCode;

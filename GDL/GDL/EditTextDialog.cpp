@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #if defined(GD_IDE_ONLY)
 #include "GDL/EditTextDialog.h"
 
@@ -10,7 +15,6 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/ChooseObject.h"
 #include "GDL/ChooseLayer.h"
-#include "GDL/ChooseObjectExpression.h"
 #include "GDL/ChooseVariableDialog.h"
 #include <wx/textdlg.h>
 #include "GDL/Game.h"

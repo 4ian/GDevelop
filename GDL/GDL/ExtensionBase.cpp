@@ -151,7 +151,7 @@ ParameterInfo & InstructionInfos::AddParameter(const std::string & type, const w
     info.codeOnly = false;
     #endif
     info.optional = parameterIsOptional;
-    info.supplementaryInformation = optionalObjectType;
+    info.supplementaryInformation = optionalObjectType.empty() ? "" : optionalObjectType;
 
     parameters.push_back(info);
     return parameters.back();
@@ -183,7 +183,7 @@ ParameterInfo & ExpressionInfos::AddParameter(const std::string & type, const wx
     info.codeOnly = false;
     #endif
     info.optional = parameterIsOptional;
-    info.supplementaryInformation = optionalObjectType;
+    info.supplementaryInformation = optionalObjectType.empty() ? "" : optionalObjectType;
 
     parameters.push_back(info);
     return parameters.back();
@@ -215,7 +215,7 @@ ParameterInfo & StrExpressionInfos::AddParameter(const std::string & type, const
     info.codeOnly = false;
     #endif
     info.optional = parameterIsOptional;
-    info.supplementaryInformation = optionalObjectType;
+    info.supplementaryInformation = optionalObjectType.empty() ? "" : optionalObjectType;
 
     parameters.push_back(info);
     return parameters.back();

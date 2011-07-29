@@ -12,6 +12,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
+        instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
         instrInfo.AddParameter("object", _("Objet à créer"), "", false);
         instrInfo.AddParameter("expression", _("Position X"), "", false);
         instrInfo.AddParameter("expression", _("Position Y"), "", false);
@@ -31,6 +32,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
+        instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
         instrInfo.AddParameter("string", _("Texte représentant le nom de l'objet à créer"), "", false);
         instrInfo.AddParameter("expression", _("Position X"), "", false);
         instrInfo.AddParameter("expression", _("Position Y"), "", false);

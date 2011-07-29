@@ -170,30 +170,30 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
 
     context.ObjectNeeded(instruction.parameters[0].GetPlainString());
 
-    //Cast the object if needed
-    string objectType = GetTypeOfObject(game, scene, instruction.parameters[0].GetPlainString());
-    const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
-    bool castNeeded = !objInfo.cppClassName.empty();
+    //Cast the automatism
+    string automatismType = GetTypeOfAutomatism(game, scene, instruction.parameters[1].GetPlainString());
+    const AutomatismInfo & autoInfo = GDpriv::ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
+    bool castNeeded = !autoInfo.cppClassName.empty();
 
-    //Build string to access the object
-    context.AddIncludeFile(objInfo.optionalIncludeFile);
-    string objectStr;
+    //Build string to access the automatism
+    context.AddIncludeFile(autoInfo.optionalIncludeFile);
+    string autoStr;
     if ( context.currentObject == instruction.parameters[0].GetPlainString() )
     {
         if ( !castNeeded )
-            objectStr = instruction.parameters[0].GetPlainString()+"objects[i]";
+            autoStr = instruction.parameters[0].GetPlainString()+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")";
         else
-            objectStr = "static_cast<"+objInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[i])";
+            autoStr = "static_cast<"+autoInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))";
     }
     else
     {
         if ( !castNeeded )
-            objectStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 :"+ instruction.parameters[0].GetPlainString()+"objects[0]";
+            autoStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 :"+ instruction.parameters[0].GetPlainString()+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")";
         else
-            objectStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 : "+"static_cast<"+objInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[0])";
+            autoStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 : "+"static_cast<"+autoInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))";
     }
 
-    plainExpression += "("+objectStr+"->"+instruction.parameters[1].GetPlainString()+"::"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+    plainExpression += "("+autoStr+"->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
 };
 
 void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
@@ -212,30 +212,30 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
 
     context.ObjectNeeded(instruction.parameters[0].GetPlainString());
 
-    //Cast the object if needed
-    string objectType = GetTypeOfObject(game, scene, instruction.parameters[0].GetPlainString());
-    const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
-    bool castNeeded = !objInfo.cppClassName.empty();
+    //Cast the automatism
+    string automatismType = GetTypeOfAutomatism(game, scene, instruction.parameters[1].GetPlainString());
+    const AutomatismInfo & autoInfo = GDpriv::ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
+    bool castNeeded = !autoInfo.cppClassName.empty();
 
-    //Build string to access the object
-    context.AddIncludeFile(objInfo.optionalIncludeFile);
-    string objectStr;
+    //Build string to access the automatism
+    context.AddIncludeFile(autoInfo.optionalIncludeFile);
+    string autoStr;
     if ( context.currentObject == instruction.parameters[0].GetPlainString() )
     {
         if ( !castNeeded )
-            objectStr = instruction.parameters[0].GetPlainString()+"objects[i]";
+            autoStr = instruction.parameters[0].GetPlainString()+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")";
         else
-            objectStr = "static_cast<"+objInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[i])";
+            autoStr = "static_cast<"+autoInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))";
     }
     else
     {
         if ( !castNeeded )
-            objectStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 :"+ instruction.parameters[0].GetPlainString()+"objects[0]";
+            autoStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 :"+ instruction.parameters[0].GetPlainString()+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")";
         else
-            objectStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 : "+"static_cast<"+objInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[0])";
+            autoStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 : "+"static_cast<"+autoInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))";
     }
 
-    plainExpression += "("+objectStr+"->"+instruction.parameters[1].GetPlainString()+"::"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+    plainExpression += "("+autoStr+"->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
 };
 
 bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression)

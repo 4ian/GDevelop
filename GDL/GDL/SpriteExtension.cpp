@@ -36,7 +36,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Valeur"), "",false);
             instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("SetOpacity").SetAssociatedGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -53,7 +53,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Valeur"), "",false);
             instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("SetAnimation").SetAssociatedGetter("GetAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -70,7 +70,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Valeur"), "",false);
             instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("SetDirection").SetAssociatedGetter("GetCurrentDirection").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -87,7 +87,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Valeur"), "",false);
             instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("SetSprite").SetAssociatedGetter("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -102,7 +102,7 @@ SpriteExtension::SpriteExtension()
                        "res/actions/animation.png");
 
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("StopAnimation").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -117,7 +117,7 @@ SpriteExtension::SpriteExtension()
                        "res/actions/animation.png");
 
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("PlayAnimation").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -134,7 +134,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet à tourner"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Position X"), "",false);
             instrInfo.AddParameter("expression", _("Position Y"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("TurnTowardPosition").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -152,7 +152,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Valeur"), "",false);
             instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -169,7 +169,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Valeur"), "",false);
             instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("SetScaleX").SetAssociatedGetter("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -186,7 +186,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Valeur"), "",false);
             instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("SetScaleY").SetAssociatedGetter("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -203,7 +203,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Numéro de l'animation à tester"), "",false);
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -220,7 +220,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Numéro de la direction à tester"), "",false);
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("GetCurrentDirection").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -237,7 +237,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Numéro de l'image à tester"), "",false);
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -252,7 +252,7 @@ SpriteExtension::SpriteExtension()
                        "res/conditions/animation.png");
 
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("IsAnimationStopped").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -269,7 +269,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Valeur à tester"), "",false);
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -286,7 +286,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Valeur à tester"), "",false);
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -303,7 +303,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Valeur à tester"), "",false);
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -320,7 +320,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Valeur à tester ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false);
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("GetBlendMode").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -340,7 +340,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("expression", _("Position X"), "",false);
             instrInfo.AddParameter("expression", _("Position Y"), "",false);
             instrInfo.AddParameter("yesorno", _("Utiliser la transparence de la source ( non si vide )"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -357,7 +357,7 @@ SpriteExtension::SpriteExtension()
 
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("color", _("Couleur à rendre transparente"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("MakeColorTransparent").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -373,7 +373,7 @@ SpriteExtension::SpriteExtension()
 
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("color", _("Couleur"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("SetColor").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -389,7 +389,7 @@ SpriteExtension::SpriteExtension()
 
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("expression", _("Mode ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("SetBlendMode").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -405,7 +405,7 @@ SpriteExtension::SpriteExtension()
 
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("yesorno", _("Activer l'inversion"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("FlipX").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -421,7 +421,7 @@ SpriteExtension::SpriteExtension()
 
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("yesorno", _("Activer l'inversion"), "",false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("FlipY").SetIncludeFile("GDL/SpriteObject.h");
 
@@ -558,7 +558,6 @@ SpriteExtension::SpriteExtension()
         instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
         instrInfo.AddParameter("expression", _("Angle de tolérance ( 0 : tolérance minimale )"), "",false);
         instrInfo.AddCodeOnlyParameter("conditionInverted", "");
-        MAIN_OBJECTS_IN_PARAMETERS(0,1)
 
         instrInfo.cppCallingInformation.SetFunctionName("IsTurnedToward").SetIncludeFile("GDL/SpriteTools.h");
 

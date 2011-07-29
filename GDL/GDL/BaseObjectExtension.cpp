@@ -36,7 +36,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddParameter("expression", _("Position X"), "", false);
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("GetX").SetManipulatedType("number");
 
@@ -53,7 +53,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddParameter("expression", _("Valeur"), "", false);
             instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("SetX").SetManipulatedType("number").SetAssociatedGetter("GetX");
 
@@ -70,7 +70,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddParameter("expression", _("Position Y"), "", false);
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("GetY").SetManipulatedType("number");
 
@@ -87,7 +87,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddParameter("expression", _("Valeur"), "", false);
             instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("SetY").SetManipulatedType("number").SetAssociatedGetter("GetY");
 
@@ -106,7 +106,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
             instrInfo.AddParameter("expression", _("Position Y"), "", false);
             instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("SetXY");
 
@@ -125,7 +125,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("expression", _("Position Y"), "", false);
             instrInfo.AddParameter("expression", _("Distance"), "", false);
             instrInfo.AddParameter("expression", _("Angle en degré"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("PutAroundAPosition");
 
@@ -143,7 +143,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("expression", _("Déplacement en X"), "", false);
             instrInfo.AddParameter("expression", _("Déplacement en Y"), "", false);
             instrInfo.AddParameter("expression", _("Dissipation ( 0 par défaut )"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("AddForce");
 
@@ -160,7 +160,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("expression", _("Angle"), "", false);
             instrInfo.AddParameter("expression", _("Longueur ( en pixels )"), "", false);
             instrInfo.AddParameter("expression", _("Dissipation ( 0 par défaut )"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("AddForceUsingPolarCoordinates");
 
@@ -226,9 +226,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/delete.png");
 
             instrInfo.AddParameter("object", _("Objet"), "", false);
-            instrInfo.AddCodeOnlyParameter("inlineCode", "\"\"");
+            instrInfo.AddCodeOnlyParameter("currentScene","");
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetName");
+            instrInfo.cppCallingInformation.SetFunctionName("DeleteFromScene");
 
         DECLARE_END_OBJECT_ACTION()
 
@@ -291,7 +291,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
             instrInfo.AddParameter("expression", _("Valeur"), "", false);
             instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.ObtainVariable").SetManipulatedType("number");
 
@@ -309,7 +309,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
             instrInfo.AddParameter("string", _("Texte"), "", false);
             instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.ObtainVariable").SetManipulatedType("string");
 
@@ -462,7 +462,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
             instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.ObtainVariable").SetManipulatedType("number");
 
@@ -480,7 +480,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
             instrInfo.AddParameter("text", _("Texte à tester"), "", false);
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.ObtainVariable").SetManipulatedType("string");
 
@@ -496,7 +496,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
-            MAIN_OBJECTS_IN_PARAMETER(0)
+
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.HasVariable");
 

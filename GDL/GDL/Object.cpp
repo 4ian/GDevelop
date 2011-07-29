@@ -260,6 +260,14 @@ unsigned int Object::GetNumberOfProperties() const
 }
 #endif
 
+void Object::DeleteFromScene(RuntimeScene & scene)
+{
+    SetName("");
+
+    //Notify scene that object's name has changed.
+    scene.objectsInstances.ObjectIdentifierHasChanged(shared_from_this());
+}
+
 void Object::PutAroundAPosition( float positionX, float positionY, float distance, float angleInDegrees )
 {
     double angle = angleInDegrees/180.0f*3.14159;

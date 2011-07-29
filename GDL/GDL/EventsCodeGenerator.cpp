@@ -291,6 +291,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
 
             //Add a static_cast if necessary
             const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
+            context.AddIncludeFile(objInfo.optionalIncludeFile);
             string objectFunctionCallNamePart =
             ( !objInfo.cppClassName.empty() ) ?
                 "static_cast<"+objInfo.cppClassName+"*>("+realObjectName+"objects[i])->"+instrInfos.cppCallingInformation.cppCallingName
@@ -359,6 +360,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
 
             //Add a static_cast if necessary
             const AutomatismInfo & autoInfo = extensionsManager->GetAutomatismInfo(automatismType);
+            context.AddIncludeFile(autoInfo.optionalIncludeFile);
             string objectFunctionCallNamePart =
             ( !autoInfo.cppClassName.empty() ) ?
                 "static_cast<"+autoInfo.cppClassName+"*>("+realObjectName+"objects[i]->GetAutomatismRawPointer(\""+condition.GetParameter(1).GetPlainString()+"\"))->"+instrInfos.cppCallingInformation.cppCallingName
@@ -434,6 +436,7 @@ string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const 
             outputCode += "condition"+ToString(i)+"IsTrue";
             if (i == cId-1) outputCode += ") ";
         }
+        outputCode += context.GenerateOptionalInstructionLevelDeclarationCode();
         outputCode += "{\n";
         if ( !conditions[cId].GetType().empty() ) outputCode += conditionCode;
         outputCode += "}\n";
@@ -543,6 +546,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
 
             //Add a static_cast if necessary
             const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
+            context.AddIncludeFile(objInfo.optionalIncludeFile);
             string objectPart = ( !objInfo.cppClassName.empty() ) ? "static_cast<"+objInfo.cppClassName+"*>("+realObjectName+"objects[i])->" : realObjectName+"objects[i]->" ;
 
             //Create call
@@ -601,6 +605,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
 
             //Add a static_cast if necessary
             const AutomatismInfo & autoInfo = extensionsManager->GetAutomatismInfo(automatismType);
+            context.AddIncludeFile(autoInfo.optionalIncludeFile);
             string objectPart =
             ( !autoInfo.cppClassName.empty() ) ?
                 "static_cast<"+autoInfo.cppClassName+"*>("+realObjectName+"objects[i]->GetAutomatismRawPointer(\""+action.GetParameter(1).GetPlainString()+"\"))->"
@@ -659,6 +664,7 @@ string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Sce
     {
         string actionCode = GenerateActionCode(game, scene, actions[aId], context);
 
+        outputCode += context.GenerateOptionalInstructionLevelDeclarationCode(); //TODO : Same things in OR
         outputCode += "{\n";
         if ( !actions[aId].GetType().empty() ) outputCode += actionCode;
         outputCode += "}\n";
@@ -830,6 +836,14 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
         {
             context.MapOfAllObjectsNeeded(game, scene);
             argOutput += "objectsListsMap";
+        }
+        else if ( parametersInfo[pNb].type == "listOfAlreadyPickedObjects" )
+        {
+            context.dynamicObjectsListsDeclaration = true;
+            argOutput += "objectsAlreadyDeclared";
+        }
+        else if ( parametersInfo[pNb].type == "objectDeleted" )
+        {
         }
         else
         {

@@ -387,6 +387,8 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         virtual unsigned int GetNumberOfProperties() const;
         #endif
 
+        void DeleteFromScene(RuntimeScene & scene);
+
         void PutAroundAPosition( float positionX, float positionY, float distance, float angleInDegrees );
         bool ActChangeLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         void AddForce( float x, float y, float clearing );

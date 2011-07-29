@@ -27,7 +27,6 @@
 
 #include "GDL/ChooseObject.h"
 #include "GDL/ChooseLayer.h"
-#include "GDL/ChooseObjectExpression.h"
 #include "GDL/ChooseVariableDialog.h"
 #include "GDL/ChooseAutomatismDlg.h"
 #include "GDL/AdvancedTextEntryDlg.h"
@@ -720,6 +719,8 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
         string parametersStr, automatismStr;
         for (unsigned int i = 1;i<infos->GetExpressionInfos().parameters.size();++i)
         {
+            if ( infos->GetExpressionInfos().parameters[i].codeOnly ) continue;
+
             if ( i == 1 && infos->GetExpressionInfos().parameters[i].type == "automatism" )
             {
                 ChooseAutomatismDlg dialog(this, game, scene, object, infos->GetExpressionInfos().parameters[i].supplementaryInformation);

@@ -14,7 +14,7 @@ class Scene;
 class EventsCodeGenerationContext
 {
     public:
-        EventsCodeGenerationContext() : errorOccured(false), allObjectsMapNeeded(false) {};
+        EventsCodeGenerationContext() : errorOccured(false), allObjectsMapNeeded(false),dynamicObjectsListsDeclaration(false) {};
         virtual ~EventsCodeGenerationContext() {};
 
         /**
@@ -30,7 +30,7 @@ class EventsCodeGenerationContext
         /**
          * Call this when an instruction in the event need an object list.
          */
-        void ObjectNeeded(std::string objectName) {objectsToBeDeclared.insert(objectName);objectsListsToBeDeclaredEmpty.erase(objectName);};
+        void ObjectNeeded(std::string objectName);
 
         /**
          * Call this when an instruction in the event need an object list.
@@ -46,6 +46,11 @@ class EventsCodeGenerationContext
          * Request a map of all objects
          */
         void MapOfAllObjectsNeeded(const Game & game, const Scene & scene);
+
+        /**
+         * In case of dynamic objects list declaration, some declarations have to be made at the level of instructions.
+         */
+        std::string GenerateOptionalInstructionLevelDeclarationCode() { std::string returnedStr = dynamicDeclaration; dynamicDeclaration.clear(); return returnedStr; };
 
         /**
          * Generate code for getting needed object lists from scene. Also clear objectsToBeDeclared.
@@ -64,6 +69,9 @@ class EventsCodeGenerationContext
         std::set<std::string> objectsListsToBeDeclaredEmpty;
 
         bool allObjectsMapNeeded;
+
+        bool dynamicObjectsListsDeclaration;
+        std::string dynamicDeclaration;
 
     private:
 };

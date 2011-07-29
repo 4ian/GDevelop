@@ -248,7 +248,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("yesorno", _("Anticiper le déplacement de l'objet ( oui par défaut )"), "",true);
         instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
         instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
-        MAIN_OBJECTS_IN_PARAMETER(0)
+
 
         instrInfo.cppCallingInformation.SetFunctionName("CenterCameraOnObject").SetIncludeFile("GDL/RuntimeSceneCameraTools.h");
 

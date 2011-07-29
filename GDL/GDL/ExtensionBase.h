@@ -356,9 +356,6 @@ typedef Object * (*CreateFunPtr)(std::string name);
             automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName));\
             automatismInfo.sharedDatasInstance = boost::shared_ptr<AutomatismsSharedDatas>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
 
-#define MAIN_OBJECTS_IN_PARAMETER(x) instrInfo.mainObjects.push_back(x);
-#define MAIN_OBJECTS_IN_PARAMETERS(x, y) instrInfo.mainObjects.push_back(x); instrInfo.mainObjects.push_back(y);
-
 #else //Condition, actions and expressions declare less thing in runtime only
 
 #define DECLARE_THE_EXTENSION(name_, fullname_, description_, author_, license_) name = name_; \
@@ -429,9 +426,6 @@ typedef Object * (*CreateFunPtr)(std::string name);
             std::string currentAutomatismDeclarationName = name_;\
             automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName)); \
             automatismInfo.sharedDatasInstance = boost::shared_ptr<AutomatismsSharedDatas>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
-
-#define MAIN_OBJECTS_IN_PARAMETER(x)
-#define MAIN_OBJECTS_IN_PARAMETERS(x, y)
 
 //Emulate wxWidgets internationalization macro
 #ifndef _
@@ -574,7 +568,6 @@ class GD_API InstructionInfos
     std::string group;
     wxBitmap icon;
     wxBitmap smallicon;
-    std::vector < int > mainObjects;
     bool canHaveSubInstructions;
 #endif
     std::vector < ParameterInfo > parameters;

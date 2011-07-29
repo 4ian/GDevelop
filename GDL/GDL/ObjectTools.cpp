@@ -25,18 +25,20 @@ bool GD_API HitBoxesCollision( string, string, std::map <std::string, std::vecto
     vector<Object*> objects1;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
-        if ( it->second == NULL ) break;
+        if ( it->second == NULL ) continue;
 
         std::vector<Object*> & list = *(it->second);
         for (unsigned int i = 0;i<list.size();++i) objects1.push_back(list[i]);
+        list.clear();
     }
     vector<Object*> objects2;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
     {
-        if ( it->second == NULL ) break;
+        if ( it->second == NULL ) continue;
 
         std::vector<Object*> & list = *(it->second);
         for (unsigned int i = 0;i<list.size();++i) objects2.push_back(list[i]);
+        list.clear();
     }
 
     bool isTrue = false;
@@ -73,7 +75,7 @@ bool GD_API HitBoxesCollision( string, string, std::map <std::string, std::vecto
                             objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
 
                         if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
-                            objectsLists1[objects2[j]->GetName()]->push_back(objects2[j]);
+                            objectsLists2[objects2[j]->GetName()]->push_back(objects2[j]);
                     }
                     AuMoinsUnObjet = true;
                 }
@@ -96,18 +98,20 @@ float GD_API DistanceBetweenObjects( string, string, std::map <std::string, std:
     vector<Object*> objects1;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
-        if ( it->second == NULL ) break;
+        if ( it->second == NULL ) continue;
 
         std::vector<Object*> & list = *(it->second);
         for (unsigned int i = 0;i<list.size();++i) objects1.push_back(list[i]);
+        list.clear();
     }
     vector<Object*> objects2;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
     {
-        if ( it->second == NULL ) break;
+        if ( it->second == NULL ) continue;
 
         std::vector<Object*> & list = *(it->second);
         for (unsigned int i = 0;i<list.size();++i) objects2.push_back(list[i]);
+        list.clear();
     }
 
     bool isTrue = false;
@@ -137,7 +141,7 @@ float GD_API DistanceBetweenObjects( string, string, std::map <std::string, std:
                             objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
 
                         if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
-                            objectsLists1[objects2[j]->GetName()]->push_back(objects2[j]);
+                            objectsLists2[objects2[j]->GetName()]->push_back(objects2[j]);
                     }
                 }
                 else
@@ -149,7 +153,7 @@ float GD_API DistanceBetweenObjects( string, string, std::map <std::string, std:
                             objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
 
                         if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
-                            objectsLists1[objects2[j]->GetName()]->push_back(objects2[j]);
+                            objectsLists2[objects2[j]->GetName()]->push_back(objects2[j]);
                     }
                 }
             }
@@ -164,18 +168,20 @@ bool GD_API MovesToward( string, string, std::map <std::string, std::vector<Obje
     vector<Object*> objects1;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
-        if ( it->second == NULL ) break;
+        if ( it->second == NULL ) continue;
 
         std::vector<Object*> & list = *(it->second);
         for (unsigned int i = 0;i<list.size();++i) objects1.push_back(list[i]);
+        list.clear();
     }
     vector<Object*> objects2;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
     {
-        if ( it->second == NULL ) break;
+        if ( it->second == NULL ) continue;
 
         std::vector<Object*> & list = *(it->second);
         for (unsigned int i = 0;i<list.size();++i) objects2.push_back(list[i]);
+        list.clear();
     }
 
     bool isTrue = false;
@@ -215,7 +221,7 @@ bool GD_API MovesToward( string, string, std::map <std::string, std::vector<Obje
                                 objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
 
                             if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
-                                objectsLists1[objects2[j]->GetName()]->push_back(objects2[j]);
+                                objectsLists2[objects2[j]->GetName()]->push_back(objects2[j]);
                         }
                     }
                     else
@@ -228,7 +234,7 @@ bool GD_API MovesToward( string, string, std::map <std::string, std::vector<Obje
                                 objectsLists1[objects1[i]->GetName()]->push_back(objects1[i]);
 
                             if ( find(objectsLists2[objects2[j]->GetName()]->begin(), objectsLists2[objects2[j]->GetName()]->end(), objects2[j]) == objectsLists2[objects2[j]->GetName()]->end() )
-                                objectsLists1[objects2[j]->GetName()]->push_back(objects2[j]);
+                                objectsLists2[objects2[j]->GetName()]->push_back(objects2[j]);
                         }
                     }
                 }

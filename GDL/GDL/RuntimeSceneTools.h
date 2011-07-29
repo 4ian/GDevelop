@@ -46,7 +46,7 @@ void GD_API MoveObjects( RuntimeScene & scene );
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, const std::string & objectName, float positionX, float positionY, const std::string & layer);
+void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, std::vector<std::string> & alreadyDeclaredObjects, const std::string & objectName, float positionX, float positionY, const std::string & layer);
 
 /**
  * Only used internally by GD events generated code.

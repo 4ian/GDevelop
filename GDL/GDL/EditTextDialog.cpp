@@ -26,6 +26,7 @@
 #include "GDL/ChooseAutomatismDlg.h"
 #include "GDL/AdvancedTextEntryDlg.h"
 #include "GDL/HelpFileAccess.h"
+#include "GDL/ExpressionsCorrectnessTesting.h"
 
 //(*IdInit(EditTextDialog)
 const long EditTextDialog::ID_CUSTOM1 = wxNewId();
@@ -389,13 +390,14 @@ void EditTextDialog::OnOkBtClick(wxCommandEvent& event)
 {
     returnedText = string(TexteEdit->GetValue().mb_str());
 
-    GDExpression expressionTest(returnedText);
-    //TODO : Reimplement me
-    /*if ( !expressionTest.PrepareForTextEvaluationOnly(game, scene) )
+    CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
+    GDExpressionParser expressionParser(returnedText);
+
+    if ( !expressionParser.ParseTextExpression(game, scene, callbacks) )
     {
         if ( wxMessageBox(_("L'expression est mal formulée. Êtes vous sûr de vouloir valider cette expression ?"), _("L'expression contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
-    }*/
+    }
 
     EndModal(1);
 }
@@ -512,19 +514,19 @@ void EditTextDialog::TextModified(wxStyledTextEvent& event)
 {
     string text = string(TexteEdit->GetValue().mb_str());
 
-    /* TODO : Reimplement me
-    GDExpression expressionTest(text);
-    if ( !expressionTest.PrepareForTextEvaluationOnly(game, scene) )
+    CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
+    GDExpressionParser expressionParser(text);
+    if ( !expressionParser.ParseTextExpression(game, scene, callbacks) )
     {
-        errorTxt->SetLabel(expressionTest.GetFirstErrorDuringPreprocessingText());
-        lastErrorPos = expressionTest.GetFirstErrorDuringPreprocessingPosition();
+        errorTxt->SetLabel(expressionParser.firstErrorStr);
+        lastErrorPos = expressionParser.firstErrorPos;
     }
     else
     {
         errorTxt->SetLabel(_("Pas d'erreurs."));
         lastErrorPos = std::string::npos;
     }
-    */
+
 
     errorTxt->Refresh(); //Need to call manually update.
 }

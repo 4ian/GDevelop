@@ -1,3 +1,7 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
 
 #include "ForEachEvent.h"
 #include "GDL/RuntimeScene.h"
@@ -6,6 +10,7 @@
 #include "GDL/EventsCodeGenerator.h"
 #include "GDL/ExpressionsCodeGeneration.h"
 #include "GDL/EventsCodeGenerationContext.h"
+#include <iostream>
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
@@ -25,6 +30,20 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
 {
     std::string outputCode;
 
+    vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), objectsToPick.GetPlainString()));
+    vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectsToPick.GetPlainString()));
+
+    std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
+    if ( globalGroup != game.objectGroups.end() )
+        realObjects = (*globalGroup).GetAllObjectsNames();
+    else if ( sceneGroup != scene.objectGroups.end() )
+        realObjects = (*sceneGroup).GetAllObjectsNames();
+    else
+        realObjects.push_back(objectsToPick.GetPlainString());
+
+    for (unsigned int i = 0;i<realObjects.size();++i)
+        parentContext.ObjectNeeded(realObjects[i]);
+
     //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
     EventsCodeGenerationContext context;
     context.InheritsFrom(parentContext);
@@ -34,27 +53,46 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
     std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
     std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
-    context.ObjectNotNeeded(objectsToPick.GetPlainString()); //We take care of declaring this object
+    //Prepare object declaration and sub events
+    std::string subevents = EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
 
-    //Write final code
-    outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < "+objectsToPick.GetPlainString()+"objects.size();++forEachIndex)\n";
-    outputCode += "{\n";
+    for (unsigned int i = 0;i<realObjects.size();++i)
+        context.ObjectNotNeeded(realObjects[i]); //We take care of declaring this object
 
-    outputCode += "std::vector<Object*> newObjectList; newObjectList.push_back("+objectsToPick.GetPlainString()+"objects[forEachIndex]);";
-    outputCode += "std::vector<Object*> "+objectsToPick.GetPlainString()+"objects = newObjectList;\n";
-    outputCode += context.GenerateObjectsDeclarationCode()+"\n";
-    outputCode += conditionsCode;
-    outputCode += "if (" +ifPredicat+ ")\n";
-    outputCode += "{\n";
-    outputCode += actionsCode;
-    outputCode += "\n{ //Subevents: \n";
-    outputCode += EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
-    outputCode += "} //Subevents end.\n";
-    outputCode += "}\n";
+    std::string objectDeclaration = context.GenerateObjectsDeclarationCode()+"\n";
 
-    outputCode += "}\n";
+    for (unsigned int i = 0;i<realObjects.size();++i)
+    {
+        //Write final code
+        outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < "+realObjects[i]+"objects.size();++forEachIndex)\n";
+        outputCode += "{\n";
 
-    parentContext.ObjectNeeded(objectsToPick.GetPlainString());
+        //Declare all lists of concerned objects empty
+        for (unsigned int j = 0;j<realObjects.size();++j)
+        {
+            if ( j != i ) outputCode += "std::vector<Object*> "+realObjects[j]+"objects;\n";
+        }
+
+        //Pick only one object
+        outputCode += "std::vector<Object*> temporaryForEachList; temporaryForEachList.push_back("+realObjects[i]+"objects[forEachIndex]);";
+        outputCode += "std::vector<Object*> "+realObjects[i]+"objects = temporaryForEachList;\n";
+        outputCode += objectDeclaration;
+        if ( context.allObjectsMapNeeded ) outputCode += "objectsListsMap[\""+realObjects[i]+"\"] = &"+realObjects[i]+"objects;\n";
+
+        outputCode += conditionsCode;
+        outputCode += "if (" +ifPredicat+ ")\n";
+        outputCode += "{\n";
+        outputCode += actionsCode;
+        if (!events.empty())
+        {
+            outputCode += "\n{ //Subevents: \n";
+            outputCode += subevents;
+            outputCode += "} //Subevents end.\n";
+        }
+        outputCode += "}\n";
+
+        outputCode += "}\n";
+    }
 
     return outputCode;
 }

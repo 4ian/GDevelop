@@ -101,7 +101,7 @@ void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std
 }
 
 
-bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, const std::string & objectName)
+bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, std::vector<std::string> & alreadyDeclaredObjects, const std::string & objectName)
 {
     vector< ObjectGroup >::const_iterator globalGroup = find_if(scene.game->objectGroups.begin(), scene.game->objectGroups.end(), bind2nd(HasTheSameName(), objectName));
     vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
@@ -127,13 +127,17 @@ bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vec
                     pickedObjectLists[realObjects[i]]->push_back(objectsOnScene[j]);
             }
         }
+
+        if ( find(alreadyDeclaredObjects.begin(), alreadyDeclaredObjects.end(), realObjects[i]) == alreadyDeclaredObjects.end() )
+            alreadyDeclaredObjects.push_back(realObjects[i]);
     }
 
     return true;
 }
 
-bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, const std::string & objectName)
+bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, std::vector<std::string> & alreadyDeclaredObjects, const std::string & objectName)
 {
+    //Get name of objects concerned by the instruction
     vector< ObjectGroup >::const_iterator globalGroup = find_if(scene.game->objectGroups.begin(), scene.game->objectGroups.end(), bind2nd(HasTheSameName(), objectName));
     vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
 
@@ -145,11 +149,31 @@ bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::v
     else
         realObjects.push_back(objectName);
 
+    //Check if object(s) are already concerned by previous instructions
+    bool objectsAlreadyConcerned = false;
+    for (unsigned int i = 0;i<realObjects.size();++i)
+    {
+        if ( find(alreadyDeclaredObjects.begin(), alreadyDeclaredObjects.end(), realObjects[i]) != alreadyDeclaredObjects.end() )
+            objectsAlreadyConcerned = true;
+    }
+
+    //Create a list with all objects
     std::vector<Object*> allObjects;
     for (unsigned int i = 0;i<realObjects.size();++i)
     {
-        std::vector<Object*> objectsOnScene = scene.objectsInstances.GetObjectsRawPointers(realObjects[i]);
+        std::vector<Object*> objectsOnScene;
+        if ( !objectsAlreadyConcerned )
+            objectsOnScene = scene.objectsInstances.GetObjectsRawPointers(realObjects[i]);
+        else
+        {
+            if ( pickedObjectLists[realObjects[i]] != NULL )
+                objectsOnScene = *pickedObjectLists[realObjects[i]];
+        }
+
         std::copy(objectsOnScene.begin(), objectsOnScene.end(), std::back_inserter(allObjects));
+
+        if ( find(alreadyDeclaredObjects.begin(), alreadyDeclaredObjects.end(), realObjects[i]) == alreadyDeclaredObjects.end() )
+            alreadyDeclaredObjects.push_back(realObjects[i]);
     }
 
     if ( !allObjects.empty() )
@@ -162,7 +186,7 @@ bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::v
             if ( pickedObjectLists[realObjects[i]] != NULL ) pickedObjectLists[realObjects[i]]->clear();
         }
 
-        pickedObjectLists[theChosenOne->GetName()]->push_back(theChosenOne);
+        if ( pickedObjectLists[theChosenOne->GetName()] != NULL ) pickedObjectLists[theChosenOne->GetName()]->push_back(theChosenOne);
     }
 
     return true;

@@ -53,9 +53,13 @@ class GD_API GDExpressionParser
          */
         bool PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks &, GDExpression & parameter, const ParameterInfo & parametersInfo, const size_t positionInExpression);
 
+        /**
+         * Used to parse parts of expression which are not functions calls
+         */
+        bool ParseNonFunctionsTokens(const std::string & str, ParserCallbacks & callbacks, const size_t positionInExpression);
+
         std::string expressionPlainString;
         static std::string parserSeparators;
-        static std::vector < std::string > parserMathFunctions;
 };
 
 /** \brief Callbacks called by parser during parsing
@@ -70,6 +74,8 @@ class ParserCallbacks
     virtual ~ParserCallbacks() {};
 
     virtual void OnConstantToken(std::string text) = 0;
+    virtual void OnNumber(std::string text) = 0;
+    virtual void OnOperator(std::string text) = 0;
 
     virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo) = 0;
     virtual void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfos) = 0;

@@ -52,7 +52,6 @@ std::vector<Object*> ObjInstancesHolder::GetAllObjectsRawPointers()
 }
 std::vector<Object*> ObjInstancesHolder::GetObjectsRawPointers(const std::string & name)
 {
-    BT_PROFILE("GetObjectsRawPointers");
     std::vector<Object*> objList;
 
     const ObjList & associatedList = objectsInstances[name];

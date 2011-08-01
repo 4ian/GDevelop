@@ -14,7 +14,7 @@ class Scene;
 class EventsCodeGenerationContext
 {
     public:
-        EventsCodeGenerationContext() : errorOccured(false), allObjectsMapNeeded(false),dynamicObjectsListsDeclaration(false) {};
+        EventsCodeGenerationContext() : errorOccured(false), allObjectsMapNeeded(false),dynamicObjectsListsDeclaration(false),parentAlreadyUseDynamicDeclaration(false) {};
         virtual ~EventsCodeGenerationContext() {};
 
         /**
@@ -66,12 +66,16 @@ class EventsCodeGenerationContext
         boost::shared_ptr< std::set<std::string> > includeFiles; ///< List of headers files used by instructions. A (shared) pointer is used so as context created from another one can share the same list.
         std::set<std::string> objectsAlreadyDeclared;
         std::set<std::string> objectsToBeDeclared;
+
+        std::set<std::string> emptyObjectsListsAlreadyDeclared;
         std::set<std::string> objectsListsToBeDeclaredEmpty;
 
         bool allObjectsMapNeeded;
 
         bool dynamicObjectsListsDeclaration;
+        bool parentAlreadyUseDynamicDeclaration;
         std::string dynamicDeclaration;
+        std::set<std::string> objectsListsDynamicallyDeclared;
 
     private:
 };

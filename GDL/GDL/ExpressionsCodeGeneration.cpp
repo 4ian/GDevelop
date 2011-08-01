@@ -12,6 +12,8 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/EventsCodeGenerationContext.h"
 #include "GDL/CommonTools.h"
+#include "GDL/Game.h"
+#include "GDL/Scene.h"
 
 using namespace std;
 
@@ -26,6 +28,17 @@ CallbacksForGeneratingExpressionCode::CallbacksForGeneratingExpressionCode(strin
 
 void CallbacksForGeneratingExpressionCode::OnConstantToken(string text)
 {
+    plainExpression += text;
+};
+void CallbacksForGeneratingExpressionCode::OnOperator(string text)
+{
+    plainExpression += text;
+};
+void CallbacksForGeneratingExpressionCode::OnNumber(string text)
+{
+    if (text.find_first_of(".e") == std::string::npos)
+        text += ".0";
+
     plainExpression += text;
 };
 
@@ -84,32 +97,54 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         parametersStr += parameters[i];
     }
 
-    context.ObjectNeeded(instruction.parameters[0].GetPlainString());
+    //Get object(s) concerned by function call
+    vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), instruction.parameters[0].GetPlainString()));
+    vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), instruction.parameters[0].GetPlainString()));
 
-    //Cast the object if needed
-    string objectType = GetTypeOfObject(game, scene, instruction.parameters[0].GetPlainString());
-    const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
-    bool castNeeded = !objInfo.cppClassName.empty();
-
-    //Build string to access the object
-    context.AddIncludeFile(objInfo.optionalIncludeFile);
-    string objectStr;
-    if ( context.currentObject == instruction.parameters[0].GetPlainString() )
-    {
-        if ( !castNeeded )
-            objectStr = instruction.parameters[0].GetPlainString()+"objects[i]";
-        else
-            objectStr = "static_cast<"+objInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[i])";
-    }
+    std::vector<std::string> realObjects; //With groups, we may have to generate expression for more than one object list.
+    if ( globalGroup != game.objectGroups.end() )
+        realObjects = (*globalGroup).GetAllObjectsNames();
+    else if ( sceneGroup != scene.objectGroups.end() )
+        realObjects = (*sceneGroup).GetAllObjectsNames();
     else
+        realObjects.push_back(instruction.parameters[0].GetPlainString());
+
+    //If current object is present, use it and only it.
+    if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() )
     {
-        if ( !castNeeded )
-            objectStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 :"+ instruction.parameters[0].GetPlainString()+"objects[0]";
-        else
-            objectStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 : "+"static_cast<"+objInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[0])";
+        realObjects.clear();
+        realObjects.push_back(context.currentObject);
     }
 
-    plainExpression += "("+objectStr+"->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+    std::string output = "0";
+    for (unsigned int i = 0;i<realObjects.size();++i)
+    {
+        context.ObjectNeeded(realObjects[i]);
+
+        //Cast the object if needed
+        string objectType = GetTypeOfObject(game, scene, realObjects[i]);
+        const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
+        bool castNeeded = !objInfo.cppClassName.empty();
+
+        //Build string to access the object
+        context.AddIncludeFile(objInfo.optionalIncludeFile);
+        if ( context.currentObject == realObjects[i] )
+        {
+            if ( !castNeeded )
+                output = "("+realObjects[i]+"objects[i]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+            else
+                output = "(static_cast<"+objInfo.cppClassName+"*>("+realObjects[i]+"objects[i])->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+        }
+        else
+        {
+            if ( !castNeeded )
+                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" :"+ realObjects[i]+"objects[0]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+            else
+                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" : "+"static_cast<"+objInfo.cppClassName+"*>("+realObjects[i]+"objects[0])->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+        }
+    }
+
+    plainExpression += output;
 };
 
 void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
@@ -126,32 +161,54 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         parametersStr += parameters[i];
     }
 
-    context.ObjectNeeded(instruction.parameters[0].GetPlainString());
+    //Get object(s) concerned by function call
+    vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), instruction.parameters[0].GetPlainString()));
+    vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), instruction.parameters[0].GetPlainString()));
 
-    //Cast the object if needed
-    string objectType = GetTypeOfObject(game, scene, instruction.parameters[0].GetPlainString());
-    const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
-    bool castNeeded = !objInfo.cppClassName.empty();
-
-    //Build string to access the object
-    context.AddIncludeFile(objInfo.optionalIncludeFile);
-    string objectStr;
-    if ( context.currentObject == instruction.parameters[0].GetPlainString() )
-    {
-        if ( !castNeeded )
-            objectStr = instruction.parameters[0].GetPlainString()+"objects[i]";
-        else
-            objectStr = "static_cast<"+objInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[i])";
-    }
+    std::vector<std::string> realObjects; //With groups, we may have to generate expression for more than one object list.
+    if ( globalGroup != game.objectGroups.end() )
+        realObjects = (*globalGroup).GetAllObjectsNames();
+    else if ( sceneGroup != scene.objectGroups.end() )
+        realObjects = (*sceneGroup).GetAllObjectsNames();
     else
+        realObjects.push_back(instruction.parameters[0].GetPlainString());
+
+    //If current object is present, use it and only it.
+    if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() )
     {
-        if ( !castNeeded )
-            objectStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 :"+ instruction.parameters[0].GetPlainString()+"objects[0]";
-        else
-            objectStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 : "+"static_cast<"+objInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[0])";
+        realObjects.clear();
+        realObjects.push_back(context.currentObject);
     }
 
-    plainExpression += "("+objectStr+"->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+    std::string output = "0";
+    for (unsigned int i = 0;i<realObjects.size();++i)
+    {
+        context.ObjectNeeded(realObjects[i]);
+
+        //Cast the object if needed
+        string objectType = GetTypeOfObject(game, scene, realObjects[i]);
+        const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
+        bool castNeeded = !objInfo.cppClassName.empty();
+
+        //Build string to access the object
+        context.AddIncludeFile(objInfo.optionalIncludeFile);
+        if ( context.currentObject == realObjects[i] )
+        {
+            if ( !castNeeded )
+                output = "("+realObjects[i]+"objects[i]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+            else
+                output = "(static_cast<"+objInfo.cppClassName+"*>("+realObjects[i]+"objects[i])->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+        }
+        else
+        {
+            if ( !castNeeded )
+                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" :"+ realObjects[i]+"objects[0]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+            else
+                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" : "+"static_cast<"+objInfo.cppClassName+"*>("+realObjects[i]+"objects[0])->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+        }
+    }
+
+    plainExpression += output;
 };
 
 void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
@@ -168,32 +225,54 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         parametersStr += parameters[i];
     }
 
-    context.ObjectNeeded(instruction.parameters[0].GetPlainString());
+    //Get object(s) concerned by function call
+    vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), instruction.parameters[0].GetPlainString()));
+    vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), instruction.parameters[0].GetPlainString()));
 
-    //Cast the automatism
-    string automatismType = GetTypeOfAutomatism(game, scene, instruction.parameters[1].GetPlainString());
-    const AutomatismInfo & autoInfo = GDpriv::ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
-    bool castNeeded = !autoInfo.cppClassName.empty();
-
-    //Build string to access the automatism
-    context.AddIncludeFile(autoInfo.optionalIncludeFile);
-    string autoStr;
-    if ( context.currentObject == instruction.parameters[0].GetPlainString() )
-    {
-        if ( !castNeeded )
-            autoStr = instruction.parameters[0].GetPlainString()+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")";
-        else
-            autoStr = "static_cast<"+autoInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))";
-    }
+    std::vector<std::string> realObjects; //With groups, we may have to generate expression for more than one object list.
+    if ( globalGroup != game.objectGroups.end() )
+        realObjects = (*globalGroup).GetAllObjectsNames();
+    else if ( sceneGroup != scene.objectGroups.end() )
+        realObjects = (*sceneGroup).GetAllObjectsNames();
     else
+        realObjects.push_back(instruction.parameters[0].GetPlainString());
+
+    //If current object is present, use it and only it.
+    if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() )
     {
-        if ( !castNeeded )
-            autoStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 :"+ instruction.parameters[0].GetPlainString()+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")";
-        else
-            autoStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 : "+"static_cast<"+autoInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))";
+        realObjects.clear();
+        realObjects.push_back(context.currentObject);
     }
 
-    plainExpression += "("+autoStr+"->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+    std::string output = "0";
+    for (unsigned int i = 0;i<realObjects.size();++i)
+    {
+        context.ObjectNeeded(realObjects[i]);
+
+        //Cast the object if needed
+        string automatismType = GetTypeOfAutomatism(game, scene, instruction.parameters[1].GetPlainString());
+        const AutomatismInfo & autoInfo = GDpriv::ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
+        bool castNeeded = !autoInfo.cppClassName.empty();
+
+        //Build string to access the automatism
+        context.AddIncludeFile(autoInfo.optionalIncludeFile);
+        if ( context.currentObject == realObjects[i] )
+        {
+            if ( !castNeeded )
+                output = "("+realObjects[i]+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+            else
+                output = "(static_cast<"+autoInfo.cppClassName+"*>("+realObjects[i]+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+        }
+        else
+        {
+            if ( !castNeeded )
+                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" :"+realObjects[i]+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+            else
+                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" : "+"static_cast<"+autoInfo.cppClassName+"*>("+realObjects[i]+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+        }
+    }
+
+    plainExpression += output;
 };
 
 void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
@@ -210,32 +289,54 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         parametersStr += parameters[i];
     }
 
-    context.ObjectNeeded(instruction.parameters[0].GetPlainString());
+    //Get object(s) concerned by function call
+    vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), instruction.parameters[0].GetPlainString()));
+    vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), instruction.parameters[0].GetPlainString()));
 
-    //Cast the automatism
-    string automatismType = GetTypeOfAutomatism(game, scene, instruction.parameters[1].GetPlainString());
-    const AutomatismInfo & autoInfo = GDpriv::ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
-    bool castNeeded = !autoInfo.cppClassName.empty();
-
-    //Build string to access the automatism
-    context.AddIncludeFile(autoInfo.optionalIncludeFile);
-    string autoStr;
-    if ( context.currentObject == instruction.parameters[0].GetPlainString() )
-    {
-        if ( !castNeeded )
-            autoStr = instruction.parameters[0].GetPlainString()+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")";
-        else
-            autoStr = "static_cast<"+autoInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))";
-    }
+    std::vector<std::string> realObjects; //With groups, we may have to generate expression for more than one object list.
+    if ( globalGroup != game.objectGroups.end() )
+        realObjects = (*globalGroup).GetAllObjectsNames();
+    else if ( sceneGroup != scene.objectGroups.end() )
+        realObjects = (*sceneGroup).GetAllObjectsNames();
     else
+        realObjects.push_back(instruction.parameters[0].GetPlainString());
+
+    //If current object is present, use it and only it.
+    if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() )
     {
-        if ( !castNeeded )
-            autoStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 :"+ instruction.parameters[0].GetPlainString()+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")";
-        else
-            autoStr = "( "+instruction.parameters[0].GetPlainString()+"objects.empty() ) ? 0 : "+"static_cast<"+autoInfo.cppClassName+"*>("+instruction.parameters[0].GetPlainString()+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))";
+        realObjects.clear();
+        realObjects.push_back(context.currentObject);
     }
 
-    plainExpression += "("+autoStr+"->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+    std::string output = "0";
+    for (unsigned int i = 0;i<realObjects.size();++i)
+    {
+        context.ObjectNeeded(realObjects[i]);
+
+        //Cast the object if needed
+        string automatismType = GetTypeOfAutomatism(game, scene, instruction.parameters[1].GetPlainString());
+        const AutomatismInfo & autoInfo = GDpriv::ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
+        bool castNeeded = !autoInfo.cppClassName.empty();
+
+        //Build string to access the automatism
+        context.AddIncludeFile(autoInfo.optionalIncludeFile);
+        if ( context.currentObject == realObjects[i] )
+        {
+            if ( !castNeeded )
+                output = "("+realObjects[i]+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+            else
+                output = "(static_cast<"+autoInfo.cppClassName+"*>("+realObjects[i]+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+        }
+        else
+        {
+            if ( !castNeeded )
+                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" :"+realObjects[i]+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+            else
+                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" : "+"static_cast<"+autoInfo.cppClassName+"*>("+realObjects[i]+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+        }
+    }
+
+    plainExpression += output;
 };
 
 bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression)
@@ -254,7 +355,6 @@ bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const Game & game
         return false;
     }
 
-    expression = GDExpression(newExpression);
     return true;
 }
 
@@ -275,6 +375,5 @@ bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(const Game & game
         return false;
     }
 
-    expression = GDExpression(newExpression);
     return true;
 }

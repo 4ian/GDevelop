@@ -162,11 +162,11 @@ wxBitmap TranslateCondition::BitmapFromType( string type )
 string TranslateCondition::AddHTMLToParameter(string & parameter, string type)
 {
     if ( type == "expression" )
-        parameter = "<FONT color=#CC2222>"+parameter+"</FONT>";
+        parameter = /*"<FONT color=#CC2222>"+*/parameter/*+"</FONT>"*/;
     else if ( type == "object" )
-        parameter = "<FONT color=#29780E><b>"+parameter+"</b></FONT>";
+        parameter = /*"<FONT color=#29780E><b>"+*/parameter/*+"</b></FONT>"*/;
     else if ( type == "relationalOperator" )
-        parameter = "<FONT color=##0404B4><b>"+parameter+"</b></FONT>";
+        parameter = /*"<FONT color=##0404B4><b>"+*/parameter/*+"</b></FONT>"*/;
     else if ( type == "file" )
         parameter = "<i>"+parameter+"</i>";
     else if ( type == "key" )

@@ -47,7 +47,7 @@ WindowExtension::WindowExtension()
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddParameter("yesorno", _("Activer le plein écran"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("SetFullscreen").SetIncludeFile("GDL/RuntimeSceneTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("SetFullScreen").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 

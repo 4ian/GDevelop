@@ -45,13 +45,14 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     DECLARE_ACTION("AjoutObjConcern",
                    _("Prendre en compte des objets"),
                    _("Prend en compte tous les objets ainsi nommés de la scène."),
-                   _("Prendre en compte tous les _PARAM0_"),
+                   _("Prendre en compte tous les _PARAM3_"),
                    _("Objets"),
                    "res/actions/add24.png",
                    "res/actions/add.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
+        instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/RuntimeSceneTools.h");
@@ -67,7 +68,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/ajouthasard.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "2");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3");
+        instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/RuntimeSceneTools.h");
@@ -130,13 +132,14 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     DECLARE_CONDITION("AjoutObjConcern",
                    _("Prendre en compte des objets"),
                    _("Prend en compte tous les objets ainsi nommés de la scène."),
-                   _("Prendre en compte tous les _PARAM0_"),
+                   _("Prendre en compte tous les _PARAM3_"),
                    _("Objets"),
                    "res/conditions/add24.png",
                    "res/conditions/add.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
+        instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/RuntimeSceneTools.h");
@@ -152,7 +155,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/conditions/ajouthasard.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "2");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3");
+        instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/RuntimeSceneTools.h");

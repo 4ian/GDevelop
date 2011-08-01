@@ -43,18 +43,25 @@ std::string RepeatEvent::GenerateEventCode(const Game & game, const Scene & scen
     std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
     std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
+    //Prepare object declaration and sub events
+    std::string subevents = EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
+    std::string objectDeclaration = context.GenerateObjectsDeclarationCode()+"\n";
+
     //Write final code
     outputCode += "int repeatCount = "+repeatCountCode+";\n";
     outputCode += "for(unsigned int repeatIndex = 0;repeatIndex < repeatCount;++repeatIndex)\n";
     outputCode += "{\n";
-    outputCode += context.GenerateObjectsDeclarationCode()+"\n";
+    outputCode += objectDeclaration;
     outputCode += conditionsCode;
     outputCode += "if (" +ifPredicat+ ")\n";
     outputCode += "{\n";
     outputCode += actionsCode;
-    outputCode += "\n{ //Subevents: \n";
-    outputCode += EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
-    outputCode += "} //Subevents end.\n";
+    if (!events.empty())
+    {
+        outputCode += "\n{ //Subevents: \n";
+        outputCode += subevents;
+        outputCode += "} //Subevents end.\n";
+    }
     outputCode += "}\n";
 
     outputCode += "}\n";

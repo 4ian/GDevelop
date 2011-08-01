@@ -7,11 +7,22 @@ using namespace std;
 
 void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext & parent)
 {
-    objectsAlreadyDeclared = parent.objectsToBeDeclared;
+    objectsAlreadyDeclared = parent.objectsAlreadyDeclared;
+    //Objects lists declared by parent became "already decalred" in the child context.
+    for ( set<string>::iterator it = parent.objectsToBeDeclared.begin() ; it != parent.objectsToBeDeclared.end(); ++it )
+        objectsAlreadyDeclared.insert(*it);
+    for ( set<string>::iterator it = parent.objectsListsDynamicallyDeclared.begin() ; it != parent.objectsListsDynamicallyDeclared.end(); ++it )
+        objectsAlreadyDeclared.insert(*it);
+
+    emptyObjectsListsAlreadyDeclared = parent.emptyObjectsListsAlreadyDeclared;
+    for ( set<string>::iterator it = parent.objectsListsToBeDeclaredEmpty.begin() ; it != parent.objectsListsToBeDeclaredEmpty.end(); ++it )
+        emptyObjectsListsAlreadyDeclared.insert(*it);
+
     includeFiles = parent.includeFiles;
     currentObject = parent.currentObject;
-    allObjectsMapNeeded = parent.allObjectsMapNeeded;
+    /*allObjectsMapNeeded = parent.allObjectsMapNeeded;*/
     dynamicObjectsListsDeclaration = parent.dynamicObjectsListsDeclaration;
+    if ( parent.dynamicObjectsListsDeclaration ) parentAlreadyUseDynamicDeclaration = true;
 }
 
 void EventsCodeGenerationContext::ObjectNeeded(std::string objectName)
@@ -22,14 +33,17 @@ void EventsCodeGenerationContext::ObjectNeeded(std::string objectName)
     }
     else
     {
+        EmptyObjectsListNeeded(objectName);
+
         //Be sure not to declare again objects
         if ( objectsAlreadyDeclared.find(objectName) != objectsAlreadyDeclared.end() ) return;
         if ( objectsToBeDeclared.find(objectName) != objectsToBeDeclared.end() ) return;
+        if ( objectsListsDynamicallyDeclared.find(objectName) != objectsListsDynamicallyDeclared.end() ) return;
 
-        EmptyObjectsListNeeded(objectName);
+        objectsListsDynamicallyDeclared.insert(objectName);
 
         dynamicDeclaration += "if (find(objectsAlreadyDeclared.begin(), objectsAlreadyDeclared.end(), \""+objectName+"\") == objectsAlreadyDeclared.end()) ";
-        dynamicDeclaration += "{";
+        dynamicDeclaration += "{\n";
         dynamicDeclaration += "    "+objectName+"objects = runtimeContext->GetObjectsRawPointers(\""+objectName+"\");\n";
         dynamicDeclaration += "    objectsAlreadyDeclared.push_back(\""+objectName+"\");";
         dynamicDeclaration += "}\n";
@@ -42,14 +56,25 @@ std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
     std::string declarationsCode;
 
     if ( allObjectsMapNeeded ) declarationsCode += "std::map <std::string, std::vector<Object*> *> objectsListsMap;\n";
-    if ( dynamicObjectsListsDeclaration ) declarationsCode += "std::vector <std::string> objectsAlreadyDeclared;\n";
+    if ( dynamicObjectsListsDeclaration )
+    {
+        if ( !parentAlreadyUseDynamicDeclaration)
+            declarationsCode += "std::vector <std::string> objectsAlreadyDeclared;\n";
+        else
+            declarationsCode += "std::vector <std::string> & objectsAlreadyDeclaredT = objectsAlreadyDeclared;std::vector <std::string> objectsAlreadyDeclared = objectsAlreadyDeclaredT;\n";
+
+        for ( set<string>::iterator it = objectsAlreadyDeclared.begin() ; it != objectsAlreadyDeclared.end(); ++it )
+            declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n";
+    }
 
     for ( set<string>::iterator it = objectsToBeDeclared.begin() ; it != objectsToBeDeclared.end(); ++it )
     {
-        if ( objectsAlreadyDeclared.find(*it) == objectsAlreadyDeclared.end() )
+        if ( objectsAlreadyDeclared.find(*it) == objectsAlreadyDeclared.end() && emptyObjectsListsAlreadyDeclared.find(*it) == emptyObjectsListsAlreadyDeclared.end() )
         {
             declarationsCode += "std::vector<Object*> "+*it+"objects = runtimeContext->GetObjectsRawPointers(\""+*it+"\");\n";
             objectsAlreadyDeclared.insert(*it);
+
+            if ( dynamicObjectsListsDeclaration ) declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n";
         }
         else
         {
@@ -59,20 +84,25 @@ std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
         }
 
         if ( allObjectsMapNeeded ) declarationsCode += "objectsListsMap[\""+*it+"\"] = &"+*it+"objects;\n";
-        if ( dynamicObjectsListsDeclaration ) declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n";
     }
     for ( set<string>::iterator it = objectsListsToBeDeclaredEmpty.begin() ; it != objectsListsToBeDeclaredEmpty.end(); ++it )
     {
-        if ( objectsAlreadyDeclared.find(*it) == objectsAlreadyDeclared.end() )
+        if ( objectsAlreadyDeclared.find(*it) == objectsAlreadyDeclared.end() && emptyObjectsListsAlreadyDeclared.find(*it) == emptyObjectsListsAlreadyDeclared.end() )
         {
             declarationsCode += "std::vector<Object*> "+*it+"objects;\n";
             objectsAlreadyDeclared.insert(*it);
+            emptyObjectsListsAlreadyDeclared.insert(*it);
+
+            // No : We declare an object list, but it is empty, and is not considered as declared.
+            //if ( dynamicObjectsListsDeclaration ) declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n"; Let me commented please.
         }
         else
         {
             //Could normally be done in one line, but clang sometimes miscompile it.
             declarationsCode += "std::vector<Object*> & "+*it+"objectsT = "+*it+"objects;\n";
             declarationsCode += "std::vector<Object*> "+*it+"objects = "+*it+"objectsT;\n";
+
+            //if ( dynamicObjectsListsDeclaration ) declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n";
         }
 
         if ( allObjectsMapNeeded ) declarationsCode += "objectsListsMap[\""+*it+"\"] = &"+*it+"objects;\n";

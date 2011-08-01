@@ -53,14 +53,14 @@ void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std
  *
  * \return true ( always )
  */
-bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, const std::string & objectName);
+bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, std::vector<std::string> & alreadyDeclaredObjects, const std::string & objectName);
 
 /**
  * Only used internally by GD events generated code.
  *
  * \return true ( always )
  */
-bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, const std::string & objectName);
+bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, std::vector<std::string> & alreadyDeclaredObjects, const std::string & objectName);
 
 /**
  * Only used internally by GD events generated code.

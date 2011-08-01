@@ -694,7 +694,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
             GDExpressionParser parser(parameters[pNb].GetPlainString());
             if ( !parser.ParseMathExpression(game, scene, callbacks) )
             {
-                cout << "Error in math expression" << parser.firstErrorStr << endl;
+                cout << "Error :" << parser.firstErrorStr << " in: "<< parameters[pNb].GetPlainString() << endl;
 
                 argOutput = "0";
             }
@@ -808,21 +808,29 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), parameters[i].GetPlainString()));
 
                 std::vector<std::string> realObjects;
-                if ( globalGroup != game.objectGroups.end() )
+                if ( globalGroup != game.objectGroups.end() ) //With groups, more than one object list can be needed
                     realObjects = (*globalGroup).GetAllObjectsNames();
                 else if ( sceneGroup != scene.objectGroups.end() )
                     realObjects = (*sceneGroup).GetAllObjectsNames();
                 else
                     realObjects.push_back(parameters[i].GetPlainString());
 
-                for (unsigned int i = 0;i<realObjects.size();++i)
+                if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() )
                 {
-                    context.ObjectNeeded(realObjects[i]);
-                    argOutput += "(!"+realObjects[i]+"objects.empty() ? "+realObjects[i]+"objects[0] : ";
+                    //If object currently used by instruction is available, use it directly.
+                    argOutput += context.currentObject+"objects[i]";
                 }
-                argOutput += "NULL";
-                for (unsigned int i = 0;i<realObjects.size();++i)
-                    argOutput += ")";
+                else
+                {
+                    for (unsigned int i = 0;i<realObjects.size();++i)
+                    {
+                        context.ObjectNeeded(realObjects[i]);
+                        argOutput += "(!"+realObjects[i]+"objects.empty() ? "+realObjects[i]+"objects[0] : ";
+                    }
+                    argOutput += "NULL";
+                    for (unsigned int i = 0;i<realObjects.size();++i)
+                        argOutput += ")";
+                }
             }
             else
             {
@@ -886,6 +894,7 @@ string EventsCodeGenerator::GenerateEventsListCode(const Game & game, const Scen
 
         string eventCoreCode = events[eId]->GenerateEventCode(game, scene, context);
         string declarationsCode = context.GenerateObjectsDeclarationCode();
+        declarationsCode += context.GenerateOptionalInstructionLevelDeclarationCode();;
 
         output += "\n{\n" + declarationsCode + "\n" + eventCoreCode + "\n}\n";
     }

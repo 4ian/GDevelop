@@ -24,6 +24,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/TreeItemExpressionInfoData.h"
+#include "GDL/ExpressionsCorrectnessTesting.h"
 
 #include "GDL/ChooseObject.h"
 #include "GDL/ChooseLayer.h"
@@ -439,32 +440,33 @@ void EditExpression::TextModified(wxStyledTextEvent& event)
     //Syntax checking
     expression = string( ExpressionEdit->GetText().mb_str() );
 
-    GDExpression expressionTest(expression);
-    //TODO : Reimplement me
-    /*if ( !expressionTest.PrepareForMathEvaluationOnly(game, scene) )
+    CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
+
+    GDExpressionParser expressionParser(expression);
+    if ( !expressionParser.ParseMathExpression(game, scene, callbacks) )
     {
-        errorTxt->SetLabel(expressionTest.GetFirstErrorDuringPreprocessingText());
-        lastErrorPos = expressionTest.GetFirstErrorDuringPreprocessingPosition();
+        errorTxt->SetLabel(expressionParser.firstErrorStr);
+        lastErrorPos = expressionParser.firstErrorPos;
     }
     else
     {
         errorTxt->SetLabel(_("Pas d'erreurs."));
         lastErrorPos = std::string::npos;
-    }*/
+    }
 
     errorTxt->Refresh(); //Need to call manually update.
 }
 
 void EditExpression::OnOkBtClick(wxCommandEvent& event)
 {
-    GDExpression expressionTest(expression);
+    CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
+    GDExpressionParser expressionParser(expression);
 
-    //TODO : Reimplement me
-    /*if ( !expressionTest.PrepareForMathEvaluationOnly(game, scene) )
+    if ( !expressionParser.ParseMathExpression(game, scene, callbacks) )
     {
         if ( wxMessageBox(_("L'expression est mal formulée. Êtes vous sûr de vouloir valider cette expression ?"), _("L'expression contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
-    }*/
+    }
 
     EndModal(1);
 }

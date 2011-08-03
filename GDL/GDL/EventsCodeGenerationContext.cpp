@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "EventsCodeGenerationContext.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
@@ -7,8 +12,8 @@ using namespace std;
 
 void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext & parent)
 {
+    //Objects lists declared by parent became "already declared" in the child context.
     objectsAlreadyDeclared = parent.objectsAlreadyDeclared;
-    //Objects lists declared by parent became "already decalred" in the child context.
     for ( set<string>::iterator it = parent.objectsToBeDeclared.begin() ; it != parent.objectsToBeDeclared.end(); ++it )
         objectsAlreadyDeclared.insert(*it);
     for ( set<string>::iterator it = parent.objectsListsDynamicallyDeclared.begin() ; it != parent.objectsListsDynamicallyDeclared.end(); ++it )
@@ -18,11 +23,15 @@ void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext
     for ( set<string>::iterator it = parent.objectsListsToBeDeclaredEmpty.begin() ; it != parent.objectsListsToBeDeclaredEmpty.end(); ++it )
         emptyObjectsListsAlreadyDeclared.insert(*it);
 
-    includeFiles = parent.includeFiles;
     currentObject = parent.currentObject;
-    /*allObjectsMapNeeded = parent.allObjectsMapNeeded;*/
     dynamicObjectsListsDeclaration = parent.dynamicObjectsListsDeclaration;
     if ( parent.dynamicObjectsListsDeclaration ) parentAlreadyUseDynamicDeclaration = true;
+
+    includeFiles = parent.includeFiles;
+    customCodeOutsideMain = parent.customCodeOutsideMain;
+    customCodeInMain = parent.customCodeInMain;
+    customGlobalDeclaration = parent.customGlobalDeclaration;
+
 }
 
 void EventsCodeGenerationContext::ObjectNeeded(std::string objectName)

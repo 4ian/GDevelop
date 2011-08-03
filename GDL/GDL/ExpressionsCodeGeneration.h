@@ -19,15 +19,24 @@ class Scene;
 class EventsCodeGenerationContext;
 
 /**
- * Generate C++ code from expressions.
+ * \brief Used to generate C++ code from expressions.
+ * Usage example :
+ * \code
+ *   std::string expressionOutputCppCode;
  *
+ *   CallbacksForGeneratingExpressionCode callbacks(expressionOutputCppCode, game, scene, context);
+ *   GDExpressionParser parser(theOriginalGameDevelopExpression);
+ *   parser.ParseTextExpression(game, scene, callbacks);
+ *
+ *   if (expressionOutputCppCode.empty()) expressionOutputCppCode = "\"\""; //If generation failed, we make sure output code is not empty.
+ * \endcode
  * \see EventsCodeGenerator
  */
-class CallbacksForGeneratingExpressionCode : public ParserCallbacks
+class GD_API CallbacksForGeneratingExpressionCode : public ParserCallbacks
 {
     public:
 
-    CallbacksForGeneratingExpressionCode(std::string & plainExpression_, const Game & game_, const Scene & scene_, EventsCodeGenerationContext & context_);
+    CallbacksForGeneratingExpressionCode(std::string & output, const Game & game_, const Scene & scene_, EventsCodeGenerationContext & context_);
     virtual ~CallbacksForGeneratingExpressionCode() {};
 
     void OnConstantToken(std::string text);

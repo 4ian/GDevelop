@@ -45,6 +45,12 @@ void CallbacksForGeneratingExpressionCode::OnNumber(string text)
 void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
 {
     context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
+
+    //Launch custom code generator if needed
+    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<ExpressionInfos::CppCallingInformation::CustomCodeGenerator>() )
+    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, context); return; }
+
+
     vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
 
     string parametersStr;
@@ -60,6 +66,10 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
 void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
 {
     context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
+
+    //Launch custom code generator if needed
+    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<StrExpressionInfos::CppCallingInformation::CustomCodeGenerator>() )
+    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, context); return; }
 
     //TODO : A bit of hack here..
     //Special case : Function without name is a litteral string.
@@ -87,6 +97,10 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
 {
     context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
     if ( instruction.parameters.empty() ) return;
+
+    //Launch custom code generator if needed
+    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<ExpressionInfos::CppCallingInformation::CustomCodeGenerator>() )
+    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, context); return; }
 
     //Prepare parameters
     vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
@@ -152,6 +166,10 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
     if ( instruction.parameters.empty() ) return;
 
+    //Launch custom code generator if needed
+    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<StrExpressionInfos::CppCallingInformation::CustomCodeGenerator>() )
+    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, context); return; }
+
     //Prepare parameters
     vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
     string parametersStr;
@@ -216,6 +234,10 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
     if ( instruction.parameters.size() < 2 ) return;
 
+    //Launch custom code generator if needed
+    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<ExpressionInfos::CppCallingInformation::CustomCodeGenerator>() )
+    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, context); return; }
+
     //Prepare parameters
     vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
     string parametersStr;
@@ -279,6 +301,10 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
 {
     context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
     if ( instruction.parameters.size() < 2 ) return;
+
+    //Launch custom code generator if needed
+    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<StrExpressionInfos::CppCallingInformation::CustomCodeGenerator>() )
+    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, context); return; }
 
     //Prepare parameters
     vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);

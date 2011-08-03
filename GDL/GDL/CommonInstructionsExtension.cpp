@@ -53,6 +53,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                     string conditionCode = EventsCodeGenerator::GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
 
+                    conditionsCode += context.GenerateOptionalInstructionLevelDeclarationCode();
                     conditionsCode += "{\n";
 
                     //Create new objects lists and generate condition
@@ -165,9 +166,18 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 {
                     string conditionCode = EventsCodeGenerator::GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", parentContext);
 
-                    outputCode += "{\n";
-                    if ( !conditions[cId].GetType().empty() ) outputCode += conditionCode;
-                    outputCode += "}\n";
+                    if ( !conditions[cId].GetType().empty() )
+                    {
+                        for (unsigned int i = 0;i<cId;++i) //Skip conditions if one condition is true. //TODO : Can be optimized
+                        {
+                            if (i == 0) outputCode += "if ( "; else outputCode += " && ";
+                            outputCode += "!condition"+ToString(i)+"IsTrue";
+                            if (i == cId-1) outputCode += ") ";
+                        }
+
+                        outputCode += parentContext.GenerateOptionalInstructionLevelDeclarationCode();
+                        outputCode += "{\n"+conditionCode+"}\n";
+                    }
                 }
 
                 std::string ifPredicat = "true";

@@ -429,17 +429,19 @@ string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const 
     for (unsigned int cId =0;cId < conditions.size();++cId)
     {
         string conditionCode = GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
-
-        for (unsigned int i = 0;i<cId;++i) //Skip conditions if one condition is false. //TODO : Can be optimized
+        if ( !conditions[cId].GetType().empty() )
         {
-            if (i == 0) outputCode += "if ( "; else outputCode += " && ";
-            outputCode += "condition"+ToString(i)+"IsTrue";
-            if (i == cId-1) outputCode += ") ";
+            for (unsigned int i = 0;i<cId;++i) //Skip conditions if one condition is false. //TODO : Can be optimized
+            {
+                if (i == 0) outputCode += "if ( "; else outputCode += " && ";
+                outputCode += "condition"+ToString(i)+"IsTrue";
+                if (i == cId-1) outputCode += ") ";
+            }
+            outputCode += context.GenerateOptionalInstructionLevelDeclarationCode();
+            outputCode += "{\n";
+            outputCode += conditionCode;
+            outputCode += "}\n";
         }
-        outputCode += context.GenerateOptionalInstructionLevelDeclarationCode();
-        outputCode += "{\n";
-        if ( !conditions[cId].GetType().empty() ) outputCode += conditionCode;
-        outputCode += "}\n";
     }
 
     return outputCode;
@@ -664,7 +666,7 @@ string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Sce
     {
         string actionCode = GenerateActionCode(game, scene, actions[aId], context);
 
-        outputCode += context.GenerateOptionalInstructionLevelDeclarationCode(); //TODO : Same things in OR
+        outputCode += context.GenerateOptionalInstructionLevelDeclarationCode();
         outputCode += "{\n";
         if ( !actions[aId].GetType().empty() ) outputCode += actionCode;
         outputCode += "}\n";
@@ -847,7 +849,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
         }
         else if ( parametersInfo[pNb].type == "listOfAlreadyPickedObjects" )
         {
-            context.dynamicObjectsListsDeclaration = true;
+            context.NeedObjectListsDynamicDeclaration();
             argOutput += "objectsAlreadyDeclared";
         }
         else if ( parametersInfo[pNb].type == "objectDeleted" )
@@ -909,6 +911,9 @@ string EventsCodeGenerator::GenerateEventsCompleteCode(const Game & game, const 
     //Prepare the global context ( Used to get needed header files )
     EventsCodeGenerationContext context;
     context.includeFiles = boost::shared_ptr< set<string> >(new set<string>);
+    context.customCodeInMain = boost::shared_ptr< string >(new string);
+    context.customCodeOutsideMain = boost::shared_ptr< string >(new string);
+    context.customGlobalDeclaration = boost::shared_ptr< set<string> >(new set<string>);
 
     //Generate whole events code
     string wholeEventsCode = EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
@@ -918,11 +923,18 @@ string EventsCodeGenerator::GenerateEventsCompleteCode(const Game & game, const 
         output += "#include \""+*include+"\"\n";
 
     output +=
-    "#include <stdio.h>\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n"
+    "#include <stdio.h>\nextern void * pointerToRuntimeContext;\n//int _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
 
+    for ( set<string>::iterator declaration = context.customGlobalDeclaration->begin() ; declaration != context.customGlobalDeclaration->end(); ++declaration )
+        output += *declaration+"\n";
+
+    output +=
+    *context.customCodeOutsideMain+
+    "\n"
     "int main()\n"
     "{\n"
 	"RuntimeContext * runtimeContext = static_cast< RuntimeContext *> (pointerToRuntimeContext);"
+	+*context.customCodeInMain
     +wholeEventsCode+
     "return 0;\n"
     "}\n";

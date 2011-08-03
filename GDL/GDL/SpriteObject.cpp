@@ -559,26 +559,39 @@ bool SpriteObject::SetAnimation( unsigned int nb )
 }
 
 /**
- * Change the value of the current direction
+ * Change the value of the current direction.
+ * If Sprite is using a direction which use angle, the function behave as SetAngle.
  */
-bool SpriteObject::SetDirection( unsigned int nb )
+bool SpriteObject::SetDirection( float nb )
 {
-    if ( currentAnimation >= GetAnimationsNumber() ||
-        nb >= GetAnimation( currentAnimation ).GetDirectionsNumber() ||
-        GetAnimation( currentAnimation ).GetDirection( nb ).HasNoSprites() ) return false;
+    if ( currentAnimation >= GetAnimationsNumber() ) return false;
 
-    if ( nb == currentDirection ) return true;
+    if ( !GetAnimation( currentAnimation ).typeNormal )
+    {
+        currentAngle = nb;
 
-    currentDirection = nb;
-    currentSprite = 0;
-    timeElapsedOnCurrentSprite = 0;
+        needUpdateCurrentSprite = true;
+        return true;
+    }
+    else
+    {
+        if ( nb >= GetAnimation( currentAnimation ).GetDirectionsNumber() ||
+            GetAnimation( currentAnimation ).GetDirection( nb ).HasNoSprites() ) return false;
 
-    needUpdateCurrentSprite = true;
-    return true;
+        if ( nb == currentDirection ) return true;
+
+        currentDirection = nb;
+        currentSprite = 0;
+        timeElapsedOnCurrentSprite = 0;
+
+        needUpdateCurrentSprite = true;
+        return true;
+    }
 }
 
 /**
  * Set the angle of a sprite object, which corresponds to its direction.
+ * If Sprite is using a direction which do not use angle, the direction is deduced from the angle.
  */
 bool SpriteObject::SetAngle(float newAngle)
 {
@@ -610,6 +623,16 @@ float SpriteObject::GetAngle() const
         return currentAngle;
     else
         return currentDirection*45;
+}
+
+float SpriteObject::GetCurrentDirectionOrAngle() const
+{
+    if ( currentAnimation >= GetAnimationsNumber() ) return 0;
+
+    if ( GetAnimation( currentAnimation ).typeNormal )
+        return GetCurrentDirection();
+    else
+        return GetAngle();
 }
 
 /**
@@ -698,6 +721,8 @@ bool SpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
                 return false;
         }
     }
+
+    return false;
 }
 
 void SpriteObject::TurnTowardObject( std::string, Object * object )
@@ -755,13 +780,13 @@ void OpenSpritesDirection(vector < Sprite > & sprites, const TiXmlElement * elem
         if ( elemPoints != NULL )
             OpenPointsSprites(sprite.GetAllNonDefaultPoints(), elemPoints);
         else
-            cout <<( "Les points d'un sprite manquent." );
+            cout <<( "Les points d'un sprite manque." );
 
         const TiXmlElement * elemPointOrigine = elemSprite->FirstChildElement("PointOrigine");
         if ( elemPointOrigine != NULL )
             OpenPoint(sprite.GetOrigine(), elemPointOrigine);
         else
-            cout <<( "Le point origine d'un sprite manquent." );
+            cout <<( "Le point origine d'un sprite manque." );
 
         const TiXmlElement * elemPointCentre = elemSprite->FirstChildElement("PointCentre");
         if ( elemPointCentre != NULL )

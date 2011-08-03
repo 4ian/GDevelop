@@ -72,7 +72,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetDirection").SetAssociatedGetter("GetCurrentDirection").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            instrInfo.cppCallingInformation.SetFunctionName("SetDirection").SetAssociatedGetter("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         DECLARE_END_OBJECT_ACTION()
 
@@ -222,7 +222,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("GetCurrentDirection").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            instrInfo.cppCallingInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         DECLARE_END_OBJECT_CONDITION()
 
@@ -500,14 +500,14 @@ SpriteExtension::SpriteExtension()
         DECLARE_OBJECT_EXPRESSION("Direc", _("Direction"), _("Direction de l'objet"), _("Direction"), "res/actions/direction.png")
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
 
-            instrInfo.cppCallingInformation.SetFunctionName("GetCurrentDirection").SetIncludeFile("GDL/SpriteObject.h");
+            instrInfo.cppCallingInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDL/SpriteObject.h");
             instrInfo.SetHidden();
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("Direction", _("Direction"), _("Direction de l'objet"), _("Direction"), "res/actions/direction.png")
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
 
-            instrInfo.cppCallingInformation.SetFunctionName("GetCurrentDirection").SetIncludeFile("GDL/SpriteObject.h");
+            instrInfo.cppCallingInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDL/SpriteObject.h");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_EXPRESSION("Anim", _("Animation"), _("Animation de l'objet"), _("Animations et images"), "res/actions/animation.png")

@@ -65,6 +65,7 @@ using namespace clang::driver;
 
 EventsCodeCompiler *EventsCodeCompiler::_singleton = NULL;
 std::set<std::string> EventsCodeCompiler::headersDirectories;
+sf::Mutex EventsCodeCompiler::openSaveDialogMutex;
 sf::Mutex EventsCodeCompiler::mutex;
 
 bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, std::string bitCodeFile)
@@ -175,6 +176,7 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
         return false;
 
     std::cout << "Writing bitcode...\n";
+    sf::Lock lock(openSaveDialogMutex);
 
     llvm::Module *Module = Act->takeModule();
 

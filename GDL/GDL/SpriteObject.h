@@ -120,8 +120,13 @@ class GD_API SpriteObject : public Object
         virtual bool SetAngle(float newAngle);
         virtual float GetAngle() const;
 
-        bool SetDirection(unsigned int nb);
+        bool SetDirection(float nb);
         inline unsigned int GetCurrentDirection() const { return currentDirection; }
+
+        /**
+         * Return angle or direction, according to the current direction type.
+         */
+        float GetCurrentDirectionOrAngle() const;
 
         bool SetSprite(unsigned int nb);
         inline unsigned int GetSpriteNb() const { return currentSprite; }

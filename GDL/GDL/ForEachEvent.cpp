@@ -77,7 +77,7 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
         outputCode += "std::vector<Object*> temporaryForEachList; temporaryForEachList.push_back("+realObjects[i]+"objects[forEachIndex]);";
         outputCode += "std::vector<Object*> "+realObjects[i]+"objects = temporaryForEachList;\n";
         outputCode += objectDeclaration;
-        if ( context.allObjectsMapNeeded ) outputCode += "objectsListsMap[\""+realObjects[i]+"\"] = &"+realObjects[i]+"objects;\n";
+        if ( context.MapOfAllObjectsIsNeeded() ) outputCode += "objectsListsMap[\""+realObjects[i]+"\"] = &"+realObjects[i]+"objects;\n";
 
         outputCode += conditionsCode;
         outputCode += "if (" +ifPredicat+ ")\n";

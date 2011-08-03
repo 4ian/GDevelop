@@ -68,6 +68,9 @@ public:
             _singleton = NULL;
         }
     }
+
+    static sf::Mutex openSaveDialogMutex; ///< wxWidgets Open/Save dialog seems to cause crash when writing bitcode at the same time.
+
 private:
 
     class Worker
@@ -108,7 +111,6 @@ private:
     std::vector < Scene* > compilationDisallowed; ///< List of scenes which disallow their events to be compiled. (However, if a compilation is being made, it will not be stopped)
 
     static std::set<std::string> headersDirectories;
-
     static sf::Mutex mutex;
 
     friend class Worker;

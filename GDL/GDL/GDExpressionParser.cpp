@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDExpressionParser.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
@@ -934,45 +939,4 @@ bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene
 GDExpressionParser::GDExpressionParser(const std::string & expressionPlainString_) :
 expressionPlainString(expressionPlainString_)
 {
-    /*if ( parserMathFunctions.empty() )
-    {
-        parserMathFunctions.push_back("abs");
-        parserMathFunctions.push_back("acos");
-        parserMathFunctions.push_back("acosh");
-        parserMathFunctions.push_back("asin");
-        parserMathFunctions.push_back("asinh");
-        parserMathFunctions.push_back("atan");
-        parserMathFunctions.push_back("atan2");
-        parserMathFunctions.push_back("atanh");
-        parserMathFunctions.push_back("avg");
-        parserMathFunctions.push_back("cbrt");
-        parserMathFunctions.push_back("ceil");
-        parserMathFunctions.push_back("cos");
-        parserMathFunctions.push_back("cosh");
-        parserMathFunctions.push_back("cot");
-        parserMathFunctions.push_back("csc");
-        parserMathFunctions.push_back("eval");
-        parserMathFunctions.push_back("exp");
-        parserMathFunctions.push_back("floor");
-        parserMathFunctions.push_back("if");
-        parserMathFunctions.push_back("else");
-        parserMathFunctions.push_back("then");
-        parserMathFunctions.push_back("int");
-        parserMathFunctions.push_back("log");
-        parserMathFunctions.push_back("log2");
-        parserMathFunctions.push_back("log10");
-        parserMathFunctions.push_back("ln");
-        parserMathFunctions.push_back("nthroot");
-        parserMathFunctions.push_back("pow");
-        parserMathFunctions.push_back("rint");
-        parserMathFunctions.push_back("sec");
-        parserMathFunctions.push_back("sign");
-        parserMathFunctions.push_back("sin");
-        parserMathFunctions.push_back("sinh");
-        parserMathFunctions.push_back("sqrt");
-        parserMathFunctions.push_back("sum");
-        parserMathFunctions.push_back("tan");
-        parserMathFunctions.push_back("tanh");
-        parserMathFunctions.push_back("trunc");
-    }*/
 }

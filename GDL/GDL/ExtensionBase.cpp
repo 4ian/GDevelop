@@ -27,9 +27,10 @@ createFunPtr(NULL)
 {
 }
 
-ExpressionInfos::ExpressionInfos() :
+ExpressionInfos::ExpressionInfos(ExtensionBase & parentExtension) :
 #if defined(GD_IDE_ONLY)
-shown(true)
+shown(true),
+extensionNamespace(parentExtension.GetNameSpace())
 #endif
 {
 }
@@ -43,9 +44,10 @@ ExpressionInfos & ExpressionInfos::SetHidden()
     return *this;
 }
 
-StrExpressionInfos::StrExpressionInfos() :
+StrExpressionInfos::StrExpressionInfos(ExtensionBase & parentExtension) :
 #if defined(GD_IDE_ONLY)
-shown(true)
+shown(true),
+extensionNamespace(parentExtension.GetNameSpace())
 #endif
 {
 }
@@ -59,9 +61,10 @@ StrExpressionInfos & StrExpressionInfos::SetHidden()
     return *this;
 }
 
-InstructionInfos::InstructionInfos() :
+InstructionInfos::InstructionInfos(ExtensionBase & parentExtension) :
 #if defined(GD_IDE_ONLY)
-canHaveSubInstructions(false)
+canHaveSubInstructions(false),
+extensionNamespace(parentExtension.GetNameSpace())
 #endif
 {
 }
@@ -151,7 +154,7 @@ ParameterInfo & InstructionInfos::AddParameter(const std::string & type, const w
     info.codeOnly = false;
     #endif
     info.optional = parameterIsOptional;
-    info.supplementaryInformation = optionalObjectType.empty() ? "" : optionalObjectType;
+    info.supplementaryInformation = optionalObjectType.empty() ? "" : extensionNamespace+optionalObjectType;
 
     parameters.push_back(info);
     return parameters.back();
@@ -183,7 +186,7 @@ ParameterInfo & ExpressionInfos::AddParameter(const std::string & type, const wx
     info.codeOnly = false;
     #endif
     info.optional = parameterIsOptional;
-    info.supplementaryInformation = optionalObjectType.empty() ? "" : optionalObjectType;
+    info.supplementaryInformation = optionalObjectType.empty() ? "" : extensionNamespace+optionalObjectType;
 
     parameters.push_back(info);
     return parameters.back();
@@ -215,7 +218,7 @@ ParameterInfo & StrExpressionInfos::AddParameter(const std::string & type, const
     info.codeOnly = false;
     #endif
     info.optional = parameterIsOptional;
-    info.supplementaryInformation = optionalObjectType.empty() ? "" : optionalObjectType;
+    info.supplementaryInformation = optionalObjectType.empty() ? "" : extensionNamespace+optionalObjectType;
 
     parameters.push_back(info);
     return parameters.back();

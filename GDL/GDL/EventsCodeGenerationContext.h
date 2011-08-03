@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef EVENTSCODEGENERATIONCONTEXT_H
 #define EVENTSCODEGENERATIONCONTEXT_H
 
@@ -11,7 +16,7 @@ class Scene;
  * Used to manage the context ( objects concerned, objects being modified by an action... )
  * when generating code for events.
  */
-class EventsCodeGenerationContext
+class GD_API EventsCodeGenerationContext
 {
     public:
         EventsCodeGenerationContext() : errorOccured(false), allObjectsMapNeeded(false),dynamicObjectsListsDeclaration(false),parentAlreadyUseDynamicDeclaration(false) {};
@@ -46,6 +51,7 @@ class EventsCodeGenerationContext
          * Request a map of all objects
          */
         void MapOfAllObjectsNeeded(const Game & game, const Scene & scene);
+        bool MapOfAllObjectsIsNeeded() const { return allObjectsMapNeeded; };
 
         /**
          * In case of dynamic objects list declaration, some declarations have to be made at the level of instructions.
@@ -63,21 +69,46 @@ class EventsCodeGenerationContext
          */
         void AddIncludeFile(std::string file) { if ( !file.empty() && includeFiles != boost::shared_ptr<std::set<std::string> >() ) includeFiles->insert(file); };
 
+        /**
+         * Add a declaration which will be inserted after includes
+         */
+        void AddGlobalDeclaration(std::string declaration) { if(customGlobalDeclaration!=boost::shared_ptr< std::set<std::string> >()) customGlobalDeclaration->insert(declaration); };
+
+        /**
+         * Add some code before events outside main function.
+         */
+        void AddCustomCodeOutsideMain(std::string code) { if(customCodeOutsideMain!=boost::shared_ptr< std::string >()) *customCodeOutsideMain += code; };
+
+        /**
+         * Add some code before events in main function.
+         */
+        void AddCustomCodeInMain(std::string code) { if(customCodeInMain!=boost::shared_ptr< std::string >()) *customCodeInMain += code; };
+
+        /**
+         * Called when an instruction need dynamic object lists declaration ( CreateObject for example, and all instruction with a "listOfAlreadyPickedObjects" parameter ).
+         */
+        void NeedObjectListsDynamicDeclaration() {dynamicObjectsListsDeclaration=true;}
+
         boost::shared_ptr< std::set<std::string> > includeFiles; ///< List of headers files used by instructions. A (shared) pointer is used so as context created from another one can share the same list.
-        std::set<std::string> objectsAlreadyDeclared;
-        std::set<std::string> objectsToBeDeclared;
 
-        std::set<std::string> emptyObjectsListsAlreadyDeclared;
-        std::set<std::string> objectsListsToBeDeclaredEmpty;
+        std::set<std::string> objectsToBeDeclared; ///< Objects list to be declared ( i.e. filled with objects of scene ) in this context.
+        std::set<std::string> objectsListsToBeDeclaredEmpty; ///< Empty objects list to be declared in this context.
 
-        bool allObjectsMapNeeded;
-
-        bool dynamicObjectsListsDeclaration;
-        bool parentAlreadyUseDynamicDeclaration;
-        std::string dynamicDeclaration;
-        std::set<std::string> objectsListsDynamicallyDeclared;
+        boost::shared_ptr< std::string > customCodeOutsideMain; ///< Custom code inserted before events ( and not in events function )
+        boost::shared_ptr< std::string > customCodeInMain; ///< Custom code inserted before events ( in main function )
+        boost::shared_ptr< std::set<std::string> > customGlobalDeclaration; ///< Custom global C++ declarations inserted after includes
 
     private:
+        std::set<std::string> objectsAlreadyDeclared; ///< Objects list declared in parent contexts.
+        std::set<std::string> emptyObjectsListsAlreadyDeclared; ///< Empty object list declared in parent context.
+        std::set<std::string> objectsListsDynamicallyDeclared; ///< Objects list which have been declared dynamically ( i.e : Declared "empty", and then filled with objects of scene if needed in an instruction ).
+
+        bool allObjectsMapNeeded; ///< Set this to true if a std::map containing pointers to all objects lists is needed.
+
+        bool dynamicObjectsListsDeclaration; ///< Set this to true when object declaration must be dynamic: The next object lists will be declared empty, and a dynamic declaration wille be generated.
+        bool parentAlreadyUseDynamicDeclaration;
+
+        std::string dynamicDeclaration; ///< String which is filled by dynamic declarations, if needed.
 };
 
 #endif // EVENTSCODEGENERATIONCONTEXT_H

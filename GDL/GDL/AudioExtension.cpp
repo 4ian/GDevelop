@@ -158,7 +158,7 @@ AudioExtension::AudioExtension()
         instrInfo.AddParameter("expression", _("Valeur"), "",false);
         instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetSoundVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("SetSoundVolumeOnChannel").SetManipulatedType("number").SetAssociatedGetter("GetSoundVolumeOnChannel").SetIncludeFile("GDL/AudioTools.h");
 
     DECLARE_END_ACTION()
 
@@ -175,7 +175,7 @@ AudioExtension::AudioExtension()
         instrInfo.AddParameter("expression", _("Valeur"), "",false);
         instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetMusicVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/AudioTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("SetMusicVolumeOnChannel").SetManipulatedType("number").SetAssociatedGetter("GetMusicVolumeOnChannel").SetIncludeFile("GDL/AudioTools.h");
 
     DECLARE_END_ACTION()
 

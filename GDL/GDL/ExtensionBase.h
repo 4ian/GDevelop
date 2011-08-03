@@ -56,7 +56,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_CONDITION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionInfos instrInfo; \
+            InstructionInfos instrInfo(*this); \
             std::string currentConditionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -76,7 +76,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_ACTION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionInfos instrInfo; \
+            InstructionInfos instrInfo(*this); \
             std::string currentActionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -96,7 +96,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_OBJECT_CONDITION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_OBJECT_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionInfos instrInfo; \
+            InstructionInfos instrInfo(*this); \
             std::string currentObjConditionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -115,7 +115,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_OBJECT_ACTION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_OBJECT_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionInfos instrInfo; \
+            InstructionInfos instrInfo(*this); \
             std::string currentObjActionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -136,7 +136,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_AUTOMATISM_CONDITION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_AUTOMATISM_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionInfos instrInfo; \
+            InstructionInfos instrInfo(*this); \
             std::string currentAutoConditionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -155,7 +155,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_AUTOMATISM_ACTION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_AUTOMATISM_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionInfos instrInfo; \
+            InstructionInfos instrInfo(*this); \
             std::string currentAutoActionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -200,7 +200,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            ExpressionInfos instrInfo; \
+            ExpressionInfos instrInfo(*this); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -220,7 +220,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_OBJECT_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            ExpressionInfos instrInfo; \
+            ExpressionInfos instrInfo(*this); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -240,7 +240,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_AUTOMATISM_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            ExpressionInfos instrInfo; \
+            ExpressionInfos instrInfo(*this); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -259,7 +259,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  */
 #define DECLARE_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            StrExpressionInfos instrInfo; \
+            StrExpressionInfos instrInfo(*this); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -279,7 +279,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            StrExpressionInfos instrInfo; \
+            StrExpressionInfos instrInfo(*this); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -299,7 +299,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_AUTOMATISM_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            StrExpressionInfos instrInfo; \
+            StrExpressionInfos instrInfo(*this); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -362,27 +362,27 @@ typedef Object * (*CreateFunPtr)(std::string name);
                                                                                 SetNameSpace(name_);
 
 #define DECLARE_CONDITION(name, fullname, description, sentence, group_, icon, smallicon) { \
-            InstructionInfos instrInfo; \
+            InstructionInfos instrInfo(*this); \
             std::string currentConditionDeclarationName = name;
 
 #define DECLARE_ACTION(name, fullname, description, sentence, group_, icon, smallicon) { \
-            InstructionInfos instrInfo; \
+            InstructionInfos instrInfo(*this); \
             std::string currentActionDeclarationName = name;
 
 #define DECLARE_OBJECT_CONDITION(name, fullname, description, sentence, group_, icon, smallicon) { \
-            InstructionInfos instrInfo; \
+            InstructionInfos instrInfo(*this); \
             std::string currentObjConditionDeclarationName = name;
 
 #define DECLARE_OBJECT_ACTION(name, fullname, description, sentence, icon, group_, smallicon) { \
-            InstructionInfos instrInfo; \
+            InstructionInfos instrInfo(*this); \
             std::string currentObjActionDeclarationName = name;
 
 #define DECLARE_AUTOMATISM_CONDITION(name, fullname, description, sentence, group_, icon, smallicon) { \
-            InstructionInfos instrInfo; \
+            InstructionInfos instrInfo(*this); \
             std::string currentAutoConditionDeclarationName = name;
 
 #define DECLARE_AUTOMATISM_ACTION(name, fullname, description, sentence, icon, group_, smallicon) { \
-            InstructionInfos instrInfo; \
+            InstructionInfos instrInfo(*this); \
             std::string currentAutoActionDeclarationName = name;
 
 #define DECLARE_OBJECT(name_, fullname, informations, icon, createFunPtrP, destroyFunPtrP, cppClassName_) { \
@@ -392,27 +392,27 @@ typedef Object * (*CreateFunPtr)(std::string name);
             objInfos.destroyFunPtr = destroyFunPtrP;
 
 #define DECLARE_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
-            ExpressionInfos instrInfo; \
+            ExpressionInfos instrInfo(*this); \
             std::string currentExprDeclarationName = name_;
 
 #define DECLARE_OBJECT_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
-            ExpressionInfos instrInfo; \
+            ExpressionInfos instrInfo(*this); \
             std::string currentExprDeclarationName = name_;
 
 #define DECLARE_AUTOMATISM_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
-            ExpressionInfos instrInfo; \
+            ExpressionInfos instrInfo(*this); \
             std::string currentExprDeclarationName = name_;
 
 #define DECLARE_STR_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
-            StrExpressionInfos instrInfo; \
+            StrExpressionInfos instrInfo(*this); \
             std::string currentExprDeclarationName = name_;
 
 #define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
-            StrExpressionInfos instrInfo; \
+            StrExpressionInfos instrInfo(*this); \
             std::string currentExprDeclarationName = name_;
 
 #define DECLARE_AUTOMATISM_STR_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
-            StrExpressionInfos instrInfo; \
+            StrExpressionInfos instrInfo(*this); \
             std::string currentExprDeclarationName = name_;
 
 #define DECLARE_EVENT(name_, fullname_, description_, group_, smallicon_, className_) { \
@@ -558,7 +558,7 @@ class GD_API InstructionInfos
 {
     public:
 
-    InstructionInfos();
+    InstructionInfos(ExtensionBase & parentExtension);
     virtual ~InstructionInfos() {};
 
 #if defined(GD_IDE_ONLY)
@@ -636,6 +636,13 @@ class GD_API InstructionInfos
         boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
     CppCallingInformation cppCallingInformation; ///< Information about how generate C++ code for the instruction
+
+    /** Don't use this constructor. Only here to fullfil std::map requirements
+     */
+    InstructionInfos() {};
+
+    private:
+        std::string extensionNamespace;
 };
 
 /**
@@ -645,7 +652,7 @@ class GD_API ExpressionInfos
 {
     public:
 
-    ExpressionInfos();
+    ExpressionInfos(ExtensionBase & parentExtension);
     virtual ~ExpressionInfos() {};
 
     ExpressionInfos & SetHidden();
@@ -685,10 +692,32 @@ class GD_API ExpressionInfos
             return *this;
         }
 
+        /** \brief Class used to redefine instruction code generation
+         */
+        class CustomCodeGenerator
+        {
+        public:
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, const ExpressionInstruction & instruction, EventsCodeGenerationContext & context) {return "";};
+        };
+
+        CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+        {
+            optionalCustomCodeGenerator = codeGenerator;
+            return *this;
+        }
+
         std::string cppCallingName;
         std::string optionalIncludeFile;
+        boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
     CppCallingInformation cppCallingInformation;
+
+    /** Don't use this constructor. Only here to fullfil std::map requirements
+     */
+    ExpressionInfos() {};
+
+    private:
+        std::string extensionNamespace;
 };
 
 /**
@@ -698,7 +727,7 @@ class GD_API StrExpressionInfos
 {
     public:
 
-    StrExpressionInfos();
+    StrExpressionInfos(ExtensionBase & parentExtension);
     virtual ~StrExpressionInfos() {};
 
     StrExpressionInfos & SetHidden();
@@ -738,10 +767,32 @@ class GD_API StrExpressionInfos
             return *this;
         }
 
+        /** \brief Class used to redefine instruction code generation
+         */
+        class CustomCodeGenerator
+        {
+        public:
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, const StrExpressionInstruction & instruction, EventsCodeGenerationContext & context) {return "";};
+        };
+
+        CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+        {
+            optionalCustomCodeGenerator = codeGenerator;
+            return *this;
+        }
+
         std::string cppCallingName;
         std::string optionalIncludeFile;
+        boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
     CppCallingInformation cppCallingInformation;
+
+    /** Don't use this constructor. Only here to fullfil std::map requirements
+     */
+    StrExpressionInfos() {};
+
+    private:
+        std::string extensionNamespace;
 };
 
 /**

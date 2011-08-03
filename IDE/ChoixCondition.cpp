@@ -43,6 +43,7 @@
 #include "ChoiceFile.h"
 #include "GDL/ChooseVariableDialog.h"
 #include "GDL/ObjectListDialogsHelper.h"
+#include "GDL/ExpressionsCorrectnessTesting.h"
 #include "Extensions.h"
 #include "SigneTest.h"
 
@@ -759,10 +760,6 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(Type);
 
-    vector < string > mainObjectsName; //On cherche maintenant le nom des objets principaux
-    for (unsigned int i =0;i<instructionInfos.mainObjects.size();++i)
-        mainObjectsName.push_back(static_cast<string>(ParaEdit.at(instructionInfos.mainObjects[i])->GetValue()));
-
     if ( i < MaxPara && i < instructionInfos.parameters.size())
     {
         if ( instructionInfos.parameters[i].type == "object" )
@@ -812,7 +809,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionInfos.parameters[i].type == "file" )
         {
-            ChoiceFile dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
+            ChoiceFile dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true);
             if ( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.file);
 
@@ -874,7 +871,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionInfos.parameters[i].type == "joyaxis" )
         {
-            ChoiceJoyAxis dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true, mainObjectsName);
+            ChoiceJoyAxis dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true);
             if( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.joyaxis);
 
@@ -954,35 +951,33 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
         //Do not check optional parameters which are desactivated
         if ( !ParaFac.at(i)->IsShown() || (ParaFac.at(i)->IsShown() && ParaFac.at(i)->GetValue()))
         {
-            GDExpression parameterExpression(string(ParaEdit.at(i)->GetValue().mb_str())) ;
+            CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
+            GDExpressionParser expressionParser(string(ParaEdit.at(i)->GetValue().mb_str())) ;
 
-//TODO :Reimplement me
-/*
-            if (  (instructionInfos.parameters[i].type == "string" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
-                ||(instructionInfos.parameters[i].type == "file" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
-                ||(instructionInfos.parameters[i].type == "color" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
-                ||(instructionInfos.parameters[i].type == "joyaxis" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
-                ||(instructionInfos.parameters[i].type == "layer" && !parameterExpression.PrepareForTextEvaluationOnly(game, scene))
-                ||(instructionInfos.parameters[i].type == "expression" && !parameterExpression.PrepareForMathEvaluationOnly(game, scene)))
+            if (  (instructionInfos.parameters[i].type == "string" && !expressionParser.ParseTextExpression(game, scene, callbacks))
+                ||(instructionInfos.parameters[i].type == "file" && !expressionParser.ParseTextExpression(game, scene, callbacks))
+                ||(instructionInfos.parameters[i].type == "color" && !expressionParser.ParseTextExpression(game, scene, callbacks))
+                ||(instructionInfos.parameters[i].type == "joyaxis" && !expressionParser.ParseTextExpression(game, scene, callbacks))
+                ||(instructionInfos.parameters[i].type == "layer" && !expressionParser.ParseTextExpression(game, scene, callbacks))
+                ||(instructionInfos.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game, scene, callbacks)))
             {
-                if ( message == "" )
-                {
-                    message = parameterExpression.GetFirstErrorDuringPreprocessingText();
-                    parameterNb = i+1;
-                }
+                message = expressionParser.firstErrorStr;
+                parameterNb = i+1;
 
                 parametersHaveErrors = true;
                 ParaEdit[i]->SetBackgroundColour(wxColour(255, 194, 191));
             }
             else
-                ParaEdit[i]->SetBackgroundColour(wxColour(255, 255, 255));*/
+                ParaEdit[i]->SetBackgroundColour(wxColour(255, 255, 255));
+
+            ParaEdit[i]->Update();
         }
     }
 
     if ( parametersHaveErrors )
     {
-        wxLogWarning(wxString::Format(_("Erreur dans le paramètre n°%i : %s\n\nVeuillez le corriger afin de valider l'action."), parameterNb, message.c_str()));
-        return;
+        if ( wxMessageBox(_("Erreur dans le paramètre n°%i : %s\n\nÊtes vous sûr de vouloir valider ce paramètre ?"), _("Un paramètre contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+            return;
     }
 
     //On ajoute les paramètres

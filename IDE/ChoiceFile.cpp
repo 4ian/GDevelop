@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "ChoiceFile.h"
 
 //(*InternalHeaders(ChoiceFile)
@@ -23,12 +28,11 @@ BEGIN_EVENT_TABLE(ChoiceFile,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoiceFile::ChoiceFile(wxWindow* parent, string file_, Game & game_, Scene & scene_, bool canSelectGroup_, const vector < string > & mainObjectsName_) :
+ChoiceFile::ChoiceFile(wxWindow* parent, string file_, Game & game_, Scene & scene_, bool canSelectGroup_) :
 file(file_),
 game(game_),
 scene(scene_),
-canSelectGroup(canSelectGroup_),
-mainObjectsName(mainObjectsName_)
+canSelectGroup(canSelectGroup_)
 {
 	//(*Initialize(ChoiceFile)
 	wxFlexGridSizer* FlexGridSizer4;

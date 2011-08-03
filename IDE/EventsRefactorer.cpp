@@ -23,12 +23,23 @@ class CallbacksForRenamingObject : public ParserCallbacks
     {
         plainExpression += text;
     };
+    virtual void OnNumber(std::string text)
+    {
+        plainExpression += text;
+    };
+    virtual void OnOperator(std::string text)
+    {
+        plainExpression += text;
+    };
 
     virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
     {
         std::string parametersStr;
         for (unsigned int i = 0;i<instruction.parameters.size();++i)
         {
+            if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
+                continue; //Skip code only parameter which are not included in function calls.
+
             if ( i != 0 ) parametersStr += ", ";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
@@ -49,6 +60,9 @@ class CallbacksForRenamingObject : public ParserCallbacks
         std::string parametersStr;
         for (unsigned int i = 0;i<instruction.parameters.size();++i)
         {
+            if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
+                continue; //Skip code only parameter which are not included in function calls.
+
             if ( i != 0 ) parametersStr += ", ";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
@@ -62,6 +76,9 @@ class CallbacksForRenamingObject : public ParserCallbacks
         std::string parametersStr;
         for (unsigned int i = 1;i<instruction.parameters.size();++i)
         {
+            if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
+                continue; //Skip code only parameter which are not included in function calls.
+
             if ( i != 1 ) parametersStr += ", ";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
@@ -76,6 +93,9 @@ class CallbacksForRenamingObject : public ParserCallbacks
         std::string parametersStr;
         for (unsigned int i = 1;i<instruction.parameters.size();++i)
         {
+            if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
+                continue; //Skip code only parameter which are not included in function calls.
+
             if ( i != 1 ) parametersStr += ", ";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
@@ -90,6 +110,9 @@ class CallbacksForRenamingObject : public ParserCallbacks
         std::string parametersStr;
         for (unsigned int i = 2;i<instruction.parameters.size();++i)
         {
+            if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
+                continue; //Skip code only parameter which are not included in function calls.
+
             if ( i != 2 ) parametersStr += ", ";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
@@ -104,6 +127,9 @@ class CallbacksForRenamingObject : public ParserCallbacks
         std::string parametersStr;
         for (unsigned int i = 2;i<instruction.parameters.size();++i)
         {
+            if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
+                continue; //Skip code only parameter which are not included in function calls.
+
             if ( i != 2 ) parametersStr += ", ";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
@@ -158,9 +184,9 @@ class CallbacksForRemovingObject : public ParserCallbacks
 
     bool objectPresent; //True if the object is present in the expression
 
-    virtual void OnConstantToken(std::string text)
-    {
-    };
+    virtual void OnConstantToken(std::string text){};
+    virtual void OnOperator(std::string text){};
+    virtual void OnNumber(std::string text){};
 
     virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
     {

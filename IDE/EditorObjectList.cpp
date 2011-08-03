@@ -854,7 +854,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
 
     //Add a number to the new name if necessary
     unsigned int i = 0;
-    while ( std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), ToString(objectsList->GetItemText( item )))) != objects->end() )
+    while ( std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), ToString(name))) != objects->end() )
     {
         i++;
         name =  _( "Copie de " ) + object->GetName()+ToString(i);

@@ -573,8 +573,6 @@ void SceneCanvas::OnPlayWindowBtClick( wxCommandEvent & event )
     externalWindow->SetSize(GetWidth(), GetHeight());
     edittimeRenderer.runtimeScene.ChangeRenderWindow(externalWindow->renderCanvas);
 
-    edittimeRenderer.runtimeScene.RenderAndStep(1);  //FIXME : Hack to make sure OpenGL Rendering is correct
-
     externalWindow->SetSize(GetWidth(), GetHeight());
     edittimeRenderer.runtimeScene.ChangeRenderWindow(externalWindow->renderCanvas);
 
@@ -765,7 +763,7 @@ void SceneCanvas::Refresh()
             if ( mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->IsBuilding() )
                 wait = true;
         }
-        if ( !edittimeRenderer.editing && EventsCodeCompiler::GetInstance()->SceneEventsBeingCompiled(sceneEdited)) //Ensure events are not being compiled.
+        if ( !edittimeRenderer.editing && EventsCodeCompiler::GetInstance()->EventsBeingCompiled()) //Ensure some events are not being compiled.
             wait =true;
 
         if ( wait ) //We're still waiting for something to finish

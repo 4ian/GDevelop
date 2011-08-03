@@ -5,6 +5,8 @@
 
 #include <wx/progdlg.h>
 #include <boost/shared_ptr.hpp>
+#include <SFML/System.hpp>
+#include "GDL/EventsCodeCompiler.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Game.h"
@@ -60,6 +62,8 @@ void Game_Develop_EditorFrame::OnRibbonNewClicked(wxRibbonButtonBarEvent& evt)
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnMenuOpenSelected( wxCommandEvent& event )
 {
+    sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
+
     //Affichage de la boite de dialogue
     wxFileDialog openFileDialog( this, _( "Choisissez le jeu à ouvrir" ), "", "", "*\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
 
@@ -71,6 +75,8 @@ void Game_Develop_EditorFrame::OnMenuOpenSelected( wxCommandEvent& event )
 }
 void Game_Develop_EditorFrame::OnOpenExampleSelected(wxCommandEvent& event)
 {
+    sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
+
     wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Exemples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
     open.ShowModal();
 
@@ -95,6 +101,8 @@ void Game_Develop_EditorFrame::OnRibbonOpenDropDownClicked(wxRibbonButtonBarEven
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::Open( string file )
 {
+    sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
+
     boost::shared_ptr<RuntimeGame> newGame(new RuntimeGame);
 
     OpenSaveGame openGame( *newGame );
@@ -179,6 +187,8 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
     {
         if ( games[i]->gameFile.empty() )
         {
+            sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
+
             wxFileDialog FileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg", wxFD_SAVE );
             FileDialog.ShowModal();
 
@@ -223,6 +233,8 @@ void Game_Develop_EditorFrame::OnMenuSaveAsSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::SaveAs()
 {
+    sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
+
     if ( !CurrentGameIsValid() ) return;
 
     //Affichage de la boite de dialogue

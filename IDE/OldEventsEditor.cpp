@@ -46,6 +46,7 @@
 #endif
 
 //(*IdInit(OldEventsEditor)
+const long OldEventsEditor::ID_PANEL1 = wxNewId();
 const long OldEventsEditor::ID_PANEL2 = wxNewId();
 const long OldEventsEditor::ID_SCROLLBAR1 = wxNewId();
 const long OldEventsEditor::ID_SCROLLBAR2 = wxNewId();
@@ -149,6 +150,8 @@ isResizingColumns(false)
     FlexGridSizer3->AddGrowableCol(0);
     FlexGridSizer3->AddGrowableRow(0);
     EventsPanel = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
+    contextPanel = new wxPanel(EventsPanel, ID_PANEL1, wxPoint(56,72), wxSize(24,40), wxSIMPLE_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+    contextPanel->SetBackgroundColour(wxColour(255,255,255));
     FlexGridSizer3->Add(EventsPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     ScrollBar1 = new wxScrollBar(this, ID_SCROLLBAR1, wxDefaultPosition, wxSize(18,130), wxSB_VERTICAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
     ScrollBar1->SetScrollbar(0, 1, 1000, 1);
@@ -375,6 +378,12 @@ isResizingColumns(false)
 	}
 
     searchDialog = new SearchEvents(this, game, scene, events);
+
+    /*for (unsigned int i = 0;i<4000;++i)
+    {
+        wxPanel * newPanel = new wxPanel(this, ID_PANEL2, wxPoint(5,((double)i)/100), wxSize(400,100), wxTAB_TRAVERSAL, _T("ID_PANEL2"));
+        if ( i > 100 ) newPanel->Show(false);
+    }*/
 }
 
 /**
@@ -490,9 +499,13 @@ void OldEventsEditor::OnhorizontalScrollbarScroll(wxScrollEvent& event)
 ////////////////////////////////////////////////////////////
 void OldEventsEditor::OnEventsPanelResize( wxSizeEvent& event )
 {
+    sf::Clock eventsNeedUpdate;
     SetEventsNeedUpdate(*events);
+    cout << "eventsNeedUpdate" << eventsNeedUpdate.GetElapsedTime() << endl;
 
+    sf::Clock refresh;
     ForceRefresh();
+    cout << "refresh" << refresh.GetElapsedTime() << endl;
 }
 
 /**
@@ -619,7 +632,16 @@ void OldEventsEditor::OnEventsPanelPaint( wxPaintEvent& event )
     instructionsSelected = false;
 
     //Phase de dessin des évènements
+    sf::Clock startDraw;
     DrawEvents(*events, dc, Yposition, initialXposition, maximalWidth, true);
+    cout << "Draw ended: " << startDraw.GetElapsedTime() << endl;
+
+
+    dc.GradientFillLinear(wxRect(contextPanel->GetPosition().x, contextPanel->GetPosition().y+contextPanel->GetSize().y, contextPanel->GetSize().x+1, 3),
+                          wxColour(190,190,190), wxColour(230,230,230,0), wxDOWN);
+
+    dc.GradientFillLinear(wxRect(contextPanel->GetPosition().x+contextPanel->GetSize().x, contextPanel->GetPosition().y, 3, contextPanel->GetSize().y+1),
+                          wxColour(190,190,190), wxColour(230,230,230,0), wxRIGHT);
 
     //Phase de dessin du texte final
     dc.SetFont(eventsRenderingHelper->GetFont());
@@ -639,7 +661,7 @@ void OldEventsEditor::OnEventsPanelPaint( wxPaintEvent& event )
 /// Cette fonction est récursive en cas de sous évènements.
 /// Met aussi à jour eventTreeSelected avec l'évènement selectionné.
 ////////////////////////////////////////////////////////////
-void OldEventsEditor::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & parentMaximalWidth, bool draw)
+void OldEventsEditor::DrawEvents(vector < BaseEventSPtr > & list, wxDC & dc, int & Yposition, int initialXposition, int & parentMaximalWidth, bool draw)
 {
     EventsRenderingHelper * eventsRenderingHelper = EventsRenderingHelper::GetInstance();
 
@@ -692,6 +714,8 @@ void OldEventsEditor::DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPain
             list[i]->selected = true;
             list[i]->eventHeightNeedUpdate = true;
             list[i]->OnSingleClick(MouseX-initialXposition, MouseY-(Yposition+positionScrollbar), eventsSelected, conditionsSelected, instructionsSelected);
+
+            contextPanel->SetPosition(wxPoint(EventsPanel->GetSize().x-contextPanel->GetSize().x-5, Yposition+renderedHeight));
         }
 
         //Render
@@ -1356,6 +1380,59 @@ void OldEventsEditor::OnEventsPanelMouseMove(wxMouseEvent& event)
         SetCursor(wxCURSOR_SIZEWE);
     else
         SetCursor(wxNullCursor);
+
+    MouseX = event.GetX();
+    MouseY = event.GetY()+ScrollBar1->GetThumbPosition();
+
+    EventsRenderingHelper * eventsRenderingHelper = EventsRenderingHelper::GetInstance();
+
+    wxClientDC realdc( EventsPanel ); //Création obligatoire du wxBufferedPaintDC
+    EventsPanel->SetBackgroundStyle( wxBG_STYLE_PAINT );
+
+    wxBufferedDC dc(&realdc);
+
+    //Préparation de la zone de dessin
+    dc.SetBackgroundMode( wxTRANSPARENT );
+    wxColour backgroundColor( wxColour( 250, 250, 250 ) );
+    dc.SetBackground( backgroundColor );
+    dc.SetBrush( wxBrush( backgroundColor ) );
+    dc.SetFont( wxFont( 8, wxDEFAULT, wxNORMAL, wxNORMAL ) );
+    dc.SetTextForeground( wxColour( 0, 0, 0 ) );
+
+    //Effacement de l'arrière plan
+    dc.SetPen( wxPen( backgroundColor ) );
+    dc.DrawRectangle( 0, 0, EventsPanel->GetSize().x, EventsPanel->GetSize().y );
+
+    dc.SetPen( wxPen( wxColour( 120, 120, 120 ), 1, wxSOLID ) );
+
+    //On récupère la position de dessin initiale
+    int Yposition = -( ScrollBar1->GetThumbPosition() );
+    int positionScrollbar = ScrollBar1->GetThumbPosition();
+    int initialXposition = 2 + dc.GetTextExtent(ToString(events->size())).GetWidth() + 2 - horizontalScrollbar->GetThumbPosition();
+    int maximalWidth = 0;
+    if ( profilingActivated ) initialXposition+=62;
+
+    //Setup renderings datas which are constants.
+    eventsRenderingHelper->SetConditionsColumnWidth(conditionsColumnWidth);
+
+    instructionsSelected = false;
+
+    //Phase de dessin des évènements
+    sf::Clock startDraw;
+    DrawEvents(*events, dc, Yposition, initialXposition, maximalWidth, true);
+    cout << "Draw ended: " << startDraw.GetElapsedTime() << endl;
+
+    //Phase de dessin du texte final
+    dc.SetFont(eventsRenderingHelper->GetFont());
+    wxString text = _("Utilisez le clic droit pour ajouter des évènements, actions et conditions.\nVous pouvez ensuite double cliquer sur les évènements pour les éditer.");
+    dc.DrawLabel(text,
+                wxRect( (EventsPanel->GetSize().x-dc.GetMultiLineTextExtent(text).GetWidth())/2,Yposition+15,
+                        (EventsPanel->GetSize().x+dc.GetMultiLineTextExtent(text).GetWidth())/2-(EventsPanel->GetSize().x-dc.GetMultiLineTextExtent(text).GetWidth())/2,0)
+                , wxALIGN_CENTER);
+
+    //Mise à jour des scrollbars
+    ScrollBar1->SetScrollbar( positionScrollbar, EventsPanel->GetSize().y, Yposition + positionScrollbar + 5 + dc.GetMultiLineTextExtent(text).GetHeight(), EventsPanel->GetSize().y );
+    horizontalScrollbar->SetScrollbar( horizontalScrollbar->GetThumbPosition(), EventsPanel->GetSize().x, maximalWidth, EventsPanel->GetSize().x );
 }
 
 void OldEventsEditor::OnEventsPanelLeftDown(wxMouseEvent& event)

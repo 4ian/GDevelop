@@ -37,7 +37,7 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
 				<ResourceCompiler>
@@ -48,7 +48,7 @@
 					<Add option="-lfreetype" />
 					<Add option="-lopenal32" />
 					<Add option="-lsndfile" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lwxmsw29d_xrc" />
 					<Add option="-lwxmsw29d_stc" />
 					<Add option="-lwxmsw29d_richtext" />
@@ -158,7 +158,7 @@
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 					<Add directory="..\ExtLibs\SFML\extlibs\libs-mingw" />
 					<Add directory="..\ExtLibs\SFML\build-mingw-debug\lib" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\lib" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
@@ -199,7 +199,7 @@
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_stc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -289,7 +289,7 @@
 					<Add option="-lopenal32" />
 					<Add option="-lsndfile" />
 					<Add option="-lfreetype" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_stc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -808,6 +808,8 @@
 		<Unit filename="ErrorCompilation.h">
 			<Option virtualFolder="Editeur principal\Fichier\" />
 		</Unit>
+		<Unit filename="EventsEditor.cpp" />
+		<Unit filename="EventsEditor.h" />
 		<Unit filename="EventsRefactorer.cpp" />
 		<Unit filename="EventsRefactorer.h" />
 		<Unit filename="ExecutableIconChanger.cpp" />
@@ -1119,6 +1121,7 @@
 					<wxDialog wxs="wxsmith/SetupCompilerToolchainDlg.wxs" src="SetupCompilerToolchainDlg.cpp" hdr="SetupCompilerToolchainDlg.h" fwddecl="0" i18n="1" name="SetupCompilerToolchainDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/NewCppFileDlg.wxs" src="NewCppFileDlg.cpp" hdr="NewCppFileDlg.h" fwddecl="0" i18n="1" name="NewCppFileDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/ExtensionBugReportDlg.wxs" src="ExtensionBugReportDlg.cpp" hdr="ExtensionBugReportDlg.h" fwddecl="0" i18n="1" name="ExtensionBugReportDlg" language="CPP" />
+					<wxPanel wxs="wxsmith/EventsEditor.wxs" src="EventsEditor.cpp" hdr="EventsEditor.h" fwddecl="0" i18n="1" name="EventsEditor" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

@@ -42,9 +42,9 @@ class EditorScene: public wxPanel
 		//(*Declarations(EditorScene)
 		wxScrollBar* scrollBar1;
 		wxScrollBar* scrollBar2;
+		OldEventsEditor* eventsEditor;
 		SceneCanvas* sceneCanvas;
 		wxPanel* scenePanel;
-		OldEventsEditor* eventsEditor;
 		wxPanel* eventsPanel;
 		wxAuiNotebook* notebook;
 		//*)

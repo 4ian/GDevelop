@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef CHOICEFILE_H
 #define CHOICEFILE_H
 
@@ -17,11 +22,14 @@ class Scene;
 
 using namespace std;
 
+/**
+ * \brief Dialog to let the user choose a file, for parameters of actions/conditions/expressions.
+ */
 class ChoiceFile: public wxDialog
 {
 	public:
 
-		ChoiceFile(wxWindow* parent, string file_, Game & game_, Scene & scene_, bool canSelectGroup_, const vector < string > & mainObjectsName_);
+		ChoiceFile(wxWindow* parent, string file_, Game & game_, Scene & scene_, bool canSelectGroup_);
 		virtual ~ChoiceFile();
 
 		//(*Declarations(ChoiceFile)
@@ -61,7 +69,6 @@ class ChoiceFile: public wxDialog
 		Game & game;
 		Scene & scene;
 		bool canSelectGroup;
-		const vector < string > & mainObjectsName;
 
 		DECLARE_EVENT_TABLE()
 };

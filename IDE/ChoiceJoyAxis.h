@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef CHOICEJOYAXIS_H
 #define CHOICEJOYAXIS_H
 
@@ -16,11 +21,14 @@ class Scene;
 
 using namespace std;
 
+/**
+ * \brief Dialog to let the user choose a joystick axis, for parameters of actions/conditions/expressions.
+ */
 class ChoiceJoyAxis: public wxDialog
 {
 	public:
 
-		ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, Scene & scene_, bool canSelectedGroup, const vector < string > & mainObjectsName_);
+		ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, Scene & scene_, bool canSelectedGroup);
 		virtual ~ChoiceJoyAxis();
 
 		//(*Declarations(ChoiceJoyAxis)
@@ -50,7 +58,6 @@ class ChoiceJoyAxis: public wxDialog
 		Game & game;
 		Scene & scene;
 		bool canSelectGroup;
-        const vector < string > & mainObjectsName;
 
 		//(*Handlers(ChoiceJoyAxis)
 		void OnadvancedBtClick(wxCommandEvent& event);

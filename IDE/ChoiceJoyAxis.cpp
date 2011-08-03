@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "ChoiceJoyAxis.h"
 
 //(*InternalHeaders(ChoiceJoyAxis)
@@ -26,12 +31,11 @@ BEGIN_EVENT_TABLE(ChoiceJoyAxis,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoiceJoyAxis::ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, Scene & scene_, bool canSelectGroup_, const vector < string > & mainObjectsName_) :
+ChoiceJoyAxis::ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, Scene & scene_, bool canSelectGroup_) :
 joyaxis(joyaxis_),
 game(game_),
 scene(scene_),
-canSelectGroup(canSelectGroup_),
-mainObjectsName(mainObjectsName_)
+canSelectGroup(canSelectGroup_)
 {
 	//(*Initialize(ChoiceJoyAxis)
 	wxFlexGridSizer* FlexGridSizer3;

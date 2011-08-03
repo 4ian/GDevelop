@@ -12,6 +12,7 @@
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
+#include <wx/html/htmlwin.h>
 //*)
 
 class Credits: public wxDialog
@@ -23,25 +24,28 @@ class Credits: public wxDialog
 
 		//(*Declarations(Credits)
 		wxButton* OkBt;
+		wxBitmapButton* BitmapButton5;
 		wxNotebook* Notebook1;
-		wxBitmapButton* GccBt;
-		wxStaticText* StaticText2;
-		wxBitmapButton* CBBt;
-		wxStaticText* StaticText6;
+		wxPanel* Panel4;
 		wxStaticBitmap* StaticBitmap1;
-		wxBitmapButton* WxBt;
+		wxStaticText* StaticText8;
+		wxBitmapButton* BitmapButton2;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxBitmapButton* DonBt;
+		wxStaticText* StaticText3;
+		wxBitmapButton* BitmapButton1;
 		wxHyperlinkCtrl* florianRival;
 		wxPanel* Panel3;
 		wxStaticText* StaticText5;
-		wxStaticText* StaticText7;
-		wxBitmapButton* SFMLBt;
+		wxHtmlWindow* HtmlWindow1;
+		wxBitmapButton* BitmapButton6;
+		wxBitmapButton* BitmapButton7;
+		wxBitmapButton* BitmapButton4;
 		wxTextCtrl* TextCtrl1;
+		wxBitmapButton* BitmapButton3;
 		wxPanel* Panel2;
 		wxStaticText* StaticText4;
-		wxBitmapButton* CppBt;
 		wxBitmapButton* CompilGamesBt;
 		//*)
 
@@ -58,15 +62,18 @@ class Credits: public wxDialog
 		static const long ID_PANEL1;
 		static const long ID_TEXTCTRL1;
 		static const long ID_PANEL2;
-		static const long ID_STATICTEXT7;
-		static const long ID_BITMAPBUTTON2;
-		static const long ID_BITMAPBUTTON3;
-		static const long ID_BITMAPBUTTON4;
-		static const long ID_STATICTEXT6;
-		static const long ID_BITMAPBUTTON5;
-		static const long ID_BITMAPBUTTON6;
-		static const long ID_STATICTEXT2;
+		static const long ID_HTMLWINDOW1;
 		static const long ID_PANEL3;
+		static const long ID_STATICTEXT3;
+		static const long ID_BITMAPBUTTON8;
+		static const long ID_BITMAPBUTTON9;
+		static const long ID_BITMAPBUTTON10;
+		static const long ID_STATICTEXT8;
+		static const long ID_BITMAPBUTTON11;
+		static const long ID_BITMAPBUTTON2;
+		static const long ID_BITMAPBUTTON12;
+		static const long ID_BITMAPBUTTON3;
+		static const long ID_PANEL4;
 		static const long ID_NOTEBOOK1;
 		static const long ID_BUTTON1;
 		//*)
@@ -83,6 +90,8 @@ class Credits: public wxDialog
 		void OnCompilGamesBtClick(wxCommandEvent& event);
 		void OnDonBtClick(wxCommandEvent& event);
 		void OnTextCtrl1Text(wxCommandEvent& event);
+		void OnLLVMBtClick(wxCommandEvent& event);
+		void OnTinyXmlBtClick(wxCommandEvent& event);
 		//*)
         void OpenLink(wxString link);
 

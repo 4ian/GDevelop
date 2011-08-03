@@ -15625,7 +15625,7 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1309795579 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
+1311891521 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
 	<wx/wx.h>
 	"GDL/Force.h"
 	<SFML/System.hpp>
@@ -16881,13 +16881,12 @@
 	<cmath>
 	"GDL/Log.h"
 
-1310051034 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
+1311454311 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
 	<wx/dcbuffer.h>
 	<boost/weak_ptr.hpp>
 	<iostream>
 	<vector>
 	<string>
-	<cmath>
 	<vector>
 	<boost/shared_ptr.hpp>
 	<boost/tuple/tuple.hpp>
@@ -22373,7 +22372,7 @@
 	<boost/shared_ptr.hpp>
 	<boost/bimap/bimap.hpp>
 
-1310050169 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
+1312373980 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
 	<wx/bitmap.h>
 	<wx/file.h>
 	<wx/wx.h>
@@ -23043,13 +23042,13 @@
 1171509642 d:\florian\programmation\gamedevelop2\ide\wxstedit\include\wx\stedit\steshell.h
 	"wx/stedit/stedefs.h"
 
-1300400558 source:d:\florian\programmation\gamedevelop2\ide\choicefile.cpp
+1311951341 source:d:\florian\programmation\gamedevelop2\ide\choicefile.cpp
 	"ChoiceFile.h"
 	<wx/intl.h>
 	<wx/string.h>
 	"GDL/EditTextDialog.h"
 
-1271878984 d:\florian\programmation\gamedevelop2\ide\choicefile.h
+1311951341 d:\florian\programmation\gamedevelop2\ide\choicefile.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
@@ -23084,7 +23083,7 @@
 
 1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\hyperlink.h
 
-1304516384 source:d:\florian\programmation\gamedevelop2\ide\choicejoyaxis.cpp
+1311951341 source:d:\florian\programmation\gamedevelop2\ide\choicejoyaxis.cpp
 	"ChoiceJoyAxis.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -23092,7 +23091,7 @@
 	<vector>
 	"GDL/EditTextDialog.h"
 
-1271878984 d:\florian\programmation\gamedevelop2\ide\choicejoyaxis.h
+1311951341 d:\florian\programmation\gamedevelop2\ide\choicejoyaxis.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/radiobox.h>
@@ -23102,7 +23101,7 @@
 	<string>
 	<vector>
 
-1309121094 source:d:\florian\programmation\gamedevelop2\ide\choixaction.cpp
+1312200108 source:d:\florian\programmation\gamedevelop2\ide\choixaction.cpp
 	"ChoixAction.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -23139,6 +23138,7 @@
 	"GDL/ChooseVariableDialog.h"
 	"GDL/ChooseAutomatismDlg.h"
 	"GDL/ObjectListDialogsHelper.h"
+	"GDL/ExpressionsCorrectnessTesting.h"
 	<boost/algorithm/string.hpp>
 
 1300632170 d:\florian\programmation\gamedevelop2\ide\choixaction.h
@@ -24542,7 +24542,7 @@
 	"GDL/SpriteObject.h"
 	<cmath>
 
-1309718973 d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.h
+1312379962 d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.h
 	"GDL/Object.h"
 	"GDL/Sprite.h"
 	"GDL/Animation.h"
@@ -24770,7 +24770,7 @@
 	<vector>
 	<wx/msgdlg.h>
 
-1309121094 source:d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp
+1312200108 source:d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp
 	"CppUnitLite/TestHarness.h"
 	"ChoixCondition.h"
 	<wx/bitmap.h>
@@ -24807,6 +24807,7 @@
 	"ChoiceFile.h"
 	"GDL/ChooseVariableDialog.h"
 	"GDL/ObjectListDialogsHelper.h"
+	"GDL/ExpressionsCorrectnessTesting.h"
 	"Extensions.h"
 	"SigneTest.h"
 	<wx/help.h>
@@ -25391,7 +25392,7 @@
 1297529536 d:\florian\programmation\gamedevelop2\gdl\gdl\basedebugger.h
 	<SFML/System.hpp>
 
-1301256490 source:d:\florian\programmation\gamedevelop2\ide\demarrage.cpp
+1311702215 source:d:\florian\programmation\gamedevelop2\ide\demarrage.cpp
 	"Demarrage.h"
 	"nommgr.h"
 	<wx/help.h>
@@ -25402,12 +25403,14 @@
 	<vector>
 	"GDL/HelpFileAccess.h"
 
-1301256473 d:\florian\programmation\gamedevelop2\ide\demarrage.h
+1311362994 d:\florian\programmation\gamedevelop2\ide\demarrage.h
 	<wx/notebook.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/checkbox.h>
+	<wx/statline.h>
 	<wx/panel.h>
+	<wx/hyperlink.h>
 	<wx/statbmp.h>
 	<wx/button.h>
 	<wx/dialog.h>
@@ -25466,7 +25469,7 @@
 1297523943 d:\florian\programmation\gamedevelop2\gdl\gdl\imagefileswatcher.h
 	<wx/fswatcher.h>
 
-1309968919 d:\florian\programmation\gamedevelop2\ide\editorscene.h
+1310660012 d:\florian\programmation\gamedevelop2\ide\editorscene.h
 	<wx/sizer.h>
 	<wx/aui/aui.h>
 	<wx/panel.h>
@@ -25755,12 +25758,12 @@
 	"GDL/EventsRenderingHelper.h"
 	"GDL/Game.h"
 
-1298908052 d:\florian\programmation\gamedevelop2\gdl\gdl\eventsrenderinghelper.h
+1310646289 d:\florian\programmation\gamedevelop2\gdl\gdl\eventsrenderinghelper.h
 	<wx/dc.h>
 	<wx/html/htmprint.h>
 	<vector>
 
-1310051034 d:\florian\programmation\gamedevelop2\gdl\gdl\standardevent.h
+1310397110 d:\florian\programmation\gamedevelop2\gdl\gdl\standardevent.h
 	<wx/bitmap.h>
 	<wx/dcbuffer.h>
 	<wx/html/htmprint.h>
@@ -25856,7 +25859,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1308421921 source:d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp
+1312061856 source:d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp
 	"EditorObjectList.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -26013,7 +26016,7 @@
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
-1310048051 source:d:\florian\programmation\gamedevelop2\ide\editorscene.cpp
+1310660011 source:d:\florian\programmation\gamedevelop2\ide\editorscene.cpp
 	"EditorScene.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -26070,7 +26073,7 @@
 	"ErrorCompilation.h"
 	"nommgr.h"
 
-1308515106 source:d:\florian\programmation\gamedevelop2\ide\eventsrefactorer.cpp
+1312228108 source:d:\florian\programmation\gamedevelop2\ide\eventsrefactorer.cpp
 	"EventsRefactorer.h"
 	"GDL/Event.h"
 	"GDL/GDExpressionParser.h"
@@ -26081,7 +26084,7 @@
 	<boost/algorithm/string.hpp>
 	<boost/weak_ptr.hpp>
 
-1307968655 d:\florian\programmation\gamedevelop2\gdl\gdl\gdexpressionparser.h
+1312214008 d:\florian\programmation\gamedevelop2\gdl\gdl\gdexpressionparser.h
 	<string>
 	<vector>
 
@@ -26089,7 +26092,7 @@
 	"ExecutableIconChanger.h"
 	<windows.h>
 
-1304534503 source:d:\florian\programmation\gamedevelop2\ide\extensionbugreportdlg.cpp
+1312379346 source:d:\florian\programmation\gamedevelop2\ide\extensionbugreportdlg.cpp
 	"ExtensionBugReportDlg.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -26184,7 +26187,7 @@
 	<string>
 	<vector>
 
-1309901451 source:d:\florian\programmation\gamedevelop2\ide\gdauitabart.cpp
+1311329054 source:d:\florian\programmation\gamedevelop2\ide\gdauitabart.cpp
 	"GDAuiTabArt.h"
 	<wx/aui/framemanager.h>
 	<wx/aui/dockart.h>
@@ -26198,7 +26201,7 @@
 	<iostream>
 	<wx/dcbuffer.h>
 
-1310054616 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp
+1312379688 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp
 	<wx/msw/winundef.h>
 	<wx/image.h>
 	<wx/fileconf.h>
@@ -26375,7 +26378,7 @@
 1304162683 d:\florian\programmation\gamedevelop2\gdl\gdl\localemanager.h
 	<wx/intl.h>
 
-1309968919 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp
+1311190716 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp
 	<wx/bitmap.h>
 	<wx/icon.h>
 	<wx/intl.h>
@@ -26597,7 +26600,7 @@
 	"Credits.h"
 	"MAJ.h"
 
-1288202587 d:\florian\programmation\gamedevelop2\ide\credits.h
+1312121025 d:\florian\programmation\gamedevelop2\ide\credits.h
 	<wx/notebook.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -26608,10 +26611,13 @@
 	<wx/statbmp.h>
 	<wx/button.h>
 	<wx/dialog.h>
+	<wx/html/htmlwin.h>
 
-1306872292 source:d:\florian\programmation\gamedevelop2\ide\mainfichier.cpp
+1312295700 source:d:\florian\programmation\gamedevelop2\ide\mainfichier.cpp
 	<wx/progdlg.h>
 	<boost/shared_ptr.hpp>
+	<SFML/System.hpp>
+	"GDL/EventsCodeCompiler.h"
 	"GDL/OpenSaveGame.h"
 	"GDL/ExtensionsManager.h"
 	"GDL/Game.h"
@@ -26860,7 +26866,7 @@
 	"Event.h"
 	"GDL/profile.h"
 
-1310162416 source:d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp
+1310217515 source:d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp
 	"ProjectManager.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -26895,7 +26901,7 @@
 	<string>
 	<wx/treectrl.h>
 
-1297545677 d:\florian\programmation\gamedevelop2\gdl\gdl\commentevent.h
+1310397110 d:\florian\programmation\gamedevelop2\gdl\gdl\commentevent.h
 	"Event.h"
 
 1279382587 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\archive\xml_oarchive.hpp
@@ -27410,7 +27416,7 @@
 	<wx/string.h>
 	<iostream>
 
-1310158374 source:d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp
+1310221089 source:d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -27504,7 +27510,7 @@
 	<wx/dcscreen.h>
 	"SplashScreen.h"
 
-1297526733 source:d:\florian\programmation\gamedevelop2\ide\startherepage.cpp
+1311183807 source:d:\florian\programmation\gamedevelop2\ide\startherepage.cpp
 	"StartHerePage.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -27550,10 +27556,10 @@
 	<wx/filename.h>
 	"mp3ogg.h"
 
-1309794430 source:d:\florian\programmation\gamedevelop2\ide\resource.rc
+1311188810 source:d:\florian\programmation\gamedevelop2\ide\resource.rc
 	"version.h"
 
-1310162416 d:\florian\programmation\gamedevelop2\ide\version.h
+1312379688 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289489446 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -27928,7 +27934,7 @@
 	<wx/wfstream.h>
 	<wx/txtstrm.h>
 
-1288202596 source:d:\florian\programmation\gamedevelop2\ide\credits.cpp
+1312121077 source:d:\florian\programmation\gamedevelop2\ide\credits.cpp
 	"Credits.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -27947,7 +27953,7 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1310053610 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1312199998 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
@@ -28147,7 +28153,7 @@
 	<string>
 	<vector>
 
-1310047989 d:\florian\programmation\gamedevelop2\ide\oldeventseditor.h
+1310557544 d:\florian\programmation\gamedevelop2\ide\oldeventseditor.h
 	<wx/sizer.h>
 	<wx/menu.h>
 	<wx/panel.h>
@@ -28160,7 +28166,7 @@
 	"GDL/EventsRenderingHelper.h"
 	"GDL/Game.h"
 
-1310075239 source:d:\florian\programmation\gamedevelop2\ide\oldeventseditor.cpp
+1310566554 source:d:\florian\programmation\gamedevelop2\ide\oldeventseditor.cpp
 	"CppUnitLite/TestHarness.h"
 	"OldEventsEditor.h"
 	<wx/bitmap.h>
@@ -28221,11 +28227,12 @@
 1305407035 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\support\dynamiclibrary.h
 	<string>
 
-1310166321 d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodecompiler.h
+1312381233 d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodecompiler.h
 	<map>
 	<string>
 	<iostream>
 	<vector>
+	<set>
 	<boost/shared_ptr.hpp>
 	<SFML/System.hpp>
 
@@ -28240,4 +28247,262 @@
 1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\busyinfo.h
 	"wx/defs.h"
 	"wx/object.h"
+
+1310660315 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
+	"EventsEditor.h"
+	<wx/intl.h>
+	<wx/string.h>
+	"GDL/Game.h"
+	"GDL/Scene.h"
+	"GDL/MainEditorCommand.h"
+	"GDL/Event.h"
+
+1310660256 d:\florian\programmation\gamedevelop2\ide\eventseditor.h
+	<wx/sizer.h>
+	<wx/panel.h>
+	<wx/scrolbar.h>
+	<boost/shared_ptr.hpp>
+	"GDL/MainEditorCommand.h"
+	"GDL/Event.h"
+
+1312214008 d:\florian\programmation\gamedevelop2\gdl\gdl\expressionscorrectnesstesting.h
+	<vector>
+	<string>
+	"GDL/GDExpressionParser.h"
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\compilerinstance.h
+	"clang/Frontend/CompilerInvocation.h"
+	"llvm/ADT/IntrusiveRefCntPtr.h"
+	"llvm/ADT/StringRef.h"
+	"llvm/ADT/OwningPtr.h"
+	<cassert>
+	<list>
+	<string>
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\compilerinvocation.h
+	"clang/Basic/LangOptions.h"
+	"clang/Basic/TargetOptions.h"
+	"clang/Basic/FileSystemOptions.h"
+	"clang/Frontend/AnalyzerOptions.h"
+	"clang/Frontend/CodeGenOptions.h"
+	"clang/Frontend/DependencyOutputOptions.h"
+	"clang/Frontend/DiagnosticOptions.h"
+	"clang/Frontend/FrontendOptions.h"
+	"clang/Frontend/HeaderSearchOptions.h"
+	"clang/Frontend/LangStandard.h"
+	"clang/Frontend/PreprocessorOptions.h"
+	"clang/Frontend/PreprocessorOutputOptions.h"
+	"llvm/ADT/IntrusiveRefCntPtr.h"
+	"llvm/ADT/StringRef.h"
+	"llvm/ADT/StringMap.h"
+	<string>
+	<vector>
+
+1305407426 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\basic\langoptions.h
+	<string>
+	"clang/Basic/Visibility.h"
+	"clang/Basic/OpenCLExtensions.def"
+	"clang/Basic/OpenCLExtensions.def"
+
+1305407426 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\basic\visibility.h
+
+1305407426 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\basic\openclextensions.def
+
+1285615588 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\basic\targetoptions.h
+	<string>
+	<vector>
+
+1305407426 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\basic\filesystemoptions.h
+	<string>
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\analyzeroptions.h
+	<string>
+	<vector>
+	"clang/Frontend/Analyses.def"
+	"clang/Frontend/Analyses.def"
+	"clang/Frontend/Analyses.def"
+	"clang/Frontend/Analyses.def"
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\analyses.def
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\codegenoptions.h
+	<string>
+	<vector>
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\dependencyoutputoptions.h
+	<string>
+	<vector>
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\diagnosticoptions.h
+	"clang/Basic/Diagnostic.h"
+	<string>
+	<vector>
+
+1305407426 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\basic\diagnostic.h
+	"clang/Basic/DiagnosticIDs.h"
+	"clang/Basic/SourceLocation.h"
+	"llvm/ADT/DenseMap.h"
+	"llvm/ADT/IntrusiveRefCntPtr.h"
+	"llvm/ADT/OwningPtr.h"
+	"llvm/Support/type_traits.h"
+	<vector>
+	<list>
+
+1305407426 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\basic\diagnosticids.h
+	"llvm/ADT/IntrusiveRefCntPtr.h"
+	"llvm/ADT/StringRef.h"
+	"clang/Basic/DiagnosticCommonKinds.inc"
+
+1305406990 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\adt\intrusiverefcntptr.h
+	<cassert>
+	"llvm/Support/Casting.h"
+
+1305407035 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\support\casting.h
+	<cassert>
+
+1305406990 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\adt\stringref.h
+	<cassert>
+	<cstring>
+	<utility>
+	<string>
+
+1306597807 d:\florian\programmation\gamedevelop2\extlibs\llvm\build-tdmgcc45-release\tools\clang\include\clang\basic\diagnosticcommonkinds.inc
+
+1305407426 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\basic\sourcelocation.h
+	"llvm/Support/PointerLikeTypeTraits.h"
+	<utility>
+	<functional>
+	<cassert>
+
+1305407035 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\support\pointerliketypetraits.h
+	"llvm/Support/DataTypes.h"
+
+1306594838 d:\florian\programmation\gamedevelop2\extlibs\llvm\build-tdmgcc45-release\include\llvm\support\datatypes.h
+	<cmath>
+	<math.h>
+	<sys/types.h>
+	<inttypes.h>
+	<stdint.h>
+	"llvm/Support/AIXDataTypesFix.h"
+	<stdlib.h>
+	<stddef.h>
+	<sys/types.h>
+	<cmath>
+	<math.h>
+
+1305407035 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\support\aixdatatypesfix.h
+
+1305406990 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\adt\densemap.h
+	"llvm/Support/MathExtras.h"
+	"llvm/Support/PointerLikeTypeTraits.h"
+	"llvm/Support/type_traits.h"
+	"llvm/ADT/DenseMapInfo.h"
+	<algorithm>
+	<iterator>
+	<new>
+	<utility>
+	<cassert>
+	<cstddef>
+	<cstring>
+
+1305407035 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\support\mathextras.h
+	"llvm/Support/SwapByteOrder.h"
+
+1305407035 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\support\swapbyteorder.h
+	"llvm/Support/DataTypes.h"
+	<cstddef>
+	<limits>
+
+1285615125 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\support\type_traits.h
+	<utility>
+
+1305406990 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\adt\densemapinfo.h
+	"llvm/Support/PointerLikeTypeTraits.h"
+	"llvm/Support/type_traits.h"
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\frontendoptions.h
+	"clang/Frontend/CommandLineSourceLoc.h"
+	"clang/Frontend/FrontendAction.h"
+	"llvm/ADT/StringRef.h"
+	<string>
+	<vector>
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\commandlinesourceloc.h
+	"llvm/Support/CommandLine.h"
+	"llvm/Support/raw_ostream.h"
+
+1305407035 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\support\commandline.h
+	"llvm/Support/type_traits.h"
+	"llvm/Support/Compiler.h"
+	"llvm/ADT/SmallVector.h"
+	"llvm/ADT/Twine.h"
+	<cassert>
+	<climits>
+	<cstdarg>
+	<utility>
+	<vector>
+
+1305407035 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\support\compiler.h
+
+1305406990 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\adt\smallvector.h
+	"llvm/Support/type_traits.h"
+	<algorithm>
+	<cassert>
+	<cstddef>
+	<cstdlib>
+	<cstring>
+	<iterator>
+	<memory>
+
+1305406990 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\adt\twine.h
+	"llvm/ADT/StringRef.h"
+	"llvm/Support/DataTypes.h"
+	<cassert>
+	<string>
+
+1305407035 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\support\raw_ostream.h
+	"llvm/ADT/StringRef.h"
+	"llvm/Support/DataTypes.h"
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\frontendaction.h
+	"llvm/ADT/StringRef.h"
+	"llvm/ADT/OwningPtr.h"
+	<string>
+	<vector>
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\headersearchoptions.h
+	"llvm/ADT/StringRef.h"
+	<vector>
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\langstandard.h
+	"llvm/ADT/StringRef.h"
+	"clang/Frontend/LangStandards.def"
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\langstandards.def
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\preprocessoroptions.h
+	"llvm/ADT/StringRef.h"
+	<cassert>
+	<string>
+	<utility>
+	<vector>
+	<set>
+
+1305407425 d:\florian\programmation\gamedevelop2\extlibs\llvm\tools\clang\include\clang\frontend\preprocessoroutputoptions.h
+
+1305406990 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\adt\stringmap.h
+	"llvm/ADT/StringRef.h"
+	"llvm/Support/Allocator.h"
+	<cstring>
+
+1305407035 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\support\allocator.h
+	"llvm/Support/AlignOf.h"
+	"llvm/Support/MathExtras.h"
+	"llvm/Support/DataTypes.h"
+	<algorithm>
+	<cassert>
+	<cstdlib>
+	<cstddef>
+
+1305407035 d:\florian\programmation\gamedevelop2\extlibs\llvm\include\llvm\support\alignof.h
 

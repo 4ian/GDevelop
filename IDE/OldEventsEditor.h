@@ -84,6 +84,7 @@ class OldEventsEditor: public wxPanel
 		wxMenuItem* MenuItem24;
 		wxMenuItem* MenuItem3;
 		wxPanel* EventsPanel;
+		wxPanel* contextPanel;
 		wxMenuItem* MenuItem6;
 		wxMenu* MenuItem37;
 		wxMenuItem* MenuItem21;
@@ -98,6 +99,7 @@ class OldEventsEditor: public wxPanel
 	protected:
 
 		//(*Identifiers(OldEventsEditor)
+		static const long ID_PANEL1;
 		static const long ID_PANEL2;
 		static const long ID_SCROLLBAR1;
 		static const long ID_SCROLLBAR2;
@@ -213,7 +215,7 @@ class OldEventsEditor: public wxPanel
 		void OnEditCommentMenuSelected(wxCommandEvent& event);
 		void OnToggleEventSelected(wxCommandEvent& event);
 		//*)
-        void DrawEvents(vector < BaseEventSPtr > & list, wxBufferedPaintDC & dc, int & Yposition, int initialXposition, int & maximalWidth, bool draw);
+        void DrawEvents(vector < BaseEventSPtr > & list, wxDC & dc, int & Yposition, int initialXposition, int & maximalWidth, bool draw);
 
         void OnSearchBtClick(wxCommandEvent& event);
         void OnProfilingBtClick(wxCommandEvent& event);

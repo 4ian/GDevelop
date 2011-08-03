@@ -916,8 +916,8 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = EventsCodeCompiler::GetInstance()->SceneEventsBeingCompiled(*(*scene)) ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de supprimer la scène...") : NULL;
-    while ( EventsCodeCompiler::GetInstance()->SceneEventsBeingCompiled(*(*scene)) )
+    wxBusyInfo * waitDialog = EventsCodeCompiler::GetInstance()->EventsBeingCompiled() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de supprimer la scène...") : NULL;
+    while ( EventsCodeCompiler::GetInstance()->EventsBeingCompiled() )
     {
         wxYield();
     }
@@ -987,8 +987,8 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = EventsCodeCompiler::GetInstance()->SceneEventsBeingCompiled(*(*scene)) ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de continuer...") : NULL;
-    while (EventsCodeCompiler::GetInstance()->SceneEventsBeingCompiled(*(*scene)))
+    wxBusyInfo * waitDialog = EventsCodeCompiler::GetInstance()->EventsBeingCompiled() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements\ndoit être menée à terme avant de continuer...") : NULL;
+    while (EventsCodeCompiler::GetInstance()->EventsBeingCompiled())
     {
         wxYield();
     }

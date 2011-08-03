@@ -209,6 +209,13 @@ buildToolsPnl(NULL)
     Connect( idRibbonStartPage, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonStartPageClicked );
     Connect( idRibbonCppTools, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonCppToolsClicked );
 
+        wxIconBundle icons;
+        icons.AddIcon("res/icon16.png");
+        icons.AddIcon("res/icon24.png");
+        icons.AddIcon("res/icon32.png");
+
+    	SetIcons(icons);
+
     SetDropTarget(new DnDFileEditor(*this));
 
     //Accès à la configuration

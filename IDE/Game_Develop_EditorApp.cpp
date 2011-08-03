@@ -254,7 +254,7 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Splash screen
     wxBitmap bitmap;
-    bitmap.LoadFile( wxString("res/splash.png"), wxBITMAP_TYPE_PNG );
+    bitmap.LoadFile( wxString("res/GD-Splashscreen.png"), wxBITMAP_TYPE_PNG );
     SplashScreen * splash = new SplashScreen(bitmap, 2, 0, -1, wxNO_BORDER | wxFRAME_SHAPED);
     cout << "Splash Screen created" << endl;
 

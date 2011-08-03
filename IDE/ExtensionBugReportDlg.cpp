@@ -47,7 +47,7 @@ ExtensionBugReportDlg::ExtensionBugReportDlg(wxWindow* parent, wxString extensio
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap1 = new wxStaticBitmap(Panel1, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/bigextensionbug.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP1"));
 	FlexGridSizer2->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Une extension semble être incompatible\net faire crasher Game Develop."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Une extension semble être incompatible et faire crasher Game Develop."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
 	wxFont StaticText1Font(11,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText1->SetFont(StaticText1Font);
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

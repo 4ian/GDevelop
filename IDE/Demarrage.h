@@ -6,7 +6,9 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/checkbox.h>
+#include <wx/statline.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -20,28 +22,35 @@ class Demarrage: public wxDialog
 		virtual ~Demarrage();
 
 		//(*Declarations(Demarrage)
-		wxStaticText* StaticText9;
+		wxHyperlinkCtrl* HyperlinkCtrl2;
+		wxHyperlinkCtrl* HyperlinkCtrl8;
 		wxStaticBitmap* StaticBitmap2;
-		wxButton* wikiBt;
+		wxStaticBitmap* StaticBitmap5;
 		wxNotebook* Notebook1;
+		wxHyperlinkCtrl* HyperlinkCtrl10;
 		wxStaticText* StaticText2;
+		wxPanel* Panel4;
 		wxButton* FermerBt;
-		wxButton* TutorielBt;
+		wxHyperlinkCtrl* HyperlinkCtrl9;
+		wxStaticBitmap* StaticBitmap11;
 		wxButton* Button1;
+		wxStaticText* StaticText6;
 		wxStaticBitmap* StaticBitmap1;
-		wxStaticText* StaticText8;
+		wxStaticBitmap* StaticBitmap4;
+		wxHyperlinkCtrl* secondTutoLink;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
+		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxButton* Button2;
 		wxCheckBox* majCheck;
 		wxPanel* Panel3;
 		wxStaticText* StaticText5;
 		wxStaticText* StaticText7;
-		wxButton* ForumBt;
-		wxButton* GuideBt;
-		wxButton* ExempleBt;
+		wxStaticLine* StaticLine1;
+		wxStaticBitmap* StaticBitmap12;
 		wxPanel* Panel2;
+		wxStaticBitmap* StaticBitmap13;
 		wxStaticText* StaticText4;
 		wxStaticBitmap* StaticBitmap3;
 		//*)
@@ -50,10 +59,13 @@ class Demarrage: public wxDialog
 
 		//(*Identifiers(Demarrage)
 		static const long ID_STATICBITMAP1;
+		static const long ID_PANEL4;
+		static const long ID_STATICLINE1;
+		static const long ID_STATICTEXT6;
 		static const long ID_STATICTEXT2;
 		static const long ID_STATICTEXT5;
-		static const long ID_STATICTEXT3;
 		static const long ID_STATICBITMAP2;
+		static const long ID_STATICTEXT3;
 		static const long ID_BUTTON6;
 		static const long ID_PANEL1;
 		static const long ID_STATICTEXT1;
@@ -61,15 +73,19 @@ class Demarrage: public wxDialog
 		static const long ID_STATICBITMAP3;
 		static const long ID_BUTTON7;
 		static const long ID_PANEL2;
-		static const long ID_STATICTEXT7;
-		static const long ID_BUTTON1;
-		static const long ID_STATICTEXT9;
-		static const long ID_BUTTON5;
-		static const long ID_STATICTEXT8;
-		static const long ID_BUTTON2;
+		static const long ID_STATICBITMAP4;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_STATICTEXT4;
-		static const long ID_BUTTON3;
-		static const long ID_BUTTON8;
+		static const long ID_STATICBITMAP5;
+		static const long ID_HYPERLINKCTRL2;
+		static const long ID_HYPERLINKCTRL17;
+		static const long ID_STATICBITMAP11;
+		static const long ID_HYPERLINKCTRL8;
+		static const long ID_STATICBITMAP12;
+		static const long ID_HYPERLINKCTRL9;
+		static const long ID_STATICBITMAP13;
+		static const long ID_HYPERLINKCTRL10;
+		static const long ID_STATICTEXT7;
 		static const long ID_BUTTON4;
 		static const long ID_PANEL3;
 		static const long ID_NOTEBOOK1;
@@ -86,6 +102,7 @@ class Demarrage: public wxDialog
 		void OnwikiBtClick(wxCommandEvent& event);
 		void OnButton1Click(wxCommandEvent& event);
 		void OnButton2Click(wxCommandEvent& event);
+		void OnsecondTutoLinkClick(wxCommandEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

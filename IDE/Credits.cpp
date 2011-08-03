@@ -26,15 +26,18 @@ const long Credits::ID_BITMAPBUTTON7 = wxNewId();
 const long Credits::ID_PANEL1 = wxNewId();
 const long Credits::ID_TEXTCTRL1 = wxNewId();
 const long Credits::ID_PANEL2 = wxNewId();
-const long Credits::ID_STATICTEXT7 = wxNewId();
-const long Credits::ID_BITMAPBUTTON2 = wxNewId();
-const long Credits::ID_BITMAPBUTTON3 = wxNewId();
-const long Credits::ID_BITMAPBUTTON4 = wxNewId();
-const long Credits::ID_STATICTEXT6 = wxNewId();
-const long Credits::ID_BITMAPBUTTON5 = wxNewId();
-const long Credits::ID_BITMAPBUTTON6 = wxNewId();
-const long Credits::ID_STATICTEXT2 = wxNewId();
+const long Credits::ID_HTMLWINDOW1 = wxNewId();
 const long Credits::ID_PANEL3 = wxNewId();
+const long Credits::ID_STATICTEXT3 = wxNewId();
+const long Credits::ID_BITMAPBUTTON8 = wxNewId();
+const long Credits::ID_BITMAPBUTTON9 = wxNewId();
+const long Credits::ID_BITMAPBUTTON10 = wxNewId();
+const long Credits::ID_STATICTEXT8 = wxNewId();
+const long Credits::ID_BITMAPBUTTON11 = wxNewId();
+const long Credits::ID_BITMAPBUTTON2 = wxNewId();
+const long Credits::ID_BITMAPBUTTON12 = wxNewId();
+const long Credits::ID_BITMAPBUTTON3 = wxNewId();
+const long Credits::ID_PANEL4 = wxNewId();
 const long Credits::ID_NOTEBOOK1 = wxNewId();
 const long Credits::ID_BUTTON1 = wxNewId();
 //*)
@@ -53,8 +56,9 @@ Credits::Credits(wxWindow* parent)
 	wxFlexGridSizer* FlexGridSizer5;
 	wxFlexGridSizer* FlexGridSizer9;
 	wxFlexGridSizer* FlexGridSizer2;
-	wxFlexGridSizer* FlexGridSizer7;
-	wxFlexGridSizer* FlexGridSizer8;
+	wxGridSizer* GridSizer1;
+	wxFlexGridSizer* FlexGridSizer13;
+	wxFlexGridSizer* FlexGridSizer12;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
@@ -64,7 +68,7 @@ Credits::Credits(wxWindow* parent)
 	SetClientSize(wxSize(271,351));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/gd-logo.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP1"));
-	FlexGridSizer1->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer1->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
 	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK1"));
@@ -111,40 +115,54 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer11->Fit(Panel2);
 	FlexGridSizer11->SetSizeHints(Panel2);
 	Panel3 = new wxPanel(Notebook1, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
-	FlexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer7->AddGrowableCol(0);
-	StaticText7 = new wxStaticText(Panel3, ID_STATICTEXT7, _("Programmé en C++, compilé avec GCC, avec l\'aide de Code::Blocks"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
-	FlexGridSizer7->Add(StaticText7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer6->AddGrowableCol(1);
-	CppBt = new wxBitmapButton(Panel3, ID_BITMAPBUTTON2, wxBitmap(wxImage(_T("res/powered-cpp.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON2"));
-	FlexGridSizer6->Add(CppBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	GccBt = new wxBitmapButton(Panel3, ID_BITMAPBUTTON3, wxBitmap(wxImage(_T("res/powered-gcc.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON3"));
-	GccBt->SetDefault();
-	FlexGridSizer6->Add(GccBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	CBBt = new wxBitmapButton(Panel3, ID_BITMAPBUTTON4, wxBitmap(wxImage(_T("res/powered-cb.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON4"));
-	CBBt->SetDefault();
-	FlexGridSizer6->Add(CBBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer7->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText6 = new wxStaticText(Panel3, ID_STATICTEXT6, _("Utilise les bibliothèques SFML et WxWidgets"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
-	FlexGridSizer7->Add(StaticText6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer8 = new wxFlexGridSizer(0, 2, 0, 0);
-	FlexGridSizer8->AddGrowableCol(1);
-	SFMLBt = new wxBitmapButton(Panel3, ID_BITMAPBUTTON5, wxBitmap(wxImage(_T("res/powered-sfml.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON5"));
-	SFMLBt->SetDefault();
-	FlexGridSizer8->Add(SFMLBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	WxBt = new wxBitmapButton(Panel3, ID_BITMAPBUTTON6, wxBitmap(wxImage(_T("res/powered-wx.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON6"));
-	WxBt->SetDefault();
-	FlexGridSizer8->Add(WxBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer7->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText2 = new wxStaticText(Panel3, ID_STATICTEXT2, _("Merci à toute la communauté et utilisateurs de Game Develop"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	FlexGridSizer7->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	Panel3->SetSizer(FlexGridSizer7);
-	FlexGridSizer7->Fit(Panel3);
-	FlexGridSizer7->SetSizeHints(Panel3);
+	FlexGridSizer6->AddGrowableCol(0);
+	FlexGridSizer6->AddGrowableRow(0);
+	HtmlWindow1 = new wxHtmlWindow(Panel3, ID_HTMLWINDOW1, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_AUTO, _T("ID_HTMLWINDOW1"));
+	HtmlWindow1->SetBorders(1);
+	FlexGridSizer6->Add(HtmlWindow1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	Panel3->SetSizer(FlexGridSizer6);
+	FlexGridSizer6->Fit(Panel3);
+	FlexGridSizer6->SetSizeHints(Panel3);
+	Panel4 = new wxPanel(Notebook1, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL4"));
+	FlexGridSizer12 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer12->AddGrowableCol(0);
+	StaticText3 = new wxStaticText(Panel4, ID_STATICTEXT3, _("Programmé en C++, compilé avec TDM-GCC, avec l\'aide de Code::Blocks"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	FlexGridSizer12->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer13 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer13->AddGrowableCol(1);
+	BitmapButton1 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON8, wxBitmap(wxImage(_T("res/powered-cpp.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON8"));
+	FlexGridSizer13->Add(BitmapButton1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BitmapButton2 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON9, wxBitmap(wxImage(_T("res/powered-gcc.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON9"));
+	BitmapButton2->SetDefault();
+	FlexGridSizer13->Add(BitmapButton2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BitmapButton3 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON10, wxBitmap(wxImage(_T("res/powered-cb.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON10"));
+	BitmapButton3->SetDefault();
+	FlexGridSizer13->Add(BitmapButton3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer12->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticText8 = new wxStaticText(Panel4, ID_STATICTEXT8, _("Game Develop utilise les bibliothèques SFML, LLVM, wxWidgets et TinyXml."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+	FlexGridSizer12->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	GridSizer1 = new wxGridSizer(0, 4, 0, 0);
+	BitmapButton4 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON11, wxBitmap(wxImage(_T("res/powered-sfml.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON11"));
+	BitmapButton4->SetDefault();
+	GridSizer1->Add(BitmapButton4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BitmapButton6 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON2, wxBitmap(wxImage(_T("res/powered-llvm.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON2"));
+	BitmapButton6->SetDefault();
+	GridSizer1->Add(BitmapButton6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BitmapButton5 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON12, wxBitmap(wxImage(_T("res/powered-wx.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON12"));
+	BitmapButton5->SetDefault();
+	GridSizer1->Add(BitmapButton5, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	BitmapButton7 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON3, wxBitmap(wxImage(_T("res/powered-tinyxml.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON3"));
+	BitmapButton7->SetDefault();
+	GridSizer1->Add(BitmapButton7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer12->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	Panel4->SetSizer(FlexGridSizer12);
+	FlexGridSizer12->Fit(Panel4);
+	FlexGridSizer12->SetSizeHints(Panel4);
 	Notebook1->AddPage(Panel1, _("A propos"), false);
 	Notebook1->AddPage(Panel2, _("Licence"), false);
 	Notebook1->AddPage(Panel3, _("Remerciements"), false);
+	Notebook1->AddPage(Panel4, _("Technologies utilisées"), false);
 	FlexGridSizer2->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
@@ -155,11 +173,13 @@ Credits::Credits(wxWindow* parent)
 
 	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCompilGamesBtClick);
 	Connect(ID_BITMAPBUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnDonBtClick);
-	Connect(ID_BITMAPBUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCppBtClick);
-	Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnGccBtClick);
-	Connect(ID_BITMAPBUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCBBtClick);
-	Connect(ID_BITMAPBUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnSFMLBtClick);
-	Connect(ID_BITMAPBUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnWxBtClick);
+	Connect(ID_BITMAPBUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCppBtClick);
+	Connect(ID_BITMAPBUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnGccBtClick);
+	Connect(ID_BITMAPBUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCBBtClick);
+	Connect(ID_BITMAPBUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnSFMLBtClick);
+	Connect(ID_BITMAPBUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnLLVMBtClick);
+	Connect(ID_BITMAPBUTTON12,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnWxBtClick);
+	Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnTinyXmlBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnOkBtClick);
 	//*)
 
@@ -171,6 +191,12 @@ Credits::Credits(wxWindow* parent)
     string status = GDLVersionWrapper::Status();
     string version ="Game Develop "+nbversion+" "+status+"";
 	StaticText1->SetLabel(version);
+	HtmlWindow1->SetPage("<html>\n<body>\n<h5>"+_("Contributeurs :")+"</h5><br>\n"+
+
+                      _("François Dumortier : Conception du logo et graphismes divers.")
+                      +"<br>( <a href=http://www.fdumortier.com>http://www.fdumortier.com</a> )"
+
+                      +"\n<center><h5>"+_("Merci à toute la communauté et utilisateurs de Game Develop")+"</h5><br></center>\n</body>\n</html>");
 
 	FlexGridSizer3->Layout();
 }
@@ -217,7 +243,7 @@ void Credits::OpenLink(wxString link)
 
 void Credits::OnGccBtClick(wxCommandEvent& event)
 {
-    OpenLink("http://gcc.gnu.org/");
+    OpenLink("http://tdm-gcc.tdragon.net/");
 }
 
 void Credits::OnCBBtClick(wxCommandEvent& event)
@@ -227,7 +253,7 @@ void Credits::OnCBBtClick(wxCommandEvent& event)
 
 void Credits::OnSFMLBtClick(wxCommandEvent& event)
 {
-    OpenLink("http://www.sfml-dev.org/index-fr.php");
+    OpenLink("http://www.sfml-dev.org");
 }
 
 void Credits::OnWxBtClick(wxCommandEvent& event)
@@ -243,4 +269,14 @@ void Credits::OnCompilGamesBtClick(wxCommandEvent& event)
 void Credits::OnDonBtClick(wxCommandEvent& event)
 {
     OpenLink(_("http://www.compilgames.net/\?file=kop8.php"));
+}
+
+void Credits::OnLLVMBtClick(wxCommandEvent& event)
+{
+    OpenLink(_("http://llvm.org/"));
+}
+
+void Credits::OnTinyXmlBtClick(wxCommandEvent& event)
+{
+    OpenLink(_("http://www.grinninglizard.com/tinyxml/"));
 }

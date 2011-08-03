@@ -73,7 +73,7 @@ mainEditor(mainEditor_)
 	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/GD-logo-simple.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP1"));
 	FlexGridSizer1->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
-	FlexGridSizer1->Add(StaticLine1, 1, wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer1->Add(StaticLine1, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	GridSizer1 = new wxGridSizer(0, 2, 0, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Commencer"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));

@@ -11,7 +11,7 @@ double GD_API PickedObjectsCount( string , std::map <std::string, std::vector<Ob
     std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists.begin();
     for (;it!=objectsLists.end();++it)
     {
-        if ( it->second == NULL ) break;
+        if ( it->second == NULL ) continue;
 
         std::vector<Object*> & list = *(it->second);
         for (unsigned int i = 0;i<list.size();++i) pickedObjects.push_back(list[i]);

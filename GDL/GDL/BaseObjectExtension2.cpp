@@ -11,7 +11,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/create.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPickingThem", "3");
         instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
         instrInfo.AddParameter("object", _("Objet à créer"), "", false);
         instrInfo.AddParameter("expression", _("Position X"), "", false);
@@ -51,7 +51,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/add.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPickingThem", "3");
         instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
@@ -138,7 +138,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/conditions/add.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPickingThem", "3");
         instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 

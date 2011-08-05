@@ -12,16 +12,38 @@ using namespace std;
 void Variable::SetValue(double val)
 {
     value = val;
-
-    //TODO : Performance KILLER.
-    stringstream s; s << (val);
-    str = s.str();
+    isNumber = true;
 }
 
 void Variable::SetString(const string & val)
 {
     str = val;
+    isNumber = false;
+}
 
-    stringstream ss; ss << val;
-    ss >> value;
+/**
+ * Get value as a double
+ */
+double Variable::GetValue() const
+{
+    if (!isNumber)
+    {
+        stringstream ss; ss << str;
+        ss >> value;
+    }
+    isNumber = true;
+
+    return value;
+}
+
+const std::string & Variable::GetString() const
+{
+    if (isNumber)
+    {
+        stringstream s; s << (value);
+        str = s.str();
+    }
+    isNumber = false;
+
+    return str;
 }

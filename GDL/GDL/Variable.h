@@ -24,7 +24,7 @@ class GD_API Variable
         /**
          * Construct a Variable from its name
          */
-        Variable(std::string name_) : name(name_), value(0) {};
+        Variable(std::string name_) : name(name_), value(0), isNumber(true) {};
         virtual ~Variable() {};
 
         /**
@@ -40,7 +40,7 @@ class GD_API Variable
         /**
          * Get value as a double
          */
-        inline double GetValue() const { return value; }
+        double GetValue() const;
 
         /**
          * Change value
@@ -65,7 +65,7 @@ class GD_API Variable
         /**
          * Get value as a string
          */
-        inline const std::string & GetString() const { return str; }
+        const std::string & GetString() const;
 
         /**
          * Change string of the variable
@@ -82,8 +82,9 @@ class GD_API Variable
 
     private:
         std::string name;
-        double value;
-        std::string str;
+        mutable double value;
+        mutable std::string str;
+        mutable bool isNumber;
 };
 
 /**

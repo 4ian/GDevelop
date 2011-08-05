@@ -41,6 +41,8 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
     else
         realObjects.push_back(objectsToPick.GetPlainString());
 
+    if ( realObjects.empty() ) return "";
+
     for (unsigned int i = 0;i<realObjects.size();++i)
         parentContext.ObjectNeeded(realObjects[i]);
 
@@ -61,38 +63,82 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
 
     std::string objectDeclaration = context.GenerateObjectsDeclarationCode()+"\n";
 
-    for (unsigned int i = 0;i<realObjects.size();++i)
+    if ( realObjects.size() != 1) //(We write a slighty more simple ( and optimized ) output code when only one object list is used.)
     {
-        //Write final code
-        outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < "+realObjects[i]+"objects.size();++forEachIndex)\n";
-        outputCode += "{\n";
+        outputCode += "unsigned int forEachTotalCount = 0;";
+        outputCode += "std::vector<Object*> forEachObjects;";
+        for (unsigned int i = 0;i<realObjects.size();++i)
+        {
+            outputCode += "unsigned int forEachCount"+ToString(i)+" = "+realObjects[i]+"objects.size(); forEachTotalCount += forEachCount"+ToString(i)+";";
+            outputCode += "forEachObjects.insert("+ string(i == 0 ? "forEachObjects.begin()" : "forEachObjects.end()") +", "+realObjects[i]+"objects.begin(), "+realObjects[i]+"objects.end());";
+        }
+    }
 
+    //Write final code :
+
+    //For loop declaration
+    if ( realObjects.size() == 1 ) //We write a slighty more simple ( and optimized ) output code when only one object list is used.
+        outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < "+realObjects[0]+"objects.size();++forEachIndex)\n";
+    else
+        outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < forEachTotalCount;++forEachIndex)\n";
+
+    outputCode += "{\n";
+
+    //Clear all concerned objects lists and keep only one object
+    if ( realObjects.size() == 1 )
+    {
+        outputCode += "std::vector<Object*> temporaryForEachList; temporaryForEachList.push_back("+realObjects[0]+"objects[forEachIndex]);";
+        outputCode += "std::vector<Object*> "+realObjects[0]+"objects = temporaryForEachList;\n";
+    }
+    else
+    {
         //Declare all lists of concerned objects empty
         for (unsigned int j = 0;j<realObjects.size();++j)
+            outputCode += "std::vector<Object*> "+realObjects[j]+"objects;\n";
+
+        if (context.MapOfAllObjectsIsNeeded()) outputCode += "std::vector<Object*> * forEachCurrentList = NULL;";
+
+        for (unsigned int i = 0;i<realObjects.size();++i) //Pick then only one object
         {
-            if ( j != i ) outputCode += "std::vector<Object*> "+realObjects[j]+"objects;\n";
+            std::string count;
+            for (unsigned int j = 0;j<=i;++j)
+            {
+                if (j!=0) count+= "+";
+                count += "forEachCount"+ToString(j);
+            }
+
+            if ( i != 0 ) outputCode += "else ";
+            outputCode += "if (forEachIndex < "+count+") {\n";
+            outputCode += "    "+realObjects[i]+"objects.push_back(forEachObjects[forEachIndex]);\n";
+            if (context.MapOfAllObjectsIsNeeded()) "    forEachCurrentList = &"+realObjects[i]+"objects;\n";
+            outputCode += "}\n";
         }
-
-        //Pick only one object
-        outputCode += "std::vector<Object*> temporaryForEachList; temporaryForEachList.push_back("+realObjects[i]+"objects[forEachIndex]);";
-        outputCode += "std::vector<Object*> "+realObjects[i]+"objects = temporaryForEachList;\n";
-        outputCode += objectDeclaration;
-        if ( context.MapOfAllObjectsIsNeeded() ) outputCode += "objectsListsMap[\""+realObjects[i]+"\"] = &"+realObjects[i]+"objects;\n";
-
-        outputCode += conditionsCode;
-        outputCode += "if (" +ifPredicat+ ")\n";
-        outputCode += "{\n";
-        outputCode += actionsCode;
-        if (!events.empty())
-        {
-            outputCode += "\n{ //Subevents: \n";
-            outputCode += subevents;
-            outputCode += "} //Subevents end.\n";
-        }
-        outputCode += "}\n";
-
-        outputCode += "}\n";
     }
+
+    outputCode += objectDeclaration;
+
+    if ( realObjects.size() == 1 )
+    {
+        if ( context.MapOfAllObjectsIsNeeded() ) outputCode += "objectsListsMap[\""+realObjects[0]+"\"] = &"+realObjects[0]+"objects;\n";
+    }
+    else
+    {
+        if ( context.MapOfAllObjectsIsNeeded() ) outputCode += "objectsListsMap[forEachObjects[forEachIndex]->GetName()] = &forEachCurrentList;\n";
+    }
+
+    outputCode += conditionsCode;
+    outputCode += "if (" +ifPredicat+ ")\n";
+    outputCode += "{\n";
+    outputCode += actionsCode;
+    if (!events.empty())
+    {
+        outputCode += "\n{ //Subevents: \n";
+        outputCode += subevents;
+        outputCode += "} //Subevents end.\n";
+    }
+    outputCode += "}\n";
+
+    outputCode += "}\n"; //End of for loop
 
     return outputCode;
 }

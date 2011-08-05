@@ -71,9 +71,6 @@ std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
             declarationsCode += "std::vector <std::string> objectsAlreadyDeclared;\n";
         else
             declarationsCode += "std::vector <std::string> & objectsAlreadyDeclaredT = objectsAlreadyDeclared;std::vector <std::string> objectsAlreadyDeclared = objectsAlreadyDeclaredT;\n";
-
-        for ( set<string>::iterator it = objectsAlreadyDeclared.begin() ; it != objectsAlreadyDeclared.end(); ++it )
-            declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n";
     }
 
     for ( set<string>::iterator it = objectsToBeDeclared.begin() ; it != objectsToBeDeclared.end(); ++it )

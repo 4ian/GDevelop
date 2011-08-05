@@ -191,8 +191,9 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
 
     if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>() )
     {
-        conditionCode += "bool & conditionTrue = "+returnBoolean+";\n";
+        conditionCode += "{\nbool & conditionTrue = "+returnBoolean+";\n";
         conditionCode += instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, condition, context);
+        conditionCode += "}\n";
 
         return conditionCode;
     }
@@ -801,6 +802,38 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 cout << "Error: Could not get objects for a parameter" << endl;
             }
         }
+        //Code only parameter type
+        else if ( parametersInfo[pNb].type == "mapOfObjectListsOfParameterWithoutPickingThem" )
+        {
+            unsigned int i = ToInt(parametersInfo[pNb].supplementaryInformation);
+            if ( i < parameters.size() )
+            {
+                vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), parameters[i].GetPlainString()));
+                vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), parameters[i].GetPlainString()));
+
+                std::vector<std::string> realObjects;
+                if ( globalGroup != game.objectGroups.end() )
+                    realObjects = (*globalGroup).GetAllObjectsNames();
+                else if ( sceneGroup != scene.objectGroups.end() )
+                    realObjects = (*sceneGroup).GetAllObjectsNames();
+                else
+                    realObjects.push_back(parameters[i].GetPlainString());
+
+                argOutput += "runtimeContext->ClearObjectListsMap()";
+                for (unsigned int i = 0;i<realObjects.size();++i)
+                {
+                    context.EmptyObjectsListNeeded(realObjects[i]);
+                    argOutput += ".AddObjectListToMap(\""+realObjects[i]+"\", "+realObjects[i]+"objects)";
+                }
+                argOutput += ".ReturnObjectListsMap()";
+            }
+            else
+            {
+                argOutput += "runtimeContext->ClearObjectListsMap().ReturnObjectListsMap()";
+                context.errorOccured = true;
+                cout << "Error: Could not get objects for a parameter" << endl;
+            }
+        }
         else if ( parametersInfo[pNb].type == "ptrToObjectOfParameter")
         {
             unsigned int i = ToInt(parametersInfo[pNb].supplementaryInformation);
@@ -923,7 +956,7 @@ string EventsCodeGenerator::GenerateEventsCompleteCode(const Game & game, const 
         output += "#include \""+*include+"\"\n";
 
     output +=
-    "#include <stdio.h>\nextern void * pointerToRuntimeContext;\n//int _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
+    "#include <stdio.h>\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
 
     for ( set<string>::iterator declaration = context.customGlobalDeclaration->begin() ; declaration != context.customGlobalDeclaration->end(); ++declaration )
         output += *declaration+"\n";

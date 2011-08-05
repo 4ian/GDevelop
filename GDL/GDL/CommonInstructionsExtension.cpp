@@ -44,6 +44,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 //Conditions code
                 std::string conditionsCode;
                 std::vector<Instruction> & conditions = instruction.GetSubInstructions();
+
+                set<string> emptyListsNeeded;
                 for (unsigned int cId =0;cId < conditions.size();++cId)
                 {
                     //Each condition inherits the context from the "Or" condition:
@@ -53,8 +55,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                     string conditionCode = EventsCodeGenerator::GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
 
-                    conditionsCode += context.GenerateOptionalInstructionLevelDeclarationCode();
                     conditionsCode += "{\n";
+                    conditionsCode += context.GenerateOptionalInstructionLevelDeclarationCode();
 
                     //Create new objects lists and generate condition
                     conditionsCode += context.GenerateObjectsDeclarationCode();
@@ -77,8 +79,12 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                     //"OR" condition must declare objects list, but without getting the objects from the scene. Lists are either empty or come from a parent event.
                     for ( set<string>::iterator it = context.objectsToBeDeclared.begin() ; it != context.objectsToBeDeclared.end(); ++it )
-                        parentContext.EmptyObjectsListNeeded(*it);
+                        emptyListsNeeded.insert(*it);
                 }
+
+                //"OR" condition must declare objects list, but without getting the objects from the scene. Lists are either empty or come from a parent event.
+                for ( set<string>::iterator it = emptyListsNeeded.begin() ; it != emptyListsNeeded.end(); ++it )
+                    parentContext.EmptyObjectsListNeeded(*it);
 
                 //Declarations code
                 std::string declarationsCode;

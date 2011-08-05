@@ -562,10 +562,8 @@
 			<Add directory="..\..\ExtLibs\SFML\build-mingw-debug\lib" />
 			<Add directory="..\..\ExtLibs\SFML\build-mingw-release\lib" />
 		</Linker>
-		<Unit filename="AESActions.cpp" />
-		<Unit filename="AESActions.h" />
-		<Unit filename="AESExpressions.cpp" />
-		<Unit filename="AESExpressions.h" />
+		<Unit filename="AESTools.cpp" />
+		<Unit filename="AESTools.h" />
 		<Unit filename="Extension.cpp" />
 		<Extensions>
 			<code_completion />

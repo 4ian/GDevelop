@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release - Edittime" />
-	<File name="AESActions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="60" topLine="3" />
+	<ActiveTarget name="Development - Edittime" />
+	<File name="AESActions.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="60" topLine="3" />
 	</File>
-	<File name="AESActions.h" open="0" top="0" tabpos="1">
-		<Cursor position="1196" topLine="7" />
+	<File name="AESActions.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1196" topLine="7" />
 	</File>
-	<File name="AESExpressions.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="2070" topLine="23" />
+	<File name="AESExpressions.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2070" topLine="23" />
 	</File>
-	<File name="AESExpressions.h" open="0" top="0" tabpos="2">
-		<Cursor position="553" topLine="0" />
+	<File name="AESExpressions.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="553" topLine="0" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="5967" topLine="119" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3251" topLine="78" />
 	</File>
 </CodeBlocks_layout_file>

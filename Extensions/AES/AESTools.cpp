@@ -25,18 +25,22 @@ freely, subject to the following restrictions:
 */
 
 #include "GDL/AES.h"
-
-#include "GDL/Instruction.h"
-#include "GDL/ObjectsConcerned.h"
-#include "GDL/RuntimeScene.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 
-bool ActEncryptFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+using namespace std;
+
+namespace GDpriv
 {
-    ifstream ifile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str(),ios_base::binary);
-    ofstream ofile(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned).c_str(),ios_base::binary);
+
+namespace AES
+{
+
+void ActEncryptFile( const std::string & srcFile, const std::string & destFile, const std::string & passwordWith24characters )
+{
+    ifstream ifile(srcFile.c_str(),ios_base::binary);
+    ofstream ofile(destFile.c_str(),ios_base::binary);
 
     // get file size
     ifile.seekg(0,ios_base::end);
@@ -50,10 +54,10 @@ bool ActEncryptFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, 
     char * obuffer = new char[size];
     ifile.read(ibuffer,fsize);
 
-    AES crypt;
+    ::AES crypt;
     crypt.SetParameters(192);
 
-    crypt.StartEncryption(reinterpret_cast<const unsigned char*>(action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned).c_str()));
+    crypt.StartEncryption(reinterpret_cast<const unsigned char*>(passwordWith24characters.c_str()));
     crypt.Encrypt(reinterpret_cast<const unsigned char*>(ibuffer),reinterpret_cast<unsigned char*>(obuffer),size/16);
 
     ofile.write(obuffer,size);
@@ -63,14 +67,12 @@ bool ActEncryptFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, 
 
     ofile.close();
     ifile.close();
-
-    return true;
 }
 
-bool ActDecryptFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void ActDecryptFile( const std::string & srcFile, const std::string & destFile, const std::string & passwordWith24characters )
 {
-    ifstream ifile(action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str(),ios_base::binary);
-    ofstream ofile(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned).c_str(),ios_base::binary);
+    ifstream ifile(srcFile.c_str(),ios_base::binary);
+    ofstream ofile(destFile.c_str(),ios_base::binary);
 
     // get file size
     ifile.seekg(0,ios_base::end);
@@ -84,10 +86,10 @@ bool ActDecryptFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, 
     char * obuffer = new char[size];
     ifile.read(ibuffer,fsize);
 
-    AES crypt;
+    ::AES crypt;
     crypt.SetParameters(192);
 
-    crypt.StartDecryption(reinterpret_cast<const unsigned char*>(action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned).c_str()));
+    crypt.StartDecryption(reinterpret_cast<const unsigned char*>(passwordWith24characters.c_str()));
     crypt.Decrypt(reinterpret_cast<const unsigned char*>(ibuffer),reinterpret_cast<unsigned char*>(obuffer),size/16);
 
     ofile.write(obuffer,size);
@@ -97,6 +99,7 @@ bool ActDecryptFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, 
 
     ofile.close();
     ifile.close();
+}
 
-    return true;
+}
 }

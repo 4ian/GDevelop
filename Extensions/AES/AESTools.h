@@ -26,13 +26,19 @@ freely, subject to the following restrictions:
 
 #ifndef AESACTIONS_H_INCLUDED
 #define AESACTIONS_H_INCLUDED
+#include <string>
 
-class RuntimeScene;
-class ObjectsConcerned;
-class Instruction;
-class Evaluateur;
+namespace GDpriv
+{
 
-bool ActEncryptFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActDecryptFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+namespace AES
+{
+
+void GD_EXTENSION_API EncryptFile( const std::string & srcFile, const std::string & destFile, const std::string & passwordWith24characters );
+void GD_EXTENSION_API DecryptFile( const std::string & srcFile, const std::string & destFile, const std::string & passwordWith24characters );
+
+}
+
+}
 
 #endif // AESACTIONS_H_INCLUDED

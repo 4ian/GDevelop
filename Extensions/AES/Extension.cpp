@@ -26,8 +26,6 @@ freely, subject to the following restrictions:
 
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
-#include "AESActions.h"
-#include "AESExpressions.h"
 #include <boost/version.hpp>
 
 /**
@@ -53,14 +51,15 @@ class Extension : public ExtensionBase
                            _("Crypte un fichier avec AES."),
                            _("Crypter le fichier _PARAM0_ en _PARAM1_ avec AES"),
                            _("Cryptage"),
-                           "res/actions/camera24.png",
-                           "res/actions/camera.png",
-                           &ActEncryptFile);
+                           "Extensions/AESicon24.png",
+                           "Extensions/AESicon16.png");
 
-                DECLARE_PARAMETER("file", _("Fichier source"), false, "")
-                DECLARE_PARAMETER("file", _("Fichier de destination"), false, "")
-                DECLARE_PARAMETER("text", _("Mot de passe ( 24 caractères )"), false, "")
-                MAIN_OBJECTS_IN_PARAMETER(0)
+                instrInfo.AddParameter("file", _("Fichier source"), "", false);
+                instrInfo.AddParameter("file", _("Fichier de destination"), "", false);
+                instrInfo.AddParameter("string", _("Mot de passe ( 24 caractères )"), "", false);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::AES::EncryptFile").SetIncludeFile("AES/AESTools.h");
+
 
             DECLARE_END_ACTION()
 
@@ -69,25 +68,25 @@ class Extension : public ExtensionBase
                            _("Décrypter un fichier avec AES."),
                            _("Décrypter le fichier _PARAM0_ en _PARAM1_ avec AES"),
                            _("Cryptage"),
-                           "res/actions/camera24.png",
-                           "res/actions/camera.png",
-                           &ActDecryptFile);
+                           "Extensions/AESicon24.png",
+                           "Extensions/AESicon16.png");
 
-                DECLARE_PARAMETER("file", _("Fichier source"), false, "")
-                DECLARE_PARAMETER("file", _("Fichier de destination"), false, "")
-                DECLARE_PARAMETER("text", _("Mot de passe ( 24 caractères )"), false, "")
-                MAIN_OBJECTS_IN_PARAMETER(0)
+                instrInfo.AddParameter("file", _("Fichier source"), "", false);
+                instrInfo.AddParameter("file", _("Fichier de destination"), "", false);
+                instrInfo.AddParameter("string", _("Mot de passe ( 24 caractères )"), "", false);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::AES::DecryptFile").SetIncludeFile("AES/AESTools.h");
 
             DECLARE_END_ACTION()
             /*
             DECLARE_STR_EXPRESSION("Encrypt", _("Crypter"), _("Crypter"), _("Cryptage"), "res/actions/scaleHeight.png", &ExpEncrypt)
-                DECLARE_PARAMETER("text", _("Texte à crypter"), false, "")
-                DECLARE_PARAMETER("text", _("Mot de passe ( 24 caractères )"), false, "")
+                instrInfo.AddParameter("string", _("Texte à crypter"), "", false);
+                instrInfo.AddParameter("string", _("Mot de passe ( 24 caractères )"), "", false);
             DECLARE_END_STR_EXPRESSION()
 
             DECLARE_STR_EXPRESSION("Decrypt", _("Decrypter"), _("Decrypter"), _("Cryptage"), "res/actions/scaleHeight.png", &ExpDecrypt)
-                DECLARE_PARAMETER("text", _("Texte à décrypter"), false, "")
-                DECLARE_PARAMETER("text", _("Mot de passe ( 24 caractères )"), false, "")
+                instrInfo.AddParameter("string", _("Texte à décrypter"), "", false);
+                instrInfo.AddParameter("string", _("Mot de passe ( 24 caractères )"), "", false);
             DECLARE_END_STR_EXPRESSION()
             */
 

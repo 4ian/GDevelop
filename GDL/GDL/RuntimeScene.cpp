@@ -71,6 +71,12 @@ specialAction(-1)
 
 RuntimeScene::~RuntimeScene()
 {
+    const vector < boost::shared_ptr<ExtensionBase> > extensions = GDpriv::ExtensionsManager::GetInstance()->GetExtensions();
+	for (unsigned int i = 0;i<extensions.size();++i)
+    {
+        if ( extensions[i] != boost::shared_ptr<ExtensionBase>() )
+            extensions[i]->SceneUnloaded(*this);
+    }
 }
 
 void RuntimeScene::Init(const RuntimeScene & scene)
@@ -609,6 +615,13 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
         ++it)
     {
         automatismsSharedDatas[it->first] = it->second->CreateRuntimeSharedDatas();
+    }
+
+    //Extensions specific initalization
+    const vector < boost::shared_ptr<ExtensionBase> > extensions = GDpriv::ExtensionsManager::GetInstance()->GetExtensions();
+	for (unsigned int i = 0;i<extensions.size();++i)
+    {
+        if ( extensions[i] != boost::shared_ptr<ExtensionBase>() ) extensions[i]->SceneLoaded(*this);
     }
 
     if ( stopSoundsOnStartup ) SoundManager::GetInstance()->ClearAllSoundsAndMusics();

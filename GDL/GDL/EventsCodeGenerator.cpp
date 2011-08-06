@@ -267,7 +267,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
     //Generate object condition if available
     string objectName = condition.GetParameters().empty() ? "" : condition.GetParameter(0).GetPlainString();
     string objectType = GetTypeOfObject(game, scene, objectName);
-    if ( !objectName.empty() && extensionsManager->HasObjectCondition(objectType, condition.GetType()))
+    if ( !objectName.empty() && extensionsManager->HasObjectCondition(objectType, condition.GetType()) && !instrInfos.parameters.empty())
     {
         vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
         vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
@@ -294,7 +294,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
             context.AddIncludeFile(objInfo.optionalIncludeFile);
             string objectFunctionCallNamePart =
-            ( !objInfo.cppClassName.empty() ) ?
+            ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ?
                 "static_cast<"+objInfo.cppClassName+"*>("+realObjectName+"objects[i])->"+instrInfos.cppCallingInformation.cppCallingName
             :   realObjectName+"objects[i]->"+instrInfos.cppCallingInformation.cppCallingName;
 
@@ -336,7 +336,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
 
     //Generate automatism condition if available
     string automatismType = GetTypeOfAutomatism(game, scene, condition.GetParameters().size() < 2 ? "" : condition.GetParameter(1).GetPlainString());
-    if (extensionsManager->HasAutomatismCondition(automatismType, condition.GetType()))
+    if (extensionsManager->HasAutomatismCondition(automatismType, condition.GetType()) && instrInfos.parameters.size() >= 2)
     {
         vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
         vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
@@ -363,7 +363,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             const AutomatismInfo & autoInfo = extensionsManager->GetAutomatismInfo(automatismType);
             context.AddIncludeFile(autoInfo.optionalIncludeFile);
             string objectFunctionCallNamePart =
-            ( !autoInfo.cppClassName.empty() ) ?
+            ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
                 "static_cast<"+autoInfo.cppClassName+"*>("+realObjectName+"objects[i]->GetAutomatismRawPointer(\""+condition.GetParameter(1).GetPlainString()+"\"))->"+instrInfos.cppCallingInformation.cppCallingName
             :   realObjectName+"objects[i]->GetAutomatism(\""+condition.GetParameter(1).GetPlainString()+"\")->"+instrInfos.cppCallingInformation.cppCallingName;
 
@@ -525,7 +525,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
     //Call object function if available
     string objectName = action.GetParameters().empty() ? "" : action.GetParameter(0).GetPlainString();
     string objectType = GetTypeOfObject(game, scene, objectName);
-    if ( extensionsManager->HasObjectAction(objectType, action.GetType()))
+    if ( extensionsManager->HasObjectAction(objectType, action.GetType()) && !instrInfos.parameters.empty())
     {
         vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
         vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
@@ -550,7 +550,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             //Add a static_cast if necessary
             const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
             context.AddIncludeFile(objInfo.optionalIncludeFile);
-            string objectPart = ( !objInfo.cppClassName.empty() ) ? "static_cast<"+objInfo.cppClassName+"*>("+realObjectName+"objects[i])->" : realObjectName+"objects[i]->" ;
+            string objectPart = ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ? "static_cast<"+objInfo.cppClassName+"*>("+realObjectName+"objects[i])->" : realObjectName+"objects[i]->" ;
 
             //Create call
             string call;
@@ -584,7 +584,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
 
     //Affection to an automatism member function if found
     string automatismType = GetTypeOfAutomatism(game, scene, action.GetParameters().size() < 2 ? "" : action.GetParameter(1).GetPlainString());
-    if (extensionsManager->HasAutomatismAction(automatismType, action.GetType()))
+    if (extensionsManager->HasAutomatismAction(automatismType, action.GetType()) && instrInfos.parameters.size() >= 2)
     {
         vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
         vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
@@ -610,7 +610,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             const AutomatismInfo & autoInfo = extensionsManager->GetAutomatismInfo(automatismType);
             context.AddIncludeFile(autoInfo.optionalIncludeFile);
             string objectPart =
-            ( !autoInfo.cppClassName.empty() ) ?
+            ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
                 "static_cast<"+autoInfo.cppClassName+"*>("+realObjectName+"objects[i]->GetAutomatismRawPointer(\""+action.GetParameter(1).GetPlainString()+"\"))->"
             :   realObjectName+"objects[i]->GetAutomatismRawPointer(\""+action.GetParameter(1).GetPlainString()+"\")->";
 

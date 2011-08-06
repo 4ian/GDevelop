@@ -1032,6 +1032,16 @@ class GD_API ExtensionBase
     virtual bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue) { return false; };
 
     /**
+     * Called when a scene is loaded: Useful to initialize some extensions specific objects related to scene
+     */
+    virtual void SceneLoaded(RuntimeScene & scene);
+
+    /**
+     * Called when a scene is unloaded: Useful to destroy some extensions specific objects related to scene
+     */
+    virtual void SceneUnloaded(RuntimeScene & scene);
+
+    /**
      * Must return the number of available properties for the debugger
      */
     virtual unsigned int GetNumberOfProperties(RuntimeScene & scene) const { return 0; };

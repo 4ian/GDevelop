@@ -57,6 +57,7 @@ std::vector<Object*> ObjInstancesHolder::GetObjectsRawPointers(const std::string
     std::vector<Object*> objList;
 
     const ObjList & associatedList = objectsInstances[name];
+    objList.reserve(associatedList.size()); //Important: Prevent multiple deallocation/reallocation
     for (unsigned int i = 0;i<associatedList.size();++i) //Mettre 1 à la place de size augmente les performances -> Appel conditions/actions couteux ? -> std::string à passer en const & ! -> Et les objets en oId ???
     {
         objList.push_back(associatedList[i].get());

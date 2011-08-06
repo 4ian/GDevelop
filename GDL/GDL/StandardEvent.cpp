@@ -25,11 +25,14 @@ std::string StandardEvent::GenerateEventCode(const Game & game, const Scene & sc
 
     outputCode += EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
 
-    std::string ifPredicat = "true";
+    std::string ifPredicat;
     for (unsigned int i = 0;i<conditions.size();++i)
-        ifPredicat += " && condition"+ToString(i)+"IsTrue";
+    {
+        if (i!=0) ifPredicat += " && ";
+        ifPredicat += "condition"+ToString(i)+"IsTrue";
+    }
 
-    outputCode += "if (" +ifPredicat+ ")\n";
+    if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
     outputCode += "{\n";
     outputCode += EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
     if ( !events.empty() ) //Sub events

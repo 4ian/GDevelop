@@ -388,3 +388,11 @@ boost::shared_ptr<AutomatismsSharedDatas> ExtensionBase::CreateAutomatismSharedD
 
     return boost::shared_ptr<AutomatismsSharedDatas>();
 }
+
+void ExtensionBase::SceneLoaded(RuntimeScene & scene)
+{
+}
+
+void ExtensionBase::SceneUnloaded(RuntimeScene & scene)
+{
+}

@@ -10,8 +10,6 @@
 #include <wx/wx.h> //This include file must be placed first
 #endif
 #include "GDL/Force.h" //This include file must be placed first
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -19,8 +17,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include "GDL/ListVariable.h"
 #include "GDL/ObjectHelpers.h"
-#include "GDL/RotatedRectangle.h"
 
+class RotatedRectangle;
 class RuntimeScene;
 class Object;
 class ExpressionInstruction;
@@ -270,7 +268,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Get object hit box(es)
          */
-        virtual std::vector<RotatedRectangle> GetHitBoxes() const { return std::vector<RotatedRectangle>(); };
+        virtual std::vector<RotatedRectangle> GetHitBoxes() const;
 
         /**
          * Call each automatism before events

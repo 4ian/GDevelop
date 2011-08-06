@@ -16,6 +16,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/Automatism.h"
+#include "GDL/RotatedRectangle.h"
 
 using namespace std;
 
@@ -561,6 +562,11 @@ void Object::SetXY( float xValue, const char* xOperator, float yValue, const cha
         SetY( GetY() * yValue );
     else if ( strcmp(yOperator, "/") == 0 )
         SetY( GetY() / yValue );
+}
+
+std::vector<RotatedRectangle> Object::GetHitBoxes() const
+{
+    return std::vector<RotatedRectangle>();
 }
 
 bool GD_API MustBeDeleted ( boost::shared_ptr<Object> object )

@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/EventsCodeCompiler.h"
 
 #include <SFML/System.hpp>
@@ -5,6 +10,7 @@
 #include <fstream>
 #include <string>
 
+//Long list of llvm and clang headers
 #include "clang/CodeGen/CodeGenAction.h"
 #include "clang/Driver/Compilation.h"
 #include "clang/Driver/Driver.h"
@@ -14,7 +20,6 @@
 #include "clang/Frontend/DiagnosticOptions.h"
 #include "clang/Frontend/FrontendDiagnostic.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
-
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
 #include "llvm/Config/config.h"
@@ -59,16 +64,14 @@
 #include "GDL/EventsExecutionEngine.h"
 #include "GDL/CommonTools.h"
 
-using namespace clang;
 using namespace std;
+using namespace clang;
 using namespace clang::driver;
 
 EventsCodeCompiler *EventsCodeCompiler::_singleton = NULL;
-std::set<std::string> EventsCodeCompiler::headersDirectories;
 sf::Mutex EventsCodeCompiler::openSaveDialogMutex;
-sf::Mutex EventsCodeCompiler::mutex;
 
-bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, std::string bitCodeFile)
+bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, std::string bitCodeFile, bool compilationForRuntime)
 {
     std::cout << "C++ events file to bitcode compilation started\n" << std::endl;
     std::cout << "Creating Clang compiler job...\n" << std::endl;
@@ -89,11 +92,15 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     Args.push_back(eventsFile.c_str());
     Args.push_back("-fsyntax-only");
     Args.push_back("-w");
-    //Args.push_back("-O3");
     //Headers
     for (std::set<std::string>::const_iterator header = headersDirectories.begin();header != headersDirectories.end();++header)
         Args.push_back((*header).c_str());
-    //Defines
+
+    if ( !compilationForRuntime )
+    {
+        Args.push_back("-DGD_IDE_ONLY"); //TODO : Use appropriate PCH.
+        //Args.push_back("-O3");
+    }
 
     #if defined(WINDOWS)
     Args.push_back("-DWINDOWS");
@@ -117,7 +124,6 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     Args.push_back("-DDEBUG");
     #endif
 
-    Args.push_back("-DGD_IDE_ONLY");
 
     llvm::OwningPtr<Compilation> C(TheDriver.BuildCompilation(Args));
     if (!C) return false;
@@ -199,16 +205,16 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
     {
         sf::Clock compilationTimer;
 
-        if ( game == NULL || scene == NULL)
+        if ( task.game == NULL || task.scene == NULL)
         {
             cout << "Game or scene invalid." << std::endl;
             cout << "Compilation aborted." << endl << char(7);
         }
         else
         {
-            Game gameCopy = *game; //We're making a copy of game and scene to ensure compilation will not crash if scene/game is destroyed during compilation.
-            Scene sceneCopy = *scene;
-            boost::shared_ptr<EventsExecutionEngine> executionEngine = scene->compiledEventsExecutionEngine; //Execution engine that compilation will setup. Using a shared_ptr to ensure that execution engine is not destroyed during compilation
+            Game gameCopy = *task.game; //We're making a copy of game and scene to ensure compilation will not crash if scene/game is destroyed during compilation.
+            Scene sceneCopy = *task.scene;
+            boost::shared_ptr<EventsExecutionEngine> executionEngine = task.scene->compiledEventsExecutionEngine; //Execution engine that compilation will setup. Using a shared_ptr to ensure that execution engine is not destroyed during compilation
             cout << "Game and scene copy made, executionEngine shared_ptr ok." << endl;
 
             if ( abort || executionEngine == boost::shared_ptr<EventsExecutionEngine>() )
@@ -226,7 +232,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                 myfile << eventsOutput;
                 myfile.close();
 
-                if ( !CompileEventsCppFileToBitCode("Temporaries/"+ToString(executionEngine.get())+"events.cpp", "Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc"))
+                if ( !EventsCodeCompiler::GetInstance()->CompileEventsCppFileToBitCode("Temporaries/"+ToString(executionEngine.get())+"events.cpp", task.bitCodeFilename.empty() ? "Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc" : task.bitCodeFilename, task.compilationForRuntime ))
                 {
                     cout << "Failed to compile Temporaries/"+ToString(executionEngine.get())+"events.cpp." << std::endl;
                     cout << "Compilation aborted." << endl << char(7);
@@ -234,63 +240,77 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                 else
                 {
                     cout << "Compilation duration: " << compilationTimer.GetElapsedTime()<<"s"<<endl;
-                    llvm::OwningPtr<llvm::MemoryBuffer> eventsBuffer;
-                    llvm::error_code err = llvm::MemoryBuffer::getFile("Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc", eventsBuffer);
-                    if ( err.value() != 0 )
-                    {
-                        std::cout << "Failed to load Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc: " << err.message() << std::endl;
-                        cout << "Compilation aborted." << endl << char(7);
-                    }
-                    else
-                    {
-                        std::string parseError;
-                        executionEngine->llvmModule = ParseBitcodeFile(eventsBuffer.get(), executionEngine->llvmContext, &parseError);
-                        std::cout << parseError;
 
-                        if ( abort )
+                    if ( !task.generateBitcodeFileOnly )
+                    {
+                        llvm::OwningPtr<llvm::MemoryBuffer> eventsBuffer;
+                        llvm::error_code err = llvm::MemoryBuffer::getFile("Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc", eventsBuffer);
+                        if ( err.value() != 0 )
                         {
+                            std::cout << "Failed to load Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc: " << err.message() << std::endl;
                             cout << "Compilation aborted." << endl << char(7);
                         }
                         else
                         {
-                            if (!executionEngine->llvmModule)
+                            std::string parseError;
+                            executionEngine->llvmModule = ParseBitcodeFile(eventsBuffer.get(), executionEngine->llvmContext, &parseError);
+                            std::cout << parseError;
+
+                            if ( abort )
                             {
-                                cout << "Module creation failed\n";
                                 cout << "Compilation aborted." << endl << char(7);
                             }
                             else
                             {
-                                std::string error;
-                                executionEngine->llvmExecutionEngine.reset( llvm::ExecutionEngine::createJIT(executionEngine->llvmModule,
-                                                                           &error,
-                                                                           0,
-                                                                           llvm::CodeGenOpt::None)); //No optimisation during machine code generation
-                                if (!executionEngine->llvmExecutionEngine)
+                                if (!executionEngine->llvmModule)
                                 {
-                                    cout << "unable to make execution engine: " << error << "\n";
+                                    cout << "Module creation failed\n";
                                     cout << "Compilation aborted." << endl << char(7);
                                 }
                                 else
                                 {
-                                    executionEngine->eventsEntryFunction = executionEngine->llvmModule->getFunction("main");
-                                    if (!executionEngine->eventsEntryFunction)
+                                    std::string error;
+                                    executionEngine->llvmExecutionEngine.reset( llvm::ExecutionEngine::createJIT(executionEngine->llvmModule,
+                                                                               &error,
+                                                                               0,
+                                                                               llvm::CodeGenOpt::None)); //No optimisation during machine code generation
+                                    if (!executionEngine->llvmExecutionEngine)
                                     {
-                                        cout << "'main' function not found in module.\n";
+                                        cout << "unable to make execution engine: " << error << "\n";
                                         cout << "Compilation aborted." << endl << char(7);
                                     }
                                     else
                                     {
-                                        cout << "Mapping objects of execution engine...\n";
-                                        llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(executionEngine->llvmModule->getOrInsertGlobal("pointerToRuntimeContext", llvm::TypeBuilder<void*, false>::get(executionEngine->llvmModule->getContext())));
-                                        executionEngine->llvmExecutionEngine->addGlobalMapping(globalValue, &executionEngine->llvmRuntimeContext);
+                                        executionEngine->eventsEntryFunction = executionEngine->llvmModule->getFunction("main");
+                                        if (!executionEngine->eventsEntryFunction)
+                                        {
+                                            cout << "'main' function not found in module.\n";
+                                            cout << "Compilation aborted." << endl << char(7);
+                                        }
+                                        else
+                                        {
+                                            cout << "Mapping objects of execution engine...\n";
+                                            llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(executionEngine->llvmModule->getOrInsertGlobal("pointerToRuntimeContext", llvm::TypeBuilder<void*, false>::get(executionEngine->llvmModule->getContext())));
+                                            executionEngine->llvmExecutionEngine->addGlobalMapping(globalValue, &executionEngine->llvmRuntimeContext);
 
-                                        cout << "JIT Compilation to machine code...\n";
-                                        sf::Clock jitTimer;
-                                        executionEngine->llvmExecutionEngine->getPointerToFunction(executionEngine->eventsEntryFunction);
-                                        cout << "JIT Compilation duration: " << jitTimer.GetElapsedTime()<<"s"<<endl;
+                                            for (llvm::Module::iterator I = executionEngine->llvmModule->begin(), E = executionEngine->llvmModule->end(); I != E; ++I)
+                                              if (I->isDeclaration())
+                                                cout << &*I << "not defined (" << (*I).getNameStr() << endl;
 
-                                        cout << "Scene compilation successful. Total duration: " << compilationTimer.GetElapsedTime()<<"s"<<endl;
-                                        scene->eventsModified = false;
+                                            for (llvm::Module::global_iterator I = executionEngine->llvmModule->global_begin(),
+                                                                         E = executionEngine->llvmModule->global_end();
+                                                 I != E; ++I)
+                                              if (I->isDeclaration())
+                                                cout << &*I << "not defined (" << (*I).getNameStr() << endl;
+
+                                            cout << "JIT Compilation to machine code...\n";
+                                            sf::Clock jitTimer;
+                                            executionEngine->llvmExecutionEngine->getPointerToFunction(executionEngine->eventsEntryFunction);
+                                            cout << "JIT Compilation duration: " << jitTimer.GetElapsedTime()<<"s"<<endl;
+
+                                            cout << "Scene compilation successful. Total duration: " << compilationTimer.GetElapsedTime()<<"s"<<endl;
+                                            task.scene->eventsModified = false;
+                                        }
                                     }
                                 }
                             }
@@ -304,19 +324,18 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
 
         //Be sure there is not a pending task waiting to be done.
         {
-            sf::Lock lock(mutex); //Disallow modifying pending tasks.
-
             EventsCodeCompiler * eventsCodeCompiler = EventsCodeCompiler::GetInstance();
+
+            sf::Lock lock(eventsCodeCompiler->mutex); //Disallow modifying pending tasks.
 
             for (unsigned int i = 0;i<eventsCodeCompiler->pendingTasks.size();++i)
             {
-                if ( find(eventsCodeCompiler->compilationDisallowed.begin(), eventsCodeCompiler->compilationDisallowed.end(), eventsCodeCompiler->pendingTasks[i].first) == eventsCodeCompiler->compilationDisallowed.end() )
+                if ( find(eventsCodeCompiler->compilationDisallowed.begin(), eventsCodeCompiler->compilationDisallowed.end(), eventsCodeCompiler->pendingTasks[i].scene) == eventsCodeCompiler->compilationDisallowed.end() )
                 {
                     //A Pending task is waiting:
                     cout << "Pending task waiting : Relaunching compilation..." << endl;
                     compile = true; //Relaunch compilation.
-                    scene = eventsCodeCompiler->pendingTasks[i].first;
-                    game = eventsCodeCompiler->pendingTasks[i].second;
+                    SetTask(eventsCodeCompiler->pendingTasks[i]);
 
                     eventsCodeCompiler->pendingTasks.erase(eventsCodeCompiler->pendingTasks.begin()+i);
                     break;
@@ -329,43 +348,36 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
     workEnded = true;
 }
 
-void GD_API EventsCodeCompiler::EventsCompilationNeeded(Game & game, Scene & scene)
+void GD_API EventsCodeCompiler::EventsCompilationNeeded(Task task)
 {
     //First clean up old finished thread
     if ( currentTask != boost::shared_ptr<Worker>() && currentTask->workEnded)
         currentTask.reset();
 
-    if ( find(compilationDisallowed.begin(), compilationDisallowed.end(), &scene) != compilationDisallowed.end() )
-    {
-        //Compilation not allowed currently : add a pending task
-        AddPendingTask(game, scene); //Add a pending task;
-        return;
-    }
-
-    //Compilation allowed : Be sure there is not a scene compilation currently
-    if ( currentTask == boost::shared_ptr<Worker>() )
+    //Compilation allowed : Be sure there is not a scene compilation currently and that compilation is not prevented
+    if ( find(compilationDisallowed.begin(), compilationDisallowed.end(), task.scene) == compilationDisallowed.end() && currentTask == boost::shared_ptr<Worker>() )
     {
         std::cout << "New worker launched" << std::endl;
-        currentTask = boost::shared_ptr<Worker>(new Worker(&game, &scene));
+        currentTask = boost::shared_ptr<Worker>(new Worker(task));
         currentTask->Launch();
     }
     else
     {
-        AddPendingTask(game, scene); //Add a pending task;
+        AddPendingTask(task); //Add a pending task;
         return;
     }
 
 }
-void EventsCodeCompiler::AddPendingTask(Game & game, Scene & scene)
+void EventsCodeCompiler::AddPendingTask(const Task & task)
 {
     for (unsigned int i = 0;i<pendingTasks.size();++i)
     {
-        if ( pendingTasks[i].first == &scene)
+        if ( pendingTasks[i].scene == task.scene)
             return; //There is already a pending task to compile scene events
     }
 
     std::cout << "Pending task effectively added" << std::endl;
-    pendingTasks.push_back(std::make_pair(&scene, &game)); //Add a pending task;
+    pendingTasks.push_back(task); //Add a pending task;
 }
 
 void GD_API EventsCodeCompiler::EnableCompilation(Scene & scene)
@@ -380,7 +392,7 @@ void GD_API EventsCodeCompiler::EnableCompilation(Scene & scene)
     if ( !pendingTasks.empty() )
     {
         //Pending task but no current task: Lauch the first pending task so.
-        EventsCompilationNeeded(*pendingTasks[0].second, *pendingTasks[0].first);
+        EventsCompilationNeeded(pendingTasks[0]);
         pendingTasks.erase(pendingTasks.begin()+0);
     }
 }
@@ -411,7 +423,7 @@ bool EventsCodeCompiler::EventsBeingCompiled()
     if ( !pendingTasks.empty() )
     {
         //Pending task but no current task: Launch the first pending task so.
-        EventsCompilationNeeded(*pendingTasks[0].second, *pendingTasks[0].first);
+        EventsCompilationNeeded(pendingTasks[0]);
         pendingTasks.erase(pendingTasks.begin()+0);
 
         cout << "SceneEventsBeingCompiled!";
@@ -434,7 +446,7 @@ bool EventsCodeCompiler::SceneEventsBeingCompiled(const Scene & scene)
 
     for (unsigned int i = 0;i<pendingTasks.size();++i)
     {
-        if ( pendingTasks[i].first == &scene )
+        if ( pendingTasks[i].scene == &scene )
         {
             //A pending task is waiting to compile the scene
             return true;
@@ -453,7 +465,7 @@ void EventsCodeCompiler::NotifyASceneIsDestroyed(const Scene & scene)
 
     for (unsigned int i = 0;i<pendingTasks.size();++i)
     {
-        if ( pendingTasks[i].first == &scene)
+        if ( pendingTasks[i].scene == &scene)
         {
             pendingTasks.erase(pendingTasks.begin()+i);
             --i;
@@ -462,8 +474,6 @@ void EventsCodeCompiler::NotifyASceneIsDestroyed(const Scene & scene)
         }
     }
 }
-
-
 
 EventsCodeCompiler::EventsCodeCompiler()
 {

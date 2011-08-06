@@ -12914,7 +12914,7 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1311891521 d:\florian\programmation\gamedevelop2\gdl\\gdl\object.h
+1312668184 d:\florian\programmation\gamedevelop2\gdl\\gdl\object.h
 	<wx/wx.h>
 	"GDL/Force.h"
 	<SFML/System.hpp>
@@ -12926,7 +12926,6 @@
 	<boost/enable_shared_from_this.hpp>
 	"GDL/ListVariable.h"
 	"GDL/ObjectHelpers.h"
-	"GDL/RotatedRectangle.h"
 
 1297544852 d:\florian\programmation\gamedevelop2\gdl\\gdl\force.h
 	"GDL/Event.h"
@@ -15797,7 +15796,7 @@
 	<wx/msgdlg.h>
 	"GDL/EventsCodeCompiler.h"
 
-1312582381 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1312659557 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1304162683 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -32143,7 +32142,7 @@
 	<vector>
 	<utility>
 
-1312480544 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodecompiler.cpp
+1312666746 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodecompiler.cpp
 	"GDL/EventsCodeCompiler.h"
 	<SFML/System.hpp>
 	<iostream>
@@ -32201,7 +32200,7 @@
 	"GDL/EventsExecutionEngine.h"
 	"GDL/CommonTools.h"
 
-1312480544 d:\florian\programmation\gamedevelop2\gdl\\gdl\eventscodecompiler.h
+1312650632 d:\florian\programmation\gamedevelop2\gdl\\gdl\eventscodecompiler.h
 	<map>
 	<string>
 	<iostream>
@@ -32898,4 +32897,47 @@
 	"GDL/GDExpressionParser.h"
 
 1312285753 d:\florian\programmation\gamedevelop2\gdl\\gdl\mathematicaltools.h
+
+1312663599 source:d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp
+	"FullProjectCompiler.h"
+	<fstream>
+	<iostream>
+	<wx/filefn.h>
+	<wx/log.h>
+	<wx/msgdlg.h>
+	<wx/dir.h>
+	<wx/help.h>
+	<wx/config.h>
+	<wx/dirdlg.h>
+	<wx/filedlg.h>
+	<wx/msgdlg.h>
+	<wx/filename.h>
+	"GDL/EventsCodeCompiler.h"
+	"GDL/DatFile.h"
+	"GDL/Game.h"
+	"GDL/Scene.h"
+	"GDL/OpenSaveLoadingScreen.h"
+	"GDL/AES.h"
+	"GDL/CommonTools.h"
+	"GDL/ResourcesMergingHelper.h"
+	"GDL/ExtensionsManager.h"
+	"GDL/ExtensionBase.h"
+	"GDL/ExternalEvents.h"
+	"GDL/OpenSaveGame.h"
+	"GDL/ExecutableIconChanger.h"
+
+1312659203 d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.h
+	<string>
+
+1312659374 source:d:\florian\programmation\gamedevelop2\gdl\gdl\executableiconchanger.cpp
+	"ExecutableIconChanger.h"
+	<windows.h>
+
+1312659405 d:\florian\programmation\gamedevelop2\gdl\gdl\executableiconchanger.h
+	<string>
+
+1265226174 d:\florian\programmation\gamedevelop2\gdl\\gdl\aes.h
+
+1312659405 d:\florian\programmation\gamedevelop2\gdl\\gdl\executableiconchanger.h
+	<string>
 

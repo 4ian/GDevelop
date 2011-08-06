@@ -1,7 +1,12 @@
-#if defined(GD_IDE_ONLY)
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
 
+#if defined(GD_IDE_ONLY)
 #ifndef EVENTSCODECOMPILER_H
 #define EVENTSCODECOMPILER_H
+
 #include <map>
 #include <string>
 #include <iostream>
@@ -19,9 +24,8 @@ class Game;
 class GD_API EventsCodeCompiler
 {
 public:
-    void EventsCompilationNeeded(Game & game, Scene & scene);
-
-    void NotifyASceneIsDestroyed(const Scene & scene);
+    class Task; //Definition below
+    void EventsCompilationNeeded(Task task);
 
     /**
      * Tell the compiler the events of the scene can be compiled:
@@ -52,6 +56,29 @@ public:
      */
     void AddHeaderDirectory(std::string dir) { headersDirectories.insert(dir); }
 
+    /**
+     * Return a set containing pointers to scene with events which cannot be compiled for now
+     */
+    std::vector<Scene*> GetSceneWithCompilationDisallowed() const { return compilationDisallowed; }
+
+    void NotifyASceneIsDestroyed(const Scene & scene);
+
+    /**
+     * Describe to compiler what is needed
+     */
+    class Task
+    {
+    public:
+        Task(Game * game_, Scene* scene_) : game(game_), scene(scene_), compilationForRuntime(false), generateBitcodeFileOnly(false) {}
+
+        Game * game;
+        Scene * scene;
+
+        bool compilationForRuntime;
+        bool generateBitcodeFileOnly; ///< Please provide a bitcode filename if generateBitcodeFileOnly is set to true
+        std::string bitCodeFilename; ///< Fill this string if generateBitcodeFileOnly is set to true
+    };
+
     static EventsCodeCompiler * GetInstance()
     {
         if ( NULL == _singleton )
@@ -76,44 +103,44 @@ private:
     class Worker
     {
     public:
-        Worker(Game * game_, Scene * scene_) :
+        Worker(Task task_) :
             abort(false),
             workEnded(false),
-            game(game_),
-            scene(scene_),
+            task(task_),
             thread(&EventsCodeCompiler::Worker::DoCompleteCompilation, this)
         {
         }
         virtual ~Worker() {};
 
+        void SetTask(Task task_) { task = task_; }
+
         void Launch() { thread.Launch(); }
-        const Scene* GetScene() { return scene; }
+        const Scene* GetScene() { return task.scene; }
 
         bool abort;
         bool workEnded;
 
     private:
-        Game * game;
-        Scene * scene;
+        Task task;
         sf::Thread thread;
         void DoCompleteCompilation();
     };
+    friend class Worker;
 
     /**
      * Compile C++ events file to bitcode file.
      */
-    static bool CompileEventsCppFileToBitCode(std::string eventsFile, std::string bitCodeFile);
+    bool CompileEventsCppFileToBitCode(std::string eventsFile, std::string bitCodeFile, bool compilationForRuntime);
 
-    void AddPendingTask(Game & game, Scene & scene);
+    void AddPendingTask(const Task & task);
 
     boost::shared_ptr<Worker> currentTask; ///< Compilation currently made.
-    std::vector <std::pair<Scene*, Game*> > pendingTasks; ///< Compilation task waiting to be launched.
+    std::vector < Task > pendingTasks; ///< Compilation task waiting to be launched.
     std::vector < Scene* > compilationDisallowed; ///< List of scenes which disallow their events to be compiled. (However, if a compilation is being made, it will not be stopped)
 
-    static std::set<std::string> headersDirectories;
-    static sf::Mutex mutex;
+    std::set<std::string> headersDirectories;
+    sf::Mutex mutex;
 
-    friend class Worker;
     EventsCodeCompiler();
     virtual ~EventsCodeCompiler();
     static EventsCodeCompiler *_singleton;

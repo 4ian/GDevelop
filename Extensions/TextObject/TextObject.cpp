@@ -335,6 +335,17 @@ void TextObject::SetColor( unsigned int r, unsigned int g, unsigned int b )
     text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
 }
 
+void TextObject::SetColor(const std::string & colorStr)
+{
+    vector < string > colors = SpliterStringToVector<string>(colorStr, ';');
+
+    if ( colors.size() < 3 ) return; //La couleur est incorrecte
+
+    SetColor(  ToInt(colors[0]),
+               ToInt(colors[1]),
+               ToInt(colors[2]) );
+}
+
 void TextObject::SetOpacity(float val)
 {
     if ( val > 255 )

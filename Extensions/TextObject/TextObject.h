@@ -29,12 +29,9 @@ freely, subject to the following restrictions:
 
 #include "GDL/Object.h"
 #include <SFML/Graphics.hpp>
-class Evaluateur;
 class ImageManager;
 class RuntimeScene;
 class Object;
-class ExpressionInstruction;
-class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
 #if defined(GD_IDE_ONLY)
@@ -114,32 +111,9 @@ class GD_EXTENSION_API TextObject : public Object
         inline unsigned int GetColorR() const { return colorR; };
         inline unsigned int GetColorG() const { return colorG; };
         inline unsigned int GetColorB() const { return colorB; };
+        void SetColor(const std::string & colorStr);
 
         virtual std::vector<RotatedRectangle> GetHitBoxes() const;
-
-        //ACE for string
-        bool CondString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        std::string ExpString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction );
-
-        //ACE for font and size
-        bool ActFont( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-
-        //ACE for opacity
-        bool CondOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-
-        //ACE for angle
-        bool CondAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-
-        //Action for color
-        bool ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-
     private:
 
         //The text to display

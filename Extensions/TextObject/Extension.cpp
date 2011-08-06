@@ -53,7 +53,10 @@ class Extension : public ExtensionBase
                            _("Objet affichant un texte"),
                            "Extensions/texticon.png",
                            &CreateTextObject,
-                           &DestroyTextObject);
+                           &DestroyTextObject,
+                           "TextObject");
+
+                objInfos.SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_OBJECT_ACTION("String",
                                _("Modifier le texte"),
@@ -61,13 +64,13 @@ class Extension : public ExtensionBase
                                _("Faire _PARAM2__PARAM1_ au texte de _PARAM0_"),
                                _("Texte"),
                                "res/actions/text24.png",
-                               "res/actions/text.png",
-                               &TextObject::ActString);
+                               "res/actions/text.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
-                    DECLARE_PARAMETER("text", _("Texte"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("string", _("Texte"), "", false);
+                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -77,13 +80,13 @@ class Extension : public ExtensionBase
                                _("Le texte de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Texte"),
                                "res/conditions/text24.png",
-                               "res/conditions/text.png",
-                               &TextObject::CondString);
+                               "res/conditions/text.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
-                    DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("string", _("Texte à tester"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetString").SetManipulatedType("string").SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
@@ -93,12 +96,13 @@ class Extension : public ExtensionBase
                                _("Changer la police de _PARAM0_ en _PARAM1_"),
                                _("Police"),
                                "res/actions/font24.png",
-                               "res/actions/font.png",
-                               &TextObject::ActFont);
+                               "res/actions/font.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
-                    DECLARE_PARAMETER("police", _("Valeur"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("police", _("Valeur"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetFont").SetManipulatedType("string").SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -108,13 +112,14 @@ class Extension : public ExtensionBase
                                _("Faire _PARAM2__PARAM1_ à la taille du texte de _PARAM0_"),
                                _("Taille"),
                                "res/actions/characterSize24.png",
-                               "res/actions/characterSize.png",
-                               &TextObject::ActSize);
+                               "res/actions/characterSize.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
-                    DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
+                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetCharacterSize").SetManipulatedType("number").SetAssociatedGetter("GetCharacterSize").SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -124,13 +129,14 @@ class Extension : public ExtensionBase
                                _("La taille du texte de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Taille"),
                                "res/conditions/characterSize24.png",
-                               "res/conditions/characterSize.png",
-                               &TextObject::CondSize);
+                               "res/conditions/characterSize.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
-                    DECLARE_PARAMETER("expression", _("Taille à tester"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("expression", _("Taille à tester"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetCharacterSize").SetManipulatedType("number").SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
@@ -140,12 +146,13 @@ class Extension : public ExtensionBase
                                _("Changer la couleur de _PARAM0_ en _PARAM1_"),
                                _("Effets"),
                                "res/actions/color24.png",
-                               "res/actions/color.png",
-                               &TextObject::ActChangeColor);
+                               "res/actions/color.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
-                    DECLARE_PARAMETER("color", _("Couleur"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("color", _("Couleur"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetColor").SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -155,13 +162,14 @@ class Extension : public ExtensionBase
                                _("Faire _PARAM2__PARAM1_ à l'opacité de _PARAM0_"),
                                _("Visibilité"),
                                "res/actions/opacity24.png",
-                               "res/actions/opacity.png",
-                               &TextObject::ActOpacity);
+                               "res/actions/opacity.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
-                    DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
+                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetOpacity").SetManipulatedType("number").SetAssociatedGetter("GetOpacity").SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -171,13 +179,15 @@ class Extension : public ExtensionBase
                                _("L'opacité de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Visibilité"),
                                "res/conditions/opacity24.png",
-                               "res/conditions/opacity.png",
-                               &TextObject::CondOpacity);
+                               "res/conditions/opacity.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
-                    DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("TextObject/TextObject.h");
+
 
                 DECLARE_END_OBJECT_CONDITION()
 
@@ -188,13 +198,14 @@ class Extension : public ExtensionBase
                                _("Faire _PARAM2__PARAM1_ à l'angle de _PARAM0_"),
                                _("Rotation"),
                                "res/actions/rotate24.png",
-                               "res/actions/rotate.png",
-                               &TextObject::ActAngle);
+                               "res/actions/rotate.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
-                    DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
+                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -204,26 +215,33 @@ class Extension : public ExtensionBase
                                _("L'angle de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Rotation"),
                                "res/conditions/rotate24.png",
-                               "res/conditions/rotate.png",
-                               &TextObject::CondAngle);
+                               "res/conditions/rotate.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
-                    DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
-                DECLARE_OBJECT_EXPRESSION("Opacity", _("Opacité"), _("Opacité"), _("Opacité"), "res/actions/opacity.png", &TextObject::ExpOpacity)
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
+                DECLARE_OBJECT_EXPRESSION("Opacity", _("Opacité"), _("Opacité"), _("Opacité"), "res/actions/opacity.png")
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetOpacity").SetIncludeFile("TextObject/TextObject.h");
                 DECLARE_END_OBJECT_EXPRESSION()
 
-                DECLARE_OBJECT_EXPRESSION("Angle", _("Angle"), _("Angle"), _("Rotation"), "res/actions/rotate.png", &TextObject::ExpAngle)
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
+                DECLARE_OBJECT_EXPRESSION("Angle", _("Angle"), _("Angle"), _("Rotation"), "res/actions/rotate.png")
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetIncludeFile("TextObject/TextObject.h");
                 DECLARE_END_OBJECT_EXPRESSION()
 
-                DECLARE_OBJECT_STR_EXPRESSION("String", _("Texte"), _("Texte"), _("Texte"), "res/texteicon.png", &TextObject::ExpString)
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Text")
+                DECLARE_OBJECT_STR_EXPRESSION("String", _("Texte"), _("Texte"), _("Texte"), "res/texteicon.png")
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetString").SetIncludeFile("TextObject/TextObject.h");
                 DECLARE_END_OBJECT_STR_EXPRESSION()
 
             DECLARE_END_OBJECT()

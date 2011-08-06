@@ -10,7 +10,7 @@
 				<Option output="..\..\Runtime\bin\debug\VideoObject.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -25,7 +25,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lsfml-audio-d" />
 					<Add option="-lsfml-graphics-d" />
 					<Add option="-lsfml-network-d" />
@@ -33,7 +33,7 @@
 					<Add option="-lsfml-system-d" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.dll.a" />
+					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.dll.a" />
 					<Add directory="..\..\Runtime\bin\debug" />
 				</Linker>
 			</Target>
@@ -41,7 +41,7 @@
 				<Option output="..\..\IDE\bin\debug\Extensions\VideoObject.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -57,13 +57,13 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-D__WXDEBUG__" />
 					<Add option="-DWXUSINGDLL" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
-					<Add directory="C:\Libs\wxwidgets\include" />
-					<Add directory="C:\Libs\mingw_dgn_media\include" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\..\ExtLibs\wxwidgets\include" />
+					<Add directory="..\..\ExtLibs\mingw_dgn_media\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lwxmsw29d_xrc" />
 					<Add option="-lwxmsw29d_richtext" />
 					<Add option="-lwxmsw29d_ribbon" />
@@ -102,17 +102,17 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.dll.a" />
+					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.dll.a" />
 					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="..\..\Runtime\bin\release\VideoObject.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -127,7 +127,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -135,7 +135,7 @@
 					<Add option="-lsfml-system" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
+					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
 					<Add directory="..\..\Runtime\bin\release" />
 				</Linker>
 			</Target>
@@ -143,7 +143,7 @@
 				<Option output="..\..\IDE\bin\release\Extensions\VideoObject.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -159,12 +159,12 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
@@ -203,17 +203,17 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
+					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
 					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
 			<Target title="Development">
 				<Option output="..\..\Runtime\bin\dev\VideoObject.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -228,7 +228,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -236,7 +236,7 @@
 					<Add option="-lsfml-system" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
+					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
 					<Add directory="..\..\Runtime\bin\dev" />
 				</Linker>
 			</Target>
@@ -244,7 +244,7 @@
 				<Option output="..\..\IDE\bin\dev\Extensions\VideoObject.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -260,12 +260,12 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
@@ -304,10 +304,10 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="C:\Libs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
+					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
 					<Add directory="..\..\IDE\bin\dev" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
@@ -329,7 +329,7 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
-					<Add directory="\home\florian\Programmation\libs\libtheoraplayer\trunk\include\theoraplayer" />
+					<Add directory="libtheoraplayer\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -377,7 +377,7 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
-					<Add directory="\home\florian\Programmation\libs\libtheoraplayer\trunk\include\theoraplayer" />
+					<Add directory="libtheoraplayer\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -425,7 +425,7 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
-					<Add directory="\home\florian\Programmation\libs\libtheoraplayer\trunk\include\theoraplayer" />
+					<Add directory="libtheoraplayer\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
@@ -469,7 +469,7 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
 					<Add directory="\home\florian\Programmation\libs\sfml\include" />
-					<Add directory="\home\florian\Programmation\libs\libtheoraplayer\trunk\include\theoraplayer" />
+					<Add directory="libtheoraplayer\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -494,33 +494,315 @@
 					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
 				</Linker>
 			</Target>
+			<Target title="Mac - Release">
+				<Option output="..\..\Runtime\bin\release\VideoObject.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DMAC" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add directory="..\..\..\libs\boost_1_43_0" />
+					<Add directory="..\..\..\libs\sfml\include" />
+					<Add directory="libtheoraplayer\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl" />
+					<Add option="-ltheoradec" />
+					<Add option="-lvorbis" />
+					<Add option="-logg" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-framework OpenGL" />
+					<Add option="-dynamiclib" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add directory="..\..\Runtime\bin\release" />
+					<Add directory="..\..\..\libs\sfml\lib" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/release/VideoObject.xgdm" />
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/release/VideoObject.xgdm" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Mac - Debug">
+				<Option output="..\..\Runtime\bin\debug\VideoObject.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Debug\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DMAC" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="..\..\..\libs\boost_1_43_0" />
+					<Add directory="..\..\..\libs\sfml\include" />
+					<Add directory="libtheoraplayer\include" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lgdl" />
+					<Add option="-ltheoradec" />
+					<Add option="-lvorbis" />
+					<Add option="-logg" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
+					<Add option="-framework OpenGL" />
+					<Add option="-dynamiclib" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add directory="..\..\Runtime\bin\debug" />
+					<Add directory="..\..\..\libs\sfml\lib" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/debug/VideoObject.xgdm" />
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/debug/VideoObject.xgdm" />
+				</ExtraCommands>
+			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-DTHEORAVIDEO_STATIC" />
 			<Add directory="..\..\GDL" />
-			<Add directory="C:\Libs\SFML\include" />
-			<Add directory="C:\Libs\boost_1_43_0" />
-			<Add directory="C:\Libs\libtheoraplayer\trunk\include" />
+			<Add directory="..\..\ExtLibs\libtheoraplayer\trunk\include" />
+			<Add directory="..\..\ExtLibs\SFML\include" />
+			<Add directory="..\..\ExtLibs\boost" />
 		</Compiler>
 		<Linker>
-			<Add directory="C:\Libs\SFML\bin-mingw-debug\lib" />
-			<Add directory="C:\Libs\SFML\bin-mingw-release\lib" />
+			<Add directory="..\..\ExtLibs\SFML\build-mingw-debug\lib" />
+			<Add directory="..\..\ExtLibs\SFML\build-mingw-release\lib" />
 		</Linker>
 		<Unit filename="Extension.cpp" />
-		<Unit filename="VideoActions.cpp" />
-		<Unit filename="VideoConditions.cpp" />
-		<Unit filename="VideoExpressions.cpp" />
+		<Unit filename="VideoInitialPositionPanel.cpp" />
+		<Unit filename="VideoInitialPositionPanel.h" />
 		<Unit filename="VideoObject.cpp" />
 		<Unit filename="VideoObject.h" />
 		<Unit filename="VideoObjectEditor.cpp" />
 		<Unit filename="VideoObjectEditor.h" />
 		<Unit filename="VideoWrapper.cpp" />
 		<Unit filename="VideoWrapper.h" />
-		<Unit filename="..\..\GDL\GDL\tinystr.cpp" />
-		<Unit filename="..\..\GDL\GDL\tinystr.h" />
-		<Unit filename="..\..\GDL\GDL\tinyxml.cpp" />
-		<Unit filename="..\..\GDL\GDL\tinyxml.h" />
-		<Unit filename="..\..\GDL\GDL\tinyxmlerror.cpp" />
-		<Unit filename="..\..\GDL\GDL\tinyxmlparser.cpp" />
+		<Unit filename="libtheoraplayer\include\TheoraAsync.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\include\TheoraAudioInterface.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\include\TheoraDataSource.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\include\TheoraException.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\include\TheoraExport.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\include\TheoraFrameQueue.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\include\TheoraPlayer.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\include\TheoraTimer.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\include\TheoraUtil.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\include\TheoraVideoClip.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\include\TheoraVideoFrame.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\include\TheoraVideoManager.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\include\TheoraWorkerThread.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\src\Endianess.h">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\src\TheoraAsync.cpp">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\src\TheoraAudioInterface.cpp">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\src\TheoraDataSource.cpp">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\src\TheoraException.cpp">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\src\TheoraFrameQueue.cpp">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\src\TheoraTimer.cpp">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\src\TheoraUtil.cpp">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\src\TheoraVideoClip.cpp">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\src\TheoraVideoFrame.cpp">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\src\TheoraVideoManager.cpp">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
+		<Unit filename="libtheoraplayer\src\TheoraWorkerThread.cpp">
+			<Option target="Linux - Release" />
+			<Option target="Linux - Release - Edittime" />
+			<Option target="Linux - Debug - Edittime" />
+			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />

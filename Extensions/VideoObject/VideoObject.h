@@ -30,7 +30,6 @@ freely, subject to the following restrictions:
 #include "GDL/Object.h"
 #include "VideoWrapper.h"
 #include <SFML/Graphics.hpp>
-class Evaluateur;
 class ImageManager;
 class RuntimeScene;
 class Object;
@@ -110,6 +109,8 @@ class GD_EXTENSION_API VideoObject : public Object
          */
         bool GetLooping() const { return looping; }
 
+        bool IsPaused() const { return paused; };
+
         virtual float GetWidth() const;
         virtual float GetHeight() const;
         virtual void SetWidth(float ) {};
@@ -132,35 +133,19 @@ class GD_EXTENSION_API VideoObject : public Object
         inline unsigned int GetColorG() const { return colorG; };
         inline unsigned int GetColorB() const { return colorB; };
 
+        /**
+         * Only used internally by GD events generated code: Prefer using original SetColor.
+         */
+        void SetColor(const std::string & colorStr);
+
         virtual std::vector<RotatedRectangle> GetHitBoxes() const;
 
-        //ACE for opacity
-        bool CondOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        void LoadAndPlayVideo( const std::string & videoFile );
 
-        //ACE for angle
-        bool CondAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        void Seek( double position );
 
-        //Action for color
-        bool ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-
-        std::string ExpVideoFile( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction );
-
-        bool ActLoadVideo( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetPause( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetLooping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActRestart( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSeek( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-
-        bool CondPaused( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondLooping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondTimePosition( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-
-        double ExpTimePosition( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpDuration( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        double GetTimePosition() const;
+        double GetDuration() const;
 
     private:
 

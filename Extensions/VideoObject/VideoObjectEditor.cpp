@@ -71,9 +71,9 @@ object(object_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Editer l\'objet texte"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _T("Editer l\'objet texte"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Fichier vidéo"));
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _T("Fichier vidéo"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
 	FlexGridSizer3->AddGrowableRow(0);
@@ -82,20 +82,20 @@ object(object_)
 	FlexGridSizer6->AddGrowableRow(0);
 	videoEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(278,23), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer6->Add(videoEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	browseBt = new wxButton(this, ID_BUTTON2, _("Parcourir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	browseBt = new wxButton(this, ID_BUTTON2, _T("Parcourir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer6->Add(browseBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Les fichiers vidéo doivent être au format vidéo libre Ogg Theora."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _T("Les fichiers vidéo doivent être au format vidéo libre Ogg Theora."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer5->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	converterBt = new wxButton(this, ID_BUTTON4, _("Convertisseur"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	converterBt = new wxButton(this, ID_BUTTON4, _T("Convertisseur"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer5->Add(converterBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Autres propriétés"));
+	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _T("Autres propriétés"));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
-	loopCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Jouer la vidéo en boucle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	loopCheck = new wxCheckBox(this, ID_CHECKBOX1, _T("Jouer la vidéo en boucle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	loopCheck->SetValue(true);
 	FlexGridSizer4->Add(loopCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2->Add(FlexGridSizer4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -103,9 +103,9 @@ object(object_)
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
-	okBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	okBt = new wxButton(this, ID_BUTTON1, _T("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(okBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cancelBt = new wxButton(this, ID_BUTTON3, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	cancelBt = new wxButton(this, ID_BUTTON3, _T("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer2->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -143,7 +143,7 @@ void VideoObjectEditor::OncancelBtClick(wxCommandEvent& event)
 
 void VideoObjectEditor::OnbrowseBtClick(wxCommandEvent& event)
 {
-    wxFileDialog fileDialog( this, _("Choisissez le fichier vidéo"), "", "", _("Vidéo Ogg Theora|*.ogg;*.ogv|Tous les fichiers|*.*"));
+    wxFileDialog fileDialog( this, _T("Choisissez le fichier vidéo"), "", "", _T("Vidéo Ogg Theora|*.ogg;*.ogv|Tous les fichiers|*.*"));
 
     if ( fileDialog.ShowModal() == wxID_OK )
         videoEdit->SetValue(fileDialog.GetPath());
@@ -154,21 +154,21 @@ void VideoObjectEditor::OnconverterBtClick(wxCommandEvent& event)
 {
     if ( !wxFileExists(wxGetCwd()+"/Extensions/ffmpeg2theora.exe"))
     {
-        wxLogError(_("L'executable ffmpeg2theora.exe n'a pas été trouvé dans le répertoire Extensions de Game Develop."));
+        wxLogError(_T("L'executable ffmpeg2theora.exe n'a pas été trouvé dans le répertoire Extensions de Game Develop."));
         return;
     }
 
-    wxFileDialog fileDialog( this, _("Choisissez le fichier vidéo à convertir au format Ogg Theora"), "", "", _("Vidéo|*.*"));
+    wxFileDialog fileDialog( this, _T("Choisissez le fichier vidéo à convertir au format Ogg Theora"), "", "", _T("Vidéo|*.*"));
 
     if ( fileDialog.ShowModal() == wxID_OK )
     {
         string parameters;
-        if ( wxMessageBox(_("Voulez vous enlever le son de la vidéo ?\nGame Develop ne lit actuellement pas le son des vidéos."), _("Suppression de l'audio"), wxYES_NO | wxICON_QUESTION, this) == wxYES )
+        if ( wxMessageBox(_T("Voulez vous enlever le son de la vidéo ?\nGame Develop ne lit actuellement pas le son des vidéos."), _T("Suppression de l'audio"), wxYES_NO | wxICON_QUESTION, this) == wxYES )
             parameters += " --noaudio";
 
-        wxProgressDialog dialog(_("Conversion en cours"), _("Veuillez patienter pendant la durée de la conversion"));
+        wxProgressDialog dialog(_T("Conversion en cours"), _T("Veuillez patienter pendant la durée de la conversion"));
         wxExecute(wxGetCwd()+"/Extensions/ffmpeg2theora.exe "+fileDialog.GetPath()+parameters, wxEXEC_SYNC);;
-        wxLogMessage(_("Conversion terminée."));
+        wxLogMessage(_T("Conversion terminée."));
     }
 }
 

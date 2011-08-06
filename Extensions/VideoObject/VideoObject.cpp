@@ -99,6 +99,41 @@ void VideoObject::ReloadVideo()
     renderSprite.SetImage(video.GetNextFrameImage(), true);
     renderSprite.SetOrigin(renderSprite.GetSize().x/2, renderSprite.GetSize().y/2);
 }
+double VideoObject::GetTimePosition() const
+{
+    return video.GetTimePosition();
+}
+
+double VideoObject::GetDuration() const
+{
+    return video.GetDuration();
+}
+
+/**
+ * Load a new video
+ */
+void VideoObject::LoadAndPlayVideo( const std::string & videoFile )
+{
+    SetVideoFile(videoFile);
+    ReloadVideo();
+    video.SetPause(false);
+}
+
+void VideoObject::Seek( double position )
+{
+    video.Seek(position);
+}
+
+void VideoObject::SetColor(const std::string & colorStr)
+{
+    vector < string > colors = SpliterStringToVector<string>(colorStr, ';');
+
+    if ( colors.size() < 3 ) return; //La couleur est incorrecte
+
+    SetColor(  ToInt(colors[0]),
+               ToInt(colors[1]),
+               ToInt(colors[2]) );
+}
 
 /**
  * Update animation and direction from the inital position
@@ -176,21 +211,21 @@ void VideoObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
 
 void VideoObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Fichier");                     value = GetVideoFile();}
-    else if ( propertyNb == 1 ) {name = _("Bouclage");                    value = looping ? _("Oui") : _("Non");}
-    else if ( propertyNb == 2 ) {name = _("Position dans la vidéo");      value = ToString(video.GetTimePosition())+"s";}
-    else if ( propertyNb == 3 ) {name = _("En pause");                    value = paused ? _("Oui") : _("Non");}
-    else if ( propertyNb == 4 ) {name = _("Durée");                       value = ToString(video.GetDuration())+"s";}
-    else if ( propertyNb == 5 ) {name = _("Couleur");                     value = ToString(colorR)+";"+ToString(colorG)+";"+ToString(colorB);}
-    else if ( propertyNb == 6 ) {name = _("Opacité");       value = ToString(GetOpacity());}
+    if      ( propertyNb == 0 ) {name = _T("Fichier");                     value = GetVideoFile();}
+    else if ( propertyNb == 1 ) {name = _T("Bouclage");                    value = looping ? _T("Oui") : _T("Non");}
+    else if ( propertyNb == 2 ) {name = _T("Position dans la vidéo");      value = ToString(video.GetTimePosition())+"s";}
+    else if ( propertyNb == 3 ) {name = _T("En pause");                    value = paused ? _T("Oui") : _T("Non");}
+    else if ( propertyNb == 4 ) {name = _T("Durée");                       value = ToString(video.GetDuration())+"s";}
+    else if ( propertyNb == 5 ) {name = _T("Couleur");                     value = ToString(colorR)+";"+ToString(colorG)+";"+ToString(colorB);}
+    else if ( propertyNb == 6 ) {name = _T("Opacité");       value = ToString(GetOpacity());}
 }
 
 bool VideoObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if      ( propertyNb == 0 ) { SetVideoFile(newValue); ReloadVideo(); }
-    else if ( propertyNb == 1 ) { looping = (newValue == _("Oui")); video.SetLooping(looping); }
+    else if ( propertyNb == 1 ) { looping = (newValue == _T("Oui")); video.SetLooping(looping); }
     else if ( propertyNb == 2 ) { video.Seek(ToFloat(newValue)); }
-    else if ( propertyNb == 3 ) { paused = (newValue == _("Oui")); video.SetPause(paused); }
+    else if ( propertyNb == 3 ) { paused = (newValue == _T("Oui")); video.SetPause(paused); }
     else if ( propertyNb == 4 ) { return false; }
     else if ( propertyNb == 5 )
     {

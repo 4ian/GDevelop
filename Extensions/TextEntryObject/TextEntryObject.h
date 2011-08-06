@@ -46,7 +46,7 @@ class ResourcesMergingHelper;
 #endif
 
 /**
- * TextEntry Object
+ * \brief Simple object which store user keyboard input.
  */
 class GD_EXTENSION_API TextEntryObject : public Object
 {
@@ -94,14 +94,8 @@ class GD_EXTENSION_API TextEntryObject : public Object
         inline void SetString(std::string str) { text = str; };
         inline std::string GetString() const { return text;};
 
-        //ACE for string
-        bool CondString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        std::string ExpString( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction );
-
-        //ACE for font and size
-        bool ActActivate( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondActivated( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
+        void Activate( bool activate = true ) { activated = activate; };
+        bool IsActivated() const { return activated; };
 
     private:
 

@@ -53,7 +53,10 @@ class Extension : public ExtensionBase
                            _("Objet captant le texte entré au clavier"),
                            "Extensions/textentry.png",
                            &CreateTextEntryObject,
-                           &DestroyTextEntryObject);
+                           &DestroyTextEntryObject,
+                           "TextEntryObject");
+
+                objInfos.SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
                 DECLARE_OBJECT_ACTION("String",
                                _("Texte en mémoire"),
@@ -61,13 +64,13 @@ class Extension : public ExtensionBase
                                _("Faire _PARAM2__PARAM1_ au texte en mémoire de _PARAM0_"),
                                _("Texte entré au clavier"),
                                "Extensions/textentry24.png",
-                               "Extensions/textentryicon.png",
-                               &TextEntryObject::ActString);
+                               "Extensions/textentryicon.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "TextEntry")
-                    DECLARE_PARAMETER("text", _("Texte"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "TextEntry", false);
+                    instrInfo.AddParameter("string", _("Texte"), "", false);
+                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -77,13 +80,13 @@ class Extension : public ExtensionBase
                                _("Le texte de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Texte entré au clavier"),
                                "Extensions/textentry24.png",
-                               "Extensions/textentryicon.png",
-                               &TextEntryObject::CondString);
+                               "Extensions/textentryicon.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "TextEntry")
-                    DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "TextEntry", false);
+                    instrInfo.AddParameter("string", _("Texte à tester"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetString").SetManipulatedType("string").SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
@@ -93,12 +96,13 @@ class Extension : public ExtensionBase
                                _("Activer la capture par _PARAM0_ du texte entré au clavier : _PARAM1_"),
                                _("Paramétrage"),
                                "Extensions/textentry24.png",
-                               "Extensions/textentryicon.png",
-                               &TextEntryObject::ActActivate);
+                               "Extensions/textentryicon.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "TextEntry")
-                    DECLARE_PARAMETER("yesorno", _("Activer"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "TextEntry", false);
+                    instrInfo.AddParameter("yesorno", _("Activer"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("Activate").SetIncludeFile("TextObject/TextObject.h");
+
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -108,16 +112,18 @@ class Extension : public ExtensionBase
                                _("_PARAM0_ capture le texte entré au clavier"),
                                _("Paramétrage"),
                                "Extensions/textentry24.png",
-                               "Extensions/textentryicon.png",
-                               &TextEntryObject::CondActivated);
+                               "Extensions/textentryicon.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "TextEntry")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "TextEntry", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("IsActivated").SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
-                DECLARE_OBJECT_STR_EXPRESSION("String", _("Texte entré au clavier"), _("Texte entré au clavier"), _("Texte entré au clavier"), "res/texteicon.png", &TextEntryObject::ExpString)
-                    DECLARE_PARAMETER("object", _("Objet"), true, "TextEntry")
+                DECLARE_OBJECT_STR_EXPRESSION("String", _("Texte entré au clavier"), _("Texte entré au clavier"), _("Texte entré au clavier"), "res/texteicon.png")
+                    instrInfo.AddParameter("object", _("Objet"), "TextEntry", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetString").SetIncludeFile("TextObject/TextObject.h");
                 DECLARE_END_OBJECT_STR_EXPRESSION()
 
             DECLARE_END_OBJECT()

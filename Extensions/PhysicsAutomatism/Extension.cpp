@@ -56,17 +56,21 @@ class Extension : public ExtensionBase
                           PhysicsAutomatism,
                           ScenePhysicsDatas)
 
+                    automatismInfo.SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
                     DECLARE_AUTOMATISM_ACTION("SetStatic",
                                    _("Rendre l'objet statique"),
                                    _("Rend l'objet statique physiquement"),
                                    _("Rendre _PARAM0_ statique"),
                                    _("Mouvement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActSetStatic);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("SetStatic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -76,11 +80,14 @@ class Extension : public ExtensionBase
                                    _("Rendre _PARAM0_ dynamique"),
                                    _("Mouvement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActSetDynamic);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("SetDynamic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -90,11 +97,14 @@ class Extension : public ExtensionBase
                                    _("_PARAM0_ est dynamique"),
                                    _("Mouvement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::CondIsDynamic);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("IsDynamic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -104,11 +114,14 @@ class Extension : public ExtensionBase
                                    _("Fixer la rotation de _PARAM0_"),
                                    _("Rotation"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActSetFixedRotation);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("SetFixedRotation").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -118,13 +131,15 @@ class Extension : public ExtensionBase
                                    _("Ajouter une charnière à _PARAM0_ à la position _PARAM2_;_PARAM3_"),
                                    _("Joints"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActAddRevoluteJoint);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Position X de la charnière"), false, "")
-                        DECLARE_PARAMETER("expression", _("Position Y de la charnière"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Position X de la charnière"), "", false);
+                        instrInfo.AddParameter("expression", _("Position Y de la charnière"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("AddRevoluteJoint").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -134,12 +149,15 @@ class Extension : public ExtensionBase
                                    _("Ajouter une charnière entre _PARAM0_ et _PARAM2_"),
                                    _("Joints"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActAddRevoluteJointBetweenObjects);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "2");
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("AddRevoluteJointBetweenObjects").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -149,12 +167,16 @@ class Extension : public ExtensionBase
                                    _("Ajouter une liaison engrenage entre _PARAM0_ et _PARAM2_"),
                                    _("Joints"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActAddGearJointBetweenObjects);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "2");
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("AddGearJointBetweenObjects").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -164,11 +186,13 @@ class Extension : public ExtensionBase
                                    _("Permettre à _PARAM0_ de tourner"),
                                    _("Rotation"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActSetFreeRotation);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("SetFreeRotation").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -178,11 +202,13 @@ class Extension : public ExtensionBase
                                    _("_PARAM0_ a sa rotation fixée"),
                                    _("Rotation"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::CondIsFixedRotation);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("IsFixedRotation").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -192,11 +218,13 @@ class Extension : public ExtensionBase
                                    _("Considérer _PARAM0_ comme un projectile"),
                                    _("Autre"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActSetAsBullet);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("SetAsBullet").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -206,11 +234,13 @@ class Extension : public ExtensionBase
                                    _("Ne pas considérer _PARAM0_ comme un projectile"),
                                    _("Autre"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActDontSetAsBullet);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("DontSetAsBullet").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -220,11 +250,13 @@ class Extension : public ExtensionBase
                                    _("_PARAM0_ est considéré comme un projectile"),
                                    _("Autre"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::CondIsBullet);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("IsBullet").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -234,13 +266,15 @@ class Extension : public ExtensionBase
                                    _("Appliquer à _PARAM0_ une force _PARAM2_;_PARAM3_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActApplyForce);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Composante X"), false, "")
-                        DECLARE_PARAMETER("expression", _("Composante Y"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Composante X"), "", false);
+                        instrInfo.AddParameter("expression", _("Composante Y"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("ApplyForce").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -250,13 +284,15 @@ class Extension : public ExtensionBase
                                    _("Appliquer à _PARAM0_ une force d'angle _PARAM2_ et de longueur _PARAM3_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActApplyForceUsingPolarCoordinates);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Angle"), false, "")
-                        DECLARE_PARAMETER("expression", _("Longueur"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Angle"), "", false);
+                        instrInfo.AddParameter("expression", _("Longueur"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("ApplyForceUsingPolarCoordinates").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -266,14 +302,16 @@ class Extension : public ExtensionBase
                                    _("Appliquer à _PARAM0_ une force vers la position _PARAM2_;_PARAM3_ de longeur _PARAM4_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActApplyForceTowardPosition);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Position X"), false, "")
-                        DECLARE_PARAMETER("expression", _("Position Y"), false, "")
-                        DECLARE_PARAMETER("expression", _("Longueur de la force"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Position X"), "", false);
+                        instrInfo.AddParameter("expression", _("Position Y"), "", false);
+                        instrInfo.AddParameter("expression", _("Longueur de la force"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("ApplyForceTowardPosition").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -283,12 +321,14 @@ class Extension : public ExtensionBase
                                    _("Appliquer à _PARAM0_ un moment de valeur _PARAM2_"),
                                    _("Rotation"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActApplyTorque);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Valeur du moment"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Valeur du moment"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("ApplyTorque").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -298,13 +338,16 @@ class Extension : public ExtensionBase
                                    _("Mettre la vitesse linéaire de _PARAM0_ à _PARAM2_;_PARAM3_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActLinearVelocity);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Coordonnée X"), false, "")
-                        DECLARE_PARAMETER("expression", _("Coordonnée Y"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Coordonnée X"), "", false);
+                        instrInfo.AddParameter("expression", _("Coordonnée Y"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("SetLinearVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -314,13 +357,16 @@ class Extension : public ExtensionBase
                                    _("La vitesse linéaire en X de _PARAM0_ est _PARAM3_ à _PARAM2_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::CondLinearVelocityX);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                        DECLARE_PARAMETER("signe", _("Signe de la comparaison"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Signe de la comparaison"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetLinearVelocityX").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -330,13 +376,15 @@ class Extension : public ExtensionBase
                                    _("La vitesse linéaire en Y de _PARAM0_ est _PARAM3_ à _PARAM2_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::CondLinearVelocityY);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                        DECLARE_PARAMETER("signe", _("Signe de la comparaison"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Signe de la comparaison"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetLinearVelocityY").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -346,12 +394,14 @@ class Extension : public ExtensionBase
                                    _("Mettre la vitesse angulaire de _PARAM0_ à _PARAM2_"),
                                    _("Rotation"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActAngularVelocity);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Nouvelle valeur"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Nouvelle valeur"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("SetAngularVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -361,13 +411,15 @@ class Extension : public ExtensionBase
                                    _("La vitesse angulaire de _PARAM0_ est _PARAM3_ à _PARAM2_"),
                                    _("Rotation"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::CondAngularVelocity);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                        DECLARE_PARAMETER("signe", _("Signe de la comparaison"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Signe de la comparaison"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetAngularVelocity").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -377,13 +429,15 @@ class Extension : public ExtensionBase
                                    _("L'amortissement linéaire de _PARAM0_ est _PARAM3_ à _PARAM2_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::CondLinearDamping);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                        DECLARE_PARAMETER("signe", _("Signe de la comparaison"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Signe de la comparaison"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetLinearDamping").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -393,12 +447,15 @@ class Extension : public ExtensionBase
                                    _("_PARAM0_ est en collision avec un _PARAM2_"),
                                    _("Collision"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::CondCollisionWith);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "2");
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("CollisionWith").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -408,12 +465,14 @@ class Extension : public ExtensionBase
                                    _("Mettre l'amortissement linéaire de _PARAM0_ à _PARAM2_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActLinearDamping);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("SetLinearDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -423,13 +482,15 @@ class Extension : public ExtensionBase
                                    _("L'amortissement angulaire de _PARAM0_ est _PARAM3_ à _PARAM2_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::CondAngularDamping);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                        DECLARE_PARAMETER("signe", _("Signe de la comparaison"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Signe de la comparaison"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetAngularDamping").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -439,12 +500,14 @@ class Extension : public ExtensionBase
                                    _("Mettre l'amortissement angulaire de _PARAM0_ à _PARAM2_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActAngularDamping);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("SetAngularDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
@@ -454,39 +517,57 @@ class Extension : public ExtensionBase
                                    _("Mettre la force de gravité à _PARAM2_;_PARAM3_"),
                                    _("Options globales"),
                                    "res/physics24.png",
-                                   "res/physics16.png",
-                                   &PhysicsAutomatism::ActSetGravity);
+                                   "res/physics16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
-                        DECLARE_PARAMETER("expression", _("Coordonnée X"), false, "")
-                        DECLARE_PARAMETER("expression", _("Coordonnée Y"), false, "")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Coordonnée X"), "", false);
+                        instrInfo.AddParameter("expression", _("Coordonnée Y"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("SetGravity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("LinearVelocityX", _("Vitesse linéaire en X"), _("Vitesse linéaire en X"), _("Déplacement"), "res/physics16.png", &PhysicsAutomatism::ExpLinearVelocityX)
-                        DECLARE_PARAMETER("object", _("Objet"), false, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                    DECLARE_AUTOMATISM_EXPRESSION("LinearVelocityX", _("Vitesse linéaire en X"), _("Vitesse linéaire en X"), _("Déplacement"), "res/physics16.png")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetLinearVelocityX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("LinearVelocityY", _("Vitesse linéaire en Y"), _("Vitesse linéaire en Y"), _("Déplacement"), "res/physics16.png", &PhysicsAutomatism::ExpLinearVelocityY)
-                        DECLARE_PARAMETER("object", _("Objet"), false, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                    DECLARE_AUTOMATISM_EXPRESSION("LinearVelocityY", _("Vitesse linéaire en Y"), _("Vitesse linéaire en Y"), _("Déplacement"), "res/physics16.png")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetLinearVelocityY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("AngularVelocity", _("Vitesse angulaire"), _("Vitesse angulaire ( de rotation )"), _("Rotation"), "res/physics16.png", &PhysicsAutomatism::ExpAngularVelocity)
-                        DECLARE_PARAMETER("object", _("Objet"), false, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                    DECLARE_AUTOMATISM_EXPRESSION("AngularVelocity", _("Vitesse angulaire"), _("Vitesse angulaire ( de rotation )"), _("Rotation"), "res/physics16.png")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetAngularVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("LinearDamping", _("Amortissement linéaire"), _("Amortissement linéaire"), _("Déplacement"), "res/physics16.png", &PhysicsAutomatism::ExpLinearDamping)
-                        DECLARE_PARAMETER("object", _("Objet"), false, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                    DECLARE_AUTOMATISM_EXPRESSION("LinearDamping", _("Amortissement linéaire"), _("Amortissement linéaire"), _("Déplacement"), "res/physics16.png")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetLinearDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("LinearDamping", _("Amortissement angulaire"), _("Amortissement angulaire"), _("Rotation"), "res/physics16.png", &PhysicsAutomatism::ExpAngularDamping)
-                        DECLARE_PARAMETER("object", _("Objet"), false, "")
-                        DECLARE_PARAMETER("automatism", _("Automatisme"), false, "PhysicsAutomatism")
+                    DECLARE_AUTOMATISM_EXPRESSION("AngularDamping", _("Amortissement angulaire"), _("Amortissement angulaire"), _("Rotation"), "res/physics16.png")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetAngularDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
                 DECLARE_END_AUTOMATISM();

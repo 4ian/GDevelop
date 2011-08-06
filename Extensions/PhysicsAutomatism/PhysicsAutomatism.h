@@ -29,18 +29,17 @@ freely, subject to the following restrictions:
 
 #include "GDL/Automatism.h"
 #include "GDL/Object.h"
-#include "Box2D/Box2D.h"
 #include "ScenePhysicsDatas.h"
 #include <boost/weak_ptr.hpp>
 #include <iostream>
 #include <map>
 #include <set>
-#include "GDL/RuntimeScene.h"
 class TiXmlElement;
-class Scene;
+class RuntimeScene;
+class b2Body;
 class PhysicsAutomatismEditor;
 
-class PhysicsAutomatism : public Automatism
+class GD_EXTENSION_API PhysicsAutomatism : public Automatism
 {
     friend class PhysicsAutomatismEditor;
 
@@ -68,47 +67,45 @@ class PhysicsAutomatism : public Automatism
         virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ );
         #endif
 
+        /**
+         * Destroy Box2D body if automatism is deactivated
+         */
+        virtual void OnDeActivate();
+
         b2Body * GetBox2DBody(const RuntimeScene & scene) { if (!body) CreateBody(scene); return body; }
         inline Object * GetObject() {return object;};
         inline const Object * GetObject() const {return object;};
 
         std::set<PhysicsAutomatism*> currentContacts; ///< List of other bodies that are in contact with this body.
 
-        bool ActSetStatic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetDynamic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondIsDynamic( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action ) { return dynamic; };
-        bool ActSetFixedRotation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetFreeRotation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondIsFixedRotation( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action ) { return fixedRotation; };
-        bool ActSetAsBullet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActDontSetAsBullet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondIsBullet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action ) { return isBullet; };
-        bool ActApplyForce( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActApplyTorque( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActAngularDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActLinearDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActAngularVelocity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActLinearVelocity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActAddRevoluteJointBetweenObjects( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActAddRevoluteJoint( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetGravity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActApplyForceTowardPosition( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActAddGearJointBetweenObjects( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActApplyForceUsingPolarCoordinates( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+        void SetStatic(RuntimeScene & scene);
+        void SetDynamic(RuntimeScene & scene);
+        void SetFixedRotation(RuntimeScene & scene);
+        void SetFreeRotation(RuntimeScene & scene);
+        void SetAsBullet(RuntimeScene & scene);
+        void DontSetAsBullet(RuntimeScene & scene);
+        void ApplyForce(double xCoordinate, double yCoordinate, RuntimeScene & scene );
+        void ApplyForceUsingPolarCoordinates( float angle, float length, RuntimeScene & scene );
+        void ApplyForceTowardPosition(float xPosition, float yPosition, float length, RuntimeScene & scene );
+        void ApplyTorque( double torque, RuntimeScene & scene );
+        void SetLinearVelocity( double xVelocity, double yVelocity, RuntimeScene & scene );
+        void SetAngularVelocity( double angularVelocity, RuntimeScene & scene );
+        void SetLinearDamping( float linearDamping_ , RuntimeScene & scene );
+        void SetAngularDamping( float angularDamping_ , RuntimeScene & scene );
+        void AddRevoluteJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene );
+        void AddRevoluteJoint( float xPosition, float yPosition, RuntimeScene & scene);
+        void SetGravity( float xGravity, float yGravity, RuntimeScene & scene);
+        void AddGearJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene );
 
+        void SetLinearVelocityX( double xVelocity, RuntimeScene & scene );
+        void SetLinearVelocityY( double yVelocity, RuntimeScene & scene );
+        float GetLinearVelocityX( RuntimeScene & scene );
+        float GetLinearVelocityY( RuntimeScene & scene );
+        double GetAngularVelocity( const RuntimeScene & scene );
+        double GetLinearDamping( const RuntimeScene & scene);
+        double GetAngularDamping( const RuntimeScene & scene);
 
-        bool CondAngularDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondLinearDamping( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondAngularVelocity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondLinearVelocityY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondLinearVelocityX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondCollisionWith( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-
-        double ExpLinearVelocityX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpLinearVelocityY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpAngularVelocity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpLinearDamping( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpAngularDamping( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
+        bool CollisionWith( const std::string & , std::vector<Object*> list, RuntimeScene & scene);
 
         static std::map < const Scene* , ScenePhysicsDatas > scenesPhysicsDatas; ///< Static map associating scene to datas
     private:

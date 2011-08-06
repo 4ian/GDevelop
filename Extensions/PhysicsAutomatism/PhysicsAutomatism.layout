@@ -1,94 +1,82 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug - Edittime" />
-	<File name="Box2D\Box2D\Box2D\Box2D.h" open="1" top="0" tabpos="6">
-		<Cursor position="1648" topLine="30" />
+	<ActiveTarget name="Development - Edittime" />
+	<File name="Box2D\Box2D\Box2D\Box2D.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1565" topLine="30" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2CircleShape.h" open="1" top="0" tabpos="4">
-		<Cursor position="2477" topLine="55" />
+	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2CircleShape.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2470" topLine="55" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="10997" topLine="402" />
+	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="10997" topLine="402" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Collision\b2BroadPhase.cpp" open="1" top="0" tabpos="11">
-		<Cursor position="980" topLine="85" />
+	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3937" topLine="99" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Collision\b2Distance.cpp" open="1" top="0" tabpos="12">
-		<Cursor position="1190" topLine="12" />
+	<File name="Box2D\Box2D\Box2D\Collision\b2BroadPhase.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="980" topLine="85" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Common\b2BlockAllocator.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="1553" topLine="37" />
+	<File name="Box2D\Box2D\Box2D\Collision\b2Distance.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1190" topLine="12" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Common\b2Settings.h" open="1" top="1" tabpos="3">
-		<Cursor position="965" topLine="4" />
+	<File name="Box2D\Box2D\Box2D\Common\b2BlockAllocator.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1553" topLine="37" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Common\b2StackAllocator.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="1786" topLine="49" />
+	<File name="Box2D\Box2D\Box2D\Common\b2Settings.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1246" topLine="4" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2ContactSolver.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="17243" topLine="565" />
+	<File name="Box2D\Box2D\Box2D\Common\b2StackAllocator.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1786" topLine="49" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.cpp" open="0" top="0" tabpos="12">
-		<Cursor position="5231" topLine="182" />
+	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2ContactSolver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="17243" topLine="565" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.h" open="0" top="0" tabpos="0">
-		<Cursor position="4" topLine="0" />
+	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="5231" topLine="182" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.cpp" open="1" top="0" tabpos="10">
-		<Cursor position="2809" topLine="89" />
+	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="4" topLine="0" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\b2World.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="20413" topLine="881" />
+	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="6345" topLine="251" />
 	</File>
-	<File name="ContactListener.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="639" topLine="0" />
+	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="0" topLine="132" />
 	</File>
-	<File name="ContactListener.h" open="0" top="0" tabpos="4">
-		<Cursor position="238" topLine="0" />
+	<File name="Box2D\Box2D\Box2D\Dynamics\b2World.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2957" topLine="92" />
 	</File>
-	<File name="Extension.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="29095" topLine="458" />
+	<File name="ContactListener.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="639" topLine="0" />
 	</File>
-	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="4202" topLine="105" />
+	<File name="ContactListener.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="238" topLine="0" />
 	</File>
-	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="1">
-		<Cursor position="2339" topLine="50" />
+	<File name="Extension.cpp" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="27447" topLine="429" />
 	</File>
-	<File name="PhysicsAutomatismActions.cpp" open="1" top="0" tabpos="9">
-		<Cursor position="1618" topLine="44" />
+	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="6420" topLine="153" />
 	</File>
-	<File name="PhysicsAutomatismConditions.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="74" topLine="3" />
+	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3913" topLine="74" />
 	</File>
-	<File name="PhysicsAutomatismEditor.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="15567" topLine="217" />
+	<File name="PhysicsAutomatismEditor.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="15182" topLine="217" />
 	</File>
-	<File name="PhysicsAutomatismEditor.h" open="0" top="0" tabpos="7">
-		<Cursor position="1008" topLine="3" />
+	<File name="PhysicsAutomatismEditor.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1008" topLine="3" />
 	</File>
-	<File name="PhysicsAutomatismExpressions.cpp" open="0" top="0" tabpos="17">
-		<Cursor position="1138" topLine="18" />
+	<File name="RuntimeScenePhysicsDatas.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="74" topLine="3" />
 	</File>
-	<File name="RuntimeScenePhysicsDatas.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="74" topLine="3" />
+	<File name="RuntimeScenePhysicsDatas.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="74" topLine="3" />
 	</File>
-	<File name="RuntimeScenePhysicsDatas.h" open="0" top="0" tabpos="2">
-		<Cursor position="74" topLine="3" />
+	<File name="ScenePhysicsDatas.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1117" topLine="3" />
 	</File>
-	<File name="ScenePhysicsDatas.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="1117" topLine="3" />
-	</File>
-	<File name="ScenePhysicsDatas.h" open="0" top="0" tabpos="10">
-		<Cursor position="2002" topLine="35" />
-	</File>
-	<File name="..\..\GDL\GDL\tinystr.h" open="0" top="0" tabpos="0">
-		<Cursor position="7349" topLine="69" />
-	</File>
-	<File name="..\..\GDL\GDL\tinyxml.h" open="0" top="0" tabpos="0">
-		<Cursor position="743" topLine="87" />
-	</File>
-	<File name="..\..\GDL\GDL\tinyxmlparser.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="9006" topLine="338" />
+	<File name="ScenePhysicsDatas.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2002" topLine="35" />
 	</File>
 </CodeBlocks_layout_file>

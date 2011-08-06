@@ -27,7 +27,8 @@ freely, subject to the following restrictions:
 #ifndef RUNTIMESCENEPHYSICSDATAS_H
 #define RUNTIMESCENEPHYSICSDATAS_H
 
-#include "Box2D/Box2D.h"
+class b2World;
+class b2Body;
 #include <iostream>
 #include "GDL/AutomatismsRuntimeSharedDatas.h"
 class ScenePhysicsDatas;

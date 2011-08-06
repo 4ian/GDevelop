@@ -27,6 +27,7 @@ freely, subject to the following restrictions:
 #include "RuntimeScenePhysicsDatas.h"
 #include "ScenePhysicsDatas.h"
 #include "ContactListener.h"
+#include "Box2D/Box2D.h"
 #include <iostream>
 
 RuntimeScenePhysicsDatas::RuntimeScenePhysicsDatas(const ScenePhysicsDatas & automatismSharedDatas) :

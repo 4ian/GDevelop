@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #include "PhysicsAutomatism.h"
 #include "Box2D/Box2D.h"
 #include "PhysicsAutomatismEditor.h"
-#include "GDL/Scene.h"
+#include "GDL/RuntimeScene.h"
 #include "GDL/tinyxml.h"
 #include "GDL/XmlMacros.h"
 
@@ -118,7 +118,7 @@ void PhysicsAutomatism::DoStepPostEvents(RuntimeScene & scene)
 void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
 {
     if ( runtimeScenesPhysicsDatas == boost::shared_ptr<RuntimeScenePhysicsDatas>() )
-        runtimeScenesPhysicsDatas = boost::static_pointer_cast<RuntimeScenePhysicsDatas>(scene.automatismsSharedDatas.find(automatismId)->second);
+        runtimeScenesPhysicsDatas = boost::static_pointer_cast<RuntimeScenePhysicsDatas>(scene.automatismsSharedDatas.find(name)->second);
 
     //Create body from object
     b2BodyDef bodyDef;
@@ -165,6 +165,300 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
     objectOldWidth = object->GetWidth();
     objectOldHeight = object->GetHeight();
 }
+
+void PhysicsAutomatism::OnDeActivate()
+{
+    if ( runtimeScenesPhysicsDatas && body )
+    {
+        runtimeScenesPhysicsDatas->world->DestroyBody(body);
+        body = NULL; //Of course.
+    }
+}
+
+/**
+ * Set a body to be static
+ */
+void PhysicsAutomatism::SetStatic(RuntimeScene & scene )
+{
+    dynamic = false;
+
+    if ( !body ) CreateBody(scene);
+    body->SetType(b2_staticBody);
+}
+
+/**
+ * Set a body to be dynamic
+ */
+void PhysicsAutomatism::SetDynamic(RuntimeScene & scene )
+{
+    dynamic = true;
+
+    if ( !body ) CreateBody(scene);
+    body->SetType(b2_dynamicBody);
+}
+
+/**
+ * Set rotation to be fixed
+ */
+void PhysicsAutomatism::SetFixedRotation(RuntimeScene & scene )
+{
+    fixedRotation = true;
+
+    if ( !body ) CreateBody(scene);
+    body->SetFixedRotation(true);
+}
+
+/**
+ * Set rotation to be free
+ */
+void PhysicsAutomatism::SetFreeRotation(RuntimeScene & scene )
+{
+    fixedRotation = false;
+
+    if ( !body ) CreateBody(scene);
+    body->SetFixedRotation(false);
+}
+
+/**
+ * Consider object as bullet, for better collision handling
+ */
+void PhysicsAutomatism::SetAsBullet(RuntimeScene & scene )
+{
+    isBullet = true;
+
+    if ( !body ) CreateBody(scene);
+    body->SetBullet(true);
+}
+
+/**
+ * Don't consider object as bullet, for faster collision handling
+ */
+void PhysicsAutomatism::DontSetAsBullet(RuntimeScene & scene )
+{
+    isBullet = false;
+
+    if ( !body ) CreateBody(scene);
+    body->SetBullet(false);
+}
+
+/**
+ * Apply a force
+ */
+void PhysicsAutomatism::ApplyForce(double xCoordinate, double yCoordinate, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+    body->ApplyForce(b2Vec2(xCoordinate, -yCoordinate),body->GetPosition());
+}
+
+/**
+ * Apply a force
+ */
+void PhysicsAutomatism::ApplyForceUsingPolarCoordinates( float angle, float length, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+    body->ApplyForce(b2Vec2(cos(angle)*length,-sin(angle)*length), body->GetPosition());
+}
+
+/**
+ * Apply a force
+ */
+void PhysicsAutomatism::ApplyForceTowardPosition(float xPosition, float yPosition, float length, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+
+    float angle = atan2(yPosition*runtimeScenesPhysicsDatas->GetInvScaleY()+body->GetPosition().y,
+                        xPosition*runtimeScenesPhysicsDatas->GetInvScaleX()-body->GetPosition().x);
+
+    body->ApplyForce(b2Vec2(cos(angle)*length, -sin(angle)*length), body->GetPosition());
+}
+
+/**
+ * Apply a torque
+ */
+void PhysicsAutomatism::ApplyTorque( double torque, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+    body->ApplyTorque(torque);
+}
+
+/**
+ * Change linear velocity
+ */
+void PhysicsAutomatism::SetLinearVelocity( double xVelocity, double yVelocity, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+    body->SetLinearVelocity(b2Vec2(xVelocity,-yVelocity));
+}
+
+/**
+ * Change angular velocity
+ */
+void PhysicsAutomatism::SetAngularVelocity( double angularVelocity, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+    body->SetAngularVelocity(angularVelocity);
+}
+
+/**
+ * Change linear damping
+ */
+void PhysicsAutomatism::SetLinearDamping( float linearDamping_ , RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+    body->SetLinearDamping(linearDamping_);
+}
+
+/**
+ * Change angular damping
+ */
+void PhysicsAutomatism::SetAngularDamping( float angularDamping_ , RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+    body->SetAngularDamping(angularDamping_);
+}
+
+/**
+ * Add an hinge between two objects
+ */
+void PhysicsAutomatism::AddRevoluteJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+
+    if ( object == NULL || !object->HasAutomatism(name) ) return;
+    b2Body * otherBody = static_cast<PhysicsAutomatism*>(object->GetAutomatismRawPointer(name))->GetBox2DBody(scene);
+
+    if ( body == otherBody ) return;
+
+    b2RevoluteJointDef jointDef;
+    jointDef.Initialize(otherBody, body, otherBody->GetWorldCenter());
+    runtimeScenesPhysicsDatas->world->CreateJoint(&jointDef);
+}
+
+
+/**
+ * Add an hinge to an object
+ */
+void PhysicsAutomatism::AddRevoluteJoint( float xPosition, float yPosition, RuntimeScene & scene)
+{
+    if ( !body ) CreateBody(scene);
+
+    b2RevoluteJointDef jointDef;
+    jointDef.Initialize(body, runtimeScenesPhysicsDatas->staticBody,
+                        b2Vec2( xPosition*runtimeScenesPhysicsDatas->GetInvScaleX(), -yPosition*runtimeScenesPhysicsDatas->GetInvScaleY()));
+
+    runtimeScenesPhysicsDatas->world->CreateJoint(&jointDef);
+}
+
+
+/**
+ * Change gravity
+ */
+void PhysicsAutomatism::SetGravity( float xGravity, float yGravity, RuntimeScene & scene)
+{
+    if ( !body ) CreateBody(scene);
+
+    runtimeScenesPhysicsDatas->world->SetGravity(b2Vec2( xGravity*runtimeScenesPhysicsDatas->GetInvScaleX(), -yGravity*runtimeScenesPhysicsDatas->GetInvScaleY()));
+}
+
+
+/**
+ * Add a gear joint between two objects
+ */
+void PhysicsAutomatism::AddGearJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+
+    if ( object == NULL || !object->HasAutomatism(name) ) return;
+    b2Body * otherBody = boost::static_pointer_cast<PhysicsAutomatism>(object->GetAutomatism(name))->GetBox2DBody(scene);
+
+    if ( body == otherBody ) return;
+
+    //Gear joint need a revolute joint to the ground for the two objects
+    b2RevoluteJointDef jointDef1;
+    jointDef1.Initialize(runtimeScenesPhysicsDatas->staticBody, body, body->GetWorldCenter());
+
+    b2RevoluteJointDef jointDef2;
+    jointDef2.Initialize(runtimeScenesPhysicsDatas->staticBody, otherBody, otherBody->GetWorldCenter());
+
+    b2GearJointDef jointDef;
+    jointDef.bodyA = body;
+    jointDef.bodyB = otherBody;
+    jointDef.joint1 = runtimeScenesPhysicsDatas->world->CreateJoint(&jointDef1);
+    jointDef.joint2 = runtimeScenesPhysicsDatas->world->CreateJoint(&jointDef2);
+    jointDef.ratio = 2.0f * b2_pi / 1.0f; //TODO : Ratio parameter ?
+
+
+    runtimeScenesPhysicsDatas->world->CreateJoint(&jointDef);
+}
+
+void PhysicsAutomatism::SetLinearVelocityX( double xVelocity, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+
+    body->SetLinearVelocity(b2Vec2(xVelocity, body->GetLinearVelocity().y));
+
+}
+void PhysicsAutomatism::SetLinearVelocityY( double yVelocity, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+
+    body->SetLinearVelocity(b2Vec2(body->GetLinearVelocity().x, -yVelocity));
+
+}
+float PhysicsAutomatism::GetLinearVelocityX( RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+
+    return body->GetLinearVelocity().x;
+}
+float PhysicsAutomatism::GetLinearVelocityY( RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+
+    return body->GetLinearVelocity().y;
+}
+double PhysicsAutomatism::GetAngularVelocity( const RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+
+    return body->GetAngularVelocity();
+}
+double PhysicsAutomatism::GetLinearDamping( const RuntimeScene & scene)
+{
+    if ( !body ) CreateBody(scene);
+
+    return body->GetLinearDamping();
+}
+double PhysicsAutomatism::GetAngularDamping( const RuntimeScene & scene)
+{
+    if ( !body ) CreateBody(scene);
+
+    return body->GetAngularDamping();
+}
+
+/**
+ * Test if there is a contact with another object
+ */
+bool PhysicsAutomatism::CollisionWith( const std::string & , std::vector<Object*> list, RuntimeScene & scene)
+{
+    if ( !body ) CreateBody(scene);
+
+	std::vector<Object*>::const_iterator obj_end = list.end();
+    for (std::vector<Object*>::iterator obj = list.begin(); obj != obj_end; ++obj )
+    {
+        set<PhysicsAutomatism*>::const_iterator it = currentContacts.begin();
+        set<PhysicsAutomatism*>::const_iterator end = currentContacts.end();
+        for (;it != end;++it)
+        {
+            if ( (*it)->GetObject()->GetName() == (*obj)->GetName() )
+                return true;
+        }
+    }
+
+    return false;
+}
+
+
 #if defined(GD_IDE_ONLY)
 void PhysicsAutomatism::SaveToXml(TiXmlElement * elem) const
 {

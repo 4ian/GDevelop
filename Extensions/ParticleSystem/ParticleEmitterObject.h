@@ -118,10 +118,13 @@ class GD_EXTENSION_API ParticleEmitterObject : public Object
         void SetEmitterZDirection(float newValue);
         void SetEmitterAngleA(float newValue);
         void SetEmitterAngleB(float newValue);
+        void SetConeSprayAngle(float newValue) { SetEmitterAngleB(newValue/180.0f*3.14159f); };
         void SetZoneRadius(float newValue);
         void SetParticleGravityX(float newValue);
         void SetParticleGravityY(float newValue);
         void SetParticleGravityZ(float newValue);
+        void SetParticleGravityAngle( float newAngleInDegree );
+        void SetParticleGravityLength( float newLength );
         void SetFriction(float newValue);
 
         enum ParticleParameterType {Nothing, Enabled, Mutable, Random};
@@ -131,6 +134,9 @@ class GD_EXTENSION_API ParticleEmitterObject : public Object
         void SetAlphaParameterType(ParticleParameterType type) { alphaParam = type; };
         void SetSizeParameterType(ParticleParameterType type) { sizeParam = type; };
         void SetAngleParameterType(ParticleParameterType type) { angleParam = type; };
+
+        void SetParticleColor1( const std::string & color );
+        void SetParticleColor2( const std::string & color );
 
         void SetParticleRed1(float newValue) { particleRed1= newValue; UpdateRedParameters();};
         void SetParticleRed2(float newValue) { particleRed2= newValue; UpdateRedParameters();};
@@ -165,10 +171,13 @@ class GD_EXTENSION_API ParticleEmitterObject : public Object
         float GetEmitterZDirection() const { return emitterZDirection; };
         float GetEmitterAngleA() const { return emitterAngleA; };
         float GetEmitterAngleB() const { return  emitterAngleB; };
+        float GetConeSprayAngle() const { return GetEmitterAngleB()*180.0f/3.14159f; };
         float GetZoneRadius() const { return  zoneRadius; };
         float GetParticleGravityX() const { return particleGravityX; };
         float GetParticleGravityY() const { return particleGravityY; };
         float GetParticleGravityZ() const { return particleGravityZ; };
+        float GetParticleGravityAngle() const;
+        float GetParticleGravityLength() const;
         float GetFriction() const { return friction; };
         float GetParticleLifeTimeMin() const { return particleLifeTimeMin; };
         float GetParticleLifeTimeMax() const { return particleLifeTimeMax; };
@@ -208,149 +217,22 @@ class GD_EXTENSION_API ParticleEmitterObject : public Object
         void SetRenderingAdditive() { additive = true;};
         void SetRenderingAlpha() { additive = false;};
 
+        /** Change texture at runtime
+         */
+        void SetTexture( RuntimeScene & scene, const std::string & textureParticleName );
+
+        /** Change texture name without changing it effectively at runtime
+         */
         void SetParticleTexture(std::string imageName) { textureParticleName = imageName; };
         std::string GetParticleTexture() const { return textureParticleName; };
+
+        bool NoMoreParticles() const {return !hasSomeParticles;};
 
         #if defined(GD_IDE_ONLY)
         bool particleEditionSimpleMode; ///< User preference related to object's edition
         bool emissionEditionSimpleMode; ///< User preference related to object's edition
         bool gravityEditionSimpleMode; ///< User preference related to object's edition
         #endif
-
-        //Actions, conditions and expressions
-        bool ActRecreateParticleSystem( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-
-        bool CondEmitterXDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActEmitterXDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondEmitterYDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActEmitterYDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondEmitterZDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActEmitterZDirection( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondParticleGravityX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleGravityX( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondParticleGravityY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleGravityY( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondParticleGravityZ( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleGravityZ( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondEmitterForceMin( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActEmitterForceMin( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondEmitterForceMax( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActEmitterForceMax( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActRendererParam1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActRendererParam2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondRendererParam1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondRendererParam2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondTank( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondFlow( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActTank( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActFlow( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActEmitterAngleA( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondEmitterAngleA( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActEmitterAngleB( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondEmitterAngleB( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActFriction( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondFriction( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActZoneRadius( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondZoneRadius( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondParticleLifeTimeMin( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleLifeTimeMin( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleLifeTimeMax( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleLifeTimeMax( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondConeSprayAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActConeSprayAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleGravityLength( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleGravityAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleGravityLength( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActParticleGravityAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondEmitterAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActEmitterAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondTexture( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActTexture( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-
-        double ExpRendererParam1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return rendererParam1; };
-        double ExpRendererParam2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return rendererParam2; };
-        double ExpTank( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return tank; };
-        double ExpFlow( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return flow; };
-        double ExpEmitterForceMin( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return emitterForceMin; };
-        double ExpEmitterForceMax( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return emitterForceMax; };
-        double ExpEmitterXDirection( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return emitterXDirection; };
-        double ExpEmitterYDirection( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return emitterYDirection; };
-        double ExpEmitterZDirection( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return emitterZDirection; };
-        double ExpEmitterAngleA( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return emitterAngleA; };
-        double ExpEmitterAngleB( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return  emitterAngleB; };
-        double ExpZoneRadius( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return  zoneRadius; };
-        double ExpParticleGravityX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return particleGravityX; };
-        double ExpParticleGravityY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return particleGravityY; };
-        double ExpParticleGravityZ( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return particleGravityZ; };
-        double ExpFriction( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return friction; };
-        double ExpParticleLifeTimeMin( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return particleLifeTimeMin; };
-        double ExpParticleLifeTimeMax( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return particleLifeTimeMax; };
-        double ExpEmitterAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return atan2(GetEmitterYDirection(), GetEmitterXDirection())*180.0f/3.14159f; };
-        double ExpParticleGravityAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return atan2(GetParticleGravityY(), GetParticleGravityX())*180.0f/3.14159f; };
-        double ExpParticleGravityLength( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ){ return sqrt(GetParticleGravityY()*GetParticleGravityY() + GetParticleGravityX()*GetParticleGravityX()); };
-        std::string ExpTexture( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const StrExpressionInstruction & exprInstruction ){ return textureParticleName; };
-
-        bool ActParticleColor1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleColor2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleRed1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleRed2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleGreen1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleGreen2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleBlue1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleBlue2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleAlpha1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleAlpha2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleSize1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleSize2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleAngle1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleAngle2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleAlphaRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleAlphaRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleSizeRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleSizeRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleAngleRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActParticleAngleRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleRed1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleRed2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleGreen1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleGreen2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleBlue1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleBlue2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleAlpha1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleAlpha2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleSize1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleSize2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleAngle1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleAngle2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleAlphaRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleAlphaRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleSizeRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleSizeRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleAngleRandomness1( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondParticleAngleRandomness2( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-
-        double ExpParticleRed1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleRed1; };
-        double ExpParticleRed2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleRed2; };
-        double ExpParticleGreen1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleGreen1; };
-        double ExpParticleGreen2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleGreen2; };
-        double ExpParticleBlue1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleBlue1; };
-        double ExpParticleBlue2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleBlue2; };
-        double ExpParticleAlpha1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAlpha1; };
-        double ExpParticleAlpha2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAlpha2; };
-        double ExpParticleSize1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleSize1; };
-        double ExpParticleSize2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleSize2; };
-        double ExpParticleAngle1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAngle1; };
-        double ExpParticleAngle2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAngle2; };
-        double ExpParticleAlphaRandomness1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAlphaRandomness1; };
-        double ExpParticleAlphaRandomness2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAlphaRandomness2; };
-        double ExpParticleSizeRandomness1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleSizeRandomness1; };
-        double ExpParticleSizeRandomness2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleSizeRandomness2; };
-        double ExpParticleAngleRandomness1( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAngleRandomness1; };
-        double ExpParticleAngleRandomness2( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return particleAngleRandomness2; };
-
-
-        bool CondNoMoreParticles( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        double ExpNbParticles( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 
     private:
 

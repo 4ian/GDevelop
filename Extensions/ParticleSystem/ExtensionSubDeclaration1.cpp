@@ -41,13 +41,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à la force minimale d'émission des particules de _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActEmitterForceMin);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetEmitterForceMin").SetManipulatedType("number").SetAssociatedGetter("GetEmitterForceMin").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -57,13 +58,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à la force maximale d'émission des particules de _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActEmitterForceMax);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetEmitterForceMax").SetManipulatedType("number").SetAssociatedGetter("GetEmitterForceMax").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -73,13 +75,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à la direction d'émission des particules en X de _PARAM0_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActEmitterXDirection);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetEmitterXDirection").SetManipulatedType("number").SetAssociatedGetter("GetEmitterXDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -89,13 +92,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("La direction d'émission des particules en X de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondEmitterXDirection);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetEmitterXDirection").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -105,13 +110,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à la direction d'émission des particules en Y de _PARAM0_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActEmitterYDirection);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetEmitterYDirection").SetManipulatedType("number").SetAssociatedGetter("GetEmitterYDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -121,13 +127,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("La direction d'émission des particules en Y de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondEmitterYDirection);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetEmitterYDirection").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -137,13 +145,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à la direction d'émission des particules en Z de _PARAM0_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActEmitterZDirection);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetEmitterZDirection").SetManipulatedType("number").SetAssociatedGetter("GetEmitterZDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -153,13 +163,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("La direction d'émission des particules en Z de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondEmitterZDirection);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetEmitterZDirection").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -169,13 +181,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à l'angle d'émission de _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActEmitterAngle);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -185,13 +199,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("L'angle d'émission de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondEmitterAngle);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -201,13 +216,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à l'angle d'émission n°1 de _PARAM0_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActEmitterAngleA);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetEmitterAngleA").SetManipulatedType("number").SetAssociatedGetter("GetEmitterAngleA").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -217,13 +234,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("L'angle d'émission n°1 de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondEmitterAngleA);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetEmitterAngleA").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -233,13 +252,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à l'angle d'émission n°2 de _PARAM0_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActEmitterAngleB);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetEmitterAngleB").SetManipulatedType("number").SetAssociatedGetter("GetEmitterAngleB").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -249,13 +270,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("L'angle d'émission n°2 de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondEmitterAngleB);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetEmitterAngleB").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -265,13 +288,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à l'angle d'ouverture du cône d'émission de _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActConeSprayAngle);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetConeSprayAngle").SetManipulatedType("number").SetAssociatedGetter("GetConeSprayAngle").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -281,13 +305,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("L'angle d'ouverture du cône d'émission de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondConeSprayAngle);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetConeSprayAngle").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -297,13 +322,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à la friction des particules _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActFriction);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetFriction").SetManipulatedType("number").SetAssociatedGetter("GetFriction").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -313,13 +340,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("La friction des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondFriction);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetFriction").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -329,13 +357,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ au rayon d'apparition des particules de _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActZoneRadius);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetZoneRadius").SetManipulatedType("number").SetAssociatedGetter("GetZoneRadius").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -345,13 +375,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Le rayon d'apparition des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondZoneRadius);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetZoneRadius").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -361,13 +393,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ au temps de vie minimum des particules de _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActParticleLifeTimeMin);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetParticleLifeTimeMin").SetManipulatedType("number").SetAssociatedGetter("GetParticleLifeTimeMin").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -377,13 +410,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Le temps de vie minimum des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondParticleLifeTimeMin);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleLifeTimeMin").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -393,13 +427,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ au temps de vie maximum des particules de _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActParticleLifeTimeMax);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetParticleLifeTimeMax").SetManipulatedType("number").SetAssociatedGetter("GetParticleLifeTimeMax").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -409,13 +445,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Le temps de vie maximum des particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondParticleLifeTimeMax);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleLifeTimeMax").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -425,13 +463,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à la direction de la gravité en X de _PARAM0_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActParticleGravityX);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetParticleGravityX").SetManipulatedType("number").SetAssociatedGetter("GetParticleGravityX").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -441,13 +481,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("La direction de la gravité des particules en X de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondParticleGravityX);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleGravityX").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -457,13 +499,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à la direction de la gravité en Y de _PARAM0_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActParticleGravityY);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetParticleGravityY").SetManipulatedType("number").SetAssociatedGetter("GetParticleGravityY").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -473,13 +517,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("La direction de la gravité des particules en Y de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondParticleGravityY);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleGravityY").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -489,13 +535,15 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à la direction de la gravité en Z de _PARAM0_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActParticleGravityZ);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetParticleGravityZ").SetManipulatedType("number").SetAssociatedGetter("GetParticleGravityZ").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -505,13 +553,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("La direction de la gravité des particules en Z de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Avancé"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondParticleGravityZ);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleGravityZ").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -521,13 +570,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à l'angle de la gravité de _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActParticleGravityAngle);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetParticleGravityAngle").SetManipulatedType("number").SetAssociatedGetter("GetParticleGravityAngle").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -537,13 +587,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("L'angle de la gravité de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondParticleGravityAngle);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleGravityAngle").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -553,13 +604,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à la gravité de _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActParticleGravityLength);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetParticleGravityLength").SetManipulatedType("number").SetAssociatedGetter("GetParticleGravityLength").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -569,13 +621,14 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
                    _("La gravité de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondParticleGravityLength);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleGravityLength").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_CONDITION()
 }

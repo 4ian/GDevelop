@@ -26,6 +26,8 @@ freely, subject to the following restrictions:
 
 #include "ParticleSystemWrapper.h"
 #include <ctime>
+#include <SPK.h>
+#include <SPK_GL.h>
 
 bool ParticleSystemWrapper::SPKinitialized = false;
 

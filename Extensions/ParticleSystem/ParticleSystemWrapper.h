@@ -28,10 +28,20 @@ freely, subject to the following restrictions:
 #define PARTICLESYSTEMWRAPPER_H
 
 #include <boost/shared_ptr.hpp>
-#include <SPK.h>
-#include <SPK_GL.h>
 class OpenGLTextureWrapper;
 
+namespace SPK
+{
+class System;
+class Model;
+class SphericEmitter;
+class Sphere;
+class Group;
+namespace GL
+{
+class GLRenderer;
+}
+}
 
 /**
  * Wrapper around SPARK related stuff.

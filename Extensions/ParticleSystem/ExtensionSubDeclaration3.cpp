@@ -40,11 +40,12 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("Recréer les particules de _PARAM0_"),
                    _("Paramétrage"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActRecreateParticleSystem);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("RecreateParticleSystem").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -54,13 +55,14 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ au paramètre 1 du rendu de _PARAM0_"),
                    _("Paramétrage"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActRendererParam1);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetRendererParam1").SetManipulatedType("number").SetAssociatedGetter("GetRendererParam1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -70,13 +72,14 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("Le 1er paramètre du rendu de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Paramétrage"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondRendererParam1);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetRendererParam1").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -86,13 +89,14 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ au paramètre 2 du rendu de _PARAM0_"),
                    _("Paramétrage"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActRendererParam2);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetRendererParam2").SetManipulatedType("number").SetAssociatedGetter("GetRendererParam2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -102,13 +106,15 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("Le 2nd paramètre du rendu de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Paramétrage"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondRendererParam2);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetRendererParam2").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -118,13 +124,14 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ à la capacité de _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActTank);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetTank").SetManipulatedType("number").SetAssociatedGetter("GetTank").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -134,13 +141,15 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("La capacité de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondTank);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetTank").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -150,13 +159,15 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("Faire _PARAM2__PARAM1_ au flux de _PARAM0_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActFlow);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetFlow").SetManipulatedType("number").SetAssociatedGetter("GetFlow").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -166,13 +177,15 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("Le flux de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondFlow);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetFlow").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
@@ -182,12 +195,13 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("Changer l'image des particules de _PARAM0_ en _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::ActTexture);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("text", _("Nouvelle image"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("string", _("Nouvelle image"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetTexture").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_ACTION()
 
@@ -197,127 +211,199 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
                    _("L'image affichée par les particules de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                    _("Commun"),
                    "Extensions/particleSystemicon24.png",
-                   "Extensions/particleSystemicon16.png",
-                   &ParticleEmitterObject::CondTexture);
+                   "Extensions/particleSystemicon16.png");
 
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
-        DECLARE_PARAMETER("text", _("Texte à tester"), false, "")
-        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-        MAIN_OBJECTS_IN_PARAMETER(0)
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+        instrInfo.AddParameter("string", _("Texte à tester"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetTexture").SetManipulatedType("string").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
 
     DECLARE_END_OBJECT_CONDITION()
 
-    DECLARE_OBJECT_STR_EXPRESSION("Texture", _("Image des particules"), _("Nom de l'image affichée par les particules"), _("Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpTexture)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_STR_EXPRESSION("Texture", _("Image des particules"), _("Nom de l'image affichée par les particules"), _("Particules"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetTexture").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_STR_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("NbParticles", _("Nombre de particules"), _("Nombre de particules"), _("Particules"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpNbParticles)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("NbParticles", _("Nombre de particules"), _("Nombre de particules"), _("Particules"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetNbParticles").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("RendererParam1", _("Paramètre 1 du rendu"), _("Paramètre 1 du rendu"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpRendererParam1)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("RendererParam1", _("Paramètre 1 du rendu"), _("Paramètre 1 du rendu"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetRendererParam1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("RendererParam2", _("Paramètre 2 du rendu"), _("Paramètre 2 du rendu"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpRendererParam2)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("RendererParam2", _("Paramètre 2 du rendu"), _("Paramètre 2 du rendu"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetRendererParam2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("Tank", _("Capacité"), _("Capacité"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpTank)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("Tank", _("Capacité"), _("Capacité"), _("Commun"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetTank").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("Flow", _("Flux"), _("Flux"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpFlow)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("Flow", _("Flux"), _("Flux"), _("Commun"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetFlow").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("EmitterForceMin", _("Force minimale de l'émission"), _("Force minimale de l'émission"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterForceMin)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("EmitterForceMin", _("Force minimale de l'émission"), _("Force minimale de l'émission"), _("Commun"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetEmitterForceMin").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("EmitterForceMax", _("Force maximale de l'émission"), _("Force maximale de l'émission"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterForceMax)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("EmitterForceMax", _("Force maximale de l'émission"), _("Force maximale de l'émission"), _("Commun"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetEmitterForceMax").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
 
-    DECLARE_OBJECT_EXPRESSION("EmitterXDirection", _("Direction X de l'émission"), _("Direction X de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterXDirection)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("EmitterXDirection", _("Direction X de l'émission"), _("Direction X de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetEmitterXDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("EmitterYDirection", _("Direction Y de l'émission"), _("Direction Y de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterYDirection)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("EmitterYDirection", _("Direction Y de l'émission"), _("Direction Y de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetEmitterYDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("EmitterZDirection", _("Direction Z de l'émission"), _("Direction Z de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterZDirection)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("EmitterZDirection", _("Direction Z de l'émission"), _("Direction Z de l'émission"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetEmitterZDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("EmitterAngle", _("Angle de l'émission"), _("Angle de l'émission"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterAngle)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("EmitterAngle", _("Angle de l'émission"), _("Angle de l'émission"), _("Commun"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("EmitterAngleA", _("Angle A de l'émission"), _("Angle A de l'émission"), _("Avancé"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterAngleA)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("EmitterAngleA", _("Angle A de l'émission"), _("Angle A de l'émission"), _("Avancé"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetEmitterAngleA").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("EmitterAngleB", _("Angle B de l'émission"), _("Angle B de l'émission"), _("Avancé"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpEmitterAngleB)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("EmitterAngleB", _("Angle B de l'émission"), _("Angle B de l'émission"), _("Avancé"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetEmitterAngleB").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ZoneRadius", _("Rayon de la zone d'émission"), _("Rayon de la zone d'émission"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpZoneRadius)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ZoneRadius", _("Rayon de la zone d'émission"), _("Rayon de la zone d'émission"), _("Commun"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetZoneRadius").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleGravityX", _("Gravité en X des particules"), _("Gravité en X des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGravityX)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleGravityX", _("Gravité en X des particules"), _("Gravité en X des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleGravityX").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleGravityY", _("Gravité en Y des particules"), _("Gravité en Y des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGravityY)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleGravityY", _("Gravité en Y des particules"), _("Gravité en Y des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleGravityY").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleGravityZ", _("Gravité en Z des particules"), _("Gravité en Z des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGravityZ)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleGravityZ", _("Gravité en Z des particules"), _("Gravité en Z des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleGravityZ").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleGravityAngle", _("Angle de la gravité"), _("Angle de la gravité"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGravityAngle)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleGravityAngle", _("Angle de la gravité"), _("Angle de la gravité"), _("Commun"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleGravityAngle").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleGravityLength", _("Gravité"), _("Valeur de la gravité"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGravityLength)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleGravityLength", _("Gravité"), _("Valeur de la gravité"), _("Commun"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleGravityLength").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("Friction", _("Friction des particules"), _("Friction des particules"), _("Commun"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpFriction)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("Friction", _("Friction des particules"), _("Friction des particules"), _("Commun"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetFriction").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleLifeTimeMin", _("Temps de vie minimal des particules"), _("Temps de vie minimal des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleLifeTimeMin)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleLifeTimeMin", _("Temps de vie minimal des particules"), _("Temps de vie minimal des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleLifeTimeMin").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleLifeTimeMax", _("Temps de vie maximal des particules"), _("Temps de vie maximal des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleLifeTimeMax)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleLifeTimeMax", _("Temps de vie maximal des particules"), _("Temps de vie maximal des particules"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleLifeTimeMax").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleRed1", _("Paramètre 1 de la couleur rouge"), _("Paramètre 1 de la couleur rouge"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleRed1)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleRed1", _("Paramètre 1 de la couleur rouge"), _("Paramètre 1 de la couleur rouge"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleRed1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleRed2", _("Paramètre 2 de la couleur rouge"), _("Paramètre 2 de la couleur rouge"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleRed2)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleRed2", _("Paramètre 2 de la couleur rouge"), _("Paramètre 2 de la couleur rouge"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleRed2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleBlue1", _("Paramètre 1 de la couleur bleue"), _("Paramètre 1 de la couleur bleue"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleBlue1)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleBlue1", _("Paramètre 1 de la couleur bleue"), _("Paramètre 1 de la couleur bleue"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleBlue1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleBlue2", _("Paramètre 2 de la couleur bleue"), _("Paramètre 2 de la couleur bleue"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleBlue2)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleBlue2", _("Paramètre 2 de la couleur bleue"), _("Paramètre 2 de la couleur bleue"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleBlue2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleGreen1", _("Paramètre 1 de la couleur vert"), _("Paramètre 1 de la couleur vert"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGreen1)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleGreen1", _("Paramètre 1 de la couleur vert"), _("Paramètre 1 de la couleur vert"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleGreen1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleGreen2", _("Paramètre 2 de la couleur vert"), _("Paramètre 2 de la couleur vert"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleGreen2)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleGreen2", _("Paramètre 2 de la couleur vert"), _("Paramètre 2 de la couleur vert"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleGreen2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleAlpha1", _("Paramètre 1 de la transparence"), _("Paramètre 1 de la transparence"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleAlpha1)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleAlpha1", _("Paramètre 1 de la transparence"), _("Paramètre 1 de la transparence"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleAlpha1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleAlpha2", _("Paramètre 2 de la transparence"), _("Paramètre 2 de la transparence"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleAlpha2)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleAlpha2", _("Paramètre 2 de la transparence"), _("Paramètre 2 de la transparence"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleAlpha2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleSize1", _("Paramètre 1 de la taille"), _("Paramètre 1 de la taille"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleSize1)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleSize1", _("Paramètre 1 de la taille"), _("Paramètre 1 de la taille"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleSize1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleSize2", _("Paramètre 2 de la taille"), _("Paramètre 2 de la taille"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleSize2)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleSize2", _("Paramètre 2 de la taille"), _("Paramètre 2 de la taille"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleSize2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleAngle1", _("Paramètre 1 de l'angle"), _("Paramètre 1 de l'angle"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleAngle1)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleAngle1", _("Paramètre 1 de l'angle"), _("Paramètre 1 de l'angle"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleAngle1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
-    DECLARE_OBJECT_EXPRESSION("ParticleAngle2", _("Paramètre 2 de l'angle"), _("Paramètre 2 de l'angle"), _("Paramétrage"), "Extensions/particleSystemicon16.png", &ParticleEmitterObject::ExpParticleAngle2)
-        DECLARE_PARAMETER("object", _("Objet"), true, "ParticleEmitter")
+    DECLARE_OBJECT_EXPRESSION("ParticleAngle2", _("Paramètre 2 de l'angle"), _("Paramètre 2 de l'angle"), _("Paramétrage"), "Extensions/particleSystemicon16.png")
+        instrInfo.AddParameter("object", _("Objet"), "ParticleEmitter", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetParticleAngle2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
 }

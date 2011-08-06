@@ -27,14 +27,15 @@ freely, subject to the following restrictions:
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include "GDL/Object.h"
-
 #include "GDL/ImageManager.h"
 #include "GDL/tinyxml.h"
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
 #include "GDL/XmlMacros.h"
+#include "GDL/RuntimeScene.h"
 #include "ParticleEmitterObject.h"
 #include "ParticleSystemWrapper.h"
+#include <SPK.h>
 #include <SPK_GL.h>
 
 #if defined(GD_IDE_ONLY)
@@ -618,7 +619,7 @@ void ParticleEmitterObject::GetPropertyForDebugger(unsigned int propertyNb, stri
 {
     if ( !particleSystem.particleSystem ) return;
 
-    if      ( propertyNb == 0 ) {name = _("Nombre de particules");      value = ToString(particleSystem.particleSystem->getNbParticles());}
+    if      ( propertyNb == 0 ) {name = _T("Nombre de particules");      value = ToString(particleSystem.particleSystem->getNbParticles());}
 }
 
 bool ParticleEmitterObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -708,6 +709,73 @@ void ParticleEmitterObject::SetZoneRadius(float newValue)
 void ParticleEmitterObject::UpdateTime(float deltaTime)
 {
 	hasSomeParticles = particleSystem.particleSystem->update (deltaTime);
+}
+
+void ParticleEmitterObject::SetParticleGravityAngle( float newAngleInDegree )
+{
+    float length = sqrt(GetParticleGravityY()*GetParticleGravityY()+GetParticleGravityX()*GetParticleGravityX());
+
+    SetParticleGravityX(cos(newAngleInDegree/180.0f*3.14159f)*length);
+    SetParticleGravityY(sin(newAngleInDegree/180.0f*3.14159f)*length);
+}
+void ParticleEmitterObject::SetParticleGravityLength( float length )
+{
+    float angle = atan2(GetParticleGravityY(), GetParticleGravityX());
+
+    SetParticleGravityX(cos(angle)*length);
+    SetParticleGravityY(sin(angle)*length);
+}
+
+float ParticleEmitterObject::GetParticleGravityAngle() const
+{
+    return atan2(GetParticleGravityY(), GetParticleGravityX())*180.0f/3.14159f;
+}
+float ParticleEmitterObject::GetParticleGravityLength() const
+{
+    return sqrt(GetParticleGravityY()*GetParticleGravityY()+GetParticleGravityX()*GetParticleGravityX());
+}
+
+
+void ParticleEmitterObject::SetParticleColor1( const std::string & color )
+{
+    vector < string > colors = SpliterStringToVector <string> (color, ';');
+
+    if ( colors.size() < 3 ) return; //Color is incorrect
+
+    SetParticleRed1(ToInt(colors[0]));
+    SetParticleBlue1(ToInt(colors[1]));
+    SetParticleGreen1(ToInt(colors[2]));
+}
+void ParticleEmitterObject::SetParticleColor2( const std::string & color )
+{
+    vector < string > colors = SpliterStringToVector <string> (color, ';');
+
+    if ( colors.size() < 3 ) return; //Color is incorrect
+
+    SetParticleRed2(ToInt(colors[0]));
+    SetParticleBlue2(ToInt(colors[1]));
+    SetParticleGreen2(ToInt(colors[2]));
+}
+
+/**
+ * Change the texture
+ */
+void ParticleEmitterObject::SetTexture( RuntimeScene & scene, const std::string & textureParticleName )
+{
+    if ( rendererType == Quad )
+    {
+        //Load new texture
+        particleSystem.openGLTextureParticle = scene.game->imageManager->GetOpenGLTexture(textureParticleName);
+
+	    //Notify the renderer of the change
+	    SPK::GL::GLQuadRenderer * quadRenderer = dynamic_cast<SPK::GL::GLQuadRenderer*>(particleSystem.renderer);
+
+        if ( quadRenderer && particleSystem.openGLTextureParticle->GetOpenGLTexture() != 0 )
+        {
+            quadRenderer->setTexturingMode(SPK::TEXTURE_2D);
+            quadRenderer->setTexture(particleSystem.openGLTextureParticle->GetOpenGLTexture());
+        }
+    }
 }
 
 /**

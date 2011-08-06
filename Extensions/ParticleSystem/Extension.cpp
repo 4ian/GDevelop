@@ -50,7 +50,10 @@ Extension::Extension()
                    _("Objet affichant un grand nombre de petites particules"),
                    "Extensions/particleSystemicon.png",
                    &CreateParticleEmitterObject,
-                   &DestroyParticleEmitterObject);
+                   &DestroyParticleEmitterObject,
+                   "ParticleEmitterObject");
+
+        objInfos.SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
         //Declaration is too big to be compiled by GCC in one file, unless you have 4GB+ ram. :/
         ExtensionSubDeclaration2(objInfos);

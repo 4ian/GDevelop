@@ -30,7 +30,6 @@ freely, subject to the following restrictions:
 #include "GDL/Event.h"
 #include <iostream>
 #include <sstream>
-#include "GDL/Chercher.h"
 
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
@@ -46,7 +45,7 @@ freely, subject to the following restrictions:
 #endif
 
 //Linux build uses dlib for dialogs
-#if defined(LINUX)
+#if defined(LINUX) || defined(MAC)
 #include "nwidgets/MessageBox.h"
 #include "nwidgets/YesNoMsgBox.h"
 #include "nwidgets/OpenFile.h"
@@ -55,31 +54,34 @@ freely, subject to the following restrictions:
 
 using namespace std;
 
+namespace GDpriv
+{
+namespace CommonDialogs
+{
+
 /**
  * Display a simple message box.
  */
-bool ActShowMsgBox( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_EXTENSION_API ShowMessageBox( RuntimeScene & scene, const std::string & message, const std::string & title )
 {
     sf::Clock timeSpent;
 
     //Display the box
     #if defined(WINDOWS)
-    MessageBox(NULL, action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned).c_str(), action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned).c_str(), MB_ICONINFORMATION);
+    MessageBox(NULL, message.c_str(), title.c_str(), MB_ICONINFORMATION);
     #endif
-    #if defined(LINUX)
-    nw::MsgBox msgBox(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned), action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned));
+    #if defined(LINUX) || defined(MAC)
+    nw::MsgBox msgBox(title, message);
     msgBox.wait_until_closed();
     #endif
 
     scene.pauseTime += timeSpent.GetElapsedTime(); //Don't take the time spent in this function in account.
-
-    return true;
 }
 
 /**
  * Display an "open file" dialog
  */
-bool ActShowOpenFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, const std::string & variable, const std::string & title, std::string filters )
 {
     sf::Clock timeSpent;
 
@@ -88,7 +90,7 @@ bool ActShowOpenFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     //Display the dialog
     #if defined(WINDOWS)
     //Process filters to match windows dialogs filters style.
-    std::string filters = action.GetParameter( 2 ).GetAsTextExpressionResult(scene, objectsConcerned)+'\0';
+    filters = filters+'\0';
     std::replace(filters.begin(), filters.end(), '|', '\0');
 
     OPENFILENAME toGetFileName; //Struct for the dialog
@@ -107,8 +109,8 @@ bool ActShowOpenFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     if(GetOpenFileName(&toGetFileName) == TRUE)
         result = filePath;
     #endif
-    #if defined(LINUX)
-    nw::OpenFile * dialog = new nw::OpenFile(action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned), true, result);
+    #if defined(LINUX) || defined(MAC)
+    nw::OpenFile * dialog = new nw::OpenFile(title, true, result);
     dialog->wait_until_closed();
     #endif
 
@@ -116,15 +118,13 @@ bool ActShowOpenFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned,
     scene.pauseTime += timeSpent.GetElapsedTime();
 
     //Update the variable
-    scene.variables.ObtainVariable(action.GetParameter( 0 ).GetPlainString()) = result;
-
-    return true;
+    scene.variables.ObtainVariable(variable) = result;
 }
 
 /**
  * Show a message box with Yes/No buttons
  */
-bool ActShowYesNoMsgBox( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_EXTENSION_API ShowYesNoMsgBox( RuntimeScene & scene, const std::string & variable, const std::string & message, const std::string & title )
 {
     sf::Clock timeSpent;
 
@@ -132,13 +132,13 @@ bool ActShowYesNoMsgBox( RuntimeScene & scene, ObjectsConcerned & objectsConcern
 
     //Display the box
     #if defined(WINDOWS)
-    if( MessageBox(NULL, action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned).c_str(), action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned).c_str(), MB_ICONQUESTION | MB_YESNO) == IDYES)
+    if( MessageBox(NULL, message.c_str(), title.c_str(), MB_ICONQUESTION | MB_YESNO) == IDYES)
         result = "yes";
     else
         result = "no";
     #endif
-    #if defined(LINUX)
-    nw::YesNoMsgBox dialog(action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned), action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned), result);
+    #if defined(LINUX) || defined(MAC)
+    nw::YesNoMsgBox dialog(title, message, result);
     dialog.wait_until_closed();
     #endif
 
@@ -146,9 +146,7 @@ bool ActShowYesNoMsgBox( RuntimeScene & scene, ObjectsConcerned & objectsConcern
     scene.pauseTime += timeSpent.GetElapsedTime();
 
     //Update the variable
-    scene.variables.ObtainVariable(action.GetParameter( 0 ).GetPlainString()) = result;
-
-    return true;
+    scene.variables.ObtainVariable(variable) = result;
 }
 
 //Declaration and definition of a simple input box for windows
@@ -386,6 +384,7 @@ BOOL CInputBox::DoModal(LPCTSTR szCaption, LPCTSTR szPrompt)
     SetWindowText(m_hWndPrompt, szPrompt);
 
     SetForegroundWindow(m_hWndInputBox);
+    BringWindowToTop(m_hWndInputBox);
 
 	EnableWindow(m_hWndParent, FALSE);
 
@@ -444,7 +443,7 @@ BOOL CInputBox::DoModal(LPCTSTR szCaption, LPCTSTR szPrompt)
 /**
  * Show a dialog so as to get a text from user
  */
-bool ActShowTextInput( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, const std::string & variable, const std::string & message, const std::string & title )
 {
     sf::Clock timeSpent;
     string result;
@@ -452,11 +451,11 @@ bool ActShowTextInput( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
     //Display the box
     #if defined(WINDOWS)
     CInputBox ibox(NULL);
-    if (ibox.DoModal(action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned).c_str(), action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned).c_str()))
+    if (ibox.DoModal(title.c_str(), message.c_str()))
         result = ibox.Text;
     #endif
-    #if defined(LINUX)
-    nw::TextInput dialog(action.GetParameter(2).GetAsTextExpressionResult(scene, objectsConcerned), action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned), result);
+    #if defined(LINUX) || defined(MAC)
+    nw::TextInput dialog(title, message, result);
     dialog.wait_until_closed();
     #endif
 
@@ -464,7 +463,10 @@ bool ActShowTextInput( RuntimeScene & scene, ObjectsConcerned & objectsConcerned
     scene.pauseTime += timeSpent.GetElapsedTime();
 
     //Update the variable
-    scene.variables.ObtainVariable(action.GetParameter( 0 ).GetPlainString()) = result;
+    scene.variables.ObtainVariable(variable) = result;
 
     return true;
 }
+
+}
+} //namespace GDpriv

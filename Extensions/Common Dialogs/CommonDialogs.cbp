@@ -10,7 +10,7 @@
 				<Option output="..\..\Runtime\bin\debug\CommonDialogs.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -25,7 +25,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lsfml-audio-d" />
 					<Add option="-lsfml-graphics-d" />
 					<Add option="-lsfml-network-d" />
@@ -42,7 +42,7 @@
 				<Option output="..\..\IDE\bin\debug\Extensions\CommonDialogs.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -58,12 +58,12 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-D__WXDEBUG__" />
 					<Add option="-DWXUSINGDLL" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
-					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lwxmsw29d_xrc" />
 					<Add option="-lwxmsw29d_richtext" />
 					<Add option="-lwxmsw29d_ribbon" />
@@ -103,15 +103,15 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="..\..\Runtime\bin\release\CommonDialogs.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -126,7 +126,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -143,7 +143,7 @@
 				<Option output="..\..\IDE\bin\release\Extensions\CommonDialogs.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -159,12 +159,12 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
@@ -204,15 +204,15 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
 			<Target title="Development">
 				<Option output="..\..\Runtime\bin\dev\CommonDialogs.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -227,7 +227,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -244,7 +244,7 @@
 				<Option output="..\..\IDE\bin\dev\Extensions\CommonDialogs.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -260,12 +260,12 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
@@ -305,8 +305,8 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\IDE\bin\dev" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
@@ -485,30 +485,123 @@
 					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
 				</Linker>
 			</Target>
+			<Target title="Mac - Release">
+				<Option output="..\..\Runtime\bin\release\CommonDialogs.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DMAC" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add directory="..\..\..\libs\boost_1_43_0" />
+					<Add directory="..\..\..\libs\sfml\include" />
+					<Add directory="nwidgets" />
+					<Add directory="dlib-17.12" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-framework OpenGL" />
+					<Add option="-lX11.6" />
+					<Add option="-dynamiclib" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add directory="..\..\Runtime\bin\release" />
+					<Add directory="..\..\..\libs\sfml\lib" />
+					<Add directory="\usr\X11\lib" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/release/CommonDialogs.xgdm" />
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/release/CommonDialogs.xgdm" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Mac - Debug">
+				<Option output="..\..\Runtime\bin\debug\CommonDialogs.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Debug\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DMAC" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="..\..\..\libs\boost_1_43_0" />
+					<Add directory="..\..\..\libs\sfml\include" />
+					<Add directory="nwidgets" />
+					<Add directory="dlib-17.12" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-pg -g" />
+					<Add option="-lgdl" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
+					<Add option="-framework OpenGL" />
+					<Add option="-lX11.6" />
+					<Add option="-dynamiclib" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add directory="..\..\Runtime\bin\debug" />
+					<Add directory="..\..\..\libs\sfml\lib" />
+					<Add directory="\usr\X11\lib" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/debug/CommonDialogs.xgdm" />
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/debug/CommonDialogs.xgdm" />
+				</ExtraCommands>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add directory="..\..\GDL" />
-			<Add directory="C:\Libs\SFML\include" />
-			<Add directory="C:\Libs\boost_1_43_0" />
+			<Add directory="..\..\ExtLibs\SFML\include" />
+			<Add directory="..\..\ExtLibs\boost" />
 		</Compiler>
 		<Linker>
-			<Add directory="C:\Libs\SFML\bin-mingw-debug\lib" />
-			<Add directory="C:\Libs\SFML\bin-mingw-release\lib" />
+			<Add directory="..\..\ExtLibs\SFML\build-mingw-debug\lib" />
+			<Add directory="..\..\ExtLibs\SFML\build-mingw-release\lib" />
 		</Linker>
-		<Unit filename="CommonDialogsActions.cpp" />
-		<Unit filename="CommonDialogsActions.h" />
+		<Unit filename="CommonDialogs.cpp" />
+		<Unit filename="CommonDialogs.h" />
 		<Unit filename="Extension.cpp" />
 		<Unit filename="dlib-17.12\dlib\all\source.cpp">
 			<Option target="Linux - Release" />
 			<Option target="Linux - Release - Edittime" />
 			<Option target="Linux - Debug - Edittime" />
 			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
 		</Unit>
 		<Unit filename="nwidgets\nsource.cpp">
 			<Option target="Linux - Release" />
 			<Option target="Linux - Release - Edittime" />
 			<Option target="Linux - Debug - Edittime" />
 			<Option target="Linux - Debug" />
+			<Option target="Mac - Release" />
+			<Option target="Mac - Debug" />
 		</Unit>
 		<Extensions>
 			<code_completion />

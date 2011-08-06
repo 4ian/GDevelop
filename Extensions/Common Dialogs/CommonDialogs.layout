@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="CommonDialogsActions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="71" topLine="3" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="5317" topLine="71" />
 	</File>
-	<File name="CommonDialogsActions.h" open="0" top="0" tabpos="3">
-		<Cursor position="71" topLine="3" />
+	<File name="dlib-17.12\dlib\all\source.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="614" topLine="0" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="7193" topLine="134" />
-	</File>
-	<File name="dlib-17.12\dlib\all\source.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="614" topLine="0" />
-	</File>
-	<File name="nwidgets\nsource.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="250" topLine="0" />
+	<File name="nwidgets\nsource.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="250" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

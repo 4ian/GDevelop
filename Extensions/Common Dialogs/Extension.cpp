@@ -26,7 +26,6 @@ freely, subject to the following restrictions:
 
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
-#include "CommonDialogsActions.h"
 #include <boost/version.hpp>
 
 /**
@@ -50,59 +49,67 @@ class Extension : public ExtensionBase
             DECLARE_ACTION("ShowMsgBox",
                            _("Afficher une boite de message"),
                            _("Affiche une boite de message avec le texte indiqué, et un bouton ok."),
-                           _("Afficher le message \"_PARAM0_\" avec le titre \"_PARAM1_\""),
+                           _("Afficher le message \"_PARAM1_\" avec le titre \"_PARAM2_\""),
                            _("Interfaces"),
                            "res/actions/msgbox24.png",
-                           "res/actions/msgbox.png",
-                           &ActShowMsgBox);
+                           "res/actions/msgbox.png");
 
-                DECLARE_PARAMETER("text", _("Message"), false, "")
-                DECLARE_PARAMETER("text", _("Titre"), false, "")
+                instrInfo.AddCodeOnlyParameter("currentScene", "");
+                instrInfo.AddParameter("string", _("Message"), "", false);
+                instrInfo.AddParameter("string", _("Titre"), "", false);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonDialogs::ShowMessageBox").SetIncludeFile("Common Dialogs/CommonDialogs.h");
 
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("ShowOpenFile",
                            _("Afficher une fenêtre d'ouverture de fichier"),
                            _("Affiche une fenêtre permettant de choisir un fichier.\nLe nom et répertoire du fichier est enregistré dans la variable de la scène indiquée."),
-                           _("Ouvrir une fenêtre de choix de fichier, et enregistrer le résultat dans _PARAM0_"),
+                           _("Ouvrir une fenêtre de choix de fichier, et enregistrer le résultat dans _PARAM1_"),
                            _("Interfaces"),
                            "res/actions/openfile24.png",
-                           "res/actions/openfile.png",
-                           &ActShowOpenFile);
+                           "res/actions/openfile.png");
 
-                DECLARE_PARAMETER("scenevar", _("Variable de la scène où enregistrer le résultat"), false, "")
-                DECLARE_PARAMETER("text", _("Titre"), false, "")
-                DECLARE_PARAMETER("text", _("Filtres ( Forme : \"TypeDeFichier|*.ext;*.ext2|TypeDeFichier2|*.ext3\" ) ( Windows seulement ) "), false, "")
+                instrInfo.AddCodeOnlyParameter("currentScene", "");
+                instrInfo.AddParameter("scenevar", _("Variable de la scène où enregistrer le résultat"), "", false);
+                instrInfo.AddParameter("string", _("Titre"), "", false);
+                instrInfo.AddParameter("string", _("Filtres ( Forme : \"TypeDeFichier|*.ext;*.ext2|TypeDeFichier2|*.ext3\" ) ( Windows seulement ) "), "", false);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonDialogs::ShowOpenFile").SetIncludeFile("Common Dialogs/CommonDialogs.h");
 
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("ShowTextInput",
                            _("Afficher une fenêtre d'entrée de texte"),
                            _("Affiche une fenêtre permettant d'entrer un texte.\nLe texte sera enregistré dans la variable de la scène indiquée."),
-                           _("Ouvrir une fenêtre d'entrée de texte, et enregistrer le résultat dans _PARAM0_"),
+                           _("Ouvrir une fenêtre d'entrée de texte, et enregistrer le résultat dans _PARAM1_"),
                            _("Interfaces"),
                            "res/actions/textenter24.png",
-                           "res/actions/textenter.png",
-                           &ActShowTextInput);
+                           "res/actions/textenter.png");
 
-                DECLARE_PARAMETER("scenevar", _("Variable de la scène où enregistrer le résultat"), false, "")
-                DECLARE_PARAMETER("text", _("Message"), false, "")
-                DECLARE_PARAMETER("text", _("Titre"), false, "")
+                instrInfo.AddCodeOnlyParameter("currentScene", "");
+                instrInfo.AddParameter("scenevar", _("Variable de la scène où enregistrer le résultat"), "", false);
+                instrInfo.AddParameter("string", _("Message"), "", false);
+                instrInfo.AddParameter("string", _("Titre"), "", false);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonDialogs::ShowTextInput").SetIncludeFile("Common Dialogs/CommonDialogs.h");
 
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("ShowYesNoMsgBox",
                            _("Afficher une boite de message Oui/Non"),
                            _("Affiche une fenêtre permettant de choisir entre oui ou non.\nLa réponse ( \"yes\" ou \"no\" ) sera enregistrée dans la variable de la scène indiquée."),
-                           _("Ouvrir une fenêtre Oui/Non, et enregistrer le résultat dans _PARAM0_"),
+                           _("Ouvrir une fenêtre Oui/Non, et enregistrer le résultat dans _PARAM1_"),
                            _("Interfaces"),
                            "res/actions/msgbox24.png",
-                           "res/actions/msgbox.png",
-                           &ActShowYesNoMsgBox);
+                           "res/actions/msgbox.png");
 
-                DECLARE_PARAMETER("scenevar", _("Variable de la scène où enregistrer le résultat"), false, "")
-                DECLARE_PARAMETER("text", _("Message"), false, "")
-                DECLARE_PARAMETER("text", _("Titre"), false, "")
+                instrInfo.AddCodeOnlyParameter("currentScene", "");
+                instrInfo.AddParameter("scenevar", _("Variable de la scène où enregistrer le résultat"), "", false);
+                instrInfo.AddParameter("string", _("Message"), "", false);
+                instrInfo.AddParameter("string", _("Titre"), "", false);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonDialogs::ShowYesNoMsgBox").SetIncludeFile("Common Dialogs/CommonDialogs.h");
 
             DECLARE_END_ACTION()
 

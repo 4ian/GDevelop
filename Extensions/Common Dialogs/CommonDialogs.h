@@ -24,17 +24,23 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef AESACTIONS_H_INCLUDED
-#define AESACTIONS_H_INCLUDED
+#ifndef COMMONDIALOGS_H_INCLUDED
+#define COMMONDIALOGS_H_INCLUDED
 
+#include <string>
 class RuntimeScene;
-class ObjectsConcerned;
-class Instruction;
-class Evaluateur;
 
-bool ActShowMsgBox( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActShowOpenFile( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActShowYesNoMsgBox( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActShowTextInput( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+namespace GDpriv
+{
+namespace CommonDialogs
+{
 
-#endif // AESACTIONS_H_INCLUDED
+void ShowMessageBox( RuntimeScene & scene, const std::string & message, const std::string & title );
+void ShowOpenFile( RuntimeScene & scene, const std::string & variable, const std::string & title, std::string filters );
+void ShowYesNoMsgBox( RuntimeScene & scene, const std::string & variable, const std::string & message, const std::string & title );
+void ShowTextInput( RuntimeScene & scene, const std::string & variable, const std::string & message, const std::string & title );
+
+}
+}
+
+#endif // COMMONDIALOGS_H_INCLUDED

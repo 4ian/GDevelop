@@ -429,21 +429,21 @@ void Box3DObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
     Box3DInitialPositionPanel * box3DPanel = dynamic_cast<Box3DInitialPositionPanel*>(panel);
     if (box3DPanel == NULL) return;
 
-    position.floatInfos["z"] = ToInt(string(box3DPanel->zEdit->GetValue().mb_str()));
-    position.angle = ToInt(string(box3DPanel->yawEdit->GetValue().mb_str()));
-    position.floatInfos["pitch"] = ToInt(string(box3DPanel->pitchEdit->GetValue().mb_str()));
-    position.floatInfos["roll"] = ToInt(string(box3DPanel->rollEdit->GetValue().mb_str()));
+    position.floatInfos["z"] = ToFloat(string(box3DPanel->zEdit->GetValue().mb_str()));
+    position.angle = ToFloat(string(box3DPanel->yawEdit->GetValue().mb_str()));
+    position.floatInfos["pitch"] = ToFloat(string(box3DPanel->pitchEdit->GetValue().mb_str()));
+    position.floatInfos["roll"] = ToFloat(string(box3DPanel->rollEdit->GetValue().mb_str()));
 }
 
 void Box3DObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Largeur");       value = ToString(width);}
-    else if ( propertyNb == 1 ) {name = _("Hauteur");       value = ToString(height);}
-    else if ( propertyNb == 2 ) {name = _("Profondeur");    value = ToString(depth);}
-    else if ( propertyNb == 3 ) {name = _("Coordonnée Z");  value = ToString(zPosition);}
-    else if ( propertyNb == 4 ) {name = _("Yaw");           value = ToString(yaw);}
-    else if ( propertyNb == 5 ) {name = _("Pitch");         value = ToString(pitch);}
-    else if ( propertyNb == 6 ) {name = _("Roll");          value = ToString(roll);}
+    if      ( propertyNb == 0 ) {name = _T("Largeur");       value = ToString(width);}
+    else if ( propertyNb == 1 ) {name = _T("Hauteur");       value = ToString(height);}
+    else if ( propertyNb == 2 ) {name = _T("Profondeur");    value = ToString(depth);}
+    else if ( propertyNb == 3 ) {name = _T("Coordonnée Z");  value = ToString(zPosition);}
+    else if ( propertyNb == 4 ) {name = _T("Yaw");           value = ToString(yaw);}
+    else if ( propertyNb == 5 ) {name = _T("Pitch");         value = ToString(pitch);}
+    else if ( propertyNb == 6 ) {name = _T("Roll");          value = ToString(roll);}
 }
 
 bool Box3DObject::ChangeProperty(unsigned int propertyNb, string newValue)

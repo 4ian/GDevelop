@@ -81,10 +81,6 @@ class GD_EXTENSION_API Box3DObject : public Object
 
         virtual void OnPositionChanged() {};
 
-        virtual float GetWidth() const;
-        virtual float GetHeight() const;
-        inline float GetDepth() const {return depth;};
-
         virtual float GetDrawableX() const;
         virtual float GetDrawableY() const;
 
@@ -96,10 +92,19 @@ class GD_EXTENSION_API Box3DObject : public Object
 
         virtual inline bool SetAngle(float newAngle) { yaw = newAngle; return true;};
         virtual inline float GetAngle() const {return yaw;};
+        float GetPitch() const { return pitch; }
+        void SetPitch(float pitch_) { pitch = pitch_; }
+        float GetRoll() const { return roll; }
+        void SetRoll(float roll_) { roll = roll_; }
+
+        virtual float GetWidth() const;
+        virtual float GetHeight() const;
 
         virtual inline void SetWidth(float newWidth) {width = newWidth;};
         virtual inline void SetHeight(float newHeight) {height = newHeight;};
-        inline void SetDepth(float newDepth) {depth = newDepth;};
+
+        float GetDepth() const { return depth; }
+        void SetDepth(float depth_) { depth = depth_; }
 
         virtual std::vector<RotatedRectangle> GetHitBoxes() const;
 
@@ -109,31 +114,6 @@ class GD_EXTENSION_API Box3DObject : public Object
         std::string leftTextureName;
         std::string rightTextureName;
         std::string backTextureName;
-
-        //Conditions
-        bool CondWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondDepth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondZPosition( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondYaw( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondPitch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool CondRoll( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-
-        //Actions
-        bool ActWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActDepth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActZPosition( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActYaw( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActPitch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActRoll( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-
-        //Expressions
-        double ExpGetDepth( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetZPosition( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetYaw( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetPitch( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGetRoll( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 
     private:
 

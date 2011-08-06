@@ -1,37 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug - Edittime" />
-	<File name="Box3DActions.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="742" topLine="3" />
+	<ActiveTarget name="Development - Edittime" />
+	<File name="Box3DInitialPositionPanel.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="5978" topLine="84" />
 	</File>
-	<File name="Box3DConditions.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="383" topLine="0" />
+	<File name="Box3DInitialPositionPanel.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="997" topLine="0" />
 	</File>
-	<File name="Box3DExpressions.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="63" topLine="3" />
+	<File name="Box3DObject.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="16895" topLine="460" />
 	</File>
-	<File name="Box3DInitialPositionPanel.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="997" topLine="0" />
+	<File name="Box3DObject.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2218" topLine="34" />
 	</File>
-	<File name="Box3DInitialPositionPanel.h" open="0" top="0" tabpos="0">
-		<Cursor position="997" topLine="0" />
+	<File name="Box3DObjectEditor.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="14938" topLine="214" />
 	</File>
-	<File name="Box3DObject.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="11499" topLine="272" />
+	<File name="Box3DObjectEditor.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="997" topLine="3" />
 	</File>
-	<File name="Box3DObject.h" open="0" top="0" tabpos="2">
-		<Cursor position="4031" topLine="91" />
-	</File>
-	<File name="Box3DObjectEditor.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="997" topLine="3" />
-	</File>
-	<File name="Box3DObjectEditor.h" open="0" top="0" tabpos="4">
-		<Cursor position="997" topLine="3" />
-	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="2519" topLine="42" />
-	</File>
-	<File name="..\..\GDL\GDL\tinyxmlparser.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="9006" topLine="339" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="15136" topLine="305" />
 	</File>
 </CodeBlocks_layout_file>

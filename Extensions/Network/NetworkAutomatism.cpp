@@ -128,6 +128,20 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
     }
 }
 
+/**
+ * Generate an object network identifier, unique for each object.
+ */
+void NetworkAutomatism::GenerateObjectNetworkIdentifier( const std::string &, const std::string & automatismName, std::vector<Object*> list )
+{
+    for ( unsigned int i = 0; i<list.size(); ++i )
+    {
+        //We can afford a dynamic_cast in this action
+        NetworkAutomatism* automatism = dynamic_cast<NetworkAutomatism*>(list[i]->GetAutomatismRawPointer(automatismName));
+
+        if ( automatism != NULL ) automatism->objectNetworkId = i;
+    }
+}
+
 #if defined(GD_IDE_ONLY)
 void NetworkAutomatism::SaveToXml(TiXmlElement * elem) const
 {

@@ -26,10 +26,7 @@ freely, subject to the following restrictions:
 
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
-#include "NetworkActions.h"
-#include "NetworkAutomatismActions.h"
 #include "NetworkAutomatism.h"
-#include "NetworkExpressions.h"
 #include "NetworkManager.h"
 #include <boost/version.hpp>
 #include <SFML/Network.hpp>
@@ -58,11 +55,12 @@ class Extension : public ExtensionBase
                            _("Ajouter _PARAM0_ en destinataire"),
                            _("Réseau : Envoi"),
                            "Extensions/networkicon24.png",
-                           "Extensions/networkicon.png",
-                           &ActAddRecipient);
+                           "Extensions/networkicon.png");
 
-                DECLARE_PARAMETER("text", _("Adresse IP du destinataire"), false, "")
-                DECLARE_PARAMETER_OPTIONAL("expression", _("Port du destinataire (Par défaut : 50001)"), false, "")
+                instrInfo.AddParameter("string", _("Adresse IP du destinataire"), "", false);
+                instrInfo.AddParameter("expression", _("Port du destinataire (Par défaut : 50001)"), "", true);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::AddRecipient").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
             DECLARE_END_ACTION()
 
@@ -72,8 +70,10 @@ class Extension : public ExtensionBase
                            _("Vider la liste des destinataires"),
                            _("Réseau : Envoi"),
                            "Extensions/networkicon24.png",
-                           "Extensions/networkicon.png",
-                           &ActRemoveAllRecipients);
+                           "Extensions/networkicon.png");
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::RemoveAllRecipients").SetIncludeFile("Network/NetworkManagerFunctions.h");
+
 
             DECLARE_END_ACTION()
 
@@ -83,10 +83,11 @@ class Extension : public ExtensionBase
                            _("Initialiser la réception de données"),
                            _("Réseau : Reception"),
                            "Extensions/networkicon24.png",
-                           "Extensions/networkicon.png",
-                           &ActListenToPort);
+                           "Extensions/networkicon.png");
 
-                DECLARE_PARAMETER_OPTIONAL("expression", _("Port d'écoute (Par défaut : 50001)"), false, "")
+                instrInfo.AddParameter("expression", _("Port d'écoute (Par défaut : 50001)"), "", true).SetDefaultValue("50001");
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::ListenToPort").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
             DECLARE_END_ACTION()
 
@@ -96,8 +97,9 @@ class Extension : public ExtensionBase
                            _("Arrêter la réception de données"),
                            _("Réseau : Reception"),
                            "Extensions/networkicon24.png",
-                           "Extensions/networkicon.png",
-                           &ActStopListening);
+                           "Extensions/networkicon.png");
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::StopListening").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
             DECLARE_END_ACTION()
 
@@ -107,12 +109,13 @@ class Extension : public ExtensionBase
                            _("Envoyer la valeur _PARAM1_ avec l'intitulé _PARAM0_ aux destinataires"),
                            _("Réseau : Envoi"),
                            "Extensions/networkicon24.png",
-                           "Extensions/networkicon.png",
-                           &ActSendValue);
+                           "Extensions/networkicon.png");
 
-                DECLARE_PARAMETER("text", _("Groupe"), false, "")
-                DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                MAIN_OBJECTS_IN_PARAMETER(0)
+                instrInfo.AddParameter("string", _("Groupe"), "", false);
+                instrInfo.AddParameter("expression", _("Valeur"), "", false);
+
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::SendValue").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
             DECLARE_END_ACTION()
 
@@ -122,11 +125,12 @@ class Extension : public ExtensionBase
                            _("Envoyer le texte _PARAM1_ avec l'intitulé _PARAM0_ aux destinataires"),
                            _("Réseau : Envoi"),
                            "Extensions/networkicon24.png",
-                           "Extensions/networkicon.png",
-                           &ActSendString);
+                           "Extensions/networkicon.png");
 
-                DECLARE_PARAMETER("text", _("Groupe"), false, "")
-                DECLARE_PARAMETER("text", _("Texte"), false, "")
+                instrInfo.AddParameter("string", _("Groupe"), "", false);
+                instrInfo.AddParameter("string", _("Texte"), "", false);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::SendString").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
             DECLARE_END_ACTION()
 
@@ -136,8 +140,9 @@ class Extension : public ExtensionBase
                            _("Recevoir les données"),
                            _("Réseau : Reception"),
                            "Extensions/networkicon24.png",
-                           "Extensions/networkicon.png",
-                           &ActReceivePackets);
+                           "Extensions/networkicon.png");
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::ReceivePackets").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
             DECLARE_END_ACTION()
 
@@ -147,27 +152,38 @@ class Extension : public ExtensionBase
                            _("Supprimer toutes les données reçues et stockées en mémoire"),
                            _("Réseau : Reception"),
                            "Extensions/networkicon24.png",
-                           "Extensions/networkicon.png",
-                           &ActResetReceivedData);
+                           "Extensions/networkicon.png");
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::ResetReceivedData").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
             DECLARE_END_ACTION()
 
-            DECLARE_STR_EXPRESSION("GetReceivedDataString", _("Obtenir le texte d'une donnée"), _("Obtenir le texte contenu dans une donnée"), _("Réseau : Reception"), "Extensions/networkicon.png", &ExpGetReceivedDataString)
-                DECLARE_PARAMETER("text", _("Nom de la donnée contenant le texte à récupérer"), false, "")
+            DECLARE_STR_EXPRESSION("GetReceivedDataString", _("Obtenir le texte d'une donnée"), _("Obtenir le texte contenu dans une donnée"), _("Réseau : Reception"), "Extensions/networkicon.png")
+                instrInfo.AddParameter("string", _("Nom de la donnée contenant le texte à récupérer"), "", false);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::GetReceivedDataString").SetIncludeFile("Network/NetworkManagerFunctions.h");
             DECLARE_END_STR_EXPRESSION()
 
-            DECLARE_EXPRESSION("GetReceivedDataValue", _("Obtenir la valeur d'une donnée"), _("Obtenir la valeur contenue dans une donnée"), _("Réseau : Reception"), "Extensions/networkicon.png", &ExpGetReceivedDataValue)
-                DECLARE_PARAMETER("text", _("Nom de la donnée contenant le texte à récupérer"), false, "")
+            DECLARE_EXPRESSION("GetReceivedDataValue", _("Obtenir la valeur d'une donnée"), _("Obtenir la valeur contenue dans une donnée"), _("Réseau : Reception"), "Extensions/networkicon.png")
+                instrInfo.AddParameter("string", _("Nom de la donnée contenant le texte à récupérer"), "", false);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::GetReceivedDataValue").SetIncludeFile("Network/NetworkManagerFunctions.h");
             DECLARE_END_EXPRESSION()
 
-            DECLARE_STR_EXPRESSION("GetLastError", _("Dernière erreur survenue"), _("Obtenir le texte décrivant la dernière erreur survenue."), _("Réseau : Erreurs"), "res/error.png", &ExpGetLastError)
+            DECLARE_STR_EXPRESSION("GetLastError", _("Dernière erreur survenue"), _("Obtenir le texte décrivant la dernière erreur survenue."), _("Réseau : Erreurs"), "res/error.png")
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::GetLastError").SetIncludeFile("Network/NetworkManagerFunctions.h");
             DECLARE_END_STR_EXPRESSION()
 
-            DECLARE_STR_EXPRESSION("GetPublicAddress", _("Adresse IP"), _("Permet d'obtenir l'adresse de l'ordinateur sur internet."), _("Réseau"), "Extensions/networkicon.png", &ExpGetPublicAddress)
-                DECLARE_PARAMETER_OPTIONAL("expression", _("Temps au maximum à attendre afin d'obtenir l'adresse ( en secondes ) ( 0 = Pas de limite )"), false, "")
+            DECLARE_STR_EXPRESSION("GetPublicAddress", _("Adresse IP"), _("Permet d'obtenir l'adresse de l'ordinateur sur internet."), _("Réseau"), "Extensions/networkicon.png")
+                instrInfo.AddParameter("expression", _("Temps au maximum à attendre afin d'obtenir l'adresse ( en secondes ) ( 0 = Pas de limite )"), "", true);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::GetPublicAddress").SetIncludeFile("Network/NetworkManagerFunctions.h");
             DECLARE_END_STR_EXPRESSION()
 
-            DECLARE_STR_EXPRESSION("GetLocalAdress", _("Adresse IP ( Locale/LAN )"), _("Permet d'obtenir l'adresse de l'ordinateur sur internet."), _("Réseau"), "Extensions/networkicon.png", &ExpGetLocalAddress)
+            DECLARE_STR_EXPRESSION("GetLocalAdress", _("Adresse IP ( Locale/LAN )"), _("Permet d'obtenir l'adresse de l'ordinateur sur internet."), _("Réseau"), "Extensions/networkicon.png")
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::NetworkExtension::GetLocalAdress").SetIncludeFile("Network/NetworkManagerFunctions.h");
             DECLARE_END_STR_EXPRESSION()
 
             DECLARE_AUTOMATISM("NetworkAutomatism",
@@ -179,18 +195,21 @@ class Extension : public ExtensionBase
                       NetworkAutomatism,
                       SceneNetworkDatas)
 
+                automatismInfo.SetIncludeFile("Network/NetworkAutomatism.h");
+
                 DECLARE_AUTOMATISM_ACTION("SetAsSender",
                                _("Mettre en envoi de données"),
                                _("L'automatisme enverra les données de ses objets.\nAssurez vous d'avoir généré les identifiants des objets auparavant"),
                                _("Mettre _PARAM0_ en envoi de données"),
                                _("Automatisme Mise à jour en réseau automatique"),
                                "Extensions/networkicon24.png",
-                               "Extensions/networkicon.png",
-                               &NetworkAutomatism::ActSetAsSender);
+                               "Extensions/networkicon.png");
 
-                    DECLARE_PARAMETER("object", _("Object"), true, "")
-                    DECLARE_PARAMETER("automatism", _("Automatism"), false, "NetworkAutomatism")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "", false);
+                    instrInfo.AddParameter("automatism", _("Automatism"), "NetworkAutomatism", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetAsSender").SetIncludeFile("Network/NetworkAutomatism.h");
 
                 DECLARE_END_AUTOMATISM_ACTION()
 
@@ -200,12 +219,13 @@ class Extension : public ExtensionBase
                                _("Mettre _PARAM0_ en réception de données"),
                                _("Automatisme Mise à jour en réseau automatique"),
                                "Extensions/networkicon24.png",
-                               "Extensions/networkicon.png",
-                               &NetworkAutomatism::ActSetAsReceiver);
+                               "Extensions/networkicon.png");
 
-                    DECLARE_PARAMETER("object", _("Object"), true, "")
-                    DECLARE_PARAMETER("automatism", _("Automatism"), false, "NetworkAutomatism")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "", false);
+                    instrInfo.AddParameter("automatism", _("Automatism"), "NetworkAutomatism", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetAsReceiver").SetIncludeFile("Network/NetworkAutomatism.h");
 
                 DECLARE_END_AUTOMATISM_ACTION()
 
@@ -215,19 +235,22 @@ class Extension : public ExtensionBase
                                _("Mettre l'identifiant de _PARAM0_ à _PARAM2_"),
                                _("Automatisme Mise à jour en réseau automatique"),
                                "Extensions/networkicon24.png",
-                               "Extensions/networkicon.png",
-                               &NetworkAutomatism::ActSetIdentifier);
+                               "Extensions/networkicon.png");
 
-                    DECLARE_PARAMETER("object", _("Object"), true, "")
-                    DECLARE_PARAMETER("automatism", _("Automatism"), false, "NetworkAutomatism")
-                    DECLARE_PARAMETER("expression", _("Identifiant"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "", false);
+                    instrInfo.AddParameter("automatism", _("Automatism"), "NetworkAutomatism", false);
+                    instrInfo.AddParameter("expression", _("Identifiant"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
 
                 DECLARE_END_AUTOMATISM_ACTION()
 
-                DECLARE_AUTOMATISM_EXPRESSION("GetIdentifier", _("Obtenir l'identifiant de l'objet"), _("Obtenir l'identifiant de l'objet"), _("Automatisme Mise à jour en réseau automatique"), "res/texteicon.png", &NetworkAutomatism::ExpGetIdentifier)
-                    DECLARE_PARAMETER("object", _("Objet"), true, "")
-                    DECLARE_PARAMETER("automatism", _("Automatisme"), false, "NetworkAutomatism")
+                DECLARE_AUTOMATISM_EXPRESSION("GetIdentifier", _("Obtenir l'identifiant de l'objet"), _("Obtenir l'identifiant de l'objet"), _("Automatisme Mise à jour en réseau automatique"), "res/texteicon.png")
+                    instrInfo.AddParameter("object", _("Objet"), "", false);
+                    instrInfo.AddParameter("automatism", _("Automatisme"), "NetworkAutomatism", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
                 DECLARE_END_AUTOMATISM_EXPRESSION()
 
             DECLARE_END_AUTOMATISM()
@@ -238,12 +261,14 @@ class Extension : public ExtensionBase
                            _("Générer des identifiants réseau unique pour _PARAM0_"),
                            _("Automatisme Mise à jour en réseau automatique"),
                            "Extensions/networkicon24.png",
-                           "Extensions/networkicon.png",
-                           &ActGenereateObjectNetworkId);
+                           "Extensions/networkicon.png");
 
-                DECLARE_PARAMETER("object", _("Object"), true, "")
-                DECLARE_PARAMETER("automatism", _("Automatism"), false, "NetworkAutomatism")
-                MAIN_OBJECTS_IN_PARAMETER(0)
+                instrInfo.AddParameter("object", _("Objet"), "", false);
+                instrInfo.AddParameter("automatism", _("Automatism"), "NetworkAutomatism", false);
+                instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
+
+
+                instrInfo.cppCallingInformation.SetFunctionName("NetworkAutomatism::GenerateObjectNetworkIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
 
             DECLARE_END_ACTION()
 

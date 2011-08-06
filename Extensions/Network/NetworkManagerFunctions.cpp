@@ -36,76 +36,92 @@ freely, subject to the following restrictions:
 #include <string>
 #include <list>
 
-bool ActResetReceivedData( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+namespace GDpriv
+{
+namespace NetworkExtension
+{
+
+void GD_EXTENSION_API ResetReceivedData()
 {
     ReceivedDataManager::GetInstance()->values.clear();
     ReceivedDataManager::GetInstance()->strings.clear();
-
-    return true;
 }
 
-bool ActStopListening( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_EXTENSION_API ActStopListening()
 {
     NetworkManager::GetInstance()->StopListening();
-
-    return true;
 }
 
-bool ActAddRecipient( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_EXTENSION_API AddRecipient( const std::string & adressStr, short unsigned int port  )
 {
-    sf::IpAddress address = action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned);
-    short unsigned int port = action.GetParameter(1).GetAsMathExpressionResult(scene, objectsConcerned);
+    sf::IpAddress address = adressStr;
 
     if ( port == 0 ) port = 50001; //Default value
 
     NetworkManager::GetInstance()->AddRecipient(address, port);
-
-    return true;
 }
 
-bool ActRemoveAllRecipients( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_EXTENSION_API RemoveAllRecipients()
 {
     NetworkManager::GetInstance()->RemoveAllRecipients();
-
-    return true;
 }
 
-bool ActListenToPort( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_EXTENSION_API ListenToPort( short unsigned int port )
 {
-    short unsigned int port = action.GetParameter(0).GetAsMathExpressionResult(scene, objectsConcerned);
     if ( port == 0 ) port = 50001;
 
     NetworkManager::GetInstance()->ListenToPort(port);
-    return true;
 }
 
-bool ActSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_EXTENSION_API SendValue( const std::string & title, double data )
 {
     sf::Packet packet;
-    packet  << sf::Int32(0)
-            << action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)
-            << static_cast<double>(action.GetParameter(1).GetAsMathExpressionResult(scene, objectsConcerned));
+    packet  << sf::Int32(0) //0 indicate that the packet contains a double
+            << title
+            << static_cast<double>(data);
 
     NetworkManager::GetInstance()->Send(packet);
-
-    return true;
 }
 
-bool ActSendString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_EXTENSION_API SendString( const std::string & title, const std::string & data )
 {
     sf::Packet packet;
-    packet  << sf::Int32(1)
-            << action.GetParameter(0).GetAsTextExpressionResult(scene, objectsConcerned)
-            << action.GetParameter(1).GetAsTextExpressionResult(scene, objectsConcerned);
+    packet  << sf::Int32(1) //1 indicate that the packet contains a string
+            << title
+            << data;
 
     NetworkManager::GetInstance()->Send(packet);
-
-    return true;
 }
 
-bool ActReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_EXTENSION_API ReceivePackets(  )
 {
     NetworkManager::GetInstance()->ReceivePackets();
+}
 
-    return true;
+std::string GD_EXTENSION_API GetReceivedDataString( const std::string & title)
+{
+    return ReceivedDataManager::GetInstance()->strings[title];
+}
+
+double GD_EXTENSION_API GetReceivedDataValue( const std::string & title )
+{
+    return ReceivedDataManager::GetInstance()->values[title];
+}
+
+std::string GD_EXTENSION_API GetLastError()
+{
+    return ErrorManager::GetInstance()->GetLastError();
+}
+
+std::string GD_EXTENSION_API GetPublicAddress(float timeout)
+{
+    return sf::IpAddress::GetPublicAddress(timeout).ToString();
+}
+
+std::string GD_EXTENSION_API GetLocalAddress()
+{
+    return sf::IpAddress::GetLocalAddress().ToString();
+}
+
+}
 }

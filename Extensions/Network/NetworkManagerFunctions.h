@@ -26,19 +26,28 @@ freely, subject to the following restrictions:
 
 #ifndef NetworkACTIONS_H_INCLUDED
 #define NetworkACTIONS_H_INCLUDED
+#include <string>
 
-class RuntimeScene;
-class ObjectsConcerned;
-class Instruction;
-class Evaluateur;
+namespace GDpriv
+{
+namespace NetworkExtension
+{
 
-bool ActStopListening( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActResetReceivedData( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActAddRecipient( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActRemoveAllRecipients( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActListenToPort( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActSendValue( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActSendString( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-bool ActReceivePackets( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+void GD_EXTENSION_API ResetReceivedData();
+void GD_EXTENSION_API ActStopListening();
+void GD_EXTENSION_API AddRecipient( const std::string & adressStr, short unsigned int port  );
+void GD_EXTENSION_API RemoveAllRecipients();
+void GD_EXTENSION_API ListenToPort( short unsigned int port );
+void GD_EXTENSION_API SendValue( const std::string & title, double data );
+void GD_EXTENSION_API SendString( const std::string & title, const std::string & data );
+void GD_EXTENSION_API ReceivePackets(  );
+std::string GD_EXTENSION_API GetReceivedDataString( const std::string & title);
+double GD_EXTENSION_API GetReceivedDataValue( const std::string & title );
+std::string GD_EXTENSION_API GetLastError();
+std::string GD_EXTENSION_API GetPublicAddress(float timeout);
+std::string GD_EXTENSION_API GetLocalAddress();
+
+}
+}
 
 #endif // NetworkACTIONS_H_INCLUDED

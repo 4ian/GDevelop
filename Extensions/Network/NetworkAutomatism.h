@@ -76,18 +76,23 @@ class GD_EXTENSION_API NetworkAutomatism : public Automatism
         bool width; ///< True if width must be send/updated
         bool height; ///< True if height must be send/updated
 
-        bool sending;
-        unsigned int objectNetworkId;
+        void SetAsSender() {sending=true;};
+        void SetAsReceiver() {sending=false;};
+        void SetIdentifier(unsigned int identifier) {objectNetworkId = identifier;};
+        unsigned int GetIdentifier() const { return objectNetworkId; }
 
-        bool ActSetAsSender( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetAsReceiver( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetIdentifier( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpGetIdentifier( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction ) { return objectNetworkId; };
+        /**
+         * Generate a unique identifier for all objects of list, using automatism named automatismName.
+         */
+        static void GenerateObjectNetworkIdentifier( const std::string &, const std::string & automatismName, std::vector<Object*> list );
 
     private:
 
         virtual void DoStepPreEvents(RuntimeScene & scene);
         virtual void DoStepPostEvents(RuntimeScene & scene);
+
+        bool sending;
+        unsigned int objectNetworkId;
 
         boost::shared_ptr<RuntimeSceneNetworkDatas> runtimeScenesNetworkDatas;
 };

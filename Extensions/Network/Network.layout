@@ -1,70 +1,55 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="ErrorManager.cpp" open="0" top="0" tabpos="21">
-		<Cursor position="75" topLine="0" />
+	<File name="ErrorManager.cpp" open="0" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="75" topLine="0" />
 	</File>
-	<File name="ErrorManager.h" open="0" top="0" tabpos="20">
-		<Cursor position="126" topLine="6" />
+	<File name="ErrorManager.h" open="0" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="126" topLine="6" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="13131" topLine="236" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="15272" topLine="268" />
 	</File>
-	<File name="NetworkActions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="1158" topLine="22" />
+	<File name="NetworkAutomatism.cpp" open="1" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3892" topLine="0" />
 	</File>
-	<File name="NetworkActions.h" open="0" top="0" tabpos="3">
-		<Cursor position="1244" topLine="8" />
+	<File name="NetworkAutomatism.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2748" topLine="67" />
 	</File>
-	<File name="NetworkAutomatism.cpp" open="0" top="0" tabpos="13">
-		<Cursor position="4176" topLine="95" />
+	<File name="NetworkAutomatismEditor.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="7826" topLine="131" />
 	</File>
-	<File name="NetworkAutomatism.h" open="0" top="0" tabpos="3">
-		<Cursor position="1967" topLine="27" />
+	<File name="NetworkAutomatismEditor.h" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1008" topLine="3" />
 	</File>
-	<File name="NetworkAutomatismActions.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="506" topLine="2" />
+	<File name="NetworkManager.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="476" topLine="0" />
 	</File>
-	<File name="NetworkAutomatismActions.h" open="0" top="0" tabpos="10">
-		<Cursor position="70" topLine="0" />
+	<File name="NetworkManager.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="503" topLine="22" />
 	</File>
-	<File name="NetworkAutomatismEditor.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="1008" topLine="3" />
+	<File name="NetworkManagerFunctions.cpp" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3125" topLine="94" />
 	</File>
-	<File name="NetworkAutomatismEditor.h" open="0" top="0" tabpos="16">
-		<Cursor position="1008" topLine="3" />
+	<File name="NetworkManagerFunctions.h" open="0" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1822" topLine="20" />
 	</File>
-	<File name="NetworkExpressions.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="64" topLine="3" />
+	<File name="ReceivedDataManager.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="64" topLine="0" />
 	</File>
-	<File name="NetworkExpressions.h" open="0" top="0" tabpos="3">
-		<Cursor position="866" topLine="9" />
+	<File name="ReceivedDataManager.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1583" topLine="33" />
 	</File>
-	<File name="NetworkManager.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="476" topLine="0" />
+	<File name="RuntimeSceneNetworkDatas.cpp" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="64" topLine="0" />
 	</File>
-	<File name="NetworkManager.h" open="0" top="0" tabpos="5">
-		<Cursor position="232" topLine="1" />
+	<File name="RuntimeSceneNetworkDatas.h" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="64" topLine="3" />
 	</File>
-	<File name="ReceivedDataManager.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="64" topLine="0" />
+	<File name="SceneNetworkDatas.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1107" topLine="1" />
 	</File>
-	<File name="ReceivedDataManager.h" open="0" top="0" tabpos="4">
-		<Cursor position="1583" topLine="33" />
-	</File>
-	<File name="RuntimeSceneNetworkDatas.cpp" open="0" top="0" tabpos="14">
-		<Cursor position="64" topLine="0" />
-	</File>
-	<File name="RuntimeSceneNetworkDatas.h" open="0" top="0" tabpos="13">
-		<Cursor position="64" topLine="3" />
-	</File>
-	<File name="SceneNetworkDatas.cpp" open="0" top="0" tabpos="11">
-		<Cursor position="1107" topLine="1" />
-	</File>
-	<File name="SceneNetworkDatas.h" open="0" top="0" tabpos="12">
-		<Cursor position="1833" topLine="15" />
-	</File>
-	<File name="..\..\GDL\GDL\tinyxmlparser.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="9006" topLine="338" />
+	<File name="SceneNetworkDatas.h" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1833" topLine="15" />
 	</File>
 </CodeBlocks_layout_file>

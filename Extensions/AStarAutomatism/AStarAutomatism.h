@@ -85,10 +85,14 @@ class GD_EXTENSION_API AStarAutomatism : public Automatism, public boost::enable
          */
         void Reset();
 
+        void MoveTo( RuntimeScene & scene, float destinationX_, float destinationY_ );
+
         /**
          * Change segment of the path where the object is
          */
         void EnterSegment(unsigned int segmentNumber);
+
+        unsigned int GetCurrentSegment() const { return currentSegment; }
 
         /**
          * Get the cost of the object when considered as an obstacle
@@ -100,48 +104,64 @@ class GD_EXTENSION_API AStarAutomatism : public Automatism, public boost::enable
          */
         void SetCost(unsigned int cost_) { cost = cost_; };
 
+        void SetSpeed(float speed_) { speed = speed_; };
+        float GetSpeed() const { return speed; };
+
+        float GetDestinationX() const { return destinationX; };
+        float GetDestinationY() const { return destinationY; };
+
+        double GetLastNodeX()
+        {
+            return path.empty() ? object->GetX() : path[currentSegment].x;
+        }
+
+        double GetLastNodeY()
+        {
+            return path.empty() ? object->GetY() : path[currentSegment].y;
+        }
+
+        double GetNextNodeX()
+        {
+            return !path.empty() && currentSegment < path.size()-1 ? path[currentSegment+1].x : destinationX;
+        }
+        double GetNextNodeY()
+        {
+            return !path.empty() && currentSegment < path.size()-1 ? path[currentSegment+1].y : destinationY;
+        }
+
+        bool PathFound() { return !path.empty(); };
+        bool DestinationReached() { return currentSegment >= path.size(); };
+
+        void SetLeftBorder(unsigned int leftBorder_) { leftBorder = leftBorder_; };
+        unsigned int GetLeftBorder() const { return leftBorder; };
+
+        void SetRightBorder(unsigned int rightBorder_) { rightBorder = rightBorder_; };
+        unsigned int GetRightBorder() const { return rightBorder; };
+
+        void SetTopBorder(unsigned int topBorder_) { topBorder = topBorder_; };
+        unsigned int GetTopBorder() const { return topBorder; };
+
+        void SetBottomBorder(unsigned int bottomBorder_) { bottomBorder = bottomBorder_; };
+        unsigned int GetBottomBorder() const { return bottomBorder; };
+
+        /** Used only by GD events generated code
+         */
+        void SetGridWidth( RuntimeScene & scene, float gridWidth );
+
+        /** Used only by GD events generated code
+         */
+        void SetGridHeight( RuntimeScene & scene, float gridHeight );
+
+        /** Used only by GD events generated code
+         */
+        float GetGridWidth( RuntimeScene & scene );
+
+        /** Used only by GD events generated code
+         */
+        float GetGridHeight( RuntimeScene & scene );
+
+
         static std::map < const Scene* , SceneAStarDatas > scenesPathDatas; ///< Static map associating scene to datas
-
-        bool ActSetDestination( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetSpeed( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondSpeed( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetCost( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondCost( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActEnterSegment( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondPathFound( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action ) { return !path.empty(); };
-        bool CondDestinationReached( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action ) { return currentSegment >= path.size(); };
-
-        double ExpSpeed( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpCost( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpLastNodeX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpLastNodeY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpNextNodeX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpNextNodeY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpDestinationX( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpDestinationY( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-
-        bool CondGridWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetGridWidth( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondGridHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetGridHeight( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpGridWidth( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpGridHeight( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-
-        bool CondLeftBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetLeftBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpLeftBorder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-
-        bool CondRightBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetRightBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpRightBorder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-
-        bool CondBottomBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetBottomBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpBottomBorder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-
-        bool CondTopBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActSetTopBorder( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpTopBorder( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
 
         unsigned int leftBorder;
         unsigned int rightBorder;
@@ -154,7 +174,7 @@ class GD_EXTENSION_API AStarAutomatism : public Automatism, public boost::enable
         /**
          * Compute the path thanks to A* algorithm
          */
-        void ComputePath();
+        void ComputePath(RuntimeScene & scene);
 
         //Path related members
         //sf::Vector2f has been choosen to represent position, but any simple vector2 class would do the job.

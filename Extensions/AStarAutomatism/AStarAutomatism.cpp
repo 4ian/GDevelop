@@ -83,7 +83,7 @@ void AStarAutomatism::DoStepPreEvents(RuntimeScene & scene)
 {
     if ( runtimeScenesAStarDatas == boost::shared_ptr<RuntimeSceneAStarDatas>() )
     {
-        runtimeScenesAStarDatas = boost::static_pointer_cast<RuntimeSceneAStarDatas>(scene.automatismsSharedDatas.find(automatismId)->second);
+        runtimeScenesAStarDatas = boost::static_pointer_cast<RuntimeSceneAStarDatas>(scene.automatismsSharedDatas.find(name)->second);
         runtimeScenesAStarDatas->objects.push_back(shared_from_this());
     }
 
@@ -110,10 +110,13 @@ void AStarAutomatism::DoStepPreEvents(RuntimeScene & scene)
     return;
 }
 
-void AStarAutomatism::ComputePath()
+void AStarAutomatism::ComputePath(RuntimeScene & scene)
 {
     if ( runtimeScenesAStarDatas == boost::shared_ptr<RuntimeSceneAStarDatas>() )
-        return;
+    {
+        runtimeScenesAStarDatas = boost::static_pointer_cast<RuntimeSceneAStarDatas>(scene.automatismsSharedDatas.find(name)->second);
+        runtimeScenesAStarDatas->objects.push_back(shared_from_this());
+    }
 
     //Recreate a new path
     path.clear();
@@ -221,6 +224,30 @@ void AStarAutomatism::ComputePath()
 	return;
 }
 
+void AStarAutomatism::MoveTo( RuntimeScene & scene, float destinationX_, float destinationY_ )
+{
+    destinationX = destinationX_;
+    destinationY = destinationY_;
+
+    ComputePath(scene);
+}
+
+void AStarAutomatism::SetGridWidth( RuntimeScene & scene, float gridWidth )
+{
+    if ( runtimeScenesAStarDatas != boost::shared_ptr<RuntimeSceneAStarDatas>() ) runtimeScenesAStarDatas->gridWidth = gridWidth;
+}
+void AStarAutomatism::SetGridHeight( RuntimeScene & scene, float gridHeight )
+{
+    if ( runtimeScenesAStarDatas != boost::shared_ptr<RuntimeSceneAStarDatas>() ) runtimeScenesAStarDatas->gridHeight = gridHeight;
+}
+float AStarAutomatism::GetGridWidth( RuntimeScene & scene )
+{
+    return runtimeScenesAStarDatas != boost::shared_ptr<RuntimeSceneAStarDatas>() ? runtimeScenesAStarDatas->gridWidth : 0;
+}
+float AStarAutomatism::GetGridHeight( RuntimeScene & scene )
+{
+    return runtimeScenesAStarDatas != boost::shared_ptr<RuntimeSceneAStarDatas>() ? runtimeScenesAStarDatas->gridHeight : 0;
+}
 
 #if defined(GD_IDE_ONLY)
 void AStarAutomatism::SaveToXml(TiXmlElement * elem) const

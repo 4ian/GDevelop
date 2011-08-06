@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #include "DrawerObject.h"
 #include <SFML/Graphics.hpp>
 #include "GDL/Object.h"
-
+#include "GDL/RuntimeScene.h"
 #include "GDL/ImageManager.h"
 #include "GDL/tinyxml.h"
 #include "GDL/FontManager.h"
@@ -249,11 +249,11 @@ void DrawerObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositi
 
 void DrawerObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Couleur de remplissage");    value = ToString(fillColorR)+";"+ToString(fillColorG)+";"+ToString(fillColorB);}
-    else if ( propertyNb == 1 ) {name = _("Opacité du remplissage");    value = ToString(fillOpacity);}
-    else if ( propertyNb == 2 ) {name = _("Taille du contour");         value = ToString(outlineSize);}
-    else if ( propertyNb == 3 ) {name = _("Couleur du contour");        value = ToString(outlineColorR)+";"+ToString(outlineColorG)+";"+ToString(outlineColorB);}
-    else if ( propertyNb == 4 ) {name = _("Opacité du contour");        value = ToString(outlineOpacity);}
+    if      ( propertyNb == 0 ) {name = _T("Couleur de remplissage");    value = ToString(fillColorR)+";"+ToString(fillColorG)+";"+ToString(fillColorB);}
+    else if ( propertyNb == 1 ) {name = _T("Opacité du remplissage");    value = ToString(fillOpacity);}
+    else if ( propertyNb == 2 ) {name = _T("Taille du contour");         value = ToString(outlineSize);}
+    else if ( propertyNb == 3 ) {name = _T("Couleur du contour");        value = ToString(outlineColorR)+";"+ToString(outlineColorG)+";"+ToString(outlineColorB);}
+    else if ( propertyNb == 4 ) {name = _T("Opacité du contour");        value = ToString(outlineOpacity);}
 }
 
 bool DrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -416,6 +416,95 @@ void DrawerObject::SetOutlineOpacity(float val)
     outlineOpacity = val;
 }
 
+/**
+ * Change the fill color
+ */
+void DrawerObject::SetFillColor( const std::string & color )
+{
+    vector < string > colors = SpliterStringToVector <string> (color, ';');
+
+    if ( colors.size() < 3 ) return;
+
+    fillColorR = ToInt(colors[0]);
+    fillColorG = ToInt(colors[1]);
+    fillColorB = ToInt(colors[2]);
+}
+
+/**
+ * Change the color of the outline
+ */
+void DrawerObject::SetOutlineColor( const std::string & color )
+{
+    vector < string > colors = SpliterStringToVector <string> (color, ';');
+
+    if ( colors.size() < 3 ) return; //La couleur est incorrecte
+
+    outlineColorR = ToInt(colors[0]);
+    outlineColorG = ToInt(colors[1]);
+    outlineColorB = ToInt(colors[2]);
+}
+
+void DrawerObject::DrawRectangle( float x, float y, float x2, float y2 )
+{
+    float Xgap = absoluteCoordinates ? 0 : GetX();
+    float Ygap = absoluteCoordinates ? 0 : GetY();
+
+    shapesToDraw.push_back(sf::Shape::Rectangle(x+Xgap,
+                                                y+Ygap,
+                                                x2-x+Xgap,
+                                                y2-y+Ygap,
+                                                sf::Color(fillColorR, fillColorG, fillColorB, fillOpacity),
+                                                outlineSize,
+                                                sf::Color(outlineColorR, outlineColorG, outlineColorB, outlineOpacity)));
+}
+
+void DrawerObject::DrawLine( float x, float y, float x2, float y2, float thickness )
+{
+    float Xgap = absoluteCoordinates ? 0 : GetX();
+    float Ygap = absoluteCoordinates ? 0 : GetY();
+
+    shapesToDraw.push_back(sf::Shape::Line(x+Xgap,
+                                                y+Ygap,
+                                                x2+Xgap,
+                                                y2+Ygap,
+                                                thickness,
+                                                sf::Color(fillColorR, fillColorG, fillColorB, fillOpacity),
+                                                outlineSize,
+                                                sf::Color(outlineColorR, outlineColorG, outlineColorB, outlineOpacity)));
+}
+
+void DrawerObject::DrawCircle( float x, float y, float radius )
+{
+    float Xgap = absoluteCoordinates ? 0 : GetX();
+    float Ygap = absoluteCoordinates ? 0 : GetY();
+
+    shapesToDraw.push_back(sf::Shape::Circle(x+Xgap, y+Ygap, radius,
+                                             sf::Color(fillColorR, fillColorG, fillColorB, fillOpacity),
+                                             outlineSize,
+                                             sf::Color(outlineColorR, outlineColorG, outlineColorB, outlineOpacity)));
+}
+
+namespace GDpriv
+{
+namespace PrimitiveDrawingExtension
+{
+
+void GD_EXTENSION_API CopyImageOnAnother( const std::string & destName, const std::string & srcName, float destX, float destY, RuntimeScene & scene )
+{
+    if ( !scene.game->imageManager->HasImage(destName) ) return;
+    if ( !scene.game->imageManager->HasImage(srcName) ) return;
+
+    boost::shared_ptr<sf::Image> dest = scene.game->imageManager->GetSFMLImage(destName);
+
+    //Make sure the coordinates are correct.
+    if ( destX < 0 || static_cast<unsigned>(destX) >= dest->GetWidth()) return;
+    if ( destY < 0 || static_cast<unsigned>(destY) >= dest->GetWidth()) return;
+
+    dest->Copy(*scene.game->imageManager->GetSFMLImage(srcName), destX, destY);
+}
+
+}
+}
 
 /**
  * Function destroying an extension Object.

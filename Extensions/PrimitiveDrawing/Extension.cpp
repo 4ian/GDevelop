@@ -53,7 +53,10 @@ class Extension : public ExtensionBase
                            _("Objet permettant de dessiner à l'écran"),
                            "Extensions/primitivedrawingicon.png",
                            &CreateDrawerObject,
-                           &DestroyDrawerObject);
+                           &DestroyDrawerObject,
+                           "DrawerObject");
+
+                objInfos.SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_OBJECT_ACTION("Rectangle",
                                _("Rectangle"),
@@ -61,15 +64,16 @@ class Extension : public ExtensionBase
                                _("Dessiner de _PARAM1_;_PARAM2_ à _PARAM3_;_PARAM4_ un rectangle avec _PARAM0_"),
                                _("Dessin"),
                                "res/actions/rectangle24.png",
-                               "res/actions/rectangle.png",
-                               &DrawerObject::ActRectangle);
+                               "res/actions/rectangle.png");
 
-                    DECLARE_PARAMETER("object", _("Objet dessinateur"), true, "Drawer")
-                    DECLARE_PARAMETER("expression", _("Position X du point haut gauche"), false, "")
-                    DECLARE_PARAMETER("expression", _("Position Y du point haut gauche"), false, "")
-                    DECLARE_PARAMETER("expression", _("Position X du point bas droit"), false, "")
-                    DECLARE_PARAMETER("expression", _("Position Y du point bas droit"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet dessinateur"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Position X du point haut gauche"), "", false);
+                    instrInfo.AddParameter("expression", _("Position Y du point haut gauche"), "", false);
+                    instrInfo.AddParameter("expression", _("Position X du point bas droit"), "", false);
+                    instrInfo.AddParameter("expression", _("Position Y du point bas droit"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("DrawRectangle").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -79,14 +83,15 @@ class Extension : public ExtensionBase
                                _("Dessiner en _PARAM1_;_PARAM2_ un cercle de rayon _PARAM3_ avec _PARAM0_"),
                                _("Dessin"),
                                "res/actions/circle24.png",
-                               "res/actions/circle.png",
-                               &DrawerObject::ActCircle);
+                               "res/actions/circle.png");
 
-                    DECLARE_PARAMETER("object", _("Objet dessinateur"), true, "Drawer")
-                    DECLARE_PARAMETER("expression", _("Position X du centre"), false, "")
-                    DECLARE_PARAMETER("expression", _("Position Y du centre"), false, "")
-                    DECLARE_PARAMETER("expression", _("Rayon en pixels"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet dessinateur"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Position X du centre"), "", false);
+                    instrInfo.AddParameter("expression", _("Position Y du centre"), "", false);
+                    instrInfo.AddParameter("expression", _("Rayon en pixels"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("DrawCircle").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -96,16 +101,17 @@ class Extension : public ExtensionBase
                                _("Dessiner de _PARAM1_;_PARAM2_ à _PARAM3_;_PARAM4_ une ligne ( épaisseur  : _PARAM5_) avec _PARAM0_"),
                                _("Dessin"),
                                "res/actions/line24.png",
-                               "res/actions/line.png",
-                               &DrawerObject::ActLine);
+                               "res/actions/line.png");
 
-                    DECLARE_PARAMETER("object", _("Objet dessinateur"), true, "Drawer")
-                    DECLARE_PARAMETER("expression", _("Position X du point de départ"), false, "")
-                    DECLARE_PARAMETER("expression", _("Position Y du point de départ"), false, "")
-                    DECLARE_PARAMETER("expression", _("Position X du point d'arrivée"), false, "")
-                    DECLARE_PARAMETER("expression", _("Position Y du point d'arrivée"), false, "")
-                    DECLARE_PARAMETER("expression", _("Epaisseur en pixels"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet dessinateur"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Position X du point de départ"), "", false);
+                    instrInfo.AddParameter("expression", _("Position Y du point de départ"), "", false);
+                    instrInfo.AddParameter("expression", _("Position X du point d'arrivée"), "", false);
+                    instrInfo.AddParameter("expression", _("Position Y du point d'arrivée"), "", false);
+                    instrInfo.AddParameter("expression", _("Epaisseur en pixels"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("DrawLine").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -115,12 +121,13 @@ class Extension : public ExtensionBase
                                _("Changer la couleur de remplissage de _PARAM0_ en _PARAM1_"),
                                _("Paramétrage"),
                                "res/actions/text24.png",
-                               "res/actions/text.png",
-                               &DrawerObject::ActFillColor);
+                               "res/actions/text.png");
 
-                    DECLARE_PARAMETER("object", _("Objet dessinateur"), true, "Drawer")
-                    DECLARE_PARAMETER("color", _("Couleur de remplissage"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet dessinateur"), "Drawer", false);
+                    instrInfo.AddParameter("color", _("Couleur de remplissage"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetFillColor").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -130,12 +137,13 @@ class Extension : public ExtensionBase
                                _("Changer la couleur du contour de _PARAM0_ en _PARAM1_"),
                                _("Paramétrage"),
                                "res/actions/color24.png",
-                               "res/actions/color.png",
-                               &DrawerObject::ActOutlineColor);
+                               "res/actions/color.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
-                    DECLARE_PARAMETER("color", _("Couleur"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
+                    instrInfo.AddParameter("color", _("Couleur"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetOutlineColor").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -145,13 +153,14 @@ class Extension : public ExtensionBase
                                _("Faire _PARAM2__PARAM1_ à la taille du contour de _PARAM0_"),
                                _("Paramétrage"),
                                "res/actions/outlineSize24.png",
-                               "res/actions/outlineSize.png",
-                               &DrawerObject::ActOutlineSize);
+                               "res/actions/outlineSize.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
-                    DECLARE_PARAMETER("expression", _("Taille en pixels"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Taille en pixels"), "", false);
+                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetOutlineSize").SetManipulatedType("number").SetAssociatedGetter("GetOutlineSize").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -161,13 +170,14 @@ class Extension : public ExtensionBase
                                _("La taille du contour de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Paramétrage"),
                                "res/conditions/outlineSize24.png",
-                               "res/conditions/outlineSize.png",
-                               &DrawerObject::CondOutlineSize);
+                               "res/conditions/outlineSize.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
-                    DECLARE_PARAMETER("expression", _("Taille à tester"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Taille à tester"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetOutlineSize").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
@@ -177,13 +187,15 @@ class Extension : public ExtensionBase
                                _("Faire _PARAM2__PARAM1_ à l'opacité du remplissage de _PARAM0_"),
                                _("Paramétrage"),
                                "res/actions/opacity24.png",
-                               "res/actions/opacity.png",
-                               &DrawerObject::ActFillOpacity);
+                               "res/actions/opacity.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
-                    DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
+                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetFillOpacity").SetManipulatedType("number").SetAssociatedGetter("GetFillOpacity").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
+
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -193,13 +205,14 @@ class Extension : public ExtensionBase
                                _("L'opacité du remplissage de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Paramétrage"),
                                "res/conditions/opacity24.png",
-                               "res/conditions/opacity.png",
-                               &DrawerObject::CondFillOpacity);
+                               "res/conditions/opacity.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
-                    DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetFillOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
@@ -209,13 +222,14 @@ class Extension : public ExtensionBase
                                _("Faire _PARAM2__PARAM1_ à l'opacité du contour de _PARAM0_"),
                                _("Paramétrage"),
                                "res/actions/opacity24.png",
-                               "res/actions/opacity.png",
-                               &DrawerObject::ActOutlineOpacity);
+                               "res/actions/opacity.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
-                    DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
+                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetOutlineOpacity").SetManipulatedType("number").SetAssociatedGetter("GetOutlineOpacity").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -225,13 +239,14 @@ class Extension : public ExtensionBase
                                _("L'opacité du contour de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Paramétrage"),
                                "res/conditions/opacity24.png",
-                               "res/conditions/opacity.png",
-                               &DrawerObject::CondOutlineOpacity);
+                               "res/conditions/opacity.png");
 
-                    DECLARE_PARAMETER("object", _("Objet"), true, "Drawer")
-                    DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                    DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-                    MAIN_OBJECTS_IN_PARAMETER(0)
+                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetOutlineOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
@@ -243,13 +258,15 @@ class Extension : public ExtensionBase
                            _("Copier l'image _PARAM1_ sur _PARAM0_ à l'emplacement _PARAM2_;_PARAM3_"),
                            _("Images"),
                            "res/actions/copy24.png",
-                           "res/actions/copu.png",
-                           &ActCopyImageOnAnother);
+                           "res/actions/copy.png");
 
-                DECLARE_PARAMETER("text", _("Nom de l'image à modifier"), false, "")
-                DECLARE_PARAMETER("text", _("Nom de l'image source"), false, "")
-                DECLARE_PARAMETER("expression", _("Position X"), false, "")
-                DECLARE_PARAMETER("expression", _("Position Y"), false, "")
+                instrInfo.AddParameter("string", _("Nom de l'image à modifier"), "", false);
+                instrInfo.AddParameter("string", _("Nom de l'image source"), "", false);
+                instrInfo.AddParameter("expression", _("Position X"), "", false);
+                instrInfo.AddParameter("expression", _("Position Y"), "", false);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::PrimitiveDrawingExtension::CopyImageOnAnother").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
+
 
             DECLARE_END_ACTION()
 

@@ -29,12 +29,9 @@ freely, subject to the following restrictions:
 
 #include "GDL/Object.h"
 #include <SFML/Graphics.hpp>
-class Evaluateur;
 class ImageManager;
 class RuntimeScene;
 class Object;
-class ExpressionInstruction;
-class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
 #if defined(GD_IDE_ONLY)
@@ -97,6 +94,10 @@ class GD_EXTENSION_API DrawerObject : public Object
         virtual void SetWidth(float ) {};
         virtual void SetHeight(float ) {};
 
+        void DrawRectangle( float x, float y, float x2, float y2 );
+        void DrawLine( float x, float y, float x2, float y2, float thickness );
+        void DrawCircle( float x, float y, float radius );
+
         inline void SetOutlineSize(float size) { outlineSize = size; };
         inline float GetOutlineSize() const { return outlineSize; };
 
@@ -107,6 +108,9 @@ class GD_EXTENSION_API DrawerObject : public Object
         inline unsigned int GetOutlineColorR() const { return outlineColorR; };
         inline unsigned int GetOutlineColorG() const { return outlineColorG; };
         inline unsigned int GetOutlineColorB() const { return outlineColorB; };
+        /** Used by GD events generated code : Prefer using original SetOutlineColor
+         */
+        void SetOutlineColor( const std::string & color );
 
         void SetFillOpacity(float val);
         inline float GetFillOpacity() const {return fillOpacity;};
@@ -116,28 +120,14 @@ class GD_EXTENSION_API DrawerObject : public Object
         inline unsigned int GetFillColorG() const { return fillColorG; };
         inline unsigned int GetFillColorB() const { return fillColorB; };
 
+        /** Used by GD events generated code : Prefer using original SetFillColor
+         */
+        void SetFillColor( const std::string & color );
+
         inline void SetCoordinatesAbsolute() { absoluteCoordinates = true; }
         inline void SetCoordinatesRelative() { absoluteCoordinates = false; }
         inline bool AreCoordinatesAbsolute() { return absoluteCoordinates; }
 
-        //Setup
-        bool ActFillColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActFillOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActOutlineColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActOutlineOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActOutlineSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-
-        bool CondFillOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondOutlineOpacity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool CondOutlineSize( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-
-        //Shapes
-        bool ActRectangle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActLine( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        bool ActCircle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-
-        double ExpFillOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-        double ExpOutlineOpacity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
     private:
 
         vector < sf::Shape > shapesToDraw;
@@ -163,10 +153,17 @@ class GD_EXTENSION_API DrawerObject : public Object
         #endif
 };
 
-bool ActCopyImageOnAnother( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
+namespace GDpriv
+{
+namespace PrimitiveDrawingExtension
+{
+
+void GD_EXTENSION_API CopyImageOnAnother( const std::string & destName, const std::string & srcName, float destX, float destY, RuntimeScene & scene );
+
+}
+}
 
 void DestroyDrawerObject(Object * object);
 Object * CreateDrawerObject(std::string name);
-
 
 #endif // DRAWEROBJECT_H

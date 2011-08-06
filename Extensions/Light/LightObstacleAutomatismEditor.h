@@ -30,11 +30,6 @@ freely, subject to the following restrictions:
 
 //(*Headers(LightObstacleAutomatismEditor)
 #include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/textctrl.h>
-#include <wx/checkbox.h>
-#include <wx/statline.h>
-#include <wx/button.h>
 #include <wx/dialog.h>
 //*)
 #include <boost/shared_ptr.hpp>
@@ -52,22 +47,6 @@ class LightObstacleAutomatismEditor: public wxDialog
 		virtual ~LightObstacleAutomatismEditor();
 
 		//(*Declarations(LightObstacleAutomatismEditor)
-		wxButton* OkBt;
-		wxStaticText* StaticText2;
-		wxTextCtrl* bottomBorderEdit;
-		wxStaticText* StaticText1;
-		wxStaticText* StaticText3;
-		wxButton* cancelBt;
-		wxTextCtrl* gridHeightEdit;
-		wxTextCtrl* topBorderEdit;
-		wxStaticText* StaticText5;
-		wxStaticLine* StaticLine1;
-		wxTextCtrl* rightBorderEdit;
-		wxTextCtrl* costEdit;
-		wxTextCtrl* gridWidthEdit;
-		wxTextCtrl* leftBorderEdit;
-		wxCheckBox* diagonalMoveCheck;
-		wxStaticText* StaticText4;
 		//*)
 
 		LightObstacleAutomatism & automatism;
@@ -75,22 +54,6 @@ class LightObstacleAutomatismEditor: public wxDialog
 	protected:
 
 		//(*Identifiers(LightObstacleAutomatismEditor)
-		static const long ID_STATICTEXT1;
-		static const long ID_TEXTCTRL1;
-		static const long ID_STATICTEXT2;
-		static const long ID_STATICTEXT4;
-		static const long ID_TEXTCTRL4;
-		static const long ID_TEXTCTRL5;
-		static const long ID_TEXTCTRL6;
-		static const long ID_TEXTCTRL7;
-		static const long ID_STATICTEXT3;
-		static const long ID_TEXTCTRL2;
-		static const long ID_STATICTEXT5;
-		static const long ID_TEXTCTRL3;
-		static const long ID_CHECKBOX1;
-		static const long ID_STATICLINE1;
-		static const long ID_BUTTON1;
-		static const long ID_BUTTON2;
 		//*)
 
 	private:

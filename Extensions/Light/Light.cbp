@@ -10,7 +10,7 @@
 				<Option output="..\..\Runtime\bin\debug\Light.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -25,7 +25,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lsfml-audio-d" />
 					<Add option="-lsfml-graphics-d" />
 					<Add option="-lsfml-network-d" />
@@ -34,13 +34,14 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\Runtime\bin\debug" />
+					<Add directory="..\..\ExtLibs\SFML\build-mingw-debug\lib" />
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
 				<Option output="..\..\IDE\bin\debug\Extensions\Light.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -56,12 +57,12 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-D__WXDEBUG__" />
 					<Add option="-DWXUSINGDLL" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
-					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lwxmsw29d_xrc" />
 					<Add option="-lwxmsw29d_richtext" />
 					<Add option="-lwxmsw29d_ribbon" />
@@ -101,15 +102,16 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\mswd" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="..\..\ExtLibs\SFML\build-mingw-debug\lib" />
 				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="..\..\Runtime\bin\release\Light.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -124,7 +126,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -133,13 +135,14 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\Runtime\bin\release" />
+					<Add directory="..\..\ExtLibs\SFML\build-mingw-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
 				<Option output="..\..\IDE\bin\release\Extensions\Light.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -154,12 +157,12 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
@@ -199,15 +202,16 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="..\..\ExtLibs\SFML\build-mingw-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Development">
 				<Option output="..\..\Runtime\bin\dev\Light.xgdw" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -222,7 +226,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -231,13 +235,14 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\Runtime\bin\dev" />
+					<Add directory="..\..\ExtLibs\SFML\build-mingw-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
 				<Option output="..\..\IDE\bin\dev\Extensions\Light.xgdwe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -252,12 +257,12 @@
 					<Add option="-DwxUSE_UNICODE=0" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\include" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
@@ -297,8 +302,9 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\IDE\bin\dev" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\msw" />
-					<Add directory="C:\Libs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
+					<Add directory="..\..\ExtLibs\SFML\build-mingw-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
@@ -504,6 +510,10 @@
 					<Add directory="..\..\Runtime\bin\release" />
 					<Add directory="..\..\..\libs\sfml\lib" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/release/Light.xgdm" />
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/release/Light.xgdm" />
+				</ExtraCommands>
 			</Target>
 			<Target title="Mac - Debug">
 				<Option output="..\..\Runtime\bin\debug\Light.xgdm" prefix_auto="0" extension_auto="0" />
@@ -540,26 +550,22 @@
 					<Add directory="..\..\Runtime\bin\debug" />
 					<Add directory="..\..\..\libs\sfml\lib" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/debug/Light.xgdm" />
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/debug/Light.xgdm" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add directory="..\..\GDL" />
-			<Add directory="C:\Libs\SFML\include" />
-			<Add directory="C:\Libs\boost_1_43_0" />
-			<Add directory="Box2D\Box2D" />
+			<Add directory="..\..\ExtLibs\SFML\include" />
+			<Add directory="..\..\ExtLibs\boost" />
 		</Compiler>
-		<Linker>
-			<Add directory="C:\Libs\SFML\bin-mingw-debug\lib" />
-			<Add directory="C:\Libs\SFML\bin-mingw-release\lib" />
-		</Linker>
 		<Unit filename="Directional_light.cpp" />
 		<Unit filename="Directional_light.h" />
 		<Unit filename="Extension.cpp" />
 		<Unit filename="Light.cpp" />
 		<Unit filename="Light.h" />
-		<Unit filename="LightActions.cpp" />
-		<Unit filename="LightConditions.cpp" />
-		<Unit filename="LightExpressions.cpp" />
 		<Unit filename="LightManager.cpp" />
 		<Unit filename="LightManager.h" />
 		<Unit filename="LightObject.cpp" />
@@ -568,21 +574,12 @@
 		<Unit filename="LightObjectEditor.h" />
 		<Unit filename="LightObstacleAutomatism.cpp" />
 		<Unit filename="LightObstacleAutomatism.h" />
-		<Unit filename="LightObstacleAutomatismActions.cpp" />
-		<Unit filename="LightObstacleAutomatismConditions.cpp" />
 		<Unit filename="LightObstacleAutomatismEditor.cpp" />
 		<Unit filename="LightObstacleAutomatismEditor.h" />
-		<Unit filename="LightObstacleAutomatismExpressions.cpp" />
 		<Unit filename="RuntimeSceneLightObstacleDatas.cpp" />
 		<Unit filename="RuntimeSceneLightObstacleDatas.h" />
 		<Unit filename="SceneLightObstacleDatas.cpp" />
 		<Unit filename="SceneLightObstacleDatas.h" />
-		<Unit filename="..\..\GDL\GDL\tinystr.cpp" />
-		<Unit filename="..\..\GDL\GDL\tinystr.h" />
-		<Unit filename="..\..\GDL\GDL\tinyxml.cpp" />
-		<Unit filename="..\..\GDL\GDL\tinyxml.h" />
-		<Unit filename="..\..\GDL\GDL\tinyxmlerror.cpp" />
-		<Unit filename="..\..\GDL\GDL\tinyxmlparser.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
@@ -592,6 +589,7 @@
 				<gui name="wxWidgets" src="" main="" init_handlers="necessary" language="CPP" />
 				<resources>
 					<wxDialog wxs="wxsmith/LightObjectEditor.wxs" src="LightObjectEditor.cpp" hdr="LightObjectEditor.h" fwddecl="0" i18n="1" name="LightObjectEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/LightObstacleAutomatismEditor.wxs" src="LightObstacleAutomatismEditor.cpp" hdr="LightObstacleAutomatismEditor.h" fwddecl="0" i18n="1" name="LightObstacleAutomatismEditor" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

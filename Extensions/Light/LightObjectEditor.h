@@ -33,6 +33,7 @@ freely, subject to the following restrictions:
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
+#include <wx/checkbox.h>
 #include <wx/spinctrl.h>
 #include <wx/statline.h>
 #include <wx/button.h>
@@ -53,6 +54,9 @@ class LightObjectEditor: public wxDialog
 		//(*Declarations(LightObjectEditor)
 		wxTextCtrl* qualityEdit;
 		wxStaticText* StaticText2;
+		wxStaticText* StaticText6;
+		wxColourPickerCtrl* globalColorPicker;
+		wxCheckBox* globalCheck;
 		wxSpinCtrl* intensityEdit;
 		wxColourPickerCtrl* colorPicker;
 		wxStaticText* StaticText1;
@@ -77,6 +81,9 @@ class LightObjectEditor: public wxDialog
 		static const long ID_SPINCTRL1;
 		static const long ID_STATICTEXT5;
 		static const long ID_TEXTCTRL2;
+		static const long ID_CHECKBOX1;
+		static const long ID_STATICTEXT6;
+		static const long ID_COLOURPICKERCTRL2;
 		static const long ID_STATICLINE1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;

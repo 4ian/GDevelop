@@ -50,6 +50,9 @@ const long LightObjectEditor::ID_STATICTEXT4 = wxNewId();
 const long LightObjectEditor::ID_SPINCTRL1 = wxNewId();
 const long LightObjectEditor::ID_STATICTEXT5 = wxNewId();
 const long LightObjectEditor::ID_TEXTCTRL2 = wxNewId();
+const long LightObjectEditor::ID_CHECKBOX1 = wxNewId();
+const long LightObjectEditor::ID_STATICTEXT6 = wxNewId();
+const long LightObjectEditor::ID_COLOURPICKERCTRL2 = wxNewId();
 const long LightObjectEditor::ID_STATICLINE1 = wxNewId();
 const long LightObjectEditor::ID_BUTTON1 = wxNewId();
 const long LightObjectEditor::ID_BUTTON2 = wxNewId();
@@ -66,41 +69,61 @@ mainEditorCommand(mainEditorCommand_),
 object(object_)
 {
 	//(*Initialize(LightObjectEditor)
+	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer3;
+	wxFlexGridSizer* FlexGridSizer5;
 	wxFlexGridSizer* FlexGridSizer2;
+	wxFlexGridSizer* FlexGridSizer6;
+	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
 	Create(parent, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Couleur de la lumière :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
+	FlexGridSizer2->AddGrowableCol(1);
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _T("Couleur de la lumière :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	colorPicker = new wxColourPickerCtrl(this, ID_COLOURPICKERCTRL1, wxColour(0,0,0), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_COLOURPICKERCTRL1"));
 	FlexGridSizer2->Add(colorPicker, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(8,11,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Rayon :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _T("Rayon :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer2->Add(StaticText2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer5->AddGrowableCol(0);
 	radiusEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(45,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-	FlexGridSizer2->Add(radiusEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("pixels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-	FlexGridSizer2->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Intensité :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	FlexGridSizer5->Add(radiusEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _T("pixels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	FlexGridSizer5->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _T("Intensité :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer2->Add(StaticText4, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	intensityEdit = new wxSpinCtrl(this, ID_SPINCTRL1, _T("255"), wxDefaultPosition, wxSize(56,21), 0, 0, 255, 255, _T("ID_SPINCTRL1"));
 	intensityEdit->SetValue(_T("255"));
 	FlexGridSizer2->Add(intensityEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(8,11,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Qualité :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _T("Qualité :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer2->Add(StaticText5, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	qualityEdit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(45,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	FlexGridSizer2->Add(qualityEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _T("Lumière globale"));
+	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
+	globalCheck = new wxCheckBox(this, ID_CHECKBOX1, _T("Faire de cette lumière la lumière globale de la scène"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	globalCheck->SetValue(false);
+	FlexGridSizer4->Add(globalCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
+	FlexGridSizer6->AddGrowableCol(1);
+	StaticText6 = new wxStaticText(this, ID_STATICTEXT6, _T("Couleur du reste de la scène :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	FlexGridSizer6->Add(StaticText6, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	globalColorPicker = new wxColourPickerCtrl(this, ID_COLOURPICKERCTRL2, wxColour(0,0,0), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_COLOURPICKERCTRL2"));
+	FlexGridSizer6->Add(globalColorPicker, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticBoxSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
-	okBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	okBt = new wxButton(this, ID_BUTTON1, _T("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer3->Add(okBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cancelBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	cancelBt = new wxButton(this, ID_BUTTON2, _T("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer3->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -115,6 +138,10 @@ object(object_)
     radiusEdit->SetValue(ToString(object.GetRadius()));
     qualityEdit->SetValue(ToString(object.GetQuality()));
     colorPicker->SetColour(wxColour(object.GetColor().r, object.GetColor().g, object.GetColor().b));
+
+    globalCheck->SetValue(object.IsGlobalLight());
+    globalColorPicker->SetColour(wxColour(object.GetGlobalColor().r, object.GetGlobalColor().g, object.GetGlobalColor().b));
+    //globalIntensityEdit->SetValue(object.GetGlobalColor().a);
 }
 
 LightObjectEditor::~LightObjectEditor()
@@ -129,6 +156,9 @@ void LightObjectEditor::OnokBtClick(wxCommandEvent& event)
     object.SetRadius( ToFloat(string(radiusEdit->GetValue().mb_str())));
     object.SetQuality( ToFloat(string(qualityEdit->GetValue().mb_str())));
     object.SetColor(sf::Color(colorPicker->GetColour().Red(), colorPicker->GetColour().Green(), colorPicker->GetColour().Blue()));
+
+    object.SetGlobalLight(globalCheck->GetValue());
+    object.SetGlobalColor(sf::Color(globalColorPicker->GetColour().Red(), globalColorPicker->GetColour().Green(), globalColorPicker->GetColour().Blue()/*, globalIntensityEdit->GetValue()*/));
 
     EndModal(1);
 }

@@ -34,7 +34,8 @@ freely, subject to the following restrictions:
 #include <iostream>
 
 LightObstacleAutomatism::LightObstacleAutomatism(std::string automatismTypeName) :
-    Automatism(automatismTypeName)
+    Automatism(automatismTypeName),
+    disabled(false)
 {
 }
 LightObstacleAutomatism::~LightObstacleAutomatism()
@@ -46,14 +47,15 @@ LightObstacleAutomatism::~LightObstacleAutomatism()
             manager->walls.erase(std::remove(manager->walls.begin(), manager->walls.end(), (wallsOfObject[i])), manager->walls.end());
             delete wallsOfObject[i];
         }
+        wallsOfObject.clear();
     }
 }
 
 #if defined(GD_IDE_ONLY)
 void LightObstacleAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ )
 {
-    LightObstacleAutomatismEditor editor(parent, game_, scene, *this, mainEditorCommand_);
-    editor.ShowModal();
+    /*LightObstacleAutomatismEditor editor(parent, game_, scene, *this, mainEditorCommand_);
+    editor.ShowModal();*/
 }
 #endif
 
@@ -81,8 +83,8 @@ void LightObstacleAutomatism::DoStepPostEvents(RuntimeScene & scene)
     else
         manager = LightObject::lightManagersList[&scene].lock();
 
-    if ( objectOldX == object->GetX() && objectOldY == object->GetY() && objectOldAngle == object->GetAngle() &&
-         objectOldHeight == object->GetHeight() && objectOldWidth == object->GetWidth() )
+    if ( disabled || (objectOldX == object->GetX() && objectOldY == object->GetY() && objectOldAngle == object->GetAngle() &&
+         objectOldHeight == object->GetHeight() && objectOldWidth == object->GetWidth()) )
         return;
 
     if ( wallsOfObject.empty() )
@@ -111,10 +113,10 @@ void LightObstacleAutomatism::DoStepPostEvents(RuntimeScene & scene)
     C += sf::Vector2f(object->GetDrawableX()+object->GetCenterX(), object->GetDrawableY()+object->GetCenterY());
     D += sf::Vector2f(object->GetDrawableX()+object->GetCenterX(), object->GetDrawableY()+object->GetCenterY());
 
-    wallsOfObject[0]->pt1 = A; wallsOfObject[0]->pt2 = B;
-    wallsOfObject[1]->pt1 = B; wallsOfObject[1]->pt2 = C;
-    wallsOfObject[2]->pt1 = C; wallsOfObject[2]->pt2 = D;
-    wallsOfObject[3]->pt1 = D; wallsOfObject[3]->pt2 = A;
+    wallsOfObject[0]->pt1 = sf::Vector2f(A.x-1,A.y); wallsOfObject[0]->pt2 = sf::Vector2f(B.x,B.y);
+    wallsOfObject[1]->pt1 = sf::Vector2f(B.x,B.y-1); wallsOfObject[1]->pt2 = sf::Vector2f(C.x,C.y);
+    wallsOfObject[2]->pt1 = sf::Vector2f(C.x+1,C.y); wallsOfObject[2]->pt2 = sf::Vector2f(D.x,D.y);
+    wallsOfObject[3]->pt1 = sf::Vector2f(D.x,D.y+1); wallsOfObject[3]->pt2 = sf::Vector2f(A.x,A.y);
 
     objectOldX = object->GetX();
     objectOldY = object->GetY();
@@ -123,6 +125,24 @@ void LightObstacleAutomatism::DoStepPostEvents(RuntimeScene & scene)
     objectOldHeight = object->GetHeight();
 }
 
+void LightObstacleAutomatism::OnDeActivate()
+{
+    if ( manager )
+    {
+        for (unsigned int i = 0;i<wallsOfObject.size();++i)
+        {
+            manager->walls.erase(std::remove(manager->walls.begin(), manager->walls.end(), (wallsOfObject[i])), manager->walls.end());
+            delete wallsOfObject[i];
+        }
+        wallsOfObject.clear();
+    }
+}
+
+void LightObstacleAutomatism::OnActivate()
+{
+    if ( object )
+        objectOldX = object->GetX()-42; //Force refreshing walls.
+}
 
 #if defined(GD_IDE_ONLY)
 void LightObstacleAutomatism::SaveToXml(TiXmlElement * elem) const

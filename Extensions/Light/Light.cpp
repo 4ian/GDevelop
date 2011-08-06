@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <math.h>
-#include "light.h"
+#include "Light.h"
 
 Light::Light()
 {
@@ -101,8 +101,9 @@ void Light::AddTriangle(sf::Vector2f pt1,sf::Vector2f pt2, int minimum_wall,std:
         {
             sf::Vector2f i = Intersect(pt1,pt2,sf::Vector2f (0,0),l1);
 
-            if((pt1.x > i.x && pt2.x < i.x) || (pt1.x < i.x && pt2.x > i.x))
-            if((pt1.y > i.y && pt2.y < i.y) || (pt1.y < i.y && pt2.y > i.y))
+            if (pt1 != i && pt2 != i)
+            if((pt1.x >= i.x && pt2.x <= i.x) || (pt1.x <= i.x && pt2.x >= i.x))
+            if((pt1.y >= i.y && pt2.y <= i.y) || (pt1.y <= i.y && pt2.y >= i.y))
                 if(l1.y > 0 && i.y > 0 || l1.y < 0 && i.y < 0)
                 if(l1.x > 0 && i.x > 0 || l1.x < 0 && i.x < 0)
                 AddTriangle(i, pt2, w, m_wall), pt2 = i;
@@ -111,8 +112,9 @@ void Light::AddTriangle(sf::Vector2f pt1,sf::Vector2f pt2, int minimum_wall,std:
         {
             sf::Vector2f i = Intersect(pt1,pt2,sf::Vector2f (0,0),l2);
 
-            if((pt1.x > i.x && pt2.x < i.x) || (pt1.x < i.x && pt2.x > i.x))
-            if((pt1.y > i.y && pt2.y < i.y) || (pt1.y < i.y && pt2.y > i.y))
+            if (pt1 != i && pt2 != i)
+            if((pt1.x >= i.x && pt2.x <= i.x) || (pt1.x <= i.x && pt2.x >= i.x))
+            if((pt1.y >= i.y && pt2.y <= i.y) || (pt1.y <= i.y && pt2.y >= i.y))
                 if(l2.y > 0 && i.y > 0 || l2.y < 0 && i.y < 0)
                 if(l2.x > 0 && i.x > 0 || l2.x < 0 && i.x < 0)
                 AddTriangle(pt1, i, w, m_wall), pt1 = i;

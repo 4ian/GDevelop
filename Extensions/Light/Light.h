@@ -1,9 +1,9 @@
+#ifndef LIGHTH
+#define LIGHTH
+
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
-
-#ifndef LIGHTH
-#define LIGHTH
 
 class Wall
 {
@@ -15,7 +15,7 @@ public:
     sf::Vector2f pt2;
 };
 
-class Light
+class GD_EXTENSION_API Light
 {
     public :
 

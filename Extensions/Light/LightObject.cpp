@@ -44,11 +44,15 @@ freely, subject to the following restrictions:
 #endif
 
 std::map<const Scene*, boost::weak_ptr<Light_Manager> >  LightObject::lightManagersList;
+sf::Shader LightObject::commonBlurEffect;
+bool LightObject::commonBlurEffectLoaded = false;
 
 LightObject::LightObject(std::string name_) :
 Object(name_),
 angle(0),
-light(sf::Vector2f(GetX(),GetY()), 150, 128, 16, sf::Color(255,255,255))
+light(sf::Vector2f(GetX(),GetY()), 150, 128, 16, sf::Color(255,255,255)),
+globalLight(false),
+globalLightColor(128,128,128,150)
 {
 }
 
@@ -70,14 +74,30 @@ void LightObject::LoadFromXml(const TiXmlElement * elem)
         SetQuality(quality);
     }
 
-    int r = 255;
-    int g = 255;
-    int b = 255;
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorR", r);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorG", g);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorB", b);
+    {
+        int r = 255;
+        int g = 255;
+        int b = 255;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorR", r);
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorG", g);
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorB", b);
+        SetColor(sf::Color(r,g,b));
+    }
 
-    SetColor(sf::Color(r,g,b));
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("globalLight", globalLight);
+
+    {
+        int r = 255;
+        int g = 255;
+        int b = 255;
+        int a = 255;
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("globalColorR", r);
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("globalColorG", g);
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("globalColorB", b);
+        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("globalColorA", a);
+        globalLightColor = sf::Color(r,g,b,a);
+    }
+
 }
 
 #if defined(GD_IDE_ONLY)
@@ -87,22 +107,22 @@ void LightObject::SaveToXml(TiXmlElement * elem)
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_DOUBLE("radius", GetRadius());
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("quality", GetQuality());
 
-    {
-        int r = GetColor().r;
-        int g = GetColor().g;
-        int b = GetColor().b;
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorR", GetColor().r);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorG", GetColor().g);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorB", GetColor().b);
 
-        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorR", r);
-        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorG", g);
-        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorB", b);
-    }
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("globalLight", globalLight);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("globalColorR", globalLightColor.r);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("globalColorG", globalLightColor.g);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("globalColorB", globalLightColor.b);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("globalColorA", globalLightColor.a);
 }
 #endif
 
 bool LightObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr)
 {
     #if defined(GD_IDE_ONLY)
-    edittimeIconImage.LoadFromFile("Extensions/particleSystemSceneIcon.png");
+    edittimeIconImage.LoadFromFile("Extensions/lightIcon32.png");
     edittimeIconImage.SetSmooth(false);
     edittimeIcon.SetImage(edittimeIconImage);
     #endif
@@ -121,7 +141,33 @@ bool LightObject::LoadRuntimeResources(const RuntimeScene & scene, const ImageMa
     else
         manager = lightManagersList[&scene].lock();
 
+    //Load ( only once during program use ) the common blur effect, shared by all lights.
+    if ( !commonBlurEffectLoaded )
+    {
+        commonBlurEffect.LoadFromMemory("uniform sampler2D texture;\nuniform float offset;\n\nvoid main()\n{\n	vec2 offx = vec2(offset, 0.0);\n	vec2 offy = vec2(0.0, offset);\n\n	vec4 pixel = texture2D(texture, gl_TexCoord[0].xy)               * 1 +\n                 texture2D(texture, gl_TexCoord[0].xy - offx)        * 2 +\n                 texture2D(texture, gl_TexCoord[0].xy + offx)        * 2 +\n                 texture2D(texture, gl_TexCoord[0].xy - offy)        * 2 +\n                 texture2D(texture, gl_TexCoord[0].xy + offy)        * 2 +\n                 texture2D(texture, gl_TexCoord[0].xy - offx - offy) * 1 +\n                 texture2D(texture, gl_TexCoord[0].xy - offx + offy) * 1 +\n                 texture2D(texture, gl_TexCoord[0].xy + offx - offy) * 1 +\n                 texture2D(texture, gl_TexCoord[0].xy + offx + offy) * 1;\n\n	gl_FragColor =  gl_Color * (pixel / 13.0);\n}\n");
+        commonBlurEffect.SetCurrentTexture("texture");
+
+        commonBlurEffectLoaded = true;
+    }
+
+    UpdateGlobalLightMembers();
+
     return true;
+}
+
+void LightObject::UpdateGlobalLightMembers()
+{
+    if ( globalLight )
+    {
+        //Create supplementary members for the global light
+        if ( !globalLightImage ) globalLightImage = boost::shared_ptr<sf::RenderImage>(new sf::RenderImage);
+    }
+    else
+    {
+        //Not a global light, destroy all members related to
+        globalLightImage.reset();
+    }
+
 }
 
 /**
@@ -148,7 +194,40 @@ bool LightObject::Draw( sf::RenderWindow& window )
         updateClock.Reset();
     }
 
-    light.Draw(&window);
+    if ( globalLight )
+    {
+        //Create render image
+        if ( globalLightImage->GetWidth() != window.GetWidth() || globalLightImage->GetHeight() != window.GetHeight() )
+            globalLightImage->Create(window.GetWidth(), window.GetHeight());
+
+        //Render light on an intermediate image
+        globalLightImage->Clear(globalLightColor);
+        globalLightImage->SetView(window.GetView());
+        //light.SetPosition(sf::Vector2f(light.GetPosition().x-(window.GetView().GetCenter().x-window.GetView().GetSize().x/2), light.GetPosition().y-(window.GetView().GetCenter().y-window.GetView().GetSize().y/2)));
+        light.Draw(globalLightImage.get());
+        globalLightImage->Display();
+
+        //Display the intermediate image
+        sf::Sprite sprite;
+        sprite.SetImage(globalLightImage->GetImage());
+        sprite.SetBlendMode(sf::Blend::Multiply);
+        commonBlurEffect.SetParameter("offset",0.005 * 1);
+
+        window.SetView(sf::View(sf::FloatRect(0,0,window.GetWidth(), window.GetHeight())));
+        window.Draw(sprite, commonBlurEffect);
+        window.SetView(globalLightImage->GetView());
+    }
+    else
+    {
+        light.Draw(&window);
+    }
+
+    //Debug draw
+    /*for (unsigned int i = 0;i<manager->walls.size();++i)
+    {
+        sf::Shape shape = sf::Shape::Line(manager->walls[i]->pt1, manager->walls[i]->pt2, 1, sf::Color(255,0,0));
+        window.Draw(shape);
+    }*/
 
     return true;
 }
@@ -171,7 +250,7 @@ void LightObject::PrepareResourcesForMerging(ResourcesMergingHelper & resourcesM
 
 bool LightObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
 {
-    thumbnail = wxBitmap("Extensions/texticon.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("Extensions/lightIcon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
@@ -193,10 +272,10 @@ void LightObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
 
 void LightObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if ( propertyNb == 0 ) {name = _("Couleur");       value = ToString(GetColor().r)+";"+ToString(GetColor().g)+";"+ToString(GetColor().b);}
-    else if ( propertyNb == 1 ) {name = _("Intensité");       value = ToString(GetIntensity());}
-    else if ( propertyNb == 2 ) {name = _("Rayon");       value = ToString(GetRadius());}
-    else if ( propertyNb == 2 ) {name = _("Qualité");       value = ToString(GetQuality());}
+    if ( propertyNb == 0 ) {name = _T("Couleur");       value = ToString(GetColor().r)+";"+ToString(GetColor().g)+";"+ToString(GetColor().b);}
+    else if ( propertyNb == 1 ) {name = _T("Intensité");       value = ToString(GetIntensity());}
+    else if ( propertyNb == 2 ) {name = _T("Rayon");       value = ToString(GetRadius());}
+    else if ( propertyNb == 2 ) {name = _T("Qualité");       value = ToString(GetQuality());}
 }
 
 bool LightObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -242,6 +321,24 @@ unsigned int LightObject::GetNumberOfProperties() const
 void LightObject::OnPositionChanged()
 {
     light.SetPosition(sf::Vector2f(GetX(),GetY()));
+}
+
+void LightObject::SetColor(const std::string & colorStr)
+{
+    vector < string > colors = SpliterStringToVector<string>(colorStr, ';');
+
+    if ( colors.size() < 3 ) return; //La couleur est incorrecte
+
+    SetColor(sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2]) ));
+}
+
+void LightObject::SetGlobalColor(const std::string & colorStr)
+{
+    vector < string > colors = SpliterStringToVector<string>(colorStr, ';');
+
+    if ( colors.size() < 3 ) return; //La couleur est incorrecte
+
+    SetGlobalColor(sf::Color( ToInt(colors[0]),ToInt(colors[1]),ToInt(colors[2]) ));
 }
 
 /**

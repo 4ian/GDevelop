@@ -44,29 +44,33 @@ class Extension : public ExtensionBase
         {
             DECLARE_THE_EXTENSION("Light",
                                   _("Lumières"),
-                                  _(""),
+                                  _("Permet d'afficher des lumières et d'utiliser des obstacles à celles ci."),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
                 DECLARE_OBJECT("Light",
                                _("Lumière"),
                                _("Objet émettant de la lumière"),
-                               "Extensions/texticon.png",
+                               "Extensions/lightIcon32.png",
                                &CreateLightObject,
-                               &DestroyLightObject);
+                               &DestroyLightObject,
+                               "LightObject");
+
+                objInfos.SetIncludeFile("Light/LightObject.h");
 
                     DECLARE_OBJECT_ACTION("ChangeColor",
-                                   _("Changer la couleur d'un objet texte"),
-                                   _("Change la couleur du texte. Par défaut, la couleur est le blanc."),
+                                   _("Couleur"),
+                                   _("Change la couleur de la lumière."),
                                    _("Changer la couleur de _PARAM0_ en _PARAM1_"),
-                                   _("Effets"),
-                                   "res/actions/color24.png",
-                                   "res/actions/color.png",
-                                   &LightObject::ActChangeColor);
+                                   _("Paramétrage"),
+                                   "Extensions/lightIcon24.png",
+                                   "Extensions/lightIcon16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "Light")
-                        DECLARE_PARAMETER("color", _("Couleur"), false, "")
-                        MAIN_OBJECTS_IN_PARAMETER(0)
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+                        instrInfo.AddParameter("color", _("Couleur"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetColor").SetIncludeFile("Light/LightObject.h");
 
                     DECLARE_END_OBJECT_ACTION()
 
@@ -74,15 +78,16 @@ class Extension : public ExtensionBase
                                    _("Intensité"),
                                    _("Modifie l'intensité d'une lumière"),
                                    _("Faire _PARAM2__PARAM1_ à l'intensité de _PARAM0_"),
-                                   _("Lumières"),
-                                   "res/actions/opacity24.png",
-                                   "res/actions/opacity.png",
-                                   &LightObject::ActIntensity);
+                                   _("Paramétrage"),
+                                   "Extensions/lightIcon24.png",
+                                   "Extensions/lightIcon16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "Light")
-                        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-                        MAIN_OBJECTS_IN_PARAMETER(0)
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetIntensity").SetManipulatedType("number").SetAssociatedGetter("GetIntensity").SetIncludeFile("Light/LightObject.h");
 
                     DECLARE_END_OBJECT_ACTION()
 
@@ -90,31 +95,148 @@ class Extension : public ExtensionBase
                                    _("Intensité"),
                                    _("Teste la valeur de l'intensité d'une lumière."),
                                    _("L'intensité de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                                   _("Lumières"),
-                                   "res/conditions/opacity24.png",
-                                   "res/conditions/opacity.png",
-                                   &LightObject::CondIntensity);
+                                   _("Paramétrage"),
+                                   "Extensions/lightIcon24.png",
+                                   "Extensions/lightIcon16.png");
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "Light")
-                        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-                        MAIN_OBJECTS_IN_PARAMETER(0)
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+                        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetIntensity").SetManipulatedType("number").SetIncludeFile("Light/LightObject.h");
 
                     DECLARE_END_OBJECT_CONDITION()
 
+                    DECLARE_OBJECT_ACTION("Radius",
+                                   _("Rayon"),
+                                   _("Modifie le rayon d'une lumière"),
+                                   _("Faire _PARAM2__PARAM1_ au rayon de _PARAM0_"),
+                                   _("Paramétrage"),
+                                   "Extensions/lightIcon24.png",
+                                   "Extensions/lightIcon16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetRadius").SetManipulatedType("number").SetAssociatedGetter("GetRadius").SetIncludeFile("Light/LightObject.h");
+
+                    DECLARE_END_OBJECT_ACTION()
+
+                    DECLARE_OBJECT_CONDITION("Radius",
+                                   _("Rayon"),
+                                   _("Teste le rayon d'une lumière."),
+                                   _("Le rayon de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                                   _("Paramétrage"),
+                                   "Extensions/lightIcon24.png",
+                                   "Extensions/lightIcon16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+                        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetRadius").SetManipulatedType("number").SetIncludeFile("Light/LightObject.h");
+
+                    DECLARE_END_OBJECT_CONDITION()
+
+                    DECLARE_OBJECT_ACTION("Quality",
+                                   _("Qualité"),
+                                   _("Modifie la qualité d'une lumière"),
+                                   _("Faire _PARAM2__PARAM1_ à la qualité de _PARAM0_"),
+                                   _("Paramétrage"),
+                                   "Extensions/lightIcon24.png",
+                                   "Extensions/lightIcon16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetQuality").SetManipulatedType("number").SetAssociatedGetter("GetQuality").SetIncludeFile("Light/LightObject.h");
+
+                    DECLARE_END_OBJECT_ACTION()
+
+                    DECLARE_OBJECT_CONDITION("Quality",
+                                   _("Qualité"),
+                                   _("Teste la valeur de la qualité d'une lumière."),
+                                   _("La qualité de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                                   _("Paramétrage"),
+                                   "Extensions/lightIcon24.png",
+                                   "Extensions/lightIcon16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+                        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetQuality").SetManipulatedType("number").SetIncludeFile("Light/LightObject.h");
+
+                    DECLARE_END_OBJECT_CONDITION()
+
+                    DECLARE_OBJECT_ACTION("ChangeGlobalColor",
+                                   _("Couleur globale"),
+                                   _("Change la couleur de la scène pour une lumière globale."),
+                                   _("Changer la couleur globale de la scène de _PARAM0_ en _PARAM1_"),
+                                   _("Paramétrage"),
+                                   "Extensions/lightIcon24.png",
+                                   "Extensions/lightIcon16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+                        instrInfo.AddParameter("color", _("Couleur"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetGlobalColor").SetIncludeFile("Light/LightObject.h");
+
+                    DECLARE_END_OBJECT_ACTION()
+
+                    DECLARE_OBJECT_ACTION("SetGlobalLight",
+                                   _("Rendre une lumière globale"),
+                                   _("Rend une lumière globale ou normale."),
+                                   _("Rendre _PARAM0_ globale : _PARAM1_"),
+                                   _("Type de lumière"),
+                                   "Extensions/lightIcon24.png",
+                                   "Extensions/lightIcon16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+                        instrInfo.AddParameter("yesorno", _("Rendre la lumière globale"), "", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetGlobalLight").SetIncludeFile("Light/LightObject.h");
+
+                    DECLARE_END_OBJECT_ACTION()
+
+                    DECLARE_OBJECT_CONDITION("GlobalLight",
+                                   _("Une lumière est globale"),
+                                   _("Renvoi vrai si la lumière est globale."),
+                                   _("_PARAM0_ est une lumière globale"),
+                                   _("Type de lumière"),
+                                   "Extensions/lightIcon24.png",
+                                   "Extensions/lightIcon16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+
+
+                    instrInfo.cppCallingInformation.SetFunctionName("IsGlobalLight").SetIncludeFile("Light/LightObject.h");
+
+                    DECLARE_END_OBJECT_CONDITION()
+
+/*
                     DECLARE_OBJECT_ACTION("Angle",
                                    _("Régler l'angle d'un objet texte"),
                                    _("Modifie l'angle d'un objet texte."),
                                    _("Faire _PARAM2__PARAM1_ à l'angle de _PARAM0_"),
                                    _("Rotation"),
-                                   "res/actions/rotate24.png",
-                                   "res/actions/rotate.png",
+                                   "Extensions/lightIcon24.png",
+                                   "Extensions/lightIcon16.png",
                                    &LightObject::ActAngle);
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "Light")
-                        DECLARE_PARAMETER("expression", _("Valeur"), false, "")
-                        DECLARE_PARAMETER("signe", _("Signe de la modification"), false, "")
-                        MAIN_OBJECTS_IN_PARAMETER(0)
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
+                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+
 
                     DECLARE_END_OBJECT_ACTION()
 
@@ -123,33 +245,45 @@ class Extension : public ExtensionBase
                                    _("Teste la valeur de l'angle d'un objet texte."),
                                    _("L'angle de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                    _("Rotation"),
-                                   "res/conditions/rotate24.png",
-                                   "res/conditions/rotate.png",
+                                   "Extensions/lightIcon24.png",
+                                   "Extensions/lightIcon16.png",
                                    &LightObject::CondAngle);
 
-                        DECLARE_PARAMETER("object", _("Objet"), true, "Light")
-                        DECLARE_PARAMETER("expression", _("Valeur à tester"), false, "")
-                        DECLARE_PARAMETER("signe", _("Signe du test"), false, "")
-                        MAIN_OBJECTS_IN_PARAMETER(0)
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+                        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
-                    DECLARE_END_OBJECT_CONDITION()
 
-                    DECLARE_OBJECT_EXPRESSION("Intensity", _("Intensité"), _("Intensité"), _("Lumières"), "res/actions/opacity.png", &LightObject::ExpIntensity)
-                        DECLARE_PARAMETER("object", _("Objet"), true, "Light")
+                    DECLARE_END_OBJECT_CONDITION()*/
+
+                    DECLARE_OBJECT_EXPRESSION("Intensity", _("Intensité"), _("Intensité"), _("Paramétrage"), "Extensions/lightIcon16.png")
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetIntensity").SetIncludeFile("Light/LightObject.h");
                     DECLARE_END_OBJECT_EXPRESSION()
+                    DECLARE_OBJECT_EXPRESSION("Radius", _("Rayon"), _("Rayon"), _("Paramétrage"), "Extensions/lightIcon16.png")
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
 
-                    DECLARE_OBJECT_EXPRESSION("Angle", _("Angle"), _("Angle"), _("Lumières"), "res/actions/rotate.png", &LightObject::ExpAngle)
-                        DECLARE_PARAMETER("object", _("Objet"), true, "Light")
+                        instrInfo.cppCallingInformation.SetFunctionName("GetRadius").SetIncludeFile("Light/LightObject.h");
                     DECLARE_END_OBJECT_EXPRESSION()
+                    DECLARE_OBJECT_EXPRESSION("Quality", _("Qualité"), _("Qualité"), _("Paramétrage"), "Extensions/lightIcon16.png")
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetQuality").SetIncludeFile("Light/LightObject.h");
+                    DECLARE_END_OBJECT_EXPRESSION()
+/*
+                    DECLARE_OBJECT_EXPRESSION("Angle", _("Angle"), _("Angle"), _("Lumières"), "Extensions/lightIcon16.png", &LightObject::ExpAngle)
+                        instrInfo.AddParameter("object", _("Objet"), "Light", false);
+                    DECLARE_END_OBJECT_EXPRESSION()*/
 
                 DECLARE_END_OBJECT()
 
                 DECLARE_AUTOMATISM("LightObstacleAutomatism",
-                          _("LightObstacle"),
+                          _("Obstacle à la lumière"),
                           _("LightObstacle"),
                           _("Automatisme permettant de déplacer les objets en évitant les obstacles."),
                           "",
-                          "Extensions/LightObstacleicon24.png",
+                          "Extensions/lightObstacleicon32.png",
                           LightObstacleAutomatism,
                           SceneLightObstacleDatas)
 

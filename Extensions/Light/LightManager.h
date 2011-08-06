@@ -9,8 +9,7 @@
 class Light_Manager
 {
     public :
-     // Les tableaux de murs, lumières statiques et dynamiques
-    std::vector <Wall*> walls;
+    std::vector <Wall*> walls; ///< Objects with light obstacle automatism have to insert their into this vector
 
     Light_Manager();
     ~Light_Manager();

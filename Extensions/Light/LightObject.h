@@ -110,28 +110,42 @@ class GD_EXTENSION_API LightObject : public Object
         void SetQuality(int quality) { light.SetQuality(quality); };
         void SetColor(const sf::Color & color) { light.SetColor(color); };
 
+        bool IsGlobalLight() const { return globalLight; };
+        void SetGlobalLight(bool global) { globalLight = global; UpdateGlobalLightMembers(); };
+        sf::Color GetGlobalColor() const { return globalLightColor; };
+        void SetGlobalColor(const sf::Color & color) { globalLightColor = color; };
+
+        /**
+         * Only used internally by GD events generated code
+         */
+        void SetGlobalColor(const std::string & color);
+
+        /**
+         * Only used internally by GD events generated code
+         */
+        void SetColor(const std::string & color);
+
         virtual std::vector<RotatedRectangle> GetHitBoxes() const;
-
-        bool CondIntensity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActIntensity( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpIntensity( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-
-        bool CondAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-        bool ActAngle( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
-        double ExpAngle( const RuntimeScene & scene, ObjectsConcerned & objectsConcerned, ObjSPtr obj1, ObjSPtr obj2, const ExpressionInstruction & exprInstruction );
-
-        bool ActChangeColor( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
         static std::map<const Scene*, boost::weak_ptr<Light_Manager> > lightManagersList;
 
     private:
 
+        void UpdateGlobalLightMembers();
+
         float angle;
 
         sf::Clock updateClock;
 
-        boost::shared_ptr<Light_Manager> manager;
-        Light light;
+        boost::shared_ptr<Light_Manager> manager; ///< Keep a link to the light manager of the scene.
+        Light light; ///< Light object used to render light
+
+        bool globalLight;
+        boost::shared_ptr<sf::RenderImage> globalLightImage;
+        sf::Color globalLightColor;
+
+        static sf::Shader commonBlurEffect;
+        static bool commonBlurEffectLoaded;
 
         #if defined(GD_IDE_ONLY)
         sf::Image edittimeIconImage;

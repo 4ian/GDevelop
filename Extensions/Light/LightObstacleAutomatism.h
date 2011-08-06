@@ -82,6 +82,9 @@ class GD_EXTENSION_API LightObstacleAutomatism : public Automatism, public boost
          */
         inline const Object * GetObject() const {return object;};
 
+        virtual void OnDeActivate();
+        virtual void OnActivate();
+
     private:
 
         virtual void DoStepPostEvents(RuntimeScene & scene);
@@ -97,6 +100,8 @@ class GD_EXTENSION_API LightObstacleAutomatism : public Automatism, public boost
         float objectOldAngle;
         float objectOldWidth;
         float objectOldHeight;
+
+        bool disabled;
 
         boost::shared_ptr<Light_Manager> manager;
 };

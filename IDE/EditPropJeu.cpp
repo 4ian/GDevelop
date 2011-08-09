@@ -17,6 +17,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <wx/msgdlg.h>
 #include "sstream"
 #include "GDL/CommonTools.h"
 #include <SFML/System.hpp>

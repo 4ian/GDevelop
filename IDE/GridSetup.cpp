@@ -8,6 +8,8 @@
 #include <wx/log.h>
 #include "GDL/CommonTools.h"
 
+using namespace std;
+
 //(*IdInit(GridSetup)
 const long GridSetup::ID_STATICTEXT3 = wxNewId();
 const long GridSetup::ID_TEXTCTRL2 = wxNewId();

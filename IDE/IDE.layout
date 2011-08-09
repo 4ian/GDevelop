@@ -220,23 +220,29 @@
 	<File name="ErrorCompilation.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="6171" topLine="158" />
 	</File>
-	<File name="EventsEditor.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="784" topLine="0" />
+	<File name="EventsEditor.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="5728" topLine="119" />
 	</File>
-	<File name="EventsEditor.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="594" topLine="18" />
+	<File name="EventsEditor.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="341" topLine="0" />
+	</File>
+	<File name="EventsEditorItemsAreas.cpp" open="1" top="1" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="639" topLine="12" />
+	</File>
+	<File name="EventsEditorItemsAreas.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1352" topLine="0" />
+	</File>
+	<File name="EventsEditorSelection.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3399" topLine="92" />
+	</File>
+	<File name="EventsEditorSelection.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1149" topLine="21" />
 	</File>
 	<File name="EventsRefactorer.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="262" topLine="0" />
 	</File>
 	<File name="EventsRefactorer.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="715" topLine="20" />
-	</File>
-	<File name="ExecutableIconChanger.cpp" open="0" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="198" topLine="0" />
-	</File>
-	<File name="ExecutableIconChanger.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="210" topLine="0" />
 	</File>
 	<File name="ExtensionBugReportDlg.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="6852" topLine="98" />
@@ -344,7 +350,7 @@
 		<Cursor1 position="5222" topLine="78" />
 	</File>
 	<File name="OldEventsEditor.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4954" topLine="29" />
+		<Cursor1 position="39472" topLine="628" />
 	</File>
 	<File name="OldEventsEditor.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="9175" topLine="247" />
@@ -377,7 +383,7 @@
 		<Cursor1 position="510" topLine="0" />
 	</File>
 	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="44153" topLine="975" />
+		<Cursor1 position="44382" topLine="897" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="3833" topLine="90" />

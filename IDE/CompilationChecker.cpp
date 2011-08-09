@@ -3,6 +3,8 @@
 #include "GDL/VersionWrapper.h"
 #include "GDL/CommonTools.h"
 
+using namespace std;
+
 bool CompilationChecker::EnsureCorrectGDLVersion()
 {
     string versionString =  ToString(GDLVersionWrapper::Major()) + ", " + ToString(GDLVersionWrapper::Minor()) + ", " +

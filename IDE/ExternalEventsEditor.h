@@ -9,7 +9,7 @@
 //*)
 class Game;
 class ExternalEvents;
-class OldEventsEditor;
+class EventsEditor;
 #include "GDL/Scene.h"
 #include "GDL/MainEditorCommand.h"
 
@@ -22,8 +22,8 @@ class ExternalEventsEditor: public wxPanel
 
 		//(*Declarations(ExternalEventsEditor)
 		wxFlexGridSizer* FlexGridSizer4;
+		EventsEditor* eventsEditor;
 		wxStaticText* StaticText1;
-		OldEventsEditor* eventsEditor;
 		wxComboBox* parentSceneComboBox;
 		wxFlexGridSizer* FlexGridSizer1;
 		//*)

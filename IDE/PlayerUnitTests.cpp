@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include "GDL/Object.h"
-#include "GDL/ObjectsConcerned.h"
 #include "GDL/SpriteObject.h"
 #include "GDL/Object.h"
 #include "GDL/RuntimeGame.h"

@@ -31,7 +31,7 @@ class Compilation: public wxDialog
 {
 	public:
 
-		Compilation(wxWindow* parent, const Game & gameToCompile_);
+		Compilation(wxWindow* parent, Game & gameToCompile_);
 		virtual ~Compilation();
 
 		//(*Declarations(Compilation)
@@ -116,7 +116,7 @@ class Compilation: public wxDialog
 		//*)
 
         void ClearDirectory(std::string directory, string & report);
-		const Game & gameToCompile;
+		Game & gameToCompile;
 		wxString GetTempDir();
 
 		wxString destinationDirectory;

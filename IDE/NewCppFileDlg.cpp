@@ -12,6 +12,8 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <wx/msgdlg.h>
+#include <wx/log.h>
 #include <wx/filedlg.h>
 #include <wx/dirdlg.h>
 #include <wx/filename.h>

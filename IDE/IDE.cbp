@@ -35,10 +35,14 @@
 					<Add option="-D__WXMSW__" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\tools\clang\include" />
+					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
@@ -189,10 +193,14 @@
 					<Add option="-DwxDEBUG_LEVEL=0" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\tools\clang\include" />
+					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
@@ -277,10 +285,14 @@
 					<Add option="-DwxDEBUG_LEVEL=0" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\tools\clang\include" />
+					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
@@ -466,95 +478,6 @@
 					<Add directory="bin\debug" />
 					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
 				</Linker>
-			</Target>
-			<Target title="Development - Edittime - wx291">
-				<Option platforms="Windows;" />
-				<Option output="bin\dev\GDEditor" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="bin\dev" />
-				<Option object_output="obj\dev wx291" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Option projectLinkerOptionsRelation="2" />
-				<Compiler>
-					<Add option="-O3" />
-					<Add option="-Wall" />
-					<Add option="-m32" />
-					<Add option="-finput-charset=iso-8859-1" />
-					<Add option="-pipe" />
-					<Add option="-mthreads" />
-					<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
-					<Add option="-DGD_IDE_ONLY" />
-					<Add option="-DGD_API=__declspec(dllimport)" />
-					<Add option="-DDEV" />
-					<Add option="-DWINDOWS" />
-					<Add option="-DSFML_DYNAMIC" />
-					<Add option="-D__GNUWIN32__" />
-					<Add option="-D__WXMSW__" />
-					<Add option="-DNDEBUG" />
-					<Add option="-DwxDEBUG_LEVEL=0" />
-					<Add option="-DWXUSINGDLL" />
-					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\mswu" />
-					<Add directory="C:\libs\wxwidgets\include" />
-				</Compiler>
-				<ResourceCompiler>
-					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
-				</ResourceCompiler>
-				<Linker>
-					<Add option="-s" />
-					<Add option="-lopenal32" />
-					<Add option="-lsndfile" />
-					<Add option="-lfreetype" />
-					<Add option="-lgdl.dll" />
-					<Add option="-lwxmsw29u_xrc" />
-					<Add option="-lwxmsw29u_stc" />
-					<Add option="-lwxmsw29u_richtext" />
-					<Add option="-lwxmsw29u_ribbon" />
-					<Add option="-lwxmsw29u_aui" />
-					<Add option="-lwxmsw29u_adv" />
-					<Add option="-lwxmsw29u_html" />
-					<Add option="-lwxmsw29u_core" />
-					<Add option="-lwxbase29u_xml" />
-					<Add option="-lwxbase29u_net" />
-					<Add option="-lwxexpat" />
-					<Add option="-lwxbase29u" />
-					<Add option="-lwxpng" />
-					<Add option="-lwxjpeg" />
-					<Add option="-lwxzlib" />
-					<Add option="-lwxtiff" />
-					<Add option="-lsfml-audio" />
-					<Add option="-lsfml-graphics" />
-					<Add option="-lsfml-network" />
-					<Add option="-lsfml-window" />
-					<Add option="-lsfml-system" />
-					<Add library="opengl32" />
-					<Add library="glu32" />
-					<Add library="libkernel32.a" />
-					<Add library="libuser32.a" />
-					<Add library="libgdi32.a" />
-					<Add library="libwinspool.a" />
-					<Add library="libcomdlg32.a" />
-					<Add library="libadvapi32.a" />
-					<Add library="libshell32.a" />
-					<Add library="libole32.a" />
-					<Add library="liboleaut32.a" />
-					<Add library="libuuid.a" />
-					<Add library="libcomctl32.a" />
-					<Add library="libwsock32.a" />
-					<Add library="libodbc32.a" />
-					<Add library="imm32" />
-					<Add library="Ws2_32" />
-					<Add library="winmm" />
-					<Add directory="bin\dev" />
-					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\mswu" />
-					<Add directory="C:\libs\wxwidgets\lib\gcc_dll" />
-					<Add directory="..\ExtLibs\SFML\bin-mingw-release\lib" />
-					<Add directory="..\ExtLibs\SFML\extlibs\libs-mingw" />
-				</Linker>
-				<ExtraCommands>
-					<Add after="c:\Program Files (x86)\VideoLAN\VLC\vlc.exe C:\Windows\Media\chimes.wav --play-and-exit" />
-					<Mode after="always" />
-				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
@@ -810,10 +733,12 @@
 		</Unit>
 		<Unit filename="EventsEditor.cpp" />
 		<Unit filename="EventsEditor.h" />
+		<Unit filename="EventsEditorItemsAreas.cpp" />
+		<Unit filename="EventsEditorItemsAreas.h" />
+		<Unit filename="EventsEditorSelection.cpp" />
+		<Unit filename="EventsEditorSelection.h" />
 		<Unit filename="EventsRefactorer.cpp" />
 		<Unit filename="EventsRefactorer.h" />
-		<Unit filename="ExecutableIconChanger.cpp" />
-		<Unit filename="ExecutableIconChanger.h" />
 		<Unit filename="ExtensionBugReportDlg.cpp" />
 		<Unit filename="ExtensionBugReportDlg.h" />
 		<Unit filename="Extensions.cpp" />

@@ -323,6 +323,17 @@ void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event 
         }
     }
 
+    //Be sure that we are able to compile all scenes of game.
+    std::vector<Scene*> sceneWithCompilationPrevented = EventsCodeCompiler::GetInstance()->GetSceneWithCompilationDisallowed();
+    for (unsigned int i = 0;i<GetCurrentGame()->scenes.size();++i)
+    {
+        if ( find(sceneWithCompilationPrevented.begin(), sceneWithCompilationPrevented.end(), GetCurrentGame()->scenes[i].get()) != sceneWithCompilationPrevented.end() )
+        {
+            wxLogMessage(_("La scène ")+GetCurrentGame()->scenes[i]->title+_(" ne peut être compilée : Fermez l'aperçu de celle ci avant de continuer."));
+            return;
+        }
+    }
+
     Compilation Dialog( this, *GetCurrentGame() );
     Dialog.ShowModal();
 }

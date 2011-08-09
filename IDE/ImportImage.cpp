@@ -15,6 +15,7 @@
 
 #include "GDL/CommonTools.h"
 
+using namespace std;
 
 //(*IdInit(ImportImage)
 const long ImportImage::ID_STATICBITMAP1 = wxNewId();

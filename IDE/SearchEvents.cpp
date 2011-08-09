@@ -9,9 +9,9 @@
 #include "GDL/Event.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-#include "EventsRefactorer.h"
-#include "OldEventsEditor.h"
 #include "GDL/HelpFileAccess.h"
+#include "EventsRefactorer.h"
+#include "EventsEditor.h"
 
 using namespace std;
 
@@ -46,7 +46,7 @@ BEGIN_EVENT_TABLE(SearchEvents,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-SearchEvents::SearchEvents(OldEventsEditor * parent_, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_) :
+SearchEvents::SearchEvents(EventsEditor * parent_, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_) :
 parent(parent_),
 game(game_),
 scene(scene_),
@@ -223,9 +223,10 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
     if ( !onlySelectedEventCheck->GetValue() && events == NULL ) return;
     if ( onlySelectedEventCheck->GetValue() )
     {
-        if ( parent->GetLastSelectedEvent() == boost::shared_ptr<BaseEvent>() ) return;
+        //if ( parent->GetLastSelectedEvent() == boost::shared_ptr<BaseEvent>() ) return;
 
-        eventsToInspect.push_back(parent->GetLastSelectedEvent()); //Use an intermediate vector for single events.
+        //TODO
+        //eventsToInspect.push_back(parent->GetLastSelectedEvent()); //Use an intermediate vector for single events.
     }
 
     EventsRefactorer::ReplaceStringInEvents(game, scene,
@@ -236,8 +237,8 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
                                             replaceConditionsCheck->GetValue(),
                                             replaceActionsCheck->GetValue());
 
-    parent->ChangesMadeOnEvents();
-    parent->ForceRefresh();
+    //parent->ChangesMadeOnEvents(); //TODO
+    parent->Refresh();
 }
 
 void SearchEvents::OnsearchBtClick(wxCommandEvent& event)
@@ -275,7 +276,7 @@ void SearchEvents::OnnextBtClick(wxCommandEvent&)
     BaseEventSPtr event = searchResults[currentResult].lock();
     if ( event == boost::shared_ptr<BaseEvent>() ) return;
 
-    parent->ScrollToEvent(event);
+    //parent->ScrollToEvent(event);//TODO
 }
 
 void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
@@ -290,7 +291,7 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
     BaseEventSPtr event = searchResults[currentResult].lock();
     if ( event == boost::shared_ptr<BaseEvent>() ) return;
 
-    parent->ScrollToEvent(event);
+    //parent->ScrollToEvent(event);//TODO
 }
 
 void SearchEvents::OnhelpBtClick(wxCommandEvent& event)

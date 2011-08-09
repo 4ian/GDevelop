@@ -537,7 +537,7 @@ void OldEventsEditor::ChangesMadeOnEvents()
     scene.wasModified = true;
     scene.eventsModified = true;
     std::cout << "ChanesMadeOnevents\n";
-    EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(game, scene);
+    EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, &scene));
 
     //Rafraichissement
     ForceRefresh();

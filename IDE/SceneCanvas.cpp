@@ -703,7 +703,7 @@ void SceneCanvas::ReloadFirstPart()
     //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
     //Useful when opening a scene for the first time for example.
     if ( sceneEdited.eventsModified && !EventsCodeCompiler::GetInstance()->SceneEventsBeingCompiled(sceneEdited) )
-        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(gameEdited, sceneEdited);
+        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&gameEdited, &sceneEdited));
 
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( !edittimeRenderer.editing && gameEdited.useExternalSourceFiles )

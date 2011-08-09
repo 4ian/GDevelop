@@ -24,16 +24,20 @@ class Credits: public wxDialog
 
 		//(*Declarations(Credits)
 		wxButton* OkBt;
+		wxStaticBitmap* StaticBitmap2;
+		wxStaticBitmap* StaticBitmap8;
 		wxBitmapButton* BitmapButton5;
 		wxNotebook* Notebook1;
+		wxStaticText* StaticText2;
 		wxPanel* Panel4;
 		wxStaticBitmap* StaticBitmap1;
+		wxHyperlinkCtrl* HyperlinkCtrl5;
 		wxStaticText* StaticText8;
 		wxBitmapButton* BitmapButton2;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
-		wxBitmapButton* DonBt;
 		wxStaticText* StaticText3;
+		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxBitmapButton* BitmapButton1;
 		wxHyperlinkCtrl* florianRival;
 		wxPanel* Panel3;
@@ -46,7 +50,6 @@ class Credits: public wxDialog
 		wxBitmapButton* BitmapButton3;
 		wxPanel* Panel2;
 		wxStaticText* StaticText4;
-		wxBitmapButton* CompilGamesBt;
 		//*)
 
 	protected:
@@ -56,9 +59,12 @@ class Credits: public wxDialog
 		static const long ID_STATICTEXT1;
 		static const long ID_STATICTEXT4;
 		static const long ID_HYPERLINKCTRL1;
+		static const long ID_STATICBITMAP2;
 		static const long ID_STATICTEXT5;
-		static const long ID_BITMAPBUTTON1;
-		static const long ID_BITMAPBUTTON7;
+		static const long ID_HYPERLINKCTRL2;
+		static const long ID_STATICBITMAP8;
+		static const long ID_STATICTEXT2;
+		static const long ID_HYPERLINKCTRL16;
 		static const long ID_PANEL1;
 		static const long ID_TEXTCTRL1;
 		static const long ID_PANEL2;

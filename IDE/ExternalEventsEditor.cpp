@@ -4,10 +4,12 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
+#include <wx/textctrl.h>
+#include <wx/log.h>
 #include "GDL/ExternalEvents.h"
 #include "GDL/Game.h"
 #include "GDL/MainEditorCommand.h"
-#include "OldEventsEditor.h"
+#include "EventsEditor.h"
 
 //(*IdInit(ExternalEventsEditor)
 const long ExternalEventsEditor::ID_STATICTEXT1 = wxNewId();
@@ -49,7 +51,7 @@ mainEditorCommand(mainEditorCommand_)
 	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer4->AddGrowableRow(0);
-	eventsEditor = new OldEventsEditor(this, game, emptyScene, &events.events, mainEditorCommand);
+	eventsEditor = new EventsEditor(this, game, emptyScene, &events.events, mainEditorCommand);
 	FlexGridSizer4->Add(eventsEditor, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -91,7 +93,7 @@ void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
 
     //Need to recreate an events editor.
     delete eventsEditor;
-    eventsEditor = new OldEventsEditor(this, game, *scene, &events.events, mainEditorCommand);
+    eventsEditor = new EventsEditor(this, game, *scene, &events.events, mainEditorCommand);
 
     //Make sure the new events editor is properly displayed.
     FlexGridSizer4->Detach(eventsEditor);

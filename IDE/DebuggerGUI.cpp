@@ -180,12 +180,14 @@ objectChanged(true)
 
     objectsTree->AddRoot(_("Objets"));
 
+    std::set<std::string> alreadyCreatedPanels; //Just to be sure not to create a panel twice ( extensionsUsed can contains the same extension name twice )
     for (unsigned int i = 0;i<scene.game->extensionsUsed.size();++i)
     {
         boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::GetInstance()->GetExtension(scene.game->extensionsUsed[i]);
 
-        if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() )
+        if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && alreadyCreatedPanels.find(extension->GetName()) == alreadyCreatedPanels.end())
         {
+            alreadyCreatedPanels.insert(extension->GetName());
             wxPanel * extPanel = new wxPanel(Notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, extension->GetName());
             wxFlexGridSizer * sizer = new wxFlexGridSizer(0, 3, 0, 0);
             sizer->AddGrowableCol(0);

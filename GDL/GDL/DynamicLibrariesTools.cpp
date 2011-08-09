@@ -34,7 +34,7 @@ namespace GDpriv
             (LPTSTR) &lpMsgBuf,
             0, NULL );
 
-        std::string errorMsg = "Error ("+ToString(dw)+"): "+string(lpMsgBuf);
+        std::string errorMsg = "Error ("+ToString(dw)+"): "+std::string(lpMsgBuf);
         return errorMsg;
     }
 #elif defined(LINUX) || defined (MAC)

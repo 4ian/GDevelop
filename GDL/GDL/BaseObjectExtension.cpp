@@ -220,7 +220,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         DECLARE_OBJECT_ACTION("Delete",
                        _("Supprimer un objet"),
                        _("Supprime l'objet indiqué."),
-                       _("Supprimer l'objet _PARAM0_"),
+                       _("Supprimer l'objet _PARAM1_"),
                        _("Objets"),
                        "res/actions/delete24.png",
                        "res/actions/delete.png");

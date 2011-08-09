@@ -17,6 +17,8 @@ class Instruction;
 class Evaluateur;
 class TiXmlElement;
 class EventsCodeGenerationContext;
+class EventsEditorItemsAreas;
+class EventsEditorSelection;
 
 /**
  * Standard event, with conditions, actions and sub events.
@@ -58,18 +60,12 @@ class GD_API StandardEvent : public BaseEvent
         /**
          * Called by event editor to draw the event.
          */
-        virtual void Render(wxDC & dc, int x, int y, unsigned int width) const;
+        virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
 
         /**
          * Must return the height of the event when rendered
          */
         virtual unsigned int GetRenderedHeight(unsigned int width) const;
-
-        /**
-         * Called when user click on the event
-         */
-        virtual void OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
-                                 bool & conditionsSelected, bool & instructionsSelected);
 #endif
 
     private:

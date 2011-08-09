@@ -53,7 +53,7 @@ SceneExtension::SceneExtension()
     DECLARE_ACTION("Scene",
                    _("Aller à une scène"),
                    _("Change et démarre la scène spécifiée."),
-                   _("Aller à la scène _PARAM0_"),
+                   _("Aller à la scène _PARAM1_"),
                    _("Scène"),
                    "res/actions/goscene24.png",
                    "res/actions/goscene.png");
@@ -82,7 +82,7 @@ SceneExtension::SceneExtension()
     DECLARE_ACTION("SceneBackground",
                    _("Changer la couleur d'arrière plan"),
                    _("Remplace la couleur d'arrière plan de la scène par celle indiquée."),
-                   _("Remplacer la couleur d'arrière plan par _PARAM0_"),
+                   _("Remplacer la couleur d'arrière plan par _PARAM1_"),
                    _("Scène"),
                    "res/actions/background24.png",
                    "res/actions/background.png");

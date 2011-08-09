@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 #include <sstream>
 #include <wx/log.h>
 #include "GDL/CommonTools.h"
@@ -29,7 +30,6 @@ using namespace std;
 string TranslateAction::Translate(const Instruction & action, const InstructionInfos & infos)
 {
     string trad = infos.sentence;
-    RemoveHTMLTags(trad);
 
     //Remplacement des _PARAMx_ par la valeur des paramètres
     for (unsigned int i =0;i<infos.parameters.size();++i)
@@ -37,8 +37,6 @@ string TranslateAction::Translate(const Instruction & action, const InstructionI
         while ( trad.find( "_PARAM"+ToString(i)+"_" ) != string::npos )
         {
             string parameter = action.GetParameterSafely( i ).GetPlainString();
-            RemoveHTMLTags(parameter);
-            AddHTMLToParameter(parameter, infos.parameters[i].type);
 
             trad.replace(   trad.find( "_PARAM"+ToString(i)+"_" ), //Chaine à remplacer
                             string("_PARAM"+ToString(i)+"_").length(), //Longueur de la chaine
@@ -46,29 +44,87 @@ string TranslateAction::Translate(const Instruction & action, const InstructionI
         }
     }
 
+    std::replace( trad.begin(), trad.end(), '\n', ' ');
+
     return trad;
 }
 
-void TranslateAction::RemoveHTMLTags(string & str)
+/**
+ * Create a formatted sentence from an action
+ */
+std::vector< std::pair<std::string, TextFormatting> > TranslateAction::GetAsFormattedText(const Instruction & action, const InstructionInfos & infos)
 {
-    size_t pos = 0;
-    while ( str.find("&", pos) != string::npos)
+    std::vector< std::pair<std::string, TextFormatting> > formattedStr;
+
+    string sentence = infos.sentence;
+    bool parse = true;
+
+    while ( parse )
     {
-        str.replace( str.find( "&", pos), 1, "&amp;" );
-        pos = str.find( "&", pos)+1;
+        //Search first parameter
+        parse = false;
+        size_t firstParamPosition = std::string::npos;
+        size_t firstParamIndex = std::string::npos;
+        for (unsigned int i =0;i<infos.parameters.size();++i)
+        {
+            size_t paramPosition = sentence.find( "_PARAM"+ToString(i)+"_" );
+            if ( paramPosition < firstParamPosition )
+            {
+                firstParamPosition = paramPosition;
+                firstParamIndex = i;
+                parse = true;
+            }
+        }
+
+        //When a parameter is found, complete formatted string.
+        if ( parse )
+        {
+            if ( firstParamPosition != 0 ) //Add constant text before the parameter if any
+            {
+                TextFormatting format;
+                formattedStr.push_back(std::make_pair(sentence.substr(0, firstParamPosition), format));
+            }
+            formattedStr.push_back(std::make_pair(action.GetParameterSafely( firstParamIndex ).GetPlainString(), GetFormattingFromType(infos.parameters[firstParamIndex].type)));
+
+            sentence = sentence.substr(firstParamPosition+ToString("_PARAM"+ToString(firstParamIndex)+"_").length());
+        }
+        else if ( !sentence.empty() )//No more parameter found : Add the end of the sentence
+        {
+            TextFormatting format;
+            formattedStr.push_back(std::make_pair(sentence, format));
+        }
     }
 
-    while ( str.find("<") != string::npos)
-        str.replace( str.find( "<" ), 1, "&lt;" );
-
-    while ( str.find(">") != string::npos)
-        str.replace( str.find( ">" ), 1, "&gt;" );
+    return formattedStr;
 }
+
+TextFormatting TranslateAction::GetFormattingFromType(const std::string & type)
+{
+    TextFormatting format;
+
+    if ( type == "expression" )
+        format.color = wxColour(99,0,0); //Red
+    else if ( type == "object" )
+        format.color = wxColour(19,81,0); //Green
+    else if ( type == "automatism" )
+        format.color = wxColour(19,81,0); //Green
+    else if ( type == "operator" )
+        format.color = wxColour(64,81,79); //Violet
+    else if ( type == "objectvar" )
+        format.color = wxColour(44,69,99); //Gray/Blue
+    else if ( type == "scenevar" )
+        format.color = wxColour(44,69,99); //Gray/Blue
+    else if ( type == "globalvar" )
+        format.color = wxColour(44,69,99); //Gray/Blue
+
+    return format;
+}
+
 
 ////////////////////////////////////////////////////////////
 /// Renvoi le nom du bouton en fonction du type
 ////////////////////////////////////////////////////////////
-string TranslateAction::LabelFromType(string type)
+string TranslateAction::LabelFromType(const string & type)
 {
     if ( type == "" )
         return "";
@@ -113,7 +169,7 @@ string TranslateAction::LabelFromType(string type)
 ////////////////////////////////////////////////////////////
 /// Renvoi le bitmap du bouton en fonction du type
 ////////////////////////////////////////////////////////////
-wxBitmap TranslateAction::BitmapFromType(string type)
+wxBitmap TranslateAction::BitmapFromType(const string & type)
 {
     BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
 
@@ -156,36 +212,5 @@ wxBitmap TranslateAction::BitmapFromType(string type)
 
     return bitmapGUIManager->unknownBt;
 }
-
-////////////////////////////////////////////////////////////
-/// Décore un paramètre avec du html, suivant son type
-////////////////////////////////////////////////////////////
-string TranslateAction::AddHTMLToParameter(string & parameter, string type)
-{
-    if ( type == "expression" )
-        parameter = /*"<FONT color=#CC2222>"+*/parameter/*+"</FONT>"*/;
-    else if ( type == "object" )
-        parameter = /*"<FONT color=#29780E><b>"+*/parameter/*+"</b></FONT>"*/;
-    else if ( type == "operator" )
-        parameter = /*"<FONT color=##0404B4><b>"+*/parameter/*+"</b></FONT>"*/;
-    else if ( type == "file" )
-        parameter = "<i>"+parameter+"</i>";
-    else if ( type == "yesorno" )
-        parameter = "<b>"+parameter+"</b>";
-    else if ( type == "police" )
-        parameter = "<b>"+parameter+"</b>";
-    else if ( type == "musicfile" )
-        parameter = "<b>"+parameter+"</b>";
-    else if ( type == "soundfile" )
-        parameter = "<b>"+parameter+"</b>";
-    else if ( type == "layer" )
-        parameter = "<b>"+parameter+"</b>";
-    else if ( type == "joyaxis" )
-        parameter = "<b>"+parameter+"</b>";
-
-    return parameter;
-}
-
-
 
 #endif

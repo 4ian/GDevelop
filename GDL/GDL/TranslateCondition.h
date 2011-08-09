@@ -11,7 +11,9 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "GDL/TextFormatting.h"
 #include "GDL/Instruction.h"
+#include <string>
 #include <wx/bitmap.h>
 class InstructionInfos;
 
@@ -30,24 +32,24 @@ class GD_API TranslateCondition
         static string Translate(const Instruction & condition, const InstructionInfos & infos);
 
         /**
-         * Add some HTML code around the parameter if needed
+         * Create a formatted sentence from a condition
          */
-        static string AddHTMLToParameter(string & parameter, string type);
+        static std::vector< std::pair<std::string, TextFormatting> > GetAsFormattedText(const Instruction & condition, const InstructionInfos & infos);
 
         /**
-         * Make sure special characters ( <,>,& ) are transformed to their HTML equivalents.
+         * Add some HTML code around the parameter if needed
          */
-        static void RemoveHTMLTags(string & str);
+        static TextFormatting GetFormattingFromType(const std::string & type);
 
         /**
          * Return the label of a button from parameter type
          */
-        static string LabelFromType(string type);
+        static string LabelFromType(const std::string & type);
 
         /**
          * Return the bitmap of a button from parameter type
          */
-        static wxBitmap BitmapFromType(string type);
+        static wxBitmap BitmapFromType(const string & type);
 
     protected:
     private:

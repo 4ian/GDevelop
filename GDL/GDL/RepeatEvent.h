@@ -11,6 +11,8 @@ class ObjectsConcerned;
 class Instruction;
 class Evaluateur;
 class TiXmlElement;
+class EventsEditorItemsAreas;
+class EventsEditorSelection;
 
 /**
  * \brief Internal built-in event being repeated a number of times.
@@ -58,18 +60,12 @@ class RepeatEvent : public BaseEvent
         /**
          * Called by event editor to draw the event.
          */
-        virtual void Render(wxDC & dc, int x, int y, unsigned int width) const;
+        virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
 
         /**
          * Must return the height of the event when rendered
          */
         virtual unsigned int GetRenderedHeight(unsigned int width) const;
-
-        /**
-         * Called when user click on the event
-         */
-        virtual void OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
-                                 bool & conditionsSelected, bool & instructionsSelected);
 
         /**
          * Called when the user want to edit the event

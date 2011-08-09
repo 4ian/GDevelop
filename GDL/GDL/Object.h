@@ -6,17 +6,19 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#if defined(GD_IDE_ONLY)
-#include <wx/wx.h> //This include file must be placed first
-#endif
-#include "GDL/Force.h" //This include file must be placed first
-#include <iostream>
+#include "GDL/Force.h" //This include file must be placed first. Could be removed if Force is removed a day.
 #include <string>
 #include <vector>
+#include <map>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "GDL/ListVariable.h"
 #include "GDL/ObjectHelpers.h"
+
+namespace sf
+{
+    class RenderWindow;
+}
 
 class RotatedRectangle;
 class RuntimeScene;
@@ -30,6 +32,7 @@ class TiXmlElement;
 class Automatism;
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
+class wxPanel;
 class Game;
 class Scene;
 class wxWindow;
@@ -362,7 +365,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Called when user edit an object on scene.
          */
-        virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position ) {return new wxPanel(parent);};
+        virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
 
         /**
          * Called so as to update InitialPosition values with values of panel.
@@ -388,7 +391,6 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         void DeleteFromScene(RuntimeScene & scene);
 
         void PutAroundAPosition( float positionX, float positionY, float distance, float angleInDegrees );
-        bool ActChangeLayer( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
         void AddForce( float x, float y, float clearing );
         void AddForceUsingPolarCoordinates( float angle, float length, float clearing );
         void AddForceTowardPosition( float positionX, float positionY, float length, float clearing );
@@ -415,11 +417,11 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
         /** To be deprecated
          */
-        void SeparateObjectsWithoutForces( const string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists);
+        void SeparateObjectsWithoutForces( const std::string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists);
 
         /** To be deprecated
          */
-        void SeparateObjectsWithForces( const string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists);
+        void SeparateObjectsWithForces( const std::string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists);
     protected:
 
         std::string name; ///< The full name of the object
@@ -457,7 +459,7 @@ bool GD_API MustBeDeleted ( boost::shared_ptr<Object> object );
 /**
  * Functor testing object name
  */
-struct ObjectHasName : public std::binary_function<boost::shared_ptr<Object>, string, bool> {
+struct ObjectHasName : public std::binary_function<boost::shared_ptr<Object>, std::string, bool> {
     bool operator()(const boost::shared_ptr<Object> & object, const std::string & name) const { return object->GetName() == name; }
 };
 

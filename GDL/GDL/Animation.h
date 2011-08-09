@@ -6,13 +6,9 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include <iostream>
-#include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
-#include "GDL/Direction.h"
-
-using namespace std;
+class Direction;
 
 /**
  * \brief Animation class mainly used by Sprite objects. Contains directions.
@@ -21,7 +17,7 @@ class GD_API Animation
 {
     public:
         Animation();
-        virtual ~Animation() {};
+        virtual ~Animation();
 
         /**
          * Return the n-th direction
@@ -58,7 +54,7 @@ class GD_API Animation
     private:
 
         unsigned int directionsNumber;
-        vector < Direction > directions;
+        std::vector < Direction > directions;
 
         static Direction badDirection;
 };

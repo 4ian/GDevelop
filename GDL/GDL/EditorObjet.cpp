@@ -29,6 +29,8 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/Animation.h"
+#include "GDL/Direction.h"
+#include "GDL/Sprite.h"
 #include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
 #include "GDL/AjoutPlusImage.h"
@@ -496,6 +498,8 @@ ySelectionOffset(0)
     toolbar->EnableTool(idDelPoint, false);
     toolbar->EnableTool(ID_MENUITEM8, false);
     toolbar->EnableTool(ID_MENUITEM9, false);
+
+    toolbar->Realize();
 
     //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
 #ifdef __WXGTK__

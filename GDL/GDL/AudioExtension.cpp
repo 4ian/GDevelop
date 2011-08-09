@@ -20,7 +20,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("PlaySoundCanal",
                    _("Jouer un son sur un canal"),
                    _("Joue un son ( court fichier audio ) sur un canal précis,\npour pouvoir ensuite interagir avec."),
-                   _("Jouer le son _PARAM0_ sur le canal _PARAM1_"),
+                   _("Jouer le son _PARAM1_ sur le canal _PARAM2_"),
                    _("Sons"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
@@ -39,7 +39,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("StopSoundCanal",
                    _("Arrêter le son sur un canal"),
                    _("Arrêter le son joué sur le canal indiqué."),
-                   _("Arrêter le son du canal _PARAM0_"),
+                   _("Arrêter le son du canal _PARAM1_"),
                    _("Sons"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
@@ -54,7 +54,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("PauseSoundCanal",
                    _("Mettre en pause le son d'un canal"),
                    _("Mettre en pause le son joué sur le canal indiqué."),
-                   _("Mettre en pause le son du canal _PARAM0_"),
+                   _("Mettre en pause le son du canal _PARAM1_"),
                    _("Sons"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
@@ -69,7 +69,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("RePlaySoundCanal",
                    _("Jouer le son d'un canal"),
                    _("(Re)jouer le son du canal."),
-                   _("Jouer le son du canal _PARAM0_"),
+                   _("Jouer le son du canal _PARAM1_"),
                    _("Sons"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
@@ -84,7 +84,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("PlayMusicCanal",
                    _("Jouer une musique sur un canal"),
                    _("Joue une musique sur un canal précis,\npour pouvoir ensuite interagir avec."),
-                   _("Jouer la musique _PARAM0_ sur le canal _PARAM1_"),
+                   _("Jouer la musique _PARAM1_ sur le canal _PARAM2_"),
                    _("Musiques"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
@@ -103,7 +103,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("StopMusicCanal",
                    _("Arrêter la musique sur un canal"),
                    _("Arrêter la musique jouée sur le canal indiqué."),
-                   _("Arrêter la musique du canal _PARAM0_"),
+                   _("Arrêter la musique du canal _PARAM1_"),
                    _("Musiques"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
@@ -118,7 +118,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("PauseMusicCanal",
                    _("Mettre en pause la musique d'un canal"),
                    _("Mettre en pause la musique jouée sur le canal indiqué."),
-                   _("Mettre en pause la musique du canal _PARAM0_"),
+                   _("Mettre en pause la musique du canal _PARAM1_"),
                    _("Musiques"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
@@ -133,7 +133,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("RePlayMusicCanal",
                    _("Jouer la musique d'un canal"),
                    _("(Re)jouer la musique du canal."),
-                   _("Jouer la musique du canal _PARAM0_"),
+                   _("Jouer la musique du canal _PARAM1_"),
                    _("Musiques"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
@@ -148,7 +148,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("ModVolumeSoundCanal",
                    _("Volume d'un son sur un canal"),
                    _("Cette action modifie le volume du son sur le canal spécifié. Le volume est compris entre 0 et 100."),
-                   _("Faire _PARAM2__PARAM1_ au volume du son sur le canal  _PARAM0_"),
+                   _("Faire _PARAM3__PARAM2_ au volume du son sur le canal  _PARAM1_"),
                    _("Volume sonore"),
                    "res/actions/sonVolume24.png",
                    "res/actions/sonVolume.png");
@@ -165,7 +165,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("ModVolumeMusicCanal",
                    _("Volume de la musique d'un canal"),
                    _("Cette action modifie le volume de la musique sur le canal spécifié. Le volume est compris entre 0 et 100."),
-                   _("Faire _PARAM2__PARAM1_ au volume de la musique du canal  _PARAM0_"),
+                   _("Faire _PARAM3__PARAM2_ au volume de la musique du canal  _PARAM1_"),
                    _("Volume sonore"),
                    "res/actions/sonVolume24.png",
                    "res/actions/sonVolume.png");
@@ -182,7 +182,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("ModGlobalVolume",
                    _("Volume global du jeu"),
                    _("Cette action modifie le volume sonore global du jeu. Le volume est compris entre 0 et 100."),
-                   _("Faire _PARAM1__PARAM0_ au volume sonore global"),
+                   _("Faire _PARAM2__PARAM1_ au volume sonore global"),
                    _("Volume sonore"),
                    "res/actions/volume24.png",
                    "res/actions/volume.png");
@@ -198,7 +198,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("ModPitchSoundChannel",
                    _("Pitch d'un son sur un canal"),
                    _("Cette action modifie le pitch ( vitesse ) du son d'un canal.\nUn pitch de 1 indique une vitesse normale."),
-                   _("Faire _PARAM2__PARAM1_ au pitch du son sur le canal _PARAM0_"),
+                   _("Faire _PARAM3__PARAM2_ au pitch du son sur le canal _PARAM1_"),
                    _("Sons"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
@@ -216,7 +216,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("ModPitchMusicChannel",
                    _("Pitch de la musique d'un canal"),
                    _("Cette action modifie le pitch de la musique sur un canal.\nUn pitch de 1 indique une vitesse normale."),
-                   _("Faire _PARAM2__PARAM1_ au pitch de la musique du canal _PARAM0_"),
+                   _("Faire _PARAM3__PARAM2_ au pitch de la musique du canal _PARAM1_"),
                    _("Musiques"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
@@ -234,7 +234,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("ModPlayingOffsetSoundChannel",
                    _("Position de lecture d'un son sur un canal"),
                    _("Cette action modifie la position de lecture du son d'un canal."),
-                   _("Faire _PARAM2__PARAM1_s à la position de lecture du son sur le canal _PARAM0_"),
+                   _("Faire _PARAM3__PARAM2_s à la position de lecture du son sur le canal _PARAM1_"),
                    _("Sons"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
@@ -251,7 +251,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("ModPlayingOffsetMusicChannel",
                    _("Position de lecture de la musique d'un canal"),
                    _("Cette action modifie la position de lecture de la musique sur un canal."),
-                   _("Faire _PARAM2__PARAM1_s à la position de lecture de la musique du canal _PARAM0_"),
+                   _("Faire _PARAM3__PARAM2_s à la position de lecture de la musique du canal _PARAM1_"),
                    _("Musiques"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
@@ -268,7 +268,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("PlaySound",
                    _("Jouer un son"),
                    _("Joue un son."),
-                   _("Jouer le son _PARAM0_"),
+                   _("Jouer le son _PARAM1_"),
                    _("Sons"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
@@ -286,7 +286,7 @@ AudioExtension::AudioExtension()
     DECLARE_ACTION("PlayMusic",
                    _("Jouer une musique"),
                    _("Joue une musique."),
-                   _("Jouer la musique _PARAM0_"),
+                   _("Jouer la musique _PARAM1_"),
                    _("Musiques"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
@@ -304,7 +304,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("MusicPlaying",
                    _("Une musique est entrain d'être jouée"),
                    _("Teste si la musique sur le canal indiqué est entrain d'être jouée."),
-                   _("La musique sur le canal _PARAM0_ est entrain d'être jouée"),
+                   _("La musique sur le canal _PARAM1_ est entrain d'être jouée"),
                    _("Musiques"),
                    "res/conditions/musicplaying24.png",
                    "res/conditions/musicplaying.png");
@@ -319,7 +319,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("MusicPaused",
                    _("Une musique est en pause"),
                    _("Teste si la musique sur le canal indiqué est en pause."),
-                   _("La musique sur le canal _PARAM0_ est en pause"),
+                   _("La musique sur le canal _PARAM1_ est en pause"),
                    _("Musiques"),
                    "res/conditions/musicpaused24.png",
                    "res/conditions/musicpaused.png");
@@ -334,7 +334,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("MusicStopped",
                    _("Une musique est arrêtée"),
                    _("Teste si la musique sur le canal indiqué est arrêtée."),
-                   _("La musique sur le canal _PARAM0_ est arrêtée"),
+                   _("La musique sur le canal _PARAM1_ est arrêtée"),
                    _("Musiques"),
                    "res/conditions/musicstopped24.png",
                    "res/conditions/musicstopped.png");
@@ -348,7 +348,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("SoundPlaying",
                    _("Un son est entrain d'être jouée"),
                    _("Teste si le son sur le canal indiqué est entrain d'être joué."),
-                   _("Le son sur le canal _PARAM0_ est entrain d'être joué"),
+                   _("Le son sur le canal _PARAM1_ est entrain d'être joué"),
                    _("Sons"),
                    "res/conditions/sonplaying24.png",
                    "res/conditions/sonplaying.png");
@@ -363,7 +363,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("SoundPaused",
                    _("Un son est en pause"),
                    _("Teste si le son sur le canal indiqué est en pause."),
-                   _("Le son sur le canal _PARAM0_ est en pause"),
+                   _("Le son sur le canal _PARAM1_ est en pause"),
                    _("Sons"),
                    "res/conditions/sonpaused24.png",
                    "res/conditions/sonpaused.png");
@@ -378,7 +378,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("SoundStopped",
                    _("Un son est arrêtée"),
                    _("Teste si le son sur le canal indiqué est arrêté."),
-                   _("Le son sur le canal _PARAM0_ est arrêté"),
+                   _("Le son sur le canal _PARAM1_ est arrêté"),
                    _("Sons"),
                    "res/conditions/sonstopped24.png",
                    "res/conditions/sonstopped.png");
@@ -393,7 +393,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("SoundCanalVolume",
                    _("Volume d'un son sur un canal"),
                    _("Teste le volume du son sur le canal indiqué. Le volume est compris entre 0 et 100."),
-                   _("Le volume du son sur le canal _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Le volume du son sur le canal _PARAM1_ est _PARAM3_ à _PARAM2_"),
                    _("Volume sonore"),
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png");
@@ -410,7 +410,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("MusicCanalVolume",
                    _("Volume de la musique sur un canal"),
                    _("Teste le volume de la musique sur le canal indiqué. Le volume est compris entre 0 et 100."),
-                   _("Le volume de la musique sur le canal _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Le volume de la musique sur le canal _PARAM1_ est _PARAM3_ à _PARAM2_"),
                    _("Volume sonore"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png");
@@ -427,7 +427,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("GlobalVolume",
                    _("Volume sonore global"),
                    _("Vérifie que le volume sonore global correspond au test. Le volume est compris entre 0 et 100."),
-                   _("Le volume sonore global est _PARAM1_ à _PARAM0_"),
+                   _("Le volume sonore global est _PARAM2_ à _PARAM1_"),
                    _("Volume sonore"),
                    "res/conditions/volume24.png",
                    "res/conditions/volume.png");
@@ -443,7 +443,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("SoundChannelPitch",
                    _("Pitch du son d'un canal"),
                    _("Teste le pitch ( vitesse ) du son sur le canal indiqué. Un pitch de 1 indique une vitesse normale."),
-                   _("Le pitch du son sur le canal _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Le pitch du son sur le canal _PARAM1_ est _PARAM3_ à _PARAM2_"),
                    _("Sons"),
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png");
@@ -460,7 +460,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("MusicChannelPitch",
                    _("Pitch de la musique d'un canal"),
                    _("Teste le pitch ( vitesse ) de la musique sur le canal indiqué. Un pitch de 1 indique une vitesse normale."),
-                   _("Le volume de la musique sur le canal _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Le volume de la musique sur le canal _PARAM1_ est _PARAM3_ à _PARAM2_"),
                    _("Musiques"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png");
@@ -477,7 +477,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("SoundChannelPlayingOffset",
                    _("Position de lecture du son d'un canal"),
                    _("Teste la position de lecture du son sur le canal indiqué."),
-                   _("La position de lecture du son sur le canal _PARAM0_ est _PARAM2_ à _PARAM1_s"),
+                   _("La position de lecture du son sur le canal _PARAM1_ est _PARAM3_ à _PARAM2_s"),
                    _("Sons"),
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png");
@@ -494,7 +494,7 @@ AudioExtension::AudioExtension()
     DECLARE_CONDITION("MusicChannelPlayingOffset",
                    _("Position de lecture de la musique d'un canal"),
                    _("Teste la position de lecture de la musique sur le canal indiqué."),
-                   _("La position de lecture la musique sur le canal _PARAM0_ est _PARAM2_ à _PARAM1_s"),
+                   _("La position de lecture la musique sur le canal _PARAM1_ est _PARAM3_ à _PARAM2_s"),
                    _("Musiques"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png");

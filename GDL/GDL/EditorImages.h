@@ -54,12 +54,27 @@ class GD_API EditorImages: public wxPanel
 		wxMenu folderMenu;
 		//*)
 
-		static void CreateRibbonPage(wxRibbonPage * page);
+		//static void CreateRibbonPage(wxRibbonPage * page); //Creation is made inside Game_Develop_EditorMain.
 
         /**
          * Can be called by parent so as to refresh ribbon for this editor.
          */
         void ForceRefreshRibbonAndConnect();
+
+		static const long idRibbonModProp;
+		static const long idRibbonMod;
+		static const long idRibbonModFile;
+		static const long idRibbonAdd;
+		static const long idRibbonDel;
+		static const long idRibbonAddDossier;
+		static const long idRibbonRemoveDossier;
+		static const long idRibbonUp;
+		static const long idRibbonDown;
+		static const long idRibbonDirectories;
+		static const long idRibbonPaintProgram;
+		static const long idRibbonSearch;
+		static const long idRibbonHelp;
+		static const long idRibbonRefresh;
 
 	protected:
 
@@ -92,20 +107,6 @@ class GD_API EditorImages: public wxPanel
 		static const long ID_BITMAPBUTTON2;
 		static const long ID_BITMAPBUTTON3;
 		static const long ID_BITMAPBUTTON6;
-		static const long idRibbonModProp;
-		static const long idRibbonMod;
-		static const long idRibbonModFile;
-		static const long idRibbonAdd;
-		static const long idRibbonDel;
-		static const long idRibbonAddDossier;
-		static const long idRibbonRemoveDossier;
-		static const long idRibbonUp;
-		static const long idRibbonDown;
-		static const long idRibbonDirectories;
-		static const long idRibbonPaintProgram;
-		static const long idRibbonSearch;
-		static const long idRibbonHelp;
-		static const long idRibbonRefresh;
 
 
 	private:

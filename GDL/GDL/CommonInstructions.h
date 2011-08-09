@@ -5,11 +5,7 @@
 
 #ifndef COMMONINSTRUCTIONS_H
 #define COMMONINSTRUCTIONS_H
-
 #include <string>
-#include <boost/shared_ptr.hpp>
-class RuntimeScene;
-class Object;
 
 /**
  * Use sf::Randomizer to generate a random number between 0 and max

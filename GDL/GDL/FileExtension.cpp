@@ -101,7 +101,7 @@ FileExtension::FileExtension()
     DECLARE_ACTION("LireFichierExp",
                    _("Lire une valeur"),
                    _("Cette action lit la valeur du groupe indiqué et\nla stocke dans une variable de la scène.\nIndiquez la structure du groupe en séparant les éléments par des /. (Exemple : Racine/Niveau/Actuel)\nAttention ! Les espaces sont interdits dans le nom des groupes."),
-                   _("Lire le groupe _PARAM1_ du fichier _PARAM0_ et stocker la valeur dans _PARAM2_"),
+                   _("Lire le groupe _PARAM1_ du fichier _PARAM0_ et stocker la valeur dans _PARAM3_"),
                    _("Fichiers XML"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png");
@@ -118,7 +118,7 @@ FileExtension::FileExtension()
     DECLARE_ACTION("LireFichierTxt",
                    _("Lire un texte"),
                    _("Cette action lit le texte du groupe indiqué et\nle stocke dans une variable de la scène.\nIndiquez la structure du groupe en séparant les éléments par des /. (Exemple : Racine/Niveau/Actuel)\nAttention ! Les espaces sont interdits dans le nom des groupes."),
-                   _("Lire le groupe _PARAM1_ du fichier _PARAM0_ et stocker le texte dans _PARAM2_"),
+                   _("Lire le groupe _PARAM1_ du fichier _PARAM0_ et stocker le texte dans _PARAM3_"),
                    _("Fichiers XML"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png");

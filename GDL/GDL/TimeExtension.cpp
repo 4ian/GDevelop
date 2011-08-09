@@ -17,7 +17,7 @@ TimeExtension::TimeExtension()
     DECLARE_CONDITION("Timer",
                    _("Valeur d'un chronomètre"),
                    _("Teste si le chronomètre atteint ou dépasse le temps indiqué."),
-                   _("Le chronomètre _PARAM1_ est supérieur à _PARAM0_ secondes"),
+                   _("Le chronomètre _PARAM2_ est supérieur à _PARAM1_ secondes"),
                    _("Temps et chronomètres"),
                    "res/conditions/timer24.png",
                    "res/conditions/timer.png");
@@ -33,7 +33,7 @@ TimeExtension::TimeExtension()
     DECLARE_CONDITION("TimeScale",
                    _("Echelle du temps"),
                    _("Teste si l'échelle du temps actuelle correspond."),
-                   _("L'échelle du temps est _PARAM1_ à _PARAM0_"),
+                   _("L'échelle du temps est _PARAM2_ à _PARAM1_"),
                    _("Temps et chronomètres"),
                    "res/conditions/time24.png",
                    "res/conditions/time.png");
@@ -49,7 +49,7 @@ TimeExtension::TimeExtension()
     DECLARE_CONDITION("TimerPaused",
                    _("Pause d'un chronomètre"),
                    _("Teste si le chronomètre indiqué est en pause."),
-                   _("Le chronomètre _PARAM0_ est en pause"),
+                   _("Le chronomètre _PARAM1_ est en pause"),
                    _("Temps et chronomètres"),
                    "res/conditions/timerPaused24.png",
                    "res/conditions/timerPaused.png");
@@ -64,7 +64,7 @@ TimeExtension::TimeExtension()
     DECLARE_ACTION("ResetTimer",
                    _("Remettre à zéro un chronomètre"),
                    _("Remet à zéro le chronomètre indiqué."),
-                   _("Remettre à zéro le chronomètre _PARAM0_"),
+                   _("Remettre à zéro le chronomètre _PARAM1_"),
                    _("Temps et chronomètres"),
                    "res/actions/timer24.png",
                    "res/actions/timer.png");
@@ -79,7 +79,7 @@ TimeExtension::TimeExtension()
     DECLARE_ACTION("PauseTimer",
                    _("Mettre en pause un chronomètre"),
                    _("Met en pause le chronomètre indiqué."),
-                   _("Mettre en pause le chronomètre _PARAM0_"),
+                   _("Mettre en pause le chronomètre _PARAM1_"),
                    _("Temps et chronomètres"),
                    "res/actions/pauseTimer24.png",
                    "res/actions/pauseTimer.png");
@@ -94,7 +94,7 @@ TimeExtension::TimeExtension()
     DECLARE_ACTION("UnPauseTimer",
                    _("Enlever la pause d'un chronomètre"),
                    _("Enlève la pause du chronomètre indiqué."),
-                   _("Enlever la pause du chronomètre _PARAM0_"),
+                   _("Enlever la pause du chronomètre _PARAM1_"),
                    _("Temps et chronomètres"),
                    "res/actions/unPauseTimer24.png",
                    "res/actions/unPauseTimer.png");
@@ -109,7 +109,7 @@ TimeExtension::TimeExtension()
     DECLARE_ACTION("RemoveTimer",
                    _("Supprimer un chronomètre"),
                    _("Supprime un chronomètre de la mémoire."),
-                   _("Supprimer le chronomètre _PARAM0_ de la mémoire"),
+                   _("Supprimer le chronomètre _PARAM1_ de la mémoire"),
                    _("Temps et chronomètres"),
                    "res/actions/time24.png",
                    "res/actions/time.png");
@@ -123,7 +123,7 @@ TimeExtension::TimeExtension()
     DECLARE_ACTION("ChangeTimeScale",
                    _("Changer l'échelle du temps"),
                    _("Change la vitesse du déroulement du jeu."),
-                   _("Mettre à _PARAM0_ l'échelle du temps"),
+                   _("Mettre à _PARAM1_ l'échelle du temps"),
                    _("Temps et chronomètres"),
                    "res/actions/time24.png",
                    "res/actions/time.png");

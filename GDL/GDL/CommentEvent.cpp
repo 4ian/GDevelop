@@ -11,6 +11,8 @@
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/EditComment.h"
+#include "GDL/EventsEditorItemsAreas.h"
+#include "GDL/EventsEditorSelection.h"
 #endif
 
 #if defined(GD_IDE_ONLY)
@@ -65,8 +67,10 @@ void CommentEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, Ma
 /**
  * Render the event
  */
-void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width) const
+void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
+    x += 1; //Small border
+
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
     renderingHelper->GetHTMLRenderer().SetDC(&dc);
     renderingHelper->GetHTMLRenderer().SetStandardFonts( 8 );
@@ -88,14 +92,13 @@ void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width) const
     unsigned int text2Height = renderingHelper->GetHTMLRenderer().GetTotalHeight();
 
     //Prepare background
-    if ( !selected )
-    {
-        dc.SetBrush(wxBrush(wxColour(r, v, b)));
-        dc.SetPen(wxPen(wxColour(r/2, v/2, b/2), 1));
-    }
+    dc.SetBrush(wxBrush(wxColour(r, v, b), wxTRANSPARENT));
+    dc.SetPen(wxPen(wxColour(r/2, v/2, b/2), 1));
 
     //Draw the background
-    dc.DrawRectangle(x, y, width, text1Height > text2Height ? sideSeparation+text1Height+sideSeparation : sideSeparation+text2Height+sideSeparation);
+    wxRect rectangle(x, y, width-1, text1Height > text2Height ? sideSeparation+text1Height+sideSeparation : sideSeparation+text2Height+sideSeparation);
+    dc.GradientFillLinear(rectangle, wxColour(r+20 > 255 ? 255 : r+20, v+20 > 255 ? 255 : v+20, b+20 > 255 ? 255 : b+20), wxColour(r, v, b), wxSOUTH);
+    dc.DrawRectangle(rectangle);
 
     //Draw text
     {
@@ -142,6 +145,6 @@ unsigned int CommentEvent::GetRenderedHeight(unsigned int width) const
         renderedHeight = text1Height > text2Height ? sideSeparation+text1Height+sideSeparation : sideSeparation+text2Height+sideSeparation;
     }
 
-    return renderedHeight;
+    return renderedHeight+2;//2 : 2 small borders
 }
 #endif

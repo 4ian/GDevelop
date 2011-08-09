@@ -16,7 +16,7 @@ VariablesExtension::VariablesExtension()
     DECLARE_CONDITION("VarScene",
                    _("Variable de la scène"),
                    _("Teste si la variable correspond au test effectué."),
-                   _("La variable _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("La variable _PARAM1_ est _PARAM3_ à _PARAM2_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png");
@@ -33,7 +33,7 @@ VariablesExtension::VariablesExtension()
     DECLARE_CONDITION("VarSceneTxt",
                    _("Texte d'une variable de la scène"),
                    _("Teste si le texte de la variable correspond au test effectué."),
-                   _("Le texte de la variable _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Le texte de la variable _PARAM1_ est _PARAM3_ à _PARAM2_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png");
@@ -50,7 +50,7 @@ VariablesExtension::VariablesExtension()
     DECLARE_CONDITION("VarSceneDef",
                    _("Tester si une variable de la scène est définie"),
                    _("Teste si la variable de la scène existe."),
-                   _("La variable _PARAM0_ est définie"),
+                   _("La variable _PARAM1_ est définie"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png");
@@ -65,7 +65,7 @@ VariablesExtension::VariablesExtension()
     DECLARE_CONDITION("VarGlobal",
                    _("Variable globale"),
                    _("Teste si la variable globale correspond au test effectué."),
-                   _("La variable globale _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("La variable globale _PARAM1_ est _PARAM3_ à _PARAM2_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png");
@@ -82,7 +82,7 @@ VariablesExtension::VariablesExtension()
     DECLARE_CONDITION("VarGlobalTxt",
                    _("Texte d'une variable globale"),
                    _("Teste si le texte de la variable globale correspond au test effectué."),
-                   _("Le texte de la variable globale _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Le texte de la variable globale _PARAM1_ est _PARAM3_ à _PARAM2_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png");
@@ -99,7 +99,7 @@ VariablesExtension::VariablesExtension()
     DECLARE_CONDITION("VarGlobalDef",
                    _("Tester si une variable globale est définie"),
                    _("Teste si la variable globale existe."),
-                   _("La variable globale _PARAM0_ est définie"),
+                   _("La variable globale _PARAM1_ est définie"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png");
@@ -114,7 +114,7 @@ VariablesExtension::VariablesExtension()
     DECLARE_ACTION("ModVarScene",
                    _("Variable de la scène"),
                    _("Modifie une variable de la scène."),
-                   _("Faire _PARAM2__PARAM1_ à la variable _PARAM0_"),
+                   _("Faire _PARAM3__PARAM2_ à la variable _PARAM1_"),
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png");
@@ -131,7 +131,7 @@ VariablesExtension::VariablesExtension()
     DECLARE_ACTION("ModVarSceneTxt",
                    _("Texte d'une variable de la scène"),
                    _("Modifie le texte d'une variable de la scène."),
-                   _("Faire _PARAM2__PARAM1_ au texte de la variable _PARAM0_"),
+                   _("Faire _PARAM3__PARAM2_ au texte de la variable _PARAM1_"),
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png");
@@ -148,7 +148,7 @@ VariablesExtension::VariablesExtension()
     DECLARE_ACTION("ModVarGlobal",
                    _("Variable globale"),
                    _("Modifie une variable globale"),
-                   _("Faire _PARAM2__PARAM1_ à la variable globale _PARAM0_"),
+                   _("Faire _PARAM3__PARAM2_ à la variable globale _PARAM1_"),
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png");
@@ -165,7 +165,7 @@ VariablesExtension::VariablesExtension()
     DECLARE_ACTION("ModVarGlobalTxt",
                    _("Texte d'une variable globale"),
                    _("Modifie le texte d'une variable globale."),
-                   _("Faire _PARAM2__PARAM1_ au texte de la variable globale _PARAM0_"),
+                   _("Faire _PARAM3__PARAM2_ au texte de la variable globale _PARAM1_"),
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png");

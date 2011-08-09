@@ -17,6 +17,9 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/Automatism.h"
 #include "GDL/RotatedRectangle.h"
+#if defined(GD_IDE_ONLY)
+#include <wx/panel.h>
+#endif
 
 using namespace std;
 
@@ -562,6 +565,11 @@ void Object::SetXY( float xValue, const char* xOperator, float yValue, const cha
         SetY( GetY() * yValue );
     else if ( strcmp(yOperator, "/") == 0 )
         SetY( GetY() / yValue );
+}
+
+wxPanel * Object::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
+{
+    return new wxPanel(parent);
 }
 
 std::vector<RotatedRectangle> Object::GetHitBoxes() const

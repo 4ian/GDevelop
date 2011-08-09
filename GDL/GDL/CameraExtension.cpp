@@ -17,7 +17,7 @@ CameraExtension::CameraExtension()
     DECLARE_CONDITION("CameraX",
                    _("Position X de la caméra"),
                    _("Teste si la valeur de la position x de la caméra\ncorrespond au test effectué."),
-                   _("La position X de la caméra _PARAM3_ est _PARAM1_ à _PARAM0_ ( Calque : _PARAM2_ )"),
+                   _("La position X de la caméra _PARAM4_ est _PARAM2_ à _PARAM1_ ( Calque : _PARAM3_ )"),
                    _("Calques et caméras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
@@ -35,7 +35,7 @@ CameraExtension::CameraExtension()
     DECLARE_CONDITION("CameraY",
                    _("Position Y de la caméra"),
                    _("Teste si la valeur de la position Y de la caméra\ncorrespond au test effectué."),
-                   _("La position Y de la caméra _PARAM3_ est _PARAM1_ à _PARAM0_ ( Calque : _PARAM2_ )"),
+                   _("La position Y de la caméra _PARAM4_ est _PARAM2_ à _PARAM1_ ( Calque : _PARAM3_ )"),
                    _("Calques et caméras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
@@ -53,7 +53,7 @@ CameraExtension::CameraExtension()
     DECLARE_CONDITION("CameraWidth",
                    _("Largeur d'une caméra"),
                    _("Teste la largeur d'une caméra d'un calque."),
-                   _("La largeur de la caméra _PARAM1_ du calque _PARAM0_ est _PARAM2_ à _PARAM3_"),
+                   _("La largeur de la caméra _PARAM2_ du calque _PARAM1_ est _PARAM3_ à _PARAM4_"),
                    _("Calques et caméras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
@@ -71,7 +71,7 @@ CameraExtension::CameraExtension()
     DECLARE_CONDITION("CameraHeight",
                    _("Hauteur d'une caméra"),
                    _("Teste la hauteur d'une caméra d'un calque."),
-                   _("La hauteur de la caméra _PARAM1_ du calque _PARAM0_ est _PARAM2_ à _PARAM3_"),
+                   _("La hauteur de la caméra _PARAM2_ du calque _PARAM1_ est _PARAM3_ à _PARAM4_"),
                    _("Calques et caméras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
@@ -89,7 +89,7 @@ CameraExtension::CameraExtension()
     DECLARE_CONDITION("CameraAngle",
                    _("Angle de la caméra d'un calque"),
                    _("Teste l'angle d'une caméra."),
-                   _("L'angle de la caméra est _PARAM1_ à _PARAM0_° ( Calque : _PARAM2_, caméra : _PARAM3_  )"),
+                   _("L'angle de la caméra est _PARAM2_ à _PARAM1_° ( Calque : _PARAM3_, caméra : _PARAM4_  )"),
                    _("Calques et caméras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
@@ -107,7 +107,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("RotateCamera",
                    _("Modifier l'angle de la caméra"),
                    _("Cette action modifie l'angle de la caméra du calque indiqué."),
-                   _("Faire _PARAM1__PARAM0_ à l'angle de la caméra ( calque : _PARAM2_, caméra : _PARAM3_ )"),
+                   _("Faire _PARAM2__PARAM1_ à l'angle de la caméra ( calque : _PARAM3_, caméra : _PARAM4_ )"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
@@ -125,7 +125,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("AddCamera",
                    _("Ajouter une caméra à un calque"),
                    _("Cette action ajoute une caméra à un calque."),
-                   _("Ajouter une caméra au calque _PARAM0_"),
+                   _("Ajouter une caméra au calque _PARAM1_"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
@@ -145,7 +145,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("DeleteCamera",
                    _("Supprimer une caméra d'un calque"),
                    _("Supprime la caméra indiquée d'un calque."),
-                   _("Supprimer la caméra _PARAM1_ du calque _PARAM0_"),
+                   _("Supprimer la caméra _PARAM2_ du calque _PARAM1_"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
@@ -160,7 +160,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("CameraSize",
                    _("Modifier la taille d'une caméra"),
                    _("Cette action modifie la taille d'une caméra. Remet le zoom à sa valeur initiale."),
-                   _("Changer la taille de la caméra _PARAM1_ du calque _PARAM0_ en _PARAM2_*_PARAM3_"),
+                   _("Changer la taille de la caméra _PARAM2_ du calque _PARAM1_ en _PARAM3_*_PARAM4_"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
@@ -177,7 +177,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("CameraViewport",
                    _("Modifier la zone de rendu d'une caméra"),
                    _("Cette action modifie la zone de rendu d'une caméra, exprimée en facteur de la fenêtre."),
-                   _("Mettre la zone de rendu de la caméra _PARAM1_ du calque _PARAM0_ à _PARAM2_;_PARAM3_ _PARAM4_;_PARAM5_"),
+                   _("Mettre la zone de rendu de la caméra _PARAM2_ du calque _PARAM1_ à _PARAM3_;_PARAM4_ _PARAM5_;_PARAM6_"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
@@ -197,7 +197,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("ZoomCamera",
                    _("Changer le niveau de zoom de la caméra"),
                    _("Modifie le niveau de zoom de la caméra."),
-                   _("Mettre le niveau de zoom de la caméra à _PARAM0_ ( calque : _PARAM1_, caméra : _PARAM2_ )"),
+                   _("Mettre le niveau de zoom de la caméra à _PARAM1_ ( calque : _PARAM2_, caméra : _PARAM3_ )"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
@@ -214,7 +214,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("FixCamera",
                    _("Centrer la caméra sur un objet ( Limites )"),
                    _("Centre la caméra sur l'objet, dans les limites définies.\nIl est préférable d'appeler cette action vers la fin des évènements, quand toutes les actions\nde positionnement et de déplacement de l'objet ont été effectuées."),
-                   _("Centrer la caméra sur _PARAM0_ ( limites : de _PARAM1_;_PARAM2_ à _PARAM3_;_PARAM4_ ) ( calque : _PARAM6_, caméra : _PARAM7_ )"),
+                   _("Centrer la caméra sur _PARAM1_ ( limites : de _PARAM3_;_PARAM4_ à _PARAM5_;_PARAM6_ ) ( calque : _PARAM8_, caméra : _PARAM9_ )"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
@@ -237,7 +237,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("CentreCamera",
                    _("Centrer la caméra sur un objet"),
                    _("Centre la caméra sur l'objet indiqué.\nIl est préférable d'appeler cette action vers la fin des évènements, quand toutes les actions\nde positionnement et de déplacement de l'objet ont été effectuées."),
-                   _("Centrer la caméra sur _PARAM0_ ( calque : _PARAM2_, caméra : _PARAM3_ )"),
+                   _("Centrer la caméra sur _PARAM1_ ( calque : _PARAM4_, caméra : _PARAM5_ )"),
                    _("Calques et caméras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
@@ -257,7 +257,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("ShowLayer",
                    _("Afficher un calque"),
                    _("Rend visible un calque."),
-                   _("Afficher le calque _PARAM0_"),
+                   _("Afficher le calque _PARAM1_"),
                    _("Calques et caméras"),
                    "res/actions/layer24.png",
                    "res/actions/layer.png");
@@ -272,7 +272,7 @@ CameraExtension::CameraExtension()
     DECLARE_ACTION("HideLayer",
                    _("Cacher un calque"),
                    _("Rend invisible un calque."),
-                   _("Cacher le calque _PARAM0_"),
+                   _("Cacher le calque _PARAM1_"),
                    _("Calques et caméras"),
                    "res/actions/layer24.png",
                    "res/actions/layer.png");
@@ -287,7 +287,7 @@ CameraExtension::CameraExtension()
     DECLARE_CONDITION("LayerVisible",
                    _("Visibilité d'un calque"),
                    _("Teste si un calque est affiché."),
-                   _("Le calque _PARAM0_ est visible"),
+                   _("Le calque _PARAM1_ est visible"),
                    _("Calques et caméras"),
                    "res/conditions/layer24.png",
                    "res/conditions/layer.png");

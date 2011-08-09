@@ -6,13 +6,6 @@
 #ifndef FORCE_H_INCLUDED
 #define FORCE_H_INCLUDED
 
-#include "GDL/Event.h" //This include file must be placed first
-#include <iostream>
-#include <vector>
-#include <string>
-#include <cmath>
-#include "GDL/Log.h"
-
 /**
  * \brief Represents a force to be applied on an object.
  * Can have an X/Y component or an angle/length.

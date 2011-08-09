@@ -13,6 +13,8 @@ class Scene;
 class Game;
 class MainEditorCommand;
 class wxWindow;
+class EventsEditorItemsAreas;
+class EventsEditorSelection;
 #endif
 #include <iostream>
 #include <vector>
@@ -122,7 +124,7 @@ class GD_API BaseEvent
         /**
          * Called by event editor to draw the event.
          */
-        virtual void Render(wxDC & dc, int x, int y, unsigned int width) const {return;}
+        virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection) {return;}
 
         /**
          * Must return the height of the event when rendered
@@ -130,17 +132,11 @@ class GD_API BaseEvent
         virtual unsigned int GetRenderedHeight(unsigned int width) const {return 0;};
 
         /**
-         * Called when user click on the event
-         */
-        virtual void OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
-                                 bool & conditionsSelected, bool & instructionsSelected) {};
-
-        /**
          * Called when the user want to edit the event
          */
         virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_) {};
 
-        bool            selected;
+        bool            folded; ///< Here as it must be saved. Used by events editor
         mutable bool    eventHeightNeedUpdate; ///<Automatically set to true/false by the events editor
 
         boost::weak_ptr<BaseEvent> originalEvent; ///< Pointer only used for profiling events, so as to remember the original event from which it has been copied.

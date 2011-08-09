@@ -6,10 +6,15 @@
 #include <string>
 #include "GDL/RuntimeScene.h"
 
+namespace GDpriv
+{
+namespace StringTools
+{
+
 /**
  * Expression function for getting a substring from a string
  */
-string GD_API GDExpSubStr(const std::string & str, size_t start, size_t length )
+string GD_API SubStr(const std::string & str, size_t start, size_t length )
 {
     if ( start < str.length() )
         return str.substr(start, length);
@@ -20,7 +25,7 @@ string GD_API GDExpSubStr(const std::string & str, size_t start, size_t length )
 /**
  * Expression function for getting a character from a string
  */
-string GD_API GDExpStrAt(const std::string & str, size_t pos )
+string GD_API StrAt(const std::string & str, size_t pos )
 {
     if ( pos < str.length() )
         return str.substr(pos, 1);
@@ -31,7 +36,7 @@ string GD_API GDExpStrAt(const std::string & str, size_t pos )
 /**
  * Expression function for getting a substring from a string
  */
-unsigned int GD_API GDExpStrLen(const std::string & str)
+unsigned int GD_API StrLen(const std::string & str)
 {
     return str.length();
 }
@@ -39,7 +44,7 @@ unsigned int GD_API GDExpStrLen(const std::string & str)
 /**
  * Expression function for finding a string in another
  */
-int GD_API GDExpStrFind(const std::string & str, const std::string & findwhat)
+int GD_API StrFind(const std::string & str, const std::string & findwhat)
 {
     size_t pos = str.find(findwhat);
 
@@ -50,7 +55,7 @@ int GD_API GDExpStrFind(const std::string & str, const std::string & findwhat)
 /**
  * Expression function for finding a string in another
  */
-int GD_API GDExpStrRFind(const std::string & str, const std::string & findwhat)
+int GD_API StrRFind(const std::string & str, const std::string & findwhat)
 {
     size_t pos = str.rfind(findwhat);
 
@@ -61,7 +66,7 @@ int GD_API GDExpStrRFind(const std::string & str, const std::string & findwhat)
 /**
  * Expression function for finding a string in another
  */
-int GD_API GDExpStrFindFrom(const std::string & str, const std::string & findwhat, unsigned int start)
+int GD_API StrFindFrom(const std::string & str, const std::string & findwhat, unsigned int start)
 {
     size_t pos = str.find(findwhat, start);
 
@@ -72,10 +77,13 @@ int GD_API GDExpStrFindFrom(const std::string & str, const std::string & findwha
 /**
  * Expression function for finding a string in another
  */
-int GD_API GDExpStrRFindFrom(const std::string & str, const std::string & findwhat, unsigned int start)
+int GD_API StrRFindFrom(const std::string & str, const std::string & findwhat, unsigned int start)
 {
     size_t pos = str.rfind(findwhat, start);
 
     if ( pos != string::npos ) return pos;
     return -1;
+}
+
+}
 }

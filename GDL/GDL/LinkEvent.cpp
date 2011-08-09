@@ -121,10 +121,11 @@ void LinkEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainE
 /**
  * Render the event in the bitmap
  */
-void LinkEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
+void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
 
+/*
     if ( !selected )
     {
         dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
@@ -134,9 +135,9 @@ void LinkEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width)
     {
         dc.SetPen(wxPen(wxColour(0, 0, 0), 1));
         dc.SetBrush(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)));
-    }
+    }*/
 
-    wxRect rect(x, y, width, GetRenderedHeight(width));
+    wxRect rect(x+1, y, width, GetRenderedHeight(width)-2);
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     dc.DrawBitmap( wxBitmap( "res/link48.png", wxBITMAP_TYPE_ANY ), x+4, y + 4, true);

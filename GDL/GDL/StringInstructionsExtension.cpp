@@ -24,7 +24,7 @@ StringInstructionsExtension::StringInstructionsExtension()
         instrInfo.AddParameter("expression", _("Position de départ de la portion ( La première lettre est à la position 0 )"), "",false);
         instrInfo.AddParameter("expression", _("Longueur de la portion"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("GDSubStr").SetIncludeFile("GDL/StringTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::StringTools::SubStr").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_STR_EXPRESSION()
 
@@ -37,7 +37,7 @@ StringInstructionsExtension::StringInstructionsExtension()
         instrInfo.AddParameter("string", _("Texte"), "",false);
         instrInfo.AddParameter("expression", _("Position du caractère à prélever ( Premier caractère : 0 )"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("GDStrAt").SetIncludeFile("GDL/StringTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::StringTools::StrAt").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_STR_EXPRESSION()
 
@@ -49,7 +49,7 @@ StringInstructionsExtension::StringInstructionsExtension()
 
         instrInfo.AddParameter("string", _("Texte"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("GDStrLen").SetIncludeFile("GDL/StringTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::StringTools::StrLen").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_EXPRESSION()
 
@@ -62,7 +62,7 @@ StringInstructionsExtension::StringInstructionsExtension()
         instrInfo.AddParameter("string", _("Texte"), "",false);
         instrInfo.AddParameter("string", _("Texte à chercher"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("GDStrFind").SetIncludeFile("GDL/StringTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::StringTools::StrFind").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_EXPRESSION()
 
@@ -75,7 +75,7 @@ StringInstructionsExtension::StringInstructionsExtension()
         instrInfo.AddParameter("string", _("Texte"), "",false);
         instrInfo.AddParameter("string", _("Texte à chercher"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("GDStrRFind").SetIncludeFile("GDL/StringTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::StringTools::StrRFind").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_EXPRESSION()
 
@@ -89,7 +89,7 @@ StringInstructionsExtension::StringInstructionsExtension()
         instrInfo.AddParameter("string", _("Texte à chercher"), "",false);
         instrInfo.AddParameter("expression", _("Position à partir de laquelle chercher le texte"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("GDStrFindFrom").SetIncludeFile("GDL/StringTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::StringTools::StrFindFrom").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_EXPRESSION()
 
@@ -103,7 +103,7 @@ StringInstructionsExtension::StringInstructionsExtension()
         instrInfo.AddParameter("string", _("Texte à chercher"), "",false);
         instrInfo.AddParameter("expression", _("Position à partir de laquelle chercher le texte"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("GDStrRFindFrom").SetIncludeFile("GDL/StringTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::StringTools::StrRFindFrom").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_EXPRESSION()
 }

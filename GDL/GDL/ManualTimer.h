@@ -12,6 +12,7 @@ class GD_API ManualTimer
 {
     public:
 
+        ManualTimer();
         ManualTimer(std::string name_);
         virtual ~ManualTimer();
         /**

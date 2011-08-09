@@ -10,33 +10,12 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
-#include "GDL/Image.h"
 #include <cmath>
 #if defined(GD_IDE_ONLY)
-#include <wx/string.h>
+class wxString;
 #endif
 
-using namespace std;
-
-#ifdef __GNUC__
-/**
- * Round the number to the nearest integer
- * \ingroup CommonProgrammingTools
- */
-inline int GDRound(float x)
-{
-    return round(x);
-}
-#else
-/**
- * Round the number to the nearest integer
- * \ingroup CommonProgrammingTools
- */
-inline double GDRound( double d )
-{
-return floor( d + 0.5 );
-}
-#endif
+#include "GDL/LightweightCommonTools.h"
 
 /**
  * Convert anything to an integer.
@@ -69,31 +48,6 @@ float ToFloat( const T & value )
     return f;
 }
 
-/**
- * Convert anything to a double
- * \ingroup CommonProgrammingTools
- */
-template<typename T>
-double ToDouble( const T & value )
-{
-    double d;
-    std::istringstream oss(value);
-    oss >> d;
-    return d;
-}
-
-/**
- * Convert anything to a std::string
- * \ingroup CommonProgrammingTools
- */
-template<typename T>
-std::string ToString( const T & value )
-{
-    std::ostringstream oss;
-    oss << value;
-    return oss.str();
-}
-
 #if defined(GD_IDE_ONLY)
 /**
  * Specialization for converting wxString to a std::string
@@ -104,20 +58,20 @@ std::string GD_API ToString( const wxString & value );
 #endif
 
 /**
- * Replace all spaces by tildes in a string
+ * Replace all spaces by tildes in a std::string
  */
 std::string ReplaceSpacesByTildes(std::string text);
 
-int Spliter(string Tableau[] , string chaine, char separateur, int longueur = -1);
-int SpliterV(vector <string> *Tableau , string chaine, char separateur);
-int SpliterVInt(vector <int> *Tableau , string chaine, char separateur);
+int Spliter(std::string Tableau[] , std::string chaine, char separateur, int longueur = -1);
+int SpliterV(std::vector <std::string> *Tableau , std::string chaine, char separateur);
+int SpliterVInt(std::vector <int> *Tableau , std::string chaine, char separateur);
 
 template <typename T>
-vector <T> SpliterStringToVector( const string & str, char separator )
+std::vector <T> SpliterStringToVector( const std::string & str, char separator )
 {
-    istringstream iss( str );
-    string token;
-    vector <T> array;
+    std::istringstream iss( str );
+    std::string token;
+    std::vector <T> array;
 
     unsigned int i = 0;
     while ( std::getline( iss, token, separator ) )
@@ -130,11 +84,11 @@ vector <T> SpliterStringToVector( const string & str, char separator )
 }
 
 /**
- * Functor testing if a string is empty
+ * Functor testing if a std::string is empty
  */
 struct StringEmpty
 {
-   bool operator ()(const string & a) const
+   bool operator ()(const std::string & a) const
    {
       return a.empty();
    }

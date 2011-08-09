@@ -15,7 +15,7 @@ JoystickExtension::JoystickExtension()
     DECLARE_CONDITION("JoystickButtonDown",
                    _("Un bouton d'un joystick est appuyé"),
                    _("Teste si un bouton d'un joystick est appuyé."),
-                   _("Le bouton _PARAM1_ du joystick _PARAM0_ est appuyé"),
+                   _("Le bouton _PARAM2_ du joystick _PARAM1_ est appuyé"),
                    _("Joystick"),
                    "res/conditions/joystick24.png",
                    "res/conditions/joystick.png");
@@ -31,7 +31,7 @@ JoystickExtension::JoystickExtension()
     DECLARE_CONDITION("JoystickAxis",
                    _("Valeur d'un axe d'un joystick"),
                    _("Teste si la valeur de l'axe d'un joystick correspond."),
-                   _("La valeur de l'axe _PARAM1_ du joystick _PARAM0_ est _PARAM3_ à _PARAM2_"),
+                   _("La valeur de l'axe _PARAM2_ du joystick _PARAM1_ est _PARAM4_ à _PARAM3_"),
                    _("Joystick"),
                    "res/conditions/joystick24.png",
                    "res/conditions/joystick.png");
@@ -49,7 +49,7 @@ JoystickExtension::JoystickExtension()
     DECLARE_ACTION("GetJoystickAxis",
                    _("Obtenir la valeur de l'axe d'un joystick"),
                    _("Enregistre dans la variable de la scène indiquée la valeur de l'axe du joystick ( de -100 à 100 )."),
-                   _("Enregistrer dans _PARAM2_ la valeur de l'axe _PARAM1_ du joystick _PARAM0_"),
+                   _("Enregistrer dans _PARAM3_ la valeur de l'axe _PARAM2_ du joystick _PARAM1_"),
                    _("Joystick"),
                    "res/actions/joystick24.png",
                    "res/actions/joystick.png");

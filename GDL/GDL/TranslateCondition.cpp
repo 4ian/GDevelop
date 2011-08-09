@@ -16,6 +16,7 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/BitmapGUIManager.h"
 #include "GDL/TranslateCondition.h"
+#include "GDL/TranslateAction.h"
 #include "GDL/CommonTools.h"
 
 using namespace std;
@@ -29,7 +30,6 @@ using namespace std;
 string TranslateCondition::Translate(const Instruction & condition, const InstructionInfos & infos)
 {
     string trad = infos.sentence;
-    RemoveHTMLTags(trad);
 
     //Remplacement des _PARAMx_ par la valeur des paramètres
     for (unsigned int i =0;i<infos.parameters.size();++i)
@@ -37,8 +37,6 @@ string TranslateCondition::Translate(const Instruction & condition, const Instru
         while ( trad.find( "_PARAM"+ToString(i)+"_" ) != string::npos )
         {
             string parameter = condition.GetParameterSafely( i ).GetPlainString();
-            RemoveHTMLTags(parameter);
-            AddHTMLToParameter(parameter, infos.parameters[i].type); //Mise en forme du paramètre
 
             trad.replace(   trad.find( "_PARAM"+ToString(i)+"_" ), //Chaine à remplacer
                             string("_PARAM"+ToString(i)+"_").length(), //Longueur de la chaine
@@ -46,30 +44,28 @@ string TranslateCondition::Translate(const Instruction & condition, const Instru
         }
     }
 
+    std::replace( trad.begin(), trad.end(), '\n', ' ');
+
     return trad;
 }
 
-void TranslateCondition::RemoveHTMLTags(string & str)
+/**
+ * Create a formatted sentence from a condition
+ */
+std::vector< std::pair<std::string, TextFormatting> > TranslateCondition::GetAsFormattedText(const Instruction & condition, const InstructionInfos & infos)
 {
-    size_t pos = 0;
-    while ( str.find("&", pos) != string::npos)
-    {
-        str.replace( str.find( "&", pos), 1, "&amp;" );
-        pos = str.find( "&", pos)+1;
-    }
+    return TranslateAction::GetAsFormattedText(condition, infos);
+}
 
-    while ( str.find("<") != string::npos)
-        str.replace( str.find( "<" ), 1, "&lt;" );
-
-    while ( str.find(">") != string::npos)
-        str.replace( str.find( ">" ), 1, "&gt;" );
-
+TextFormatting TranslateCondition::GetFormattingFromType(const std::string & type)
+{
+    return TranslateAction::GetFormattingFromType(type);
 }
 
 ////////////////////////////////////////////////////////////
 /// Renvoi le nom du bouton en fonction du type
 ////////////////////////////////////////////////////////////
-string TranslateCondition::LabelFromType( string type )
+std::string TranslateCondition::LabelFromType( const string & type )
 {
     if ( type == "" )
         return "";
@@ -113,7 +109,7 @@ string TranslateCondition::LabelFromType( string type )
 ////////////////////////////////////////////////////////////
 /// Renvoi le bitmap du bouton en fonction du type
 ////////////////////////////////////////////////////////////
-wxBitmap TranslateCondition::BitmapFromType( string type )
+wxBitmap TranslateCondition::BitmapFromType( const string & type )
 {
     BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
 
@@ -155,34 +151,4 @@ wxBitmap TranslateCondition::BitmapFromType( string type )
     wxLogWarning( "Game Develop n'a pas pu trouver le bitmap d'un bouton suivant le type du paramètre" );
     return bitmapGUIManager->unknownBt;
 }
-
-////////////////////////////////////////////////////////////
-/// Décore un paramètre avec du html, suivant son type
-////////////////////////////////////////////////////////////
-string TranslateCondition::AddHTMLToParameter(string & parameter, string type)
-{
-    if ( type == "expression" )
-        parameter = /*"<FONT color=#CC2222>"+*/parameter/*+"</FONT>"*/;
-    else if ( type == "object" )
-        parameter = /*"<FONT color=#29780E><b>"+*/parameter/*+"</b></FONT>"*/;
-    else if ( type == "relationalOperator" )
-        parameter = /*"<FONT color=##0404B4><b>"+*/parameter/*+"</b></FONT>"*/;
-    else if ( type == "file" )
-        parameter = "<i>"+parameter+"</i>";
-    else if ( type == "key" )
-        parameter = "<b>"+parameter+"</b>";
-    else if ( type == "mouse" )
-        parameter = "<b>"+parameter+"</b>";
-    else if ( type == "trueorfalse" )
-        parameter = "<b>"+parameter+"</b>";
-    else if ( type == "yesorno" )
-        parameter = "<b>"+parameter+"</b>";
-    else if ( type == "layer" )
-        parameter = "<b>"+parameter+"</b>";
-    else if ( type == "joyaxis" )
-        parameter = "<b>"+parameter+"</b>";
-
-    return parameter;
-}
-
 #endif

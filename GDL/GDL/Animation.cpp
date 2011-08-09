@@ -4,18 +4,22 @@
  */
 
 #include "GDL/Animation.h"
-#include <SFML/System.hpp>
 #include <iostream>
-#include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
-#include "GDL/MemTrace.h"
+#include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
+#include "GDL/Direction.h"
 
 Direction Animation::badDirection;
 
 Animation::Animation() :
 typeNormal(true),
 directionsNumber(0)
+{
+}
+
+Animation::~Animation()
 {
 }
 

@@ -221,11 +221,14 @@ toolbar(NULL)
     Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorImages::OnMoveDownSelected);
     //*)
 
+    CreateToolbar();
+
     //EditorImages can be used without ribbon
-    if ( !useRibbon )
-        CreateToolbar();
-    else
+    if ( useRibbon )
+    {
         ConnectEvents();
+        toolbarPanel->SetSize(GetSize().x, 0);
+    }
 
     Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorImages::OnRefreshBtClick);
     Connect(ID_BITMAPBUTTON5,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorImages::OnOpenPaintProgramClick);
@@ -254,6 +257,8 @@ void EditorImages::OnResize(wxSizeEvent& event)
         toolbarPanel->SetSize(event.GetSize().GetWidth(), toolbar->GetSize().GetHeight());
         toolbar->SetSize(toolbarPanel->GetSize().x, -1);
     }
+    else
+        toolbarPanel->SetSize(event.GetSize().GetWidth(), 0);
 
     SplitterWindow1->Unsplit(BanqueImageList);
     SplitterWindow1->Unsplit(apercuPanel);
@@ -290,48 +295,10 @@ void EditorImages::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnRefreshBtClick, NULL, this);
 }
 
-/**
- * Static method for creating the ribbon's page used by Images Editors
- */
-void EditorImages::CreateRibbonPage(wxRibbonPage * page)
+/*void EditorImages::CreateRibbonPage(wxRibbonPage * page)
 {
-    wxConfigBase *pConfig = wxConfigBase::Get();
-    bool hideLabels = false;
-    pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
-
-    {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Liste d'images"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Ajouter une image") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Supprimer") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("Déplacer vers le haut") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("Déplacer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonSearch, !hideLabels ? _("Rechercher") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonRefresh, !hideLabels ? _("Rafraichir") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
-    }
-
-    {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Image sélectionnée"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonMod, !hideLabels ? _("Nom") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonModFile, !hideLabels ? _("Modifier le fichier") : "", wxBitmap("res/openicon24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Propriétés") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonPaintProgram, !hideLabels ? _("Editer") : "", wxBitmap("res/paint24.png", wxBITMAP_TYPE_ANY));
-    }
-
-    {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Dossiers"), wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonAddDossier, !hideLabels ? _("Ajouter un dossier") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
-    }
-
-    {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
-    }
-
-}
+    //After updating to wxWidgets 2.9.2 ( SVN ), buttons are not created correctly if we create them from here.
+}*/
 
 ////////////////////////////////////////////////////////////
 /// Création de la toolbar
@@ -873,11 +840,12 @@ void EditorImages::OnapercuPanelPaint(wxPaintEvent& event)
         return;
 
     wxBitmap bmp( fileImageSelected, wxBITMAP_TYPE_ANY);
-    if ( bmp.GetWidth() > 120 || bmp.GetHeight() > 120 )
+    if ( bmp.GetWidth() > apercuPanel->GetSize().x || bmp.GetHeight() > apercuPanel->GetSize().y )
     {
-        //Réduction à l'échelle
-        int max = bmp.GetWidth() > bmp.GetHeight() ? bmp.GetWidth() : bmp.GetHeight();
-        float factor = 120.f/max;
+        //Rescale to fit in apercuPanel
+        float xFactor = static_cast<float>(apercuPanel->GetSize().x)/static_cast<float>(bmp.GetWidth());
+        float yFactor = static_cast<float>(apercuPanel->GetSize().y)/static_cast<float>(bmp.GetHeight());
+        float factor = std::min(xFactor, yFactor);
 
         wxImage image = bmp.ConvertToImage();
         bmp = wxBitmap(image.Scale(bmp.GetWidth()*factor, bmp.GetHeight()*factor));

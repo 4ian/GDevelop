@@ -17,7 +17,7 @@ KeyboardExtension::KeyboardExtension()
     DECLARE_CONDITION("KeyPressed",
                    _("Une touche est appuyée"),
                    _("Teste si une touche du clavier est appuyée."),
-                   _("La touche _PARAM0_ est appuyée"),
+                   _("La touche _PARAM1_ est appuyée"),
                    _("Clavier"),
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png");
@@ -32,7 +32,7 @@ KeyboardExtension::KeyboardExtension()
     DECLARE_CONDITION("KeyFromTextPressed",
                    _("Une touche est appuyée (Expression texte)"),
                    _("Teste si une touche du clavier, retrouvée à partir du résultat de l'expression, est appuyée."),
-                   _("La touche _PARAM0_ est appuyée"),
+                   _("La touche _PARAM1_ est appuyée"),
                    _("Clavier"),
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png");

@@ -86,12 +86,7 @@ class GD_API Instruction
         inline const GDExpression & GetParameterSafely(unsigned int nb) const
         {
             if ( nb >= parameters.size() )
-            {
-                #ifndef RELEASE
-                    std::cout << "Parameter that doesn't exist was requested.";
-                #endif
                 return badExpression;
-            }
 
             return parameters[nb];
         }
@@ -102,12 +97,7 @@ class GD_API Instruction
         inline GDExpression & GetParameterSafely(unsigned int nb)
         {
             if ( nb >= parameters.size() )
-            {
-                #ifndef RELEASE
-                    std::cout << "Parameter that doesn't exist was requested.";
-                #endif
                 return badExpression;
-            }
 
             return parameters[nb];
         }

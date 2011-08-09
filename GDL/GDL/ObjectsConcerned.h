@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-typedef vector < boost::shared_ptr<Object> > ObjList;
+typedef svector < boost::shared_ptr<Object> > ObjList;
 typedef boost::shared_ptr<Object> ObjSPtr;
 
 using namespace std;

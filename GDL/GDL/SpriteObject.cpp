@@ -1,3 +1,9 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
+#include <SFML/Graphics.hpp>
 #include "GDL/SpriteObject.h"
 #include "GDL/Object.h"
 #include "GDL/ImageManager.h"
@@ -5,7 +11,8 @@
 #include "GDL/Position.h"
 #include "GDL/CommonTools.h"
 #include "GDL/RuntimeScene.h"
-#include <SFML/Graphics.hpp>
+#include "GDL/Direction.h"
+#include "GDL/Sprite.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
@@ -31,7 +38,7 @@ ptrToCurrentSprite( NULL ),
 needUpdateCurrentSprite(true),
 cacheAnimationSizeNeedUpdate(true),
 opacity( 255 ),
-blendMode(sf::Blend::Alpha),
+blendMode(0),
 isFlippedX(false),
 isFlippedY(false),
 scaleX( 1 ),
@@ -183,14 +190,7 @@ bool SpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
     else if ( propertyNb == 1 ) {return GetAnimation( currentAnimation ).typeNormal ? SetDirection(ToInt(newValue)) : SetAngle(ToFloat(newValue)); }
     else if ( propertyNb == 2 ) { return SetSprite(ToInt(newValue)); }
     else if ( propertyNb == 3 ) { SetOpacity(ToFloat(newValue)); }
-    else if ( propertyNb == 4 )
-    {
-        int blendModeRequested = ToInt(newValue);
-        if ( blendModeRequested == 0 ) SetBlendMode(sf::Blend::Alpha);
-        else if ( blendModeRequested == 1 ) SetBlendMode(sf::Blend::Add);
-        else if ( blendModeRequested == 2 ) SetBlendMode(sf::Blend::Multiply);
-        else if ( blendModeRequested == 3 ) SetBlendMode(sf::Blend::None);
-    }
+    else if ( propertyNb == 4 ) { SetBlendMode(ToInt(newValue)); }
     else if ( propertyNb == 5 ) {SetScaleX(ToFloat(newValue));}
     else if ( propertyNb == 6 ) {SetScaleY(ToFloat(newValue));}
 
@@ -341,14 +341,6 @@ void SpriteObject::ChangeScale(double newScale, const std::string & operatorStr)
     return;
 }
 
-void SpriteObject::SetBlendMode(int blendModeAsInt)
-{
-    if ( blendModeAsInt == 0 ) SetBlendMode(sf::Blend::Alpha);
-    else if ( blendModeAsInt == 1 ) SetBlendMode(sf::Blend::Add);
-    else if ( blendModeAsInt == 2 ) SetBlendMode(sf::Blend::Multiply);
-    else if ( blendModeAsInt == 3 ) SetBlendMode(sf::Blend::None);
-}
-
 void SpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const std::string & imageName, float xPosition, float yPosition, bool useTransparency)
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
@@ -409,13 +401,15 @@ void SpriteObject::UpdateCurrentSprite() const
         ptrToCurrentSprite = &badSpriteDatas;
     else
     {
-        if ( animations[currentAnimation].typeNormal )
+        Animation & currentAnim = animations[currentAnimation].GetNonConst();
+
+        if ( currentAnim.typeNormal )
         {
             //Update sprite pointer
-            if ( currentDirection >= animations[currentAnimation].GetDirectionsNumber() || currentSprite >= animations[currentAnimation].GetDirection(currentDirection).GetSpritesNumber() )
+            if ( currentDirection >= currentAnim.GetDirectionsNumber() || currentSprite >= currentAnim.GetDirection(currentDirection).GetSpritesNumber() )
                 ptrToCurrentSprite = &badSpriteDatas;
             else
-                ptrToCurrentSprite = &animations[currentAnimation].GetDirectionToModify( currentDirection ).GetSprite( currentSprite );
+                ptrToCurrentSprite = &currentAnim.GetDirectionToModify( currentDirection ).GetSprite( currentSprite );
 
             ptrToCurrentSprite->GetSFMLSprite().SetX( X - ptrToCurrentSprite->GetOrigine().GetX() + (ptrToCurrentSprite->GetSFMLSprite().GetSubRect().Width)*(1-scaleX)/2 );
             ptrToCurrentSprite->GetSFMLSprite().SetY( Y - ptrToCurrentSprite->GetOrigine().GetY() + (ptrToCurrentSprite->GetSFMLSprite().GetSubRect().Height)*(1-scaleY)/2 );
@@ -423,10 +417,10 @@ void SpriteObject::UpdateCurrentSprite() const
         else
         {
             //Update sprite pointer
-            if ( animations[currentAnimation].HasNoDirections() || currentSprite >= animations[currentAnimation].GetDirection(0).GetSpritesNumber() )
+            if ( currentAnim.HasNoDirections() || currentSprite >= currentAnim.GetDirection(0).GetSpritesNumber() )
                 ptrToCurrentSprite = &badSpriteDatas;
             else
-                ptrToCurrentSprite = &animations[currentAnimation].GetDirectionToModify(0).GetSprite( currentSprite );
+                ptrToCurrentSprite = &currentAnim.GetDirectionToModify(0).GetSprite( currentSprite );
 
             ptrToCurrentSprite->GetSFMLSprite().SetX( X  + ptrToCurrentSprite->GetCentre().GetX()*scaleX - ptrToCurrentSprite->GetOrigine().GetX()
                                                 + (ptrToCurrentSprite->GetSFMLSprite().GetSubRect().Width)*(1-scaleX)/2);
@@ -441,9 +435,12 @@ void SpriteObject::UpdateCurrentSprite() const
 
     ptrToCurrentSprite->GetSFMLSprite().SetScale( scaleX, scaleY );
     ptrToCurrentSprite->GetSFMLSprite().SetColor( sf::Color( colorR, colorV, colorB, opacity ) );
-    ptrToCurrentSprite->GetSFMLSprite().SetBlendMode( blendMode );
     ptrToCurrentSprite->GetSFMLSprite().FlipX(isFlippedX);
     ptrToCurrentSprite->GetSFMLSprite().FlipY(isFlippedY);
+    if ( blendMode == 0 ) ptrToCurrentSprite->GetSFMLSprite().SetBlendMode(sf::Blend::Alpha);
+    else if ( blendMode == 1 ) ptrToCurrentSprite->GetSFMLSprite().SetBlendMode(sf::Blend::Add);
+    else if ( blendMode == 2 ) ptrToCurrentSprite->GetSFMLSprite().SetBlendMode(sf::Blend::Multiply);
+    else if ( blendMode == 3 ) ptrToCurrentSprite->GetSFMLSprite().SetBlendMode(sf::Blend::None);
 
     needUpdateCurrentSprite = false;
 }
@@ -640,7 +637,7 @@ float SpriteObject::GetCurrentDirectionOrAngle() const
  */
 void SpriteObject::AddAnimation(const Animation & animation)
 {
-    animations.push_back(animation);
+    animations.push_back(AnimationProxy(animation));
     cacheAnimationSizeNeedUpdate = true;
 }
 
@@ -1031,6 +1028,31 @@ void SpriteObject::SaveToXml(TiXmlElement * objet)
     }
 }
 #endif
+
+SpriteObject::AnimationProxy::AnimationProxy() :
+    animation(new Animation)
+{
+}
+SpriteObject::AnimationProxy::~AnimationProxy()
+{
+    delete animation;
+}
+
+SpriteObject::AnimationProxy::AnimationProxy(const Animation & animation_) :
+    animation(new Animation(animation_))
+{
+}
+
+SpriteObject::AnimationProxy::AnimationProxy(const SpriteObject::AnimationProxy & proxy) :
+    animation(new Animation(proxy.Get()))
+{
+}
+SpriteObject::AnimationProxy & SpriteObject::AnimationProxy::operator=(const AnimationProxy & rhs)
+{
+    *animation = Animation(rhs.Get());
+
+    return *this;
+}
 
 /**
  * Function destroying an extension Object.

@@ -12,6 +12,8 @@
 
 #if defined(GD_IDE_ONLY)
 #include "EventsRenderingHelper.h"
+#include "GDL/EventsEditorItemsAreas.h"
+#include "GDL/EventsEditorSelection.h"
 #endif
 
 StandardEvent::StandardEvent() :
@@ -111,16 +113,25 @@ void StandardEvent::LoadFromXml(const TiXmlElement * eventElem)
 /**
  * Render the event in the bitmap
  */
-void StandardEvent::Render(wxDC & dc, int x, int y, unsigned int width) const
+void StandardEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+    int border = renderingHelper->instructionsListBorder;
 
     //Draw event rectangle
-    wxRect rect(x, y, width, GetRenderedHeight(width));
+    wxRect rect(x, y, renderingHelper->GetConditionsColumnWidth(), GetRenderedHeight(width));
     renderingHelper->DrawNiceRectangle(dc, rect);
 
-    renderingHelper->DrawConditionsList(conditions, dc, x+renderingHelper->instructionsListBorder, y+renderingHelper->instructionsListBorder, renderingHelper->GetConditionsColumnWidth()-renderingHelper->instructionsListBorder*2, IsDisabled());
-    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth()+renderingHelper->instructionsListBorder, y+renderingHelper->instructionsListBorder, width-renderingHelper->GetConditionsColumnWidth()-renderingHelper->instructionsListBorder*2, IsDisabled());
+    renderingHelper->DrawConditionsList(conditions, dc,
+                                        x+border,
+                                        y+border,
+                                        renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+    renderingHelper->DrawActionsList(actions, dc,
+                                     x+renderingHelper->GetConditionsColumnWidth()+border,
+                                     y+border,
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+
+    //Make sure that Render is rendering an event with the same height as GetRenderedHeight : Use same values for border and similar calls to compute heights
 }
 
 unsigned int StandardEvent::GetRenderedHeight(unsigned int width) const
@@ -128,81 +139,17 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width) const
     if ( eventHeightNeedUpdate )
     {
         EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+        int border = renderingHelper->instructionsListBorder;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth());
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
 
-        renderedHeight = (conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight)+renderingHelper->instructionsListBorder*2;
+        renderedHeight = (conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight)+border*2;
         eventHeightNeedUpdate = false;
     }
 
     return renderedHeight;
-}
-
-void StandardEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
-                         bool & conditionsSelected, bool & instructionsSelected)
-{
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
-
-    if ( x <= renderingHelper->GetConditionsColumnWidth())
-    {
-        conditionsSelected = true;
-
-        vector < Instruction > * conditionsListSelected = NULL;
-        unsigned int conditionIdInList = 0;
-
-        bool found = renderingHelper->GetConditionAt(conditions, x-renderingHelper->instructionsListBorder, y-renderingHelper->instructionsListBorder, conditionsListSelected, conditionIdInList);
-
-        if ( found )
-        {
-            //Update event and conditions selection information
-            if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
-
-            //Update editor selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = conditionsListSelected;
-            boost::tuples::get<3>(eventsSelected.back()) = conditionIdInList;
-
-            return;
-        }
-        else if ( y <= 18 )
-        {
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &conditions;
-            boost::tuples::get<3>(eventsSelected.back()) = 0;
-
-            return;
-        }
-    }
-    else
-    {
-        conditionsSelected = false;
-
-        vector < Instruction > * actionsListSelected = NULL;
-        unsigned int actionIdInList = 0;
-
-        bool found = renderingHelper->GetActionAt(actions, x-renderingHelper->instructionsListBorder, y-renderingHelper->instructionsListBorder, actionsListSelected, actionIdInList);
-
-        if ( found )
-        {
-            //Update event and action selection information
-            if ( actionIdInList < actionsListSelected->size() ) (*actionsListSelected)[actionIdInList].selected = true;
-
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = actionsListSelected;
-            boost::tuples::get<3>(eventsSelected.back()) = actionIdInList;
-        }
-        else
-        {
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &actions;
-            boost::tuples::get<3>(eventsSelected.back()) = 0;
-        }
-    }
 }
 #endif
 

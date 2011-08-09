@@ -9,7 +9,7 @@ vector <BaseEventSPtr> BaseEvent::badSubEvents;
 
 BaseEvent::BaseEvent() :
 #if defined(GD_IDE_ONLY)
-selected(false),
+folded(false),
 eventHeightNeedUpdate(true),
 totalTimeDuringLastSession(0),
 #endif

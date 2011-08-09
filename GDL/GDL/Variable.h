@@ -6,8 +6,6 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
 #include <string>
-#include <iostream>
-#include <functional>
 
 /**
  * \brief Class used to represent a simple Game Develop variable.

@@ -1036,6 +1036,8 @@
 		<Unit filename="GDL\EventsExecutionEngine.h" />
 		<Unit filename="GDL\EventsRenderingHelper.cpp" />
 		<Unit filename="GDL\EventsRenderingHelper.h" />
+		<Unit filename="GDL\ExecutableIconChanger.cpp" />
+		<Unit filename="GDL\ExecutableIconChanger.h" />
 		<Unit filename="GDL\ExpressionInstruction.cpp" />
 		<Unit filename="GDL\ExpressionInstruction.h" />
 		<Unit filename="GDL\ExpressionsCodeGeneration.cpp" />
@@ -1062,6 +1064,8 @@
 		<Unit filename="GDL\ForEachEvent.h" />
 		<Unit filename="GDL\Force.cpp" />
 		<Unit filename="GDL\Force.h" />
+		<Unit filename="GDL\FullProjectCompiler.cpp" />
+		<Unit filename="GDL\FullProjectCompiler.h" />
 		<Unit filename="GDL\GDExpression.cpp" />
 		<Unit filename="GDL\GDExpression.h" />
 		<Unit filename="GDL\GDExpressionParser.cpp" />

@@ -2,6 +2,7 @@
 #include "GDL/Object.h"
 #include "GDL/RotatedRectangle.h"
 #include "GDL/RotatedRectangleCollision.h"
+#include <cmath>
 
 using namespace std;
 

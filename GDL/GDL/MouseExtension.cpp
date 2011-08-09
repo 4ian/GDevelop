@@ -73,7 +73,7 @@ MouseExtension::MouseExtension()
     DECLARE_ACTION("SetSourisXY",
                    _("Positionner le curseur de la souris"),
                    _("Positionne le curseur de la souris aux coordonnées données."),
-                   _("Mettre le curseur en _PARAM0_;_PARAM1_"),
+                   _("Mettre le curseur en _PARAM1_;_PARAM2_"),
                    _("Souris"),
                    "res/actions/mouse24.png",
                    "res/actions/mouse.png")
@@ -104,7 +104,7 @@ MouseExtension::MouseExtension()
     DECLARE_CONDITION("SourisX",
                    _("Position X de la souris"),
                    _("Teste si la valeur de la position x de la souris correspond au test effectué."),
-                   _("La position X de la souris est _PARAM1_ à _PARAM0_"),
+                   _("La position X de la souris est _PARAM2_ à _PARAM1_"),
                    _("Souris"),
                    "res/conditions/mouse24.png",
                    "res/conditions/mouse.png")
@@ -122,7 +122,7 @@ MouseExtension::MouseExtension()
     DECLARE_CONDITION("SourisY",
                    _("Position Y de la souris"),
                    _("Teste si la valeur de la position y de la souris correspond au test effectué."),
-                   _("La position Y de la souris est _PARAM1_ à _PARAM0_"),
+                   _("La position Y de la souris est _PARAM2_ à _PARAM1_"),
                    _("Souris"),
                    "res/conditions/mouse24.png",
                    "res/conditions/mouse.png");
@@ -140,7 +140,7 @@ MouseExtension::MouseExtension()
     DECLARE_CONDITION("SourisBouton",
                    _("Bouton de la souris"),
                    _("Teste si le bouton choisi de la souris est appuyé."),
-                   _("Le bouton _PARAM0_ de la souris est appuyé"),
+                   _("Le bouton _PARAM1_ de la souris est appuyé"),
                    _("Souris"),
                    "res/conditions/mouse24.png",
                    "res/conditions/mouse.png");

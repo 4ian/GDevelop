@@ -5,7 +5,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     DECLARE_ACTION("Create",
                    _("Créer un objet"),
                    _("Créer un objet à la position spécifiée"),
-                   _("Créer l'objet _PARAM0_ à la position _PARAM1_;_PARAM2_"),
+                   _("Créer l'objet _PARAM3_ à la position _PARAM4_;_PARAM5_"),
                    _("Objets"),
                    "res/actions/create24.png",
                    "res/actions/create.png");
@@ -25,7 +25,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     DECLARE_ACTION("CreateByName",
                    _("Créer un objet de partir son nom"),
                    _("Créer un objet à la position spécifiée"),
-                   _("Créer l'objet ayant le nom _PARAM0_ à la position _PARAM1_;_PARAM2_"),
+                   _("Créer l'objet ayant le nom _PARAM3_ à la position _PARAM4_;_PARAM5_"),
                    _("Objets"),
                    "res/actions/create24.png",
                    "res/actions/create.png");
@@ -62,7 +62,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     DECLARE_ACTION("AjoutHasard",
                    _("Prendre un objet au hasard"),
                    _("Prend un seul objet ayant ce nom parmi tous ceux de la scène"),
-                   _("Prendre un _PARAM0_ au hasard"),
+                   _("Prendre un _PARAM3_ au hasard"),
                    _("Objets"),
                    "res/actions/ajouthasard24.png",
                    "res/actions/ajouthasard.png");
@@ -112,7 +112,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     DECLARE_CONDITION("Distance",
                    _("Distance entre deux objets"),
                    _("Teste si la distance entre les deux objets correspond au test effectué"),
-                   _("La distance entre les objets _PARAM0_ et _PARAM1_ est _PARAM3_ à _PARAM2_"),
+                   _("La distance entre les objets _PARAM0_ et _PARAM1_ est _PARAM5_ à _PARAM4_"),
                    _("Position"),
                    "res/conditions/distance24.png",
                    "res/conditions/distance.png");
@@ -149,7 +149,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     DECLARE_CONDITION("AjoutHasard",
                    _("Prendre un objet au hasard"),
                    _("Prend un seul objet ayant ce nom parmi tous ceux de la scène"),
-                   _("Prendre un _PARAM0_ au hasard"),
+                   _("Prendre un _PARAM3_ au hasard"),
                    _("Objets"),
                    "res/conditions/ajouthasard24.png",
                    "res/conditions/ajouthasard.png");

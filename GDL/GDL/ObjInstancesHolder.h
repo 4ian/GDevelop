@@ -41,7 +41,7 @@ public:
     {
         ObjList objList;
 
-        for (map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        for (std::map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
             copy(it->second.begin(), it->second.end(), back_inserter(objList));
 
         return objList;
@@ -63,7 +63,7 @@ public:
      */
     inline void RemoveObject(const ObjSPtr & object)
     {
-        for (map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        for (std::map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
         {
             ObjList & associatedList = it->second;
             associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());

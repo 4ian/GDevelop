@@ -18,7 +18,7 @@ WindowExtension::WindowExtension()
     DECLARE_ACTION("EcrireTexte",
                    _("Afficher un texte"),
                    _("Affiche le texte spécifié à l'écran."),
-                   _("Afficher _PARAM0_ en _PARAM1_;_PARAM2_ ( couleur : _PARAM3_ , taille : _PARAM4_, police : _PARAM5_ )"),
+                   _("Afficher _PARAM1_ en _PARAM2_;_PARAM3_ ( couleur : _PARAM4_ , taille : _PARAM5_, police : _PARAM6_ )"),
                    _("Scène"),
                    "res/actions/texte24.png",
                    "res/actions/texte.png");
@@ -39,7 +39,7 @@ WindowExtension::WindowExtension()
     DECLARE_ACTION("SetFullScreen",
                    _("(Dés)Activer le plein écran"),
                    _("Cette action active ou désactive l'affichage du jeu en plein écran."),
-                   _("Activer le plein écran :  _PARAM0_"),
+                   _("Activer le plein écran :  _PARAM1_"),
                    _("Fenêtre de jeu"),
                    "res/actions/fullscreen24.png",
                    "res/actions/fullscreen.png");
@@ -54,7 +54,7 @@ WindowExtension::WindowExtension()
     DECLARE_ACTION("SetWindowSize",
                    _("Changer la taille de l'écran"),
                    _("Cette action change la taille de la fenêtre de jeu."),
-                   _("Changer la taille de la fenêtre de jeu en _PARAM0_x_PARAM1_"),
+                   _("Changer la taille de la fenêtre de jeu en _PARAM1_x_PARAM2_"),
                    _("Fenêtre de jeu"),
                    "res/actions/window24.png",
                    "res/actions/window.png");

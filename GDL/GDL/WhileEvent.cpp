@@ -14,6 +14,8 @@
 #if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/EventsEditorItemsAreas.h"
+#include "GDL/EventsEditorSelection.h"
 #endif
 
 std::string WhileEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & parentContext)
@@ -125,114 +127,13 @@ void WhileEvent::LoadFromXml(const TiXmlElement * eventElem)
 }
 
 #if defined(GD_IDE_ONLY)
-
-void WhileEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
-                         bool & conditionsSelected, bool & instructionsSelected)
-{
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
-    const int repeatHeight = 20;
-
-    if ( y>0 && static_cast<unsigned int>(y) <= whileConditionsHeight)
-    {
-        conditionsSelected = true;
-
-        vector < Instruction > * conditionsListSelected = NULL;
-        unsigned int conditionIdInList = 0;
-
-        bool found = renderingHelper->GetConditionAt(whileConditions, x-0, y-0, conditionsListSelected, conditionIdInList);
-
-        if ( found )
-        {
-            //Update event and conditions selection information
-            if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
-
-            //Update editor selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = conditionsListSelected;
-            boost::tuples::get<3>(eventsSelected.back()) = conditionIdInList;
-
-            return;
-        }
-        else if ( y <= 18 )
-        {
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &whileConditions;
-            boost::tuples::get<3>(eventsSelected.back()) = 0;
-
-            return;
-        }
-    }
-
-    y -= whileConditionsHeight+repeatHeight; //Substract the height of the "For Each object ..." text so as to simplify the tests
-    if ( y < 0 ) return;
-
-    if ( x < 0 || static_cast<unsigned int>(x) <= renderingHelper->GetConditionsColumnWidth())
-    {
-        conditionsSelected = true;
-
-        vector < Instruction > * conditionsListSelected = NULL;
-        unsigned int conditionIdInList = 0;
-
-        bool found = renderingHelper->GetConditionAt(conditions, x-0, y-0, conditionsListSelected, conditionIdInList);
-
-        if ( found )
-        {
-            //Update event and conditions selection information
-            if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
-
-            //Update editor selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = conditionsListSelected;
-            boost::tuples::get<3>(eventsSelected.back()) = conditionIdInList;
-
-            return;
-        }
-        else if ( y <= 18 )
-        {
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &conditions;
-            boost::tuples::get<3>(eventsSelected.back()) = 0;
-
-            return;
-        }
-    }
-    else
-    {
-        conditionsSelected = false;
-
-        vector < Instruction > * actionsListSelected = NULL;
-        unsigned int actionIdInList = 0;
-
-        bool found = renderingHelper->GetActionAt(actions, x-0, y-0, actionsListSelected, actionIdInList);
-
-        if ( found )
-        {
-            //Update event and action selection information
-            if ( actionIdInList < actionsListSelected->size() ) (*actionsListSelected)[actionIdInList].selected = true;
-
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = actionsListSelected;
-            boost::tuples::get<3>(eventsSelected.back()) = actionIdInList;
-        }
-        else
-        {
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &actions;
-            boost::tuples::get<3>(eventsSelected.back()) = 0;
-        }
-    }
-}
-
 /**
  * Render the event in the bitmap
  */
-void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width) const
+void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+    int border = renderingHelper->instructionsListBorder;
     const int repeatHeight = 20;
 
     //Draw event rectangle
@@ -241,17 +142,23 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width) const
 
     //While text
     dc.SetFont( renderingHelper->GetBoldFont() );
-    dc.DrawText( _("Tant que :"), x+2, y+1 );
+    dc.DrawText( _("Tant que :"), x+5, y+5 );
 
     //Draw "while conditions"
-    whileConditionsHeight = 2;
-    whileConditionsHeight += renderingHelper->DrawConditionsList(whileConditions, dc, x+80, y+2, width-80, IsDisabled());
+    int whileConditionsHeight = renderingHelper->DrawConditionsList(whileConditions, dc, x+80+border, y+border, width-80-border*2, this, areas, selection);
 
     dc.SetFont( renderingHelper->GetBoldFont() );
     dc.DrawText( _("Répéter :"), x+2, y+whileConditionsHeight);
+    whileConditionsHeight += repeatHeight;
 
-    renderingHelper->DrawConditionsList(conditions, dc, x, y+whileConditionsHeight+repeatHeight, renderingHelper->GetConditionsColumnWidth(), IsDisabled());
-    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+whileConditionsHeight+repeatHeight, width-renderingHelper->GetConditionsColumnWidth(), IsDisabled());
+    renderingHelper->DrawConditionsList(conditions, dc,
+                                        x+border,
+                                        y+whileConditionsHeight+border+border*2,
+                                        renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+    renderingHelper->DrawActionsList(actions, dc,
+                                     x+renderingHelper->GetConditionsColumnWidth()+border,
+                                     y+whileConditionsHeight+border+border*2,
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
 }
 
 unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
@@ -259,14 +166,15 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
     if ( eventHeightNeedUpdate )
     {
         EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+        int border = renderingHelper->instructionsListBorder;
         const int repeatHeight = 20;
 
         //Get maximum height needed
-        whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80);
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth());
+        int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2);
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
 
-        renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + whileConditionsHeight + repeatHeight);
+        renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + whileConditionsHeight + repeatHeight)+border*2+border*2;
         eventHeightNeedUpdate = false;
     }
 

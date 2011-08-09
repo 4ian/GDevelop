@@ -13,6 +13,8 @@ class Scene;
 class Game;
 class MainEditorCommand;
 class wxWindow;
+class EventsEditorItemsAreas;
+class EventsEditorSelection;
 #endif
 
 /**
@@ -45,7 +47,7 @@ class GD_API CommentEvent : public BaseEvent
         /**
          * Called by event editor to draw the event.
          */
-        virtual void Render(wxDC & dc, int x, int y, unsigned int width) const;
+        virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
 
         /**
          * Must return the height of the event when rendered

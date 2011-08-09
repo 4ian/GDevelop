@@ -7,8 +7,8 @@
 #define SPRITEOBJECT_H
 
 #include "GDL/Object.h"
-#include "GDL/Sprite.h"
 #include "GDL/Animation.h"
+class Sprite;
 class Evaluateur;
 class ImageManager;
 class RuntimeScene;
@@ -17,6 +17,10 @@ class ExpressionInstruction;
 class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
+namespace sf
+{
+    class Sprite;
+}
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
 class Game;
@@ -49,8 +53,8 @@ class GD_API SpriteObject : public Object
         virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
         virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, string & name, string & value) const;
-        virtual bool ChangeProperty(unsigned int propertyNb, string newValue);
+        virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+        virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
         virtual unsigned int GetNumberOfProperties() const;
         #endif
 
@@ -92,22 +96,16 @@ class GD_API SpriteObject : public Object
         inline const Animation & GetAnimation(unsigned int nb) const
         {
             if ( nb >= GetAnimationsNumber() )
-            {
-                cout << "Impossible d'accéder à l'animation "<<nb;
                 return badAnimation;
-            }
 
-            return animations[nb];
+            return animations[nb].Get();
         }
         inline Animation & GetAnimation(unsigned int nb)
         {
             if ( nb >= GetAnimationsNumber() )
-            {
-                cout << "Impossible d'accéder à l'animation "<<nb;
                 return badAnimation;
-            }
 
-            return animations[nb];
+            return animations[nb].Get();
         }
         unsigned int GetAnimationsNumber() const;
         void AddAnimation(const Animation & animation);
@@ -134,8 +132,8 @@ class GD_API SpriteObject : public Object
         void SetOpacity(float val);
         inline float GetOpacity() const {return opacity;};
 
-        inline void SetBlendMode(const sf::Blend::Mode & val) { blendMode = val; };
-        inline sf::Blend::Mode GetBlendMode() const {return blendMode;};
+        inline void SetBlendMode(unsigned int blendMode_) { blendMode = blendMode_; };
+        inline unsigned int GetBlendMode() const {return blendMode;};
 
         inline void SetScaleX(float val) { if ( val > 0 ) scaleX = val; needUpdateCurrentSprite = true; };
         inline float GetScaleX() const { return scaleX; };
@@ -163,11 +161,6 @@ class GD_API SpriteObject : public Object
         void ChangeScale(double newValue, const std::string & operatorStr);
 
         /**
-         * Only used internally by GD events generated code: Prefer using original SetBlendMode.
-         */
-        void SetBlendMode(int blendModeAsInt);
-
-        /**
          * Only used internally by GD events generated code: Prefer using original SetColor.
          */
         void SetColor(const std::string & colorStr);
@@ -188,13 +181,32 @@ class GD_API SpriteObject : public Object
         mutable Sprite * ptrToCurrentSprite; //Ptr to the current sprite
         mutable bool needUpdateCurrentSprite;
 
-        //Animations de l'objets
-        mutable vector < Animation > animations;
+        /**
+         * \brief Wrapper around a pointer to Animation. Used to reduce compile time.
+         * Animation proxy is used to avoid including Animation.h/Direction.h/Sprite.h and SFML headers
+         */
+        class AnimationProxy
+        {
+        public:
+            AnimationProxy();
+            AnimationProxy(const Animation & animation);
+            virtual ~AnimationProxy();
+            AnimationProxy(const AnimationProxy & proxy);
+            AnimationProxy & operator=(const AnimationProxy & rhs);
+
+            Animation & Get() {return *animation; }
+            const Animation & Get() const {return *animation; }
+            Animation & GetNonConst() {return *animation; }
+
+        private:
+            Animation * animation;
+        };
+        mutable std::vector < AnimationProxy > animations;
         mutable unsigned int cacheAnimationsSize;
         mutable bool cacheAnimationSizeNeedUpdate;
 
         float opacity;
-        sf::Blend::Mode blendMode;
+        unsigned int blendMode;
         bool isFlippedX;
         bool isFlippedY;
 
@@ -211,15 +223,6 @@ class GD_API SpriteObject : public Object
         static Sprite       badSpriteDatas;
         static Animation    badAnimation;
 };
-
-//Conditions
-bool CondSourisSurObjet( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-bool CondEstTourne( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-bool CondCollision( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-bool CondCollisionNP( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & condition );
-
-//Actions
-bool ActTourneVers( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action );
 
 GD_API void DestroySpriteObject(Object * object);
 GD_API Object * CreateSpriteObject(std::string name);

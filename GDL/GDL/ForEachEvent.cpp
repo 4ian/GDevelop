@@ -15,6 +15,8 @@
 #if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/EditForEachEvent.h"
+#include "GDL/EventsEditorItemsAreas.h"
+#include "GDL/EventsEditorSelection.h"
 #endif
 
 ForEachEvent::ForEachEvent() :
@@ -220,89 +222,13 @@ void ForEachEvent::LoadFromXml(const TiXmlElement * eventElem)
 
 
 #if defined(GD_IDE_ONLY)
-void ForEachEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
-                         bool & conditionsSelected, bool & instructionsSelected)
-{
-    const int forEachTextHeight = 20;
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
-
-    //Test selection for the "For Each object..."
-    if ( y >= 0 && y <= forEachTextHeight )
-    {
-        objectsToPickSelected = true;
-        return;
-    }
-
-    //Test selection of actions/conditions
-    objectsToPickSelected = false;
-    y -= forEachTextHeight; //Substract the height of the "For Each object ..." text so as to simplify the tests
-    if ( x <= renderingHelper->GetConditionsColumnWidth())
-    {
-        conditionsSelected = true;
-
-        vector < Instruction > * conditionsListSelected = NULL;
-        unsigned int conditionIdInList = 0;
-
-        bool found = renderingHelper->GetConditionAt(conditions, x-0, y-0, conditionsListSelected, conditionIdInList);
-
-        if ( found )
-        {
-            //Update event and conditions selection information
-            if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
-
-            //Update editor selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = conditionsListSelected;
-            boost::tuples::get<3>(eventsSelected.back()) = conditionIdInList;
-
-            return;
-        }
-        else if ( y <= 18 )
-        {
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &conditions;
-            boost::tuples::get<3>(eventsSelected.back()) = 0;
-
-            return;
-        }
-    }
-    else
-    {
-        conditionsSelected = false;
-
-        vector < Instruction > * actionsListSelected = NULL;
-        unsigned int actionIdInList = 0;
-
-        bool found = renderingHelper->GetActionAt(actions, x-0, y-0, actionsListSelected, actionIdInList);
-
-        if ( found )
-        {
-            //Update event and action selection information
-            if ( actionIdInList < actionsListSelected->size() ) (*actionsListSelected)[actionIdInList].selected = true;
-
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = actionsListSelected;
-            boost::tuples::get<3>(eventsSelected.back()) = actionIdInList;
-        }
-        else
-        {
-
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &actions;
-            boost::tuples::get<3>(eventsSelected.back()) = 0;
-        }
-    }
-}
-
 /**
  * Render the event in the bitmap
  */
-void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width) const
+void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+    int border = renderingHelper->instructionsListBorder;
     const int forEachTextHeight = 20;
 
     //Draw event rectangle
@@ -310,20 +236,26 @@ void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width) const
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     //"For Each" text selection
-    if ( selected && objectsToPickSelected )
+    /*if ( selection.EventSelected(this) && objectsToPickSelected )
     {
         dc.SetBrush(renderingHelper->GetSelectedRectangleFillBrush());
         dc.SetPen(renderingHelper->GetSelectedRectangleOutlinePen());
         dc.DrawRectangle(x+1, y+1, width-2, forEachTextHeight-2);
-    }
+    }*/
 
     //For Each text
     dc.SetFont( renderingHelper->GetBoldFont() );
     dc.DrawText( _("Pour chaque objet") + " " + objectsToPick.GetPlainString() + _(", répéter :"), x + 2, y + 1 );
 
     //Draw actions and conditions
-    renderingHelper->DrawConditionsList(conditions, dc, x, y+forEachTextHeight, renderingHelper->GetConditionsColumnWidth(), IsDisabled());
-    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+forEachTextHeight, width-renderingHelper->GetConditionsColumnWidth(), IsDisabled());
+    renderingHelper->DrawConditionsList(conditions, dc,
+                                        x+border,
+                                        y+forEachTextHeight+border,
+                                        renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+    renderingHelper->DrawActionsList(actions, dc,
+                                     x+renderingHelper->GetConditionsColumnWidth()+border,
+                                     y+forEachTextHeight+border,
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
 }
 
 unsigned int ForEachEvent::GetRenderedHeight(unsigned int width) const
@@ -331,13 +263,14 @@ unsigned int ForEachEvent::GetRenderedHeight(unsigned int width) const
     if ( eventHeightNeedUpdate )
     {
         EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+        int border = renderingHelper->instructionsListBorder;
         const int forEachTextHeight = 20;
 
         //Get maximum height needed
         int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
         int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth());
 
-        renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + forEachTextHeight);
+        renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + forEachTextHeight)+border*2;
         eventHeightNeedUpdate = false;
     }
 

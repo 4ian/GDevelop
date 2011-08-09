@@ -9,10 +9,11 @@
 #include <iostream>
 #include <vector>
 #include "GDL/CommonTools.h"
-#include "GDL/Image.h"
 #if defined(GD_IDE_ONLY)
 #include <wx/string.h>
 #endif
+
+using namespace std;
 
 #if defined(GD_IDE_ONLY)
 template<>

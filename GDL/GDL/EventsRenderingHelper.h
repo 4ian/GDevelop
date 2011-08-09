@@ -6,11 +6,14 @@
 #if defined(GD_IDE_ONLY)
 #ifndef EventsRenderingHelper_H
 #define EventsRenderingHelper_H
-
 #include <wx/dc.h>
 #include <wx/html/htmprint.h>
 #include <vector>
+class BaseEvent;
 class Instruction;
+class EventsEditorItemsAreas;
+class EventsEditorSelection;
+class InstructionInfos;
 
 /**
  * \brief Provides tools to draw events.
@@ -26,43 +29,44 @@ class GD_API EventsRenderingHelper
 
         void DrawNiceRectangle(wxDC & dc, const wxRect & rect) const;
 
-        int DrawConditionsList(const std::vector < Instruction > & conditions, wxDC & dc, const int x, const int y, const int width, bool disabled);
-        int DrawActionsList(const std::vector < Instruction > & actions, wxDC & dc, int x, int y, int width, bool disabled);
+        int DrawConditionsList(std::vector < Instruction > & conditions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
+        int DrawActionsList(std::vector < Instruction > & actions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
         unsigned int GetRenderedConditionsListHeight(const std::vector < Instruction > & conditions, int width);
         unsigned int GetRenderedActionsListHeight(const std::vector < Instruction > & actions, int width);
-
-
-        /**
-         * Get a condition under a point in a list.
-         * Return true if a condition was found, in which case conditionList and conditionIdInList are completed
-         */
-        bool GetConditionAt(std::vector < Instruction > & conditions, int x, int y, std::vector < Instruction > *& conditionList, unsigned int & conditionIdInList);
-
-        /**
-         * Get an action under a point in a list.
-         * Return true if an action was found, in which case actionList and actionIdInList are completed
-         */
-        bool GetActionAt(std::vector < Instruction > & actions, int x, int y, std::vector < Instruction > *& actionList, unsigned int & actionIdInList);
-
-        unsigned int GetRenderedInstructionAndSubInstructionsHeight(const Instruction & instr);
 
         inline unsigned int GetConditionsColumnWidth() const {return conditionsColumnWidth;};
         inline void SetConditionsColumnWidth(unsigned int conditionsColumnWidth_) { conditionsColumnWidth = conditionsColumnWidth_; };
 
-        inline const wxFont & GetBigFont() const {return bigFont;};
-        inline wxFont & GetBigFont() {return bigFont;};
+        /**
+         * Draw a text in dc at point, without taking more than widthAvailable.
+         * \return X position of the last character and total height taken by the text
+         */
+        wxPoint DrawTextInArea(wxString text, wxDC & dc, wxPoint point, unsigned int widthAvailable, float xStartPosition=0);
 
-        inline const wxFont & GetBoldFont() const {return boldFont;};
-        inline wxFont & GetBoldFont() {return boldFont;};
+        /**
+         * \return Height taken by the text
+         */
+        unsigned int GetTextHeightInArea(wxString text, unsigned int widthAvailable);
+
+        int DrawInstruction(Instruction & instruction, const InstructionInfos & instructionInfos, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
+
+        /**
+         * Change font. Only use a fixed width font.
+         */
+        void SetFont(const wxFont & font);
 
         inline const wxFont & GetFont() const {return font;};
         inline wxFont & GetFont() {return font;};
+
+        inline const wxFont & GetBoldFont() const {return boldFont;};
+        inline wxFont & GetBoldFont() {return boldFont;};
 
         inline const wxFont & GetItalicFont() const {return italicFont;};
         inline wxFont & GetItalicFont() {return italicFont;};
 
         inline const wxFont & GetItalicSmallFont() const {return italicSmallFont;};
         inline wxFont & GetItalicSmallFont() {return italicSmallFont;};
+
 
         inline const wxHtmlDCRenderer & GetHTMLRenderer() const {return htmlRenderer;};
         inline wxHtmlDCRenderer & GetHTMLRenderer() {return htmlRenderer;};
@@ -94,6 +98,7 @@ class GD_API EventsRenderingHelper
         wxColor disabledColor2;
 
         int instructionsListBorder;
+        int separationBetweenInstructions;
 
     private:
         EventsRenderingHelper();
@@ -112,11 +117,15 @@ class GD_API EventsRenderingHelper
         wxPen conditionsRectangleOutline;
         wxBrush actionsRectangleFill;
         wxBrush conditionsRectangleFill;
-        wxFont font;
+
+        wxFont font; ///< Fixed width font
+        float fontCharacterWidth;
+
         wxFont bigFont;
         wxFont boldFont;
         wxFont italicFont;
         wxFont italicSmallFont;
+
         wxHtmlDCRenderer htmlRenderer;
 
         static EventsRenderingHelper *singleton;

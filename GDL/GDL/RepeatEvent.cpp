@@ -169,14 +169,15 @@ void RepeatEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdit
     }*/
 
     //Repeat text
-    dc.SetFont( renderingHelper->GetBoldFont() );
+    dc.SetFont( renderingHelper->GetNiceFont().Bold() );
+    dc.SetTextForeground(wxColour(0,0,0));
     dc.DrawText( _("Répéter") + " " + repeatNumberExpression.GetPlainString() + " " + _("fois :"), x + 5, y + 5 );
 
     //Draw actions and conditions
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+repeatTextHeight+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+repeatTextHeight+border,
@@ -192,8 +193,8 @@ unsigned int RepeatEvent::GetRenderedHeight(unsigned int width) const
         const int repeatTextHeight = 20;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth());
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
 
         renderedHeight = ( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + repeatTextHeight + border*2;
         eventHeightNeedUpdate = false;

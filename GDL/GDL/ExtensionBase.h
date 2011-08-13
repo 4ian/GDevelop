@@ -24,6 +24,7 @@ class MainEditorCommand;
 class RuntimeScene;
 class Instruction;
 class Automatism;
+class Game;
 class Scene;
 class Object;
 class ExtensionBase;
@@ -543,12 +544,16 @@ class GD_API ParameterInfo
     std::string description; ///< Description shown in editor
     bool codeOnly; ///< True if parameter is relative to code generation only, i.e. must not be shown in editor
     std::string defaultValue; ///< Used as a default value in editor or if an optional parameter is empty.
+#endif
 
     /**
      * Set the default value used in editor or if an optional parameter is empty during code generation.
      */
-    ParameterInfo & SetDefaultValue(std::string defaultValue_) { defaultValue = defaultValue_; return *this; };
-#endif
+    ParameterInfo & SetDefaultValue(std::string defaultValue_) {
+        #if defined(GD_IDE_ONLY)
+        defaultValue = defaultValue_;
+        #endif
+        return *this; };
 };
 
 /**
@@ -571,6 +576,15 @@ class GD_API InstructionInfos
     bool canHaveSubInstructions;
 #endif
     std::vector < ParameterInfo > parameters;
+
+    InstructionInfos & SetCanHaveSubInstructions()
+    {
+        #if defined(GD_IDE_ONLY)
+        canHaveSubInstructions = true;
+        #endif
+        return *this;
+    }
+
 
     #if !defined(GD_IDE_ONLY)
     ParameterInfo & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional);

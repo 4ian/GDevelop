@@ -166,7 +166,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     DECLARE_CONDITION("NbObjet",
                    _("Nombre d'objets"),
                    _("Teste le nombre d'objet concernés."),
-                   _("Le nombre de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                   _("Le nombre de _PARAM0_ est _PARAM3_ à _PARAM2_"),
                    _("Objets"),
                    "res/conditions/nbObjet24.png",
                    "res/conditions/nbObjet.png");

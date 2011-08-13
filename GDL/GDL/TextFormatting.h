@@ -8,9 +8,11 @@
 #ifndef TEXTFORMATTING_H
 #define TEXTFORMATTING_H
 #include <wx/colour.h>
+#include <string>
 
 /**
- * Lightweight class used to define information about how to render a text
+ * \brief Lightweight class used to define information about how to render a text
+ * Currently used to render Instruction in EventsEditor.
  */
 class GD_API TextFormatting
 {
@@ -18,8 +20,9 @@ public:
     wxColour color;
     bool bold;
     bool italic;
+    size_t userData;
 
-    TextFormatting() : color(0,0,0), bold(false), italic(false) {}
+    TextFormatting() : color(0,0,0), bold(false), italic(false), userData(std::string::npos) {}
     ~TextFormatting() {}
 };
 

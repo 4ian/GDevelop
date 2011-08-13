@@ -119,13 +119,13 @@ void StandardEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEd
     int border = renderingHelper->instructionsListBorder;
 
     //Draw event rectangle
-    wxRect rect(x, y, renderingHelper->GetConditionsColumnWidth(), GetRenderedHeight(width));
+    wxRect rect(x, y, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width));
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+border,

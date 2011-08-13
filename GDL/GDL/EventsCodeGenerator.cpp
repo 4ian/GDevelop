@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #include <utility>
 #include "GDL/EventsCodeGenerator.h"
 #include "GDL/ExtensionsManager.h"
@@ -956,7 +958,7 @@ string EventsCodeGenerator::GenerateEventsCompleteCode(const Game & game, const 
         output += "#include \""+*include+"\"\n";
 
     output +=
-    "#include <stdio.h>\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
+    "#include <stdio.h>\n#include <vector>\n#include <map>\n#include <string>\n#include <stdio.h>\n#include \"GDL/RuntimeContext.h\"\n#include \"GDL/Object.h\"\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
 
     for ( set<string>::iterator declaration = context.customGlobalDeclaration->begin() ; declaration != context.customGlobalDeclaration->end(); ++declaration )
         output += *declaration+"\n";
@@ -1070,3 +1072,5 @@ void EventsCodeGenerator::PreprocessEventList( const Game & game, const Scene & 
     }
     #endif
 }
+
+#endif

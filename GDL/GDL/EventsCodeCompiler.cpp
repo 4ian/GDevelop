@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #include "GDL/EventsCodeCompiler.h"
 
 #include <SFML/System.hpp>
@@ -56,6 +58,7 @@
 #include "clang/FrontendTool/Utils.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/Bitcode/ReaderWriter.h" // Important
+#include "clang/Basic/FileManager.h"
 
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
@@ -87,10 +90,10 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     // (basically, exactly one input, and the operation mode is hard wired).
     llvm::SmallVector<const char *, 128> Args;
     Args.push_back("GDEditor.exe");
-    Args.push_back("-include-pch");
-    Args.push_back("include/GDL/GDL/RuntimePrecompiledHeader.h.pch");
+    Args.push_back("-includeinclude/GDL/GDL/RuntimePrecompiledHeader.h");
     Args.push_back(eventsFile.c_str());
     Args.push_back("-fsyntax-only");
+    Args.push_back("-ferror-limit 5");
     Args.push_back("-w");
     //Headers
     for (std::set<std::string>::const_iterator header = headersDirectories.begin();header != headersDirectories.end();++header)
@@ -99,19 +102,16 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     if ( !compilationForRuntime )
     {
         Args.push_back("-DGD_IDE_ONLY"); //TODO : Use appropriate PCH.
-        //Args.push_back("-O3");
+        //Args.push_back("-O2");
     }
 
     #if defined(WINDOWS)
-    Args.push_back("-DWINDOWS");
     Args.push_back("-DGD_API=__declspec(dllimport)");
     Args.push_back("-DGD_EXTENSION_API=__declspec(dllimport)");
     #elif defined(LINUX)
-    Args.push_back("-DLINUX");
     Args.push_back("-DGD_API=\"\"");
     Args.push_back("-DGD_EXTENSION_API=\"\"");
     #elif defined(MAC)
-    Args.push_back("-DMAC");
     Args.push_back("-DGD_API=\"\"");
     Args.push_back("-DGD_EXTENSION_API=\"\"");
     #endif
@@ -157,7 +157,7 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
                                        CCArgs.size(),
                                        Diags);
 
-    if (false)
+    if (true)
     {
         llvm::errs() << "clang invocation:\n";
         C->PrintJob(llvm::errs(), C->getJobs(), "\n", true);
@@ -232,7 +232,11 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                 myfile << eventsOutput;
                 myfile.close();
 
-                if ( !EventsCodeCompiler::GetInstance()->CompileEventsCppFileToBitCode("Temporaries/"+ToString(executionEngine.get())+"events.cpp", task.bitCodeFilename.empty() ? "Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc" : task.bitCodeFilename, task.compilationForRuntime ))
+                if ( abort )
+                {
+                    cout << "Compilation aborted." << endl;
+                }
+                else if ( !EventsCodeCompiler::GetInstance()->CompileEventsCppFileToBitCode("Temporaries/"+ToString(executionEngine.get())+"events.cpp", task.bitCodeFilename.empty() ? "Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc" : task.bitCodeFilename, task.compilationForRuntime ))
                 {
                     cout << "Failed to compile Temporaries/"+ToString(executionEngine.get())+"events.cpp." << std::endl;
                     cout << "Compilation aborted." << endl << char(7);
@@ -241,7 +245,11 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                 {
                     cout << "Compilation duration: " << compilationTimer.GetElapsedTime()<<"s"<<endl;
 
-                    if ( !task.generateBitcodeFileOnly )
+                    if ( abort )
+                    {
+                        cout << "Compilation aborted." << endl;
+                    }
+                    else if ( !task.generateBitcodeFileOnly && !abort )
                     {
                         llvm::OwningPtr<llvm::MemoryBuffer> eventsBuffer;
                         llvm::error_code err = llvm::MemoryBuffer::getFile("Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc", eventsBuffer);
@@ -293,7 +301,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                                             llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(executionEngine->llvmModule->getOrInsertGlobal("pointerToRuntimeContext", llvm::TypeBuilder<void*, false>::get(executionEngine->llvmModule->getContext())));
                                             executionEngine->llvmExecutionEngine->addGlobalMapping(globalValue, &executionEngine->llvmRuntimeContext);
 
-                                            for (llvm::Module::iterator I = executionEngine->llvmModule->begin(), E = executionEngine->llvmModule->end(); I != E; ++I)
+                                            /*for (llvm::Module::iterator I = executionEngine->llvmModule->begin(), E = executionEngine->llvmModule->end(); I != E; ++I)
                                               if (I->isDeclaration())
                                                 cout << &*I << "not defined (" << (*I).getNameStr() << endl;
 
@@ -301,7 +309,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                                                                          E = executionEngine->llvmModule->global_end();
                                                  I != E; ++I)
                                               if (I->isDeclaration())
-                                                cout << &*I << "not defined (" << (*I).getNameStr() << endl;
+                                                cout << &*I << "not defined (" << (*I).getNameStr() << endl;*/
 
                                             cout << "JIT Compilation to machine code...\n";
                                             sf::Clock jitTimer;
@@ -321,6 +329,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
         }
 
         compile = false; //Compilation ended.
+        abort = false;
 
         //Be sure there is not a pending task waiting to be done.
         {
@@ -374,6 +383,12 @@ void EventsCodeCompiler::AddPendingTask(const Task & task)
     {
         if ( pendingTasks[i].scene == task.scene)
             return; //There is already a pending task to compile scene events
+    }
+
+    if ( currentTask->GetScene() == task.scene )
+    {
+        std::cout << "Trying to abort as soon as possible compilation." << endl;
+        currentTask->abort = true;
     }
 
     std::cout << "Pending task effectively added" << std::endl;
@@ -477,6 +492,7 @@ void EventsCodeCompiler::NotifyASceneIsDestroyed(const Scene & scene)
 
 EventsCodeCompiler::EventsCodeCompiler()
 {
+    headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/include");
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include");
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++");
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
@@ -492,3 +508,5 @@ EventsCodeCompiler::EventsCodeCompiler()
 EventsCodeCompiler::~EventsCodeCompiler()
 {
 }
+
+#endif

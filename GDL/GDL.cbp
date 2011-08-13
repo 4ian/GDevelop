@@ -1032,6 +1032,10 @@
 		<Unit filename="GDL\EventsCodeGenerationContext.h" />
 		<Unit filename="GDL\EventsCodeGenerator.cpp" />
 		<Unit filename="GDL\EventsCodeGenerator.h" />
+		<Unit filename="GDL\EventsEditorItemsAreas.cpp" />
+		<Unit filename="GDL\EventsEditorItemsAreas.h" />
+		<Unit filename="GDL\EventsEditorSelection.cpp" />
+		<Unit filename="GDL\EventsEditorSelection.h" />
 		<Unit filename="GDL\EventsExecutionEngine.cpp" />
 		<Unit filename="GDL\EventsExecutionEngine.h" />
 		<Unit filename="GDL\EventsRenderingHelper.cpp" />
@@ -1203,6 +1207,8 @@
 		<Unit filename="GDL\StringTools.h" />
 		<Unit filename="GDL\Text.cpp" />
 		<Unit filename="GDL\Text.h" />
+		<Unit filename="GDL\TextFormatting.cpp" />
+		<Unit filename="GDL\TextFormatting.h" />
 		<Unit filename="GDL\TimeExtension.cpp" />
 		<Unit filename="GDL\TimeExtension.h" />
 		<Unit filename="GDL\TimeTools.cpp" />

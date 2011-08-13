@@ -141,20 +141,21 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     //While text
-    dc.SetFont( renderingHelper->GetBoldFont() );
+    dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
+    dc.SetTextForeground(wxColour(0,0,0));
     dc.DrawText( _("Tant que :"), x+5, y+5 );
 
     //Draw "while conditions"
     int whileConditionsHeight = renderingHelper->DrawConditionsList(whileConditions, dc, x+80+border, y+border, width-80-border*2, this, areas, selection);
 
-    dc.SetFont( renderingHelper->GetBoldFont() );
+    dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.DrawText( _("Répéter :"), x+2, y+whileConditionsHeight);
     whileConditionsHeight += repeatHeight;
 
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+whileConditionsHeight+border+border*2,
-                                        renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+whileConditionsHeight+border+border*2,
@@ -171,7 +172,7 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
 
         //Get maximum height needed
         int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2);
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2);
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border);
         int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
 
         renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + whileConditionsHeight + repeatHeight)+border*2+border*2;

@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef EventsCodeGenerator_H
 #define EventsCodeGenerator_H
 
@@ -57,3 +59,4 @@ class GD_API EventsCodeGenerator
 };
 
 #endif // EventsCodeGenerator_H
+#endif

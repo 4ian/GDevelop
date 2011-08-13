@@ -59,6 +59,27 @@ public:
 size_t hash_value(const InstructionItem & a);
 
 /**
+ * \brief Used to indicate to EventsEditorItemsAreas that an instruction list is displayed somewhere
+ */
+class GD_API InstructionListItem
+{
+public:
+    /**
+     * Use this constructor to declare the instruction, the list it belongs to and its position in this list.
+     */
+    InstructionListItem(bool isConditionList, std::vector<Instruction>* instructionList_, BaseEvent * event );
+    InstructionListItem();
+    ~InstructionListItem() {};
+
+    bool operator==(const InstructionListItem & other) const;
+
+    bool isConditionList;
+    std::vector<Instruction>* instructionList;
+    BaseEvent * event;
+};
+size_t hash_value(const InstructionListItem & a);
+
+/**
  * \brief Used to indicate to EventsEditorItemsAreas that a parameter is displayed somewhere
  */
 class GD_API ParameterItem
@@ -122,6 +143,11 @@ public:
     void AddFoldingItem(wxRect area, FoldingItem & event);
 
     /**
+     * Notify the editor there is a list in this area
+     */
+    void AddInstructionListArea(wxRect area, InstructionListItem & item);
+
+    /**
      * True if a point is on an event.
      */
     bool IsOnEvent(int x, int y);
@@ -132,14 +158,29 @@ public:
     EventItem GetEventAt(int x, int y);
 
     /**
-     * True if a point is on an event.
+     * True if a point is on an instruction.
      */
     bool IsOnInstruction(int x, int y);
 
     /**
-     * Return event at point (x,y). Be sure there is an event here using IsOnEvent(x,y);
+     * Return event at point (x,y). Be sure there is an event here using IsOnInstruction(x,y);
      */
     InstructionItem GetInstructionAt(int x, int y);
+
+    /**
+     * True if a point is on an instruction list.
+     */
+    bool IsOnInstructionList(int x, int y);
+
+    /**
+     * Return event at point (x,y). Be sure there is an event here using IsOnEvent(x,y);
+     */
+    InstructionListItem GetInstructionListAt(int x, int y);
+
+    /**
+     * Return the rectangle used by the list at point(x,y).
+     */
+    wxRect GetAreaOfInstructionListAt(int x, int y);
 
     /**
      * True if a point is on an event.
@@ -150,6 +191,11 @@ public:
      * Return event at point (x,y). Be sure there is an event here using IsOnEvent(x,y);
      */
     ParameterItem GetParameterAt(int x, int y);
+
+    /**
+     * Return the rectangle used by the parameter at point(x,y).
+     */
+    wxRect GetAreaOfParameterAt(int x, int y);
 
     /**
      * True if a point is on an event.
@@ -170,6 +216,7 @@ public:
     std::vector< std::pair<wxRect, InstructionItem > > instructionsAreas;
     std::vector< std::pair<wxRect, ParameterItem > > parametersAreas;
     std::vector< std::pair<wxRect, FoldingItem > > foldingAreas;
+    std::vector< std::pair<wxRect, InstructionListItem > > instructionListsAreas;
 
 private:
 };

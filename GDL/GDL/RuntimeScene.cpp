@@ -373,7 +373,7 @@ void RuntimeScene::Render()
     }
 
         //Internal profiler
-        #ifndef RELEASE
+        /*#ifndef RELEASE
         if ( renderWindow->GetInput().IsKeyDown(sf::Key::F2))
             CProfileManager::Reset();
 
@@ -383,7 +383,7 @@ void RuntimeScene::Render()
         int y = 0;
         DisplayProfile(renderWindow, iter, 0,y);
         CProfileManager::Increment_Frame_Counter();
-        #endif
+        #endif*/
 
     // Display window contents on screen
     renderWindow->RestoreGLStates();

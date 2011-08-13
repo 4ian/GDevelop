@@ -55,9 +55,14 @@ class GD_API EventsEditorSelection
         void SetHighlighted(const EventItem & event);
 
         /**
-         * Highlight an event
+         * Highlight an instruction
          */
-        void SetHighlighted(const InstructionItem & event);
+        void SetHighlighted(const InstructionItem & item);
+
+        /**
+         * Highlight an instruction list
+         */
+        void SetHighlighted(const InstructionListItem & item);
 
         /**
          * Highlight a parameter
@@ -79,13 +84,63 @@ class GD_API EventsEditorSelection
          */
         bool ParameterHighLighted(const ParameterItem & parameter) { return parameterHighlighted == parameter; };
 
+        /**
+         * Return highlighted event item
+         */
+        EventItem & GetHighlightedEvent() { return eventHighlighted; };
+
+        /**
+         * Return highlighted instruction list item
+         */
+        InstructionListItem & GetHighlightedInstructionList() { return instructionListHighlighted; };
+
+        /**
+         * Return true if some events are selected
+         */
+        bool HasSelectedEvents() { return !eventsSelected.empty(); };
+
+        /**
+         * Return true if some instructions are selected
+         */
+        bool HasSelectedInstructions() { return !instructionsSelected.empty(); };
+
+        /**
+         * Return true if some actions are selected
+         */
+        bool HasSelectedActions();
+
+        /**
+         * Return true if some conditions are selected
+         */
+        bool HasSelectedConditions();
+
+        /**
+         * Return a vector with all selected events
+         */
+        std::vector < EventItem > GetAllSelectedEvents();
+
+        /**
+         * Return a vector with all selected events but without sub events
+         */
+        std::vector < EventItem > GetAllSelectedEventsWithoutSubEvents();
+
+        /**
+         * Return a vector with all selected instructions
+         */
+        std::vector < InstructionItem > GetAllSelectedInstructions();
+
+        /**
+         * As it is more difficult than for event, this function is dedicaced to deleting all instructions selected
+         */
+        void DeleteAllInstructionSelected();
+
         void BeginDragEvent();
         bool IsDraggingEvent();
-        void EndDragEvent();
+        bool EndDragEvent();
 
         void BeginDragInstruction();
         bool IsDraggingInstruction();
-        void EndDragInstruction();
+        bool EndDragInstruction();
 
     private:
 
@@ -93,6 +148,7 @@ class GD_API EventsEditorSelection
         boost::unordered_set< InstructionItem > instructionsSelected; ///< Events selection
         EventItem eventHighlighted;
         InstructionItem instructionHighlighted;
+        InstructionListItem instructionListHighlighted;
         ParameterItem parameterHighlighted;
         bool dragging; ///< True if dragging event
         bool draggingInstruction; ///< True if dragging instruction
@@ -104,7 +160,7 @@ class GD_API EventsEditorSelection
         /**
          * Return true if an instruction is found in the list ( sub instructions are also taken in account )
          */
-        bool FindInInstructionsAndSubInstructions(std::vector<Instruction> & list, Instruction * instrToSearch);
+        bool FindInInstructionsAndSubInstructions(std::vector<Instruction> & list, const Instruction * instrToSearch);
 
         GDpriv::EventsEditorRefreshCallbacks & eventsEditorCallback;
 };

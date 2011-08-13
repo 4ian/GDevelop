@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <wx/renderer.h>
 #include "GDL/Instruction.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/TranslateAction.h"
@@ -19,13 +20,22 @@
 
 EventsRenderingHelper * EventsRenderingHelper::singleton = NULL;
 
-wxPoint EventsRenderingHelper::DrawTextInArea(wxString text, wxDC & dc, wxPoint point, unsigned int widthAvailable, float xStartPosition)
+wxPoint EventsRenderingHelper::DrawTextInArea(wxString text, wxDC & dc, wxRect rect, wxPoint point)
 {
-    if ( text.empty() || widthAvailable == 0) return wxPoint(0,0);
+    if ( text.empty() || rect.width == 0) return point;
+
+    //Insert artificial space to simulate starting from point indicated
+    int spacesToInsert = static_cast<float>(point.x-rect.x)/static_cast<float>(fontCharacterWidth);
+    if ( spacesToInsert < 0 ) spacesToInsert = 0;
+    for (unsigned int i = 0;i<spacesToInsert;++i)
+    {
+        text = " "+text;
+    }
+    point.x = rect.x; //We can now start from rect.x as space have been inserted.
 
     unsigned int textSize = text.length()*fontCharacterWidth;
-    int cutCount = ceil(static_cast<double>(textSize)/static_cast<double>(widthAvailable));
-    int charactersInALine = static_cast<double>(widthAvailable)/static_cast<double>(textSize)*static_cast<double>(text.length());
+    int cutCount = ceil(static_cast<double>(textSize)/static_cast<double>(rect.width));
+    int charactersInALine = static_cast<double>(rect.width)/static_cast<double>(textSize)*static_cast<double>(text.length());
 
     if ( cutCount == 0 ) cutCount = 1;
     if ( charactersInALine == 0) charactersInALine = 1;
@@ -34,15 +44,16 @@ wxPoint EventsRenderingHelper::DrawTextInArea(wxString text, wxDC & dc, wxPoint 
     wxString displayedText;
     for (unsigned int i = 0;i<cutCount;++i)
     {
-        displayedText = text.Mid(lastCutPosition, charactersInALine);
+        if (i != 0 ) point.y += 15;
 
+        displayedText = text.Mid(lastCutPosition, charactersInALine);
         dc.DrawText(displayedText, point);
 
         lastCutPosition += charactersInALine;
-        point.y += 15;
     }
 
-    return wxPoint(displayedText.length()*fontCharacterWidth, cutCount*15);
+    //Return position to lastest drawn character
+    return wxPoint(point.x+displayedText.length()*fontCharacterWidth, point.y);
 }
 
 unsigned int EventsRenderingHelper::GetTextHeightInArea(wxString text, unsigned int widthAvailable)
@@ -73,17 +84,16 @@ separationBetweenInstructions(2),
 conditionsColumnWidth(400),
 selectionRectangleOutline(wxPen(wxColour(244,217,141), 1)),
 selectionRectangleFill(wxBrush(wxColour(251,235,189))),
+highlightRectangleOutline(wxPen(wxColour(226,226,226), 1)),
+highlightRectangleFill(wxBrush(wxColour(226,226,226))),
 niceRectangleFill1(wxColour(225,225,246)),
 niceRectangleFill2(wxColour(198,198,246)),
 niceRectangleOutline(wxPen(wxColour(205,205,246), 1)),
-actionsRectangleOutline(wxPen(wxColour(220,220,255))),
+actionsRectangleOutline(wxPen(wxColour(205,205,246))),
 conditionsRectangleOutline(wxPen(wxColour(185,185,247), 1)),
-actionsRectangleFill(wxBrush(wxColour(252,252,255))),
+actionsRectangleFill(wxBrush(wxColour(230,230,230))),
 conditionsRectangleFill(wxBrush(wxColour(252,252,255))),
-bigFont(12, wxDEFAULT, wxNORMAL, wxNORMAL ),
-boldFont(8, wxDEFAULT, wxNORMAL, wxBOLD ),
-italicFont( 8, wxDEFAULT, wxFONTSTYLE_ITALIC, wxNORMAL ),
-italicSmallFont( 5, wxDEFAULT, wxFONTSTYLE_ITALIC, wxNORMAL )
+niceFont(wxFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL))
 {
     fakeBmp.Create(10,10,-1);
     //SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Arial"));
@@ -114,11 +124,15 @@ int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & condition
     wxRect rect(x-1, y-1, width+2, conditionsHeight+2);
     dc.SetPen(conditionsRectangleOutline);
     dc.SetBrush(conditionsRectangleFill);
-    //dc.DrawRectangle(rect);
+    dc.DrawRectangle(rect);
+
+    InstructionListItem item(/**isCondition=*/true, &conditions, event);
+    areas.AddInstructionListArea(rect, item);
 
     if ( conditions.empty() )
     {
-        dc.SetFont( GetItalicFont() );
+        dc.SetTextForeground( wxColour(0,0,0) );
+        dc.SetFont( niceFont.Italic() );
         dc.DrawText( _("Pas de conditions"), x + 2, y + 1 );
 
         return 15;
@@ -147,17 +161,17 @@ int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & condition
             dc.SetPen(selectionRectangleOutline);
             dc.SetBrush(selectionRectangleFill);
             dc.DrawRectangle(x, y, width, height);
-            DrawInstruction(conditions[j], instructionInfos, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, areas, selection);
+            DrawInstruction(conditions[j], instructionInfos, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
             std::string text = TranslateCondition::Translate(conditions[j], instructionInfos);
             height = GetTextHeightInArea(text, freeWidth);
 
-            dc.SetPen(wxPen(wxColour(228,228,238)));
-            dc.SetBrush(wxBrush(wxColour(228,228,238)));
+            dc.SetPen(highlightRectangleOutline);
+            dc.SetBrush(highlightRectangleFill);
             dc.DrawRectangle(x, y, width, height);
-            DrawInstruction(conditions[j], instructionInfos, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, areas, selection);
+            DrawInstruction(conditions[j], instructionInfos, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
 
             if ( selection.IsDraggingInstruction() )
             {
@@ -167,7 +181,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & condition
             }
         }
         else
-            height = DrawInstruction(conditions[j], instructionInfos, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, areas, selection);
+            height = DrawInstruction(conditions[j], instructionInfos, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
 
         //Draw needed icons
         if ( conditions[j].IsInverted() )
@@ -177,7 +191,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & condition
         }
         else if ( instructionInfos.smallicon.IsOk() ) dc.DrawBitmap( instructionInfos.smallicon, x + 1, y, true );
 
-        areas.AddInstructionArea(wxRect(x,y, freeWidth, height), accessor);
+        areas.AddInstructionArea(wxRect(x,y, width, height), accessor);
         y+=height;
 
         //Draw sub conditions
@@ -199,13 +213,19 @@ int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxD
     //Draw Actions rectangle
     const int actionsHeight = GetRenderedActionsListHeight(actions, width);
     wxRect rect(x-1, y-1, width+2, actionsHeight+2);
-    dc.SetPen(conditionsRectangleOutline);
-    dc.SetBrush(conditionsRectangleFill);
+    dc.SetPen(actionsRectangleOutline);
+    //dc.SetBrush(actionsRectangleFill);
+    //dc.GradientFillLinear(rect, wxColour(235,235,235), wxColour(250,250,250), wxSOUTH);
+    dc.SetBrush(*wxWHITE_BRUSH);
     dc.DrawRectangle(rect);
+
+    InstructionListItem item(/**isCondition=*/false, &actions, event);
+    areas.AddInstructionListArea(rect, item);
 
     if ( actions.empty() )
     {
-        dc.SetFont( GetItalicFont() );
+        dc.SetTextForeground( wxColour(0,0,0) );
+        dc.SetFont( niceFont.Italic() );
         dc.DrawText( _("Pas d'actions"), x + 2, y + 1 );
 
         return 15;
@@ -226,23 +246,24 @@ int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxD
         int height = 0;
         if ( selection.InstructionSelected(accessor) )
         {
-            std::string text = TranslateAction::Translate(actions[j], instructionInfos);
+            std::string text = TranslateAction::GetInstance()->Translate(actions[j], instructionInfos);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(selectionRectangleOutline);
             dc.SetBrush(selectionRectangleFill);
             dc.DrawRectangle(x, y, width, height);
-            DrawInstruction(actions[j], instructionInfos, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, areas, selection);
+            DrawInstruction(actions[j], instructionInfos, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, event, areas, selection);
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
-            std::string text = TranslateAction::Translate(actions[j], instructionInfos);
+            std::string text = TranslateAction::GetInstance()->Translate(actions[j], instructionInfos);
             height = GetTextHeightInArea(text, freeWidth);
 
-            dc.SetPen(wxPen(wxColour(228,228,238)));
-            dc.SetBrush(wxBrush(wxColour(228,228,238)));
+            dc.SetPen(highlightRectangleOutline);
+            dc.SetBrush(highlightRectangleFill);
             dc.DrawRectangle(x, y, width, height);
-            DrawInstruction(actions[j], instructionInfos, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, areas, selection);
+            wxRendererNative::Get().DrawItemSelectionRect(NULL, dc, wxRect(x,y, width,height), wxCONTROL_CURRENT);
+            DrawInstruction(actions[j], instructionInfos, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, event, areas, selection);
 
             if ( selection.IsDraggingInstruction() )
             {
@@ -252,12 +273,12 @@ int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxD
             }
         }
         else
-            height = DrawInstruction(actions[j], instructionInfos, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, areas, selection);
+            height = DrawInstruction(actions[j], instructionInfos, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, event, areas, selection);
 
         //Draw needed icons
         if ( instructionInfos.smallicon.IsOk() ) dc.DrawBitmap( instructionInfos.smallicon, x + 1, y, true );
 
-        areas.AddInstructionArea(wxRect(x,y, freeWidth, height), accessor);
+        areas.AddInstructionArea(wxRect(x,y, width, height), accessor);
         y+=height;
 
         //Draw sub actions
@@ -322,7 +343,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
         int freeWidth = width - iconWidth;
         freeWidth = freeWidth <= 0 ? 1 : freeWidth;
 
-        int height = GetTextHeightInArea(TranslateAction::Translate(actions[j], instructionInfos), freeWidth);
+        int height = GetTextHeightInArea(TranslateAction::GetInstance()->Translate(actions[j], instructionInfos), freeWidth);
         y+=height;
 
         //Draw sub actions
@@ -333,26 +354,45 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
     return y;
 }
 
-int EventsRenderingHelper::DrawInstruction(Instruction & instruction, const InstructionInfos & instructionInfos, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+int EventsRenderingHelper::DrawInstruction(Instruction & instruction, const InstructionInfos & instructionInfos, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
     std::vector< std::pair<std::string, TextFormatting > > formattedStr = isCondition ? TranslateCondition::GetAsFormattedText(instruction, instructionInfos) :
-                                                                                        TranslateAction::GetAsFormattedText(instruction, instructionInfos);
+                                                                                        TranslateAction::GetInstance()->GetAsFormattedText(instruction, instructionInfos);
 
-    int height = 0;
-    size_t alreadyWrittenCharCount = 0;
+    wxPoint lastPos = point;
+    //size_t alreadyWrittenCharCount = 0;
     for (unsigned int i = 0;i<formattedStr.size();++i)
     {
         dc.SetTextForeground(formattedStr[i].second.color);
-
+        font.SetWeight(formattedStr[i].second.bold ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL);
+        font.SetStyle(formattedStr[i].second.italic ? wxFONTSTYLE_ITALIC : wxFONTSTYLE_NORMAL);
         std::string text = formattedStr[i].first;
-        for (unsigned int k = 0;k<alreadyWrittenCharCount;++k) text = " "+text;
 
-        height = DrawTextInArea(text, dc, point, freeWidth).y;
+        //Verify if we are drawing a parameter
+        if ( formattedStr[i].second.userData != std::string::npos)
+        {
+            ParameterItem item( formattedStr[i].second.userData < instruction.GetParameters().size() ? &instruction.GetParameter(formattedStr[i].second.userData) : NULL, event );
 
-        alreadyWrittenCharCount = text.length();
+            int parameterWidth = (text.length()*fontCharacterWidth <= freeWidth-lastPos.x+point.x ? text.length()*fontCharacterWidth : freeWidth-lastPos.x+point.x);
+            if ( selection.ParameterHighLighted(item) )
+            {
+                dc.SetBrush(wxBrush(wxColour(255, 163, 163)));
+                dc.SetPen(wxPen(wxColour(209, 0, 0)));
+                dc.DrawRectangle(lastPos.x, lastPos.y,  parameterWidth, 15);
+            }
+
+            areas.AddParameterArea(wxRect(lastPos.x, lastPos.y, parameterWidth,15) ,item);
+        }
+
+        dc.SetFont(font);
+        lastPos = DrawTextInArea(text, dc, wxRect(point.x, point.y, freeWidth, 0/*Useless*/), lastPos);
     }
 
-    return height;
+    font.SetWeight(wxFONTWEIGHT_NORMAL);
+    font.SetStyle(wxFONTSTYLE_NORMAL);
+    dc.SetFont(font);
+
+    return lastPos.y-point.y+15;
 }
 
 void EventsRenderingHelper::DrawNiceRectangle(wxDC & dc, const wxRect & rect) const

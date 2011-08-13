@@ -41,14 +41,14 @@ class GD_API EventsRenderingHelper
          * Draw a text in dc at point, without taking more than widthAvailable.
          * \return X position of the last character and total height taken by the text
          */
-        wxPoint DrawTextInArea(wxString text, wxDC & dc, wxPoint point, unsigned int widthAvailable, float xStartPosition=0);
+        wxPoint DrawTextInArea(wxString text, wxDC & dc, wxRect rect, wxPoint point);
 
         /**
          * \return Height taken by the text
          */
         unsigned int GetTextHeightInArea(wxString text, unsigned int widthAvailable);
 
-        int DrawInstruction(Instruction & instruction, const InstructionInfos & instructionInfos, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
+        int DrawInstruction(Instruction & instruction, const InstructionInfos & instructionInfos, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
 
         /**
          * Change font. Only use a fixed width font.
@@ -58,15 +58,8 @@ class GD_API EventsRenderingHelper
         inline const wxFont & GetFont() const {return font;};
         inline wxFont & GetFont() {return font;};
 
-        inline const wxFont & GetBoldFont() const {return boldFont;};
-        inline wxFont & GetBoldFont() {return boldFont;};
-
-        inline const wxFont & GetItalicFont() const {return italicFont;};
-        inline wxFont & GetItalicFont() {return italicFont;};
-
-        inline const wxFont & GetItalicSmallFont() const {return italicSmallFont;};
-        inline wxFont & GetItalicSmallFont() {return italicSmallFont;};
-
+        inline const wxFont & GetNiceFont() const {return niceFont;};
+        inline wxFont & GetNiceFont() {return niceFont;};
 
         inline const wxHtmlDCRenderer & GetHTMLRenderer() const {return htmlRenderer;};
         inline wxHtmlDCRenderer & GetHTMLRenderer() {return htmlRenderer;};
@@ -75,7 +68,13 @@ class GD_API EventsRenderingHelper
         wxBrush & GetSelectedRectangleFillBrush() { return selectionRectangleFill; }
 
         const wxPen & GetSelectedRectangleOutlinePen() const { return selectionRectangleOutline; }
-        wxPen & GetSelectedRectangleOutlineBrush() { return selectionRectangleOutline; }
+        wxPen & GetSelectedRectangleOutlinePen() { return selectionRectangleOutline; }
+
+        const wxBrush & GetHighlightedRectangleFillBrush() const { return highlightRectangleFill; }
+        wxBrush & GetHighlightedRectangleFillBrush() { return highlightRectangleFill; }
+
+        const wxPen & GetHighlightedRectangleOutlinePen() const { return highlightRectangleOutline; }
+        wxPen & GetHighlightedRectangleOutlinePen() { return highlightRectangleOutline; }
 
         /**
          * Make sure a text will be correctly display by replacing specials characters
@@ -108,6 +107,8 @@ class GD_API EventsRenderingHelper
 
         wxPen selectionRectangleOutline;
         wxBrush selectionRectangleFill;
+        wxPen highlightRectangleOutline;
+        wxBrush highlightRectangleFill;
 
         wxPen niceRectangleOutline;
         wxColour niceRectangleFill1;
@@ -121,10 +122,7 @@ class GD_API EventsRenderingHelper
         wxFont font; ///< Fixed width font
         float fontCharacterWidth;
 
-        wxFont bigFont;
-        wxFont boldFont;
-        wxFont italicFont;
-        wxFont italicSmallFont;
+        wxFont niceFont;
 
         wxHtmlDCRenderer htmlRenderer;
 

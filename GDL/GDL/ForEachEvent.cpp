@@ -28,6 +28,7 @@ objectsToPick("")
 {
 }
 
+#if defined(GD_IDE_ONLY)
 std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & parentContext)
 {
     std::string outputCode;
@@ -144,7 +145,7 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
 
     return outputCode;
 }
-
+#endif
 
 vector < vector<Instruction>* > ForEachEvent::GetAllConditionsVectors()
 {
@@ -235,23 +236,16 @@ void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdi
     wxRect rect(x, y, width, GetRenderedHeight(width));
     renderingHelper->DrawNiceRectangle(dc, rect);
 
-    //"For Each" text selection
-    /*if ( selection.EventSelected(this) && objectsToPickSelected )
-    {
-        dc.SetBrush(renderingHelper->GetSelectedRectangleFillBrush());
-        dc.SetPen(renderingHelper->GetSelectedRectangleOutlinePen());
-        dc.DrawRectangle(x+1, y+1, width-2, forEachTextHeight-2);
-    }*/
-
     //For Each text
-    dc.SetFont( renderingHelper->GetBoldFont() );
+    dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
+    dc.SetTextForeground(wxColour(0,0,0));
     dc.DrawText( _("Pour chaque objet") + " " + objectsToPick.GetPlainString() + _(", répéter :"), x + 2, y + 1 );
 
     //Draw actions and conditions
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+forEachTextHeight+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+forEachTextHeight+border,
@@ -267,8 +261,8 @@ unsigned int ForEachEvent::GetRenderedHeight(unsigned int width) const
         const int forEachTextHeight = 20;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth());
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
 
         renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + forEachTextHeight)+border*2;
         eventHeightNeedUpdate = false;

@@ -125,20 +125,10 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditor
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
 
-/*
-    if ( !selected )
-    {
-        dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
-        dc.SetPen( wxPen( wxColour( 255, 255, 255 ), 5, wxSOLID ) );
-    }
-    else
-    {
-        dc.SetPen(wxPen(wxColour(0, 0, 0), 1));
-        dc.SetBrush(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)));
-    }*/
-
+    dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
+    dc.SetPen( wxPen( wxColour( 0, 0, 0 ), 1) );
     wxRect rect(x+1, y, width, GetRenderedHeight(width)-2);
-    renderingHelper->DrawNiceRectangle(dc, rect);
+    dc.DrawRectangle(rect);
 
     dc.DrawBitmap( wxBitmap( "res/link48.png", wxBITMAP_TYPE_ANY ), x+4, y + 4, true);
 

@@ -27,9 +27,9 @@ createFunPtr(NULL)
 {
 }
 
-ExpressionInfos::ExpressionInfos(ExtensionBase & parentExtension) :
+ExpressionInfos::ExpressionInfos(ExtensionBase & parentExtension)
 #if defined(GD_IDE_ONLY)
-shown(true),
+:shown(true),
 extensionNamespace(parentExtension.GetNameSpace())
 #endif
 {
@@ -44,9 +44,9 @@ ExpressionInfos & ExpressionInfos::SetHidden()
     return *this;
 }
 
-StrExpressionInfos::StrExpressionInfos(ExtensionBase & parentExtension) :
+StrExpressionInfos::StrExpressionInfos(ExtensionBase & parentExtension)
 #if defined(GD_IDE_ONLY)
-shown(true),
+:shown(true),
 extensionNamespace(parentExtension.GetNameSpace())
 #endif
 {
@@ -61,17 +61,17 @@ StrExpressionInfos & StrExpressionInfos::SetHidden()
     return *this;
 }
 
-InstructionInfos::InstructionInfos(ExtensionBase & parentExtension) :
+InstructionInfos::InstructionInfos(ExtensionBase & parentExtension)
 #if defined(GD_IDE_ONLY)
-canHaveSubInstructions(false),
+:canHaveSubInstructions(false),
 extensionNamespace(parentExtension.GetNameSpace())
 #endif
 {
 }
 
-ParameterInfo::ParameterInfo() :
+ParameterInfo::ParameterInfo()
 #if defined(GD_IDE_ONLY)
-optional(false),
+:optional(false),
 codeOnly(false)
 #endif
 {

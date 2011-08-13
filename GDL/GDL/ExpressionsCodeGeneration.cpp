@@ -2,6 +2,8 @@
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY)
+
 #include "GDL/ExpressionsCodeGeneration.h"
 #include "GDL/StrExpressionInstruction.h"
 #include "GDL/ExpressionInstruction.h"
@@ -403,3 +405,4 @@ bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(const Game & game
 
     return true;
 }
+#endif

@@ -54,12 +54,12 @@ string TranslateCondition::Translate(const Instruction & condition, const Instru
  */
 std::vector< std::pair<std::string, TextFormatting> > TranslateCondition::GetAsFormattedText(const Instruction & condition, const InstructionInfos & infos)
 {
-    return TranslateAction::GetAsFormattedText(condition, infos);
+    return TranslateAction::GetInstance()->GetAsFormattedText(condition, infos);
 }
 
 TextFormatting TranslateCondition::GetFormattingFromType(const std::string & type)
 {
-    return TranslateAction::GetFormattingFromType(type);
+    return TranslateAction::GetInstance()->GetFormattingFromType(type);
 }
 
 ////////////////////////////////////////////////////////////

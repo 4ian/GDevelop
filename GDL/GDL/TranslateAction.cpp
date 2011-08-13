@@ -10,17 +10,19 @@
 #include <utility>
 #include <sstream>
 #include <wx/log.h>
+#include <wx/config.h>
 #include "GDL/CommonTools.h"
 #include "GDL/BitmapGUIManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/TranslateAction.h"
 #include "GDL/tinyxml.h"
-#include <wx/wx.h>
 #include <wx/bitmap.h>
 #include <iostream>
 #include <map>
 
 using namespace std;
+
+TranslateAction *TranslateAction::_singleton = NULL;
 
 ////////////////////////////////////////////////////////////
 /// Traduction complète
@@ -57,6 +59,7 @@ std::vector< std::pair<std::string, TextFormatting> > TranslateAction::GetAsForm
     std::vector< std::pair<std::string, TextFormatting> > formattedStr;
 
     string sentence = infos.sentence;
+    std::replace( sentence.begin(), sentence.end(), '\n', ' ');
     bool parse = true;
 
     while ( parse )
@@ -84,7 +87,15 @@ std::vector< std::pair<std::string, TextFormatting> > TranslateAction::GetAsForm
                 TextFormatting format;
                 formattedStr.push_back(std::make_pair(sentence.substr(0, firstParamPosition), format));
             }
-            formattedStr.push_back(std::make_pair(action.GetParameterSafely( firstParamIndex ).GetPlainString(), GetFormattingFromType(infos.parameters[firstParamIndex].type)));
+
+            //Add the parameter
+            TextFormatting format = GetFormattingFromType(infos.parameters[firstParamIndex].type);
+            format.userData = firstParamIndex;
+
+            std::string text = action.GetParameterSafely( firstParamIndex ).GetPlainString();
+            std::replace( text.begin(), text.end(), '\n', ' ');
+
+            formattedStr.push_back(std::make_pair(text, format));
 
             sentence = sentence.substr(firstParamPosition+ToString("_PARAM"+ToString(firstParamIndex)+"_").length());
         }
@@ -102,24 +113,63 @@ TextFormatting TranslateAction::GetFormattingFromType(const std::string & type)
 {
     TextFormatting format;
 
-    if ( type == "expression" )
-        format.color = wxColour(99,0,0); //Red
-    else if ( type == "object" )
-        format.color = wxColour(19,81,0); //Green
-    else if ( type == "automatism" )
-        format.color = wxColour(19,81,0); //Green
-    else if ( type == "operator" )
-        format.color = wxColour(64,81,79); //Violet
-    else if ( type == "objectvar" )
-        format.color = wxColour(44,69,99); //Gray/Blue
-    else if ( type == "scenevar" )
-        format.color = wxColour(44,69,99); //Gray/Blue
-    else if ( type == "globalvar" )
-        format.color = wxColour(44,69,99); //Gray/Blue
-
-    return format;
+    return typesFormatting[type];
 }
 
+void TranslateAction::LoadTypesFormattingFromConfig()
+{
+    wxConfigBase * config = wxConfigBase::Get();
+
+    typesFormatting.clear();
+
+    {
+    typesFormatting["expression"].color = config->ReadObject("EventsEditor/expressionColor", wxColour(99,0,0));
+    typesFormatting["expression"].bold = config->ReadBool("EventsEditor/expressionBold", true);
+    typesFormatting["expression"].italic = config->ReadBool("EventsEditor/expressionItalic", false);
+    }
+    {
+    typesFormatting["object"].color = config->ReadObject("EventsEditor/objectColor", wxColour(19,81,0));
+    typesFormatting["object"].bold = config->ReadBool("EventsEditor/objectBold", true);
+    typesFormatting["object"].italic = config->ReadBool("EventsEditor/objectItalic", false);
+    }
+    {
+    typesFormatting["automatism"].color = config->ReadObject("EventsEditor/automatismColor", wxColour(19,81,0));
+    typesFormatting["automatism"].bold = config->ReadBool("EventsEditor/automatismBold", true);
+    typesFormatting["automatism"].italic = config->ReadBool("EventsEditor/automatismItalic", false);
+    }
+    {
+    typesFormatting["operator"].color = config->ReadObject("EventsEditor/operatorColor", wxColour(64,81,79));
+    typesFormatting["operator"].bold = config->ReadBool("EventsEditor/operatorBold", true);
+    typesFormatting["operator"].italic = config->ReadBool("EventsEditor/operatorItalic", false);
+    }
+    {
+    typesFormatting["objectvar"].color = config->ReadObject("EventsEditor/objectvarColor", wxColour(44,69,99));
+    typesFormatting["objectvar"].bold = config->ReadBool("EventsEditor/objectvarBold", true);
+    typesFormatting["objectvar"].italic = config->ReadBool("EventsEditor/objectvarItalic", false);
+    }
+    {
+    typesFormatting["scenevar"].color = config->ReadObject("EventsEditor/scenevarColor", wxColour(44,69,99));
+    typesFormatting["scenevar"].bold = config->ReadBool("EventsEditor/scenevarBold", true);
+    typesFormatting["scenevar"].italic = config->ReadBool("EventsEditor/scenevarItalic", false);
+    }
+    {
+    typesFormatting["globalvar"].color = config->ReadObject("EventsEditor/globalvarColor", wxColour(44,69,99));
+    typesFormatting["globalvar"].bold = config->ReadBool("EventsEditor/globalvarBold", true);
+    typesFormatting["globalvar"].italic = config->ReadBool("EventsEditor/globalvarItalic", false);
+    }
+}
+
+void TranslateAction::SaveTypesFormattingToConfig()
+{
+    wxConfigBase * config = wxConfigBase::Get();
+
+    for (std::map<std::string, TextFormatting>::iterator it = typesFormatting.begin();it!=typesFormatting.end();++it)
+    {
+        config->Write("EventsEditor/"+it->first+"Color", typesFormatting[it->first].color);
+        config->Write("EventsEditor/"+it->first+"Bold", typesFormatting[it->first].bold);
+        config->Write("EventsEditor/"+it->first+"Italic", typesFormatting[it->first].italic);
+    }
+}
 
 ////////////////////////////////////////////////////////////
 /// Renvoi le nom du bouton en fonction du type

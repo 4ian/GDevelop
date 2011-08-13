@@ -55,6 +55,45 @@ InstructionItem EventsEditorItemsAreas::GetInstructionAt(int x, int y)
     return dummy;
 }
 
+bool EventsEditorItemsAreas::IsOnInstructionList(int x, int y)
+{
+    for (unsigned int i = 0;i<instructionListsAreas.size();++i)
+    {
+        if ( instructionListsAreas[i].first.Contains(x,y) )
+            return true;
+    }
+
+    return false;
+}
+
+InstructionListItem EventsEditorItemsAreas::GetInstructionListAt(int x, int y)
+{
+    for (unsigned int i = 0;i<instructionListsAreas.size();++i)
+    {
+        if ( instructionListsAreas[i].first.Contains(x,y) )
+            return instructionListsAreas[i].second;
+    }
+
+    std::cout << "WARNING, RETURNING DUMMY InstructionListItem";
+
+    InstructionListItem dummy;
+    return dummy;
+}
+
+wxRect EventsEditorItemsAreas::GetAreaOfInstructionListAt(int x, int y)
+{
+    for (unsigned int i = 0;i<instructionListsAreas.size();++i)
+    {
+        if ( instructionListsAreas[i].first.Contains(x,y) )
+            return instructionListsAreas[i].first;
+    }
+
+    std::cout << "WARNING, RETURNING DUMMY InstructionListItem Rect";
+
+    wxRect dummy;
+    return dummy;
+}
+
 bool EventsEditorItemsAreas::IsOnParameter(int x, int y)
 {
     for (unsigned int i = 0;i<parametersAreas.size();++i)
@@ -77,6 +116,20 @@ ParameterItem EventsEditorItemsAreas::GetParameterAt(int x, int y)
     std::cout << "WARNING, RETURNING DUMMY Parameter";
 
     ParameterItem dummy;
+    return dummy;
+}
+
+wxRect EventsEditorItemsAreas::GetAreaOfParameterAt(int x, int y)
+{
+    for (unsigned int i = 0;i<parametersAreas.size();++i)
+    {
+        if ( parametersAreas[i].first.Contains(x,y) )
+            return parametersAreas[i].first;
+    }
+
+    std::cout << "WARNING, RETURNING DUMMY Parameter Rect";
+
+    wxRect dummy;
     return dummy;
 }
 
@@ -109,6 +162,7 @@ void EventsEditorItemsAreas::Clear()
 {
     eventsAreas.clear();
     instructionsAreas.clear();
+    instructionListsAreas.clear();
     parametersAreas.clear();
     foldingAreas.clear();
 }
@@ -131,6 +185,11 @@ void EventsEditorItemsAreas::AddEventArea(wxRect area, EventItem & event)
 void EventsEditorItemsAreas::AddFoldingItem(wxRect area, FoldingItem & item)
 {
     foldingAreas.push_back(std::make_pair(area, item));
+}
+
+void EventsEditorItemsAreas::AddInstructionListArea(wxRect area, InstructionListItem & item)
+{
+    instructionListsAreas.push_back(std::make_pair(area, item));
 }
 
 //EventItem stuff :
@@ -196,6 +255,33 @@ InstructionItem::InstructionItem() :
 {
 }
 
+//InstructionListItem stuff :
+bool InstructionListItem::operator==(const InstructionListItem & other) const
+{
+    return (isConditionList == other.isConditionList && instructionList == other.instructionList && event == other.event);
+}
+size_t hash_value(const InstructionListItem & a)
+{
+    std::size_t seed = 0;
+    boost::hash_combine(seed, a.instructionList);
+    boost::hash_combine(seed, a.event);
+    boost::hash_combine(seed, a.isConditionList);
+    return seed;
+}
+
+InstructionListItem::InstructionListItem(bool isCondition_, std::vector<Instruction>* instructionList_, BaseEvent * event_ ) :
+    isConditionList(isCondition_),
+    instructionList(instructionList_),
+    event(event_)
+{
+}
+
+InstructionListItem::InstructionListItem() :
+    isConditionList(true),
+    instructionList(NULL),
+    event(NULL)
+{
+}
 //ParameterItem stuff :
 bool ParameterItem::operator==(const ParameterItem & other) const
 {

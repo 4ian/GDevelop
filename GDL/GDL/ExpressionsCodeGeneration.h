@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef EXPRESSIONSCODEGENERATION_H
 #define EXPRESSIONSCODEGENERATION_H
 
@@ -61,3 +63,4 @@ class GD_API CallbacksForGeneratingExpressionCode : public ParserCallbacks
 
 
 #endif // EXPRESSIONSCODEGENERATION_H
+#endif

@@ -21,7 +21,7 @@ rem Boost (shared_ptr and dependencies) headers
 xcopy ..\..\ExtLibs\boost\boost\*.hpp ..\Bin\Dev\include\boost\boost\*.hpp  /Y /S /D
 xcopy ..\..\ExtLibs\boost\boost\*.h ..\Bin\Dev\include\boost\boost\*.h  /Y /S /D
 
-rem SFML headers
+rem SFML headers 
 xcopy ..\..\ExtLibs\SFML\include\*.h ..\Bin\Dev\include\SFML\include\*.h /S /Y /D
 xcopy ..\..\ExtLibs\SFML\include\*.hpp ..\Bin\Dev\include\SFML\include\*.hpp /S /Y /D
 xcopy ..\..\ExtLibs\SFML\include\*.inl ..\Bin\Dev\include\SFML\include\*.inl /S /Y /D

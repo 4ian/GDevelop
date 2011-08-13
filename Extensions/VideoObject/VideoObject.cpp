@@ -32,6 +32,7 @@ freely, subject to the following restrictions:
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
 #include "GDL/XmlMacros.h"
+#include "GDL/RotatedRectangle.h"
 #include "VideoObject.h"
 
 #if defined(GD_IDE_ONLY)
@@ -96,9 +97,15 @@ void VideoObject::ReloadVideo()
     video.Load(videoFile);
     video.SetLooping(looping);
     video.SetPause(paused);
-    renderSprite.SetImage(video.GetNextFrameImage(), true);
-    renderSprite.SetOrigin(renderSprite.GetSize().x/2, renderSprite.GetSize().y/2);
+    video.GetRenderSprite().SetImage(video.GetNextFrameImage(), true);
+    video.GetRenderSprite().SetOrigin(video.GetRenderSprite().GetSize().x/2, video.GetRenderSprite().GetSize().y/2);
 }
+bool VideoObject::SetAngle(float newAngle)
+{
+    angle = newAngle;
+    video.GetRenderSprite().SetRotation(-angle);
+    return true;
+};
 double VideoObject::GetTimePosition() const
 {
     return video.GetTimePosition();
@@ -151,8 +158,8 @@ bool VideoObject::Draw( sf::RenderWindow& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-	renderSprite.SetImage(video.GetNextFrameImage(), true);
-    window.Draw( renderSprite );
+	video.GetRenderSprite().SetImage(video.GetNextFrameImage(), true);
+    window.Draw( video.GetRenderSprite() );
 
     return true;
 }
@@ -172,12 +179,12 @@ bool VideoObject::DrawEdittime(sf::RenderWindow& renderWindow)
             badVideoIcon.LoadFromFile("Extensions/badVideo.png");
             badImageLoaded = true;
         }
-        renderSprite.SetImage(badVideoIcon, true);
+        video.GetRenderSprite().SetImage(badVideoIcon, true);
     }
     else
-        renderSprite.SetImage(video.GetNextFrameImage(), true);
+        video.GetRenderSprite().SetImage(video.GetNextFrameImage(), true);
 
-    renderWindow.Draw( renderSprite );
+    renderWindow.Draw( video.GetRenderSprite() );
 
     return true;
 }
@@ -265,8 +272,8 @@ unsigned int VideoObject::GetNumberOfProperties() const
 
 void VideoObject::OnPositionChanged()
 {
-    renderSprite.SetX( GetX() );
-    renderSprite.SetY( GetY() );
+    video.GetRenderSprite().SetX( GetX() );
+    video.GetRenderSprite().SetY( GetY() );
 }
 
 /**
@@ -291,7 +298,7 @@ std::vector<RotatedRectangle> VideoObject::GetHitBoxes() const
  */
 float VideoObject::GetDrawableX() const
 {
-    return renderSprite.GetPosition().x-renderSprite.GetOrigin().x;
+    return video.GetRenderSprite().GetPosition().x-video.GetRenderSprite().GetOrigin().x;
 }
 
 /**
@@ -299,7 +306,7 @@ float VideoObject::GetDrawableX() const
  */
 float VideoObject::GetDrawableY() const
 {
-    return renderSprite.GetPosition().y-renderSprite.GetOrigin().y;
+    return video.GetRenderSprite().GetPosition().y-video.GetRenderSprite().GetOrigin().y;
 }
 
 /**
@@ -307,7 +314,7 @@ float VideoObject::GetDrawableY() const
  */
 float VideoObject::GetWidth() const
 {
-    return renderSprite.GetSize().x;
+    return video.GetRenderSprite().GetSize().x;
 }
 
 /**
@@ -315,7 +322,7 @@ float VideoObject::GetWidth() const
  */
 float VideoObject::GetHeight() const
 {
-    return renderSprite.GetSize().y;
+    return video.GetRenderSprite().GetSize().y;
 }
 
 /**
@@ -323,7 +330,7 @@ float VideoObject::GetHeight() const
  */
 float VideoObject::GetCenterX() const
 {
-    return renderSprite.GetSize().x/2;
+    return video.GetRenderSprite().GetSize().x/2;
 }
 
 /**
@@ -331,7 +338,7 @@ float VideoObject::GetCenterX() const
  */
 float VideoObject::GetCenterY() const
 {
-    return renderSprite.GetSize().y/2;
+    return video.GetRenderSprite().GetSize().y/2;
 }
 
 /**
@@ -350,7 +357,7 @@ void VideoObject::SetColor( unsigned int r, unsigned int g, unsigned int b )
     colorR = r;
     colorG = g;
     colorB = b;
-    renderSprite.SetColor(sf::Color(colorR, colorG, colorB, opacity));
+    video.GetRenderSprite().SetColor(sf::Color(colorR, colorG, colorB, opacity));
 }
 
 void VideoObject::SetOpacity(float val)
@@ -361,7 +368,7 @@ void VideoObject::SetOpacity(float val)
         val = 0;
 
     opacity = val;
-    renderSprite.SetColor(sf::Color(colorR, colorG, colorB, opacity));
+    video.GetRenderSprite().SetColor(sf::Color(colorR, colorG, colorB, opacity));
 }
 
 /**

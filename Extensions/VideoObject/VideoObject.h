@@ -29,7 +29,6 @@ freely, subject to the following restrictions:
 
 #include "GDL/Object.h"
 #include "VideoWrapper.h"
-#include <SFML/Graphics.hpp>
 class ImageManager;
 class RuntimeScene;
 class Object;
@@ -70,8 +69,8 @@ class GD_EXTENSION_API VideoObject : public Object
         virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
         virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, string & name, string & value) const;
-        virtual bool ChangeProperty(unsigned int propertyNb, string newValue);
+        virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+        virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
         virtual unsigned int GetNumberOfProperties() const;
         #endif
 
@@ -122,7 +121,7 @@ class GD_EXTENSION_API VideoObject : public Object
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
 
-        virtual bool SetAngle(float newAngle) { angle = newAngle; renderSprite.SetRotation(-angle); return true;};
+        virtual bool SetAngle(float newAngle);
         virtual float GetAngle() const {return angle;};
 
         void SetOpacity(float val);
@@ -151,7 +150,6 @@ class GD_EXTENSION_API VideoObject : public Object
 
         std::string videoFile;
         VideoWrapper video;
-        sf::Sprite renderSprite;
 
         bool looping;
         bool paused;

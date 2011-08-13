@@ -32,6 +32,8 @@ freely, subject to the following restrictions:
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
+#include <wx/msgdlg.h>
+#include <wx/log.h>
 #include <wx/colordlg.h>
 #include <wx/filedlg.h>
 

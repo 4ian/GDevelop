@@ -81,7 +81,7 @@ class Extension : public ExtensionBase
                            &DestroyVideoObject,
                            "VideoObject");
 
-                objInfos.SetIncludeFile("Video/VideoObject.h");
+                objInfos.SetIncludeFile("VideoObject/VideoObject.h");
 
                 DECLARE_OBJECT_ACTION("LoadVideo",
                                _("Charger et jouer une vidéo"),
@@ -95,7 +95,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("file", _("Vidéo"), "", false);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("LoadAndPlayVideo").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("LoadAndPlayVideo").SetIncludeFile("VideoObject/VideoObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -111,7 +111,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("yesorno", _("Activer la pause ?"), "", false);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("SetPause").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("SetPause").SetIncludeFile("VideoObject/VideoObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -127,7 +127,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("yesorno", _("Activer le bouclage ?"), "", false);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("SetLooping").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("SetLooping").SetIncludeFile("VideoObject/VideoObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -142,7 +142,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("object", _("Objet"), "Video", true);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("Restart").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("Restart").SetIncludeFile("VideoObject/VideoObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -158,7 +158,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("expression", _("Position ( en secondes )"), "", false);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("Seek").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("Seek").SetIncludeFile("VideoObject/VideoObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -173,7 +173,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("object", _("Objet"), "Video", true);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("IsPaused").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("IsPaused").SetIncludeFile("VideoObject/VideoObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
@@ -188,7 +188,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("object", _("Objet"), "Video", true);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("GetLooping").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("GetLooping").SetIncludeFile("VideoObject/VideoObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
@@ -205,7 +205,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("TimePosition").SetManipulatedType("number").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("TimePosition").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
@@ -221,7 +221,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("color", _("Couleur"), "", false);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("SetColor").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("SetColor").SetIncludeFile("VideoObject/VideoObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 
@@ -238,7 +238,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("SetOpacity").SetAssociatedGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("SetOpacity").SetAssociatedGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
 
 
                 DECLARE_END_OBJECT_ACTION()
@@ -256,7 +256,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
 
 
                 DECLARE_END_OBJECT_CONDITION()
@@ -274,7 +274,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("SetAngle").SetAssociatedGetter("GetAngle").SetManipulatedType("number").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("SetAngle").SetAssociatedGetter("GetAngle").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
 
 
                 DECLARE_END_OBJECT_ACTION()
@@ -292,38 +292,38 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
 
-                    instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("VideoObject/VideoObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
                 DECLARE_OBJECT_EXPRESSION("Opacity", _("Opacité"), _("Opacité"), _("Opacité"), "res/actions/opacity.png")
                     instrInfo.AddParameter("object", _("Objet"), "Video", true);
 
-                    instrInfo.cppCallingInformation.SetFunctionName("GetOpacity").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("GetOpacity").SetIncludeFile("VideoObject/VideoObject.h");
                 DECLARE_END_OBJECT_EXPRESSION()
 
                 DECLARE_OBJECT_EXPRESSION("Angle", _("Angle"), _("Angle"), _("Rotation"), "res/actions/rotate.png")
                     instrInfo.AddParameter("object", _("Objet"), "Video", true);
 
-                    instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetIncludeFile("VideoObject/VideoObject.h");
                 DECLARE_END_OBJECT_EXPRESSION()
 
                 DECLARE_OBJECT_EXPRESSION("TimePosition", _("Position actuelle dans la vidéo"), _("Position actuelle dans la vidéo en secondes"), _("Vidéo"), "res/conditions/time.png")
                     instrInfo.AddParameter("object", _("Objet"), "Video", true);
 
-                    instrInfo.cppCallingInformation.SetFunctionName("GetTimePosition").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("GetTimePosition").SetIncludeFile("VideoObject/VideoObject.h");
                 DECLARE_END_OBJECT_EXPRESSION()
 
                 DECLARE_OBJECT_EXPRESSION("Duration", _("Durée"), _("Durée de la vidéo en secondes"), _("Vidéo"), "res/conditions/time.png")
                     instrInfo.AddParameter("object", _("Objet"), "Video", true);
 
-                    instrInfo.cppCallingInformation.SetFunctionName("GetDuration").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("GetDuration").SetIncludeFile("VideoObject/VideoObject.h");
                 DECLARE_END_OBJECT_EXPRESSION()
 
                 DECLARE_OBJECT_STR_EXPRESSION("VideoFile", _("Fichier vidéo"), _("Fichier vidéo"), _("Fichier vidéo"), "res/conditions/fichier.png")
                     instrInfo.AddParameter("object", _("Objet"), "Video", true);
 
-                    instrInfo.cppCallingInformation.SetFunctionName("GetVideoFile").SetIncludeFile("Video/VideoObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("GetVideoFile").SetIncludeFile("VideoObject/VideoObject.h");
                 DECLARE_END_OBJECT_STR_EXPRESSION()
 
             DECLARE_END_OBJECT()

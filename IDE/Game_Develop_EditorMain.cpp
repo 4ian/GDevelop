@@ -209,12 +209,12 @@ buildToolsPnl(NULL)
     Connect( idRibbonStartPage, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonStartPageClicked );
     Connect( idRibbonCppTools, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonCppToolsClicked );
 
-        wxIconBundle icons;
-        icons.AddIcon("res/icon16.png");
-        icons.AddIcon("res/icon24.png");
-        icons.AddIcon("res/icon32.png");
+    wxIconBundle icons;
+    icons.AddIcon("res/icon16.png");
+    icons.AddIcon("res/icon24.png");
+    icons.AddIcon("res/icon32.png");
 
-    	SetIcons(icons);
+    SetIcons(icons);
 
     SetDropTarget(new DnDFileEditor(*this));
 
@@ -385,10 +385,11 @@ buildToolsPnl(NULL)
     if ( result != "" )
         m_mgr.LoadPerspective( result , true );
 
-    if ( !hideLabels )
-        m_mgr.GetPane(ribbonPanel).MinSize(1, 109);
-    else
-        m_mgr.GetPane(ribbonPanel).MinSize(1, 108);
+    #if defined(WINDOWS)
+    m_mgr.GetPane(ribbonPanel).MinSize(1, 110);
+    #else
+    m_mgr.GetPane(ribbonPanel).MinSize(1, 120);
+    #endif
 
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );

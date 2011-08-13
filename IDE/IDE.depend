@@ -22360,7 +22360,7 @@
 	<boost/shared_ptr.hpp>
 	<boost/bimap/bimap.hpp>
 
-1312580948 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
+1313056212 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
 	<wx/bitmap.h>
 	<wx/file.h>
 	<wx/wx.h>
@@ -23088,7 +23088,7 @@
 	<string>
 	<vector>
 
-1312200108 source:d:\florian\programmation\gamedevelop2\ide\choixaction.cpp
+1313248625 source:d:\florian\programmation\gamedevelop2\ide\choixaction.cpp
 	"ChoixAction.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -23294,7 +23294,7 @@
 	"wx/filesys.h"
 	"wx/hashmap.h"
 
-1312904614 d:\florian\programmation\gamedevelop2\gdl\gdl\translateaction.h
+1313248853 d:\florian\programmation\gamedevelop2\gdl\gdl\translateaction.h
 	<string>
 	<vector>
 	<map>
@@ -24922,7 +24922,7 @@
 	"GDL/tinyxml.h"
 	"GDL/CommonTools.h"
 
-1308421921 source:d:\florian\programmation\gamedevelop2\ide\clipboard.cpp
+1313263337 source:d:\florian\programmation\gamedevelop2\ide\clipboard.cpp
 	<boost/shared_ptr.hpp>
 	"Clipboard.h"
 	"GDL/Object.h"
@@ -24930,7 +24930,7 @@
 	"GDL/Instruction.h"
 	"GDL/ExtensionsManager.h"
 
-1297526868 d:\florian\programmation\gamedevelop2\ide\clipboard.h
+1313263223 d:\florian\programmation\gamedevelop2\ide\clipboard.h
 	"GDL/Object.h"
 	"GDL/Event.h"
 	"GDL/Scene.h"
@@ -25745,7 +25745,7 @@
 	"GDL/EventsRenderingHelper.h"
 	"GDL/Game.h"
 
-1312914154 d:\florian\programmation\gamedevelop2\gdl\gdl\eventsrenderinghelper.h
+1313182637 d:\florian\programmation\gamedevelop2\gdl\gdl\eventsrenderinghelper.h
 	<wx/dc.h>
 	<wx/html/htmprint.h>
 	<vector>
@@ -26191,7 +26191,7 @@
 	<iostream>
 	<wx/dcbuffer.h>
 
-1312555443 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp
+1313258067 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp
 	<wx/msw/winundef.h>
 	<wx/image.h>
 	<wx/fileconf.h>
@@ -26233,7 +26233,6 @@
 	"GDL/FontManager.h"
 	"GDL/HelpFileAccess.h"
 	"GDL/TranslateAction.h"
-	"GDL/TranslateCondition.h"
 	"GDL/ExtensionsManager.h"
 	"GDL/SpriteExtension.h"
 	"GDL/ExtensionsLoader.h"
@@ -26368,7 +26367,7 @@
 1304162683 d:\florian\programmation\gamedevelop2\gdl\gdl\localemanager.h
 	<wx/intl.h>
 
-1312839756 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp
+1313055649 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp
 	<wx/bitmap.h>
 	<wx/icon.h>
 	<wx/intl.h>
@@ -26666,13 +26665,14 @@
 	"Preferences.h"
 	"wx/aui/aui.h"
 
-1298662956 d:\florian\programmation\gamedevelop2\ide\preferences.h
+1313246291 d:\florian\programmation\gamedevelop2\ide\preferences.h
 	<wx/notebook.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/radiobox.h>
 	<wx/textctrl.h>
 	<wx/checkbox.h>
+	<wx/propgrid/propgrid.h>
 	<wx/statline.h>
 	<wx/radiobut.h>
 	<wx/panel.h>
@@ -26815,13 +26815,14 @@
 	"GDL/Game.h"
 	"GDL/OpenSaveGame.h"
 
-1306615223 source:d:\florian\programmation\gamedevelop2\ide\preferences.cpp
+1313251599 source:d:\florian\programmation\gamedevelop2\ide\preferences.cpp
 	"Preferences.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
 	<wx/intl.h>
 	<wx/image.h>
 	<wx/string.h>
+	<wx/propgrid/advprops.h>
 	<wx/imaglist.h>
 	<wx/fileconf.h>
 	<wx/filename.h>
@@ -26836,6 +26837,7 @@
 	"GDL/HelpFileAccess.h"
 	"GDL/CommonTools.h"
 	"GDL/LocaleManager.h"
+	"GDL/TranslateAction.h"
 	<wx/listctrl.h>
 	"SetupCompilerToolchainDlg.h"
 	<string>
@@ -27550,7 +27552,7 @@
 1311188810 source:d:\florian\programmation\gamedevelop2\ide\resource.rc
 	"version.h"
 
-1312930920 d:\florian\programmation\gamedevelop2\ide\version.h
+1313265446 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289489446 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -27944,7 +27946,7 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1312905694 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1313185362 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
@@ -28239,13 +28241,17 @@
 	"wx/defs.h"
 	"wx/object.h"
 
-1312915667 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
+1313263765 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
 	"EventsEditor.h"
+	<wx/bitmap.h>
 	<wx/intl.h>
+	<wx/image.h>
 	<wx/string.h>
 	<wx/event.h>
+	<wx/config.h>
 	<iostream>
 	<utility>
+	<algorithm>
 	"GDL/Game.h"
 	"GDL/Scene.h"
 	"GDL/Event.h"
@@ -28253,11 +28259,27 @@
 	"GDL/EventsEditorItemsAreas.h"
 	"GDL/EventsEditorSelection.h"
 	"GDL/EventsRenderingHelper.h"
+	"GDL/CommonTools.h"
+	"GDL/EventsCodeCompiler.h"
+	"GDL/ExtensionsManager.h"
+	"GDL/HelpFileAccess.h"
+	"SceneCanvas.h"
+	"ProfileDlg.h"
+	"SearchEvents.h"
+	"CreateTemplate.h"
+	"ChoixTemplateEvent.h"
+	"ChoixCondition.h"
+	"ChoixAction.h"
+	"Clipboard.h"
 	<SFML/System.hpp>
 
-1312914661 d:\florian\programmation\gamedevelop2\ide\eventseditor.h
+1313265446 d:\florian\programmation\gamedevelop2\ide\eventseditor.h
 	<wx/sizer.h>
+	<wx/menu.h>
+	<wx/textctrl.h>
 	<wx/panel.h>
+	<wx/hyperlink.h>
+	<wx/bmpbuttn.h>
 	<wx/scrolbar.h>
 	<vector>
 	<boost/shared_ptr.hpp>
@@ -28693,20 +28715,81 @@
 	<functional>
 	<boost/functional/hash_fwd.hpp>
 
-1312913217 d:\florian\programmation\gamedevelop2\gdl\gdl\eventseditoritemsareas.h
+1313012656 d:\florian\programmation\gamedevelop2\gdl\gdl\eventseditoritemsareas.h
 	<wx/gdicmn.h>
 	<boost/weak_ptr.hpp>
 	<boost/unordered_map.hpp>
 	<vector>
 	<utility>
 
-1312898434 d:\florian\programmation\gamedevelop2\gdl\gdl\eventseditorselection.h
+1313261766 d:\florian\programmation\gamedevelop2\gdl\gdl\eventseditorselection.h
 	<set>
 	<boost/weak_ptr.hpp>
 	<boost/shared_ptr.hpp>
 	<boost/unordered_set.hpp>
 	"GDL/EventsEditorItemsAreas.h"
 
-1312906595 d:\florian\programmation\gamedevelop2\gdl\gdl\textformatting.h
+1312976000 d:\florian\programmation\gamedevelop2\gdl\gdl\textformatting.h
 	<wx/colour.h>
+	<string>
+
+1307990269 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\propgrid.h
+	"wx/defs.h"
+	"wx/thread.h"
+	"wx/dcclient.h"
+	"wx/control.h"
+	"wx/scrolwin.h"
+	"wx/tooltip.h"
+	"wx/datetime.h"
+	"wx/recguard.h"
+	"wx/propgrid/property.h"
+	"wx/propgrid/propgridiface.h"
+	"wx/propgrid/props.h"
+
+1253308514 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\recguard.h
+	"wx/defs.h"
+
+1307990269 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\property.h
+	"wx/defs.h"
+	"wx/propgrid/propgriddefs.h"
+
+1307990269 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\propgriddefs.h
+	"wx/defs.h"
+	"wx/dynarray.h"
+	"wx/vector.h"
+	"wx/hashmap.h"
+	"wx/variant.h"
+	"wx/any.h"
+	"wx/longlong.h"
+	"wx/clntdata.h"
+	"wx/tokenzr.h"
+
+1307990269 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\propgridiface.h
+	"wx/defs.h"
+	"wx/propgrid/property.h"
+	"wx/propgrid/propgridpagestate.h"
+
+1307990269 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\propgridpagestate.h
+	"wx/defs.h"
+	"wx/propgrid/property.h"
+
+1307990269 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\props.h
+	"wx/defs.h"
+	"wx/propgrid/editors.h"
+	"wx/filename.h"
+	"wx/dialog.h"
+	"wx/textctrl.h"
+	"wx/button.h"
+	"wx/listbox.h"
+	"wx/valtext.h"
+
+1307990269 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\editors.h
+	"wx/defs.h"
+
+1307990269 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\advprops.h
+	"wx/defs.h"
+	"wx/propgrid/props.h"
+	"wx/image.h"
+	"wx/spinbutt.h"
+	"wx/propgrid/editors.h"
 

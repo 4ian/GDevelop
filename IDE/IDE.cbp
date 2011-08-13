@@ -689,8 +689,6 @@
 		<Unit filename="EditPropScene.h">
 			<Option virtualFolder="Editeur principal\Autres\" />
 		</Unit>
-		<Unit filename="EditorEventsActions.cpp" />
-		<Unit filename="EditorEventsConditions.cpp" />
 		<Unit filename="EditorJeu.cpp">
 			<Option virtualFolder="Racine\" />
 		</Unit>
@@ -733,10 +731,6 @@
 		</Unit>
 		<Unit filename="EventsEditor.cpp" />
 		<Unit filename="EventsEditor.h" />
-		<Unit filename="EventsEditorItemsAreas.cpp" />
-		<Unit filename="EventsEditorItemsAreas.h" />
-		<Unit filename="EventsEditorSelection.cpp" />
-		<Unit filename="EventsEditorSelection.h" />
 		<Unit filename="EventsRefactorer.cpp" />
 		<Unit filename="EventsRefactorer.h" />
 		<Unit filename="ExtensionBugReportDlg.cpp" />
@@ -836,12 +830,6 @@
 		</Unit>
 		<Unit filename="ObjectsOnBadLayerBox.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\Editeur calques\" />
-		</Unit>
-		<Unit filename="OldEventsEditor.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
-		</Unit>
-		<Unit filename="OldEventsEditor.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
 		</Unit>
 		<Unit filename="PlayerUnitTests.cpp" />
 		<Unit filename="Portable.cpp">

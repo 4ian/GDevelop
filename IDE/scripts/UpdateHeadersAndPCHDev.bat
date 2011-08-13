@@ -2,15 +2,16 @@
 echo.
 echo Tool for updating include directory for Dev target.
 echo Optional parameters : noPCH to skip headers precompilation.
+echo Optional parameters : onlyPCH to do only headers precompilation.
+if "%1"=="onlyPCH" GOTO PCH
 echo.
 
 echo -Copying files...
 rem del ..\Bin\Dev\include\*.* /S /Q
 
 rem Standard library headers
-xcopy C:\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\*.h ..\Bin\Dev\include\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\*.h /S  /Y /D
-xcopy c:\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\c++\*.h ..\Bin\Dev\include\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\c++\*.h /S  /Y /D
-xcopy c:\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\c++\mingw32\*.h ..\Bin\Dev\include\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\c++\mingw32\*.h /S  /Y /D
+xcopy C:\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\*.* ..\Bin\Dev\include\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\*.* /S  /Y /D
+xcopy C:\TDM-GCC-4.5.2\include\*.* ..\Bin\Dev\include\TDM-GCC-4.5.2\include\*.* /S  /Y /D
 xcopy ..\..\ExtLibs\llvm\tools\clang\lib\Headers\*.h ..\Bin\Dev\include\llvm\tools\clang\lib\Headers\*.h /S  /Y /D
 
 rem Game Develop C++ Implementation headers
@@ -48,9 +49,10 @@ echo -End of copy
 if NOT errorlevel 0 echo Some errors occurred.
 
 echo.
+:PCH
 if "%1"=="noPCH" GOTO END
 echo -Precompiling headers
-..\..\ExtLibs\llvm\build-tdmgcc45-release\bin\clang.exe -cc1 -fsyntax-only -disable-free -main-file-name RuntimePrecompiledHeader.h -mrelocation-model static -mdisable-fp-elim -mconstructor-aliases -momit-leaf-frame-pointer -resource-dir D:/Florian/Programmation/CGD_Compiler/bin/Release\\..\\lib\\clang\\3.0 -D GD_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DGD_IDE_ONLY -DDEV -DWINDOWS -D__WXMSW__ -D__GNUWIN32__ -DWXUSINGDLL -DwxDEBUG_LEVEL=0 -DNDEBUG -DwxUSE_UNICODE=0 -I C:/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include -I ..\Bin\Dev\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++ -I ..\Bin\Dev\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32 -I ..\..\ExtLibs/llvm/tools/clang/lib/Headers -I ..\../ExtLibs/llvm/include -I ..\../ExtLibs/llvm/build-tdmgcc45-release/include -I ..\../GDL -I ..\../ExtLibs/boost -I ..\../ExtLibs/SFML/include -I..\..\ExtLibs\wxwidgets\include -I..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw -w -fdeprecated-macro -fno-dwarf2-cfi-asm -ferror-limit 19 -fmessage-length 80 -fcxx-exceptions -fexceptions -fno-use-cxa-atexit -fgnu-runtime -fdiagnostics-show-option -fcolor-diagnostics -x c++ RuntimePrecompiledHeader.h -emit-pch -o ..\Bin\Dev\include\GDL\GDL\RuntimePrecompiledHeader.h.pch
+..\..\ExtLibs\llvm\build-tdmgcc45-release\bin\clang.exe  -mdisable-fp-elim -mconstructor-aliases -momit-leaf-frame-pointer -fdeprecated-macro -fno-dwarf2-cfi-asm -fcxx-exceptions -fexceptions -fno-use-cxa-atexit -fgnu-runtime -fdiagnostics-show-option -fcolor-diagnostics -D GD_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DGD_IDE_ONLY -DDEV -DWINDOWS -D__WXMSW__ -D__GNUWIN32__ -DWXUSINGDLL -DwxDEBUG_LEVEL=0 -DNDEBUG -DwxUSE_UNICODE=0 -I..\Bin\Dev\include/TDM-GCC-4.5.2/include  -I..\Bin\Dev\include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include -I..\Bin\Dev\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++ -I..\Bin\Dev\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32 -I..\Bin\Dev\include/llvm/tools/clang/lib/Headers -I..\Bin\Dev\include/llvm/include -I..\Bin\Dev\include/llvm/build-tdmgcc45-release/include -I..\Bin\Dev\include/GDL -I..\Bin\Dev\include/boost -I..\Bin\Dev\include\SFML/include -I..\Bin\Dev\include\wxwidgets\include -I..\Bin\Dev\include\wxwidgets\lib\gcc_dll\msw -x c++-header --relocatable-pch  ..\Bin\Dev\include\GDL\GDL\RuntimePrecompiledHeader.h -o ..\Bin\Dev\include\GDL\GDL\RuntimePrecompiledHeader.h.pch
 
 echo 
 

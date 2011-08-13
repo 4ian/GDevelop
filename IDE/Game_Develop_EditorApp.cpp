@@ -55,7 +55,6 @@
 #include "GDL/FontManager.h"
 #include "GDL/HelpFileAccess.h"
 #include "GDL/TranslateAction.h"
-#include "GDL/TranslateCondition.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/SpriteExtension.h"
 #include "GDL/ExtensionsLoader.h"
@@ -350,6 +349,9 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "Connecting shortcuts" << endl;
     Connect(wxID_ANY,wxEVT_KEY_DOWN, wxKeyEventHandler(Game_Develop_EditorApp::OnKeyPressed));
 
+    cout << "Loading events editor configuration" << endl;
+    TranslateAction::GetInstance()->LoadTypesFormattingFromConfig();
+
     //Fin du splash screen, affichage de la fenêtre
     splash->Destroy();
     mainEditor->Show();
@@ -374,7 +376,7 @@ bool Game_Develop_EditorApp::OnInit()
         }
     }
 
-    //wxLogWarning("Cette version de Game Develop n'est utilisable qu'à des fins de tests. Merci d'utiliser la version disponible sur notre site pour toute autre utilisation.");
+    wxLogWarning("Cette version de Game Develop n'est pas finalisée et n'est utilisable qu'à des fins de tests. Merci de ne pas la redistribuer et d'utiliser la version disponible sur notre site pour toute autre utilisation.");
 
 #ifndef RELEASE
     TestResult tr;

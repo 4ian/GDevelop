@@ -20,13 +20,9 @@ public:
     ObjSPtr GetObject();
     bool HasObject() { return hasObject; };
 
-    void SetEvent( BaseEventSPtr event );
-    BaseEventSPtr GetEvent();
-    bool HasEvent() { return hasEvent; };
-
-    void SetAction( const Instruction & action );
-    Instruction GetAction();
-    bool HasAction() { return hasAction; };
+    void SetEvents( const std::vector<BaseEventSPtr> & event );
+    std::vector<BaseEventSPtr> GetEvents();
+    bool HasEvents() { return hasEvents; };
 
     void SetScene( const Scene & scene );
     Scene GetScene();
@@ -36,9 +32,12 @@ public:
     ExternalEvents GetExternalEvents();
     bool HasExternalEvents() { return hasExternalEvents; };
 
-    void SetCondition( const Instruction & condition );
-    Instruction GetCondition();
-    bool HasCondition() { return hasCondition; };
+    void SetConditions( const std::vector<Instruction> & conditions );
+    void SetActions( const std::vector<Instruction> & actions );
+
+    bool HasCondition() { return hasInstructions && instructionsAreConditions; };
+    bool HasAction() { return hasInstructions && !instructionsAreConditions; };
+    std::vector<Instruction> GetInstructions() const { return instructionsCopied; };
 
     void SetObjectGroup( const ObjectGroup & group );
     ObjectGroup GetObjectGroup();
@@ -55,17 +54,15 @@ private:
     ObjSPtr objectCopied;
     bool hasObject;
 
-    BaseEventSPtr eventCopied;
-    bool hasEvent;
+    std::vector<BaseEventSPtr> eventsCopied;
+    bool hasEvents;
+
+    std::vector<Instruction> instructionsCopied;
+    bool hasInstructions;
+    bool instructionsAreConditions;
 
     ExternalEvents externalEventsCopied;
     bool hasExternalEvents;
-
-    Instruction actionCopied;
-    bool hasAction;
-
-    Instruction conditionCopied;
-    bool hasCondition;
 
     Scene sceneCopied;
     bool hasScene;

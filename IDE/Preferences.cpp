@@ -7,6 +7,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <wx/propgrid/advprops.h>
 #include <wx/imaglist.h>
 #include <wx/fileconf.h>
 #include <wx/filename.h>
@@ -21,6 +22,7 @@
 #include "GDL/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
 #include "GDL/LocaleManager.h"
+#include "GDL/TranslateAction.h"
 #include <wx/listctrl.h>
 #include "SetupCompilerToolchainDlg.h"
 
@@ -80,6 +82,11 @@ const long Preferences::ID_PANEL12 = wxNewId();
 const long Preferences::ID_STATICTEXT12 = wxNewId();
 const long Preferences::ID_PANEL14 = wxNewId();
 const long Preferences::ID_PANEL8 = wxNewId();
+const long Preferences::ID_STATICTEXT17 = wxNewId();
+const long Preferences::ID_TEXTCTRL5 = wxNewId();
+const long Preferences::ID_STATICTEXT18 = wxNewId();
+const long Preferences::ID_CUSTOM1 = wxNewId();
+const long Preferences::ID_PANEL18 = wxNewId();
 const long Preferences::ID_STATICTEXT16 = wxNewId();
 const long Preferences::ID_BUTTON9 = wxNewId();
 const long Preferences::ID_RADIOBUTTON2 = wxNewId();
@@ -110,9 +117,11 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer19;
     wxStaticBoxSizer* StaticBoxSizer12;
     wxFlexGridSizer* FlexGridSizer23;
+    wxStaticBoxSizer* StaticBoxSizer15;
     wxStaticBoxSizer* StaticBoxSizer4;
     wxFlexGridSizer* FlexGridSizer10;
     wxFlexGridSizer* FlexGridSizer3;
+    wxFlexGridSizer* FlexGridSizer27;
     wxFlexGridSizer* FlexGridSizer5;
     wxFlexGridSizer* FlexGridSizer25;
     wxFlexGridSizer* FlexGridSizer22;
@@ -123,6 +132,7 @@ changesNeedRestart(false)
     wxStaticBoxSizer* StaticBoxSizer7;
     wxStaticBoxSizer* StaticBoxSizer13;
     wxStaticBoxSizer* StaticBoxSizer10;
+    wxFlexGridSizer* FlexGridSizer29;
     wxStaticBoxSizer* StaticBoxSizer8;
     wxStaticBoxSizer* StaticBoxSizer3;
     wxStaticBoxSizer* StaticBoxSizer6;
@@ -141,6 +151,7 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer11;
     wxFlexGridSizer* FlexGridSizer17;
     wxStaticBoxSizer* StaticBoxSizer5;
+    wxFlexGridSizer* FlexGridSizer28;
     wxFlexGridSizer* FlexGridSizer26;
 
     Create(parent, wxID_ANY, _("Préférences de Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX, _T("wxID_ANY"));
@@ -178,6 +189,7 @@ changesNeedRestart(false)
     StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Autosauvegarde"));
     FlexGridSizer10 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer19 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer19->AddGrowableCol(1);
     autosaveActivatedCheck = new wxCheckBox(Panel2, ID_CHECKBOX3, _("Faire une copie de sauvegarde des projets ouverts toutes les"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
     autosaveActivatedCheck->SetValue(false);
     FlexGridSizer19->Add(autosaveActivatedCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -337,6 +349,25 @@ changesNeedRestart(false)
     Panel4->SetSizer(FlexGridSizer16);
     FlexGridSizer16->Fit(Panel4);
     FlexGridSizer16->SetSizeHints(Panel4);
+    Panel8 = new wxPanel(Listbook1, ID_PANEL18, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL18"));
+    FlexGridSizer27 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer28 = new wxFlexGridSizer(0, 3, 0, 0);
+    StaticText17 = new wxStaticText(Panel8, ID_STATICTEXT17, _("Taille par défaut de la colonnes des conditions :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT17"));
+    FlexGridSizer28->Add(StaticText17, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    conditionsColumnWidthEdit = new wxTextCtrl(Panel8, ID_TEXTCTRL5, wxEmptyString, wxDefaultPosition, wxSize(65,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
+    FlexGridSizer28->Add(conditionsColumnWidthEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText18 = new wxStaticText(Panel8, ID_STATICTEXT18, _("pixels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT18"));
+    FlexGridSizer28->Add(StaticText18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer27->Add(FlexGridSizer28, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
+    StaticBoxSizer15 = new wxStaticBoxSizer(wxHORIZONTAL, Panel8, _("Couleurs des paramètres"));
+    FlexGridSizer29 = new wxFlexGridSizer(0, 3, 0, 0);
+    eventsEditorParametersProperties = new wxPropertyGrid(Panel8,ID_CUSTOM1,wxDefaultPosition,wxSize(342,168),0,_T("ID_CUSTOM1"));
+    FlexGridSizer29->Add(eventsEditorParametersProperties, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer15->Add(FlexGridSizer29, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer27->Add(StaticBoxSizer15, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Panel8->SetSizer(FlexGridSizer27);
+    FlexGridSizer27->Fit(Panel8);
+    FlexGridSizer27->SetSizeHints(Panel8);
     Panel7 = new wxPanel(Listbook1, ID_PANEL17, wxDefaultPosition, wxSize(463,247), wxTAB_TRAVERSAL, _T("ID_PANEL17"));
     FlexGridSizer23 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer23->AddGrowableCol(0);
@@ -373,6 +404,7 @@ changesNeedRestart(false)
     Listbook1->AddPage(Panel3, _("Répertoires"), false);
     Listbook1->AddPage(Panel6, _("Positionnements par défaut"), false);
     Listbook1->AddPage(Panel4, _("Apparence"), false);
+    Listbook1->AddPage(Panel8, _("Editeur d\'évènements"), false);
     Listbook1->AddPage(Panel7, _("Compilation C++"), false);
     FlexGridSizer1->Add(Listbook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
@@ -422,6 +454,7 @@ changesNeedRestart(false)
     imageList->Add(( wxBitmap( "res/layout.png", wxBITMAP_TYPE_ANY ) ) );
     imageList->Add(( wxBitmap( "res/looknfeel.png", wxBITMAP_TYPE_ANY ) ) );
     imageList->Add(( wxBitmap( "res/source_cpp24.png", wxBITMAP_TYPE_ANY ) ) );
+    imageList->Add(( wxBitmap( "res/events24.png", wxBITMAP_TYPE_ANY ) ) );
     Listbook1->AssignImageList(imageList);
 
     //Adding manually pages so as to specify image number
@@ -433,7 +466,17 @@ changesNeedRestart(false)
     Listbook1->AddPage(Panel3, _("Répertoires"), false, 2);
     Listbook1->AddPage(Panel6, _("Positionnements par défaut"), false, 3);
     Listbook1->AddPage(Panel4, _("Apparence"), false, 4);
+    Listbook1->AddPage(Panel8, _("Editeurs d'évènements"), false, 6);
     Listbook1->AddPage(Panel7, _("Compilation C++"), false, 5);
+
+    //Events editor parameters property grid
+    TranslateAction * eventsEditorConfig = TranslateAction::GetInstance();
+    for (std::map<std::string, TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
+    {
+        eventsEditorParametersProperties->Append( new wxColourProperty(it->first, wxPG_LABEL, eventsEditorConfig->typesFormatting[it->first].color) );
+        eventsEditorParametersProperties->Append( new wxBoolProperty(it->first+_(": Gras"), wxPG_LABEL, eventsEditorConfig->typesFormatting[it->first].bold) );
+        eventsEditorParametersProperties->Append( new wxBoolProperty(it->first+_(": Italique"), wxPG_LABEL, eventsEditorConfig->typesFormatting[it->first].italic) );
+    }
 
     wxConfigBase *pConfig = wxConfigBase::Get();
     {
@@ -615,6 +658,8 @@ changesNeedRestart(false)
         pConfig->Read("/Code/UseExternalEditor", &useExternalEditor, false);
         if ( useExternalEditor ) externalCodeEditorCheck->SetValue(true);
     }
+
+	conditionsColumnWidthEdit->SetValue(ToString(static_cast<int>(pConfig->ReadDouble("EventsEditor/ConditionColumnWidth", 350))));
 }
 
 Preferences::~Preferences()
@@ -735,6 +780,30 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     pConfig->Write("/Code/ExternalEditor", codeEditorEdit->GetValue());
     pConfig->Write("/Code/UseExternalEditor", externalCodeEditorCheck->GetValue());
+
+    TranslateAction * eventsEditorConfig = TranslateAction::GetInstance();
+    for (std::map<std::string, TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
+    {
+        if ( eventsEditorParametersProperties->GetProperty(it->first) != NULL)
+        {
+            wxFromString("rgb"+eventsEditorParametersProperties->GetProperty(it->first)->GetValueAsString(), &eventsEditorConfig->typesFormatting[it->first].color);
+        }
+
+        if ( eventsEditorParametersProperties->GetProperty(it->first+_(": Gras")) != NULL)
+        {
+            wxAny bold = eventsEditorParametersProperties->GetProperty(it->first+_(": Gras"))->GetValue();
+            eventsEditorConfig->typesFormatting[it->first].bold = wxANY_AS(bold, bool);
+        }
+
+        if ( eventsEditorParametersProperties->GetProperty(it->first+_(": Italique")) != NULL)
+        {
+            wxAny italic = eventsEditorParametersProperties->GetProperty(it->first+_(": Italique"))->GetValue();
+            eventsEditorConfig->typesFormatting[it->first].italic = wxANY_AS(italic, bool);
+        }
+    }
+
+    TranslateAction::GetInstance()->SaveTypesFormattingToConfig();
+	pConfig->Write("EventsEditor/ConditionColumnWidth", ToInt(ToString(conditionsColumnWidthEdit->GetValue())));
 
     EndModal( 1 );
 }

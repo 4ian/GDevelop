@@ -13,11 +13,10 @@
 Clipboard::Clipboard() :
 objectCopied(boost::shared_ptr<Object>()),
 hasObject(false),
-eventCopied(boost::shared_ptr<BaseEvent>()),
-hasEvent(false),
+hasEvents(false),
 hasExternalEvents(false),
-hasAction(false),
-hasCondition(false),
+hasInstructions(false),
+instructionsAreConditions(true),
 hasScene(false),
 hasObjectGroup(false),
 hasPositionsSelection(false)
@@ -59,15 +58,15 @@ ObjSPtr Clipboard::GetObject()
     return objectCopied;
 }
 
-void Clipboard::SetEvent( BaseEventSPtr event )
+void Clipboard::SetEvents( const std::vector<BaseEventSPtr> & events )
 {
-    eventCopied = event->Clone();
-    hasEvent = true;
+    eventsCopied = CloneVectorOfEvents(events);
+    hasEvents = true;
 }
 
-BaseEventSPtr Clipboard::GetEvent()
+std::vector<BaseEventSPtr> Clipboard::GetEvents()
 {
-    return eventCopied->Clone();
+    return CloneVectorOfEvents(eventsCopied);
 }
 
 void Clipboard::SetScene( const Scene & scene )
@@ -92,26 +91,18 @@ ExternalEvents Clipboard::GetExternalEvents()
     return externalEventsCopied;
 }
 
-void Clipboard::SetCondition( const Instruction & condition )
+void Clipboard::SetConditions( const std::vector<Instruction> & conditions )
 {
-    conditionCopied = condition;
-    hasCondition = true;
+    hasInstructions = true;
+    instructionsAreConditions = true;
+    instructionsCopied = conditions;
 }
 
-Instruction Clipboard::GetCondition()
+void Clipboard::SetActions( const std::vector<Instruction> & actions )
 {
-    return conditionCopied;
-}
-
-void Clipboard::SetAction( const Instruction & action )
-{
-    actionCopied = action ;
-    hasAction = true;
-}
-
-Instruction Clipboard::GetAction()
-{
-    return actionCopied;
+    hasInstructions = true;
+    instructionsAreConditions = false;
+    instructionsCopied = actions;
 }
 
 void Clipboard::SetObjectGroup( const ObjectGroup & group )

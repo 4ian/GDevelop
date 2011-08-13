@@ -8,6 +8,7 @@
 #include <wx/radiobox.h>
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
+#include <wx/propgrid/propgrid.h>
 #include <wx/statline.h>
 #include <wx/radiobut.h>
 #include <wx/panel.h>
@@ -51,8 +52,11 @@ class Preferences: public wxDialog
 		wxPanel* borderColorPnl;
 		wxStaticText* StaticText8;
 		wxStaticText* StaticText11;
+		wxStaticText* StaticText18;
 		wxTextCtrl* autosaveTimeEdit;
+		wxPanel* Panel8;
 		wxPanel* Panel1;
+		wxTextCtrl* conditionsColumnWidthEdit;
 		wxPanel* activeTextColorPnl;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
@@ -65,6 +69,7 @@ class Preferences: public wxDialog
 		wxStaticLine* StaticLine2;
 		wxPanel* ActifColorPnl;
 		wxCheckBox* GuideCheck;
+		wxPropertyGrid* eventsEditorParametersProperties;
 		wxListbook* Listbook1;
 		wxStaticText* StaticText5;
 		wxStaticText* StaticText7;
@@ -80,6 +85,7 @@ class Preferences: public wxDialog
 		wxTextCtrl* DossierTempCompEdit;
 		wxPanel* ribbonColor1Pnl;
 		wxPanel* ribbonColor2Pnl;
+		wxStaticText* StaticText17;
 		wxStaticText* StaticText4;
 		wxButton* browseCodeEditorBt;
 		wxButton* officeStyleBt;
@@ -141,6 +147,11 @@ class Preferences: public wxDialog
 		static const long ID_STATICTEXT12;
 		static const long ID_PANEL14;
 		static const long ID_PANEL8;
+		static const long ID_STATICTEXT17;
+		static const long ID_TEXTCTRL5;
+		static const long ID_STATICTEXT18;
+		static const long ID_CUSTOM1;
+		static const long ID_PANEL18;
 		static const long ID_STATICTEXT16;
 		static const long ID_BUTTON9;
 		static const long ID_RADIOBUTTON2;
@@ -178,6 +189,9 @@ class Preferences: public wxDialog
 		void OnlangChoiceSelect(wxCommandEvent& event);
 		void OncompilerToolchainBtClick(wxCommandEvent& event);
 		void OnbrowseCodeEditorBtClick(wxCommandEvent& event);
+		void OnobjectParamColorLeftUp(wxMouseEvent& event);
+		void OnautoParamColorLeftUp(wxMouseEvent& event);
+		void OnexpressionParamColorLeftUp(wxMouseEvent& event);
 		//*)
 		void SetSkinDefault();
 		void SetSkinOffice();

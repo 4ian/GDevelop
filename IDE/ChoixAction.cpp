@@ -652,8 +652,8 @@ void ChoixAction::RefreshFromAction()
             if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
             ParaEdit.at(i)->Show();
 
-            ParaBmpBt.at(i)->SetBitmapLabel( TranslateAction::BitmapFromType(instructionInfos.parameters[i].type) );
-            ParaBmpBt.at(i)->SetToolTip( TranslateAction::LabelFromType(instructionInfos.parameters[i].type) );
+            ParaBmpBt.at(i)->SetBitmapLabel( TranslateAction::GetInstance()->BitmapFromType(instructionInfos.parameters[i].type) );
+            ParaBmpBt.at(i)->SetToolTip( TranslateAction::GetInstance()->LabelFromType(instructionInfos.parameters[i].type) );
             ParaBmpBt.at(i)->Show( !instructionInfos.parameters[i].type.empty() );
 
             //De/activate widgets if parameter is optional

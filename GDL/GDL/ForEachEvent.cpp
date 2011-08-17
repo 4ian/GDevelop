@@ -9,6 +9,7 @@
 #include "GDL/tinyxml.h"
 #include "GDL/EventsCodeGenerator.h"
 #include "GDL/ExpressionsCodeGeneration.h"
+#include "GDL/EventsCodeNameMangler.h"
 #include "GDL/EventsCodeGenerationContext.h"
 #include <iostream>
 
@@ -72,8 +73,8 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
         outputCode += "std::vector<Object*> forEachObjects;";
         for (unsigned int i = 0;i<realObjects.size();++i)
         {
-            outputCode += "unsigned int forEachCount"+ToString(i)+" = "+realObjects[i]+"objects.size(); forEachTotalCount += forEachCount"+ToString(i)+";";
-            outputCode += "forEachObjects.insert("+ string(i == 0 ? "forEachObjects.begin()" : "forEachObjects.end()") +", "+realObjects[i]+"objects.begin(), "+realObjects[i]+"objects.end());";
+            outputCode += "unsigned int forEachCount"+ToString(i)+" = "+ManObjListName(realObjects[i])+".size(); forEachTotalCount += forEachCount"+ToString(i)+";";
+            outputCode += "forEachObjects.insert("+ string(i == 0 ? "forEachObjects.begin()" : "forEachObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
         }
     }
 
@@ -81,7 +82,7 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
 
     //For loop declaration
     if ( realObjects.size() == 1 ) //We write a slighty more simple ( and optimized ) output code when only one object list is used.
-        outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < "+realObjects[0]+"objects.size();++forEachIndex)\n";
+        outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < "+ManObjListName(realObjects[0])+".size();++forEachIndex)\n";
     else
         outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < forEachTotalCount;++forEachIndex)\n";
 
@@ -90,14 +91,14 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
     //Clear all concerned objects lists and keep only one object
     if ( realObjects.size() == 1 )
     {
-        outputCode += "std::vector<Object*> temporaryForEachList; temporaryForEachList.push_back("+realObjects[0]+"objects[forEachIndex]);";
-        outputCode += "std::vector<Object*> "+realObjects[0]+"objects = temporaryForEachList;\n";
+        outputCode += "std::vector<Object*> temporaryForEachList; temporaryForEachList.push_back("+ManObjListName(realObjects[0])+"[forEachIndex]);";
+        outputCode += "std::vector<Object*> "+ManObjListName(realObjects[0])+" = temporaryForEachList;\n";
     }
     else
     {
         //Declare all lists of concerned objects empty
         for (unsigned int j = 0;j<realObjects.size();++j)
-            outputCode += "std::vector<Object*> "+realObjects[j]+"objects;\n";
+            outputCode += "std::vector<Object*> "+ManObjListName(realObjects[j])+";\n";
 
         if (context.MapOfAllObjectsIsNeeded()) outputCode += "std::vector<Object*> * forEachCurrentList = NULL;";
 
@@ -112,8 +113,8 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
 
             if ( i != 0 ) outputCode += "else ";
             outputCode += "if (forEachIndex < "+count+") {\n";
-            outputCode += "    "+realObjects[i]+"objects.push_back(forEachObjects[forEachIndex]);\n";
-            if (context.MapOfAllObjectsIsNeeded()) "    forEachCurrentList = &"+realObjects[i]+"objects;\n";
+            outputCode += "    "+ManObjListName(realObjects[i])+".push_back(forEachObjects[forEachIndex]);\n";
+            if (context.MapOfAllObjectsIsNeeded()) "    forEachCurrentList = &"+ManObjListName(realObjects[i])+";\n";
             outputCode += "}\n";
         }
     }
@@ -122,7 +123,7 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
 
     if ( realObjects.size() == 1 )
     {
-        if ( context.MapOfAllObjectsIsNeeded() ) outputCode += "objectsListsMap[\""+realObjects[0]+"\"] = &"+realObjects[0]+"objects;\n";
+        if ( context.MapOfAllObjectsIsNeeded() ) outputCode += "objectsListsMap[\""+realObjects[0]+"\"] = &"+ManObjListName(realObjects[0])+";\n";
     }
     else
     {
@@ -232,14 +233,18 @@ void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdi
     int border = renderingHelper->instructionsListBorder;
     const int forEachTextHeight = 20;
 
-    //Draw event rectangle
-    wxRect rect(x, y, width, GetRenderedHeight(width));
-    renderingHelper->DrawNiceRectangle(dc, rect);
+    //Draw header rectangle
+    wxRect headerRect(x, y, width, forEachTextHeight);
+    renderingHelper->DrawNiceRectangle(dc, headerRect);
 
     //For Each text
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
-    dc.DrawText( _("Pour chaque objet") + " " + objectsToPick.GetPlainString() + _(", répéter :"), x + 2, y + 1 );
+    dc.DrawText( _("Pour chaque objet") + " " + objectsToPick.GetPlainString() + _(", répéter :"), x + 4, y + 3 );
+
+    //Draw conditions rectangle
+    wxRect rect(x, y+forEachTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-forEachTextHeight);
+    renderingHelper->DrawNiceRectangle(dc, rect);
 
     //Draw actions and conditions
     renderingHelper->DrawConditionsList(conditions, dc,

@@ -8,6 +8,8 @@ class RuntimeScene;
 
 float GD_API GetCameraX(RuntimeScene & scene, const std::string & layer, unsigned int camera);
 float GD_API GetCameraY(RuntimeScene & scene, const std::string & layer, unsigned int camera);
+void GD_API SetCameraX(RuntimeScene & scene, float x, const std::string & layer, unsigned int camera);
+void GD_API SetCameraY(RuntimeScene & scene, float y, const std::string & layer, unsigned int camera);
 double GD_API GetCameraAngle(RuntimeScene & scene, const std::string & layer, unsigned int camera);
 void GD_API SetCameraAngle(RuntimeScene & scene, float newValue, const std::string & layer, unsigned int camera);
 void GD_API SetCameraZoom(RuntimeScene & scene, float newZoom, const std::string & layer, unsigned int cameraNb);

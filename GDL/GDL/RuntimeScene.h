@@ -56,7 +56,6 @@ public:
     SoundManager *                          soundManager; ///< Pointer to the sound manager.
     #if defined(GD_IDE_ONLY)
     BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
-    BaseProfiler *                          profiler; ///< Pointer to the profiler. Can be NULL.
     #endif
     ObjInstancesHolder                      objectsInstances; ///< Contains all of the objects on the scene
     ListVariable                            variables; ///<List of the scene variables

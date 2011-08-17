@@ -158,6 +158,11 @@ public:
     EventItem GetEventAt(int x, int y);
 
     /**
+     * Return the rectangle used by the event at point(x,y).
+     */
+    wxRect GetAreaOfEventAt(int x, int y);
+
+    /**
      * True if a point is on an instruction.
      */
     bool IsOnInstruction(int x, int y);
@@ -176,6 +181,11 @@ public:
      * Return event at point (x,y). Be sure there is an event here using IsOnEvent(x,y);
      */
     InstructionListItem GetInstructionListAt(int x, int y);
+
+    /**
+     * Return the rectangle used by the instruction at point(x,y).
+     */
+    wxRect GetAreaOfInstructionAt(int x, int y);
 
     /**
      * Return the rectangle used by the list at point(x,y).

@@ -20,6 +20,7 @@ public:
     inline void AddObject(const ObjSPtr & object)
     {
         objectsInstances[object->GetName()].push_back(object);
+        objectsRawPointersInstances[object->GetName()].push_back(object.get());
     }
 
     /**
@@ -48,11 +49,6 @@ public:
     }
 
     /**
-     * Get a "raw pointers" list to all objects
-     */
-    std::vector<Object*> GetAllObjectsRawPointers();
-
-    /**
      * Remove an object
      *
      * \attention In an event, do not directly remove an object using this function, but make its name empty instead. Example :
@@ -68,6 +64,11 @@ public:
             ObjList & associatedList = it->second;
             associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());
         }
+        for (std::map<std::string, std::vector<Object*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
+        {
+            std::vector<Object*> & associatedList = it->second;
+            associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object.get()), associatedList.end());
+        }
     }
 
     /**
@@ -76,6 +77,7 @@ public:
     inline void RemoveObjects(const std::string & name)
     {
         objectsInstances[name].clear();
+        objectsRawPointersInstances[name].clear();
     }
 
     /**
@@ -104,12 +106,14 @@ public:
     inline void Clear()
     {
         objectsInstances.clear();
+        objectsRawPointersInstances.clear();
     }
 
 protected:
 private:
 
     std::map<std::string, ObjList> objectsInstances;
+    std::map<std::string, std::vector<Object*> > objectsRawPointersInstances;
 };
 
 #endif // OBJINSTANCESHOLDER_H

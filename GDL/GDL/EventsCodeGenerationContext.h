@@ -19,7 +19,7 @@ class Scene;
 class GD_API EventsCodeGenerationContext
 {
     public:
-        EventsCodeGenerationContext() : errorOccured(false), allObjectsMapNeeded(false),dynamicObjectsListsDeclaration(false),parentAlreadyUseDynamicDeclaration(false) {};
+        EventsCodeGenerationContext() : errorOccured(false), allObjectsMapNeeded(false),dynamicObjectsListsDeclaration(false),parentAlreadyUseDynamicDeclaration(false), contextReallyNeedAlreadyConcernedObjects(false) {};
         virtual ~EventsCodeGenerationContext() {};
 
         /**
@@ -87,7 +87,11 @@ class GD_API EventsCodeGenerationContext
         /**
          * Called when an instruction need dynamic object lists declaration ( CreateObject for example, and all instruction with a "listOfAlreadyPickedObjects" parameter ).
          */
-        void NeedObjectListsDynamicDeclaration() {dynamicObjectsListsDeclaration=true;}
+        void NeedObjectListsDynamicDeclaration()
+        {
+            dynamicObjectsListsDeclaration=true;
+            contextReallyNeedAlreadyConcernedObjects=true;  //We really need objectsAlreadyDeclared in code
+        }
 
         boost::shared_ptr< std::set<std::string> > includeFiles; ///< List of headers files used by instructions. A (shared) pointer is used so as context created from another one can share the same list.
 
@@ -107,6 +111,7 @@ class GD_API EventsCodeGenerationContext
 
         bool dynamicObjectsListsDeclaration; ///< Set this to true when object declaration must be dynamic: The next object lists will be declared empty, and a dynamic declaration wille be generated.
         bool parentAlreadyUseDynamicDeclaration;
+        bool contextReallyNeedAlreadyConcernedObjects; ///< Sometimes, when dynamicObjectsListsDeclaration is set to true owing to the parent context, the current context could then not use any dynamic declaration. We use this bool to know if we must really declare an "alreadyConcernedObjects" vector.
 
         std::string dynamicDeclaration; ///< String which is filled by dynamic declarations, if needed.
 };

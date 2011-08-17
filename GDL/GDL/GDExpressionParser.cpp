@@ -83,27 +83,10 @@ std::vector<GDExpression> CompleteParameters(const std::vector < ParameterInfo >
     return completeParameters;
 }
 
-bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, ParserCallbacks & callbacks, const size_t positionInExpression)
+bool GDExpressionParser::ValidSyntax(const std::string & str)
 {
-    callbacks.OnConstantToken(str);
-    return true;
-
     static const std::string numerics = "0123456789.e";
     static const std::string operators = "+/*-";
-
-    /*
-    if ( str.find_first_not_of(allowedCharacters) != std::string::npos )
-    {
-        #if defined(GD_IDE_ONLY)
-        firstErrorStr = _("Erreur de syntaxe");
-        firstErrorPos = positionInExpression+str.find_first_not_of(allowedCharacters);
-        #endif
-
-        return false;
-    }*/
-
-    bool precededByOtherToken = (positionInExpression != 0);
-    bool followedByOtherToken = (positionInExpression+str.length() < expressionPlainString.length());
 
     size_t parenthesisLevel = 0;
     std::string lastOperator;
@@ -113,17 +96,16 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
     bool parsingDecimalNumber = false;
     bool requestNumber = false;
     std::string lastNumber;
-    bool numberWasParsedLast = precededByOtherToken;
+    bool numberWasParsedLast = false;
 
     for (unsigned int parsePos = 0;parsePos<str.length();++parsePos)
     {
-        if ( str[parsePos] == ' ' )
+        if ( str[parsePos] == ' ' || str[parsePos] == '\n' )
         {
             if ( requestNumber )
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Nombre attendu");
-                firstErrorPos = positionInExpression+parsePos;
                 #endif
 
                 return false;
@@ -131,7 +113,7 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
 
             if ( parsingNumber )
             {
-                callbacks.OnNumber(lastNumber);
+                //callbacks.OnNumber(lastNumber);
                 parsingNumber = false;
                 parsingScientificNotationNumber = false;
                 parsingDecimalNumber = false;
@@ -150,7 +132,6 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorStr = _("Erreur de syntaxe");
-                    firstErrorPos = positionInExpression+parsePos;
                     #endif
 
                     return false;
@@ -160,7 +141,6 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorStr = _("Erreur de syntaxe dans la formation d'un nombre.");
-                    firstErrorPos = positionInExpression+parsePos;
                     #endif
 
                     return false;
@@ -175,7 +155,6 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorStr = _("Erreur de syntaxe dans la formation d'un nombre.");
-                    firstErrorPos = positionInExpression+parsePos;
                     #endif
 
                     return false;
@@ -189,7 +168,6 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Opérateur manquant devant un nombre");
-                firstErrorPos = positionInExpression+parsePos;
                 #endif
 
                 return false;
@@ -204,7 +182,6 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Nombre attendu");
-                firstErrorPos = positionInExpression+parsePos;
                 #endif
 
                 return false;
@@ -212,7 +189,7 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
 
             if ( parsingNumber )
             {
-                callbacks.OnNumber(lastNumber);
+                //callbacks.OnNumber(lastNumber);
                 parsingNumber = false;
                 parsingScientificNotationNumber = false;
                 parsingDecimalNumber = false;
@@ -224,33 +201,30 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Opérateur en trop avant la parenthèse.");
-                firstErrorPos = positionInExpression+parsePos;
                 #endif
 
                 return false;
             }
 
             if (parenthesisLevel>0) parenthesisLevel--;
-            /*else
+            else
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Parenthèse fermante en trop");
-                firstErrorPos = positionInExpression+parsePos;
                 #endif
 
                 return false;
-            }*/
+            }
 
             if ( str[parsePos-1] == '(' )
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Parenthèses vides");
-                firstErrorPos = positionInExpression+parsePos;
                 #endif
 
                 return false;
             }
-            callbacks.OnOperator(")");
+            //callbacks.OnOperator(")");
         }
         else if ( str[parsePos] == '(' )
         {
@@ -258,7 +232,6 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Nombre attendu");
-                firstErrorPos = positionInExpression+parsePos;
                 #endif
 
                 return false;
@@ -266,7 +239,7 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
 
             if ( parsingNumber )
             {
-                callbacks.OnNumber(lastNumber);
+                //callbacks.OnNumber(lastNumber);
                 parsingNumber = false;
                 parsingScientificNotationNumber = false;
                 parsingDecimalNumber = false;
@@ -278,7 +251,6 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
             {
                 #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Opérateur manquant devant une paranthèse");
-                firstErrorPos = positionInExpression+parsePos;
                 #endif
 
                 return false;
@@ -286,7 +258,7 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
 
             parenthesisLevel++;
             numberWasParsedLast = false;
-            callbacks.OnOperator("(");
+            //callbacks.OnOperator("(");
         }
         else if ( operators.find_first_of(str[parsePos]) != std::string::npos )
         {
@@ -301,7 +273,6 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorStr = _("Nombre attendu");
-                    firstErrorPos = positionInExpression+parsePos;
                     #endif
 
                     return false;
@@ -309,7 +280,7 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
 
                 if ( parsingNumber )
                 {
-                    callbacks.OnNumber(lastNumber);
+                    //callbacks.OnNumber(lastNumber);
                     parsingNumber = false;
                     parsingScientificNotationNumber = false;
                     parsingDecimalNumber = false;
@@ -321,13 +292,12 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
                 {
                     #if defined(GD_IDE_ONLY)
                     firstErrorStr = _("Opérateurs accolés sans nombres entre eux");
-                    firstErrorPos = positionInExpression+parsePos;
                     #endif
 
                     return false;
                 }
 
-                callbacks.OnOperator(str.substr(parsePos,1));
+                //callbacks.OnOperator(str.substr(parsePos,1));
                 numberWasParsedLast = false;
             }
         }
@@ -335,7 +305,6 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
         {
             #if defined(GD_IDE_ONLY)
             firstErrorStr = _("Erreur de syntaxe");
-            firstErrorPos = positionInExpression+parsePos;
             #endif
 
             return false;
@@ -344,7 +313,7 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
 
     if ( parsingNumber )
     {
-        callbacks.OnNumber(lastNumber);
+        //callbacks.OnNumber(lastNumber);
         parsingNumber = false;
         parsingScientificNotationNumber = false;
         parsingDecimalNumber = false;
@@ -355,37 +324,24 @@ bool GDExpressionParser::ParseNonFunctionsTokens(const std::string & str, Parser
     {
         #if defined(GD_IDE_ONLY)
         firstErrorStr = _("Nombre attendu");
-        firstErrorPos = positionInExpression+str.length();
         #endif
 
         return false;
     }
 
-    /*if ( parenthesisLevel != 0 )
+    if ( parenthesisLevel != 0 )
     {
         #if defined(GD_IDE_ONLY)
         firstErrorStr = _("Parenthèses mal formées");
-        firstErrorPos = positionInExpression;
-        #endif
-
-        return false;
-    }*/
-
-    if (followedByOtherToken && numberWasParsedLast)
-    {
-        #if defined(GD_IDE_ONLY)
-        firstErrorStr = _("Opérateur manquant");
-        firstErrorPos = positionInExpression+str.length();
         #endif
 
         return false;
     }
 
-    if (!followedByOtherToken && !numberWasParsedLast)
+    if (!numberWasParsedLast)
     {
         #if defined(GD_IDE_ONLY)
         firstErrorStr = _("Opérateur seul en fin d'expression");
-        firstErrorPos = positionInExpression+str.length();
         #endif
 
         return false;
@@ -404,6 +360,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
     size_t firstPointPos = expression.find(".");
     size_t firstParPos = expression.find("(");
 
+    std::string expressionWithoutFunctions;
     std::string nonFunctionToken;
     size_t nonFunctionTokenStartPos = std::string::npos;
 
@@ -568,13 +525,16 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
 
                 instruction.parameters = parameters;
 
-                if ( !ParseNonFunctionsTokens(nonFunctionToken+expression.substr(parsePosition, nameStart-parsePosition), callbacks, nonFunctionTokenStartPos != std::string::npos ? nonFunctionTokenStartPos : parsePosition) ) return false;
+                callbacks.OnConstantToken(nonFunctionToken+expression.substr(parsePosition, nameStart-parsePosition));
+                expressionWithoutFunctions += expression.substr(parsePosition, nameStart-parsePosition);
                 nonFunctionToken.clear();
                 nonFunctionTokenStartPos = std::string::npos;
 
                 if      ( objectFunctionFound ) callbacks.OnObjectFunction(functionName, instruction, instructionInfos);
                 else if ( automatismFunctionFound ) callbacks.OnObjectAutomatismFunction(functionName, instruction, instructionInfos);
                 else if ( staticFunctionFound ) callbacks.OnStaticFunction(functionName, instruction, instructionInfos);
+
+                if ( objectFunctionFound || automatismFunctionFound || staticFunctionFound ) expressionWithoutFunctions += "0";
 
                 parsePosition = parametersEnd+1;
                 firstPointPos = expression.find(".", parametersEnd+1);
@@ -583,6 +543,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
             else //Math function or math constant : Pass it.
             {
                 nonFunctionToken += expression.substr(parsePosition, functionNameEnd+1-parsePosition);
+                expressionWithoutFunctions += expression.substr(parsePosition, functionNameEnd+1-parsePosition);
                 nonFunctionTokenStartPos = (nonFunctionTokenStartPos != std::string::npos ? nonFunctionTokenStartPos : parsePosition);
                 parsePosition = functionNameEnd+1;
                 firstPointPos = expression.find(".", functionNameEnd+1);
@@ -592,6 +553,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
         else //Not a function call : Pass it
         {
             nonFunctionToken += expression.substr(parsePosition, nameEnd+1-parsePosition);
+            expressionWithoutFunctions += expression.substr(parsePosition, nameEnd+1-parsePosition);
             nonFunctionTokenStartPos = (nonFunctionTokenStartPos != std::string::npos ? nonFunctionTokenStartPos : parsePosition);
             parsePosition = nameEnd+1;
             firstPointPos = expression.find(".", nameEnd+1);
@@ -600,9 +562,11 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
     }
 
     if ( parsePosition < expression.length() || !nonFunctionToken.empty() )
-        if ( !ParseNonFunctionsTokens(nonFunctionToken+expression.substr(parsePosition, expression.length()), callbacks, nonFunctionTokenStartPos != std::string::npos ? nonFunctionTokenStartPos : parsePosition) ) return false;
+        callbacks.OnConstantToken(nonFunctionToken+expression.substr(parsePosition, expression.length()));
 
-    return true;
+    expressionWithoutFunctions += expression.substr(parsePosition, expression.length());
+
+    return ValidSyntax(expressionWithoutFunctions);
 }
 
 bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & scene, ParserCallbacks & callbacks)
@@ -731,8 +695,11 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 return false;
             }
 
-            GDExpression lastParameter(currentParameterStr);
-            parameters.push_back(lastParameter);
+            if ( currentParameterStr.find_first_not_of(" ") != string::npos ) //Add last parameter if needed
+            {
+                GDExpression lastParameter(currentParameterStr);
+                parameters.push_back(lastParameter);
+            }
 
             StrExpressionInstruction instruction;
             bool functionFound = false;
@@ -777,6 +744,9 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                     firstErrorPos = functionNameEnd;
                     firstErrorStr = _("Nombre de paramètres incorrect.");
                     #endif
+                    for (unsigned int i = 0;i<parameters.size();++i)
+                        cout << "Param:" << parameters[i].GetPlainString() << endl;
+
                     return false;
                 }
 

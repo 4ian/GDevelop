@@ -731,7 +731,7 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
             }
             else
             {
-                if ( i != 1 ) parametersStr += ",";
+                if ( !parametersStr.empty() ) parametersStr += ",";
                 parametersStr += ShowParameterDialog(infos->GetExpressionInfos().parameters[i], cancelled);
                 if ( cancelled ) return;
             }
@@ -752,7 +752,9 @@ void EditExpression::OnAddValBtClick(wxCommandEvent& event)
         string parametersStr;
         for (unsigned int i = 0;i<infos->GetExpressionInfos().parameters.size();++i)
         {
-            if ( i != 0 ) parametersStr += ",";
+            if ( infos->GetExpressionInfos().parameters[i].codeOnly ) continue;
+
+            if ( !parametersStr.empty() ) parametersStr += ",";
             bool userCancelled = false;
             parametersStr += ShowParameterDialog(infos->GetExpressionInfos().parameters[i], userCancelled);
             if ( userCancelled ) return;

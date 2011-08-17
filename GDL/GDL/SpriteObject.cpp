@@ -697,25 +697,20 @@ void SpriteObject::SetColor( unsigned int r, unsigned int v, unsigned int b )
 
 bool SpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
 {
-    for (unsigned int layerIndex = 0;layerIndex < scene.layers.size();++layerIndex)
+    for (unsigned int cameraIndex = 0;cameraIndex < scene.GetLayer(layer).GetCamerasNumber();++cameraIndex)
     {
-        for (unsigned int cameraIndex = 0;cameraIndex < scene.layers[layerIndex].GetCamerasNumber();++cameraIndex)
+        int mouseXInTheLayer = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).x;
+        int mouseYInTheLayer = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).y;
+
+        if  ( GetDrawableX() < mouseXInTheLayer &&
+            ( GetDrawableX() + GetWidth() ) > mouseXInTheLayer &&
+              GetDrawableY() < mouseYInTheLayer &&
+            ( GetDrawableY() + GetHeight() ) > mouseYInTheLayer )
         {
-            int mouseXInTheLayer = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), scene.layers[layerIndex].GetCamera(cameraIndex).GetSFMLView()).x;
-            int mouseYInTheLayer = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), scene.layers[layerIndex].GetCamera(cameraIndex).GetSFMLView()).y;
+            int ClicX = static_cast<int>( mouseXInTheLayer - GetDrawableX() );
+            int ClicY = static_cast<int>( mouseYInTheLayer - GetDrawableY() );
 
-            if  ( GetDrawableX() < mouseXInTheLayer &&
-                ( GetDrawableX() + GetWidth() ) > mouseXInTheLayer &&
-                  GetDrawableY() < mouseYInTheLayer &&
-                ( GetDrawableY() + GetHeight() ) > mouseYInTheLayer )
-            {
-                int ClicX = static_cast<int>( mouseXInTheLayer - GetDrawableX() );
-                int ClicY = static_cast<int>( mouseYInTheLayer - GetDrawableY() );
-
-                return ( !accurate || GetCurrentSFMLSprite().GetPixel( ClicX , ClicY ).a != 0 );
-            }
-            else
-                return false;
+            return ( !accurate || GetCurrentSFMLSprite().GetPixel( ClicX , ClicY ).a != 0 );
         }
     }
 

@@ -28,6 +28,7 @@
 #include "GDL/ProfileEvent.h"
 #include "GDL/BaseProfiler.h"
 #include "GDL/BaseDebugger.h"
+#include "GDL/ProfileTools.h"
 #endif
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
@@ -42,7 +43,6 @@ inputKeyPressed(false),
 game(game_),
 #if defined(GD_IDE_ONLY)
 debugger(NULL),
-profiler(NULL),
 #endif
 running(true),
 pauseTime(0),
@@ -87,7 +87,6 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     input = scene.input;
     #if defined(GD_IDE_ONLY)
     debugger = scene.debugger;
-    profiler = scene.profiler;
     #endif
     running = scene.running;
 
@@ -373,7 +372,7 @@ void RuntimeScene::Render()
     }
 
         //Internal profiler
-        /*#ifndef RELEASE
+        #ifndef RELEASE
         if ( renderWindow->GetInput().IsKeyDown(sf::Key::F2))
             CProfileManager::Reset();
 
@@ -383,7 +382,7 @@ void RuntimeScene::Render()
         int y = 0;
         DisplayProfile(renderWindow, iter, 0,y);
         CProfileManager::Increment_Frame_Counter();
-        #endif*/
+        #endif
 
     // Display window contents on screen
     renderWindow->RestoreGLStates();
@@ -542,6 +541,8 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     compiledEventsExecutionEngine = scene.compiledEventsExecutionEngine;
     compiledEventsExecutionEngine->llvmRuntimeContext->scene = this;
 
+    profiler = scene.profiler;
+
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;
     backgroundColorB = scene.backgroundColorB;
@@ -625,6 +626,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     }
 
     if ( stopSoundsOnStartup ) SoundManager::GetInstance()->ClearAllSoundsAndMusics();
+
 
     MessageLoading( "Loading finished", 100 );
 

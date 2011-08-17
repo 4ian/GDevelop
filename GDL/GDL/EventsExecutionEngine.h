@@ -1,6 +1,12 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef EVENTSEXECUTIONENGINE_H
 #define EVENTSEXECUTIONENGINE_H
 
+#include <string>
 #include <llvm/ADT/OwningPtr.h>
 #include <llvm/LLVMContext.h>
 namespace llvm
@@ -42,5 +48,16 @@ public:
 private:
     static bool llvmTargetsInitialized;
 };
+
+/**
+ * Blank function doing nothing used as a substitute for functions which were not found by JIT when generating machine code
+ */
+void GDEmptyFunctionDoingNothing();
+
+/**
+ * Called by llvm JIT when an unknown function is needed: As it should not happen, this function will warn the user about the error
+ * and will return a pointer to a blank function to prevent crash.
+ */
+void* UseSubstituteForUnknownFunctions(const std::string& name);
 
 #endif // EVENTSEXECUTIONENGINE_H

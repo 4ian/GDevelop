@@ -401,14 +401,15 @@ double Object::GetDistanceWithObject( const std::string & unused, Object * other
 
 void Object::SeparateObjectsWithoutForces( const string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists)
 {
-    std::vector<Object*> objects2;
-    std::map <std::string, std::vector<Object*> *>::const_iterator it = pickedObjectLists.begin();
-    for (;it!=pickedObjectLists.end();++it)
+    vector<Object*> objects2;
+    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
-        if ( it->second == NULL ) break;
-
-        std::vector<Object*> & list = *(it->second);
-        for (unsigned int i = 0;i<list.size();++i) objects2.push_back(list[i]);
+        if ( it->second != NULL )
+        {
+            objects2.reserve(objects2.size()+it->second->size());
+            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
+            it->second->clear();
+        }
     }
 
     for (unsigned int j = 0;j<objects2.size(); ++j)
@@ -447,14 +448,15 @@ void Object::SeparateObjectsWithoutForces( const string & , std::map <std::strin
 
 void Object::SeparateObjectsWithForces( const string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists)
 {
-    std::vector<Object*> objects2;
-    std::map <std::string, std::vector<Object*> *>::const_iterator it = pickedObjectLists.begin();
-    for (;it!=pickedObjectLists.end();++it)
+    vector<Object*> objects2;
+    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
-        if ( it->second == NULL ) break;
-
-        std::vector<Object*> & list = *(it->second);
-        for (unsigned int i = 0;i<list.size();++i) objects2.push_back(list[i]);
+        if ( it->second != NULL )
+        {
+            objects2.reserve(objects2.size()+it->second->size());
+            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
+            it->second->clear();
+        }
     }
 
     for (unsigned int j = 0;j<objects2.size(); ++j)

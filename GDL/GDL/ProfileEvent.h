@@ -32,20 +32,16 @@ class GD_API ProfileEvent : public BaseEvent
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new ProfileEvent(*this));}
 
         void SetPreviousProfileEvent( boost::shared_ptr<ProfileEvent> previousProfileEvent_ ) { previousProfileEvent = previousProfileEvent_; }
-        void SetClock( boost::shared_ptr<btClock> profileClock_ ) { profileClock = profileClock_; }
 
         virtual bool IsExecutable() const {return true;}
-        virtual void Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
-        void Stop();
+        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & context);
 
-        unsigned long int GetTime() const { return time; }
+        unsigned int index;
 
     private:
         void Init(const ProfileEvent & event);
 
-        boost::shared_ptr<btClock> profileClock;
         boost::shared_ptr<ProfileEvent> previousProfileEvent;
-        unsigned long int time;
 };
 
 #endif // PROFILEEVENT_H

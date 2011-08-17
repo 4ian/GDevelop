@@ -19,6 +19,9 @@ oglFOV(90.0f),
 oglZNear(1.0f),
 oglZFar(500.0f),
 stopSoundsOnStartup(true),
+#if defined(GD_IDE_ONLY)
+profiler(NULL),
+#endif
 compiledEventsExecutionEngine(boost::shared_ptr<EventsExecutionEngine>(new EventsExecutionEngine))
 #if defined(GD_IDE_ONLY)
 ,wasModified(false),
@@ -60,6 +63,10 @@ void Scene::Init(const Scene & scene)
     oglZNear = scene.oglZNear;
     oglZFar = scene.oglZFar;
     stopSoundsOnStartup = scene.stopSoundsOnStartup;
+
+    #if defined(GD_IDE_ONLY)
+    profiler = scene.profiler;
+    #endif
 
     events = CloneVectorOfEvents(scene.events);
 

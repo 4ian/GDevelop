@@ -302,7 +302,11 @@ void OpenSaveGame::OpenGameInformations(const TiXmlElement * elem)
         while (extensionsElem)
         {
             if ( extensionsElem->Attribute("name") )
-                game.extensionsUsed.push_back(extensionsElem->Attribute("name"));
+            {
+                std::string extensionName = extensionsElem->Attribute("name");
+                if ( find(game.extensionsUsed.begin(), game.extensionsUsed.end(), extensionName ) == game.extensionsUsed.end() )
+                    game.extensionsUsed.push_back(extensionName);
+            }
 
             extensionsElem = extensionsElem->NextSiblingElement();
         }

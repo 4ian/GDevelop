@@ -156,22 +156,18 @@ void RepeatEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdit
     int border = renderingHelper->instructionsListBorder;
     const int repeatTextHeight = 20;
 
-    //Draw event rectangle
-    wxRect rect(x, y, width, GetRenderedHeight(width));
-    renderingHelper->DrawNiceRectangle(dc, rect);
-
-    //"Repeat" text selection
-    /*if ( selected && repeatNumberExpressionSelected )
-    {
-        dc.SetBrush(renderingHelper->GetSelectedRectangleFillBrush());
-        dc.SetPen(renderingHelper->GetSelectedRectangleOutlinePen());
-        dc.DrawRectangle(x+1, y+1, width-2, repeatTextHeight-2);
-    }*/
+    //Draw header rectangle
+    wxRect headerRect(x, y, width, repeatTextHeight);
+    renderingHelper->DrawNiceRectangle(dc, headerRect);
 
     //Repeat text
     dc.SetFont( renderingHelper->GetNiceFont().Bold() );
     dc.SetTextForeground(wxColour(0,0,0));
-    dc.DrawText( _("Répéter") + " " + repeatNumberExpression.GetPlainString() + " " + _("fois :"), x + 5, y + 5 );
+    dc.DrawText( _("Répéter") + " " + repeatNumberExpression.GetPlainString() + " " + _("fois :"), x + 4, y + 3 );
+
+    //Draw conditions rectangle
+    wxRect rect(x, y+repeatTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-repeatTextHeight);
+    renderingHelper->DrawNiceRectangle(dc, rect);
 
     //Draw actions and conditions
     renderingHelper->DrawConditionsList(conditions, dc,

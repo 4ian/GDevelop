@@ -15,20 +15,23 @@ bool GD_API SpriteTurnedToward( std::string, std::string, std::map <std::string,
     vector<Object*> objects1;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
-        if ( it->second == NULL ) continue;
-
-        std::vector<Object*> & list = *(it->second);
-        for (unsigned int i = 0;i<list.size();++i) objects1.push_back(list[i]);
-        list.clear();
+        if ( it->second != NULL )
+        {
+            objects1.reserve(objects1.size()+it->second->size());
+            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects1));
+            it->second->clear();
+        }
     }
+
     vector<Object*> objects2;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
     {
-        if ( it->second == NULL ) continue;
-
-        std::vector<Object*> & list = *(it->second);
-        for (unsigned int i = 0;i<list.size();++i) objects2.push_back(list[i]);
-        list.clear();
+        if ( it->second != NULL )
+        {
+            objects2.reserve(objects2.size()+it->second->size());
+            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
+            it->second->clear();
+        }
     }
 
     bool isTrue = false;
@@ -102,21 +105,23 @@ bool GD_API SpriteCollision( std::string, std::string, std::map <std::string, st
     vector<Object*> objects1;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
-        if ( it->second == NULL ) continue;
-
-        std::vector<Object*> & list = *(it->second);
-        for (unsigned int i = 0;i<list.size();++i) objects1.push_back(list[i]);
-        list.clear();
+        if ( it->second != NULL )
+        {
+            objects1.reserve(objects1.size()+it->second->size());
+            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects1));
+            it->second->clear();
+        }
     }
 
     vector<Object*> objects2;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
     {
-        if ( it->second == NULL ) continue;
-
-        std::vector<Object*> & list = *(it->second);
-        for (unsigned int i = 0;i<list.size();++i) objects2.push_back(list[i]);
-        list.clear();
+        if ( it->second != NULL )
+        {
+            objects2.reserve(objects2.size()+it->second->size());
+            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
+            it->second->clear();
+        }
     }
 
     bool isTrue = false;

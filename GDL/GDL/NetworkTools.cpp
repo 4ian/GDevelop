@@ -69,7 +69,7 @@ void GD_API SendDataToPhpWebPage(const std::string & webpageurl,
     return;
 }
 
-void GD_API DownloadFile( std::string & host, std::string & uri, std::string & outputfilename )
+void GD_API DownloadFile( const std::string & host, const std::string & uri, const std::string & outputfilename )
 {
     // Create Http
     sf::Http Http;

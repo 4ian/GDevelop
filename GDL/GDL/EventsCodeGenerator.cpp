@@ -13,8 +13,12 @@
 #include "GDL/CommonInstructions.h"
 #include "GDL/CommonTools.h"
 #include "GDL/GDExpressionParser.h"
+#include "GDL/EventsCodeNameMangler.h"
 #include "GDL/EventsCodeGenerationContext.h"
 #include "GDL/ExpressionsCodeGeneration.h"
+
+#include "GDL/ProfileEvent.h"
+#include "GDL/BaseProfiler.h"
 
 using namespace std;
 
@@ -297,8 +301,8 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             context.AddIncludeFile(objInfo.optionalIncludeFile);
             string objectFunctionCallNamePart =
             ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ?
-                "static_cast<"+objInfo.cppClassName+"*>("+realObjectName+"objects[i])->"+instrInfos.cppCallingInformation.cppCallingName
-            :   realObjectName+"objects[i]->"+instrInfos.cppCallingInformation.cppCallingName;
+                "static_cast<"+objInfo.cppClassName+"*>("+ManObjListName(realObjectName)+"[i])->"+instrInfos.cppCallingInformation.cppCallingName
+            :   ManObjListName(realObjectName)+"[i]->"+instrInfos.cppCallingInformation.cppCallingName;
 
             //Create call
             string predicat;
@@ -320,7 +324,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             if ( condition.IsInverted() ) predicat = "!("+predicat+")";
 
             //Generate whole condition code
-            conditionCode += "for(unsigned int i = 0;i < "+realObjectName+"objects.size();)\n";
+            conditionCode += "for(unsigned int i = 0;i < "+ManObjListName(realObjectName)+".size();)\n";
             conditionCode += "{\n";
             conditionCode += "    if ( "+predicat+" )\n";
             conditionCode += "    {\n";
@@ -329,7 +333,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             conditionCode += "    }\n";
             conditionCode += "    else\n";
             conditionCode += "    {\n";
-            conditionCode += "        "+realObjectName+"objects.erase("+realObjectName+"objects.begin()+i);\n";
+            conditionCode += "        "+ManObjListName(realObjectName)+".erase("+ManObjListName(realObjectName)+".begin()+i);\n";
             conditionCode += "    }\n";
             conditionCode += "}\n";
             context.currentObject = "";
@@ -366,8 +370,8 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             context.AddIncludeFile(autoInfo.optionalIncludeFile);
             string objectFunctionCallNamePart =
             ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
-                "static_cast<"+autoInfo.cppClassName+"*>("+realObjectName+"objects[i]->GetAutomatismRawPointer(\""+condition.GetParameter(1).GetPlainString()+"\"))->"+instrInfos.cppCallingInformation.cppCallingName
-            :   realObjectName+"objects[i]->GetAutomatism(\""+condition.GetParameter(1).GetPlainString()+"\")->"+instrInfos.cppCallingInformation.cppCallingName;
+                "static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(realObjectName)+"[i]->GetAutomatismRawPointer(\""+condition.GetParameter(1).GetPlainString()+"\"))->"+instrInfos.cppCallingInformation.cppCallingName
+            :   ManObjListName(realObjectName)+"[i]->GetAutomatism(\""+condition.GetParameter(1).GetPlainString()+"\")->"+instrInfos.cppCallingInformation.cppCallingName;
 
             //Create call
             string predicat;
@@ -397,7 +401,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             }
             else
             {
-                conditionCode += "for(unsigned int i = 0;i < "+realObjectName+"objects.size();)\n";
+                conditionCode += "for(unsigned int i = 0;i < "+ManObjListName(realObjectName)+".size();)\n";
                 conditionCode += "{\n";
                 conditionCode += "    if ( "+predicat+" )\n";
                 conditionCode += "    {\n";
@@ -406,7 +410,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
                 conditionCode += "    }\n";
                 conditionCode += "    else\n";
                 conditionCode += "    {\n";
-                conditionCode += "        "+realObjectName+"objects.erase("+realObjectName+"objects.begin()+i);\n";
+                conditionCode += "        "+ManObjListName(realObjectName)+".erase("+ManObjListName(realObjectName)+".begin()+i);\n";
                 conditionCode += "    }\n";
                 conditionCode += "}";
             }
@@ -440,8 +444,8 @@ string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const 
                 outputCode += "condition"+ToString(i)+"IsTrue";
                 if (i == cId-1) outputCode += ") ";
             }
-            outputCode += context.GenerateOptionalInstructionLevelDeclarationCode();
             outputCode += "{\n";
+            outputCode += context.GenerateOptionalInstructionLevelDeclarationCode();
             outputCode += conditionCode;
             outputCode += "}\n";
         }
@@ -552,7 +556,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             //Add a static_cast if necessary
             const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
             context.AddIncludeFile(objInfo.optionalIncludeFile);
-            string objectPart = ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ? "static_cast<"+objInfo.cppClassName+"*>("+realObjectName+"objects[i])->" : realObjectName+"objects[i]->" ;
+            string objectPart = ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ? "static_cast<"+objInfo.cppClassName+"*>("+ManObjListName(realObjectName)+"[i])->" : ManObjListName(realObjectName)+"[i]->" ;
 
             //Create call
             string call;
@@ -575,7 +579,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
                 call = objectPart+instrInfos.cppCallingInformation.cppCallingName+"("+argumentsStr+")";
             }
 
-            actionCode += "for(unsigned int i = 0;i < "+realObjectName+"objects.size();++i)\n";
+            actionCode += "for(unsigned int i = 0;i < "+ManObjListName(realObjectName)+".size();++i)\n";
             actionCode += "{\n";
             actionCode += "    "+call+";\n";
             actionCode += "}\n";
@@ -613,8 +617,8 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             context.AddIncludeFile(autoInfo.optionalIncludeFile);
             string objectPart =
             ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
-                "static_cast<"+autoInfo.cppClassName+"*>("+realObjectName+"objects[i]->GetAutomatismRawPointer(\""+action.GetParameter(1).GetPlainString()+"\"))->"
-            :   realObjectName+"objects[i]->GetAutomatismRawPointer(\""+action.GetParameter(1).GetPlainString()+"\")->";
+                "static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(realObjectName)+"[i]->GetAutomatismRawPointer(\""+action.GetParameter(1).GetPlainString()+"\"))->"
+            :   ManObjListName(realObjectName)+"[i]->GetAutomatismRawPointer(\""+action.GetParameter(1).GetPlainString()+"\")->";
 
             //Create call
             string call;
@@ -646,7 +650,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             }
             else
             {
-                actionCode += "for(unsigned int i = 0;i < "+realObjectName+"objects.size();++i)\n";
+                actionCode += "for(unsigned int i = 0;i < "+ManObjListName(realObjectName)+".size();++i)\n";
                 actionCode += "{\n";
                 actionCode += "    "+call+";\n";
                 actionCode += "}\n";
@@ -724,7 +728,10 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
         {
             argOutput += parameters[pNb].GetPlainString() == "=" ? "==" :parameters[pNb].GetPlainString();
             if ( argOutput != "==" && argOutput != "<" && argOutput != ">" && argOutput != "<=" && argOutput != ">=" && argOutput != "!=")
-                cout << "Warning: Bad relational operator." << endl;
+            {
+                cout << "Warning: Bad relational operator: Set to == by default." << endl;
+                argOutput = "==";
+            }
 
             argOutput = "\""+argOutput+"\"";
         }
@@ -732,7 +739,10 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
         {
             argOutput += parameters[pNb].GetPlainString();
             if ( argOutput != "=" && argOutput != "+" && argOutput != "-" && argOutput != "/" && argOutput != "*")
-                cout << "Warning: Bad operator." << endl;
+            {
+                cout << "Warning: Bad operator: Set to = by default." << endl;
+                argOutput = "=";
+            }
 
             argOutput = "\""+argOutput+"\"";
         }
@@ -793,7 +803,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 for (unsigned int i = 0;i<realObjects.size();++i)
                 {
                     context.ObjectNeeded(realObjects[i]);
-                    argOutput += ".AddObjectListToMap(\""+realObjects[i]+"\", "+realObjects[i]+"objects)";
+                    argOutput += ".AddObjectListToMap(\""+realObjects[i]+"\", "+ManObjListName(realObjects[i])+")";
                 }
                 argOutput += ".ReturnObjectListsMap()";
             }
@@ -825,7 +835,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 for (unsigned int i = 0;i<realObjects.size();++i)
                 {
                     context.EmptyObjectsListNeeded(realObjects[i]);
-                    argOutput += ".AddObjectListToMap(\""+realObjects[i]+"\", "+realObjects[i]+"objects)";
+                    argOutput += ".AddObjectListToMap(\""+realObjects[i]+"\", "+ManObjListName(realObjects[i])+")";
                 }
                 argOutput += ".ReturnObjectListsMap()";
             }
@@ -855,14 +865,14 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() )
                 {
                     //If object currently used by instruction is available, use it directly.
-                    argOutput += context.currentObject+"objects[i]";
+                    argOutput += ManObjListName(context.currentObject)+"[i]";
                 }
                 else
                 {
                     for (unsigned int i = 0;i<realObjects.size();++i)
                     {
                         context.ObjectNeeded(realObjects[i]);
-                        argOutput += "(!"+realObjects[i]+"objects.empty() ? "+realObjects[i]+"objects[0] : ";
+                        argOutput += "(!"+ManObjListName(realObjects[i])+".empty() ? "+ManObjListName(realObjects[i])+"[0] : ";
                     }
                     argOutput += "NULL";
                     for (unsigned int i = 0;i<realObjects.size();++i)
@@ -958,7 +968,7 @@ string EventsCodeGenerator::GenerateEventsCompleteCode(const Game & game, const 
         output += "#include \""+*include+"\"\n";
 
     output +=
-    "#include <stdio.h>\n#include <vector>\n#include <map>\n#include <string>\n#include <stdio.h>\n#include \"GDL/RuntimeContext.h\"\n#include \"GDL/Object.h\"\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
+    "\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
 
     for ( set<string>::iterator declaration = context.customGlobalDeclaration->begin() ; declaration != context.customGlobalDeclaration->end(); ++declaration )
         output += *declaration+"\n";
@@ -1031,9 +1041,8 @@ void EventsCodeGenerator::DeleteUselessEvents(vector < BaseEventSPtr > & events)
  */
 void EventsCodeGenerator::PreprocessEventList( const Game & game, const Scene & scene, vector < BaseEventSPtr > & listEvent )
 {
-    #if defined(GD_IDE_ONLYdeactivated)
+    #if defined(GD_IDE_ONLY)
     boost::shared_ptr<ProfileEvent> previousProfileEvent;
-    boost::shared_ptr<btClock> clock = boost::shared_ptr<btClock>(new btClock);
     #endif
 
     for ( unsigned int i = 0;i < listEvent.size();++i )
@@ -1042,12 +1051,11 @@ void EventsCodeGenerator::PreprocessEventList( const Game & game, const Scene & 
         if ( listEvent[i]->CanHaveSubEvents() )
             PreprocessEventList( game, scene, listEvent[i]->GetSubEvents());
 
-        #if defined(GD_IDE_ONLYdeactivated)
-        if ( profiler && profiler->profilingActivated && listEvent[i]->IsExecutable() )
+        #if defined(GD_IDE_ONLY)
+        if ( scene.profiler && scene.profiler->profilingActivated && listEvent[i]->IsExecutable() )
         {
             //Define a new profile event
             boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
-            profileEvent->SetClock(clock);
             profileEvent->originalEvent = listEvent[i]->originalEvent;
             profileEvent->SetPreviousProfileEvent(previousProfileEvent);
 
@@ -1059,15 +1067,14 @@ void EventsCodeGenerator::PreprocessEventList( const Game & game, const Scene & 
         }
         #endif
     }
-    #if defined(GD_IDE_ONLYdeactivated)
-    if ( profiler && profiler->profilingActivated )
+    #if defined(GD_IDE_ONLY)
+    if ( scene.profiler && scene.profiler->profilingActivated )
     {
         //Define a new profile event
         boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
-        profileEvent->SetClock(clock);
         profileEvent->SetPreviousProfileEvent(previousProfileEvent);
 
-        //Add it before the event to profile
+        //Add it at the end of the events list
         listEvent.push_back(profileEvent);
     }
     #endif

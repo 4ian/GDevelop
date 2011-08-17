@@ -34,8 +34,8 @@ CameraExtension::CameraExtension()
 
     DECLARE_CONDITION("CameraY",
                    _("Position Y de la caméra"),
-                   _("Teste si la valeur de la position Y de la caméra\ncorrespond au test effectué."),
-                   _("La position Y de la caméra _PARAM4_ est _PARAM2_ à _PARAM1_ ( Calque : _PARAM3_ )"),
+                   _("Modifie la position Y de la caméra indiquée."),
+                   _("Faire _PARAM2__PARAM1_ à la position Y de la caméra _PARAM4_ ( Calque : _PARAM3_ )"),
                    _("Calques et caméras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
@@ -49,6 +49,42 @@ CameraExtension::CameraExtension()
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraY").SetManipulatedType("number").SetIncludeFile("GDL/RuntimeSceneCameraTools.h");
 
     DECLARE_END_CONDITION()
+
+    DECLARE_ACTION("CameraX",
+                   _("Position X de la caméra"),
+                   _("Modifie la position X de la caméra indiquée."),
+                   _("Faire _PARAM2__PARAM1_ à la position X de la caméra _PARAM4_ ( Calque : _PARAM3_ )"),
+                   _("Calques et caméras"),
+                   "res/conditions/camera24.png",
+                   "res/conditions/camera.png");
+
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Valeur"), "",false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
+        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetCameraX").SetManipulatedType("number").SetAssociatedGetter("GetCameraX").SetIncludeFile("GDL/RuntimeSceneCameraTools.h");
+
+    DECLARE_END_ACTION()
+
+    DECLARE_ACTION("CameraY",
+                   _("Position Y de la caméra"),
+                   _("Teste si la valeur de la position Y de la caméra\ncorrespond au test effectué."),
+                   _("La position Y de la caméra _PARAM4_ est _PARAM2_ à _PARAM1_ ( Calque : _PARAM3_ )"),
+                   _("Calques et caméras"),
+                   "res/conditions/camera24.png",
+                   "res/conditions/camera.png");
+
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("expression", _("Valeur"), "",false);
+        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
+        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",false).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",false).SetDefaultValue("0");
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetCameraY").SetManipulatedType("number").SetAssociatedGetter("GetCameraY").SetIncludeFile("GDL/RuntimeSceneCameraTools.h");
+
+    DECLARE_END_ACTION()
 
     DECLARE_CONDITION("CameraWidth",
                    _("Largeur d'une caméra"),
@@ -207,7 +243,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
         instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("SetCameraZoom").SetAssociatedGetter("GetCameraZoom").SetManipulatedType("number").SetIncludeFile("GDL/RuntimeSceneCameraTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("SetCameraZoom").SetIncludeFile("GDL/RuntimeSceneCameraTools.h");
 
     DECLARE_END_ACTION()
 
@@ -226,7 +262,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("expression", _("Coté haut gauche de la limite : Position Y"), "",false);
         instrInfo.AddParameter("expression", _("Coté bas droit de la limite : Position X"), "",false);
         instrInfo.AddParameter("expression", _("Coté bas droit de la limite : Position Y"), "",false);
-        instrInfo.AddParameter("yesorno", _("Anticiper le déplacement de l'objet ( oui par défaut )"), "",true);
+        instrInfo.AddParameter("yesorno", _("Anticiper le déplacement de l'objet ( oui par défaut )"), "",true).SetDefaultValue("true");
         instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
         instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
 
@@ -245,7 +281,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddParameter("object", _("Objet"), "", false);
         instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
-        instrInfo.AddParameter("yesorno", _("Anticiper le déplacement de l'objet ( oui par défaut )"), "",true);
+        instrInfo.AddParameter("yesorno", _("Anticiper le déplacement de l'objet ( oui par défaut )"), "",true).SetDefaultValue("true");
         instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
         instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
 
@@ -295,7 +331,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",false).SetDefaultValue("\"\"");
 
-        instrInfo.cppCallingInformation.SetFunctionName("IsLayerVisible").SetIncludeFile("GDL/RuntimeSceneTools.h");;
+        instrInfo.cppCallingInformation.SetFunctionName("LayerVisible").SetIncludeFile("GDL/RuntimeSceneTools.h");;
 
     DECLARE_END_CONDITION()
 

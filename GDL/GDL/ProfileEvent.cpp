@@ -6,11 +6,16 @@
 #if defined(GD_IDE_ONLY)
 
 #include "ProfileEvent.h"
+#include "GDL/ProfileTools.h"
+#include "GDL/CommonTools.h"
+#include "GDL/Scene.h"
+#include "GDL/EventsCodeGenerationContext.h"
+#include "GDL/BaseProfiler.h"
 #include <iostream>
 
 ProfileEvent::ProfileEvent() :
 BaseEvent(),
-time(0)
+index(0)
 {
 }
 
@@ -18,19 +23,23 @@ ProfileEvent::~ProfileEvent()
 {
 }
 
-/**
- * Execution launch the timer
- */
-void ProfileEvent::Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
+std::string ProfileEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & context)
 {
-    if ( previousProfileEvent ) previousProfileEvent->Stop();
-    if ( profileClock ) profileClock->reset();
-}
+    context.AddIncludeFile("GDL/ProfileTools.h");
 
-void ProfileEvent::Stop()
-{
-    if ( profileClock )
-        time += profileClock->getTimeMicroseconds();
+    ProfileLink profileLink;
+    profileLink.originalEvent = originalEvent;
+    scene.profiler->profileEventsInformation.push_back(profileLink);
+    index = scene.profiler->profileEventsInformation.size()-1;
+
+    std::string code;
+
+    if ( previousProfileEvent )
+        code += "EndProfileTimer(*runtimeContext->scene, "+ToString(previousProfileEvent->index)+");\n";
+
+    code += "StartProfileTimer(*runtimeContext->scene, "+ToString(index)+");\n";
+
+    return code;
 }
 
 /**
@@ -39,9 +48,7 @@ void ProfileEvent::Stop()
  */
 void ProfileEvent::Init(const ProfileEvent & event)
 {
-    profileClock = event.profileClock;
     previousProfileEvent = event.previousProfileEvent;
-    time = event.time;
 }
 
 /**

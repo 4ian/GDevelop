@@ -65,6 +65,7 @@
 #include "GDL/Event.h"
 #include "GDL/EventsCodeGenerator.h"
 #include "GDL/EventsExecutionEngine.h"
+#include "GDL/BaseProfiler.h"
 #include "GDL/CommonTools.h"
 
 using namespace std;
@@ -93,7 +94,6 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     Args.push_back("-includeinclude/GDL/GDL/RuntimePrecompiledHeader.h");
     Args.push_back(eventsFile.c_str());
     Args.push_back("-fsyntax-only");
-    Args.push_back("-ferror-limit 5");
     Args.push_back("-w");
     //Headers
     for (std::set<std::string>::const_iterator header = headersDirectories.begin();header != headersDirectories.end();++header)
@@ -157,7 +157,7 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
                                        CCArgs.size(),
                                        Diags);
 
-    if (true)
+    if (false)
     {
         llvm::errs() << "clang invocation:\n";
         C->PrintJob(llvm::errs(), C->getJobs(), "\n", true);
@@ -224,6 +224,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
             else
             {
                 cout << "Generating C++ code...\n";
+                sceneCopy.profiler->profileEventsInformation.clear();
                 EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.events);
                 EventsCodeGenerator::DeleteUselessEvents(sceneCopy.events);
                 std::string eventsOutput = EventsCodeGenerator::GenerateEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.events);
@@ -301,15 +302,11 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                                             llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(executionEngine->llvmModule->getOrInsertGlobal("pointerToRuntimeContext", llvm::TypeBuilder<void*, false>::get(executionEngine->llvmModule->getContext())));
                                             executionEngine->llvmExecutionEngine->addGlobalMapping(globalValue, &executionEngine->llvmRuntimeContext);
 
-                                            /*for (llvm::Module::iterator I = executionEngine->llvmModule->begin(), E = executionEngine->llvmModule->end(); I != E; ++I)
-                                              if (I->isDeclaration())
-                                                cout << &*I << "not defined (" << (*I).getNameStr() << endl;
-
-                                            for (llvm::Module::global_iterator I = executionEngine->llvmModule->global_begin(),
-                                                                         E = executionEngine->llvmModule->global_end();
-                                                 I != E; ++I)
-                                              if (I->isDeclaration())
-                                                cout << &*I << "not defined (" << (*I).getNameStr() << endl;*/
+                                            // Using this, warnAboutUnknownFunctions is called if we need to generate code for an unknown function.
+                                            // As each function should normally be provided by extensions or gd, no such unknown function should exists.
+                                            // If warnAboutUnknownFunctions is called, it will prevent LLVM from crashing by returning a dummy function, and
+                                            // will warn the user about this problem.
+                                            executionEngine->llvmExecutionEngine->InstallLazyFunctionCreator(UseSubstituteForUnknownFunctions);
 
                                             cout << "JIT Compilation to machine code...\n";
                                             sf::Clock jitTimer;
@@ -385,7 +382,7 @@ void EventsCodeCompiler::AddPendingTask(const Task & task)
             return; //There is already a pending task to compile scene events
     }
 
-    if ( currentTask->GetScene() == task.scene )
+    if ( currentTask != boost::shared_ptr<Worker>() && currentTask->GetScene() == task.scene )
     {
         std::cout << "Trying to abort as soon as possible compilation." << endl;
         currentTask->abort = true;

@@ -12,6 +12,7 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/Scene.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/EventsCodeNameMangler.h"
 #include "GDL/EventsCodeGenerationContext.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
@@ -78,7 +79,7 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
     if ( functionName.empty() )
     {
         if ( instruction.parameters.empty() ) return;
-        plainExpression += "\""+EventsCodeGenerator::ConvertToCppString(instruction.parameters[0].GetPlainString())+"\"";
+        plainExpression += "std::string(\""+EventsCodeGenerator::ConvertToCppString(instruction.parameters[0].GetPlainString())+"\")";
 
         return;
     }
@@ -147,16 +148,16 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         if ( context.currentObject == realObjects[i] )
         {
             if ( !castNeeded )
-                output = "("+realObjects[i]+"objects[i]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "("+ManObjListName(realObjects[i])+"[i]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
             else
-                output = "(static_cast<"+objInfo.cppClassName+"*>("+realObjects[i]+"objects[i])->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "(static_cast<"+objInfo.cppClassName+"*>("+ManObjListName(realObjects[i])+"[i])->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
         }
         else
         {
             if ( !castNeeded )
-                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" :"+ realObjects[i]+"objects[0]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "(( "+ManObjListName(realObjects[i])+".empty() ) ? "+output+" :"+ ManObjListName(realObjects[i])+"[0]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
             else
-                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" : "+"static_cast<"+objInfo.cppClassName+"*>("+realObjects[i]+"objects[0])->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "(( "+ManObjListName(realObjects[i])+".empty() ) ? "+output+" : "+"static_cast<"+objInfo.cppClassName+"*>("+ManObjListName(realObjects[i])+"[0])->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
         }
     }
 
@@ -215,16 +216,16 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         if ( context.currentObject == realObjects[i] )
         {
             if ( !castNeeded )
-                output = "("+realObjects[i]+"objects[i]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "("+ManObjListName(realObjects[i])+"[i]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
             else
-                output = "(static_cast<"+objInfo.cppClassName+"*>("+realObjects[i]+"objects[i])->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "(static_cast<"+objInfo.cppClassName+"*>("+ManObjListName(realObjects[i])+"[i])->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
         }
         else
         {
             if ( !castNeeded )
-                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" :"+ realObjects[i]+"objects[0]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "(( "+ManObjListName(realObjects[i])+".empty() ) ? "+output+" :"+ ManObjListName(realObjects[i])+"[0]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
             else
-                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" : "+"static_cast<"+objInfo.cppClassName+"*>("+realObjects[i]+"objects[0])->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "(( "+ManObjListName(realObjects[i])+".empty() ) ? "+output+" : "+"static_cast<"+objInfo.cppClassName+"*>("+ManObjListName(realObjects[i])+"[0])->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
         }
     }
 
@@ -283,16 +284,16 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         if ( context.currentObject == realObjects[i] )
         {
             if ( !castNeeded )
-                output = "("+realObjects[i]+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "("+ManObjListName(realObjects[i])+"[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
             else
-                output = "(static_cast<"+autoInfo.cppClassName+"*>("+realObjects[i]+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "(static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(realObjects[i])+"[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
         }
         else
         {
             if ( !castNeeded )
-                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" :"+realObjects[i]+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "(( "+ManObjListName(realObjects[i])+".empty() ) ? "+output+" :"+ManObjListName(realObjects[i])+"[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
             else
-                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" : "+"static_cast<"+autoInfo.cppClassName+"*>("+realObjects[i]+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "(( "+ManObjListName(realObjects[i])+".empty() ) ? "+output+" : "+"static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(realObjects[i])+"[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
         }
     }
 
@@ -351,16 +352,16 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         if ( context.currentObject == realObjects[i] )
         {
             if ( !castNeeded )
-                output = "("+realObjects[i]+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "("+ManObjListName(realObjects[i])+"[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
             else
-                output = "(static_cast<"+autoInfo.cppClassName+"*>("+realObjects[i]+"objects[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "(static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(realObjects[i])+"[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
         }
         else
         {
             if ( !castNeeded )
-                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" :"+realObjects[i]+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "(( "+ManObjListName(realObjects[i])+".empty() ) ? "+output+" :"+ManObjListName(realObjects[i])+"[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
             else
-                output = "(( "+realObjects[i]+"objects.empty() ) ? "+output+" : "+"static_cast<"+autoInfo.cppClassName+"*>("+realObjects[i]+"objects[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
+                output = "(( "+ManObjListName(realObjects[i])+".empty() ) ? "+output+" : "+"static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(realObjects[i])+"[0]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\"))->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
         }
     }
 

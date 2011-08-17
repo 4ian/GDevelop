@@ -6,6 +6,16 @@
 
 #include "BaseProfiler.h"
 
+void ProfileLink::Reset()
+{
+    profileClock.reset();
+}
+
+void ProfileLink::Stop()
+{
+    time += profileClock.getTimeMicroseconds();
+}
+
 BaseProfiler::BaseProfiler() :
 profilingActivated(false),
 lastEventsTime(0),

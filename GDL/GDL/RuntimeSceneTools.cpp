@@ -99,81 +99,61 @@ void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std
     if ( mapOfAllObjectLists[objectWanted] != NULL && find(mapOfAllObjectLists[objectWanted]->begin(), mapOfAllObjectLists[objectWanted]->end(), newObject.get()) == mapOfAllObjectLists[objectWanted]->end() )
         mapOfAllObjectLists[objectWanted]->push_back( newObject.get() );
 }
-
-
-bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, std::vector<std::string> & alreadyDeclaredObjects, const std::string & objectName)
+void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> mapOfAllObjectLists, int useless, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
 {
-    vector< ObjectGroup >::const_iterator globalGroup = find_if(scene.game->objectGroups.begin(), scene.game->objectGroups.end(), bind2nd(HasTheSameName(), objectName));
-    vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
+    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
+    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->globalObjects.begin(), scene.game->globalObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
 
-    std::vector<std::string> realObjects; //With groups, we may have more than one object list.
-    if ( globalGroup != scene.game->objectGroups.end() )
-        realObjects = (*globalGroup).GetAllObjectsNames();
-    else if ( sceneGroup != scene.objectGroups.end() )
-        realObjects = (*sceneGroup).GetAllObjectsNames();
+    ObjSPtr newObject = boost::shared_ptr<Object> ();
+
+    if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
+        newObject = (*sceneObject)->Clone();
+    else if ( globalObject != scene.game->globalObjects.end() ) //Then the global object list
+        newObject = (*globalObject)->Clone();
     else
-        realObjects.push_back(objectName);
+        return;
 
-    std::vector<Object*> allObjects;
-    for (unsigned int i = 0;i<realObjects.size();++i)
+    //Ajout à la liste d'objet et configuration de sa position
+    newObject->SetX( positionX );
+    newObject->SetY( positionY );
+    newObject->LoadRuntimeResources(scene, *scene.game->imageManager);
+
+    newObject->SetLayer( layer );
+
+    //Add object to scene and let it be concerned by futures actions
+    scene.objectsInstances.AddObject(newObject);
+    if ( mapOfAllObjectLists[objectWanted] != NULL && find(mapOfAllObjectLists[objectWanted]->begin(), mapOfAllObjectLists[objectWanted]->end(), newObject.get()) == mapOfAllObjectLists[objectWanted]->end() )
+        mapOfAllObjectLists[objectWanted]->push_back( newObject.get() );
+}
+
+
+bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int, const std::string &)
+{
+    for (std::map <std::string, std::vector<Object*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
-        if ( pickedObjectLists[realObjects[i]] != NULL )
+        if ( it->second != NULL )
         {
-            std::vector<Object*> objectsOnScene = scene.objectsInstances.GetObjectsRawPointers(realObjects[i]);
+            std::vector<Object*> objectsOnScene = scene.objectsInstances.GetObjectsRawPointers(it->first);
 
             for (unsigned int j = 0;j<objectsOnScene.size();++j)
             {
-                if ( find(pickedObjectLists[realObjects[i]]->begin(), pickedObjectLists[realObjects[i]]->end(), objectsOnScene[j]) == pickedObjectLists[realObjects[i]]->end() )
-                    pickedObjectLists[realObjects[i]]->push_back(objectsOnScene[j]);
+                if ( find(it->second->begin(), it->second->end(), objectsOnScene[j]) == it->second->end() )
+                    it->second->push_back(objectsOnScene[j]);
             }
         }
-
-        if ( find(alreadyDeclaredObjects.begin(), alreadyDeclaredObjects.end(), realObjects[i]) == alreadyDeclaredObjects.end() )
-            alreadyDeclaredObjects.push_back(realObjects[i]);
     }
 
     return true;
 }
 
-bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, std::vector<std::string> & alreadyDeclaredObjects, const std::string & objectName)
+bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int useless, const std::string & objectName)
 {
-    //Get name of objects concerned by the instruction
-    vector< ObjectGroup >::const_iterator globalGroup = find_if(scene.game->objectGroups.begin(), scene.game->objectGroups.end(), bind2nd(HasTheSameName(), objectName));
-    vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
-
-    std::vector<std::string> realObjects; //With groups, we may have more than one object list.
-    if ( globalGroup != scene.game->objectGroups.end() )
-        realObjects = (*globalGroup).GetAllObjectsNames();
-    else if ( sceneGroup != scene.objectGroups.end() )
-        realObjects = (*sceneGroup).GetAllObjectsNames();
-    else
-        realObjects.push_back(objectName);
-
-    //Check if object(s) are already concerned by previous instructions
-    bool objectsAlreadyConcerned = false;
-    for (unsigned int i = 0;i<realObjects.size();++i)
-    {
-        if ( find(alreadyDeclaredObjects.begin(), alreadyDeclaredObjects.end(), realObjects[i]) != alreadyDeclaredObjects.end() )
-            objectsAlreadyConcerned = true;
-    }
-
     //Create a list with all objects
     std::vector<Object*> allObjects;
-    for (unsigned int i = 0;i<realObjects.size();++i)
+    for (std::map <std::string, std::vector<Object*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
-        std::vector<Object*> objectsOnScene;
-        if ( !objectsAlreadyConcerned )
-            objectsOnScene = scene.objectsInstances.GetObjectsRawPointers(realObjects[i]);
-        else
-        {
-            if ( pickedObjectLists[realObjects[i]] != NULL )
-                objectsOnScene = *pickedObjectLists[realObjects[i]];
-        }
-
-        std::copy(objectsOnScene.begin(), objectsOnScene.end(), std::back_inserter(allObjects));
-
-        if ( find(alreadyDeclaredObjects.begin(), alreadyDeclaredObjects.end(), realObjects[i]) == alreadyDeclaredObjects.end() )
-            alreadyDeclaredObjects.push_back(realObjects[i]);
+        if ( it->second != NULL )
+            std::copy(it->second->begin(), it->second->end(), std::back_inserter(allObjects));
     }
 
     if ( !allObjects.empty() )
@@ -181,9 +161,9 @@ bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::v
         unsigned int id = sf::Randomizer::Random(0, allObjects.size()-1);
         Object * theChosenOne = allObjects[id];
 
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        for (std::map <std::string, std::vector<Object*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
         {
-            if ( pickedObjectLists[realObjects[i]] != NULL ) pickedObjectLists[realObjects[i]]->clear();
+            if ( it->second != NULL ) it->second->clear();
         }
 
         if ( pickedObjectLists[theChosenOne->GetName()] != NULL ) pickedObjectLists[theChosenOne->GetName()]->push_back(theChosenOne);

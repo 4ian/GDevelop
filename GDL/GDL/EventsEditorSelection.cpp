@@ -148,7 +148,7 @@ bool EventsEditorSelection::IsDraggingEvent()
     return dragging;
 }
 
-bool EventsEditorSelection::EndDragEvent()
+bool EventsEditorSelection::EndDragEvent(bool deleteDraggedEvent, bool dropAfterHighlightedElement)
 {
     if (!dragging) return false;
     dragging = false;
@@ -174,20 +174,27 @@ bool EventsEditorSelection::EndDragEvent()
     }
 
     //Insert dragged events
+    size_t positionInList = !dropAfterHighlightedElement ? eventHighlighted.positionInList : eventHighlighted.positionInList+1;
     for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
     {
         if ( (*it).event != boost::shared_ptr<BaseEvent>() )
         {
             boost::shared_ptr<BaseEvent> newEvent = (*it).event->Clone();
-            eventHighlighted.eventsList->insert(eventHighlighted.eventsList->begin()+eventHighlighted.positionInList, newEvent);
+            if ( positionInList < eventHighlighted.eventsList->size() )
+                eventHighlighted.eventsList->insert(eventHighlighted.eventsList->begin()+positionInList, newEvent);
+            else
+                eventHighlighted.eventsList->push_back(newEvent);
         }
     }
 
     //Remove them from their initial position
-    for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
+    if ( deleteDraggedEvent )
     {
-        if ( (*it).event != boost::shared_ptr<BaseEvent>() && (*it).eventsList != NULL)
-            (*it).eventsList->erase(std::remove((*it).eventsList->begin(), (*it).eventsList->end(), (*it).event) , (*it).eventsList->end());
+        for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
+        {
+            if ( (*it).event != boost::shared_ptr<BaseEvent>() && (*it).eventsList != NULL)
+                (*it).eventsList->erase(std::remove((*it).eventsList->begin(), (*it).eventsList->end(), (*it).event) , (*it).eventsList->end());
+        }
     }
 
     std::cout << "endDragEND" << std::endl;
@@ -206,36 +213,54 @@ bool EventsEditorSelection::IsDraggingInstruction()
     return draggingInstruction;
 }
 
-bool EventsEditorSelection::EndDragInstruction()
+bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bool dropAfterHighlightedElement)
 {
     if (!draggingInstruction) return false;
     draggingInstruction = false;
 
     std::cout << "endDragSTART" << std::endl;
 
-    if ( instructionHighlighted.instruction == NULL ) return false;
-
-    if ( instructionHighlighted.event != NULL ) instructionHighlighted.event->eventHeightNeedUpdate = true;
-    else std::cout << "WARNING : Instruction hightlighted event is not valid! " << std::endl;
-
-    //Be sure we do not try to drag inside an event selected
-    for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+    //Find where to drag
+    std::vector<Instruction> * list = NULL;
+    size_t positionInList = std::string::npos;
+    if ( instructionHighlighted.instructionList != NULL )
     {
-        if ( (*it).instruction == NULL )
-        {
-            std::cout << "WARNING: Bad instr in selection";
-            continue;
-        }
+        list = instructionHighlighted.instructionList;
+        positionInList = instructionHighlighted.positionInList;
+        if ( instructionHighlighted.event != NULL ) instructionHighlighted.event->eventHeightNeedUpdate = true;
+        else std::cout << "WARNING : Instruction hightlighted event is not valid! " << std::endl;
 
-        if ( (*it).instruction == instructionHighlighted.instruction || (FindInInstructionsAndSubInstructions((*it).instruction->GetSubInstructions(), instructionHighlighted.instruction)) )
+        if ( dropAfterHighlightedElement ) positionInList++;
+    }
+    else if ( instructionListHighlighted.instructionList != NULL )
+    {
+        list = instructionListHighlighted.instructionList;
+        if ( instructionListHighlighted.event != NULL ) instructionListHighlighted.event->eventHeightNeedUpdate = true;
+        else std::cout << "WARNING : Instruction list hightlighted event is not valid! " << std::endl;
+    }
+    else return false;
+
+    //Be sure we do not try to drag inside an instruction selected
+    if (instructionHighlighted.instruction != NULL)
+    {
+        for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
         {
-            std::cout << "Cannot drag here" << std::endl;
-            return false;
-        }
-        if  (FindInInstructionsAndSubInstructions(instructionHighlighted.instruction->GetSubInstructions(), (*it).instruction) )
-        {
-            std::cout << "Cannot drag here" << std::endl;
-            return false;
+            if ( (*it).instruction == NULL )
+            {
+                std::cout << "WARNING: Bad instr in selection";
+                continue;
+            }
+
+            if ( (*it).instruction == instructionHighlighted.instruction || (FindInInstructionsAndSubInstructions((*it).instruction->GetSubInstructions(), instructionHighlighted.instruction)) )
+            {
+                std::cout << "Cannot drag here" << std::endl;
+                return false;
+            }
+            if  (FindInInstructionsAndSubInstructions(instructionHighlighted.instruction->GetSubInstructions(), (*it).instruction) )
+            {
+                std::cout << "Cannot drag here" << std::endl;
+                return false;
+            }
         }
     }
 
@@ -249,30 +274,48 @@ bool EventsEditorSelection::EndDragInstruction()
 
     //Insert dragged instructions into their new list.
     for (unsigned int i = 0;i<draggedInstructions.size();++i)
-        instructionHighlighted.instructionList->insert(instructionHighlighted.instructionList->begin()+instructionHighlighted.positionInList, draggedInstructions[i]);
-
-
-    boost::unordered_set< InstructionItem > newInstructionsSelected;
-    for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
     {
-        if ((*it).instructionList == instructionHighlighted.instructionList && (*it).positionInList > instructionHighlighted.positionInList)
-        {
-            InstructionItem newItem = (*it);
-            newItem.instruction = NULL;
-            newItem.positionInList += draggedInstructions.size();
-            newInstructionsSelected.insert(newItem);
-        }
-        else newInstructionsSelected.insert(*it);
+        if ( positionInList < list->size() )
+            list->insert(list->begin()+positionInList, draggedInstructions[i]);
+        else
+            list->push_back(draggedInstructions[i]);
     }
-    instructionsSelected = newInstructionsSelected;
 
-    //Remove dragged instructions
-    DeleteAllInstructionSelected();
+    if ( deleteDraggedInstruction )
+    {
+        //Update selection as some selected instruction can have become invalid
+        boost::unordered_set< InstructionItem > newInstructionsSelected;
+        for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
+        {
+            if ((*it).instructionList == instructionHighlighted.instructionList && (*it).positionInList > instructionHighlighted.positionInList)
+            {
+                InstructionItem newItem = (*it);
+                newItem.instruction = NULL;
+                newItem.positionInList += draggedInstructions.size();
+                newInstructionsSelected.insert(newItem);
+            }
+            else newInstructionsSelected.insert(*it);
+        }
+        instructionsSelected = newInstructionsSelected;
+
+        //Remove dragged instructions
+        DeleteAllInstructionSelected();
+    }
 
     std::cout << "endDragEND" << std::endl;
     ClearSelection();
 
     return true;
+}
+
+void EventsEditorSelection::InstructionHighlightedOnBottomPart(bool isOnbottomHandSide)
+{
+    isOnbottomHandSideOfInstruction = isOnbottomHandSide;
+}
+
+void EventsEditorSelection::EventHighlightedOnBottomPart(bool isOnbottomHandSide)
+{
+    isOnbottomHandSideOfEvent = isOnbottomHandSide;
 }
 
 void EventsEditorSelection::DeleteAllInstructionSelected()

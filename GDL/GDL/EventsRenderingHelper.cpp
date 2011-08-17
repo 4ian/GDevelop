@@ -84,14 +84,14 @@ separationBetweenInstructions(2),
 conditionsColumnWidth(400),
 selectionRectangleOutline(wxPen(wxColour(244,217,141), 1)),
 selectionRectangleFill(wxBrush(wxColour(251,235,189))),
-highlightRectangleOutline(wxPen(wxColour(226,226,226), 1)),
+highlightRectangleOutline(wxPen(wxColour(206,206,206), 1)),
 highlightRectangleFill(wxBrush(wxColour(226,226,226))),
 niceRectangleFill1(wxColour(225,225,246)),
 niceRectangleFill2(wxColour(198,198,246)),
 niceRectangleOutline(wxPen(wxColour(205,205,246), 1)),
 actionsRectangleOutline(wxPen(wxColour(205,205,246))),
 conditionsRectangleOutline(wxPen(wxColour(185,185,247), 1)),
-actionsRectangleFill(wxBrush(wxColour(230,230,230))),
+actionsRectangleFill(*wxWHITE_BRUSH),
 conditionsRectangleFill(wxBrush(wxColour(252,252,255))),
 niceFont(wxFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL))
 {
@@ -131,6 +131,13 @@ int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & condition
 
     if ( conditions.empty() )
     {
+        if ( selection.IsDraggingInstruction() && selection.InstructionListHighlighted(item) )
+        {
+            dc.SetPen(wxPen(wxColour(0,0,0)));
+            dc.SetBrush(wxBrush(wxColour(0,0,0)));
+            dc.DrawRectangle(x + 2, y, width-2, 2);
+        }
+
         dc.SetTextForeground( wxColour(0,0,0) );
         dc.SetFont( niceFont.Italic() );
         dc.DrawText( _("Pas de conditions"), x + 2, y + 1 );
@@ -177,7 +184,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & condition
             {
                 dc.SetPen(wxPen(wxColour(0,0,0)));
                 dc.SetBrush(wxBrush(wxColour(0,0,0)));
-                dc.DrawRectangle(x + leftIconsWidth+2, y, width-2 -iconWidth -2, 2);
+                dc.DrawRectangle(x + leftIconsWidth+2, selection.IsInstructionHighlightedOnBottomPart() ? y+height :y, width-2 -iconWidth -2, 2);
             }
         }
         else
@@ -214,9 +221,7 @@ int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxD
     const int actionsHeight = GetRenderedActionsListHeight(actions, width);
     wxRect rect(x-1, y-1, width+2, actionsHeight+2);
     dc.SetPen(actionsRectangleOutline);
-    //dc.SetBrush(actionsRectangleFill);
-    //dc.GradientFillLinear(rect, wxColour(235,235,235), wxColour(250,250,250), wxSOUTH);
-    dc.SetBrush(*wxWHITE_BRUSH);
+    dc.SetBrush(actionsRectangleFill);
     dc.DrawRectangle(rect);
 
     InstructionListItem item(/**isCondition=*/false, &actions, event);
@@ -224,6 +229,13 @@ int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxD
 
     if ( actions.empty() )
     {
+        if ( selection.IsDraggingInstruction() && selection.InstructionListHighlighted(item) )
+        {
+            dc.SetPen(wxPen(wxColour(0,0,0)));
+            dc.SetBrush(wxBrush(wxColour(0,0,0)));
+            dc.DrawRectangle(x + 2, y, width-2, 2);
+        }
+
         dc.SetTextForeground( wxColour(0,0,0) );
         dc.SetFont( niceFont.Italic() );
         dc.DrawText( _("Pas d'actions"), x + 2, y + 1 );
@@ -262,14 +274,13 @@ int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxD
             dc.SetPen(highlightRectangleOutline);
             dc.SetBrush(highlightRectangleFill);
             dc.DrawRectangle(x, y, width, height);
-            wxRendererNative::Get().DrawItemSelectionRect(NULL, dc, wxRect(x,y, width,height), wxCONTROL_CURRENT);
             DrawInstruction(actions[j], instructionInfos, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, event, areas, selection);
 
             if ( selection.IsDraggingInstruction() )
             {
                 dc.SetPen(wxPen(wxColour(0,0,0)));
                 dc.SetBrush(wxBrush(wxColour(0,0,0)));
-                dc.DrawRectangle(x + iconWidth + 2, y, width -2 - iconWidth - 2, 2);
+                dc.DrawRectangle(x + iconWidth + 2, selection.IsInstructionHighlightedOnBottomPart() ? y+height :y , width -2 - iconWidth - 2, 2);
             }
         }
         else
@@ -363,7 +374,8 @@ int EventsRenderingHelper::DrawInstruction(Instruction & instruction, const Inst
     //size_t alreadyWrittenCharCount = 0;
     for (unsigned int i = 0;i<formattedStr.size();++i)
     {
-        dc.SetTextForeground(formattedStr[i].second.color);
+        //Update font and properties
+        dc.SetTextForeground(!event->IsDisabled() ? formattedStr[i].second.color : wxColour(160,160,160));
         font.SetWeight(formattedStr[i].second.bold ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL);
         font.SetStyle(formattedStr[i].second.italic ? wxFONTSTYLE_ITALIC : wxFONTSTYLE_NORMAL);
         std::string text = formattedStr[i].first;

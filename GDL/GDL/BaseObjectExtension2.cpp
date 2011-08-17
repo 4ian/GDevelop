@@ -12,7 +12,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPickingThem", "3");
-        instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
+        instrInfo.AddCodeOnlyParameter("inlineCode", "0"); //Useless parameter
         instrInfo.AddParameter("object", _("Objet à créer"), "", false);
         instrInfo.AddParameter("expression", _("Position X"), "", false);
         instrInfo.AddParameter("expression", _("Position Y"), "", false);
@@ -51,8 +51,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/add.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPickingThem", "3");
-        instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3");
+        instrInfo.AddCodeOnlyParameter("inlineCode", "0");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/RuntimeSceneTools.h");
@@ -69,7 +69,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3");
-        instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
+        instrInfo.AddCodeOnlyParameter("inlineCode", "0");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/RuntimeSceneTools.h");
@@ -138,8 +138,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/conditions/add.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPickingThem", "3");
-        instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3");
+        instrInfo.AddCodeOnlyParameter("inlineCode", "0");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/RuntimeSceneTools.h");
@@ -156,7 +156,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3");
-        instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
+        instrInfo.AddCodeOnlyParameter("inlineCode", "0");
         instrInfo.AddParameter("object", _("Objet"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/RuntimeSceneTools.h");

@@ -179,6 +179,7 @@ TimeExtension::TimeExtension()
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("Time", _("Temps actuel"), _("Temps actuel"), _("Temps"), "res/actions/time.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddParameter("", _("Valeur à récupérer :\n\nHeure : hour\nMinutes : min\nSecondes : sec\nJour du mois: mday\nMois depuis janvier : mon\nAnnées depuis 1900 : year\nJours depuis dimanche :wday\nJours depuis le 1er Janvier : yday"), "",false);
         instrInfo.cppCallingInformation.SetFunctionName("GetTime").SetIncludeFile("GDL/TimeTools.h");
     DECLARE_END_EXPRESSION()

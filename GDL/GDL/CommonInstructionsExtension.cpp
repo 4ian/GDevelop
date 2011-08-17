@@ -16,6 +16,7 @@
 #include "GDL/DynamicExtensionCallerEvent.h"
 #include "GDL/EventsCodeGenerator.h"
 #include "GDL/EventsCodeGenerationContext.h"
+#include "GDL/EventsCodeNameMangler.h"
 
 #include "GDL/ExtensionBase.h"
 
@@ -67,10 +68,10 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     conditionsCode += "    conditionTrue = true;\n";
                     for ( set<string>::iterator it = context.objectsToBeDeclared.begin() ; it != context.objectsToBeDeclared.end(); ++it )
                     {
-                        conditionsCode += "    for(unsigned int i = 0;i<"+*it+"objects.size();++i)\n";
+                        conditionsCode += "    for(unsigned int i = 0;i<"+ManObjListName(*it)+".size();++i)\n";
                         conditionsCode += "    {\n";
-                        conditionsCode += "        if ( find("+*it+"finalObjects.begin(), "+*it+"finalObjects.end(), "+*it+"objects[i]) == "+*it+"finalObjects.end())\n";
-                        conditionsCode += "            "+*it+"finalObjects.push_back("+*it+"objects[i]);\n";
+                        conditionsCode += "        if ( find("+ManObjListName(*it)+"final.begin(), "+ManObjListName(*it)+"final.end(), "+ManObjListName(*it)+"[i]) == "+ManObjListName(*it)+"final.end())\n";
+                        conditionsCode += "            "+ManObjListName(*it)+"final.push_back("+ManObjListName(*it)+"[i]);\n";
                         conditionsCode += "    }\n";
                     }
                     conditionsCode += "}\n";
@@ -92,7 +93,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 {
                     //We need to duplicate the object lists : The "final" ones will be filled with objects by conditions,
                     //but they will have no incidence on further conditions, as conditions use "normal" ones.
-                    declarationsCode += "std::vector<Object*> "+*it+"finalObjects = "+*it+"objects;\n";
+                    declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+"final = "+ManObjListName(*it)+";\n";
                 }
                 for (unsigned int i = 0;i<conditions.size();++i)
                     declarationsCode += "bool condition"+ToString(i)+"IsTrue = false;\n";
@@ -105,7 +106,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 //When condition is finished, "final" objects lists become the "normal" ones.
                 code += "{\n";
                 for ( set<string>::iterator it = parentContext.objectsListsToBeDeclaredEmpty.begin() ; it != parentContext.objectsListsToBeDeclaredEmpty.end(); ++it )
-                    code += *it+"objects = "+*it+"finalObjects;\n";
+                    code += ManObjListName(*it)+" = "+ManObjListName(*it)+"final;\n";
                 code += "}\n";
 
                 return code;

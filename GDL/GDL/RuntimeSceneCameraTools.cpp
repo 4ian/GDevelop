@@ -19,6 +19,18 @@ float GD_API GetCameraY(RuntimeScene & scene, const std::string & layer, unsigne
     return view.GetCenter().y-view.GetSize().y/2;
 }
 
+void GD_API SetCameraX(RuntimeScene & scene, float x, const std::string & layer, unsigned int camera)
+{
+    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
+    return view.SetCenter(x+view.GetSize().x/2, view.GetCenter().y);
+}
+
+void GD_API SetCameraY(RuntimeScene & scene, float y, const std::string & layer, unsigned int camera)
+{
+    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
+    return view.SetCenter(view.GetCenter().x, y+view.GetSize().y/2);
+}
+
 double GD_API GetCameraAngle(RuntimeScene & scene, const std::string & layer, unsigned int camera)
 {
     return scene.GetLayer(layer).GetCamera(camera).GetSFMLView().GetRotation();

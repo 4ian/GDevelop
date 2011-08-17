@@ -23,6 +23,8 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
@@ -242,6 +244,8 @@
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
@@ -363,6 +367,8 @@
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
@@ -1032,6 +1038,8 @@
 		<Unit filename="GDL\EventsCodeGenerationContext.h" />
 		<Unit filename="GDL\EventsCodeGenerator.cpp" />
 		<Unit filename="GDL\EventsCodeGenerator.h" />
+		<Unit filename="GDL\EventsCodeNameMangler.cpp" />
+		<Unit filename="GDL\EventsCodeNameMangler.h" />
 		<Unit filename="GDL\EventsEditorItemsAreas.cpp" />
 		<Unit filename="GDL\EventsEditorItemsAreas.h" />
 		<Unit filename="GDL\EventsEditorSelection.cpp" />

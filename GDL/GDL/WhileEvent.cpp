@@ -136,9 +136,10 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     int border = renderingHelper->instructionsListBorder;
     const int repeatHeight = 20;
 
-    //Draw event rectangle
-    wxRect rect(x, y, width, GetRenderedHeight(width));
-    renderingHelper->DrawNiceRectangle(dc, rect);
+    //Draw header rectangle
+    int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2)+border*2;
+    wxRect headerRect(x, y, width, whileConditionsHeight+repeatHeight);
+    renderingHelper->DrawNiceRectangle(dc, headerRect);
 
     //While text
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
@@ -146,19 +147,24 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     dc.DrawText( _("Tant que :"), x+5, y+5 );
 
     //Draw "while conditions"
-    int whileConditionsHeight = renderingHelper->DrawConditionsList(whileConditions, dc, x+80+border, y+border, width-80-border*2, this, areas, selection);
+    renderingHelper->DrawConditionsList(whileConditions, dc, x+80+border, y+border, width-80-border*2, this, areas, selection);
 
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
-    dc.DrawText( _("Répéter :"), x+2, y+whileConditionsHeight);
+    dc.SetTextForeground(wxColour(0,0,0));
+    dc.DrawText( _("Répéter :"), x+4, y+whileConditionsHeight+3);
     whileConditionsHeight += repeatHeight;
+
+    //Draw conditions rectangle
+    wxRect rect(x, y+whileConditionsHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-whileConditionsHeight);
+    renderingHelper->DrawNiceRectangle(dc, rect);
 
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
-                                        y+whileConditionsHeight+border+border*2,
+                                        y+whileConditionsHeight+border,
                                         renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
-                                     y+whileConditionsHeight+border+border*2,
+                                     y+whileConditionsHeight+border,
                                      width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
 }
 

@@ -53,10 +53,7 @@ class GD_API GDExpressionParser
          */
         bool PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks &, GDExpression & parameter, const ParameterInfo & parametersInfo, const size_t positionInExpression);
 
-        /**
-         * Used to parse parts of expression which are not functions calls
-         */
-        bool ParseNonFunctionsTokens(const std::string & str, ParserCallbacks & callbacks, const size_t positionInExpression);
+        bool ValidSyntax(const std::string & str);
 
         std::string expressionPlainString;
         static std::string parserSeparators;

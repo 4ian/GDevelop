@@ -76,6 +76,18 @@ class GD_API EventsRenderingHelper
         const wxPen & GetHighlightedRectangleOutlinePen() const { return highlightRectangleOutline; }
         wxPen & GetHighlightedRectangleOutlinePen() { return highlightRectangleOutline; }
 
+        const wxPen & GetConditionsRectangleOutlinePen() const { return conditionsRectangleOutline; }
+        wxPen & GetConditionsRectangleOutlinePen() { return conditionsRectangleOutline; }
+
+        const wxPen & GetActionsRectangleOutlinePen() const { return actionsRectangleOutline; }
+        wxPen & GetActionsRectangleOutlinePen() { return actionsRectangleOutline; }
+
+        const wxBrush & GetConditionsRectangleFillBrush() const { return conditionsRectangleFill; }
+        wxBrush & GetConditionsRectangleFillBrush() { return conditionsRectangleFill; }
+
+        const wxBrush & GetActionsRectangleFillBrush() const { return actionsRectangleFill; }
+        wxBrush & GetActionsRectangleFillBrush() { return actionsRectangleFill; }
+
         /**
          * Make sure a text will be correctly display by replacing specials characters
          * and inserting tags like <br>.

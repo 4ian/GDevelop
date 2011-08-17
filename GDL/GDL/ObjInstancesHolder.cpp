@@ -35,33 +35,9 @@ void ObjInstancesHolder::Merge(ObjInstancesHolder & second)
     }
 }
 
-std::vector<Object*> ObjInstancesHolder::GetAllObjectsRawPointers()
-{
-    std::vector<Object*> objList;
-
-    for (map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
-    {
-        const ObjList & associatedList = it->second;
-        for (unsigned int i = 0;i<associatedList.size();++i)
-        {
-            objList.push_back(associatedList[i].get());
-        }
-    }
-
-    return objList;
-}
 std::vector<Object*> ObjInstancesHolder::GetObjectsRawPointers(const std::string & name)
 {
     BT_PROFILE("GetObjectsRawPointers");
 
-    std::vector<Object*> objList;
-
-    const ObjList & associatedList = objectsInstances[name];
-    objList.reserve(associatedList.size()); //Important: Prevent multiple deallocation/reallocation
-    for (unsigned int i = 0;i<associatedList.size();++i) //Mettre 1 à la place de size augmente les performances -> Appel conditions/actions couteux ? -> std::string à passer en const & ! -> Et les objets en oId ???
-    {
-        objList.push_back(associatedList[i].get());
-    }
-
-    return objList;
+    return objectsRawPointersInstances[name];
 }

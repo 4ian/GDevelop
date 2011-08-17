@@ -70,14 +70,39 @@ class GD_API EventsEditorSelection
         void SetHighlighted(const ParameterItem & parameter);
 
         /**
+         * Set if the mouse is on the bottom hand side of the instruction, or on the top hand side.
+         */
+        void InstructionHighlightedOnBottomPart(bool isOnbottomHandSide);
+
+        /**
+         * Set if the mouse is on the bottom hand side of the event, or on the top hand side.
+         */
+        void EventHighlightedOnBottomPart(bool isOnbottomHandSide);
+
+        /**
          * Return true if an event is highlighted
          */
         bool EventHighlighted(const EventItem & event) { return eventHighlighted == event; };
 
         /**
-         * Return true if an event is highlighted
+         * Return true if the mouse is on the bottom hand side of the event highlighted. ( Used to known if we have to drop the dragged event(s) afer or before the highlighted one )
+         */
+        bool IsEventHighlightedOnBottomPart(){ return isOnbottomHandSideOfEvent; };
+
+        /**
+         * Return true if an instruction item is highlighted
          */
         bool InstructionHighlighted(const InstructionItem & instr) { return instructionHighlighted == instr; };
+
+        /**
+         * Return true if the mouse is on the bottom hand side of the instruction highlighted
+         */
+        bool IsInstructionHighlightedOnBottomPart() { return isOnbottomHandSideOfInstruction; };
+
+        /**
+         * Return true if an instruction list item is highlighted
+         */
+        bool InstructionListHighlighted(const InstructionListItem & list) { return instructionListHighlighted == list; };
 
         /**
          * Return true if a parameter is highlighted
@@ -136,20 +161,24 @@ class GD_API EventsEditorSelection
 
         void BeginDragEvent();
         bool IsDraggingEvent();
-        bool EndDragEvent();
+        bool EndDragEvent(bool deleteDraggedEvent = true, bool dropAfterHighlightedElement = false);
 
         void BeginDragInstruction();
         bool IsDraggingInstruction();
-        bool EndDragInstruction();
+        bool EndDragInstruction(bool deleteDraggedInstruction = true, bool dropAfterHighlightedElement = false);
 
     private:
 
         boost::unordered_set< EventItem > eventsSelected; ///< Events selection
         boost::unordered_set< InstructionItem > instructionsSelected; ///< Events selection
+
         EventItem eventHighlighted;
+        bool isOnbottomHandSideOfEvent;
         InstructionItem instructionHighlighted;
+        bool isOnbottomHandSideOfInstruction;
         InstructionListItem instructionListHighlighted;
         ParameterItem parameterHighlighted;
+
         bool dragging; ///< True if dragging event
         bool draggingInstruction; ///< True if dragging instruction
 

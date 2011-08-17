@@ -19,6 +19,7 @@ class Game;
 #include "GDL/Layer.h"
 class EventsExecutionEngine;
 class AutomatismsSharedDatas;
+class BaseProfiler;
 
 /**
  * \brief Represents a scene.
@@ -56,6 +57,9 @@ class GD_API Scene
         bool stopSoundsOnStartup; ///< True to make the scene stop all sounds at startup.
 
         vector < BaseEventSPtr >                events; ///< Scene events
+        #if defined(GD_IDE_ONLY)
+        BaseProfiler *                          profiler; ///< Pointer to the profiler. Can be NULL.
+        #endif
         vector < boost::shared_ptr<Object> >    initialObjects; ///< Objects availables.
         vector < ObjectGroup >                  objectGroups; ///< Objects groups availables.
         vector < InitialPosition >              initialObjectsPositions; ///< List of all objects to be put on the scene at the beginning

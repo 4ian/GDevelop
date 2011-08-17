@@ -36,6 +36,7 @@ class Credits: public wxDialog
 		wxBitmapButton* BitmapButton2;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
+		wxBitmapButton* BitmapButton8;
 		wxStaticText* StaticText3;
 		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxBitmapButton* BitmapButton1;
@@ -72,11 +73,12 @@ class Credits: public wxDialog
 		static const long ID_PANEL3;
 		static const long ID_STATICTEXT3;
 		static const long ID_BITMAPBUTTON8;
+		static const long ID_BITMAPBUTTON2;
 		static const long ID_BITMAPBUTTON9;
 		static const long ID_BITMAPBUTTON10;
 		static const long ID_STATICTEXT8;
 		static const long ID_BITMAPBUTTON11;
-		static const long ID_BITMAPBUTTON2;
+		static const long ID_BITMAPBUTTON1;
 		static const long ID_BITMAPBUTTON12;
 		static const long ID_BITMAPBUTTON3;
 		static const long ID_PANEL4;
@@ -98,6 +100,7 @@ class Credits: public wxDialog
 		void OnTextCtrl1Text(wxCommandEvent& event);
 		void OnLLVMBtClick(wxCommandEvent& event);
 		void OnTinyXmlBtClick(wxCommandEvent& event);
+		void OnBoostBtClick(wxCommandEvent& event);
 		//*)
         void OpenLink(wxString link);
 

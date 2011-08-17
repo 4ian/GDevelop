@@ -948,9 +948,11 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
     //Check for validity of parameters
     bool parametersHaveErrors = false;
     string message;
-    size_t parameterNb = string::npos;
+    size_t parameterDisplayedNb = 0;
     for ( unsigned int i = 0;i < instructionInfos.parameters.size();i++ )
     {
+        if (!instructionInfos.parameters[i].codeOnly ) parameterDisplayedNb++;
+
         //Do not check optional parameters which are desactivated
         if ( !ParaFac.at(i)->IsShown() || (ParaFac.at(i)->IsShown() && ParaFac.at(i)->GetValue()))
         {
@@ -965,10 +967,10 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
                 ||(instructionInfos.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game, scene, callbacks)))
             {
                 message = expressionParser.firstErrorStr;
-                parameterNb = i+1;
 
                 parametersHaveErrors = true;
                 ParaEdit[i]->SetBackgroundColour(wxColour(255, 194, 191));
+                break;
             }
             else
                 ParaEdit[i]->SetBackgroundColour(wxColour(255, 255, 255));
@@ -979,7 +981,7 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 
     if ( parametersHaveErrors )
     {
-        if ( wxMessageBox(_("Erreur dans le paramètre n°%i : %s\n\nÊtes vous sûr de vouloir valider ce paramètre ?"), _("Un paramètre contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(wxString::Format(_("Erreur dans le paramètre n°%i : %s\n\nÊtes vous sûr de vouloir valider ce paramètre ?"), parameterDisplayedNb, message.c_str()), _("Un paramètre contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 

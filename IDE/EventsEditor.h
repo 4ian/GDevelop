@@ -53,8 +53,10 @@ class EventsEditor: public wxPanel
 		//(*Declarations(EventsEditor)
 		wxMenuItem* redoMenu;
 		wxMenuItem* MenuItem5;
+		wxMenuItem* toggleActivation;
 		wxMenuItem* eventPasteMenu;
 		wxMenuItem* MenuItem1;
+		wxPanel* addEventIconPnl;
 		wxMenuItem* eventCutMenu;
 		wxScrollBar* scrollBar;
 		wxHyperlinkCtrl* addEventBt;
@@ -62,11 +64,14 @@ class EventsEditor: public wxPanel
 		wxMenuItem* undoMenu;
 		wxHyperlinkCtrl* addInstrBt;
 		wxMenuItem* deleteMenu;
+		wxPanel* addSubEventIconPnl;
 		wxTextCtrl* liveEdit;
 		wxPanel* liveEditingPanel;
 		wxPanel* eventContextPanel;
 		wxPanel* listContextPanel;
+		wxPanel* addInstrIconPnl;
 		wxMenuItem* MenuItem6;
+		wxPanel* addMoreIconPnl;
 		wxMenu eventTypesMenu;
 		wxPanel* eventsPanel;
 		wxMenuItem* eventCopyMenu;
@@ -96,17 +101,22 @@ class EventsEditor: public wxPanel
 		static const long ID_TEXTCTRL1;
 		static const long ID_BITMAPBUTTON1;
 		static const long ID_PANEL2;
+		static const long ID_PANEL7;
 		static const long ID_HYPERLINKCTRL2;
+		static const long ID_PANEL6;
 		static const long ID_HYPERLINKCTRL1;
+		static const long ID_PANEL5;
 		static const long ID_HYPERLINKCTRL3;
 		static const long ID_PANEL3;
+		static const long ID_PANEL8;
 		static const long ID_HYPERLINKCTRL4;
 		static const long ID_PANEL4;
 		static const long ID_PANEL1;
 		static const long ID_SCROLLBAR1;
-		static const long ID_MENUITEM1;
-		static const long ID_MENUITEM2;
-		static const long ID_MENUITEM3;
+		static const long deleteMenuItem;
+		static const long toggleActivationMenuItem;
+		static const long copyMenuItem;
+		static const long cutMenuItem;
 		static const long ID_MENUITEM4;
 		static const long ID_MENUITEM5;
 		static const long ID_MENUITEM6;
@@ -168,6 +178,16 @@ class EventsEditor: public wxPanel
 		void OnparameterEditBtClick(wxCommandEvent& event);
 		void OneventsPanelMiddleUp(wxMouseEvent& event);
 		void OneventsPanelRightUp(wxMouseEvent& event);
+		void OntoggleActivationSelected(wxCommandEvent& event);
+		void OnPanel1LeftDown(wxMouseEvent& event);
+		void OnaddEventIconPnlPaint(wxPaintEvent& event);
+		void OnaddMoreIconPnlPaint(wxPaintEvent& event);
+		void OnaddMoreIconPnlLeftDown(wxMouseEvent& event);
+		void OnaddSubEventIconPnlPaint(wxPaintEvent& event);
+		void OnaddSubEventIconPnlLeftDown(wxMouseEvent& event);
+		void OnaddEventIconPnlLeftDown(wxMouseEvent& event);
+		void OnaddInstrIconPnlPaint(wxPaintEvent& event);
+		void OnaddInstrIconPnlLeftDown(wxMouseEvent& event);
 		//*)
 		void UpdateRibbonBars();
 		void OnHelpBtClick(wxCommandEvent& event);

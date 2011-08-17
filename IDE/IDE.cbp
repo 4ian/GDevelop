@@ -304,6 +304,7 @@
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_stc" />
+					<Add option="-lwxmsw29_propgrid" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
 					<Add option="-lwxmsw29_aui" />

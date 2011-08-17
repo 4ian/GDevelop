@@ -38,11 +38,12 @@ const long Credits::ID_HTMLWINDOW1 = wxNewId();
 const long Credits::ID_PANEL3 = wxNewId();
 const long Credits::ID_STATICTEXT3 = wxNewId();
 const long Credits::ID_BITMAPBUTTON8 = wxNewId();
+const long Credits::ID_BITMAPBUTTON2 = wxNewId();
 const long Credits::ID_BITMAPBUTTON9 = wxNewId();
 const long Credits::ID_BITMAPBUTTON10 = wxNewId();
 const long Credits::ID_STATICTEXT8 = wxNewId();
 const long Credits::ID_BITMAPBUTTON11 = wxNewId();
-const long Credits::ID_BITMAPBUTTON2 = wxNewId();
+const long Credits::ID_BITMAPBUTTON1 = wxNewId();
 const long Credits::ID_BITMAPBUTTON12 = wxNewId();
 const long Credits::ID_BITMAPBUTTON3 = wxNewId();
 const long Credits::ID_PANEL4 = wxNewId();
@@ -65,11 +66,11 @@ Credits::Credits(wxWindow* parent)
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
 	wxGridSizer* GridSizer1;
-	wxFlexGridSizer* FlexGridSizer13;
 	wxFlexGridSizer* FlexGridSizer12;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
+	wxGridSizer* GridSizer2;
 
 	Create(parent, wxID_ANY, _("A propos de Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxSize(271,351));
@@ -140,29 +141,31 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer12->AddGrowableCol(0);
 	StaticText3 = new wxStaticText(Panel4, ID_STATICTEXT3, _("Programmé en C++, compilé avec TDM-GCC, avec l\'aide de Code::Blocks"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer12->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer13 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer13->AddGrowableCol(1);
+	GridSizer2 = new wxGridSizer(0, 4, 0, 0);
 	BitmapButton1 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON8, wxBitmap(wxImage(_T("res/powered-cpp.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON8"));
-	FlexGridSizer13->Add(BitmapButton1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	GridSizer2->Add(BitmapButton1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BitmapButton6 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON2, wxBitmap(wxImage(_T("res/powered-boost.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON2"));
+	BitmapButton6->SetDefault();
+	GridSizer2->Add(BitmapButton6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BitmapButton2 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON9, wxBitmap(wxImage(_T("res/powered-gcc.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON9"));
 	BitmapButton2->SetDefault();
-	FlexGridSizer13->Add(BitmapButton2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	GridSizer2->Add(BitmapButton2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BitmapButton3 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON10, wxBitmap(wxImage(_T("res/powered-cb.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON10"));
 	BitmapButton3->SetDefault();
-	FlexGridSizer13->Add(BitmapButton3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer12->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText8 = new wxStaticText(Panel4, ID_STATICTEXT8, _("Game Develop utilise les bibliothèques SFML, LLVM, wxWidgets et TinyXml."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+	GridSizer2->Add(BitmapButton3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer12->Add(GridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticText8 = new wxStaticText(Panel4, ID_STATICTEXT8, _("Game Develop utilise les bibliothèques SFML, LLVM, Boost, wxWidgets et TinyXml."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
 	FlexGridSizer12->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	GridSizer1 = new wxGridSizer(0, 4, 0, 0);
 	BitmapButton4 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON11, wxBitmap(wxImage(_T("res/powered-sfml.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON11"));
 	BitmapButton4->SetDefault();
 	GridSizer1->Add(BitmapButton4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	BitmapButton6 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON2, wxBitmap(wxImage(_T("res/powered-llvm.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON2"));
-	BitmapButton6->SetDefault();
-	GridSizer1->Add(BitmapButton6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BitmapButton8 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/powered-llvm.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
+	BitmapButton8->SetDefault();
+	GridSizer1->Add(BitmapButton8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BitmapButton5 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON12, wxBitmap(wxImage(_T("res/powered-wx.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON12"));
 	BitmapButton5->SetDefault();
-	GridSizer1->Add(BitmapButton5, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	GridSizer1->Add(BitmapButton5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BitmapButton7 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON3, wxBitmap(wxImage(_T("res/powered-tinyxml.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON3"));
 	BitmapButton7->SetDefault();
 	GridSizer1->Add(BitmapButton7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -183,10 +186,11 @@ Credits::Credits(wxWindow* parent)
 	Center();
 
 	Connect(ID_BITMAPBUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCppBtClick);
+	Connect(ID_BITMAPBUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnBoostBtClick);
 	Connect(ID_BITMAPBUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnGccBtClick);
 	Connect(ID_BITMAPBUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCBBtClick);
 	Connect(ID_BITMAPBUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnSFMLBtClick);
-	Connect(ID_BITMAPBUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnLLVMBtClick);
+	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnLLVMBtClick);
 	Connect(ID_BITMAPBUTTON12,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnWxBtClick);
 	Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnTinyXmlBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnOkBtClick);
@@ -297,4 +301,9 @@ void Credits::OnLLVMBtClick(wxCommandEvent& event)
 void Credits::OnTinyXmlBtClick(wxCommandEvent& event)
 {
     OpenLink(_("http://www.grinninglizard.com/tinyxml/"));
+}
+
+void Credits::OnBoostBtClick(wxCommandEvent& event)
+{
+    OpenLink(_("http://www.boost.org/"));
 }

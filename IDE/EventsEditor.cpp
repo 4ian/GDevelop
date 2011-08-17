@@ -43,17 +43,22 @@ using namespace std;
 const long EventsEditor::ID_TEXTCTRL1 = wxNewId();
 const long EventsEditor::ID_BITMAPBUTTON1 = wxNewId();
 const long EventsEditor::ID_PANEL2 = wxNewId();
+const long EventsEditor::ID_PANEL7 = wxNewId();
 const long EventsEditor::ID_HYPERLINKCTRL2 = wxNewId();
+const long EventsEditor::ID_PANEL6 = wxNewId();
 const long EventsEditor::ID_HYPERLINKCTRL1 = wxNewId();
+const long EventsEditor::ID_PANEL5 = wxNewId();
 const long EventsEditor::ID_HYPERLINKCTRL3 = wxNewId();
 const long EventsEditor::ID_PANEL3 = wxNewId();
+const long EventsEditor::ID_PANEL8 = wxNewId();
 const long EventsEditor::ID_HYPERLINKCTRL4 = wxNewId();
 const long EventsEditor::ID_PANEL4 = wxNewId();
 const long EventsEditor::ID_PANEL1 = wxNewId();
 const long EventsEditor::ID_SCROLLBAR1 = wxNewId();
-const long EventsEditor::ID_MENUITEM1 = wxNewId();
-const long EventsEditor::ID_MENUITEM2 = wxNewId();
-const long EventsEditor::ID_MENUITEM3 = wxNewId();
+const long EventsEditor::deleteMenuItem = wxNewId();
+const long EventsEditor::toggleActivationMenuItem = wxNewId();
+const long EventsEditor::copyMenuItem = wxNewId();
+const long EventsEditor::cutMenuItem = wxNewId();
 const long EventsEditor::ID_MENUITEM4 = wxNewId();
 const long EventsEditor::ID_MENUITEM5 = wxNewId();
 const long EventsEditor::ID_MENUITEM6 = wxNewId();
@@ -129,18 +134,26 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	liveEditingPanel->SetSizer(FlexGridSizer2);
 	FlexGridSizer2->Fit(liveEditingPanel);
 	FlexGridSizer2->SetSizeHints(liveEditingPanel);
-	eventContextPanel = new wxPanel(eventsPanel, ID_PANEL3, wxPoint(136,24), wxSize(224,40), wxSIMPLE_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
-	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
+	eventContextPanel = new wxPanel(eventsPanel, ID_PANEL3, wxPoint(136,24), wxSize(224,40), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
+	FlexGridSizer3 = new wxFlexGridSizer(0, 6, 0, 0);
+	addEventIconPnl = new wxPanel(eventContextPanel, ID_PANEL7, wxDefaultPosition, wxSize(16,16), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL7"));
+	FlexGridSizer3->Add(addEventIconPnl, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	addEventBt = new wxHyperlinkCtrl(eventContextPanel, ID_HYPERLINKCTRL2, _("Ajouter un évènement"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
 	FlexGridSizer3->Add(addEventBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-	addSubEventBt = new wxHyperlinkCtrl(eventContextPanel, ID_HYPERLINKCTRL1, _("un sous évènement"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	addSubEventIconPnl = new wxPanel(eventContextPanel, ID_PANEL6, wxDefaultPosition, wxSize(16,16), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL6"));
+	FlexGridSizer3->Add(addSubEventIconPnl, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	addSubEventBt = new wxHyperlinkCtrl(eventContextPanel, ID_HYPERLINKCTRL1, _("Un sous évènement"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	FlexGridSizer3->Add(addSubEventBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-	addMoreBt = new wxHyperlinkCtrl(eventContextPanel, ID_HYPERLINKCTRL3, _("autre"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL3"));
+	addMoreIconPnl = new wxPanel(eventContextPanel, ID_PANEL5, wxDefaultPosition, wxSize(16,16), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL5"));
+	FlexGridSizer3->Add(addMoreIconPnl, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	addMoreBt = new wxHyperlinkCtrl(eventContextPanel, ID_HYPERLINKCTRL3, _("Autre..."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL3"));
 	FlexGridSizer3->Add(addMoreBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
 	eventContextPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->SetSizeHints(eventContextPanel);
-	listContextPanel = new wxPanel(eventsPanel, ID_PANEL4, wxPoint(136,50), wxSize(224,40), wxSIMPLE_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL4"));
+	listContextPanel = new wxPanel(eventsPanel, ID_PANEL4, wxPoint(136,50), wxSize(224,40), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
+	addInstrIconPnl = new wxPanel(listContextPanel, ID_PANEL8, wxDefaultPosition, wxSize(16,16), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL8"));
+	FlexGridSizer4->Add(addInstrIconPnl, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	addInstrBt = new wxHyperlinkCtrl(listContextPanel, ID_HYPERLINKCTRL4, _("Ajouter une condition"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL4"));
 	FlexGridSizer4->Add(addInstrBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
 	listContextPanel->SetSizer(FlexGridSizer4);
@@ -150,20 +163,27 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	scrollBar->SetScrollbar(0, 1, 10, 1);
 	FlexGridSizer1->Add(scrollBar, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
-	deleteMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM1, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
+	deleteMenu = new wxMenuItem((&eventsContextMenu), deleteMenuItem, _("Supprimer\tDEL"), wxEmptyString, wxITEM_NORMAL);
 	deleteMenu->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	eventsContextMenu.Append(deleteMenu);
+	toggleActivation = new wxMenuItem((&eventsContextMenu), toggleActivationMenuItem, _("Dés/activer"), wxEmptyString, wxITEM_NORMAL);
+	eventsContextMenu.Append(toggleActivation);
 	eventsContextMenu.AppendSeparator();
-	eventCopyMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM2, _("Copier"), wxEmptyString, wxITEM_NORMAL);
+	eventCopyMenu = new wxMenuItem((&eventsContextMenu), copyMenuItem, _("Copier\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
+	eventCopyMenu->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
 	eventsContextMenu.Append(eventCopyMenu);
-	eventCutMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM3, _("Couper"), wxEmptyString, wxITEM_NORMAL);
+	eventCutMenu = new wxMenuItem((&eventsContextMenu), cutMenuItem, _("Couper\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
+	eventCutMenu->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
 	eventsContextMenu.Append(eventCutMenu);
-	eventPasteMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM4, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+	eventPasteMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM4, _("Coller\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
+	eventPasteMenu->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	eventsContextMenu.Append(eventPasteMenu);
 	eventsContextMenu.AppendSeparator();
-	undoMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM5, _("Annuler"), wxEmptyString, wxITEM_NORMAL);
+	undoMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM5, _("Annuler\tCtrl-Z"), wxEmptyString, wxITEM_NORMAL);
+	undoMenu->SetBitmap(wxBitmap(wxImage(_T("res/undo.png"))));
 	eventsContextMenu.Append(undoMenu);
-	redoMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM6, _("Refaire"), wxEmptyString, wxITEM_NORMAL);
+	redoMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM6, _("Refaire\tCtrl-Y"), wxEmptyString, wxITEM_NORMAL);
+	redoMenu->SetBitmap(wxBitmap(wxImage(_T("res/redo.png"))));
 	eventsContextMenu.Append(redoMenu);
 	MenuItem1 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
@@ -179,10 +199,20 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EventsEditor::OnliveEditText);
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&EventsEditor::OnliveEditTextEnter);
 	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EventsEditor::OnparameterEditBtClick);
+	addEventIconPnl->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OnaddEventIconPnlPaint,0,this);
+	addEventIconPnl->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&EventsEditor::OnaddEventIconPnlLeftDown,0,this);
 	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EventsEditor::OnaddEventBtClick);
+	addSubEventIconPnl->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OnaddSubEventIconPnlPaint,0,this);
+	addSubEventIconPnl->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&EventsEditor::OnaddSubEventIconPnlLeftDown,0,this);
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EventsEditor::OnaddSubEventBtClick);
+	addMoreIconPnl->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OnaddMoreIconPnlPaint,0,this);
+	addMoreIconPnl->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&EventsEditor::OnaddMoreIconPnlLeftDown,0,this);
 	Connect(ID_HYPERLINKCTRL3,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EventsEditor::OnaddMoreBtClick);
+	eventContextPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OneventContextPanelPaint,0,this);
+	addInstrIconPnl->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OnaddInstrIconPnlPaint,0,this);
+	addInstrIconPnl->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&EventsEditor::OnaddInstrIconPnlLeftDown,0,this);
 	Connect(ID_HYPERLINKCTRL4,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EventsEditor::OnaddInstrBtClick);
+	listContextPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OnlistContextPanelPaint,0,this);
 	eventsPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OneventsPanelPaint,0,this);
 	eventsPanel->Connect(wxEVT_ERASE_BACKGROUND,(wxObjectEventFunction)&EventsEditor::OneventsPanelEraseBackground,0,this);
 	eventsPanel->Connect(wxEVT_KEY_DOWN,(wxObjectEventFunction)&EventsEditor::OneventsPanelKeyDown,0,this);
@@ -198,9 +228,10 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EventsEditor::OnscrollBarScroll);
 	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&EventsEditor::OnscrollBarScroll);
 	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EventsEditor::OnscrollBarScroll);
-	Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OndeleteMenuSelected);
-	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OneventCopyMenuSelected);
-	Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OneventCutMenuSelected);
+	Connect(deleteMenuItem,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OndeleteMenuSelected);
+	Connect(toggleActivationMenuItem,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OntoggleActivationSelected);
+	Connect(copyMenuItem,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OneventCopyMenuSelected);
+	Connect(cutMenuItem,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OneventCutMenuSelected);
 	Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OneventPasteMenuSelected);
 	Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OnundoMenuSelected);
 	Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OnredoMenuSelected);
@@ -210,6 +241,11 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	Connect(wxEVT_KEY_DOWN,(wxObjectEventFunction)&EventsEditor::OneventsPanelKeyDown);
 	Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&EventsEditor::OneventsPanelKeyUp);
 	//*)
+
+    addInstrBt->SetVisitedColour(addInstrBt->GetNormalColour());
+    addEventBt->SetVisitedColour(addEventBt->GetNormalColour());
+    addSubEventBt->SetVisitedColour(addSubEventBt->GetNormalColour());
+    addMoreBt->SetVisitedColour(addMoreBt->GetNormalColour());
 
 	//Load configuration
 	wxConfigBase * config = wxConfigBase::Get();
@@ -262,6 +298,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
     liveEdit->SetFont(EventsRenderingHelper::GetInstance()->GetFont());
     liveEditingPanel->Show(false);
     eventContextPanel->Show(false);
+    listContextPanel->Show(false);
 
     latestState = CloneVectorOfEvents(*events);
 }
@@ -289,7 +326,7 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Suppression"), wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         deleteRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        deleteRibbonBar->AddButton(idRibbonDelEvent, !hideLabels ? _("Supprimer l'évènement") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
+        deleteRibbonBar->AddButton(idRibbonDelEvent, !hideLabels ? _("Supprimer la sélection") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Annulation"), wxBitmap("res/unredo24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -479,7 +516,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
             {
                 dc.SetPen(wxPen(wxColour(0, 0, 0)));
                 dc.SetBrush(wxBrush(wxColour(0, 0, 0)));
-                dc.DrawRectangle(x+2,y,eventsPanel->GetSize().x-x-2,2);
+                dc.DrawRectangle(x+2, selection.IsEventHighlightedOnBottomPart() ? y+height-2 : y, eventsPanel->GetSize().x-x-2, 2);
             }
 
             //Registering event in items which are displayed
@@ -522,18 +559,91 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
 void EventsEditor::OnlistContextPanelPaint(wxPaintEvent& event)
 {
     wxBufferedPaintDC dc(listContextPanel);
-    /*dc.SetPen(EventsRenderingHelper::GetInstance()->Get);
-    dc.SetBrush(wxBrush(wxColour(246, 246, 246)));
-    dc.DrawRectangle(0,-1,listContextPanel->GetSize().x,listContextPanel->GetSize().y);*/
+
+    if ( selection.GetHighlightedInstructionList().isConditionList )
+    {
+        dc.SetPen(EventsRenderingHelper::GetInstance()->GetConditionsRectangleOutlinePen());
+        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetConditionsRectangleFillBrush());
+    }
+    else
+    {
+        dc.SetPen(EventsRenderingHelper::GetInstance()->GetActionsRectangleOutlinePen());
+        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetActionsRectangleFillBrush());
+    }
+    dc.DrawRectangle(0,-1,listContextPanel->GetSize().x,listContextPanel->GetSize().y+1);
+    addInstrBt->SetBackgroundColour(dc.GetBrush().GetColour());
+}
+void EventsEditor::OnaddInstrIconPnlPaint(wxPaintEvent& event)
+{
+    wxBufferedPaintDC dc(addInstrIconPnl);
+
+    if ( selection.GetHighlightedInstructionList().isConditionList )
+        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetConditionsRectangleFillBrush());
+    else
+        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetActionsRectangleFillBrush());
+
+    dc.DrawRectangle(-1,-1,eventContextPanel->GetSize().x+2,eventContextPanel->GetSize().y+2);
+    dc.DrawBitmap(wxBitmap("res/addicon.png",wxBITMAP_TYPE_ANY), 0,0,true);
+}
+
+void EventsEditor::OnaddMoreIconPnlPaint(wxPaintEvent& event)
+{
+    wxBufferedPaintDC dc(addMoreIconPnl);
+
+    if ( selection.EventSelected(selection.GetHighlightedEvent()) )
+        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
+    else
+        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
+
+    dc.DrawRectangle(-1,-1,addMoreIconPnl->GetSize().x+2,addMoreIconPnl->GetSize().y+2);
+    dc.DrawBitmap(wxBitmap("res/addicon.png",wxBITMAP_TYPE_ANY), 0,0,true);
+}
+void EventsEditor::OnaddSubEventIconPnlPaint(wxPaintEvent& event)
+{
+    wxBufferedPaintDC dc(addSubEventIconPnl);
+
+    if ( selection.EventSelected(selection.GetHighlightedEvent()) )
+        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
+    else
+        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
+
+    dc.DrawRectangle(-1,-1,addSubEventIconPnl->GetSize().x+2,addSubEventIconPnl->GetSize().y+2);
+    dc.DrawBitmap(wxBitmap("res/subeventaddicon.png",wxBITMAP_TYPE_ANY), 0,0,true);
+}
+void EventsEditor::OnaddEventIconPnlPaint(wxPaintEvent& event)
+{
+    wxBufferedPaintDC dc(addEventIconPnl);
+
+    if ( selection.EventSelected(selection.GetHighlightedEvent()) )
+        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
+    else
+        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
+
+    dc.DrawRectangle(-1,-1,addMoreIconPnl->GetSize().x+2,addMoreIconPnl->GetSize().y+2);
+    dc.DrawBitmap(wxBitmap("res/eventaddicon.png",wxBITMAP_TYPE_ANY), 0,0,true);
 }
 
 void EventsEditor::OneventContextPanelPaint(wxPaintEvent& event)
 {
     wxBufferedPaintDC dc(eventContextPanel);
-    /*dc.SetPen(wxPen(wxColour(245, 231, 189)));
-    dc.SetBrush(wxBrush(wxColour(208, 208, 218)));
-    dc.DrawRectangle(0,-1,eventContextPanel->GetSize().x,eventContextPanel->GetSize().y+1);*/
+
+    if ( selection.EventSelected(selection.GetHighlightedEvent()) )
+    {
+        dc.SetPen(EventsRenderingHelper::GetInstance()->GetSelectedRectangleOutlinePen());
+        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
+    }
+    else
+    {
+        dc.SetPen(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleOutlinePen());
+        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
+    }
+    dc.DrawRectangle(0,-1,eventContextPanel->GetSize().x,eventContextPanel->GetSize().y+1);
+    addEventBt->SetBackgroundColour(dc.GetBrush().GetColour());
+    addSubEventBt->SetBackgroundColour(dc.GetBrush().GetColour());
+    addMoreBt->SetBackgroundColour(dc.GetBrush().GetColour());
 }
+
+
 
 /**
  * De/activate ribbon buttons
@@ -561,11 +671,10 @@ void EventsEditor::OneventsPanelLeftUp(wxMouseEvent& event)
         isResizingColumns = false;
     }
 
-    if ( selection.EndDragEvent() || selection.EndDragInstruction() )
-    {
+    if ( selection.EndDragEvent(!ctrlKeyDown, selection.IsEventHighlightedOnBottomPart()) || selection.EndDragInstruction(!ctrlKeyDown, selection.IsInstructionHighlightedOnBottomPart()) )
         ChangesMadeOnEvents();
-        Refresh();
-    }
+
+    Refresh();
 }
 
 void EventsEditor::OneventsPanelLeftDown(wxMouseEvent& event)
@@ -605,7 +714,7 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
 
         if (liveEditedParameter.parameter == NULL ) return;
 
-        liveEditingPanel->SetPosition(wxPoint(parameterArea.x+liveEditingPanel->GetSize().x < eventsPanel->GetSize().x ? parameterArea.x : (parameterArea.x-liveEditingPanel->GetSize().x), parameterArea.y));
+        liveEditingPanel->SetPosition(wxPoint(parameterArea.x+liveEditingPanel->GetSize().x < eventsPanel->GetSize().x ? parameterArea.x : (eventsPanel->GetSize().x-liveEditingPanel->GetSize().x), parameterArea.y));
         liveEdit->SetValue(liveEditedParameter.parameter->GetPlainString());
         liveEditingPanel->Layout();
         liveEditingPanel->Show(true);
@@ -766,23 +875,35 @@ void EventsEditor::OneventsPanelMouseMove(wxMouseEvent& event)
     //Reset highlighted items.
     ParameterItem dummy;
     selection.SetHighlighted(dummy);
+    InstructionListItem dummy2;
+    selection.SetHighlighted(dummy2);
+    InstructionItem dummy3;
+    selection.SetHighlighted(dummy3);
+    EventItem dummy4;
+    selection.SetHighlighted(dummy4);
 
     //Highlight management
     if ( itemsAreas.IsOnEvent(event.GetX(), event.GetY()) )
     {
         selection.SetHighlighted(itemsAreas.GetEventAt(event.GetX(), event.GetY()));
 
+        wxRect area = itemsAreas.GetAreaOfEventAt(event.GetX(), event.GetY());
+        selection.EventHighlightedOnBottomPart(area.y+area.height/2.0 < event.GetY());
+
         if ( itemsAreas.IsOnInstructionList(event.GetX(), event.GetY()) )
         {
             selection.SetHighlighted(itemsAreas.GetInstructionListAt(event.GetX(), event.GetY()));
             wxRect area = itemsAreas.GetAreaOfInstructionListAt(event.GetX(), event.GetY());
             addInstrBt->SetLabel(itemsAreas.GetInstructionListAt(event.GetX(), event.GetY()).isConditionList ? _("Ajouter une condition") : _("Ajouter une action"));
-            listContextPanel->SetPosition(wxPoint(area.x, area.y+area.height-2));
+            listContextPanel->SetPosition(wxPoint(area.x, area.y+area.height-1));
             showlistContextPanel = true;
 
             if ( itemsAreas.IsOnInstruction(event.GetX(), event.GetY()) )
             {
                 selection.SetHighlighted(itemsAreas.GetInstructionAt(event.GetX(), event.GetY()));
+
+                wxRect area = itemsAreas.GetAreaOfInstructionAt(event.GetX(), event.GetY());
+                selection.InstructionHighlightedOnBottomPart(area.y+area.height/2.0 < event.GetY());
 
                 if ( itemsAreas.IsOnParameter(event.GetX(), event.GetY()) )
                     selection.SetHighlighted(itemsAreas.GetParameterAt(event.GetX(), event.GetY()));
@@ -806,10 +927,26 @@ void EventsEditor::OneventsPanelRightUp(wxMouseEvent& event)
 
     if ( itemsAreas.IsOnInstruction(event.GetX(), event.GetY()) )
     {
+        eventsContextMenu.Enable(deleteMenuItem, true);
+        eventsContextMenu.Enable(toggleActivationMenuItem, false);
+        eventsContextMenu.Enable(copyMenuItem, true);
+        eventsContextMenu.Enable(cutMenuItem, true);
+        PopupMenu(&eventsContextMenu);
+    }
+    else if ( itemsAreas.IsOnInstructionList(event.GetX(), event.GetY()) )
+    {
+        eventsContextMenu.Enable(deleteMenuItem, false);
+        eventsContextMenu.Enable(toggleActivationMenuItem, false);
+        eventsContextMenu.Enable(copyMenuItem, false);
+        eventsContextMenu.Enable(cutMenuItem, false);
         PopupMenu(&eventsContextMenu);
     }
     else if ( itemsAreas.IsOnEvent(event.GetX(), event.GetY()) )
     {
+        eventsContextMenu.Enable(deleteMenuItem, true);
+        eventsContextMenu.Enable(toggleActivationMenuItem, true);
+        eventsContextMenu.Enable(copyMenuItem, true);
+        eventsContextMenu.Enable(cutMenuItem, true);
         PopupMenu(&eventsContextMenu);
     }
 }
@@ -831,6 +968,49 @@ void EventsEditor::OneventsPanelKeyDown(wxKeyEvent& event)
     else if ( event.GetKeyCode() == WXK_DELETE )
     {
         DeleteSelection();
+    }
+    else if ( event.GetKeyCode() == WXK_INSERT )
+    {
+        wxCommandEvent unusedEvent;
+        OnaddEventBtClick( unusedEvent );
+    }
+    if ( event.GetModifiers() == wxMOD_CMD ) //Ctrl-xxx
+    {
+        switch ( event.GetKeyCode() )
+        {
+            case 67: //Ctrl C
+            {
+                wxCommandEvent unusedEvent;
+                OneventCopyMenuSelected( unusedEvent );
+                break;
+            }
+            case 86: //Ctrl-V
+            {
+                wxCommandEvent unusedEvent;
+                OneventPasteMenuSelected( unusedEvent );
+                break;
+            }
+            case 88: //Ctrl-X
+            {
+                wxCommandEvent unusedEvent;
+                OneventCutMenuSelected( unusedEvent );
+                break;
+            }
+            case 89: //Ctrl-Y
+            {
+                wxCommandEvent unusedEvent;
+                OnredoMenuSelected( unusedEvent );
+                break;
+            }
+            case 90: //Ctrl-Z
+            {
+                wxCommandEvent unusedEvent;
+                OnundoMenuSelected( unusedEvent );
+                break;
+            }
+            default:
+                break;
+        }
     }
 }
 
@@ -1214,48 +1394,58 @@ void EventsEditor::OneventCutMenuSelected(wxCommandEvent& event)
 
 void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
 {
-    if ( selection.HasSelectedConditions())
+        cout << "allo";
+    if ( selection.HasSelectedConditions() || (selection.GetHighlightedInstructionList().instructionList != NULL && selection.GetHighlightedInstructionList().isConditionList) )
     {
         if ( !Clipboard::GetInstance()->HasCondition() ) return;
 
-        InstructionItem item = selection.GetAllSelectedInstructions().back();
-        if (item.instructionList == NULL) return;
+        //Get information about list where conditions must be pasted
+        std::vector<Instruction> * instructionList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
+        size_t positionInThisList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().positionInList : std::string::npos;
+        BaseEvent * event = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().event : selection.GetHighlightedInstructionList().event;
+        if (instructionList == NULL) return;
 
+        //Paste all conditions
         const vector < Instruction > & instructions = Clipboard::GetInstance()->GetInstructions();
         for (unsigned int i = 0;i<instructions.size();++i)
         {
-            if ( item.positionInList < item.instructionList->size() )
-                item.instructionList->insert(item.instructionList->begin()+item.positionInList, instructions[i]);
+            if ( positionInThisList < instructionList->size() )
+                instructionList->insert(instructionList->begin()+positionInThisList, instructions[i]);
             else
-                item.instructionList->push_back(instructions[i]);
+                instructionList->push_back(instructions[i]);
         }
 
-        if ( item.event != NULL ) item.event->eventHeightNeedUpdate = true;
-        ChangesMadeOnEvents();
+        if ( event != NULL ) event->eventHeightNeedUpdate = true;
+        if ( !instructions.empty() ) ChangesMadeOnEvents();
         Refresh();
     }
-    else if ( selection.HasSelectedActions())
+    else if ( selection.HasSelectedActions()|| (selection.GetHighlightedInstructionList().instructionList != NULL && !selection.GetHighlightedInstructionList().isConditionList) )
     {
         if ( !Clipboard::GetInstance()->HasAction() ) return;
 
-        InstructionItem item = selection.GetAllSelectedInstructions().back();
-        if (item.instructionList == NULL) return;
+        //Get information about list where actions must be pasted
+        std::vector<Instruction> * instructionList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
+        size_t positionInThisList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().positionInList : std::string::npos;
+        BaseEvent * event = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().event : selection.GetHighlightedInstructionList().event;
+        if (instructionList == NULL) return;
 
+        //Paste all actions
         const vector < Instruction > & instructions = Clipboard::GetInstance()->GetInstructions();
         for (unsigned int i = 0;i<instructions.size();++i)
         {
-            if ( item.positionInList < item.instructionList->size() )
-                item.instructionList->insert(item.instructionList->begin()+item.positionInList, instructions[i]);
+            if ( positionInThisList < instructionList->size() )
+                instructionList->insert(instructionList->begin()+positionInThisList, instructions[i]);
             else
-                item.instructionList->push_back(instructions[i]);
+                instructionList->push_back(instructions[i]);
         }
 
-        if ( item.event != NULL ) item.event->eventHeightNeedUpdate = true;
-        ChangesMadeOnEvents();
+        if ( event != NULL ) event->eventHeightNeedUpdate = true;
+        if ( !instructions.empty() ) ChangesMadeOnEvents();
         Refresh();
     }
     else if ( selection.HasSelectedEvents())
     {
+        cout << "lola";
         EventItem item = selection.GetAllSelectedEvents().back();
         if (item.eventsList == NULL) return;
 
@@ -1268,7 +1458,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
                 item.eventsList->push_back(eventsToPaste[i]->Clone());
         }
 
-        ChangesMadeOnEvents();
+        if ( !eventsToPaste.empty() ) ChangesMadeOnEvents();
         Refresh();
     }
 }
@@ -1418,3 +1608,35 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
     }
 }
 
+
+void EventsEditor::OntoggleActivationSelected(wxCommandEvent& event)
+{
+    std::vector< EventItem > eventsSelected = selection.GetAllSelectedEvents();
+    for (unsigned int i = 0;i<eventsSelected.size();++i)
+    {
+        if ( eventsSelected[i].event != boost::shared_ptr<BaseEvent>())
+            eventsSelected[i].event->SetDisabled(!eventsSelected[i].event->IsDisabled());
+    }
+}
+
+
+void EventsEditor::OnaddMoreIconPnlLeftDown(wxMouseEvent& event)
+{
+    wxCommandEvent useless;
+    OnaddMoreBtClick(useless);
+}
+void EventsEditor::OnaddSubEventIconPnlLeftDown(wxMouseEvent& event)
+{
+    wxCommandEvent useless;
+    OnaddSubEventBtClick(useless);
+}
+void EventsEditor::OnaddEventIconPnlLeftDown(wxMouseEvent& event)
+{
+    wxCommandEvent useless;
+    OnaddEventBtClick(useless);
+}
+void EventsEditor::OnaddInstrIconPnlLeftDown(wxMouseEvent& event)
+{
+    wxCommandEvent useless;
+    OnaddInstrBtClick(useless);
+}

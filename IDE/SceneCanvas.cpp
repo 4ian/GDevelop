@@ -346,7 +346,7 @@ void SceneCanvas::SetOwnedProfileDialog(boost::shared_ptr<ProfileDlg> profileDia
         profileDialog->SetAssociatedSceneCanvas(this);
 
     if ( profileDialog )
-        edittimeRenderer.runtimeScene.profiler = profileDialog.get();
+        sceneEdited.profiler = profileDialog.get();
 }
 
 /**
@@ -697,7 +697,6 @@ void SceneCanvas::ReloadFirstPart()
     RuntimeScene newScene(this, &game);
     edittimeRenderer.runtimeScene = newScene;
     edittimeRenderer.runtimeScene.running = false;
-    if ( profileDialog )   edittimeRenderer.runtimeScene.profiler = profileDialog.get();
     if ( debugger ) edittimeRenderer.runtimeScene.debugger = debugger.get();
 
     //Launch now events compilation if it has not been launched by another way. ( Events editor for example )

@@ -263,28 +263,17 @@ void ProfileDlg::ParseProfileEvents()
 {
     if ( !sceneCanvas ) return;
 
-    ParseProfileEvents(sceneCanvas->edittimeRenderer.runtimeScene.events);
-}
-
-void ProfileDlg::ParseProfileEvents(const std::vector < BaseEventSPtr > & events)
-{
-    for (unsigned int i =0;i<events.size();++i)
+    for (unsigned int i = 0;i<sceneCanvas->sceneEdited.profiler->profileEventsInformation.size();++i)
     {
-        boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_dynamic_cast< ProfileEvent >(events[i]);
-        if ( profileEvent != boost::shared_ptr<ProfileEvent>() )
+        boost::shared_ptr<BaseEvent> event = sceneCanvas->sceneEdited.profiler->profileEventsInformation[i].originalEvent.lock();
+        if ( event != boost::shared_ptr<BaseEvent>())
         {
-            BaseEventSPtr originalEvent = profileEvent->originalEvent.lock();
-            if ( originalEvent )
-            {
-                originalEvent->totalTimeDuringLastSession = profileEvent->GetTime();
-                originalEvent->percentDuringLastSession = static_cast<double>(originalEvent->totalTimeDuringLastSession)/static_cast<double>(totalEventsTime)*100.0f;
-            }
+            event->totalTimeDuringLastSession = sceneCanvas->sceneEdited.profiler->profileEventsInformation[i].GetTime();
+            event->percentDuringLastSession = static_cast<double>(event->totalTimeDuringLastSession)/static_cast<double>(totalEventsTime)*100.0f;
+
         }
         else
-        {
-            if ( events[i]->CanHaveSubEvents() )
-                ParseProfileEvents(events[i]->GetSubEvents());
-        }
+            cout << "Event null";
     }
 }
 

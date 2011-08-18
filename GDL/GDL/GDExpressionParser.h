@@ -1,3 +1,9 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+#if defined(GD_IDE_ONLY)
+
 #ifndef GDEXPRESSIONPARSER_H
 #define GDEXPRESSIONPARSER_H
 
@@ -93,3 +99,5 @@ class ParserCallbacks
 };
 
 #endif // GDEXPRESSIONPARSER_H
+
+#endif

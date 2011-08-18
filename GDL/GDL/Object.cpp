@@ -262,6 +262,11 @@ unsigned int Object::GetNumberOfProperties() const
     //Be careful, properties start at 0.
     return 10;
 }
+
+wxPanel * Object::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
+{
+    return new wxPanel(parent);
+}
 #endif
 
 void Object::DeleteFromScene(RuntimeScene & scene)
@@ -567,11 +572,6 @@ void Object::SetXY( float xValue, const char* xOperator, float yValue, const cha
         SetY( GetY() * yValue );
     else if ( strcmp(yOperator, "/") == 0 )
         SetY( GetY() / yValue );
-}
-
-wxPanel * Object::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
-{
-    return new wxPanel(parent);
 }
 
 std::vector<RotatedRectangle> Object::GetHitBoxes() const

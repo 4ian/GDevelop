@@ -52,8 +52,10 @@
 using namespace std;
 
 OpenSaveGame::OpenSaveGame( Game & game_ ) :
-game(game_),
-updateEventsFromGD1x(false)
+game(game_)
+#if defined(GD_IDE_ONLY)
+,updateEventsFromGD1x(false)
+#endif
 {
 }
 
@@ -140,12 +142,21 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 
 
     //Compatibility code
+    #if defined(GD_IDE_ONLY)
     if ( major <= 1 )
     {
         updateEventsFromGD1x = true;
         game.extensionsUsed.push_back("BuiltinMathematicalTools");
+
+        if ( minor < 5 || build < 10151 )
+        {
+            wxLogWarning(_("Le jeu ouvert a été enregistré avec une ancienne version de Game Develop.\nIl se peut que le jeu ne soit pas correctement ouvert.\nVeuillez ouvrir le jeu et l'enregistrer avec la version 1.5.10151 avant de le réouvrir avec cette version de Game Develop."));
+        }
+
     }
+
     //End of Compatibility code
+    #endif
 
     elem = hdl.FirstChildElement().FirstChildElement( "Info" ).Element();
     if ( elem )
@@ -1372,6 +1383,7 @@ void OpenSaveGame::RecreatePaths(string file)
 #endif //GDE
 }
 
+#if defined(GD_IDE_ONLY)
 void OpenSaveGame::AdaptConditionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos)
 {
     vector < GDExpression > newParameters = instruction.GetParameters();
@@ -1392,6 +1404,7 @@ void OpenSaveGame::AdaptConditionFromGD1x(Instruction & instruction, const Instr
             AdaptConditionFromGD1x(subInstructions[i], extensionManager->GetConditionInfos(subInstructions[i].GetType()));
     }
 }
+
 void OpenSaveGame::AdaptActionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos)
 {
     vector < GDExpression > newParameters = instruction.GetParameters();
@@ -1441,3 +1454,5 @@ void OpenSaveGame::AdaptEventsFromGD1x(vector < BaseEventSPtr > & list)
             AdaptEventsFromGD1x(list[eId]->GetSubEvents());
     }
 }
+
+#endif

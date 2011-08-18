@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #include "GDL/ExpressionsCorrectnessTesting.h"
 #include "GDL/GDExpressionParser.h"
 #include "GDL/CommonTools.h"
@@ -51,3 +53,5 @@ bool CallbacksForExpressionCorrectnessTesting::OnSubTextExpression(const Game & 
 
     return true;
 }
+
+#endif

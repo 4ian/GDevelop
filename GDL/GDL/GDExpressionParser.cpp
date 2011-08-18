@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY)
 
 #include "GDExpressionParser.h"
 #include "GDL/Scene.h"
@@ -910,3 +911,4 @@ GDExpressionParser::GDExpressionParser(const std::string & expressionPlainString
 expressionPlainString(expressionPlainString_)
 {
 }
+#endif

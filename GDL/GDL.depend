@@ -13241,7 +13241,7 @@
 1297462808 source:d:\florian\programmation\gamedevelop2\gdl\gdl\camera.cpp
 	"GDL/Camera.h"
 
-1313534906 source:d:\florian\programmation\gamedevelop2\gdl\gdl\cameraextension.cpp
+1313576417 source:d:\florian\programmation\gamedevelop2\gdl\gdl\cameraextension.cpp
 	"GDL/CameraExtension.h"
 	"GDL/ExtensionBase.h"
 
@@ -13511,7 +13511,7 @@
 	"GDL/Log.h"
 	"GDL/Instruction.h"
 
-1310079054 d:\florian\programmation\gamedevelop2\gdl\\gdl\opensavegame.h
+1313666635 d:\florian\programmation\gamedevelop2\gdl\\gdl\opensavegame.h
 	"GDL/Game.h"
 	<string>
 	"GDL/tinyxml.h"
@@ -13630,7 +13630,7 @@
 	<string>
 	<vector>
 
-1309973615 source:d:\florian\programmation\gamedevelop2\gdl\gdl\commonconversionsextension.cpp
+1313583533 source:d:\florian\programmation\gamedevelop2\gdl\gdl\commonconversionsextension.cpp
 	"GDL/CommonConversionsExtension.h"
 
 1297545221 d:\florian\programmation\gamedevelop2\gdl\\gdl\commonconversionsextension.h
@@ -14433,11 +14433,11 @@
 	<string>
 	<wx/wx.h>
 
-1313335469 d:\florian\programmation\gamedevelop2\gdl\\gdl\gdexpressionparser.h
+1313666059 d:\florian\programmation\gamedevelop2\gdl\\gdl\gdexpressionparser.h
 	<string>
 	<vector>
 
-1313489349 source:d:\florian\programmation\gamedevelop2\gdl\gdl\gdexpressionparser.cpp
+1313666059 source:d:\florian\programmation\gamedevelop2\gdl\gdl\gdexpressionparser.cpp
 	"GDExpressionParser.h"
 	"GDL/Scene.h"
 	"GDL/Game.h"
@@ -14449,7 +14449,7 @@
 	"GDL/CommonInstructions.h"
 	"GDL/CommonTools.h"
 
-1313335469 d:\florian\programmation\gamedevelop2\gdl\gdl\gdexpressionparser.h
+1313666059 d:\florian\programmation\gamedevelop2\gdl\gdl\gdexpressionparser.h
 	<string>
 	<vector>
 
@@ -14592,7 +14592,7 @@
 	"GDL/ExtensionsManager.h"
 	"GDL/profile.h"
 
-1313530092 source:d:\florian\programmation\gamedevelop2\gdl\gdl\object.cpp
+1313666203 source:d:\florian\programmation\gamedevelop2\gdl\gdl\object.cpp
 	"GDL/Object.h"
 	<iostream>
 	<string>
@@ -14820,7 +14820,7 @@
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
 
-1313527651 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
+1313585308 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
 	"GDL/RuntimeScene.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -15061,10 +15061,11 @@
 
 1282594524 source:d:\florian\programmation\gamedevelop2\gdl\gdl\treeitemstrexpressioninfodata.cpp
 
-1312476511 source:d:\florian\programmation\gamedevelop2\gdl\gdl\variable.cpp
+1313586269 source:d:\florian\programmation\gamedevelop2\gdl\gdl\variable.cpp
 	"GDL/Variable.h"
 	<string>
 	<sstream>
+	"GDL/profile.h"
 
 1312911446 source:d:\florian\programmation\gamedevelop2\gdl\gdl\variablesextension.cpp
 	"GDL/VariablesExtension.h"
@@ -32130,7 +32131,7 @@
 
 1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
-1313575203 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodegenerationcontext.cpp
+1313584385 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodegenerationcontext.cpp
 	"EventsCodeGenerationContext.h"
 	"GDL/Game.h"
 	"GDL/Scene.h"
@@ -32759,13 +32760,14 @@
 	"wx/defs.h"
 	"wx/dialog.h"
 
-1313530092 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spritetools.cpp
+1313585308 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spritetools.cpp
 	"SpriteTools.h"
 	<string>
 	<vector>
 	"GDL/SpriteObject.h"
 	"GDL/RuntimeScene.h"
 	"GDL/Collisions.h"
+	"GDL/profile.h"
 
 1311718470 d:\florian\programmation\gamedevelop2\gdl\gdl\spritetools.h
 	<string>
@@ -32920,14 +32922,14 @@
 	<string>
 	"GDL/RuntimeScene.h"
 
-1312199327 source:d:\florian\programmation\gamedevelop2\gdl\gdl\expressionscorrectnesstesting.cpp
+1313666097 source:d:\florian\programmation\gamedevelop2\gdl\gdl\expressionscorrectnesstesting.cpp
 	"GDL/ExpressionsCorrectnessTesting.h"
 	"GDL/GDExpressionParser.h"
 	"GDL/CommonTools.h"
 	"GDL/Scene.h"
 	"GDL/Game.h"
 
-1312214008 d:\florian\programmation\gamedevelop2\gdl\\gdl\expressionscorrectnesstesting.h
+1313666081 d:\florian\programmation\gamedevelop2\gdl\\gdl\expressionscorrectnesstesting.h
 	<vector>
 	<string>
 	"GDL/GDExpressionParser.h"
@@ -33212,7 +33214,7 @@
 	<vector>
 	<map>
 
-1313527318 d:\florian\programmation\gamedevelop2\gdl\\gdl\profiletools.h
+1313666728 d:\florian\programmation\gamedevelop2\gdl\\gdl\profiletools.h
 	<vector>
 	<map>
 

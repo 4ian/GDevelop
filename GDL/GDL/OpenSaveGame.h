@@ -36,10 +36,10 @@ public:
     static void SaveEvents( const vector < BaseEventSPtr > & list, TiXmlElement * events );
     static void SaveConditions(const vector < Instruction > & list, TiXmlElement * elem);
     static void SaveActions(const vector < Instruction > & list, TiXmlElement * elem);
-    #endif
 
     //Compatibility code --- with Game Develop 1
     static void AdaptEventsFromGD1x(vector < BaseEventSPtr > & list);
+    #endif
 
 private:
 
@@ -62,12 +62,12 @@ private:
     void SaveLayers( const vector < Layer > & list, TiXmlElement * layers );
     void SaveExternalEvents( const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * layers );
     static void SaveVariablesList(const ListVariable & list, TiXmlElement * elem);
-    #endif
 
     static void AdaptConditionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos);
     static void AdaptActionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos);
 
     bool updateEventsFromGD1x;
+    #endif
 };
 
 #endif // OPENSAVEGAME_H

@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef EXPRESSIONSCORRECTNESSTESTING_H
 #define EXPRESSIONSCORRECTNESSTESTING_H
 
@@ -46,3 +48,5 @@ class GD_API CallbacksForExpressionCorrectnessTesting : public ParserCallbacks
 };
 
 #endif // EXPRESSIONSCORRECTNESSTESTING_H
+
+#endif

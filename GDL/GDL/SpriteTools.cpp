@@ -9,6 +9,7 @@
 #include "GDL/SpriteObject.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/Collisions.h"
+#include "GDL/profile.h"
 
 bool GD_API SpriteTurnedToward( std::string, std::string, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
@@ -102,6 +103,8 @@ bool GD_API SpriteTurnedToward( std::string, std::string, std::map <std::string,
  */
 bool GD_API SpriteCollision( std::string, std::string, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, bool conditionInverted )
 {
+    BT_PROFILE("SpriteCollision");
+
     vector<Object*> objects1;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
@@ -132,19 +135,33 @@ bool GD_API SpriteCollision( std::string, std::string, std::map <std::string, st
     //On teste la collision entre chaque objets
     for ( std::vector<Object*>::const_iterator obj = objects1.begin(); obj != obj_end; ++obj )
     {
+        bool collideWithAtLeastOneObject = false;
         for (std::vector<Object*>::const_iterator obj2 = objects2.begin(); obj2 != obj2_end; ++obj2 )
         {
             //On vérifie que ce n'est pas le même objet
             if ( *obj != *obj2 &&
-                CheckCollision( static_cast<SpriteObject*>(*obj), static_cast<SpriteObject*>(*obj2) ) ^ conditionInverted )
+                CheckCollision( static_cast<SpriteObject*>(*obj), static_cast<SpriteObject*>(*obj2) ) )
             {
-                if ( find(objectsLists1[(*obj)->GetName()]->begin(), objectsLists1[(*obj)->GetName()]->end(), (*obj)) == objectsLists1[(*obj)->GetName()]->end() )
-                    objectsLists1[(*obj)->GetName()]->push_back((*obj));
+                if ( !conditionInverted )
+                {
+                    if ( find(objectsLists1[(*obj)->GetName()]->begin(), objectsLists1[(*obj)->GetName()]->end(), (*obj)) == objectsLists1[(*obj)->GetName()]->end() )
+                        objectsLists1[(*obj)->GetName()]->push_back((*obj));
 
-                if ( find(objectsLists2[(*obj2)->GetName()]->begin(), objectsLists2[(*obj2)->GetName()]->end(), (*obj2)) == objectsLists2[(*obj2)->GetName()]->end() )
-                    objectsLists2[(*obj2)->GetName()]->push_back((*obj2));
-                isTrue = true;
+                    if ( find(objectsLists2[(*obj2)->GetName()]->begin(), objectsLists2[(*obj2)->GetName()]->end(), (*obj2)) == objectsLists2[(*obj2)->GetName()]->end() )
+                        objectsLists2[(*obj2)->GetName()]->push_back((*obj2));
+
+                    isTrue = true;
+                }
+
+                collideWithAtLeastOneObject = true;
             }
+        }
+
+        if ( conditionInverted && !collideWithAtLeastOneObject)
+        {
+            isTrue = true;
+            if ( find(objectsLists1[(*obj)->GetName()]->begin(), objectsLists1[(*obj)->GetName()]->end(), (*obj)) == objectsLists1[(*obj)->GetName()]->end() )
+                objectsLists1[(*obj)->GetName()]->push_back((*obj));
         }
     }
 

@@ -14,6 +14,8 @@ StringInstructionsExtension::StringInstructionsExtension()
                           "Compil Games",
                           "Freeware")
 
+    #if defined(GD_IDE_ONLY)
+
     DECLARE_STR_EXPRESSION("SubStr",
                    _("Obtenir une portion de texte depuis un texte"),
                    _("Obtenir une portion de texte depuis un texte"),
@@ -106,4 +108,5 @@ StringInstructionsExtension::StringInstructionsExtension()
         instrInfo.cppCallingInformation.SetFunctionName("GDpriv::StringTools::StrRFindFrom").SetIncludeFile("GDL/StringTools.h");
 
     DECLARE_END_EXPRESSION()
+    #endif
 }

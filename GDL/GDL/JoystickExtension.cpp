@@ -11,6 +11,7 @@ JoystickExtension::JoystickExtension()
                           _("Extension permettant d'utiliser des joysticks, integrée en standard"),
                           "Compil Games",
                           "Freeware")
+    #if defined(GD_IDE_ONLY)
 
     DECLARE_CONDITION("JoystickButtonDown",
                    _("Un bouton d'un joystick est appuyé"),
@@ -76,4 +77,5 @@ JoystickExtension::JoystickExtension()
         instrInfo.cppCallingInformation.SetFunctionName("GetJoystickAxisValue").SetIncludeFile("GDL/JoystickTools.h");
 
     DECLARE_END_EXPRESSION()
+    #endif
 }

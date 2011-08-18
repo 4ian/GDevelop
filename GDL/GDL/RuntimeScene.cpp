@@ -537,11 +537,14 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     initialLayers = scene.initialLayers;
     variables = scene.variables;
 
+    #if defined(GD_IDE_ONLY)
+    profiler = scene.profiler;
     events = CloneVectorOfEvents(scene.events);
+    #endif
+
     compiledEventsExecutionEngine = scene.compiledEventsExecutionEngine;
     compiledEventsExecutionEngine->llvmRuntimeContext->scene = this;
 
-    profiler = scene.profiler;
 
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;

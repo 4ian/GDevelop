@@ -13,6 +13,7 @@ TimeExtension::TimeExtension()
                           _("Extension proposant des actions et conditions sur le temps, integrée en standard"),
                           "Compil Games",
                           "Freeware")
+    #if defined(GD_IDE_ONLY)
 
     DECLARE_CONDITION("Timer",
                    _("Valeur d'un chronomètre"),
@@ -183,8 +184,10 @@ TimeExtension::TimeExtension()
         instrInfo.AddParameter("", _("Valeur à récupérer :\n\nHeure : hour\nMinutes : min\nSecondes : sec\nJour du mois: mday\nMois depuis janvier : mon\nAnnées depuis 1900 : year\nJours depuis dimanche :wday\nJours depuis le 1er Janvier : yday"), "",false);
         instrInfo.cppCallingInformation.SetFunctionName("GetTime").SetIncludeFile("GDL/TimeTools.h");
     DECLARE_END_EXPRESSION()
+    #endif
 }
 
+#if defined(GD_IDE_ONLY)
 void TimeExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const
 {
     if ( propertyNb < scene.timers.size() )
@@ -212,3 +215,4 @@ unsigned int TimeExtension::GetNumberOfProperties(RuntimeScene & scene) const
 {
     return scene.timers.size();
 }
+#endif

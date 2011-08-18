@@ -9,9 +9,9 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
-bool GD_API EcrireLog(string, string);
-bool GD_API InitLog();
+/**
+ * Display Game Develop version and some informations to std::cout.
+ */
+void GD_API GDLogBanner();
 
 #endif // LOG_H_INCLUDED

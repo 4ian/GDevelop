@@ -1,3 +1,10 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
+#if defined(GD_IDE_ONLY)
+
 #include "ExternalEvents.h"
 
 ExternalEvents::ExternalEvents()
@@ -23,3 +30,5 @@ void ExternalEvents::Init(const ExternalEvents & externalEvents)
     name = externalEvents.GetName();
     events = CloneVectorOfEvents(externalEvents.events);
 }
+
+#endif

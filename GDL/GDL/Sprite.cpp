@@ -8,6 +8,7 @@ Point Sprite::badPoint("");
 
 Sprite::Sprite() :
 hasItsOwnImage(false),
+automaticCollisionMask(true),
 origine("origine"),
 centre("centre"),
 automaticCentre(true)

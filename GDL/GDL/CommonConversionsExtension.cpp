@@ -7,7 +7,7 @@ CommonConversionsExtension::CommonConversionsExtension()
                           _("Extension apportant des expressions de conversion, intégrée en standard."),
                           "Compil Games",
                           "Freeware")
-
+    #if defined(GD_IDE_ONLY)
 
     DECLARE_EXPRESSION("ToNumber",
                        _("Convertir en un nombre"),
@@ -32,4 +32,5 @@ CommonConversionsExtension::CommonConversionsExtension()
         instrInfo.cppCallingInformation.SetFunctionName("ToString").SetIncludeFile("GDL/LightweightCommonTools.h");
 
     DECLARE_END_STR_EXPRESSION()
+    #endif
 }

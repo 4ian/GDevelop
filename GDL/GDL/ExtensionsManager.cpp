@@ -39,9 +39,11 @@ namespace GDpriv
 {
 
 ExtensionsManager *ExtensionsManager::_singleton = NULL;
+#if defined(GD_IDE_ONLY)
 InstructionInfos ExtensionsManager::badInstructionInfos;
 ExpressionInfos ExtensionsManager::badExpressionInfos;
 StrExpressionInfos ExtensionsManager::badStrExpressionInfos;
+#endif
 AutomatismInfo ExtensionsManager::badAutomatismInfo;
 ExtensionObjectInfos ExtensionsManager::badObjectInfo;
 
@@ -131,6 +133,7 @@ boost::shared_ptr<ExtensionBase> ExtensionsManager::GetExtension(string name) co
     return boost::shared_ptr<ExtensionBase> ();
 }
 
+#if defined(GD_IDE_ONLY)
 bool ExtensionsManager::HasEventType(std::string eventType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
@@ -164,6 +167,22 @@ bool ExtensionsManager::HasAutomatism(std::string automatismType) const
 
     return false;
 }
+#endif
+
+boost::shared_ptr<Object> ExtensionsManager::CreateObject(std::string type, std::string name)
+{
+    if ( creationFunctionTable.find(type) == creationFunctionTable.end() )
+    {
+        std::cout << "Tried to create an object with an unknown type: " << type << std::endl;
+        type = "";
+    }
+
+    //Create a new object with the type we want.
+    Object * object = creationFunctionTable[type](name);
+    object->SetType(type);
+
+    return boost::shared_ptr<Object> (object, destroyFunctionTable[type]);
+}
 
 boost::shared_ptr<Automatism> ExtensionsManager::CreateAutomatism(std::string automatismType) const
 {
@@ -189,6 +208,7 @@ boost::shared_ptr<AutomatismsSharedDatas> ExtensionsManager::CreateAutomatismSha
     return boost::shared_ptr<AutomatismsSharedDatas>();
 }
 
+#if defined(GD_IDE_ONLY)
 const AutomatismInfo& ExtensionsManager::GetAutomatismInfo(std::string automatism) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
@@ -607,22 +627,6 @@ bool ExtensionsManager::HasAutomatismStrExpression(std::string automatismType, s
     return false;
 }
 
-boost::shared_ptr<Object> ExtensionsManager::CreateObject(std::string type, std::string name)
-{
-    if ( creationFunctionTable.find(type) == creationFunctionTable.end() )
-    {
-        std::cout << "Tried to create an object with an unknown type: " << type << std::endl;
-        type = "";
-    }
-
-    //Create a new object with the type we want.
-    Object * object = creationFunctionTable[type](name);
-    object->SetType(type);
-
-    return boost::shared_ptr<Object> (object, destroyFunctionTable[type]);
-}
-
-#if defined(GD_IDE_ONLY)
 /**
  * Get information about an object
  */

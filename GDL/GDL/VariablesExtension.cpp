@@ -12,6 +12,7 @@ VariablesExtension::VariablesExtension()
                           _("Extension permettant de manipuler les variables, integrée en standard"),
                           "Compil Games",
                           "Freeware")
+    #if defined(GD_IDE_ONLY)
 
     DECLARE_CONDITION("VarScene",
                    _("Variable de la scène"),
@@ -206,4 +207,5 @@ VariablesExtension::VariablesExtension()
 
         instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariableString").SetIncludeFile("GDL/RuntimeSceneTools.h");
     DECLARE_END_STR_EXPRESSION()
+    #endif
 }

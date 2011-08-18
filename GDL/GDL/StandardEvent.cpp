@@ -3,18 +3,17 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #include "StandardEvent.h"
 #include "GDL/tinyxml.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/CommonTools.h"
 #include "GDL/EventsCodeGenerator.h"
 #include "GDL/EventsCodeGenerationContext.h"
-
-#if defined(GD_IDE_ONLY)
 #include "EventsRenderingHelper.h"
 #include "GDL/EventsEditorItemsAreas.h"
 #include "GDL/EventsEditorSelection.h"
-#endif
 
 StandardEvent::StandardEvent() :
 BaseEvent()
@@ -65,7 +64,6 @@ vector < vector<Instruction>* > StandardEvent::GetAllActionsVectors()
     return allActions;
 }
 
-#if defined(GD_IDE_ONLY)
 void StandardEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     //Les conditions
@@ -88,7 +86,6 @@ void StandardEvent::SaveToXml(TiXmlElement * eventElem) const
         OpenSaveGame::SaveEvents(events, subeventsElem);
     }
 }
-#endif
 
 void StandardEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
@@ -109,7 +106,6 @@ void StandardEvent::LoadFromXml(const TiXmlElement * eventElem)
         OpenSaveGame::OpenEvents(events, eventElem->FirstChildElement( "Events" ));
 }
 
-#if defined(GD_IDE_ONLY)
 /**
  * Render the event in the bitmap
  */
@@ -151,7 +147,6 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width) const
 
     return renderedHeight;
 }
-#endif
 
 /**
  * Initialize from another StandardEvent.
@@ -187,3 +182,5 @@ StandardEvent& StandardEvent::operator=(const StandardEvent & event)
 
     return *this;
 }
+
+#endif

@@ -15,11 +15,14 @@
 using namespace std;
 
 std::map<std::string, ExtensionObjectInfos > ExtensionBase::badObjectsInfos;
+std::map<std::string, AutomatismInfo > ExtensionBase::badAutomatismsInfo;
+
+#if defined(GD_IDE_ONLY)
 std::map<std::string, InstructionInfos > ExtensionBase::badConditionsInfos;
 std::map<std::string, InstructionInfos > ExtensionBase::badActionsInfos;
 std::map<std::string, ExpressionInfos > ExtensionBase::badExpressionsInfos;
 std::map<std::string, StrExpressionInfos > ExtensionBase::badStrExpressionsInfos;
-std::map<std::string, AutomatismInfo > ExtensionBase::badAutomatismsInfo;
+#endif
 
 ExtensionObjectInfos::ExtensionObjectInfos() :
 destroyFunPtr(NULL),
@@ -27,53 +30,42 @@ createFunPtr(NULL)
 {
 }
 
-ExpressionInfos::ExpressionInfos(ExtensionBase & parentExtension)
 #if defined(GD_IDE_ONLY)
-:shown(true),
+ExpressionInfos::ExpressionInfos(ExtensionBase & parentExtension) :
+shown(true),
 extensionNamespace(parentExtension.GetNameSpace())
-#endif
 {
 }
 
 ExpressionInfos & ExpressionInfos::SetHidden()
 {
-    #if defined(GD_IDE_ONLY)
     shown = false;
-    #endif
 
     return *this;
 }
 
-StrExpressionInfos::StrExpressionInfos(ExtensionBase & parentExtension)
-#if defined(GD_IDE_ONLY)
-:shown(true),
+StrExpressionInfos::StrExpressionInfos(ExtensionBase & parentExtension) :
+shown(true),
 extensionNamespace(parentExtension.GetNameSpace())
-#endif
 {
 }
 
 StrExpressionInfos & StrExpressionInfos::SetHidden()
 {
-    #if defined(GD_IDE_ONLY)
     shown = false;
-    #endif
 
     return *this;
 }
 
-InstructionInfos::InstructionInfos(ExtensionBase & parentExtension)
-#if defined(GD_IDE_ONLY)
-:canHaveSubInstructions(false),
+InstructionInfos::InstructionInfos(ExtensionBase & parentExtension) :
+canHaveSubInstructions(false),
 extensionNamespace(parentExtension.GetNameSpace())
-#endif
 {
 }
 
-ParameterInfo::ParameterInfo()
-#if defined(GD_IDE_ONLY)
-:optional(false),
+ParameterInfo::ParameterInfo() :
+optional(false),
 codeOnly(false)
-#endif
 {
 }
 
@@ -81,6 +73,7 @@ EventInfos::EventInfos() :
 instance(boost::shared_ptr<BaseEvent>())
 {
 }
+#endif
 
 AutomatismInfo::AutomatismInfo() :
 instance(boost::shared_ptr<Automatism>())
@@ -130,6 +123,7 @@ vector < std::string > ExtensionBase::GetExtensionObjectsTypes() const
     return objects;
 }
 
+#if defined(GD_IDE_ONLY)
 vector < std::string > ExtensionBase::GetAutomatismsTypes() const
 {
     vector < string > automatisms;
@@ -141,18 +135,12 @@ vector < std::string > ExtensionBase::GetAutomatismsTypes() const
     return automatisms;
 }
 
-#if !defined(GD_IDE_ONLY)
-ParameterInfo & InstructionInfos::AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional)
-#else //This is exactly the same function, but wxString need to be used in IDE
 ParameterInfo & InstructionInfos::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
-#endif
 {
     ParameterInfo info;
     info.type = type;
-    #if defined(GD_IDE_ONLY)
     info.description = ToString(description);
     info.codeOnly = false;
-    #endif
     info.optional = parameterIsOptional;
     info.supplementaryInformation = optionalObjectType.empty() ? "" : extensionNamespace+optionalObjectType;
 
@@ -164,27 +152,19 @@ ParameterInfo & InstructionInfos::AddCodeOnlyParameter(const std::string & type,
 {
     ParameterInfo info;
     info.type = type;
-    #if defined(GD_IDE_ONLY)
     info.codeOnly = true;
-    #endif
     info.supplementaryInformation = supplementaryInformation;
 
     parameters.push_back(info);
     return parameters.back();
 }
 
-#if !defined(GD_IDE_ONLY)
-ParameterInfo & ExpressionInfos::AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional)
-#else //This is exactly the same function, but wxString need to be used in IDE
 ParameterInfo & ExpressionInfos::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
-#endif
 {
     ParameterInfo info;
     info.type = type;
-    #if defined(GD_IDE_ONLY)
     info.description = ToString(description);
     info.codeOnly = false;
-    #endif
     info.optional = parameterIsOptional;
     info.supplementaryInformation = optionalObjectType.empty() ? "" : extensionNamespace+optionalObjectType;
 
@@ -196,27 +176,19 @@ ParameterInfo & ExpressionInfos::AddCodeOnlyParameter(const std::string & type, 
 {
     ParameterInfo info;
     info.type = type;
-    #if defined(GD_IDE_ONLY)
     info.codeOnly = true;
-    #endif
     info.supplementaryInformation = supplementaryInformation;
 
     parameters.push_back(info);
     return parameters.back();
 }
 
-#if !defined(GD_IDE_ONLY)
-ParameterInfo & StrExpressionInfos::AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional)
-#else //This is exactly the same function, but wxString need to be used in IDE
 ParameterInfo & StrExpressionInfos::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
-#endif
 {
     ParameterInfo info;
     info.type = type;
-    #if defined(GD_IDE_ONLY)
     info.description = ToString(description);
     info.codeOnly = false;
-    #endif
     info.optional = parameterIsOptional;
     info.supplementaryInformation = optionalObjectType.empty() ? "" : extensionNamespace+optionalObjectType;
 
@@ -228,9 +200,7 @@ ParameterInfo & StrExpressionInfos::AddCodeOnlyParameter(const std::string & typ
 {
     ParameterInfo info;
     info.type = type;
-    #if defined(GD_IDE_ONLY)
     info.codeOnly = true;
-    #endif
     info.supplementaryInformation = supplementaryInformation;
 
     parameters.push_back(info);
@@ -330,7 +300,6 @@ const std::map<std::string, StrExpressionInfos > & ExtensionBase::GetAllStrExpre
     return badStrExpressionsInfos;
 }
 
-#if defined(GD_IDE_ONLY)
 const ExtensionObjectInfos & ExtensionBase::GetObjectInfo(std::string objectType) const
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
@@ -338,7 +307,6 @@ const ExtensionObjectInfos & ExtensionBase::GetObjectInfo(std::string objectType
 
     return badObjectsInfos[""];
 }
-#endif
 
 const AutomatismInfo & ExtensionBase::GetAutomatismInfo(std::string objectType) const
 {
@@ -347,6 +315,7 @@ const AutomatismInfo & ExtensionBase::GetAutomatismInfo(std::string objectType) 
 
     return badAutomatismsInfo[""];
 }
+#endif
 
 CreateFunPtr ExtensionBase::GetObjectCreationFunctionPtr(std::string objectType) const
 {
@@ -364,6 +333,7 @@ DestroyFunPtr ExtensionBase::GetDestroyObjectFunction(std::string objectType) co
     return NULL;
 }
 
+#if defined(GD_IDE_ONLY)
 BaseEventSPtr ExtensionBase::CreateEvent(std::string eventType) const
 {
     if ( eventsInfos.find(eventType) != eventsInfos.end())
@@ -371,6 +341,7 @@ BaseEventSPtr ExtensionBase::CreateEvent(std::string eventType) const
 
     return boost::shared_ptr<BaseEvent>();
 }
+#endif
 
 boost::shared_ptr<Automatism> ExtensionBase::CreateAutomatism(std::string type) const
 {

@@ -6,12 +6,12 @@ void GD_API CenterCursor( RuntimeScene & scene )
     scene.renderWindow->SetCursorPosition(scene.renderWindow->GetWidth()/2, scene.renderWindow->GetHeight()/2 );
 }
 
-void GD_API CenterCursorHorizontally( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API CenterCursorHorizontally( RuntimeScene & scene )
 {
     scene.renderWindow->SetCursorPosition(scene.renderWindow->GetWidth()/2, scene.input->GetMouseY() );
 }
 
-void GD_API CenterCursorVertically( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, const Instruction & action )
+void GD_API CenterCursorVertically( RuntimeScene & scene )
 {
     scene.renderWindow->SetCursorPosition(scene.input->GetMouseX(), scene.renderWindow->GetHeight()/2 );
 }

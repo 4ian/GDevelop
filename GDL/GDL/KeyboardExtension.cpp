@@ -13,6 +13,7 @@ KeyboardExtension::KeyboardExtension()
                           _("Extension permettant d'utiliser le clavier, integrée en standard"),
                           "Compil Games",
                           "Freeware")
+    #if defined(GD_IDE_ONLY)
 
     DECLARE_CONDITION("KeyPressed",
                    _("Une touche est appuyée"),
@@ -57,4 +58,5 @@ KeyboardExtension::KeyboardExtension()
         instrInfo.cppCallingInformation.SetFunctionName("AnyKeyIsPressed").SetIncludeFile("GDL/KeyboardTools.h");
 
     DECLARE_END_CONDITION()
+    #endif
 }

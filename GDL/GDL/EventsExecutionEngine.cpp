@@ -18,6 +18,7 @@
 #include <llvm/Support/TypeBuilder.h>
 #undef _ //llvm/Support/system_error.h does not support wxWidgets "_" macro
 #include <llvm/Support/system_error.h>
+#include <SFML/System.hpp>
 #include "GDL/RuntimeContext.h"
 
 #if defined(GD_IDE_ONLY)
@@ -50,6 +51,62 @@ void EventsExecutionEngine::Execute()
 {
     const std::vector< llvm::GenericValue > args;
     llvmExecutionEngine->runFunction(eventsEntryFunction, args);
+}
+
+bool EventsExecutionEngine::LoadFromLLVMBitCode(const std::string & bitCode)
+{
+    const char * src = bitCode.c_str();
+    llvm::StringRef input_data(src);
+    llvm::StringRef buffer_name("src");
+    llvm::OwningPtr<llvm::MemoryBuffer> eventsBuffer;
+    eventsBuffer.reset(llvm::MemoryBuffer::getMemBufferCopy(input_data, buffer_name));
+
+    return LoadFromLLVMBitCode(eventsBuffer.get());
+}
+
+bool EventsExecutionEngine::LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffer)
+{
+    std::string parseError;
+    llvmModule = ParseBitcodeFile(eventsBuffer, llvmContext, &parseError);
+    std::cout << parseError;
+
+    if (!llvmModule)
+    {
+        std::cout << "Module creation failed\n";
+        return false;
+    }
+
+    std::string error;
+    llvmExecutionEngine.reset( llvm::ExecutionEngine::createJIT(llvmModule, &error, 0, llvm::CodeGenOpt::None)); //No optimisation during machine code generation
+    if (!llvmExecutionEngine)
+    {
+        std::cout << "unable to make execution engine: " << error << "\n";
+        return false;
+    }
+
+    eventsEntryFunction = llvmModule->getFunction("main");
+    if (!eventsEntryFunction)
+    {
+        std::cout << "'main' function not found in module.\n";
+        return false;
+    }
+
+    std::cout << "Mapping objects of execution engine...\n";
+    llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(llvmModule->getOrInsertGlobal("pointerToRuntimeContext", llvm::TypeBuilder<void*, false>::get(llvmModule->getContext())));
+    llvmExecutionEngine->addGlobalMapping(globalValue, &llvmRuntimeContext);
+
+    // Using this, warnAboutUnknownFunctions is called if we need to generate code for an unknown function.
+    // As each function should normally be provided by extensions or gd, no such unknown function should exists.
+    // If warnAboutUnknownFunctions is called, it will prevent LLVM from crashing by returning a dummy function, and
+    // will warn the user about this problem.
+    llvmExecutionEngine->InstallLazyFunctionCreator(UseSubstituteForUnknownFunctions);
+
+    std::cout << "JIT Compilation to machine code...\n";
+    sf::Clock jitTimer;
+    llvmExecutionEngine->getPointerToFunction(eventsEntryFunction);
+    std::cout << "JIT Compilation duration: " << jitTimer.GetElapsedTime()<<"s"<<std::endl;
+
+    return true;
 }
 
 void GDEmptyFunctionDoingNothing()

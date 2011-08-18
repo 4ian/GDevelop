@@ -256,27 +256,27 @@ bool SourceFileBuilder::BuildSourceFile(std::string filename)
 
     std::string definesStr;
     {
-        vector < string > defines = SpliterStringToVector<string>(gdlDefines, ' ');
+        vector < string > defines = SplitString<string>(gdlDefines, ' ');
         for (unsigned int i = 0;i<defines.size();++i)
             definesStr += " -D"+defines[i];
     }
     {
-        vector < string > defines = SpliterStringToVector<string>(sfmlDefines, ' ');
+        vector < string > defines = SplitString<string>(sfmlDefines, ' ');
         for (unsigned int i = 0;i<defines.size();++i)
             definesStr += " -D"+defines[i];
     }
     {
-        vector < string > defines = SpliterStringToVector<string>(wxwidgetsDefines, ' ');
+        vector < string > defines = SplitString<string>(wxwidgetsDefines, ' ');
         for (unsigned int i = 0;i<defines.size();++i)
             definesStr += " -D"+defines[i];
     }
     {
-        vector < string > defines = SpliterStringToVector<string>(osDefines, ' ');
+        vector < string > defines = SplitString<string>(osDefines, ' ');
         for (unsigned int i = 0;i<defines.size();++i)
             definesStr += " -D"+defines[i];
     }
     {
-        vector < string > defines = SpliterStringToVector<string>(boostDefines, ' ');
+        vector < string > defines = SplitString<string>(boostDefines, ' ');
         for (unsigned int i = 0;i<defines.size();++i)
             definesStr += " -D"+defines[i];
     }

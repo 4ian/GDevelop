@@ -3,19 +3,13 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef EVENT_H
 #define EVENT_H
 
-#if defined(GD_IDE_ONLY)
 #include <wx/dcbuffer.h> //This include file must be placed first
 #include <boost/weak_ptr.hpp>
-class Scene;
-class Game;
-class MainEditorCommand;
-class wxWindow;
-class EventsEditorItemsAreas;
-class EventsEditorSelection;
-#endif
 #include <iostream>
 #include <vector>
 #include <string>
@@ -24,6 +18,11 @@ class EventsEditorSelection;
 #include <boost/tuple/tuple.hpp>
 #include "GDL/Log.h"
 #include "GDL/Instruction.h"
+class Game;
+class MainEditorCommand;
+class wxWindow;
+class EventsEditorItemsAreas;
+class EventsEditorSelection;
 class Scene;
 class ObjectsConcerned;
 class Instruction;
@@ -105,12 +104,10 @@ class GD_API BaseEvent
          */
         virtual vector < GDExpression* > GetAllExpressions() { vector < GDExpression* > noExpr; return noExpr;};
 
-        #if defined(GD_IDE_ONLY)
         /**
          * Save event to XML
          */
         virtual void SaveToXml(TiXmlElement * eventElem) const {}
-        #endif
 
         /**
          * Load event from XML
@@ -120,7 +117,6 @@ class GD_API BaseEvent
         std::string GetType() const { return type; };
         void SetType(std::string type_) { type = type_; };
 
-#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */
@@ -145,7 +141,6 @@ class GD_API BaseEvent
 
     protected:
         mutable unsigned int    renderedHeight;
-#endif
 
     private:
         bool disabled; ///<True if the event is disabled and must not be executed
@@ -154,13 +149,11 @@ class GD_API BaseEvent
         static vector <BaseEventSPtr> badSubEvents;
 };
 
-#if defined(GD_IDE_ONLY)
 /**
  * Clone an event and insert a reference to the original event into the newly created event.
  * Used for profiling events for example.
  */
 BaseEventSPtr CloneRememberingOriginalEvent(BaseEventSPtr event);
-#endif
 
 /**
  * Helper function for copying vector of shared_ptr of events
@@ -168,3 +161,5 @@ BaseEventSPtr CloneRememberingOriginalEvent(BaseEventSPtr event);
 std::vector < BaseEventSPtr > GD_API CloneVectorOfEvents(const vector < BaseEventSPtr > & events);
 
 #endif // EVENT_H
+
+#endif

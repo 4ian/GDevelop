@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef REPEATEVENT_H
 #define REPEATEVENT_H
 #include "Event.h"
@@ -51,12 +53,9 @@ class RepeatEvent : public BaseEvent
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
         virtual vector < GDExpression* > GetAllExpressions();
 
-        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
-        #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */
@@ -71,7 +70,6 @@ class RepeatEvent : public BaseEvent
          * Called when the user want to edit the event
          */
         virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
-#endif
 
     private:
         void Init(const RepeatEvent & event);
@@ -81,9 +79,9 @@ class RepeatEvent : public BaseEvent
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
 
-#if defined(GD_IDE_ONLY)
         bool repeatNumberExpressionSelected;
-#endif
 };
 
 #endif // REPEATEVENT_H
+
+#endif

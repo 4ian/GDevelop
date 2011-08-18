@@ -56,8 +56,8 @@ class GD_API Scene
         float oglZFar; ///< OpenGL Far Z position
         bool stopSoundsOnStartup; ///< True to make the scene stop all sounds at startup.
 
-        vector < BaseEventSPtr >                events; ///< Scene events
         #if defined(GD_IDE_ONLY)
+        vector < BaseEventSPtr >                events; ///< Scene events
         BaseProfiler *                          profiler; ///< Pointer to the profiler. Can be NULL.
         #endif
         vector < boost::shared_ptr<Object> >    initialObjects; ///< Objects availables.
@@ -66,8 +66,8 @@ class GD_API Scene
         vector < Layer >                        initialLayers; ///< Initial layers
         ListVariable                            variables; ///< Variables list
         std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
-
         boost::shared_ptr<EventsExecutionEngine> compiledEventsExecutionEngine;
+
         #if defined(GD_IDE_ONLY)
         bool wasModified;
         bool eventsModified;

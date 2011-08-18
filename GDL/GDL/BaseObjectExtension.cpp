@@ -25,6 +25,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                    &DestroyBaseObject,
                    "");
 
+        #if defined(GD_IDE_ONLY)
         DECLARE_OBJECT_CONDITION("PosX",
                        _("Tester la position X d'un objet"),
                        _("Teste si la position X de l'objet correspond au test effectué."),
@@ -588,37 +589,37 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         DECLARE_END_OBJECT_ACTION()
 
-    DECLARE_OBJECT_ACTION("Rebondir",
-                   _("Ecarter un objet d'un autre"),
-                   _("Ecarte un objet d'un autre, en utilisant les forces."),
-                   _("Ecarter _PARAM0_ de _PARAM2_ ( seul _PARAM0_ bougera )"),
-                   _("Déplacement"),
-                   "res/actions/ecarter24.png",
-                   "res/actions/ecarter.png");
+        DECLARE_OBJECT_ACTION("Rebondir",
+                       _("Ecarter un objet d'un autre"),
+                       _("Ecarte un objet d'un autre, en utilisant les forces."),
+                       _("Ecarter _PARAM0_ de _PARAM2_ ( seul _PARAM0_ bougera )"),
+                       _("Déplacement"),
+                       "res/actions/ecarter24.png",
+                       "res/actions/ecarter.png");
 
-        instrInfo.AddParameter("object", _("Objet"), "", false);
-        instrInfo.AddParameter("object", _("Objet 2 ( Ne bougera pas )"), "", false);
-        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("object", _("Objet 2 ( Ne bougera pas )"), "", false);
+            instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
 
-        instrInfo.cppCallingInformation.SetFunctionName("SeparateObjectsWithForces").SetIncludeFile("GDL/ObjectTools.h");
+            instrInfo.cppCallingInformation.SetFunctionName("SeparateObjectsWithForces").SetIncludeFile("GDL/ObjectTools.h");
 
-    DECLARE_END_OBJECT_ACTION()
+        DECLARE_END_OBJECT_ACTION()
 
-    DECLARE_OBJECT_ACTION("Ecarter",
-                   _("Ecarter un objet d'un autre"),
-                   _("Ecarte un objet d'un autre sans utiliser les forces."),
-                   _("Ecarter _PARAM0_ de _PARAM2_ ( seul _PARAM0_ bougera )"),
-                   _("Position"),
-                   "res/actions/ecarter24.png",
-                   "res/actions/ecarter.png");
+        DECLARE_OBJECT_ACTION("Ecarter",
+                       _("Ecarter un objet d'un autre"),
+                       _("Ecarte un objet d'un autre sans utiliser les forces."),
+                       _("Ecarter _PARAM0_ de _PARAM2_ ( seul _PARAM0_ bougera )"),
+                       _("Position"),
+                       "res/actions/ecarter24.png",
+                       "res/actions/ecarter.png");
 
-        instrInfo.AddParameter("object", _("Objet"), "", false);
-        instrInfo.AddParameter("object", _("Objet 2 ( Ne bougera pas )"), "", false);
-        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("object", _("Objet 2 ( Ne bougera pas )"), "", false);
+            instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
 
-        instrInfo.cppCallingInformation.SetFunctionName("SeparateObjectsWithoutForces").SetIncludeFile("GDL/ObjectTools.h");
+            instrInfo.cppCallingInformation.SetFunctionName("SeparateObjectsWithoutForces").SetIncludeFile("GDL/ObjectTools.h");
 
-    DECLARE_END_OBJECT_ACTION()
+        DECLARE_END_OBJECT_ACTION()
 
         DECLARE_OBJECT_EXPRESSION("X", _("Position X"), _("Position X de l'objet"), _("Position"), "res/actions/position.png")
             instrInfo.AddParameter("object", _("Objet"), "", false);
@@ -739,6 +740,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.GetVariableString");
         DECLARE_END_OBJECT_STR_EXPRESSION()
+        #endif
 
     DECLARE_END_OBJECT()
 }

@@ -62,12 +62,13 @@ std::string GD_API ToString( const wxString & value );
  */
 std::string ReplaceSpacesByTildes(std::string text);
 
-int Spliter(std::string Tableau[] , std::string chaine, char separateur, int longueur = -1);
-int SpliterV(std::vector <std::string> *Tableau , std::string chaine, char separateur);
-int SpliterVInt(std::vector <int> *Tableau , std::string chaine, char separateur);
-
+/**
+ * Split a string into tokens stored in a vector, using separator defined.
+ * \param String to split
+ * \param Separator to use
+ */
 template <typename T>
-std::vector <T> SpliterStringToVector( const std::string & str, char separator )
+std::vector <T> SplitString( const std::string & str, char separator )
 {
     std::istringstream iss( str );
     std::string token;

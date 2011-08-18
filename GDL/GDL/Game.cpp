@@ -19,8 +19,10 @@ maxFPS(60),
 minFPS(10),
 verticalSync(false),
 portable(false),
-fullscreen(false),
-useExternalSourceFiles(false)
+fullscreen(false)
+#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
+,useExternalSourceFiles(false)
+#endif
 {
     //Game use builtin extensions by default
     extensionsUsed.push_back("BuiltinObject");
@@ -73,9 +75,11 @@ void Game::Init(const Game & game)
     for (unsigned int i =0;i<game.scenes.size();++i)
     	scenes.push_back( boost::shared_ptr<Scene>(new Scene(*game.scenes[i])) );
 
+    #if defined(GD_IDE_ONLY)
     externalEvents.clear();
     for (unsigned int i =0;i<game.externalEvents.size();++i)
     	externalEvents.push_back( boost::shared_ptr<ExternalEvents>(new ExternalEvents(*game.externalEvents[i])) );
+    #endif
 
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     useExternalSourceFiles = game.useExternalSourceFiles;

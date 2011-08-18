@@ -2,20 +2,19 @@
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY)
 
 #ifndef COMMENTEVENT_H
 #define COMMENTEVENT_H
 
 #include "Event.h"
 class TiXmlElement;
-#if defined(GD_IDE_ONLY)
 class Scene;
 class Game;
 class MainEditorCommand;
 class wxWindow;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
-#endif
 
 /**
  * \brief Internal builtin Comment Event, allowing to add a simple text in events.
@@ -27,9 +26,7 @@ class GD_API CommentEvent : public BaseEvent
         virtual ~CommentEvent() {};
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new CommentEvent(*this));}
 
-        #if defined(GD_IDE_ONLY)
         void SaveToXml(TiXmlElement * eventElem) const;
-        #endif
         void LoadFromXml(const TiXmlElement * eventElem);
 
         int r; ///< Background color Red component
@@ -43,7 +40,6 @@ class GD_API CommentEvent : public BaseEvent
         string com1; ///< Comment string
         string com2; ///< Optional second comment string
 
-#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */
@@ -55,7 +51,8 @@ class GD_API CommentEvent : public BaseEvent
         virtual unsigned int GetRenderedHeight(unsigned int width) const;
 
         virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
-#endif
 };
 
 #endif // COMMENTEVENT_H
+
+#endif

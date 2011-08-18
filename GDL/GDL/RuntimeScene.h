@@ -155,7 +155,6 @@ protected:
     bool UpdateTime();
 
     bool DisplayLegacyTexts(string layer = "");
-    void PreprocessEventList( const Game & Jeu, vector < BaseEventSPtr > & listEvent );
 
     bool firstLoop; ///<true if the scene was just rendered once.
     bool isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not

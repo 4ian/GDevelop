@@ -13,6 +13,7 @@ MouseExtension::MouseExtension()
                           _("Extension permettant d'utiliser la souris, integrée en standard"),
                           "Compil Games",
                           "Freeware")
+    #if defined(GD_IDE_ONLY)
 
     DECLARE_ACTION("CentreSourisX",
                    _("Centrer la souris en x"),
@@ -191,5 +192,5 @@ MouseExtension::MouseExtension()
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMouseWheelDelta").SetIncludeFile("GDL/MouseTools.h");
     DECLARE_END_EXPRESSION()
-
+    #endif
 }

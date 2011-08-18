@@ -261,63 +261,14 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                         }
                         else
                         {
-                            std::string parseError;
-                            executionEngine->llvmModule = ParseBitcodeFile(eventsBuffer.get(), executionEngine->llvmContext, &parseError);
-                            std::cout << parseError;
-
-                            if ( abort )
+                            if ( !executionEngine->LoadFromLLVMBitCode(eventsBuffer.get()) )
                             {
-                                cout << "Compilation aborted." << endl << char(7);
+                                cout << "Compilation aborted: Bitcode loading and compiling failed." << endl << char(7);
                             }
                             else
                             {
-                                if (!executionEngine->llvmModule)
-                                {
-                                    cout << "Module creation failed\n";
-                                    cout << "Compilation aborted." << endl << char(7);
-                                }
-                                else
-                                {
-                                    std::string error;
-                                    executionEngine->llvmExecutionEngine.reset( llvm::ExecutionEngine::createJIT(executionEngine->llvmModule,
-                                                                               &error,
-                                                                               0,
-                                                                               llvm::CodeGenOpt::None)); //No optimisation during machine code generation
-                                    if (!executionEngine->llvmExecutionEngine)
-                                    {
-                                        cout << "unable to make execution engine: " << error << "\n";
-                                        cout << "Compilation aborted." << endl << char(7);
-                                    }
-                                    else
-                                    {
-                                        executionEngine->eventsEntryFunction = executionEngine->llvmModule->getFunction("main");
-                                        if (!executionEngine->eventsEntryFunction)
-                                        {
-                                            cout << "'main' function not found in module.\n";
-                                            cout << "Compilation aborted." << endl << char(7);
-                                        }
-                                        else
-                                        {
-                                            cout << "Mapping objects of execution engine...\n";
-                                            llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(executionEngine->llvmModule->getOrInsertGlobal("pointerToRuntimeContext", llvm::TypeBuilder<void*, false>::get(executionEngine->llvmModule->getContext())));
-                                            executionEngine->llvmExecutionEngine->addGlobalMapping(globalValue, &executionEngine->llvmRuntimeContext);
-
-                                            // Using this, warnAboutUnknownFunctions is called if we need to generate code for an unknown function.
-                                            // As each function should normally be provided by extensions or gd, no such unknown function should exists.
-                                            // If warnAboutUnknownFunctions is called, it will prevent LLVM from crashing by returning a dummy function, and
-                                            // will warn the user about this problem.
-                                            executionEngine->llvmExecutionEngine->InstallLazyFunctionCreator(UseSubstituteForUnknownFunctions);
-
-                                            cout << "JIT Compilation to machine code...\n";
-                                            sf::Clock jitTimer;
-                                            executionEngine->llvmExecutionEngine->getPointerToFunction(executionEngine->eventsEntryFunction);
-                                            cout << "JIT Compilation duration: " << jitTimer.GetElapsedTime()<<"s"<<endl;
-
-                                            cout << "Scene compilation successful. Total duration: " << compilationTimer.GetElapsedTime()<<"s"<<endl;
-                                            task.scene->eventsModified = false;
-                                        }
-                                    }
-                                }
+                                cout << "Scene compilation successful. Total duration: " << compilationTimer.GetElapsedTime()<<"s"<<endl;
+                                task.scene->eventsModified = false;
                             }
                         }
                     }

@@ -363,7 +363,7 @@ void SpriteObject::MakeColorTransparent( const std::string & colorStr )
     ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
     boost::shared_ptr<sf::Image> dest = ptrToCurrentSprite->GetSFMLImage();
 
-    vector < string > colors = SpliterStringToVector <string> (colorStr, ';');
+    vector < string > colors = SplitString <string> (colorStr, ';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
@@ -372,7 +372,7 @@ void SpriteObject::MakeColorTransparent( const std::string & colorStr )
 
 void SpriteObject::SetColor(const std::string & colorStr)
 {
-    vector < string > colors = SpliterStringToVector<string>(colorStr, ';');
+    vector < string > colors = SplitString<string>(colorStr, ';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
@@ -872,8 +872,7 @@ void SpriteObject::LoadFromXml(const TiXmlElement * elemScene)
                 if ( elemObjetDirecScene->Attribute( "Images" )  != NULL )
                 {
                     string sprites = elemObjetDirecScene->Attribute("Images");
-                    vector < string > imgs; //Imgs contiendra toutes les images de la direction de l'animation.
-                    SpliterV( &imgs, sprites, ';' );
+                    vector < string > imgs = SplitString<string>(sprites, ';'); //Imgs contiendra toutes les images de la direction de l'animation.
                     for (unsigned int spriteID = 0;spriteID < imgs.size() ;++spriteID)
                     {
                         Sprite sprite;

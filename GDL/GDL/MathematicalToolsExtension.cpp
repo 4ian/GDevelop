@@ -12,6 +12,7 @@ MathematicalToolsExtension::MathematicalToolsExtension()
                           _("Extension proposant des outils mathématiques, integrée en standard"),
                           "Compil Games",
                           "Freeware")
+    #if defined(GD_IDE_ONLY)
 
     DECLARE_EXPRESSION("min", _("Minimum de deux nombres"), _("Minimum de deux nombres"), _("Outils mathématiques"), "res/mathfunction.png")
         instrInfo.AddParameter("expression", _("Première expression"), "", false);
@@ -228,4 +229,5 @@ MathematicalToolsExtension::MathematicalToolsExtension()
 
         instrInfo.cppCallingInformation.SetFunctionName("GDpriv::MathematicalTools::trunc").SetIncludeFile("GDL/MathematicalTools.h");
     DECLARE_END_EXPRESSION()
+    #endif
 }

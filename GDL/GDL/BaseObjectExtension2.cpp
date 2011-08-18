@@ -2,6 +2,7 @@
 
 void BaseObjectExtension::DeclareExtensionSecondPart()
 {
+    #if defined(GD_IDE_ONLY)
     DECLARE_ACTION("Create",
                    _("Créer un objet"),
                    _("Créer un objet à la position spécifiée"),
@@ -204,4 +205,5 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
 
         instrInfo.cppCallingInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/ObjectTools.h");
     DECLARE_END_EXPRESSION()
+    #endif
 }

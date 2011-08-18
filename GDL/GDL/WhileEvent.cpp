@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #include "WhileEvent.h"
 #include "GDL/tinyxml.h"
 #include "GDL/RuntimeScene.h"
@@ -10,13 +12,10 @@
 #include "GDL/EventsCodeGenerator.h"
 #include "GDL/ExpressionsCodeGeneration.h"
 #include "GDL/EventsCodeGenerationContext.h"
-
-#if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/EventsEditorItemsAreas.h"
 #include "GDL/EventsEditorSelection.h"
-#endif
 
 std::string WhileEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & parentContext)
 {
@@ -72,7 +71,7 @@ vector < vector<Instruction>* > WhileEvent::GetAllActionsVectors()
 
     return allActions;
 }
-#if defined(GD_IDE_ONLY)
+
 void WhileEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     //Save "While conditions"
@@ -100,7 +99,7 @@ void WhileEvent::SaveToXml(TiXmlElement * eventElem) const
         OpenSaveGame::SaveEvents(events, subeventsElem);
     }
 }
-#endif
+
 
 void WhileEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
@@ -126,7 +125,6 @@ void WhileEvent::LoadFromXml(const TiXmlElement * eventElem)
         OpenSaveGame::OpenEvents(events, eventElem->FirstChildElement( "Events" ));
 }
 
-#if defined(GD_IDE_ONLY)
 /**
  * Render the event in the bitmap
  */
@@ -191,7 +189,6 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
 void WhileEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
 }
-#endif
 
 /**
  * Initialize from another WhileEvent.
@@ -228,3 +225,5 @@ WhileEvent& WhileEvent::operator=(const WhileEvent & event)
 
     return *this;
 }
+
+#endif

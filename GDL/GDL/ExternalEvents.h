@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef EXTERNALEVENTS_H
 #define EXTERNALEVENTS_H
 #include <string>
@@ -22,7 +24,7 @@ class GD_API ExternalEvents
         /**
          * Get external events name
          */
-        inline string GetName() const {return name;};
+        inline std::string GetName() const {return name;};
 
         /**
          * Change external events name
@@ -52,3 +54,4 @@ struct ExternalEventsHasName : public std::binary_function<boost::shared_ptr<Ext
 };
 
 #endif // EXTERNALEVENTS_H
+#endif

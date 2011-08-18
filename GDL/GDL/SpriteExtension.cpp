@@ -22,6 +22,7 @@ SpriteExtension::SpriteExtension()
                    &CreateSpriteObject,
                    &DestroySpriteObject,
                    "SpriteObject");
+        #if defined(GD_IDE_ONLY)
 
         objInfos.SetIncludeFile("GDL/SpriteObject.h");
 
@@ -540,8 +541,11 @@ SpriteExtension::SpriteExtension()
 
             instrInfo.cppCallingInformation.SetFunctionName("GetScaleY").SetIncludeFile("GDL/SpriteObject.h");
         DECLARE_END_OBJECT_EXPRESSION()
+        #endif
 
     DECLARE_END_OBJECT()
+
+    #if defined(GD_IDE_ONLY)
 
     //Declaration of all conditions available
 
@@ -579,4 +583,6 @@ SpriteExtension::SpriteExtension()
         instrInfo.cppCallingInformation.SetFunctionName("SpriteCollision").SetIncludeFile("GDL/SpriteTools.h");
 
     DECLARE_END_CONDITION()
+
+    #endif
 }

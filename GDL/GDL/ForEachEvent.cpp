@@ -3,7 +3,10 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #include "ForEachEvent.h"
+#include <iostream>
 #include "GDL/RuntimeScene.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml.h"
@@ -11,25 +14,18 @@
 #include "GDL/ExpressionsCodeGeneration.h"
 #include "GDL/EventsCodeNameMangler.h"
 #include "GDL/EventsCodeGenerationContext.h"
-#include <iostream>
-
-#if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/EditForEachEvent.h"
 #include "GDL/EventsEditorItemsAreas.h"
 #include "GDL/EventsEditorSelection.h"
-#endif
 
 ForEachEvent::ForEachEvent() :
 BaseEvent(),
-objectsToPick("")
-#if defined(GD_IDE_ONLY)
-,objectsToPickSelected(false)
-#endif
+objectsToPick(""),
+objectsToPickSelected(false)
 {
 }
 
-#if defined(GD_IDE_ONLY)
 std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & parentContext)
 {
     std::string outputCode;
@@ -146,7 +142,6 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
 
     return outputCode;
 }
-#endif
 
 vector < vector<Instruction>* > ForEachEvent::GetAllConditionsVectors()
 {
@@ -171,7 +166,7 @@ vector < GDExpression* > ForEachEvent::GetAllExpressions()
 
     return allExpressions;
 }
-#if defined(GD_IDE_ONLY)
+
 void ForEachEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * objectElem = new TiXmlElement( "Object" );
@@ -198,7 +193,6 @@ void ForEachEvent::SaveToXml(TiXmlElement * eventElem) const
         OpenSaveGame::SaveEvents(events, subeventsElem);
     }
 }
-#endif
 
 void ForEachEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
@@ -223,7 +217,6 @@ void ForEachEvent::LoadFromXml(const TiXmlElement * eventElem)
 }
 
 
-#if defined(GD_IDE_ONLY)
 /**
  * Render the event in the bitmap
  */
@@ -281,7 +274,6 @@ void ForEachEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, Ma
     EditForEachEvent dialog(parent_, *this, game_, scene_);
     dialog.ShowModal();
 }
-#endif
 
 /**
  * Initialize from another ForEachEvent.
@@ -319,3 +311,5 @@ ForEachEvent& ForEachEvent::operator=(const ForEachEvent & event)
 
     return *this;
 }
+
+#endif

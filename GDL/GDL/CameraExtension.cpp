@@ -13,6 +13,7 @@ CameraExtension::CameraExtension()
                           _("Extension caméra integrée en standard"),
                           "Compil Games",
                           "Freeware")
+    #if defined(GD_IDE_ONLY)
 
     DECLARE_CONDITION("CameraX",
                    _("Position X de la caméra"),
@@ -433,4 +434,5 @@ CameraExtension::CameraExtension()
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraRotation");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
+    #endif
 }

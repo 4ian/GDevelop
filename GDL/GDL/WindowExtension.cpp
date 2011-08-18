@@ -14,6 +14,7 @@ WindowExtension::WindowExtension()
                           _("Extension permettant de manipuler la fenêtre de jeu, integrée en standard"),
                           "Compil Games",
                           "Freeware")
+    #if defined(GD_IDE_ONLY)
 
     DECLARE_ACTION("EcrireTexte",
                    _("Afficher un texte"),
@@ -88,6 +89,7 @@ WindowExtension::WindowExtension()
     DECLARE_EXPRESSION("ColorDepth", "Profondeur de couleur de la résolution actuelle", "Profondeur de couleur de la résolution actuelle", "Ecran", "res/display16.png")
         instrInfo.cppCallingInformation.SetFunctionName("GetColorDepth").SetIncludeFile("GDL/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
+    #endif
 }
 
 #if defined(GD_IDE_ONLY)

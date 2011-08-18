@@ -14,6 +14,7 @@ AdvancedExtension::AdvancedExtension()
                           "Compil Games",
                           "Freeware")
 
+    #if defined(GD_IDE_ONLY)
     DECLARE_CONDITION("Toujours",
                    _("Toujours"),
                    _("Cette condition renvoie toujours vrai ( et toujours faux si le contraire est activé )."),
@@ -27,4 +28,5 @@ AdvancedExtension::AdvancedExtension()
         instrInfo.cppCallingInformation.SetFunctionName("LogicalNegation").SetIncludeFile("GDL/CommonInstructions.h");
 
     DECLARE_END_CONDITION()
+    #endif
 }

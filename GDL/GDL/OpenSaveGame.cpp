@@ -5,17 +5,20 @@
 
 #if defined(GD_IDE_ONLY)
     #include <wx/wx.h>
-    #include "GDL/CommonTools.h"
     #define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
     #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
     #define ToString(x)ToString(x) // Méthode de conversion int vers string
 #else
-    #define MSG(x) EcrireLog("Chargement", x); //Macro pour rapporter des erreurs
-    #define MSGERR(x) EcrireLog("Chargement, erreur", x);
+    #include "GDL/Log.h"
+    #include <iostream>
 
-    #ifndef _T
-    #define _T(x) x // "Emule" la macro de WxWidgets
+    #ifndef _
+    #define _(x) x // "Emule" la macro de WxWidgets
     #endif
+
+    #define MSG(x) std::cout << _("Loading: ") << x; //Macro pour rapporter des erreurs
+    #define MSGERR(x) std::cout << _("Error during loading: ") << x;
+
 #endif
 
 #include <string>
@@ -74,10 +77,10 @@ bool OpenSaveGame::OpenFromFile(string file)
     {
 #if defined(GD_IDE_ONLY)
         wxString ErrorDescription = doc.ErrorDesc();
-        wxString Error = _T( "Erreur lors du chargement : " ) + ErrorDescription + _T("\nVérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder.");
+        wxString Error = _( "Erreur lors du chargement : " ) + ErrorDescription + _("\nVérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder.");
 #else
         string ErrorDescription = doc.ErrorDesc();
-        string Error =  "Erreur lors du chargement : " + ErrorDescription + _T("\nVérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder.");
+        string Error =  "Erreur lors du chargement : " + ErrorDescription + _("\nVérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder.");
 #endif
         MSGERR( Error );
         return false;
@@ -130,13 +133,13 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     elem->QueryIntAttribute( "Revision", &revision );
     if ( major > GDLVersionWrapper::Major() )
     {
-        MSG( _T( "La version de l'éditeur utilisé pour créer ce jeu semble être une nouvelle version.\nLe jeu peut donc ne pas s'ouvrir, ou des données peuvent manquer.\nVous devriez vérifier si une nouvelle version de Game Develop est disponible." ) );
+        MSG( _( "La version de l'éditeur utilisé pour créer ce jeu semble être une nouvelle version.\nLe jeu peut donc ne pas s'ouvrir, ou des données peuvent manquer.\nVous devriez vérifier si une nouvelle version de Game Develop est disponible." ) );
     }
     else
     {
         if ( major == GDLVersionWrapper::Major() && (build > GDLVersionWrapper::Build() || minor > GDLVersionWrapper::Minor() || revision > GDLVersionWrapper::Revision()) )
         {
-            MSG( _T( "La version de l'éditeur utilisé pour créer ce jeu semble être supérieure.\nLe jeu peut donc ne pas s'ouvrir, ou des données peuvent manquer.\nVous devriez vérifier si une nouvelle version de Game Develop est disponible." ) );
+            MSG( _( "La version de l'éditeur utilisé pour créer ce jeu semble être supérieure.\nLe jeu peut donc ne pas s'ouvrir, ou des données peuvent manquer.\nVous devriez vérifier si une nouvelle version de Game Develop est disponible." ) );
         }
     }
 
@@ -148,7 +151,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         updateEventsFromGD1x = true;
         game.extensionsUsed.push_back("BuiltinMathematicalTools");
 
-        if ( minor < 5 || build < 10151 )
+        if ( minor < 4 || build < 9587 )
         {
             wxLogWarning(_("Le jeu ouvert a été enregistré avec une ancienne version de Game Develop.\nIl se peut que le jeu ne soit pas correctement ouvert.\nVeuillez ouvrir le jeu et l'enregistrer avec la version 1.5.10151 avant de le réouvrir avec cette version de Game Develop."));
         }
@@ -236,9 +239,11 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         if ( elem->FirstChildElement( "Layers" ) != NULL )
             OpenLayers(newScene->initialLayers, elem->FirstChildElement( "Layers" ));
 
+        #if defined(GD_IDE_ONLY)
         if ( elem->FirstChildElement( "Events" ) != NULL )
             OpenEvents(newScene->events, elem->FirstChildElement( "Events" ));
         if ( updateEventsFromGD1x ) AdaptEventsFromGD1x(newScene->events);
+        #endif
 
         if ( elem->FirstChildElement( "Variables" ) != NULL )
             OpenVariablesList(newScene->variables, elem->FirstChildElement( "Variables" ));
@@ -267,12 +272,13 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         elem = elem->NextSiblingElement();
     }
 
+    #if defined(GD_IDE_ONLY)
     //External events
     elem = hdl.FirstChildElement().FirstChildElement( "ExternalEvents" ).Element();
     if ( elem )
         OpenExternalEvents(game.externalEvents, elem);
 
-    #if defined(GD_IDE_ONLY)
+    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     elem = hdl.FirstChildElement().FirstChildElement( "ExternalSourceFiles" ).Element();
     if ( elem )
     {
@@ -287,10 +293,11 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         }
     }
     #endif
+    #endif
 
     if ( notBackwardCompatible )
     {
-        MSG( _T("Attention, si vous enregistrez votre jeu avec cette version de Game Develop, vous ne pourrez plus le réouvrir avec une version précédente.") );
+        MSG( _("Attention, si vous enregistrez votre jeu avec cette version de Game Develop, vous ne pourrez plus le réouvrir avec une version précédente.") );
     }
 
     return;
@@ -347,18 +354,20 @@ void OpenSaveGame::OpenGameInformations(const TiXmlElement * elem)
         {
             game.portable = true;
         }
-    } else { MSG(_T("Aucune information sur la portabilité du jeu")); }
+    } else { MSG(_("Aucune information sur la portabilité du jeu")); }
 
     #if defined(GD_IDE_ONLY)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableFilename", game.winExecutableFilename);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableIconFile", game.winExecutableIconFile);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("linuxExecutableFilename", game.linuxExecutableFilename);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("macExecutableFilename", game.macExecutableFilename);
-    #endif
+    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( elem->Attribute( "useExternalSourceFiles" )  != NULL )
     {
         GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("useExternalSourceFiles", game.useExternalSourceFiles);
     }
+    #endif
+    #endif
 
     return;
 }
@@ -604,9 +613,9 @@ void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement
     }
 }
 
+#if defined(GD_IDE_ONLY)
 void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElement * elem)
 {
-    cout << "Events";
     const TiXmlElement * elemScene = elem->FirstChildElement();
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
@@ -732,6 +741,7 @@ void OpenSaveGame::OpenActions(vector < Instruction > & actions, const TiXmlElem
         elemActions = elemActions->NextSiblingElement();
     }
 }
+#endif
 
 void OpenSaveGame::OpenLayers(vector < Layer > & list, TiXmlElement * elem)
 {
@@ -794,6 +804,7 @@ void OpenSaveGame::OpenLayers(vector < Layer > & list, TiXmlElement * elem)
 }
 
 
+#if defined(GD_IDE_ONLY)
 void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * elem )
 {
     list.clear();
@@ -814,6 +825,7 @@ void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents
         elemScene = elemScene->NextSiblingElement();
     }
 }
+#endif
 
 void OpenSaveGame::OpenVariablesList(ListVariable & list, const TiXmlElement * elem)
 {
@@ -1081,7 +1093,7 @@ bool OpenSaveGame::SaveToFile(string file)
     //Sauvegarde le tout
     if ( !doc.SaveFile( file.c_str() ) )
     {
-        MSG( _T( "Impossible d'enregistrer le fichier. Vérifiez que le disque comporte assez d'espace disque, ou qu'il n'est pas protégé en écriture." ) );
+        MSG( _( "Impossible d'enregistrer le fichier. Vérifiez que le disque comporte assez d'espace disque, ou qu'il n'est pas protégé en écriture." ) );
         return false;
     }
 

@@ -17,10 +17,12 @@ class TimeExtension : public ExtensionBase
         TimeExtension();
         virtual ~TimeExtension() {};
 
+        #if defined(GD_IDE_ONLY)
         bool HasDebuggingProperties() const { return true; };
         void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const;
         bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue);
         unsigned int GetNumberOfProperties(RuntimeScene & scene) const;
+        #endif
 
     private:
 };

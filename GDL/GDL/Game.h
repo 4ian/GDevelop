@@ -45,7 +45,7 @@ class GD_API Game
         bool portable; ///< True if the game was saved as a portable game file
         bool fullscreen; ///< True if the game is displayed full screen
 
-        vector < string > extensionsUsed; ///< List of extensions used
+        vector < std::string > extensionsUsed; ///< List of extensions used
 
         LoadingScreen loadingScreen; ///< Data concerning the loading screen
 
@@ -53,19 +53,14 @@ class GD_API Game
         std::vector < Dossier >  imagesFolders; ///< Folder used to organize images
 
         std::vector < boost::shared_ptr<Scene> >             scenes; ///< List of all scenes
-        std::vector < boost::shared_ptr<ExternalEvents> >    externalEvents; ///< List of all externals events
         std::vector < boost::shared_ptr<Object> >            globalObjects; ///< Global objects
         std::vector < ObjectGroup >                          objectGroups; ///< Global objects groups
-        #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
-        bool useExternalSourceFiles; ///< True if game used external source files, and thus dynamic extensions.
-        #if defined(GD_IDE_ONLY)
-        std::vector < boost::shared_ptr<GDpriv::SourceFile> >        externalSourceFiles; ///< List of C++ source files used.
-        #endif
-        #endif
 
         ListVariable variables; ///< Initial global variables
 
         #if defined(GD_IDE_ONLY)
+        std::vector < boost::shared_ptr<ExternalEvents> >    externalEvents; ///< List of all externals events
+
         std::string gameFile; ///< File of the game
         std::vector < string > imagesChanged; ///< Images that have been changed and which have to be reloaded
 
@@ -75,7 +70,13 @@ class GD_API Game
         std::string macExecutableFilename;  ///< Mac executable name
         #endif
 
-    protected:
+        #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
+        bool useExternalSourceFiles; ///< True if game used external source files, and thus dynamic extensions.
+        #if defined(GD_IDE_ONLY)
+        std::vector < boost::shared_ptr<GDpriv::SourceFile> >        externalSourceFiles; ///< List of C++ source files used.
+        #endif
+        #endif
+
     private:
 
         /**

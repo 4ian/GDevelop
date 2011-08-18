@@ -8,6 +8,7 @@ FileExtension::FileExtension()
                           _("Extension offrant des actions et conditions sur les fichiers, integrée en standard."),
                           "Compil Games",
                           "Freeware")
+    #if defined(GD_IDE_ONLY)
 
     DECLARE_CONDITION("FileExists",
                    _("Le fichier existe"),
@@ -188,6 +189,7 @@ FileExtension::FileExtension()
         instrInfo.cppCallingInformation.SetFunctionName("ExecuteCmd").SetIncludeFile("GDL/FileTools.h");
 
     DECLARE_END_ACTION()
+    #endif
 }
 
 #if defined(GD_IDE_ONLY)

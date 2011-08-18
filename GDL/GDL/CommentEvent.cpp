@@ -2,20 +2,17 @@
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY)
 
 #include "CommentEvent.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/tinyxml.h"
 #include "GDL/XmlMacros.h"
-
-#if defined(GD_IDE_ONLY)
 #include "GDL/EditComment.h"
 #include "GDL/EventsEditorItemsAreas.h"
 #include "GDL/EventsEditorSelection.h"
-#endif
 
-#if defined(GD_IDE_ONLY)
 void CommentEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * color;
@@ -37,7 +34,6 @@ void CommentEvent::SaveToXml(TiXmlElement * eventElem) const
     eventElem->LinkEndChild( com2Elem );
     com2Elem->SetAttribute( "value", com2.c_str() );
 }
-#endif
 
 void CommentEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
@@ -57,7 +53,6 @@ void CommentEvent::LoadFromXml(const TiXmlElement * eventElem)
     if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "textB" ) != NULL ) { eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "textB", &textB );}
 }
 
-#if defined(GD_IDE_ONLY)
 void CommentEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
     EditComment dialog(parent_, *this);

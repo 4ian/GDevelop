@@ -17,6 +17,7 @@ AudioExtension::AudioExtension()
                           "Compil Games",
                           "Freeware")
 
+    #if defined(GD_IDE_ONLY)
     DECLARE_ACTION("PlaySoundCanal",
                    _("Jouer un son sur un canal"),
                    _("Joue un son ( court fichier audio ) sur un canal précis,\npour pouvoir ensuite interagir avec."),
@@ -544,6 +545,7 @@ AudioExtension::AudioExtension()
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicPitchOnChannel").SetIncludeFile("GDL/AudioTools.h");
     DECLARE_END_EXPRESSION()
+    #endif
 }
 
 #if defined(GD_IDE_ONLY)

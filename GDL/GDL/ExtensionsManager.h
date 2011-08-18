@@ -58,6 +58,22 @@ class GD_API ExtensionsManager
         inline const vector < boost::shared_ptr<ExtensionBase> > & GetExtensions() const { return extensionsLoaded; };
 
         /**
+         * Return a shared_ptr to a new object.
+         */
+        boost::shared_ptr<Object> CreateObject(std::string type, std::string name);
+
+        /**
+         * Create a new automatism of given type
+         */
+        boost::shared_ptr<Automatism> CreateAutomatism(std::string automatismType) const;
+
+        /**
+         * Create shared datas of the automatism of given type
+         */
+        boost::shared_ptr<AutomatismsSharedDatas> CreateAutomatismSharedDatas(std::string automatismType) const;
+
+        #if defined(GD_IDE_ONLY)
+        /**
          * Verifying if a ( static ) condition exists
          * @return true if the ( static ) condition exists
          */
@@ -178,18 +194,6 @@ class GD_API ExtensionsManager
         bool HasAutomatismStrExpression(std::string automatismType, string name) const;
 
         /**
-         * Return a shared_ptr to a new object.
-         */
-        boost::shared_ptr<Object> CreateObject(std::string type, std::string name);
-
-        #if defined(GD_IDE_ONLY)
-        /**
-         * Get information about an object
-         */
-        const ExtensionObjectInfos & GetObjectInfo(std::string type);
-        #endif
-
-        /**
          * Check if an event type is available
          */
         bool HasEventType(std::string eventType) const;
@@ -210,14 +214,10 @@ class GD_API ExtensionsManager
         const AutomatismInfo & GetAutomatismInfo(std::string automatismType) const;
 
         /**
-         * Create a new automatism of given type
+         * Get information about an object
          */
-        boost::shared_ptr<Automatism> CreateAutomatism(std::string automatismType) const;
-
-        /**
-         * Create shared datas of the automatism of given type
-         */
-        boost::shared_ptr<AutomatismsSharedDatas> CreateAutomatismSharedDatas(std::string automatismType) const;
+        const ExtensionObjectInfos & GetObjectInfo(std::string type);
+        #endif
 
         static ExtensionsManager *GetInstance()
         {
@@ -246,9 +246,11 @@ class GD_API ExtensionsManager
         map < std::string, CreateFunPtr >             creationFunctionTable;
         map < std::string, DestroyFunPtr >            destroyFunctionTable;
 
+        #if defined(GD_IDE_ONLY)
         static InstructionInfos badInstructionInfos;
         static ExpressionInfos badExpressionInfos;
         static StrExpressionInfos badStrExpressionInfos;
+        #endif
         static AutomatismInfo badAutomatismInfo;
         static ExtensionObjectInfos badObjectInfo;
 

@@ -2,26 +2,24 @@
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
+
+#if defined(GD_IDE_ONLY)
+
 #include "RepeatEvent.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/EventsCodeGenerator.h"
 #include "GDL/ExpressionsCodeGeneration.h"
 #include "GDL/EventsCodeGenerationContext.h"
-
-#if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/EditRepeatEvent.h"
 #include "GDL/EventsEditorItemsAreas.h"
 #include "GDL/EventsEditorSelection.h"
-#endif
 
 RepeatEvent::RepeatEvent() :
 BaseEvent(),
-repeatNumberExpression("")
-#if defined(GD_IDE_ONLY)
-,repeatNumberExpressionSelected(false)
-#endif
+repeatNumberExpression(""),
+repeatNumberExpressionSelected(false)
 {
 }
 
@@ -95,7 +93,6 @@ vector < GDExpression* > RepeatEvent::GetAllExpressions()
     return allExpressions;
 }
 
-#if defined(GD_IDE_ONLY)
 void RepeatEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * repeatElem = new TiXmlElement( "RepeatExpression" );
@@ -122,7 +119,6 @@ void RepeatEvent::SaveToXml(TiXmlElement * eventElem) const
         OpenSaveGame::SaveEvents(events, subeventsElem);
     }
 }
-#endif
 
 void RepeatEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
@@ -146,7 +142,6 @@ void RepeatEvent::LoadFromXml(const TiXmlElement * eventElem)
         OpenSaveGame::OpenEvents(events, eventElem->FirstChildElement( "Events" ));
 }
 
-#if defined(GD_IDE_ONLY)
 /**
  * Render the event in the bitmap
  */
@@ -204,7 +199,6 @@ void RepeatEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, Mai
     EditRepeatEvent dialog(parent_, *this, game_, scene_);
     dialog.ShowModal();
 }
-#endif
 
 /**
  * Initialize from another RepeatEvent.
@@ -242,3 +236,5 @@ RepeatEvent& RepeatEvent::operator=(const RepeatEvent & event)
 
     return *this;
 }
+
+#endif

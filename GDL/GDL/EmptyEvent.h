@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef EMPTYEVENT_H
 #define EMPTYEVENT_H
 
@@ -19,3 +21,5 @@ class EmptyEvent : public BaseEvent
 };
 
 #endif // EMPTYEVENT_H
+
+#endif

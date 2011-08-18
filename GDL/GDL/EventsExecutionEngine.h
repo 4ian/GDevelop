@@ -14,6 +14,7 @@ namespace llvm
     class Function;
     class Module;
     class ExecutionEngine;
+    class MemoryBuffer;
 }
 class RuntimeContext;
 
@@ -32,6 +33,16 @@ public:
      * Execute compiled events.
      */
     void Execute();
+
+    /**
+     * Initialize execution engine from bitCode.
+     */
+    bool LoadFromLLVMBitCode(const std::string & bitCode);
+
+    /**
+     * Initialize execution engine from bitCode loaded in memory.
+     */
+    bool LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffer);
 
     bool beingExecuted; ///< Runtime scene has to set this to true when the scene is being played, so as to prevent compiled events to be replaced during a preview, which would result in a crash.
     llvm::LLVMContext llvmContext;

@@ -3,16 +3,16 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #include "GDL/Event.h"
 
 vector <BaseEventSPtr> BaseEvent::badSubEvents;
 
 BaseEvent::BaseEvent() :
-#if defined(GD_IDE_ONLY)
 folded(false),
 eventHeightNeedUpdate(true),
 totalTimeDuringLastSession(0),
-#endif
 disabled(false)
 {
 }
@@ -30,11 +30,8 @@ std::vector < BaseEventSPtr > GD_API CloneVectorOfEvents(const vector < BaseEven
 
     for(;e != end;++e)
     {
-        #if defined(GD_IDE_ONLY) //Profiling can be enabled in editor
+        //Profiling can be enabled
         newVector.push_back(CloneRememberingOriginalEvent(*e));
-        #else
-        newVector.push_back((*e)->Clone());
-        #endif
     }
 
     return newVector;
@@ -43,10 +40,10 @@ std::vector < BaseEventSPtr > GD_API CloneVectorOfEvents(const vector < BaseEven
 BaseEventSPtr CloneRememberingOriginalEvent(BaseEventSPtr event)
 {
     BaseEventSPtr copy = event->Clone();
-    #if defined(GD_IDE_ONLY)
     //Original event is either the original event of the copied event, or the event copied.
     copy->originalEvent = event->originalEvent.expired() ? event : event->originalEvent;
-    #endif
 
     return copy;
 }
+
+#endif

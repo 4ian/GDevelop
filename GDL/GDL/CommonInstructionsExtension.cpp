@@ -28,8 +28,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                           "Compil Games",
                           "Freeware")
 
-
-
+    #if defined(GD_IDE_ONLY)
     DECLARE_CONDITION("Or",
                    _("Ou"),
                    _("Renvoie vraie si une seule des sous conditions est vraie"),
@@ -37,7 +36,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                    _("Avancé"),
                    "res/conditions/or24.png",
                    "res/conditions/or.png");
-#if defined(GD_IDE_ONLY)
+
         class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & parentContext)
@@ -115,7 +114,6 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         InstructionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
         instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
         instrInfo.SetCanHaveSubInstructions();
-#endif
 
     DECLARE_END_CONDITION()
 
@@ -127,7 +125,6 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                    "res/conditions/and24.png",
                    "res/conditions/and.png");
 
-#if defined(GD_IDE_ONLY)
         class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & parentContext)
@@ -149,7 +146,6 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         InstructionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
         instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
         instrInfo.SetCanHaveSubInstructions();
-#endif
 
     DECLARE_END_CONDITION()
 
@@ -161,7 +157,6 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                    "res/conditions/not24.png",
                    "res/conditions/not.png");
 
-#if defined(GD_IDE_ONLY)
         class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & parentContext)
@@ -203,7 +198,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         InstructionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
         instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
         instrInfo.SetCanHaveSubInstructions();
-#endif
+
     DECLARE_END_CONDITION()
 
     DECLARE_EVENT("Standard",
@@ -270,4 +265,6 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     DECLARE_END_EVENT()
     #endif*/
+
+    #endif
 }

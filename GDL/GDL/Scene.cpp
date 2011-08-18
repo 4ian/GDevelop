@@ -66,9 +66,9 @@ void Scene::Init(const Scene & scene)
 
     #if defined(GD_IDE_ONLY)
     profiler = scene.profiler;
-    #endif
 
     events = CloneVectorOfEvents(scene.events);
+    #endif
 
     compiledEventsExecutionEngine = boost::shared_ptr<EventsExecutionEngine>(new EventsExecutionEngine);
 

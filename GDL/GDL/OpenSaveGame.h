@@ -27,11 +27,12 @@ public:
     bool OpenFromFile(string file);
     void OpenFromString(string text);
     void RecreatePaths(string file);
+
+    #if defined(GD_IDE_ONLY)
     static void OpenEvents( vector < BaseEventSPtr > & list, const TiXmlElement * elem );
     static void OpenConditions(vector < Instruction > & list, const TiXmlElement * elem);
     static void OpenActions(vector < Instruction > & list, const TiXmlElement * elem);
 
-    #if defined(GD_IDE_ONLY)
     bool SaveToFile(string file);
     static void SaveEvents( const vector < BaseEventSPtr > & list, TiXmlElement * events );
     static void SaveConditions(const vector < Instruction > & list, TiXmlElement * elem);
@@ -52,10 +53,11 @@ private:
     void OpenPositions( vector < InitialPosition > & list, TiXmlElement * elem );
     void OpenGroupesObjets( vector < ObjectGroup > & list, TiXmlElement * elem );
     void OpenLayers( vector < Layer > & list, TiXmlElement * elem );
-    void OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * elem );
     static void OpenVariablesList(ListVariable & list, const TiXmlElement * elem);
 
     #if defined(GD_IDE_ONLY)
+    void OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * elem );
+
     void SavePositions( const vector < InitialPosition > & list, TiXmlElement * positions );
     void SaveObjects( const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects );
     void SaveGroupesObjets( const vector < ObjectGroup > & list, TiXmlElement * grpsobjets );

@@ -3,13 +3,13 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef STANDARDEVENT_H
 #define STANDARDEVENT_H
-#if defined(GD_IDE_ONLY)
 #include <wx/bitmap.h>
 #include <wx/dcbuffer.h>
 #include <wx/html/htmprint.h>
-#endif
 #include "Event.h"
 class RuntimeScene;
 class ObjectsConcerned;
@@ -51,12 +51,9 @@ class GD_API StandardEvent : public BaseEvent
         virtual vector < vector<Instruction>* > GetAllConditionsVectors();
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
 
-        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
-        #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */
@@ -66,7 +63,6 @@ class GD_API StandardEvent : public BaseEvent
          * Must return the height of the event when rendered
          */
         virtual unsigned int GetRenderedHeight(unsigned int width) const;
-#endif
 
     private:
         void Init(const StandardEvent & event);
@@ -78,3 +74,5 @@ class GD_API StandardEvent : public BaseEvent
 
 
 #endif // STANDARDEVENT_H
+
+#endif

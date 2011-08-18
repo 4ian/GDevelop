@@ -12,6 +12,7 @@ NetworkExtension::NetworkExtension()
                           _("Extension pour utiliser internet, integrée en standard"),
                           "Compil Games",
                           "Freeware")
+    #if defined(GD_IDE_ONLY)
 
     DECLARE_ACTION("EnvoiDataNet",
                    _("Envoyer des données sur internet"),
@@ -49,4 +50,5 @@ NetworkExtension::NetworkExtension()
         instrInfo.cppCallingInformation.SetFunctionName("DownloadFile").SetIncludeFile("GDL/NetworkTools.h");
 
     DECLARE_END_ACTION()
+    #endif
 }

@@ -13,6 +13,7 @@ SceneExtension::SceneExtension()
                           _("Extension permettant de manipuler les scènes, integrée en standard"),
                           "Compil Games",
                           "Freeware")
+    #if defined(GD_IDE_ONLY)
 
     DECLARE_EXPRESSION("Random", _("Valeur aléatoire"), _("Valeur aléatoire"), _("Aléatoire"), "res/actions/position.png")
         instrInfo.AddParameter("expression", _("Valeur maximale"), "", false);
@@ -93,4 +94,5 @@ SceneExtension::SceneExtension()
         instrInfo.cppCallingInformation.SetFunctionName("ChangeSceneBackground").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
+    #endif
 }

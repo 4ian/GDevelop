@@ -357,86 +357,6 @@ typedef Object * (*CreateFunPtr)(std::string name);
             automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName));\
             automatismInfo.sharedDatasInstance = boost::shared_ptr<AutomatismsSharedDatas>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
 
-#else //Condition, actions and expressions declare less thing in runtime only
-
-#define DECLARE_THE_EXTENSION(name_, fullname_, description_, author_, license_) name = name_; \
-                                                                                SetNameSpace(name_);
-
-#define DECLARE_CONDITION(name, fullname, description, sentence, group_, icon, smallicon) { \
-            InstructionInfos instrInfo(*this); \
-            std::string currentConditionDeclarationName = name;
-
-#define DECLARE_ACTION(name, fullname, description, sentence, group_, icon, smallicon) { \
-            InstructionInfos instrInfo(*this); \
-            std::string currentActionDeclarationName = name;
-
-#define DECLARE_OBJECT_CONDITION(name, fullname, description, sentence, group_, icon, smallicon) { \
-            InstructionInfos instrInfo(*this); \
-            std::string currentObjConditionDeclarationName = name;
-
-#define DECLARE_OBJECT_ACTION(name, fullname, description, sentence, icon, group_, smallicon) { \
-            InstructionInfos instrInfo(*this); \
-            std::string currentObjActionDeclarationName = name;
-
-#define DECLARE_AUTOMATISM_CONDITION(name, fullname, description, sentence, group_, icon, smallicon) { \
-            InstructionInfos instrInfo(*this); \
-            std::string currentAutoConditionDeclarationName = name;
-
-#define DECLARE_AUTOMATISM_ACTION(name, fullname, description, sentence, icon, group_, smallicon) { \
-            InstructionInfos instrInfo(*this); \
-            std::string currentAutoActionDeclarationName = name;
-
-#define DECLARE_OBJECT(name_, fullname, informations, icon, createFunPtrP, destroyFunPtrP, cppClassName_) { \
-            ExtensionObjectInfos objInfos; \
-            std::string currentObjectDeclarationName = name_; \
-            objInfos.createFunPtr = createFunPtrP;\
-            objInfos.destroyFunPtr = destroyFunPtrP;
-
-#define DECLARE_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
-            ExpressionInfos instrInfo(*this); \
-            std::string currentExprDeclarationName = name_;
-
-#define DECLARE_OBJECT_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
-            ExpressionInfos instrInfo(*this); \
-            std::string currentExprDeclarationName = name_;
-
-#define DECLARE_AUTOMATISM_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
-            ExpressionInfos instrInfo(*this); \
-            std::string currentExprDeclarationName = name_;
-
-#define DECLARE_STR_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
-            StrExpressionInfos instrInfo(*this); \
-            std::string currentExprDeclarationName = name_;
-
-#define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
-            StrExpressionInfos instrInfo(*this); \
-            std::string currentExprDeclarationName = name_;
-
-#define DECLARE_AUTOMATISM_STR_EXPRESSION(name_, fullname, description, group_, smallicon_) { \
-            StrExpressionInfos instrInfo(*this); \
-            std::string currentExprDeclarationName = name_;
-
-#define DECLARE_EVENT(name_, fullname_, description_, group_, smallicon_, className_) { \
-            EventInfos eventInfo; \
-            std::string currentEventDeclarationName = name_;\
-            eventInfo.instance = boost::shared_ptr<BaseEvent>(new className_); \
-            eventInfo.instance->SetType(GetNameSpace()+currentEventDeclarationName);
-
-#define DECLARE_AUTOMATISM(name_, fullname_, defaultName_, description_, group_, smallicon_, className_, sharedDatasClassName_) { \
-            AutomatismInfo automatismInfo; \
-            std::string currentAutomatismDeclarationName = name_;\
-            automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName)); \
-            automatismInfo.sharedDatasInstance = boost::shared_ptr<AutomatismsSharedDatas>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
-
-//Emulate wxWidgets internationalization macro
-#ifndef _
-#define _(x) x // "Emule" la macro de WxWidgets
-#endif
-#ifndef _
-#define wxT(x) x // "Emule" la macro de WxWidgets
-#endif
-#endif
-
 /**
  * Need to be added after DECLARE_CONDITION and DECLARE_PARAMTERs.
  */
@@ -470,18 +390,6 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * Need to be added after DECLARE_AUTOMATISM_ACTION and DECLARE_PARAMTERs.
  */
 #define DECLARE_END_AUTOMATISM_ACTION() automatismInfo.actionsInfos[GetNameSpace()+currentAutoActionDeclarationName] = instrInfo; \
-            }
-
-/**
- * Need to be added after DECLARE_OBJECT and all actions/conditions/expressions.
- */
-#define DECLARE_END_OBJECT() objectsInfos[GetNameSpace()+currentObjectDeclarationName] = objInfos; \
-            }
-
-/**
- * Need to be added after DECLARE_AUTOMATISM and all actions/conditions/expressions.
- */
-#define DECLARE_END_AUTOMATISM()  automatismsInfo[GetNameSpace()+currentAutomatismDeclarationName] = automatismInfo; \
             }
 
 /**
@@ -526,6 +434,35 @@ typedef Object * (*CreateFunPtr)(std::string name);
 #define DECLARE_END_EVENT() eventsInfos[GetNameSpace()+currentEventDeclarationName] = eventInfo; \
             }
 
+#else //Condition, actions and expressions declare less thing in runtime only
+
+#define DECLARE_THE_EXTENSION(name_, fullname_, description_, author_, license_) name = name_; \
+                                                                                SetNameSpace(name_);
+
+//Emulating wxWidgets internationalization macro
+#ifndef _
+#define _(x) x // "Emule" la macro de WxWidgets
+#endif
+#ifndef _
+#define wxT(x) x // "Emule" la macro de WxWidgets
+#endif
+
+#endif //End of runtime only declarations
+
+/**
+ * Need to be added after DECLARE_OBJECT and all actions/conditions/expressions.
+ */
+#define DECLARE_END_OBJECT() objectsInfos[GetNameSpace()+currentObjectDeclarationName] = objInfos; \
+            }
+
+/**
+ * Need to be added after DECLARE_AUTOMATISM and all actions/conditions/expressions.
+ */
+#define DECLARE_END_AUTOMATISM()  automatismsInfo[GetNameSpace()+currentAutomatismDeclarationName] = automatismInfo; \
+            }
+
+
+#if defined(GD_IDE_ONLY)
 /**
  * \brief ParameterInfo contains user-friendly info about a parameter, only at edittime, and information about what a parameter need
  */
@@ -540,19 +477,16 @@ class GD_API ParameterInfo
     std::string supplementaryInformation; ///< Used if needed
     bool optional; ///< True if the parameter is optional
 
-#if defined(GD_IDE_ONLY)
     std::string description; ///< Description shown in editor
     bool codeOnly; ///< True if parameter is relative to code generation only, i.e. must not be shown in editor
     std::string defaultValue; ///< Used as a default value in editor or if an optional parameter is empty.
-#endif
+
 
     /**
      * Set the default value used in editor or if an optional parameter is empty during code generation.
      */
     ParameterInfo & SetDefaultValue(std::string defaultValue_) {
-        #if defined(GD_IDE_ONLY)
         defaultValue = defaultValue_;
-        #endif
         return *this; };
 };
 
@@ -566,7 +500,6 @@ class GD_API InstructionInfos
     InstructionInfos(ExtensionBase & parentExtension);
     virtual ~InstructionInfos() {};
 
-#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string description;
     std::string sentence;
@@ -574,23 +507,15 @@ class GD_API InstructionInfos
     wxBitmap icon;
     wxBitmap smallicon;
     bool canHaveSubInstructions;
-#endif
     std::vector < ParameterInfo > parameters;
 
     InstructionInfos & SetCanHaveSubInstructions()
     {
-        #if defined(GD_IDE_ONLY)
         canHaveSubInstructions = true;
-        #endif
         return *this;
     }
 
-
-    #if !defined(GD_IDE_ONLY)
-    ParameterInfo & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional);
-    #else //This is exactly the same function, but wxString need to be used in IDE
     ParameterInfo & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
-    #endif
 
     ParameterInfo & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
@@ -671,20 +596,14 @@ class GD_API ExpressionInfos
 
     ExpressionInfos & SetHidden();
 
-#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string description;
     std::string group;
     bool shown;
     wxBitmap smallicon;
-#endif
     std::vector < ParameterInfo > parameters;
 
-    #if !defined(GD_IDE_ONLY)
-    ParameterInfo & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional);
-    #else //This is exactly the same function, but wxString need to be used in IDE
     ParameterInfo & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
-    #endif
 
     ParameterInfo & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
@@ -746,20 +665,14 @@ class GD_API StrExpressionInfos
 
     StrExpressionInfos & SetHidden();
 
-#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string description;
     std::string group;
     bool shown;
     wxBitmap smallicon;
-#endif
     std::vector < ParameterInfo > parameters;
 
-    #if !defined(GD_IDE_ONLY)
-    ParameterInfo & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional);
-    #else //This is exactly the same function, but wxString need to be used in IDE
     ParameterInfo & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
-    #endif
 
     ParameterInfo & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
@@ -819,15 +732,15 @@ class GD_API EventInfos
     EventInfos();
     virtual ~EventInfos() {};
 
-#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string description;
     std::string group;
     wxBitmap smallicon;
-#endif
 
     boost::shared_ptr<BaseEvent> instance;
 };
+
+#endif
 
 /**
  * \brief Contains user-friendly infos about an automatism, only at edittime, and members needed to create the automatism
@@ -839,26 +752,26 @@ class GD_API AutomatismInfo
     AutomatismInfo();
     virtual ~AutomatismInfo() {};
 
+#if defined(GD_IDE_ONLY)
     AutomatismInfo & SetIncludeFile(const std::string & includeFile) { optionalIncludeFile = includeFile; return *this; }
 
-#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string defaultName;
     std::string description;
     std::string group;
     wxBitmap icon;
-#endif
 
     std::map<std::string, InstructionInfos > conditionsInfos;
     std::map<std::string, InstructionInfos > actionsInfos;
     std::map<std::string, ExpressionInfos > expressionsInfos;
     std::map<std::string, StrExpressionInfos > strExpressionsInfos;
 
-    boost::shared_ptr<Automatism> instance;
-    boost::shared_ptr<AutomatismsSharedDatas> sharedDatasInstance;
-
     std::string optionalIncludeFile;
     std::string cppClassName;
+#endif
+
+    boost::shared_ptr<Automatism> instance;
+    boost::shared_ptr<AutomatismsSharedDatas> sharedDatasInstance;
 };
 
 /**
@@ -871,16 +784,12 @@ class GD_API ExtensionObjectInfos
     ExtensionObjectInfos();
     virtual ~ExtensionObjectInfos() {};
 
+#if defined(GD_IDE_ONLY)
     ExtensionObjectInfos & SetIncludeFile(const std::string & includeFile) { optionalIncludeFile = includeFile; return *this; }
 
-#if defined(GD_IDE_ONLY)
     std::string fullname;
     std::string informations;
     wxBitmap icon;
-#endif
-
-    DestroyFunPtr destroyFunPtr;
-    CreateFunPtr createFunPtr;
 
     std::map<std::string, InstructionInfos > conditionsInfos;
     std::map<std::string, InstructionInfos > actionsInfos;
@@ -889,6 +798,10 @@ class GD_API ExtensionObjectInfos
 
     std::string optionalIncludeFile;
     std::string cppClassName;
+#endif
+
+    DestroyFunPtr destroyFunPtr;
+    CreateFunPtr createFunPtr;
 };
 
 /**
@@ -947,44 +860,6 @@ class GD_API ExtensionBase
 
     inline std::string GetName() const { return name; }
 
-    #if defined(GD_IDE_ONLY)
-    inline std::string GetInfo() const { return informations; }
-    inline std::string GetAuthor() const { return author; }
-    inline std::string GetLicense() const { return license; }
-    inline std::string GetFullName() const { return fullname; }
-    const std::vector < std::pair<std::string, std::string> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
-    #endif
-
-    /**
-     * Get objects types provided by the extension
-     */
-    std::vector < std::string > GetExtensionObjectsTypes() const;
-
-    /**
-     * Get automatism types provided by the extension
-     */
-    std::vector < std::string > GetAutomatismsTypes() const;
-
-    const std::map<std::string, InstructionInfos > & GetAllActions() const;
-    const std::map<std::string, InstructionInfos > & GetAllConditions() const;
-    const std::map<std::string, ExpressionInfos > & GetAllExpressions() const;
-    const std::map<std::string, StrExpressionInfos > & GetAllStrExpressions() const;
-    const std::map<std::string, InstructionInfos > & GetAllActionsForObject(std::string objectType) const;
-    const std::map<std::string, InstructionInfos > & GetAllConditionsForObject(std::string objectType) const;
-    const std::map<std::string, ExpressionInfos > & GetAllExpressionsForObject(std::string objectType) const;
-    const std::map<std::string, StrExpressionInfos > & GetAllStrExpressionsForObject(std::string objectType) const;
-    const std::map<std::string, EventInfos > & GetAllEvents() const;
-    const std::map<std::string, AutomatismInfo > & GetAllAutomatisms() const;
-    const std::map<std::string, InstructionInfos > & GetAllActionsForAutomatism(std::string autoType) const;
-    const std::map<std::string, InstructionInfos > & GetAllConditionsForAutomatism(std::string autoType) const;
-    const std::map<std::string, ExpressionInfos > & GetAllExpressionsForAutomatism(std::string autoType) const;
-    const std::map<std::string, StrExpressionInfos > & GetAllStrExpressionsForAutomatism(std::string autoType) const;
-
-    #if defined(GD_IDE_ONLY)
-    const ExtensionObjectInfos & GetObjectInfo(std::string objectType) const;
-    #endif
-    const AutomatismInfo & GetAutomatismInfo(std::string objectType) const;
-
     /**
      * Return a function to create the object if the type is handled by the extension
      */
@@ -994,12 +869,6 @@ class GD_API ExtensionBase
      * Make sure that the object from an extension is deleted by the same extension.
      */
     DestroyFunPtr       GetDestroyObjectFunction(std::string objectType) const;
-
-    /**
-     * Create an custom event.
-     * Return NULL if eventType is not provided by the extension.
-     */
-    boost::shared_ptr<BaseEvent> CreateEvent(std::string eventType) const;
 
     /**
      * Create an automatism
@@ -1018,7 +887,58 @@ class GD_API ExtensionBase
      */
     inline std::string GetNameSpace() { return nameSpace; };
 
+    /**
+     * Called when a scene is loaded: Useful to initialize some extensions specific objects related to scene
+     */
+    virtual void SceneLoaded(RuntimeScene & scene);
+
+    /**
+     * Called when a scene is unloaded: Useful to destroy some extensions specific objects related to scene
+     */
+    virtual void SceneUnloaded(RuntimeScene & scene);
+
+    /**
+     * Get objects types provided by the extension
+     */
+    std::vector < std::string > GetExtensionObjectsTypes() const;
+
+    /**
+     * Get automatism types provided by the extension
+     */
+    std::vector < std::string > GetAutomatismsTypes() const;
+
     #if defined(GD_IDE_ONLY)
+    inline std::string GetInfo() const { return informations; }
+    inline std::string GetAuthor() const { return author; }
+    inline std::string GetLicense() const { return license; }
+    inline std::string GetFullName() const { return fullname; }
+    const std::vector < std::pair<std::string, std::string> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
+
+
+    const std::map<std::string, InstructionInfos > & GetAllActions() const;
+    const std::map<std::string, InstructionInfos > & GetAllConditions() const;
+    const std::map<std::string, ExpressionInfos > & GetAllExpressions() const;
+    const std::map<std::string, StrExpressionInfos > & GetAllStrExpressions() const;
+    const std::map<std::string, InstructionInfos > & GetAllActionsForObject(std::string objectType) const;
+    const std::map<std::string, InstructionInfos > & GetAllConditionsForObject(std::string objectType) const;
+    const std::map<std::string, ExpressionInfos > & GetAllExpressionsForObject(std::string objectType) const;
+    const std::map<std::string, StrExpressionInfos > & GetAllStrExpressionsForObject(std::string objectType) const;
+    const std::map<std::string, EventInfos > & GetAllEvents() const;
+    const std::map<std::string, AutomatismInfo > & GetAllAutomatisms() const;
+    const std::map<std::string, InstructionInfos > & GetAllActionsForAutomatism(std::string autoType) const;
+    const std::map<std::string, InstructionInfos > & GetAllConditionsForAutomatism(std::string autoType) const;
+    const std::map<std::string, ExpressionInfos > & GetAllExpressionsForAutomatism(std::string autoType) const;
+    const std::map<std::string, StrExpressionInfos > & GetAllStrExpressionsForAutomatism(std::string autoType) const;
+
+    const ExtensionObjectInfos & GetObjectInfo(std::string objectType) const;
+    const AutomatismInfo & GetAutomatismInfo(std::string objectType) const;
+
+    /**
+     * Create an custom event.
+     * Return NULL if eventType is not provided by the extension.
+     */
+    boost::shared_ptr<BaseEvent> CreateEvent(std::string eventType) const;
+
     /**
      * Called ( e.g. during compilation ) so as to inventory resources used by conditions and update their filename
      */
@@ -1028,7 +948,6 @@ class GD_API ExtensionBase
      * Called ( e.g. during compilation ) so as to inventory resources used by actions and update their filename
      */
     virtual void PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper) {};
-    #endif
 
     /**
      * Must return true if the extension has something to display in debugger.
@@ -1046,19 +965,10 @@ class GD_API ExtensionBase
     virtual bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue) { return false; };
 
     /**
-     * Called when a scene is loaded: Useful to initialize some extensions specific objects related to scene
-     */
-    virtual void SceneLoaded(RuntimeScene & scene);
-
-    /**
-     * Called when a scene is unloaded: Useful to destroy some extensions specific objects related to scene
-     */
-    virtual void SceneUnloaded(RuntimeScene & scene);
-
-    /**
      * Must return the number of available properties for the debugger
      */
     virtual unsigned int GetNumberOfProperties(RuntimeScene & scene) const { return 0; };
+    #endif
 
     protected :
 
@@ -1069,28 +979,30 @@ class GD_API ExtensionBase
 
     std::string name;
 
+    std::map<std::string, ExtensionObjectInfos > objectsInfos;
+    std::map<std::string, AutomatismInfo > automatismsInfo;
+
+    static std::map<std::string, ExtensionObjectInfos > badObjectsInfos; ///< Used when an object is not found in the extension
+    static std::map<std::string, AutomatismInfo > badAutomatismsInfo;///< Used when an automatism is not found in the extension
+
     #if defined(GD_IDE_ONLY) //Information available only at edittime
     std::string fullname; ///<Name displayed to users at edittime
     std::string informations; ///<Description displayed to users at edittime
     std::string author; ///<Author displayed to users at edittime
     std::string license;  ///<License name displayed to users at edittime
     std::vector < std::pair<std::string, std::string> > supplementaryRuntimeFiles; ///<Supplementary runtime files to copy on compilation
-    #endif
 
-    std::map<std::string, ExtensionObjectInfos > objectsInfos;
     std::map<std::string, InstructionInfos > conditionsInfos;
     std::map<std::string, InstructionInfos > actionsInfos;
     std::map<std::string, ExpressionInfos > expressionsInfos;
     std::map<std::string, StrExpressionInfos > strExpressionsInfos;
     std::map<std::string, EventInfos > eventsInfos;
-    std::map<std::string, AutomatismInfo > automatismsInfo;
 
-    static std::map<std::string, ExtensionObjectInfos > badObjectsInfos; ///< Used when an object is not found in the extension
     static std::map<std::string, InstructionInfos > badConditionsInfos; ///< Used when a condition is not found in the extension
     static std::map<std::string, InstructionInfos > badActionsInfos;  ///< Used when an action is not found in the extension
     static std::map<std::string, ExpressionInfos > badExpressionsInfos; ///< Used when an expression is not found in the extension
     static std::map<std::string, StrExpressionInfos > badStrExpressionsInfos;///< Used when an expression is not found in the extension
-    static std::map<std::string, AutomatismInfo > badAutomatismsInfo;///< Used when an automatism is not found in the extension
+    #endif
 
     private:
 

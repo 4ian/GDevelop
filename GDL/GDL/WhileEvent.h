@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef WHILEEVENT_H
 #define WHILEEVENT_H
 
@@ -51,12 +53,9 @@ class WhileEvent : public BaseEvent
         virtual vector < vector<Instruction>* > GetAllConditionsVectors();
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
 
-        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
-        #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */
@@ -71,7 +70,6 @@ class WhileEvent : public BaseEvent
          * Called when the user want to edit the event
          */
         virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
-#endif
 
     private:
         void Init(const WhileEvent & event);
@@ -81,13 +79,13 @@ class WhileEvent : public BaseEvent
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
 
-#if defined(GD_IDE_ONLY)
         mutable unsigned int whileConditionsHeight;
 
         int GetConditionsHeight() const;
         int GetActionsHeight() const;
         int GetWhileConditionsHeight() const;
-#endif
 };
 
 #endif // WHILEEVENT_H
+
+#endif

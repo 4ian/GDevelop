@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #include "GDL/LinkEvent.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/EventsRenderingHelper.h"
@@ -13,14 +15,10 @@
 #include "Game.h"
 #include "Event.h"
 #include <iostream>
-
-#if defined(GD_IDE_ONLY)
 #include "GDL/EditLink.h"
-#endif
 
 using namespace std;
 
-#if defined(GD_IDE_ONLY)
 void LinkEvent::SaveToXml(TiXmlElement * eventElem) const
 {
     TiXmlElement * type = new TiXmlElement( "Type" );
@@ -39,7 +37,6 @@ void LinkEvent::SaveToXml(TiXmlElement * eventElem) const
     eventElem->LinkEndChild( com1 );
     com1->SetAttribute( "value", sceneLinked.c_str() );
 }
-#endif
 
 void LinkEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
@@ -102,16 +99,12 @@ void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector <
 
     for ( unsigned int insertion = 0;insertion <= static_cast<unsigned>(lastEvent-firstEvent);insertion++ ) //Insertion des évènements du lien
     {
-        #if defined(GD_IDE_ONLY) //Profiling can be enabled in editor.
+        //Profiling can be enabled in editor.
         eventList.insert( eventList.begin() + indexOfTheEventInThisList + insertion, CloneRememberingOriginalEvent(eventsToInclude->at( firstEvent+insertion )));
-        #else
-        eventList.insert( eventList.begin() + indexOfTheEventInThisList + insertion, eventsToInclude->at( firstEvent+insertion )->Clone() );
-        #endif
     }
     eventList.erase( eventList.begin() + indexOfTheEventInThisList + static_cast<unsigned>(lastEvent-firstEvent)+1 ); //Suppression du lien
 }
 
-#if defined(GD_IDE_ONLY)
 void LinkEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
     EditLink dialog(parent_, *this);

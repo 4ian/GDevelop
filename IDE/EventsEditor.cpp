@@ -43,15 +43,15 @@ using namespace std;
 const long EventsEditor::ID_TEXTCTRL1 = wxNewId();
 const long EventsEditor::ID_BITMAPBUTTON1 = wxNewId();
 const long EventsEditor::ID_PANEL2 = wxNewId();
-const long EventsEditor::ID_PANEL7 = wxNewId();
-const long EventsEditor::ID_HYPERLINKCTRL2 = wxNewId();
-const long EventsEditor::ID_PANEL6 = wxNewId();
-const long EventsEditor::ID_HYPERLINKCTRL1 = wxNewId();
-const long EventsEditor::ID_PANEL5 = wxNewId();
-const long EventsEditor::ID_HYPERLINKCTRL3 = wxNewId();
+const long EventsEditor::ID_STATICBITMAP1 = wxNewId();
+const long EventsEditor::ID_STATICTEXT1 = wxNewId();
+const long EventsEditor::ID_STATICBITMAP2 = wxNewId();
+const long EventsEditor::ID_STATICTEXT2 = wxNewId();
+const long EventsEditor::ID_STATICBITMAP3 = wxNewId();
+const long EventsEditor::ID_STATICTEXT3 = wxNewId();
 const long EventsEditor::ID_PANEL3 = wxNewId();
-const long EventsEditor::ID_PANEL8 = wxNewId();
-const long EventsEditor::ID_HYPERLINKCTRL4 = wxNewId();
+const long EventsEditor::ID_STATICBITMAP4 = wxNewId();
+const long EventsEditor::ID_STATICTEXT4 = wxNewId();
 const long EventsEditor::ID_PANEL4 = wxNewId();
 const long EventsEditor::ID_PANEL1 = wxNewId();
 const long EventsEditor::ID_SCROLLBAR1 = wxNewId();
@@ -135,26 +135,26 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	FlexGridSizer2->Fit(liveEditingPanel);
 	FlexGridSizer2->SetSizeHints(liveEditingPanel);
 	eventContextPanel = new wxPanel(eventsPanel, ID_PANEL3, wxPoint(136,24), wxSize(224,40), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
-	FlexGridSizer3 = new wxFlexGridSizer(0, 6, 0, 0);
-	addEventIconPnl = new wxPanel(eventContextPanel, ID_PANEL7, wxDefaultPosition, wxSize(16,16), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL7"));
-	FlexGridSizer3->Add(addEventIconPnl, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	addEventBt = new wxHyperlinkCtrl(eventContextPanel, ID_HYPERLINKCTRL2, _("Ajouter un évènement"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
-	FlexGridSizer3->Add(addEventBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-	addSubEventIconPnl = new wxPanel(eventContextPanel, ID_PANEL6, wxDefaultPosition, wxSize(16,16), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL6"));
-	FlexGridSizer3->Add(addSubEventIconPnl, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	addSubEventBt = new wxHyperlinkCtrl(eventContextPanel, ID_HYPERLINKCTRL1, _("Un sous évènement"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
-	FlexGridSizer3->Add(addSubEventBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
-	addMoreIconPnl = new wxPanel(eventContextPanel, ID_PANEL5, wxDefaultPosition, wxSize(16,16), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL5"));
-	FlexGridSizer3->Add(addMoreIconPnl, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	addMoreBt = new wxHyperlinkCtrl(eventContextPanel, ID_HYPERLINKCTRL3, _("Autre..."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL3"));
-	FlexGridSizer3->Add(addMoreBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+	FlexGridSizer3 = new wxFlexGridSizer(0, 7, 0, 0);
+	addEventIcon = new wxStaticBitmap(eventContextPanel, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/eventaddicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
+	FlexGridSizer3->Add(addEventIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	addEventBt = new wxStaticText(eventContextPanel, ID_STATICTEXT1, _("Ajouter un évènement"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	FlexGridSizer3->Add(addEventBt, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 2);
+	addSubEventIcon = new wxStaticBitmap(eventContextPanel, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/subeventaddicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	FlexGridSizer3->Add(addSubEventIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	addSubEventBt = new wxStaticText(eventContextPanel, ID_STATICTEXT2, _("Un sous évènement"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	FlexGridSizer3->Add(addSubEventBt, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
+	addMoreIcon = new wxStaticBitmap(eventContextPanel, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/addicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
+	FlexGridSizer3->Add(addMoreIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	addMoreBt = new wxStaticText(eventContextPanel, ID_STATICTEXT3, _("Autre"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	FlexGridSizer3->Add(addMoreBt, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
 	eventContextPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->SetSizeHints(eventContextPanel);
 	listContextPanel = new wxPanel(eventsPanel, ID_PANEL4, wxPoint(136,50), wxSize(224,40), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
-	addInstrIconPnl = new wxPanel(listContextPanel, ID_PANEL8, wxDefaultPosition, wxSize(16,16), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL8"));
-	FlexGridSizer4->Add(addInstrIconPnl, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	addInstrBt = new wxHyperlinkCtrl(listContextPanel, ID_HYPERLINKCTRL4, _("Ajouter une condition"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL4"));
+	addInstrIcon = new wxStaticBitmap(listContextPanel, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/addicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP4"));
+	FlexGridSizer4->Add(addInstrIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	addInstrBt = new wxStaticText(listContextPanel, ID_STATICTEXT4, _("Ajouter une condition"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer4->Add(addInstrBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
 	listContextPanel->SetSizer(FlexGridSizer4);
 	FlexGridSizer4->SetSizeHints(listContextPanel);
@@ -199,19 +199,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EventsEditor::OnliveEditText);
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&EventsEditor::OnliveEditTextEnter);
 	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EventsEditor::OnparameterEditBtClick);
-	addEventIconPnl->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OnaddEventIconPnlPaint,0,this);
-	addEventIconPnl->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&EventsEditor::OnaddEventIconPnlLeftDown,0,this);
-	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EventsEditor::OnaddEventBtClick);
-	addSubEventIconPnl->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OnaddSubEventIconPnlPaint,0,this);
-	addSubEventIconPnl->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&EventsEditor::OnaddSubEventIconPnlLeftDown,0,this);
-	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EventsEditor::OnaddSubEventBtClick);
-	addMoreIconPnl->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OnaddMoreIconPnlPaint,0,this);
-	addMoreIconPnl->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&EventsEditor::OnaddMoreIconPnlLeftDown,0,this);
-	Connect(ID_HYPERLINKCTRL3,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EventsEditor::OnaddMoreBtClick);
 	eventContextPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OneventContextPanelPaint,0,this);
-	addInstrIconPnl->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OnaddInstrIconPnlPaint,0,this);
-	addInstrIconPnl->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&EventsEditor::OnaddInstrIconPnlLeftDown,0,this);
-	Connect(ID_HYPERLINKCTRL4,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EventsEditor::OnaddInstrBtClick);
 	listContextPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OnlistContextPanelPaint,0,this);
 	eventsPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OneventsPanelPaint,0,this);
 	eventsPanel->Connect(wxEVT_ERASE_BACKGROUND,(wxObjectEventFunction)&EventsEditor::OneventsPanelEraseBackground,0,this);
@@ -242,10 +230,33 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&EventsEditor::OneventsPanelKeyUp);
 	//*)
 
-    addInstrBt->SetVisitedColour(addInstrBt->GetNormalColour());
-    addEventBt->SetVisitedColour(addEventBt->GetNormalColour());
-    addSubEventBt->SetVisitedColour(addSubEventBt->GetNormalColour());
-    addMoreBt->SetVisitedColour(addMoreBt->GetNormalColour());
+    addEventBt->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(EventsEditor::OnaddEventIconPnlLeftDown), NULL, this);
+    addEventIcon->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(EventsEditor::OnaddEventIconPnlLeftDown), NULL, this);
+    addEventBt->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(EventsEditor::OnaddEventIconPnlMouseEnter), NULL, this);
+    addEventIcon->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(EventsEditor::OnaddEventIconPnlMouseEnter), NULL, this);
+    addEventBt->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(EventsEditor::OnaddEventIconPnlMouseLeave), NULL, this);
+    addEventIcon->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(EventsEditor::OnaddEventIconPnlMouseLeave), NULL, this);
+
+    addSubEventBt->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(EventsEditor::OnaddSubEventIconPnlLeftDown), NULL, this);
+    addSubEventIcon->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(EventsEditor::OnaddSubEventIconPnlLeftDown), NULL, this);
+    addSubEventBt->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(EventsEditor::OnaddSubEventIconPnlMouseEnter), NULL, this);
+    addSubEventIcon->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(EventsEditor::OnaddSubEventIconPnlMouseEnter), NULL, this);
+    addSubEventBt->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(EventsEditor::OnaddSubEventIconPnlMouseLeave), NULL, this);
+    addSubEventIcon->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(EventsEditor::OnaddSubEventIconPnlMouseLeave), NULL, this);
+
+    addMoreBt->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(EventsEditor::OnaddMoreIconPnlLeftDown), NULL, this);
+    addMoreIcon->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(EventsEditor::OnaddMoreIconPnlLeftDown), NULL, this);
+    addMoreBt->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(EventsEditor::OnaddMoreIconPnlMouseEnter), NULL, this);
+    addMoreIcon->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(EventsEditor::OnaddMoreIconPnlMouseEnter), NULL, this);
+    addMoreBt->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(EventsEditor::OnaddMoreIconPnlMouseLeave), NULL, this);
+    addMoreIcon->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(EventsEditor::OnaddMoreIconPnlMouseLeave), NULL, this);
+
+    addInstrBt->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(EventsEditor::OnaddInstrIconPnlLeftDown), NULL, this);
+    addInstrIcon->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(EventsEditor::OnaddInstrIconPnlLeftDown), NULL, this);
+    addInstrBt->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(EventsEditor::OnaddInstrIconPnlMouseEnter), NULL, this);
+    addInstrIcon->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(EventsEditor::OnaddInstrIconPnlMouseEnter), NULL, this);
+    addInstrBt->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(EventsEditor::OnaddInstrIconPnlMouseLeave), NULL, this);
+    addInstrIcon->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(EventsEditor::OnaddInstrIconPnlMouseLeave), NULL, this);
 
 	//Load configuration
 	wxConfigBase * config = wxConfigBase::Get();
@@ -572,55 +583,7 @@ void EventsEditor::OnlistContextPanelPaint(wxPaintEvent& event)
     }
     dc.DrawRectangle(0,-1,listContextPanel->GetSize().x,listContextPanel->GetSize().y+1);
     addInstrBt->SetBackgroundColour(dc.GetBrush().GetColour());
-}
-void EventsEditor::OnaddInstrIconPnlPaint(wxPaintEvent& event)
-{
-    wxBufferedPaintDC dc(addInstrIconPnl);
-
-    if ( selection.GetHighlightedInstructionList().isConditionList )
-        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetConditionsRectangleFillBrush());
-    else
-        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetActionsRectangleFillBrush());
-
-    dc.DrawRectangle(-1,-1,eventContextPanel->GetSize().x+2,eventContextPanel->GetSize().y+2);
-    dc.DrawBitmap(wxBitmap("res/addicon.png",wxBITMAP_TYPE_ANY), 0,0,true);
-}
-
-void EventsEditor::OnaddMoreIconPnlPaint(wxPaintEvent& event)
-{
-    wxBufferedPaintDC dc(addMoreIconPnl);
-
-    if ( selection.EventSelected(selection.GetHighlightedEvent()) )
-        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
-    else
-        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
-
-    dc.DrawRectangle(-1,-1,addMoreIconPnl->GetSize().x+2,addMoreIconPnl->GetSize().y+2);
-    dc.DrawBitmap(wxBitmap("res/addicon.png",wxBITMAP_TYPE_ANY), 0,0,true);
-}
-void EventsEditor::OnaddSubEventIconPnlPaint(wxPaintEvent& event)
-{
-    wxBufferedPaintDC dc(addSubEventIconPnl);
-
-    if ( selection.EventSelected(selection.GetHighlightedEvent()) )
-        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
-    else
-        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
-
-    dc.DrawRectangle(-1,-1,addSubEventIconPnl->GetSize().x+2,addSubEventIconPnl->GetSize().y+2);
-    dc.DrawBitmap(wxBitmap("res/subeventaddicon.png",wxBITMAP_TYPE_ANY), 0,0,true);
-}
-void EventsEditor::OnaddEventIconPnlPaint(wxPaintEvent& event)
-{
-    wxBufferedPaintDC dc(addEventIconPnl);
-
-    if ( selection.EventSelected(selection.GetHighlightedEvent()) )
-        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
-    else
-        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
-
-    dc.DrawRectangle(-1,-1,addMoreIconPnl->GetSize().x+2,addMoreIconPnl->GetSize().y+2);
-    dc.DrawBitmap(wxBitmap("res/eventaddicon.png",wxBITMAP_TYPE_ANY), 0,0,true);
+    addInstrIcon->SetBackgroundColour(dc.GetBrush().GetColour());
 }
 
 void EventsEditor::OneventContextPanelPaint(wxPaintEvent& event)
@@ -641,6 +604,9 @@ void EventsEditor::OneventContextPanelPaint(wxPaintEvent& event)
     addEventBt->SetBackgroundColour(dc.GetBrush().GetColour());
     addSubEventBt->SetBackgroundColour(dc.GetBrush().GetColour());
     addMoreBt->SetBackgroundColour(dc.GetBrush().GetColour());
+    addEventIcon->SetBackgroundColour(dc.GetBrush().GetColour());
+    addSubEventIcon->SetBackgroundColour(dc.GetBrush().GetColour());
+    addMoreIcon->SetBackgroundColour(dc.GetBrush().GetColour());
 }
 
 
@@ -1639,4 +1605,60 @@ void EventsEditor::OnaddInstrIconPnlLeftDown(wxMouseEvent& event)
 {
     wxCommandEvent useless;
     OnaddInstrBtClick(useless);
+}
+
+void EventsEditor::OnaddEventIconPnlMouseEnter(wxMouseEvent& event)
+{
+    addEventBt->SetForegroundColour(wxColor(255,0,0));
+    addEventBt->Refresh();
+    addEventBt->Update();
+}
+
+void EventsEditor::OnaddEventIconPnlMouseLeave(wxMouseEvent& event)
+{
+    addEventBt->SetForegroundColour(wxColor(0,0,0));
+    addEventBt->Refresh();
+    addEventBt->Update();
+}
+
+void EventsEditor::OnaddSubEventIconPnlMouseEnter(wxMouseEvent& event)
+{
+    addSubEventBt->SetForegroundColour(wxColor(255,0,0));
+    addSubEventBt->Refresh();
+    addSubEventBt->Update();
+}
+
+void EventsEditor::OnaddSubEventIconPnlMouseLeave(wxMouseEvent& event)
+{
+    addSubEventBt->SetForegroundColour(wxColor(0,0,0));
+    addSubEventBt->Refresh();
+    addSubEventBt->Update();
+}
+
+void EventsEditor::OnaddMoreIconPnlMouseEnter(wxMouseEvent& event)
+{
+    addMoreBt->SetForegroundColour(wxColor(255,0,0));
+    addMoreBt->Refresh();
+    addMoreBt->Update();
+}
+
+void EventsEditor::OnaddMoreIconPnlMouseLeave(wxMouseEvent& event)
+{
+    addMoreBt->SetForegroundColour(wxColor(0,0,0));
+    addMoreBt->Refresh();
+    addMoreBt->Update();
+}
+
+void EventsEditor::OnaddInstrIconPnlMouseEnter(wxMouseEvent& event)
+{
+    addInstrBt->SetForegroundColour(wxColor(255,0,0));
+    addInstrBt->Refresh();
+    addInstrBt->Update();
+}
+
+void EventsEditor::OnaddInstrIconPnlMouseLeave(wxMouseEvent& event)
+{
+    addInstrBt->SetForegroundColour(wxColor(0,0,0));
+    addInstrBt->Refresh();
+    addInstrBt->Update();
 }

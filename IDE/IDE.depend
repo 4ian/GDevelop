@@ -27554,7 +27554,7 @@
 1311188810 source:d:\florian\programmation\gamedevelop2\ide\resource.rc
 	"version.h"
 
-1313528705 d:\florian\programmation\gamedevelop2\ide\version.h
+1313583209 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289489446 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -28244,7 +28244,7 @@
 	"wx/defs.h"
 	"wx/object.h"
 
-1313492195 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
+1313583071 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
 	"EventsEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -28276,13 +28276,14 @@
 	"Clipboard.h"
 	<SFML/System.hpp>
 
-1313444701 d:\florian\programmation\gamedevelop2\ide\eventseditor.h
+1313582617 d:\florian\programmation\gamedevelop2\ide\eventseditor.h
 	<wx/sizer.h>
+	<wx/stattext.h>
 	<wx/menu.h>
 	<wx/textctrl.h>
 	<wx/panel.h>
-	<wx/hyperlink.h>
 	<wx/bmpbuttn.h>
+	<wx/statbmp.h>
 	<wx/scrolbar.h>
 	<vector>
 	<boost/shared_ptr.hpp>

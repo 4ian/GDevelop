@@ -8,11 +8,12 @@
 
 //(*Headers(EventsEditor)
 #include <wx/sizer.h>
+#include <wx/stattext.h>
 #include <wx/menu.h>
 #include <wx/textctrl.h>
 #include <wx/panel.h>
-#include <wx/hyperlink.h>
 #include <wx/bmpbuttn.h>
+#include <wx/statbmp.h>
 #include <wx/scrolbar.h>
 //*)
 #include <vector>
@@ -51,34 +52,34 @@ class EventsEditor: public wxPanel
 		virtual ~EventsEditor();
 
 		//(*Declarations(EventsEditor)
+		wxStaticText* addSubEventBt;
+		wxStaticText* addEventBt;
 		wxMenuItem* redoMenu;
 		wxMenuItem* MenuItem5;
 		wxMenuItem* toggleActivation;
 		wxMenuItem* eventPasteMenu;
 		wxMenuItem* MenuItem1;
-		wxPanel* addEventIconPnl;
 		wxMenuItem* eventCutMenu;
 		wxScrollBar* scrollBar;
-		wxHyperlinkCtrl* addEventBt;
+		wxStaticBitmap* addInstrIcon;
 		wxMenu eventsContextMenu;
 		wxMenuItem* undoMenu;
-		wxHyperlinkCtrl* addInstrBt;
+		wxStaticBitmap* addEventIcon;
+		wxStaticText* addMoreBt;
 		wxMenuItem* deleteMenu;
-		wxPanel* addSubEventIconPnl;
+		wxStaticBitmap* addMoreIcon;
 		wxTextCtrl* liveEdit;
 		wxPanel* liveEditingPanel;
 		wxPanel* eventContextPanel;
 		wxPanel* listContextPanel;
-		wxPanel* addInstrIconPnl;
 		wxMenuItem* MenuItem6;
-		wxPanel* addMoreIconPnl;
 		wxMenu eventTypesMenu;
 		wxPanel* eventsPanel;
+		wxStaticText* addInstrBt;
 		wxMenuItem* eventCopyMenu;
-		wxHyperlinkCtrl* addMoreBt;
 		wxMenu multipleContextMenu;
 		wxBitmapButton* parameterEditBt;
-		wxHyperlinkCtrl* addSubEventBt;
+		wxStaticBitmap* addSubEventIcon;
 		//*)
         SearchEvents * searchDialog;
 
@@ -101,15 +102,15 @@ class EventsEditor: public wxPanel
 		static const long ID_TEXTCTRL1;
 		static const long ID_BITMAPBUTTON1;
 		static const long ID_PANEL2;
-		static const long ID_PANEL7;
-		static const long ID_HYPERLINKCTRL2;
-		static const long ID_PANEL6;
-		static const long ID_HYPERLINKCTRL1;
-		static const long ID_PANEL5;
-		static const long ID_HYPERLINKCTRL3;
+		static const long ID_STATICBITMAP1;
+		static const long ID_STATICTEXT1;
+		static const long ID_STATICBITMAP2;
+		static const long ID_STATICTEXT2;
+		static const long ID_STATICBITMAP3;
+		static const long ID_STATICTEXT3;
 		static const long ID_PANEL3;
-		static const long ID_PANEL8;
-		static const long ID_HYPERLINKCTRL4;
+		static const long ID_STATICBITMAP4;
+		static const long ID_STATICTEXT4;
 		static const long ID_PANEL4;
 		static const long ID_PANEL1;
 		static const long ID_SCROLLBAR1;
@@ -188,6 +189,14 @@ class EventsEditor: public wxPanel
 		void OnaddEventIconPnlLeftDown(wxMouseEvent& event);
 		void OnaddInstrIconPnlPaint(wxPaintEvent& event);
 		void OnaddInstrIconPnlLeftDown(wxMouseEvent& event);
+		void OnaddEventIconPnlMouseEnter(wxMouseEvent& event);
+		void OnaddEventIconPnlMouseLeave(wxMouseEvent& event);
+		void OnaddSubEventIconPnlMouseEnter(wxMouseEvent& event);
+		void OnaddSubEventIconPnlMouseLeave(wxMouseEvent& event);
+		void OnaddMoreIconPnlMouseLeave(wxMouseEvent& event);
+		void OnaddMoreIconPnlMouseEnter(wxMouseEvent& event);
+		void OnaddInstrIconPnlMouseEnter(wxMouseEvent& event);
+		void OnaddInstrIconPnlMouseLeave(wxMouseEvent& event);
 		//*)
 		void UpdateRibbonBars();
 		void OnHelpBtClick(wxCommandEvent& event);

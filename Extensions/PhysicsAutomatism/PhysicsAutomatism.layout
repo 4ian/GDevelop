@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
+	<ActiveTarget name="Development" />
 	<File name="Box2D\Box2D\Box2D\Box2D.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1565" topLine="30" />
 	</File>
@@ -52,14 +52,14 @@
 	<File name="ContactListener.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="238" topLine="0" />
 	</File>
-	<File name="Extension.cpp" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="27447" topLine="429" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2297" topLine="33" />
 	</File>
 	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="6420" topLine="153" />
+		<Cursor1 position="1181" topLine="21" />
 	</File>
 	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3913" topLine="74" />
+		<Cursor1 position="1121" topLine="19" />
 	</File>
 	<File name="PhysicsAutomatismEditor.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="15182" topLine="217" />
@@ -70,13 +70,13 @@
 	<File name="RuntimeScenePhysicsDatas.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="74" topLine="3" />
 	</File>
-	<File name="RuntimeScenePhysicsDatas.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="74" topLine="3" />
+	<File name="RuntimeScenePhysicsDatas.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1072" topLine="3" />
 	</File>
 	<File name="ScenePhysicsDatas.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1117" topLine="3" />
 	</File>
-	<File name="ScenePhysicsDatas.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2002" topLine="35" />
+	<File name="ScenePhysicsDatas.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1011" topLine="6" />
 	</File>
 </CodeBlocks_layout_file>

@@ -26,10 +26,11 @@ freely, subject to the following restrictions:
 
 #include "PhysicsAutomatism.h"
 #include "Box2D/Box2D.h"
-#include "PhysicsAutomatismEditor.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/tinyxml.h"
 #include "GDL/XmlMacros.h"
+#include "PhysicsAutomatismEditor.h"
+#undef GetObject
 
 PhysicsAutomatism::PhysicsAutomatism(std::string automatismTypeName) :
 Automatism(automatismTypeName),

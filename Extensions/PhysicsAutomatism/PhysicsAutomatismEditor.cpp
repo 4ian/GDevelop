@@ -27,10 +27,17 @@ freely, subject to the following restrictions:
 #if defined(GD_IDE_ONLY)
 #include "PhysicsAutomatismEditor.h"
 
+#ifdef __WXMSW__
+#include <wx/msw/winundef.h>
+#endif
 //(*InternalHeaders(PhysicsAutomatismEditor)
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
+#include <wx/log.h>
+#ifdef __WXMSW__
+#include <wx/msw/winundef.h>
+#endif
 #include "GDL/Game.h"
 #include "PhysicsAutomatism.h"
 #include "GDL/MainEditorCommand.h"

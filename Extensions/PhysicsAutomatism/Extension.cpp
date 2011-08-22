@@ -47,6 +47,7 @@ class Extension : public ExtensionBase
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
+
                 DECLARE_AUTOMATISM("PhysicsAutomatism",
                           _("Moteur physique"),
                           _("Physics"),
@@ -55,6 +56,8 @@ class Extension : public ExtensionBase
                           "res/physics32.png",
                           PhysicsAutomatism,
                           ScenePhysicsDatas)
+
+                    #if defined(GD_IDE_ONLY)
 
                     automatismInfo.SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
@@ -569,6 +572,8 @@ class Extension : public ExtensionBase
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetAngularDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
+
+                    #endif
 
                 DECLARE_END_AUTOMATISM();
 

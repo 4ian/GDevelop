@@ -28,6 +28,9 @@ freely, subject to the following restrictions:
 #ifndef PHYSICSAUTOMATISMEDITOR_H
 #define PHYSICSAUTOMATISMEDITOR_H
 
+#ifdef __WXMSW__
+#include <wx/msw/winundef.h>
+#endif
 //(*Headers(PhysicsAutomatismEditor)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
@@ -38,6 +41,9 @@ freely, subject to the following restrictions:
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
+#ifdef __WXMSW__
+#include <wx/msw/winundef.h>
+#endif
 #include <boost/shared_ptr.hpp>
 class Game;
 class MainEditorCommand;

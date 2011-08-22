@@ -56,12 +56,14 @@ class Extension : public ExtensionBase
                           AStarAutomatism,
                           SceneAStarDatas)
 
+                    #if defined(GD_IDE_ONLY)
+
                     automatismInfo.SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_AUTOMATISM_ACTION("SetDestination",
                                    _("Déplacement vers une position"),
                                    _("Déplace l'objet vers une position"),
-                                   _("Déplacer _PARAM0_ vers _PARAM2_;_PARAM3_"),
+                                   _("Déplacer _PARAM0_ vers _PARAM3_;_PARAM4_"),
                                    _("Déplacement"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
@@ -178,14 +180,14 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_ACTION("SetGridWidth",
                                    _("Largeur de la grille virtuelle"),
                                    _("Change la largeur des cellules de la grille virtuelle."),
-                                   _("Faire _PARAM3__PARAM2_ à la largeur des cellules de la grille virtuelle"),
+                                   _("Faire _PARAM4__PARAM3_ à la largeur des cellules de la grille virtuelle"),
                                    _("Paramétrage global"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddCodeOnlyParameter("currentScene", "");
                         instrInfo.AddParameter("object", _("Objet"), "", false);
                         instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
                         instrInfo.AddParameter("expression", _("Largeur ( pixels )"), "", false);
                         instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
 
@@ -197,14 +199,14 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_CONDITION("GridWidth",
                                    _("Largeur de la grille virtuelle"),
                                    _("Teste la largeur des cellules de la grille virtuelle."),
-                                   _("La largeur des cellules de la grille virtuelle est _PARAM3_ à _PARAM2_"),
+                                   _("La largeur des cellules de la grille virtuelle est _PARAM4_ à _PARAM3_"),
                                    _("Paramétrage global"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddCodeOnlyParameter("currentScene", "");
                         instrInfo.AddParameter("object", _("Objet"), "", false);
                         instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
                         instrInfo.AddParameter("expression", _("Largeur ( pixels )"), "", false);
                         instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
@@ -214,14 +216,14 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_ACTION("SetGridHeight",
                                    _("Hauteur de la grille virtuelle"),
                                    _("Change la hauteur des cellules de la grille virtuelle."),
-                                   _("Faire _PARAM3__PARAM2_ à la hauteur des cellules de la grille virtuelle"),
+                                   _("Faire _PARAM4__PARAM3_ à la hauteur des cellules de la grille virtuelle"),
                                    _("Paramétrage global"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddCodeOnlyParameter("currentScene", "");
                         instrInfo.AddParameter("object", _("Objet"), "", false);
                         instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
                         instrInfo.AddParameter("expression", _("Hauteur ( pixels )"), "", false);
                         instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
 
@@ -232,14 +234,14 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_CONDITION("GridHeight",
                                    _("Hauteur de la grille virtuelle"),
                                    _("Teste la hauteur des cellules de la grille virtuelle."),
-                                   _("La hauteur des cellules de la grille virtuelle est _PARAM3_ à _PARAM2_"),
+                                   _("La hauteur des cellules de la grille virtuelle est _PARAM4_ à _PARAM3_"),
                                    _("Paramétrage global"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddCodeOnlyParameter("currentScene", "");
                         instrInfo.AddParameter("object", _("Objet"), "", false);
                         instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
                         instrInfo.AddParameter("expression", _("Hauteur ( pixels )"), "", false);
                         instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
@@ -491,6 +493,8 @@ class Extension : public ExtensionBase
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetBottomBorder").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
+
+                    #endif
 
                 DECLARE_END_AUTOMATISM();
 

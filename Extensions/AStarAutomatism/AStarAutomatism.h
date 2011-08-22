@@ -24,17 +24,18 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef PHYSICAUTOMATISM_H
-#define PHYSICAUTOMATISM_H
+#ifndef ASTARAUTOMATISM_H
+#define ASTARAUTOMATISM_H
 
 #include "GDL/Automatism.h"
 #include "GDL/Object.h"
 #include "SceneAStarDatas.h"
 #include <boost/weak_ptr.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <iostream>
 #include <map>
 #include <set>
-#include "GDL/RuntimeScene.h"
+class RuntimeScene;
 class TiXmlElement;
 class Scene;
 class AStarAutomatismEditor;
@@ -193,4 +194,4 @@ class GD_EXTENSION_API AStarAutomatism : public Automatism, public boost::enable
         boost::shared_ptr<RuntimeSceneAStarDatas> runtimeScenesAStarDatas;
 };
 
-#endif // PHYSICAUTOMATISM_H
+#endif // ASTARAUTOMATISM_H

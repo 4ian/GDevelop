@@ -26,6 +26,7 @@ freely, subject to the following restrictions:
 
 #include "AStarAutomatism.h"
 #include "AStarAutomatismEditor.h"
+#include "GDL/RuntimeScene.h"
 #include "GDL/Scene.h"
 #include "GDL/tinyxml.h"
 #include "GDL/XmlMacros.h"

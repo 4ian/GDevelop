@@ -24,8 +24,8 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef SCENEPHYSICSDATAS_H
-#define SCENEPHYSICSDATAS_H
+#ifndef SCENEASTARDATAS_H
+#define SCENEASTARDATAS_H
 
 #include "GDL/AutomatismsSharedDatas.h"
 #include "RuntimeSceneAStarDatas.h"
@@ -57,4 +57,4 @@ class GD_EXTENSION_API SceneAStarDatas : public AutomatismsSharedDatas
         bool diagonalMove;
 };
 
-#endif // SCENEPHYSICSDATAS_H
+#endif // SCENEASTARDATAS_H

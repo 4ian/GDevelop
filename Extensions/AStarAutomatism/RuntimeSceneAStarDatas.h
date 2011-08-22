@@ -24,8 +24,8 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef RUNTIMESCENEPHYSICSDATAS_H
-#define RUNTIMESCENEPHYSICSDATAS_H
+#ifndef RUNTIMESCENEASTARDATAS_H
+#define RUNTIMESCENEASTARDATAS_H
 
 #include <iostream>
 #include <boost/weak_ptr.hpp>
@@ -53,4 +53,4 @@ class GD_EXTENSION_API RuntimeSceneAStarDatas : public AutomatismsRuntimeSharedD
     private:
 };
 
-#endif // RUNTIMESCENEPHYSICSDATAS_H
+#endif // RUNTIMESCENEASTARDATAS_H

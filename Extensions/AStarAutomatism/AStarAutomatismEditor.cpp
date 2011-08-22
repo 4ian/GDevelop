@@ -32,6 +32,7 @@ freely, subject to the following restrictions:
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
+#include <wx/log.h>
 #include "GDL/Game.h"
 #include "AStarAutomatism.h"
 #include "GDL/MainEditorCommand.h"

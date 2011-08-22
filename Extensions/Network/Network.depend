@@ -11967,7 +11967,7 @@
 
 1236015922 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\smart_ptr\detail\operator_bool.hpp
 
-1307193655 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
+1313670759 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
 	<string>
 	<vector>
 	"GDL/Object.h"
@@ -11977,19 +11977,15 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1311891521 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
-	<wx/wx.h>
+1312670601 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
 	"GDL/Force.h"
-	<SFML/System.hpp>
-	<SFML/Graphics.hpp>
-	<iostream>
 	<string>
 	<vector>
+	<map>
 	<boost/shared_ptr.hpp>
 	<boost/enable_shared_from_this.hpp>
 	"GDL/ListVariable.h"
 	"GDL/ObjectHelpers.h"
-	"GDL/RotatedRectangle.h"
 
 1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\wx.h
 	"wx/defs.h"
@@ -13204,16 +13200,9 @@
 1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\mdi.h
 	"wx/frame.h"
 
-1297544852 d:\florian\programmation\gamedevelop2\gdl\gdl\force.h
-	"GDL/Event.h"
-	<iostream>
-	<vector>
-	<string>
-	<cmath>
-	"GDL/Log.h"
+1312668877 d:\florian\programmation\gamedevelop2\gdl\gdl\force.h
 
-1311454311 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
-	<wx/dcbuffer.h>
+1313855658 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
 	<boost/weak_ptr.hpp>
 	<iostream>
 	<vector>
@@ -15412,11 +15401,11 @@
 	<boost/type_traits/remove_volatile.hpp>
 	<boost/type_traits/remove_cv.hpp>
 
-1297523943 d:\florian\programmation\gamedevelop2\gdl\gdl\log.h
+1313672531 d:\florian\programmation\gamedevelop2\gdl\gdl\log.h
 	<string>
 	<vector>
 
-1309204429 d:\florian\programmation\gamedevelop2\gdl\gdl\instruction.h
+1312827069 d:\florian\programmation\gamedevelop2\gdl\gdl\instruction.h
 	<string>
 	<vector>
 	<iostream>
@@ -15706,10 +15695,8 @@
 	<string>
 	"GDL/Variable.h"
 
-1312475842 d:\florian\programmation\gamedevelop2\gdl\gdl\variable.h
+1312668877 d:\florian\programmation\gamedevelop2\gdl\gdl\variable.h
 	<string>
-	<iostream>
-	<functional>
 
 1297523943 d:\florian\programmation\gamedevelop2\gdl\gdl\objecthelpers.h
 	<boost/shared_ptr.hpp>
@@ -15718,7 +15705,7 @@
 1309119157 d:\florian\programmation\gamedevelop2\gdl\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
-1310075239 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
+1313668638 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
 	"GDL/Event.h"
 	<vector>
 	<map>
@@ -15761,15 +15748,12 @@
 	<string>
 	<vector>
 
-1311158683 d:\florian\programmation\gamedevelop2\extensions\network\networkautomatism.h
+1313275965 d:\florian\programmation\gamedevelop2\extensions\network\networkautomatism.h
 	"GDL/Automatism.h"
 	"GDL/Object.h"
 	"SceneNetworkDatas.h"
-	<boost/weak_ptr.hpp>
 	<iostream>
 	<map>
-	<set>
-	"GDL/RuntimeScene.h"
 
 1308402053 d:\florian\programmation\gamedevelop2\gdl\gdl\automatism.h
 	<boost/shared_ptr.hpp>
@@ -15792,7 +15776,7 @@
 	<iostream>
 	"GDL/AutomatismsRuntimeSharedDatas.h"
 
-1310048203 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
+1313668656 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
 	"GDL/Scene.h"
 	<iostream>
 	<sstream>
@@ -15834,14 +15818,13 @@
 	<OpenGL/gl.h>
 	<OpenGL/glu.h>
 
-1308418294 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
+1313672614 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
 	<string>
 	<sstream>
 	<iostream>
 	<vector>
-	"GDL/Image.h"
 	<cmath>
-	<wx/string.h>
+	"GDL/LightweightCommonTools.h"
 
 1297543007 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimelayer.h
 	<SFML/Graphics.hpp>
@@ -15855,10 +15838,10 @@
 	<SFML/Graphics.hpp>
 	<string>
 
-1298930048 d:\florian\programmation\gamedevelop2\gdl\gdl\manualtimer.h
+1312749127 d:\florian\programmation\gamedevelop2\gdl\gdl\manualtimer.h
 	<string>
 
-1308847549 d:\florian\programmation\gamedevelop2\gdl\gdl\objinstancesholder.h
+1313849265 d:\florian\programmation\gamedevelop2\gdl\gdl\objinstancesholder.h
 	"GDL/Object.h"
 	<string>
 	<map>
@@ -15975,12 +15958,13 @@
 	<map>
 	<string>
 
-1311158021 source:d:\florian\programmation\gamedevelop2\extensions\network\networkautomatism.cpp
+1312720287 source:d:\florian\programmation\gamedevelop2\extensions\network\networkautomatism.cpp
 	<iostream>
 	<SFML/Network.hpp>
 	"GDL/Scene.h"
 	"GDL/tinyxml.h"
 	"GDL/XmlMacros.h"
+	"GDL/CommonTools.h"
 	"ReceivedDataManager.h"
 	"NetworkAutomatismEditor.h"
 	"NetworkAutomatism.h"
@@ -16017,15 +16001,16 @@
 	"GDL/XmlMacros.h"
 	<iostream>
 
-1311951341 source:d:\florian\programmation\gamedevelop2\extensions\network\extension.cpp
+1313695419 source:d:\florian\programmation\gamedevelop2\extensions\network\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
+	"GDL/CommonTools.h"
 	"NetworkAutomatism.h"
 	"NetworkManager.h"
 	<boost/version.hpp>
 	<SFML/Network.hpp>
 
-1312580948 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
+1313695175 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
 	<wx/bitmap.h>
 	<wx/file.h>
 	<wx/wx.h>
@@ -16035,13 +16020,12 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1312582381 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1313841848 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1299115781 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\version.hpp
 
-1311158248 source:d:\florian\programmation\gamedevelop2\extensions\network\networkmanagerfunctions.cpp
+1312673076 source:d:\florian\programmation\gamedevelop2\extensions\network\networkmanagerfunctions.cpp
 	"GDL/Instruction.h"
-	"GDL/ObjectsConcerned.h"
 	"GDL/RuntimeScene.h"
 	"NetworkManager.h"
 	"ErrorManager.h"
@@ -16089,4 +16073,8 @@
 1255632386 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\interprocess\detail\config_end.hpp
 
 1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+
+1312714221 d:\florian\programmation\gamedevelop2\gdl\gdl\lightweightcommontools.h
+	<sstream>
+	<cmath>
 

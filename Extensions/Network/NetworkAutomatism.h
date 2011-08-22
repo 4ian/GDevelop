@@ -24,17 +24,14 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef PHYSICAUTOMATISM_H
-#define PHYSICAUTOMATISM_H
+#ifndef NETWORKAUTOMATISM_H
+#define NETWORKAUTOMATISM_H
 
 #include "GDL/Automatism.h"
 #include "GDL/Object.h"
 #include "SceneNetworkDatas.h"
-#include <boost/weak_ptr.hpp>
 #include <iostream>
 #include <map>
-#include <set>
-#include "GDL/RuntimeScene.h"
 class TiXmlElement;
 class Scene;
 class NetworkAutomatismEditor;
@@ -97,4 +94,4 @@ class GD_EXTENSION_API NetworkAutomatism : public Automatism
         boost::shared_ptr<RuntimeSceneNetworkDatas> runtimeScenesNetworkDatas;
 };
 
-#endif // PHYSICAUTOMATISM_H
+#endif // NETWORKAUTOMATISM_H

@@ -29,6 +29,7 @@ freely, subject to the following restrictions:
 #include "GDL/Scene.h"
 #include "GDL/tinyxml.h"
 #include "GDL/XmlMacros.h"
+#include "GDL/CommonTools.h"
 #include "ReceivedDataManager.h"
 #include "NetworkAutomatismEditor.h"
 #include "NetworkAutomatism.h"

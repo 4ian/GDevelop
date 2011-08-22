@@ -26,6 +26,7 @@ freely, subject to the following restrictions:
 
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
+#include "GDL/CommonTools.h"
 #include "NetworkAutomatism.h"
 #include "NetworkManager.h"
 #include <boost/version.hpp>
@@ -48,6 +49,8 @@ class Extension : public ExtensionBase
                                   _("Extension permettant de communiquer entre plusieurs jeux"),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
+
+            #if defined(GD_IDE_ONLY)
 
             DECLARE_ACTION("AddRecipient",
                            _("Ajouter un destinataire"),
@@ -272,6 +275,8 @@ class Extension : public ExtensionBase
 
             DECLARE_END_ACTION()
 
+            #endif
+
             CompleteCompilationInformation();
         };
         virtual ~Extension() {};
@@ -286,7 +291,7 @@ class Extension : public ExtensionBase
                 name = _("Liste des destinataires");
                 const std::vector< std::pair<sf::IpAddress, short unsigned int> > & list = NetworkManager::GetInstance()->GetRecipientsList();
                 for (unsigned int i = 0;i<list.size();++i)
-                    value += list[i].first.ToString()+string(_(" Port : ").mb_str())+ToString(list[i].second)+"; ";
+                    value += list[i].first.ToString()+ToString(_(" Port : "))+ToString(list[i].second)+"; ";
             }
         }
 

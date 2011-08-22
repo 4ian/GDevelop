@@ -37,7 +37,7 @@ namespace GDpriv
 namespace AES
 {
 
-void ActEncryptFile( const std::string & srcFile, const std::string & destFile, const std::string & passwordWith24characters )
+void GD_EXTENSION_API EncryptFile( const std::string & srcFile, const std::string & destFile, const std::string & passwordWith24characters )
 {
     ifstream ifile(srcFile.c_str(),ios_base::binary);
     ofstream ofile(destFile.c_str(),ios_base::binary);
@@ -69,7 +69,7 @@ void ActEncryptFile( const std::string & srcFile, const std::string & destFile, 
     ifile.close();
 }
 
-void ActDecryptFile( const std::string & srcFile, const std::string & destFile, const std::string & passwordWith24characters )
+void GD_EXTENSION_API DecryptFile( const std::string & srcFile, const std::string & destFile, const std::string & passwordWith24characters )
 {
     ifstream ifile(srcFile.c_str(),ios_base::binary);
     ofstream ofile(destFile.c_str(),ios_base::binary);

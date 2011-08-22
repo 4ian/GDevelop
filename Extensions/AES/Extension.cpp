@@ -46,6 +46,8 @@ class Extension : public ExtensionBase
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
+            #if defined(GD_IDE_ONLY)
+
             DECLARE_ACTION("EncryptFile",
                            _("Crypter un fichier"),
                            _("Crypte un fichier avec AES."),
@@ -89,6 +91,8 @@ class Extension : public ExtensionBase
                 instrInfo.AddParameter("string", _("Mot de passe ( 24 caractères )"), "", false);
             DECLARE_END_STR_EXPRESSION()
             */
+
+            #endif
 
             CompleteCompilationInformation();
         };

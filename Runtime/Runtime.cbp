@@ -11,8 +11,7 @@
 				<Option working_dir="bin\debug" />
 				<Option object_output="obj\Debug\" />
 				<Option type="1" />
-				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-pg" />
@@ -22,15 +21,83 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
+					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lsfml-audio-d" />
 					<Add option="-lsfml-graphics-d" />
 					<Add option="-lsfml-network-d" />
 					<Add option="-lsfml-window-d" />
 					<Add option="-lsfml-system-d" />
+					<Add option="-lLLVMJIT" />
+					<Add option="-lLLVMInterpreter" />
+					<Add option="-lLLVMX86CodeGen" />
+					<Add option="-lLLVMAsmParser" />
+					<Add option="-lLLVMBitReader" />
+					<Add option="-lLLVMBitWriter" />
+					<Add option="-lLLVMipo" />
+					<Add option="-lLLVMExecutionEngine" />
+					<Add option="-lLLVMAsmPrinter" />
+					<Add option="-lLLVMSelectionDAG" />
+					<Add option="-lLLVMX86AsmPrinter" />
+					<Add option="-lLLVMX86Info" />
+					<Add option="-lLLVMMCParser" />
+					<Add option="-lLLVMCodeGen" />
+					<Add option="-lLLVMX86Utils" />
+					<Add option="-lLLVMScalarOpts" />
+					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMTransformUtils" />
+					<Add option="-lLLVMipa" />
+					<Add option="-lLLVMAnalysis" />
+					<Add option="-lLLVMTarget" />
+					<Add option="-lLLVMCore" />
+					<Add option="-lLLVMMC" />
+					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
+					<Add option="-lLLVMInstrumentation" />
+					<Add option="-lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
+					<Add option="-lLLVMAlphaCodeGen" />
+					<Add option="-lLLVMARMAsmParser" />
+					<Add option="-lLLVMARMDisassembler" />
+					<Add option="-lLLVMBlackfinCodeGen" />
+					<Add option="-lLLVMCBackend" />
+					<Add option="-lLLVMCellSPUCodeGen" />
+					<Add option="-lLLVMCppBackend" />
+					<Add option="-lLLVMMipsCodeGen" />
+					<Add option="-lLLVMMBlazeAsmParser" />
+					<Add option="-lLLVMMBlazeDisassembler" />
+					<Add option="-lLLVMMSP430CodeGen" />
+					<Add option="-lLLVMPowerPCCodeGen" />
+					<Add option="-lLLVMPTXCodeGen" />
+					<Add option="-lLLVMSparcCodeGen" />
+					<Add option="-lLLVMSystemZCodeGen" />
+					<Add option="-lLLVMX86AsmParser" />
+					<Add option="-lLLVMX86Disassembler" />
+					<Add option="-lLLVMXCoreCodeGen" />
+					<Add option="-lLLVMAlphaInfo" />
+					<Add option="-lLLVMARMCodeGen" />
+					<Add option="-lLLVMBlackfinInfo" />
+					<Add option="-lLLVMCBackendInfo" />
+					<Add option="-lLLVMCellSPUInfo" />
+					<Add option="-lLLVMCppBackendInfo" />
+					<Add option="-lLLVMMipsInfo" />
+					<Add option="-lLLVMMBlazeCodeGen" />
+					<Add option="-lLLVMMSP430AsmPrinter" />
+					<Add option="-lLLVMMSP430Info" />
+					<Add option="-lLLVMPowerPCAsmPrinter" />
+					<Add option="-lLLVMPowerPCInfo" />
+					<Add option="-lLLVMPTXInfo" />
+					<Add option="-lLLVMSparcInfo" />
+					<Add option="-lLLVMSystemZInfo" />
+					<Add option="-lLLVMXCoreInfo" />
+					<Add option="-lLLVMARMAsmPrinter" />
+					<Add option="-lLLVMARMInfo" />
+					<Add option="-lLLVMMBlazeAsmPrinter" />
+					<Add option="-lLLVMMBlazeInfo" />
 					<Add library="mingw32" />
 					<Add library="opengl32" />
 					<Add library="Imm32" />
@@ -38,11 +105,12 @@
 					<Add library="glu32" />
 					<Add library="Ws2_32" />
 					<Add library="gdi32" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add library="winmm" />
 					<Add directory="bin\debug" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-debug\lib" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -50,7 +118,7 @@
 				<Option working_dir="bin\release" />
 				<Option object_output="obj\release\" />
 				<Option type="0" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -59,11 +127,13 @@
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -76,9 +146,9 @@
 					<Add library="glu32" />
 					<Add library="Ws2_32" />
 					<Add library="gdi32" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add library="winmm" />
 					<Add directory="bin\release" />
 				</Linker>
@@ -88,8 +158,7 @@
 				<Option working_dir="bin\dev" />
 				<Option object_output="obj\dev\" />
 				<Option type="1" />
-				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
+				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -98,11 +167,16 @@
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
+					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lgdl.dll" />
+					<Add option="-lgdl" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-network" />
@@ -115,11 +189,12 @@
 					<Add library="glu32" />
 					<Add library="Ws2_32" />
 					<Add library="gdi32" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libfreetype.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libopenal32.a" />
-					<Add library="C:\Libs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add library="winmm" />
 					<Add directory="bin\dev" />
+					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
@@ -138,8 +213,9 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
-					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -160,7 +236,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="bin\release" />
-					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+					<Add directory="..\ExtLibs\SFML\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
@@ -177,8 +253,9 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
-					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
@@ -200,7 +277,7 @@
 					<Add option="-g" />
 					<Add option="-pg" />
 					<Add directory="bin\debug" />
-					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+					<Add directory="..\ExtLibs\SFML\lib" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
@@ -219,6 +296,8 @@
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="..\..\libs\boost_1_43_0" />
 					<Add directory="..\..\libs\sfml\include" />
 				</Compiler>
@@ -237,6 +316,10 @@
 					<Add directory="bin\release" />
 					<Add directory="..\..\libs\sfml\lib" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../Runtime/bin/release/MacExe" />
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../Runtime/bin/release/MacExe" />
+				</ExtraCommands>
 			</Target>
 			<Target title="Mac - Debug">
 				<Option output="bin\debug\MacExe" prefix_auto="0" extension_auto="0" />
@@ -252,6 +335,8 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="..\..\libs\boost_1_43_0" />
 					<Add directory="..\..\libs\sfml\include" />
 				</Compiler>
@@ -271,18 +356,21 @@
 					<Add directory="bin\debug" />
 					<Add directory="..\..\libs\sfml\lib" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../Runtime/bin/debug/MacExe" />
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../Runtime/bin/debug/MacExe" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-fexceptions" />
-			<Add option="-DGDP" />
 			<Add directory="..\GDL" />
-			<Add directory="C:\Libs\boost_1_43_0" />
-			<Add directory="C:\Libs\SFML\include" />
+			<Add directory="..\ExtLibs\boost" />
+			<Add directory="..\ExtLibs\SFML\include" />
 		</Compiler>
 		<Linker>
-			<Add directory="C:\Libs\SFML\bin-mingw-debug\lib" />
-			<Add directory="C:\Libs\SFML\bin-mingw-release\lib" />
+			<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
+			<Add directory="..\ExtLibs\SFML\build-mingw-debug\lib" />
 		</Linker>
 		<Unit filename="CompilationChecker.cpp">
 			<Option weight="60" />
@@ -295,7 +383,7 @@
 			<debugger />
 			<AutoVersioning>
 				<Scheme minor_max="1" build_max="0" rev_max="0" rev_rand_max="9" build_times_to_increment_minor="100" />
-				<Settings autoincrement="0" date_declarations="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
+				<Settings autoincrement="0" date_declarations="1" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
 				<Changes_Log show_changes_editor="0" app_title="sortie de la version %M.%m.%b de %p" changeslog_path="ChangesLog.txt" />
 				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>

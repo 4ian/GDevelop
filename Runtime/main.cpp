@@ -1,31 +1,32 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
+#include <vector>
+#include <string>
+#include <iostream>
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-#include <iostream>
-#include <vector>
-#include <string>
-#include <cmath>
-#include <iostream>
-#include <sstream>
-#include <fstream>
 #if defined(__GNUC__)
 #include <unistd.h>
 #endif
 
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
-#include "GDL/MemTrace.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/ImageManager.h"
 #include "GDL/RessourcesLoader.h"
 #include "GDL/FontManager.h"
+#include "GDL/SoundManager.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/Game.h"
+#include "GDL/EventsExecutionEngine.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/SpriteExtension.h"
 #include "GDL/ExtensionsLoader.h"
 #include "GDL/DynamicExtensionsManager.h"
 #include "CompilationChecker.h"
+#include "GDL/Log.h"
 #include "GDL/AES.h"
 
 #include <time.h>
@@ -34,13 +35,9 @@
 
 using namespace std;
 
-#ifndef RELEASE
-MemTrace MemTracer;
-#endif
-
 int main( int argc, char *p_argv[] )
 {
-    InitLog();
+    GDLogBanner();
 
     // On définit le chemin d'execution du programme par rapport a la localisation de son executable
     // Utile surtout sous linux
@@ -63,7 +60,9 @@ int main( int argc, char *p_argv[] )
     extensionsLoader->SetExtensionsDir("./");
     extensionsLoader->LoadAllStaticExtensionsAvailable();
 
+    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     GDpriv::DynamicExtensionsManager::GetInstance()->LoadDynamicExtension("dynext.dxgd");
+    #endif
 
     RessourcesLoader * exeGD = RessourcesLoader::GetInstance();
     exeGD->SetExeGD( "gam.egd" );
@@ -72,35 +71,8 @@ int main( int argc, char *p_argv[] )
     //Le jeu
     RuntimeGame game;
 
-    //Chargement du fichier contenant les info sur le loading screen
-    OpenSaveLoadingScreen openLS(game.loadingScreen);
-    openLS.OpenFromString(exeGD->LoadPlainText( "loadingscreen" ));
-
-    // Display loading window
-    unsigned long style = 0;
-    if ( game.loadingScreen.border ) style |= sf::Style::Titlebar;
-    sf::RenderWindow loadingApp( sf::VideoMode( game.loadingScreen.width, game.loadingScreen.height, 32 ), "Chargement en cours...", style );
-    loadingApp.Show(game.loadingScreen.afficher);
-    loadingApp.Clear( sf::Color( 100, 100, 100 ) );
-
-    boost::shared_ptr<sf::Image> image = boost::shared_ptr<sf::Image>(exeGD->LoadImage( game.loadingScreen.imageFichier ));
-    if ( !game.loadingScreen.smooth ) image->SetSmooth(false);
-
-    sf::Sprite sprite( *image );
-    if ( game.loadingScreen.image )
-    {
-        loadingApp.Draw( sprite );
-    }
-    if ( game.loadingScreen.texte )
-    {
-        sf::Text Chargement( game.loadingScreen.texteChargement, *FontManager::GetInstance()->GetFont("") );
-        Chargement.SetPosition( game.loadingScreen.texteXPos, game.loadingScreen.texteYPos );
-        loadingApp.Draw( Chargement );
-    }
-    loadingApp.Display();
-
     //Open game
-#ifdef RELEASE
+#ifndef RELEASE
 
     if ( srcString.empty() )
     {
@@ -127,24 +99,33 @@ int main( int argc, char *p_argv[] )
         crypt.Decrypt(reinterpret_cast<const unsigned char*>(ibuffer),reinterpret_cast<unsigned char*>(obuffer),size/16);
 
         string uncryptedSrc = obuffer;
-
         delete [] obuffer;
 
         openGame.OpenFromString(uncryptedSrc);
 	}
 
 #else
-    OpenSaveGame openGame( game );
-    //openGame.OpenFromFile("D:/Florian/Programmation/Jeux Game Develop/SA4/Game.gdg" );
-    openGame.OpenFromFile("D:/Florian/Desktop/Temporaire/ResolutionTEst/Game.gdg" );
-    //openGame.OpenFromFile("D:/Florian/Programmation/Jeux Game Develop/Ecce Deus/EcceDeus.gdg" );
-    //openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/TestPhysicNew.gdg" );
-    //openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/testTextFont.gdg" );
-    //openGame.OpenFromFile("D:/Florian/Programmation/Jeu de test Game Develop/testCrashVariableString.gdg" );
 
 #endif
 
-    if ( game.scenes.empty() ) return EXIT_FAILURE;
+    if ( game.scenes.empty() )
+    {
+        std::cout << "No scene to be loaded." << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    //LLVM stuff
+    cout << "Initializing LLVM/Clang..." << endl;
+    EventsExecutionEngine::EnsureLLVMTargetsInitialization();
+    cout << "Loading required dynamic libraries..." << endl;
+    EventsExecutionEngine::LoadDynamicLibraries();
+
+    //Loading first scene bitcode
+    if ( !game.scenes[0]->compiledEventsExecutionEngine->LoadFromLLVMBitCode(exeGD->LoadBinaryFile( "GDpriv"+game.scenes[0]->GetName()+".ir" ), exeGD->GetBinaryFileSize( "GDpriv"+game.scenes[0]->GetName()+".ir" )) )
+    {
+        std::cout << "Unable to load bitcode from " << "GDpriv"+game.scenes[0]->GetName()+".ir" << std::endl;
+        return EXIT_FAILURE;
+    }
 
     //Initialize image manager and load always loaded images
     game.imageManager->SetGame( &game );
@@ -157,9 +138,8 @@ int main( int argc, char *p_argv[] )
 
     RuntimeScene scenePlayed(&window, &game);
     if ( !scenePlayed.LoadFromScene( *game.scenes[0] ) )
-        EcrireLog( "Chargement", "Erreur lors du chargement de la scène initiale" );
+        std::cout << "Unable to load first scene." << std::endl;
 
-    loadingApp.Close();
     window.Create( sf::VideoMode( game.windowWidth, game.windowHeight, 32 ), scenePlayed.title, sf::Style::Close );
     window.SetActive(true);
 
@@ -176,18 +156,24 @@ int main( int argc, char *p_argv[] )
     //Boucle de jeu
     while ( scenePlayed.running )
     {
-        int retour = scenePlayed.RenderAndStep(1);
+        int returnCode = scenePlayed.RenderAndStep(1);
 
-        if ( retour == -2 ) //Quitter le jeu
+        if ( returnCode == -2 ) //Quitter le jeu
             scenePlayed.running = false;
-        else if ( retour != -1 ) //Changer de scènes
+        else if ( returnCode != -1 ) //Changer de scènes
         {
             RuntimeScene newScenePlayed(&window, &game);
-            scenePlayed = newScenePlayed; //On vide la scène
-            if ( !scenePlayed.LoadFromScene( *game.scenes.at( retour ) ) )
+            scenePlayed = newScenePlayed; //Clear the scene
+
+            if ( !game.scenes[returnCode]->compiledEventsExecutionEngine->Ready() &&
+                 !game.scenes[returnCode]->compiledEventsExecutionEngine->LoadFromLLVMBitCode(exeGD->LoadBinaryFile( "GDpriv"+game.scenes[returnCode]->GetName()+".ir" ), exeGD->GetBinaryFileSize( "GDpriv"+game.scenes[returnCode]->GetName()+".ir" )) )
             {
-                EcrireLog( "Chargement", "Erreur lors du chargement" );
+                std::cout << "Unable to load bitcode from " << "GDpriv"+game.scenes[returnCode]->GetName()+".ir" << std::endl;
+                return EXIT_FAILURE;
             }
+
+            if ( !scenePlayed.LoadFromScene( *game.scenes[returnCode] ) )
+                std::cout << "Scene loading failed!" << std::endl;
         }
     }
 

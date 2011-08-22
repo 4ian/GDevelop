@@ -2,13 +2,13 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
 	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="11254" topLine="204" />
+		<Cursor1 position="739" topLine="48" />
 	</File>
 	<File name="TextObject.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4820" topLine="60" />
+		<Cursor1 position="1064" topLine="15" />
 	</File>
 	<File name="TextObject.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4527" topLine="38" />
+		<Cursor1 position="1139" topLine="21" />
 	</File>
 	<File name="TextObjectEditor.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="7565" topLine="137" />

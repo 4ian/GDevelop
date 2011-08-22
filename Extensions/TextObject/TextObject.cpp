@@ -31,11 +31,12 @@ freely, subject to the following restrictions:
 #include "GDL/tinyxml.h"
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
+#include "GDL/RotatedRectangle.h"
+#include "GDL/CommonTools.h"
 #include "TextObject.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
-#include "GDL/CommonTools.h"
 #include "GDL/ResourcesMergingHelper.h"
 #include "GDL/MainEditorCommand.h"
 #include "TextObjectEditor.h"
@@ -337,7 +338,7 @@ void TextObject::SetColor( unsigned int r, unsigned int g, unsigned int b )
 
 void TextObject::SetColor(const std::string & colorStr)
 {
-    vector < string > colors = SpliterStringToVector<string>(colorStr, ';');
+    vector < string > colors = SplitString<string>(colorStr, ';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 

@@ -28,8 +28,10 @@ freely, subject to the following restrictions:
 #define BOX3DOBJECT_H
 
 #include "GDL/Object.h"
-#include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
+namespace sf
+{
+    class Image;
+}
 class Evaluateur;
 class ImageManager;
 class RuntimeScene;
@@ -69,8 +71,8 @@ class GD_EXTENSION_API Box3DObject : public Object
         virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
         virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, string & name, string & value) const;
-        virtual bool ChangeProperty(unsigned int propertyNb, string newValue);
+        virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+        virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
         virtual unsigned int GetNumberOfProperties() const;
         #endif
 

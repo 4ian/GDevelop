@@ -8973,7 +8973,7 @@
 1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
 	"GDL/btScalar.h"
 
-1306594475 source:d:\florian\programmation\gamedevelop2\extensions\box3dobject\box3dobject.cpp
+1312712198 source:d:\florian\programmation\gamedevelop2\extensions\box3dobject\box3dobject.cpp
 	"Box3DObject.h"
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
@@ -8981,31 +8981,27 @@
 	"GDL/ImageManager.h"
 	"GDL/FontManager.h"
 	"GDL/Position.h"
+	"GDL/RotatedRectangle.h"
 	"GDL/tinyxml.h"
-	<wx/wx.h>
+	<wx/bitmap.h>
+	<wx/panel.h>
 	"GDL/CommonTools.h"
 	"GDL/MainEditorCommand.h"
 	"Box3DObjectEditor.h"
 	"Box3DInitialPositionPanel.h"
 
-1311096196 d:\florian\programmation\gamedevelop2\extensions\box3dobject\box3dobject.h
+1312712217 d:\florian\programmation\gamedevelop2\extensions\box3dobject\box3dobject.h
 	"GDL/Object.h"
-	<SFML/Graphics.hpp>
-	<SFML/OpenGL.hpp>
 
-1311891521 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
-	<wx/wx.h>
+1312670601 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
 	"GDL/Force.h"
-	<SFML/System.hpp>
-	<SFML/Graphics.hpp>
-	<iostream>
 	<string>
 	<vector>
+	<map>
 	<boost/shared_ptr.hpp>
 	<boost/enable_shared_from_this.hpp>
 	"GDL/ListVariable.h"
 	"GDL/ObjectHelpers.h"
-	"GDL/RotatedRectangle.h"
 
 1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\wx.h
 	"wx/defs.h"
@@ -12056,16 +12052,9 @@
 1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\mdi.h
 	"wx/frame.h"
 
-1297544852 d:\florian\programmation\gamedevelop2\gdl\gdl\force.h
-	"GDL/Event.h"
-	<iostream>
-	<vector>
-	<string>
-	<cmath>
-	"GDL/Log.h"
+1312668877 d:\florian\programmation\gamedevelop2\gdl\gdl\force.h
 
-1311454311 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
-	<wx/dcbuffer.h>
+1313855658 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
 	<boost/weak_ptr.hpp>
 	<iostream>
 	<vector>
@@ -15504,11 +15493,11 @@
 	<boost/type_traits/remove_volatile.hpp>
 	<boost/type_traits/remove_cv.hpp>
 
-1297523943 d:\florian\programmation\gamedevelop2\gdl\gdl\log.h
+1313672531 d:\florian\programmation\gamedevelop2\gdl\gdl\log.h
 	<string>
 	<vector>
 
-1309204429 d:\florian\programmation\gamedevelop2\gdl\gdl\instruction.h
+1312827069 d:\florian\programmation\gamedevelop2\gdl\gdl\instruction.h
 	<string>
 	<vector>
 	<iostream>
@@ -15798,10 +15787,8 @@
 	<string>
 	"GDL/Variable.h"
 
-1312475842 d:\florian\programmation\gamedevelop2\gdl\gdl\variable.h
+1312668877 d:\florian\programmation\gamedevelop2\gdl\gdl\variable.h
 	<string>
-	<iostream>
-	<functional>
 
 1297523943 d:\florian\programmation\gamedevelop2\gdl\gdl\objecthelpers.h
 	<boost/shared_ptr.hpp>
@@ -15830,7 +15817,7 @@
 	<vector>
 	<string>
 
-1307193655 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
+1313670759 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
 	<string>
 	<vector>
 	"GDL/Object.h"
@@ -15840,7 +15827,7 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1310075239 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
+1313668638 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
 	"GDL/Event.h"
 	<vector>
 	<map>
@@ -15903,14 +15890,13 @@
 	<assert.h>
 	<string.h>
 
-1308418294 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
+1313672614 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
 	<string>
 	<sstream>
 	<iostream>
 	<vector>
-	"GDL/Image.h"
 	<cmath>
-	<wx/string.h>
+	"GDL/LightweightCommonTools.h"
 
 1297531393 d:\florian\programmation\gamedevelop2\gdl\gdl\maineditorcommand.h
 	<wx/ribbon/bar.h>
@@ -16145,19 +16131,20 @@
 	<wx/textctrl.h>
 	<wx/panel.h>
 
-1306594475 source:d:\florian\programmation\gamedevelop2\extensions\box3dobject\box3dobjecteditor.cpp
+1312673764 source:d:\florian\programmation\gamedevelop2\extensions\box3dobject\box3dobjecteditor.cpp
 	"Box3DObjectEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
 	<wx/image.h>
 	<wx/string.h>
+	<wx/log.h>
 	"GDL/Game.h"
 	"GDL/CommonTools.h"
 	"GDL/MainEditorCommand.h"
 	"GDL/EditorImages.h"
 	"Box3DObject.h"
 
-1307193655 d:\florian\programmation\gamedevelop2\gdl\gdl\editorimages.h
+1312804734 d:\florian\programmation\gamedevelop2\gdl\gdl\editorimages.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/menu.h>
@@ -16287,13 +16274,13 @@
 	<wx/intl.h>
 	<wx/string.h>
 
-1312233880 source:d:\florian\programmation\gamedevelop2\extensions\box3dobject\extension.cpp
+1313695419 source:d:\florian\programmation\gamedevelop2\extensions\box3dobject\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"Box3DObject.h"
 	<boost/version.hpp>
 
-1312580948 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
+1313695175 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
 	<wx/bitmap.h>
 	<wx/file.h>
 	<wx/wx.h>
@@ -16303,9 +16290,13 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1312582381 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1313841848 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1299115781 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\version.hpp
 
 1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+
+1312714221 d:\florian\programmation\gamedevelop2\gdl\gdl\lightweightcommontools.h
+	<sstream>
+	<cmath>
 

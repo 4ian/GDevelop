@@ -33,6 +33,7 @@ freely, subject to the following restrictions:
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <wx/log.h>
 #include "GDL/Game.h"
 #include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"

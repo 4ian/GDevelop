@@ -28,14 +28,15 @@ freely, subject to the following restrictions:
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include "GDL/Object.h"
-
 #include "GDL/ImageManager.h"
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
+#include "GDL/RotatedRectangle.h"
 #include "GDL/tinyxml.h"
 
 #if defined(GD_IDE_ONLY)
-#include <wx/wx.h>
+#include <wx/bitmap.h>
+#include <wx/panel.h>
 #include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
 #include "Box3DObjectEditor.h"
@@ -437,13 +438,13 @@ void Box3DObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
 
 void Box3DObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _T("Largeur");       value = ToString(width);}
-    else if ( propertyNb == 1 ) {name = _T("Hauteur");       value = ToString(height);}
-    else if ( propertyNb == 2 ) {name = _T("Profondeur");    value = ToString(depth);}
-    else if ( propertyNb == 3 ) {name = _T("Coordonnée Z");  value = ToString(zPosition);}
-    else if ( propertyNb == 4 ) {name = _T("Yaw");           value = ToString(yaw);}
-    else if ( propertyNb == 5 ) {name = _T("Pitch");         value = ToString(pitch);}
-    else if ( propertyNb == 6 ) {name = _T("Roll");          value = ToString(roll);}
+    if      ( propertyNb == 0 ) {name = _("Largeur");       value = ToString(width);}
+    else if ( propertyNb == 1 ) {name = _("Hauteur");       value = ToString(height);}
+    else if ( propertyNb == 2 ) {name = _("Profondeur");    value = ToString(depth);}
+    else if ( propertyNb == 3 ) {name = _("Coordonnée Z");  value = ToString(zPosition);}
+    else if ( propertyNb == 4 ) {name = _("Yaw");           value = ToString(yaw);}
+    else if ( propertyNb == 5 ) {name = _("Pitch");         value = ToString(pitch);}
+    else if ( propertyNb == 6 ) {name = _("Roll");          value = ToString(roll);}
 }
 
 bool Box3DObject::ChangeProperty(unsigned int propertyNb, string newValue)

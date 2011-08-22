@@ -54,6 +54,7 @@ class Extension : public ExtensionBase
                            &CreateBox3DObject,
                            &DestroyBox3DObject,
                            "Box3DObject");
+                #if defined(GD_IDE_ONLY)
 
                 objInfos.SetIncludeFile("Box3DObject/Box3DObject.h");
 
@@ -336,6 +337,8 @@ class Extension : public ExtensionBase
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetRoll").SetIncludeFile("Box3DObject/Box3DObject.h");
                 DECLARE_END_OBJECT_EXPRESSION()
+
+                #endif
 
             DECLARE_END_OBJECT()
 

@@ -149,7 +149,7 @@ bool Game_Develop_EditorApp::OnInit()
     std::vector<std::string> filesToOpen;
     for (unsigned int i = 0;i<parser.GetParamCount();++i)
     {
-        filesToOpen.push_back(parser.GetParam(i).mb_str());
+        filesToOpen.push_back(string(parser.GetParam(i).mb_str()));
     }
 
     //Load configuration
@@ -245,7 +245,7 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "Crash management ended" << endl;
 
     //Creating the console Manager
-    #ifdef RELEASE
+    #if defined(RELEASE) && defined(WINDOWS)
     ConsoleManager * consoleManager;
     consoleManager = ConsoleManager::GetInstance();
     cout << "ConsoleManager created" << endl;
@@ -263,17 +263,14 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Les log
     log = new wxLogGui(); // Affichage des messages d'erreurs
-    InitLog(); // Log sous forme de fichier détaillé
+    GDLogBanner(); // Log sous forme de fichier détaillé
     logChain = new wxLogChain( log );
 
     //LLVM stuff
     cout << "Initializing LLVM/Clang..." << endl;
     EventsExecutionEngine::EnsureLLVMTargetsInitialization();
-
-    cout << "Loading libstdc++..." << std::endl;
-    std::string error;
-    llvm::sys::DynamicLibrary::LoadLibraryPermanently("libstdc++-6.dll", &error);
-    cout << error;
+    cout << "Loading required dynamic libraries..." << endl;
+    EventsExecutionEngine::LoadDynamicLibraries();
 
     //Load extensions
     cout << "Loading extensions" << endl;
@@ -400,6 +397,11 @@ int Game_Develop_EditorApp::OnExit()
     fontManager->DestroySingleton();
     HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
     helpFileAccess->DestroySingleton();
+
+    #if defined(LINUX) || defined(MAC)
+    if ( singleInstanceChecker ) delete singleInstanceChecker;
+    singleInstanceChecker = NULL;
+    #endif
 
     wxRemoveFile("GameDevelopRunning.log");
 

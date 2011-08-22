@@ -69,6 +69,7 @@ class Preferences: public wxDialog
 		wxStaticLine* StaticLine2;
 		wxPanel* ActifColorPnl;
 		wxCheckBox* GuideCheck;
+		wxCheckBox* hideContextPanelsLabels;
 		wxPropertyGrid* eventsEditorParametersProperties;
 		wxListbook* Listbook1;
 		wxStaticText* StaticText5;
@@ -150,6 +151,7 @@ class Preferences: public wxDialog
 		static const long ID_STATICTEXT17;
 		static const long ID_TEXTCTRL5;
 		static const long ID_STATICTEXT18;
+		static const long ID_CHECKBOX6;
 		static const long ID_CUSTOM1;
 		static const long ID_PANEL18;
 		static const long ID_STATICTEXT16;

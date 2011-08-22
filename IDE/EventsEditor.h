@@ -247,6 +247,7 @@ class EventsEditor: public wxPanel
 
         wxBitmap foldBmp;
         wxBitmap unfoldBmp;
+        bool hideContextPanelsLabels;
 
         ParameterItem liveEditedParameter; ///< Filled with information about parameter which is currently edited, if any.
         InstructionItem liveEditedAssociatedInstruction; ///< Filled with information about instruction of parameter which is currently edited, if any.
@@ -259,7 +260,6 @@ class EventsEditor: public wxPanel
         std::vector < BaseEventSPtr > latestState; ///< Necessary to keep track of what changed
 
         bool profilingActivated;
-
 
         InternalEventsEditorRefreshCallbacks refreshCallback; ///< Used to allow external objects to request the editor to refresh
 

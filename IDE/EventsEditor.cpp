@@ -12,6 +12,7 @@
 //*)
 #include <wx/event.h>
 #include <wx/config.h>
+#include <wx/dcbuffer.h>
 #include <iostream>
 #include <utility>
 #include <algorithm>
@@ -106,6 +107,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
     leftMargin(20),
     foldBmp("res/fold.png", wxBITMAP_TYPE_ANY),
     unfoldBmp("res/unfold.png", wxBITMAP_TYPE_ANY),
+    hideContextPanelsLabels(false),
     selection(refreshCallback),
     ctrlKeyDown(false),
     profilingActivated(false),
@@ -137,14 +139,17 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	eventContextPanel = new wxPanel(eventsPanel, ID_PANEL3, wxPoint(136,24), wxSize(224,40), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 7, 0, 0);
 	addEventIcon = new wxStaticBitmap(eventContextPanel, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/eventaddicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
+	addEventIcon->SetToolTip(_("Ajouter un évènement"));
 	FlexGridSizer3->Add(addEventIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	addEventBt = new wxStaticText(eventContextPanel, ID_STATICTEXT1, _("Ajouter un évènement"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer3->Add(addEventBt, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 2);
 	addSubEventIcon = new wxStaticBitmap(eventContextPanel, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/subeventaddicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	addSubEventIcon->SetToolTip(_("Ajouter un sous évènement"));
 	FlexGridSizer3->Add(addSubEventIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	addSubEventBt = new wxStaticText(eventContextPanel, ID_STATICTEXT2, _("Un sous évènement"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer3->Add(addSubEventBt, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
 	addMoreIcon = new wxStaticBitmap(eventContextPanel, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/addicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
+	addMoreIcon->SetToolTip(_("Ajouter un autre type d\'évènement"));
 	FlexGridSizer3->Add(addMoreIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	addMoreBt = new wxStaticText(eventContextPanel, ID_STATICTEXT3, _("Autre"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer3->Add(addMoreBt, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
@@ -153,6 +158,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	listContextPanel = new wxPanel(eventsPanel, ID_PANEL4, wxPoint(136,50), wxSize(224,40), wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
 	addInstrIcon = new wxStaticBitmap(listContextPanel, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/addicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP4"));
+	addInstrIcon->SetToolTip(_("Ajouter une condition"));
 	FlexGridSizer4->Add(addInstrIcon, 1, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	addInstrBt = new wxStaticText(listContextPanel, ID_STATICTEXT4, _("Ajouter une condition"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer4->Add(addInstrBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
@@ -261,6 +267,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	//Load configuration
 	wxConfigBase * config = wxConfigBase::Get();
 	conditionColumnWidth = config->ReadDouble("EventsEditor/ConditionColumnWidth", 350);
+	hideContextPanelsLabels = config->ReadBool("EventsEditor/HideContextPanelsLabels", false);
 
     //Adding events types
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
@@ -310,6 +317,17 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
     liveEditingPanel->Show(false);
     eventContextPanel->Show(false);
     listContextPanel->Show(false);
+
+    if ( hideContextPanelsLabels )
+    {
+        addEventBt->SetLabel("");
+        addSubEventBt->SetLabel("");
+        addMoreBt->SetLabel("");
+        addInstrBt->SetLabel("");
+
+        eventContextPanel->SetSize(5+16+5+16+5+16+5,eventContextPanel->GetSize().y);
+        listContextPanel->SetSize(5+16+5,listContextPanel->GetSize().y);
+    }
 
     latestState = CloneVectorOfEvents(*events);
 }
@@ -860,7 +878,7 @@ void EventsEditor::OneventsPanelMouseMove(wxMouseEvent& event)
         {
             selection.SetHighlighted(itemsAreas.GetInstructionListAt(event.GetX(), event.GetY()));
             wxRect area = itemsAreas.GetAreaOfInstructionListAt(event.GetX(), event.GetY());
-            addInstrBt->SetLabel(itemsAreas.GetInstructionListAt(event.GetX(), event.GetY()).isConditionList ? _("Ajouter une condition") : _("Ajouter une action"));
+            if (!hideContextPanelsLabels) addInstrBt->SetLabel(itemsAreas.GetInstructionListAt(event.GetX(), event.GetY()).isConditionList ? _("Ajouter une condition") : _("Ajouter une action"));
             listContextPanel->SetPosition(wxPoint(area.x, area.y+area.height-1));
             showlistContextPanel = true;
 

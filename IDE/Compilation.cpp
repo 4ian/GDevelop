@@ -305,8 +305,13 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         return;
     }
 
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    wxString tempDir;
+    pConfig->Read( _T( "/Dossier/Compilation" ), &tempDir );
+
     FullProjectCompilerDialogDiagnosticManager diagnosticManager(StaticText3, StaticText2, AvancementGauge, Panel4, Notebook1);
     GDpriv::FullProjectCompiler compilationManager(gameToCompile, diagnosticManager, ToString(dialog.GetPath()));
+    compilationManager.SetForcedTempDir(ToString(tempDir));
     compilationManager.TargetWindows(WinCheck->GetValue());
     compilationManager.TargetLinux(LinuxCheck->GetValue());
     compilationManager.TargetMac(MacCheck->GetValue());

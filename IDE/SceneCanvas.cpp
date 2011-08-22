@@ -385,8 +385,6 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
     cout << "OnPreviewBtClick: " << endl;
     if ( !edittimeRenderer.editing ) return;
 
-    EventsCodeCompiler::GetInstance()->DisableCompilation(sceneEdited);
-
     mainEditorCommand.LockShortcuts(this);
 
     edittimeRenderer.editing = false;
@@ -722,6 +720,9 @@ void SceneCanvas::ReloadFirstPart()
 
 void SceneCanvas::ReloadSecondPart()
 {
+    if ( !edittimeRenderer.editing )
+        EventsCodeCompiler::GetInstance()->DisableCompilation(sceneEdited);
+
     cout << "ReloadSecondPart" << endl;
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( !edittimeRenderer.editing && gameEdited.useExternalSourceFiles )

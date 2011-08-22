@@ -55,6 +55,7 @@
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29d_xrc" />
 					<Add option="-lwxmsw29d_stc" />
+					<Add option="-lwxmsw29d_propgrid" />
 					<Add option="-lwxmsw29d_richtext" />
 					<Add option="-lwxmsw29d_ribbon" />
 					<Add option="-lwxmsw29d_aui" />
@@ -203,13 +204,14 @@
 					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_stc" />
+					<Add option="-lwxmsw29_propgrid" />
 					<Add option="-lwxmsw29_richtext" />
 					<Add option="-lwxmsw29_ribbon" />
 					<Add option="-lwxmsw29_aui" />
@@ -295,7 +297,7 @@
 					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="C:\libs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-lopenal32" />
@@ -393,7 +395,6 @@
 				<Option object_output="obj\release" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-O3" />
 					<Add option="-Wall" />
@@ -408,8 +409,8 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
-					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -430,8 +431,41 @@
 					<Add option="-lGLU" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
+					<Add option="-lclangFrontend  -lclangSerialization  -lclangDriver  -lclangCodeGen  -lclangSema  -lclangStaticAnalyzerFrontend  -lclangStaticAnalyzerCheckers  -lclangStaticAnalyzerCore  -lclangIndex  -lclangAnalysis  -lclangRewrite  -lclangAST  -lclangParse  -lclangLex  -lclangBasic  -lLLVMJIT  -lLLVMInterpreter  -lLLVMX86CodeGen  -lLLVMAsmParser  -lLLVMBitReader  -lLLVMBitWriter  -lLLVMipo  -lLLVMExecutionEngine  -lLLVMAsmPrinter  -lLLVMSelectionDAG  -lLLVMX86AsmPrinter  -lLLVMX86Info  -lLLVMMCParser  -lLLVMCodeGen  -lLLVMX86Utils  -lLLVMScalarOpts  -lLLVMInstCombine  -lLLVMTransformUtils  -lLLVMipa  -lLLVMAnalysis  -lLLVMTarget  -lLLVMCore  -lLLVMMC  -lLLVMSupport  -lLLVMInstrumentation  -lclangFrontend  -lclangSerialization  -lclangDriver  -lclangParse  -lclangSema  -lclangAnalysis  -lclangIndex  -lclangAST  -lclangLex  -lclangBasic  -lLLVMMC  -lLLVMSupport" />
+					<Add option="-lLLVMJIT" />
+					<Add option="-lLLVMInterpreter" />
+					<Add option="-lLLVMX86CodeGen" />
+					<Add option="-lLLVMAsmParser" />
+					<Add option="-lLLVMBitReader" />
+					<Add option="-lLLVMBitWriter" />
+					<Add option="-lLLVMipo" />
+					<Add option="-lLLVMExecutionEngine" />
+					<Add option="-lLLVMAsmPrinter" />
+					<Add option="-lLLVMSelectionDAG" />
+					<Add option="-lLLVMX86Desc" />
+					<Add option="-lLLVMX86AsmPrinter" />
+					<Add option="-lLLVMX86Info" />
+					<Add option="-lLLVMMCParser" />
+					<Add option="-lLLVMCodeGen" />
+					<Add option="-lLLVMX86Utils" />
+					<Add option="-lLLVMScalarOpts" />
+					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMTransformUtils" />
+					<Add option="-lLLVMipa" />
+					<Add option="-lLLVMAnalysis" />
+					<Add option="-lLLVMTarget" />
+					<Add option="-lLLVMCore" />
+					<Add option="-lLLVMMC" />
+					<Add option="-lLLVMInstrumentation" />
+					<Add option="-lLLVMSupport" />
+					<Add option="-lLLVMCBackend" />
+					<Add option="-lLLVMCppBackend" />
+					<Add option="-lLLVMX86AsmParser" />
+					<Add option="-lLLVMX86Disassembler" />
+					<Add option="-lLLVMCBackendInfo" />
 					<Add directory="bin\release" />
-					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+					<Add directory="..\ExtLibs\SFML\lib" />
+					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
@@ -455,8 +489,8 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
-					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
@@ -476,8 +510,41 @@
 					<Add option="-lGLU" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
+					<Add option="-lclangFrontend  -lclangSerialization  -lclangDriver  -lclangCodeGen  -lclangSema  -lclangStaticAnalyzerFrontend  -lclangStaticAnalyzerCheckers  -lclangStaticAnalyzerCore  -lclangIndex  -lclangAnalysis  -lclangRewrite  -lclangAST  -lclangParse  -lclangLex  -lclangBasic  -lLLVMJIT  -lLLVMInterpreter  -lLLVMX86CodeGen  -lLLVMAsmParser  -lLLVMBitReader  -lLLVMBitWriter  -lLLVMipo  -lLLVMExecutionEngine  -lLLVMAsmPrinter  -lLLVMSelectionDAG  -lLLVMX86AsmPrinter  -lLLVMX86Info  -lLLVMMCParser  -lLLVMCodeGen  -lLLVMX86Utils  -lLLVMScalarOpts  -lLLVMInstCombine  -lLLVMTransformUtils  -lLLVMipa  -lLLVMAnalysis  -lLLVMTarget  -lLLVMCore  -lLLVMMC  -lLLVMSupport  -lLLVMInstrumentation  -lclangFrontend  -lclangSerialization  -lclangDriver  -lclangParse  -lclangSema  -lclangAnalysis  -lclangIndex  -lclangAST  -lclangLex  -lclangBasic  -lLLVMMC  -lLLVMSupport" />
+					<Add option="-lLLVMJIT" />
+					<Add option="-lLLVMInterpreter" />
+					<Add option="-lLLVMX86CodeGen" />
+					<Add option="-lLLVMAsmParser" />
+					<Add option="-lLLVMBitReader" />
+					<Add option="-lLLVMBitWriter" />
+					<Add option="-lLLVMipo" />
+					<Add option="-lLLVMExecutionEngine" />
+					<Add option="-lLLVMAsmPrinter" />
+					<Add option="-lLLVMSelectionDAG" />
+					<Add option="-lLLVMX86Desc" />
+					<Add option="-lLLVMX86AsmPrinter" />
+					<Add option="-lLLVMX86Info" />
+					<Add option="-lLLVMMCParser" />
+					<Add option="-lLLVMCodeGen" />
+					<Add option="-lLLVMX86Utils" />
+					<Add option="-lLLVMScalarOpts" />
+					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMTransformUtils" />
+					<Add option="-lLLVMipa" />
+					<Add option="-lLLVMAnalysis" />
+					<Add option="-lLLVMTarget" />
+					<Add option="-lLLVMCore" />
+					<Add option="-lLLVMMC" />
+					<Add option="-lLLVMInstrumentation" />
+					<Add option="-lLLVMSupport" />
+					<Add option="-lLLVMCBackend" />
+					<Add option="-lLLVMCppBackend" />
+					<Add option="-lLLVMX86AsmParser" />
+					<Add option="-lLLVMX86Disassembler" />
+					<Add option="-lLLVMCBackendInfo" />
 					<Add directory="bin\debug" />
-					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+					<Add directory="..\ExtLibs\SFML\lib" />
+					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
 				</Linker>
 			</Target>
 		</Build>

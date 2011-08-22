@@ -85,6 +85,7 @@ const long Preferences::ID_PANEL8 = wxNewId();
 const long Preferences::ID_STATICTEXT17 = wxNewId();
 const long Preferences::ID_TEXTCTRL5 = wxNewId();
 const long Preferences::ID_STATICTEXT18 = wxNewId();
+const long Preferences::ID_CHECKBOX6 = wxNewId();
 const long Preferences::ID_CUSTOM1 = wxNewId();
 const long Preferences::ID_PANEL18 = wxNewId();
 const long Preferences::ID_STATICTEXT16 = wxNewId();
@@ -359,6 +360,9 @@ changesNeedRestart(false)
     StaticText18 = new wxStaticText(Panel8, ID_STATICTEXT18, _("pixels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT18"));
     FlexGridSizer28->Add(StaticText18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer27->Add(FlexGridSizer28, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
+    hideContextPanelsLabels = new wxCheckBox(Panel8, ID_CHECKBOX6, _("Cacher les noms des boutons dans les panneaux contextuels"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
+    hideContextPanelsLabels->SetValue(false);
+    FlexGridSizer27->Add(hideContextPanelsLabels, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer15 = new wxStaticBoxSizer(wxHORIZONTAL, Panel8, _("Couleurs des paramètres"));
     FlexGridSizer29 = new wxFlexGridSizer(0, 3, 0, 0);
     eventsEditorParametersProperties = new wxPropertyGrid(Panel8,ID_CUSTOM1,wxDefaultPosition,wxSize(342,168),0,_T("ID_CUSTOM1"));
@@ -660,6 +664,8 @@ changesNeedRestart(false)
     }
 
 	conditionsColumnWidthEdit->SetValue(ToString(static_cast<int>(pConfig->ReadDouble("EventsEditor/ConditionColumnWidth", 350))));
+
+	hideContextPanelsLabels->SetValue(pConfig->ReadBool("EventsEditor/HideContextPanelsLabels", false));
 }
 
 Preferences::~Preferences()
@@ -804,6 +810,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     TranslateAction::GetInstance()->SaveTypesFormattingToConfig();
 	pConfig->Write("EventsEditor/ConditionColumnWidth", ToInt(ToString(conditionsColumnWidthEdit->GetValue())));
+	pConfig->Write("EventsEditor/HideContextPanelsLabels", hideContextPanelsLabels->GetValue());
 
     EndModal( 1 );
 }

@@ -29,7 +29,15 @@ freely, subject to the following restrictions:
 
 #include "GDL/Object.h"
 #include "LightManager.h"
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/System/Clock.hpp>
+namespace sf
+{
+    class Sprite;
+    class Image;
+    class Shader;
+    class RenderImage;
+}
 class Evaluateur;
 class ImageManager;
 class RuntimeScene;
@@ -72,8 +80,8 @@ class GD_EXTENSION_API LightObject : public Object
         virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
         virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, string & name, string & value) const;
-        virtual bool ChangeProperty(unsigned int propertyNb, string newValue);
+        virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+        virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
         virtual unsigned int GetNumberOfProperties() const;
         #endif
 
@@ -148,8 +156,8 @@ class GD_EXTENSION_API LightObject : public Object
         static bool commonBlurEffectLoaded;
 
         #if defined(GD_IDE_ONLY)
-        sf::Image edittimeIconImage;
-        sf::Sprite edittimeIcon;
+        static sf::Image edittimeIconImage;
+        static sf::Sprite edittimeIcon;
         #endif
 };
 

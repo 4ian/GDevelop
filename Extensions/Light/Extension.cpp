@@ -56,7 +56,9 @@ class Extension : public ExtensionBase
                                &DestroyLightObject,
                                "LightObject");
 
-                objInfos.SetIncludeFile("Light/LightObject.h");
+                    #if defined(GD_IDE_ONLY)
+
+                    objInfos.SetIncludeFile("Light/LightObject.h");
 
                     DECLARE_OBJECT_ACTION("ChangeColor",
                                    _("Couleur"),
@@ -271,10 +273,13 @@ class Extension : public ExtensionBase
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetQuality").SetIncludeFile("Light/LightObject.h");
                     DECLARE_END_OBJECT_EXPRESSION()
-/*
+
+                    /*
                     DECLARE_OBJECT_EXPRESSION("Angle", _("Angle"), _("Angle"), _("Lumières"), "Extensions/lightIcon16.png", &LightObject::ExpAngle)
                         instrInfo.AddParameter("object", _("Objet"), "Light", false);
                     DECLARE_END_OBJECT_EXPRESSION()*/
+
+                    #endif
 
                 DECLARE_END_OBJECT()
 

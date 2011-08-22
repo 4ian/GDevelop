@@ -1,9 +1,15 @@
 #ifndef LIGHTH
 #define LIGHTH
 
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
+#include <vector>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Shape.hpp>
+namespace sf
+{
+    class Shape;
+    class RenderTarget;
+}
 
 class Wall
 {

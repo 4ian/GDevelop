@@ -24,8 +24,8 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef PHYSICAUTOMATISM_H
-#define PHYSICAUTOMATISM_H
+#ifndef LIGHTOBSTACLEAUTOMATISM_H
+#define LIGHTOBSTACLEAUTOMATISM_H
 
 #include "GDL/Automatism.h"
 #include "GDL/Object.h"
@@ -106,4 +106,4 @@ class GD_EXTENSION_API LightObstacleAutomatism : public Automatism, public boost
         boost::shared_ptr<Light_Manager> manager;
 };
 
-#endif // PHYSICAUTOMATISM_H
+#endif // LIGHTOBSTACLEAUTOMATISM_H

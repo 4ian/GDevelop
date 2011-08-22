@@ -1,6 +1,7 @@
 #include "Directional_light.h"
-
+#include <cmath>
 #include <iostream>
+#include <SFML/Graphics.hpp>
 
 Directional_light::Directional_light() : Light()
 {

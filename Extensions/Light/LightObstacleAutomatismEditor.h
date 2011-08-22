@@ -28,6 +28,9 @@ freely, subject to the following restrictions:
 #ifndef PHYSICSAUTOMATISMEDITOR_H
 #define PHYSICSAUTOMATISMEDITOR_H
 
+#ifdef __WXMSW__
+#include <wx/msw/winundef.h>
+#endif
 //(*Headers(LightObstacleAutomatismEditor)
 #include <wx/sizer.h>
 #include <wx/dialog.h>

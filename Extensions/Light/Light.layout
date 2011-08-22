@@ -8,7 +8,7 @@
 		<Cursor1 position="413" topLine="0" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="13055" topLine="254" />
+		<Cursor1 position="15293" topLine="275" />
 	</File>
 	<File name="Light.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="2678" topLine="82" />
@@ -20,7 +20,7 @@
 		<Cursor1 position="238" topLine="0" />
 	</File>
 	<File name="LightObject.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="6893" topLine="178" />
+		<Cursor1 position="1783" topLine="33" />
 	</File>
 	<File name="LightObject.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="3986" topLine="22" />
@@ -34,8 +34,8 @@
 	<File name="LightObstacleAutomatism.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="5731" topLine="122" />
 	</File>
-	<File name="LightObstacleAutomatism.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2796" topLine="69" />
+	<File name="LightObstacleAutomatism.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3310" topLine="77" />
 	</File>
 	<File name="LightObstacleAutomatismEditor.cpp" open="0" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1722" topLine="48" />
@@ -46,13 +46,13 @@
 	<File name="RuntimeSceneLightObstacleDatas.cpp" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="37" topLine="2" />
 	</File>
-	<File name="RuntimeSceneLightObstacleDatas.h" open="0" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="37" topLine="2" />
+	<File name="RuntimeSceneLightObstacleDatas.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2050" topLine="24" />
 	</File>
 	<File name="SceneLightObstacleDatas.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="37" topLine="2" />
 	</File>
-	<File name="SceneLightObstacleDatas.h" open="0" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1088" topLine="18" />
+	<File name="SceneLightObstacleDatas.h" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2207" topLine="28" />
 	</File>
 </CodeBlocks_layout_file>

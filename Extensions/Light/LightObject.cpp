@@ -32,6 +32,7 @@ freely, subject to the following restrictions:
 #include "GDL/FontManager.h"
 #include "GDL/XmlMacros.h"
 #include "GDL/Position.h"
+#include "GDL/RotatedRectangle.h"
 #include "LightObject.h"
 #include "LightManager.h"
 
@@ -46,6 +47,10 @@ freely, subject to the following restrictions:
 std::map<const Scene*, boost::weak_ptr<Light_Manager> >  LightObject::lightManagersList;
 sf::Shader LightObject::commonBlurEffect;
 bool LightObject::commonBlurEffectLoaded = false;
+#if defined(GD_IDE_ONLY)
+sf::Image LightObject::edittimeIconImage;
+sf::Sprite LightObject::edittimeIcon;
+#endif
 
 LightObject::LightObject(std::string name_) :
 Object(name_),
@@ -272,10 +277,10 @@ void LightObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
 
 void LightObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if ( propertyNb == 0 ) {name = _T("Couleur");       value = ToString(GetColor().r)+";"+ToString(GetColor().g)+";"+ToString(GetColor().b);}
-    else if ( propertyNb == 1 ) {name = _T("Intensité");       value = ToString(GetIntensity());}
-    else if ( propertyNb == 2 ) {name = _T("Rayon");       value = ToString(GetRadius());}
-    else if ( propertyNb == 2 ) {name = _T("Qualité");       value = ToString(GetQuality());}
+    if ( propertyNb == 0 ) {name = _("Couleur");       value = ToString(GetColor().r)+";"+ToString(GetColor().g)+";"+ToString(GetColor().b);}
+    else if ( propertyNb == 1 ) {name = _("Intensité");       value = ToString(GetIntensity());}
+    else if ( propertyNb == 2 ) {name = _("Rayon");       value = ToString(GetRadius());}
+    else if ( propertyNb == 2 ) {name = _("Qualité");       value = ToString(GetQuality());}
 }
 
 bool LightObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -325,7 +330,7 @@ void LightObject::OnPositionChanged()
 
 void LightObject::SetColor(const std::string & colorStr)
 {
-    vector < string > colors = SpliterStringToVector<string>(colorStr, ';');
+    vector < string > colors = SplitString<string>(colorStr, ';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
@@ -334,7 +339,7 @@ void LightObject::SetColor(const std::string & colorStr)
 
 void LightObject::SetGlobalColor(const std::string & colorStr)
 {
-    vector < string > colors = SpliterStringToVector<string>(colorStr, ';');
+    vector < string > colors = SplitString<string>(colorStr, ';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 

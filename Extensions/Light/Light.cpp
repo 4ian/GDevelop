@@ -1,6 +1,6 @@
-
 #include <iostream>
-#include <math.h>
+#include <cmath>
+#include <SFML/Graphics.hpp>
 #include "Light.h"
 
 Light::Light()

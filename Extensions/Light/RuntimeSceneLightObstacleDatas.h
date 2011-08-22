@@ -24,8 +24,8 @@ freely, subject to the following restrictions:
 
 */
 
-#ifndef RUNTIMESCENEPHYSICSDATAS_H
-#define RUNTIMESCENEPHYSICSDATAS_H
+#ifndef RUNTIMESCENELIGHTOBSTACLEDATAS_H
+#define RUNTIMESCENELIGHTOBSTACLEDATAS_H
 
 #include <iostream>
 #include <boost/weak_ptr.hpp>
@@ -53,4 +53,4 @@ class GD_EXTENSION_API RuntimeSceneLightObstacleDatas : public AutomatismsRuntim
     private:
 };
 
-#endif // RUNTIMESCENEPHYSICSDATAS_H
+#endif // RUNTIMESCENELIGHTOBSTACLEDATAS_H

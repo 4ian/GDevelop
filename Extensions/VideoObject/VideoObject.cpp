@@ -33,11 +33,11 @@ freely, subject to the following restrictions:
 #include "GDL/Position.h"
 #include "GDL/XmlMacros.h"
 #include "GDL/RotatedRectangle.h"
+#include "GDL/CommonTools.h"
 #include "VideoObject.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
-#include "GDL/CommonTools.h"
 #include "GDL/ResourcesMergingHelper.h"
 #include "GDL/MainEditorCommand.h"
 #include "VideoObjectEditor.h"
@@ -133,7 +133,7 @@ void VideoObject::Seek( double position )
 
 void VideoObject::SetColor(const std::string & colorStr)
 {
-    vector < string > colors = SpliterStringToVector<string>(colorStr, ';');
+    vector < string > colors = SplitString<string>(colorStr, ';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
@@ -218,13 +218,13 @@ void VideoObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
 
 void VideoObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _T("Fichier");                     value = GetVideoFile();}
-    else if ( propertyNb == 1 ) {name = _T("Bouclage");                    value = looping ? _T("Oui") : _T("Non");}
-    else if ( propertyNb == 2 ) {name = _T("Position dans la vidéo");      value = ToString(video.GetTimePosition())+"s";}
-    else if ( propertyNb == 3 ) {name = _T("En pause");                    value = paused ? _T("Oui") : _T("Non");}
-    else if ( propertyNb == 4 ) {name = _T("Durée");                       value = ToString(video.GetDuration())+"s";}
-    else if ( propertyNb == 5 ) {name = _T("Couleur");                     value = ToString(colorR)+";"+ToString(colorG)+";"+ToString(colorB);}
-    else if ( propertyNb == 6 ) {name = _T("Opacité");       value = ToString(GetOpacity());}
+    if      ( propertyNb == 0 ) {name = _("Fichier");                     value = GetVideoFile();}
+    else if ( propertyNb == 1 ) {name = _("Bouclage");                    value = looping ? _("Oui") : _("Non");}
+    else if ( propertyNb == 2 ) {name = _("Position dans la vidéo");      value = ToString(video.GetTimePosition())+"s";}
+    else if ( propertyNb == 3 ) {name = _("En pause");                    value = paused ? _("Oui") : _("Non");}
+    else if ( propertyNb == 4 ) {name = _("Durée");                       value = ToString(video.GetDuration())+"s";}
+    else if ( propertyNb == 5 ) {name = _("Couleur");                     value = ToString(colorR)+";"+ToString(colorG)+";"+ToString(colorB);}
+    else if ( propertyNb == 6 ) {name = _("Opacité");       value = ToString(GetOpacity());}
 }
 
 bool VideoObject::ChangeProperty(unsigned int propertyNb, string newValue)

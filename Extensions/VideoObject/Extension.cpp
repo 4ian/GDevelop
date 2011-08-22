@@ -81,6 +81,8 @@ class Extension : public ExtensionBase
                            &DestroyVideoObject,
                            "VideoObject");
 
+                #if defined(GD_IDE_ONLY)
+
                 objInfos.SetIncludeFile("VideoObject/VideoObject.h");
 
                 DECLARE_OBJECT_ACTION("LoadVideo",
@@ -325,6 +327,8 @@ class Extension : public ExtensionBase
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetVideoFile").SetIncludeFile("VideoObject/VideoObject.h");
                 DECLARE_END_OBJECT_STR_EXPRESSION()
+
+                #endif
 
             DECLARE_END_OBJECT()
 

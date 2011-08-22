@@ -10164,7 +10164,7 @@
 
 1253308520 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\checkeddelete.h
 
-1312713691 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\videoobject.cpp
+1313695503 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\videoobject.cpp
 	<SFML/Graphics.hpp>
 	"GDL/Object.h"
 	"GDL/ImageManager.h"
@@ -10173,9 +10173,9 @@
 	"GDL/Position.h"
 	"GDL/XmlMacros.h"
 	"GDL/RotatedRectangle.h"
+	"GDL/CommonTools.h"
 	"VideoObject.h"
 	<wx/wx.h>
-	"GDL/CommonTools.h"
 	"GDL/ResourcesMergingHelper.h"
 	"GDL/MainEditorCommand.h"
 	"VideoObjectEditor.h"
@@ -12206,8 +12206,7 @@
 
 1312668877 d:\florian\programmation\gamedevelop2\gdl\gdl\force.h
 
-1312898062 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
-	<wx/dcbuffer.h>
+1313855658 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
 	<boost/weak_ptr.hpp>
 	<iostream>
 	<vector>
@@ -15646,7 +15645,7 @@
 	<boost/type_traits/remove_volatile.hpp>
 	<boost/type_traits/remove_cv.hpp>
 
-1297523943 d:\florian\programmation\gamedevelop2\gdl\gdl\log.h
+1313672531 d:\florian\programmation\gamedevelop2\gdl\gdl\log.h
 	<string>
 	<vector>
 
@@ -15694,7 +15693,7 @@
 	<vector>
 	<string>
 
-1307193655 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
+1313670759 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
 	<string>
 	<vector>
 	"GDL/Object.h"
@@ -15704,7 +15703,7 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1310075239 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
+1313668638 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
 	"GDL/Event.h"
 	<vector>
 	<map>
@@ -15806,7 +15805,7 @@
 1284229476 d:\florian\programmation\gamedevelop2\extlibs\libtheoraplayer\trunk\include\theoravideoframe.h
 	<TheoraExport.h>
 
-1312670999 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
+1313672614 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
 	<string>
 	<sstream>
 	<iostream>
@@ -15969,13 +15968,13 @@
 1284229476 d:\florian\programmation\gamedevelop2\extlibs\libtheoraplayer\trunk\include\theoraexception.h
 	<string>
 
-1311951341 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\extension.cpp
+1313695419 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"VideoObject.h"
 	<boost/version.hpp>
 
-1313056212 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
+1313695175 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
 	<wx/bitmap.h>
 	<wx/file.h>
 	<wx/wx.h>
@@ -15985,7 +15984,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1313185362 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1313841848 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1299115781 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\version.hpp
 

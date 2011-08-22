@@ -37,7 +37,16 @@ void EventsExecutionEngine::EnsureLLVMTargetsInitialization()
     }
 }
 
-EventsExecutionEngine::EventsExecutionEngine()
+void EventsExecutionEngine::LoadDynamicLibraries()
+{
+    std::string error;
+    llvm::sys::DynamicLibrary::LoadLibraryPermanently("libstdc++-6.dll", &error);
+    if ( !error.empty() ) std::cout << error;
+}
+
+EventsExecutionEngine::EventsExecutionEngine() :
+    beingExecuted(false),
+    engineReady(false)
 {
     llvmRuntimeContext = new RuntimeContext(NULL);
 }
@@ -53,13 +62,13 @@ void EventsExecutionEngine::Execute()
     llvmExecutionEngine->runFunction(eventsEntryFunction, args);
 }
 
-bool EventsExecutionEngine::LoadFromLLVMBitCode(const std::string & bitCode)
+bool EventsExecutionEngine::LoadFromLLVMBitCode(const char * src, unsigned int size)
 {
-    const char * src = bitCode.c_str();
     llvm::StringRef input_data(src);
     llvm::StringRef buffer_name("src");
     llvm::OwningPtr<llvm::MemoryBuffer> eventsBuffer;
-    eventsBuffer.reset(llvm::MemoryBuffer::getMemBufferCopy(input_data, buffer_name));
+    eventsBuffer.reset(llvm::MemoryBuffer::getNewMemBuffer(size, "src"));
+    memcpy((char*)eventsBuffer->getBufferStart(), src, size);
 
     return LoadFromLLVMBitCode(eventsBuffer.get());
 }
@@ -75,6 +84,8 @@ bool EventsExecutionEngine::LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffe
         std::cout << "Module creation failed\n";
         return false;
     }
+
+    engineReady = false;
 
     std::string error;
     llvmExecutionEngine.reset( llvm::ExecutionEngine::createJIT(llvmModule, &error, 0, llvm::CodeGenOpt::None)); //No optimisation during machine code generation
@@ -106,6 +117,7 @@ bool EventsExecutionEngine::LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffe
     llvmExecutionEngine->getPointerToFunction(eventsEntryFunction);
     std::cout << "JIT Compilation duration: " << jitTimer.GetElapsedTime()<<"s"<<std::endl;
 
+    engineReady = true;
     return true;
 }
 

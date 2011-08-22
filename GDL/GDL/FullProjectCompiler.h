@@ -34,6 +34,7 @@ class GD_API FullProjectCompiler
 
         void ClearDirectory(std::string directory);
         std::string GetTempDir();
+        void SetForcedTempDir(const std::string & dir) { forcedTempDir = dir; };
 
         void TargetWindows(bool enable = true) { windowsTarget = enable; };
         void TargetLinux(bool enable = true) { linuxTarget = enable; };
@@ -45,6 +46,7 @@ class GD_API FullProjectCompiler
         Game & gameToCompile;
         FullProjectCompilerDiagnosticManager & diagnosticManager;
         std::string outDir;
+        std::string forcedTempDir;
 
         bool windowsTarget;
         bool linuxTarget;

@@ -490,13 +490,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
  */
 std::string FullProjectCompiler::GetTempDir()
 {
-    wxConfigBase *pConfig = wxConfigBase::Get();
-    wxString * result = new wxString();
-
-    pConfig->Read( _T( "/Dossier/Compilation" ), result );
-
-    std::string tempDir = ToString(*result);
-    if ( tempDir == "" ) //If the user has not forced a directory
+    std::string tempDir = forcedTempDir;
+    if ( tempDir.empty() ) //If the user has not forced a directory
     {
         tempDir = wxFileName::GetHomeDir()+"/.Game Develop/";
         if ( !wxFileName::IsDirWritable(tempDir) )

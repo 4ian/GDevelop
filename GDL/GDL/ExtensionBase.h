@@ -439,6 +439,18 @@ typedef Object * (*CreateFunPtr)(std::string name);
 #define DECLARE_THE_EXTENSION(name_, fullname_, description_, author_, license_) name = name_; \
                                                                                 SetNameSpace(name_);
 
+#define DECLARE_OBJECT(name_, fullname, informations, icon, createFunPtrP, destroyFunPtrP, cppClassName_) { \
+            ExtensionObjectInfos objInfos; \
+            std::string currentObjectDeclarationName = name_; \
+            objInfos.createFunPtr = createFunPtrP;\
+            objInfos.destroyFunPtr = destroyFunPtrP;
+
+#define DECLARE_AUTOMATISM(name_, fullname_, defaultName_, description_, group_, smallicon_, className_, sharedDatasClassName_) { \
+            AutomatismInfo automatismInfo; \
+            std::string currentAutomatismDeclarationName = name_;\
+            automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName)); \
+            automatismInfo.sharedDatasInstance = boost::shared_ptr<AutomatismsSharedDatas>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
+
 //Emulating wxWidgets internationalization macro
 #ifndef _
 #define _(x) x // "Emule" la macro de WxWidgets

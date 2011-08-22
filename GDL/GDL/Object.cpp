@@ -10,6 +10,7 @@
 #include <string>
 #include <list>
 #include <sstream>
+#include <cstring>
 #include <boost/shared_ptr.hpp>
 #include "GDL/Log.h"
 #include "GDL/Force.h"

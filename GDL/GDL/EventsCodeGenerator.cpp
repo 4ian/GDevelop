@@ -968,7 +968,7 @@ string EventsCodeGenerator::GenerateEventsCompleteCode(const Game & game, const 
         output += "#include \""+*include+"\"\n";
 
     output +=
-    "\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
+    "#include <vector>\n#include <map>\n#include <string>\n#include <stdio.h>\n#include <SFML/System/Clock.hpp>\n#include <SFML/System/Vector2.hpp>\n#include <SFML/Graphics/Color.hpp>\n#include \"GDL/RuntimeContext.h\"\n#include \"GDL/Object.h\"\n#include \"GDL/AudioTools.h\"\n#include \"GDL/CommonInstructions.h\"\n#include \"GDL/LightweightCommonTools.h\"\n#include \"GDL/FileTools.h\"\n#include \"GDL/KeyboardTools.h\"\n#include \"GDL/MouseTools.h\"\n#include \"GDL/NetworkTools.h\"\n#include \"GDL/ObjectTools.h\"\n#include \"GDL/RuntimeSceneCameraTools.h\"\n#include \"GDL/RuntimeSceneTools.h\"\n#include \"GDL/SpriteObject.h\"\n#include \"GDL/SpriteTools.h\"\n#include \"GDL/TimeTools.h\"\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
 
     for ( set<string>::iterator declaration = context.customGlobalDeclaration->begin() ; declaration != context.customGlobalDeclaration->end(); ++declaration )
         output += *declaration+"\n";

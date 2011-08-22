@@ -31,13 +31,19 @@ public:
 
     /**
      * Execute compiled events.
+     * Beware, there is no protection against calling Execute on an EventsExecutionEngine that is not initalized with bitcode
      */
     void Execute();
 
     /**
-     * Initialize execution engine from bitCode.
+     * Return true if loading from bitcode has been made successfully and if Execute can be called.
      */
-    bool LoadFromLLVMBitCode(const std::string & bitCode);
+    bool const Ready() { return engineReady; };
+
+    /**
+     * Initialize execution engine from bitCode stored in memory.
+     */
+    bool LoadFromLLVMBitCode(const char * src, unsigned int size);
 
     /**
      * Initialize execution engine from bitCode loaded in memory.
@@ -56,7 +62,14 @@ public:
      */
     static void EnsureLLVMTargetsInitialization();
 
+    /**
+     * Load dynamic libraries needed by gd events generated code ( libstdc++ basically )
+     */
+    static void LoadDynamicLibraries();
+
 private:
+    bool engineReady;
+
     static bool llvmTargetsInitialized;
 };
 

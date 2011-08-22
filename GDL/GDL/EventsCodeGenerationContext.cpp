@@ -54,7 +54,6 @@ void EventsCodeGenerationContext::ObjectNeeded(std::string objectName)
         if ( objectsListsDynamicallyDeclared.find(objectName) != objectsListsDynamicallyDeclared.end() ) return;
 
         objectsListsDynamicallyDeclared.insert(objectName);
-        contextReallyNeedAlreadyConcernedObjects = true; //We really need objectsAlreadyDeclared in code
 
         dynamicDeclaration += "if (find(objectsAlreadyDeclared.begin(), objectsAlreadyDeclared.end(), \""+objectName+"\") == objectsAlreadyDeclared.end()) ";
         dynamicDeclaration += "{\n";
@@ -73,7 +72,7 @@ std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
     {
         declarationsCode += "std::map <std::string, std::vector<Object*> *> objectsListsMap;\n";
     }
-    if ( dynamicObjectsListsDeclaration /*&& contextReallyNeedAlreadyConcernedObjects*/ )
+    if ( dynamicObjectsListsDeclaration )
     {
         if ( !parentAlreadyUseDynamicDeclaration)
         {
@@ -95,7 +94,7 @@ std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
             declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+" = runtimeContext->GetObjectsRawPointers(\""+*it+"\");\n";
             objectsAlreadyDeclared.insert(*it);
 
-            if ( dynamicObjectsListsDeclaration /*&& contextReallyNeedAlreadyConcernedObjects*/) declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n";
+            if ( dynamicObjectsListsDeclaration) declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n";
         }
         else
         {
@@ -115,7 +114,7 @@ std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
             emptyObjectsListsAlreadyDeclared.insert(*it);
 
             // No : We declare an object list, but it is empty, and is not considered as declared.
-            //if ( dynamicObjectsListsDeclaration && contextReallyNeedAlreadyConcernedObjects ) declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n"; Let me commented please.
+            //if ( dynamicObjectsListsDeclaration ) declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n"; Let me commented please.
         }
         else
         {
@@ -123,7 +122,7 @@ std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
             declarationsCode += "std::vector<Object*> & "+ManObjListName(*it)+"T = "+ManObjListName(*it)+";\n";
             declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+" = "+ManObjListName(*it)+"T;\n";
 
-            //if ( dynamicObjectsListsDeclaration && contextReallyNeedAlreadyConcernedObjects ) declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n"; Let me commented please.
+            //if ( dynamicObjectsListsDeclaration ) declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n"; Let me commented please.
         }
 
         if ( allObjectsMapNeeded ) declarationsCode += "objectsListsMap[\""+*it+"\"] = &"+ManObjListName(*it)+";\n";

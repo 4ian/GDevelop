@@ -8,7 +8,6 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-#include <wx/dcbuffer.h> //This include file must be placed first
 #include <boost/weak_ptr.hpp>
 #include <iostream>
 #include <vector>
@@ -30,6 +29,7 @@ class Evaluateur;
 class TiXmlElement;
 class Game;
 class EventsCodeGenerationContext;
+class wxDC;
 
 class BaseEvent;
 typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;

@@ -124,7 +124,7 @@ char* RessourcesLoader::LoadBinaryFile( const string & filename )
         return buffer;
     }
     else
-            cout << "Binary file can't be loaded from external file for " << filename << endl;
+        cout << "Binary file can't be loaded from external file for " << filename << endl;
 
     return NULL;
 }

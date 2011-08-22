@@ -91,31 +91,33 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     // (basically, exactly one input, and the operation mode is hard wired).
     llvm::SmallVector<const char *, 128> Args;
     Args.push_back("GDEditor.exe");
-    Args.push_back("-includeinclude/GDL/GDL/RuntimePrecompiledHeader.h");
+    Args.push_back(!compilationForRuntime ? "-includeinclude/GDL/GDL/PrecompiledHeader.h" : "-includeinclude/GDL/GDL/PrecompiledHeaderRuntime.h");
     Args.push_back(eventsFile.c_str());
     Args.push_back("-fsyntax-only");
-    Args.push_back("-w");
+    Args.push_back("-w"); //No warning
     //Headers
     for (std::set<std::string>::const_iterator header = headersDirectories.begin();header != headersDirectories.end();++header)
         Args.push_back((*header).c_str());
 
     if ( !compilationForRuntime )
-    {
-        Args.push_back("-DGD_IDE_ONLY"); //TODO : Use appropriate PCH.
-        //Args.push_back("-O2");
-    }
+        Args.push_back("-DGD_IDE_ONLY"); //Already set in PCH
 
+    //if ( compilationForRuntime )
+    //    Args.push_back("-O2"); //Already set in PCH
+
+    //Already set in PCH :
     #if defined(WINDOWS)
     Args.push_back("-DGD_API=__declspec(dllimport)");
     Args.push_back("-DGD_EXTENSION_API=__declspec(dllimport)");
     #elif defined(LINUX)
-    Args.push_back("-DGD_API=\"\"");
-    Args.push_back("-DGD_EXTENSION_API=\"\"");
+    Args.push_back("-DGD_API= ");
+    Args.push_back("-DGD_EXTENSION_API= ");
     #elif defined(MAC)
-    Args.push_back("-DGD_API=\"\"");
-    Args.push_back("-DGD_EXTENSION_API=\"\"");
+    Args.push_back("-DGD_API= ");
+    Args.push_back("-DGD_EXTENSION_API= ");
     #endif
 
+    //Already set in PCH :
     #if defined(RELEASE)
     Args.push_back("-DRELEASE");
     #elif defined(DEV)
@@ -123,7 +125,6 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     #elif defined(DEBUG)
     Args.push_back("-DDEBUG");
     #endif
-
 
     llvm::OwningPtr<Compilation> C(TheDriver.BuildCompilation(Args));
     if (!C) return false;
@@ -224,7 +225,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
             else
             {
                 cout << "Generating C++ code...\n";
-                sceneCopy.profiler->profileEventsInformation.clear();
+                if ( sceneCopy.profiler != NULL ) sceneCopy.profiler->profileEventsInformation.clear();
                 EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.events);
                 EventsCodeGenerator::DeleteUselessEvents(sceneCopy.events);
                 std::string eventsOutput = EventsCodeGenerator::GenerateEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.events);
@@ -285,8 +286,10 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
 
             sf::Lock lock(eventsCodeCompiler->mutex); //Disallow modifying pending tasks.
 
+
             for (unsigned int i = 0;i<eventsCodeCompiler->pendingTasks.size();++i)
             {
+                cout << "Testing pending task of scene " << eventsCodeCompiler->pendingTasks[i].scene->GetName() << endl;
                 if ( find(eventsCodeCompiler->compilationDisallowed.begin(), eventsCodeCompiler->compilationDisallowed.end(), eventsCodeCompiler->pendingTasks[i].scene) == eventsCodeCompiler->compilationDisallowed.end() )
                 {
                     //A Pending task is waiting:
@@ -364,6 +367,8 @@ void GD_API EventsCodeCompiler::DisableCompilation(Scene & scene)
 {
     sf::Lock lock(mutex); //Disallow modifying pending tasks.
 
+    std::cout << "Disabling compilation for scene:" << scene.GetName() << endl;
+
     vector<Scene*>::iterator it = find(compilationDisallowed.begin(), compilationDisallowed.end(), &scene);
     if ( it == compilationDisallowed.end())
         compilationDisallowed.push_back(&scene);
@@ -379,7 +384,6 @@ bool EventsCodeCompiler::EventsBeingCompiled()
 
     if ( currentTask != boost::shared_ptr<Worker>() )
     {
-        cout << "SceneEventsBeingCompiled!";
         return true;
     }
 
@@ -389,11 +393,9 @@ bool EventsCodeCompiler::EventsBeingCompiled()
         EventsCompilationNeeded(pendingTasks[0]);
         pendingTasks.erase(pendingTasks.begin()+0);
 
-        cout << "SceneEventsBeingCompiled!";
         return true; //There is already a task to compile scene events
     }
 
-    cout << "OK, no compilation";
     return false;
 }
 
@@ -441,9 +443,12 @@ void EventsCodeCompiler::NotifyASceneIsDestroyed(const Scene & scene)
 EventsCodeCompiler::EventsCodeCompiler()
 {
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/include");
-    headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include");
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++");
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
+    /*headersDirectories.insert("-Iinclude/Debian/");
+    headersDirectories.insert("-Iinclude/Debian/c++/4.1.2/");
+    headersDirectories.insert("-Iinclude/Debian/c++/4.1.2/i486-linux-gnu");*/
+
     headersDirectories.insert("-Iinclude/llvm/tools/clang/lib/Headers");
     headersDirectories.insert("-Iinclude/GDL");
     headersDirectories.insert("-Iinclude/boost");

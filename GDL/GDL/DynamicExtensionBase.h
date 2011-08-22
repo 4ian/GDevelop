@@ -4,6 +4,7 @@
 #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 
 #include <map>
+#include <string>
 #include "GDL/Event.h"
 
 /**

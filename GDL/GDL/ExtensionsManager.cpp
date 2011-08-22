@@ -73,9 +73,9 @@ ExtensionsManager::ExtensionsManager()
     AddExtension(boost::shared_ptr<ExtensionBase>(new StringInstructionsExtension()));
 
 #if defined(GD_IDE_ONLY)
-    badInstructionInfos.fullname = _T("Instruction inconnue");
-    badInstructionInfos.description = _T("Instruction inconnue");
-    badInstructionInfos.sentence = _T("Instruction inconnue");
+    badInstructionInfos.fullname = _("Instruction inconnue");
+    badInstructionInfos.description = _("Instruction inconnue");
+    badInstructionInfos.sentence = _("Instruction inconnue");
 #endif
 }
 

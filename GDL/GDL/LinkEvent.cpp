@@ -5,6 +5,7 @@
 
 #if defined(GD_IDE_ONLY)
 
+#include <wx/dcmemory.h>
 #include "GDL/LinkEvent.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/EventsRenderingHelper.h"

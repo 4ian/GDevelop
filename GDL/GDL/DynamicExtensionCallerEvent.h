@@ -1,13 +1,12 @@
+#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
+#if defined(GD_IDE_ONLY)
+
 #ifndef DYNAMICEXTENSIONCALLEREVENT_H
 #define DYNAMICEXTENSIONCALLEREVENT_H
 
-#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
-
-#if defined(GD_IDE_ONLY)
 #include <wx/bitmap.h>
 #include <wx/dcbuffer.h>
 #include <wx/html/htmprint.h>
-#endif
 #include <string>
 #include <boost/weak_ptr.hpp>
 #include "Event.h"
@@ -38,15 +37,12 @@ class GD_API DynamicExtensionCallerEvent : public BaseEvent
 
         virtual bool CanHaveSubEvents() const {return false;}
 
-        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
-        #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
         void SetDynamicExtensionEventName(std::string name) { dynamicExtensionEventName = name; }
         std::string GetDynamicExtensionEventName() const { return dynamicExtensionEventName; }
 
-#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */
@@ -58,7 +54,7 @@ class GD_API DynamicExtensionCallerEvent : public BaseEvent
         virtual unsigned int GetRenderedHeight(unsigned int width) const;
 
         virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
-#endif
+
 
     private:
         void Init(const DynamicExtensionCallerEvent & event);
@@ -67,6 +63,7 @@ class GD_API DynamicExtensionCallerEvent : public BaseEvent
         boost::weak_ptr<BaseEvent> dynamicExtensionEvent;
 };
 
-#endif
-
 #endif // DYNAMICEXTENSIONCALLEREVENT_H
+
+#endif
+#endif

@@ -29,6 +29,7 @@ freely, subject to the following restrictions:
 #include "GDL/Object.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ImageManager.h"
+#include "GDL/RotatedRectangle.h"
 #include "GDL/tinyxml.h"
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
@@ -38,6 +39,11 @@ freely, subject to the following restrictions:
 #include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
 #include "DrawerObjectEditor.h"
+#endif
+
+#if defined(GD_IDE_ONLY)
+sf::Image DrawerObject::edittimeIconImage;
+sf::Sprite DrawerObject::edittimeIcon;
 #endif
 
 DrawerObject::DrawerObject(std::string name_) :
@@ -249,11 +255,11 @@ void DrawerObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositi
 
 void DrawerObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _T("Couleur de remplissage");    value = ToString(fillColorR)+";"+ToString(fillColorG)+";"+ToString(fillColorB);}
-    else if ( propertyNb == 1 ) {name = _T("Opacité du remplissage");    value = ToString(fillOpacity);}
-    else if ( propertyNb == 2 ) {name = _T("Taille du contour");         value = ToString(outlineSize);}
-    else if ( propertyNb == 3 ) {name = _T("Couleur du contour");        value = ToString(outlineColorR)+";"+ToString(outlineColorG)+";"+ToString(outlineColorB);}
-    else if ( propertyNb == 4 ) {name = _T("Opacité du contour");        value = ToString(outlineOpacity);}
+    if      ( propertyNb == 0 ) {name = _("Couleur de remplissage");    value = ToString(fillColorR)+";"+ToString(fillColorG)+";"+ToString(fillColorB);}
+    else if ( propertyNb == 1 ) {name = _("Opacité du remplissage");    value = ToString(fillOpacity);}
+    else if ( propertyNb == 2 ) {name = _("Taille du contour");         value = ToString(outlineSize);}
+    else if ( propertyNb == 3 ) {name = _("Couleur du contour");        value = ToString(outlineColorR)+";"+ToString(outlineColorG)+";"+ToString(outlineColorB);}
+    else if ( propertyNb == 4 ) {name = _("Opacité du contour");        value = ToString(outlineOpacity);}
 }
 
 bool DrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -421,7 +427,7 @@ void DrawerObject::SetOutlineOpacity(float val)
  */
 void DrawerObject::SetFillColor( const std::string & color )
 {
-    vector < string > colors = SpliterStringToVector <string> (color, ';');
+    vector < string > colors = SplitString <string> (color, ';');
 
     if ( colors.size() < 3 ) return;
 
@@ -435,7 +441,7 @@ void DrawerObject::SetFillColor( const std::string & color )
  */
 void DrawerObject::SetOutlineColor( const std::string & color )
 {
-    vector < string > colors = SpliterStringToVector <string> (color, ';');
+    vector < string > colors = SplitString <string> (color, ';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 

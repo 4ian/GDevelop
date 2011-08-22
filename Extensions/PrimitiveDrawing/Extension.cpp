@@ -56,6 +56,8 @@ class Extension : public ExtensionBase
                            &DestroyDrawerObject,
                            "DrawerObject");
 
+                #if defined(GD_IDE_ONLY)
+
                 objInfos.SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_OBJECT_ACTION("Rectangle",
@@ -250,7 +252,11 @@ class Extension : public ExtensionBase
 
                 DECLARE_END_OBJECT_CONDITION()
 
+            #endif
+
             DECLARE_END_OBJECT()
+
+            #if defined(GD_IDE_ONLY)
 
             DECLARE_ACTION("CopyImageOnAnother",
                            _("Copier une image sur une autre"),
@@ -269,6 +275,9 @@ class Extension : public ExtensionBase
 
 
             DECLARE_END_ACTION()
+
+            #endif
+
 
             CompleteCompilationInformation();
         };

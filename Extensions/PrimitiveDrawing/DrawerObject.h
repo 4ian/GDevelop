@@ -28,7 +28,13 @@ freely, subject to the following restrictions:
 #define DRAWEROBJECT_H
 
 #include "GDL/Object.h"
-#include <SFML/Graphics.hpp>
+#include <vector>
+#include <SFML/Graphics/Shape.hpp>
+namespace sf
+{
+    class Sprite;
+    class Image;
+}
 class ImageManager;
 class RuntimeScene;
 class Object;
@@ -65,8 +71,8 @@ class GD_EXTENSION_API DrawerObject : public Object
         virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
         virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, string & name, string & value) const;
-        virtual bool ChangeProperty(unsigned int propertyNb, string newValue);
+        virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+        virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
         virtual unsigned int GetNumberOfProperties() const;
         #endif
 
@@ -130,7 +136,7 @@ class GD_EXTENSION_API DrawerObject : public Object
 
     private:
 
-        vector < sf::Shape > shapesToDraw;
+        std::vector < sf::Shape > shapesToDraw;
 
         //Fill color
         unsigned int fillColorR;
@@ -148,8 +154,8 @@ class GD_EXTENSION_API DrawerObject : public Object
         bool absoluteCoordinates;
 
         #if defined(GD_IDE_ONLY)
-        sf::Image edittimeIconImage;
-        sf::Sprite edittimeIcon;
+        static sf::Image edittimeIconImage;
+        static sf::Sprite edittimeIcon;
         #endif
 };
 

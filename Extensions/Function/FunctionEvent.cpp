@@ -24,79 +24,110 @@ freely, subject to the following restrictions:
 
 */
 
+#if defined(GD_IDE_ONLY)
+
 #include "GDL/OpenSaveGame.h"
 #include "FunctionEvent.h"
-#include "GDL/ObjectsConcerned.h"
 #include "GDL/RuntimeScene.h"
+#include "GDL/CommonTools.h"
+#include "GDL/EventsCodeGenerationContext.h"
+#include "GDL/EventsCodeGenerator.h"
+#include "GDL/EventsCodeNameMangler.h"
+#include "GDL/XmlMacros.h"
 #include "GDL/tinyxml.h"
-
-#if defined(GD_IDE_ONLY)
 #include "GDL/EventsRenderingHelper.h"
-#endif
-
-std::map < const Scene* , std::map < std::string, FunctionEvent* > > FunctionEvent::functionsList;
-std::map < const Scene* , std::vector < std::string >* > FunctionEvent::currentFunctionParameter;
+#include "GDL/EventsEditorItemsAreas.h"
+#include "GDL/EventsEditorSelection.h"
+#include "FunctionEventEditorDlg.h"
+#include <wx/textdlg.h>
 
 FunctionEvent::FunctionEvent() :
 BaseEvent(),
-name("MyFunction")
-#if defined(GD_IDE_ONLY)
+name("MyFunction"),
+useCallerContext(false)
 ,nameSelected(false)
-#endif
 {
 }
 
-/**
- * Check the conditions, and launch actions and subevents if necessary
- */
-void FunctionEvent::Launch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, std::vector < string > parameters )
+//Functions need some additionals "tools"
+const std::string FunctionEvent::globalDeclaration = "typedef void (*GDEventsFunctionsType)(RuntimeContext *, std::map <std::string, std::vector<Object*> *> &, std::vector <std::string> &);\n"
+                                                     "std::map <std::string, GDEventsFunctionsType> * functionEventsMap;\n"
+                                                     "std::vector<std::string> * currentFunctionParameters;\n";
+
+std::string FunctionEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & callerContext)
 {
-    std::vector < std::string > * parentFunctionParameters = currentFunctionParameter[&scene];
-    currentFunctionParameter[&scene] = &parameters;
+    //Declaring the maps containing pointers to functions. We can't use a global object directly ( The execution engine does not initialize static/global objects ), so we use a pointer.
+    callerContext.AddGlobalDeclaration(globalDeclaration);
 
-    if ( ExecuteConditions( scene, objectsConcerned) == true )
+    //Declaring function prototype.
+    callerContext.AddGlobalDeclaration("void GDEventsGeneratedFunction"+name+ToString(this)+"(RuntimeContext *, std::map <std::string, std::vector<Object*> *> & , std::vector <std::string> &);\n");
+
+    //We take care of initializing ourselves the map and the pointer to current function parameters
+    callerContext.AddCustomCodeInMain("if ( functionEventsMap == NULL ) functionEventsMap = new std::map <std::string, GDEventsFunctionsType>;\ncurrentFunctionParameters = NULL;");
+
+    //Registering the function.
+    callerContext.AddCustomCodeInMain("(*functionEventsMap)[\""+name+"\"] = GDEventsGeneratedFunction"+name+ToString(this)+";");
+
+    //Generating function code :
+    std::string functionCode;
+    EventsCodeGenerationContext context;
+    context.includeFiles = callerContext.includeFiles;
+
+
+    //Function declaration
+    if ( useCallerContext )
     {
-        ExecuteActions( scene, objectsConcerned);
+        context.NeedObjectListsDynamicDeclaration();
+        functionCode += "\nvoid GDEventsGeneratedFunction"+name+ToString(this)+"(RuntimeContext * runtimeContext, std::map <std::string, std::vector<Object*> *> & objectsListsMap, std::vector <std::string> & objectsAlreadyDeclared)\n{\n";
+    }
+    else
+        functionCode += "\nvoid GDEventsGeneratedFunction"+name+ToString(this)+"(RuntimeContext * runtimeContext, std::map <std::string, std::vector<Object*> *> & , std::vector <std::string> &)\n{\n";
 
-        for (unsigned int i = 0;i<events.size();++i)
+    //Generating function body code
+    std::string conditionsCode = EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
+    std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
+    std::string subeventsCode = EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
+
+    //Object declaration :
+    if ( useCallerContext ) //Using functions parameters to initalize objects list if we use caller context
+    {
+        for (unsigned int i = 0;i<game.globalObjects.size();++i)
         {
-            ObjectsConcerned objectsConcernedForSubEvent;
-            objectsConcernedForSubEvent.InheritsFrom(&objectsConcerned);
-
-            events[i]->Execute(scene, objectsConcernedForSubEvent);
+            functionCode += "std::vector<Object*> "+ManObjListName(game.globalObjects[i]->GetName()) + ";\n";
+            functionCode += "if ( objectsListsMap[\""+game.globalObjects[i]->GetName()+"\"] != NULL ) "+ManObjListName(game.globalObjects[i]->GetName())+" = *objectsListsMap[\""+game.globalObjects[i]->GetName()+"\"];\n";
+            functionCode += "objectsListsMap[\""+game.globalObjects[i]->GetName()+"\"] = &"+ManObjListName(game.globalObjects[i]->GetName())+";\n";
+        }
+        for (unsigned int i = 0;i<scene.initialObjects.size();++i)
+        {
+            functionCode += "std::vector<Object*> "+ManObjListName(scene.initialObjects[i]->GetName()) + ";\n";
+            functionCode += "if ( objectsListsMap[\""+scene.initialObjects[i]->GetName()+"\"] != NULL ) "+ManObjListName(scene.initialObjects[i]->GetName())+" = *objectsListsMap[\""+scene.initialObjects[i]->GetName()+"\"];\n";
+            functionCode += "objectsListsMap[\""+scene.initialObjects[i]->GetName()+"\"] = &"+ManObjListName(scene.initialObjects[i]->GetName())+";\n";
         }
     }
+    else //Or make standard declaration if we do not use the caller context
+        functionCode += context.GenerateObjectsDeclarationCode();
 
-    currentFunctionParameter[&scene] = parentFunctionParameters;
-}
+    std::string ifPredicat = "true";
+    for (unsigned int i = 0;i<conditions.size();++i)
+        ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
-/**
- * Check if all conditions are true
- */
-bool FunctionEvent::ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
-{
-    for ( unsigned int k = 0; k < conditions.size(); ++k )
+    functionCode += conditionsCode;
+    functionCode += "if (" +ifPredicat+ ")\n";
+    functionCode += "{\n";
+    functionCode += actionsCode;
+    if ( !events.empty() ) //Sub events
     {
-        if ( conditions[k].function != NULL &&
-             !conditions[k].function( scene, objectsConcerned, conditions[k]) )
-            return false; //Return false as soon as a condition is false
+        functionCode += "\n{\n";
+        functionCode += subeventsCode;
+        functionCode += "}\n";
     }
+    functionCode += "}\n";
 
-    return true;
-}
 
-/**
- * Run actions of the event
- */
-void FunctionEvent::ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned )
-{
-    for ( unsigned int k = 0; k < actions.size();k++ )
-    {
-        if ( actions[k].function != NULL )
-            actions[k].function( scene, objectsConcerned, actions[k]);
-    }
+    functionCode += "}\n";
+    callerContext.AddCustomCodeOutsideMain(functionCode);
 
-    return;
+    return "";
 }
 
 vector < vector<Instruction>* > FunctionEvent::GetAllConditionsVectors()
@@ -114,21 +145,21 @@ vector < vector<Instruction>* > FunctionEvent::GetAllActionsVectors()
 
     return allActions;
 }
-#if defined(GD_IDE_ONLY)
-void FunctionEvent::SaveToXml(TiXmlElement * eventElem) const
+
+void FunctionEvent::SaveToXml(TiXmlElement * elem) const
 {
     TiXmlElement * objectElem = new TiXmlElement( "Name" );
-    eventElem->LinkEndChild( objectElem );
+    elem->LinkEndChild( objectElem );
     objectElem->SetAttribute("value", name.c_str());
 
     //Les conditions
     TiXmlElement * conditionsElem = new TiXmlElement( "Conditions" );
-    eventElem->LinkEndChild( conditionsElem );
+    elem->LinkEndChild( conditionsElem );
     OpenSaveGame::SaveConditions(conditions, conditionsElem);
 
     //Les actions
     TiXmlElement * actionsElem = new TiXmlElement( "Actions" );
-    eventElem->LinkEndChild( actionsElem );
+    elem->LinkEndChild( actionsElem );
     OpenSaveGame::SaveActions(actions, actionsElem);
 
     //Sous évènements
@@ -136,190 +167,78 @@ void FunctionEvent::SaveToXml(TiXmlElement * eventElem) const
     {
         TiXmlElement * subeventsElem;
         subeventsElem = new TiXmlElement( "Events" );
-        eventElem->LinkEndChild( subeventsElem );
+        elem->LinkEndChild( subeventsElem );
 
         OpenSaveGame::SaveEvents(events, subeventsElem);
     }
-}
-#endif
 
-void FunctionEvent::LoadFromXml(const TiXmlElement * eventElem)
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("useCallerContext", useCallerContext);
+}
+
+void FunctionEvent::LoadFromXml(const TiXmlElement * elem)
 {
-    if ( eventElem->FirstChildElement( "Name" ) != NULL )
-        name = eventElem->FirstChildElement("Name")->Attribute("value");
+    if ( elem->FirstChildElement( "Name" ) != NULL )
+        name = elem->FirstChildElement("Name")->Attribute("value");
 
     //Conditions
-    if ( eventElem->FirstChildElement( "Conditions" ) != NULL )
-        OpenSaveGame::OpenConditions(conditions, eventElem->FirstChildElement( "Conditions" ));
+    if ( elem->FirstChildElement( "Conditions" ) != NULL )
+        OpenSaveGame::OpenConditions(conditions, elem->FirstChildElement( "Conditions" ));
     else
         cout << "Aucune informations sur les conditions d'un évènement";
 
     //Actions
-    if ( eventElem->FirstChildElement( "Actions" ) != NULL )
-        OpenSaveGame::OpenActions(actions, eventElem->FirstChildElement( "Actions" ));
+    if ( elem->FirstChildElement( "Actions" ) != NULL )
+        OpenSaveGame::OpenActions(actions, elem->FirstChildElement( "Actions" ));
     else
         cout << "Aucune informations sur les actions d'un évènement";
 
     //Subevents
-    if ( eventElem->FirstChildElement( "Events" ) != NULL )
-        OpenSaveGame::OpenEvents(events, eventElem->FirstChildElement( "Events" ));
+    if ( elem->FirstChildElement( "Events" ) != NULL )
+        OpenSaveGame::OpenEvents(events, elem->FirstChildElement( "Events" ));
+
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("useCallerContext", useCallerContext);
+    if ( elem->FirstChildElement( "useCallerContext" ) == NULL ) useCallerContext = true;
 }
 
-/**
- * Register function during preprocessing
- */
-void FunctionEvent::Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
-{
-    ReferenceFunction(&scene);
-}
 
 /**
  * Unregister function when object is destroyed
  */
 FunctionEvent::~FunctionEvent()
 {
-    UnreferenceFunction();
-}
-
-/**
- * Add function to functions list
- */
-void FunctionEvent::ReferenceFunction(Scene * scene)
-{
-    functionsList[scene][name] = this;
-}
-
-/**
- * Suppress function from functions list
- */
-void FunctionEvent::UnreferenceFunction()
-{
-    std::map < const Scene* , std::map < std::string, FunctionEvent* > >::iterator siter = functionsList.begin();
-    std::map < const Scene* , std::map < std::string, FunctionEvent* > >::const_iterator send = functionsList.end();
-    for (;siter!=send;++siter)
-    {
-        std::map < std::string, FunctionEvent* >::iterator fiter = siter->second.begin();
-        std::map < std::string, FunctionEvent* >::const_iterator fend = siter->second.end();
-        for (;fiter!=fend;++fiter)
-        {
-            if ( fiter->second == this ) fiter->second = NULL;
-        }
-    }
-}
-
-#if defined(GD_IDE_ONLY)
-void FunctionEvent::OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
-                         bool & conditionsSelected, bool & instructionsSelected)
-{
-    const int forEachTextHeight = 20;
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
-
-    //Test selection for the name
-    if ( y >= 0 && y <= forEachTextHeight )
-    {
-        nameSelected = true;
-        return;
-    }
-
-    //Test selection of actions/conditions
-    nameSelected = false;
-    y -= forEachTextHeight; //Substract the height of the "For Each object ..." text so as to simplify the tests
-    if ( x <= renderingHelper->GetConditionsColumnWidth())
-    {
-        conditionsSelected = true;
-
-        vector < Instruction > * conditionsListSelected = NULL;
-        unsigned int conditionIdInList = 0;
-
-        bool found = renderingHelper->GetConditionAt(conditions, x-0, y-0, conditionsListSelected, conditionIdInList);
-
-        if ( found )
-        {
-            //Update event and conditions selection information
-            if ( conditionIdInList < conditionsListSelected->size() ) (*conditionsListSelected)[conditionIdInList].selected = true;
-
-            //Update editor selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = conditionsListSelected;
-            boost::tuples::get<3>(eventsSelected.back()) = conditionIdInList;
-
-            return;
-        }
-        else if ( y <= 18 )
-        {
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &conditions;
-            boost::tuples::get<3>(eventsSelected.back()) = 0;
-
-            return;
-        }
-    }
-    else
-    {
-        conditionsSelected = false;
-
-        vector < Instruction > * actionsListSelected = NULL;
-        unsigned int actionIdInList = 0;
-
-        bool found = renderingHelper->GetActionAt(actions, x-0, y-0, actionsListSelected, actionIdInList);
-
-        if ( found )
-        {
-            //Update event and action selection information
-            if ( actionIdInList < actionsListSelected->size() ) (*actionsListSelected)[actionIdInList].selected = true;
-
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = actionsListSelected;
-            boost::tuples::get<3>(eventsSelected.back()) = actionIdInList;
-        }
-        else
-        {
-            //Update selection information
-            instructionsSelected = true;
-            boost::tuples::get<2>(eventsSelected.back()) = &actions;
-            boost::tuples::get<3>(eventsSelected.back()) = 0;
-        }
-    }
 }
 
 /**
  * Render the event in the bitmap
  */
-void FunctionEvent::Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const
+void FunctionEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
     EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+    int border = renderingHelper->instructionsListBorder;
     const int functionTextHeight = 20;
 
-    //Draw event rectangle
-    dc.SetPen(*wxTRANSPARENT_PEN);
-    dc.SetBrush(wxBrush(wxColour(255, 255, 255), wxBRUSHSTYLE_SOLID));
-    {
-        wxRect rect(x, y, width, GetRenderedHeight(width));
-        wxColor color1 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient1);
-        wxColor color2 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient2;
-        wxColor color3 = IsDisabled() ? renderingHelper->disabledColor : renderingHelper->eventGradient3;
-        wxColor color4 = selected ? renderingHelper->selectionColor : (IsDisabled() ? renderingHelper->disabledColor2 :renderingHelper->eventGradient4);
-
-        renderingHelper->DrawNiceRectangle(dc, rect, color1, color2, color3, color4, renderingHelper->eventBorderColor);
-    }
-
-    //Name Selection
-    if ( selected && nameSelected )
-    {
-        dc.SetBrush(renderingHelper->GetSelectedRectangleFillBrush());
-        dc.SetPen(renderingHelper->GetSelectedRectangleOutlinePen());
-        dc.DrawRectangle(x+1, y+1, width-2, functionTextHeight-2);
-    }
+    //Draw header rectangle
+    wxRect headerRect(x, y, width, functionTextHeight);
+    renderingHelper->DrawNiceRectangle(dc, headerRect);
 
     //Name
-    dc.SetFont( renderingHelper->GetBoldFont() );
-    dc.DrawText( _("Fonction") + " " + name, x + 2, y + 1 );
+    dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
+    dc.SetTextForeground(wxColour(0,0,0));
+    dc.DrawText( _("Fonction") + " " + name, x + 4, y + 3 );
+
+    //Draw conditions rectangle
+    wxRect rect(x, y+functionTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-functionTextHeight);
+    renderingHelper->DrawNiceRectangle(dc, rect);
 
     //Draw actions and conditions
-    renderingHelper->DrawConditionsList(conditions, dc, x, y+functionTextHeight, renderingHelper->GetConditionsColumnWidth(), IsDisabled());
-    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+functionTextHeight, width-renderingHelper->GetConditionsColumnWidth(), IsDisabled());
+    renderingHelper->DrawConditionsList(conditions, dc,
+                                        x+border,
+                                        y+functionTextHeight+border,
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection);
+    renderingHelper->DrawActionsList(actions, dc,
+                                     x+renderingHelper->GetConditionsColumnWidth()+border,
+                                     y+functionTextHeight+border,
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
 }
 
 unsigned int FunctionEvent::GetRenderedHeight(unsigned int width) const
@@ -327,13 +246,14 @@ unsigned int FunctionEvent::GetRenderedHeight(unsigned int width) const
     if ( eventHeightNeedUpdate )
     {
         EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+        int border = renderingHelper->instructionsListBorder;
         const int functionTextHeight = 20;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth());
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
 
-        renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + functionTextHeight);
+        renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + functionTextHeight)+border*2;
         eventHeightNeedUpdate = false;
     }
 
@@ -342,10 +262,9 @@ unsigned int FunctionEvent::GetRenderedHeight(unsigned int width) const
 
 void FunctionEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
-    string newName = string(wxGetTextFromUser(_("Entrez le nom de la fonction"), _("Nom de la fonction"), name).mb_str());
-    if ( newName != "" ) name = newName;
+    FunctionEventEditorDlg dialog(parent_, *this, game_, scene_);
+    dialog.ShowModal();
 }
-#endif
 
 /**
  * Initialize from another FunctionEvent.
@@ -354,7 +273,7 @@ void FunctionEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, M
 void FunctionEvent::Init(const FunctionEvent & event)
 {
     events = CloneVectorOfEvents(event.events);
-
+    useCallerContext = event.useCallerContext;
     name = event.name;
     conditions = event.conditions;
     actions = event.actions;
@@ -382,3 +301,5 @@ FunctionEvent& FunctionEvent::operator=(const FunctionEvent & event)
 
     return *this;
 }
+
+#endif

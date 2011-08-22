@@ -24,6 +24,8 @@ freely, subject to the following restrictions:
 
 */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef FUNCTIONEVENT_H
 #define FUNCTIONEVENT_H
 #include "GDL/Event.h"
@@ -32,12 +34,11 @@ class ObjectsConcerned;
 class Instruction;
 class Evaluateur;
 class TiXmlElement;
-
-#if defined(GD_IDE_ONLY)
+class EventsEditorItemsAreas;
+class EventsEditorSelection;
 class Scene;
 class MainEditorCommand;
 class wxWindow;
-#endif
 
 /**
  * Function event is an event which is executed by an action ( This action can pass to the function parameters and objects concerned )
@@ -54,15 +55,7 @@ class GD_EXTENSION_API FunctionEvent : public BaseEvent
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new FunctionEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual void Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned ) {}; //Execute does not do anything, as function are launched by actions
-
-        virtual void Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
-        virtual void Launch( RuntimeScene & scene, ObjectsConcerned & objectsConcerned, std::vector < string > parameters_ );
-
-        static std::map < const Scene* , std::map < std::string, FunctionEvent* > > functionsList; ///< Static map containing all functions, associated with their game, scene and name
-        static std::map < const Scene* , std::vector < std::string >* > currentFunctionParameter; ///< Static map containing the parameters of the current function
-        void UnreferenceFunction();
-        void ReferenceFunction(Scene *);
+        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & callerContext);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};
@@ -80,19 +73,19 @@ class GD_EXTENSION_API FunctionEvent : public BaseEvent
         string GetName() const { return name; };
         void SetName(string name_) { name = name_; };
 
+        bool UseCallerContext() const { return useCallerContext; };
+        void SetUseCallerContext(bool useCallerContext_) { useCallerContext = useCallerContext_; };
+
         virtual vector < vector<Instruction>* > GetAllConditionsVectors();
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
 
-        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
-        #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */
-        virtual void Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const;
+        virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
 
         /**
          * Must return the height of the event when rendered
@@ -100,30 +93,24 @@ class GD_EXTENSION_API FunctionEvent : public BaseEvent
         virtual unsigned int GetRenderedHeight(unsigned int width) const;
 
         /**
-         * Called when user click on the event
-         */
-        virtual void OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
-                                 bool & conditionsSelected, bool & instructionsSelected);
-
-        /**
          * Called when the user want to edit the event
          */
         virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
-#endif
+
+        static const std::string globalDeclaration;
 
     private:
         void Init(const FunctionEvent & event);
-        bool ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
-        void ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
 
         string name;
         vector < Instruction > conditions;
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
+        bool useCallerContext;
 
-#if defined(GD_IDE_ONLY)
         bool nameSelected;
-#endif
 };
 
 #endif // FUNCTIONEVENT_H
+
+#endif

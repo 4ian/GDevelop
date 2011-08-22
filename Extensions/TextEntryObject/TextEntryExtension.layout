@@ -2,22 +2,13 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release - Edittime" />
 	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="5260" topLine="114" />
-	</File>
-	<File name="TextEntryActions.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1777" topLine="25" />
-	</File>
-	<File name="TextEntryConditions.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1934" topLine="21" />
-	</File>
-	<File name="TextEntryExpressions.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1345" topLine="1" />
+		<Cursor1 position="1788" topLine="21" />
 	</File>
 	<File name="TextEntryObject.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="4139" topLine="143" />
 	</File>
 	<File name="TextEntryObject.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3390" topLine="84" />
+		<Cursor1 position="3390" topLine="77" />
 	</File>
 	<File name="TextEntryObjectEditor.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="2403" topLine="56" />

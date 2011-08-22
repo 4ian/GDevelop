@@ -47,6 +47,8 @@ class Extension : public ExtensionBase
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
+            #if defined(GD_IDE_ONLY)
+
             //Declaration of all objects available
             DECLARE_OBJECT("TextEntry",
                            _("Entrée de texte"),
@@ -127,6 +129,8 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_STR_EXPRESSION()
 
             DECLARE_END_OBJECT()
+
+            #endif
 
             CompleteCompilationInformation();
         };

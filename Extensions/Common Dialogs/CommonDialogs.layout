@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
+	<File name="CommonDialogs.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="971" topLine="14" />
+	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="5317" topLine="71" />
+		<Cursor1 position="1796" topLine="27" />
 	</File>
 	<File name="dlib-17.12\dlib\all\source.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="614" topLine="0" />

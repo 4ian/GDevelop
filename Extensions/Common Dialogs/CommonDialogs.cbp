@@ -328,8 +328,8 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="nwidgets" />
 					<Add directory="dlib-17.12" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
-					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					
+					
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -348,7 +348,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+					<Add directory="../../ExtLibs/SFML/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
@@ -374,8 +374,8 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="nwidgets" />
 					<Add directory="dlib-17.12" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
-					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					
+					
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -395,7 +395,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+					<Add directory="../../ExtLibs/SFML/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
@@ -420,8 +420,8 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add directory="nwidgets" />
 					<Add directory="dlib-17.12" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
-					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					
+					
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
@@ -440,7 +440,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+					<Add directory="../../ExtLibs/SFML/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
@@ -462,8 +462,8 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add directory="nwidgets" />
 					<Add directory="dlib-17.12" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
-					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					
+					
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -482,7 +482,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+					<Add directory="../../ExtLibs/SFML/lib" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">

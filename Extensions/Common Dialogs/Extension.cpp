@@ -45,6 +45,7 @@ class Extension : public ExtensionBase
                                   _("Extension permettant d'afficher des boites de dialogues souvent utilisées ( Message, ouverture de fichier... )"),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
+            #if defined(GD_IDE_ONLY)
 
             DECLARE_ACTION("ShowMsgBox",
                            _("Afficher une boite de message"),
@@ -112,6 +113,8 @@ class Extension : public ExtensionBase
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonDialogs::ShowYesNoMsgBox").SetIncludeFile("Common Dialogs/CommonDialogs.h");
 
             DECLARE_END_ACTION()
+
+            #endif
 
             CompleteCompilationInformation();
         };

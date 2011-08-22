@@ -32,7 +32,6 @@ freely, subject to the following restrictions:
 #include <sstream>
 
 #include "GDL/RuntimeScene.h"
-#include "GDL/ObjectsConcerned.h"
 #include <string>
 #include <vector>
 #include <algorithm>
